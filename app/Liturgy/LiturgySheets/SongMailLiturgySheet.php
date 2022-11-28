@@ -50,12 +50,29 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
                 'dddd, DD.MM.YYYY'
             ) . ', ' . $service->timeText() . ', ' . $service->locationText();
 
-        $body = 'Hier der geplante Ablauf für den Gottesdienst' . ' am ' . $service->date->isoFormat('dddd, DD. MMMM YYYY')
+        $body = 'Hier der geplante Ablauf für den Gottesdienst' . ' am ' . $service->date->isoFormat(
+                'dddd, DD. MMMM YYYY'
+            )
             . ', ' . $service->timeText() .
-            ($service->location->at_text ? ' '.$service->location->at_text : ', '.$service->locationText())
+            ($service->location->at_text ? ' ' . $service->location->at_text : ', ' . $service->locationText())
             . ':' . PHP_EOL . PHP_EOL;
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
+
+                if (isset($item->data['responsible'])) {
+                    $concernsOrganists = in_array('ministry:organists', $item->data['responsible']);
+                    if (!$concernsOrganists) {
+                        foreach ($service->organists as $organist) {
+                            $concernsOrganists = $concernsOrganists || in_array(
+                                    'user:' . $organist->id,
+                                    $item->data['responsible']
+                                );
+                        }
+                    }
+                } else {
+                    $concernsOrganists = false;
+                }
+
                 if (($item->data_type == 'song') && (isset($item->data['song']))) {
                     $helper = new SongItemHelper($item);
                     $verseCount = $helper->getActiveVerseCount(true, true);
@@ -64,10 +81,10 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
                         . ($item->data[$item->data_type]['code'] ?? $item->data[$item->data_type]['songbook']['name'] ?? '')
                         . ' '
                         . $item->data[$item->data_type]['reference'] . ' '
-                        . ($item->data[$item->data_type]['altEG'] ? '(EG ' . $item->data[$item->data_type]['altEG'] . ') ' : '')
+                        . (isset($item->data[$item->data_type]['altEG']) ? '(EG ' . $item->data[$item->data_type]['altEG'] . ') ' : '')
                         . $item->data[$item->data_type]['song']['title']
                         . $helper->forceVerseString(', ')
-                        . ($verseCount ? ' ('.$verseCount.')' : '')
+                        . ($verseCount ? ' (' . $verseCount . ')' : '')
                         . PHP_EOL;
                 } elseif ($item->data_type == 'psalm') {
                     if (isset($item->data['psalm'])) {
@@ -79,30 +96,17 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
                             . (isset($item->data['verses']) && ($item->data['verses'] != '') ? ', ' . $item->data['verses'] : '')
                             . PHP_EOL;
                     }
+                } elseif ($item->data_type == 'reading') {
+                    $body .= ($concernsOrganists ? '  -> ' : '       ') . $item->title . ': ' . ($item->data['reference'] ?? '--') . PHP_EOL;
                 } else {
-                    if (isset($item->data['responsible'])) {
-                        $concernsOrganists = in_array('ministry:organists', $item->data['responsible']);
-                        if (!$concernsOrganists) {
-                            foreach ($service->organists as $organist) {
-                                $concernsOrganists = $concernsOrganists || in_array('user:'.$organist->id, $item->data['responsible']);
-                            }
-                        }
-                    } else {
-                        $concernsOrganists = false;
-                    }
-
-                    if ($concernsOrganists) {
-                        $body .= '  -> ' .$item->title.PHP_EOL;
-                    } else {
-                        $body .= '        '.$item->title.PHP_EOL;
-                    }
+                    $body .= ($concernsOrganists ? '  -> ' : '       ') . $item->title  . PHP_EOL;
                 }
             }
         }
 
         $body .= PHP_EOL
             . 'Der komplette Ablauf kann hier in einem druckbaren Format heruntergeladen werden:' . PHP_EOL
-            . route('liturgy.download', ['service' => $service->slug, 'key' => 'A4']) . PHP_EOL.PHP_EOL
+            . route('liturgy.download', ['service' => $service->slug, 'key' => 'A4']) . PHP_EOL . PHP_EOL
             . 'Außerdem gibt es den Ablauf in einem druckbaren, für Organist*innen optimierten Format hier:' . PHP_EOL
             . route('liturgy.download', ['service' => $service->slug, 'key' => 'Organist']) . PHP_EOL
             . PHP_EOL . 'Freundliche Grüße, ' . PHP_EOL . Auth::user()->name;
