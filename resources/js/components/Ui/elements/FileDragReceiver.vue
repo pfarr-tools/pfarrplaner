@@ -96,7 +96,7 @@ export default {
     .file-drag-receiver {
         padding: 3px;
         padding-bottom: 1em;
-        min-height: 2em;
+        min-height: 7em;
     }
 
     .file-drag-receiver.dragging {
