@@ -43,10 +43,18 @@
             <form-input name="name" label="Name" v-model="newPerson.name" ref="newPersonName" id="newPersonName"
                         :autofocus="true"/>
             <hr/>
-            <form-input name="title" label="Titel" v-model="newPerson.title"
-                        placeholder="z.B. Pfr."/>
-            <form-input name="first_name" label="Vorname" v-model="newPerson.first_name"/>
-            <form-input name="last_name" label="Nachname" v-model="newPerson.last_name"/>
+            <div class="row">
+                <div class="col-md-2">
+                    <form-input name="title" label="Titel" v-model="newPerson.title"
+                                placeholder="z.B. Pfr."/>
+                </div>
+                <div class="col-md-5">
+                    <form-input name="first_name" label="Vorname" v-model="newPerson.first_name"/>
+                </div>
+                <div class="col-md-5">
+                    <form-input name="last_name" label="Nachname" v-model="newPerson.last_name"/>
+                </div>
+            </div>
             <form-input name="email" label="E-Mailadresse" v-model="newPerson.email" type="email" help="(falls bekannt)"/>
         </modal>
     </div>
