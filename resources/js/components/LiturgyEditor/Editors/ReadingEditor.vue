@@ -40,6 +40,7 @@
 <script>
 import TimeFields from "./Elements/TimeFields";
 import FormBibleReferenceInput from "../../Ui/forms/FormBibleReferenceInput";
+import {romanize} from "../../../libraries/Romanize";
 
 export default {
     name: "ReadingEditor",
@@ -60,7 +61,7 @@ export default {
         if (undefined !== this.service.liturgicalInfo.title) {
             textSources['Perikope für ' + this.service.liturgicalInfo.title] = this.service.liturgicalInfo.currentPerikope;
             for (let i = 1; i <= 6; i++) {
-                textSources[this.service.liturgicalInfo.title + ' ' + this.romanize(i)] = this.service.liturgicalInfo['litTextsPerikope' + i];
+                textSources[this.service.liturgicalInfo.title + ' ' + romanize(i)] = this.service.liturgicalInfo['litTextsPerikope' + i];
             }
             textSources[this.service.liturgicalInfo.title + ' Psalm'] = this.service.liturgicalInfo['litTextsWeeklyPsalm'];
             textSources[this.service.liturgicalInfo.title + ' Wochenspruch'] = this.service.liturgicalInfo['litTextsWeeklyQuote'];
@@ -89,24 +90,6 @@ export default {
                 block: this.element.liturgy_block_id,
                 item: this.element.id,
             }), this.element, {preserveState: false});
-        },
-        /**
-         * @source http://blog.stevenlevithan.com/archives/javascript-roman-numeral-converter
-         * @param num
-         * @returns {string|number}
-         */
-        romanize(num) {
-            if (isNaN(num))
-                return NaN;
-            var digits = String(+num).split(""),
-                key = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM",
-                    "", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC",
-                    "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"],
-                roman = "",
-                i = 3;
-            while (i--)
-                roman = (key[+digits.pop() + (i * 10)] || "") + roman;
-            return Array(+digits.join("") + 1).join("M") + roman;
         },
     }
 }

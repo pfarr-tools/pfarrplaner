@@ -205,6 +205,7 @@ import Card from "../components/Ui/cards/card";
 import CardBody from "../components/Ui/cards/cardBody";
 import FormBibleReferenceInput from "../components/Ui/forms/FormBibleReferenceInput";
 import NavButton from "../components/Ui/buttons/NavButton";
+import {romanize} from "../libraries/Romanize";
 
 export default {
     name: "sermonEditor",
@@ -267,7 +268,7 @@ export default {
             if (undefined !== thisService.liturgicalInfo.title) {
                 textSources['Perikope für '+thisService.liturgicalInfo.title] = thisService.liturgicalInfo.currentPerikope;
                 for (let i=1; i<=6; i++) {
-                    textSources[thisService.liturgicalInfo.title+' '+this.romanize(i)] = thisService.liturgicalInfo['litTextsPerikope'+i];
+                    textSources[thisService.liturgicalInfo.title+' '+romanize(i)] = thisService.liturgicalInfo['litTextsPerikope'+i];
                 }
                 textSources[thisService.liturgicalInfo.title+' Psalm'] = thisService.liturgicalInfo['litTextsWeeklyPsalm'];
                 textSources[thisService.liturgicalInfo.title+' Wochenspruch'] = thisService.liturgicalInfo['litTextsWeeklyQuote'];
@@ -390,24 +391,6 @@ export default {
         setSermonReference(ref) {
             this.editedSermon.reference = ref;
             this.referenceCopied++;
-        },
-        /**
-         * @source http://blog.stevenlevithan.com/archives/javascript-roman-numeral-converter
-         * @param num
-         * @returns {string|number}
-         */
-        romanize(num) {
-            if (isNaN(num))
-                return NaN;
-            var digits = String(+num).split(""),
-                key = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM",
-                    "", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC",
-                    "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"],
-                roman = "",
-                i = 3;
-            while (i--)
-                roman = (key[+digits.pop() + (i * 10)] || "") + roman;
-            return Array(+digits.join("") + 1).join("M") + roman;
         },
         insertFuneralStory(funeral) {
             if (this.editedSermon.text.trim() != '') this.editedSermon.text += "\n\n";
