@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2022.161.0](https://github.com/pfarrplaner/pfarrplaner/compare/v2022.159.0...v2022.161.0) (2022-11-28)
+
+
+### Features
+
+* Allow inserting Bible text into FreetextItems ([c690252](https://github.com/pfarrplaner/pfarrplaner/commits/c6902520fa2a74daa0ea53aa5d2f857b2e5f09f9)), closes [#338](https://github.com/pfarrplaner/pfarrplaner/issues/338)
+* Always use full book names for pericopes ([4faffd6](https://github.com/pfarrplaner/pfarrplaner/commits/4faffd6a24c84f6b32ee266f829fdcab8e4d259c)), closes [#335](https://github.com/pfarrplaner/pfarrplaner/issues/335)
+* Larger drop area for file drag-and-drop upload ([c348afe](https://github.com/pfarrplaner/pfarrplaner/commits/c348afe8353019d99d9a6f2c88b3eb487a6120f5))
+* List scripture reading in SongMail ([59abf20](https://github.com/pfarrplaner/pfarrplaner/commits/59abf2097fbbb45527c14f6eb9e8d555d333ec9c)), closes [#339](https://github.com/pfarrplaner/pfarrplaner/issues/339)
+* Provide export for sermon only ([b41ee00](https://github.com/pfarrplaner/pfarrplaner/commits/b41ee00b2fdc0974eeae695fcbc9c6786411f3ca)), closes [#301](https://github.com/pfarrplaner/pfarrplaner/issues/301)
+
+
+### Bug Fixes
+
+* New person modal is not scrollable (and therefore not saveable) in Edge ([4e453bf](https://github.com/pfarrplaner/pfarrplaner/commits/4e453bf7f7a5927a54845d477cfd9c2fbe347abb)), closes [#336](https://github.com/pfarrplaner/pfarrplaner/issues/336)
+
+## [2022.160.0](https://github.com/pfarrplaner/pfarrplaner/compare/v2022.159.0...v2022.160.0) (2022-11-28)
+
+
+### Features
+
+* Allow inserting Bible text into FreetextItems ([c690252](https://github.com/pfarrplaner/pfarrplaner/commits/c6902520fa2a74daa0ea53aa5d2f857b2e5f09f9)), closes [#338](https://github.com/pfarrplaner/pfarrplaner/issues/338)
+* Always use full book names for pericopes ([4faffd6](https://github.com/pfarrplaner/pfarrplaner/commits/4faffd6a24c84f6b32ee266f829fdcab8e4d259c)), closes [#335](https://github.com/pfarrplaner/pfarrplaner/issues/335)
+* Larger drop area for file drag-and-drop upload ([c348afe](https://github.com/pfarrplaner/pfarrplaner/commits/c348afe8353019d99d9a6f2c88b3eb487a6120f5))
+* List scripture reading in SongMail ([59abf20](https://github.com/pfarrplaner/pfarrplaner/commits/59abf2097fbbb45527c14f6eb9e8d555d333ec9c)), closes [#339](https://github.com/pfarrplaner/pfarrplaner/issues/339)
+* Provide export for sermon only ([b41ee00](https://github.com/pfarrplaner/pfarrplaner/commits/b41ee00b2fdc0974eeae695fcbc9c6786411f3ca)), closes [#301](https://github.com/pfarrplaner/pfarrplaner/issues/301)
+
+
+### Bug Fixes
+
+* New person modal is not scrollable (and therefore not saveable) in Edge ([4e453bf](https://github.com/pfarrplaner/pfarrplaner/commits/4e453bf7f7a5927a54845d477cfd9c2fbe347abb)), closes [#336](https://github.com/pfarrplaner/pfarrplaner/issues/336)
+
 ## [2022.159.0](https://github.com/pfarrplaner/pfarrplaner/compare/v2022.158.2...v2022.159.0) (2022-11-25)
 
 
