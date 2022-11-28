@@ -42,8 +42,14 @@
                     <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                             @click="toggleTextDropdown"
-                            title="Textbaustein einfügen">
-                        <span class="mdi mdi-text"></span> Textbaustein einfügen
+                            title="Liturgischen Text einfügen">
+                        <span class="mdi mdi-text"></span> Liturgischen Text einfügen
+                    </button>
+                    <button class="btn btn-light dropdown-toggle" type="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                            @click="toggleBibleImportDropdown"
+                            title="Bibeltext importieren">
+                        <span class="mdi mdi-book-open-variant"></span> Bibeltext einfügen
                     </button>
                     <button class="btn btn-light dropdown-toggle" type="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
@@ -74,6 +80,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="dropdown-menu bg-light" :style="{display: showBibleImportDropdown ? 'block' : 'none'}"
+                     aria-labelledby="dropdownMenuButton">
+                    <div class="dropdown-form p-1">
+                        <form-bible-reference-input v-model="insertBibleReference" full-text
+                                                    :sources="textSources" :clipboard="false"/>
+                        <button v-if="insertBibleReference" class="btn btn-secondary" @click.prevent.stop="insertBibleText">Einfügen</button>
+                    </div>
+                </div>
                 <div class="dropdown-menu bg-light" :style="{display: showWordImportDropdown ? 'block' : 'none'}"
                      aria-labelledby="dropdownMenuButton">
                     <div class="dropdown-form p-1">
@@ -95,12 +109,13 @@ import TextStats from "../Elements/TextStats";
 import FormInput from "../../Ui/forms/FormInput";
 import FormSelectize from "../../Ui/forms/FormSelectize";
 import NavButton from "../../Ui/buttons/NavButton";
-import FormFileUploader from "../../Ui/forms/FormFileUploader";
 import FormFileUpload from "../../Ui/forms/FormFileUpload";
+import {romanize} from "../../../libraries/Romanize";
+import FormBibleReferenceInput from "../../Ui/forms/FormBibleReferenceInput";
 
 export default {
     name: "FreetextEditor",
-    components: {FormFileUpload, NavButton, FormSelectize, FormInput, TextStats, Nl2br},
+    components: {FormBibleReferenceInput, FormFileUpload, NavButton, FormSelectize, FormInput, TextStats, Nl2br},
     inject: ['lists'],
     props: {
         element: Object,
@@ -117,12 +132,38 @@ export default {
     data() {
         var e = this.element;
         if (undefined == e.data.description) e.data.description = '';
+
+        let textSources = {};
+        if (undefined !== this.service.liturgicalInfo.title) {
+            textSources['Perikope für ' + this.service.liturgicalInfo.title] = this.service.liturgicalInfo.currentPerikope;
+            for (let i = 1; i <= 6; i++) {
+                textSources[this.service.liturgicalInfo.title + ' ' + romanize(i)] = this.service.liturgicalInfo['litTextsPerikope' + i];
+            }
+            textSources[this.service.liturgicalInfo.title + ' Psalm'] = this.service.liturgicalInfo['litTextsWeeklyPsalm'];
+            textSources[this.service.liturgicalInfo.title + ' Wochenspruch'] = this.service.liturgicalInfo['litTextsWeeklyQuote'];
+        }
+        this.service.baptisms.forEach(baptism => {
+            if (baptism.text) textSources['Taufspruch ' + baptism.candidate_name] = baptism.text;
+        });
+        this.service.funerals.forEach(funeral => {
+            if (funeral.text) textSources['Beerdigungstext ' + funeral.buried_name] = funeral.text;
+            if (funeral.confirmation_text) textSources['Denkspruch ' + funeral.buried_name] = funeral.confirmation_text;
+            if (funeral.wedding_text) textSources['Trauspruch ' + funeral.buried_name] = funeral.wedding_text;
+        });
+        this.service.weddings.forEach(wedding => {
+            if (wedding.text) textSources['Trauspruch ' + wedding.spouse1_name + ' & ' + wedding.spouse2_name] = wedding.text;
+        });
+
+
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
             editedElement: e,
             selectedText: '',
             showTextDropdown: false,
+            showBibleImportDropdown: false,
             showWordImportDropdown: false,
+            textSources,
+            insertBibleReference: '',
         };
     },
     methods: {
@@ -146,6 +187,10 @@ export default {
             this.showTextDropdown = !this.showTextDropdown;
             if (!this.showTextDropdown) this.$refs['textEditor'].focus();
         },
+        toggleBibleImportDropdown() {
+            this.showBibleImportDropdown = !this.showBibleImportDropdown;
+            if (!this.showBibleImportDropdown) this.$refs['textEditor'].focus();
+        },
         toggleWordImportDropdown() {
             this.showWordImportDropdown = !this.showWordImportDropdown;
             if (!this.showWordImportDropdown) this.$refs['textEditor'].focus();
@@ -167,6 +212,12 @@ export default {
                 this.$refs['textEditor'].focus();
             });
         },
+        insertBibleText() {
+            this.insertText(this.insertBibleReference);
+            this.showBibleImportDropdown = false;
+            this.insertBibleReference = '';
+            this.$refs['textEditor'].focus();
+        }
     },
 }
 </script>

@@ -44,7 +44,7 @@
         <small class="form-text text-muted mt-0 p-0" :title="myBibleText">
             <span v-if="myBibleTextLoading" class="mdi mdi-spin mdi-loading" title="Bibeltext wird geladen..."></span>
             <span v-else>{{ myBibleText }}</span>
-            <span v-if="(!myBibleTextLoading) && (myBibleText)" class="mdi mdi-content-copy" @click.prevent.stop="copyToClipboard"
+            <span v-if="(!myBibleTextLoading) && (myBibleText) && (clipboard)" class="mdi mdi-content-copy" @click.prevent.stop="copyToClipboard"
                                                        title="Klicken, um den Text in die Zwischenablage zu kopieren"></span>
         </small>
     </div>
@@ -91,6 +91,14 @@ export default {
         sources: {
             type: Object,
             default() { return {}; },
+        },
+        clipboard: {
+            type: Boolean,
+            default: true,
+        },
+        fullText: {
+            type: Boolean,
+            default: false,
         },
     },
     mounted() {
@@ -151,7 +159,7 @@ export default {
                     component.myBibleTextLoading = false;
                     if (component.myValue != result.data.reference.correctedReference) {
                         component.myValue = result.data.reference.correctedReference;
-                        component.$emit('input', result.data.reference.correctedReference);
+                        component.returnInput();
                     }
                 });
         }, 1000),
@@ -168,7 +176,10 @@ export default {
         handleInput(e) {
             this.myValue = e.target.value;
             this.bibleText(this);
-            this.$emit('input', this.myValue);
+            this.returnInput();
+        },
+        returnInput() {
+            this.$emit('input', this.fullText ? this.myBibleText+" \n("+this.myReference.correctedReference+')' : this.myValue);
         }
     },
 }
