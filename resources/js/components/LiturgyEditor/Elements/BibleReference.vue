@@ -46,7 +46,7 @@ export default {
     methods: {
         copyToClipboard() {
             const cb = navigator.clipboard;
-            cb.writeText(this.text+"\n("+this.liturgy[this.liturgyKey]+')').then(result => {});
+            cb.writeText(this.text+"\n("+this.reference.correctedReference+')').then(result => {});
         }
     },
     created() {
@@ -54,6 +54,7 @@ export default {
             axios.get(route('bible.text', {reference: this.liturgy[this.liturgyKey]}))
                 .then(result => {
                     this.text = result.data.text;
+                    this.reference = result.data.reference;
                     this.loading = false;
                 });
         }
@@ -61,6 +62,7 @@ export default {
     data() {
         return {
             text: '',
+            reference: {},
             loading: true,
         }
     }

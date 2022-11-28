@@ -140,7 +140,8 @@ class ReferenceParser
             }
 
             // 2.) book name
-            $bible['book'] = $this->matchBook(trim(preg_replace('/\d+\s*$/', "", $parts[0])));
+            $bookCode = trim(preg_replace('/\d+\s*$/', "", $parts[0]));
+            $bible['book'] = $this->matchBook($bookCode);
         }
 
         // 3.) verses
@@ -163,14 +164,14 @@ class ReferenceParser
                     'book' => $bible['book'],
                     'bookTitle' => $this->getBookTitle($bible['book']),
                     'chapter' => $bible['chapter'],
-                    'verse' => $start,
+                    'verse' => filter_var($start, FILTER_SANITIZE_NUMBER_INT),
                     'verseRaw' => $start,
                 ],
                 1 => [
                     'book' => $bible['book'],
                     'bookTitle' => $this->getBookTitle($bible['book']),
                     'chapter' => $bible['chapter'],
-                    'verse' => $end,
+                    'verse' => filter_var($end, FILTER_SANITIZE_NUMBER_INT),
                     'verseRaw' => $end,
                 ],
             ];
@@ -179,7 +180,8 @@ class ReferenceParser
 
         return ([
                 'originalReference' => $originalReference,
-                'parsed' => $references
+                'correctedReference' => str_replace($bookCode, $this->getBookTitle($bible['book']), $originalReference),
+                'parsed' => $references,
             ]);
     }
 

@@ -112,6 +112,7 @@ export default {
             myValue: this.value,
             myBibleText: '',
             myBibleTextLoading: false,
+            myReference: {},
             component: this,
             myOptions,
             mySettings: {
@@ -146,12 +147,17 @@ export default {
             axios.get(route('bible.text', {reference: component.myValue}))
                 .then(result => {
                     component.myBibleText = result.data.text;
+                    component.myReference = result.data.reference;
                     component.myBibleTextLoading = false;
+                    if (component.myValue != result.data.reference.correctedReference) {
+                        component.myValue = result.data.reference.correctedReference;
+                        component.$emit('input', result.data.reference.correctedReference);
+                    }
                 });
         }, 1000),
         copyToClipboard() {
             const cb = navigator.clipboard;
-            cb.writeText(this.myBibleText+"\n("+this.myValue+')').then(result => {});
+            cb.writeText(this.myBibleText+"\n("+this.myReference.correctedReference+')').then(result => {});
         },
         setTextFromList(e) {
             this.myValue = e;
