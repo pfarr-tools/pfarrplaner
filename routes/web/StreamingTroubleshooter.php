@@ -6,7 +6,7 @@
  * @author Christoph Fischer <chris@toph.de>
  * @copyright (c) 2020 Christoph Fischer, https://christoph-fischer.org
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
- * @link https://github.com/pfarrplaner/pfarrplaner
+ * @link https://codeberg.org/pfarrplaner/pfarrplaner
  * @version git: $Id$
  *
  * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
@@ -41,7 +41,7 @@
 
 
 
-use App\Http\Controllers\StreamingTroubleshooterController; 
+use App\Http\Controllers\StreamingTroubleshooterController;
 
 Route::get('/streaming/{city}', [StreamingTroubleshooterController::class, 'index'])->name('streaming.troubleshooter');
 Route::post('/streaming/activateService/{service}', [StreamingTroubleshooterController::class, 'activateService'])->name('streaming.troubleshooter.activateService');

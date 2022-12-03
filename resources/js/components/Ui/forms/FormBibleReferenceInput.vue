@@ -5,7 +5,7 @@
   - @author Christoph Fischer <chris@toph.de>
   - @copyright (c) 2021 Christoph Fischer, https://christoph-fischer.org
   - @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
-  - @link https://github.com/pfarrplaner/pfarrplaner
+  - @link https://codeberg.org/pfarrplaner/pfarrplaner
   - @version git: $Id: 0b0fd8f37c4667ae007bba5c24b1b3519bda2bc9
   -
   - Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de

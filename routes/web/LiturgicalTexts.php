@@ -6,7 +6,7 @@
  * @author Christoph Fischer <chris@toph.de>
  * @copyright (c) 2020 Christoph Fischer, https://christoph-fischer.org
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
- * @link https://github.com/pfarrplaner/pfarrplaner
+ * @link https://codeberg.org/pfarrplaner/pfarrplaner
  * @version git: $Id$
  *
  * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
@@ -41,7 +41,7 @@
 
 
 
-use App\Http\Controllers\LiturgicalTextsController; 
+use App\Http\Controllers\LiturgicalTextsController;
 
 Route::get('/liturgy/texts', [LiturgicalTextsController::class, 'index'])->name('liturgy.text.index');
 Route::get('/liturgy/texts/list', [LiturgicalTextsController::class, 'list'])->name('liturgy.text.list');
