@@ -3,7 +3,7 @@
  *
  * @package Pfarrplaner
  * @author Christoph Fischer <chris@toph.de>
- * @copyright (c) 2020 Christoph Fischer, https://christoph-fischer.org
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.de
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
  * @link https://codeberg.org/pfarrplaner/pfarrplaner
  * @version git: $Id$
