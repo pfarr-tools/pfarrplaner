@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2022.162.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.161.0...v2022.162.0) (2022-12-15)
+
+
+### Features
+
+* Einfügen von Texten zur Beerdigung bei Freitextelementen in der Liturgie ([8118649](https://codeberg.org/pfarrplaner/pfarrplaner/commits/8118649b314709fd42d6563930b10b8243cc4406))
+
+
+### Bug Fixes
+
+* Downloadmenü für Liturgie fehlt ([692818c](https://codeberg.org/pfarrplaner/pfarrplaner/commits/692818c77cf050e8ab80954f4e27256e97531016)), closes [#343](https://codeberg.org/pfarrplaner/pfarrplaner/issues/343)
+
 ## [2022.161.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.159.0...v2022.161.0) (2022-11-28)
 
 
