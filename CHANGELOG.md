@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2022.162.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.162.0...v2022.162.1) (2022-12-15)
+
+
+### Bug Fixes
+
+* Menü für Beerdigungs-bezogene Texte funktioniert nicht, wenn Elemente leer sind ([8c39ea2](https://codeberg.org/pfarrplaner/pfarrplaner/commits/8c39ea2c14d71febe7c293a0c9a4180054b6a9cf))
+
 ## [2022.162.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.161.0...v2022.162.0) (2022-12-15)
 
 
