@@ -57,6 +57,9 @@
                             title="Aus Worddokument importieren">
                         <span class="mdi mdi-file-word"></span>
                     </button>
+                    <replacement-menu-button
+                        v-for="(item,itemIndex) in replacementMenus" :menu="item" :key="itemIndex"
+                        @toggle="item.show = $event" />
                 </div>
                 <div class="dropdown-menu bg-light" :style="{display: showTextDropdown ? 'block' : 'none'}"
                      aria-labelledby="dropdownMenuButton">
@@ -85,16 +88,21 @@
                     <div class="dropdown-form p-1">
                         <form-bible-reference-input v-model="insertBibleReference" full-text
                                                     :sources="textSources" :clipboard="false"/>
-                        <button v-if="insertBibleReference" class="btn btn-secondary" @click.prevent.stop="insertBibleText">Einfügen</button>
+                        <button v-if="insertBibleReference" class="btn btn-secondary"
+                                @click.prevent.stop="insertBibleText">Einfügen
+                        </button>
                     </div>
                 </div>
                 <div class="dropdown-menu bg-light" :style="{display: showWordImportDropdown ? 'block' : 'none'}"
                      aria-labelledby="dropdownMenuButton">
                     <div class="dropdown-form p-1">
                         <form-file-upload @input="upload"
-                                          no-url="1" no-pixabay="1" no-camera="1" no-description="1" />
+                                          no-url="1" no-pixabay="1" no-camera="1" no-description="1"/>
                     </div>
                 </div>
+                <replacement-menu
+                    v-for="(item,itemIndex) in replacementMenus" :menu="item" :key="itemIndex"
+                    @input="item.show=false; insertText($event)" />
             </div>
             <textarea class="form-control" v-model="editedElement.data.description" ref="textEditor"
                       rows="15"></textarea>
@@ -112,10 +120,17 @@ import NavButton from "../../Ui/buttons/NavButton";
 import FormFileUpload from "../../Ui/forms/FormFileUpload";
 import {romanize} from "../../../libraries/Romanize";
 import FormBibleReferenceInput from "../../Ui/forms/FormBibleReferenceInput";
+import ReplacementMenu from "./Elements/ReplacementMenu";
+import ReplacementMenuButton from "./Elements/ReplacementMenuButton";
+import RelativeDate from "../../../libraries/RelativeDate";
 
 export default {
     name: "FreetextEditor",
-    components: {FormBibleReferenceInput, FormFileUpload, NavButton, FormSelectize, FormInput, TextStats, Nl2br},
+    components: {
+        ReplacementMenuButton,
+        ReplacementMenu,
+        FormBibleReferenceInput, FormFileUpload, NavButton, FormSelectize, FormInput, TextStats, Nl2br
+    },
     inject: ['lists'],
     props: {
         element: Object,
@@ -142,6 +157,9 @@ export default {
             textSources[this.service.liturgicalInfo.title + ' Psalm'] = this.service.liturgicalInfo['litTextsWeeklyPsalm'];
             textSources[this.service.liturgicalInfo.title + ' Wochenspruch'] = this.service.liturgicalInfo['litTextsWeeklyQuote'];
         }
+
+        let replacementMenus = [];
+
         this.service.baptisms.forEach(baptism => {
             if (baptism.text) textSources['Taufspruch ' + baptism.candidate_name] = baptism.text;
         });
@@ -149,6 +167,24 @@ export default {
             if (funeral.text) textSources['Beerdigungstext ' + funeral.buried_name] = funeral.text;
             if (funeral.confirmation_text) textSources['Denkspruch ' + funeral.buried_name] = funeral.confirmation_text;
             if (funeral.wedding_text) textSources['Trauspruch ' + funeral.buried_name] = funeral.wedding_text;
+
+            let items = {};
+            replacementMenus.push({
+                title: funeral.buried_name,
+                icon: 'mdi mdi-grave-stone',
+                show: false,
+                items: {
+                    'Geburtsdatum': moment(funeral.dob).locale('de').format('LL'),
+                    'Sterbedatum': moment(funeral.dod).locale('de').format('LL'),
+                    'Sterbedatum (relativ)': RelativeDate(moment(funeral.dod).format('DD.MM.YYYY'), moment(this.service.date).format('DD.MM.YYYY')),
+                    'Sterbealter': funeral.age,
+                    'Lebenszeit in Tagen': moment(funeral.dod).diff(moment(funeral.dob), 'days').toLocaleString('de-DE'),
+                    'Geburtsort': funeral.birth_place,
+                    'Sterbeort': funeral.death_place,
+                    'Geburtsname': funeral.birth_name,
+                    'Rufname': funeral.spoken_name,
+                }
+            })
         });
         this.service.weddings.forEach(wedding => {
             if (wedding.text) textSources['Trauspruch ' + wedding.spouse1_name + ' & ' + wedding.spouse2_name] = wedding.text;
@@ -164,6 +200,7 @@ export default {
             showWordImportDropdown: false,
             textSources,
             insertBibleReference: '',
+            replacementMenus,
         };
     },
     methods: {
