@@ -45,7 +45,7 @@
                     </button>
                 </div>
                 <div class="col-md-6 text-right">
-                    <div class="dropdown" v-if="hasDownload">
+                    <div class="dropdown" v-if="hasDownload()">
                         <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                 title="Dokumente herunterladen">
@@ -383,7 +383,6 @@ export default {
             focusedItem: null,
             editable: true,
             importFrom: null,
-            hasDownload: (myBlocks.length > 0) && (Object.keys(this.sheets).length > 0),
             modalOpen: false,
             dialogs: dialogs,
             sermons: [],
@@ -750,6 +749,9 @@ export default {
             this.treeState = Math.random().toString(36).substr(2, 9);
             this.$forceUpdate();
             this.focusOff();
+        },
+        hasDownload() {
+            return (this.blocks.length > 0) && (Object.keys(this.sheets).length > 0);
         }
     },
     provide() {
