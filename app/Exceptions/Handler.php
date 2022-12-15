@@ -40,6 +40,7 @@ use Spatie\FlareClient\Truncation\ReportTrimmer;
 use Spatie\LaravelIgnition\ContextProviders\LaravelContextProviderDetector;
 use Spatie\LaravelIgnition\Facades\Flare;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 use Spatie\FlareClient\Report;
 
@@ -51,7 +52,7 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        //
+        NotFoundHttpException::class,
     ];
 
     /**
