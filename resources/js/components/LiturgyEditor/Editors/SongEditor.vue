@@ -134,6 +134,8 @@ export default {
     data() {
         var e = this.element;
 
+        if (undefined == e.data) e.data = {};
+        if (typeof e.data != Object) e.data = {};
         if (undefined == e.data.song) e.data.song = {};
         if (undefined == e.data.song.song) e.data.song.song = {};
         if (undefined == e.data.song.song.verses) e.data.song.song.verses = [];
@@ -201,7 +203,6 @@ export default {
     },
     methods: {
         selectSong(e) {
-            if (!e) return;
             if (!e) return;
             if (e < 0) return;
             if (undefined == this.songList[e]) {
