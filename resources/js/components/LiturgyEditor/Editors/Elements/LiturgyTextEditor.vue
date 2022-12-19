@@ -129,9 +129,9 @@ export default {
         Quill.register(SmartBreak);
 
         let quillDefaults = {
+            formats: [],
             placeholder: 'Hier Text eingeben...',
             modules: {
-                formats: [],
                 toolbar: {
                     container: '#toolbar',
                     handlers: {
