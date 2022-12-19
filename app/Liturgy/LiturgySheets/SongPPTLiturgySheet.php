@@ -110,14 +110,6 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                     /** @var PsalmItemHelper $helper */
                     $helper = $item->getHelper();
                     foreach ($helper->getVerses() as $verse) $this->slide($verse, $this->config['fontSize']);
-                } elseif ($item->data_type == 'liturgic') {
-                    if ($item->title == 'Ehr sei dem Vater') {
-//                        unset($slides[count($slides) - 1]);
-                        $this->slide($item->data['text']);
-                        if ($this->config['includeEmpty']) {
-                            $this->slide();
-                        }
-                    }
                 }
             }
 

@@ -430,13 +430,6 @@ export default {
                         data: {description: ''},
                     };
                     break;
-                case 'Liturgic':
-                    obj = {
-                        title: 'Liturgischer Text',
-                        data_type: 'liturgic',
-                        data: {id: -1, title: '', text: ''}
-                    };
-                    break;
                 case 'Psalm':
                     obj = {
                         title: 'Psalmgebet',
@@ -525,8 +518,6 @@ export default {
                         .replaceAll('<br />', "\n")
                         .replaceAll('<br/>', "\n");
                     return s.length > 40 ? s.substr(0, 40) + '...' : s;
-                case 'liturgic':
-                    return item.data.title;
                 case 'psalm':
                     if (undefined == item.data.psalm) return '';
                     var title = item.data.psalm.title;

@@ -115,26 +115,6 @@ class Item extends Model
         throw new ItemHelperNotFoundException('Item helper class not found for data_type '.$this->data_type);
     }
 
-    /**
-     * Check replacement settings for 'liturgic' blocks
-     */
-    public function checkMarkerReplacementSettings()
-    {
-        if ($this->data_type != 'liturgic') return;
-        $service = $this->block->service;
-        $data = $this->data;
-        $data['needs_replacement'] ??= '';
-        $data['replacement'] ??= '';
-        foreach (['funeral' => $service->funerals, 'baptism' => $service->baptisms, 'wedding' => $service->weddings] as $key => $records) {
-            if (($data['needs_replacement'] == $key) && ($data['replacement'] == '')) {
-                if (count($records)) {
-                    $data['replacements'] = $records->first()->id;
-                }
-            }
-        }
-        $this->data = $data;
-    }
-
     public function setData($key, $value)
     {
         $this->setDataAttribute(array_merge($this->getDataAttribute(), [$key => $value]));
@@ -165,7 +145,6 @@ class Item extends Model
     public function performTypeSpecificActionsOnCreate()
     {
         $this->addBibleText();
-        $this->checkMarkerReplacementSettings();
     }
 
     /**
@@ -174,7 +153,6 @@ class Item extends Model
     public function performTypeSpecificActionsOnUpdate()
     {
         $this->addBibleText();
-        $this->checkMarkerReplacementSettings();
     }
 
 }

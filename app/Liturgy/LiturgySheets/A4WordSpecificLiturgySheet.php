@@ -31,12 +31,10 @@
 namespace App\Liturgy\LiturgySheets;
 
 
-use App\Documents\Word\DefaultA5WordDocument;
 use App\Documents\Word\DefaultWordDocument;
 use App\Liturgy\Bible\BibleText;
 use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\Item;
-use App\Liturgy\ItemHelpers\LiturgicItemHelper;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Replacement\Replacement;
@@ -221,13 +219,6 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         $this->renderRow($table, $item, $text);
     }
 
-    protected function renderLiturgicItemRow(DefaultWordDocument $doc, Table $table, Item $item)
-    {
-        /** @var LiturgicItemHelper $helper */
-        $helper = $item->getHelper();
-        $this->renderRow($table, $item, '');
-    }
-
     protected function renderSermonItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         $this->renderRow($table, $item, $this->service->sermon_id ? $this->service->sermon->title : '');
@@ -258,13 +249,6 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
     {
         if (!$item->data['description']) return;
         $doc->renderNormalText(Replacement::replaceAll($item->data['description'], $this->service));
-    }
-
-    protected function renderLiturgicItem(DefaultWordDocument $doc, Item $item)
-    {
-        /** @var LiturgicItemHelper $helper */
-        $helper = $item->getHelper();
-        $doc->renderNormalText(Replacement::replaceAll($helper->getReplacedText($this->service), $this->service));
     }
 
     protected function renderSermonItem(DefaultWordDocument $doc, Item $item)

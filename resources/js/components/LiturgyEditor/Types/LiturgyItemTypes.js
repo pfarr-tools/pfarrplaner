@@ -41,12 +41,6 @@ export function FreetextType() {
     this.description = '';
 }
 
-export function LiturgicType() {
-    this.title = 'Lit. Element';
-    this.typeDescription = 'Lit. Element';
-    this.type= 'liturgic';
-}
-
 export function PsalmType() {
     this.title = 'Psalmgebet';
     this.typeDescription = 'Psalmgebet';

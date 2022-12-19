@@ -267,8 +267,6 @@
                 @if($concernsOrganists && $item->data_type == 'freetext')
                     <td valign="top"
                         colspan="4">{{ $item->getHelper()->getText(80) }}</td>
-                @elseif($concernsOrganists && $item->data_type == 'liturgic')
-                    <td valign="top" colspan="4"></td>
                 @elseif($item->data_type == 'song')
                     @php $helper = new App\Liturgy\ItemHelpers\SongItemHelper($item); @endphp
 

@@ -62,8 +62,6 @@ export default {
                         .replaceAll('<br>', "\n")
                         .replaceAll('<br />', "\n")
                         .replaceAll('<br/>', "\n");
-                case 'liturgic':
-                    return this.item.data ? (this.item.data.text || '') : '';
                 case 'psalm':
                     return this.item.data.psalm ? (this.item.data.psalm.text || '') : '';
                 case 'sermon':

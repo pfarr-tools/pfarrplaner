@@ -31,21 +31,10 @@
 namespace App\Liturgy\LiturgySheets;
 
 
-use App\Documents\Word\DefaultA5WordDocument;
 use App\Documents\Word\DefaultWordDocument;
-use App\Integrations\KonfiApp\KonfiAppIntegration;
-use App\Liturgy\Bible\BibleText;
-use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\Item;
-use App\Liturgy\ItemHelpers\LiturgicItemHelper;
-use App\Liturgy\ItemHelpers\PsalmItemHelper;
-use App\Liturgy\ItemHelpers\SongItemHelper;
-use App\Liturgy\Replacement\Replacement;
 use App\Service;
 use Illuminate\Support\Facades\Auth;
-use PhpOffice\PhpWord\Element\Footer;
-use PhpOffice\PhpWord\Element\TextRun;
-use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Shared\Html;
 
 class SermonTextLiturgySheet extends AbstractLiturgySheet

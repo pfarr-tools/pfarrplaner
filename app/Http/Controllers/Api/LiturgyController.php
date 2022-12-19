@@ -87,24 +87,6 @@ class LiturgyController extends \App\Http\Controllers\Controller
                 $newItem = $sourceItem->replicate();
                 $newItem->liturgy_block_id = $newBlock->id;
                 $newItem->sortable = $itemCtr;
-                if ($newItem->data_type == 'liturgic') {
-                    foreach (
-                        [
-                            'funeral' => $service->funerals,
-                            'baptism' => $service->baptisms,
-                            'wedding' => $service->weddings
-                        ] as $key => $collection
-                    ) {
-                        if ($newItem->data['needs_replacement'] == $key) {
-                            $newItem->setData('foo', 'bar');
-                            if ($collection->count()) {
-                                $newItem->setData('replacement', $collection->first()->id);
-                            } else {
-                                $newItem->setData('replacement', '');
-                            }
-                        }
-                    }
-                }
                 $newItem->save();
             }
         }
