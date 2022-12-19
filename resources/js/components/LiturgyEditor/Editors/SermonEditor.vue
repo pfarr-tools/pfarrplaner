@@ -90,6 +90,14 @@ export default {
             myService: this.service,
             sermonSelectizeSettings: {
                 searchField: ['title'],
+                render: {
+                    option: function (item, escape) {
+                        var t= '<div>'+escape(item.title)+(item.subtitle ? ': '+escape(item.subtitle) : '');
+                        if (item.reference) t+= '<div class="text-sm text-muted">'+escape(item.reference)+'</div>';
+                        t += '</div>';
+                        return t;
+                    }
+                }
             },
         };
     },
