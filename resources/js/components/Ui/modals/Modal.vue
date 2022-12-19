@@ -32,7 +32,7 @@
         <div class="modal-mask">
             <div class="modal-wrapper">
                 <div class="modal-dialog" role="document" tabindex="-1" :style="{maxWidth: maxWidth, minHeight: minHeight || 'auto', maxHeight: maxHeight || 'auto'}">
-                    <div class="modal-content">
+                    <div class="modal-content" :style="{maxWidth: maxWidth, minHeight: minHeight || 'auto', maxHeight: maxHeight || 'auto'}">
                         <div class="modal-header">
                             <h5 class="modal-title">{{ title }}</h5>
                             <button v-if="allowCancel" type="button" class="close" data-dismiss="modal"

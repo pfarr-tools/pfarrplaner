@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <modal title="Bibeltext einfügen" close-button-label="Einfügen"
+    <modal title="Bibeltext einfügen" close-button-label="Einfügen" min-height="50vh"
            @cancel="$emit('input', '')"
            @close="$emit('input', insertBibleReference)">
         <form-bible-reference-input v-model="insertBibleReference" full-text

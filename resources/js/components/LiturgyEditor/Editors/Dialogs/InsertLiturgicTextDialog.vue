@@ -29,7 +29,7 @@
 
 <template>
     <modal title="Liturgischen Text einfügen" close-button-label="Einfügen"
-           @cancel="$emit('input', '')"
+           @cancel="$emit('input', '')" min-height="50vh"
            @close="$emit('input', lists.texts.filter(item => item.id == selectedText)[0].text)">
         <div class="row">
             <div class="col-sm-6">
