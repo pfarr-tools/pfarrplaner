@@ -82,7 +82,7 @@
             </div>
         </quill-editor>
 
-        <insert-liturgic-text-dialog v-if="dialogs.insertLiturgic" class="dialog"
+        <insert-liturgic-text-dialog v-if="dialogs.insertLiturgic" class="dialog" :service="service"
                                      @input="dialogs.insertLiturgic = false; insertText($event)"/>
         <insert-bible-text-dialog v-if="dialogs.insertBible"  class="dialog" :service="service"
                                   @input="dialogs.insertBible = false; insertText($event)" />
@@ -107,6 +107,7 @@ import {lineBreakMatcher, SmartBreak} from '../Quill/QuillSmartBreak';
 import InsertLiturgicTextDialog from "../Dialogs/InsertLiturgicTextDialog.vue";
 import InsertBibleTextDialog from "../Dialogs/InsertBibleTextDialog.vue";
 import InsertWordDocumentDialog from "../Dialogs/InsertWordDocumentDialog.vue";
+import {NameService} from "../../../../libraries/NameService";
 
 
 export default {
@@ -140,13 +141,14 @@ export default {
 
         let baptismDataSets = []
         this.service.baptisms.forEach(baptism => {
-            let nameSet = baptism.candidate_name.split(',');
+            let nameSet = new NameService(baptism.candidate_name);
+            console.log(nameSet);
             baptismDataSets.push({
                 baptism: baptism,
                 data: {
-                    'Name': nameSet[1].trim()+' '+nameSet[0].trim(),
-                    'Vorname': nameSet[1].trim(),
-                    'Nachname': nameSet[0].trim(),
+                    'Name': nameSet.name,
+                    'Vorname': nameSet.first,
+                    'Nachname': nameSet.last,
                 }
             })
         });

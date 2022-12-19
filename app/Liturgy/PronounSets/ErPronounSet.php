@@ -62,6 +62,7 @@ class ErPronounSet extends AbstractPronounSet
         'deinem Ehemann' => 'deinem Ehemann',
         'Ehemann' => 'Ehemann',
         'Ehegatte' => 'Ehegatte',
+        'Ehepartner' => 'Ehepartner',
         'Verstorbener' => 'Verstorbene',
         'der Verstorbene' => 'der Verstorbene',
         'des Verstorbenen' => 'des Verstorbenen',

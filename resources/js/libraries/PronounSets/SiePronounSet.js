@@ -1,10 +1,9 @@
-<?php
 /*
  * Pfarrplaner
  *
  * @package Pfarrplaner
  * @author Christoph Fischer <chris@toph.de>
- * @copyright (c) Christoph Fischer, https://christoph-fischer.de
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
  * @link https://codeberg.org/pfarrplaner/pfarrplaner
  * @version git: $Id$
@@ -28,48 +27,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Liturgy\PronounSets;
 
+import {AbstractPronounSet} from "./AbstractPronounSet";
 
-class SiePronounSet extends AbstractPronounSet
-{
-
-    protected $label = 'sie/ihr/ihr/sie';
-
-    protected $pronouns = [
-        'er' => 'sie',
-        'seiner' => 'ihrer',
-        'ihm' => 'sie',
-        'ihn' => 'sie',
+export class SiePronounSet extends AbstractPronounSet {
+    data = {
+        'er': 'sie',
+        'seiner': 'ihrer',
+        'ihm': 'sie',
+        'ihn': 'sie',
         // possessive
-        'sein' => 'ihr',
-        'seine' => 'ihre',
-        'seines' => 'ihres',
-        'seinem' => 'ihrem',
-        'seinen' => 'ihren',
+        'sein': 'ihr',
+        'seine': 'ihre',
+        'seines': 'ihres',
+        'seinem': 'ihrem',
+        'seinen': 'ihren',
         // relative
-        'der' => 'die',
-        'dessen' => 'deren',
-        'dem' => 'der',
-        'den' => 'die',
+        'der': 'die',
+        'dessen': 'deren',
+        'dem': 'der',
+        'den': 'die',
         // demonstrative
-        'dieser' => 'diese',
-        'welcher' => 'welche',
+        'dieser': 'diese',
+        'welcher': 'welche',
         // misc
-        'Sohn' => 'Tochter',
-        'Bruder' => 'Schwester',
-        'Mann' => 'Frau',
-        'deinem Ehemann' => 'deiner Ehefrau',
-        'Ehemann' => 'Ehefrau',
-        'Ehegatte' => 'Ehegattin',
-        'Ehepartner' => 'Ehepartnerin',
-        'Verstorbener' => 'Verstorbene',
-        'der Verstorbene' => 'die Verstorbene',
-        'des Verstorbenen' => 'der Verstorbenen',
-        'dem Verstorbenen' => 'der Verstorbenen',
-        'den Verstorbenen' => 'die Verstorbene',
-    ];
-
-
-
+        'Sohn': 'Tochter',
+        'Bruder': 'Schwester',
+        'Mann': 'Frau',
+        'deinem Ehemann': 'deiner Ehefrau',
+        'Ehemann': 'Ehefrau',
+        'Ehegatte': 'Ehegattin',
+        'Ehepartner': 'Ehepartnerin',
+        'Verstorbener': 'Verstorbene',
+        'der Verstorbene': 'die Verstorbene',
+        'des Verstorbenen': 'der Verstorbenen',
+        'dem Verstorbenen': 'der Verstorbenen',
+        'den Verstorbenen': 'die Verstorbene',
+    }
 }

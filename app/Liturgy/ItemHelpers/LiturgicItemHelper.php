@@ -94,6 +94,7 @@ class LiturgicItemHelper extends AbstractItemHelper
                         [
                             'taufe:vorname' => trim($firstName),
                             'taufe:lastname' => trim($lastName),
+                            'taufe:nachname' => trim($lastName),
                             'taufe:name' => trim($firstName) . ' ' . trim($lastName),
 
                         ] as $marker => $value
