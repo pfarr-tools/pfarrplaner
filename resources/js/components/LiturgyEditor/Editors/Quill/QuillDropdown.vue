@@ -28,7 +28,7 @@
   -->
 
 <template>
-        <span class="ql-formats">
+        <span class="">
             <span class="ql-picker" :class="{'ql-expanded': t}">
                 <span class="ql-picker-label" :data-label="title" :title="title" @click.prevent.stop="toggle($event)">
                     <span v-if="icon" :class="icon"></span>
@@ -71,5 +71,7 @@ export default {
 </script>
 
 <style scoped>
-
+    .ql-picker-label {
+        padding-left: 0 !important;
+    }
 </style>
