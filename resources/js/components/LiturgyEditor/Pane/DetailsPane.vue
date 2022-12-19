@@ -55,7 +55,6 @@
 
 import BlockEditor from "../Editors/BlockEditor";
 import FreetextEditor from "../Editors/FreetextEditor";
-import LiturgicEditor from "../Editors/LiturgicEditor";
 import PsalmEditor from "../Editors/PsalmEditor";
 import ReadingEditor from "../Editors/ReadingEditor";
 import SermonEditor from "../Editors/SermonEditor";
@@ -71,7 +70,6 @@ export default {
         TimeFields,
         BlockEditor,
         FreetextEditor,
-        LiturgicEditor,
         PsalmEditor,
         ReadingEditor,
         SermonEditor,

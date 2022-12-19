@@ -35,7 +35,7 @@
             <div class="col-sm-6">
                 <div v-if="lists.texts.length > 0">
                     <form-selectize label="Textbaustein" :options="lists.texts"
-                                    title-key="title"
+                                    title-key="title" :settings="selectizeSettings"
                                     v-model="selectedText" :key="lists.texts.length"/>
                 </div>
 
@@ -111,6 +111,18 @@ export default {
             replacementBaptism: this.service.baptisms.length ? this.service.baptisms[0].id : null,
             replacementFuneral: this.service.funerals.length ? this.service.funerals[0].id : null,
             replacementWedding: this.service.weddings.length ? this.service.weddings[0].id : null,
+            selectizeSettings: {
+                searchField: ['title', 'source', 'data'],
+                render: {
+                    option:  function(item, escape) {
+                        let t= '<div>'+escape(item.title);
+                        if (item.source) t+='<div class="text-sm text-muted">'
+                            +'<span class="mdi mdi-book"></span> '
+                            +escape(item.source).replaceAll("\n", '<br />')+'</div>';
+                        return t+'</div>';
+                    }
+                }
+            },
         }
     },
     methods: {

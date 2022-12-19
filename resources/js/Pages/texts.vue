@@ -70,13 +70,8 @@
 </template>
 
 <script>
-import LiturgicEditor from "../components/LiturgyEditor/Editors/LiturgicEditor";
-
 export default {
     props: ['texts'],
-    components: {
-        LiturgicEditor
-    },
     data() {
         return {
             selectedText: null,
