@@ -55,7 +55,13 @@ export default {
         getItemText() {
             switch(this.item.data_type) {
                 case 'freetext':
-                    return this.item.data ? (this.item.data.description || '') : '';
+                    if (!this.item.data) return '';
+                    if (!this.item.data.description) return '';
+                    return this.item.data.description.replaceAll('<p>', '')
+                        .replaceAll('</p>', "\r\n")
+                        .replaceAll('<br>', "\n")
+                        .replaceAll('<br />', "\n")
+                        .replaceAll('<br/>', "\n");
                 case 'liturgic':
                     return this.item.data ? (this.item.data.text || '') : '';
                 case 'psalm':

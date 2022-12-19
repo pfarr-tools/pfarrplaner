@@ -34,80 +34,8 @@
             <input class="form-control" v-model="editedElement.title" v-focus/>
         </div>
 
-
-        <div class="form-group">
-            <label for="description">Beschreibender Text</label>
-            <div class="dropdown mb-1">
-                <div class="btn-group">
-                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                            @click="toggleTextDropdown"
-                            title="Liturgischen Text einfügen">
-                        <span class="mdi mdi-text"></span> Liturgischen Text einfügen
-                    </button>
-                    <button class="btn btn-light dropdown-toggle" type="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                            @click="toggleBibleImportDropdown"
-                            title="Bibeltext importieren">
-                        <span class="mdi mdi-book-open-variant"></span> Bibeltext einfügen
-                    </button>
-                    <button class="btn btn-light dropdown-toggle" type="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                            @click="toggleWordImportDropdown"
-                            title="Aus Worddokument importieren">
-                        <span class="mdi mdi-file-word"></span>
-                    </button>
-                    <replacement-menu-button
-                        v-for="(item,itemIndex) in replacementMenus" :menu="item" :key="itemIndex"
-                        @toggle="item.show = $event" />
-                </div>
-                <div class="dropdown-menu bg-light" :style="{display: showTextDropdown ? 'block' : 'none'}"
-                     aria-labelledby="dropdownMenuButton">
-                    <div class="dropdown-form p-1">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div v-if="lists.texts.length > 0">
-                                    <form-selectize label="Textbaustein" :options="lists.texts"
-                                                    title-key="title"
-                                                    v-model="selectedText" :key="lists.texts.length"/>
-                                </div>
-                                <nav-button type="secondary" icon="mdi mdi-text"
-                                            @click="insertText(lists.texts.filter(item => item.id == selectedText)[0].text); showTextDropdown = false;"
-                                            title="Einfügen">Einfügen
-                                </nav-button>
-                            </div>
-                            <div class="col-sm-6">
-                                <nl2br tag="div" v-if="selectedText"
-                                       :text="lists.texts.filter(item => item.id == selectedText)[0].text"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="dropdown-menu bg-light" :style="{display: showBibleImportDropdown ? 'block' : 'none'}"
-                     aria-labelledby="dropdownMenuButton">
-                    <div class="dropdown-form p-1">
-                        <form-bible-reference-input v-model="insertBibleReference" full-text
-                                                    :sources="textSources" :clipboard="false"/>
-                        <button v-if="insertBibleReference" class="btn btn-secondary"
-                                @click.prevent.stop="insertBibleText">Einfügen
-                        </button>
-                    </div>
-                </div>
-                <div class="dropdown-menu bg-light" :style="{display: showWordImportDropdown ? 'block' : 'none'}"
-                     aria-labelledby="dropdownMenuButton">
-                    <div class="dropdown-form p-1">
-                        <form-file-upload @input="upload"
-                                          no-url="1" no-pixabay="1" no-camera="1" no-description="1"/>
-                    </div>
-                </div>
-                <replacement-menu
-                    v-for="(item,itemIndex) in replacementMenus" :menu="item" :key="itemIndex"
-                    @input="item.show=false; insertText($event)" />
-            </div>
-            <textarea class="form-control" v-model="editedElement.data.description" ref="textEditor"
-                      rows="15"></textarea>
-            <text-stats :text="editedElement.data.description"/>
-        </div>
+        <liturgy-text-editor v-model="editedElement.data.description" settings="myEditorSettings" :service="service"/>
+        <text-stats :text="editedElement.data.description"/>
     </div>
 </template>
 
@@ -123,10 +51,12 @@ import FormBibleReferenceInput from "../../Ui/forms/FormBibleReferenceInput";
 import ReplacementMenu from "./Elements/ReplacementMenu";
 import ReplacementMenuButton from "./Elements/ReplacementMenuButton";
 import RelativeDate from "../../../libraries/RelativeDate";
+import LiturgyTextEditor from "./Elements/LiturgyTextEditor.vue";
 
 export default {
     name: "FreetextEditor",
     components: {
+        LiturgyTextEditor,
         ReplacementMenuButton,
         ReplacementMenu,
         FormBibleReferenceInput, FormFileUpload, NavButton, FormSelectize, FormInput, TextStats, Nl2br
@@ -148,26 +78,11 @@ export default {
         var e = this.element;
         if (undefined == e.data.description) e.data.description = '';
 
-        let textSources = {};
-        if (undefined !== this.service.liturgicalInfo.title) {
-            textSources['Perikope für ' + this.service.liturgicalInfo.title] = this.service.liturgicalInfo.currentPerikope;
-            for (let i = 1; i <= 6; i++) {
-                textSources[this.service.liturgicalInfo.title + ' ' + romanize(i)] = this.service.liturgicalInfo['litTextsPerikope' + i];
-            }
-            textSources[this.service.liturgicalInfo.title + ' Psalm'] = this.service.liturgicalInfo['litTextsWeeklyPsalm'];
-            textSources[this.service.liturgicalInfo.title + ' Wochenspruch'] = this.service.liturgicalInfo['litTextsWeeklyQuote'];
-        }
-
         let replacementMenus = [];
 
         this.service.baptisms.forEach(baptism => {
-            if (baptism.text) textSources['Taufspruch ' + baptism.candidate_name] = baptism.text;
         });
         this.service.funerals.forEach(funeral => {
-            if (funeral.text) textSources['Beerdigungstext ' + funeral.buried_name] = funeral.text;
-            if (funeral.confirmation_text) textSources['Denkspruch ' + funeral.buried_name] = funeral.confirmation_text;
-            if (funeral.wedding_text) textSources['Trauspruch ' + funeral.buried_name] = funeral.wedding_text;
-
             let items = {};
             replacementMenus.push({
                 title: funeral.buried_name,
@@ -187,7 +102,6 @@ export default {
             })
         });
         this.service.weddings.forEach(wedding => {
-            if (wedding.text) textSources['Trauspruch ' + wedding.spouse1_name + ' & ' + wedding.spouse2_name] = wedding.text;
         });
 
 
@@ -198,9 +112,9 @@ export default {
             showTextDropdown: false,
             showBibleImportDropdown: false,
             showWordImportDropdown: false,
-            textSources,
             insertBibleReference: '',
             replacementMenus,
+            myEditorSettings: {},
         };
     },
     methods: {
@@ -231,23 +145,6 @@ export default {
         toggleWordImportDropdown() {
             this.showWordImportDropdown = !this.showWordImportDropdown;
             if (!this.showWordImportDropdown) this.$refs['textEditor'].focus();
-        },
-        upload(file) {
-            let fd = new FormData();
-            fd.append('import', file);
-
-            this.uploading = true;
-            axios.post(route('api.liturgy.text.import', {
-                api_token: this.apiToken,
-            }), fd, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then(response => {
-                this.showWordImportDropdown = false;
-                this.insertText(response.data);
-                this.$refs['textEditor'].focus();
-            });
         },
         insertBibleText() {
             this.insertText(this.insertBibleReference);

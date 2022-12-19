@@ -37,6 +37,7 @@ use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Liturgy\Bible\BibleText;
 use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\Item;
+use App\Liturgy\ItemHelpers\FreetextItemHelper;
 use App\Liturgy\ItemHelpers\LiturgicItemHelper;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
@@ -180,7 +181,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         if (!$item->data['description']) {
             return;
         }
-        $doc->renderNormalText(Replacement::replaceAll($item->data['description'], $this->service));
+        $doc->renderNormalText(Replacement::replaceAll($item->getHelper()->getText(), $this->service));
     }
 
     protected function renderLiturgicItem(DefaultWordDocument $doc, Item $item)

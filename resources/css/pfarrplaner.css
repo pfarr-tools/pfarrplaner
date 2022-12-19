@@ -799,3 +799,7 @@ tr.changed, tr.changed td, tr.changed th {
 .mdi {
     font-size: 1.1em;
 }
+
+.ql-picker.float-right .ql-picker-options {
+    right: 0;
+}

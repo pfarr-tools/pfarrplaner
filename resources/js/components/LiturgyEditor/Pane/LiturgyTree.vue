@@ -65,7 +65,7 @@
                        @start="focusOff" @end="saveState" :disabled="!editable" handle=".handle">
                 <div v-for="(block,blockIndex) in blocks" class="liturgy-block"
                      :class="{focused: (focusedBlock == blockIndex) && (focusedItem == null)}"
-                     @click="focusBlock(blockIndex)" >
+                     @click="focusBlock(blockIndex)">
                     <div class="row" :ref="'block'+blockIndex" :key="'block'+blockIndex">
                         <div class="col-11 liturgy-block-title">
                         <span class="mdi mdi-drag-horizontal handle mr-1"
@@ -214,7 +214,7 @@
                    @close="importElements" @cancel="modalOpen = false;"
                    close-button-label="Importieren" cancel-button-label="Abbrechen" max-width="800">
                 <div v-if="importFrom != null">
-                    <form-selectize :options="sources" v-model="importFrom" :settings="sourceSelectizeSettings" />
+                    <form-selectize :options="sources" v-model="importFrom" :settings="sourceSelectizeSettings"/>
                 </div>
                 <div v-else class="text-align: right; width: 100%; color: darkgray;">
                     Importmöglichquellen werden geladen... <span class="mdi mdi-spin mdi-loading"></span>
@@ -400,7 +400,7 @@ export default {
                 optgroupField: 'group',
                 optgroupLabelField: 'groupName',
                 optgroupValueField: 'groupName',
-                optgroups: [{groupName: 'Agenden'},{ groupName: 'Gottesdienste'}],
+                optgroups: [{groupName: 'Agenden'}, {groupName: 'Gottesdienste'}],
             }
         }
     },
@@ -544,7 +544,12 @@ export default {
                 case 'freetext':
                     if (null === item.data.description) return '';
                     if (undefined === item.data.description) return '';
-                    return item.data.description.length > 40 ? item.data.description.substr(0, 40) + '...' : item.data.description;
+                    let s = item.data.description.replaceAll('<p>', '')
+                        .replaceAll('</p>', "\r\n")
+                        .replaceAll('<br>', "\n")
+                        .replaceAll('<br />', "\n")
+                        .replaceAll('<br/>', "\n");
+                    return s.length > 40 ? s.substr(0, 40) + '...' : s;
                 case 'liturgic':
                     return item.data.title;
                 case 'psalm':
@@ -568,7 +573,7 @@ export default {
                     if (undefined == item.data.song.song) return '';
                     var title = item.data.song.song.title;
                     if (item.data.song.altEG) {
-                        title = '(EG '+item.data.song.altEG+') '+title;
+                        title = '(EG ' + item.data.song.altEG + ') ' + title;
                     }
                     if (item.data.song.reference) {
                         title = item.data.song.reference + ' ' + title;
@@ -737,7 +742,7 @@ export default {
                 window.scrollTo(el.offsetLeft, el.offsetTop);
             });
         },
-        cancelEditing(item, blockIndex, itemIndex = null)  {
+        cancelEditing(item, blockIndex, itemIndex = null) {
             if (undefined == item.data.responsible) item.data.responsible = [];
             if (null !== itemIndex) {
                 this.blocks[blockIndex].items[itemIndex] = item;
