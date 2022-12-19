@@ -38,22 +38,22 @@ Pfarrplaner uses the following open-source libraries:
  - [composer/ca-bundle](https://packagist.org/packages/composer/ca-bundle) 1.3.1
     under the MIT license
 
- - [composer/composer](https://packagist.org/packages/composer/composer) 2.2.6
+ - [composer/composer](https://packagist.org/packages/composer/composer) 2.3.5
     under the MIT license
 
  - [composer/metadata-minifier](https://packagist.org/packages/composer/metadata-minifier) 1.0.0
     under the MIT license
 
- - [composer/pcre](https://packagist.org/packages/composer/pcre) 1.0.1
+ - [composer/pcre](https://packagist.org/packages/composer/pcre) 3.0.0
     under the MIT license
 
- - [composer/semver](https://packagist.org/packages/composer/semver) 3.2.9
+ - [composer/semver](https://packagist.org/packages/composer/semver) 3.3.2
     under the MIT license
 
  - [composer/spdx-licenses](https://packagist.org/packages/composer/spdx-licenses) 1.5.6
     under the MIT license
 
- - [composer/xdebug-handler](https://packagist.org/packages/composer/xdebug-handler) 2.0.4
+ - [composer/xdebug-handler](https://packagist.org/packages/composer/xdebug-handler) 3.0.3
     under the MIT license
 
  - [dasprid/enum](https://packagist.org/packages/dasprid/enum) 1.0.3
@@ -146,7 +146,7 @@ Pfarrplaner uses the following open-source libraries:
  - [jenssegers/agent](https://packagist.org/packages/jenssegers/agent) v2.6.4
     under the MIT license
 
- - [justinrainbow/json-schema](https://packagist.org/packages/justinrainbow/json-schema) 5.2.11
+ - [justinrainbow/json-schema](https://packagist.org/packages/justinrainbow/json-schema) 5.2.12
     under the MIT license
 
  - [laminas/laminas-escaper](https://packagist.org/packages/laminas/laminas-escaper) 2.9.0
@@ -353,7 +353,10 @@ Pfarrplaner uses the following open-source libraries:
  - [rap2hpoutre/laravel-log-viewer](https://packagist.org/packages/rap2hpoutre/laravel-log-viewer) v1.7.0
     under the MIT license
 
- - [react/promise](https://packagist.org/packages/react/promise) v2.8.0
+ - [react/promise](https://packagist.org/packages/react/promise) v2.9.0
+    under the MIT license
+
+ - [revolution/laravel-amazon-product-api](https://packagist.org/packages/revolution/laravel-amazon-product-api) 4.5.0
     under the MIT license
 
  - [sebastian/cli-parser](https://packagist.org/packages/sebastian/cli-parser) 1.0.1
@@ -404,7 +407,7 @@ Pfarrplaner uses the following open-source libraries:
  - [sebastian/version](https://packagist.org/packages/sebastian/version) 3.0.2
     under the BSD-3-Clause license
 
- - [seld/jsonlint](https://packagist.org/packages/seld/jsonlint) 1.8.3
+ - [seld/jsonlint](https://packagist.org/packages/seld/jsonlint) 1.9.0
     under the MIT license
 
  - [seld/phar-utils](https://packagist.org/packages/seld/phar-utils) 1.2.0
@@ -419,10 +422,22 @@ Pfarrplaner uses the following open-source libraries:
  - [simplesoftwareio/simple-qrcode](https://packagist.org/packages/simplesoftwareio/simple-qrcode) 4.2.0
     under the MIT license
 
+ - [spatie/backtrace](https://packagist.org/packages/spatie/backtrace) 1.2.1
+    under the MIT license
+
  - [spatie/db-dumper](https://packagist.org/packages/spatie/db-dumper) 2.21.1
     under the MIT license
 
+ - [spatie/flare-client-php](https://packagist.org/packages/spatie/flare-client-php) 1.2.0
+    under the MIT license
+
+ - [spatie/ignition](https://packagist.org/packages/spatie/ignition) 1.3.1
+    under the MIT license
+
  - [spatie/laravel-backup](https://packagist.org/packages/spatie/laravel-backup) 6.16.5
+    under the MIT license
+
+ - [spatie/laravel-ignition](https://packagist.org/packages/spatie/laravel-ignition) 1.3.1
     under the MIT license
 
  - [spatie/laravel-permission](https://packagist.org/packages/spatie/laravel-permission) 3.18.0
@@ -437,16 +452,16 @@ Pfarrplaner uses the following open-source libraries:
  - [swiftmailer/swiftmailer](https://packagist.org/packages/swiftmailer/swiftmailer) v6.3.0
     under the MIT license
 
- - [symfony/console](https://packagist.org/packages/symfony/console) v5.4.3
+ - [symfony/console](https://packagist.org/packages/symfony/console) v5.4.7
     under the MIT license
 
  - [symfony/css-selector](https://packagist.org/packages/symfony/css-selector) v6.0.3
     under the MIT license
 
- - [symfony/debug](https://packagist.org/packages/symfony/debug) v4.4.37
+ - [symfony/debug](https://packagist.org/packages/symfony/debug) v4.4.41
     under the MIT license
 
- - [symfony/deprecation-contracts](https://packagist.org/packages/symfony/deprecation-contracts) v3.0.0
+ - [symfony/deprecation-contracts](https://packagist.org/packages/symfony/deprecation-contracts) v3.0.1
     under the MIT license
 
  - [symfony/error-handler](https://packagist.org/packages/symfony/error-handler) v5.4.3
@@ -455,10 +470,10 @@ Pfarrplaner uses the following open-source libraries:
  - [symfony/event-dispatcher](https://packagist.org/packages/symfony/event-dispatcher) v6.0.3
     under the MIT license
 
- - [symfony/event-dispatcher-contracts](https://packagist.org/packages/symfony/event-dispatcher-contracts) v3.0.0
+ - [symfony/event-dispatcher-contracts](https://packagist.org/packages/symfony/event-dispatcher-contracts) v3.0.1
     under the MIT license
 
- - [symfony/filesystem](https://packagist.org/packages/symfony/filesystem) v6.0.3
+ - [symfony/filesystem](https://packagist.org/packages/symfony/filesystem) v6.0.7
     under the MIT license
 
  - [symfony/finder](https://packagist.org/packages/symfony/finder) v5.4.3
@@ -473,43 +488,43 @@ Pfarrplaner uses the following open-source libraries:
  - [symfony/mime](https://packagist.org/packages/symfony/mime) v5.4.3
     under the MIT license
 
- - [symfony/polyfill-ctype](https://packagist.org/packages/symfony/polyfill-ctype) v1.24.0
+ - [symfony/polyfill-ctype](https://packagist.org/packages/symfony/polyfill-ctype) v1.25.0
     under the MIT license
 
  - [symfony/polyfill-iconv](https://packagist.org/packages/symfony/polyfill-iconv) v1.24.0
     under the MIT license
 
- - [symfony/polyfill-intl-grapheme](https://packagist.org/packages/symfony/polyfill-intl-grapheme) v1.24.0
+ - [symfony/polyfill-intl-grapheme](https://packagist.org/packages/symfony/polyfill-intl-grapheme) v1.25.0
     under the MIT license
 
  - [symfony/polyfill-intl-idn](https://packagist.org/packages/symfony/polyfill-intl-idn) v1.24.0
     under the MIT license
 
- - [symfony/polyfill-intl-normalizer](https://packagist.org/packages/symfony/polyfill-intl-normalizer) v1.24.0
+ - [symfony/polyfill-intl-normalizer](https://packagist.org/packages/symfony/polyfill-intl-normalizer) v1.25.0
     under the MIT license
 
- - [symfony/polyfill-mbstring](https://packagist.org/packages/symfony/polyfill-mbstring) v1.24.0
+ - [symfony/polyfill-mbstring](https://packagist.org/packages/symfony/polyfill-mbstring) v1.25.0
     under the MIT license
 
  - [symfony/polyfill-php72](https://packagist.org/packages/symfony/polyfill-php72) v1.24.0
     under the MIT license
 
- - [symfony/polyfill-php73](https://packagist.org/packages/symfony/polyfill-php73) v1.24.0
+ - [symfony/polyfill-php73](https://packagist.org/packages/symfony/polyfill-php73) v1.25.0
     under the MIT license
 
- - [symfony/polyfill-php80](https://packagist.org/packages/symfony/polyfill-php80) v1.24.0
+ - [symfony/polyfill-php80](https://packagist.org/packages/symfony/polyfill-php80) v1.25.0
     under the MIT license
 
  - [symfony/polyfill-php81](https://packagist.org/packages/symfony/polyfill-php81) v1.24.0
     under the MIT license
 
- - [symfony/process](https://packagist.org/packages/symfony/process) v5.4.3
+ - [symfony/process](https://packagist.org/packages/symfony/process) v5.4.7
     under the MIT license
 
  - [symfony/routing](https://packagist.org/packages/symfony/routing) v5.4.3
     under the MIT license
 
- - [symfony/service-contracts](https://packagist.org/packages/symfony/service-contracts) v2.4.1
+ - [symfony/service-contracts](https://packagist.org/packages/symfony/service-contracts) v2.5.1
     under the MIT license
 
  - [symfony/string](https://packagist.org/packages/symfony/string) v6.0.3
@@ -518,7 +533,7 @@ Pfarrplaner uses the following open-source libraries:
  - [symfony/translation](https://packagist.org/packages/symfony/translation) v6.0.3
     under the MIT license
 
- - [symfony/translation-contracts](https://packagist.org/packages/symfony/translation-contracts) v3.0.0
+ - [symfony/translation-contracts](https://packagist.org/packages/symfony/translation-contracts) v3.0.1
     under the MIT license
 
  - [symfony/var-dumper](https://packagist.org/packages/symfony/var-dumper) v5.4.3
@@ -1364,7 +1379,7 @@ Pfarrplaner uses the following open-source libraries:
     by Samuel Reed
     under the MIT license
 
- - [async](https://github.com/caolan/async) 2.6.3
+ - [async](https://github.com/caolan/async) 2.6.4
     by Caolan McMahon
     under the MIT license
 
@@ -4198,6 +4213,10 @@ Pfarrplaner uses the following open-source libraries:
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
 
+ - [opencollective-postinstall](https://github.com/opencollective/opencollective-postinstall) 2.0.3
+    by Xavier Damman
+    under the MIT license
+
  - [opn](https://github.com/sindresorhus/opn) 5.5.0
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
@@ -5688,6 +5707,10 @@ Pfarrplaner uses the following open-source libraries:
     by Norserium
     under the MIT license
 
+ - [vue-async-computed](https://github.com/foxbenjaminfox/vue-async-computed) 3.9.0
+    by Benjamin Fox (foxbenjaminfox@gmail.com)
+    under the MIT license
+
  - [vue-bootstrap-datetimepicker](https://github.com/ankurk91/vue-bootstrap-datetimepicker) 5.0.1
     by ankurk91
     under the MIT license
@@ -5718,6 +5741,10 @@ Pfarrplaner uses the following open-source libraries:
 
  - [vue-nl2br](https://github.com/inouetakuya/vue-nl2br) 0.1.2
     by INOUE Takuya
+    under the MIT license
+
+ - [vue-popperjs](https://github.com/RobinCK/vue-popper) 2.3.0
+    by Igor Ognichenko (ognichenko.igor@gmail.com)
     under the MIT license
 
  - [vue-quill-editor](https://github.com/surmon-china/vue-quill-editor) 3.0.6
