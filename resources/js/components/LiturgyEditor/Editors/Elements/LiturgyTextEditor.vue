@@ -67,6 +67,18 @@
                                 :title="'Textbausteine zur Beerdigung von '+funeralDataset.funeral.buried_name"
                                 icon="mdi mdi-grave-stone" :items="funeralDataset.data"
                                 :class="floatClass" @input="insertText($event)"/>
+
+                <quill-dropdown v-for="baptismDataset in baptismDataSets" :key="baptismDataset.baptism.id"
+                                :label="baptismDataset.baptism.candidate_name"
+                                :title="'Textbausteine zur Taufe von '+baptismDataset.baptism.candidate_name"
+                                icon="mdi mdi-water" :items="baptismDataset.data"
+                                :class="floatClass" @input="insertText($event)"/>
+
+                <quill-dropdown v-for="weddingDataset in weddingDataSets" :key="weddingDataset.wedding.id"
+                                :label="weddingDataset.wedding.spouse1_name+' &amp; '+weddingDataset.wedding.spouse2_name"
+                                :title="'Textbausteine zur Trauung von '+weddingDataset.wedding.spouse1_name+' und '+weddingDataset.wedding.spouse2_name"
+                                icon="mdi mdi-ring" :items="weddingDataset.data"
+                                :class="floatClass" @input="insertText($event)"/>
             </div>
         </quill-editor>
 
@@ -122,6 +134,35 @@ export default {
                     'Sterbeort': funeral.death_place,
                     'Geburtsname': funeral.birth_name,
                     'Rufname': funeral.spoken_name,
+                }
+            })
+        });
+
+        let baptismDataSets = []
+        this.service.baptisms.forEach(baptism => {
+            let nameSet = baptism.candidate_name.split(',');
+            baptismDataSets.push({
+                baptism: baptism,
+                data: {
+                    'Name': nameSet[1].trim()+' '+nameSet[0].trim(),
+                    'Vorname': nameSet[1].trim(),
+                    'Nachname': nameSet[0].trim(),
+                }
+            })
+        });
+
+        let weddingDataSets = []
+        this.service.weddings.forEach(wedding => {
+            let nameSet = [wedding.spouse1_name.split(','), wedding.spouse2_name.split(',')];
+            weddingDataSets.push({
+                wedding: wedding,
+                data: {
+                    'Name 1': nameSet[0][1].trim()+' '+nameSet[0][0].trim(),
+                    'Vorname 1': nameSet[0][1].trim(),
+                    'Nachname 1': nameSet[0][0].trim(),
+                    'Name 2': nameSet[1][1].trim()+' '+nameSet[1][0].trim(),
+                    'Vorname 2': nameSet[1][1].trim(),
+                    'Nachname 2': nameSet[1][0].trim(),
                 }
             })
         });
@@ -211,7 +252,9 @@ export default {
             quill: null,
             t: false,
             selectedText: '',
-            funeralDataSets: funeralDataSets,
+            funeralDataSets,
+            baptismDataSets,
+            weddingDataSets,
             textEditorActive: false,
             quillOptions: {
                 ...quillDefaults,
