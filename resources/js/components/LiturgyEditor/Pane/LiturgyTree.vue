@@ -143,22 +143,16 @@
                                           class="mdi mdi-music text-success"
                                           title="Zu diesem Lied sind Noten vorhanden."/>
                                 </div>
-                                <div class="col-sm-2 responsible-list"
-                                     @click="editResponsibles(blockIndex, itemIndex, item)">
-                                    <people-pane v-if="item.editResponsibles==true" :service="service" :element="item"
-                                                 @close="doneEditingResponsibles(item)"
-                                                 :ministries="ministries"/>
-                                    <div v-else>
-                                        <div v-if="item.data.responsible.length > 0">
+                                <div class="col-sm-2 responsible-list">
+                                    <div v-if="item.data.responsible.length > 0">
                                             <span class="badge badge-light" v-for="record in item.data.responsible"
                                                   v-html="displayResponsible(record)"/>
-                                        </div>
-                                        <div v-else>
-                                            <div v-if="editable">
-                                                <span class="mdi mdi-account-multiple"></span> Hier klicken, um
-                                                Verantwortliche
-                                                auszuwählen.
-                                            </div>
+                                    </div>
+                                    <div v-else>
+                                        <div v-if="editable">
+                                            <span class="mdi mdi-account-multiple"></span> Hier klicken, um
+                                            Verantwortliche
+                                            auszuwählen.
                                         </div>
                                     </div>
                                 </div>
@@ -222,7 +216,6 @@
 import draggable from 'vuedraggable'
 import LiturgyBlock from "../Elements/LiturgyBlock";
 import DetailsPane from "./DetailsPane";
-import PeoplePane from "./PeoplePane";
 import Selectize from "vue2-selectize";
 import Modal from "../../Ui/modals/Modal";
 import LiturgySheetLink from "../Elements/LiturgySheetLink";
@@ -246,7 +239,6 @@ export default {
         Modal,
         LiturgyBlock,
         DetailsPane,
-        PeoplePane,
         draggable,
         Selectize,
         FullTextLiturgySheetConfiguration,
@@ -342,7 +334,6 @@ export default {
             myBlocks[idx].editing = false;
             myBlocks[idx].items.forEach(function (val2, idx2) {
                 myBlocks[idx].items[idx2].editing = false;
-                myBlocks[idx].items[idx2].editResponsibles = false;
                 if (undefined == myBlocks[idx].items[idx2].data.responsible) myBlocks[idx].items[idx2].data.responsible = [];
             });
         });
@@ -592,7 +583,6 @@ export default {
                 this.blocks[idx].editing = false;
                 for (const idx2 in this.blocks[idx].items) {
                     this.blocks[idx].items[idx2].editing = false;
-                    this.blocks[idx].items[idx2].editResponsibles = false;
                     if (undefined == this.blocks[idx].items[idx2].data.responsible) this.blocks[idx].items[idx2].data.responsible = [];
                 }
             }
@@ -607,16 +597,6 @@ export default {
                 api_token: this.apiToken
             }), {blocks: this.blocks})
                 .then(response => this.reloadTree(response.data));
-        },
-        editResponsibles(blockIndex, itemIndex, item) {
-            this.editable = false;
-            this.focusItem(blockIndex, itemIndex);
-            item.editResponsibles = true;
-        },
-        doneEditingResponsibles(item) {
-            item.editResponsibles = false;
-            this.focusOff();
-            this.editable = true;
         },
         displayResponsible(record) {
             var title = '';
@@ -743,6 +723,10 @@ export default {
         Object.defineProperty(lists, 'sermons', {
             enumerable: true,
             get: () => this.sermons,
+        });
+        Object.defineProperty(lists, 'ministries', {
+            enumerable: true,
+            get: () => this.ministries,
         });
         return {
             lists,

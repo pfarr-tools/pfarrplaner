@@ -29,14 +29,23 @@
 
 <template>
     <form submit.prevent="save">
-        <div class="liturgy-editor-details-pane p-1" v-scroll-to :key="state">
-            <component :is="editorComponent" :element="editedElement" v-model="editedElement" :service="service"
-                       :agenda-mode="agendaMode" :markers="markers" @unfocus="$emit('unfocus')"/>
-            <time-fields v-if="element.data_type != 'block'"
-                :service="service" :element="editedElement" :agenda-mode="agendaMode"/>
-            <div class="form-group">
-                <button class="btn btn-primary" @click.prevent.stop="save">Speichern</button>
-                <button class="btn btn-secondary" @click.prevent.stop="cancel">Abbrechen</button>
+        <div class="row">
+            <div class="col-sm-9">
+                <div class="liturgy-editor-details-pane p-1" v-scroll-to :key="state">
+                    <component :is="editorComponent" :element="editedElement" v-model="editedElement" :service="service"
+                               :agenda-mode="agendaMode" :markers="markers" @unfocus="$emit('unfocus')"/>
+                    <time-fields v-if="element.data_type != 'block'"
+                                 :service="service" :element="editedElement" :agenda-mode="agendaMode"/>
+                    <div class="form-group">
+                        <button class="btn btn-primary" @click.prevent.stop="save">Speichern</button>
+                        <button class="btn btn-secondary" @click.prevent.stop="cancel">Abbrechen</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <people-pane :service="service" :element="editedElement"
+                             @close="doneEditingResponsibles(item)"
+                             :ministries="lists.ministries"/>
             </div>
         </div>
     </form>
@@ -53,10 +62,12 @@ import SermonEditor from "../Editors/SermonEditor";
 import SongEditor from "../Editors/SongEditor";
 import __ from "lodash";
 import TimeFields from "../Editors/Elements/TimeFields";
+import PeoplePane from "./PeoplePane.vue";
 
 export default {
     name: "DetailsPane",
     components: {
+        PeoplePane,
         TimeFields,
         BlockEditor,
         FreetextEditor,
@@ -78,6 +89,7 @@ export default {
             default: false,
         }
     },
+    inject: ['lists'],
     data() {
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
