@@ -121,17 +121,7 @@
                                 </div>
                                 <div class="col-sm-4" v-if="item.data_type == 'sermon'">
                                     <div v-if="myService.sermon === null">
-                                        <form-selectize v-if="sermons.length > 0" :options="sermons" id-key="id"
-                                                        title-key="title"
-                                                        label="Bestehende Predigt auswählen"
-                                                        :settings="sermonSelectizeSettings"
-                                                        @input="setSermon($event, item)"/>
-                                        <inertia-link :href="route('service.sermon.editor', {service: myService.slug})"
-                                                      @click.stop=""
-                                                      class="btn btn-success"
-                                                      title="Hier klicken, um die Predigt jetzt anzulegen">
-                                            Neue Predigt anlegen
-                                        </inertia-link>
+                                        <i>Für diesen Gottesdienst ist noch keine Predigt angelegt.</i>
                                     </div>
                                     <div v-else>
                                         <inertia-link :href="route('sermon.editor', {sermon: myService.sermon.id})"
@@ -139,12 +129,9 @@
                                             {{ myService.sermon.title }}<span
                                             v-if="myService.sermon.subtitle">: {{ myService.sermon.subtitle }}</span>
                                         </inertia-link>
-                                        <button class="btn btn-sm btn-light ml-1" @click="setSermon(null, item)"
-                                                title="Verknüpfung mit dieser Predigt aufheben">
-                                            <span class="mdi mdi-link-off"></span>
-                                        </button>
-                                        <br/>
-                                        <small>{{ myService.sermon.reference }}</small>
+                                        <div v-if="myService.sermon.reference" class="text-sm text-muted">
+                                            {{ myService.sermon.reference }}
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-4" v-else>{{ itemDescription(item) }}
@@ -388,9 +375,6 @@ export default {
             sermons: [],
             songList: [],
             texts: [],
-            sermonSelectizeSettings: {
-                searchField: ['title'],
-            },
             sources: [],
             sourceSelectizeSettings: {
                 placeholder: 'Bitte warten, Quellen werden geladen...',
@@ -721,20 +705,6 @@ export default {
             if (!item.data.replacement) return 'badge-danger';
             return 'badge-success';
         },
-        setSermon(e, item) {
-            this.myService.sermon_id = e;
-            axios.patch(route('service.setsermon', this.myService.slug), {sermon_id: e ?? null});
-            if (e) {
-                this.sermons.forEach(sermon => {
-                    if (sermon.id == e) this.myService.sermon = sermon;
-                });
-            } else {
-                this.myService.sermon = null;
-            }
-            item.editing = false;
-            this.focusedItem = null;
-            this.focusedBlock = null;
-        },
         scrollToRef(refId) {
             this.$nextTick(function () {
                 let el = this.$refs[refId].$el;
@@ -769,6 +739,10 @@ export default {
         Object.defineProperty(lists, 'texts', {
             enumerable: true,
             get: () => this.texts,
+        });
+        Object.defineProperty(lists, 'sermons', {
+            enumerable: true,
+            get: () => this.sermons,
         });
         return {
             lists,

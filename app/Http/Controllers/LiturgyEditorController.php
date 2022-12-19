@@ -149,7 +149,7 @@ class LiturgyEditorController extends Controller
             ->orderedDesc()
             ->get(['sermon_id'])->pluck('sermon_id')->unique();
 
-        $sermons = Sermon::whereIn('id', $sermonIds)->get(['id', 'title']);
+        $sermons = Sermon::whereIn('id', $sermonIds)->get(['id', 'title', 'subtitle', 'reference']);
 
         return response()->json($sermons);
     }
