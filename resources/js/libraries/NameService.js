@@ -37,7 +37,7 @@ export class NameService {
         if (myName.includes(',')) {
             let t = myName.split(',')
             this.first = t[1].trim();
-            this.last = t[2].trim();
+            this.last = t[0].trim();
         } else {
             let t = myName.split(' ');
             this.last = t.splice(t.length-1).join(' ');
