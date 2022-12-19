@@ -171,8 +171,6 @@ export default {
                 };
             }
 
-            console.log(dataset);
-
             // do replace
             for (const key in dataset) {
                 if (null != dataset[key]) text = text.replaceAll('['+key+']', dataset[key]);
