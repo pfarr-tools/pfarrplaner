@@ -95,9 +95,6 @@
                                 class="mdi mdi-microphone"></span></button>
                             <button @click.stop="addItem(blockIndex, 'Song')" class="btn btn-sm btn-light"
                                     title="Lied hinzufügen"><span class="mdi mdi-music"></span></button>
-                            <button @click.stop="addItem(blockIndex, 'Liturgic')" class="btn btn-sm btn-light"
-                                    title="Liturgischen Text hinzufügen"><span
-                                class="mdi mdi-text-box"></span></button>
                         </div>
                     </div>
                     <details-pane v-if="block.editing == true" :service="service" :element="block"
@@ -354,7 +351,6 @@ export default {
                 reading: 'mdi mdi-book-open-variant',
                 sermon: 'mdi mdi-microphone',
                 song: 'mdi mdi-music',
-                liturgic: 'mdi mdi-text-box',
             },
             blocks: myBlocks,
             focusedBlock: null,
