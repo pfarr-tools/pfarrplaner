@@ -28,7 +28,8 @@
   -->
 
 <template>
-    <div class="liturgy-text-editor">
+    <div class="liturgy-text-editor form-group">
+        <label>Inhalt</label>
         <quill-editor v-model="myValue" :options="quillOptions"
                       class="focused" ref="textEditor"
                       @focus="textEditorActive = true"
