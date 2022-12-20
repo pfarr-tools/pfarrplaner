@@ -173,7 +173,7 @@ export default {
         Quill.register(SmartBreak);
 
         let quillDefaults = {
-            formats: [],
+            formats: ['break'],
             placeholder: 'Hier Text eingeben...',
             modules: {
                 toolbar: {
@@ -264,6 +264,11 @@ export default {
                 ...this.settings.quill || {},
             },
 
+        }
+    },
+    watch: {
+        myValue: {
+            handler(newVal) { this.$emit('input', newVal); },
         }
     },
     methods: {
