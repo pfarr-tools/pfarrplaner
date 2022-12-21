@@ -7,14 +7,14 @@
         @csrf
         @component('components.ui.card')
             @slot('cardHeader')
-                Dienstanfrage für "{{ $ministry }}"
+                Dienstanfrage für "{{ $ministryTitle }}"
             @endslot
             @slot('cardFooter')
                 <button type="submit" class="btn btn-primary">Absenden</button>
             @endslot
 
             <p>Guten Tag, {{ $user->name }}!</p>
-            <p>Bei welchem der folgenden Gottesdienste könnten Sie den Dienst "{{ $ministry }}" übernehmen? Bitte kreuzen Sie einfach an:</p>
+            <p>Bei welchem der folgenden Gottesdienste könnten Sie den Dienst "{{ $ministryTitle }}" übernehmen? Bitte kreuzen Sie einfach an:</p>
 
             <table class="table table-striped">
                 <thead>

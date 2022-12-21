@@ -36,6 +36,7 @@ use App\Day;
 use App\Funeral;
 use App\Mail\ContactFormMessage;
 use App\Mail\MinistryRequestFilled;
+use App\Ministry;
 use App\Service;
 use App\User;
 use App\Wedding;
@@ -190,9 +191,10 @@ class PublicController extends Controller
             ->ordered()
             ->get();
         $report = 'ministryRequest';
+        $ministryTitle = Ministry::all(true)[$ministry];
         return view(
             'reports.ministryrequest.request',
-            compact('ministry', 'user', 'services', 'report', 'sender')
+            compact('ministry', 'ministryTitle', 'user', 'services', 'report', 'sender')
         );
     }
 
@@ -216,7 +218,9 @@ class PublicController extends Controller
             }
         }
 
-        return view('reports.ministryrequest.thanks', compact('user', 'ministry'));
+        $ministryTitle = Ministry::all(true)[$ministry];
+
+        return view('reports.ministryrequest.thanks', compact('user', 'ministry', 'ministryTitle'));
     }
 
     public function ministryPlan($cityName, $ministry)

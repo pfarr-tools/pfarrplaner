@@ -2,12 +2,11 @@
 
 namespace App\Mail;
 
+use App\Ministry;
 use App\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\URL;
 
 class MinistryRequestFilled extends Mailable
 {
@@ -41,11 +40,14 @@ class MinistryRequestFilled extends Mailable
      */
     public function build()
     {
-        return $this->subject('Zusage: ' . $this->ministry . ' im Gottesdienst')->markdown('mail.ministry.filled')->with(
+
+        $ministryTitle = Ministry::all(true)[$this->ministry];
+
+        return $this->subject('Zusage: ' . $ministryTitle . ' im Gottesdienst')->markdown('mail.ministry.filled')->with(
             [
                 'user' => $this->user,
                 'sender' => $this->sender,
-                'ministry' => $this->ministry,
+                'ministry' => $ministryTitle,
                 'services' => $this->services,
             ]
         );

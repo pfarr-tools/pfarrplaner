@@ -132,7 +132,7 @@ export default {
     data() {
         let myMinistries = [];
         for (let id in this.ministries) {
-            myMinistries.push({ id: this.ministries[id], name: this.ministries[id] });
+            myMinistries.push({ id: id, name: this.ministries[id] });
         }
 
         return {

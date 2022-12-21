@@ -78,7 +78,7 @@ class MinistryRequestReport extends AbstractReport
     {
         $cities = Auth::user()->writableCities;
         $locations = Location::whereIn('city_id', Auth::user()->writableCities->pluck('id'))->get();
-        $ministries = Ministry::all();
+        $ministries = Ministry::all(true);
         $users = User::all();
 
         return Inertia::render('Report/MinistryRequest/Setup', compact('cities', 'locations', 'ministries', 'users'));
@@ -155,6 +155,8 @@ class MinistryRequestReport extends AbstractReport
         $data['services'] = Service::whereIn('id', $data['services'])
             ->ordered()
             ->get();
+
+        $ministries = Ministry::all();
 
 
         foreach ($data['recipients'] as $user) {

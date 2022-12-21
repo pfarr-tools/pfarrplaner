@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Ministry;
 use App\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -51,12 +52,14 @@ class MinistryRequest extends Mailable
         ];
         $url = URL::signedRoute('ministry.request', $urlData);
 
+        $ministryTitle = Ministry::all(true)[$this->ministry];
 
-        return $this->subject('Anfrage: ' . $this->ministry . ' im Gottesdienst')->markdown('mail.ministry.request')->with(
+
+        return $this->subject('Anfrage: ' . $ministryTitle . ' im Gottesdienst')->markdown('mail.ministry.request')->with(
             [
                 'user' => $this->user,
                 'sender' => $this->sender,
-                'ministry' => $this->ministry,
+                'ministry' => $ministryTitle,
                 'services' => $this->services,
                 'url' => $url,
                 'text' => $this->text,

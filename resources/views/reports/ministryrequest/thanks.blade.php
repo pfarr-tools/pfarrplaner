@@ -7,7 +7,7 @@
         @csrf
         @component('components.ui.card')
             @slot('cardHeader')
-                Dienstanfrage für "{{ $ministry }}"
+                Dienstanfrage für "{{ $ministryTitle }}"
             @endslot
 
             <p>Herzlichen Dank, {{ $user->name }}!</p>

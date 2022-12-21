@@ -41,25 +41,35 @@ use phpDocumentor\Reflection\Types\Self_;
 class Ministry
 {
     /**
-     * @return Collection
+     * Get all available ministries
+     *
+     * @param bool $includeBasicMinistries Include P/O/M/A ?
+     * @return array
      */
-    public static function all()
+    public static function all(bool $includeBasicMinistries = false): array
     {
-        return Participant::all()
+        $ministries = Participant::all()
             ->pluck('category')
             ->unique()
-            ->reject(
-                function ($value, $key) {
-                    return in_array($value, ['P', 'O', 'M', 'A']);
-                }
-            );
+            ->reject(function ($item) {
+                return in_array($item, ['P', 'O', 'M', 'A']) || is_numeric($item);
+            })
+            ->sort();
+
+        $m = $includeBasicMinistries ? self::POMA() : [];
+
+        foreach ($ministries as $ministry) {
+            $m[$ministry] = $ministry;
+        }
+
+        return $m;
     }
 
     /**
      * @param $title
      * @return string
      */
-    public static function title($title)
+    public static function title($title): string
     {
         if ($title == 'P') {
             return 'Pfarrer*in';
@@ -79,14 +89,16 @@ class Ministry
     /**
      * @return array
      */
-    public static function POMA() {
+    public static function POMA(): array
+    {
         return ['P' => 'Pfarrer*in', 'O' => 'Organist*in', 'M' => 'Mesner*in', 'A' => 'Weitere Beteiligte'];
     }
 
     /**
      * @return array
      */
-    public static function selectList() {
+    public static function selectList(): array
+    {
         $ministries = [];
         foreach (Participant::all()->pluck('category')->unique() as $ministry) {
             $ministries[] = [
