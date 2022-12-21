@@ -28,16 +28,23 @@
   -->
 
 <template>
-    <admin-layout title="Dienstplan für einen Dienst erstellen">
+    <admin-layout title="Dienstplan für einzelne Dienste erstellen">
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Dienstplan für einen Dienst erstellen" @click="renderReport" />
         </template>
         <form method="post" :action="route('reports.render', {report: 'singleMinistry'})" ref="myForm">
             <form-csrf-token />
-            <form-selectize name="city" label="Plan für folgende Kirchengemeinde erstellen" :options="cities" v-model="myCity"/>
-            <form-selectize name="ministry" label="Dienst" :options="myMinistries" v-model="myMinistry"/>
+            <form-selectize name="cities[]" label="Plan für folgende Kirchengemeinden erstellen"
+                            :options="cities" v-model="myCities" multiple />
+            <form-selectize name="ministries[]" label="Dienste" :options="myMinistries"
+                            v-model="mySelectedMinistries" multiple />
             <form-date-picker name="start" label="Gottesdienste von" v-model="myStart" iso-date />
             <form-date-picker name="end" label="Bis" v-model="myEnd" iso-date />
+            <form-radio-group name="file_format" label="Dateiformat" v-model="myFileFormat" :items="{
+                            'pdf': 'PDF-Datei',
+                            'xlsx': 'Microsoft Excel-Tabelle',
+                        }"/>
+            <form-check name="includeHeader" label="Überschriftenblock mit ausgeben" v-model="includeHeader" />
         </form>
     </admin-layout>
 </template>
@@ -48,10 +55,12 @@ import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import FormRadioGroup from "../../../components/Ui/forms/FormRadioGroup.vue";
+import FormCheck from "../../../components/Ui/forms/FormCheck.vue";
 export default {
     name: "Setup",
     props: ['cities', 'ministries'],
-    components: {FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {FormCheck, FormRadioGroup, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         let myMinistries = [];
         for (let key in this.ministries) {
@@ -63,8 +72,10 @@ export default {
             myStart: moment(),
             myEnd: moment().endOf('year'),
             myMinistries,
-            myMinistry: 'P',
-            myCity: this.cities.length > 0 ? this.cities[0].id : null,
+            mySelectedMinistries: 'P',
+            myCities: this.cities.length > 0 ? [this.cities[0].id] : [],
+            myFileFormat: 'pdf',
+            includeHeader: true,
         }
     },
     methods: {
