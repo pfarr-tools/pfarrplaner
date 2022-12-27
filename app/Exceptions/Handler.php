@@ -101,6 +101,8 @@ class Handler extends ExceptionHandler
     {
         parent::report($e);
 
+        if (in_array(get_class($e), $this->dontReport)) return;
+
         $flat = $this->getFlattenedException($e);
         $flare = Flare::make()
             ->setStage(app()->environment())
