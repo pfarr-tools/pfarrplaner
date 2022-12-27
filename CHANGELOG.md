@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2022.163.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.162.1...v2022.163.0) (2022-12-27)
+
+
+### Features
+
+*  Ersetze alle liturgischen Textelemente durch Freitexte mit dem entsprechenden Text ([7b7c529](https://codeberg.org/pfarrplaner/pfarrplaner/commits/7b7c529884b85acb78cfaff540f839d63c5ee9e2)), closes [#345](https://codeberg.org/pfarrplaner/pfarrplaner/issues/345)
+*  Führe Ersetzungen in liturgischen Texten direkt im Editor durch ([2f17683](https://codeberg.org/pfarrplaner/pfarrplaner/commits/2f176834d9d40339e74cc887c2d0096eb8ecd710)), closes [#346](https://codeberg.org/pfarrplaner/pfarrplaner/issues/346)
+*  Predigtelement muss zur Auswahl der Predigt geöffnet werden ([1192d33](https://codeberg.org/pfarrplaner/pfarrplaner/commits/1192d33831bff2f569216fe2a3047c63832b7f83)), closes [#348](https://codeberg.org/pfarrplaner/pfarrplaner/issues/348)
+*  Verwende einen formattierenden Editor (Quill) für FreetextItemEditor ([fc039b8](https://codeberg.org/pfarrplaner/pfarrplaner/commits/fc039b87765229efb2853cce7dba5ab5697e9174)), closes [#344](https://codeberg.org/pfarrplaner/pfarrplaner/issues/344)
+* Bearbeiten von verantwortlichen Personen direkt beim Bearbeiten eines Elements ([c1800eb](https://codeberg.org/pfarrplaner/pfarrplaner/commits/c1800eb0ef3ddc5c7b9b90ac737e564fa7c001f5)), closes [#347](https://codeberg.org/pfarrplaner/pfarrplaner/issues/347)
+* Bei Dienstanfrage auch Basisdienste (P/O/M) erlauben ([5cd558a](https://codeberg.org/pfarrplaner/pfarrplaner/commits/5cd558a715740ad52548df744f2c1a8cd102bde6)), closes [#352](https://codeberg.org/pfarrplaner/pfarrplaner/issues/352)
+* Dienstplan für einzelne Dienste jetzt auch als Exceltabelle ([00dc9a0](https://codeberg.org/pfarrplaner/pfarrplaner/commits/00dc9a07f10d1f81b235c337cc469ea5a82af8b9))
+* Erste Textbausteine für Trauungen und Taufen ([606679d](https://codeberg.org/pfarrplaner/pfarrplaner/commits/606679dc16b3b2be42def659b498812d71eccb3d))
+* Kleine Layoutverbesserungen ([e0583e5](https://codeberg.org/pfarrplaner/pfarrplaner/commits/e0583e5f75fb57d14ea70366c596eba94829ed7d))
+* Kleine Layoutverbesserungen ([b647d94](https://codeberg.org/pfarrplaner/pfarrplaner/commits/b647d94a88224be4018d45b278b3d0230f7cf377))
+* Verbesserungen bei der Auswahl von liturgischen Texten ([b0244bf](https://codeberg.org/pfarrplaner/pfarrplaner/commits/b0244bf045d759f62f616862a3d1e7a0434bdda9))
+* Verbesserungen bei der Predigtauswahl ([9f7dea2](https://codeberg.org/pfarrplaner/pfarrplaner/commits/9f7dea2c695a1e709ef7053281add00dd3053617))
+
+
+### Bug Fixes
+
+* Exception handler berücksichtigt keine Ausnahmen ([8aa7b51](https://codeberg.org/pfarrplaner/pfarrplaner/commits/8aa7b519a34db7b7cdd0f9f99fb0166f2b41abee))
+* Fehler bei der Normalisierung von Personennamen ([f2f9583](https://codeberg.org/pfarrplaner/pfarrplaner/commits/f2f9583377cf46c5a5373835d5764b29b37b5bf0))
+* Kleine Layoutkorrekturen ([967cb80](https://codeberg.org/pfarrplaner/pfarrplaner/commits/967cb808aa70a683df3cb4bac984df787b4c4548))
+* Korrekturen an der Höhe von Dialogen ([c618f83](https://codeberg.org/pfarrplaner/pfarrplaner/commits/c618f83ab42ccf2e2c2c062f9db54093394df155))
+* Liedauswahl wird nicht gespeichert ([2f29df4](https://codeberg.org/pfarrplaner/pfarrplaner/commits/2f29df4031b5f71963973dfc5d63ae4cef8fdd7e))
+* Obsolete Schaltfläche entfernt ([36c392b](https://codeberg.org/pfarrplaner/pfarrplaner/commits/36c392b8325ecac0ba51afe3563535f02b214d4c))
+* Quill-Editor akzeptiert keine Zeilenumbrüche mehr ([eac3217](https://codeberg.org/pfarrplaner/pfarrplaner/commits/eac3217e6d71649ccf8a3d5996d7b22336f8a2d1))
+* Quill-Editor ist nicht korrekt konfiguriert ([df1869a](https://codeberg.org/pfarrplaner/pfarrplaner/commits/df1869aad0f863fd219fbb9ca37af224c812291e))
+
 ### [2022.162.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.162.0...v2022.162.1) (2022-12-15)
 
 
