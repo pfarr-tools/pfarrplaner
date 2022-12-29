@@ -7,13 +7,10 @@ use App\Jobs\SyncSingleServiceToCalendarConnection;
 use AustinHeap\Database\Encryption\Traits\HasEncryptedAttributes;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class CalendarConnection extends Model
 {
-    use HasEncryptedAttributes;
-
     public const CONNECTION_TYPE_OWN = 1;
     public const CONNECTION_TYPE_ALL = 2;
 

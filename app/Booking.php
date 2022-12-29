@@ -5,11 +5,9 @@ namespace App;
 use AustinHeap\Database\Encryption\Traits\HasEncryptedAttributes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Psy\Util\Str;
 
 class Booking extends Model
 {
-    use HasEncryptedAttributes;
 
     protected $fillable = [
         'service_id',

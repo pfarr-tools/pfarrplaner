@@ -33,7 +33,6 @@ namespace App;
 use App\Calendars\SyncEngines\AbstractSyncEngine;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCommentsTrait;
-use AustinHeap\Database\Encryption\Traits\HasEncryptedAttributes;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -45,7 +44,6 @@ use Illuminate\Support\Facades\URL;
  */
 class Funeral extends Model
 {
-    use HasEncryptedAttributes;
     use HasCommentsTrait;
     use HasAttachmentsTrait;
 

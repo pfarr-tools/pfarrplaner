@@ -50,107 +50,6 @@
             "time": "2022-02-07T20:33:09+00:00"
         },
         {
-            "name": "austinheap/laravel-database-encryption",
-            "version": "dev-laravel8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/potofcoffee/laravel-database-encryption.git",
-                "reference": "da21b5e159e4c739445f3ac4b1ce391445fcebcf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/potofcoffee/laravel-database-encryption/zipball/da21b5e159e4c739445f3ac4b1ce391445fcebcf",
-                "reference": "da21b5e159e4c739445f3ac4b1ce391445fcebcf",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": "5.5.*|5.6.*|5.7.*|5.8.*|6.*|7.*|8.*",
-                "php": ">=7.1.0"
-            },
-            "conflict": {
-                "delatbabel/elocryptfive": "*",
-                "dtisgodsson/elocrypt": "*"
-            },
-            "replace": {
-                "delatbabel/elocryptfive": "*",
-                "dtisgodsson/elocrypt": "*"
-            },
-            "require-dev": {
-                "codeclimate/php-test-reporter": "dev-master",
-                "orchestra/testbench": "^3.5",
-                "phpunit/phpunit": "~6.0|~7.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "AustinHeap\\Database\\Encryption\\EncryptionServiceProvider"
-                    ],
-                    "aliases": {
-                        "DatabaseEncryption": "AustinHeap\\Database\\Encryption\\EncryptionFacade"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "AustinHeap\\Database\\Encryption\\": "src"
-                },
-                "files": [
-                    "src/helpers.php"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Austin Heap",
-                    "email": "me@austinheap.com",
-                    "homepage": "https://github.com/austinheap",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A package for automatically encrypting and decrypting Eloquent attributes in Laravel 5.5+, based on configuration settings.",
-            "homepage": "https://github.com/austinheap/laravel-database-encryption",
-            "keywords": [
-                "aes",
-                "attribute",
-                "attribute encryption",
-                "database",
-                "database encryption",
-                "db",
-                "decrypt",
-                "decryption",
-                "elocrypt",
-                "elocryptfive",
-                "eloquent",
-                "eloquent aes",
-                "eloquent encryption",
-                "encrypt",
-                "encryption",
-                "l5",
-                "laravel",
-                "laravel encryption",
-                "laravel5",
-                "laravel5 aes",
-                "laravel5 encryption",
-                "laravel55",
-                "laravel55 encryption",
-                "laravel56",
-                "laravel56 encryption",
-                "laravel57",
-                "laravel57 encryption",
-                "laravel58",
-                "laravel58 encryption",
-                "model",
-                "model encryption"
-            ],
-            "support": {
-                "source": "https://github.com/potofcoffee/laravel-database-encryption/tree/laravel8"
-            },
-            "time": "2020-12-17T13:29:51+00:00"
-        },
-        {
             "name": "aws/aws-crt-php",
             "version": "v1.0.2",
             "source": {
@@ -12420,7 +12319,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "austinheap/laravel-database-encryption": 20,
         "phpoffice/phppresentation": 20,
         "phpoffice/phpword": 20,
         "thybag/php-sharepoint-lists-api": 20

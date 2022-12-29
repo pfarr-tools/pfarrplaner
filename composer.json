@@ -21,7 +21,6 @@
     "require": {
         "php": "^8.0",
         "almasaeed2010/adminlte": "~3.0",
-        "austinheap/laravel-database-encryption": "dev-laravel8",
         "barryvdh/laravel-ide-helper": "^2.6",
         "davejamesmiller/laravel-breadcrumbs": "^5.3",
         "doctrine/dbal": "^2.9",
