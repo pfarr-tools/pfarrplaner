@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2022.164.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.163.0...v2022.164.0) (2022-12-30)
+
+
+### Features
+
+* Alte Verschlüsselung entfernt ([0257e7e](https://codeberg.org/pfarrplaner/pfarrplaner/commits/0257e7e0c6aebca8e0ccd759986481ddf7b1c44f))
+* Neuer Verschlüsselungsstandard für persönliche Daten ([ecdb4bd](https://codeberg.org/pfarrplaner/pfarrplaner/commits/ecdb4bd7256f1b6aa0f8308731c8dc61f89e5e78))
+
 ## [2022.163.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.162.1...v2022.163.0) (2022-12-27)
 
 
