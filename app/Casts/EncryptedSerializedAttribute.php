@@ -39,7 +39,11 @@ class EncryptedSerializedAttribute extends EncryptedAttribute
     {
         $decrypted = parent::get($model, $key, $value, $attributes);
         if (Str::startsWith($decrypted, '_____')) $decrypted = substr($decrypted, 5);
-        return @unserialize($decrypted) ?: $decrypted;
+        while (is_string($decrypted) && ($x = @unserialize($decrypted))) {
+            $decrypted = $x;
+            if (is_string($decrypted) && Str::startsWith($decrypted, '_____')) $decrypted = substr($decrypted, 5);
+        }
+        return $decrypted;
     }
 
     public static function encrypt($value)
