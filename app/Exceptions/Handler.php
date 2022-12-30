@@ -30,19 +30,14 @@
 
 namespace App\Exceptions;
 
-use BeyondCode\DumpServer\RequestContextProvider;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Mail;
-use PHPUnit\Exception;
-use Spatie\FlareClient\Context\BaseContextProviderDetector;
-use Spatie\FlareClient\Context\ConsoleContextProvider;
-use Spatie\FlareClient\Truncation\ReportTrimmer;
 use Spatie\LaravelIgnition\ContextProviders\LaravelContextProviderDetector;
 use Spatie\LaravelIgnition\Facades\Flare;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
-use Spatie\FlareClient\Report;
 
 class Handler extends ExceptionHandler
 {
@@ -53,6 +48,7 @@ class Handler extends ExceptionHandler
      */
     protected $dontReport = [
         NotFoundHttpException::class,
+        AuthenticationException::class,
     ];
 
     /**
