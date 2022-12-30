@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2022.164.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.164.0...v2022.164.1) (2022-12-30)
+
+
+### Bug Fixes
+
+* Fehler beim Konvertieren von Benutzereinstellungen ([1481659](https://codeberg.org/pfarrplaner/pfarrplaner/commits/1481659c09fe19428834bf53cddb5cc2b6ddd56c))
+
 ## [2022.164.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.163.0...v2022.164.0) (2022-12-30)
 
 
