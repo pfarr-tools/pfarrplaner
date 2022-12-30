@@ -1,10 +1,10 @@
 <?php
-/**
+/*
  * Pfarrplaner
  *
  * @package Pfarrplaner
  * @author Christoph Fischer <chris@toph.de>
- * @copyright (c) Christoph Fischer, https://christoph-fischer.de
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
  * @link https://codeberg.org/pfarrplaner/pfarrplaner
  * @version git: $Id$
@@ -28,46 +28,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App;
+namespace App\Casts;
 
-use App\Casts\EncryptedSerializedAttribute;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
-/**
- * Class UserSetting
- * @package App
- */
-class UserSetting extends Model
+class EncryptedSerializedAttribute extends EncryptedAttribute
 {
 
-    /**
-     * @var string[]
-     */
-    protected $fillable = [
-        'user_id',
-        'key',
-        'value'
-    ];
-
-    /**
-     * @var string[]
-     */
-    protected $casts = [
-        'value' => EncryptedSerializedAttribute::class,
-    ];
-
-    /**
-     * @return BelongsTo
-     */
-    public function user()
+    public function get($model, $key, $value, $attributes)
     {
-        return $this->belongsTo(User::class);
+        $decrypted = parent::get($model, $key, $value, $attributes);
+        if (Str::startsWith($decrypted, '_____')) $decrypted = substr($decrypted, 5);
+        return @unserialize($decrypted) ?: $decrypted;
     }
 
-    public function getRouteKeyName()
+    public static function encrypt($value)
     {
-        return 'key';
+        return parent::encrypt(serialize($value));
     }
 
 }

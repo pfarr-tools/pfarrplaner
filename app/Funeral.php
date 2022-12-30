@@ -31,6 +31,7 @@
 namespace App;
 
 use App\Calendars\SyncEngines\AbstractSyncEngine;
+use App\Casts\EncryptedAttribute;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCommentsTrait;
 use Carbon\Carbon;
@@ -128,41 +129,41 @@ class Funeral extends Model
     ];
 
     /** @var array */
-    protected $encrypted = [
-        'buried_name',
-        'buried_address',
-        'buried_zip',
-        'buried_city',
-        'relative_name',
-        'relative_address',
-        'relative_zip',
-        'relative_city',
-        'relative_contact_data',
-        'spouse',
-        'parents',
-        'children',
-        'further_family',
-        'baptism',
-        'confirmation',
-        'eulogies',
-        'notes',
-        'announcements',
-        'childhood',
-        'profession',
-        'family',
-        'further_life',
-        'faith',
-        'events',
-        'character',
-        'death',
-        'life',
-        'attending',
-        'quotes',
-        'spoken_name',
-        'professional_life',
-        'birth_place',
-        'death_place',
-        'birth_name',
+    protected $casts = [
+        'buried_name' => EncryptedAttribute::class,
+        'buried_address' => EncryptedAttribute::class,
+        'buried_zip' => EncryptedAttribute::class,
+        'buried_city' => EncryptedAttribute::class,
+        'relative_name' => EncryptedAttribute::class,
+        'relative_address' => EncryptedAttribute::class,
+        'relative_zip' => EncryptedAttribute::class,
+        'relative_city' => EncryptedAttribute::class,
+        'relative_contact_data' => EncryptedAttribute::class,
+        'spouse' => EncryptedAttribute::class,
+        'parents' => EncryptedAttribute::class,
+        'children' => EncryptedAttribute::class,
+        'further_family' => EncryptedAttribute::class,
+        'baptism' => EncryptedAttribute::class,
+        'confirmation' => EncryptedAttribute::class,
+        'eulogies' => EncryptedAttribute::class,
+        'notes' => EncryptedAttribute::class,
+        'announcements' => EncryptedAttribute::class,
+        'childhood' => EncryptedAttribute::class,
+        'profession' => EncryptedAttribute::class,
+        'family' => EncryptedAttribute::class,
+        'further_life' => EncryptedAttribute::class,
+        'faith' => EncryptedAttribute::class,
+        'events' => EncryptedAttribute::class,
+        'character' => EncryptedAttribute::class,
+        'death' => EncryptedAttribute::class,
+        'life' => EncryptedAttribute::class,
+        'attending' => EncryptedAttribute::class,
+        'quotes' => EncryptedAttribute::class,
+        'spoken_name' => EncryptedAttribute::class,
+        'professional_life' => EncryptedAttribute::class,
+        'birth_place' => EncryptedAttribute::class,
+        'death_place' => EncryptedAttribute::class,
+        'birth_name' => EncryptedAttribute::class,
     ];
 
     protected $appends = ['age', 'dimissorialUrl'];

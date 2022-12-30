@@ -1,6 +1,7 @@
 <?php
 
 use App\Baptism;
+use App\Casts\EncryptedAttribute;
 use App\Funeral;
 use App\Liturgy\PronounSets\AbstractPronounSet;
 use App\Liturgy\PronounSets\PronounSets;
@@ -26,6 +27,9 @@ return new class extends Migration {
 
         $console = new \Symfony\Component\Console\Output\ConsoleOutput();
 
+        // get the database encrypter
+        $encrypter = EncryptedAttribute::getEncrypter();
+
         foreach ($this->getModels() as $model) {
             $ct = 1;
             $records = $model['class']::all();
@@ -34,7 +38,8 @@ return new class extends Migration {
             foreach ($records as $record) {
                 $consoleSection->overwrite('<comment>Decrypting</comment> '.$model['table'].' ['.$ct.' / '.count($records).']...');
                 $update = [];
-                foreach ($model['encrypted'] as $field) {
+                foreach ($model['encrypted'] as $property) {
+                    $field = $property['field'];
                     $value = $record->$field ?? '';
                     if ($model['table'] == 'user_settings') {
                         if (is_string($value)) {
@@ -44,7 +49,7 @@ return new class extends Migration {
                     } else {
                         $value = $this->unquote($value);
                     }
-                    $update[$field] = $value;
+                    $update[$field] = $property['cast']::encrypt($value);
                 }
                 DB::table($model['table'])->where('id', $record['id'])->update($update);
                 $ct++;
@@ -52,6 +57,7 @@ return new class extends Migration {
 
             $consoleSection->overwrite('<info>Success:</info> Decrypted '.count($records).' '.$model['table'].'.');
         }
+
     }
 
     private function unquote($value) {
@@ -79,13 +85,22 @@ return new class extends Migration {
             $class = 'App\\'.pathinfo($file, PATHINFO_FILENAME);
             $instance = new $class();
             $reflectionClass = new ReflectionClass($class);
-            if ($reflectionClass->hasProperty('encrypted')) {
-                $models[] = [
+            if ($reflectionClass->hasProperty('casts')) {
+
+                $model = [
                     'class' => $class,
                     'classShort' => ucfirst(pathinfo($file, PATHINFO_FILENAME)),
                     'table' => $reflectionClass->getProperty('table')->getValue($instance) ?? Str::snake(Str::plural(pathinfo($file, PATHINFO_FILENAME))),
-                    'encrypted' => $reflectionClass->getProperty('encrypted')->getValue($instance),
                 ];
+
+                $model['encrypted'] = [];
+                foreach ($reflectionClass->getProperty('casts')->getValue($instance) as $field => $cast) {
+                    if ($cast == EncryptedAttribute::class || $cast == \App\Casts\EncryptedSerializedAttribute::class) {
+                        $model['encrypted'][] = ['field' => $field, 'cast' => $cast];
+                    }
+                }
+
+                if (count($model['encrypted'])) $models[] = $model;
             }
         }
         return $models;

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Casts\EncryptedAttribute;
 use AustinHeap\Database\Encryption\Traits\HasEncryptedAttributes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -22,11 +23,11 @@ class Booking extends Model
         'email',
     ];
 
-    protected $encrypted = [
-        'name',
-        'first_name',
-        'contact',
-        'email'
+    protected $casts = [
+        'name' => EncryptedAttribute::class,
+        'first_name' => EncryptedAttribute::class,
+        'contact' => EncryptedAttribute::class,
+        'email' => EncryptedAttribute::class,
     ];
 
     /**

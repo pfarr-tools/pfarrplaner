@@ -31,6 +31,7 @@
 namespace App;
 
 use App\Calendars\SyncEngines\AbstractSyncEngine;
+use App\Casts\EncryptedAttribute;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCommentsTrait;
 use Illuminate\Database\Eloquent\Model;
@@ -88,14 +89,14 @@ class Baptism extends Model
     ];
 
     /** @var array */
-    protected $encrypted = [
-        'candidate_name',
-        'candidate_address',
-        'candidate_city',
-        'candidate_email',
-        'candidate_phone',
-        'text',
-        'birth_place',
+    protected $casts = [
+        'candidate_name' => EncryptedAttribute::class,
+        'candidate_address' => EncryptedAttribute::class,
+        'candidate_city' => EncryptedAttribute::class,
+        'candidate_email' => EncryptedAttribute::class,
+        'candidate_phone' => EncryptedAttribute::class,
+        'text' => EncryptedAttribute::class,
+        'birth_place' => EncryptedAttribute::class,
     ];
 
     protected $with = ['attachments'];

@@ -31,6 +31,7 @@
 namespace App;
 
 use App\Calendars\SyncEngines\AbstractSyncEngine;
+use App\Casts\EncryptedAttribute;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCommentsTrait;
 use Illuminate\Database\Eloquent\Model;
@@ -111,22 +112,22 @@ class Wedding extends Model
     ];
 
     /** @var array $encrypted These fields are en-/decrypted on-the-fly */
-    protected $encrypted = [
-        'spouse1_name',
-        'spouse1_birth_name',
-        'spouse1_email',
-        'spouse1_phone',
-        'spouse2_name',
-        'spouse2_birth_name',
-        'spouse2_email',
-        'spouse2_phone',
-        'spouse1_address',
-        'spouse1_zip',
-        'spouse1_city',
-        'spouse2_address',
-        'spouse2_zip',
-        'spouse2_city',
-        'notes',
+    protected $casts = [
+        'spouse1_name' => EncryptedAttribute::class,
+        'spouse1_birth_name' => EncryptedAttribute::class,
+        'spouse1_email' => EncryptedAttribute::class,
+        'spouse1_phone' => EncryptedAttribute::class,
+        'spouse2_name' => EncryptedAttribute::class,
+        'spouse2_birth_name' => EncryptedAttribute::class,
+        'spouse2_email' => EncryptedAttribute::class,
+        'spouse2_phone' => EncryptedAttribute::class,
+        'spouse1_address' => EncryptedAttribute::class,
+        'spouse1_zip' => EncryptedAttribute::class,
+        'spouse1_city' => EncryptedAttribute::class,
+        'spouse2_address' => EncryptedAttribute::class,
+        'spouse2_zip' => EncryptedAttribute::class,
+        'spouse2_city' => EncryptedAttribute::class,
+        'notes' => EncryptedAttribute::class,
     ];
 
     protected $with = ['attachments'];

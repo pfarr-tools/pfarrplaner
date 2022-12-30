@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Calendars\SyncEngines\SyncEngines;
+use App\Casts\EncryptedAttribute;
 use App\Jobs\SyncSingleServiceToCalendarConnection;
 use AustinHeap\Database\Encryption\Traits\HasEncryptedAttributes;
 use Illuminate\Database\Eloquent\Collection;
@@ -14,9 +15,21 @@ class CalendarConnection extends Model
     public const CONNECTION_TYPE_OWN = 1;
     public const CONNECTION_TYPE_ALL = 2;
 
-    protected $fillable = ['user_id', 'title', 'credentials1', 'credentials2', 'connection_string', 'include_hidden', 'include_alternate'];
+    protected $fillable = [
+        'user_id',
+        'title',
+        'credentials1',
+        'credentials2',
+        'connection_string',
+        'include_hidden',
+        'include_alternate'
+    ];
 
-    protected $encrypted = ['credentials1', 'credentials2', 'connection_string'];
+    protected $casts = [
+        'credentials1' => EncryptedAttribute::class,
+        'credentials2' => EncryptedAttribute::class,
+        'connection_string' => EncryptedAttribute::class,
+    ];
     protected $with = ['user', 'cities'];
 
     /**
@@ -64,7 +77,9 @@ class CalendarConnection extends Model
         }
 
         // exclude hidden service if necessary
-        if (!$this->include_hidden) $cityServices->notHidden();
+        if (!$this->include_hidden) {
+            $cityServices->notHidden();
+        }
 
         return $countOnly ? $cityServices->count() : $cityServices->get();
     }
@@ -76,7 +91,9 @@ class CalendarConnection extends Model
     public function getSyncEngine()
     {
         $syncEngine = SyncEngines::get($this);
-        if (!$syncEngine) Log::error('No sync engine found for CalendarConnection #'.$this->id);
+        if (!$syncEngine) {
+            Log::error('No sync engine found for CalendarConnection #' . $this->id);
+        }
         return $syncEngine;
     }
 
@@ -91,7 +108,7 @@ class CalendarConnection extends Model
             $services = $services->merge($this->getSyncableServicesForCity($city));
         }
 
-        Log::debug('Syncing entire calendar for CalendarConnection #'.$this->id);
+        Log::debug('Syncing entire calendar for CalendarConnection #' . $this->id);
         Log::debug('Dispatching ' . count($services) . ' sync jobs');
         foreach ($services as $service) {
             SyncSingleServiceToCalendarConnection::dispatch($this, $service);

@@ -43,6 +43,9 @@ return [
 
     'default' => env('DB_CONNECTION', 'mysql'),
 
+    'key' => env('DATABASE_KEY'),
+    'cipher' => env('DATABASE_CIPHER', 'AES-256-CBC'),
+
     /*
     |--------------------------------------------------------------------------
     | Database Connections

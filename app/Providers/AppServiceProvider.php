@@ -32,17 +32,11 @@ namespace App\Providers;
 
 use App\QueryLog;
 use App\Seating\SeatingValidators;
-use App\Services\PackageService;
-use Carbon\Carbon;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;

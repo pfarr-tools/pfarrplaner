@@ -30,6 +30,7 @@
 
 namespace App;
 
+use App\Casts\EncryptedAttribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -54,8 +55,8 @@ class Comment extends Model
     /**
      * @var string[]
      */
-    protected $encrypted = [
-        'body',
+    protected $casts = [
+        'body' => EncryptedAttribute::class,
     ];
 
     protected $with = ['user'];
