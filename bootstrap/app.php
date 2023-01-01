@@ -71,6 +71,8 @@ $app->singleton(
     App\Exceptions\Handler::class
 );
 
+$app->alias('mail.manager', Illuminate\Mail\MailManager::class);
+
 /*
 |--------------------------------------------------------------------------
 | Return The Application

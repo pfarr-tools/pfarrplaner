@@ -136,6 +136,10 @@ class User extends Authenticatable
         'sortName',
     ];
 
+    // this is for laravel-permissions, to always use web guard when matching permissions
+    public $guard_name = 'web';
+
+
     /**
      * @var string
      */

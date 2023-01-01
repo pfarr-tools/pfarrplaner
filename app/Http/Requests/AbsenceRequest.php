@@ -94,7 +94,7 @@ class AbsenceRequest extends FormRequest
      * Get the validated data
      * @return array|void
      */
-    public function validated()
+    public function validated($key = null, $default = null)
     {
         $data = parent::validated();
 

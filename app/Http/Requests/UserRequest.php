@@ -65,7 +65,7 @@ class UserRequest extends FormRequest
         return $rules;
     }
 
-    public function validated()
+    public function validated($key = null, $default = null)
     {
         $data = parent::validated();
 

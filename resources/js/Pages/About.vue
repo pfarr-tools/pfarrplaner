@@ -37,7 +37,7 @@
         <p>Gehostet auf einem Server des <a href="https://wwww.kirchenbezirk-balingen.de/" target="_blank">Evangelischen
             Kirchenbezirks Balingen</a>.</p>
         <p>Der Quellcode von Pfarrplaner ist als Open Source auf <a href="https://codeberg.org/pfarrplaner/pfarrplaner"
-                                                                    target="_blank">GitHub</a> verfügbar und steht unter
+                                                                    target="_blank">Codeberg</a> verfügbar und steht unter
             der <a href="https://codeberg.org/pfarrplaner/pfarrplaner/blob/master/LICENSE" target="_blank">GNU General
                 Public License (GPL) 3.0</a> oder höher.
         </p>

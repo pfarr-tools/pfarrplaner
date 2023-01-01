@@ -44,8 +44,6 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use Rap2hpoutre\LaravelLogViewer\LaravelLogViewer;
-use Rap2hpoutre\LaravelLogViewer\Level;
 
 /**
  * Class AdminHomeScreen
@@ -72,11 +70,6 @@ class AdminHomeScreen extends AbstractHomeScreen
             ->get();
 
         $end = Carbon::now()->addYear(1);
-
-        $logViewer = new LaravelLogViewer();
-        $logViewer->setFolder('apache2handler');
-        $logs = $logViewer->all();
-        $levels = new Level();
 
         return $this->renderView('homescreen.admin', compact('user', 'logs', 'levels'));
     }

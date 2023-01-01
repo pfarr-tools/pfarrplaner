@@ -90,7 +90,7 @@ class StoreBaptismRequest extends FormRequest
         ];
     }
 
-    public function validated()
+    public function validated($key = null, $default = null)
     {
         $data = parent::validated();
 

@@ -213,7 +213,6 @@ return [
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         \Spatie\Permission\PermissionServiceProvider::class,
         Shetabit\Visitor\Provider\VisitorServiceProvider::class,
-        Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
         App\Providers\SettingsServiceProvider::class,
     ],
 

@@ -128,7 +128,7 @@ class ServiceRequest extends FormRequest
      *
      * @return array|void
      */
-    public function validated()
+    public function validated($key = null, $default = null)
     {
         $data = parent::validated();
 
