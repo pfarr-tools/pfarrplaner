@@ -5,214 +5,175 @@ Pfarrplaner uses the following open-source libraries:
 
 ## Composer packages
 
- - [almasaeed2010/adminlte](https://packagist.org/packages/almasaeed2010/adminlte) v3.1.0
-    under the MIT license
-
- - [austinheap/laravel-database-encryption](https://packagist.org/packages/austinheap/laravel-database-encryption) dev-laravel8 da21b5e
+ - [almasaeed2010/adminlte](https://packagist.org/packages/almasaeed2010/adminlte) v3.2.0
     under the MIT license
 
  - [aws/aws-crt-php](https://packagist.org/packages/aws/aws-crt-php) v1.0.2
     under the Apache-2.0 license
 
- - [aws/aws-sdk-php](https://packagist.org/packages/aws/aws-sdk-php) 3.209.17
+ - [aws/aws-sdk-php](https://packagist.org/packages/aws/aws-sdk-php) 3.255.7
     under the Apache-2.0 license
 
- - [bacon/bacon-qr-code](https://packagist.org/packages/bacon/bacon-qr-code) 2.0.5
+ - [bacon/bacon-qr-code](https://packagist.org/packages/bacon/bacon-qr-code) 2.0.8
     under the BSD-2-Clause license
 
- - [barryvdh/laravel-debugbar](https://packagist.org/packages/barryvdh/laravel-debugbar) v3.6.6
+ - [barryvdh/laravel-debugbar](https://packagist.org/packages/barryvdh/laravel-debugbar) v3.7.0
     under the MIT license
 
- - [barryvdh/laravel-ide-helper](https://packagist.org/packages/barryvdh/laravel-ide-helper) v2.12.1
+ - [barryvdh/laravel-ide-helper](https://packagist.org/packages/barryvdh/laravel-ide-helper) v2.12.3
     under the MIT license
 
- - [barryvdh/reflection-docblock](https://packagist.org/packages/barryvdh/reflection-docblock) v2.0.6
+ - [barryvdh/reflection-docblock](https://packagist.org/packages/barryvdh/reflection-docblock) v2.1.0
     under the MIT license
 
- - [beyondcode/laravel-dump-server](https://packagist.org/packages/beyondcode/laravel-dump-server) 1.7.0
+ - [beyondcode/laravel-dump-server](https://packagist.org/packages/beyondcode/laravel-dump-server) 1.8.0
     under the MIT license
 
- - [brick/math](https://packagist.org/packages/brick/math) 0.9.3
+ - [brick/math](https://packagist.org/packages/brick/math) 0.10.2
     under the MIT license
 
- - [composer/ca-bundle](https://packagist.org/packages/composer/ca-bundle) 1.3.1
-    under the MIT license
-
- - [composer/composer](https://packagist.org/packages/composer/composer) 2.3.5
-    under the MIT license
-
- - [composer/metadata-minifier](https://packagist.org/packages/composer/metadata-minifier) 1.0.0
-    under the MIT license
-
- - [composer/pcre](https://packagist.org/packages/composer/pcre) 3.0.0
-    under the MIT license
-
- - [composer/semver](https://packagist.org/packages/composer/semver) 3.3.2
-    under the MIT license
-
- - [composer/spdx-licenses](https://packagist.org/packages/composer/spdx-licenses) 1.5.6
-    under the MIT license
-
- - [composer/xdebug-handler](https://packagist.org/packages/composer/xdebug-handler) 3.0.3
+ - [composer/pcre](https://packagist.org/packages/composer/pcre) 3.1.0
     under the MIT license
 
  - [dasprid/enum](https://packagist.org/packages/dasprid/enum) 1.0.3
     under the BSD-2-Clause license
 
- - [davejamesmiller/laravel-breadcrumbs](https://packagist.org/packages/davejamesmiller/laravel-breadcrumbs) 5.3.2
+ - [dflydev/dot-access-data](https://packagist.org/packages/dflydev/dot-access-data) v3.0.2
     under the MIT license
 
- - [dflydev/dot-access-data](https://packagist.org/packages/dflydev/dot-access-data) v3.0.1
+ - [doctrine/cache](https://packagist.org/packages/doctrine/cache) 2.2.0
     under the MIT license
 
- - [doctrine/cache](https://packagist.org/packages/doctrine/cache) 2.1.1
+ - [doctrine/dbal](https://packagist.org/packages/doctrine/dbal) 2.13.9
     under the MIT license
 
- - [doctrine/dbal](https://packagist.org/packages/doctrine/dbal) 2.13.7
+ - [doctrine/deprecations](https://packagist.org/packages/doctrine/deprecations) v1.0.0
     under the MIT license
 
- - [doctrine/deprecations](https://packagist.org/packages/doctrine/deprecations) v0.5.3
+ - [doctrine/event-manager](https://packagist.org/packages/doctrine/event-manager) 1.2.0
     under the MIT license
 
- - [doctrine/event-manager](https://packagist.org/packages/doctrine/event-manager) 1.1.1
+ - [doctrine/inflector](https://packagist.org/packages/doctrine/inflector) 2.0.6
     under the MIT license
 
- - [doctrine/inflector](https://packagist.org/packages/doctrine/inflector) 2.0.4
+ - [doctrine/instantiator](https://packagist.org/packages/doctrine/instantiator) 1.5.0
     under the MIT license
 
- - [doctrine/instantiator](https://packagist.org/packages/doctrine/instantiator) 1.4.0
+ - [doctrine/lexer](https://packagist.org/packages/doctrine/lexer) 2.1.0
     under the MIT license
 
- - [doctrine/lexer](https://packagist.org/packages/doctrine/lexer) 1.2.2
+ - [dragonmantank/cron-expression](https://packagist.org/packages/dragonmantank/cron-expression) v3.3.2
     under the MIT license
 
- - [dragonmantank/cron-expression](https://packagist.org/packages/dragonmantank/cron-expression) v3.3.1
+ - [egulias/email-validator](https://packagist.org/packages/egulias/email-validator) 3.2.4
     under the MIT license
 
- - [egulias/email-validator](https://packagist.org/packages/egulias/email-validator) 2.1.25
-    under the MIT license
-
- - [ezyang/htmlpurifier](https://packagist.org/packages/ezyang/htmlpurifier) v4.14.0
+ - [ezyang/htmlpurifier](https://packagist.org/packages/ezyang/htmlpurifier) v4.16.0
     under the LGPL-2.1-or-later license
 
- - [facade/ignition-contracts](https://packagist.org/packages/facade/ignition-contracts) 1.0.2
+ - [filp/whoops](https://packagist.org/packages/filp/whoops) 2.14.6
     under the MIT license
 
- - [fideloper/proxy](https://packagist.org/packages/fideloper/proxy) 4.4.1
-    under the MIT license
-
- - [filp/whoops](https://packagist.org/packages/filp/whoops) 2.14.5
-    under the MIT license
-
- - [firebase/php-jwt](https://packagist.org/packages/firebase/php-jwt) v5.5.1
+ - [firebase/php-jwt](https://packagist.org/packages/firebase/php-jwt) v6.3.2
     under the BSD-3-Clause license
+
+ - [fruitcake/php-cors](https://packagist.org/packages/fruitcake/php-cors) v1.2.0
+    under the MIT license
 
  - [fzaninotto/faker](https://packagist.org/packages/fzaninotto/faker) dev-master 5ffe7db
     under the MIT license
 
- - [google/apiclient](https://packagist.org/packages/google/apiclient) v2.12.1
+ - [google/apiclient](https://packagist.org/packages/google/apiclient) v2.13.0
     under the Apache-2.0 license
 
- - [google/apiclient-services](https://packagist.org/packages/google/apiclient-services) v0.233.0
+ - [google/apiclient-services](https://packagist.org/packages/google/apiclient-services) v0.280.0
     under the Apache-2.0 license
 
- - [google/auth](https://packagist.org/packages/google/auth) v1.18.0
+ - [google/auth](https://packagist.org/packages/google/auth) v1.24.0
     under the Apache-2.0 license
 
- - [graham-campbell/result-type](https://packagist.org/packages/graham-campbell/result-type) v1.0.4
+ - [graham-campbell/result-type](https://packagist.org/packages/graham-campbell/result-type) v1.1.0
     under the MIT license
 
- - [guzzlehttp/guzzle](https://packagist.org/packages/guzzlehttp/guzzle) 7.4.1
+ - [guzzlehttp/guzzle](https://packagist.org/packages/guzzlehttp/guzzle) 7.5.0
     under the MIT license
 
- - [guzzlehttp/promises](https://packagist.org/packages/guzzlehttp/promises) 1.5.1
+ - [guzzlehttp/promises](https://packagist.org/packages/guzzlehttp/promises) 1.5.2
     under the MIT license
 
- - [guzzlehttp/psr7](https://packagist.org/packages/guzzlehttp/psr7) 2.1.0
+ - [guzzlehttp/psr7](https://packagist.org/packages/guzzlehttp/psr7) 2.4.3
     under the MIT license
 
  - [hamcrest/hamcrest-php](https://packagist.org/packages/hamcrest/hamcrest-php) v2.0.1
     under the BSD-3-Clause license
 
- - [inertiajs/inertia-laravel](https://packagist.org/packages/inertiajs/inertia-laravel) v0.3.6
+ - [inertiajs/inertia-laravel](https://packagist.org/packages/inertiajs/inertia-laravel) v0.6.4
     under the MIT license
 
  - [jamesiarmes/php-ntlm](https://packagist.org/packages/jamesiarmes/php-ntlm) 1.0.0
     under the MIT license
 
- - [jaybizzle/crawler-detect](https://packagist.org/packages/jaybizzle/crawler-detect) v1.2.110
-    under the MIT license
-
- - [jenssegers/agent](https://packagist.org/packages/jenssegers/agent) v2.6.4
-    under the MIT license
-
- - [justinrainbow/json-schema](https://packagist.org/packages/justinrainbow/json-schema) 5.2.12
-    under the MIT license
-
- - [laminas/laminas-escaper](https://packagist.org/packages/laminas/laminas-escaper) 2.9.0
+ - [laminas/laminas-escaper](https://packagist.org/packages/laminas/laminas-escaper) 2.12.0
     under the BSD-3-Clause license
 
- - [laravel-lang/lang](https://packagist.org/packages/laravel-lang/lang) 8.1.3
+ - [laravel-lang/lang](https://packagist.org/packages/laravel-lang/lang) 9.1.2
     under the MIT license
 
- - [laravel/framework](https://packagist.org/packages/laravel/framework) v8.82.0
+ - [laravel/framework](https://packagist.org/packages/laravel/framework) v9.45.1
     under the MIT license
 
- - [laravel/legacy-factories](https://packagist.org/packages/laravel/legacy-factories) v1.3.0
+ - [laravel/legacy-factories](https://packagist.org/packages/laravel/legacy-factories) v1.3.1
     under the MIT license
 
- - [laravel/sanctum](https://packagist.org/packages/laravel/sanctum) v2.14.0
+ - [laravel/sanctum](https://packagist.org/packages/laravel/sanctum) v2.15.1
     under the MIT license
 
- - [laravel/serializable-closure](https://packagist.org/packages/laravel/serializable-closure) v1.1.0
+ - [laravel/serializable-closure](https://packagist.org/packages/laravel/serializable-closure) v1.2.2
     under the MIT license
 
- - [laravel/tinker](https://packagist.org/packages/laravel/tinker) v2.7.0
+ - [laravel/tinker](https://packagist.org/packages/laravel/tinker) v2.7.3
     under the MIT license
 
- - [laravel/ui](https://packagist.org/packages/laravel/ui) v3.4.2
+ - [laravel/ui](https://packagist.org/packages/laravel/ui) v3.4.6
     under the MIT license
 
- - [league/commonmark](https://packagist.org/packages/league/commonmark) 2.2.1
+ - [league/commonmark](https://packagist.org/packages/league/commonmark) 2.3.8
     under the BSD-3-Clause license
 
- - [league/config](https://packagist.org/packages/league/config) v1.1.1
+ - [league/config](https://packagist.org/packages/league/config) v1.2.0
     under the BSD-3-Clause license
 
- - [league/flysystem](https://packagist.org/packages/league/flysystem) 1.1.9
+ - [league/flysystem](https://packagist.org/packages/league/flysystem) 3.12.0
     under the MIT license
 
- - [league/flysystem-aws-s3-v3](https://packagist.org/packages/league/flysystem-aws-s3-v3) 1.0.29
+ - [league/flysystem-aws-s3-v3](https://packagist.org/packages/league/flysystem-aws-s3-v3) 3.10.3
     under the MIT license
 
- - [league/flysystem-sftp](https://packagist.org/packages/league/flysystem-sftp) 1.1.0
+ - [league/flysystem-sftp-v3](https://packagist.org/packages/league/flysystem-sftp-v3) 3.10.3
     under the MIT license
 
- - [league/mime-type-detection](https://packagist.org/packages/league/mime-type-detection) 1.9.0
+ - [league/mime-type-detection](https://packagist.org/packages/league/mime-type-detection) 1.11.0
     under the MIT license
 
- - [maennchen/zipstream-php](https://packagist.org/packages/maennchen/zipstream-php) 2.1.0
+ - [maennchen/zipstream-php](https://packagist.org/packages/maennchen/zipstream-php) v2.4.0
     under the MIT license
 
- - [markbaker/complex](https://packagist.org/packages/markbaker/complex) 3.0.1
+ - [markbaker/complex](https://packagist.org/packages/markbaker/complex) 3.0.2
     under the MIT license
 
- - [markbaker/matrix](https://packagist.org/packages/markbaker/matrix) 3.0.0
+ - [markbaker/matrix](https://packagist.org/packages/markbaker/matrix) 3.0.1
     under the MIT license
 
- - [maximebf/debugbar](https://packagist.org/packages/maximebf/debugbar) v1.17.3
+ - [maximebf/debugbar](https://packagist.org/packages/maximebf/debugbar) v1.18.1
     under the MIT license
 
- - [mobiledetect/mobiledetectlib](https://packagist.org/packages/mobiledetect/mobiledetectlib) 2.8.37
-    under the MIT license
-
- - [mockery/mockery](https://packagist.org/packages/mockery/mockery) 1.5.0
+ - [mockery/mockery](https://packagist.org/packages/mockery/mockery) 1.5.1
     under the BSD-3-Clause license
 
- - [monolog/monolog](https://packagist.org/packages/monolog/monolog) 2.3.5
+ - [monolog/monolog](https://packagist.org/packages/monolog/monolog) 2.8.0
     under the MIT license
 
- - [mpdf/mpdf](https://packagist.org/packages/mpdf/mpdf) v8.0.17
+ - [mpdf/mpdf](https://packagist.org/packages/mpdf/mpdf) v8.0.16
     under the GPL-2.0-only license
 
  - [mpdf/qrcode](https://packagist.org/packages/mpdf/qrcode) v1.2.0
@@ -221,31 +182,34 @@ Pfarrplaner uses the following open-source libraries:
  - [mtdowling/jmespath.php](https://packagist.org/packages/mtdowling/jmespath.php) 2.6.1
     under the MIT license
 
- - [myclabs/deep-copy](https://packagist.org/packages/myclabs/deep-copy) 1.10.2
+ - [myclabs/deep-copy](https://packagist.org/packages/myclabs/deep-copy) 1.11.0
     under the MIT license
 
- - [myclabs/php-enum](https://packagist.org/packages/myclabs/php-enum) 1.8.3
+ - [myclabs/php-enum](https://packagist.org/packages/myclabs/php-enum) 1.8.4
     under the MIT license
 
- - [nesbot/carbon](https://packagist.org/packages/nesbot/carbon) 2.56.0
+ - [nesbot/carbon](https://packagist.org/packages/nesbot/carbon) 2.64.0
     under the MIT license
 
- - [nette/schema](https://packagist.org/packages/nette/schema) v1.2.2
+ - [nette/schema](https://packagist.org/packages/nette/schema) v1.2.3
     under the BSD-3-Clause / GPL-2.0-only / GPL-3.0-only licenses
 
- - [nette/utils](https://packagist.org/packages/nette/utils) v3.2.7
+ - [nette/utils](https://packagist.org/packages/nette/utils) v3.2.8
     under the BSD-3-Clause / GPL-2.0-only / GPL-3.0-only licenses
 
- - [nikic/php-parser](https://packagist.org/packages/nikic/php-parser) v4.13.2
+ - [nikic/php-parser](https://packagist.org/packages/nikic/php-parser) v4.15.2
     under the BSD-3-Clause license
 
  - [niklasravnsborg/laravel-pdf](https://packagist.org/packages/niklasravnsborg/laravel-pdf) v4.1.0
     under the MIT license
 
- - [nunomaduro/collision](https://packagist.org/packages/nunomaduro/collision) v5.11.0
+ - [nunomaduro/collision](https://packagist.org/packages/nunomaduro/collision) v6.3.2
     under the MIT license
 
- - [opis/closure](https://packagist.org/packages/opis/closure) 3.6.3
+ - [nunomaduro/termwind](https://packagist.org/packages/nunomaduro/termwind) v1.15.0
+    under the MIT license
+
+ - [paragonie/constant_time_encoding](https://packagist.org/packages/paragonie/constant_time_encoding) v2.6.3
     under the MIT license
 
  - [paragonie/random_compat](https://packagist.org/packages/paragonie/random_compat) v9.99.100
@@ -257,7 +221,7 @@ Pfarrplaner uses the following open-source libraries:
  - [phar-io/manifest](https://packagist.org/packages/phar-io/manifest) 2.0.3
     under the BSD-3-Clause license
 
- - [phar-io/version](https://packagist.org/packages/phar-io/version) 3.1.0
+ - [phar-io/version](https://packagist.org/packages/phar-io/version) 3.2.1
     under the BSD-3-Clause license
 
  - [php-ews/php-ews](https://packagist.org/packages/php-ews/php-ews) 1.0.0
@@ -266,34 +230,28 @@ Pfarrplaner uses the following open-source libraries:
  - [phpdocumentor/reflection-common](https://packagist.org/packages/phpdocumentor/reflection-common) 2.2.0
     under the MIT license
 
- - [phpdocumentor/reflection-docblock](https://packagist.org/packages/phpdocumentor/reflection-docblock) 5.3.0
+ - [phpdocumentor/type-resolver](https://packagist.org/packages/phpdocumentor/type-resolver) 1.6.2
     under the MIT license
 
- - [phpdocumentor/type-resolver](https://packagist.org/packages/phpdocumentor/type-resolver) 1.6.0
-    under the MIT license
-
- - [phpoffice/common](https://packagist.org/packages/phpoffice/common) 1.0.0
+ - [phpoffice/common](https://packagist.org/packages/phpoffice/common) 1.0.1
     under the LGPL-3.0-only license
 
  - [phpoffice/phppresentation](https://packagist.org/packages/phpoffice/phppresentation) dev-fix-video 0245429
     under the LGPL-3.0-only license
 
- - [phpoffice/phpspreadsheet](https://packagist.org/packages/phpoffice/phpspreadsheet) 1.21.0
+ - [phpoffice/phpspreadsheet](https://packagist.org/packages/phpoffice/phpspreadsheet) 1.26.0
     under the MIT license
 
- - [phpoffice/phpword](https://packagist.org/packages/phpoffice/phpword) dev-develop 44aaa55
+ - [phpoffice/phpword](https://packagist.org/packages/phpoffice/phpword) dev-develop f195d28
     under the LGPL-3.0 license
 
- - [phpoption/phpoption](https://packagist.org/packages/phpoption/phpoption) 1.8.1
+ - [phpoption/phpoption](https://packagist.org/packages/phpoption/phpoption) 1.9.0
     under the Apache-2.0 license
 
- - [phpseclib/phpseclib](https://packagist.org/packages/phpseclib/phpseclib) 2.0.36
+ - [phpseclib/phpseclib](https://packagist.org/packages/phpseclib/phpseclib) 3.0.18
     under the MIT license
 
- - [phpspec/prophecy](https://packagist.org/packages/phpspec/prophecy) v1.15.0
-    under the MIT license
-
- - [phpunit/php-code-coverage](https://packagist.org/packages/phpunit/php-code-coverage) 9.2.10
+ - [phpunit/php-code-coverage](https://packagist.org/packages/phpunit/php-code-coverage) 9.2.23
     under the BSD-3-Clause license
 
  - [phpunit/php-file-iterator](https://packagist.org/packages/phpunit/php-file-iterator) 3.0.6
@@ -308,16 +266,16 @@ Pfarrplaner uses the following open-source libraries:
  - [phpunit/php-timer](https://packagist.org/packages/phpunit/php-timer) 5.0.3
     under the BSD-3-Clause license
 
- - [phpunit/phpunit](https://packagist.org/packages/phpunit/phpunit) 9.5.13
+ - [phpunit/phpunit](https://packagist.org/packages/phpunit/phpunit) 9.5.27
     under the BSD-3-Clause license
 
  - [predis/predis](https://packagist.org/packages/predis/predis) v1.1.10
     under the MIT license
 
- - [psr/cache](https://packagist.org/packages/psr/cache) 2.0.0
+ - [psr/cache](https://packagist.org/packages/psr/cache) 3.0.0
     under the MIT license
 
- - [psr/container](https://packagist.org/packages/psr/container) 1.1.2
+ - [psr/container](https://packagist.org/packages/psr/container) 2.0.2
     under the MIT license
 
  - [psr/event-dispatcher](https://packagist.org/packages/psr/event-dispatcher) 1.0.0
@@ -332,28 +290,22 @@ Pfarrplaner uses the following open-source libraries:
  - [psr/http-message](https://packagist.org/packages/psr/http-message) 1.0.1
     under the MIT license
 
- - [psr/log](https://packagist.org/packages/psr/log) 2.0.0
+ - [psr/log](https://packagist.org/packages/psr/log) 3.0.0
     under the MIT license
 
- - [psr/simple-cache](https://packagist.org/packages/psr/simple-cache) 1.0.1
+ - [psr/simple-cache](https://packagist.org/packages/psr/simple-cache) 3.0.0
     under the MIT license
 
- - [psy/psysh](https://packagist.org/packages/psy/psysh) v0.11.1
+ - [psy/psysh](https://packagist.org/packages/psy/psysh) v0.11.10
     under the MIT license
 
  - [ralouphie/getallheaders](https://packagist.org/packages/ralouphie/getallheaders) 3.0.3
     under the MIT license
 
- - [ramsey/collection](https://packagist.org/packages/ramsey/collection) 1.2.2
+ - [ramsey/collection](https://packagist.org/packages/ramsey/collection) 2.0.0
     under the MIT license
 
- - [ramsey/uuid](https://packagist.org/packages/ramsey/uuid) 4.2.3
-    under the MIT license
-
- - [rap2hpoutre/laravel-log-viewer](https://packagist.org/packages/rap2hpoutre/laravel-log-viewer) v1.7.0
-    under the MIT license
-
- - [react/promise](https://packagist.org/packages/react/promise) v2.9.0
+ - [ramsey/uuid](https://packagist.org/packages/ramsey/uuid) 4.7.1
     under the MIT license
 
  - [revolution/laravel-amazon-product-api](https://packagist.org/packages/revolution/laravel-amazon-product-api) 4.5.0
@@ -368,7 +320,7 @@ Pfarrplaner uses the following open-source libraries:
  - [sebastian/code-unit-reverse-lookup](https://packagist.org/packages/sebastian/code-unit-reverse-lookup) 2.0.3
     under the BSD-3-Clause license
 
- - [sebastian/comparator](https://packagist.org/packages/sebastian/comparator) 4.0.6
+ - [sebastian/comparator](https://packagist.org/packages/sebastian/comparator) 4.0.8
     under the BSD-3-Clause license
 
  - [sebastian/complexity](https://packagist.org/packages/sebastian/complexity) 2.0.2
@@ -377,13 +329,13 @@ Pfarrplaner uses the following open-source libraries:
  - [sebastian/diff](https://packagist.org/packages/sebastian/diff) 4.0.4
     under the BSD-3-Clause license
 
- - [sebastian/environment](https://packagist.org/packages/sebastian/environment) 5.1.3
+ - [sebastian/environment](https://packagist.org/packages/sebastian/environment) 5.1.4
     under the BSD-3-Clause license
 
- - [sebastian/exporter](https://packagist.org/packages/sebastian/exporter) 4.0.4
+ - [sebastian/exporter](https://packagist.org/packages/sebastian/exporter) 4.0.5
     under the BSD-3-Clause license
 
- - [sebastian/global-state](https://packagist.org/packages/sebastian/global-state) 5.0.3
+ - [sebastian/global-state](https://packagist.org/packages/sebastian/global-state) 5.0.5
     under the BSD-3-Clause license
 
  - [sebastian/lines-of-code](https://packagist.org/packages/sebastian/lines-of-code) 1.0.3
@@ -401,22 +353,13 @@ Pfarrplaner uses the following open-source libraries:
  - [sebastian/resource-operations](https://packagist.org/packages/sebastian/resource-operations) 3.0.3
     under the BSD-3-Clause license
 
- - [sebastian/type](https://packagist.org/packages/sebastian/type) 2.3.4
+ - [sebastian/type](https://packagist.org/packages/sebastian/type) 3.2.0
     under the BSD-3-Clause license
 
  - [sebastian/version](https://packagist.org/packages/sebastian/version) 3.0.2
     under the BSD-3-Clause license
 
- - [seld/jsonlint](https://packagist.org/packages/seld/jsonlint) 1.9.0
-    under the MIT license
-
- - [seld/phar-utils](https://packagist.org/packages/seld/phar-utils) 1.2.0
-    under the MIT license
-
  - [setasign/fpdi](https://packagist.org/packages/setasign/fpdi) v2.3.6
-    under the MIT license
-
- - [shetabit/visitor](https://packagist.org/packages/shetabit/visitor) v2.0.1
     under the MIT license
 
  - [simplesoftwareio/simple-qrcode](https://packagist.org/packages/simplesoftwareio/simple-qrcode) 4.2.0
@@ -425,118 +368,118 @@ Pfarrplaner uses the following open-source libraries:
  - [spatie/backtrace](https://packagist.org/packages/spatie/backtrace) 1.2.1
     under the MIT license
 
- - [spatie/db-dumper](https://packagist.org/packages/spatie/db-dumper) 2.21.1
+ - [spatie/db-dumper](https://packagist.org/packages/spatie/db-dumper) 3.3.0
     under the MIT license
 
- - [spatie/flare-client-php](https://packagist.org/packages/spatie/flare-client-php) 1.2.0
+ - [spatie/flare-client-php](https://packagist.org/packages/spatie/flare-client-php) 1.3.2
     under the MIT license
 
- - [spatie/ignition](https://packagist.org/packages/spatie/ignition) 1.3.1
+ - [spatie/ignition](https://packagist.org/packages/spatie/ignition) 1.4.1
     under the MIT license
 
- - [spatie/laravel-backup](https://packagist.org/packages/spatie/laravel-backup) 6.16.5
+ - [spatie/laravel-backup](https://packagist.org/packages/spatie/laravel-backup) 8.1.5
     under the MIT license
 
- - [spatie/laravel-ignition](https://packagist.org/packages/spatie/laravel-ignition) 1.3.1
+ - [spatie/laravel-ignition](https://packagist.org/packages/spatie/laravel-ignition) 1.6.3
     under the MIT license
 
- - [spatie/laravel-permission](https://packagist.org/packages/spatie/laravel-permission) 3.18.0
+ - [spatie/laravel-package-tools](https://packagist.org/packages/spatie/laravel-package-tools) 1.13.8
     under the MIT license
 
- - [spatie/temporary-directory](https://packagist.org/packages/spatie/temporary-directory) 1.3.0
+ - [spatie/laravel-permission](https://packagist.org/packages/spatie/laravel-permission) 5.7.0
     under the MIT license
 
- - [staudenmeir/belongs-to-through](https://packagist.org/packages/staudenmeir/belongs-to-through) v2.11.2
+ - [spatie/laravel-signal-aware-command](https://packagist.org/packages/spatie/laravel-signal-aware-command) 1.2.0
     under the MIT license
 
- - [swiftmailer/swiftmailer](https://packagist.org/packages/swiftmailer/swiftmailer) v6.3.0
+ - [spatie/temporary-directory](https://packagist.org/packages/spatie/temporary-directory) 2.1.1
     under the MIT license
 
- - [symfony/console](https://packagist.org/packages/symfony/console) v5.4.7
+ - [staudenmeir/belongs-to-through](https://packagist.org/packages/staudenmeir/belongs-to-through) v2.12.1
     under the MIT license
 
- - [symfony/css-selector](https://packagist.org/packages/symfony/css-selector) v6.0.3
+ - [symfony/console](https://packagist.org/packages/symfony/console) v6.2.3
     under the MIT license
 
- - [symfony/debug](https://packagist.org/packages/symfony/debug) v4.4.41
+ - [symfony/css-selector](https://packagist.org/packages/symfony/css-selector) v6.2.3
     under the MIT license
 
- - [symfony/deprecation-contracts](https://packagist.org/packages/symfony/deprecation-contracts) v3.0.1
+ - [symfony/debug](https://packagist.org/packages/symfony/debug) v4.4.44
     under the MIT license
 
- - [symfony/error-handler](https://packagist.org/packages/symfony/error-handler) v5.4.3
+ - [symfony/deprecation-contracts](https://packagist.org/packages/symfony/deprecation-contracts) v3.2.0
     under the MIT license
 
- - [symfony/event-dispatcher](https://packagist.org/packages/symfony/event-dispatcher) v6.0.3
+ - [symfony/error-handler](https://packagist.org/packages/symfony/error-handler) v6.2.3
     under the MIT license
 
- - [symfony/event-dispatcher-contracts](https://packagist.org/packages/symfony/event-dispatcher-contracts) v3.0.1
+ - [symfony/event-dispatcher](https://packagist.org/packages/symfony/event-dispatcher) v6.2.2
     under the MIT license
 
- - [symfony/filesystem](https://packagist.org/packages/symfony/filesystem) v6.0.7
+ - [symfony/event-dispatcher-contracts](https://packagist.org/packages/symfony/event-dispatcher-contracts) v3.2.0
     under the MIT license
 
- - [symfony/finder](https://packagist.org/packages/symfony/finder) v5.4.3
+ - [symfony/finder](https://packagist.org/packages/symfony/finder) v6.2.3
     under the MIT license
 
- - [symfony/http-foundation](https://packagist.org/packages/symfony/http-foundation) v5.4.3
+ - [symfony/http-foundation](https://packagist.org/packages/symfony/http-foundation) v6.2.2
     under the MIT license
 
- - [symfony/http-kernel](https://packagist.org/packages/symfony/http-kernel) v5.4.4
+ - [symfony/http-kernel](https://packagist.org/packages/symfony/http-kernel) v6.2.4
     under the MIT license
 
- - [symfony/mime](https://packagist.org/packages/symfony/mime) v5.4.3
+ - [symfony/mailer](https://packagist.org/packages/symfony/mailer) v6.2.2
     under the MIT license
 
- - [symfony/polyfill-ctype](https://packagist.org/packages/symfony/polyfill-ctype) v1.25.0
+ - [symfony/mime](https://packagist.org/packages/symfony/mime) v6.2.2
     under the MIT license
 
- - [symfony/polyfill-iconv](https://packagist.org/packages/symfony/polyfill-iconv) v1.24.0
+ - [symfony/polyfill-ctype](https://packagist.org/packages/symfony/polyfill-ctype) v1.27.0
     under the MIT license
 
- - [symfony/polyfill-intl-grapheme](https://packagist.org/packages/symfony/polyfill-intl-grapheme) v1.25.0
+ - [symfony/polyfill-intl-grapheme](https://packagist.org/packages/symfony/polyfill-intl-grapheme) v1.27.0
     under the MIT license
 
- - [symfony/polyfill-intl-idn](https://packagist.org/packages/symfony/polyfill-intl-idn) v1.24.0
+ - [symfony/polyfill-intl-idn](https://packagist.org/packages/symfony/polyfill-intl-idn) v1.27.0
     under the MIT license
 
- - [symfony/polyfill-intl-normalizer](https://packagist.org/packages/symfony/polyfill-intl-normalizer) v1.25.0
+ - [symfony/polyfill-intl-normalizer](https://packagist.org/packages/symfony/polyfill-intl-normalizer) v1.27.0
     under the MIT license
 
- - [symfony/polyfill-mbstring](https://packagist.org/packages/symfony/polyfill-mbstring) v1.25.0
+ - [symfony/polyfill-mbstring](https://packagist.org/packages/symfony/polyfill-mbstring) v1.27.0
     under the MIT license
 
- - [symfony/polyfill-php72](https://packagist.org/packages/symfony/polyfill-php72) v1.24.0
+ - [symfony/polyfill-php72](https://packagist.org/packages/symfony/polyfill-php72) v1.27.0
     under the MIT license
 
- - [symfony/polyfill-php73](https://packagist.org/packages/symfony/polyfill-php73) v1.25.0
+ - [symfony/polyfill-php80](https://packagist.org/packages/symfony/polyfill-php80) v1.27.0
     under the MIT license
 
- - [symfony/polyfill-php80](https://packagist.org/packages/symfony/polyfill-php80) v1.25.0
+ - [symfony/polyfill-uuid](https://packagist.org/packages/symfony/polyfill-uuid) v1.27.0
     under the MIT license
 
- - [symfony/polyfill-php81](https://packagist.org/packages/symfony/polyfill-php81) v1.24.0
+ - [symfony/process](https://packagist.org/packages/symfony/process) v6.2.0
     under the MIT license
 
- - [symfony/process](https://packagist.org/packages/symfony/process) v5.4.7
+ - [symfony/routing](https://packagist.org/packages/symfony/routing) v6.2.3
     under the MIT license
 
- - [symfony/routing](https://packagist.org/packages/symfony/routing) v5.4.3
+ - [symfony/service-contracts](https://packagist.org/packages/symfony/service-contracts) v3.2.0
     under the MIT license
 
- - [symfony/service-contracts](https://packagist.org/packages/symfony/service-contracts) v2.5.1
+ - [symfony/string](https://packagist.org/packages/symfony/string) v6.2.2
     under the MIT license
 
- - [symfony/string](https://packagist.org/packages/symfony/string) v6.0.3
+ - [symfony/translation](https://packagist.org/packages/symfony/translation) v6.2.3
     under the MIT license
 
- - [symfony/translation](https://packagist.org/packages/symfony/translation) v6.0.3
+ - [symfony/translation-contracts](https://packagist.org/packages/symfony/translation-contracts) v3.2.0
     under the MIT license
 
- - [symfony/translation-contracts](https://packagist.org/packages/symfony/translation-contracts) v3.0.1
+ - [symfony/uid](https://packagist.org/packages/symfony/uid) v6.2.0
     under the MIT license
 
- - [symfony/var-dumper](https://packagist.org/packages/symfony/var-dumper) v5.4.3
+ - [symfony/var-dumper](https://packagist.org/packages/symfony/var-dumper) v6.2.3
     under the MIT license
 
  - [theseer/tokenizer](https://packagist.org/packages/theseer/tokenizer) 1.2.1
@@ -545,28 +488,22 @@ Pfarrplaner uses the following open-source libraries:
  - [thybag/php-sharepoint-lists-api](https://packagist.org/packages/thybag/php-sharepoint-lists-api) dev-master 6f03a95
     under the MIT license
 
- - [tightenco/ziggy](https://packagist.org/packages/tightenco/ziggy) v1.4.3
+ - [tightenco/ziggy](https://packagist.org/packages/tightenco/ziggy) v1.5.0
     under the MIT license
 
- - [tijsverkoyen/css-to-inline-styles](https://packagist.org/packages/tijsverkoyen/css-to-inline-styles) 2.2.4
+ - [tijsverkoyen/css-to-inline-styles](https://packagist.org/packages/tijsverkoyen/css-to-inline-styles) 2.2.5
     under the BSD-3-Clause license
-
- - [ua-parser/uap-php](https://packagist.org/packages/ua-parser/uap-php) v3.9.14
-    under the MIT license
-
- - [ukfast/laravel-health-check](https://packagist.org/packages/ukfast/laravel-health-check) v1.13.2
-    under the MIT license
 
  - [venturecraft/revisionable](https://packagist.org/packages/venturecraft/revisionable) 1.39.0
     under the MIT license
 
- - [vlucas/phpdotenv](https://packagist.org/packages/vlucas/phpdotenv) v5.4.1
+ - [vlucas/phpdotenv](https://packagist.org/packages/vlucas/phpdotenv) v5.5.0
     under the BSD-3-Clause license
 
- - [voku/portable-ascii](https://packagist.org/packages/voku/portable-ascii) 1.6.1
+ - [voku/portable-ascii](https://packagist.org/packages/voku/portable-ascii) 2.0.1
     under the MIT license
 
- - [webmozart/assert](https://packagist.org/packages/webmozart/assert) 1.10.0
+ - [webmozart/assert](https://packagist.org/packages/webmozart/assert) 1.11.0
     under the MIT license
 
 
