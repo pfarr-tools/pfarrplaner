@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.0.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.164.1...v2023.0.0) (2023-01-01)
+
+
+### Bug Fixes
+
+* Fehler bei der Ausgabe, wenn Liedtitel leer ist ([a21b0c1](https://codeberg.org/pfarrplaner/pfarrplaner/commits/a21b0c171b8102805d9d30eddc014908bb884cd3))
+* Zu viele Fehlerreports wegen Spamanfragen ([afcb269](https://codeberg.org/pfarrplaner/pfarrplaner/commits/afcb269480e046e6f3ffd22ec65da8f91396676a))
+
 ### [2022.164.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.164.0...v2022.164.1) (2022-12-30)
 
 
