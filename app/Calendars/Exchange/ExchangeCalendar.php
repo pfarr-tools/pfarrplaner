@@ -83,18 +83,22 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
         $parent->Id = DistinguishedFolderIdNameType::ROOT;
         $request->ParentFolderIds->DistinguishedFolderId[] = $parent;
 
-        $response = $this->client->FindFolder($request);
-        $response_messages = $response->ResponseMessages->FindFolderResponseMessage;
-        $calendars = [];
-        foreach ($response_messages as $response_message) {
-            if ($response_message->ResponseClass == ResponseClassType::SUCCESS) {
-                $id = 0;
-                foreach($response_message->RootFolder->Folders->CalendarFolder as $calendar) {
-                    $calendars[] = ['id' => $calendar->DisplayName, 'name' => $calendar->DisplayName];
+        try {
+            $response = $this->client->FindFolder($request);
+            $response_messages = $response->ResponseMessages->FindFolderResponseMessage;
+            $calendars = [];
+            foreach ($response_messages as $response_message) {
+                if ($response_message->ResponseClass == ResponseClassType::SUCCESS) {
+                    $id = 0;
+                    foreach ($response_message->RootFolder->Folders->CalendarFolder as $calendar) {
+                        $calendars[] = ['id' => $calendar->DisplayName, 'name' => $calendar->DisplayName];
+                    }
                 }
             }
+            return $calendars;
+        } catch (\Exception $e) {
+            return [];
         }
-        return $calendars;
     }
 
     public function getAllEventsForRange(Carbon $start, Carbon $end)
@@ -112,16 +116,20 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
         $request->CalendarView->StartDate = $start->format('c');
         $request->CalendarView->EndDate = $end->format('c');
 
-        $response = $this->client->FindItem($request);
-        $response_messages = $response->ResponseMessages->FindItemResponseMessage;
-        foreach ($response_messages as $response_message) {
-            if ($response_message->ResponseClass != ResponseClassType::SUCCESS) {
-                $code = $response_message->ResponseCode;
-                $message = $response_message->MessageText;
-                fwrite(STDERR, "Failed to find folders with \"$code: $message\"\n");
-                return null;
+        try {
+            $response = $this->client->FindItem($request);
+            $response_messages = $response->ResponseMessages->FindItemResponseMessage;
+            foreach ($response_messages as $response_message) {
+                if ($response_message->ResponseClass != ResponseClassType::SUCCESS) {
+                    $code = $response_message->ResponseCode;
+                    $message = $response_message->MessageText;
+                    fwrite(STDERR, "Failed to find folders with \"$code: $message\"\n");
+                    return null;
+                }
+                return $response_message->RootFolder->Items->CalendarItem;
             }
-            return $response_message->RootFolder->Items->CalendarItem;
+        } catch (\Exception $e) {
+            return false;
         }
     }
 
@@ -152,16 +160,20 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
         $contains->ContainmentMode = ContainmentModeType::SUBSTRING;
         $request->Restriction->Contains = $contains;
 
-        $response = $this->client->FindFolder($request);
-        $response_messages = $response->ResponseMessages->FindFolderResponseMessage;
-        foreach ($response_messages as $response_message) {
-            if ($response_message->ResponseClass != ResponseClassType::SUCCESS) {
-                $code = $response_message->ResponseCode;
-                $message = $response_message->MessageText;
-                fwrite(STDERR, "Failed to find folders with \"$code: $message\"\n");
-                return null;
+        try {
+            $response = $this->client->FindFolder($request);
+            $response_messages = $response->ResponseMessages->FindFolderResponseMessage;
+            foreach ($response_messages as $response_message) {
+                if ($response_message->ResponseClass != ResponseClassType::SUCCESS) {
+                    $code = $response_message->ResponseCode;
+                    $message = $response_message->MessageText;
+                    fwrite(STDERR, "Failed to find folders with \"$code: $message\"\n");
+                    return null;
+                }
+                return $response_message->RootFolder->Folders->CalendarFolder[0];
             }
-            return $response_message->RootFolder->Folders->CalendarFolder[0];
+        } catch (\Exception $e) {
+            return false;
         }
     }
 
@@ -175,15 +187,19 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
         $item->Id = $id;
         $request->ItemIds->ItemId[] = $item;
 
-        $response = $this->client->GetItem($request);
-        return $this->handleResponse(
-            $response->ResponseMessages->GetItemResponseMessage,
-            null,
-            function (CalendarItemType $item) {
-                return ExchangeCalendarItem::fromExchangeItem($item, $this);
-            },
-            false
-        );
+        try {
+            $response = $this->client->GetItem($request);
+            return $this->handleResponse(
+                $response->ResponseMessages->GetItemResponseMessage,
+                null,
+                function (CalendarItemType $item) {
+                    return ExchangeCalendarItem::fromExchangeItem($item, $this);
+                },
+                false
+            );
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function create(array $data = [])
@@ -197,19 +213,23 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
         $request->Items->CalendarItem[] = $item;
         $request->SavedItemFolderId = $this->folder;
 
-        $response = $this->client->CreateItem($request);
+        try {
+            $response = $this->client->CreateItem($request);
 
-        $response_messages = $response->ResponseMessages->CreateItemResponseMessage;
-        foreach ($response_messages as $response_message) {
-            // Make sure the request succeeded.
-            if ($response_message->ResponseClass != ResponseClassType::SUCCESS) {
-                return null;
-            }
+            $response_messages = $response->ResponseMessages->CreateItemResponseMessage;
+            foreach ($response_messages as $response_message) {
+                // Make sure the request succeeded.
+                if ($response_message->ResponseClass != ResponseClassType::SUCCESS) {
+                    return null;
+                }
 
-            // Iterate over the created events, printing the id for each.
-            foreach ($response_message->Items->CalendarItem as $item) {
-                return $this->find($item->ItemId->Id);
+                // Iterate over the created events, printing the id for each.
+                foreach ($response_message->Items->CalendarItem as $item) {
+                    return $this->find($item->ItemId->Id);
+                }
             }
+        } catch (\Exception $e) {
+            return false;
         }
     }
 
@@ -225,14 +245,18 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
         $change = $item->getItemChangeType($data);
         $request->ItemChanges[] = $change;
 
-        $response = $this->client->UpdateItem($request);
-        return $this->handleResponse(
-            $response->ResponseMessages->UpdateItemResponseMessage,
-            false,
-            function (CalendarItemType $item) {
-                return $this->find($item->ItemId->Id);
-            }
-        );
+        try {
+            $response = $this->client->UpdateItem($request);
+            return $this->handleResponse(
+                $response->ResponseMessages->UpdateItemResponseMessage,
+                false,
+                function (CalendarItemType $item) {
+                    return $this->find($item->ItemId->Id);
+                }
+            );
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
