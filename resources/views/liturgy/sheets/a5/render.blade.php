@@ -256,7 +256,7 @@
                                 {{ $item->data['song']['code'] ?? ($item['song']['songbook']['name'] ?? '') }}
                             @endif
                                 {{ $item->data['song']['reference'] ?? '' }}@if(isset($item->data['song']) && isset($item->data['song']['altEG'])) (EG {{ $item->data['song']['altEG'] }})@endif
-                                @if(isset($item->data['song']['song']['title'])){{ $item->data['song']['song']['title'] ?: '' }}@endif@if ($item->data['verses']), {{ $item->data['verses'] }}@endif
+                                @if(isset($item->data['song']['song']['title'])){{ $item->data['song']['song']['title'] ?: '' }}@endif{{""}}@if ($item->data['verses']), {{ $item->data['verses'] }}@endif
                         @endif
                     </td>
                 @elseif($item->data_type == 'psalm')

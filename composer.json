@@ -34,7 +34,7 @@
         "league/flysystem-sftp-v3": "~3.10",
         "mpdf/qrcode": "^1.0",
         "nesbot/carbon": "^2.64",
-        "niklasravnsborg/laravel-pdf": "^4.0",
+        "niklasravnsborg/laravel-pdf": "^4.1.0",
         "php-ews/php-ews": "^1.0",
         "phpoffice/phppresentation": "dev-fix-video",
         "phpoffice/phpspreadsheet": "^1.8",
