@@ -33,6 +33,7 @@ namespace App\Exceptions;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 use Spatie\LaravelIgnition\ContextProviders\LaravelContextProviderDetector;
 use Spatie\LaravelIgnition\Facades\Flare;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
@@ -49,6 +50,7 @@ class Handler extends ExceptionHandler
     protected $dontReport = [
         NotFoundHttpException::class,
         AuthenticationException::class,
+        ValidationException::class,
     ];
 
     /**
