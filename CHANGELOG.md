@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.0.3](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.0.2...v2023.0.3) (2023-01-02)
+
+
+### Bug Fixes
+
+* Versionsinkompatibilität bei mPDF ([108a09f](https://codeberg.org/pfarrplaner/pfarrplaner/commits/108a09f1f575b58dcd2e279d5fd312b094143d3f))
+
 ### [2023.0.2](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.0.1...v2023.0.2) (2023-01-02)
 
 
