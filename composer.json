@@ -40,6 +40,7 @@
         "phpoffice/phpspreadsheet": "^1.8",
         "phpoffice/phpword": "dev-develop",
         "predis/predis": "^1.1",
+        "psr/log": "^2",
         "revolution/laravel-amazon-product-api": "^4.5",
         "simplesoftwareio/simple-qrcode": "^4.1",
         "spatie/laravel-backup": "^8.1.5",
