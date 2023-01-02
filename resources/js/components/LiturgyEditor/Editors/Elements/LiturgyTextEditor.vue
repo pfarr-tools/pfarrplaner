@@ -84,7 +84,7 @@
         </quill-editor>
 
         <insert-liturgic-text-dialog v-if="dialogs.insertLiturgic" class="dialog" :service="service"
-                                     @input="dialogs.insertLiturgic = false; insertText($event)"/>
+                                     @input="dialogs.insertLiturgic = false; insertText($event, true)"/>
         <insert-bible-text-dialog v-if="dialogs.insertBible"  class="dialog" :service="service"
                                   @input="dialogs.insertBible = false; insertText($event)" />
         <insert-word-document-dialog v-if="dialogs.insertWord" class="dialog"
@@ -273,13 +273,17 @@ export default {
     },
     methods: {
         dummy() {},
-        insertText(value) {
+        insertText(value, withHtml = false) {
             const quill = this.$refs.textEditor.quill;
             const {index, length} = quill.selection.savedRange;
             value = String(value);
             if (value != '') {
                 quill.deleteText(index, length);
-                quill.insertText(index, value);
+                if (withHtml) {
+                    quill.clipboard.dangerouslyPasteHTML(value);
+                } else {
+                    quill.insertText(index, value);
+                }
             }
             quill.setSelection(index + value.length);
         },

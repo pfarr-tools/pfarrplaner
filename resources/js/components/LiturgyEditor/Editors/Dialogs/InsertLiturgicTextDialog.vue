@@ -72,8 +72,7 @@
 
             </div>
             <div class="col-sm-6">
-                <nl2br tag="div" v-if="selectedText"
-                       :text="myText"/>
+                <div v-if="selectedText" v-html="myText" />
             </div>
         </div>
     </modal>
