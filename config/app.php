@@ -212,7 +212,6 @@ return [
         niklasravnsborg\LaravelPdf\PdfServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         \Spatie\Permission\PermissionServiceProvider::class,
-        Shetabit\Visitor\Provider\VisitorServiceProvider::class,
         App\Providers\SettingsServiceProvider::class,
     ],
 

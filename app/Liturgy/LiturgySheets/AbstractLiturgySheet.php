@@ -227,10 +227,10 @@ class AbstractLiturgySheet
      */
     public function getConfiguration()
     {
-	if (Auth::guest()) return $this->defaultConfig;
+	    if (Auth::guest()) return $this->defaultConfig;
         return $this->config = array_replace_recursive(
             $this->defaultConfig,
-            Auth::user()->getSetting('liturgySheetConfig_' . $this->getKey()) ?? []
+            Auth::user()->getSetting('liturgySheetConfig_' . $this->getKey()) ?: []
         );
     }
 

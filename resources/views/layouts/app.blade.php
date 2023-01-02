@@ -161,7 +161,6 @@
                         <h1 class="m-0 text-dark">@yield('title')</h1>
                     </div><!-- /.col -->
                     <div class="col-sm-6">
-                        {{ \DaveJamesMiller\Breadcrumbs\Facades\Breadcrumbs::render() }}
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->

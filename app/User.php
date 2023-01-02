@@ -49,8 +49,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\HasApiTokens;
-use Shetabit\Visitor\Traits\Visitable;
-use Shetabit\Visitor\Traits\Visitor;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 use App\Facades\Settings;
@@ -62,7 +60,7 @@ use Venturecraft\Revisionable\Revision;
  */
 class User extends Authenticatable
 {
-    use Notifiable, HasRoles, Visitable, Visitor, HasApiTokens;
+    use Notifiable, HasRoles, HasApiTokens;
 
     /**
      *
