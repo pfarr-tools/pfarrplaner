@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.0.2](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.0.1...v2023.0.2) (2023-01-02)
+
+
+### Bug Fixes
+
+* PDF-Ausdrucke sind nicht mehr möglich ([3ff3ff6](https://codeberg.org/pfarrplaner/pfarrplaner/commits/3ff3ff66f8f0f71da384402b9b1a42b848d50d66))
+
 ### [2023.0.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.0.0...v2023.0.1) (2023-01-02)
 
 
