@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.0.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.0.0...v2023.0.1) (2023-01-02)
+
+
+### Bug Fixes
+
+* Backups enden mit Fehlermeldung ([d8e2039](https://codeberg.org/pfarrplaner/pfarrplaner/commits/d8e2039a217b0d45f1109072fa0789ffea15fb84))
+* Beerdigung kann nicht gespeichert werden, wenn bei einer Kalenderverbindung Fehler auftreten. ([dbc868d](https://codeberg.org/pfarrplaner/pfarrplaner/commits/dbc868dc4cc338a5544883830d3a449d6277bf03))
+* Fehler beim Import vom EventKalender ([46a7c62](https://codeberg.org/pfarrplaner/pfarrplaner/commits/46a7c6279eb7e358598fe452f1fde4cf16e66ca7))
+* Liturgie lässt sich nicht mehr öffnen ([49f9c20](https://codeberg.org/pfarrplaner/pfarrplaner/commits/49f9c2093dfbc405c9355a8dd6ec1263cf48bf34))
+
 ## [2023.0.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2022.164.1...v2023.0.0) (2023-01-01)
 
 
