@@ -120,6 +120,7 @@ class EventCalendarImport
 
 
         $filteredEvents = [];
+        if (!is_array($events)) return [];
         foreach ($events as $key => $event) {
             $event['record_type'] = 'Outlook_Event';
             $event['start'] = $this->sanitizeTimeString($event['start']);
