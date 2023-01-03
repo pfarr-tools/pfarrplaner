@@ -119,6 +119,7 @@ class EncryptedAttribute implements CastsAttributes
     }
 
     public static function encrypt($value) {
+        if (!is_string($value) && !is_null($value)) $value = serialize($value);
         return self::getEncrypter()->encryptString($value);
     }
 }
