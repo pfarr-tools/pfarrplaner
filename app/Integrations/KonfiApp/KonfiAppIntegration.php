@@ -102,7 +102,7 @@ class KonfiAppIntegration extends AbstractIntegration
      */
     public function listEventTypes()
     {
-        return collect($this->requestData('verwaltung/veranstaltungen/list/')->payload->veranstaltungen);
+        return collect($this->requestData('verwaltung/veranstaltungen/')->data->veranstaltungen);
     }
 
     /**
@@ -116,7 +116,7 @@ class KonfiAppIntegration extends AbstractIntegration
      */
     protected function requestData($path, $arguments = [])
     {
-        $response = $this->request('POST', $path, $arguments);
+        $response = $this->request('GET', $path, $arguments);
         if ($response->getStatusCode() != 200) {
             throw new Exception ('Could not retrieve event types from KonfiApp.');
         }
@@ -135,13 +135,13 @@ class KonfiAppIntegration extends AbstractIntegration
      */
     protected function request($requestType, $path, $arguments = []): ResponseInterface
     {
-        $arguments['apikey'] = $this->apiKey;
         return $this->client->request(
             $requestType,
             $path,
             [
                 'query' => $arguments,
                 'form_params' => $arguments,
+                'headers' => ['X-Konfiapp-Token' => $this->apiKey]
             ]
         );
     }
