@@ -30,7 +30,7 @@
 <template>
     <admin-layout title="Ausgabeformat wählen">
         <dataset v-slot="{ ds }"
-                 :ds-data="reports"
+                 :ds-data="myReports"
                  ds-sort-by="name"
                  :ds-search-in="['title', 'description', 'group']">
             <div class="row mb-3" :data-page-count="ds.dsPagecount">
@@ -104,6 +104,7 @@ export default {
     data() {
         return {
             showEntries: 25,
+            myReports: typeof this.reports == 'object' ? Object.values(this.reports) : this.reports,
         }
     },
     methods: {
