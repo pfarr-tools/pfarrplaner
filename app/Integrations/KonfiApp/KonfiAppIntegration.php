@@ -190,7 +190,7 @@ class KonfiAppIntegration extends AbstractIntegration
     public function createQRCode(Service $service)
     {
         return ($this->requestData(
-            'verwaltung/veranstaltungen/qr/add/',
+            'verwaltung/veranstaltungen/qr/',
             [
                 'veranstaltungID' => $service->konfiapp_event_type,
                 'dateStart' => $service->date->format('Y.m.d'),
@@ -209,7 +209,7 @@ class KonfiAppIntegration extends AbstractIntegration
     public function deleteQRCodeByCode($code, $type)
     {
         $codes = $this->requestData(
-            'verwaltung/veranstaltungen/qr/list/',
+            'verwaltung/veranstaltungen/qr/',
             [
                 'veranstaltungID' => $type,
             ]
