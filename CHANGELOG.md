@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.1.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.0.3...v2023.1.0) (2023-01-08)
+
+
+### Features
+
+* Korrigierte Zeilenumbrüche bei liturgischen Texten ([2ba6fec](https://codeberg.org/pfarrplaner/pfarrplaner/commits/2ba6fec39436695b1efb4809f394f86b7f579b42))
+
+
+### Bug Fixes
+
+* Fehler beim Erstellen von QR-Codes in der KonfiApp ([732d4e7](https://codeberg.org/pfarrplaner/pfarrplaner/commits/732d4e76bb6302a519932cdb2c468d3c8daefa25))
+* In der mobilen Kalenderansicht kann der Monat nicht gewechselt werden ([72a8882](https://codeberg.org/pfarrplaner/pfarrplaner/commits/72a8882e5ae17018d159851e96f50ae3739a1c65))
+* Liste der Ausgabeformate ist leer ([4f91b9f](https://codeberg.org/pfarrplaner/pfarrplaner/commits/4f91b9f8f82e64a8459ac883fa8f6e1ebe0bc2be))
+* Urlaubsplaner kann nicht aufgerufen werden. ([22972bd](https://codeberg.org/pfarrplaner/pfarrplaner/commits/22972bdc4e7bd2272b030edac1a4eb608b6524f3))
+* Veranstaltungstypen können nicht mehr von der KonfiApp geladen werden ([8f87bc7](https://codeberg.org/pfarrplaner/pfarrplaner/commits/8f87bc71a9673ccb853d4a10c7688bf9c5159250))
+
 ### [2023.0.3](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.0.2...v2023.0.3) (2023-01-02)
 
 
