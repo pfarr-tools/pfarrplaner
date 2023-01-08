@@ -33,7 +33,8 @@
             </div>
             <div class="d-inline d-md-none">
                 <!-- mobile version -->
-                <calendar-pane-mobile :date="myDate" :days="days" :cities="cityList" :services="services" :years="years"
+                <calendar-pane-mobile :date="myDate" :days="myDays" :cities="cityList" :services="services" :years="years"
+                                      :key="myDate"
                                       :absences="absences" :can-create="canCreate" :loading="loading"/>
             </div>
         </div>
@@ -204,6 +205,7 @@ export default {
             });
         },
         navigateTo(targetDate) {
+            console.log('navigateTo', targetDate);
             this.myDate = targetDate;
             this.daysLoaded = false;
             axios.get(route('api.calendar.navigate', {
