@@ -27,7 +27,6 @@ return new class extends Migration {
 
         }
         $consoleSection->overwrite('<info>Converted</info> linebreaks in '.count($texts).' liturgical texts');
-        dd('abort');
     }
 
 
