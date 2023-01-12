@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.2.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.2.0...v2023.2.1) (2023-01-12)
+
+
+### Bug Fixes
+
+* Kalender springt zu aktuellem Monat nachdem ein Gottesdienst bearbeitet wurde ([65a7ff0](https://codeberg.org/pfarrplaner/pfarrplaner/commits/65a7ff041cbc5f6a7724012f1991f1a2979021c6)), closes [#356](https://codeberg.org/pfarrplaner/pfarrplaner/issues/356)
+
 ## [2023.2.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.1.0...v2023.2.0) (2023-01-12)
 
 
