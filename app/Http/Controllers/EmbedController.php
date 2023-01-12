@@ -169,18 +169,10 @@ class EmbedController extends Controller
         $ids = explode(',', $ids);
         $title = $request->has('title') ? $request->get('title') : '';
         $services = Service::with('location', 'baptisms')
-            ->select('services.*')
-            ->join('days', 'services.day_id', '=', 'days.id')
+            ->startingFrom(Carbon::now('Europe/Berlin')->setTime(0,0,0))
             ->where('baptism', true)
             ->whereIn('city_id', $ids)
-            ->whereHas(
-                'day',
-                function ($query) {
-                    $query->where('date', '>=', Carbon::now('Europe/Berlin')->setTime(0, 0, 0));
-                }
-            )
-            ->orderBy('days.date', 'ASC')
-            ->orderBy('time', 'ASC')
+            ->ordered()
             ->limit($limit)
             ->get();
 
