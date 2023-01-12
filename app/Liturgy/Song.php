@@ -66,7 +66,7 @@ class Song extends \Illuminate\Database\Eloquent\Model
      */
     public function songbooks()
     {
-        return $this->belongsToMany(Songbook::class)->withPivot(['id', 'reference']);
+        return $this->belongsToMany(Songbook::class)->withPivot(['id', 'reference', 'color']);
     }
 
     public function syncSongbooksFromRequest($data)
@@ -74,7 +74,7 @@ class Song extends \Illuminate\Database\Eloquent\Model
         if (!isset($data['songbooks'])) return;
         $sync = [];
         foreach ($data['songbooks'] as $item) {
-            $sync[$item['pivot']['songbook_id']] = ['reference' => $item['pivot']['reference'], 'code' => $item['code']];
+            $sync[$item['pivot']['songbook_id']] = ['reference' => $item['pivot']['reference'], 'code' => $item['code'], 'color' => $item['pivot']['color']];
         }
         $this->songbooks()->sync($sync, true);
     }
