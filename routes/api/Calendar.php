@@ -31,6 +31,5 @@
 
 use App\Http\Controllers\Api\CalendarController;
 
-Route::get('/cal/navigate/{date}', [CalendarController::class, 'navigate'])->name('calendar.navigate');
 Route::get('/cal/city/{city}/{date}', [CalendarController::class, 'city'])->name('calendar.byCityAndMonth');
 

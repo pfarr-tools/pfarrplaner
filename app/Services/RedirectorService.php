@@ -32,6 +32,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
+
 class RedirectorService
 {
 

@@ -104,6 +104,7 @@ export default {
             myTeams: [],
             ministriesLoaded: false,
             myMinistries: [],
+            returnRoute: null,
             target: {
                 people: [],
                 ministry: this.$page.props.currentUser.data.isPastor ? 'P' : null,

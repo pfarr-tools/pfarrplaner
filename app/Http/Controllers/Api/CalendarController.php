@@ -35,6 +35,7 @@ use App\City;
 use App\Liturgy;
 use App\Service;
 use App\Services\CalendarService;
+use App\Services\RedirectorService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +45,7 @@ class CalendarController extends \App\Http\Controllers\Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except('navigate');
     }
 
     /**
@@ -55,6 +56,10 @@ class CalendarController extends \App\Http\Controllers\Controller
     public function navigate($date)
     {
         $date = Carbon::parse($date . '-01 0:00:00');
+
+        $returnRoute = route('calendar', $date->format('Y-m'));
+        RedirectorService::setReturnRoute(route('calendar', $date->format('Y-m')));
+        $returnRoute = RedirectorService::backRoute();
 
         $dates = Service::select(DB::raw('DISTINCT DATE(services.date) as day'))
             ->inCities(Auth::user()->visibleCities)
@@ -79,7 +84,7 @@ class CalendarController extends \App\Http\Controllers\Controller
         );
 
 
-        return response()->json(compact('days', 'absences'));
+        return response()->json(compact('days', 'absences', 'returnRoute'));
     }
 
 
