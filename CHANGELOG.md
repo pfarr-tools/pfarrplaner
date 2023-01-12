@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.3.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.2.1...v2023.3.0) (2023-01-12)
+
+
+### Features
+
+* Liederliste und automatisches "Ehr sei dem Vater" in der Powerpoint ([a30d7d6](https://codeberg.org/pfarrplaner/pfarrplaner/commits/a30d7d62ca3864a2d3f76e95383b21aa67349618))
+
+
+### Bug Fixes
+
+* Fehler beim Anlegen von neuen Kirchengemeinden ([ac3cda8](https://codeberg.org/pfarrplaner/pfarrplaner/commits/ac3cda84bc9fb60be971e5b7e97cee93e2d2fc90))
+
 ### [2023.2.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.2.0...v2023.2.1) (2023-01-12)
 
 
