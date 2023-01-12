@@ -48,7 +48,7 @@ Route::get('/kirchengemeinden/neu', [CityController::class, 'create'])->name('ci
 
 
 Route::get('/kirchengemeinde/{city:name}', [CityController::class, 'edit'])->name('city.edit');
-Route::patch('/kirchengemeinde/{city:name}', [CityController::class, 'update'])->name('city.update');
+Route::patch('/kirchengemeinde/{city:id}', [CityController::class, 'update'])->name('city.update');
 Route::delete('/kirchengemeinde/{city:name}', [CityController::class, 'destroy'])->name('city.delete');
 
 Route::post('/city/{city}/attach/{field}', [CityController::class, 'attachImage'])->name('city.attach');

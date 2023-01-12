@@ -89,7 +89,7 @@ class CityController extends Controller
      */
     public function create()
     {
-        $city = City::create([]);
+        $city = City::create(['name' => 'Neue-Kirchengemeinde '.(City::count()), 'default_ministries' => []]);
         return redirect()->route('city.edit', $city);
     }
 

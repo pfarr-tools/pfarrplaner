@@ -256,7 +256,7 @@ export default {
             return 'Kirchengemeinde "' + this.city.name + '" bearbeiten';
         },
         saveCity() {
-            this.$inertia.patch(route('city.update', {city: this.city.name}), this.myCity);
+            this.$inertia.patch(route('city.update', {city: this.city.id}), this.myCity);
         }
     }
 }

@@ -29,6 +29,10 @@
 
 <template>
     <admin-layout title="Kirchengemeinden">
+        <template v-slot:navbar-left>
+            <nav-button type="success" icon="mdi mdi-plus" title="Neue Kirchengemeinde hinzufügen"
+                        @click="addCity">Neue Kirchengemeinde</nav-button>
+        </template>
         <dataset v-slot="{ ds }"
                  :ds-data="cities"
                  ds-sort-by="name"
@@ -99,11 +103,13 @@ import {
 import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
 import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
 import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
+import NavButton from "../../../components/Ui/buttons/NavButton.vue";
 
 
 export default {
     name: "CityIndex",
-    components: {FakeTable, CardBody, Card,
+    components: {
+        NavButton, FakeTable, CardBody, Card,
         Dataset,
         DatasetItem,
         DatasetInfo,
@@ -117,6 +123,9 @@ export default {
             if (confirm('Willst du die Kirchengemeinde wirklich komplett löschen?')) {
                 this.$inertia.delete(route('city.destroy', {city: city.name}));
             }
+        },
+        addCity() {
+            this.$inertia.get(route('cities.create'));
         }
     }
 }
