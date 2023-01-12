@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.2.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.1.0...v2023.2.0) (2023-01-12)
+
+
+### Features
+
+* Hinweise auf Liederbuch in der Powerpoint-Ausgabe ([ef7fec0](https://codeberg.org/pfarrplaner/pfarrplaner/commits/ef7fec0c69f8770df6b19ac02e3b1c64d8034231))
+
+
+### Bug Fixes
+
+* Anzeige der Taufgottesdienste liefert leeres Ergebnis ([4d8771a](https://codeberg.org/pfarrplaner/pfarrplaner/commits/4d8771a9ba772aa5173edb5b79dcac1769bc2d3f))
+* Migration der Zeilenumbrüche in liturgischen Texten wurde nie abgeschlossen ([878028c](https://codeberg.org/pfarrplaner/pfarrplaner/commits/878028c70a121d7e505b79ccfe6ab18047ac0cb0))
+
 ## [2023.1.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.0.3...v2023.1.0) (2023-01-08)
 
 
