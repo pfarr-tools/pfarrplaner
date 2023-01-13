@@ -43,4 +43,8 @@
 
 use App\Http\Controllers\CalendarConnectionController;
 
+Route::resource('calendarConnection', 'CalendarConnectionController');
+Route::get('calendarConnection/{calendarConnection}/sync', [CalendarConnectionController::class, 'resync'])->name('calendarConnection.sync');
+
 Route::post('exchangeCalendars', [CalendarConnectionController::class, 'exchangeCalendars'])->name('calendarConnection.exchangeCalendars');
+

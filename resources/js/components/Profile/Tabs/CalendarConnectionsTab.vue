@@ -43,11 +43,15 @@
                 <div class="col-md-5">{{ calendarConnection.title }}</div>
                 <div class="col-md-5">{{ connectionType(calendarConnection) }}</div>
                 <div class="col-md-2 text-right">
-                    <button class="btn btn-light" @click="editConnection(calendarConnection)"
+                    <button class="btn btn-light  btn-sm" @click="syncConnection(calendarConnection)"
+                            title="Kalender neu synchronisieren">
+                        <span class="mdi mdi-calendar-sync"></span>
+                    </button>
+                    <button class="btn btn-primary btn-sm" @click="editConnection(calendarConnection)"
                             title="Verbindung bearbeiten">
                         <span class="mdi mdi-pencil"></span>
                     </button>
-                    <button class="btn btn-danger" @click="deleteConnection(calendarConnection)"
+                    <button class="btn btn-danger btn-sm" @click="deleteConnection(calendarConnection)"
                             title="Verbindung löschen">
                         <span class="mdi mdi-delete"></span>
                     </button>
@@ -74,6 +78,10 @@ export default {
         },
         editConnection(calendarConnection) {
             this.$inertia.get(route('calendarConnection.edit', calendarConnection.id));
+        },
+        syncConnection(calendarConnection) {
+            window.alert('Der gewählte Kalender wird komplett neu synchronisiert. Der Prozess kann eine Weile dauern, läuft aber unsichtbar im Hintergrund ab. Du kannst solange normal weiterarbeiten.');
+            this.$inertia.get(route('calendarConnection.sync', calendarConnection.id));
         },
         deleteConnection(calendarConnection) {
             if (confirm('Willst du diese Verbindung wirklich löschen?')) {

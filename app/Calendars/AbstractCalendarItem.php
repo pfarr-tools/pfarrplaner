@@ -44,9 +44,9 @@ class AbstractCalendarItem
             if (property_exists($this, $key)) {
                 $setter = 'set'.ucfirst($key);
                 if (method_exists($this, $setter)) {
-                    $this->$setter($val);
+                    $this->$setter($val ?? '');
                 } else {
-                    $this->$key = $val;
+                    $this->$key = $val ?? '';
                 }
             }
         }

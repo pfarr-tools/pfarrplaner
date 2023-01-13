@@ -39,7 +39,6 @@
 |
 */
 
-Route::resource('calendarConnection', 'CalendarConnectionController');
 Route::resource('baptisms', 'BaptismController')->middleware('auth');
 Route::resource('weddings', 'WeddingController')->middleware('auth');
 

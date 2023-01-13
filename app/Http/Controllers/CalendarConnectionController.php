@@ -111,6 +111,20 @@ class CalendarConnectionController extends Controller
     }
 
     /**
+     * Resync entire calendar
+     *
+     * @param CalendarConnection $calendarConnection
+     * @return \Illuminate\Http\RedirectResponse
+     * @return void
+     */
+    public function resync(CalendarConnection $calendarConnection)
+    {
+        SyncEntireCalendarConnection::dispatch($calendarConnection);
+        return redirect()->route('calendarConnection.index')->with('info', 'Der Kalender wird neu synchronisiert. Es kann eine Weile dauern, bis alle Daten zum externen Kalender übertragen sind. Dieser
+            Prozess läuft im Hintergrund ab. Du kannst solange ganz normal weiterarbeiten.');
+    }
+
+    /**
      * Remove the specified resource from storage.
      *
      * @param \App\CalendarConnection $calendarConnection
