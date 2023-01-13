@@ -205,7 +205,11 @@ class CityController extends Controller
         $services = Service::where('city_id', $city->id)->whereDate('date', Carbon::now()->setTime(0,0,0))
             ->whereNotNull('konfiapp_event_qr')->get();
         $types = KonfiAppIntegration::get($city)->listEventTypes();
-        return Inertia::render('Public/City/QR', compact('services', 'city', 'types'));
+
+        $servicesWithoutQR = Service::where('city_id', $city->id)->whereDate('date', Carbon::now()->setTime(0,0,0))
+            ->whereNull('konfiapp_event_qr')->get();
+
+        return Inertia::render('Public/City/QR', compact('services', 'city', 'types', 'servicesWithoutQR'));
     }
 
 }

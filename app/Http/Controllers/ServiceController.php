@@ -40,6 +40,7 @@ use App\Events\ServiceBeforeUpdate;
 use App\Events\ServiceCreated;
 use App\Events\ServiceUpdated;
 use App\Http\Requests\ServiceRequest;
+use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Liturgy;
 use App\Liturgy\LiturgySheets\LiturgySheets;
 use App\Location;
@@ -74,7 +75,7 @@ class ServiceController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth')->except('createQR');
     }
 
     /**
@@ -427,6 +428,21 @@ class ServiceController extends Controller
         $data = $request->validate(['sermon_id' => 'int|nullable|exists:sermons,id']);
         $service->update(['sermon_id' => $data['sermon_id']]);
         return response()->json($service);
+    }
+
+    public function createQR(Request $request, Service $service)
+    {
+        if (!$service->city->konfiapp_apikey) abort(404);
+
+        $type = $request->validate(['type' => 'nullable|int'])['type'] ?? $service->city->konfiapp_default_type ?? null;;
+        if (!$type) abort(403);
+
+        $konfiApp = new KonfiAppIntegration($service->city());
+        $service->konfiapp_event_type = $type;
+        $service->konfiapp_event_qr = $konfiApp->createQRCode($service);
+        $service->save();
+
+        return redirect()->route('qr', $service->city->name);
     }
 
 }

@@ -60,3 +60,5 @@ Route::get('/gottesdienst/{service:slug}/liedblatt', [ServiceController::class, 
 Route::post('/gottesdienst/{service:slug}/dateien', [ServiceController::class, 'attach'])->name('service.attach');
 Route::delete('/gottesdienst/{service:slug}/datei/{attachment}', [ServiceController::class, 'detach'])->name('service.detach');
 
+Route::post('/gottesdienst/{service:slug}/qr', [ServiceController::class, 'createQR'])->name('service.createQR');
+

@@ -41,17 +41,48 @@
                 <div class="text-small">{{getType(service)}}</div>
             </accordion-element>
         </accordion>
+        <div v-if="servicesWithoutQR">
+            <hr />
+            <h3>Gottesdienste ohne QR-Code</h3>
+            <p>Vielleicht ist für den gesuchten Gottesdienst noch kein QR-Code angelegt?</p>
+
+            <table class="table table-striped">
+                <thead></thead>
+                <tbody>
+                    <tr v-for="(service,serviceIndex,serviceKey) in myServicesWithoutQR"
+                        :title="service.timeText+': '+service.titleText+' ('+service.locationText+')'"
+                        :key="serviceKey">
+                        <td>{{ service.timeText + ': ' + service.titleText + ' (' + service.locationText + ')' }}</td>
+                        <td class="text-right">
+                            <form-selectize :options="types" v-model="service.konfiapp_event_type" class="text-left"/>
+                            <button class="btn btn-sm btn-secondary" @click="createQR(service)"><span class="mdi mdi-qrcode"></span> Anlegen</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
 <script>
 import Accordion from "../../../components/Ui/accordion/Accordion";
 import AccordionElement from "../../../components/Ui/accordion/AccordionElement";
+import FormSelectize from "../../../components/Ui/forms/FormSelectize.vue";
 
 export default {
     name: "QR",
-    components: {AccordionElement, Accordion},
-    props: ['services', 'city', 'types'],
+    components: {FormSelectize, AccordionElement, Accordion},
+    props: ['services', 'city', 'types', 'servicesWithoutQR'],
+    data() {
+        let myServicesWithoutQR = this.servicesWithoutQR;
+        for (let index in myServicesWithoutQR) {
+            myServicesWithoutQR[index].konfiapp_event_type = this.city.konfiapp_default_type || null;
+        }
+
+        return {
+            myServicesWithoutQR,
+        }
+    },
     methods: {
         getType(service) {
             let filtered = this.types.filter(item => {
@@ -59,6 +90,12 @@ export default {
             });
             if (filtered.length == 0) return '';
             return filtered[0]['punktzahl']+(filtered[0]['punktzahl'] == 1 ? ' Punkt' : ' Punkte')+' in der Kategorie '+filtered[0]['name'];
+        },
+        createQR(service) {
+            if (!service.konfiapp_event_type) return;
+            this.$inertia.post(route('service.createQR', service.slug), {
+                type: service.konfiapp_event_type,
+            });
         }
     }
 }
