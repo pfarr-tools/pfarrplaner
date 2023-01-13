@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.5.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.4.0...v2023.5.0) (2023-01-13)
+
+
+### Features
+
+* Korrekter Frei-/Gebucht-Status bei Export nach Outlook ([9a5ac82](https://codeberg.org/pfarrplaner/pfarrplaner/commits/9a5ac8272bbef9d54e89e2a15fd6982b94cb3b2d))
+* QR-Codes für die KonfiApp aus der QR-Ansicht anlegen ([4393054](https://codeberg.org/pfarrplaner/pfarrplaner/commits/439305440279c7f4c4c1366500b58364dced1a6f)), closes [#296](https://codeberg.org/pfarrplaner/pfarrplaner/issues/296)
+
 ## [2023.4.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.3.0...v2023.4.0) (2023-01-13)
 
 
