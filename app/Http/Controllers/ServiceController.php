@@ -198,6 +198,7 @@ class ServiceController extends Controller
         $service->setDefaultOfferingValues();
         $this->updateFromRequest($request, $service);
         $service->save();
+
         $this->handleAttachments($request, $service);
         $this->handleIndividualAttachment($request, $service, 'songsheet');
         $this->handleIndividualAttachment($request, $service, 'sermon_image');

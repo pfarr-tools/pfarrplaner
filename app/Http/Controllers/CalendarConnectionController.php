@@ -147,6 +147,8 @@ class CalendarConnectionController extends Controller
                 'connection_string' => 'required|string',
                 'include_hidden' => 'nullable|int',
                 'include_alternate' => 'nullable|int',
+                'include_vacations' => 'nullable|int',
+                'include_rite_anniversaries' => 'nullable|int',
             ]
         );
     }

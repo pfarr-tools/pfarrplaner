@@ -30,6 +30,7 @@
 
 namespace App\Calendars\SyncEngines;
 
+use App\Absence;
 use App\CalendarConnection;
 use App\CalendarConnectionEntry;
 use App\Calendars\AbstractCalendar;
@@ -191,7 +192,9 @@ abstract class AbstractSyncEngine
             foreach ([$service->weddings, $service->funerals, $service->baptisms] as $collection) {
                 if (count($collection)) {
                     foreach ($collection as $collectionItem) {
-                        $result = $collectionItem->getPreparationEvent();
+                        $result = $collectionItem->getAdditionalEvents([
+                            'include_rite_anniversaries' => $this->calendarConnection->include_rite_anniversaries,
+                                                                       ]);
                         if ($result) {
                             foreach ($result as $prepKey => $prepEvent) {
                                 $this->syncSingleAlternateEvent($prepKey, $prepEvent);
@@ -326,6 +329,21 @@ abstract class AbstractSyncEngine
         if ($entry = CalendarConnectionEntry::where('calendar_connection_id', $this->calendarConnection->id)
             ->where('alternate_key', $key)->first()) {
             $this->calendar->delete($entry->foreign_id);
+        }
+    }
+
+
+    public function syncSingleAbsence(Absence $absence)
+    {
+        foreach ($absence->getCalendarEvent($this->getCalendarConnection()->user) as $key => $event) {
+            $this->syncSingleAlternateEvent($key, $event);
+        }
+    }
+
+    public function deleteSingleAbsence(Absence $absence)
+    {
+        foreach ($absence->getCalendarEvent($this->getCalendarConnection()->user) as $key => $event) {
+            $this->deleteSingleAlternateEvent($key);
         }
     }
 }

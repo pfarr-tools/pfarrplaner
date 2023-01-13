@@ -72,11 +72,15 @@
                     </div>
 
                 </div>
+                <form-selectize name="include_vacations" label="Urlaub eintragen" :options="myVacationOptions"
+                                v-model="myConnection.include_vacations" />
                 <form-check name="include_hidden" label="Versteckte Gottesdienste mit einbeziehen"
                             v-model="myConnection.include_hidden"/>
                 <form-check name="include_hidden" label="Vorbereitungstermine mit einbeziehen"
                             help="z.B. Taufgespräche, Trauergespräche, Traugespräche"
                             v-model="myConnection.include_alternate"/>
+                <form-check name="include_rite_anniversaries" label="Erinnerung an den Jahrestag von Beerdigungen, Trauungen"
+                            v-model="myConnection.include_rite_anniversaries"/>
             </card-body>
         </card>
     </admin-layout>
@@ -135,6 +139,10 @@ export default {
                 {id: 0, name: 'keine Einträge'},
                 {id: 1, name: 'nur eigene Gottesdienste'},
                 {id: 2, name: 'alle Gottesdienste'},
+            ],
+            myVacationOptions: [
+                {id: 0, name: 'keinen Urlaub eintragen'},
+                {id: 1, name: 'nur eigenen Urlaub + Vertretungen'},
             ],
             myConnectionType: myConnectionType,
             mySPUrl: mySPUrl,

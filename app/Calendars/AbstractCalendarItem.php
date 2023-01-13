@@ -30,6 +30,11 @@ class AbstractCalendarItem
     /** @var string[] Categories */
     protected $categories = [];
 
+    /** @var int LegacyFreeBusyStatus */
+    protected $legacyFreeBusyStatus = 2;
+
+    protected $isAllDayEvent = false;
+
     protected $calendar = null;
 
     protected $dates = ['startDate', 'endDate'];
@@ -152,6 +157,38 @@ class AbstractCalendarItem
     public function setCategories($categories): void
     {
         $this->categories = (array)$categories;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIsAllDayEvent(): bool
+    {
+        return $this->isAllDayEvent;
+    }
+
+    /**
+     * @param bool $isAllDayEvent
+     */
+    public function setIsAllDayEvent(bool $isAllDayEvent): void
+    {
+        $this->isAllDayEvent = $isAllDayEvent;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLegacyFreeBusyStatus(): int
+    {
+        return $this->legacyFreeBusyStatus;
+    }
+
+    /**
+     * @param int $legacyFreeBusyStatus
+     */
+    public function setLegacyFreeBusyStatus(int $legacyFreeBusyStatus): void
+    {
+        $this->legacyFreeBusyStatus = $legacyFreeBusyStatus;
     }
 
 

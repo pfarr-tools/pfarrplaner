@@ -34,6 +34,8 @@ class ExchangeCalendarItem extends AbstractCalendarItem
         'location' => UnindexedFieldURIType::CALENDAR_LOCATION,
         'description' => UnindexedFieldURIType::ITEM_BODY,
         'categories' => UnindexedFieldURIType::ITEM_CATEGORIES,
+        'isAllDayEvent' => UnindexedFieldURIType::CALENDAR_IS_ALL_DAY_EVENT,
+        'legacyFreeBusyStatus' => UnindexedFieldURIType::CALENDAR_LEGACY_FREE_BUSY_STATUS,
     ];
 
     public function __construct($data = [], ExchangeCalendar $calendar = null)
@@ -55,6 +57,7 @@ class ExchangeCalendarItem extends AbstractCalendarItem
         $event->Body->_ = $this->description ?: '';
         $event->Location = $this->location;
         $event->Categories = $this->categories;
+        $event->IsAllDayEvent = $this->isAllDayEvent;
 
         // do not set reminder for past items!
         if ($this->startDate <= Carbon::now()) {
@@ -73,6 +76,7 @@ class ExchangeCalendarItem extends AbstractCalendarItem
             'location' => $item->Location ?? '',
             'description' => $item->Body->_ ?? '',
             'categories' => $item->Categories,
+            'isAllDayEvent' => $item->IsAllDayEvent,
             'ID' => $item->ItemId->Id,
             'changeKey' => $item->ItemId->ChangeKey,
         ];
@@ -132,6 +136,10 @@ class ExchangeCalendarItem extends AbstractCalendarItem
                     break;
                 case 'categories':
                     $field->CalendarItem->Categories = $value ?? '';
+                    break;
+                case 'isAllDayEvent':
+                    $field->CalendarItem->IsAllDayEvent = $value ?? false;
+                    break;
             }
             $change->Updates->SetItemField[] = $field;
         }

@@ -4,6 +4,7 @@ namespace App;
 
 use App\Calendars\SyncEngines\SyncEngines;
 use App\Casts\EncryptedAttribute;
+use App\Jobs\SyncSingleAbsenceToCalendarConnection;
 use App\Jobs\SyncSingleServiceToCalendarConnection;
 use AustinHeap\Database\Encryption\Traits\HasEncryptedAttributes;
 use Illuminate\Database\Eloquent\Collection;
@@ -22,7 +23,9 @@ class CalendarConnection extends Model
         'credentials2',
         'connection_string',
         'include_hidden',
-        'include_alternate'
+        'include_alternate',
+        'include_vacations',
+        'include_rite_anniversaries',
     ];
 
     protected $casts = [
@@ -102,6 +105,11 @@ class CalendarConnection extends Model
      */
     public function syncEntireCalendar()
     {
+        // sync absences
+        foreach ($this->getSyncableAbsences() as $absence) {
+            SyncSingleAbsenceToCalendarConnection::dispatch($this, $absence);
+        }
+
         // create new entries
         $services = new Collection();
         foreach ($this->cities as $city) {
@@ -114,6 +122,7 @@ class CalendarConnection extends Model
             SyncSingleServiceToCalendarConnection::dispatch($this, $service);
         }
     }
+
 
     /**
      * Get all CalendarConnections that should be concerned with a service
@@ -148,6 +157,18 @@ class CalendarConnection extends Model
         }
 
         return $calendarConnections;
+    }
+
+    public function getSyncableAbsences()
+    {
+        if (!$this->include_vacations) return collect([]);
+
+        switch ($this->include_vacations) {
+            case 1:
+                $own = Absence::where('user_id', $this->user_id)->get();
+                $replacing = Absence::userIsReplacement($this->user)->get();
+                return $own->merge($replacing);
+        }
     }
 
 }

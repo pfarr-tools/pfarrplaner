@@ -33,8 +33,10 @@ namespace App\Http\Controllers;
 use App\Absence;
 use App\Attachment;
 use App\Events\AbsenceApproved;
+use App\Events\AbsenceBeforeDelete;
 use App\Events\AbsenceDemanded;
 use App\Events\AbsenceRejected;
+use App\Events\AbsenceUpdated;
 use App\Funeral;
 use App\Http\Requests\AbsenceRequest;
 use App\Mail\Absence\AbsenceChecked;
@@ -264,6 +266,8 @@ class AbsenceController extends Controller
                 break;
         }
 
+        event(new AbsenceUpdated($absence));
+
         if ($request->get('noRedirect', false)) return response()->json();
         if ($url = $request->get('redirectTo', false)) {
             return Inertia::location($url);
@@ -282,6 +286,8 @@ class AbsenceController extends Controller
      */
     public function destroy(Request $request, Absence $absence)
     {
+        event(new AbsenceBeforeDelete($absence));
+
         if ($request->get('sendRejectionMail', false)) {
             $recipients = collect([$absence->user]);
             $recipients = $recipients->merge($absence->user->vacationAdmins);

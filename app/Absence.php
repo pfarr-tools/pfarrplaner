@@ -31,6 +31,7 @@
 namespace App;
 
 use App\Services\CalendarService;
+use App\Services\NameService;
 use App\Tools\StringTool;
 use App\Traits\HasAttachmentsTrait;
 use Carbon\Carbon;
@@ -164,6 +165,17 @@ class Absence extends Model
     {
         return $query->whereHas('user', function($q) { $q->where('show_vacations_with_services', 1); });
     }
+
+    public function scopeUserIsReplacement(Builder $query, User $user)
+    {
+        return $query->whereHas('replacements', function ($q) use ($user) {
+            $q->whereHas('users', function ($q2) use ($user) {
+                $q2->where('users.id', $user->id);
+            });
+        });
+    }
+
+
 
     /**
      * @param $query
@@ -347,6 +359,49 @@ class Absence extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getCalendarEvent(User $user)
+    {
+        $replacing = $this->user_id != $user->id;
+        $categories = ['Pfarrplaner', ($replacing ? 'Vertretung' : 'Urlaub')];
 
+        if (!$replacing) {
+            $statusTexts = [
+                self::STATUS_NEW => ['Noch nicht genehmigt'],
+                self::STATUS_CHECKED => ['Überprüft', 'Noch nicht genehmigt'],
+                self::STATUS_APPROVED => ['Überprüft', 'Genehmigt'],
+                self::STATUS_SELF_ADMINISTERED => [],
+                self::STATUS_SELF_ADMINISTERED_AND_APPROVED => ['Genehmigt'],
+            ];
+            if (isset($statusTexts[$this->workflow_status])) $categories = array_merge($categories, $statusTexts[$this->workflow_status]);
+        }
+
+        return ['absence_'.$this->id => [
+            'startDate' => $this->from,
+            'endDate' => $this->to,
+            'title' => $this->fullDescription(),
+            'description' => '<p><b>Vertretungsregelung:</b><br /> '.$this->replacementText().'</p>',
+            'categories' => $categories,
+            'location' => '',
+            'isAllDayEvent' => true,
+            'legacyFreeBusyStatus' => ($replacing ? 0 : 2),
+        ]];
+    }
+
+
+    public function getConcernedCalendars()
+    {
+        // 1. user's own calendars
+        $calendars = CalendarConnection::where('user_id', $this->user_id)->where('include_vacations', '>', 0)->get();
+
+        // 2. replacements' calendars
+        foreach ($this->replacements as $replacement) {
+            foreach ($replacement->users as $user) {
+                $moreCalendars = CalendarConnection::where('user_id', $user->id)->where('include_vacations', '>', 0)->get();
+                if ($moreCalendars) $calendars = $calendars->merge($moreCalendars);
+            }
+        }
+
+        return $calendars;
+    }
 
 }

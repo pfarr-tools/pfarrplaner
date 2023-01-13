@@ -46,6 +46,7 @@ class SyncEntireCalendarConnection implements ShouldQueue
         if ($calendarConnection = CalendarConnection::find($this->calendarConnectionId)) {
             Log::debug('SyncEntireCalendarConnection triggered for CalendarConnection #'.$calendarConnection->id);
             $calendarConnection->syncEntireCalendar();
+
             Log::debug('SyncEntireCalendarConnection completed for CalendarConnection #'.$calendarConnection->id);
         } else {
             Log::error('SyncEntireCalendarConnection could not find CalendarConnection #'.$calendarConnection->id);

@@ -247,25 +247,49 @@ class Funeral extends Model
      * Generate a record for sync'ing to external calendars
      * @return array[]|null
      */
-    public function getPreparationEvent()
+    public function getAdditionalEvents($config = [])
     {
-        if (!$this->appointment) return null;
+        $records = [];
+        if ($this->appointment) {
+            $records['funeral_prep_' . $this->id] = [
+                'startDate' => $this->appointment->copy(),
+                'endDate' => $this->appointment->copy()->addHour(1),
+                'title' => 'Trauergespräch ' . $this->buried_name,
+                'description' =>
+                    '<p>' . $this->type . ' am ' . $this->service->date->format(
+                        'd.m.Y'
+                    ) . ' um ' . $this->service->timeText() . ' (' . $this->service->locationText() . ')</p>'
+                    . '<p><a href="' . route(
+                        'funerals.edit',
+                        $this->id
+                    ) . '">Bestattung im Pfarrplaner öffnen</a></p>'
+                    . '<p>Kontakt: ' . nl2br($this->relative_contact_data) . '</p>'
+                    . AbstractSyncEngine::AUTO_WARNING,
+                'location' => $this->appointment_address,
+                'categories' => ['Pfarrplaner', 'Trauergespräch', 'Amtskalender: Seelsorge/Diakonie'],
+            ];
+        }
 
-        $key = 'funeral_prep_'.$this->id;
+        if ($config['include_rite_anniversaries']) {
+            $records['funeral_anniversary_' . $this->id] = [
+                'startDate' => $this->service->date->copy()->addYear(1),
+                'endDate' => $this->service->date->copy()->addYear(1),
+                'title' => '1. Jahrestag der Beerdigung von ' . $this->buried_name,
+                'description' =>
+                    '<p>' . $this->type . ' am ' . $this->service->date->format(
+                        'd.m.Y'
+                    ) . ' um ' . $this->service->timeText() . ' (' . $this->service->locationText() . ')</p>'
+                    . '<p><a href="' . route('funerals.edit', $this->id) . '">Bestattung im Pfarrplaner öffnen</a></p>'
+                    . '<p>Kontakt: ' . nl2br($this->relative_contact_data) . '</p>'
+                    . AbstractSyncEngine::AUTO_WARNING,
+                'location' => $this->appointment_address,
+                'categories' => ['Pfarrplaner', 'Jahrestag Beerdigung'],
+                'isAllDayEvent' => true,
+                'legacyFreeBusyStatus' => 0,
+            ];
+        }
 
-        $record = [
-            'startDate' => $this->appointment->copy(),
-            'endDate' => $this->appointment->copy()->addHour(1),
-            'title' => 'Trauergespräch '.$this->buried_name,
-            'description' =>
-                '<p>'.$this->type.' am '.$this->service->date->format('d.m.Y').' um '.$this->service->timeText().' ('.$this->service->locationText().')</p>'
-                .'<p><a href="'.route('funerals.edit', $this->id).'">Bestattung im Pfarrplaner öffnen</a></p>'
-                .'<p>Kontakt: '.nl2br($this->relative_contact_data).'</p>'
-                .AbstractSyncEngine::AUTO_WARNING,
-            'location' => $this->appointment_address,
-            'categories' => ['Pfarrplaner','Trauergespräch','Amtskalender: Seelsorge/Diakonie'],
-        ];
-        return [$key => $record];
+        return $records;
     }
 
     /**

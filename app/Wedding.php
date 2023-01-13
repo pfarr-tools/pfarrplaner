@@ -145,7 +145,7 @@ class Wedding extends Model
      * Generate a record for sync'ing to external calendars
      * @return array[]|null
      */
-    public function getPreparationEvent()
+    public function getAdditionalEvents($config = [])
     {
         if (!$this->appointment) return null;
 

@@ -127,7 +127,7 @@ class Baptism extends Model
      * Generate a record for sync'ing to external calendars
      * @return array[]|null
      */
-    public function getPreparationEvent()
+    public function getAdditionalEvents($config = [])
     {
         if (!$this->appointment) return null;
 
@@ -148,6 +148,7 @@ class Baptism extends Model
                 .AbstractSyncEngine::AUTO_WARNING,
             'location' => $this->candidate_address.', '.$this->candidate_zip.' '.$this->candidate_city,
             'categories' => ['Pfarrplaner','Taufgespräch','Amtskalender: Amtshandlungen'],
+            'allDay' => true,
         ];
         return [$key => $record];
     }
