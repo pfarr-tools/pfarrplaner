@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.4.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.3.0...v2023.4.0) (2023-01-13)
+
+
+### Features
+
+* Kalenderverbindung manuell neu synchronisieren ([0bd23ca](https://codeberg.org/pfarrplaner/pfarrplaner/commits/0bd23ca9891a811c69caac74ec016cfca4639e16))
+* Kategorien bei der Synchronisation mit Outlook ([494e1a9](https://codeberg.org/pfarrplaner/pfarrplaner/commits/494e1a9cba9754d106c7f1db1b24fc5b8626fa9d))
+* Urlaube und Jahrestage von Kasualien in den Outlookkalender eintragen ([ea8ccf4](https://codeberg.org/pfarrplaner/pfarrplaner/commits/ea8ccf4705176ce09ed6fdc68943f3653fff2b15))
+
 ## [2023.3.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.2.1...v2023.3.0) (2023-01-12)
 
 
