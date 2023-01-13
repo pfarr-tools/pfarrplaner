@@ -48,7 +48,6 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
     protected $folderName = '';
     protected $serverVersion = '';
 
-
     protected $client = null;
 
     /** @var \jamesiarmes\PhpEws\Type\CalendarFolderType */
@@ -97,6 +96,7 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
             }
             return $calendars;
         } catch (\Exception $e) {
+            $this->setLastError($e);
             return [];
         }
     }
@@ -129,6 +129,7 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
                 return $response_message->RootFolder->Items->CalendarItem;
             }
         } catch (\Exception $e) {
+            $this->setLastError($e);
             return false;
         }
     }
@@ -173,6 +174,7 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
                 return $response_message->RootFolder->Folders->CalendarFolder[0];
             }
         } catch (\Exception $e) {
+            $this->setLastError($e);
             return false;
         }
     }
@@ -198,6 +200,7 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
                 false
             );
         } catch (\Exception $e) {
+            $this->setLastError($e);
             return false;
         }
     }
@@ -229,6 +232,7 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
                 }
             }
         } catch (\Exception $e) {
+            $this->setLastError($e);
             return false;
         }
     }
@@ -255,6 +259,7 @@ class ExchangeCalendar extends \App\Calendars\AbstractCalendar
                 }
             );
         } catch (\Exception $e) {
+            $this->setLastError($e);
             return false;
         }
     }

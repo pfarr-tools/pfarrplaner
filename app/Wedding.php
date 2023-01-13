@@ -165,6 +165,7 @@ class Wedding extends Model
             'title' => 'Traugespräch '.$this->spouse1_name.' / '.$this->spouse2_name,
             'description' => $description,
             'location' => '',
+            'categories' => ['Pfarrplaner','Traugespräch','Amtskalender: Amtshandlungen'],
         ];
         return [$key => $record];
     }

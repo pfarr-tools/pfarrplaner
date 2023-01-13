@@ -147,6 +147,7 @@ class Baptism extends Model
                 .(count($contacts) ? '<p>Kontakt: '.join(', ', $contacts).'</p>' : '')
                 .AbstractSyncEngine::AUTO_WARNING,
             'location' => $this->candidate_address.', '.$this->candidate_zip.' '.$this->candidate_city,
+            'categories' => ['Pfarrplaner','Taufgespräch','Amtskalender: Amtshandlungen'],
         ];
         return [$key => $record];
     }

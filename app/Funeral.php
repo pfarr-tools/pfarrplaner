@@ -263,6 +263,7 @@ class Funeral extends Model
                 .'<p>Kontakt: '.nl2br($this->relative_contact_data).'</p>'
                 .AbstractSyncEngine::AUTO_WARNING,
             'location' => $this->appointment_address,
+            'categories' => ['Pfarrplaner','Trauergespräch','Amtskalender: Seelsorge/Diakonie'],
         ];
         return [$key => $record];
     }

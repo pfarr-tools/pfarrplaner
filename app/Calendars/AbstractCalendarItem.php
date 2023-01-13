@@ -5,6 +5,7 @@ namespace App\Calendars;
 
 
 use Carbon\Carbon;
+use jamesiarmes\PhpEws\ArrayType\ArrayOfStringsType;
 
 class AbstractCalendarItem
 {
@@ -25,6 +26,9 @@ class AbstractCalendarItem
 
     /** @var string Location */
     protected $location = '';
+
+    /** @var string[] Categories */
+    protected $categories = [];
 
     protected $calendar = null;
 
@@ -133,6 +137,23 @@ class AbstractCalendarItem
     {
         $this->location = $location;
     }
+
+    /**
+     * @return string
+     */
+    public function getCategories(): array
+    {
+        return $this->categories;
+    }
+
+    /**
+     * @param string[] $categories
+     */
+    public function setCategories($categories): void
+    {
+        $this->categories = (array)$categories;
+    }
+
 
     /**
      * @return null

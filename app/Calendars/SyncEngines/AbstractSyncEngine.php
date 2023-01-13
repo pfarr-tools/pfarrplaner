@@ -134,7 +134,14 @@ abstract class AbstractSyncEngine
                 . 'Im Pfarrplaner ansehen'
                 . '</a></p><p></p>'
                 . self::AUTO_WARNING,
+            'categories' => ['Pfarrplaner','Gottesdienst'],
         ];
+
+        if (count($service->funerals)) {
+            $record['categories'][] = 'Amtskalender: Seelsorge/Diakonie';
+        } else {
+            $record['categories'][] = 'Amtskalender: Gottesdienst/Taufe/Abendmahl';
+        }
 
         $item = null;
         if ($entry = CalendarConnectionEntry::where('service_id', $service->id)->where(
@@ -174,7 +181,7 @@ abstract class AbstractSyncEngine
                 Log::error(
                     'Failed to create calendar item for service #' . $service->id
                     . ' on CalendarConnection #' . $this->calendarConnection->id,
-                    [$record]
+                    [$record, $this->calendar->getLastError()]
                 );
             }
         }
@@ -240,7 +247,8 @@ abstract class AbstractSyncEngine
                 );
             } else {
                 Log::error(
-                    'Failed to create record for alternate event #' . $key . ' on CalendarConnection ' . $this->calendarConnection->id
+                    'Failed to create record for alternate event #' . $key . ' on CalendarConnection ' . $this->calendarConnection->id,
+                    [$this->calendar->getLastError()],
                 );
             }
         }

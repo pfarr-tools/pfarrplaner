@@ -33,6 +33,7 @@ class ExchangeCalendarItem extends AbstractCalendarItem
         'title' => UnindexedFieldURIType::ITEM_SUBJECT,
         'location' => UnindexedFieldURIType::CALENDAR_LOCATION,
         'description' => UnindexedFieldURIType::ITEM_BODY,
+        'categories' => UnindexedFieldURIType::ITEM_CATEGORIES,
     ];
 
     public function __construct($data = [], ExchangeCalendar $calendar = null)
@@ -53,6 +54,7 @@ class ExchangeCalendarItem extends AbstractCalendarItem
         $event->Body->BodyType = BodyTypeType::HTML;
         $event->Body->_ = $this->description ?: '';
         $event->Location = $this->location;
+        $event->Categories = $this->categories;
 
         // do not set reminder for past items!
         if ($this->startDate <= Carbon::now()) {
@@ -70,6 +72,7 @@ class ExchangeCalendarItem extends AbstractCalendarItem
             'title' => $item->Subject ?? '',
             'location' => $item->Location ?? '',
             'description' => $item->Body->_ ?? '',
+            'categories' => $item->Categories,
             'ID' => $item->ItemId->Id,
             'changeKey' => $item->ItemId->ChangeKey,
         ];
@@ -127,6 +130,8 @@ class ExchangeCalendarItem extends AbstractCalendarItem
                 case 'location':
                     $field->CalendarItem->Location = $value ?? '';
                     break;
+                case 'categories':
+                    $field->CalendarItem->Categories = $value ?? '';
             }
             $change->Updates->SetItemField[] = $field;
         }
