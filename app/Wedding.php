@@ -30,6 +30,7 @@
 
 namespace App;
 
+use App\Calendars\AbstractCalendarItem;
 use App\Calendars\SyncEngines\AbstractSyncEngine;
 use App\Casts\EncryptedAttribute;
 use App\Traits\HasAttachmentsTrait;
@@ -148,8 +149,7 @@ class Wedding extends Model
     public function getAdditionalEvents($config = [])
     {
         if (!$this->appointment) return null;
-
-        $key = 'wedding_prep_'.$this->id;
+        $records = [];
 
         $description =                 '<p>Trauung am '.$this->service->date->format('d.m.Y').' um '.$this->service->timeText().' ('.$this->service->locationText().')</p>'
             .'<p><a href="'.route('weddings.edit', $this->id).'">Trauung im Pfarrplaner öffnen</a></p>'
@@ -159,15 +159,34 @@ class Wedding extends Model
             .'</p>'
             .AbstractSyncEngine::AUTO_WARNING;
 
-        $record = [
-            'startDate' => $this->appointment->copy(),
-            'endDate' => $this->appointment->copy()->addHour(1),
-            'title' => 'Traugespräch '.$this->spouse1_name.' / '.$this->spouse2_name,
-            'description' => $description,
-            'location' => '',
-            'categories' => ['Pfarrplaner','Traugespräch','Amtskalender: Amtshandlungen'],
-        ];
-        return [$key => $record];
+
+        if ($this->appointment) {
+            $records['wedding_prep_'.$this->id] = [
+                'startDate' => $this->appointment->copy(),
+                'endDate' => $this->appointment->copy()->addHour(1),
+                'title' => 'Traugespräch '.$this->spouse1_name.' / '.$this->spouse2_name,
+                'description' => $description,
+                'location' => '',
+                'categories' => ['Pfarrplaner','Traugespräch','Amtskalender: Amtshandlungen'],
+            ];
+        }
+        if ($config['include_rite_anniversaries'] ?? false) {
+            $records['wedding_anniversary_'.$this->id] = [
+                'startDate' => $this->service()->date->copy()->addYear(1),
+                'endDate' => $this->service()->date->copy()->addYear(1),
+                'title' => '1. Jahrestag der Trauung von '.$this->spouse1_name.' / '.$this->spouse2_name,
+                'description' => $description,
+                'location' => '',
+                'categories' => ['Pfarrplaner','Traugespräch','Amtskalender: Amtshandlungen'],
+                'isAllDayEvent' => true,
+                'freeBusy' => AbstractCalendarItem::STATUS_FREE,
+            ];
+        }
+
+
+
+
+        return $records;
     }
 
     public function getSpouse1DimissorialUrlAttribute() {

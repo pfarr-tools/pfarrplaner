@@ -9,6 +9,13 @@ use jamesiarmes\PhpEws\ArrayType\ArrayOfStringsType;
 
 class AbstractCalendarItem
 {
+    public const STATUS_FREE = 0;
+    public const STATUS_TENTATIVE = 1;
+    public const STATUS_BUSY = 2;
+    public const STATUS_OUT_OF_OFFICE = 3;
+    public const STATUS_WORKING_ELSEWHERE = 4;
+    public const NO_DATA = 5;
+
 
     protected $ID;
 
@@ -31,13 +38,14 @@ class AbstractCalendarItem
     protected $categories = [];
 
     /** @var int LegacyFreeBusyStatus */
-    protected $legacyFreeBusyStatus = 2;
+    protected $freeBusy = self::STATUS_BUSY;
 
     protected $isAllDayEvent = false;
 
     protected $calendar = null;
 
     protected $dates = ['startDate', 'endDate'];
+
 
 
     public function __construct(array $data = [], $calendar = null)
@@ -178,17 +186,17 @@ class AbstractCalendarItem
     /**
      * @return int
      */
-    public function getLegacyFreeBusyStatus(): int
+    public function getFreeBusy(): int
     {
-        return $this->legacyFreeBusyStatus;
+        return $this->freeBusy;
     }
 
     /**
-     * @param int $legacyFreeBusyStatus
+     * @param int $freeBusy
      */
-    public function setLegacyFreeBusyStatus(int $legacyFreeBusyStatus): void
+    public function setFreeBusy(int $freeBusy): void
     {
-        $this->legacyFreeBusyStatus = $legacyFreeBusyStatus;
+        $this->freeBusy = $freeBusy;
     }
 
 

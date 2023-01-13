@@ -30,6 +30,7 @@
 
 namespace App;
 
+use App\Calendars\AbstractCalendarItem;
 use App\Calendars\SyncEngines\AbstractSyncEngine;
 use App\Casts\EncryptedAttribute;
 use App\Traits\HasAttachmentsTrait;
@@ -285,7 +286,7 @@ class Funeral extends Model
                 'location' => $this->appointment_address,
                 'categories' => ['Pfarrplaner', 'Jahrestag Beerdigung'],
                 'isAllDayEvent' => true,
-                'legacyFreeBusyStatus' => 0,
+                'freeBusy' => AbstractCalendarItem::STATUS_FREE,
             ];
         }
 

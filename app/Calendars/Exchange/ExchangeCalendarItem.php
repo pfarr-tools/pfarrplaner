@@ -7,6 +7,7 @@ namespace App\Calendars\Exchange;
 use Carbon\Carbon;
 use jamesiarmes\PhpEws\ArrayType\NonEmptyArrayOfItemChangeDescriptionsType;
 use jamesiarmes\PhpEws\Enumeration\BodyTypeType;
+use jamesiarmes\PhpEws\Enumeration\LegacyFreeBusyType;
 use jamesiarmes\PhpEws\Enumeration\UnindexedFieldURIType;
 use jamesiarmes\PhpEws\Type\BodyContentType;
 use jamesiarmes\PhpEws\Type\BodyType;
@@ -35,7 +36,16 @@ class ExchangeCalendarItem extends AbstractCalendarItem
         'description' => UnindexedFieldURIType::ITEM_BODY,
         'categories' => UnindexedFieldURIType::ITEM_CATEGORIES,
         'isAllDayEvent' => UnindexedFieldURIType::CALENDAR_IS_ALL_DAY_EVENT,
-        'legacyFreeBusyStatus' => UnindexedFieldURIType::CALENDAR_LEGACY_FREE_BUSY_STATUS,
+        'freeBusy' => UnindexedFieldURIType::CALENDAR_LEGACY_FREE_BUSY_STATUS,
+    ];
+
+    public static $busyStatus = [
+        0 => LegacyFreeBusyType::FREE,
+        1 => LegacyFreeBusyType::TENTATIVE,
+        2 => LegacyFreeBusyType::BUSY,
+        3 => LegacyFreeBusyType::OUT_OF_OFFICE,
+        4 => LegacyFreeBusyType::WORKING_ELSEWHERE,
+        5 => LegacyFreeBusyType::NO_DATA,
     ];
 
     public function __construct($data = [], ExchangeCalendar $calendar = null)
@@ -58,6 +68,7 @@ class ExchangeCalendarItem extends AbstractCalendarItem
         $event->Location = $this->location;
         $event->Categories = $this->categories;
         $event->IsAllDayEvent = $this->isAllDayEvent;
+        $event->LegacyFreeBusyStatus = self::$busyStatus[$this->freeBusy] ?? LegacyFreeBusyType::BUSY;
 
         // do not set reminder for past items!
         if ($this->startDate <= Carbon::now()) {
@@ -69,6 +80,8 @@ class ExchangeCalendarItem extends AbstractCalendarItem
 
     public static function fromExchangeItem(CalendarItemType $item, $calendar = null): ExchangeCalendarItem
     {
+        $busyStatus = array_search($item->LegacyFreeBusyStatus, self::$busyStatus) ?: 2;
+
         $data = [
             'startDate' => new Carbon($item->Start),
             'endDate' => new Carbon($item->End),
@@ -79,6 +92,7 @@ class ExchangeCalendarItem extends AbstractCalendarItem
             'isAllDayEvent' => $item->IsAllDayEvent,
             'ID' => $item->ItemId->Id,
             'changeKey' => $item->ItemId->ChangeKey,
+            'freeBusy' => $busyStatus,
         ];
         return new self($data, $calendar);
     }
@@ -139,6 +153,9 @@ class ExchangeCalendarItem extends AbstractCalendarItem
                     break;
                 case 'isAllDayEvent':
                     $field->CalendarItem->IsAllDayEvent = $value ?? false;
+                    break;
+                case 'freeBusy':
+                    $field->CalendarItem->LegacyFreeBusyStatus = self::$busyStatus[$value] ?? LegacyFreeBusyType::BUSY;
                     break;
             }
             $change->Updates->SetItemField[] = $field;

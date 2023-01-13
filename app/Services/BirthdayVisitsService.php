@@ -31,6 +31,7 @@
 namespace App\Services;
 
 use App\CalendarConnection;
+use App\Calendars\AbstractCalendarItem;
 use App\Calendars\Exchange\ExchangeCalendar;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -209,6 +210,7 @@ class BirthdayVisitsService
                 .' am '.$birthday['original_date']->isoFormat('dd, DD.MM.').')',
             'location' => $birthday['Straße'].' '.$birthday['HNr.'].', '.$birthday['PLZ'].' '.$birthday['Wohnort'],
             'description' => 'Dieser Geburtstagsbesuch wurde automatisch mit dem Pfarrplaner geplant. Du kannst ihn in deinem Kalender jederzeit an eine passendere Stelle verschieben.',
+            'freeBusy' => AbstractCalendarItem::STATUS_TENTATIVE,
         ];
 
     }

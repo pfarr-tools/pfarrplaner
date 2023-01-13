@@ -30,6 +30,7 @@
 
 namespace App;
 
+use App\Calendars\AbstractCalendarItem;
 use App\Services\CalendarService;
 use App\Services\NameService;
 use App\Tools\StringTool;
@@ -363,6 +364,7 @@ class Absence extends Model
     {
         $replacing = $this->user_id != $user->id;
         $categories = ['Pfarrplaner', ($replacing ? 'Vertretung' : 'Urlaub')];
+        $status = AbstractCalendarItem::STATUS_FREE;
 
         if (!$replacing) {
             $statusTexts = [
@@ -373,17 +375,27 @@ class Absence extends Model
                 self::STATUS_SELF_ADMINISTERED_AND_APPROVED => ['Genehmigt'],
             ];
             if (isset($statusTexts[$this->workflow_status])) $categories = array_merge($categories, $statusTexts[$this->workflow_status]);
+
+            $title = $this->reason;
+            $status = $status = AbstractCalendarItem::STATUS_OUT_OF_OFFICE;
+        } else {
+            $title = 'Vertretung für '.NameService::fromUser($this->user)->format(NameService::FIRST_LAST).' ('.$this->reason.')';
         }
+
+        $title .= $this->replacementText(' V: ');
+
+
+
 
         return ['absence_'.$this->id => [
             'startDate' => $this->from,
             'endDate' => $this->to,
-            'title' => $this->fullDescription(),
+            'title' => $title,
             'description' => '<p><b>Vertretungsregelung:</b><br /> '.$this->replacementText().'</p>',
             'categories' => $categories,
             'location' => '',
             'isAllDayEvent' => true,
-            'legacyFreeBusyStatus' => ($replacing ? 0 : 2),
+            'freeBusy' => $status,
         ]];
     }
 
