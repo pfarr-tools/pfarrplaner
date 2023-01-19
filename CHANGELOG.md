@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.6.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.5.0...v2023.6.0) (2023-01-19)
+
+
+### Features
+
+* Jahresplan der Gottesdienste kann mehr als eine Gemeinde umfassen ([e1734e9](https://codeberg.org/pfarrplaner/pfarrplaner/commits/e1734e94bf6de8507a6b7e8bf05526815b2c051d))
+
 ## [2023.5.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.4.0...v2023.5.0) (2023-01-13)
 
 
