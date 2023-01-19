@@ -85,6 +85,19 @@ class ServiceTableReport extends AbstractExcelDocumentReport
         return Inertia::render('Report/ServiceTable/Setup', compact('cities', 'ministries'));
     }
 
+    private function columnAddress($col, $cities)
+    {
+        if ((count($cities) > 1) && ($col != 'A')) {
+            $col = chr(ord($col) + 1);
+        }
+        return $col;
+    }
+
+    private function cellAddress($col, $row, $cities)
+    {
+        return $this->columnAddress($col, $cities) . $row;
+    }
+
     /**
      * @param Request $request
      * @return string|void
@@ -95,7 +108,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
     {
         $data = $request->validate(
             [
-                'city' => 'required|integer',
+                'cities.*' => 'required|integer|exists:cities,id',
                 'year' => 'required|integer',
                 'ministries' => 'nullable',
                 'ministries.*' => 'nullable|string',
@@ -103,24 +116,39 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             ]
         );
 
-
-
         $serviceList = Service::between(
             Carbon::createFromDate($data['year'], 1, 1),
             Carbon::createFromDate($data['year'], 12, 31)->setTime(23, 59, 59),
         )->notHidden()
-            ->where('city_id', $data['city'])
+            ->whereIn('city_id', $data['cities'])
             ->ordered()
             ->get()
             ->groupBy('key_date');
 
-        $city = City::findOrFail($data['city']);
+        $cities = City::whereIn('id', $data['cities'])->get();
 
 
         $ministries = $data['ministries'] ?? [];
         $nameFormat = $data['name_format'] ?? User::NAME_FORMAT_DEFAULT;
 
-        $columns = [
+        $columns = (count($cities) > 1) ? [
+            'A' => 12.73046875,
+            'B' => 12.73046875,
+            'C' => 15,
+            'D' => 18,
+            'E' => 5.86328125,
+            'F' => 9.265625,
+            'G' => 12,
+            'H' => 11,
+            'I' => 3.86328125,
+            'J' => 10.5,
+            'K' => 10.73046875,
+            'L' => 13.8,
+            'M' => 16.7,
+            'N' => 10.1328125,
+            'O' => 14,
+            'P' => 10.73046875
+        ] : [
             'A' => 12.73046875,
             'B' => 15,
             'C' => 18,
@@ -138,7 +166,39 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             'O' => 10.73046875
         ];
 
-        $lastColumn = chr(78 + count($ministries));
+
+        $colors = [
+            'white' => 'ffffffff',
+            'green' => 'ff00da05',
+            'purple' => 'ffdb05ff',
+            'black' => 'ff808080',
+            'red' => 'ffff0000',
+        ];
+
+        $headers = [
+            'Datum',
+            "Sonn-/Festtag\nFarbe",
+            'Anmerkung zum Gottesdienst',
+            "Uhr-\nzeit",
+            'Kirche/Ort',
+            'Predigt',
+            'Orgel',
+            'AM',
+            'Mesner',
+            '',
+            "Opfer-\nbestimmung",
+            'Anmerkungen zum Opfer',
+            "Opfer-\nbetrag",
+            "Weiter-\nleitung",
+        ];
+
+        if (count($cities) > 1) {
+            array_splice($headers, 1, 0, 'Ort');
+        }
+
+
+
+        $lastColumn = $this->columnAddress(chr(78 + count($ministries)), $cities);
         $colCtr = 0;
         foreach ($ministries as $ministry) {
             $colCtr++;
@@ -167,10 +227,14 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             ->setFooter(0);
         $sheet->getHeaderFooter()
             ->setOddHeader(
-                '&LEvangelische Kirchengemeinde ' . $city->name . '&RPlan für Gottesdienste ' . $data['year'] . ' - Blatt &P von &N'
+                '&LEvangelische Kirchengemeinde' . (count($cities) > 1 ? 'n ' : ' ') . $cities->pluck('name')->join(
+                    ', '
+                ) . '&RPlan für Gottesdienste ' . $data['year'] . ' - Blatt &P von &N'
             )
             ->setEvenHeader(
-                '&LEvangelische Kirchengemeinde ' . $city->name . '&RPlan für Gottesdienste ' . $data['year'] . ' - Blatt &P von &N'
+                '&LEvangelische Kirchengemeinde' . (count($cities) > 1 ? 'n ' : ' ') . $cities->pluck('name')->join(
+                    ', '
+                ) . '&RPlan für Gottesdienste ' . $data['year'] . ' - Blatt &P von &N'
             )
             ->setOddFooter('&CAusdruck vom &D, &T')
             ->setEvenFooter('&CAusdruck vom &D, &T');
@@ -184,7 +248,10 @@ class ServiceTableReport extends AbstractExcelDocumentReport
         // title row
         $sheet->mergeCells("A1:{$lastColumn}1");
         $sheet->getRowDimension('1')->setRowHeight(21);
-        $style = $sheet->setCellValue('A1', 'Plan für Gottesdienste - Liturgischer Kalender für das Jahr ' . $data['year'])
+        $style = $sheet->setCellValue(
+            'A1',
+            'Plan für Gottesdienste - Liturgischer Kalender für das Jahr ' . $data['year']
+        )
             ->getStyle('A1');
         $style->getFill()
             ->setFillType(Fill::FILL_SOLID)
@@ -209,7 +276,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             "Sonn-/Festtag\nFarbe",
             'Anmerkung zum Gottesdienst',
             "Uhr-\nzeit",
-            'Ort',
+            'Kirche/Ort',
             'Predigt',
             'Orgel',
             'AM',
@@ -220,6 +287,10 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             "Opfer-\nbetrag",
             "Weiter-\nleitung",
         ];
+
+        if (count($cities) > 1) {
+            array_splice($headers, 1, 0, 'Ort');
+        }
 
         foreach ($ministries as $ministry) {
             $headers[] = $ministry;
@@ -232,16 +303,16 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                 $maxRow = 3;
             } else {
                 $maxRow = 4;
-                $sheet->setCellValue('J3', '1. Opferzähler');
-                $sheet->setCellValue('J4', '2. Opferzähler');
+                $sheet->setCellValue($this->cellAddress('J', 3, $cities), '1. Opferzähler');
+                $sheet->setCellValue($this->cellAddress('J', 4, $cities), '2. Opferzähler');
             }
             for ($row = 3; $row <= $maxRow; $row++) {
                 $style = $sheet->getStyle("{$column}{$row}");
-                if ($column == 'C') {
+                if ($column == $this->columnAddress('C', $cities)) {
                     $fontSize = 9;
-                } elseif ($column == 'J') {
+                } elseif ($column == $this->columnAddress('J', $cities)) {
                     $fontSize = 6;
-                } elseif (in_array($column, ['H', 'I'])) {
+                } elseif (in_array($column, [$this->columnAddress('H', $cities), $this->columnAddress('J', $cities)])) {
                     $fontSize = 8;
                 } else {
                     $fontSize = 10;
@@ -260,9 +331,26 @@ class ServiceTableReport extends AbstractExcelDocumentReport
         // content rows
 
         $fontSizes = [
-            6 => ['E', 'L'],
-            7 => ['D', 'G', 'I'],
-            8 => ['A', 'B', 'C', 'F', 'H', 'J', 'K', 'M', 'N']
+            6 => [
+                $this->columnAddress($this->columnAddress('E', $cities), $cities),
+                $this->columnAddress('L', $cities)
+            ],
+            7 => [
+                $this->columnAddress('D', $cities),
+                $this->columnAddress('G', $cities),
+                $this->columnAddress('I', $cities)
+            ],
+            8 => [
+                $this->columnAddress('A', $cities),
+                $this->columnAddress('B', $cities),
+                $this->columnAddress('C', $cities),
+                $this->columnAddress('F', $cities),
+                $this->columnAddress('H', $cities),
+                $this->columnAddress('J', $cities),
+                $this->columnAddress('K', $cities),
+                $this->columnAddress('M', $cities),
+                $this->columnAddress('N', $cities)
+            ]
         ];
 
         $colCtr = 0;
@@ -286,7 +374,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
 
                 foreach (array_keys($headers) as $index) {
                     $column = chr(65 + $index);
-                    if ($column != 'J') {
+                    if ($column != $this->columnAddress('J', $cities)) {
                         $sheet->mergeCells("{$column}{$row}:{$column}{$row2}");
                         $maxRow = $row;
                     } else {
@@ -316,34 +404,37 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                 $textrun = $richtext->createTextRun(strftime('%A,', $service->date->getTimestamp()));
                 $textrun->getFont()->setName('Arial')->setSize(8)->setBold(true);
                 $richtext->createText("\n" . $service->date->format('d.m.Y'));
-                $sheet->getCell("A{$row}")->setValue($richtext);
-                $sheet->setCellValue("B{$row}", $liturgy['title'] ?: '');
-                $sheet->setCellValue("C{$row}", $service->descriptionText());
-                $sheet->setCellValue("D{$row}", $service->timeText(false));
-                $sheet->setCellValue("E{$row}", $service->locationText());
+                $sheet->getCell($this->cellAddress('A', $row, $cities))->setValue($richtext);
+                if (count($cities) > 1) {
+                    $sheet->setCellValue("B{$row}", $service->city->name);
+                }
+                $sheet->setCellValue($this->cellAddress('B', $row, $cities), $liturgy['title'] ?: '');
+                $sheet->setCellValue($this->cellAddress('C', $row, $cities), $service->descriptionText());
+                $sheet->setCellValue($this->cellAddress('D', $row, $cities), $service->timeText(false));
+                $sheet->setCellValue($this->cellAddress('E', $row, $cities), $service->locationText());
                 $sheet->setCellValue(
-                    "F{$row}",
+                    $this->cellAddress('F', $row, $cities),
                     $this->peopleListFormatted($service->participantsByCategory('P'), $nameFormat)
                 );
                 $sheet->setCellValue(
-                    "G{$row}",
+                    $this->cellAddress('G', $row, $cities),
                     $this->peopleListFormatted($service->participantsByCategory('O'), $nameFormat)
                 );
-                $sheet->setCellValue("H{$row}", $service->eucharist ? 'X' : '');
+                $sheet->setCellValue($this->cellAddress('H', $row, $cities), $service->eucharist ? 'X' : '');
                 $sheet->setCellValue(
-                    "I{$row}",
+                    $this->cellAddress('I', $row, $cities),
                     $this->peopleListFormatted($service->participantsByCategory('A'), $nameFormat)
                 );
-                $sheet->setCellValue("J{$row}", $service->offerings_counter1);
-                $sheet->setCellValue("J{$row2}", $service->offerings_counter2);
-                $sheet->setCellValue("K{$row}", $service->offeringText());
-                $sheet->setCellValue("L{$row}", $service->offering_description);
+                $sheet->setCellValue($this->cellAddress('J', $row, $cities), $service->offerings_counter1);
+                $sheet->setCellValue($this->cellAddress('A', $row2, $cities), $service->offerings_counter2);
+                $sheet->setCellValue($this->cellAddress('K', $row, $cities), $service->offeringText());
+                $sheet->setCellValue($this->cellAddress('L', $row, $cities), $service->offering_description);
 
 
                 $colCtr = 0;
                 foreach ($ministries as $ministry) {
                     $colCtr++;
-                    $col = chr(78 + $colCtr);
+                    $col = chr((count($cities) > 1 ? 79 : 78) + $colCtr);
                     $sheet->setCellValue(
                         "{$col}{$row}",
                         $this->peopleListFormatted($service->participantsByCategory($ministry), $nameFormat)
@@ -357,41 +448,45 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                     $liturgy['litColor'] = 'red';
                 }
                 // liturgical color
-                $sheet->getStyle("B{$row}")->getFill()->setFillType(Fill::FILL_SOLID)
+                $sheet->getStyle($this->cellAddress('B', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()->setARGB($colors[$liturgy['litColor']]);
 
                 // yellow for special location
                 if (!is_object($service->location)) {
-                    $sheet->getStyle("E{$row}")->getFill()->setFillType(Fill::FILL_SOLID)
+                    $sheet->getStyle($this->cellAddress('E', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('ffffff00');
                 }
 
                 // light green for "Gottesdienst im Grünen"
                 if ($service->hasDescription('gottesdienst im grünen')) {
-                    $sheet->getStyle("C{$row}")->getFill()->setFillType(Fill::FILL_SOLID)
+                    $sheet->getStyle($this->cellAddress('C', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('ff92d050');
-                    $sheet->getStyle("E{$row}")->getFill()->setFillType(Fill::FILL_SOLID)
+                    $sheet->getStyle($this->cellAddress('E', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('ff92d050');
                 }
 
                 // colors for required/recommended offerings
                 if ($service->offering_type == 'PO') {
-                    $sheet->getStyle("K{$row}")->getFont()->getColor()->setARGB('ffff0000');
+                    $sheet->getStyle($this->cellAddress('K', $row, $cities))->getFont()->getColor()->setARGB(
+                        'ffff0000'
+                    );
                 }
                 if ($service->offering_type == 'eO') {
-                    $sheet->getStyle("K{$row}")->getFont()->getColor()->setARGB('ff838dd5');
+                    $sheet->getStyle($this->cellAddress('K', $row, $cities))->getFont()->getColor()->setARGB(
+                        'ff838dd5'
+                    );
                 }
 
                 // color for offering description
                 if ($service->offering_description) {
-                    $sheet->getStyle("L{$row}")->getFill()->setFillType(Fill::FILL_SOLID)
+                    $sheet->getStyle($this->cellAddress('L', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('ffffc000');
                 }
             }
         }
 
         // output
-        $filename = $data['year'] . ' Plan für Gottesdienste ' . $city->name.'.xlsx';
+        $filename = $data['year'] . ' Plan für Gottesdienste ' . $cities->pluck('name')->join(', ') . '.xlsx';
         $this->sendToBrowser($filename);
     }
 

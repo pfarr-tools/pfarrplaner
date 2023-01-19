@@ -34,7 +34,7 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'serviceTable'})" ref="myForm">
             <form-csrf-token />
-            <form-selectize name="city" label="Jahresplan für folgende Kirchengemeinde erstellen" :options="cities" v-model="myCity" />
+            <form-selectize name="cities[]" label="Jahresplan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple/>
             <form-input name="year" label="Jahr" v-model="myYear" type="number" />
             <form-selectize name="ministries[]" label="Folgende Dienste mit einschließen" :options="ministries" v-model="myMinistries" multiple/>
             <form-selectize name="name_format" label="Namen ausgeben als" :options="nameFormats" v-model="myNameFormat" />
@@ -63,7 +63,7 @@ export default {
         return {
             myUser: this.$page.props.currentUser.data.id,
             myMinistries: [],
-            myCity: this.cities.length > 0 ? this.cities[0].id : null,
+            myCities: this.cities.length > 0 ? [this.cities[0].id] : [],
             myYear: moment().format('YYYY'),
             nameFormats,
             myNameFormat: 3,
