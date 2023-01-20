@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.6.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.6.0...v2023.6.1) (2023-01-20)
+
+
+### Bug Fixes
+
+* Sharepoint/Onlinekalender-Importe funktionieren nicht mehr ([593f74d](https://codeberg.org/pfarrplaner/pfarrplaner/commits/593f74d1a6cfc2731301cb371009aae1d2f50b6b))
+
 ## [2023.6.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.5.0...v2023.6.0) (2023-01-19)
 
 
