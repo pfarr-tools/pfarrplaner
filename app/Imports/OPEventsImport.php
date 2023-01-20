@@ -77,7 +77,7 @@ class OPEventsImport
         if (empty($this->city->op_customer_token.$this->city->op_customer_key)) return $events;
 
         $myEvents = $this->getEvents();
-        foreach ($myEvents['data'] as $myEvent) {
+        foreach ($myEvents as $myEvent) {
             $myEvent['record_type'] = 'OP_Event';
             $this->fixTimeAndDates($myEvent);
             if (($myEvent['start']) <= $end && ((!isset($myEvent['end']) || ($myEvent['end'] >= $start)))) {
@@ -120,7 +120,7 @@ class OPEventsImport
         if (Cache::has($cacheKey)) {
             $events = Cache::get($cacheKey);
         } else {
-            $events = json_decode($this->getUrl($url), true);
+            $events = $this->getUrl($url);
             Cache::put($cacheKey, $events, 900);
         }
         return $events;
@@ -144,7 +144,8 @@ class OPEventsImport
                 ]
             ]
         );
-        return $response->getBody();
+        $body = json_decode($response->getBody(), true);
+        return $body['data'] ?? [];
     }
 
     /**

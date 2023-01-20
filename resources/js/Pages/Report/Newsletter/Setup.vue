@@ -37,8 +37,8 @@
             <form-selectize name="city" label="Newsletter für folgende Kirchengemeinde erstellen" v-model="myForm.city" :options="cities" />
             <form-date-picker name="start" label="Gottesdienste von" v-model="myForm.start" iso-date />
             <form-date-picker name="end" label="Bis" v-model="myForm.end" iso-date />
-            <form-check name="mixOutlook" label="Veranstaltungen aus dem Outlook-Kalender mit aufnehmen." v-model="myForm.mixOP"/>
-            <form-check name="mixOP" label="Veranstaltungen aus dem Online Planer mit aufnehmen." v-model="myForm.mixOutlook"/>
+            <form-check name="mixOutlook" label="Veranstaltungen aus dem Outlook-Kalender mit aufnehmen." v-model="myForm.mixOutlook"/>
+            <form-check name="mixOP" label="Veranstaltungen aus dem Online Planer mit aufnehmen." v-model="myForm.mixOP"/>
         </form>
     </admin-layout>
 </template>
