@@ -43,7 +43,7 @@
                 <h3>Zur Überprüfung</h3>
                 <fake-table :columns="[3,3,3,3]" :headers="['Benutzer', 'Beschreibung', '', '']"
                             collapsed-header="Abwesenheiten">
-                    <div class="row mb-3 p-1" v-for="absence in check">
+                    <div class="row mb-3 p-1" v-for="absence in myCheckableAbsences">
                         <div class="col-md-3">
                             <b>{{ absence.user.name }}</b><br/>
                             vom {{ moment(absence.updated_at).locale('de').format('DD.MM.YYYY') }}
@@ -55,6 +55,9 @@
                         </div>
                         <div class="col-md-3"></div>
                         <div class="col-md-3 text-right">
+                            <nav-button v-if="!absence.checking" type="success" icon="mdi mdi-check"
+                                        title="Als überprüft markieren" force-icon @click="absence.checking=true; forceChecked(absence)" />
+                            <span v-else class="mdi mdi-spin mdi-loading" title="Wird als überprüft markiert..."></span>
                             <nav-button type="primary" icon="mdi mdi-pencil" title="Zur Überprüfung des Antrags" force-icon
                                         @click="editAbsence(absence)"/>
                         </div>
@@ -66,7 +69,7 @@
                 <h3>Zur Genehmigung</h3>
                 <fake-table :columns="[3,3,3,3]" :headers="['Benutzer', 'Beschreibung', 'Status', '']"
                             collapsed-header="Abwesenheiten">
-                    <div class="row mb-3 p-1" v-for="absence in approve">
+                    <div class="row mb-3 p-1" v-for="absence in myApprovableAbsences">
                         <div class="col-md-3">
                             <b>{{ absence.user.name }}</b><br/>
                             vom {{ moment(absence.updated_at).locale('de').format('DD.MM.YYYY') }}
@@ -87,6 +90,9 @@
                             </checked-process-item>
                         </div>
                         <div class="col-md-3 text-right">
+                            <nav-button v-if="!absence.approving" type="success" icon="mdi mdi-check"
+                                        title="Als genehmigt markieren" force-icon @click="absence.approving=true; forceApproved(absence)" />
+                            <span v-else class="mdi mdi-spin mdi-loading" title="Wird als genehmigt markiert..."></span>
                             <nav-button type="primary" icon="mdi mdi-pencil" title="Zur Genehmigung des Antrags" force-icon
                                         @click="editAbsence(absence)"/>
                         </div>
@@ -106,10 +112,43 @@ export default {
     name: "AbsenceRequestsTab",
     components: {CheckedProcessItem, NavButton, FakeTable},
     props: ['title', 'description', 'user', 'settings', 'check', 'approve', 'count', 'config'],
+    data() {
+        let myCheckableAbsences =  this.check;
+        let myApprovableAbsences = this.approve;
+
+        for (let id in myCheckableAbsences) {
+            myCheckableAbsences[id].checking = false;
+        }
+        for (let id in myApprovableAbsences) {
+            myApprovableAbsences[id].approving = false;
+        }
+
+        return {
+            apiToken: this.$page.props.currentUser.data.api_token,
+            myCheckableAbsences,
+            myApprovableAbsences,
+        }
+    },
     methods: {
         editAbsence(absence) {
             this.$inertia.get(route('absence.edit', absence.id));
-        }
+        },
+        forceChecked(absence) {
+            axios.post(route('api.absence.set-checked', {
+                api_token: this.apiToken,
+                absence: absence.id,
+            })).then(response => {
+                this.myCheckableAbsences = this.myCheckableAbsences.filter(item => item.id != absence.id);
+            });
+        },
+        forceApproved(absence) {
+            axios.post(route('api.absence.set-approved', {
+                api_token: this.apiToken,
+                absence: absence.id,
+            })).then(response => {
+                this.myApprovableAbsences = this.myApprovableAbsences.filter(item => item.id != absence.id);
+            });
+        },
     }
 
 }
