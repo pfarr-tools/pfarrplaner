@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.7.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.6.1...v2023.7.0) (2023-01-27)
+
+
+### Features
+
+* Schaltfläche zum schnellen Überprüfen/Genehmigen von Urlaubsanträgen auf der Startseite ([528919a](https://codeberg.org/pfarrplaner/pfarrplaner/commits/528919ab058042cfd3c08d13aa1ca3bfa7df241f))
+
 ### [2023.6.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.6.0...v2023.6.1) (2023-01-20)
 
 
