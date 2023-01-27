@@ -30,8 +30,48 @@
 <template>
     <admin-layout :title="'Willkommen, '+(user.first_name ? user.first_name : user.name)+'!'">
         <template slot="navbar-left">
-            <a class="btn btn-primary" :href="route('calendar')"><span class="mdi mdi-calendar"></span> <span
-                class="d-none d-md-inline">Zum Kalender</span></a>&nbsp;
+            <div class="btn-group mr-1">
+                <a class="btn btn-primary" :href="route('calendar')"><span class="mdi mdi-calendar"></span> <span
+                    class="d-none d-md-inline">Zum Kalender</span></a>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="sr-only">Weitere Optionen aufklappen</span>
+                </button>
+                <div class="dropdown-menu p-1">
+                    <form-date-picker :config="myDatePickerSettings" v-model="myQuickPickerDate"
+                                      @input="quickPickDate($event)" @dp-update="updateViewDate" />
+                    <hr />
+                    <div class="px-2 mb-2 text-sm">
+                        <nav-button type="secondary btn-sm" icon="mdi mdi-calendar" force-icon :key="myQuickPickViewDate"
+                                    :title="quickPickerMonthText+' im Kalender öffnen'"
+                                    @click="openCalendar">{{ quickPickerMonthText }} öffnen</nav-button>
+                    </div>
+                    <div v-if="myQuickPickerLoading" class="text-center text-muted" style="font-size: 4em;">
+                        <span class="mdi mdi-spin mdi-loading"></span>
+                    </div>
+                    <div v-if="(!myQuickPickerLoading) && (myQuickPickerServices.length > 0)" :key="myQuickPickerChanges" class="px-2">
+                        <div v-for="service in myQuickPickerServices" class="mb-2" style="font-size: .8em;">
+                            <div class="text-bold">{{ service.timeText }} {{ service.titleText }}</div>
+                            <div class="text-sm text-muted">{{ service.locationText }}</div>
+                            <div class="text-right">
+                                <nav-button type="primary btn-sm" icon="mdi mdi-pencil" force-icon
+                                            title="Gottesdienst bearbeiten" @click="editService(service)" />
+                                <nav-button type="light  btn-sm" icon="mdi mdi-view-list" force-icon
+                                            title="Liturgie bearbeiten" @click="editLiturgy(service)" />
+                                <nav-button type="light btn-sm" icon="mdi mdi-microphone" force-icon
+                                            title="Predigt bearbeiten" @click="editSermon(service)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="(!myQuickPickerLoading) && (myQuickPickerServices.length == 0)"
+                         :key="myQuickPickerChanges" class="text-sm text-muted px-2 mb-2">
+                        An diesem Tag sind noch keine Gottesdienste geplant.
+                    </div>
+                </div>
+            </div>
+
+
+
             <inertia-link v-if="config.wizardButtons == '1'" class="btn btn-light" :href="route('baptisms.create')">
                 <span class="mdi mdi-water"></span>
                 <span class="d-none d-md-inline">Taufe anlegen...</span></inertia-link>&nbsp;
@@ -116,10 +156,14 @@ import NextServicesTab from "../components/HomeScreen/NextServicesTab";
 import RegistrationsTab from "../components/HomeScreen/RegistrationsTab";
 import StreamingTab from "../components/HomeScreen/StreamingTab";
 import WeddingsTab from "../components/HomeScreen/WeddingsTab";
+import FormDatePicker from "../components/Ui/forms/FormDatePicker.vue";
+import NavButton from "../components/Ui/buttons/NavButton.vue";
 
 export default {
     name: "HomeScreen",
     components: {
+        NavButton,
+        FormDatePicker,
         TabHeader,
         TabHeaders,
         Tabs,
@@ -151,6 +195,11 @@ export default {
             }
         }, this);
     },
+    computed: {
+        quickPickerMonthText() {
+            return this.myQuickPickViewDate.locale('de').format('MMMM YYYY');
+        },
+    },
     data() {
         let myTabNames = this.settings.homeScreenTabs ? this.settings.homeScreenTabs.split(',') : [];
         return {
@@ -161,6 +210,16 @@ export default {
             myTabsConfig: this.settings.homeScreenTabsConfig,
             myTabs: {},
             myActiveTab: this.activeTab || (this.settings.homeScreenTabsConfig.tabs[0] ? this.settings.homeScreenTabsConfig.tabs[0].type + '0' : null),
+            myDatePickerSettings: {
+                inline: true,
+                format: 'L',
+                locale: 'de',
+            },
+            myQuickPickerDate: moment().locale('de').format('DD.MM.YYYY'),
+            myQuickPickViewDate: moment(),
+            myQuickPickerServices: [],
+            myQuickPickerChanges: 0,
+            myQuickPickerLoading: true,
         }
     },
     async mounted() {
@@ -196,6 +255,7 @@ export default {
             }
         }, this);
 
+        this.quickPickDate(this.myQuickPickerDate);
     },
     methods: {
         tabComponent(tab) {
@@ -204,7 +264,36 @@ export default {
         loadTab(tab) {
             this.myActiveTab = tab.key;
             this.$forceUpdate();
-        }
+        },
+        quickPickDate(d) {
+            this.myQuickPickerDate = d;
+            this.myQuickPickerLoading = true;
+            axios.get(route('api.calendar.quick-pick', {
+                api_token: this.apiToken,
+                date: this.myQuickPickerDate,
+            })).then(response => {
+                this.myQuickPickerServices = response.data;
+                this.myQuickPickerLoading = false;
+                this.myQuickPickerChanges++;
+                this.$forceUpdate();
+            });
+        },
+        updateViewDate(e) {
+            this.myQuickPickViewDate = e.viewDate;
+            this.$forceUpdate();
+        },
+        openCalendar() {
+            this.$inertia.get(route('calendar', {date: this.myQuickPickViewDate.format('YYYY-MM')}));
+        },
+        editService(service) {
+            this.$inertia.get(route('service.edit', {service: service.slug}));
+        },
+        editLiturgy(service) {
+            this.$inertia.get(route('liturgy.editor', {service: service.slug}));
+        },
+        editSermon(service) {
+            this.$inertia.get(route('service.sermon.editor', {service: service.slug}));
+        },
     }
 }
 </script>

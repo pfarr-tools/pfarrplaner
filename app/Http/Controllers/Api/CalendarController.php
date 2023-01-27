@@ -37,6 +37,7 @@ use App\Service;
 use App\Services\CalendarService;
 use App\Services\RedirectorService;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -110,6 +111,22 @@ class CalendarController extends \App\Http\Controllers\Controller
             ->groupBy('keyDate');
 
         return response()->json($services);
+    }
+
+    /**
+     * Get services for the quick-pick calendar
+     * @param Carbon $date
+     * @return JsonResponse
+     */
+    public function quickPick($date)
+    {
+        $date = Carbon::createFromFormat('d.m.Y', $date)->setTime(0,0,0);
+        $services = Service::setEagerLoads([])->without(['city', 'location', 'participants'])
+            ->select(['id', 'slug', 'title', 'date', 'location_id', 'city_id', 'special_location'])
+            ->whereIn('city_id', Auth::user()->writableCities->pluck('id'))
+            ->startingFrom($date)->endingAt($date->copy()->endOfDay())->ordered()
+            ->get();
+        return response()->json($services ?? []);
     }
 
 

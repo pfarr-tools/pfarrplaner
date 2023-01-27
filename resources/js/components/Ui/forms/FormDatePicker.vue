@@ -31,7 +31,7 @@
     <form-group :id="id" :label="label" :help="help" :name="name" :pre-label="preLabel" :required="required"
                 :value="myValue" :is-checked-item="isCheckedItem">
         <date-picker :name="name" v-model="myValue" :config="myDatePickerConfig" :disabled="disabled" :required="required"
-                     :aria-required="required" @input="handleInputEvent" />
+                     :aria-required="required" @input="handleInputEvent" @dp-update="$emit('dp-update', $event)"/>
     </form-group>
 </template>
 

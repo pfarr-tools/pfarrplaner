@@ -32,4 +32,5 @@
 use App\Http\Controllers\Api\CalendarController;
 
 Route::get('/cal/city/{city}/{date}', [CalendarController::class, 'city'])->name('calendar.byCityAndMonth');
+Route::get('/quick-pick/{date}', [CalendarController::class, 'quickPick'])->name('calendar.quick-pick');
 
