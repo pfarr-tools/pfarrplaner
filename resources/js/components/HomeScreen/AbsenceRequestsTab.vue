@@ -60,6 +60,8 @@
                             <span v-else class="mdi mdi-spin mdi-loading" title="Wird als überprüft markiert..."></span>
                             <nav-button type="primary" icon="mdi mdi-pencil" title="Zur Überprüfung des Antrags" force-icon
                                         @click="editAbsence(absence)"/>
+                            <nav-button type="danger" icon="mdi mdi-delete" title="Antrag kommentarlos löschen" force-icon
+                                        @click="deleteAbsence(absence)"/>
                         </div>
                     </div>
                 </fake-table>
@@ -132,6 +134,15 @@ export default {
     methods: {
         editAbsence(absence) {
             this.$inertia.get(route('absence.edit', absence.id));
+        },
+        deleteAbsence(absence) {
+            axios.delete(route('api.absence.destroy', {
+                api_token: this.apiToken,
+                absence: absence.id,
+            })).then(response => {
+                this.myCheckableAbsences = this.myCheckableAbsences.filter(item => item.id != absence.id);
+                this.myApprovableAbsences = this.myApprovableAbsences.filter(item => item.id != absence.id);
+            });
         },
         forceChecked(absence) {
             axios.post(route('api.absence.set-checked', {

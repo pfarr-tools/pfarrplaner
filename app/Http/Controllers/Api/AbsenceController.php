@@ -90,4 +90,16 @@ class AbsenceController extends \App\Http\Controllers\Controller
         return response()->json($absence);
     }
 
+    /**
+     * Delete absence without comment
+     * @param Absence $absence
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function destroy(Absence $absence)
+    {
+        $absence->delete();
+        return response()->json();
+    }
+
 }

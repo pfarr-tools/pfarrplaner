@@ -32,3 +32,4 @@ use App\Http\Controllers\Api\AbsenceController;
 
 Route::post('/absence/{absence}/set-checked', [AbsenceController::class, 'setChecked'])->name('absence.set-checked');
 Route::post('/absence/{absence}/set-approved', [AbsenceController::class, 'setApproved'])->name('absence.set-approved');
+Route::delete('/absence/{absence}', [AbsenceController::class, 'destroy'])->name('absence.destroy');
