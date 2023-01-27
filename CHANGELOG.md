@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.8.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.7.0...v2023.8.0) (2023-01-27)
+
+
+### Features
+
+* Schaltfläche zum schnellen Löschen von Urlaubsanträgen auf der Startseite ([3767921](https://codeberg.org/pfarrplaner/pfarrplaner/commits/376792134d2be2f51852362bb0aa299b8b1997d5))
+
 ## [2023.7.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.6.1...v2023.7.0) (2023-01-27)
 
 
