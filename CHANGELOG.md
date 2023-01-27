@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.9.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.8.0...v2023.9.0) (2023-01-27)
+
+
+### Features
+
+* Schnelle Kalenderauswahl auf der Startseite ([5d242f5](https://codeberg.org/pfarrplaner/pfarrplaner/commits/5d242f57849fe6884ec14a8f69ebd7b7c6dfdaf5))
+
+
+### Bug Fixes
+
+* Fehler beim Anlegen von Jahrestagen einer Trauung ([d8f5d4d](https://codeberg.org/pfarrplaner/pfarrplaner/commits/d8f5d4d43a635ea72441d1805b3e0015ef0f1b5d))
+
 ## [2023.8.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.7.0...v2023.8.0) (2023-01-27)
 
 
