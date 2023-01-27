@@ -172,8 +172,8 @@ class Wedding extends Model
         }
         if ($config['include_rite_anniversaries'] ?? false) {
             $records['wedding_anniversary_'.$this->id] = [
-                'startDate' => $this->service()->date->copy()->addYear(1),
-                'endDate' => $this->service()->date->copy()->addYear(1),
+                'startDate' => $this->service->date->copy()->addYear(1),
+                'endDate' => $this->service->date->copy()->addYear(1),
                 'title' => '1. Jahrestag der Trauung von '.$this->spouse1_name.' / '.$this->spouse2_name,
                 'description' => $description,
                 'location' => '',
