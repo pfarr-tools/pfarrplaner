@@ -42,6 +42,8 @@ class SyncSingleAbsenceToCalendarConnection implements ShouldQueue
      */
     public function handle()
     {
+        // temporarily disabled
+        return;
         Log::debug('Executing sync job for absence #'.$this->absence->id.' on CalendarConnection #'.$this->calendarConnection->id);
         $syncEngine = $this->calendarConnection->getSyncEngine();
         if ($syncEngine) {

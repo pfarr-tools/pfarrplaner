@@ -40,6 +40,8 @@ class DeleteSingleServiceFromCalendarConnection implements ShouldQueue
      */
     public function handle()
     {
+        // temporarily disabled
+        return;
         Log::debug('Executing delete job for service #'.$this->service->id.' on CalendarConnection #'.$this->calendarConnection->id);
         $syncEngine = $this->calendarConnection->getSyncEngine();
         if ($syncEngine) {

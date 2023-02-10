@@ -42,6 +42,8 @@ class SyncEntireCalendarConnection implements ShouldQueue
      */
     public function handle()
     {
+        // temporarily disabled
+        return;
         /** @var CalendarConnection $calendarConnection */
         if ($calendarConnection = CalendarConnection::find($this->calendarConnectionId)) {
             Log::debug('SyncEntireCalendarConnection triggered for CalendarConnection #'.$calendarConnection->id);
