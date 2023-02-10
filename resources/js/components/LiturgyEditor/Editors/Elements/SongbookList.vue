@@ -38,11 +38,15 @@
                 </td>
                 <td v-if="editing != songbookIndex">{{ songbook.code }}</td>
                 <td v-if="editing != songbookIndex">{{ songbook.name }}</td>
+                <td v-if="editing != songbookIndex"><div v-if="songbook.pivot.color" class="color" :style="songbook.pivot.color ? 'background-color: '+songbook.pivot.color : ''" :title="songbook.color || ''"></div></td>
                 <td>
                     <div v-if="editing == songbookIndex">
                         <form-input v-model="songbook.pivot.reference" />
                     </div>
                     <div v-else>{{ songbook.pivot.reference || ''}}</div>
+                </td>
+                <td v-if="editing == songbookIndex">
+                    <form-selectize :options="colors" v-model="songbook.pivot.color" />
                 </td>
                 <td class="text-right">
                     <nav-button icon="mdi mdi-pencil" title="Eintrag bearbeiten" v-if="editing != songbookIndex"
@@ -73,14 +77,19 @@
 import NavButton from "../../../Ui/buttons/NavButton";
 import FormInput from "../../../Ui/forms/FormInput";
 import SongbookSelect from "./SongbookSelect";
+import FormSelectize from "../../../Ui/forms/FormSelectize.vue";
 export default {
     name: "SongbookList",
-    components: {SongbookSelect, FormInput, NavButton},
+    components: {FormSelectize, SongbookSelect, FormInput, NavButton},
     props: ['value', 'allowSplit'],
     created() {
         axios.get(route('api.songbooks.index', { api_token: this.apiToken }))
         .then(result => {
             this.allSongbooks = result.data;
+        });
+        axios.get(route('api.songbooks.colors', { api_token: this.apiToken }))
+        .then(result => {
+            this.colors = result.data;
         });
     },
     data() {
@@ -88,6 +97,7 @@ export default {
             editing: -1,
             mySongbooks: this.value,
             allSongbooks: [],
+            colors: [],
             apiToken: this.$page.props.currentUser.data.api_token,
         };
     },
@@ -111,6 +121,7 @@ export default {
                     reference: '',
                     song_id: null,
                     songbook_id: null,
+                    color: '',
                 }
             });
             this.editing = this.mySongbooks.length - 1;
@@ -124,5 +135,12 @@ export default {
 </script>
 
 <style scoped>
-
+    div.color {
+        margin-top: .5em;
+        height: 10px;
+        width: 10px;
+        border: solid 1px lightgray;
+        background-color: transparent;
+        border-radius: .25em;
+    }
 </style>

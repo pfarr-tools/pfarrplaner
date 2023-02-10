@@ -64,6 +64,19 @@ class SongbookController extends \App\Http\Controllers\Controller
     }
 
     /**
+     * Get default colors for songbooks
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function colors()
+    {
+        $data = [['name' => 'Ohne Abschnittsfarbe', 'id' => '']];
+        foreach (config('colors.songbooks', []) as $name => $color) {
+            $data[] = ['name' => $name, 'id' => $color];
+        }
+        return response()->json($data);
+    }
+
+    /**
      * Validate submitted data
      *
      * @param Request $request

@@ -226,6 +226,7 @@ class SongController extends Controller
                 'song.songbooks.*.code' => 'nullable|string',
                 'song.songbooks.*.pivot.songbook_id' => 'nullable|int|exists:songbooks,id',
                 'song.songbooks.*.pivot.reference' => 'nullable|string',
+                'song.songbooks.*.pivot.color' => 'nullable|string',
             ]
         );
     }

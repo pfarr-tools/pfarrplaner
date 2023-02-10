@@ -4,7 +4,7 @@
  *
  * @package Pfarrplaner
  * @author Christoph Fischer <chris@toph.de>
- * @copyright (c) Christoph Fischer, https://christoph-fischer.de
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
  * @link https://codeberg.org/pfarrplaner/pfarrplaner
  * @version git: $Id$
@@ -28,9 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-use App\Http\Controllers\Api\SongbookController;
-
-Route::get('/songbooks/index', [SongbookController::class, 'index'])->name('songbooks.index');
-Route::get('/songbooks/colors', [SongbookController::class, 'colors'])->name('songbooks.colors');
-Route::post('/songbooks', [SongbookController::class, 'store'])->name('songbook.store');
+return [
+    'songbooks' => [
+        'EG gelb' => '#fdf538',
+    ]
+];

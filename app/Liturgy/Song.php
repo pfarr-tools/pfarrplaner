@@ -74,7 +74,7 @@ class Song extends \Illuminate\Database\Eloquent\Model
         if (!isset($data['songbooks'])) return;
         $sync = [];
         foreach ($data['songbooks'] as $item) {
-            $sync[$item['pivot']['songbook_id']] = ['reference' => $item['pivot']['reference'], 'code' => $item['code'], 'color' => $item['pivot']['color']];
+            $sync[$item['pivot']['songbook_id']] = ['reference' => $item['pivot']['reference'], 'code' => $item['code'], 'color' => ($item['pivot']['color'] ?? '')];
         }
         $this->songbooks()->sync($sync, true);
     }
