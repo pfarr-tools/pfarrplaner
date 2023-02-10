@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.10.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.9.0...v2023.10.0) (2023-02-10)
+
+
+### Features
+
+* Die Abschnittsfarben eines Lieds in einem bestimmten Liederbuch kann nun bearbeitet werden ([d557c06](https://codeberg.org/pfarrplaner/pfarrplaner/commits/d557c067c4c5ce2581f7c7fc789af44e460028f7))
+
 ## [2023.9.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.8.0...v2023.9.0) (2023-01-27)
 
 
