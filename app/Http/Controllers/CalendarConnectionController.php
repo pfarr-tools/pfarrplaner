@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\CalendarConnection;
 use App\Calendars\Exchange\ExchangeCalendar;
-use App\Jobs\SyncEntireCalendarConnection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +20,13 @@ class CalendarConnectionController extends Controller
     {
         $data = $request->validate(['credentials1' => 'required|string', 'credentials2' => 'required|string']);
 
-        $exchange = new ExchangeCalendar('outlook.office365.com', $data['credentials1'], $data['credentials2'], '2010_SP2', '');
+        $exchange = new ExchangeCalendar(
+            'outlook.office365.com',
+            $data['credentials1'],
+            $data['credentials2'],
+            '2010_SP2',
+            ''
+        );
         $folders = $exchange->getAllCalendars();
         return response()->json($folders);
     }
@@ -104,9 +109,6 @@ class CalendarConnectionController extends Controller
         $calendarConnection->update($data);
         $calendarConnection->cities()->sync($request->get('cities') ?? []);
 
-        // dispatch full sync job
-        SyncEntireCalendarConnection::dispatch($calendarConnection);
-
         return redirect()->route('calendarConnection.index');
     }
 
@@ -119,9 +121,11 @@ class CalendarConnectionController extends Controller
      */
     public function resync(CalendarConnection $calendarConnection)
     {
-        SyncEntireCalendarConnection::dispatch($calendarConnection);
-        return redirect()->route('calendarConnection.index')->with('info', 'Der Kalender wird neu synchronisiert. Es kann eine Weile dauern, bis alle Daten zum externen Kalender übertragen sind. Dieser
-            Prozess läuft im Hintergrund ab. Du kannst solange ganz normal weiterarbeiten.');
+        return redirect()->route('calendarConnection.index')->with(
+            'info',
+            'Der Kalender wird neu synchronisiert. Es kann eine Weile dauern, bis alle Daten zum externen Kalender übertragen sind. Dieser
+            Prozess läuft im Hintergrund ab. Du kannst solange ganz normal weiterarbeiten.'
+        );
     }
 
     /**

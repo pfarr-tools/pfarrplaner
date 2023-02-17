@@ -7,9 +7,11 @@ use App\Casts\EncryptedAttribute;
 use App\Jobs\SyncSingleAbsenceToCalendarConnection;
 use App\Jobs\SyncSingleServiceToCalendarConnection;
 use AustinHeap\Database\Encryption\Traits\HasEncryptedAttributes;
-use Illuminate\Database\Eloquent\Collection;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CalendarConnection extends Model
 {
@@ -19,21 +21,14 @@ class CalendarConnection extends Model
     protected $fillable = [
         'user_id',
         'title',
-        'credentials1',
-        'credentials2',
-        'connection_string',
         'include_hidden',
         'include_alternate',
         'include_vacations',
         'include_rite_anniversaries',
     ];
 
-    protected $casts = [
-        'credentials1' => EncryptedAttribute::class,
-        'credentials2' => EncryptedAttribute::class,
-        'connection_string' => EncryptedAttribute::class,
-    ];
     protected $with = ['user', 'cities'];
+    protected $appends = ['uri'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -51,12 +46,8 @@ class CalendarConnection extends Model
         return $this->belongsToMany(City::class)->withPivot('connection_type');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function entries()
-    {
-        return $this->hasMany(CalendarConnectionEntry::class);
+    public function getUriAttribute() {
+        return url('/dav/calendars/'.$this->user->email.'/'.Str::slug($this->title)).'/';
     }
 
     /**
@@ -67,16 +58,17 @@ class CalendarConnection extends Model
      */
     public function getSyncableServicesForCity(City $city, $countOnly = false)
     {
+        $cityServices = Service::setEagerLoads([])->with([])->startingFrom(Carbon::now()->subMonths(12));
         switch ($city->pivot->connection_type) {
             case 0:
                 $cityServices = new \Illuminate\Support\Collection();
                 return ($countOnly ? 0 : $cityServices);
                 break;
             case self::CONNECTION_TYPE_ALL:
-                $cityServices = Service::inCity($city);
+                $cityServices = $cityServices->inCity($city);
                 break;
             case self::CONNECTION_TYPE_OWN:
-                $cityServices = Service::inCity($city)->userParticipates($this->user);
+                $cityServices = $cityServices->inCity($city)->userParticipates($this->user);
         }
 
         // exclude hidden service if necessary
@@ -88,39 +80,50 @@ class CalendarConnection extends Model
     }
 
     /**
-     * Get the SyncEngine for this connection
-     * @return Calendars\SyncEngines\AbstractSyncEngine|null
+     * Get all services to be synced
+     * @return Collection
      */
-    public function getSyncEngine()
+    public function getSyncableServices(): Collection
     {
-        $syncEngine = SyncEngines::get($this);
-        if (!$syncEngine) {
-            Log::error('No sync engine found for CalendarConnection #' . $this->id);
-        }
-        return $syncEngine;
-    }
-
-    /**
-     * Sync all relevant services to external calendar
-     */
-    public function syncEntireCalendar()
-    {
-        // sync absences
-        foreach ($this->getSyncableAbsences() as $absence) {
-            SyncSingleAbsenceToCalendarConnection::dispatch($this, $absence);
-        }
-
-        // create new entries
-        $services = new Collection();
+        $services = collect();
         foreach ($this->cities as $city) {
             $services = $services->merge($this->getSyncableServicesForCity($city));
         }
+        return $services;
+    }
 
-        Log::debug('Syncing entire calendar for CalendarConnection #' . $this->id);
-        Log::debug('Dispatching ' . count($services) . ' sync jobs');
-        foreach ($services as $service) {
-            SyncSingleServiceToCalendarConnection::dispatch($this, $service);
+    public function getCurrentSyncToken()
+    {
+        return max(
+            $this->getSyncableServices()->pluck('updated_at')->max(),
+            $this->getSyncableAbsences()->pluck('updated_at')->max(),
+        )->toIsoString();
+    }
+
+    public function getCalendarItems()
+    {
+        $items = [];
+
+        foreach($this->getSyncableAbsences() as $absence) {
+            try {
+                foreach ($absence->getCalendarItems(false, false) as $item) {
+                    $items[] = $item;
+                }
+            } catch (\RuntimeException $e) {
+            }
         }
+
+        foreach ($this->getSyncableServices() as $service) {
+            try {
+                foreach ($service->getCalendarItems($this->include_alternate, $this->include_rite_anniversaries) as $item) {
+                    $items[] = $item;
+                }
+            } catch (\RuntimeException $e) {
+            }
+        }
+
+
+        return $items;
     }
 
 
@@ -161,11 +164,13 @@ class CalendarConnection extends Model
 
     public function getSyncableAbsences()
     {
-        if (!$this->include_vacations) return collect([]);
+        if (!$this->include_vacations) {
+            return collect([]);
+        }
 
         switch ($this->include_vacations) {
             case 1:
-                $own = Absence::where('user_id', $this->user_id)->get();
+                $own = Absence::where('user_id', $this->user_id)->where('to', '>=', Carbon::now()->subYear(1))->get();
                 $replacing = Absence::userIsReplacement($this->user)->get();
                 return $own->merge($replacing);
         }

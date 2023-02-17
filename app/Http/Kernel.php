@@ -128,6 +128,7 @@ class Kernel extends HttpKernel
         'throttle' => ThrottleRequests::class,
         'verified' => EnsureEmailIsVerified::class,
         'cors' => Cors::class,
+        'csrf' => VerifyCsrfToken::class,
     ];
 
     /**

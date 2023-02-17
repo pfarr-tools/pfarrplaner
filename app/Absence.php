@@ -31,6 +31,8 @@
 namespace App;
 
 use App\Calendars\AbstractCalendarItem;
+use App\DAV\DAVCalendarItem;
+use App\DAV\HasDAVCalendarItems;
 use App\Services\CalendarService;
 use App\Services\NameService;
 use App\Tools\StringTool;
@@ -42,12 +44,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class Absence
  * @package App
  */
-class Absence extends Model
+class Absence extends Model implements HasDAVCalendarItems
 {
     public const STATUS_NEW = 0;
     public const STATUS_CHECKED = 1;
@@ -416,4 +419,50 @@ class Absence extends Model
         return $calendars;
     }
 
+
+    public function getCalendarItems(bool $includeAlternate, bool $includeRiteAnniversaries): array
+    {
+        return [
+            $this->getCalendarItem(''),
+        ];
+    }
+
+    public function getCalendarItem(string $itemType): DAVCalendarItem
+    {
+        $replacing = $this->user_id != Auth::user()->id;
+        $categories = [($replacing ? 'Vertretung' : 'Abwesenheit')];
+        $status = 'FREE';
+        $busy = false;
+
+        if (!$replacing) {
+            $statusTexts = [
+                self::STATUS_NEW => ['Noch nicht genehmigt'],
+                self::STATUS_CHECKED => ['Überprüft', 'Noch nicht genehmigt'],
+                self::STATUS_APPROVED => ['Überprüft', 'Genehmigt'],
+                self::STATUS_SELF_ADMINISTERED => [],
+                self::STATUS_SELF_ADMINISTERED_AND_APPROVED => ['Genehmigt'],
+            ];
+            if (isset($statusTexts[$this->workflow_status])) $categories = array_merge($categories, $statusTexts[$this->workflow_status]);
+
+            $title = $this->reason;
+            $busy = true;
+            $status = 'OOF';
+        } else {
+            $title = 'Vertretung für '.NameService::fromUser($this->user)->format(NameService::FIRST_LAST).' ('.$this->reason.')';
+        }
+
+        $title .= $this->replacementText(' V: ');
+
+        return new DAVCalendarItem(
+            $this,
+            $title,
+            $this->from,
+            $this->to->addDay(1)->startOfDay(),
+            '',
+            'Vertretungsregelung: '.$this->replacementText(),
+            '',
+            ['busy' => $busy, 'busyStatus' => $status, 'allDay' => true],
+            $categories,
+        );
+    }
 }

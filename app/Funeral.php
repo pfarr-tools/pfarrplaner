@@ -33,6 +33,8 @@ namespace App;
 use App\Calendars\AbstractCalendarItem;
 use App\Calendars\SyncEngines\AbstractSyncEngine;
 use App\Casts\EncryptedAttribute;
+use App\DAV\DAVCalendarItem;
+use App\DAV\HasDAVCalendarItems;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCommentsTrait;
 use Carbon\Carbon;
@@ -44,7 +46,7 @@ use Illuminate\Support\Facades\URL;
  * Class Funeral
  * @package App
  */
-class Funeral extends Model
+class Funeral extends Model implements HasDAVCalendarItems
 {
     use HasCommentsTrait;
     use HasAttachmentsTrait;
@@ -300,6 +302,72 @@ class Funeral extends Model
     public function getDimissorialUrlAttribute()
     {
         return URL::signedRoute('dimissorial.show', ['type' => 'beerdigung', 'id' => $this->id]);
+    }
+
+
+    /**
+     * Get all calendar items related to this service for CalDAV
+     * @param bool $includeAlternate Include alternate calendar items
+     * @param bool $includeRiteAnniversaries Include one-year anniversary for rites
+     * @return DAVCalendarItem[]
+     */
+    public function getCalendarItems(bool $includeAlternate, bool $includeRiteAnniversaries): array
+    {
+        $items = [];
+        if ($includeAlternate && ($this->appointment != null)) {
+            $items[] = $this->getCalendarItem('prep');
+        }
+        if ($includeRiteAnniversaries) {
+            $items[] = $this->getCalendarItem('anniv');
+        }
+        return $items;
+    }
+
+    /**
+     * Get a single calendar item related to this service for CalDAV
+     * @param string $itemType
+     * @return DAVCalendarItem
+     */
+    public function getCalendarItem(string $itemType): DAVCalendarItem
+    {
+        switch ($itemType) {
+            case 'prep':
+                return new DAVCalendarItem(
+                    $this,
+                    'Trauergespräch ' . $this->buried_name,
+                    $this->appointment->copy(),
+                    $this->appointment->copy()->addHour(1),
+                    $this->appointment_address,
+                    $this->type . ' am ' . $this->service->date->format(
+                        'd.m.Y'
+                    ) . ' um ' . $this->service->timeText() . ' (' . $this->service->locationText() . ")\n"
+                    . 'Bestattung im Pfarrplaner öffnen: '
+                    . route('funerals.edit', $this->id)
+                    . "\nKontakt: " . $this->relative_contact_data . "\n\n" . DAVCalendarItem::AUTO_WARNING,
+                    'prep',
+                    ['busyStatus' => 'BUSY'],
+                    ['Trauergespräch', 'Amtskalender: Seelsorge/Diakonie']
+                );
+                break;
+            case 'anniv':
+                return new DAVCalendarItem(
+                    $this,
+                    '1. Jahrestag der Beerdigung von ' . $this->buried_name,
+                    $this->service->date->copy()->addYear(1),
+                    $this->service->date->copy()->addYear(1)->addDay(1)->startOfDay(),
+                    $this->relative_address,
+                    $this->type . ' am ' . $this->service->date->format(
+                        'd.m.Y'
+                    ) . ' um ' . $this->service->timeText() . ' (' . $this->service->locationText()
+                    . ")\nBestattung im Pfarrplaner öffnen:  "
+                    . route('funerals.edit', $this->id)
+                    . "\nKontakt: " . $this->relative_contact_data . "\n\n" . DAVCalendarItem::AUTO_WARNING,
+                    'anniv',
+                    ['allDay' => true, 'busy' => false, 'busyStatus' => 'FREE'],
+                    ['Jahrestag Beerdigung']
+                );
+                break;
+        }
     }
 
 

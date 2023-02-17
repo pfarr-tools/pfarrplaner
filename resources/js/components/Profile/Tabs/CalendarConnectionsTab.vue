@@ -38,15 +38,11 @@
         </div>
         <fake-table v-if="calendarConnections.length >0"
                     :columns="[5,5,2]" collapsed-header="Kalender"
-                    :headers="['Titel', 'Typ', '']" >
+                    :headers="['Titel', 'URL', '']" >
             <div class="row p-1" v-for="(calendarConnection, key) in calendarConnections" :key="key">
                 <div class="col-md-5">{{ calendarConnection.title }}</div>
-                <div class="col-md-5">{{ connectionType(calendarConnection) }}</div>
+                <div class="col-md-5"><copyable-code :content="calendarConnection.uri" /></div>
                 <div class="col-md-2 text-right">
-                    <button class="btn btn-light  btn-sm" @click="syncConnection(calendarConnection)"
-                            title="Kalender neu synchronisieren">
-                        <span class="mdi mdi-calendar-sync"></span>
-                    </button>
                     <button class="btn btn-primary btn-sm" @click="editConnection(calendarConnection)"
                             title="Verbindung bearbeiten">
                         <span class="mdi mdi-pencil"></span>
@@ -63,25 +59,14 @@
 
 <script>
 import FakeTable from "../../Ui/FakeTable";
+import CopyableCode from "../../Ui/CopyableCode.vue";
 export default {
     name: "CalendarConnectionsTab",
-    components: {FakeTable},
+    components: {CopyableCode, FakeTable},
     props: ['user', 'calendarConnections'],
     methods: {
-        connectionType(calendarConnection) {
-            if (!calendarConnection.connection_string) return 'Unbekannt';
-            var prefix = calendarConnection.connection_string.substr(0,3);
-            if (prefix=='exc') return 'Exchange-Kalender';
-            if (prefix=='sps') return 'Sharepoint-Ordner';
-            if (prefix=='spp') return 'Persönlicher Sharepoint-Ordner';
-            return 'Unbekannt';
-        },
         editConnection(calendarConnection) {
             this.$inertia.get(route('calendarConnection.edit', calendarConnection.id));
-        },
-        syncConnection(calendarConnection) {
-            window.alert('Der gewählte Kalender wird komplett neu synchronisiert. Der Prozess kann eine Weile dauern, läuft aber unsichtbar im Hintergrund ab. Du kannst solange normal weiterarbeiten.');
-            this.$inertia.get(route('calendarConnection.sync', calendarConnection.id));
         },
         deleteConnection(calendarConnection) {
             if (confirm('Willst du diese Verbindung wirklich löschen?')) {

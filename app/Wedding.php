@@ -33,6 +33,8 @@ namespace App;
 use App\Calendars\AbstractCalendarItem;
 use App\Calendars\SyncEngines\AbstractSyncEngine;
 use App\Casts\EncryptedAttribute;
+use App\DAV\DAVCalendarItem;
+use App\DAV\HasDAVCalendarItems;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCommentsTrait;
 use Illuminate\Database\Eloquent\Model;
@@ -43,7 +45,7 @@ use Illuminate\Support\Facades\URL;
  * Class Wedding
  * @package App
  */
-class Wedding extends Model
+class Wedding extends Model implements HasDAVCalendarItems
 {
     use HasCommentsTrait;
     use HasAttachmentsTrait;
@@ -196,6 +198,72 @@ class Wedding extends Model
     public function getSpouse2DimissorialUrlAttribute() {
         return URL::signedRoute('dimissorial.show', ['type' => 'trauung', 'id' => $this->id, 'spouse' => 2]);
     }
+
+
+    /**
+     * Get all calendar items related to this service for CalDAV
+     * @param bool $includeAlternate Include alternate calendar items
+     * @param bool $includeRiteAnniversaries Include one-year anniversary for rites
+     * @return DAVCalendarItem[]
+     */
+    public function getCalendarItems(bool $includeAlternate, bool $includeRiteAnniversaries): array
+    {
+        $items = [];
+        if ($includeAlternate && ($this->appointment != null)) {
+            $items[] = $this->getCalendarItem('prep');
+        }
+        if ($includeRiteAnniversaries) {
+            $items[] = $this->getCalendarItem('anniv');
+        }
+        return $items;
+    }
+
+    /**
+     * Get a single calendar item related to this service for CalDAV
+     * @param string $itemType
+     * @return DAVCalendarItem
+     */
+    public function getCalendarItem(string $itemType): DAVCalendarItem
+    {
+
+        $description = 'Trauung am '.$this->service->date->format('d.m.Y').' um '.$this->service->timeText().' ('.$this->service->locationText().")\n\n"
+            .'Trauung im Pfarrplaner öffnen: '
+            .route('weddings.edit', $this->id)
+            ."\n\nKontakt:\n"
+            .trim(' - '.$this->spouse1_name.': '.$this->spouse1_phone.' '.$this->spouse1_email)."\n"
+            .trim(' - '.$this->spouse2_name.': '.$this->spouse2_phone.' '.$this->spouse2_email)
+            ."\n\n".DAVCalendarItem::AUTO_WARNING;
+
+        switch ($itemType) {
+            case 'prep':
+                return new DAVCalendarItem(
+                    $this,
+                    'Traugespräch '.$this->spouse1_name.' / '.$this->spouse2_name,
+                    $this->appointment->copy(),
+                    $this->appointment->copy()->addHour(1),
+                    $this->appointment_address ?? '',
+                    $description,
+                    'prep',
+                    ['busyStatus' => 'BUSY'],
+                    ['Traugespräch','Amtskalender: Amtshandlungen']
+                );
+                break;
+            case 'anniv':
+                return new DAVCalendarItem(
+                    $this,
+                    '1. Jahrestag der Trauung von ' . $this->spouse1_name.' / '.$this->spouse2_name,
+                    $this->service->date->copy()->addYear(1),
+                    $this->service->date->copy()->addYear(1)->addDay(1)->startOfDay(),
+                    '',
+                    $description,
+                    'anniv',
+                    ['allDay' => true, 'busy' => false, 'busyStatus' => 'FREE'],
+                    ['Jahrestag Trauung']
+                );
+                break;
+        }
+    }
+
 
 
 }
