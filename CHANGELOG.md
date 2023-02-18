@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.11.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.10.0...v2023.11.0) (2023-02-18)
+
+
+### Features
+
+* Anleitung zur Kalenderverbindung mit Outlook ([9a34333](https://codeberg.org/pfarrplaner/pfarrplaner/commits/9a3433381e916fd18c85b22290227cfc98506286))
+* Kalenderverbindungen per CalDAV ([1d24349](https://codeberg.org/pfarrplaner/pfarrplaner/commits/1d24349107a1f526bb3d8c482e468982b9e47b6d))
+
 ## [2023.10.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.9.0...v2023.10.0) (2023-02-10)
 
 
