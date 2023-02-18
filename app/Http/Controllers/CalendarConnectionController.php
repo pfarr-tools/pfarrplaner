@@ -146,9 +146,6 @@ class CalendarConnectionController extends Controller
             [
                 'user_id' => 'required|int|exists:users,id',
                 'title' => 'required|string',
-                'credentials1' => 'required|string',
-                'credentials2' => 'required|string',
-                'connection_string' => 'required|string',
                 'include_hidden' => 'nullable|int',
                 'include_alternate' => 'nullable|int',
                 'include_vacations' => 'nullable|int',

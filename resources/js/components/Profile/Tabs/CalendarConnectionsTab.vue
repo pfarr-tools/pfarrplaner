@@ -30,6 +30,12 @@
 <template>
     <div class="calendar-connections-tab">
         <div v-if="calendarConnections.length == 0" class="alert alert-info">Du hast noch keine externen Kalender verbunden.</div>
+        <div class="alert alert-info">
+            Um einen Kalender mit Outlook zu verbinden, wird das kostenlose Outlook-Addin <i>Outlook CalDav Synchronizer</i>
+            benötigt. Du kannst es <a href="http://caldavsynchronizer.org/download-2/" target="_blank">hier herunterladen</a>.
+            <a href="/docs/Eine%20Kalenderverbindung%20mit%20Outlook%20einrichten.pdf">Hier</a>
+            findest du eine Anleitung zum Einrichten der Verbindung in Outlook.
+        </div>
         <div class="mb-2">
             <inertia-link class="btn btn-light" title="Neuen Kalender verbinden"
                           :href="route('calendarConnection.create')">
@@ -78,5 +84,7 @@ export default {
 </script>
 
 <style scoped>
-
+    .alert-info a, .alert-info a:visited, .alert-info a:focus {
+        color: black;
+    }
 </style>

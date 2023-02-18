@@ -50,10 +50,14 @@ $verbs = [
     'REPORT',
 ];
 
+
 Router::$verbs = array_merge(Router::$verbs, $verbs);
+
+Route::permanentRedirect('/.well-known/caldav', '/dav/')->withoutMiddleware(['auth', 'csrf']);
 
 Route::any('/dav/{any?}', [\App\Http\Controllers\DAV\DAVController::class, 'handle'])
     ->where('any', '.*')
-    ->withoutMiddleware(['auth', 'csrf'])->name('sabre.dav');
+    ->middleware('auth.basic')
+    ->withoutMiddleware(['auth', 'csrf'])
+    ->name('sabre.dav');
 
-Route::permanentRedirect('/.well-known/caldav', '/dav/');

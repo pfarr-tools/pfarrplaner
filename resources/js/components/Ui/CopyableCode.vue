@@ -29,14 +29,14 @@
 
 <template>
     <div class="row">
+        <div class="col-1">
+            <nav-button type="light btn-sm" icon="mdi mdi-content-copy" force-icon force-no-text
+                        title="In die Zwischenablage kopieren"
+                        @click="copyCode"/>
+        </div>
         <div class="col-11">
             <code>{{ content }}</code>
             <div v-if="copied" class="text-muted text-sm">Inhalt wurde in die Zwischenablage kopiert.</div>
-        </div>
-        <div class="col-1">
-            <nav-button type="light btn-sm" icon="mdi mdi-clipboard" force-icon force-no-text
-                        title="In die Zwischenablage kopieren"
-                        @click="copyCode"/>
         </div>
     </div>
 </template>
