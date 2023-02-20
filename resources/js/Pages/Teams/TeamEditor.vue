@@ -44,7 +44,7 @@
                 <form-input name="name" v-model="myTeam.name" label="Bezeichnung" autofocus />
                 <form-selectize name="city_id" v-model="myTeam.city_id" label="Kirchengemeinde"
                                 :options="cities" />
-                <people-select name="users" v-model="myTeam.users" :people="users" label="Mitglieder" />
+                <people-select name="users" v-model="myTeam.users" :people="users" label="Mitglieder"  :city="{id: myTeam.city_id}"/>
             </card-body>
         </card>
     </admin-layout>

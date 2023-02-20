@@ -76,7 +76,7 @@
                                             </td>
                                             <td v-for="(ministry,ministryKey,ministryIndex) in ministries" :key="ministryKey+rowIndex">
                                                 <people-select :label="ministry" :people="users" :teams="teams"
-                                                               :include-teams-from-city="row.city"
+                                                               :include-teams-from-city="row.city" :city="row.city"
                                                                v-model="row.ministries[ministryKey]"
                                                                @input="saveService(row.slug, row)"/>
                                             </td>

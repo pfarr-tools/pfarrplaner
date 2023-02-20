@@ -45,7 +45,7 @@
         <form-input label="Verstorbene:r" placeholder="Nachname, Vorname" name="name"
                     v-model="funeral.name"/>
         <form-group label="Pfarrer*in">
-            <people-select :people="people" v-model="funeral.pastor"/>
+            <people-select :people="people" v-model="funeral.pastor" :city="{id: funeral.city}"/>
         </form-group>
     </admin-layout>
 </template>

@@ -163,7 +163,7 @@ class PlanningInput extends AbstractInput
 
         $serviceSlugs = $query->get()->pluck('slug');
 
-        $users = User::all();
+        $users = User::visibleFor(Auth::user());
 
         $ministries = $this->getAvailableMinistries($setup['ministries'] ?: []);
 

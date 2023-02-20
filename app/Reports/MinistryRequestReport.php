@@ -31,18 +31,16 @@
 namespace App\Reports;
 
 
-use App\City;
-use App\Day;
 use App\Location;
 use App\Mail\MinistryRequest;
 use App\Ministry;
 use App\Service;
 use App\User;
-use Auth;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use Inertia\Inertia;
@@ -79,7 +77,7 @@ class MinistryRequestReport extends AbstractReport
         $cities = Auth::user()->writableCities;
         $locations = Location::whereIn('city_id', Auth::user()->writableCities->pluck('id'))->get();
         $ministries = Ministry::all(true);
-        $users = User::all();
+        $users = User::visibleFor(Auth::user());
 
         return Inertia::render('Report/MinistryRequest/Setup', compact('cities', 'locations', 'ministries', 'users'));
     }

@@ -13,7 +13,7 @@
                 <button type="submit" class="btn btn-primary">Weiter &gt;</button>
             @endslot
 
-            @peopleselect(['name' => 'recipients[]', 'label' => 'Anfrage senden an', 'people' => \App\User::all(), 'value' => $users ])
+            @peopleselect(['name' => 'recipients[]', 'label' => 'Anfrage senden an', 'people' => \App\User::visibleFor(Auth::user()), 'value' => $users ])
 
             <label>Folgende Gottesdienste anfragen</label>
                 <table class="table table-striped">

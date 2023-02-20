@@ -99,7 +99,7 @@ class FuneralController extends Controller
     {
         $cities = Auth::user()->writableCities;
         $locations = Location::whereIn('city_id', $cities->pluck('id'))->get();
-        $people = User::all();
+        $people = User::visibleFor(Auth::user());
         $user = Auth::user();
         return Inertia::render('Rites/FuneralWizard', compact('cities', 'locations', 'people', 'user'));
     }

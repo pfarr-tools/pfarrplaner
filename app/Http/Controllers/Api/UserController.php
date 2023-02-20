@@ -30,8 +30,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\City;
 use App\Team;
 use App\ListedPerson;
+use App\User;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends \App\Http\Controllers\Controller
 {
@@ -48,9 +51,41 @@ class UserController extends \App\Http\Controllers\Controller
     public function select()
     {
         $users = ListedPerson::select(['id', 'name'])
+            ->visibleFor(Auth::user())
             ->get();
         $teams = Team::with('users')->get();
         return response()->json(compact('users', 'teams'));
     }
 
+
+    /**
+     * Search for people to add from other cities
+     * @param $searchString
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search($searchString)
+    {
+        if (empty($searchString)) return response()->json([]);
+        $users = User::with('cityScopes')
+            ->where('name', 'LIKE', '%'.$searchString.'%')
+            ->whereDoesntHave('cityScopes', function($q) {
+                return $q->whereIn('city_id', Auth::user()->cities->pluck('id'));
+            })
+            ->orderBy('name')
+            ->get();
+
+        return response()->json($users);
+    }
+
+    /**
+     * Activate a user within a certain city scope
+     * @param User $user
+     * @param City $city
+     * @return void
+     */
+    public function activate(User $user, City $city)
+    {
+        $user->cityScopes()->attach($city->id);
+        return response()->json(true);
+    }
 }

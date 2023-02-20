@@ -61,7 +61,7 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
     public function setup()
     {
         $cities = Auth::user()->cities;
-        $people = User::all();
+        $people = User::visibleFor(Auth::user());
         return Inertia::render('Report/ServicesByWTCCategory/Setup', compact('cities', 'people'));
     }
 

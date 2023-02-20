@@ -74,8 +74,7 @@ class User extends Authenticatable
      *
      */
     public const NAME_FORMAT_FIRST_AND_LAST = 3;
-
-
+    public $guard_name = 'web';
     /**
      * The attributes that are mass assignable.
      *
@@ -108,14 +107,12 @@ class User extends Authenticatable
         'image',
         'must_change_password',
     ];
-
     /**
      * @var string[]
      */
     protected $dates = [
         'new_features',
     ];
-
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -126,6 +123,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    // this is for laravel-permissions, to always use web guard when matching permissions
     protected $appends = [
         'isOfficialUser',
         'isAdmin',
@@ -133,11 +131,6 @@ class User extends Authenticatable
         'isPastor',
         'sortName',
     ];
-
-    // this is for laravel-permissions, to always use web guard when matching permissions
-    public $guard_name = 'web';
-
-
     /**
      * @var string
      */
@@ -332,8 +325,20 @@ class User extends Authenticatable
 
         return $query;
     }
-// END SCOPES
 
+    /**
+     * @param Builder $query
+     * @param User $user
+     * @return Builder
+     */
+    public function scopeVisibleFor(Builder $query, User $user)
+    {
+        return $query->whereHas('cityScopes', function ($q) use ($user) {
+            $q->whereIn('city_id', $user->cities->pluck('id'));
+        });
+    }
+// END SCOPES
+// SETTERS
 // SETTERS
 // SETTERS
     /**
@@ -413,25 +418,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if another user has admin rights for this user
-     * This is the case, if the other user administers one of this users homeCities
-     * @param $user User User to be checked for admin rights
-     * @return bool True if other user has admin rights for this one
-     */
-    public function administeredBy($user)
-    {
-        if ($user->hasRole('Super-Administrator*in')) {
-            return true;
-        }
-        foreach ($this->homeCities as $city) {
-            if ($city->administeredBy($user)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * @return BelongsToMany
      */
     public function approvers()
@@ -490,6 +476,14 @@ class User extends Authenticatable
     public function getEditableFields()
     {
         return explode(',', $this->canEditFields);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function cityScopes()
+    {
+        return $this->belongsToMany(City::class, 'user_scopes');
     }
 
     /**
@@ -887,6 +881,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Cities to which the user has at least read access
+     * @return BelongsToMany
+     */
+    public function cities()
+    {
+        return $this->belongsToMany(City::class)
+            ->withPivot('permission');
+    }
+
+    /**
      * @return BelongsToMany
      */
     public function parishes()
@@ -1044,6 +1048,25 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if another user has admin rights for this user
+     * This is the case, if the other user administers one of this users homeCities
+     * @param $user User User to be checked for admin rights
+     * @return bool True if other user has admin rights for this one
+     */
+    public function administeredBy($user)
+    {
+        if ($user->hasRole('Super-Administrator*in')) {
+            return true;
+        }
+        foreach ($this->homeCities as $city) {
+            if ($city->administeredBy($user)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @return HasMany
      */
     public function userSettings()
@@ -1071,16 +1094,6 @@ class User extends Authenticatable
     public function visibleCities()
     {
         return $this->cities();
-    }
-
-    /**
-     * Cities to which the user has at least read access
-     * @return BelongsToMany
-     */
-    public function cities()
-    {
-        return $this->belongsToMany(City::class)
-            ->withPivot('permission');
     }
 
     /**

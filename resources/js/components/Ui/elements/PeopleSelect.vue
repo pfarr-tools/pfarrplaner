@@ -33,29 +33,60 @@
             <div ref="container">
                 <selectize class="form-control" :class="{'is-invalid': error}" :name="name" :id="myId+'Input'"
                            :value="myValue" multiple @input="changed" @blur="editing = false" :settings="settings"
-                           :options="people" :disabled="disabled" />
+                           :options="people" :disabled="disabled"/>
                 <small class="form-text text-muted">Eine oder mehrere Personen (keine Anmerkungen, Notizen,
                     usw.)</small>
             </div>
         </form-group>
-        <modal title="Neue Person anlegen" v-if="showModal" @close="closeModal" @cancel="cancelModal"
-               @shown="modalShown" close-button-label="Person speichern">
-            <form-input name="name" label="Name" v-model="newPerson.name" ref="newPersonName" id="newPersonName"
-                        :autofocus="true"/>
-            <hr/>
-            <div class="row">
-                <div class="col-md-2">
-                    <form-input name="title" label="Titel" v-model="newPerson.title"
-                                placeholder="z.B. Pfr."/>
-                </div>
-                <div class="col-md-5">
-                    <form-input name="first_name" label="Vorname" v-model="newPerson.first_name"/>
-                </div>
-                <div class="col-md-5">
-                    <form-input name="last_name" label="Nachname" v-model="newPerson.last_name"/>
-                </div>
+        <modal title="Neue Person anlegen" v-if="showNewPersonModal" @close="closeNewPersonModal"
+               @cancel="cancelNewPersonModal"
+               @shown="newPersonModalShown" close-button-label="Person speichern">
+            <div v-if="searchingForPerson" class="searching-for-person text-muted">
+                <div>Bitte warte, Person wird in anderen Kirchengemeinden gesucht...</div>
+                <span class="mdi mdi-spin mdi-loading"></span>
             </div>
-            <form-input name="email" label="E-Mailadresse" v-model="newPerson.email" type="email" help="(falls bekannt)"/>
+            <div v-else>
+                <div v-if="searchResults.length" class="search-results">
+                    <table class="table">
+                        <tbody>
+                        <tr v-for="(person,personIndex in searchResults">
+                            <td>
+                                <avatar :username="displayName(person)" :src="person.image" />
+                            </td>
+                            <td class="text-left">
+                                <div class="text-bold">{{ displayName(person, true) }}</div>
+                                <div>
+                                    <div class="badge badge-light" v-for="city in person.city_scopes">{{ city.name }}</div>
+                                </div>
+                            </td>
+                            <td class="text-right">
+                                <nav-button type="primary btn-sm"
+                                            @click="extendPersonScopeAndCloseModal(person)">Übernehmen</nav-button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <hr />
+                <h2> Oder neue Person anlegen:</h2>
+                <form-input name="name" label="Name" v-model="newPerson.name" ref="newPersonName" id="newPersonName"
+                            :autofocus="true"/>
+                <hr/>
+                <div class="row">
+                    <div class="col-md-2">
+                        <form-input name="title" label="Titel" v-model="newPerson.title"
+                                    placeholder="z.B. Pfr."/>
+                    </div>
+                    <div class="col-md-5">
+                        <form-input name="first_name" label="Vorname" v-model="newPerson.first_name"/>
+                    </div>
+                    <div class="col-md-5">
+                        <form-input name="last_name" label="Nachname" v-model="newPerson.last_name"/>
+                    </div>
+                </div>
+                <form-input name="email" label="E-Mailadresse" v-model="newPerson.email" type="email"
+                            help="(falls bekannt)"/>
+            </div>
         </modal>
     </div>
 </template>
@@ -65,10 +96,12 @@ import FormGroup from "../forms/FormGroup";
 import Selectize from "vue2-selectize";
 import FormInput from "../forms/FormInput";
 import Modal from "../modals/Modal";
+import NavButton from "../buttons/NavButton.vue";
+import Avatar from 'vue-avatar';
 
 export default {
     name: "PeopleSelect",
-    components: {Modal, FormInput, FormGroup, Selectize},
+    components: {NavButton, Modal, FormInput, FormGroup, Selectize, Avatar},
     props: {
         label: String,
         id: String,
@@ -86,8 +119,11 @@ export default {
         disabled: Boolean,
         teams: {
             type: Array,
-            default() { return [] },
+            default() {
+                return []
+            },
         },
+        city: Object,
     },
     mounted() {
         if (this.myId == '') this.myId = this._uid;
@@ -126,14 +162,21 @@ export default {
 
         this.teams.forEach(team => {
             myTeamReference[team.id] = team;
-            let tempTeam = {name: team.name, id: 'team:'+team.id, type: 'mdi mdi-account-multiple', category: 'Teams', users: team.users, userString: ''};
-            tempTeam.users.forEach(user => tempTeam.userString += user.name+' ');
+            let tempTeam = {
+                name: team.name,
+                id: 'team:' + team.id,
+                type: 'mdi mdi-account-multiple',
+                category: 'Teams',
+                users: team.users,
+                userString: ''
+            };
+            tempTeam.users.forEach(user => tempTeam.userString += user.name + ' ');
             myPeople.push(tempTeam);
         });
 
 
-
         return {
+            apiToken: this.$page.props.currentUser.data.api_token,
             createCallback: null,
             myId: this.id || '',
             myValue: myValue,
@@ -142,7 +185,9 @@ export default {
             editing: false,
             clicked: false,
             personCreated: false,
-            showModal: false,
+            showNewPersonModal: false,
+            searchingForPerson: false,
+            searchResults: [],
             newPerson: {
                 name: '',
                 first_name: '',
@@ -157,7 +202,7 @@ export default {
                 optgroupField: 'category',
                 optgroupLabelField: 'groupName',
                 optgroupValueField: 'groupName',
-                optgroups: [{groupName: 'Ich'},{ groupName: 'Andere Personen'}, {groupName: 'Teams'}],
+                optgroups: [{groupName: 'Ich'}, {groupName: 'Andere Personen'}, {groupName: 'Teams'}],
                 create: this.addPerson,
                 options: myPeople,
                 render: {
@@ -166,27 +211,27 @@ export default {
                     },
                     item: function (item, escape) {
                         if (item.type == 'mdi mdi-account') {
-                            return '<div><span class="mdi mdi-account"></span> '+escape(item.name)+'</div>';
+                            return '<div><span class="mdi mdi-account"></span> ' + escape(item.name) + '</div>';
                         } else {
                             let users = [];
                             item.users.forEach(user => {
                                 users.push(user.name);
                             });
-                            return '<div><span class="mdi mdi-account-multiple"></span> '+escape(item.name)+': '+escape(users.join(', '))+'</div>';
+                            return '<div><span class="mdi mdi-account-multiple"></span> ' + escape(item.name) + ': ' + escape(users.join(', ')) + '</div>';
                         }
                     },
                     option: function (item, escape) {
-                        var t= '<div><span class="ml-1 '+item.type+'"></span> '+escape(item.name);
+                        var t = '<div><span class="ml-1 ' + item.type + '"></span> ' + escape(item.name);
 
                         if (item.type == 'mdi mdi-account-multiple') {
-                            t += '<span class="ml-1 badge badge-dark">'+item.users.length+'</span>'
+                            t += '<span class="ml-1 badge badge-dark">' + item.users.length + '</span>'
                             if (item.users.length > 0) t += '<div>';
                             item.users.forEach(user => {
-                                t += '<span class="ml-1 badge badge-light">'+user.name+'</span>'
+                                t += '<span class="ml-1 badge badge-light">' + user.name + '</span>'
                             });
                             if (item.users.length > 0) t += '</div>';
                         }
-                            t+='</div>';
+                        t += '</div>';
                         return t;
                     }
                 },
@@ -199,13 +244,13 @@ export default {
             var newVal2 = [];
 
             newVal.forEach(item => {
-               if (isNaN(item) && (item.substr(0,5) == 'team:')) {
-                   this.myTeamReference[item.substr(5)].users.forEach(user => {
-                       newVal2.push(user.id);
-                   });
-               } else {
-                   newVal2.push(item);
-               }
+                if (isNaN(item) && (item.substr(0, 5) == 'team:')) {
+                    this.myTeamReference[item.substr(5)].users.forEach(user => {
+                        newVal2.push(user.id);
+                    });
+                } else {
+                    newVal2.push(item);
+                }
             });
 
             newVal2.forEach(item => {
@@ -217,16 +262,16 @@ export default {
             this.myValue = newVal2;
             this.$forceUpdate();
         },
-        closeModal() {
+        closeNewPersonModal() {
             var component = this;
-            this.showModal = false;
+            this.showNewPersonModal = false;
             axios.post(route('users.add'), this.newPerson)
                 .then(response => {
                     return response.data;
                 })
                 .then(data => {
-                    data.type='mdi mdi-account';
-                    data.category='Personen';
+                    data.type = 'mdi mdi-account';
+                    data.category = 'Personen';
                     data.userString = '';
 
                     this.myPeople.push(data);
@@ -236,13 +281,38 @@ export default {
                     component.personCreated = true;
                 });
         },
-        cancelModal() {
-            this.showModal = false;
+        cancelNewPersonModal() {
+            this.showNewPersonModal = false;
         },
-        modalShown(ref) {
+        /**
+         * Activate a new person for this city, and pick the person for the select list
+         * @param person
+         */
+        extendPersonScopeAndCloseModal(person) {
+            this.showNewPersonModal = false;
+            if (this.city) {
+                axios.post(route('api.people.activate', {
+                    api_token: this.apiToken,
+                    user: person.id,
+                    city: this.city.id,
+                }));
+            }
+            person.type='mdi mdi-account';
+            person.category = 'Personen';
+            this.myPeople.push(person);
+            this.myPeopleReference[person.id] = person;
+            this.createCallback(person);
+            this.changed(this.myValue);
+            component.personCreated = true;
+        },
+        newPersonModalShown(ref) {
             var el = this.$refs['newPersonName'].$el.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;
             el.focus();
             el.select();
+        },
+        displayName(person, showTitle = false) {
+            let n = showTitle ? (person.title ? person.title+' ' : '') : '';
+            return n + ((person.first_name && person.last_name) ? person.first_name+' '+person.last_name : person.name);
         },
         addPerson(item, callback = null) {
             var tmp, firstName, lastName;
@@ -257,7 +327,17 @@ export default {
                 email: '',
             };
             this.createCallback = callback;
-            this.showModal = true;
+            this.searchingForPerson = true;
+            this.showNewPersonModal = true;
+            this.searchResults = [];
+            axios.post(route('api.people.search', {
+                api_token: this.apiToken,
+                searchString: item,
+            })).then(response => {
+                console.log('found', response.data);
+                this.searchResults = response.data;
+                this.searchingForPerson = false;
+            });
         }
     }
 
@@ -278,6 +358,18 @@ export default {
     font-size: inherit;
     font-weight: normal;
     margin: 0 3px 3px 0;
+}
+
+.searching-for-person {
+    min-height: 50vh;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.search-results {
+    width: 100%;
+    height: 50%;
+    overflow-y: scroll;
 }
 
 </style>

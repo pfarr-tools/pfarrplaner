@@ -131,7 +131,9 @@
                     <div class="row py-1 fake-table-row"
                          v-for="(replacement, replacementKey, replacementIndex) in myAbsence.replacements">
                         <div class="col-md-5">
-                            <people-select :people="users" v-model="replacement.users" :disabled="!mayEdit"/>
+                            <people-select :people="users" v-model="replacement.users"
+                                           :city="myAbsence.user.cities[0]"
+                                           :disabled="!mayEdit"/>
                         </div>
                         <div class="col-md-6">
                             <date-range-input :from="replacement.from" :to="replacement.to"

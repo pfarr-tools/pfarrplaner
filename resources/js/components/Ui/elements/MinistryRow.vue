@@ -34,7 +34,8 @@
         </div>
         <div class="col-md-5">
             <people-select :name="'ministries['+index+']'+'[people][]'" v-model="myMembers" :teams="teams"
-                           :people="people" @input="changed" :include-teams-from-city="includeTeamsFromCity"
+                           :people="people" @input="changed"
+                           :include-teams-from-city="includeTeamsFromCity" :city="city"
                            @count="$emit('count')" />
         </div>
         <div class="col-md-1 text-right">
@@ -58,6 +59,7 @@ export default {
         value: Object,
         includeTeamsFromCity: Object,
         teams: Array,
+        city: Object,
     },
     data() {
         var myMinistries = [];

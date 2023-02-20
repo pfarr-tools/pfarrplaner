@@ -37,6 +37,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
 
@@ -68,7 +69,7 @@ class PersonReport extends AbstractPDFDocumentReport
      */
     public function setup()
     {
-        $users = User::all();
+        $users = User::visibleFor(Auth::user());
         return Inertia::render('Report/Person/Setup', compact( 'users'));
     }
 

@@ -126,6 +126,14 @@ class City extends Model
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function scopedUsers()
+    {
+        return $this->belongsToMany(User::class, 'user_scopes');
+    }
+
+    /**
      * Check if this city has any locations where seating is defined
      * @return bool True if such locations exist
      */

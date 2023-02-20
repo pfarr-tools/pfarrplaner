@@ -47,7 +47,7 @@
         <form-input label="2. Ehepartner:in" placeholder="Nachname, Vorname" name="spouse2_name"
                     v-model="wedding.spouse2_name"/>
         <form-group label="Pfarrer*in">
-            <people-select :people="people" v-model="wedding.pastor"/>
+            <people-select :people="people" v-model="wedding.pastor"  :city="{id: funeral.city}"/>
         </form-group>
     </admin-layout>
 </template>

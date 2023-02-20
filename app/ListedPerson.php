@@ -30,31 +30,10 @@
 
 namespace App;
 
-use App\HomeScreens\AbstractHomeScreen;
-use App\Mail\User\AccountData;
-use App\Providers\AuthServiceProvider;
-use App\Services\PasswordService;
-use App\Services\RoleService;
-use Carbon\Carbon;
-use Exception;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Laravel\Sanctum\HasApiTokens;
 use Shetabit\Visitor\Traits\Visitable;
 use Shetabit\Visitor\Traits\Visitor;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Traits\HasRoles;
-use App\Facades\Settings;
-use Venturecraft\Revisionable\Revision;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Class ListedUser
@@ -65,4 +44,16 @@ use Venturecraft\Revisionable\Revision;
 class ListedPerson extends Model
 {
     protected $table = 'users';
+
+    public function cityScopes()
+    {
+        return $this->belongsToMany(City::class, 'user_scopes', 'user_id');
+    }
+
+    public function scopeVisibleFor(Builder $query, User $user)
+    {
+        return $query->whereHas('cityScopes', function ($q) use ($user) {
+            return $q->whereIn('city_id', $user->cities->pluck('id'));
+        });
+    }
 }

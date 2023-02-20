@@ -32,7 +32,8 @@
         <div class="row">
             <div class="col-md-4">
                 <people-select name="participants[P][]" label="Pfarrer*in" :people="people" :teams="teams"
-                               v-model="myService.pastors" :include-teams-from-city="myService.city"
+                               v-model="myService.pastors"
+                               :include-teams-from-city="myService.city" :city="myService.city"
                                 @count="updatePeopleCounter" />
                 <form-check name="need_predicant"
                             label="Für diesen Gottesdienst wird ein*e Prädikant*in benötigt."
@@ -40,12 +41,14 @@
             </div>
             <div class="col-md-4">
                 <people-select name="participants[O][]" label="Organist*in" :people="people" :teams="teams"
-                               v-model="myService.organists"  :include-teams-from-city="myService.city"
+                               v-model="myService.organists"
+                               :include-teams-from-city="myService.city" :city="myService.city"
                                @count="updatePeopleCounter"  />
             </div>
             <div class="col-md-4">
                 <people-select name="participants[M][]" label="Mesner*in" :people="people" :teams="teams"
-                               v-model="myService.sacristans" :include-teams-from-city="myService.city"
+                               v-model="myService.sacristans"
+                               :include-teams-from-city="myService.city" :city="myService.city"
                                @count="updatePeopleCounter"  />
             </div>
         </div>
@@ -65,7 +68,7 @@
                       :title="title" :members="members" :index="index" :people="people" :teams="teams"
                       :key="'ministry_rows'+Object.entries(myService.ministriesByCategory).length+'_'+index"
                       :ministries="ministries" v-model="myService.ministriesByCategory" @delete="deleteRow"
-                      :include-teams-from-city="myService.city"
+                      :include-teams-from-city="myService.city" :city="myService.city"
                       @count="updatePeopleCounter" />
         <button class="btn btn-light btn-sm" @click.prevent.stop="addRow">Reihe hinzufügen</button>
         <hr>
