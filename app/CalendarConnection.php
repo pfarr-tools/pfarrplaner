@@ -4,8 +4,6 @@ namespace App;
 
 use App\Calendars\SyncEngines\SyncEngines;
 use App\Casts\EncryptedAttribute;
-use App\Jobs\SyncSingleAbsenceToCalendarConnection;
-use App\Jobs\SyncSingleServiceToCalendarConnection;
 use AustinHeap\Database\Encryption\Traits\HasEncryptedAttributes;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
