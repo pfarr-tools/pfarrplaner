@@ -87,17 +87,9 @@ class ICalController extends Controller
      */
     protected function checkToken($token)
     {
-        $users = User::all();
-        $found = false;
-        foreach ($users as $user) {
-            if ($user->api_token == $token) {
-                $found = true;
-                $this->user = $user;
-            }
-        }
-        if (!$found) {
-            die('wrong token');
-        }
+        $tokenUser = User::where('api_token', $token)->first();
+        if (!$tokenUser) abort(401);
+        $this->user = $tokenUser;
     }
 
     /**
