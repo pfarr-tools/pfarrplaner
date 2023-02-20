@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.12.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.11.0...v2023.12.0) (2023-02-20)
+
+
+### Features
+
+* Es werden nur noch Personen aus verfügbaren Kirchengemeinden angezeigt ([0d69c02](https://codeberg.org/pfarrplaner/pfarrplaner/commits/0d69c02e68576e35465c459215a5c281f944fd31))
+
+
+### Bug Fixes
+
+* Fehler beim Speichern von Gottesdiensten ([af5a6f8](https://codeberg.org/pfarrplaner/pfarrplaner/commits/af5a6f85d7d874e42b2c5449588620d845981940))
+
 ## [2023.11.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.10.0...v2023.11.0) (2023-02-18)
 
 
