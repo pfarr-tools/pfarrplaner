@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.13.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.12.1...v2023.13.0) (2023-02-24)
+
+
+### Features
+
+* Notendruck mit mehreren Versen auf einmal ([066ee05](https://codeberg.org/pfarrplaner/pfarrplaner/commits/066ee056f39256cdcc8c59b93c032f4050094673))
+
 ### [2023.12.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.12.0...v2023.12.1) (2023-02-24)
 
 
