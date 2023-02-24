@@ -114,10 +114,10 @@ class ABCMusic
         return $music;
     }
 
-    public static function makeSingleLine(Song $song, $verses, $lineNumber, $showLineNumber = true)
+    public static function makeSingleLine(Song $song, $verses, $lineNumber, $showLineNumber = true, $textOnly = false)
     {
         $musicLines = explode("\n", $song->notation);
-        $music = ($musicLines[$lineNumber] ?? '') . "\n";
+        $music = $textOnly ? '' : ($musicLines[$lineNumber] ?? '') . "\n";
         if (!is_array($verses)) {
             $verses = [$verses];
         }
@@ -205,8 +205,9 @@ class ABCMusic
         }
     }
 
-    public static function images(Song $song, $verses, $colors = self::COLORS_NORMAL)
+    public static function images(Song $song, $verses, $colors = self::COLORS_NORMAL, $mergeVerses = true)
     {
+        if ($mergeVerses) return self::imagesMerged($song, $verses, $colors);
         $images = [];
 
         $verses = self::getVerses($song, $verses);
@@ -214,12 +215,7 @@ class ABCMusic
             $verse = self::getVerse($song, $verseNumber);
 
             if ($verse->refrain_before) {
-                $refrainLines = explode("\n", $song->refrain_notation);
-                $refrainText = explode("\n", $song->refrain_text_notation);
-                for ($i = 0; $i < count(explode("\n", $verse->refrain_notation)); $i++) {
-                    $music = self::makeHeaders($song, $i).$refrainLines[$i]."\n".($refrainText[$i] ? 'w:'.$refrainText[$i]."\n" : '');
-                    $images['refrain-before-'.$verseNumber.'-' . $i] = self::renderToFile($song, 'refrain', $music, $colors, $i);
-                }
+                $images = self::makeRefrain($song, $images, $verseNumber, $colors, 'before');
             }
 
             for ($i = 0; $i < count(explode("\n", $verse->notation)); $i++) {
@@ -228,15 +224,58 @@ class ABCMusic
             }
 
             if ($verse->refrain_after) {
-                $refrainLines = explode("\n", $song->refrain_notation);
-                $refrainText = explode("\n", $song->refrain_text_notation);
-                for ($i = 0; $i < count($refrainLines); $i++) {
-                    $music = self::makeHeaders($song, $i).$refrainLines[$i]."\n".($refrainText[$i] ? 'w:'.$refrainText[$i]."\n" : '');
-                    $images['refrain-after-'.$verseNumber.'-' . $i] = self::renderToFile($song, 'refrain', $music, $colors, $i);
-                }
+                $images = self::makeRefrain($song, $images, $verseNumber, $colors, 'after');
             }
 
         }
         return $images;
     }
+
+    public function makeRefrain(Song $song, $images, $verseNumber, $colors, $tag)
+    {
+        $refrainLines = explode("\n", $song->refrain_notation);
+        $refrainText = explode("\n", $song->refrain_text_notation);
+        for ($i = 0; $i < count($refrainLines); $i++) {
+            $music = self::makeHeaders($song, $i).$refrainLines[$i]."\n".($refrainText[$i] ? 'w:'.$refrainText[$i]."\n" : '');
+            $images['refrain-'.$tag.'-'.$verseNumber.'-' . $i] = self::renderToFile($song, 'refrain', $music, $colors, $i);
+        }
+        return $images;
+    }
+
+    public static function imagesMerged(Song $song, $verses, $colors = self::COLORS_NORMAL)
+    {
+        $verseDesignation = $verses;
+        $images = [];
+        $verseNumbers = self::getVerses($song, $verses);
+        $verses = [];
+
+        $refrainBefore = false;
+        $refrainAfter = false;
+        foreach ($verseNumbers as $verseNumber) {
+            $verse = self::getVerse($song, $verseNumber);
+            $verses[] = $verse;
+            $refrainBefore = $refrainBefore || $verse->refrain_before;
+            $refrainAfter = $refrainAfter || $verse->refrain_after;
+        }
+        if ($refrainBefore) {
+            $images = self::makeRefrain($song, $images, $verseNumber[0], $colors, 'before');
+        }
+
+        $music = '';
+        for ($i = 0; $i < count(explode("\n", $verse->notation)); $i++) {
+            $music = self::makeHeaders($song, $i);
+            $first = true;
+            foreach ($verseNumbers as $verseNumber) {
+                $music .= self::makeSingleLine($song, $verseNumber, $i, true, !$first);
+                $first = false;
+            }
+            $images[$verseNumber . '-' . $i] = self::renderToFile($song, $verseDesignation, $music, $colors, $i);
+        }
+
+        if ($refrainAfter) {
+            $images = self::makeRefrain($song, $images, $verseNumber[0], $colors. 'after');
+        }
+        return $images;
+    }
+
 }

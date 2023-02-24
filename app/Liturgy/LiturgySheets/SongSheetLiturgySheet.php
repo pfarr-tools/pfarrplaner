@@ -54,6 +54,7 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
 
     protected $defaultConfig = [
         'renderMusic' => false,
+        'mergeVerses' => false,
     ];
 
 
@@ -128,7 +129,7 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
 
         if ($this->config['renderMusic'] && isset($item->data['song']['song']['notation'])) {
             $song = Song::find($item->data['song']['song_id']);
-            $images = ABCMusic::images($song, $item->data['verses']);
+            $images = ABCMusic::images($song, $item->data['verses'], ABCMusic::COLORS_NORMAL, $this->config['mergeVerses']);
             foreach ($images as $image) {
                 $doc->getSection()->addImage($image, ['width' => Converter::cmToPoint(17.5)]);
             }

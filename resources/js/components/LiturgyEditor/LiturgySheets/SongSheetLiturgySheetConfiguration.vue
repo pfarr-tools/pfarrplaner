@@ -32,6 +32,7 @@
         <fieldset>
             <legend>Lieder</legend>
             <form-check label="Wo möglich, Noten abdrucken" v-model="myConfig.renderMusic" name="config[renderMusic]"/>
+            <form-check label="Verse beim Notendruck kombinieren" v-model="myConfig.renderMusic" name="config[mergeVerses]"/>
         </fieldset>
     </liturgy-sheet-configuration-form>
 </template>
