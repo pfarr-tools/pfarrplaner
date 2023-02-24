@@ -77,7 +77,7 @@ class MinistryRequestReport extends AbstractReport
         $cities = Auth::user()->writableCities;
         $locations = Location::whereIn('city_id', Auth::user()->writableCities->pluck('id'))->get();
         $ministries = Ministry::all(true);
-        $users = User::visibleFor(Auth::user());
+        $users = User::visibleFor(Auth::user())->get();
 
         return Inertia::render('Report/MinistryRequest/Setup', compact('cities', 'locations', 'ministries', 'users'));
     }

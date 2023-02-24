@@ -57,7 +57,7 @@ class TeamController extends Controller
     {
         $team->load(['city', 'users']);
         $cities = Auth::user()->writableCities;
-        $users = User::visibleFor(Auth::user());
+        $users = User::visibleFor(Auth::user())->get();
         return Inertia::render('Teams/TeamEditor', compact('team', 'cities', 'users'));
     }
 

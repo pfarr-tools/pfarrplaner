@@ -99,7 +99,7 @@ class AbsenceController extends Controller
      */
     public function create($year, $month, User $user, $day = 1)
     {
-        $users = User::visibleFor(Auth::user());
+        $users = User::visibleFor(Auth::user())->get();
         $workflowStatus = 0;
         if (Auth::user()->id == $user->id) {
             if (Auth::user()->can('selfAdminister', Absence::class)) {
@@ -225,7 +225,7 @@ class AbsenceController extends Controller
         if (!$month) {
             $year = date('m');
         }
-        $users = User::visibleFor(Auth::user());
+        $users = User::visibleFor(Auth::user())->get();
         return Inertia::render(
             'Absences/AbsenceEditor',
             compact('absence', 'month', 'year', 'users', 'mayCheck', 'mayApprove', 'maySelfAdminister')

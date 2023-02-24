@@ -69,7 +69,7 @@ class PersonReport extends AbstractPDFDocumentReport
      */
     public function setup()
     {
-        $users = User::visibleFor(Auth::user());
+        $users = User::visibleFor(Auth::user())->get();
         return Inertia::render('Report/Person/Setup', compact( 'users'));
     }
 

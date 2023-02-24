@@ -210,7 +210,7 @@ class WeddingController extends Controller
     {
         $cities = Auth::user()->writableCities;
         $locations = Location::whereIn('city_id', $cities->pluck('id'))->get();
-        $people = User::visibleFor(Auth::user());
+        $people = User::visibleFor(Auth::user())->get();
         $user = Auth::user();
         return Inertia::render('Rites/WeddingWizard', compact('cities', 'locations', 'people', 'user'));
     }
