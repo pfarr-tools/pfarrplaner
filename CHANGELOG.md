@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.12.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.12.0...v2023.12.1) (2023-02-24)
+
+
+### Bug Fixes
+
+* Noteneditor lässt sich nicht speichern ([174994f](https://codeberg.org/pfarrplaner/pfarrplaner/commits/174994f055fe035e1f042388c337f1d2942a1173))
+
 ## [2023.12.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.11.0...v2023.12.0) (2023-02-20)
 
 
