@@ -43,7 +43,6 @@
 
 use App\Http\Controllers\SongController;
 
-Route::get('/liturgie/lied/{song}/noten-editor', [SongController::class, 'musicEditor'])->name('liturgy.song.musiceditor');
 Route::get('/liturgie/lied/{song}/noten/{verses?}/{lineNumber?}', [SongController::class, 'music'])->name('liturgy.song.music');
 
 Route::get('/liturgy/songs/songbooks', [SongController::class, 'songbooks'])->name('liturgy.song.songbooks');

@@ -40,3 +40,4 @@ Route::delete('/lied/{song}', [SongController::class, 'destroy'])->name('song.de
 
 Route::post('/lied/{song}/split/{reference}',[SongController::class, 'split'])->name('song.songbook.split');
 
+Route::get('/lied/{song}/noten-editor', [SongController::class, 'musicEditor'])->name('liturgy.song.musiceditor');

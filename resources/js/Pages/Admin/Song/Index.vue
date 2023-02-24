@@ -74,6 +74,9 @@
                                         <td>{{ row.title }}</td>
                                         <td class="text-right">
                                             <nav-button class="btn-sm"
+                                                        type="light" icon="mdi mdi-music-note-eighth" title="Noten bearbeiten"
+                                                        force-icon force-no-text :href="route('liturgy.song.musiceditor', row.id)" />
+                                            <nav-button class="btn-sm"
                                                         type="primary" icon="mdi mdi-pencil" title="Lied bearbeiten"
                                                         force-icon force-no-text :href="route('song.edit', row.id)" />
                                             <nav-button class="btn-sm"
