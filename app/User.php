@@ -734,13 +734,13 @@ class User extends Authenticatable
             $ids = array_merge($ids, $newIds);
         }
 
-        if ($this->hasRole('Pfarrer*in')) {
+        if ($this->hasRole('Pfarrer*in') || $this->hasRole('Diakon*in')) {
             $newIds = User::where(
                 function ($query2) {
                     $query2->whereHas(
                         'roles',
                         function ($query) {
-                            $query->where('name', 'Pfarrer*in');
+                            $query->whereIn('name', ['Pfarrer*in', 'Diakon*in']);
                         }
                     );
                     $query2->whereHas(
