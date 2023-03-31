@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.14.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.14.0...v2023.14.1) (2023-03-31)
+
+
+### Bug Fixes
+
+* Fehler beim Hinzufügen von Vertretungen ([00f0e6d](https://codeberg.org/pfarrplaner/pfarrplaner/commits/00f0e6d8088714e9f99e09cb715d2aa7491f07eb))
+
 ## [2023.14.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.13.1...v2023.14.0) (2023-03-03)
 
 
