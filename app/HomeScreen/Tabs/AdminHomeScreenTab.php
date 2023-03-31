@@ -59,6 +59,7 @@ class AdminHomeScreenTab extends AbstractHomeScreenTab
     }
 
     protected function getBackups() {
+        if (env('THIS_IS_MY_DEV_HOST')) return [];
         $statuses = BackupDestinationStatusFactory::createForMonitorConfig(config('backup.monitor_backups'));
 
         $cmd = new ListCommand();

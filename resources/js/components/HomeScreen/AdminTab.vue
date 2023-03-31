@@ -34,8 +34,13 @@
                 <form-selectize label="Schnellauswahl Benutzer" :options="people" v-model="selectedPerson" />
             </div>
             <div class="col-md-2 text-right pt-md-4" v-if="selectedPerson">
-                <inertia-link class="btn btn-sm btn-primary mt-md-2" :href="route('user.edit', {user: selectedPerson})"><span class="mdi mdi-pencil"></span></inertia-link>
-                <a class="btn btn-sm btn-light mt-md-2" :href="route('user.switch', {user: selectedPerson})"><span class="mdi mdi-account-switch"></span></a>
+                <inertia-link class="btn btn-sm btn-primary mt-md-2" v-if="canEdit(selectedUser) && selectedUser.isOfficialUser"
+                              :href="route('user.edit', {user: selectedPerson})"><span class="mdi mdi-pencil"></span></inertia-link>
+                <a class="btn btn-sm btn-light mt-md-2" v-if="canEdit(selectedUser) && selectedUser.isOfficialUser"
+                   :href="route('user.switch', {user: selectedPerson})"><span class="mdi mdi-account-switch"></span></a>
+                <nav-button type="light" icon="mdi mdi-lock-reset" title="Passwort zurücksetzen"
+                            class="btn-sm mt-md-2" v-if="canEdit(selectedUser) && selectedUser.isOfficialUser"
+                            force-icon force-no-text @click="resetPassword(selectedUser)"/>
             </div>
         </div>
         <a :href="route('users.duplicates')" class="btn btn-sm btn-light">Duplikate suchen</a>
@@ -59,13 +64,41 @@
 import FormSelectize from "../Ui/forms/FormSelectize";
 import FakeTable from "../Ui/FakeTable";
 import CheckedProcessItem from "../Ui/elements/CheckedProcessItem";
+import NavButton from "../Ui/buttons/NavButton";
+
 export default {
     name: "AdminTab",
-    components: {CheckedProcessItem, FakeTable, FormSelectize},
+    components: {CheckedProcessItem, FakeTable, FormSelectize, NavButton},
     props: ['people', 'backups'],
     data() {
         return {
+            isAdmin: this.$page.props.currentUser.data.isAdmin,
+            currentUser: this.$page.props.currentUser.data,
             selectedPerson: null,
+        }
+    },
+    computed: {
+        selectedUser() {
+            if (!this.selectedPerson) return null;
+            return this.people.filter(person => person.id == this.selectedPerson)[0];
+        }
+    },
+    methods: {
+        canEdit(user) {
+            if (user.isAdmin) {
+                if (user.name == 'Admin') return (this.currentUser.name == 'Admin');
+                return (this.currentUser.isAdmin);
+            }
+            return this.currentUser.isAdmin
+                || this.currentUser.isLocalAdmin
+                || this.hasPermission('benutzer-bearbeiten');
+        },
+        resetPassword(user) {
+            if (confirm('Willst du das Passwort für '+user.name+' wirklich zurücksetzen? '
+                +(user.first_name || user.name)+' erhält dann eine E-Mail mit neuen Zugangsdaten. Das bisherige Passwort '
+                +'ist dann ab sofort ungültig.')) {
+                this.$inertia.post(route('user.password.reset', user.id), { preserveState: false });
+            }
         }
     }
 }
