@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.14.2](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.14.1...v2023.14.2) (2023-03-31)
+
+
+### Bug Fixes
+
+* Bearbeiten von Urlauben greift auf alte Kalenderfunktionen zurück ([b5a9182](https://codeberg.org/pfarrplaner/pfarrplaner/commits/b5a9182273a46b03e8802b6beb588591b31f788d))
+
 ### [2023.14.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.14.0...v2023.14.1) (2023-03-31)
 
 
