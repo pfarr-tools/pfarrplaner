@@ -208,7 +208,7 @@ class AbsenceController extends Controller
     public function edit(Request $request, Absence $absence)
     {
         $absence->load(['replacements', 'user', 'checkedBy', 'approvedBy']);
-        $absence->user->load(['vacationAdmins', 'vacationApprovers']);
+        $absence->user->load(['vacationAdmins', 'vacationApprovers', 'cities']);
 
         $mayCheck = $absence->user->vacationAdmins->pluck('id')->contains(Auth::user()->id);
         $mayApprove = $absence->user->vacationApprovers->pluck('id')->contains(Auth::user()->id);

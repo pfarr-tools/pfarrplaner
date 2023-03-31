@@ -51,6 +51,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Output\Output;
 
 /**
@@ -367,6 +368,7 @@ class DemoBuilder extends Command
         } catch (\Exception $e) {
             return false;
         }
+
         return true;
     }
 
@@ -379,10 +381,10 @@ class DemoBuilder extends Command
                 'address' => $this->faker->address,
                 'phone' => $this->faker->phoneNumber,
                 'office' => '',
-                'api_token' => '',
                 'own_website' => $this->faker->url,
                 'own_podcast_title' => $this->faker->sentence,
                 'own_podcast_url' => $this->faker->url,
+                'api_token' => Str::random(20),
             ];
             $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
             $data['email'] = strtolower($data['first_name'] . '.' . $data['last_name']) . '@demo.pfarrplaner.de';
