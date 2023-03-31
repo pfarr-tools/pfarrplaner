@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.15.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.14.2...v2023.15.0) (2023-03-31)
+
+
+### Features
+
+* Passwort-Reset vom Startbildschirm (Admin) ([b80f6b2](https://codeberg.org/pfarrplaner/pfarrplaner/commits/b80f6b23d1efd31c78a0966072be968e67f84fb1))
+
 ### [2023.14.2](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.14.1...v2023.14.2) (2023-03-31)
 
 
