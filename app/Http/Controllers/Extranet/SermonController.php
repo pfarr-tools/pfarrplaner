@@ -63,6 +63,20 @@ class SermonController extends Controller
         return $sermon;
     }
 
+    public function headers()
+    {
+        $user = Auth::user();
+        $sermons = Sermon::setEagerLoads([])->with([])->select(['id', 'slug', 'updated_at'])
+            ->whereHas(
+                'services',
+                function ($query) use ($user) {
+                    $query->userParticipates($user, 'P');
+                    $query->endingAt(Carbon::now());
+                }
+            )->get();
+        return response()->json($sermons);
+    }
+
     public function latest(Request $request)
     {
         $user = Auth::user();

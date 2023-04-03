@@ -32,4 +32,5 @@
 use App\Http\Controllers\Extranet\SermonController;
 
 Route::get('/user/sermons/latest', [SermonController::class, 'latest'])->name('sermons.lastest');
+Route::get('/user/sermons/headers', [SermonController::class, 'headers'])->name('sermons.headers');
 Route::get('/sermon/{sermonId}', [SermonController::class, 'details'])->name('sermon.details');

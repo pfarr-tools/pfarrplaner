@@ -104,7 +104,7 @@ class Kernel extends HttpKernel
 
         'extranet' => [
             EnsureFrontendRequestsAreStateful::class,
-            'throttle:60,1',
+            'throttle:600,1',
             'bindings',
             'auth:sanctum',
         ],
