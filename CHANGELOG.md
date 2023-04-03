@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.15.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.15.0...v2023.15.1) (2023-04-03)
+
+
+### Bug Fixes
+
+* E-Mail mit Liederliste kann nicht versendet werden, wenn der Text zu lang ist. ([2240b03](https://codeberg.org/pfarrplaner/pfarrplaner/commits/2240b03afdd11fefd2290bcea4addf42b85c1be0))
+
 ## [2023.15.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.14.2...v2023.15.0) (2023-03-31)
 
 
