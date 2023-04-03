@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.16.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.15.1...v2023.16.0) (2023-04-03)
+
+
+### Features
+
+* Optimierte Extranet-API für Predigten ([c9e171d](https://codeberg.org/pfarrplaner/pfarrplaner/commits/c9e171db9db8fba250ba4503b5f5982c07897b2d))
+
+
+### Bug Fixes
+
+* E-Mail mit Liederliste funktioniert nicht bei Gottesdiensten mit einer Freitextangabe zum Ort ([0f8f374](https://codeberg.org/pfarrplaner/pfarrplaner/commits/0f8f374ddf512e7d9a1ea40bd0b9e9798b806e9a))
+
 ### [2023.15.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.15.0...v2023.15.1) (2023-04-03)
 
 
