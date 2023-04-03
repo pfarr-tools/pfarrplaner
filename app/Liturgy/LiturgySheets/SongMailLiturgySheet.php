@@ -55,7 +55,7 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
                 'dddd, DD. MMMM YYYY'
             )
             . ', ' . $service->timeText() .
-            ($service->location->at_text ? ' ' . $service->location->at_text : ', ' . $service->locationText())
+            (($service->location && $service->location->at_text) ? ' ' . $service->location->at_text : ', ' . $service->locationText())
             . ':' . PHP_EOL . PHP_EOL;
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
