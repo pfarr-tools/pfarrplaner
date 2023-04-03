@@ -36,6 +36,7 @@ use App\Service;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class SongMailLiturgySheet extends AbstractLiturgySheet
 {
@@ -120,6 +121,9 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
             $recipients[] = Auth::user()->email;
         }
 
+        if (strlen($body) > 1000) {
+            return Inertia::render('Liturgy/LiturgySheets/SongMailOverflow', compact('body', 'subject', 'recipients', 'service'));
+        }
 
         return redirect(
             'mailto:' . join(',', $recipients) . '?subject=' . rawurlencode($subject) . '&body=' . rawurlencode($body)
