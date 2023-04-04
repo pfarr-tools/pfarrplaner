@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.17.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.16.0...v2023.17.0) (2023-04-04)
+
+
+### Features
+
+* Das Benutzerkonto einer Person wird automatisch gelöscht, wenn keine E-Mailadresse mehr gespeichert wird. ([2da7fb7](https://codeberg.org/pfarrplaner/pfarrplaner/commits/2da7fb789d6fdd2e5f5cd90e2012ed011a5b98d6))
+
 ## [2023.16.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.15.1...v2023.16.0) (2023-04-03)
 
 
