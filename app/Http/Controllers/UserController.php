@@ -361,6 +361,23 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $user->update($data);
+        if (($user->email == '') && ($user->password != '')) {
+            // this only works with a raw query!
+            DB::table('users')->where('id',$user->id)->update(['password' => null]);
+            $user->update([
+                'manage_absences' => 0,
+                'needs_replacement' => 0,
+                'show_vacations_with_services' => 0,
+                          ]);
+            $user->cities()->sync([]);
+            $user->writableCities()->sync([]);
+            $user->adminCities()->sync([]);
+            $user->roles()->sync([]);
+            $user->permissions()->sync([]);
+            $user->homeCities()->sync([]);
+            $user->vacationAdmins()->sync([]);
+            $user->vacationApprovers()->sync([]);
+        }
         $this->updateUserDataFromRequest($request, $user);
 
         return redirect()->route('users.index')->with('success', 'Die Änderungen wurden gespeichert.');
