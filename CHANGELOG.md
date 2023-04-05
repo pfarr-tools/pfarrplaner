@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.17.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.17.0...v2023.17.1) (2023-04-05)
+
+
+### Bug Fixes
+
+* Schnellerstellung von Trauungen funktioniert nicht mehr ([875af8d](https://codeberg.org/pfarrplaner/pfarrplaner/commits/875af8db419ba75561c436e6dbf45004c658eee6))
+
 ## [2023.17.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.16.0...v2023.17.0) (2023-04-04)
 
 
