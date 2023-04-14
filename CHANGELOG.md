@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.18.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.17.1...v2023.18.0) (2023-04-14)
+
+
+### Features
+
+* Liturgie als Ablaufplan für SongBeamer exportieren ([f507301](https://codeberg.org/pfarrplaner/pfarrplaner/commits/f5073018b8bd7176872eb5021962705c1da96bec))
+
+
+### Bug Fixes
+
+* Leere Dienstkategorien werden unter "Mitwirkende" im PowerPoint-Export angezeigt ([341b82f](https://codeberg.org/pfarrplaner/pfarrplaner/commits/341b82f6190c6fcf2603a074f6d845196a4c998a))
+
 ### [2023.17.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.17.0...v2023.17.1) (2023-04-05)
 
 
