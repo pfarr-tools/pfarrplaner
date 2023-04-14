@@ -370,14 +370,20 @@ class Service extends Model implements HasDAVCalendarItems
 
     public function getCreditsAttribute()
     {
-        $credits = [
-            'Liturgie' => 'Liturgie: ' . $this->participantsText('P', true),
-            'Orgel' => 'Orgel: ' . $this->participantsText('O', true)
-        ];
-        foreach ($this->ministries() as $ministry => $people) {
-            $credits[$ministry] = $ministry . ': ' . $this->participantsText($ministry, true, true);
+        if ($t = $this->participantsText('P', true, true)) {
+            $credits['Liturgie'] = 'Liturgie: ' . $t;
         }
-        $credits['Mesner*in'] = 'Mesnerdienst: ' . $this->participantsText('M', true, true);
+        if ($t = $this->participantsText('O', true, true)) {
+            $credits['Orgel'] = 'Orgel: ' . $t;
+        }
+        foreach ($this->ministries() as $ministry => $people) {
+            if ($t = $this->participantsText($ministry, true, true)) {
+                $credits[$ministry] = $ministry . ': ' . $t;
+            }
+        }
+        if ($t = $this->participantsText('M', true, true)) {
+            $credits['Mesner*in'] = 'Mesnerdienst: ' . $t;
+        }
         $separator = utf8_encode(' ' . chr(183) . ' ');
         return join($separator, $credits);
     }
