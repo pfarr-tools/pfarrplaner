@@ -31,17 +31,63 @@
 namespace App\Liturgy\ItemHelpers;
 
 
+use Illuminate\Support\Str;
+
 class SongItemHelper extends AbstractItemHelper
 {
 
-    public function getTitleText()
+    protected $info = [];
+
+    public function extractInfo()
+    {
+        $rights = $this->item->data['song']['song']['copyrights'];
+        if (str_contains($rights, '/')) {
+            $parts = explode('/', $rights);
+            foreach ($parts as $part) {
+                $part = trim($part);
+                if (Str::startsWith($part, 'Text:')) {
+                    $this->info['text'] = trim(substr($part, 5));
+                }
+                if (Str::startsWith($part, 'Melodie:')) {
+                    $this->info['melodie'] = trim(substr($part, 8));
+                }
+            }
+        }
+        $this->info['rights'] = $rights;
+    }
+
+    public function getRights()
+    {
+        if (!count($this->info)) $this->extractInfo();
+        return $this->info['rights'] ?? '';
+    }
+
+    public function getTextAuthor()
+    {
+        if (!count($this->info)) $this->extractInfo();
+        return $this->info['text'] ?? '';
+    }
+
+    public function getComposer()
+    {
+        if (!count($this->info)) $this->extractInfo();
+        return $this->info['melodie'] ?? '';
+    }
+
+    public function getCodeText()
     {
         if (!isset($this->item->data['song'])) return '';
         $title = $this->item->data['song']['code'] ?? $this->getItem()->data['song']['songbook']['name'] ?? '';
         $title .= ' '.($this->item->data['song']['reference'] ?? '')
-            .(isset($this->item->data['song']['song']) && isset($this->item->data['song']['song']['alt_eg']) ? ' (EG '.$this->item->data['song']['song']['alt_eg'].')' : '')
-            .' '.($this->item->data['song']['song']['title'] ?? '');
-        if ($this->item->data['verses']) $title.= ', '.$this->item->data['verses'];
+            .(isset($this->item->data['song']['song']) && isset($this->item->data['song']['song']['alt_eg']) ? ' (EG '.$this->item->data['song']['song']['alt_eg'].')' : '');
+        return $title;
+    }
+
+    public function getTitleText()
+    {
+        if (!isset($this->item->data['song'])) return '';
+        $code = $this->getCodeText();
+        $title = ($code ? $code.' ' : '').$this->item->data['song']['song']['title'];
         return trim(str_replace('  ', ' ', $title));
     }
 

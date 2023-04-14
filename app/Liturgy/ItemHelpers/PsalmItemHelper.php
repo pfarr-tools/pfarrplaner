@@ -34,12 +34,19 @@ namespace App\Liturgy\ItemHelpers;
 class PsalmItemHelper extends AbstractItemHelper
 {
 
+    public function getCodeText()
+    {
+        if (!isset($this->item->data['psalm'])) return '';
+        $codeText = $this->item->data['psalm']['code'] ?? $this->item->data['psalm']['songbook_abbreviation'] ?? '';
+        $codeText .= ' '.($this->item->data['psalm']['reference'] ?? '')
+            .(isset($this->item->data['psalm']['alt_eg']) ? ' (EG '.$this->item->data['psalm']['alt_eg'].')' : '');
+        return $codeText;
+    }
+
     public function getTitleText()
     {
         if (!isset($this->item->data['psalm'])) return '';
-        $title = $this->item->data['psalm']['songbook_abbreviation'] ?: $this->getItem()->data['psalm']['songbook'] ?: '';
-        $title .= ' '.($this->item->data['psalm']['reference'] ?? '').' '.($this->item->data['psalm']['title'] ?? '');
-        return trim(str_replace('  ', ' ', $title));
+        return $this->item->data['psalm']['name'] ?? '';
     }
 
     public function getVerses()

@@ -221,6 +221,7 @@ import FullTextLiturgySheetConfiguration from "../LiturgySheets/FullTextLiturgyS
 import A4WordSpecificLiturgySheetConfiguration from "../LiturgySheets/A4WordSpecificLiturgySheetConfiguration";
 import SongPPTLiturgySheetConfiguration from "../LiturgySheets/SongPPTLiturgySheetConfiguration";
 import SongSheetLiturgySheetConfiguration from "../LiturgySheets/SongSheetLiturgySheetConfiguration";
+import SBLiturgySheetConfiguration from "../LiturgySheets/SBLiturgySheetConfiguration.vue";
 import ItemTextStats from "../Elements/ItemTextStats";
 import ItemStartingTime from "../Elements/ItemStartingTime";
 import NavButton from "../../Ui/buttons/NavButton";
@@ -242,6 +243,7 @@ export default {
         SongPPTLiturgySheetConfiguration,
         A4WordSpecificLiturgySheetConfiguration,
         SongSheetLiturgySheetConfiguration,
+        SBLiturgySheetConfiguration,
     },
     props: {
         service: Object,

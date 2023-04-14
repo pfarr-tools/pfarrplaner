@@ -85,6 +85,9 @@ import FormFileUploader from "../../Ui/forms/FormFileUploader";
 import FullTextLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/FullTextLiturgySheetConfiguration";
 import SongPPTLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/SongPPTLiturgySheetConfiguration";
 import SongSheetLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/SongSheetLiturgySheetConfiguration";
+import SBLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/SBLiturgySheetConfiguration.vue";
+import A4WordSpecificLiturgySheetConfiguration
+    from "../../LiturgyEditor/LiturgySheets/A4WordSpecificLiturgySheetConfiguration.vue";
 
 export default {
     name: "AttachmentsTab",
@@ -95,9 +98,11 @@ export default {
         FormGroup,
         FormInput,
         Attachment,
+        A4WordSpecificLiturgySheetConfiguration,
         FullTextLiturgySheetConfiguration,
         SongPPTLiturgySheetConfiguration,
         SongSheetLiturgySheetConfiguration,
+        SBLiturgySheetConfiguration,
     },
     props: {
         service: Object,
