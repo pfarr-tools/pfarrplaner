@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.18.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.18.0...v2023.18.1) (2023-04-27)
+
+
+### Bug Fixes
+
+* Fehler bei Benachrichtigungen bei Abwesenheiten mit Genehmigungspflicht, wenn E-Mailadressen fehlen ([9cddd59](https://codeberg.org/pfarrplaner/pfarrplaner/commits/9cddd59952ae3318d9f0c38fc2cd895228b82ba2))
+* Fehler beim Löschen einer Abwesenheit ([e28fbe0](https://codeberg.org/pfarrplaner/pfarrplaner/commits/e28fbe097dd44bc8499fdc9caef8c6c2b7bab1b1))
+
 ## [2023.18.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.17.1...v2023.18.0) (2023-04-14)
 
 
