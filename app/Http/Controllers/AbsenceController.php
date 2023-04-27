@@ -245,26 +245,38 @@ class AbsenceController extends Controller
         $absence->setupReplacements($request->get('replacements') ?: []);
 
         // check workflow status and send appropriate notifications
+        $message = null;
         switch ($absence->workflow_status) {
             case Absence::STATUS_NEW:
-                Mail::to($absence->user->vacationAdmins)->send(new AbsenceRequested($absence));
+                $recipients = $absence->user->vacationAdmins->reject(function ($user) {
+                    // filter out users without email address
+                    return empty($user->email);
+                });
+                $message = new AbsenceRequested($absence);
                 break;
             case Absence::STATUS_CHECKED:
-                Mail::to($absence->user->vacationApprovers)->send(new AbsenceChecked($absence));
+                $recipients = $absence->user->vacationApprovers->reject(function ($user) {
+                        // filter out users without email address
+                        return empty($user->email);
+                    });
+                $message = new AbsenceChecked($absence);
                 break;
             case Absence::STATUS_APPROVED:
-                Mail::to(
-                    collect([$absence->user])
-                        ->merge($absence->user->vacationAdmins)
-                        ->merge($absence->user->vacationApprovers)
-                        ->reject(function ($user) {
-                            // filter out users without email address
-                            return empty($user->email);
-                        })
-                )
-                    ->send(new \App\Mail\Absence\AbsenceApproved($absence));
+                $recipients = collect([$absence->user])
+                    ->merge($absence->user->vacationAdmins)
+                    ->merge($absence->user->vacationApprovers)
+                    ->reject(function ($user) {
+                        // filter out users without email address
+                        return empty($user->email);
+                    });
+                $message = new \App\Mail\Absence\AbsenceApproved($absence);
                 break;
         }
+
+        if ($recipients->count() && (null !== $message)) {
+            Mail::to($recipients)->send($message);
+        }
+
 
         event(new AbsenceUpdated($absence));
 
