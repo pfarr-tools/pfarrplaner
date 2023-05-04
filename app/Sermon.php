@@ -22,6 +22,37 @@ class Sermon extends Model
         return $this->hasMany(Service::class);
     }
 
+
+    /**
+     * Initialize the model class
+     *
+     * - Register created/updated events
+     *
+     * @return void
+     */
+    public static function boot() {
+        parent::boot();
+        static::created(function (Sermon $sermon) {
+            $sermon->handleRelatedFunerals();
+        });
+        static::updated(function (Sermon $sermon) {
+            $sermon->handleRelatedFunerals();
+        });
+    }
+
+    /**
+     * Set funeral text for related funerals
+     * @return void
+     */
+    public function handleRelatedFunerals()
+    {
+        foreach ($this->services as $service) {
+            foreach ($service->funerals as $funeral) {
+                if (empty($funeral->text)) $funeral->update(['text' => $this->reference]);
+            }
+        }
+    }
+
     /**
      * Get all preachers for this sermon
      * @return array Preachers (by service id)
