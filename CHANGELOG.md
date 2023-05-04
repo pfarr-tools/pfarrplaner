@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.19.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.18.1...v2023.19.0) (2023-05-04)
+
+
+### Features
+
+* Bei Beerdigungen Predigttext automatisch eintragen ([4c45ef6](https://codeberg.org/pfarrplaner/pfarrplaner/commits/4c45ef6fb7e0e072862b4c71083ec716d7752239))
+
 ### [2023.18.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.18.0...v2023.18.1) (2023-04-27)
 
 
