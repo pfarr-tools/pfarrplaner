@@ -46,7 +46,7 @@ class ForceDomain extends Middleware
     {
         $host = parse_url(config('app.url'), PHP_URL_HOST);
         if ($host == '127.0.0.1') abort(403);
-        if ($host != $request->server->getHeaders()['HOST']) abort(403);
+        if ($host != ($request->server->getHeaders()['HOST'] ?? '')) abort(403);
         return $next($request);
     }
 
