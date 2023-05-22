@@ -145,6 +145,7 @@ import TabHeader from "../components/Ui/tabs/tabHeader";
 import Tabs from "../components/Ui/tabs/tabs";
 import Tab from "../components/Ui/tabs/tab";
 import AdminTab from "../components/HomeScreen/AdminTab";
+import AdminBackupTab from "../components/HomeScreen/AdminBackupTab.vue";
 import AbsencesTab from "../components/HomeScreen/AbsencesTab";
 import AbsenceRequestsTab from "../components/HomeScreen/AbsenceRequestsTab";
 import BaptismsTab from "../components/HomeScreen/BaptismsTab";
@@ -169,6 +170,7 @@ export default {
         Tabs,
         Tab,
         AdminTab,
+        AdminBackupTab,
         AbsencesTab,
         AbsenceRequestsTab,
         BaptismsTab,

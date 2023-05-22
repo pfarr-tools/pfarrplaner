@@ -30,7 +30,6 @@
 
 namespace App\HomeScreen\Tabs;
 
-use App\UI\Modules\AdminModule;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Backup\BackupDestination\Backup;
@@ -39,10 +38,10 @@ use Spatie\Backup\Helpers\Format;
 use Spatie\Backup\Tasks\Monitor\BackupDestinationStatus;
 use Spatie\Backup\Tasks\Monitor\BackupDestinationStatusFactory;
 
-class AdminHomeScreenTab extends AbstractHomeScreenTab
+class AdminBackupHomeScreenTab extends AbstractHomeScreenTab
 {
-    protected $title = 'Administration';
-    protected $description = 'Werkzeuge für Administrator:innen';
+    protected $title = 'Backups';
+    protected $description = 'Übersicht über den Status der Backups';
     protected $config = [];
 
     public function isAvailable(): bool
@@ -53,21 +52,13 @@ class AdminHomeScreenTab extends AbstractHomeScreenTab
 
     public function toArray($data = [])
     {
-        $data['people'] = User::select('id', 'name', 'email', 'password')
-            ->whereNotNull('email')
-            ->whereNotNull('password')
-            ->where('id', '!=', Auth::user()->id)
-            ->get();
-        $data['modules'] = AdminModule::modules();
+        $data['backups'] = $this->getBackups();
 
         return parent::toArray($data);
     }
 
-    protected function getBackups()
-    {
-        if (env('THIS_IS_MY_DEV_HOST')) {
-            return [];
-        }
+    protected function getBackups() {
+        if (env('THIS_IS_MY_DEV_HOST')) return [];
         $statuses = BackupDestinationStatusFactory::createForMonitorConfig(config('backup.monitor_backups'));
 
         $cmd = new ListCommand();
@@ -88,7 +79,7 @@ class AdminHomeScreenTab extends AbstractHomeScreenTab
                 'usedStorage' => Format::humanReadableSize($destination->usedStorage()),
             ];
 
-            if (!$destination->isReachable()) {
+            if (! $destination->isReachable()) {
                 foreach (['amount', 'newest', 'usedStorage'] as $propertyName) {
                     $row[$propertyName] = '/';
                 }
