@@ -66,12 +66,13 @@ $app->singleton(
     App\Console\Kernel::class
 );
 
+$app->alias('mail.manager', Illuminate\Mail\MailManager::class);
+
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class
 );
 
-$app->alias('mail.manager', Illuminate\Mail\MailManager::class);
 
 /*
 |--------------------------------------------------------------------------

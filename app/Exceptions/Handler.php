@@ -99,6 +99,14 @@ class Handler extends ExceptionHandler
     {
         parent::report($e);
 
+        // abort here, if 'mail.manager' is not available
+        try {
+            $mailManager = app('mail.manager');
+        } catch (\Exception $exception) {
+            return;
+        }
+
+
         if (in_array(get_class($e), $this->dontReport)) return;
 
         $flat = $this->getFlattenedException($e);

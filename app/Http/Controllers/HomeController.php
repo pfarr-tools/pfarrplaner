@@ -106,7 +106,7 @@ class HomeController extends Controller
         //$tab = HomeScreenTabFactory::getOne($config['tabs'][$activeTabIndex], $activeTabIndex);
         $tab = [];
 
-        $tabTitles = HomeScreenTabFactory::getTitles($config['tabs']);
+        $tabTitles = HomeScreenTabFactory::getTitles($config['tabs'] ?? []);
 
         return Inertia::render('HomeScreen', compact('user', 'settings', 'activeTab', 'replacements', 'tab', 'tabTitles'));
     }

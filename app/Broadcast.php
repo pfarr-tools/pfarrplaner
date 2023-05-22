@@ -69,6 +69,7 @@ class Broadcast
      */
     public function __construct($service = null)
     {
+        if (!file_exists(base_path('config/client_secret.json'))) return;
         if (null !== $service) $this->setService($service);
 
         $client = new Google_Client();
