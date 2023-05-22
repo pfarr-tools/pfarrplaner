@@ -52,6 +52,11 @@
                         <i class="mdi mdi-help-circle"></i>
                     </a>
                 </li>
+                <li v-if="layout.adminUserSwitchBack" class="nav-item">
+                    <a class="btn btn-warning mr-1" :href="route('user.switchback')">
+                        <i class="mdi mdi-account-switch"></i>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="btn btn-navbar" :href="route('logout')">
                         <i class="mdi mdi-logout"></i><span class="d-none d-md-inline"> Abmelden</span>

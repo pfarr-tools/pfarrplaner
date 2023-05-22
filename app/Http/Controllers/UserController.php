@@ -472,9 +472,21 @@ class UserController extends Controller
         if (!Auth::user()->isAdmin) {
             abort(403);
         }
+        $adminId = Auth::user()->id;
         Auth::logout();
         Auth::login($user);
+        Session::put('adminUserSwitchBack', $adminId);
         // save switch in session!
+        return redirect()->route('home');
+    }
+
+    public function switchBack()
+    {
+        if (!Session::has('adminUserSwitchBack')) abort(403);
+        $user = User::findOrFail(Session::get('adminUserSwitchBack'));
+        Auth::logout();
+        Auth::login($user);
+        Session::remove('adminUserSwitchBack');
         return redirect()->route('home');
     }
 

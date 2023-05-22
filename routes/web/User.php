@@ -34,3 +34,5 @@ use App\Http\Controllers\UserController;
 Route::get('/profil', [UserController::class, 'profile'])->name('user.profile');
 Route::patch('/profil', [UserController::class, 'profileSave'])->name('user.profile.save');
 Route::get('/benutzer/{user}/gottesdienste', [UserController::class, 'services'])->name('user.services');
+
+Route::get('/benutzer/zurueck-zu-admin', [UserController::class, 'switchBack'])->name('user.switchback');

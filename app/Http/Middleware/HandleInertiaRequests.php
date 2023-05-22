@@ -103,6 +103,7 @@ class HandleInertiaRequests extends Middleware
                     : null,
                 'menu' => fn() => MenuBuilder::sidebar(),
                 'settings' => fn() => Settings::all(Auth::user()),
+                'adminUserSwitchBack' => Session::has('adminUserSwitchBack'),
             ]);
         }
 
