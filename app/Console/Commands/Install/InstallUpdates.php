@@ -30,15 +30,12 @@
 
 namespace App\Console\Commands\Install;
 
-use App\Services\PasswordService;
 use App\Services\UpdateService;
-use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Console\Command\Install;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
 
 class InstallUpdates extends Command
 {
@@ -64,15 +61,16 @@ class InstallUpdates extends Command
     public function handle()
     {
         $files = UpdateService::getUpdateableFiles();
+        $this->line('');
 
         if ($files->count() == 0) {
-            $this->line('<info>INFO</info> Done installing updates.');
+            $this->line('<info>INFO</info> There are no new updates to be installed..');
             return Command::SUCCESS;
         }
 
         $actions = UpdateService::getUpdateActions($files);
 
-        if ($this->options('dry-run')) {
+        if (true === $this->options('dry-run')) {
             $this->line('The following '.$files->count().' files will be affected by the next update: ');
             foreach ($files as $file) {
                 $this->line(' - '.$file);
@@ -91,35 +89,35 @@ class InstallUpdates extends Command
 
 
         // composer
-        if ($actions['composer']) {
+        if (isset($actions['composer'])) {
             $this->getOutput()->section('Composer');
             passthru('composer update');
             $this->line('');
         }
 
         // npm install
-        if ($actions['npm']) {
+        if (isset($actions['npm'])) {
             $this->getOutput()->section('NPM packages');
             passthru('npm install');
             $this->line('');
         }
 
         // npm run prod
-        if ($actions['webpack']) {
+        if (isset($actions['webpack'])) {
             $this->getOutput()->section('NPM build');
             passthru('npm run prod');
             $this->line('');
         }
 
         // art migrate
-        if ($actions['migrations']) {
+        if (isset($actions['migrations'])) {
             $this->getOutput()->section('Database migrations');
             Artisan::call('migrate');
             $this->line('');
         }
 
         // art optimize
-        if ($actions['optimizations']) {
+        if (isset($actions['optimizations'])) {
             $this->getOutput()->section('Optimizations');
             Artisan::call('optimize');
             $this->line('');
