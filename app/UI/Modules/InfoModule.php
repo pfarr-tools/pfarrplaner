@@ -39,10 +39,16 @@ class InfoModule extends AbstractModule
     protected $icon = 'mdi mdi-information';
     protected $defaultRoute = 'about';
 
+    public function __construct(array $config)
+    {
+        parent::__construct($config);
+        $this->title = 'Über '.config('app.name');
+    }
+
     public function addItems(array $items): array
     {
         $items[] = [
-            'text' => 'Über Pfarrplaner',
+            'text' => 'Über '.config('app.name'),
             'icon' => 'mdi mdi-information',
             'url' => route('about'),
             'active' => request()->is(['about']),

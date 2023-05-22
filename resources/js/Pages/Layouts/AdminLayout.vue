@@ -73,7 +73,7 @@
                 <inertia-link class="brand-link-anchor" :href="route('home')"  :title="'Startseite (Pfarrplaner '+package.info.version+'-'+package.env+', '+moment(package.date).locale('de').format('LLLL')+')'">
                     <img src="/img/logo/pfarrplaner.png" width="22" height="22" class="brand-image"
                          style="opacity: .8; margin-top: 7px;"/>
-                    <span class="brand-text font-weight-light">Pfarrplaner</span>
+                    <span class="brand-text font-weight-light">{{ layout.appName }}</span>
                 </inertia-link>
                 <a class="mobile-menu-handle d-md-none" data-widget="pushmenu" href="#" title="Menüleiste schließen"><i class="mdi mdi-chevron-left-circle"></i></a>
             </div>

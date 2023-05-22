@@ -28,10 +28,10 @@
   -->
 
 <template>
-    <admin-layout title="Über Pfarrplaner">
+    <admin-layout :title="'Über '+appName">
         <div>
-            <h2>Pfarrplaner</h2><br/>
-            v.{{ version }}-{{ env }} vom {{ moment(date).locale('DE').format('LLLL') }}<br/>
+            <h2>{{ appName }}</h2><br/>
+            <span v-if="appName != 'Pfarrplaner'">Pfarrplaner </span>v.{{ version }}-{{ env }} vom {{ moment(date).locale('DE').format('LLLL') }}<br/>
             Laravel {{ laravelVersion }} auf PHP {{ phpVersion }}
         </div>
         <p v-if="officialServer">Gehostet auf einem Server des <a href="https://wwww.kirchenbezirk-balingen.de/" target="_blank">Evangelischen
@@ -56,7 +56,7 @@ export default {
     name: "About",
     components: {Card, CardBody, CardHeader, VueMarkdown},
 
-    props: ['version', 'date', 'changelog', 'env', 'phpVersion', 'laravelVersion'],
+    props: ['version', 'date', 'changelog', 'env', 'phpVersion', 'laravelVersion', 'appName'],
     computed: {
         officialServer() {
             return window.location.href.includes('.pfarrplaner.de');

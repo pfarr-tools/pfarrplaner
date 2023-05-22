@@ -152,8 +152,9 @@ class HomeController extends Controller
         $env = App::environment();
         $phpVersion = phpversion();
         $laravelVersion = app()->version();
+        $appName = config('app.name');
 
-        return Inertia::render('About', compact('version', 'date', 'changelog', 'env', 'phpVersion', 'laravelVersion'));
+        return Inertia::render('About', compact('version', 'date', 'changelog', 'env', 'phpVersion', 'laravelVersion', 'appName'));
     }
 
 
