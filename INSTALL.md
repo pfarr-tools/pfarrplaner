@@ -62,15 +62,21 @@ Schritts angezeigt.
 php artisan optimize
 ````
 
-## Updates installieren
+# Updates installieren
+
+Mit dem Artisan-Befehl ````ìnstall:updates```` werden neue Updates aus dem Git-Repository auf Codeberg
+automatisch geladen und die notwendigen Aktionen ausgeführt.
+
 ````
 cd pfarrplaner
-git pull
-composer install
-npm install
-npm run prod
-php artisan migrate
-php artisan optimize
+php artisan install:updates
 ````
 
+Mit der Option ````--dry-run```` ist es möglich, nur zu prüfen, ob ein Update vorhanden ist
+und welche Änderungen damit verbunden sind.
+
+````
+cd pfarrplaner
+php artisan install:updates --dry-run
+````
 
