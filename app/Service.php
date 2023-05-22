@@ -1234,19 +1234,12 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @return mixed
+     * @deprecated
+     * @return Carbon
      */
     public function dateTime()
     {
-        if (false === strpos($this->time, ':')) {
-            return new Carbon();
-        }
-        list ($hour, $minute) = explode(':', $this->time);
-        return Carbon::createFromFormat(
-            'Y-m-d H:i:s',
-            $this->date->format('Y-m-d') . ' ' . $this->time . ':00',
-            'Europe/Berlin'
-        );
+        return $this->date->copy()->setTimeZone('Europe/Berlin');
     }
 
     /**

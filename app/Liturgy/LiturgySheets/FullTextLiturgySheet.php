@@ -110,7 +110,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         $run->addText($service->titleText(false), $doc->getFontStyle('heading1'));
         $run->addTextBreak();
         $run->addText(
-            $service->dateTime()->formatLocalized('%d.%m.%Y, %H:%M Uhr') . ', '
+            $service->date->setTimeZone('Europe/Berlin')->formatLocalized('%d.%m.%Y, %H:%M Uhr') . ', '
             . $service->locationText(),
             $doc->getFontStyle('heading1')
         );
@@ -158,7 +158,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         $properties = $doc->getPhpWord()->getDocInfo();
         $properties->setCreator(Auth::user()->name);
         $properties->setCompany(Auth::user()->office ?? '');
-        $properties->setTitle($this->service->dateTime()->format('Ymd-Hi') . ' ' . $this->getFileTitle());
+        $properties->setTitle($this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi') . ' ' . $this->getFileTitle());
         $properties->setDescription($this->getFileTitle() . ' (' . $this->title . ')');
         $properties->setCategory('Gottesdienste');
         $properties->setLastModifiedBy(Auth::user()->name);
