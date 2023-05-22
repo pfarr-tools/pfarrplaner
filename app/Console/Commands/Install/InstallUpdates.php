@@ -30,15 +30,12 @@
 
 namespace App\Console\Commands\Install;
 
-use App\Services\PasswordService;
 use App\Services\UpdateService;
-use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Console\Command\Install;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
 
 class InstallUpdates extends Command
 {
@@ -64,9 +61,10 @@ class InstallUpdates extends Command
     public function handle()
     {
         $files = UpdateService::getUpdateableFiles();
+        $this->line('');
 
         if ($files->count() == 0) {
-            $this->line('<info>INFO</info> Done installing updates.');
+            $this->line('<info>INFO</info> There are no new updates to be installed..');
             return Command::SUCCESS;
         }
 
