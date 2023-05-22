@@ -37,15 +37,22 @@ class UpdateService
 {
 
     /**
+     * Return current commit ID
+     * @return string
+     */
+    public static function currentCommit(): ?string {
+        return shell_exec('git rev-parse HEAD');
+    }
+
+    /**
      * Get all files that would be affected by pulling an update
      * @return Collection
      */
     public static function getUpdateableFiles(): Collection {
         exec('git fetch');
         $log = shell_exec('git log --name-status origin/main');
-        $currentCommit = shell_exec('git rev-parse HEAD');
 
-        $log = explode("\n", substr($log, 0, strpos($log, $currentCommit)));
+        $log = explode("\n", substr($log, 0, strpos($log, static::currentCommit())));
         $files = collect();
 
         foreach ($log as $line) {

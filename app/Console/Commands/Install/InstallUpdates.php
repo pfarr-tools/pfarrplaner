@@ -30,6 +30,7 @@
 
 namespace App\Console\Commands\Install;
 
+use App\Services\InstanceRegistryService;
 use App\Services\UpdateService;
 use Illuminate\Console\Command;
 use Illuminate\Console\Command\Install;
@@ -123,6 +124,8 @@ class InstallUpdates extends Command
             $this->line('');
         }
 
+        // ping instance registry with updated info
+        InstanceRegistryService::ping();
 
         $this->line('<info>INFO</info> Done installing updates.');
         return Command::SUCCESS;
