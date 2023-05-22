@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.20.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.19.0...v2023.20.0) (2023-05-22)
+
+
+### Features
+
+* Admins können nach Benutzerwechsel zurückwechseln ([16bdd77](https://codeberg.org/pfarrplaner/pfarrplaner/commits/16bdd77d13852b74e5a089eeb90a4ea52ef5d286))
+* Backupstatus als eigener Tab für Admins ([7e1246f](https://codeberg.org/pfarrplaner/pfarrplaner/commits/7e1246f2a1854b3052f509e1d785bde7bfe35250))
+* Benutzerbild als Profil-Icon ([5e9e5f9](https://codeberg.org/pfarrplaner/pfarrplaner/commits/5e9e5f94d62f67e62cc4b0f46d9deff2d4e59e6b))
+
+
+### Bug Fixes
+
+* Exception in der ForceDomain middleware, wenn HOST header nicht gesetzt ist ([5d6c20b](https://codeberg.org/pfarrplaner/pfarrplaner/commits/5d6c20bbcfbfae6a9cf553b18d0228a2ab594629))
+* Falsche Uhrzeit in LiturgySheets ([e3c2178](https://codeberg.org/pfarrplaner/pfarrplaner/commits/e3c21781e87f8f2810cdf32051d87627fa351948))
+* Falsches Datum in Dateinamen von LiturgySheets ([9db1fe1](https://codeberg.org/pfarrplaner/pfarrplaner/commits/9db1fe1dd5e80f993eae1f07c5a81f0a1afc6559))
+* Liedauswahl geht verloren, wenn ein Liedeintrag im Ablauf zum Bearbeiten geöffnet wird ([37537de](https://codeberg.org/pfarrplaner/pfarrplaner/commits/37537deaf7f37835aa2c98e94a33262e223ea9b1))
+
 ## [2023.19.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.18.1...v2023.19.0) (2023-05-04)
 
 
