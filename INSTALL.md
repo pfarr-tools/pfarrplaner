@@ -11,7 +11,7 @@ Folgende Schritte sind zur Installation einer eigenen Instanz notwendig:
 - Apache installieren und einrichten. Der verwendete Virtualhost muss auf *Pfarrplaner-Ordner*/public zeigen.
 - MySQL oder MariaDB installieren, eine Datenbank und den zugehörigen Benutzer einrichten
 - Composer installieren
-- Node.js/NPM installieren
+- Node.js/NPM installieren. (Hinweis: Bei einer Node-Version ab 17 sollte folgende Option gesetzt werden: ````export NODE_OPTIONS="--openssl-legacy-provider"````)
 
 ### Pfarrplaner installieren
 
