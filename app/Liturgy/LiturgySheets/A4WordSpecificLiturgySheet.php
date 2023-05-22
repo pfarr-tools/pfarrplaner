@@ -139,8 +139,7 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
             $this->renderLiturgyTable($doc);
         }
 
-        $filename = $service->dateTime()->format('Ymd-Hi') . ' ' . $this->getFileTitle();
-        $doc->sendToBrowser($filename);
+        $doc->sendToBrowser($this->getFileName($service));
     }
 
     protected function renderLiturgyTable(DefaultWordDocument $doc, $recipient = '') {

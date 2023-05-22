@@ -149,8 +149,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             $this->slide('Hier Jingle einfügen', 18);
         }
 
-        $fileName = $service->dateTime()->format('Ymd-Hi') . ' Texte und Lieder.pptx';
-        return $this->sendToBrowser($fileName);
+        return $this->sendToBrowser($this->getFileName($service, 'Texte und Lieder'));
     }
 
     protected function createTextBox($slide, $yOffset, $text, $color = null, $xOffset = 0, $fontSize = null, $bold = false, $alignment = Alignment::HORIZONTAL_LEFT) {

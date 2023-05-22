@@ -84,14 +84,18 @@ class AbstractLiturgySheet
             $this->layout
         );
 
-        $filename = $service->dateTime()->format('Ymd-Hi') . ' ' . $this->getFileTitle() . '.pdf';
-
-        return $pdf->download($filename);
+        return $pdf->download($this->getFileName($service));
     }
 
     protected function getRenderViewName()
     {
         return 'liturgy.sheets.' . strtolower($this->getKey() . '.render');
+    }
+
+    public function getFileName(Service $service, $title = null)
+    {
+        return $service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi').' '.($title ?? $this->getFileTitle())
+            .($this->extension ? '.'.$this->extension : '');
     }
 
     /**

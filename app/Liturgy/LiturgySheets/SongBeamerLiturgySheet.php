@@ -128,7 +128,7 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
         }
 
 
-        $this->sendToBrowser($service->dateTime()->format('Ymd-Hi') . ' Texte und Lieder.zip', $songBeamerSchedule);
+        $this->sendToBrowser($this->getFileName($service, 'Texte und Lieder'), $songBeamerSchedule);
     }
 
     protected function sendToBrowser($filename, ImportableSchedule $sb)

@@ -40,6 +40,7 @@ use App\Service;
 class PsalmLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Psalm';
+    protected $fileTitle = 'Psalm';
     protected $icon = 'fa fa-file-word';
     protected $service = null;
     protected $extension = 'docx';
@@ -61,7 +62,7 @@ class PsalmLiturgySheet extends AbstractLiturgySheet
                 }
             }
         }
-        $doc->sendToBrowser($this->fileName);
+        $doc->sendToBrowser($this->getFileName($service));
     }
 
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
