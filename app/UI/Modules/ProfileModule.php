@@ -47,6 +47,7 @@ class ProfileModule extends AbstractModule
             'url' => route('user.profile'),
             'active' => request()->is(['user.profile']),
             'inertia' => true,
+            'profile' => true,
         ];
         return $items;
     }

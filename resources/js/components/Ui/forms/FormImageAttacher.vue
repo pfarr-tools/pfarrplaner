@@ -46,12 +46,13 @@
                 </div>
                 <div v-else>
                     <form-file-upload @input="upload" @upload-url="uploadUrl" :no-description="true"
+                                      :no-camera="noCamera" :no-pixabay="noPixabay" :no-url="noUrl" no-description="noDescription"
                                       :helpText="handlePaste ? 'Du kannst das Bild auch einfach mit Strg+V aus der Zwischenablage einfügen.' : ''"/>
                 </div>
             </div>
         </form-group>
         <modal title="Bild zuschneiden" v-if="modalCropperOpen" min-height="50vh" max-height="80vh"
-               @close="cropImage" @cancel="modalCropperOpen = false;"
+               @close="cropImage" @cancel="modalCropperOpen = false;" :allow-cancel="allowNoCropping"
                close-button-label="Zuschneiden" cancel-button-label="Original verwenden" max-width="800">
             <div style="height: 40vh; !important">
                 <cropper class="cropper" ref="cropper" :src="cropableImage" :canvas="canvasSettings"
@@ -71,7 +72,8 @@ import 'vue-advanced-cropper/dist/style.css';
 export default {
     name: "FormImageAttacher",
     components: {FormGroup, Modal, FormFileUpload, Cropper},
-    props: ['attachRoute', 'detachRoute', 'value', 'label', 'help', 'isCheckedItem', 'handlePaste', 'cropperCanvas', 'cropperStencil', 'width', 'height', 'noSource'],
+    props: ['attachRoute', 'detachRoute', 'value', 'label', 'help', 'isCheckedItem', 'handlePaste', 'cropperCanvas', 'cropperStencil', 'width', 'height',
+        'noSource', 'allowUncropped', 'noCamera', 'noUrl', 'noPixabay', 'noDescription'],
     created() {
         if (this.handlePaste) window.addEventListener('paste', this.attachFromClipboard);
     },
@@ -99,6 +101,7 @@ export default {
             canvasSettings,
             stencilSettings,
             info: {},
+            allowNoCropping: (undefined == this.allowUncropped) ? true : this.allowUncropped,
         }
     },
     methods: {

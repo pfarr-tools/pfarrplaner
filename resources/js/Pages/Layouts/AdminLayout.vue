@@ -93,7 +93,11 @@
                         }">
                             <span v-if="item.text == undefined">{{ item }}</span>
                             <inertia-link v-if="(item.text != undefined) && (item.inertia == true)" class="nav-link" :class="{ active: item.active }" :href="item.url">
-                                <i v-if="item.icon" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
+                                <i v-if="item.icon && (!item.profile)" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
+                                <span v-if="item.profile">
+                                    <i v-if="!user.image" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
+                                    <img v-else class="rounded-circle" :src="user.image.replace('attachments/', '/image/')" width="22" height="22" />
+                                </span>
                                 <p>{{ item.text }}
                                     <i v-if="item.submenu" class="right mdi mdi-chevron-left"></i></p>
                             </inertia-link>
@@ -194,7 +198,7 @@ export default {
     },
     computed: {
         layout() {
-            return vm.$root.$children[0].$page.props;
+            return this.$page.props;
         }
     },
     mounted() {
@@ -202,8 +206,9 @@ export default {
     },
     data() {
         return {
-            dev: vm.$root.$children[0].$page.props.dev,
-            package: vm.$root.$children[0].$page.props.package,
+            dev: this.$page.props.dev,
+            package: this.$page.props.package,
+            user: this.$page.props.currentUser.data,
         };
     },
     methods: {
