@@ -15,7 +15,7 @@ Folgende Schritte sind zur Installation einer eigenen Instanz notwendig:
 
 ### Pfarrplaner installieren
 
-````
+````bash
 git clone https://codeberg.org/pfarrplaner/pfarrplaner.git
 cd pfarrplaner
 mkdir bootstrap/cache
@@ -28,7 +28,7 @@ npm run prod
 ### Pfarrplaner konfigurieren
 
 .env-Datei anlegen:
-````
+````bash
 cp .env.example .env
 ````
 
@@ -44,13 +44,13 @@ Anschließend die Datei .env bearbeiten und alle wichtigen Felder
 (v.a. Datenbank-Zugangsdaten) ausfüllen.
 
 ### Datenbankstruktur anlegen
-````
+````bash
 php artisan migrate
 ````
 
 ### Administratorbenutzer anlegen
 
-````
+````bash
 php artisan install:admin
 ````
 
@@ -58,7 +58,7 @@ Jetzt sollte es möglich sein, sich als Administrator anzumelden. Die Zugangsdat
 Schritts angezeigt.
 
 ### Cache vorbelegen
-````
+````bash
 php artisan optimize
 ````
 
@@ -67,7 +67,7 @@ php artisan optimize
 Mit dem Artisan-Befehl ````ìnstall:updates```` werden neue Updates aus dem Git-Repository auf Codeberg
 automatisch geladen und die notwendigen Aktionen ausgeführt.
 
-````
+````bash
 cd pfarrplaner
 php artisan install:updates
 ````
@@ -75,7 +75,7 @@ php artisan install:updates
 Mit der Option ````--dry-run```` ist es möglich, nur zu prüfen, ob ein Update vorhanden ist
 und welche Änderungen damit verbunden sind.
 
-````
+````bash
 cd pfarrplaner
 php artisan install:updates --dry-run
 ````
