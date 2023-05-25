@@ -90,6 +90,7 @@ class UpdateService
         if (static::hasFileChanges('resources/js/', $files)) $actions['webpack'] = 'Webpack (compiling resources)';
         if (static::hasFileChanges('database/migrations/', $files)) $actions['migrations'] = 'Database migrations';
         $actions['optimizations'] = 'Cache optimizations';
+        $actions['queue'] = 'Restart queue workers';
         return $actions;
     }
 

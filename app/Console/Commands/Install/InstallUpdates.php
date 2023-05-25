@@ -124,6 +124,13 @@ class InstallUpdates extends Command
             $this->line('');
         }
 
+        // art optimize
+        if (isset($actions['queue'])) {
+            $this->getOutput()->section('Queue workers');
+            Artisan::call('queue:restart');
+            $this->line('');
+        }
+
         // ping instance registry with updated info
         InstanceRegistryService::ping();
 
