@@ -75,17 +75,6 @@ class AppServiceProvider extends ServiceProvider
         Blade::include('partials.string.badges', 'badges');
 
 
-        Validator::extendImplicit(
-            'checkbox',
-            function ($attribute, $value, $parameters, $validator) {
-                $data = $oldData = $validator->getData();
-                $data[$attribute] = ($value == "1" || strtolower($value) == "true" || strtolower(
-                        $value
-                    ) == "on") ? 1 : 0;
-                $validator->setData($data);
-                return true;
-            }
-        );
 
         Validator::extend(
             'phone_number',
@@ -100,7 +89,6 @@ class AppServiceProvider extends ServiceProvider
                 return preg_match('/^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$/i', $value);
             }
         );
-
         Validator::extend(
             'hash',
             function ($attribute, $value, $parameters) {
