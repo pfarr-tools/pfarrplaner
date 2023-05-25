@@ -360,6 +360,7 @@ class UserController extends Controller
     public function update(UserRequest $request, User $user)
     {
         $data = $request->validated();
+        dd($data);
         $user->update($data);
         if (($user->email == '') && ($user->password != '')) {
             // this only works with a raw query!
@@ -535,16 +536,16 @@ class UserController extends Controller
             'address' => 'nullable|string',
             'phone' => 'nullable|phone_number',
             'preference_cities' => 'nullable|string',
-            'manage_absences' => 'nullable|checkbox',
+            'manage_absences' => 'nullable|bool',
             'homeCities' => 'nullable',
             'homeCities.*' => 'int|exists:cities,id',
             'own_website' => 'nullable|string',
             'own_podcast_title' => 'nullable|string',
             'own_podcast_url' => 'nullable|string|url',
-            'own_podcast_spotify' => 'nullable|checkbox',
-            'own_podcast_itunes' => 'nullable|checkbox',
-            'show_vacations_with_services' => 'nullable|checkbox',
-            'needs_replacement' => 'nullable|checkbox',
+            'own_podcast_spotify' => 'nullable|bool',
+            'own_podcast_itunes' => 'nullable|bool',
+            'show_vacations_with_services' => 'nullable|bool',
+            'needs_replacement' => 'nullable|bool',
         ];
 
         // special treatment if the submitter is a local admin

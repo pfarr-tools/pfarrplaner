@@ -753,8 +753,8 @@ Amen.'
                     'service' => 'required|int|exists:services,id',
                     'offerings' => 'required|string',
                     'lastService' => 'required|date',
-                    'mix_op' => 'nullable|checkbox',
-                    'mix_outlook' => 'nullable|checkbox',
+                    'mix_op' => 'nullable|bool',
+                    'mix_outlook' => 'nullable|bool',
                     'offering_text' => 'nullable|string',
                 ]
             )

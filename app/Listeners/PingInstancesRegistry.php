@@ -30,12 +30,10 @@
 
 namespace App\Listeners;
 
-use App\Events\AbsenceApproved;
-use App\Events\OrderShipped;
 use App\Services\InstanceRegistryService;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 /**
  * Class PingInstancesRegistry
@@ -48,20 +46,11 @@ use Illuminate\Support\Facades\Mail;
  */
 class PingInstancesRegistry
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
 
     /**
      * Handle the event.
      *
-     * @param OrderShipped $event
+     * @param Login $event
      * @return void
      */
     public function handle(Login $event)

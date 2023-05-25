@@ -43,7 +43,7 @@ class AbsenceRequest extends FormRequest
             'reason' => 'required|string',
             'replacement_notes' => 'nullable|string',
             'workflow_status' => 'int|in:' . Absence::STATUS_NEW,
-            'sick_days' => 'nullable|checkbox',
+            'sick_days' => 'nullable|bool',
             'internal_notes' => 'nullable|string',
         ];
         if ($this->route()->getName() == 'absences.store') {

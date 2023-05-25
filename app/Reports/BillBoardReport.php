@@ -116,8 +116,8 @@ class BillBoardReport extends AbstractWordDocumentReport
             [
                 'city' => 'required|int',
                 'start' => 'required|date',
-                'mixOutlook' => 'nullable|checkbox',
-                'mixOP' => 'nullable|checkbox',
+                'mixOutlook' => 'nullable|bool',
+                'mixOP' => 'nullable|bool',
             ]
         );
 

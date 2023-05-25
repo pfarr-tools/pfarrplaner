@@ -35,6 +35,7 @@ use App\Service;
 use App\User;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 
 class InstanceRegistryService
 {
@@ -44,9 +45,10 @@ class InstanceRegistryService
      * Note that this is obligatory if you hope to get any kind of help from the developer
      * concerning your instance.
      *
+     * @param bool $debug Debug output?
      * @return void
      */
-    public static function ping() {
+    public static function ping($debug = false) {
         if (env('NO_PING')) return;
 
         $package = PackageService::info();
@@ -65,10 +67,13 @@ class InstanceRegistryService
             'administrator' => config('app.administrator'),
         ];
 
+        Log::debug('Pinging central registry');
         $client = new Client();
         try {
             $client->post('https://instances.pfarrplaner.de/api/ping', ['form_params' => $data]);
         } catch (\Exception $exception) {
+            Log::debug('Pinging central registry failed', $exception);
+            if ($debug) dd($data, $exception);
             return;
         }
     }

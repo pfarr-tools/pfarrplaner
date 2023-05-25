@@ -162,8 +162,8 @@ class ServiceController extends Controller
         $data = $request->validate([
                                        'ministry' => 'required|string',
                                        'users.*' => 'required|int|exists:users,id',
-                                       'exclusive' => 'required|checkbox',
-                                       'no-toggle' => 'nullable|checkbox',
+                                       'exclusive' => 'required|bool',
+                                       'no-toggle' => 'nullable|bool',
                                    ]);
         $participants = $service->getSyncableParticipantsArray();
         if (!isset($participants[$data['ministry']])) {

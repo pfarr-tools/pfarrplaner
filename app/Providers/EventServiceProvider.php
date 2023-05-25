@@ -31,6 +31,8 @@
 namespace App\Providers;
 
 use App\Events\AbsenceUpdated;
+use App\Listeners\PingInstancesRegistry;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -60,7 +62,13 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\SendRejectionNotification'
         ],
         AbsenceUpdated::class => [
+        ],
+        Login::class => [
+            PingInstancesRegistry::class,
         ]
+    ];
+
+    protected $subscribe = [
     ];
 
     /**
