@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.21.2](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.1...v2023.21.2) (2023-05-25)
+
+
+### Features
+
+* Queue-Prozesse werden nach Updates automatisch neu gestartet ([dbf48c7](https://codeberg.org/pfarrplaner/pfarrplaner/commits/dbf48c7549b0e0ab9e817f64a60cf315dae73cb7))
+
+
+### Bug Fixes
+
+* Genehmigungsprozess für Urlaube wird nicht korrekt gespeichert. ([1a2addf](https://codeberg.org/pfarrplaner/pfarrplaner/commits/1a2addf00f5ab648ed2aa422387051cf2540da41))
+* Genehmigungsprozess für Urlaube wird nicht korrekt gespeichert. ([db0239b](https://codeberg.org/pfarrplaner/pfarrplaner/commits/db0239b04ecf4d9306e16b022eff5b8ceb30f82b))
+
 ### [2023.21.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.0...v2023.21.1) (2023-05-25)
 
 
