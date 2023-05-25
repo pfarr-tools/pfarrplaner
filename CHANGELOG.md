@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.21.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.0...v2023.21.1) (2023-05-25)
+
+
+### Features
+
+* Automatischer Updatebefehl install:updates ([aa7c4aa](https://codeberg.org/pfarrplaner/pfarrplaner/commits/aa7c4aa543db98c97bf75ebceb91f2ad3616e091))
+* Automatischer Updatebefehl install:updates ([d537346](https://codeberg.org/pfarrplaner/pfarrplaner/commits/d537346c0d70dca4a1064006c7e0f88231173d06))
+* Zentrale Registrierung aller existierenden Instanzen ([b8674f3](https://codeberg.org/pfarrplaner/pfarrplaner/commits/b8674f323bb55d3b9b8938e02a8d9f7a835b4ee7))
+
+
+### Bug Fixes
+
+* Bearbeiten eines Benutzereintrags setzt Urlaubsfelder zurück ([8918583](https://codeberg.org/pfarrplaner/pfarrplaner/commits/891858367826f1816693f1954e024d98bda47d9a))
+
 ## [2023.21.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.20.0...v2023.21.0) (2023-05-22)
 
 
