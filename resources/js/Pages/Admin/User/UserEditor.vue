@@ -391,7 +391,11 @@ export default {
         reduceToIds(records) {
             let ids = [];
             records.forEach(record => {
-                if (record && record.id) ids.push(record.id);
+                if (record && (!isNaN(record))) {
+                    ids.push(record)
+                } else {
+                    if (record.id) ids.push(record.id);
+                }
             });
             return ids;
         },

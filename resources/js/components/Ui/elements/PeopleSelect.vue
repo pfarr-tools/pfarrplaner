@@ -137,6 +137,9 @@ export default {
 
 
         this.value.forEach(function (person) {
+            if (!isNaN(person)) {
+                person = myPeople.filter(item => item.id == person)[0];
+            }
             myValue.push(person.id);
         });
 
