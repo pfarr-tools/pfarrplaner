@@ -23,11 +23,11 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css"/>
     <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.20.0/daterangepicker.min.css"/>
-    <link href="{{ asset('css/pfarrplaner.css') }}?v=20191207162200" rel="stylesheet">
+    <link href="{{ asset('css/pfarrplaner.css') }}" rel="stylesheet">
 
-    <link href="{{ mix('/css/app.css') }}&v={{ json_decode(file_get_contents(base_path('package.json')), true)['version'] }}" rel="stylesheet">
+    <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
     @routes()
-    <script src="{{ mix('/js/inertia-app.js') }}&v={{ json_decode(file_get_contents(base_path('package.json')), true)['version'] }}" defer></script>
+    <script src="{{ mix('/js/inertia-app.js') }}" defer></script>
 @yield('styles', '')
 
 <!-- favicons -->
