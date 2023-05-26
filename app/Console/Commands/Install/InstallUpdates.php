@@ -103,6 +103,13 @@ class InstallUpdates extends Command
             $this->line('');
         }
 
+        // npx browserslist@latest --update-db
+        if (isset($actions['browserslist'])) {
+            $this->getOutput()->section('Update browser lsit');
+            passthru('npx browserslist@latest --update-db');
+            $this->line('');
+        }
+
         // npm run prod
         if (isset($actions['webpack'])) {
             $this->getOutput()->section('NPM build');
@@ -113,21 +120,29 @@ class InstallUpdates extends Command
         // art migrate
         if (isset($actions['migrations'])) {
             $this->getOutput()->section('Database migrations');
-            Artisan::call('migrate');
+            Artisan::call('migrate', [], $this->getOutput());
+            $this->line('');
+        }
+
+        // view-cache
+        if (isset($actions['view-cache'])) {
+            $this->getOutput()->section('View cache');
+            Artisan::call('view:clear', [], $this->getOutput());
+            Artisan::call('view:cache', [], $this->getOutput());
             $this->line('');
         }
 
         // art optimize
         if (isset($actions['optimizations'])) {
             $this->getOutput()->section('Optimizations');
-            Artisan::call('optimize');
+            Artisan::call('optimize', [], $this->getOutput());
             $this->line('');
         }
 
         // art optimize
         if (isset($actions['queue'])) {
             $this->getOutput()->section('Queue workers');
-            Artisan::call('queue:restart');
+            Artisan::call('queue:restart', [], $this->getOutput());
             $this->line('');
         }
 
