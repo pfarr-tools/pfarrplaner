@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.21.3](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.2...v2023.21.3) (2023-05-26)
+
+
+### Bug Fixes
+
+* Probleme mit dem Cache-Busting unter Firefox ([6c1c4f0](https://codeberg.org/pfarrplaner/pfarrplaner/commits/6c1c4f09834a998137402d479755236cd48bb436))
+
 ### [2023.21.2](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.1...v2023.21.2) (2023-05-25)
 
 
