@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.21.4](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.3...v2023.21.4) (2023-06-05)
+
+
+### Features
+
+* Weitere Verbesserungen am Update-Skript ([8f0da35](https://codeberg.org/pfarrplaner/pfarrplaner/commits/8f0da35541f988b472c6625bd71fbcceae5e6a3a))
+
+
+### Bug Fixes
+
+* Gottesdienste lassen sich nicht speichern ([effacd6](https://codeberg.org/pfarrplaner/pfarrplaner/commits/effacd671d7aa7b70722643a92e49fc07ae683b4))
+* Neue Gottesdienste können nicht gespeichert werden ([f7e3adc](https://codeberg.org/pfarrplaner/pfarrplaner/commits/f7e3adcac5261b74dd0383b6ac10d4ca28f770a7))
+
 ### [2023.21.3](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.2...v2023.21.3) (2023-05-26)
 
 
