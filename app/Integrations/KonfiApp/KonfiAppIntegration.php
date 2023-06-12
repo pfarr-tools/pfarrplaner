@@ -111,12 +111,13 @@ class KonfiAppIntegration extends AbstractIntegration
      * @param $requestType
      * @param $path
      * @param array $arguments
+     * @param String $requestType
      * @return mixed Response data field
      * @throws Exception
      */
-    protected function requestData($path, $arguments = [])
+    protected function requestData($path, $arguments = [], $requestType = 'GET')
     {
-        $response = $this->request('GET', $path, $arguments);
+        $response = $this->request($requestType, $path, $arguments);
         if ($response->getStatusCode() != 200) {
             throw new Exception ('Could not retrieve event types from KonfiApp.');
         }
@@ -158,27 +159,51 @@ class KonfiAppIntegration extends AbstractIntegration
     {
         if ($service->konfiapp_event_type != '') {
             if ($service->konfiapp_event_qr == '') {
-                Log::debug('Updating service #'.$service->id.', no KonfiApp QR set yet.');
-                $code = $this->createQRCode($service);
-                Log::debug('Got code '.$code);
-                $service->update(['konfiapp_event_qr' => $code]);
-                $service->refresh();
-                Log::debug('Updated service to code '.$service->konfiapp_event_qr);
+                return $this->addQRCodeToService($service);
             } elseif ($service->konfiapp_event_type != $requestedChange) {
-                // change of event type: old qr needs to be deleted first
-                Log::debug('Updating service #'.$service->id.', changed KonfiApp event type from '.$service->konfiapp_event_type.' to '.$requestedChange);
-                Log::debug('Deleting old KonfiApp QR code '.$service->konfiapp_event_qr);
-                $this->deleteQRCodeByCode($service->konfiapp_event_qr, $service->konfiapp_event_type);
-                $code = $this->createQRCode($service);
-                Log::debug('Got code '.$code);
-                $service->update(
-                    ['konfiapp_event_type' => $requestedChange, 'konfiapp_event_qr' => $code]
-                );
-                $service2 = Service::find($service->id);
-                Log::debug('Updated service to code '.$service2->konfiapp_event_qr);
+                return $this->updateServiceQRCode($service, $requestedChange);
             }
         }
+    }
+
+    /**
+     * Add a QR code to a service and save it with the service record
+     * @param Service $service
+     * @return Service
+     * @throws Exception
+     */
+    public function addQRCodeToService(Service $service): Service {
+        Log::debug('Updating service #'.$service->id.', no KonfiApp QR set yet.');
+        $code = $this->createQRCode($service);
+        Log::debug('Got code '.$code);
+        $service->update(['konfiapp_event_qr' => $code]);
+        $service->refresh();
+        Log::debug('Updated service to code '.$service->konfiapp_event_qr);
         return $service;
+    }
+
+    /**
+     * Update a service's existing QR code
+     * @param Service $service
+     * @param $eventType
+     * @return Service
+     * @throws Exception
+     */
+    public function updateServiceQRCode(Service $service, $eventType = null): Service
+    {
+        $eventType ??= $service->konfiapp_event_type;
+        // change of event type: old qr needs to be deleted first
+        Log::debug('Updating service #'.$service->id.', changed KonfiApp event type from '.$service->konfiapp_event_type.' to '.$eventType);
+        Log::debug('Deleting old KonfiApp QR code '.$service->konfiapp_event_qr);
+        $this->deleteQRCodeByCode($service->konfiapp_event_qr, $service->konfiapp_event_type);
+        $code = $this->createQRCode($service);
+        Log::debug('Got code '.$code);
+        $service->update(
+            ['konfiapp_event_type' => $eventType, 'konfiapp_event_qr' => $code]
+        );
+        $service2 = Service::find($service->id);
+        Log::debug('Updated service to code '.$service2->konfiapp_event_qr);
+        return $service2;
     }
 
     /**
@@ -189,15 +214,18 @@ class KonfiAppIntegration extends AbstractIntegration
      */
     public function createQRCode(Service $service)
     {
+        $start = $service->date->setTimeZone('Europe/Berlin');
+        $data = [
+            'veranstaltungID' => $service->konfiapp_event_type,
+            'dateStart' => $start->format('Y.m.d'),
+            'dateEnd' => $start->format('Y.m.d'),
+            'timeStart' => $start->format('H:i'),
+            'timeEnd' => $start->clone()->addHour(3)->format('H:i'),
+        ];
+
         return ($this->requestData(
-            'verwaltung/veranstaltungen/qr/',
-            [
-                'veranstaltungID' => $service->konfiapp_event_type,
-                'dateStart' => $service->date->format('Y.m.d'),
-                'dateEnd' => $service->date->format('Y.m.d'),
-                'timeStart' => $service->date->format('H:i'),
-                'timeEnd' => $service->date->clone()->addHour(3)->format('H:i'),
-            ]
+            'verwaltung/veranstaltungen/qr/', $data,
+             'POST'
         ))->code;
     }
 
