@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.21.5](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.4...v2023.21.5) (2023-06-12)
+
+
+### Bug Fixes
+
+* Zeitverschiebung bei den Codes für die KonfiApp ([e66f273](https://codeberg.org/pfarrplaner/pfarrplaner/commits/e66f2732f7f12b19de7b97485fe27334aea2f005))
+
 ### [2023.21.4](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.3...v2023.21.4) (2023-06-05)
 
 
