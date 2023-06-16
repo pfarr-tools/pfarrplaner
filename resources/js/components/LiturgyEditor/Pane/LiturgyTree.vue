@@ -460,6 +460,7 @@ export default {
             }), obj)
                 .then(response => {
                     let item = response.data.item;
+                    if (item.data.length == 0) item.data = {};
                     if (undefined == item.data.responsible) item.data.responsible = [];
                     let itemIndex = this.blocks[blockIndex].items.push(item);
                     this.focusItem(blockIndex, itemIndex - 1);

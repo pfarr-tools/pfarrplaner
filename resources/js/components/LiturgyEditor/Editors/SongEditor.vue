@@ -133,14 +133,8 @@ export default {
     },
     data() {
         var e = this.element;
-        if (undefined == e.data) e.data = {};
-        if (typeof e.data != 'object') e.data = {};
-        if (undefined == e.data.song) e.data.song = {};
-        if (undefined == e.data.song.song) e.data.song.song = {};
-        if (undefined == e.data.song.song.verses) e.data.song.song.verses = [];
-        if (undefined == e.data.song.song.id) e.data.song.song.id = -1;
 
-        var emptySong = {
+        const emptySong = {
             id: -1,
             title: '',
             verses: [
@@ -153,9 +147,20 @@ export default {
             reference: '',
         };
 
-        if (undefined == e.data.verses) e.data.verses = '';
+
+        let responsible = e.data.responsible || [];
+        if (e.data.length == 0) e.data = { song: emptySong, verses: '', responsible: responsible }
+        if (undefined == e.data) e.data = {song: emptySong, verses: '', responsible: responsible};
+        if (typeof e.data != 'object') e.data = { song: emptySong, verses: '', responsible: responsible };
         if (undefined == e.data.song) e.data.song = emptySong;
-        const component = this;
+        if (undefined == e.data.song.song) e.data.song.song = { verses: [], id: -1 };
+        if (undefined == e.data.song.song.verses) e.data.song.song.verses = [];
+        if (undefined == e.data.song.song.id) e.data.song.song.id = -1;
+
+
+        if (undefined == e.data.verses) e.data.verses = '';
+
+
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
             editedElement: e,
