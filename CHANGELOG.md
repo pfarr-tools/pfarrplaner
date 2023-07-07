@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.21.6](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.5...v2023.21.6) (2023-07-07)
+
+
+### Bug Fixes
+
+* Fehler bei der Ausgabe, wenn keine Liedverse vorhanden sind. ([95c0c56](https://codeberg.org/pfarrplaner/pfarrplaner/commits/95c0c56901a608dbfbbdb15d9ed0268a189ae08f))
+* Fehler beim Versand von Benachrichtigungen wenn 'need_predicant' geändert wurde ([4897d84](https://codeberg.org/pfarrplaner/pfarrplaner/commits/4897d84da14e63ccd6601a3bfff620cdd0c19b22))
+* Neu angelegte Liedelemente lassen sich nicht speichern ([7edd6a9](https://codeberg.org/pfarrplaner/pfarrplaner/commits/7edd6a9124b253617d6ff33ec84fc089b5efb86d))
+* SongMailLiturgySheet produziert Fehlermeldung ([b1f738b](https://codeberg.org/pfarrplaner/pfarrplaner/commits/b1f738b42802f39ebc23db4e33e84785b3cf0f94))
+
 ### [2023.21.5](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.4...v2023.21.5) (2023-06-12)
 
 
