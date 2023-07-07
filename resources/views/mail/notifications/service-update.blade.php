@@ -68,8 +68,8 @@
             @include('mail.notifications.service.changed-attribute', [
                      'title' => 'Prädikant benötigt',
                      'key' => 'need_predicant',
-                     'old' => $original->need_predicant ? '✔' : '✘',
-                     'new' => $changed->need_predicant ? '✔' : '✘',
+                     'old' => $changes['need_predicant']['original'] ? '✔' : '✘',
+                     'new' => $changes['need_predicant']['changed'] ? '✔' : '✘',
                      ])
             @endif
 
