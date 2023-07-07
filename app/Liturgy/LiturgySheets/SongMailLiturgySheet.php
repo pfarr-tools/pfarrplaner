@@ -83,7 +83,7 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
                         . ' '
                         . $item->data[$item->data_type]['reference'] . ' '
                         . (isset($item->data[$item->data_type]['altEG']) ? '(EG ' . $item->data[$item->data_type]['altEG'] . ') ' : '')
-                        . $item->data[$item->data_type]['song']['title']
+                        . ($item->data[$item->data_type]['song']['title'] ?? '')
                         . $helper->forceVerseString(', ')
                         . ($verseCount ? ' (' . $verseCount . ')' : '')
                         . PHP_EOL;
@@ -93,7 +93,7 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
                             . ($item->data[$item->data_type]['songbook_abbreviation'] ?? $item->data[$item->data_type]['songbook'] ?? '')
                             . ' '
                             . $item->data[$item->data_type]['reference'] . ' '
-                            . $item->data[$item->data_type]['title']
+                            . ($item->data[$item->data_type]['title'] ?? '')
                             . (isset($item->data['verses']) && ($item->data['verses'] != '') ? ', ' . $item->data['verses'] : '')
                             . PHP_EOL;
                     }
