@@ -146,6 +146,7 @@ class SongItemHelper extends AbstractItemHelper
         if (!isset($this->item->data['song'])) return '';
         if (!isset($this->item->data['song']['song'])) return '';
         if (isset($this->item->data['verses'])) return $prefix.$this->item->data['verses'];
+        $verseRefs = [];
         foreach ($this->item->data['song']['song']['verses'] as $verse) $verseRefs[] = $verse['number'];
         if ((count($verseRefs) == 1) && ($verseRefs[0] == 1)) return '';
         if (count($verseRefs) == 1) return $prefix.$verseRefs[0];
