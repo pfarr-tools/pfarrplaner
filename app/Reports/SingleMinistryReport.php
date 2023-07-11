@@ -96,7 +96,7 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
                 'cities.*' => 'required|int|exists:cities,id',
                 'ministries.*' => 'string',
                 'file_format' => 'required|string',
-                'includeHeader' => 'checkbox',
+                'includeHeader' => 'bool',
             ]
         );
 
