@@ -116,6 +116,7 @@ class AbsenceController extends Controller
                 'workflow_status' => $workflowStatus,
             ]
         );
+
         return redirect()->route('absence.edit', $absence->id);
     }
 
@@ -244,38 +245,6 @@ class AbsenceController extends Controller
         $absence->update($request->validated());
         $absence->setupReplacements($request->get('replacements') ?: []);
 
-        // check workflow status and send appropriate notifications
-        $message = null;
-        switch ($absence->workflow_status) {
-            case Absence::STATUS_NEW:
-                $recipients = $absence->user->vacationAdmins->reject(function ($user) {
-                    // filter out users without email address
-                    return empty($user->email);
-                });
-                $message = new AbsenceRequested($absence);
-                break;
-            case Absence::STATUS_CHECKED:
-                $recipients = $absence->user->vacationApprovers->reject(function ($user) {
-                        // filter out users without email address
-                        return empty($user->email);
-                    });
-                $message = new AbsenceChecked($absence);
-                break;
-            case Absence::STATUS_APPROVED:
-                $recipients = collect([$absence->user])
-                    ->merge($absence->user->vacationAdmins)
-                    ->merge($absence->user->vacationApprovers)
-                    ->reject(function ($user) {
-                        // filter out users without email address
-                        return empty($user->email);
-                    });
-                $message = new \App\Mail\Absence\AbsenceApproved($absence);
-                break;
-        }
-
-        if ($recipients->count() && (null !== $message)) {
-            Mail::to($recipients)->send($message);
-        }
 
 
         event(new AbsenceUpdated($absence));
