@@ -88,7 +88,7 @@ class UpdateService
         if (static::hasFileChanges('composer.', $files)) $actions['composer'] = 'Composer updates';
         if (static::hasFileChanges('package.json', $files)) $actions['npm'] = 'NPM package installs';
         $actions['browserslist'] = 'Browserlist update';
-        if (static::hasFileChanges('resources/js/', $files)) $actions['webpack'] = 'Webpack (compiling resources)';
+        if (static::hasFileChanges('resources/js/', $files) || isset($actions['npm'])) $actions['webpack'] = 'Webpack (compiling resources)';
         if (static::hasFileChanges('resources/views/', $files)) $actions['view-cache'] = 'Clear view cache';
         if (static::hasFileChanges('database/migrations/', $files)) $actions['migrations'] = 'Database migrations';
         $actions['optimizations'] = 'Cache optimizations';
