@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.21.8](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.7...v2023.21.8) (2023-07-14)
+
+
+### Bug Fixes
+
+*  Genehmigungsprozess im Urlaubsplaner versendet keine Benachrichtigungen ([be93f3e](https://codeberg.org/pfarrplaner/pfarrplaner/commits/be93f3e9be3431b9f86be95f832b1965ac57f32f))
+
 ### [2023.21.7](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.6...v2023.21.7) (2023-07-14)
 
 
