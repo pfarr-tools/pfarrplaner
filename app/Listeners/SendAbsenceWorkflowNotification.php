@@ -63,8 +63,13 @@ class SendAbsenceWorkflowNotification
      */
     public function handle(AbsenceUpdated $event)
     {
+        Log::debug('SendAbsenceWorkflowNotification::handle()');
         // do nothing, if no workflow is defined
-        if ((!$event->absence->user->vacationAdmins->count()) && !$event->absence->user->vacationApprovers->count()) return;
+        if ((!$event->absence->user->vacationAdmins->count()) && !$event->absence->user->vacationApprovers->count()) {
+            Log::debug('SendAbsenceWorkflowNotification abgebrochen, weil kein Workflow definiert ist.');
+        }
+
+
 
         // check workflow status and send appropriate notifications
         $message = null;
@@ -95,10 +100,13 @@ class SendAbsenceWorkflowNotification
                 break;
         }
 
+        Log::debug('SendAbsenceWorkflowNotification hat '.$recipients->count().' Empfänger');
+
+
         //dd($recipients, $event->absence, $event->absence->user->vacationAdmins);
 
         if ($recipients->count() && (null !== $message)) {
-            Log::debug('SendAbsenceWorkflowNotification listener: Sende Workflow-Update ('
+            Log::debug('SendAbsenceWorkflowNotification: Sende Workflow-Update ('
                        .get_class($message)
                        .') an ' . $recipients->pluck('email')->unique()->join(', '));
             Mail::to($recipients)->send($message);
