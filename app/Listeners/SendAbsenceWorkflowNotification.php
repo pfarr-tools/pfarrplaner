@@ -67,6 +67,7 @@ class SendAbsenceWorkflowNotification
         // do nothing, if no workflow is defined
         if ((!$event->absence->user->vacationAdmins->count()) && !$event->absence->user->vacationApprovers->count()) {
             Log::debug('SendAbsenceWorkflowNotification abgebrochen, weil kein Workflow definiert ist.');
+            return;
         }
 
 
