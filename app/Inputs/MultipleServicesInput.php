@@ -112,7 +112,7 @@ class MultipleServicesInput extends AbstractInput
 
         $eventTypes = [];
 
-        foreach ($data['services'] as $serviceData) {
+        foreach ($data['services'] ?? [] as $serviceData) {
             $location = Location::find($serviceData['location']);
             $date = Carbon::parse($serviceData['date'], 'UTC')
                 ->setTimezone('Europe/Berlin')
