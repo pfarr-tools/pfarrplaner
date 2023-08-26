@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.22.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.8...v2023.22.0) (2023-08-26)
+
+
+### Features
+
+* Dienstanfrage berücksichtigt Teams der Kirchengemeinde ([6e36c6c](https://codeberg.org/pfarrplaner/pfarrplaner/commits/6e36c6cec68b482647951cb82178c5a3b4769d0d))
+
+
+### Bug Fixes
+
+* MultipleServicesInput erzeugt Exception ([0ab28ed](https://codeberg.org/pfarrplaner/pfarrplaner/commits/0ab28ede8936488abef145ccd3f2f41a0f7643e8))
+* Speichern von Abwesenheiten ohne Workflow (z.B. Pfarrer:innen) nicht mehr möglich ([c98dc34](https://codeberg.org/pfarrplaner/pfarrplaner/commits/c98dc3452e33f71f556f726497b4c0021d246852))
+
 ### [2023.21.8](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.7...v2023.21.8) (2023-07-14)
 
 
