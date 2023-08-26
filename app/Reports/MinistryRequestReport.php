@@ -35,6 +35,7 @@ use App\Location;
 use App\Mail\MinistryRequest;
 use App\Ministry;
 use App\Service;
+use App\Team;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
@@ -79,7 +80,8 @@ class MinistryRequestReport extends AbstractReport
         $ministries = Ministry::all(true);
         $users = User::visibleFor(Auth::user())->get();
 
-        return Inertia::render('Report/MinistryRequest/Setup', compact('cities', 'locations', 'ministries', 'users'));
+        $teams = Team::with('users')->whereIn('city_id', $cities->pluck('id'))->get()->groupBy('city_id');
+        return Inertia::render('Report/MinistryRequest/Setup', compact('cities', 'locations', 'ministries', 'users', 'teams'));
     }
 
 

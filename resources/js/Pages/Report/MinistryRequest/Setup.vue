@@ -32,62 +32,54 @@
         <template v-slot:navbar-left>
             <nav-button type="primary" icon="mdi mdi-email-fast" title="Anfrage absenden"
                         :disabled="(selectedServices.length == 0) && (recipients.length == 0)"
-                        @click="sendMessage">Senden</nav-button>
+                        @click="sendMessage">Senden
+            </nav-button>
         </template>
         <div class="row">
             <div class="col-md-6">
                 <form-selectize label="Kirchengemeinde" name="city" v-model="myCity"
-                                :options="cities" />
+                                :options="cities"/>
             </div>
             <div class="col-md-6">
                 <location-select name="locations" :locations="locations" label="Auf folgende Orte beschränken"
-                                 v-model="myLocations" multiple @set-location="setLocation" />
+                                 v-model="myLocations" multiple @set-location="setLocation"/>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
-                <form-date-picker v-model="from" name="start" label="Gottesdienste von" />
+                <form-date-picker v-model="from" name="start" label="Gottesdienste von"/>
             </div>
             <div class="col-md-6">
-                <form-date-picker v-model="to" name="end" label="Bis" />
+                <form-date-picker v-model="to" name="end" label="Bis"/>
             </div>
         </div>
         <form-selectize label="Anfrage für folgenden Dienst senden"
                         v-model="myMinistry" name="ministry"
-                        :options="myMinistries" />
+                        :options="myMinistries"/>
 
-        <tab-headers>
-            <tab-header :active-tab="activeTab" id="services" title="Gottesdienste" :count="selectedServices.length"/>
-            <tab-header :active-tab="activeTab" id="recipients" title="Empfänger" :count="recipients.length"/>
-        </tab-headers>
-        <tabs>
-            <tab :active-tab="activeTab" id="services">
-                <div v-if="servicesLoading"><span class="mdi mdi-spin mdi-loading"></span> Gottesdienstliste wird geladen...</div>
-                <fake-table v-if="services.length > 0"
-                            collapsed-header="Folgende Gottesdienste anfragen"
-                            :columns="[1,6,5]" :headers="['', 'Zeit', 'Ort']">
-                    <div v-for="service in services" class="row py-1">
-                        <div class="col-md-1">
-                            <input type="checkbox" v-model="service.checked">
-                        </div>
-                        <div class="col-md-6">
-                            {{ moment(service.date).locale('de').format('LLLL') }}<br />
-                            {{ service.titleText }}
-                        </div>
-                        <div class="col-md-5">
-                            {{ service.locationText }}
-                        </div>
-                    </div>
-                </fake-table>
-            </tab>
-            <tab :active-tab="activeTab" id="recipients">
-                <div v-if="usersLoading"><span class="mdi mdi-spin mdi-loading"></span> Mitarbeiterliste wird geladen...</div>
-                <div v-if="(!usersLoading)">
-                    <form-selectize label="Empfänger" :options="users" v-model="recipients" multiple :key="usersLoaded"/>
-                    <form-textarea name="message" label="Zusätzliche Nachricht" v-model="message" />
+        <div v-if="usersLoading"><span class="mdi mdi-spin mdi-loading"></span> Mitarbeiterliste wird geladen...</div>
+        <div v-if="(!usersLoading)">
+            <people-select label="Empfänger" :people="users" :teams="myTeams" v-model="recipients" :key="usersLoaded"/>
+        </div>
+
+        <div v-if="servicesLoading"><span class="mdi mdi-spin mdi-loading"></span> Gottesdienstliste wird geladen...
+        </div>
+        <fake-table v-if="services.length > 0"
+                    collapsed-header="Folgende Gottesdienste anfragen"
+                    :columns="[1,6,5]" :headers="['', 'Zeit', 'Ort']">
+            <div v-for="service in services" class="row py-1">
+                <div class="col-md-1">
+                    <input type="checkbox" v-model="service.checked">
                 </div>
-            </tab>
-        </tabs>
+                <div class="col-md-6">
+                    {{ moment(service.date).locale('de').format('LLLL') }}<br/>
+                    {{ service.titleText }}
+                </div>
+                <div class="col-md-5">
+                    {{ service.locationText }}
+                </div>
+            </div>
+        </fake-table>
     </admin-layout>
 
 </template>
@@ -106,16 +98,18 @@ import Tabs from "../../../components/Ui/tabs/tabs";
 import Tab from "../../../components/Ui/tabs/tab";
 import FormTextarea from "../../../components/Ui/forms/FormTextarea";
 import NavButton from "../../../components/Ui/buttons/NavButton";
+
 export default {
     name: "Setup",
-    props: ['cities', 'ministries', 'locations', 'users'],
+    props: ['cities', 'ministries', 'locations', 'users', 'teams'],
     components: {
         NavButton,
         FormTextarea,
         Tab,
         Tabs,
         TabHeader,
-        TabHeaders, PeopleSelect, FakeTable, LocationSelect, FormDatePicker, FormSelectize, FormInput},
+        TabHeaders, PeopleSelect, FakeTable, LocationSelect, FormDatePicker, FormSelectize, FormInput
+    },
     computed: {
         selectedServices() {
             let s = [];
@@ -132,7 +126,7 @@ export default {
     data() {
         let myMinistries = [];
         for (let id in this.ministries) {
-            myMinistries.push({ id: id, name: this.ministries[id] });
+            myMinistries.push({id: id, name: this.ministries[id]});
         }
 
         return {
@@ -142,6 +136,7 @@ export default {
             myMinistry: null,
             myLocations: [],
             myCity: (this.cities.length ? this.cities[0].id : null),
+            myTeams: this.cities.length ? (this.teams[this.cities[0].id] || []) : [],
             services: [],
             apiToken: this.$page.props.currentUser.data.api_token,
             usersLoading: false,
@@ -168,7 +163,7 @@ export default {
             await this.getServices();
         },
         async myMinistry() {
-            await this.getRecipients();
+            //await this.getRecipients();
         }
     },
     methods: {
@@ -179,7 +174,7 @@ export default {
             if (!(this.myCity && this.from && this.to)) return [];
             this.servicesLoading = true;
             this.services = await axios.post(route('api.report.step', {
-                api_token:this.apiToken,
+                api_token: this.apiToken,
                 report: 'ministryRequest',
                 step: 'services',
                 city: this.myCity,
@@ -195,21 +190,9 @@ export default {
             });
         },
         async getRecipients() {
-            if (!(this.myCity && this.myMinistry)) return [];
-            this.usersLoading = true;
-            this.$forceUpdate();
-            this.recipients = await axios.post(route('api.report.step', {
-                api_token:this.apiToken,
-                report: 'ministryRequest',
-                step: 'recipients',
-                city: this.myCity,
-                ministry: this.myMinistry,
-            })).then(response => {
-                this.usersLoading = false;
-                this.usersLoaded++;
-                this.$forceUpdate();
-                return response.data;
-            });
+            console.log('selecting teams for ', this.myCity, this.teams[this.myCity] || []);
+            if (!this.myCity) return [];
+            this.myTeams = this.teams[this.myCity] || [];
             this.usersLoaded++;
             this.$forceUpdate();
         },
@@ -218,9 +201,9 @@ export default {
         },
         sendMessage() {
             let record = {
-                services : [],
+                services: [],
                 recipients: this.recipients,
-                address : {},
+                address: {},
                 ministry: this.myMinistry,
                 text: this.message,
             };
@@ -233,7 +216,7 @@ export default {
                 })[0];
                 if (user) {
                     if (!user.email) {
-                        let address = window.prompt('Bitte gib eine E-Mailadresse für '+user.name+' an.');
+                        let address = window.prompt('Bitte gib eine E-Mailadresse für ' + user.name + ' an.');
                         if (address) {
                             record.address[recipient] = address;
                         }
