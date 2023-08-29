@@ -202,11 +202,12 @@ export default {
         sendMessage() {
             let record = {
                 services: [],
-                recipients: this.recipients,
+                recipients: [],
                 address: {},
                 ministry: this.myMinistry,
                 text: this.message,
             };
+            this.recipients.forEach(recipient => record.recipients.push(recipient.id));
             this.services.forEach(service => {
                 if (service.checked) record.services.push(service.id)
             });
