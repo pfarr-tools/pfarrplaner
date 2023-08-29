@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.22.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.22.0...v2023.22.1) (2023-08-29)
+
+
+### Bug Fixes
+
+* Fehler beim Senden einer Dienstanfrage ([879fb19](https://codeberg.org/pfarrplaner/pfarrplaner/commits/879fb19c156156437f29e3c8ef2008a3887137b2))
+
 ## [2023.22.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.21.8...v2023.22.0) (2023-08-26)
 
 
