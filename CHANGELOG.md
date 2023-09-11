@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.23.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.23.0...v2023.23.1) (2023-09-11)
+
+
+### Bug Fixes
+
+* Fehlender View ([eeb50e6](https://codeberg.org/pfarrplaner/pfarrplaner/commits/eeb50e685b35ec49527b174ff1121d1181f15308))
+
 ## [2023.23.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.22.1...v2023.23.0) (2023-09-11)
 
 
