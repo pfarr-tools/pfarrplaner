@@ -50,9 +50,13 @@ export default {
         href: String,
     },
     methods: {
-        handleClick() {
+        handleClick(event) {
             if (this.href) {
-                this.$inertia.get(this.href);
+                if (!event.ctrlKey) {
+                    this.$inertia.get(this.href);
+                } else {
+                    window.open(this.href);
+                }
             } else {
                 this.$emit('click');
             }
