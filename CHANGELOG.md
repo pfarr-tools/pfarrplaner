@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.23.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.22.1...v2023.23.0) (2023-09-11)
+
+
+### Features
+
+* Zu vertretende Dienste für einen bestimmten Zeitraum finden ([5fe90fa](https://codeberg.org/pfarrplaner/pfarrplaner/commits/5fe90fac164ff34bde69ec6fd49717832c198b9b))
+
 ### [2023.22.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.22.0...v2023.22.1) (2023-08-29)
 
 
