@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.24.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.23.1...v2023.24.0) (2023-09-11)
+
+
+### Features
+
+* Vertretungen für eine Person für einen bestimmten Zeitraum können direkt online bearbeitet werden. ([1060d54](https://codeberg.org/pfarrplaner/pfarrplaner/commits/1060d546cb6d152bee0d777034f316e51473db7e))
+
 ### [2023.23.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.23.0...v2023.23.1) (2023-09-11)
 
 
