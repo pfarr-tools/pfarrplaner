@@ -31,8 +31,9 @@
     <admin-layout title="Zu vertretende Dienste für eine Person finden">
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Zu vertretende Dienste für eine Person finden" @click="renderReport" />
+            <nav-button title="Zur Übersicht der Diensten mit Möglichkeit zum Eintragen" icon="mdi mdi-list" class="ml-1" @click="wizard">Direkt eintragen</nav-button>
         </template>
-        <form method="post" :action="route('reports.render', {report: 'replaceableServices'})" ref="myForm">
+        <form method="post" :action="myAction" ref="myForm" :key="myAction">
             <form-csrf-token />
             <form-selectize name="person" label="Nach folgender Person suchen" :options="users" v-model="myUser" />
             <form-date-picker name="start" label="Dienste von" v-model="myStart" iso-date />
@@ -47,21 +48,30 @@ import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import NavButton from "../../../components/Ui/buttons/NavButton.vue";
 export default {
     name: "Setup",
     props: ['users'],
-    components: {FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {NavButton, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         return {
             myUser: this.$page.props.currentUser.data.id,
             myStart: moment(),
             myEnd: moment().endOf('year'),
+            myAction: route('reports.render', {report: 'replaceableServices'}),
         }
     },
     methods: {
         renderReport() {
+            this.myAction = route('reports.render', {report: 'replaceableServices'});
+            this.$refs.myForm.action = this.myAction;
             this.$refs.myForm.submit();
         },
+        wizard() {
+            this.myAction = route('report.step', {report: 'replaceableServices', step: 'wizard'})
+            this.$refs.myForm.action = this.myAction;
+            this.$refs.myForm.submit();
+        }
     }
 }
 </script>

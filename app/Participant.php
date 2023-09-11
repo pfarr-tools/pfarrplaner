@@ -46,4 +46,19 @@ class Participant extends Pivot
      * @var string
      */
     protected $table = 'service_user';
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function service() {
+        return $this->belongsTo(Service::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

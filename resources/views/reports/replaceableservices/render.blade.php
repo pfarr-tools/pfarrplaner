@@ -137,5 +137,10 @@
     </div>
 @endif
 
+<div style="padding: 2em 0; font-size: .8em; font-style:italic;"><u>Hinweis:</u> Alle oben aufgeführten Dienste können
+    <a href="{{ route('report.step', ['report' => 'replaceableServices', 'step' => 'wizard', 'person' => $user->id, 'start' => $start, 'end' => $end]) }}">
+    im Pfarrplaner auf einer übersichtlichen Seite gemeinsam bearbeitet werden</a>.
+</div>
+
 </body>
 </html>

@@ -190,4 +190,14 @@ class ServiceController extends Controller
         return response()->json(compact('service'));
     }
 
+    /**
+     * @param Service $service
+     * @return JsonResponse
+     */
+    public function destroy(Service $service)
+    {
+        $service->delete();
+        return response()->json([]);
+    }
+
 }

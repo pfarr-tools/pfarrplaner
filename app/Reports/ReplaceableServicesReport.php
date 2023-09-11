@@ -31,17 +31,17 @@
 namespace App\Reports;
 
 use App\Baptism;
-use App\Day;
 use App\Funeral;
+use App\ListedPerson;
+use App\Ministry;
+use App\Participant;
 use App\Service;
+use App\Team;
 use App\User;
 use App\Wedding;
 use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use Inertia\Inertia;
 
 
@@ -73,7 +73,7 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
     public function setup()
     {
         $users = User::visibleFor(Auth::user())->get();
-        return Inertia::render('Report/ReplaceableServices/Setup', compact( 'users'));
+        return Inertia::render('Report/ReplaceableServices/Setup', compact('users'));
     }
 
     /**
@@ -104,23 +104,23 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
         $weddings = Wedding::join('services', 'service_id', 'services.id')
             ->select(['weddings.*', 'services.date'])
             ->whereHas('service', function ($query) use ($user, $data) {
-            $query->userParticipates($user)
-                ->between(Carbon::parse($data['start']), Carbon::parse($data['end']));
-        })->orderBy('date')->get();
+                $query->userParticipates($user)
+                    ->between(Carbon::parse($data['start']), Carbon::parse($data['end']));
+            })->orderBy('date')->get();
 
         $funerals = Funeral::join('services', 'service_id', 'services.id')
             ->select(['funerals.*', 'services.date'])
             ->whereHas('service', function ($query) use ($user, $data) {
-            $query->userParticipates($user)
-                ->between(Carbon::parse($data['start']), Carbon::parse($data['end']));
-        })->orderBy('date')->get();
+                $query->userParticipates($user)
+                    ->between(Carbon::parse($data['start']), Carbon::parse($data['end']));
+            })->orderBy('date')->get();
 
         $baptisms = Baptism::join('services', 'service_id', 'services.id')
             ->select(['baptisms.*', 'services.date'])
             ->whereHas('service', function ($query) use ($user, $data) {
-            $query->userParticipates($user)
-                ->between(Carbon::parse($data['start']), Carbon::parse($data['end']));
-        })->orderBy('date')->get();
+                $query->userParticipates($user)
+                    ->between(Carbon::parse($data['start']), Carbon::parse($data['end']));
+            })->orderBy('date')->get();
 
         return $this->sendToBrowser(
             date('Ymd') . ' Zu vertretende Dienste ' . $request->get('highlight') . '.pdf',
@@ -136,5 +136,34 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
             ['format' => 'A4']
         );
     }
+
+    public function wizard(Request $request)
+    {
+        $data = $request->validate(
+            [
+                'person' => 'required|int|exists:users,id',
+                'start' => 'required|date',
+                'end' => 'required|date',
+            ]
+        );
+
+        $user = User::find($data['person']);
+        $people =  ListedPerson::select(['id', 'name'])
+            ->visibleFor(Auth::user())
+            ->get();
+        $teams = Team::with('users')->get();
+
+        $services = Participant::with('service')
+            ->join('services', 'service_id', 'services.id')
+            ->select('services.date', 'service_user.*')
+            ->whereHas('service', function ($query) use ($data) {
+                $query->between(Carbon::parse($data['start']), Carbon::parse($data['end']));
+                })
+            ->where('user_id', $user->id)->orderBy('date')->get();
+
+        $ministries = Ministry::POMA();
+        return Inertia::render('Report/ReplaceableServices/Wizard', compact('user', 'people', 'services', 'ministries', 'teams'));
+    }
+
 
 }

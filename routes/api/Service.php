@@ -37,6 +37,7 @@ Route::get('user/{user}/services', [ServiceController::class, 'byUser'])->name('
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('service/{service}', [ServiceController::class, 'show'])->name('service.show');
     Route::patch('service/{service}', [ServiceController::class, 'update'])->name('service.update');
+    Route::delete('service/{service:slug}', [ServiceController::class, 'destroy'])->name('service.destroy');
 
     Route::post('/service/{service}/assign', [ServiceController::class, 'assign'])->name('service.assign');
 });
