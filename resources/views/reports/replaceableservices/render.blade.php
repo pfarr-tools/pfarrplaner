@@ -46,8 +46,10 @@
                     <div style="padding-top: 1em; font-size: .8em;">
                         @if($baptism->appointment && ($baptism->appointment <= \Carbon\Carbon::now()))
                             <div>Das Taufgespräch hat bereits am {{ $baptism->appointment->format('d.m.Y') }} stattgefunden.</div>
+                            @if(trim($baptism->candidate_phone.$baptism->candidate_email))<div>Kontakt zur Familie: {{join(', ', [$baptism->candidate_phone, $baptism->candidate_email ])}}</div> @endif
                         @elseif($baptism->appointment && ($baptism->appointment > \Carbon\Carbon::now()))
                             <div>Das Taufgespräch ist für den {{ $baptism->appointment->format('d.m.Y') }} um {{ $baptism->appointment->setTimeZone('Europe/Berlin')->format('H:i') }} Uhr vereinbart.</div>
+                            @if(trim($baptism->candidate_phone.$baptism->candidate_email))<div>Kontakt zur Familie: {{join(', ', [$baptism->candidate_phone, $baptism->candidate_email ])}}</div> @endif
                         @else
                             Es hat noch kein Taufgespräch stattgefunden.
                         @endif
@@ -82,8 +84,12 @@
                     <div style="padding-top: 1em; font-size: .8em">
                         @if($wedding->appointment && ($wedding->appointment <= \Carbon\Carbon::now()))
                             <div>Das Traugespräch hat bereits am {{ $wedding->appointment->format('d.m.Y') }} stattgefunden.</div>
+                            @if(trim($wedding->spouse1_phone.$wedding->spouse1_email))<div>Kontakt zu {{ $wedding->spouse1_name }}: {{join(', ', [$wedding->spouse1_phone, $wedding->spouse1_email ])}}</div> @endif
+                            @if(trim($wedding->spouse2_phone.$wedding->spouse2_email))<div>Kontakt zu {{ $wedding->spouse2_name }}: {{join(', ', [$wedding->spouse2_phone, $wedding->spouse2_email ])}}</div> @endif
                         @elseif($wedding->appointment && ($wedding->appointment > \Carbon\Carbon::now()))
                             <div>Das Traugespräch ist für den {{ $wedding->appointment->format('d.m.Y') }} um {{ $wedding->appointment->setTimeZone('Europe/Berlin')->format('H:i') }} Uhr vereinbart.</div>
+                            @if(trim($wedding->spouse1_phone.$wedding->spouse1_email))<div>Kontakt zu {{ $wedding->spouse1_name }}: {{join(', ', [$wedding->spouse1_phone, $wedding->spouse1_email ])}}</div> @endif
+                            @if(trim($wedding->spouse2_phone.$wedding->spouse2_email))<div>Kontakt zu {{ $wedding->spouse2_name }}: {{join(', ', [$wedding->spouse2_phone, $wedding->spouse2_email ])}}</div> @endif
                         @else
                             Es hat noch kein Traugespräch stattgefunden.
                         @endif
@@ -116,8 +122,10 @@
                     <div style="padding-top: 1em; font-size: .8em">
                         @if($funeral->appointment && ($funeral->appointment <= \Carbon\Carbon::now()))
                             <div>Das Trauergespräch hat bereits am {{ $funeral->appointment->format('d.m.Y') }} stattgefunden.</div>
+                            @if(trim($funeral->relative_name.$funeral->relative_contact_data))<div>Kontakt zur Familie: {{ $funeral->relative_name }}, {!! nl2br($funeral->relative_contact_data) !!}</div> @endif
                         @elseif($funeral->appointment && ($funeral->appointment > \Carbon\Carbon::now()))
                             <div>Das Trauergespräch ist für den {{ $funeral->appointment->format('d.m.Y') }} um {{ $funeral->appointment->setTimeZone('Europe/Berlin')->format('H:i') }} Uhr vereinbart.</div>
+                            @if(trim($funeral->relative_name.$funeral->relative_contact_data))<div>Kontakt zur Familie: {{ $funeral->relative_name }}, {!! nl2br($funeral->relative_contact_data) !!}</div> @endif
                         @else
                             Es hat noch kein Trauergespräch stattgefunden.
                         @endif
@@ -137,7 +145,7 @@
     </div>
 @endif
 
-<div style="padding: 2em 0; font-size: .8em; font-style:italic;"><u>Hinweis:</u> Alle oben aufgeführten Dienste können
+<div style="padding: 2em 0; font-size: .8em; font-style:italic;"><u>Hinweis</u><br />Alle oben aufgeführten Dienste können
     <a href="{{ route('report.step', ['report' => 'replaceableServices', 'step' => 'wizard', 'person' => $user->id, 'start' => $start, 'end' => $end]) }}">
     im Pfarrplaner auf einer übersichtlichen Seite gemeinsam bearbeitet werden</a>.
 </div>
