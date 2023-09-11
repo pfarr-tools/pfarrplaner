@@ -68,6 +68,9 @@
                                                            :city="row.service.city"/>
                                         </td>
                                         <td>
+                                            <nav-button class="btn-sm" type="primary" icon="mdi mdi-pencil"
+                                                        force-no-text force-icon title="Gottesdienst bearbeiten"
+                                                        :href="route('service.edit', row.service)"></nav-button>
                                             <nav-button class="btn-sm" type="danger" icon="mdi mdi-delete"
                                                         force-no-text force-icon title="Gottesdienst löschen"
                                                         @click="deleteService(row, rowIndex)"></nav-button>
