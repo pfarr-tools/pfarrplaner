@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.25.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.24.0...v2023.25.0) (2023-09-11)
+
+
+### Features
+
+* Buttons mit href können jetzt mit Strg+Klick als neuer Tab ausgelöst werden ([af6694a](https://codeberg.org/pfarrplaner/pfarrplaner/commits/af6694ab1efa15586c975c3f348eb214b42bb905))
+* Erlaube bearbeiten eines Gottesdienstes direkt aus der Vertretungsliste ([be76ca4](https://codeberg.org/pfarrplaner/pfarrplaner/commits/be76ca4d51f300f1781c4da13ab7a122db1fe8d8))
+* Kontaktdaten mit in die Liste der Vertretungen aufgenommen ([516d854](https://codeberg.org/pfarrplaner/pfarrplaner/commits/516d8540e66e27aaaa3bb7398cc01f06aa7d17fb))
+
 ## [2023.24.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.23.1...v2023.24.0) (2023-09-11)
 
 
