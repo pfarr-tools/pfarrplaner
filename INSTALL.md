@@ -16,7 +16,7 @@ Folgende Schritte sind zur Installation einer eigenen Instanz notwendig:
 ### Pfarrplaner installieren
 
 ````bash
-git clone https://codeberg.org/pfarrplaner/pfarrplaner.git
+git clone https://codeberg.org/pfarr.tools/pfarrplaner.git
 cd pfarrplaner
 mkdir bootstrap/cache
 chmod -R 777 bootstrap/cache
@@ -48,10 +48,10 @@ Anschließend die Datei .env bearbeiten und alle wichtigen Felder
 php artisan migrate
 ````
 
-### Administratorbenutzer anlegen
+### Setup ausführen
 
 ````bash
-php artisan install:admin
+php artisan install:setup
 ````
 
 Jetzt sollte es möglich sein, sich als Administrator anzumelden. Die Zugangsdaten dazu werden als Ergebnis des letzten 
