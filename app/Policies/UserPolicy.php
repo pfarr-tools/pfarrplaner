@@ -203,7 +203,7 @@ class UserPolicy
             return true;
         }
         if ($user->hasPermissionTo('fremden-urlaub-bearbeiten') || ($user->hasRole(AuthServiceProvider::ADMIN))) {
-            if (!$model->hasRole('Pfarrer*in')) {
+            if (!$model->hasRole('Pfarrer:in')) {
                 if (count($user->writableCities->intersect($model->homeCities))) {
                     return true;
                 }

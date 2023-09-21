@@ -115,7 +115,7 @@ class City extends Model
      */
     public function administeredBy(User $user)
     {
-        if ($user->hasRole('Super-Administrator*in')) {
+        if ($user->hasRole('Super-Administrator:in')) {
             return true;
         }
         $city = $user->cities->where('id', $this->id)->first();

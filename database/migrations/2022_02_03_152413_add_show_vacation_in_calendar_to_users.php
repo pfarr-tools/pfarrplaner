@@ -20,8 +20,8 @@ class AddShowVacationInCalendarToUsers extends Migration
             $table->boolean('needs_replacement')->nullable()->default(false);
         });
 
-        if (Role::where('name', 'Pfarrer*in')->count() > 0)
-            User::role('Pfarrer*in')->update(['show_vacations_with_services' => 1, 'needs_replacement' => 1]);
+        if (Role::where('name', 'Pfarrer:in')->count() > 0)
+            User::role('Pfarrer:in')->update(['show_vacations_with_services' => 1, 'needs_replacement' => 1]);
     }
 
     /**

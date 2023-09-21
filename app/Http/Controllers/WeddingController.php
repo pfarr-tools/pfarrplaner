@@ -279,7 +279,7 @@ class WeddingController extends Controller
         );
         $service->update(['slug' => $service->createSlug()]);
         if (!is_array($data['pastor'])) {
-            if (Auth::user()->hasRole('Pfarrer*in')) {
+            if (Auth::user()->hasRole('Pfarrer:in')) {
                 $service->pastors()->sync([Auth::user()->id => ['category' => 'P']]);
             }
         } else {

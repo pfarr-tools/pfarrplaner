@@ -382,7 +382,7 @@ class Service extends Model implements HasDAVCalendarItems
             }
         }
         if ($t = $this->participantsText('M', true, true)) {
-            $credits['Mesner*in'] = 'Mesnerdienst: ' . $t;
+            $credits['Mesner:in'] = 'Mesnerdienst: ' . $t;
         }
         $separator = utf8_encode(' ' . chr(183) . ' ');
         return join($separator, $credits);

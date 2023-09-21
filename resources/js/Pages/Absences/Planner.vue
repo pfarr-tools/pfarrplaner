@@ -136,7 +136,7 @@ export default {
             sections: [],
             openSections: this.sectionConfig || {
                 'Eigenes Konto': true,
-                'Pfarrer*innen': true,
+                'Pfarrer:innen': true,
                 'Mitarbeitende': true,
                 'Ausgeblendete Mitarbeitende': false,
             },

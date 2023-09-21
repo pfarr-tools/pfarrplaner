@@ -176,10 +176,10 @@ class UserController extends Controller
      */
     protected function getRoles()
     {
-        if (Auth::user()->hasRole('Super-Administrator*in')) {
+        if (Auth::user()->hasRole('Super-Administrator:in')) {
             $roles = Role::all();
         } else {
-            $roles = Role::where('name', '!=', 'Super-Administrator*in')->get();
+            $roles = Role::where('name', '!=', 'Super-Administrator:in')->get();
         }
         return $roles->sortBy('name');
     }

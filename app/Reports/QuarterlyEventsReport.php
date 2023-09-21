@@ -152,13 +152,13 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         $table->addCell()->addText('Datum', ['bold' => true]);
         $table->addCell()->addText('Uhrzeit', ['bold' => true]);
         if ($request->get('includePastor')) {
-            $table->addCell()->addText('Pfarrer*in', ['bold' => true]);
+            $table->addCell()->addText('Pfarrer:in', ['bold' => true]);
         }
         if ($request->get('includeOrganist')) {
-            $table->addCell()->addText('Organist*in', ['bold' => true]);
+            $table->addCell()->addText('Organist:in', ['bold' => true]);
         }
         if ($request->get('includeSacristan')) {
-            $table->addCell()->addText('Mesner*in', ['bold' => true]);
+            $table->addCell()->addText('Mesner:in', ['bold' => true]);
         }
         if ($request->get('includeDescription')) {
             $table->addCell()->addText('Hinweise', ['bold' => true]);

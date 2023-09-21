@@ -48,7 +48,7 @@ class CityPolicy
      */
     public function index(User $user)
     {
-        if ($user->hasRole('Administrator*in')) {
+        if ($user->hasRole('Administrator:in')) {
             return true;
         }
         if ($user->can('ort-bearbeiten')) return true;
@@ -92,7 +92,7 @@ class CityPolicy
             )) {
             return true;
         }
-        if ($user->hasRole('Administrator*in') && $user->adminCities->contains($city)) {
+        if ($user->hasRole('Administrator:in') && $user->adminCities->contains($city)) {
             return true;
         }
         return false;

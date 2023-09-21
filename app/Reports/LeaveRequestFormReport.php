@@ -63,7 +63,7 @@ class LeaveRequestFormReport extends AbstractPDFDocumentReport
      */
     public function isActive(): bool
     {
-        return Auth::user()->hasRole('Pfarrer*in');
+        return Auth::user()->hasRole('Pfarrer:in');
     }
 
     public function setup()

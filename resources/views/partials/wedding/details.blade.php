@@ -32,7 +32,7 @@
     @if ($wedding->signed) <span class="fa fa-check-circle"></span>&nbsp;Anmeldung unterzeichnet @else <span class="fa fa-times-circle"></span>&nbsp;noch nicht unterzeichnet @endif
     @else <span class="fa fa-times-circle"></span>&nbsp;Anmeldung noch nicht erhalten @endif
     <br />
-    @hasrole('Pfarrer*in')
+    @hasrole('Pfarrer:in')
         @if(count($wedding->attachments))
             @foreach($wedding->attachments as $attachment)
                 <a href="{{ route('attachment', $attachment->id) }}" class="btn-secondary btn-sm"

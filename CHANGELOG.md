@@ -242,7 +242,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* Neue Rolle Diakon*in kann Urlaube von Pfarrer*innen im Plan sehen ([726090d](https://codeberg.org/pfarrplaner/pfarrplaner/commits/726090df215200fa1c2c57a4a6ba560b16cf7480))
+* Neue Rolle Diakon:in kann Urlaube von Pfarrer:innen im Plan sehen ([726090d](https://codeberg.org/pfarrplaner/pfarrplaner/commits/726090df215200fa1c2c57a4a6ba560b16cf7480))
 
 ### [2023.13.1](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.13.0...v2023.13.1) (2023-02-24)
 

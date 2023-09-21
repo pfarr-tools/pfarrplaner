@@ -52,7 +52,7 @@ class DiaryModule extends AbstractModule
 
     public function isActive(): bool
     {
-        return parent::isActive() && Auth::user()->hasRole('Pfarrer*in');
+        return parent::isActive() && Auth::user()->hasRole('Pfarrer:in');
     }
 
 

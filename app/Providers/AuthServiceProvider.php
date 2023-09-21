@@ -61,11 +61,11 @@ class AuthServiceProvider extends ServiceProvider
     /**
      *
      */
-    public const SUPER = 'Super-Administrator*in';
+    public const SUPER = 'Super-Administrator:in';
     /**
      *
      */
-    public const ADMIN = 'Administrator*in';
+    public const ADMIN = 'Administrator:in';
 
     /**
      * The policy mappings for the application.
@@ -96,7 +96,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // Super-Administrator*in can do everything
+        // Super-Administrator:in can do everything
         Gate::before(
             function ($user, $ability) {
                 if ($user->hasRole(self::SUPER)) {

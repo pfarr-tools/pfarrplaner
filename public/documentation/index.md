@@ -137,7 +137,7 @@ Informationen:
   vorhanden)
 * Die liturgische Farbe (sofern bekannt)
 * Der Predigttext zum Tag (sofern vorhanden)
-* Die an diesem Tag abwesenden Pfarrer*innen
+* Die an diesem Tag abwesenden Pfarrer:innen
 
 Die Anzeige der abwesenden Pfarrer\*innen erfolgt nur, wenn ein
 [Urlaubskalender](#urlaubskalender-einrichten) eingerichtet ist und Sie

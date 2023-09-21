@@ -64,13 +64,13 @@ export default {
             this.config.ministries.forEach(ministry => {
                 let examine = null;
                 switch (ministry) {
-                    case 'Pfarrer*in':
+                    case 'Pfarrer:in':
                         examine = service.pastors;
                         break;
-                    case 'Organist*in':
+                    case 'Organist:in':
                         examine = service.organists;
                         break;
-                    case 'Mesner*in':
+                    case 'Mesner:in':
                         examine = service.sacristans;
                         break;
                     default:

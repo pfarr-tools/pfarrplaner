@@ -600,11 +600,11 @@ export default {
             } else if (tmp[0] == 'ministry') {
                 switch (tmp[1]) {
                     case 'pastors':
-                        return '<span class="mdi mdi-account-multiple"></span> Pfarrer*in';
+                        return '<span class="mdi mdi-account-multiple"></span> Pfarrer:in';
                     case 'organists':
-                        return '<span class="mdi mdi-account-multiple"></span> Organist*in';
+                        return '<span class="mdi mdi-account-multiple"></span> Organist:in';
                     case 'sacristans':
-                        return '<span class="mdi mdi-account-multiple"></span> Mesner*in';
+                        return '<span class="mdi mdi-account-multiple"></span> Mesner:in';
                 }
                 return "<span class=\"mdi mdi-account-multiple\"></span> " + tmp[1];
             } else {

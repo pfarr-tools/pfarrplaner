@@ -45,9 +45,9 @@
             </td>
             @foreach($ministries as $ministry)
                 @php
-                    if ($ministry == 'Pfarrer*in') $ministry = 'P';
-                    if ($ministry == 'Organist*in') $ministry = 'O';
-                    if ($ministry == 'Mesner*in') $ministry = 'M';
+                    if ($ministry == 'Pfarrer:in') $ministry = 'P';
+                    if ($ministry == 'Organist:in') $ministry = 'O';
+                    if ($ministry == 'Mesner:in') $ministry = 'M';
                 @endphp
                 <td valign="top"><small>{{ $service->participantsText($ministry)}}</small></td>
             @endforeach

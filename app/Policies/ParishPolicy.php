@@ -58,7 +58,7 @@ class ParishPolicy
      */
     public function index(User $user)
     {
-        if ($user->hasRole('Administrator*in')) {
+        if ($user->hasRole('Administrator:in')) {
             return true;
         }
         if ($user->isLocalAdmin) return true;

@@ -98,17 +98,17 @@ class PlanningInput extends AbstractInput
             switch ($ministry) {
                 case 'P':
                     if (Auth::user()->can('gd-pfarrer-bearbeiten')) {
-                        $ministries[$ministry] = 'Pfarrer*in';
+                        $ministries[$ministry] = 'Pfarrer:in';
                     }
                     break;
                 case 'O':
                     if (Auth::user()->can('gd-organist-bearbeiten')) {
-                        $ministries[$ministry] = 'Organist*in';
+                        $ministries[$ministry] = 'Organist:in';
                     }
                     break;
                 case 'M':
                     if (Auth::user()->can('gd-mesner-bearbeiten')) {
-                        $ministries[$ministry] = 'Mesner*in';
+                        $ministries[$ministry] = 'Mesner:in';
                     }
                     break;
                 case 'A':

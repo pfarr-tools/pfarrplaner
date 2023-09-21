@@ -48,7 +48,7 @@ class LocationPolicy
      */
     public function index(User $user)
     {
-        if ($user->hasRole('Administrator*in')) {
+        if ($user->hasRole('Administrator:in')) {
             return true;
         }
         if ($user->can('ort-bearbeiten') || $user->can('gd-opfer-bearbeiten')) {
@@ -92,7 +92,7 @@ class LocationPolicy
      */
     public function update(User $user, Location $location)
     {
-        if ($user->hasRole('Administrator*in') && $location->city->administeredBy($user)) {
+        if ($user->hasRole('Administrator:in') && $location->city->administeredBy($user)) {
             return true;
         }
         if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {
@@ -110,7 +110,7 @@ class LocationPolicy
      */
     public function delete(User $user, Location $location)
     {
-        if ($user->hasRole('Administrator*in') && $location->city->administeredBy($user)) {
+        if ($user->hasRole('Administrator:in') && $location->city->administeredBy($user)) {
             return true;
         }
         if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {
@@ -128,7 +128,7 @@ class LocationPolicy
      */
     public function restore(User $user, Location $location)
     {
-        if ($user->hasRole('Administrator*in') && $location->city->administeredBy($user)) {
+        if ($user->hasRole('Administrator:in') && $location->city->administeredBy($user)) {
             return true;
         }
         if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {
@@ -146,7 +146,7 @@ class LocationPolicy
      */
     public function forceDelete(User $user, Location $location)
     {
-        if ($user->hasRole('Administrator*in') && $location->city->administeredBy($user)) {
+        if ($user->hasRole('Administrator:in') && $location->city->administeredBy($user)) {
             return true;
         }
         if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {

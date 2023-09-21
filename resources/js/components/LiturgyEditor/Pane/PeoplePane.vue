@@ -70,7 +70,7 @@ export default {
         var options = [];
         var optGroups = [];
 
-        const basicMinistries = {pastors: 'Pfarrer*in', organists: 'Organist*in', sacristans: 'Mesner*in'};
+        const basicMinistries = {pastors: 'Pfarrer:in', organists: 'Organist:in', sacristans: 'Mesner:in'};
         for (var ministryIndex in basicMinistries) {
             optGroups.push({groupName: basicMinistries[ministryIndex]});
             options.push({

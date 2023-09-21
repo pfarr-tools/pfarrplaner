@@ -132,7 +132,7 @@ class AbsenceController extends Controller
             $user->canEdit = false;
             if (($user->id == Auth::user()->id)
                 || (Auth::user()->hasPermissionTo('fremden-urlaub-bearbeiten')
-                    && (!$user->hasRole('Pfarrer*in'))
+                    && (!$user->hasRole('Pfarrer:in'))
                     && (count(Auth::user()->writableCities->intersect($user->homeCities))))
             ) {
                 $user->canEdit = true;

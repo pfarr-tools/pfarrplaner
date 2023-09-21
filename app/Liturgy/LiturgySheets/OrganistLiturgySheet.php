@@ -35,7 +35,7 @@ use App\Service;
 
 class OrganistLiturgySheet extends AbstractLiturgySheet
 {
-    protected $title = 'Ablaufplan für Organist*innen (DIN A4)';
+    protected $title = 'Ablaufplan für Organist:innen (DIN A4)';
     protected $icon = 'fa fa-file-pdf';
 
     protected function getData(Service $service) {

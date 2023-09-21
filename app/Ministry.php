@@ -72,13 +72,13 @@ class Ministry
     public static function title($title): string
     {
         if ($title == 'P') {
-            return 'Pfarrer*in';
+            return 'Pfarrer:in';
         }
         if ($title == 'O') {
-            return 'Organist*in';
+            return 'Organist:in';
         }
         if ($title == 'M') {
-            return 'Mesner*in';
+            return 'Mesner:in';
         }
         if ($title == 'A') {
             return 'Weitere Beteiligte';
@@ -91,7 +91,7 @@ class Ministry
      */
     public static function POMA(): array
     {
-        return ['P' => 'Pfarrer*in', 'O' => 'Organist*in', 'M' => 'Mesner*in', 'A' => 'Weitere Beteiligte'];
+        return ['P' => 'Pfarrer:in', 'O' => 'Organist:in', 'M' => 'Mesner:in', 'A' => 'Weitere Beteiligte'];
     }
 
     /**

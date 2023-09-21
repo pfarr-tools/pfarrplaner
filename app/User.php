@@ -182,7 +182,7 @@ class User extends Authenticatable
      */
     public function getIsAdminAttribute()
     {
-        return $this->hasRole('Administrator*in') || $this->hasRole('Super-Administrator*in');
+        return $this->hasRole('Administrator:in') || $this->hasRole('Super-Administrator:in');
     }
 
     /**
@@ -723,7 +723,7 @@ class User extends Authenticatable
         $userQuery = User::where('manage_absences', 1)
             ->where('id', $this->id);
 
-        if ($this->hasRole('Pfarrer*in') || $this->hasPermissionTo('fremden-urlaub-bearbeiten')) {
+        if ($this->hasRole('Pfarrer:in') || $this->hasPermissionTo('fremden-urlaub-bearbeiten')) {
             $newIds = User::whereHas(
                 'homeCities',
                 function ($query) {
@@ -734,13 +734,13 @@ class User extends Authenticatable
             $ids = array_merge($ids, $newIds);
         }
 
-        if ($this->hasRole('Pfarrer*in') || $this->hasRole('Diakon*in')) {
+        if ($this->hasRole('Pfarrer:in') || $this->hasRole('Diakon:in')) {
             $newIds = User::where(
                 function ($query2) {
                     $query2->whereHas(
                         'roles',
                         function ($query) {
-                            $query->whereIn('name', ['Pfarrer*in', 'Diakon*in']);
+                            $query->whereIn('name', ['Pfarrer:in', 'Diakon:in']);
                         }
                     );
                     $query2->whereHas(
@@ -1055,7 +1055,7 @@ class User extends Authenticatable
      */
     public function administeredBy($user)
     {
-        if ($user->hasRole('Super-Administrator*in')) {
+        if ($user->hasRole('Super-Administrator:in')) {
             return true;
         }
         foreach ($this->homeCities as $city) {
