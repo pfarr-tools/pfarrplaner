@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.26.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.25.0...v2023.26.0) (2023-09-21)
+
+
+### Features
+
+* Setup zum Erstellen von Rollen usw. ([77288ec](https://codeberg.org/pfarrplaner/pfarrplaner/commit/77288ecddd9bc7f5eef3dc56c3b5d8dec4af8df7))
+
 ## [2023.25.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.24.0...v2023.25.0) (2023-09-11)
 
 
