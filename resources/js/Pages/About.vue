@@ -3,9 +3,9 @@
   -
   - @package Pfarrplaner
   - @author Christoph Fischer <chris@toph.de>
-  - @copyright (c) Christoph Fischer, https://christoph-fischer.de
+  - @copyright (c) Christoph Fischer, https://christoph-fischer.org
   - @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
-  - @link https://codeberg.org/pfarrplaner/pfarrplaner
+  - @link https://codeberg.org/pfarr.tools/pfarrplaner
   - @version git: $Id$
   -
   - Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
@@ -36,9 +36,9 @@
         </div>
         <p v-if="officialServer">Gehostet auf einem Server des <a href="https://wwww.kirchenbezirk-balingen.de/" target="_blank">Evangelischen
             Kirchenbezirks Balingen</a>.</p>
-        <p>Der Quellcode von Pfarrplaner ist als Open Source auf <a href="https://codeberg.org/pfarrplaner/pfarrplaner"
+        <p>Der Quellcode von Pfarrplaner ist als Open Source auf <a href="https://codeberg.org/pfarr.tools/pfarrplaner"
                                                                     target="_blank">Codeberg</a> verfügbar und steht unter
-            der <a href="https://codeberg.org/pfarrplaner/pfarrplaner/blob/master/LICENSE" target="_blank">GNU General
+            der <a href="https://codeberg.org/pfarr.tools/pfarrplaner/blob/master/LICENSE" target="_blank">GNU General
                 Public License (GPL) 3.0</a> oder höher.
         </p>
         <hr class="my-3"/>

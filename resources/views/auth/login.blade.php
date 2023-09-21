@@ -474,7 +474,7 @@
                     <p>
                         Damit auch andere von der geleisteten Arbeit profitieren können, ist der Pfarrplaner Open Source.
                         Der Quellcode des kompletten Projekts
-                        <a href="https://codeberg.org/pfarrplaner/pfarrplaner" target="_blank">steht auf GitHub zur Verfügung.</a>
+                        <a href="https://codeberg.org/pfarr.tools/pfarrplaner" target="_blank">steht auf GitHub zur Verfügung.</a>
                     </p>
                     <ul>
                         <li><i class="bi bi-check"></i> Ständige Verbesserungen</li>

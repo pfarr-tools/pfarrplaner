@@ -1,3 +1,32 @@
+/*!
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*--------------------------------------------------------------
 # Sections General
 --------------------------------------------------------------*/
@@ -33,7 +62,7 @@ section {
     background: $primary;
     margin: 4px 10px;
   }
-  
+
   p {
     margin: 0;
     margin: 0;
@@ -120,7 +149,7 @@ section {
       margin-bottom: 15px;
     }
   }
-  
+
 
   .icon-box {
     margin-top: 40px;
@@ -135,23 +164,23 @@ section {
       border: 2px solid lighten($primary, 26);
       border-radius: 50px;
       transition: 0.5s;
-  
+
       i {
         color: $primary;
         font-size: 32px;
       }
-  
+
     }
-  
+
     &:hover .icon {
       background: $primary;
       border-color: $primary;
       i {
         color: $white;
       }
-  
+
     }
-  
+
     .title {
       margin-left: 85px;
       font-weight: 700;
@@ -164,9 +193,9 @@ section {
           color: $primary;
         }
       }
-  
+
     }
-  
+
     .description {
       margin-left: 85px;
       line-height: 24px;
@@ -290,7 +319,7 @@ section {
           color: darken($secondary, 40);
         }
       }
-  
+
     }
     &:hover {
       background: lighten($secondary, 34);
@@ -361,7 +390,7 @@ section {
       font-size: 26px;
       color: darken($secondary, 36);
     }
-  
+
     ul {
       list-style: none;
       padding: 0;
@@ -482,14 +511,14 @@ section {
   .swiper-pagination {
     margin-top: 20px;
     position: relative;
-  
+
     .swiper-pagination-bullet {
       width: 12px;
       height: 12px;
       opacity: 1;
       background-color: rgba($white, .4);
     }
-  
+
     .swiper-pagination-bullet-active {
       background-color: $primary;
     }
@@ -503,7 +532,7 @@ section {
   @media (min-width: 992px) {
     .testimonial-item p {
       width: 80%;
-    } 
+    }
   }
 
 }
@@ -523,11 +552,11 @@ section {
       border-radius: 4px;
       overflow: hidden;
     }
-    
+
     img {
       transition: all ease-in-out 0.4s;
     }
-  
+
     &:hover {
       img {
         transform: scale(1.1);
@@ -792,7 +821,7 @@ section {
 # Contact
 --------------------------------------------------------------*/
 .contact {
-  
+
   .info {
     width: 100%;
     background: $white;
@@ -846,7 +875,7 @@ section {
     .form-group {
       padding-bottom: 8px;
     }
-    
+
     .error-message {
       display: none;
       color: #fff;
@@ -858,7 +887,7 @@ section {
         margin-top: 25px;
       }
     }
-    
+
     .sent-message {
       display: none;
       color: #fff;
@@ -867,13 +896,13 @@ section {
       padding: 15px;
       font-weight: 600;
     }
-  
+
     .loading {
       display: none;
       background: #fff;
       text-align: center;
       padding: 15px;
-  
+
       &:before {
         content: "";
         display: inline-block;
@@ -885,7 +914,7 @@ section {
         border-top-color: #eee;
         animation: animate-loading 1s linear infinite;
       }
-  
+
     }
 
     input, textarea {
@@ -913,7 +942,7 @@ section {
         background: lighten($primary, 10%);
       }
     }
-  
+
   }
 
   @keyframes animate-loading {
