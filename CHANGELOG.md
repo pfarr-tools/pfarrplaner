@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.26.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.26.0...v2023.26.1) (2023-09-25)
+
+
+### Bug Fixes
+
+* Neuer Personeneintrag wird keinem Ort zugeordnet ([1e457d8](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1e457d88e7d1a46af35fcff9e954a4ac28258991)), closes [#371](https://codeberg.org/pfarr.tools/pfarrplaner/issues/371)
+* Verschiedene kleine Bugs in neuer Serverinstallation ([b585fa6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b585fa6d46cba8660cbedae7a75848588b9b2200))
+
 ## [2023.26.0](https://codeberg.org/pfarrplaner/pfarrplaner/compare/v2023.25.0...v2023.26.0) (2023-09-21)
 
 
