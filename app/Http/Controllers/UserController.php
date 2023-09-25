@@ -522,7 +522,7 @@ class UserController extends Controller
      * @param User|null $user
      * @return array
      */
-    protected function validateRequest(Request $request, $user = null)
+    protected function validateRequest(Request $request, $user = null, $withCity = false)
     {
         $rules = [
             'name' => 'required|string|max:255',
@@ -546,6 +546,10 @@ class UserController extends Controller
             'show_vacations_with_services' => 'nullable|bool',
             'needs_replacement' => 'nullable|bool',
         ];
+
+        if ($withCity) {
+            $rules['city_id'] = 'int|exists:cities,id';
+        }
 
         // special treatment if the submitter is a local admin
         if (Auth::user()->isLocalAdmin) {
@@ -578,8 +582,14 @@ class UserController extends Controller
 
     public function add(Request $request)
     {
-        $data = $this->validateRequest($request);
+        $data = $this->validateRequest($request, null, true);
         $user = User::create($data);
+
+        // activate the new user for a city
+        if (isset($data['city_id'])) {
+            $user->cityScopes()->attach($data['city_id']);
+        }
+
         return response()->json($user);
     }
 

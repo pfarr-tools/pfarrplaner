@@ -38,15 +38,18 @@
                     usw.)</small>
             </div>
         </form-group>
-        <modal title="Neue Person anlegen" v-if="showNewPersonModal" @close="closeNewPersonModal"
-               @cancel="cancelNewPersonModal"
+        <modal  v-if="showNewPersonModal" @close="closeNewPersonModal"
+                :title="(ignoreSearchResults || searchResults.length == 0) ? 'Neue Person anlegen' : 'Person übernehmen'"
+                @keydown.esc="cancelNewPersonModal"
+               @cancel="cancelNewPersonModal" :allow-close="ignoreSearchResults || (searchResults.length == 0)"
                @shown="newPersonModalShown" close-button-label="Person speichern">
             <div v-if="searchingForPerson" class="searching-for-person text-muted">
                 <div>Bitte warte, Person wird in anderen Kirchengemeinden gesucht...</div>
                 <span class="mdi mdi-spin mdi-loading"></span>
             </div>
             <div v-else>
-                <div v-if="searchResults.length" class="search-results">
+                <div v-if="(searchResults.length > 0) && (!ignoreSearchResults)" class="search-results">
+                    <p>Folgende Person<span v-if="searchResults.length > 1">en</span> wurde<span v-if="searchResults.length > 1">n</span> bereits im System gefunden</p>
                     <table class="table">
                         <tbody>
                         <tr v-for="(person,personIndex in searchResults">
@@ -56,19 +59,24 @@
                             <td class="text-left">
                                 <div class="text-bold">{{ displayName(person, true) }}</div>
                                 <div>
-                                    <div class="badge badge-light" v-for="city in person.city_scopes">{{ city.name }}</div>
+                                    <span class="text-sm">in Kirchengemeinde</span><span v-if="person.city_scopes.length > 1">n</span>: <div class="badge badge-light" v-for="city in person.city_scopes">{{ city.name }}</div>
                                 </div>
                             </td>
                             <td class="text-right">
-                                <nav-button type="primary btn-sm"
-                                            @click="extendPersonScopeAndCloseModal(person)">Übernehmen</nav-button>
+                                <nav-button type="primary"
+                                            @click="extendPersonScopeAndCloseModal(person)">Diese Person übernehmen</nav-button>
                             </td>
                         </tr>
                         </tbody>
                     </table>
+                    <hr />
+                    <p>
+                        <span v-if="searchResults.length > 1">Die gesuchte Person ist nicht dabei?</span><span v-else>Das ist nicht die gesuchte Person?</span> Dann kannst du hier eine neue Person anlegen:</p>
+                    <div class="text-right">
+                        <button class="btn btn-warning btn-sm" @click.prevent.stop="setIgnoreSearchResults">Als neue Person anlegen</button>
+                    </div>
                 </div>
-                <hr />
-                <h2> Oder neue Person anlegen:</h2>
+                <div v-if="ignoreSearchResults || (searchResults.length == 0)">
                 <form-input name="name" label="Name" v-model="newPerson.name" ref="newPersonName" id="newPersonName"
                             :autofocus="true"/>
                 <hr/>
@@ -86,7 +94,11 @@
                 </div>
                 <form-input name="email" label="E-Mailadresse" v-model="newPerson.email" type="email"
                             help="(falls bekannt)"/>
+                </div>
             </div>
+            <template v-slot:additional-buttons>
+                <button class="btn btn-light" v-if="ignoreSearchResults" @click.prevent.stop="ignoreSearchResults = false">&lt; Zurück zu den Suchergebnissen</button>
+            </template>
         </modal>
     </div>
 </template>
@@ -177,6 +189,7 @@ export default {
 
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
+            component: this,
             createCallback: null,
             myId: this.id || '',
             myValue: myValue,
@@ -188,6 +201,7 @@ export default {
             showNewPersonModal: false,
             searchingForPerson: false,
             searchResults: [],
+            ignoreSearchResults: false,
             newPerson: {
                 name: '',
                 first_name: '',
@@ -265,7 +279,7 @@ export default {
         closeNewPersonModal() {
             var component = this;
             this.showNewPersonModal = false;
-            axios.post(route('users.add'), this.newPerson)
+            axios.post(route('users.add'), {...this.newPerson, city_id: this.city.id })
                 .then(response => {
                     return response.data;
                 })
@@ -306,9 +320,6 @@ export default {
             component.personCreated = true;
         },
         newPersonModalShown(ref) {
-            var el = this.$refs['newPersonName'].$el.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;
-            el.focus();
-            el.select();
         },
         displayName(person, showTitle = false) {
             let n = showTitle ? (person.title ? person.title+' ' : '') : '';
@@ -327,6 +338,7 @@ export default {
                 email: '',
             };
             this.createCallback = callback;
+            this.ignoreSearchResults = false;
             this.searchingForPerson = true;
             this.showNewPersonModal = true;
             this.searchResults = [];
@@ -338,6 +350,12 @@ export default {
                 this.searchResults = response.data;
                 this.searchingForPerson = false;
             });
+            return fa
+        },
+        setIgnoreSearchResults() {
+            if (confirm('Willst du wirklich die Suchergebnisse ignorieren und stattdessen eine neue Person anlegen? Das solltest du nur tun, wenn du sicher bist, dass die von dir gemeinte Person nicht in der Liste der Suchergebnisse vorhanden ist.')) {
+                this.ignoreSearchResults = true;
+            }
         }
     }
 

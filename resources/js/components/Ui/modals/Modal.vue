@@ -44,7 +44,8 @@
                             <slot />
                         </div>
                         <div class="modal-footer">
-                            <button type="button" :class="'btn btn-'+submitButtonType"
+                            <slot name="additional-buttons" />
+                            <button  v-if="allowClose" type="button" :class="'btn btn-'+submitButtonType"
                                     @click.prevent="closeModal">{{ closeButtonLabel }}
                             </button>
                             <button v-if="allowCancel" type="button" :class="'btn btn-'+cancelButtonType" @click.prevent="cancelModal('button')">
@@ -64,6 +65,10 @@ export default {
     props: {
         title: String,
         allowCancel: {
+            type: Boolean,
+            default: true,
+        },
+        allowClose: {
             type: Boolean,
             default: true,
         },
