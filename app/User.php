@@ -182,7 +182,7 @@ class User extends Authenticatable
      */
     public function getIsAdminAttribute()
     {
-        return $this->hasRole('Administrator:in') || $this->hasRole('Super-Administrator:in');
+        return $this->hasRole(RoleService::ROLE_ADMIN) || $this->hasRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
     /**

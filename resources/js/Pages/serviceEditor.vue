@@ -103,7 +103,7 @@
                                   :tags="tags" :service-groups="serviceGroups"/>
                     </tab>
                     <tab id="people" :active-tab="activeTab">
-                        <people-tab v-if="(lists.users.length > 0) && (Object.keys(lists.ministries).length > 0)"
+                        <people-tab v-if="(peopleLoaded) && (ministriesLoaded)"
                                     :service="service" :teams="lists.teams"
                                     :people="lists.users" :ministries="lists.ministries"
                                     @count="updatePeopleCounter"/>
@@ -202,6 +202,7 @@ export default {
             counted: 0,
             peopleCount: 0,
             peopleLoaded: false,
+            ministriesLoaded: false,
             lists: {
                 users: [],
                 teams: [],
@@ -215,11 +216,13 @@ export default {
         })).then(response => {
             this.lists.users = response.data.users;
             this.lists.teams = response.data.teams;
+            this.peopleLoaded = true;
         });
         axios.get(route('api.ministries.list', {
             api_token: this.apiToken,
         })).then(response => {
             this.lists.ministries = response.data;
+            this.ministriesLoaded = true;
         });
         this.updatePeopleCounter();
     },

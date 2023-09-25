@@ -59,17 +59,12 @@ class InstallAdmin extends Command
      */
     public function handle()
     {
-        if (Role::query()->where('name', 'Super-Administrator:in')->count()) {
-            $this->line('<error>ERROR</error> Super admin role already exists.');
-            return Command::FAILURE;
-        }
-
         if (User::where('name', 'Admin')->count()) {
             $this->line('<error>ERROR</error> Admin user already exists.');
             return Command::FAILURE;
         }
 
-        $role = Role::create(['name' => 'Super-Administrator:in']);
+        $role = Role::firstOrCreate(['name' => 'Super-Administrator:in']);
         $domain = parse_url(url('/'), PHP_URL_HOST);
 
         $password = PasswordService::randomPassword();

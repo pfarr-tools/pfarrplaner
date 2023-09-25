@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class InstallSetup extends Command
 {
@@ -102,6 +103,10 @@ class InstallSetup extends Command
                 'gd-pfarrer-bearbeiten',
                 'gd-taufe-bearbeiten',
                 'ort-bearbeiten',
+                'benutzer-bearbeiten',
+                'rollen-bearbeiten',
+                'liederbuecher-bearbeiten',
+                'lieder-bearbeiten',
             ],
             'Gemeindesekretär:in' => [
                 'gd-abendmahl-bearbeiten',
@@ -165,6 +170,7 @@ class InstallSetup extends Command
         foreach ($roleDefinitions as $roleName => $rolePermissions) {
             $role = Role::firstOrCreate(['name' => $roleName]);
             foreach ($rolePermissions as $permissionName) {
+                $permission = Permission::firstOrCreate(['name' => $permissionName]);
                 $role->givePermissionTo($permissionName);
             }
         }
@@ -174,6 +180,7 @@ class InstallSetup extends Command
 
     public function setupAdmin()
     {
-        return Artisan::call('install:admin');
+        $output = new BufferedOutput();
+        return Artisan::call('install:admin', [], $this->getOutput());
     }
 }

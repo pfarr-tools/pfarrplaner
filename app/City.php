@@ -30,6 +30,7 @@
 
 namespace App;
 
+use App\Services\RoleService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -115,7 +116,7 @@ class City extends Model
      */
     public function administeredBy(User $user)
     {
-        if ($user->hasRole('Super-Administrator:in')) {
+        if ($user->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
             return true;
         }
         $city = $user->cities->where('id', $this->id)->first();

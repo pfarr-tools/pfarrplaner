@@ -28,23 +28,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('email')->nullable()->default('')->change();
+            $table->string('password')->nullable()->change();
+        });
+    }
+
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('email')->nullable(false)->change();
+            $table->string('password')->nullable(false)->change();
+        });
+    }
 
 
 
-use App\Http\Controllers\LiturgicalTextsController;
-
-Route::get('/liturgie/texte', [LiturgicalTextsController::class, 'index'])->name('liturgy.text.index');
-Route::get('/liturgie/texte/liste', [LiturgicalTextsController::class, 'list'])->name('liturgy.text.list');
-Route::post('/liturgie/texte', [LiturgicalTextsController::class, 'store'])->name('liturgy.text.store');
-Route::post('/liturgie/texte/import', [LiturgicalTextsController::class, 'import'])->name('liturgy.text.import');
-Route::patch('/liturgie/texte/{text}', [LiturgicalTextsController::class, 'update'])->name('liturgy.text.update');
+};

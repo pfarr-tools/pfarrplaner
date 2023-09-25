@@ -31,6 +31,7 @@
 namespace App\Policies;
 
 use App\City;
+use App\Services\RoleService;
 use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -48,7 +49,7 @@ class CityPolicy
      */
     public function index(User $user)
     {
-        if ($user->hasRole('Administrator:in')) {
+        if ($user->isAdmin) {
             return true;
         }
         if ($user->can('ort-bearbeiten')) return true;
@@ -92,7 +93,7 @@ class CityPolicy
             )) {
             return true;
         }
-        if ($user->hasRole('Administrator:in') && $user->adminCities->contains($city)) {
+        if ($user->isAdmin && $user->adminCities->contains($city)) {
             return true;
         }
         return false;
@@ -107,7 +108,7 @@ class CityPolicy
      */
     public function delete(User $user, City $city)
     {
-        return false;
+        return $user->hasRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
     /**
