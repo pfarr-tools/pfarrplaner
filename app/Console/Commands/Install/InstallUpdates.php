@@ -105,8 +105,8 @@ class InstallUpdates extends Command
 
         // npx browserslist@latest --update-db
         if (isset($actions['browserslist'])) {
-            $this->getOutput()->section('Update browser lsit');
-            passthru('npx browserslist@latest --update-db');
+            $this->getOutput()->section('Update browser list');
+            passthru('npx update-browserslist-db@latest');
             $this->line('');
         }
 
