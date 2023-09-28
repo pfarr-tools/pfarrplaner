@@ -39,27 +39,30 @@
                 </button>
                 <div class="dropdown-menu p-1">
                     <form-date-picker :config="myDatePickerSettings" v-model="myQuickPickerDate"
-                                      @input="quickPickDate($event)" @dp-update="updateViewDate" />
-                    <hr />
+                                      @input="quickPickDate($event)" @dp-update="updateViewDate"/>
+                    <hr/>
                     <div class="px-2 mb-2 text-sm">
-                        <nav-button type="secondary btn-sm" icon="mdi mdi-calendar" force-icon :key="myQuickPickViewDate"
+                        <nav-button type="secondary btn-sm" icon="mdi mdi-calendar" force-icon
+                                    :key="myQuickPickViewDate"
                                     :title="quickPickerMonthText+' im Kalender öffnen'"
-                                    @click="openCalendar">{{ quickPickerMonthText }} öffnen</nav-button>
+                                    @click="openCalendar">{{ quickPickerMonthText }} öffnen
+                        </nav-button>
                     </div>
                     <div v-if="myQuickPickerLoading" class="text-center text-muted" style="font-size: 4em;">
                         <span class="mdi mdi-spin mdi-loading"></span>
                     </div>
-                    <div v-if="(!myQuickPickerLoading) && (myQuickPickerServices.length > 0)" :key="myQuickPickerChanges" class="px-2">
+                    <div v-if="(!myQuickPickerLoading) && (myQuickPickerServices.length > 0)"
+                         :key="myQuickPickerChanges" class="px-2">
                         <div v-for="service in myQuickPickerServices" class="mb-2" style="font-size: .8em;">
                             <div class="text-bold">{{ service.timeText }} {{ service.titleText }}</div>
                             <div class="text-sm text-muted">{{ service.locationText }}</div>
                             <div class="text-right">
                                 <nav-button type="primary btn-sm" icon="mdi mdi-pencil" force-icon
-                                            title="Gottesdienst bearbeiten" @click="editService(service)" />
+                                            title="Gottesdienst bearbeiten" @click="editService(service)"/>
                                 <nav-button type="light  btn-sm" icon="mdi mdi-view-list" force-icon
-                                            title="Liturgie bearbeiten" @click="editLiturgy(service)" />
+                                            title="Liturgie bearbeiten" @click="editLiturgy(service)"/>
                                 <nav-button type="light btn-sm" icon="mdi mdi-microphone" force-icon
-                                            title="Predigt bearbeiten" @click="editSermon(service)" />
+                                            title="Predigt bearbeiten" @click="editSermon(service)"/>
                             </div>
                         </div>
                     </div>
@@ -70,7 +73,11 @@
                 </div>
             </div>
 
-
+            <button v-if="cities.length > 0"
+                    class="btn btn-light" href="#" @click.prevent.stop="createServiceWizard.show = true">
+                <span class="mdi mdi-church"></span>
+                <span class="d-none d-md-inline">Gottesdienst anlegen...</span>
+            </button>
 
             <inertia-link v-if="config.wizardButtons == '1'" class="btn btn-light" :href="route('baptisms.create')">
                 <span class="mdi mdi-water"></span>
@@ -100,7 +107,7 @@
         <template slot="tab-headers">
             <tab-headers>
                 <li v-for="tab in myTabs"
-                    :id="tab.key+'Tab'" class="nav-item"  @click.prevent.stop="loadTab(tab)">
+                    :id="tab.key+'Tab'" class="nav-item" @click.prevent.stop="loadTab(tab)">
                     <a class="nav-link" :class="{active: myActiveTab == tab.key}" href="#" role="tab"
                        data-toggle="tab" @click.prevent.stop="loadTab(tab)">
                         {{ tab.title }}
@@ -126,6 +133,15 @@
                     bearbeiten</a>
             </div>
         </div>
+        <modal v-if="createServiceWizard.show"
+               min-height="80vh" max-height="80vh"
+               @close="createServiceFromWizard"
+               @cancel="createServiceWizard.show = false"
+               title="Gottesdienst anlegen" close-button-label="Anlegen">
+            <form-selectize label="Für Kirchengemeinde" :options="cities" v-model="createServiceWizard.city"/>
+            <form-date-picker name="date" label="Datum und Uhrzeit" v-model="createServiceWizard.date"
+                              :config="createServiceWizard.pickerConfig" iso-date/>
+        </modal>
         <tabs>
             <tab v-for="tab in myTabs" :id="tab.key" :key="tab.key" :active-tab="myActiveTab">
                 <component v-if="tab.loaded" :is="tabComponent(tab)" v-bind="tab"
@@ -159,10 +175,14 @@ import StreamingTab from "../components/HomeScreen/StreamingTab";
 import WeddingsTab from "../components/HomeScreen/WeddingsTab";
 import FormDatePicker from "../components/Ui/forms/FormDatePicker.vue";
 import NavButton from "../components/Ui/buttons/NavButton.vue";
+import Modal from "../components/Ui/modals/Modal.vue";
+import FormSelectize from "../components/Ui/forms/FormSelectize.vue";
 
 export default {
     name: "HomeScreen",
     components: {
+        FormSelectize,
+        Modal,
         NavButton,
         FormDatePicker,
         TabHeader,
@@ -183,7 +203,7 @@ export default {
         StreamingTab,
         WeddingsTab,
     },
-    props: ['user', 'settings', 'activeTab', 'replacements', 'tab', 'tabTitles'],
+    props: ['user', 'settings', 'activeTab', 'replacements', 'tab', 'tabTitles', 'cities'],
     created() {
         var index = 0;
         this.myTabsConfig.tabs.forEach(function (tab, tabIndex) {
@@ -222,6 +242,16 @@ export default {
             myQuickPickerServices: [],
             myQuickPickerChanges: 0,
             myQuickPickerLoading: true,
+            createServiceWizard: {
+                show: false,
+                city: this.cities.length ? this.cities[0].id : null,
+                date: null,
+                pickerConfig: {
+                    locale: 'de',
+                    format: 'DD.MM.YYYY',
+                    showClear: true,
+                },
+            },
         }
     },
     async mounted() {
@@ -296,6 +326,15 @@ export default {
         editSermon(service) {
             this.$inertia.get(route('service.sermon.editor', {service: service.slug}));
         },
+        createServiceFromWizard() {
+            if (!this.createServiceWizard.city) return;
+            if (!this.createServiceWizard.date) return;
+            this.createServiceWizard.show = false;
+            this.$inertia.get(route('service.create', {
+                city: this.createServiceWizard.city,
+                date: this.createServiceWizard.date.substring(0, 10),
+            }));
+        }
     }
 }
 </script>
