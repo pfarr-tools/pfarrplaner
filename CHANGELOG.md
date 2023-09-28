@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.27.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.26.1...v2023.27.0) (2023-09-28)
+
+
+### Features
+
+* Assistent für neuen Gottesdienst ([b51e4ae](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b51e4ae3be22778f447767e5d1135b6ffed5b574)), closes [#375](https://codeberg.org/pfarr.tools/pfarrplaner/issues/375)
+
 ### [2023.26.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.26.0...v2023.26.1) (2023-09-25)
 
 
