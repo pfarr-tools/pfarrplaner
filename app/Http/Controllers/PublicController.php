@@ -338,4 +338,44 @@ class PublicController extends Controller
         Mail::to('christoph.fischer@elkw.de')->send(new ContactFormMessage($data));
         return response('OK');
     }
+
+    public function whatIs()
+    {
+        $demo = (app()->environment() == 'demo');
+        $blog = null;
+        if ($url = (config('blog.blog_feed', false))) {
+            $blog = simplexml_load_file($url);
+
+            if (count($blog->channel->item) > 3) {
+                $columns = 3;
+            }
+        }
+
+        try {
+            $ytFeed = (array)simplexml_load_file(config('support.youtube_channel_feed'));
+            $videos = [];
+            foreach ($ytFeed['entry'] as $video) {
+                $videos[(string)$video->title] = str_replace(
+                    'https://www.youtube.com/watch?v=',
+                    'https://www.youtube.com/embed/',
+                    (string)$video->link->attributes()->href
+                );
+            }
+        } catch (\Exception $exception) {
+            $videos = [];
+        }
+
+
+        $count = [
+            'cities' => City::count(),
+            'users' => User::where('password', '!=', '')->count(),
+            'services' => Service::count(),
+        ];
+
+        $packageConfig = json_decode(file_get_contents(base_path('package.json')), true);
+        $version = $packageConfig['version'];
+
+        $recaptchaKey = config('recaptcha.key');
+        return view('whatis', compact('blog', 'videos', 'count', 'version', 'demo', 'recaptchaKey'));
+    }
 }
