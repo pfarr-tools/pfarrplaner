@@ -227,7 +227,8 @@ class UserController extends Controller
             }
         }
         $roles = Role::all()->sortBy('name');
-        $parishes = Parish::whereIn('city_id', Auth::user()->cities->pluck('id'))->get();
+
+        $parishes = Parish::whereIn('city_id', Auth::user()->adminCities->pluck('id'))->get();
         $homescreen = $user->getSetting('homeScreen', 'route:calendar');
         $users = User::all();
         $subscriptions = Subscription::where('user_id', $user->id)
