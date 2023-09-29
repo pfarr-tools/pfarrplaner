@@ -73,11 +73,7 @@
                 </div>
             </div>
 
-            <button v-if="cities.length > 0"
-                    class="btn btn-light" href="#" @click.prevent.stop="createServiceWizard.show = true">
-                <span class="mdi mdi-church"></span>
-                <span class="d-none d-md-inline">Gottesdienst anlegen...</span>
-            </button>
+            <create-service-wizard-button :cities="cities" />
 
             <inertia-link v-if="config.wizardButtons == '1'" class="btn btn-light" :href="route('baptisms.create')">
                 <span class="mdi mdi-water"></span>
@@ -133,15 +129,6 @@
                     bearbeiten</a>
             </div>
         </div>
-        <modal v-if="createServiceWizard.show"
-               min-height="80vh" max-height="80vh"
-               @close="createServiceFromWizard"
-               @cancel="createServiceWizard.show = false"
-               title="Gottesdienst anlegen" close-button-label="Anlegen">
-            <form-selectize label="Für Kirchengemeinde" :options="cities" v-model="createServiceWizard.city"/>
-            <form-date-picker name="date" label="Datum und Uhrzeit" v-model="createServiceWizard.date"
-                              :config="createServiceWizard.pickerConfig" iso-date/>
-        </modal>
         <tabs>
             <tab v-for="tab in myTabs" :id="tab.key" :key="tab.key" :active-tab="myActiveTab">
                 <component v-if="tab.loaded" :is="tabComponent(tab)" v-bind="tab"
@@ -175,14 +162,12 @@ import StreamingTab from "../components/HomeScreen/StreamingTab";
 import WeddingsTab from "../components/HomeScreen/WeddingsTab";
 import FormDatePicker from "../components/Ui/forms/FormDatePicker.vue";
 import NavButton from "../components/Ui/buttons/NavButton.vue";
-import Modal from "../components/Ui/modals/Modal.vue";
-import FormSelectize from "../components/Ui/forms/FormSelectize.vue";
+import CreateServiceWizardButton from "../components/Ui/wizards/CreateServiceWizardButton.vue";
 
 export default {
     name: "HomeScreen",
     components: {
-        FormSelectize,
-        Modal,
+        CreateServiceWizardButton,
         NavButton,
         FormDatePicker,
         TabHeader,
@@ -242,16 +227,6 @@ export default {
             myQuickPickerServices: [],
             myQuickPickerChanges: 0,
             myQuickPickerLoading: true,
-            createServiceWizard: {
-                show: false,
-                city: this.cities.length ? this.cities[0].id : null,
-                date: null,
-                pickerConfig: {
-                    locale: 'de',
-                    format: 'DD.MM.YYYY',
-                    showClear: true,
-                },
-            },
         }
     },
     async mounted() {
@@ -326,15 +301,6 @@ export default {
         editSermon(service) {
             this.$inertia.get(route('service.sermon.editor', {service: service.slug}));
         },
-        createServiceFromWizard() {
-            if (!this.createServiceWizard.city) return;
-            if (!this.createServiceWizard.date) return;
-            this.createServiceWizard.show = false;
-            this.$inertia.get(route('service.create', {
-                city: this.createServiceWizard.city,
-                date: this.createServiceWizard.date.substring(0, 10),
-            }));
-        }
     }
 }
 </script>

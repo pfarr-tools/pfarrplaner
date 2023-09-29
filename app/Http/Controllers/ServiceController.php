@@ -92,10 +92,10 @@ class ServiceController extends Controller
         $service->updateRelatedCitiesFromRequest($request);
     }
 
-    public function create(City $city, $date)
+    public function create(City $city, $date = null)
     {
         $location = $city->locations->first();
-        $date = Carbon::parse($date);
+        $date = $date ? Carbon::parse($date) : Carbon::parse('next Sunday');
         if ($location && $location->default_time) {
             $date = Carbon::parse($date->format('Y-m-d') . ' ' . $location->default_time, 'Europe/Berlin');
         } else {
