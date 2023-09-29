@@ -231,7 +231,7 @@ class WeddingController extends Controller
         if (is_numeric($data['location'])) {
             $request->validate(['location' => 'exists:locations,id']);
         }
-        $data['date'] = Carbon::createFromFormat('d.m.Y H:i', $data['date']);
+        $data['date'] = Carbon::createFromFormat('d.m.Y H:i', $data['date'], 'Europe/Berlin')->setTimezone('UTC');
 
         $city = City::find($data['city']);
 
