@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.28.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.27.0...v2023.28.0) (2023-09-29)
+
+
+### Features
+
+* Besserer Workflow für den Gottesdienstassistenten auf dem Startbildschirm ([0b5a901](https://codeberg.org/pfarr.tools/pfarrplaner/commit/0b5a901cb6ac46300f5595ca80db9710e5311a76))
+
+
+### Bug Fixes
+
+* Fehler beim Anlegen von Pfarrämtern ([8a917cd](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8a917cd8519d6aab156b70c66e31787352d98041)), closes [#373](https://codeberg.org/pfarr.tools/pfarrplaner/issues/373)
+* Trauung wird über den Assistenten in der falschen Zeitzone angelegt ([3f215bd](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3f215bd861c24d38739459f0d3773190dbb1d960)), closes [#374](https://codeberg.org/pfarr.tools/pfarrplaner/issues/374)
+
 ## [2023.27.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.26.1...v2023.27.0) (2023-09-28)
 
 
