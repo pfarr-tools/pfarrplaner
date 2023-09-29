@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.29.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.28.0...v2023.29.0) (2023-09-29)
+
+
+### Features
+
+* Vereinfachtes Anmeldeformular ([12b9ec8](https://codeberg.org/pfarr.tools/pfarrplaner/commit/12b9ec803ea91653ee559e07aa0a72316ff8d72a))
+
+
+### Bug Fixes
+
+* Im Benutzereditor können keine Pfarrämter ausgewählt werden ([a111ef6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a111ef6147c512f97cb46f4611240bc8621570fb))
+* Installation von Updates wartet auf Benutzereingabe ([7f27b73](https://codeberg.org/pfarr.tools/pfarrplaner/commit/7f27b73b0cc57fcd972ab7b887e87b4a4c9c36ca))
+
 ## [2023.28.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.27.0...v2023.28.0) (2023-09-29)
 
 
