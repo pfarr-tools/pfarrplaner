@@ -70,12 +70,9 @@ class ParishPolicy
      * @param Parish $model
      * @return bool
      */
-    public function create(User $user, Parish $model)
+    public function create(User $user)
     {
-        if ($user->adminCities->contains($model->owningCity)) {
-            return true;
-        }
-        return $user->hasPermissionTo('pfarramt-bearbeiten');
+        return (count($user->adminCities) > 0) || $user->hasPermissionTo('pfarramt-bearbeiten');
     }
 
     /**

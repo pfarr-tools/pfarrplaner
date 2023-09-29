@@ -35,19 +35,19 @@
                         class="ml-1" type="danger" icon="mdi mdi-delete">Löschen</nav-button>
 
         </template>
-        <form-selectize :options="cities" name="city_id" v-model="parish.owningCity" label="Kirchengemeinde"/>
-        <form-input name="name" label="Name" v-model="parish.name" />
-        <form-input name="code" label="Bezeichnung in DaviP" v-model="parish.code" />
-        <form-input name="congregation_name" label="Name der Teilkirchengemeinde" v-model="parish.congregation_name"
+        <form-selectize :options="cities" name="city_id" v-model="myParish.city_id" label="Kirchengemeinde"/>
+        <form-input name="name" label="Name" v-model="myParish.name" />
+        <form-input name="code" label="Bezeichnung in DaviP" v-model="myParish.code" />
+        <form-input name="congregation_name" label="Name der Teilkirchengemeinde" v-model="myParish.congregation_name"
                     placeholder="Leer lassen, wenn keine Teilkirchengemeinde"/>
-        <form-input name="congregation_url" label="Link zur Teilkirchengemeinde" v-model="parish.congregation_url"
+        <form-input name="congregation_url" label="Link zur Teilkirchengemeinde" v-model="myParish.congregation_url"
                     placeholder="Leer lassen, wenn keine Teilkirchengemeinde"/>
-        <form-input name="address" label="Straße" v-model="parish.address" />
-        <form-input name="zip" label="Straße" v-model="parish.zip" />
-        <form-input name="city" label="Ort" v-model="parish.city" />
-        <form-input name="phone" label="Telefon" v-model="parish.phone" />
-        <form-input name="email" label="E-Mailadresse" v-model="parish.email" />
-        <form-textarea name="csv" label="CSV-formatierte Straßeneinträge aus DaviP" rows="15" v-model="parish.csv" />
+        <form-input name="address" label="Straße" v-model="myParish.address" />
+        <form-input name="zip" label="Postleitzahl" v-model="myParish.zip" />
+        <form-input name="city" label="Ort" v-model="myParish.city" />
+        <form-input name="phone" label="Telefon" v-model="myParish.phone" />
+        <form-input name="email" label="E-Mailadresse" v-model="myParish.email" />
+        <form-textarea name="csv" label="CSV-formatierte Straßeneinträge aus DaviP" rows="15" v-model="myParish.csv" />
     </admin-layout>
 </template>
 
@@ -60,9 +60,13 @@ import FormTextarea from "../../../components/Ui/forms/FormTextarea";
 export default {
     name: "ParishEditor",
     components: {FormTextarea, FormSelectize, FormInput, NavButton, SaveButton},
-    props: ['parish', 'cities'],
+    props: {
+        parish: Object,
+        cities: Array,
+    },
     data() {
         let myParish = this.parish;
+
         myParish.owningCity = myParish.city_id;
         myParish.csv = myParish.csv || '';
         return {
@@ -71,6 +75,7 @@ export default {
     },
     methods: {
         saveParish() {
+            console.log(this.myParish);
             if (this.myParish.id) {
                 this.$inertia.patch(route('parish.update', this.myParish.id), this.myParish);
             } else {

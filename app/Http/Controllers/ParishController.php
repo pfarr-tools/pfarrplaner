@@ -70,8 +70,19 @@ class ParishController extends Controller
     {
         $this->authorize('create', Parish::class);
         $cities = Auth::user()->writableCities;
-        $parish = new Parish();
-        return Inertia::render('Admin/Parish/ParishEditor', compact('parish','cities'));
+
+        if (!count($cities)) {
+            abort(403);
+        }
+
+        $parish = new Parish(
+            [
+                'city_id' => $cities[0]->id,
+                'name' => 'Pfarramt ' . (Parish::where('city_id', $cities[0]->id)->count() + 1),
+                'code' => ''
+            ]
+        );
+        return Inertia::render('Admin/Parish/ParishEditor', compact('parish', 'cities'));
     }
 
     /**
@@ -95,7 +106,7 @@ class ParishController extends Controller
     public function edit(Parish $parish)
     {
         $cities = Auth::user()->writableCities;
-        return Inertia::render('Admin/Parish/ParishEditor', compact('parish','cities'));
+        return Inertia::render('Admin/Parish/ParishEditor', compact('parish', 'cities'));
     }
 
     /**
@@ -141,10 +152,11 @@ class ParishController extends Controller
      * @param Request $request
      * @return array
      */
-    protected function validateRequest(Request $request) {
+    protected function validateRequest(Request $request)
+    {
         return $request->validate(
             [
-                'owningCity' => 'required|int|exists:cities,id',
+                'city_id' => 'required|int|exists:cities,id',
                 'name' => 'required|string',
                 'code' => 'required|string',
                 'congregation_name' => 'nullable|string',
@@ -156,6 +168,5 @@ class ParishController extends Controller
                 'email' => 'nullable|email',
             ]
         );
-
     }
 }
