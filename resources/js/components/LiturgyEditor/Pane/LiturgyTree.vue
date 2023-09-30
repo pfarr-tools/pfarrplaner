@@ -47,7 +47,7 @@
                 <div class="col-md-6 text-right">
                     <div class="dropdown" v-if="hasDownload()">
                         <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                 title="Dokumente herunterladen">
                             <span class="mdi mdi-download"></span> Herunterladen
                         </button>

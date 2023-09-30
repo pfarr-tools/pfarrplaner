@@ -1,7 +1,7 @@
 <div class="card">
     @if(isset($cardHeader))
     <div class="card-header">
-        @if(isset($collapseId))<a class="card-link" data-toggle="collapse" href="#{!! $collapseId !!}">@endif
+        @if(isset($collapseId))<a class="card-link" data-bs-toggle="collapse" href="#{!! $collapseId !!}">@endif
         {!! $cardHeader !!}
         @if(isset($collapseId))</a>@endif
     </div>

@@ -43,7 +43,7 @@
             <!-- TODO month / year dropdown -->
             <div class="btn-group" role="group">
                 <button id="btnGroupDrop1" type="button" class="btn btn-default dropdown-toggle"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {{ moment(date).locale('de-DE').format('MMMM') }}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
@@ -75,7 +75,7 @@
             </div>
             <div class="btn-group" role="group">
                 <button id="btnGroupDrop2" type="button" class="btn btn-default dropdown-toggle"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {{ moment(date).format('YYYY') }}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop2">

@@ -29,7 +29,7 @@
 
 <template>
     <button class="btn btn-light dropdown-toggle" type="button"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
             @click="toggleMenu"
             :title="menu.title">
         <span :class="menu.icon"></span> {{ menu.title }}

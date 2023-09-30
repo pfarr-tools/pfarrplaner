@@ -55,7 +55,7 @@
                         </a>
                         <div class="dropdown">
                             <button class="btn btn-light dropdown-toggle m-1" type="button" id="dropdownMenuButton"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                     title="Dokumente herunterladen">
                                 <span class="mdi mdi-download"></span>
                             </button>

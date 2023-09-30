@@ -2614,7 +2614,7 @@
             };
             var Selector$1 = {
                 DATA_TOGGLE_CARROT: '[data-toggle^="button"]',
-                DATA_TOGGLE: '[data-toggle="buttons"]',
+                DATA_TOGGLE: '[data-bs-toggle="buttons"]',
                 INPUT: 'input:not([type="hidden"])',
                 ACTIVE: '.active',
                 BUTTON: '.btn'
@@ -3388,7 +3388,7 @@
             };
             var Selector$3 = {
                 ACTIVES: '.show, .collapsing',
-                DATA_TOGGLE: '[data-toggle="collapse"]'
+                DATA_TOGGLE: '[data-bs-toggle="collapse"]'
                 /**
                  * ------------------------------------------------------------------------
                  * Class Definition
@@ -3755,7 +3755,7 @@
                 POSITION_STATIC: 'position-static'
             };
             var Selector$4 = {
-                DATA_TOGGLE: '[data-toggle="dropdown"]',
+                DATA_TOGGLE: '[data-bs-toggle="dropdown"]',
                 FORM_CHILD: '.dropdown form',
                 MENU: '.dropdown-menu',
                 NAVBAR_NAV: '.navbar-nav',
@@ -4285,7 +4285,7 @@
             var Selector$5 = {
                 DIALOG: '.modal-dialog',
                 MODAL_BODY: '.modal-body',
-                DATA_TOGGLE: '[data-toggle="modal"]',
+                DATA_TOGGLE: '[data-bs-toggle="modal"]',
                 DATA_DISMISS: '[data-dismiss="modal"]',
                 FIXED_CONTENT: '.fixed-top, .fixed-bottom, .is-fixed, .sticky-top',
                 STICKY_CONTENT: '.sticky-top'
@@ -6180,7 +6180,7 @@
                 NAV_LIST_GROUP: '.nav, .list-group',
                 ACTIVE: '.active',
                 ACTIVE_UL: '> li > .active',
-                DATA_TOGGLE: '[data-toggle="tab"], [data-toggle="pill"], [data-toggle="list"]',
+                DATA_TOGGLE: '[data-bs-toggle="tab"], [data-bs-toggle="pill"], [data-bs-toggle="list"]',
                 DROPDOWN_TOGGLE: '.dropdown-toggle',
                 DROPDOWN_ACTIVE_CHILD: '> .dropdown-menu .active'
                 /**

@@ -9,7 +9,7 @@
         @if (\App\Inputs\Inputs::all())
             <li class="nav-item dropdown">
                 <a id="navbarDropdown1" class="nav-link dropdown-toggle" href="#" role="button"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
                     <span class="fa fa-th-list"></span> Sammeleingabe <span class="caret"></span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown1">
@@ -30,7 +30,7 @@
         @canany(['benutzerliste-lokal-sehen', 'benutzer-bearbeiten', 'ort-bearbeiten', 'kirche-bearbeiten', 'rollen-bearbeiten'])
         <li class="nav-item dropdown">
             <a id="navbarDropdown2" class="nav-link dropdown-toggle" href="#" role="button"
-               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
                 <span class="fa fa-wrench"></span> Admin <span class="caret"></span>
             </a>
 
@@ -76,7 +76,7 @@
         @endcanany
         <li class="nav-item dropdown">
             <a id="navbarDropdown3" class="nav-link dropdown-toggle" href="#" role="button"
-               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
                 <span class="fa fa-user"></span> {{ Auth::user()->name }} <span class="caret"></span>
             </a>
 

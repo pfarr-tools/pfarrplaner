@@ -9,7 +9,7 @@
             @if(isset($enabled) && (!$enabled)) disabled @endif
             @if(isset($required) && ($required)) required @endif
             @if(isset($pattern)) pattern="{{ $pattern }}" @endif
-            data-toggle="datetimepicker" @if(isset($id)) data-target="#{{ $id }}_input" @else data-target="#{{ $name }}" @endif
+            data-bs-toggle="datetimepicker" @if(isset($id)) data-target="#{{ $id }}_input" @else data-target="#{{ $name }}" @endif
     />
     @if($errors->has($name))
         @foreach($errors->get($name) as $message)

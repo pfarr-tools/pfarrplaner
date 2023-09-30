@@ -1,5 +1,5 @@
 <li class="nav-item dropdown">
-    <a class="nav-link" data-toggle="dropdown" href="#" title="Benachrichtigungen">
+    <a class="nav-link" data-bs-toggle="dropdown" href="#" title="Benachrichtigungen">
         <i class="far fa-bell"></i>
         @if($c = \App\UI\FlashMessages::count() + count($errors))<span class="badge @if(count($errors) > 0)badge-danger @else badge-info @endif navbar-badge">{{ $c }}</span>@endif
     </a>

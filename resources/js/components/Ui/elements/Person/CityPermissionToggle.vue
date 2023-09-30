@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+    <div class="btn-group btn-group-toggle" data-bs-toggle="buttons">
         <label class="btn btn-light btn-sm no-rights" :class="{active: rights == 'n'}">
             <input type="radio" v-model="rights" value="n" @input="changed" title="Keine Rechte"> <span class="mdi mdi-eye-off"></span> Keine
         </label>

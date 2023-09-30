@@ -31,7 +31,7 @@
     <card>
         <card-header :id="'heading'+uid">
             <h2 class="mb-0">
-                <button class="btn btn-block text-left pl-0 accordion-button collapsed" type="button" data-toggle="collapse" :data-target="'#collapse'+uid" aria-expanded="false" :aria-controls="'collapse'+uid">
+                <button class="btn btn-block text-left pl-0 accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-target="'#collapse'+uid" aria-expanded="false" :aria-controls="'collapse'+uid">
                     <span v-if="icon" :class="icon"></span>
                     {{ title }}
                 </button>

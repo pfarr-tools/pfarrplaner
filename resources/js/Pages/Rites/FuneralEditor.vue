@@ -39,7 +39,7 @@
             </button>
             <div class="dropdown show">
                 <a class="btn btn-light dropdown-toggle ms-1" href="#" role="button" id="dropdownMenuLink"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Weitere Aktionen
                 </a>
 

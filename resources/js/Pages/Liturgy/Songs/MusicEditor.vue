@@ -41,7 +41,7 @@
                     <div class="card z-depth-0 bordered">
                         <div class="card-header" :id="'setupHeading'">
                             <h5 class="mb-0">
-                                <button class="btn btn-link" type="button" data-toggle="collapse" :data-target="'#setupBody'"
+                                <button class="btn btn-link" type="button" data-bs-toggle="collapse" :data-target="'#setupBody'"
                                         aria-expanded="true" :aria-controls="'setupBody'">
                                     Einstellungen
                                 </button>
@@ -66,7 +66,7 @@
                     <div class="card z-depth-0 bordered">
                         <div class="card-header" :id="'notationRefrainHeading'">
                             <h5 class="mb-0">
-                                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" :data-target="'#notationRefrainBody'"
+                                <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" :data-target="'#notationRefrainBody'"
                                         aria-expanded="true" :aria-controls="'notationRefrainBody'">
                                     Kehrvers
                                 </button>
@@ -81,7 +81,7 @@
                     <div class="card z-depth-0 bordered">
                         <div class="card-header" :id="'notationHeading'">
                             <h5 class="mb-0">
-                                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" :data-target="'#notationBody'"
+                                <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" :data-target="'#notationBody'"
                                         aria-expanded="true" :aria-controls="'notationBody'">
                                     Notation (Strophen)
                                 </button>
@@ -95,7 +95,7 @@
                     <div v-for="(verse,verseIndex) in mySong.verses" class="card z-depth-0 bordered">
                         <div class="card-header" :id="'verseHeading'+verseIndex">
                             <h5 class="mb-0">
-                                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" :data-target="'#verseBody'+verseIndex"
+                                <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" :data-target="'#verseBody'+verseIndex"
                                         aria-expanded="true" :aria-controls="'verseBody'+verseIndex">
                                     <span class="toggle-visibility me-1" :class="verseVisible[verse.number] ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
                                           @click.prevent.stop="verseVisible[verse.number] = !verseVisible[verse.number]"></span>

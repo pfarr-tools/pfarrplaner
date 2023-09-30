@@ -31,7 +31,7 @@
     <li :id="id+'Tab'" class="nav-item" :title="disabled ? disabledTitle : ''" @click="tabSwitch">
         <span v-if="(!title) && (!icon)" class="nav-link mdi mdi-spin mdi-loading"></span>
         <a v-else class="nav-link" :class="{active: (active || (activeTab == id)) && !disabled, disabled: disabled}" :href="href || ('#'+id)" role="tab"
-           data-toggle="tab" @click="tabSwitch">
+           data-bs-toggle="tab" @click="tabSwitch">
             <span v-if="icon" :class="icon"></span>
             {{ title }}
             <span v-if="count && (count > 0) && (!disabled)" class="badge" :class="badgeClass()">{{ count }}</span>

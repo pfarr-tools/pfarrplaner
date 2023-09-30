@@ -37,7 +37,7 @@
                         <span class="mdi mdi-content-save d-md-none"></span><span class="d-none d-md-inline"> Speichern</span>
                     </button>
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="sr-only">Weitere Optionen aufklappen</span>
                     </button>
                     <div class="dropdown-menu">
@@ -53,7 +53,7 @@
                     class="mdi mdi-delete d-md-none"></span><span class="d-none d-md-inline"> Löschen</span></button>&nbsp;
                 <div class="dropdown show">
                     <a class="btn btn-light dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                       data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Weitere Aktionen
                     </a>
 
