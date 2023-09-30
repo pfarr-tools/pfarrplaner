@@ -64,14 +64,14 @@
                     <!--begin::User Menu Dropdown-->
                     <li class="nav-item dropdown user-menu">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <i v-if="!user.image" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
+                            <i v-if="!user.image" class="nav-icon mdi mdi-account" ></i>
                             <img v-else class="rounded-circle" :src="user.image.replace('attachments/', '/image/')" width="22" height="22" />
                             <span class="d-none d-md-inline">{{ user.name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                             <!--begin::User Image-->
                             <li class="user-header text-bg-primary">
-                                <i v-if="!user.image" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
+                                <i v-if="!user.image" class="nav-icon mdi mdi-account" style="font-size: 4em;"></i>
                                 <img v-else class="rounded-circle" :src="user.image.replace('attachments/', '/image/')" width="22" height="22" />
 
                                 <p>
