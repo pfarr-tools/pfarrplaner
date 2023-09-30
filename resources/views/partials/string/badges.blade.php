@@ -1,3 +1,3 @@
 @foreach($items as $item)
-    <span class="badge badge-{{ $badge_type ?? 'primary' }}">{{ $item }}</span>
+    <span class="badge bg-{{ $badge_type ?? 'primary' }}">{{ $item }}</span>
 @endforeach

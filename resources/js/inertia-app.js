@@ -50,15 +50,12 @@ import CalendarServiceBaptism from './components/Calendar/Service/Baptism.vue';
 import CalendarControlCitySort from './components/Calendar/Control/CitySort';
 
 import datePicker from 'vue-bootstrap-datetimepicker';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
+import 'bootswatch/dist/pulse/bootstrap.min.css'
+import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.min.css';
 import "@mdi/font/css/materialdesignicons.min.css"
 
-//import $ from 'jquery';
 
 window._ = require('lodash');
-//window.$ = window.jQuery = $;
-//import(/* webpackIgnore: true */ 'https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.20.0/jquery.daterangepicker.min.js');
 
 
 /**
@@ -69,8 +66,8 @@ window._ = require('lodash');
 
 window.$ = window.jQuery = require('jquery');
 try {
-    window.Popper = require('popper.js').default;
-    require('bootstrap');
+    window.Popper = require('@popperjs/core');
+    require('bootstrap/dist/js/bootstrap.bundle.min');
 } catch (e) {}
 
 window.$ = $.noConflict();
@@ -90,8 +87,9 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
  * Bootstrap plugins etc.
  */
 
-require('admin-lte');
+//require('admin-lte');
 window.moment = require('moment');
+
 
 
 

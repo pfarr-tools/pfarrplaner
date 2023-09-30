@@ -46,13 +46,13 @@
                                           :title="'Liturgische Farbe: '+liturgy['litColorName']"></span>
                                 </div>
                                 <div v-if="liturgy['feastCircleName']">
-                            <span class="badge badge-info">{{
+                            <span class="badge bg-info">{{
                                     liturgy['feastCircleName']
                                 }} ({{ romanize(liturgy['perikope']) }}) </span>
                                 </div>
                                 <div v-if="liturgy['subjects']">
                         <span v-for="subject in liturgy['subjects']"
-                              class="badge badge-light">{{ subject.subjectTitle }}</span>
+                              class="badge bg-light">{{ subject.subjectTitle }}</span>
                                 </div>
                             </div>
                             <div class="col-3 col-md-12 text-right text-md-left">

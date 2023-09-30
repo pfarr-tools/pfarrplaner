@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="text-center" style="width: 100%;">
-        <span class="badge badge-success" style="font-size: 10em;"><span class="fa fa-check-circle"></span></span>
+        <span class="badge bg-success" style="font-size: 10em;"><span class="fa fa-check-circle"></span></span>
         <div style="font-size: 1.5em; font-weight: bold">
             {{ $service->locationText() }}<br/>
             {{ $service->dateTime()->formatLocalized('%d.%m.%Y, %H:%M Uhr') }}<br />

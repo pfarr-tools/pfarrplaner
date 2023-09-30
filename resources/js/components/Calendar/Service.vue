@@ -32,9 +32,11 @@
         'service-entry': 1,
         'editable': myService.isEditable,
         'mine': myService.isMine,
+        'bg-success': myService.isMine,
         'highlighted': 0,
         'possible-target': targetMode,
         'funeral': myService.funerals.length > 0,
+        'bg-dark': myService.funerals.length > 0,
         'reloading': loading,
         'hidden': myService.hidden}"
          :title="myService.isEditable ? clickTitle(service) : null"
@@ -42,11 +44,11 @@
     >
         <div v-if="loading" class="text-center"><span class="mdi mdi-spin mdi-loading"></span></div>
         <div v-else>
-            <div :class="{'service-time': 1,  'service-special-time': isSpecialTime(service)}">
+            <div :class="{'service-time': 1,  'service-special-time text-warning': isSpecialTime(service)}">
                 {{ myService.timeText }}
             </div>
             <span class="separator">|</span>
-            <div :class="{'service-location': 1, 'service-special-location': isSpecialLocation(service)}">
+            <div :class="{'service-location': 1, 'service-special-location text-warning': isSpecialLocation(service)}">
                 {{ isSpecialLocation(service) ? myService.special_location : myService.location.name }}
             </div>
             <img v-if="(!settings.show_cc_details) && (myService.cc)" src="/img/cc.png" :title="ccTitle(service)">

@@ -32,9 +32,9 @@
         <template slot="navbar-left">
             <save-button @click="saveLocation"/>
             <nav-button title="Bereich hinzufügen" v-if="myLocation.id"
-                        class="ml-1" type="success" icon="mdi mdi-plus">Bereich hinzufügen</nav-button>
+                        class="ms-1" type="success" icon="mdi mdi-plus">Bereich hinzufügen</nav-button>
             <nav-button @click="addRow" title="Reihe hinzufügen" v-if="myLocation.id"
-                        class="ml-1" type="success" icon="mdi mdi-plus">Reihe hinzufügen</nav-button>
+                        class="ms-1" type="success" icon="mdi mdi-plus">Reihe hinzufügen</nav-button>
         </template>
         <template slot="tab-headers">
             <tab-headers>

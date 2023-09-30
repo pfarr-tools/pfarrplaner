@@ -41,7 +41,7 @@
         :data-day="day.id">
         <div class="day-header-collapse-hover">{{ today.format('dddd, DD.') }}</div>
         <div class="card card-effect">
-            <div :class="{'card-header': 1, 'day-header-So': today.format('E') == 7}">
+            <div class="card-header bg-dark" :class="{'bg-danger': today.format('E') == 7}">
                 {{ today.format('dddd') }}
             </div>
             <div class="card-body">
@@ -58,7 +58,7 @@
             </div>
         </div>
         <div v-if="hasPermission('urlaub-lesen')">
-        <div class="vacation mr-1" v-for="(absence,absenceIndex,absenceKey) in absences" :absence="absence" :key="absenceKey"
+        <div class="vacation me-1" v-for="(absence,absenceIndex,absenceKey) in absences" :absence="absence" :key="absenceKey"
              :title="absence.user.name+': '
              +absenceReasonText(absence)
              +' ('+absence.durationText+') '

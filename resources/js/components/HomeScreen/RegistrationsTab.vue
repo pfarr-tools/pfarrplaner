@@ -48,7 +48,7 @@
                 <nav-button type="light" icon="mdi mdi-ticket" title="Anmeldungen anzeigen"
                             :href="route('service.edit', {service: service.slug, tab: 'registrations'})">
                     <span class="d-none d-md-inline">Anmeldungen</span>
-                    <span v-if="service.bookings.length > 0" class="badge badge-info">{{ service.bookings.length }}</span>
+                    <span v-if="service.bookings.length > 0" class="badge bg-info">{{ service.bookings.length }}</span>
                 </nav-button>
                 <a :href="route('booking.finalize', service.id)" title="Anmeldeliste ausgeben"
                    class="btn btn-light"><span class="mdi mdi-clipboard-check"></span>

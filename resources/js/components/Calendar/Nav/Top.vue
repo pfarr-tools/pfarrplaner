@@ -29,7 +29,7 @@
 
 <template>
     <div class="button-row no-print btn-toolbar" role="toolbar">
-        <div class="btn-group mr-2" role="group">
+        <div class="btn-group me-2" role="group">
             <button class="btn btn-default"
                     v-if="numericDate > 201801"
                     @click.prevent.stop="$emit('navigate', moment(date).subtract(1, 'months').format('YYYY-MM'))"
@@ -93,9 +93,9 @@
             </button>
         </div>
 
-        <create-service-wizard-button v-if="canCreate" type="success" :cities="writableCities" class="mr-2" />
+        <create-service-wizard-button v-if="canCreate" type="success" :cities="writableCities" class="me-2" />
 
-        <nav-button class="mr-2"
+        <nav-button class="me-2"
                     :type="targetMode ? 'warning' : 'default'"
                     :icon="targetMode ? (target.exclusive ? 'mdi mdi-account-convert-outline': 'mdi mdi-account-arrow-down-outline') : 'mdi mdi-target-account'"
                     :force-no-text="!targetMode"

@@ -32,7 +32,7 @@
         <template slot="navbar-left">
             <save-button @click="saveRow"/>
             <nav-button @click="deleteRow" title="Bereich löschen"
-                        class="ml-1" type="danger" icon="mdi mdi-delete">Löschen</nav-button>
+                        class="ms-1" type="danger" icon="mdi mdi-delete">Löschen</nav-button>
         </template>
         <form-input name="title" label="Bezeichnung" v-model="mySection.title" />
         <form-input name="priority" label="Prioriät" type="number" v-model="mySection.priority" />

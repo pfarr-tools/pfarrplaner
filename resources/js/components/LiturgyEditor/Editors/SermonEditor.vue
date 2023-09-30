@@ -55,7 +55,7 @@
                     {{ myService.sermon.title }}<span
                     v-if="myService.sermon.subtitle">: {{ myService.sermon.subtitle }}</span>
                 </inertia-link>
-                <button class="btn btn-sm btn-light ml-1" @click="setSermon(null, item)"
+                <button class="btn btn-sm btn-light ms-1" @click="setSermon(null, item)"
                         title="Verknüpfung mit dieser Predigt aufheben">
                     <span class="mdi mdi-link-off"></span>
                 </button>

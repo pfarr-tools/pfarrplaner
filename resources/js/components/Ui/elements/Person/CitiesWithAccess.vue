@@ -29,7 +29,7 @@
 
 <template>
     <div>
-        <span v-for="city in allCities" class="badge mr-1" :class="city.badge" >{{ city.name }}</span>
+        <span v-for="city in allCities" class="badge me-1" :class="city.badge" >{{ city.name }}</span>
     </div>
 </template>
 

@@ -151,10 +151,10 @@
                                     sogenannte "Scopes" aktiviert werden. Folgende Scopes sind für das Funktionieren der
                                     Integration erforderlich:</p>
                                 <p>
-                                    <span class="badge badge-secondary">veranstaltungen.read</span>
-                                    <span class="badge badge-secondary">veranstaltungen.qr.read</span>
-                                    <span class="badge badge-secondary">veranstaltungen.qr.create</span>
-                                    <span class="badge badge-secondary">veranstaltungen.qr.delete</span>
+                                    <span class="badge bg-secondary">veranstaltungen.read</span>
+                                    <span class="badge bg-secondary">veranstaltungen.qr.read</span>
+                                    <span class="badge bg-secondary">veranstaltungen.qr.create</span>
+                                    <span class="badge bg-secondary">veranstaltungen.qr.delete</span>
                                 </p>
                                 <form-input name="konfiapp_apikey" label="API-Schlüssel für die KonfiApp"
                                             v-model="myCity.konfiapp_apikey"/>

@@ -30,11 +30,11 @@
 <template>
     <admin-layout :title="'Willkommen, '+(user.first_name ? user.first_name : user.name)+'!'">
         <template slot="navbar-left">
-            <div class="btn-group mr-1">
+            <div class="btn-group me-1">
                 <a class="btn btn-primary" :href="route('calendar')"><span class="mdi mdi-calendar"></span> <span
                     class="d-none d-md-inline">Zum Kalender</span></a>
                 <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="sr-only">Weitere Optionen aufklappen</span>
                 </button>
                 <div class="dropdown-menu p-1">
@@ -43,7 +43,7 @@
                     <hr/>
                     <div class="px-2 mb-2 text-sm">
                         <nav-button type="secondary btn-sm" icon="mdi mdi-calendar" force-icon
-                                    :key="myQuickPickViewDate"
+                                    :key="myQuickPickViewDate.toISOString()"
                                     :title="quickPickerMonthText+' im Kalender öffnen'"
                                     @click="openCalendar">{{ quickPickerMonthText }} öffnen
                         </nav-button>
@@ -85,6 +85,14 @@
                 class="mdi mdi-ring"></span>
                 <span class="d-none d-md-inline">Trauung anlegen...</span></a>&nbsp;
         </template>
+        <template v-slot:navbar-right>
+            <li class="nav-item">
+                <inertia-link :href="route('user.profile')" class="nav-link" title="Anzeigeeinstellungen">
+                    <span class="mdi mdi-cog"></span> <span class="d-none d-md-inline">Anzeige</span>
+                </inertia-link>
+            </li>
+        </template>
+
         <template slot="before-flash">
             <div v-if="settings.homeScreenConfig.showReplacements && (replacements.length > 0)"
                  class="alert alert-info">
@@ -105,20 +113,13 @@
                 <li v-for="tab in myTabs"
                     :id="tab.key+'Tab'" class="nav-item" @click.prevent.stop="loadTab(tab)">
                     <a class="nav-link" :class="{active: myActiveTab == tab.key}" href="#" role="tab"
-                       data-toggle="tab" @click.prevent.stop="loadTab(tab)">
+                       data-bs-toggle="tab" @click.prevent.stop="loadTab(tab)">
                         {{ tab.title }}
                         <span v-if="tab.count > 0" class="badge"
-                              :key="tab.count"
-                              :class="tab.badgeType ? 'badge-'+tab.badgeType : 'badge-primary'">{{ tab.count }}</span>
+                              :key="'__'+(tab.count || '')"
+                              :class="tab.badgeType ? 'bg-'+tab.badgeType : 'bg-primary'">{{ tab.count }}</span>
                     </a>
                 </li>
-                <div class="ml-auto d-inline tab-setup">
-                    <a :href="route('user.profile', {tab: 'homeScreenConfiguration'})"
-                       class="p-2 pl-3 tab-setup ml-auto"
-                       title="Angezeigte Reiter konfigurieren"><span class="mdi mdi-cog"></span>
-                        <span class="d-none d-md-inline">Anzeige</span>
-                    </a>
-                </div>
             </tab-headers>
         </template>
         <div v-if="myTabsConfig.tabs.length == 0" class="alert alert-info">

@@ -33,10 +33,10 @@
             <save-button @click="saveUser"/>
             <nav-button v-if="myUser.isOfficialUser && (!justCreated)"
                         title="Passwort zurücksetzen und Nachricht versenden"
-                        @click="resetUserPassword" class="ml-1"
+                        @click="resetUserPassword" class="ms-1"
                         type="light" icon="mdi mdi-lock-reset">Passwort zurücksetzen
             </nav-button>
-            <nav-button type="danger" icon="mdi mdi-account-remove" title="Benutzer löschen" class="ml-1"
+            <nav-button type="danger" icon="mdi mdi-account-remove" title="Benutzer löschen" class="ms-1"
                         @click="deleteUser">Löschen
             </nav-button>
         </template>

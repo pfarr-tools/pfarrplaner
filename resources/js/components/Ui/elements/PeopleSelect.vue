@@ -59,7 +59,7 @@
                             <td class="text-left">
                                 <div class="text-bold">{{ displayName(person, true) }}</div>
                                 <div>
-                                    <span class="text-sm">in Kirchengemeinde</span><span v-if="person.city_scopes.length > 1">n</span>: <div class="badge badge-light" v-for="city in person.city_scopes">{{ city.name }}</div>
+                                    <span class="text-sm">in Kirchengemeinde</span><span v-if="person.city_scopes.length > 1">n</span>: <div class="badge bg-light" v-for="city in person.city_scopes">{{ city.name }}</div>
                                 </div>
                             </td>
                             <td class="text-right">
@@ -235,13 +235,13 @@ export default {
                         }
                     },
                     option: function (item, escape) {
-                        var t = '<div><span class="ml-1 ' + item.type + '"></span> ' + escape(item.name);
+                        var t = '<div><span class="ms-1 ' + item.type + '"></span> ' + escape(item.name);
 
                         if (item.type == 'mdi mdi-account-multiple') {
-                            t += '<span class="ml-1 badge badge-dark">' + item.users.length + '</span>'
+                            t += '<span class="ms-1 badge bg-dark">' + item.users.length + '</span>'
                             if (item.users.length > 0) t += '<div>';
                             item.users.forEach(user => {
-                                t += '<span class="ml-1 badge badge-light">' + user.name + '</span>'
+                                t += '<span class="ms-1 badge bg-light">' + user.name + '</span>'
                             });
                             if (item.users.length > 0) t += '</div>';
                         }

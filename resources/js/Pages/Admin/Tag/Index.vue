@@ -66,7 +66,7 @@
                                                           :href="route('tag.edit', {tag: row.id})">
                                                 <span class="mdi mdi-pencil"></span>
                                             </inertia-link>
-                                            <button class="btn  btn-sm btn-danger ml-1" title="Rolle löschen"
+                                            <button class="btn  btn-sm btn-danger ms-1" title="Rolle löschen"
                                                     @click="deleteTag(row)">
                                                 <span class="mdi mdi-delete"></span>
                                             </button>

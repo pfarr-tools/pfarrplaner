@@ -30,7 +30,7 @@
 <template>
     <div class="form-inline">
         <label>Zeige</label>
-        <select :value="dsShowEntries" class="form-control mr-1 ml-1" @change="change">
+        <select :value="dsShowEntries" class="form-control me-1 ms-1" @change="change">
             <option v-for="option in dsShowEntriesLovs" :key="option.value" :value="option.value">
                 {{ option.text }}
             </option>

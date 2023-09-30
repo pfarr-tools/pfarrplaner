@@ -49,8 +49,8 @@
             class="d-none d-md-inline">Gottesdienst anlegen</span>
         </inertia-link>
         <div class="dropdown" v-if="cities.length > 1">
-            <button v-if="cities.length > 1" type="button" class="btn dropdown-toggle dropdown-toggle-split" :class="myClass"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="mdi mdi-church"></span> <span
+            <button v-if="cities.length > 1" type="button" class="btn dropdown-toggle" :class="myClass"
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="mdi mdi-church"></span> <span
                 class="d-none d-md-inline">Gottesdienst anlegen</span>
                 <span class="sr-only">Weitere Optionen aufklappen</span>
             </button>

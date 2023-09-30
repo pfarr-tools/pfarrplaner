@@ -63,7 +63,7 @@
                 <th class="text-center">
                     {{ city.name }}
                     <div v-if="(absences.length) && $can('urlaub-lesen')" class="my-1">
-                        <div class="vacation mr-1" v-for="absence in absences" :absence="absence"
+                        <div class="vacation me-1" v-for="absence in absences" :absence="absence"
                              :title="absence.user.name+': '+absence.reason+' ('+absence.durationText+') '+replacementText(absence)">
                             <span class="mdi mdi-earth"></span> {{ absence.user.last_name }}</div>
                     </div>

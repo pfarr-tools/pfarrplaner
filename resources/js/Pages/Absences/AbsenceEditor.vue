@@ -42,15 +42,15 @@
             <nav-button v-if="role == 'approver'" @click="approveAndSave()" type="success" icon="mdi mdi-check" force-icon
                         title="Antrag genehmigen">Genehmigen
             </nav-button>
-            <nav-button v-if="role == 'approver'" @click="returnAndSave()" class="ml-1" type="warning" icon="mdi mdi-undo"
+            <nav-button v-if="role == 'approver'" @click="returnAndSave()" class="ms-1" type="warning" icon="mdi mdi-undo"
                         force-icon
                         title="Abwesenheitseintrag zurück zur Überprüfung verweisen">Erneut überprüfen lassen
             </nav-button>
-            <nav-button v-if="(role == 'admin') || (role=='approver')" @click="rejectAbsence" class="ml-1"
+            <nav-button v-if="(role == 'admin') || (role=='approver')" @click="rejectAbsence" class="ms-1"
                         title="Antrag ablehnen" type="danger" icon="mdi mdi-close-octagon" force-icon>Ablehnen
             </nav-button>
             <nav-button v-if="mayDelete" @click="deleteAbsence" type="danger" icon="mdi mdi-delete"
-                        class="ml-1" title="Abwesenheitseintrag löschen" force-icon>Löschen
+                        class="ms-1" title="Abwesenheitseintrag löschen" force-icon>Löschen
             </nav-button>
         </template>
         <template slot="before-flash">

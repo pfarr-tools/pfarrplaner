@@ -61,7 +61,7 @@
                                     <tr>
                                         <td>{{ row.name }}</td>
                                         <td>{{ row.city.name }}</td>
-                                        <td><span v-for="user in row.users" class="badge badge-light">{{
+                                        <td><span v-for="user in row.users" class="badge bg-light">{{
                                                 user.name
                                             }}</span></td>
                                         <td>

@@ -8,13 +8,13 @@
         <div class="dropdown-divider"></div>
         @foreach($errors->all() as $error)
             <a href="#" class="dropdown-item">
-                <i class="fas fa-exclamation-trianble mr-2" style="color: red;"></i> {{ $error }}
+                <i class="fas fa-exclamation-trianble me-2" style="color: red;"></i> {{ $error }}
                 <span class="float-right text-muted text-sm"><i class="fa fa-close"></i></span>
             </a>
         @endforeach
         @foreach(\App\UI\FlashMessages::all() as $message)
             <a href="#" class="dropdown-item">
-                <i class="fas fa-envelope mr-2"></i> {{ $message['text'] }}
+                <i class="fas fa-envelope me-2"></i> {{ $message['text'] }}
                 <span class="float-right text-muted text-sm"><i class="fa fa-close"></i></span>
             </a>
         @endforeach

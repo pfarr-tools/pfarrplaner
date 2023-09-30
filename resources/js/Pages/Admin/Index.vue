@@ -54,7 +54,7 @@
                                 <template #default="{ row, rowIndex }">
                                     <tr @click="$inertia.get(row.url)" style="cursor:pointer;" title="Klicken, um diesen Bereich zu öffnen">
                                         <td>
-                                            <span :class="row.icon" class="mr-1"></span>
+                                            <span :class="row.icon" class="me-1"></span>
                                             {{ row.text }}
                                         </td>
                                     </tr>

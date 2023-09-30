@@ -34,7 +34,7 @@
                 <span class="d-inline d-md-none mdi mdi-download"></span>
                 <span class="d-none d-md-inline">Herunterladen</span>
             </button>
-            <button class="btn btn-light ml-1" @click="back">
+            <button class="btn btn-light ms-1" @click="back">
                 <span class="d-inline d-md-none mdi mdi-chevron-left"></span>
                 <span class="d-none d-md-inline">Zurück</span>
             </button>

@@ -30,18 +30,18 @@
 <template>
     <admin-layout :title="'Amtskalender '+moment(myDate+'-01').locale('de').format('MMMM YYYY')" no-content-header>
         <template v-slot:navbar-left>
-            <nav-button type="default" class="mr-1" title="Einen Monat zurück" icon="mdi mdi-chevron-left" force-icon
+            <nav-button type="default" class="me-1" title="Einen Monat zurück" icon="mdi mdi-chevron-left" force-icon
                         force-no-text
                         @click="myDate = moment(myDate+'-01').subtract(1, 'month').format('YYYY-MM')"/>
-            <nav-button type="default" class="mr-1" title="Gehe zu heute" icon="mdi mdi-calendar-today" force-icon
+            <nav-button type="default" class="me-1" title="Gehe zu heute" icon="mdi mdi-calendar-today" force-icon
                         force-no-text
                         @click="myDate = moment().format('YYYY-MM')"/>
-            <nav-button type="default" v-if="!picking" @click="focusPicker" class="mr-1">
+            <nav-button type="default" v-if="!picking" @click="focusPicker" class="me-1">
                 {{ moment(myDate + '-01').locale('de').format('MMMM YYYY') }}
             </nav-button>
             <date-picker v-if="picking" v-model="myDate" :config="myDatePickerSettings" @input="picking=false"
                          autofocus ref="picker"/>
-            <nav-button type="default" class="mr-1" title="Einen Monat vor" icon="mdi mdi-chevron-right" force-icon
+            <nav-button type="default" class="me-1" title="Einen Monat vor" icon="mdi mdi-chevron-right" force-icon
                         force-no-text
                         @click="myDate = moment(myDate+'-01').add(1, 'month').format('YYYY-MM')"/>
             <nav-button type="light" icon="mdi mdi-file-word" title="Worddokument herunterladen" force-icon

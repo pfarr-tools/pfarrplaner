@@ -64,7 +64,7 @@
                                                 }}<br/>
                                                 {{ row.locationText }}
                                                 <div>
-                                                    <span class="badge badge-secondary">{{ row.city.name }}</span>
+                                                    <span class="badge bg-secondary">{{ row.city.name }}</span>
                                                 </div>
                                                 <div>
                                                     <nav-button type="primary" icon="mdi mdi-pencil" force-icon

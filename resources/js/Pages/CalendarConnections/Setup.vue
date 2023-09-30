@@ -34,7 +34,7 @@
                 <span class="d-inline d-md-none mdi mdi-content-save"></span><span
                 class="d-none d-md-inline">Speichern</span>
             </button>
-            <button class="btn btn-danger ml-1" @click="deleteConnection">
+            <button class="btn btn-danger ms-1" @click="deleteConnection">
                 <span class="d-inline d-md-none mdi mdi-delete"></span><span class="d-none d-md-inline">Löschen</span>
             </button>
         </template>

@@ -40,6 +40,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 /**
  * Class LoginController
@@ -78,7 +79,8 @@ class LoginController extends Controller
     }
 
     /**
-     * @return Application|Factory|View
+     * @param Request $request
+     * @return \Inertia\Response
      */
     public function showLoginForm(Request $request)
     {
@@ -87,7 +89,7 @@ class LoginController extends Controller
         $demo = (app()->environment() == 'demo');
         $users = $demo ? User::with('roles', 'homeCities')->where('password', '!=', '')->orderBy('id')->get() : [];
 
-        return view('auth.login', compact('users', 'demo'));
+        return Inertia::render('Auth/Login', compact('users', 'demo'));
     }
 
     public function setInitialPassword()

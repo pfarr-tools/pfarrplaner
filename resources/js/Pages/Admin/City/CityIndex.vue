@@ -71,7 +71,7 @@
                                                           :href="route('city.edit', {city: row.name})">
                                                 <span class="mdi mdi-pencil"></span>
                                             </inertia-link>
-                                            <button v-if="row.canDelete" class="btn  btn-sm btn-danger ml-1" title="Kirchengemeinde löschen"
+                                            <button v-if="row.canDelete" class="btn  btn-sm btn-danger ms-1" title="Kirchengemeinde löschen"
                                                     @click="deleteCity(row)">
                                                 <span class="mdi mdi-delete"></span>
                                             </button>

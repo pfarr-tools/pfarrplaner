@@ -108,16 +108,16 @@
                         <div id="toolbar" slot="toolbar">
                             <button class="ql-bold"></button>
                             <button class="ql-italic"></button>
-                            <button class="ql-underline mr-2"></button>
+                            <button class="ql-underline me-2"></button>
                             <button class="ql-header" value="1"></button>
-                            <button class="ql-blockquote mr-2"></button>
-                            <span class="ql-formats mr-2">
+                            <button class="ql-blockquote me-2"></button>
+                            <span class="ql-formats me-2">
                                                     <button class="ql-list" value="ordered"></button>
                                                     <button class="ql-list" value="bullet"></button>
                                                     <button class="ql-indent" value="-1"></button>
                                                     <button class="ql-indent" value="+1"></button>
                                                 </span>
-                            <button class="ql-clean mr-2"></button>
+                            <button class="ql-clean me-2"></button>
                             <button class="ql-insertbible quill-mdi-button" title="Bibeltext hinzufügen"><span
                                 class="mdi mdi-book-open-variant"></span></button>
                         </div>
@@ -125,7 +125,7 @@
 
                     <text-stats :text="editedSermon.text"  :key="textUpdated"/>
                     <div v-if="funerals.length > 0" class="mt-1 mb-3">
-                        <nav-button v-for="(funeral, funeralIndex, funeralKey) in funerals" type="light" class="mr-1"
+                        <nav-button v-for="(funeral, funeralIndex, funeralKey) in funerals" type="light" class="me-1"
                                     :key="funeralKey"
                                     icon="mdi mdi-text" :title="'Lebenslauf von '+funeral.buried_name+' in den Text einfügen'"
                                     @click="insertFuneralStory(funeral)">

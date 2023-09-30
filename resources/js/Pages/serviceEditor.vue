@@ -31,7 +31,7 @@
     <div class="service-editor">
         <admin-layout title="Gottesdienst bearbeiten">
             <template v-slot:navbar-left>
-                <div class="btn-group mr-1">
+                <div class="btn-group me-1">
                     <button type="button" class="btn btn-primary" @click.prevent="saveService(true)"
                             title="Speichern und schließen">
                         <span class="mdi mdi-content-save d-md-none"></span><span class="d-none d-md-inline"> Speichern</span>

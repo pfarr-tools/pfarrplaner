@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <span class="badge badge-info" :title="permissionString">
+    <span class="badge bg-info" :title="permissionString">
         {{ role.name }}
     </span>
 </template>

@@ -32,7 +32,7 @@
         <template slot="navbar-left">
             <save-button @click="saveRow"/>
             <nav-button @click="deleteRow" title="Reihe löschen"
-                        class="ml-1" type="danger" icon="mdi mdi-delete">Löschen</nav-button>
+                        class="ms-1" type="danger" icon="mdi mdi-delete">Löschen</nav-button>
         </template>
         <section-select label="Bereich" value-key="id"
             :location="location" v-model="seatingRow.seating_section_id" />

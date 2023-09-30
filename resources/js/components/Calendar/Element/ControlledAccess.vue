@@ -29,7 +29,7 @@
 
 <template>
     <div>
-        <span class="badge badge-light" :style="{backgroundColor: color}">
+        <span class="badge bg-light" :style="{backgroundColor: color}">
             <span v-if="icon" :class="icon"></span>
             {{ description }}
         </span>

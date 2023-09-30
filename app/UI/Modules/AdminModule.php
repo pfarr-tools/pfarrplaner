@@ -58,7 +58,7 @@ class AdminModule extends AbstractModule
                 'icon' => 'mdi mdi-shield-account',
                 'url' => route('admin.index'),
                 'active' => request()->is('admin.*'),
-                'inertia' => false,
+                'inertia' => true,
             ];
         }
         return $items;

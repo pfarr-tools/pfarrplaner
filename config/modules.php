@@ -32,7 +32,6 @@
 return [
     'groups' => [
         'default' => [
-            \App\UI\Modules\ProfileModule::class,
             \App\UI\Modules\CalendarModule::class,
             \App\UI\Modules\RitesModule::class,
             \App\UI\Modules\AbsencesModule::class,

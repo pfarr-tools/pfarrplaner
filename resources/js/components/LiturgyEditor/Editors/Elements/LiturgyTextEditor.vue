@@ -37,16 +37,16 @@
             <div id="toolbar" slot="toolbar">
                 <button v-if="mySettings.toolbar.bold" class="ql-bold"></button>
                 <button v-if="mySettings.toolbar.italic"  class="ql-italic"></button>
-                <button v-if="mySettings.toolbar.underline"  class="ql-underline mr-2"></button>
+                <button v-if="mySettings.toolbar.underline"  class="ql-underline me-2"></button>
                 <button v-if="mySettings.toolbar.header"  class="ql-header" value="1"></button>
-                <button v-if="mySettings.toolbar.blockquote"  class="ql-blockquote mr-2"></button>
-                <span v-if="mySettings.toolbar.formats.length > 0"  class="ql-formats mr-2">
+                <button v-if="mySettings.toolbar.blockquote"  class="ql-blockquote me-2"></button>
+                <span v-if="mySettings.toolbar.formats.length > 0"  class="ql-formats me-2">
                                                     <button class="ql-list" value="ordered"></button>
                                                     <button class="ql-list" value="bullet"></button>
                                                     <button class="ql-indent" value="-1"></button>
                                                     <button class="ql-indent" value="+1"></button>
                                                 </span>
-                <button v-if="mySettings.toolbar.clean"  class="ql-clean mr-2"></button>
+                <button v-if="mySettings.toolbar.clean"  class="ql-clean me-2"></button>
                 <button class="ql-importword quill-mdi-button  quill-text-button" :class="floatClass"
                         @click="dialogs.insertWord = true"
                         title="Aus Worddokument importieren"><span

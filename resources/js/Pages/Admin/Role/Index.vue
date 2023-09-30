@@ -61,7 +61,7 @@
                                     <tr>
                                         <td>{{ row.name }}</td>
                                         <td>
-                                            <span class="badge badge-secondary mr-1" v-for="permission in row.permissions">
+                                            <span class="badge bg-secondary me-1" v-for="permission in row.permissions">
                                                 {{ permission.name}}
                                             </span>
                                         </td>
@@ -70,7 +70,7 @@
                                                           :href="route('role.edit', {role: row.id})">
                                                 <span class="mdi mdi-pencil"></span>
                                             </inertia-link>
-                                            <button class="btn  btn-sm btn-danger ml-1" title="Rolle löschen"
+                                            <button class="btn  btn-sm btn-danger ms-1" title="Rolle löschen"
                                                     @click="deleteRole(row)">
                                                 <span class="mdi mdi-delete"></span>
                                             </button>

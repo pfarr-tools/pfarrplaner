@@ -38,7 +38,7 @@
                 <span class="d-inline d-md-none mdi mdi-delete"></span> <span class="d-none d-md-inline">Löschen</span>
             </button>
             <div class="dropdown show">
-                <a class="btn btn-light dropdown-toggle ml-1" href="#" role="button" id="dropdownMenuLink"
+                <a class="btn btn-light dropdown-toggle ms-1" href="#" role="button" id="dropdownMenuLink"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Weitere Aktionen
                 </a>
@@ -345,16 +345,16 @@
                                 <div id="toolbar" slot="toolbar">
                                     <button class="ql-bold"></button>
                                     <button class="ql-italic"></button>
-                                    <button class="ql-underline mr-2"></button>
+                                    <button class="ql-underline me-2"></button>
                                     <button class="ql-header" value="1"></button>
-                                    <button class="ql-blockquote mr-2"></button>
-                                    <span class="ql-formats mr-2">
+                                    <button class="ql-blockquote me-2"></button>
+                                    <span class="ql-formats me-2">
                                                 <button class="ql-list" value="ordered"></button>
                                                 <button class="ql-list" value="bullet"></button>
                                                 <button class="ql-indent" value="-1"></button>
                                                 <button class="ql-indent" value="+1"></button>
                                             </span>
-                                    <button class="ql-clean mr-2"></button>
+                                    <button class="ql-clean me-2"></button>
                                     <select class="ql-custom" data-label="Texte">
                                         <option value="dob" data-label="Geburtsdatum" data-value="dob">Geburtsdatum
                                         </option>

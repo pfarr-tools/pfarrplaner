@@ -68,7 +68,7 @@
                      @click="focusBlock(blockIndex)">
                     <div class="row" :ref="'block'+blockIndex" :key="'block'+blockIndex">
                         <div class="col-11 liturgy-block-title">
-                        <span class="mdi mdi-drag-horizontal handle mr-1"
+                        <span class="mdi mdi-drag-horizontal handle me-1"
                               title="Klicken und ziehen, um die Position im Ablauf zu verändern"></span>
                             <span class="mdi mdi-chevron-right-circle" style="display: none;"></span> {{ block.title }}
                         </div>
@@ -111,7 +111,7 @@
                             <div class="row item" :ref="'block'+blockIndex+'_item'+itemIndex"
                                  title="Klicken, um zu bearbeiten.">
                                 <div class="col-sm-3 item-title">
-                                    <span class="fa data-type-icon handle mr-1" :class="icons[item.data_type]"
+                                    <span class="fa data-type-icon handle me-1" :class="icons[item.data_type]"
                                           title="Klicken und ziehen, um die Position im Ablauf zu verändern"></span>
                                     <span class="mdi mdi-chevron-right-circle"
                                           style="display: none;"></span> {{ item.title }}
@@ -142,7 +142,7 @@
                                 </div>
                                 <div class="col-sm-2 responsible-list">
                                     <div v-if="item.data.responsible.length > 0">
-                                            <span class="badge badge-light" v-for="record in item.data.responsible"
+                                            <span class="badge bg-light" v-for="record in item.data.responsible"
                                                   v-html="displayResponsible(record)"/>
                                     </div>
                                     <div v-else>

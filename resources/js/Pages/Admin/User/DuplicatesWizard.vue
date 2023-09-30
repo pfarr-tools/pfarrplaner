@@ -37,11 +37,11 @@
                 <div class="col-md-3">
                     <span class="handle" :class="user.isOfficialUser ? 'mdi mdi-account-check' : 'mdi mdi-account-question-outline'"></span>
                     <span class="text-bold">{{ user.fullNameText || user.name }}</span>
-                    <span class="badge badge-info">{{ user.duplicates.length }}</span><br />
+                    <span class="badge bg-info">{{ user.duplicates.length }}</span><br />
                     <small>
                         <div v-if="user.email">{{ user.email }}</div>
                         <div v-if="user.home_cities">
-                            <span v-for="city in user.home_cities" class="badge badge-dark mr-1 mb-1">{{ city.name }}</span>
+                            <span v-for="city in user.home_cities" class="badge bg-dark me-1 mb-1">{{ city.name }}</span>
                         </div>
                     </small>
                 </div>
@@ -53,7 +53,7 @@
                             <span class="text-bold">{{ duplicateUser.fullNameText || duplicateUser.name }}</span>
                             <div v-if="user.email">{{ user.email }}</div>
                             <div v-if="duplicateUser.home_cities">
-                                <span v-for="city in user.home_cities" class="badge badge-dark mr-1 mb-1">{{ city.name }}</span>
+                                <span v-for="city in user.home_cities" class="badge bg-dark me-1 mb-1">{{ city.name }}</span>
                             </div>
                         </div>
                     </draggable>

@@ -31,7 +31,7 @@
     <admin-layout title="Zu vertretende Dienste für eine Person finden">
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Zu vertretende Dienste für eine Person finden" @click="renderReport" />
-            <nav-button title="Zur Übersicht der Diensten mit Möglichkeit zum Eintragen" icon="mdi mdi-list" class="ml-1" @click="wizard">Direkt eintragen</nav-button>
+            <nav-button title="Zur Übersicht der Diensten mit Möglichkeit zum Eintragen" icon="mdi mdi-list" class="ms-1" @click="wizard">Direkt eintragen</nav-button>
         </template>
         <form method="post" :action="myAction" ref="myForm" :key="myAction">
             <form-csrf-token />

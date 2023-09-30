@@ -31,7 +31,7 @@
     <admin-layout title="Psalm bearbeiten">
         <template v-slot:navbar-left>
             <save-button @click="savePsalm"/>
-            <nav-button @click="saveAsCopy" class="ml-1" title="Kopie als neuen Psalm speichern"
+            <nav-button @click="saveAsCopy" class="ms-1" title="Kopie als neuen Psalm speichern"
                         type="light" icon="mdi mdi-content-save-move-outline">Kopie speichern</nav-button>
         </template>
         <div class="row">

@@ -26,7 +26,7 @@
                     <td style="hyphens: none;">{{$role->name}}</td>
                     <td>
                         @foreach($role->permissions->sortBy('name') as $permission)
-                            <span class="badge badge-dark">{{ $permission->name }}</span>
+                            <span class="badge bg-dark">{{ $permission->name }}</span>
                         @endforeach
                     </td>
                     <td class="text-right" style="min-width: 100px;">

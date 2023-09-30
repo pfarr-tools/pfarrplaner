@@ -31,7 +31,7 @@
     <admin-layout title="Benutzerrollen">
         <template v-slot:navbar-left>
             <save-button @click="saveRole" />
-            <nav-button class="ml-1" type="danger" icon="mdi mdi-delete" title="Benutzerrolle löschen"
+            <nav-button class="ms-1" type="danger" icon="mdi mdi-delete" title="Benutzerrolle löschen"
                         @click="deleteRole">Löschen</nav-button>
         </template>
         <form-input name="name" label="Name" v-model="myRole.name" />

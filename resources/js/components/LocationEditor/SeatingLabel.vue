@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <span class="badge badge-light" :style="{backgroundColor: color}">{{ value.title }}</span>
+    <span class="badge bg-light" :style="{backgroundColor: color}">{{ value.title }}</span>
 </template>
 
 <script>

@@ -35,8 +35,8 @@
                 @click.prevent.stop="deleteAttachment($event)">
             <span class="mdi mdi-delete"></span>
         </button>
-        <span class="float-right mdi mdi-download" :class="allowDelete ? 'mr-3 mt-1' : ''"></span>
-        <img v-if="isImage" class="float-right preview mr-4" :src="imageRoute()" @click.stop="showLightBox = true"/>
+        <span class="float-right mdi mdi-download" :class="allowDelete ? 'me-3 mt-1' : ''"></span>
+        <img v-if="isImage" class="float-right preview me-4" :src="imageRoute()" @click.stop="showLightBox = true"/>
         <div v-if="isImage && showLightBox" class="lightbox-backdrop"
              @click.stop="showLightBox = false"
              @keydown.esc="showLightBox = false">

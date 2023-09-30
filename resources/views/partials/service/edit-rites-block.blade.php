@@ -21,7 +21,7 @@
         @endif
         <div class="mt-1">
             <a class="btn btn-secondary" title="Meldung an das Ordnungsamt nach §1g Abs. 3 CoronaVO" href="{{ route('reports.setup', ['report' => 'regulatory', 'service' => $service->id]) }}">
-                <span class="fa fa-envelope"></span> Ordnungsamt <span class="badge badge-info">{{ $service->estimatePeoplePresent() }}</span></a>
+                <span class="fa fa-envelope"></span> Ordnungsamt <span class="badge bg-info">{{ $service->estimatePeoplePresent() }}</span></a>
         </div>
         @if(\App\Integrations\KonfiApp\KonfiAppIntegration::isActive($service->city) && ($service->konfiapp_event_qr != ''))
             <div style="margin-top: 2px;">

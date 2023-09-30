@@ -24,7 +24,6 @@
     <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.20.0/daterangepicker.min.css"/>
     <link href="{{ asset('css/pfarrplaner.css') }}" rel="stylesheet">
-
     <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
     @routes()
     <script src="{{ mix('/js/inertia-app.js') }}" defer></script>
@@ -42,7 +41,7 @@
     <meta name="theme-color" content="#ffffff">
 </head>
 <body
-    class="notranslate hold-transition sidebar-mini sidebar-collapse">
+    class="notranslate hold-transition layout-fixed sidebar-expand-lg sidebar-mini sidebar-collapse bg-body-tertiary">
     @inertia
 <!-- ./wrapper -->
 

@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button @click="saveParish"/>
             <nav-button @click="deleteParish" title="Pfarramt löschen"
-                        class="ml-1" type="danger" icon="mdi mdi-delete">Löschen</nav-button>
+                        class="ms-1" type="danger" icon="mdi mdi-delete">Löschen</nav-button>
 
         </template>
         <form-selectize :options="cities" name="city_id" v-model="myParish.city_id" label="Kirchengemeinde"/>

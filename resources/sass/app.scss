@@ -38,9 +38,6 @@
 @import '~bootstrap/scss/bootstrap';
 $font-family-sans-serif: "Nunito", sans-serif;
 
-@import '~admin-lte/dist/css/adminlte.min.css';
-
-
 .navbar-laravel {
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
@@ -49,3 +46,5 @@ $font-family-sans-serif: "Nunito", sans-serif;
 .stripe-odd {
     background-color: #f2f2f2;
 }
+
+

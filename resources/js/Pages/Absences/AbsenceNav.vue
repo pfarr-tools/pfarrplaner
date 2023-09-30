@@ -29,7 +29,7 @@
 
 <template>
     <div class="button-row no-print btn-toolbar" role="toolbar">
-        <div class="btn-group mr-2" role="group">
+        <div class="btn-group me-2" role="group">
             <inertia-link class="btn btn-default"
                           v-if="numericDate > 201801"
                           :href="route('absences.index', { year: moment(date).subtract(1, 'months').format('YYYY'), month: moment(date).subtract(1, 'months').format('MM') })"

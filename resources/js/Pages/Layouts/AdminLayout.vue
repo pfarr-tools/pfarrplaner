@@ -28,119 +28,130 @@
   -->
 
 <template>
-    <div class="admin-layout wrapper">
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item" v-if="!noNavBar">
-                    <a class="nav-link" data-widget="pushmenu" href="#"><i class="mdi mdi-menu"></i></a>
-                </li>
-                <slot name="navbar-left"/>
-            </ul>
+    <!--begin::App Wrapper-->
+    <div class="admin-layout app-wrapper">
+        <!--begin::Header-->
+        <nav class="app-header navbar navbar-expand bg-body py-2">
+            <!--begin::Container-->
+            <div class="container-fluid">
+                <!--begin::Start Navbar Links-->
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button" @click.prevent.stop="toggleSideBar(!collapsed)">
+                            <i class="mdi mdi-menu"></i>
+                        </a>
+                    </li>
+                    <slot name="navbar-left" />
+                </ul>
+                <!--end::Start Navbar Links-->
+
+                <!--begin::End Navbar Links-->
+                <ul class="navbar-nav ms-auto">
+                    <slot name="navbar-right" />
+
+                    <li class="nav-item dropdown" v-if="enableControlSidebar">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <span class="mdi mdi-cog"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                            <div class="p-2">
+                                <slot name="control-sidebar" />
+                            </div>
+                        </ul>
+                    </li>
 
 
-            <!-- Right navbar links -->
-            <ul class="navbar-nav ml-auto">
-                <!-- Notifications Dropdown Menu -->
-                <li class="nav-item" id="toggleControlSidebar" v-if="enableControlSidebar">
-                    <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#"><i
-                        class="mdi mdi-cog"></i></a>
-                </li>
-                <li class="nav-item">
-                    <a class="btn btn-navbar btn-light mr-1" :href="route('manual', layout.route)" target="_blank" title="Benutzerhandbuch">
-                        <i class="mdi mdi-help-circle"></i>
-                    </a>
-                </li>
-                <li v-if="layout.adminUserSwitchBack" class="nav-item">
-                    <a class="btn btn-warning mr-1" :href="route('user.switchback')">
-                        <i class="mdi mdi-account-switch"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="btn btn-navbar" :href="route('logout')">
-                        <i class="mdi mdi-logout"></i><span class="d-none d-md-inline"> Abmelden</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-        <!-- /.navbar -->
+                    <!--begin::User Menu Dropdown-->
+                    <li class="nav-item dropdown user-menu">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <i v-if="!user.image" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
+                            <img v-else class="rounded-circle" :src="user.image.replace('attachments/', '/image/')" width="22" height="22" />
+                            <span class="d-none d-md-inline">{{ user.name }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                            <!--begin::User Image-->
+                            <li class="user-header text-bg-primary">
+                                <i v-if="!user.image" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
+                                <img v-else class="rounded-circle" :src="user.image.replace('attachments/', '/image/')" width="22" height="22" />
 
-        <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dark-primary elevation-4" :class="{dev: dev}" style="position: fixed;">
-            <!-- Brand Logo -->
-            <div class="brand-link" style="margin-left: 5px;">
-                <inertia-link class="brand-link-anchor" :href="route('home')"  :title="'Startseite (Pfarrplaner '+package.info.version+'-'+package.env+', '+moment(package.date).locale('de').format('LLLL')+')'">
-                    <img src="/img/logo/pfarrplaner.png" width="22" height="22" class="brand-image"
-                         style="opacity: .8; margin-top: 7px;"/>
-                    <span class="brand-text font-weight-light">{{ layout.appName }}</span>
-                </inertia-link>
-                <a class="mobile-menu-handle d-md-none" data-widget="pushmenu" href="#" title="Menüleiste schließen"><i class="mdi mdi-chevron-left-circle"></i></a>
+                                <p>
+                                    {{ user.name }}
+                                </p>
+                            </li>
+                            <!--end::User Image-->
+                            <!--begin::Menu Body-->
+                            <li class="user-body">
+                                <inertia-link :href="route('user.profile')" class="btn btn-default btn-flat">Einstellungen</inertia-link>
+                                <inertia-link :href="route('logout')" class="btn btn-default btn-flat float-end">Abmelden</inertia-link>
+                            </li>
+                            <!--end::Menu Body-->
+                            <!--begin::Menu Footer-->
+                            <!--end::Menu Footer-->
+                        </ul>
+                    </li>
+                    <!--end::User Menu Dropdown-->
+
+                </ul>
+                <!--end::End Navbar Links-->
             </div>
+            <!--end::Container-->
+        </nav>
+        <!--end::Header-->
+        <!--begin::Sidebar-->
+        <aside class="app-sidebar shadow" :class="dev ? 'bg-info' : 'bg-primary'" data-bs-theme="dark">
+            <!--begin::Sidebar Brand-->
+            <div class="sidebar-brand">
+                <!--begin::Brand Link-->
+                <inertia-link href="/" class="brand-link">
+                    <!--begin::Brand Image-->
+                    <img src="/img/logo/pfarrplaner.svg" class="brand-image opacity-75 shadow" :title="'Startseite (Pfarrplaner '+package.info.version+'-'+package.env+', '+moment(package.date).locale('de').format('LLLL')+')'">
+                    <!--end::Brand Image-->
+                    <!--begin::Brand Text-->
+                    <span class="brand-text fw-light">{{ layout.appName }}</span>
+                    <!--end::Brand Text-->
+                </inertia-link>
+                <!--end::Brand Link-->
+                <a class="d-inline d-md-none ms-2" @click.prevent.stop="toggleSideBar(true)"><i class="mdi mdi-chevron-left-circle"></i></a>
+            </div>
+            <!--end::Sidebar Brand-->
+            <!--begin::Sidebar Wrapper-->
+            <div class="sidebar-wrapper" >
+                <nav class="mt-2" v-if="!noNavBar">
+                    <!--begin::Sidebar Menu-->
+                    <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
 
-
-            <div class="sidebar" v-if="!noNavBar">
-                <!-- Sidebar user panel (optional) -->
-
-                <!-- Sidebar Menu -->
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                        data-accordion="false">
                         <li v-for="item in layout.menu" :class="{
                             'nav-header': (item.text == undefined) ,
                             'nav-item': (item.text != undefined),
-                            'has-treeview': (item.submenu != undefined),
                         }">
-                            <span v-if="item.text == undefined">{{ item }}</span>
-                            <inertia-link v-if="(item.text != undefined) && (item.inertia == true)" class="nav-link" :class="{ active: item.active }" :href="item.url">
+                            {{ item.text == undefined ? item.toUpperCase() : '' }}
+                            <inertia-link v-if="item.text && item.inertia" class="nav-link" :class="{ active: item.active }" :href="item.url">
                                 <i v-if="item.icon && (!item.profile)" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
-                                <span v-if="item.profile">
-                                    <i v-if="!user.image" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
-                                    <img v-else class="rounded-circle" :src="user.image.replace('attachments/', '/image/')" width="22" height="22" />
-                                </span>
-                                <p>{{ item.text }}
-                                    <i v-if="item.submenu" class="right mdi mdi-chevron-left"></i></p>
+                                <p v-if="item.text">
+                                    {{ item.text }}
+                                </p>
                             </inertia-link>
-                            <a v-if="(item.text != undefined) && (item.inertia == false)" class="nav-link" :class="{ active: item.active }" @click="clickUrl(item.url)">
-                                <i v-if="item.icon" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
-                                <p>{{ item.text }}
-                                    <i v-if="item.submenu" class="right mdi mdi-chevron-left"></i></p></a>
-                            <ul class="nav nav-treeview" style="display: none;" v-if="item.submenu != undefined">
-                                <li class="nav-item" v-for="subitem in item.submenu">
-                                    <inertia-link v-if="subitem.inertia" class="nav-link" :class="{active: subitem.active}"
-                                       :href="subitem.url">
-                                        <i v-if="subitem.icon" class="nav-icon" :class="subitem.icon"
-                                           :style="subitem.icon_color ? 'color: '+subitem.icon_color+';' : ''"></i>
-                                        <p>{{ subitem.text }}
-                                            <span v-if="subitem.counter != undefined" class="badge right"
-                                                  :class="subitem.counter_class ? 'badge-'+subitem.counter_class : 'badge-info'">{{ subitem.counter }}</span>
-                                        </p>
-                                    </inertia-link>
-                                    <a v-else class="nav-link" :class="{active: subitem.active}"
-                                       :href="subitem.url">
-                                        <i v-if="subitem.icon" class="nav-icon" :class="subitem.icon"
-                                           :style="subitem.icon_color ? 'color: '+subitem.icon_color+';' : ''"></i>
-                                        <p>{{ subitem.text }}
-                                            <span v-if="subitem.counter != undefined" class="badge right"
-                                                  :class="subitem.counter_class ? 'badge-'+subitem.counter_class : 'badge-info'">{{ subitem.counter }}</span>
-                                        </p>
-                                    </a>
-                                </li>
-                            </ul>
+                            <a v-if="item.text && (!item.inertia)" class="nav-link" :class="{ active: item.active }" :href="item.url">
+                                <i v-if="item.icon && (!item.profile)" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
+                                <p v-if="item.text">
+                                    {{ item.text }}
+                                </p>
+                            </a>
                         </li>
-                        <div class="user-panel d-flex"></div>
-                        <!-- Add icons to the links using the .nav-icon class
-                             with font-awesome or any other icon font library -->
-                    </ul>
-                </nav>
-                <!-- /.sidebar-menu -->
-            </div>
-            <!-- /.sidebar -->
-        </aside>
 
-        <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
-            <div class="content-header border-bottom pb-0 mb-0" v-if="!noContentHeader">
+
+                    </ul>
+                    <!--end::Sidebar Menu-->
+                </nav>
+            </div>
+            <!--end::Sidebar Wrapper-->
+        </aside>
+        <!--end::Sidebar-->
+        <!--begin::App Main-->
+        <main class="app-main">
+            <!--begin::App Content Header-->
+            <div class="app-content-header">
+                <!--begin::Container-->
                 <div class="container-fluid mb-0 pb-0">
                     <h1 v-if="title" class="m-0 mb-4 text-dark">{{ title }}</h1>
                     <!-- flash messages here -->
@@ -156,31 +167,28 @@
                     <div class="slot-tab-headers mb-0 pb-0">
                         <slot name="tab-headers" />
                     </div>
-                </div><!-- /.container-fluid -->
+                </div>
+                <!--end::Container-->
             </div>
-
-            <!-- Main content -->
-            <div class="content" :class="{'p-0': noPadding, 'pt-3': !noPadding}">
+            <!--end::App Content Header-->
+            <!--begin::App Content-->
+            <div class="app-content" :class="{'p-0': noPadding, 'pt-3': !noPadding}">
                 <div class="container-fluid" :class="{'p-0': noPadding}">
                     <slot/>
                 </div>
-                <div class="footer">
-                    <!-- footer here -->
-                </div>
             </div>
+            <!--end::App Content-->
+        </main>
+        <!--end::App Main-->
 
-        </div>
-
-        <aside class="control-sidebar control-sidebar-dark">
-            <div class="p-3 control-sidebar-content">
-                <slot name="control-sidebar"/>
-            </div>
-            <!-- Control sidebar content goes here -->
-        </aside>
     </div>
+    <!--end::App Wrapper-->
 </template>
 
 <script>
+
+import 'admin-lte/dist/css/adminlte.css';
+import 'admin-lte/dist/js/adminlte.min';
 
 export default {
     props: {
@@ -209,66 +217,32 @@ export default {
             dev: this.$page.props.dev,
             package: this.$page.props.package,
             user: this.$page.props.currentUser.data,
+            collapsed: true,
         };
     },
     methods: {
         clickUrl(url) {
-            if (url=='#') return;
+            if (url == '#') return;
             window.location.href = url;
-        }
+        },
+        toggleSideBar(state) {
+            this.collapsed = state;
+            let e = document.querySelector('body');
+            if (this.collapsed) {
+                e.classList.remove('sidebar-open');
+                e.classList.add('sidebar-collapse');
+            } else {
+                e.classList.remove('sidebar-collapse');
+                e.classList.add('sidebar-open');
+            }
+        },
     }
 }
 </script>
 
 <style scoped>
-aside.main-sidebar {
-    position: fixed !important;
-}
-
-.main-sidebar.dev {
-    background-color: orangered;
-}
-
-
 .nprogress-busy .admin-layout {
     margin-top: 2px;
 }
 
-.nav-item {
-    cursor: pointer;
-}
-
-.brand-link a {
-    text-decoration: none;
-    color: rgba(255,255,255,.8);
-}
-
-.brand-link a:hover,
-a.brand-link-anchor:hover,
-a.brand-link-anchor:hover span.brand-text {
-    text-decoration: none !important;
-    color: white;
-}
-
-.mobile-menu-handle {
-    float: right;
-    margin-right: 5px;
-}
-
-.slot-tab-headers /deep/ ul {
-    margin-bottom: 0;
-    border-bottom: 0;
-}
-
-.content-wrapper {
-    background-color: #fff;
-}
-
-.content-header {
-    background-color: #f4f6f9;
-}
-
-.content {
-    background-color: #fff;
-}
 </style>

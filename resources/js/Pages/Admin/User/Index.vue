@@ -76,7 +76,7 @@
                                                 </span>
                                                 <span v-else>{{ row.name }}</span>
                                             </div>
-                                            <span class="badge badge-secondary"
+                                            <span class="badge bg-secondary"
                                                   v-for="city in row.home_cities">{{ city.name }}</span>
                                         </td>
                                         <td>

@@ -31,7 +31,7 @@
     <div class="admin-tab">
         <div class="btn-group" role="group" aria-label="Bereiche">
             <inertia-link v-for="module,moduleKey in modules" :href="module.url" class="btn btn-light" :key="moduleKey">
-                <span :class="module.icon" class="mr-1"></span>
+                <span :class="module.icon" class="me-1"></span>
                 {{ module.text }}
             </inertia-link>
         </div>
@@ -62,7 +62,7 @@
                                 <template #default="{ row, rowIndex }">
                                     <tr v-if="row.isOfficialUser">
                                         <td>
-                                            <span class="mdi mdi-account mr-1"></span>
+                                            <span class="mdi mdi-account me-1"></span>
                                             {{ row.name }}
                                         </td>
                                         <td style="text-align: right">
