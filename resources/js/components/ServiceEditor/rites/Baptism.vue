@@ -87,7 +87,7 @@
                 <attachment  v-for="(attachment,key,index) in myBaptism.attachments" :key="'attachment'+key" :attachment="attachment" />
             </file-drag-receiver>
         </div>
-        <div class="col-md-1 text-right">
+        <div class="col-md-1 text-end">
             <inertia-link class="btn btn-sm btn-light" title="Taufe bearbeiten"
                :href="route('baptisms.edit', {baptism: baptism.id})"><span class="mdi mdi-pencil"></span></inertia-link>
             <button class="btn btn-sm btn-danger" title="Taufe löschen"

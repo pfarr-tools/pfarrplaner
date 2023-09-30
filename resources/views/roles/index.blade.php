@@ -29,7 +29,7 @@
                             <span class="badge bg-dark">{{ $permission->name }}</span>
                         @endforeach
                     </td>
-                    <td class="text-right" style="min-width: 100px;">
+                    <td class="text-end" style="min-width: 100px;">
                         @can('update', $role)
                             <a href="{{ route('roles.edit',$role->id)}}" class="btn btn-sm btn-primary"
                                title="Bearbeiten">

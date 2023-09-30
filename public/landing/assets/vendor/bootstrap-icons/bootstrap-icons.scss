@@ -1275,9 +1275,9 @@ $bootstrap-icons-map: (
   "text-center": "\f5c4",
   "text-indent-left": "\f5c5",
   "text-indent-right": "\f5c6",
-  "text-left": "\f5c7",
+  "text-start": "\f5c7",
   "text-paragraph": "\f5c8",
-  "text-right": "\f5c9",
+  "text-end": "\f5c9",
   "textarea-resize": "\f5ca",
   "textarea-t": "\f5cb",
   "textarea": "\f5cc",
@@ -2812,9 +2812,9 @@ $bootstrap-icons-map: (
 .bi-text-center::before { content: map-get($bootstrap-icons-map, "text-center"); }
 .bi-text-indent-left::before { content: map-get($bootstrap-icons-map, "text-indent-left"); }
 .bi-text-indent-right::before { content: map-get($bootstrap-icons-map, "text-indent-right"); }
-.bi-text-left::before { content: map-get($bootstrap-icons-map, "text-left"); }
+.bi-text-start::before { content: map-get($bootstrap-icons-map, "text-start"); }
 .bi-text-paragraph::before { content: map-get($bootstrap-icons-map, "text-paragraph"); }
-.bi-text-right::before { content: map-get($bootstrap-icons-map, "text-right"); }
+.bi-text-end::before { content: map-get($bootstrap-icons-map, "text-end"); }
 .bi-textarea-resize::before { content: map-get($bootstrap-icons-map, "textarea-resize"); }
 .bi-textarea-t::before { content: map-get($bootstrap-icons-map, "textarea-t"); }
 .bi-textarea::before { content: map-get($bootstrap-icons-map, "textarea"); }

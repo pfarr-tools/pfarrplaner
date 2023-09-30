@@ -85,7 +85,7 @@
                                      icon="mdi mdi-file-pdf-box" size="ca. 135 kB"/>
             </file-drag-receiver>
         </div>
-        <div class="col-md-1 text-right">
+        <div class="col-md-1 text-end">
             <a class="btn btn-sm btn-light" title="Bestattung bearbeiten"
                :href="route('funerals.edit', {funeral: funeral.id})"><span class="mdi mdi-pencil"></span></a>
             <button class="btn btn-sm btn-danger" title="Bestattung löschen"

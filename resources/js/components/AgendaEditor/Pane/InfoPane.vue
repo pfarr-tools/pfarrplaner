@@ -35,7 +35,7 @@
                     <div class="col-sm-8">
                         <h1>{{ agenda.title }}</h1>
                     </div>
-                    <div class="col-sm-4 text-right">
+                    <div class="col-sm-4 text-end">
                         <button class="btn btn-light" @click="editAgendaInfo"><span class="mdi mdi-pencil"></span>
                             Bearbeiten
                         </button>

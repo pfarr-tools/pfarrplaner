@@ -40,7 +40,7 @@
                             {{ service.titleText }} am {{ moment(service.date).format('DD.MM.YYYY') }},
                             {{ service.timeText }}, {{ service.locationText }}
                         </div>
-                        <div class="col-md-4 text-right">
+                        <div class="col-md-4 text-end">
                             <inertia-link class="btn btn-sm btn-light"
                                           :href="route('service.edit', {service: service.slug})"
                                           title="Gottesdienst bearbeiten"><span class="mdi mdi-pencil"></span>

@@ -13,7 +13,7 @@
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="left" valign="top">Taufgespräch
             </td>
-            <td class="text-right"
+            <td class="text-end"
                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="right"
                 valign="top">@if($baptism->appointment){{ $baptism->appointment->format('d.m.Y') }} {{ $baptism->appointment <= \Carbon\Carbon::now()? '✔' : '✘' }} @else
@@ -23,7 +23,7 @@
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="left" valign="top">Anmeldung erhalten
             </td>
-            <td class="text-right"
+            <td class="text-end"
                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="right" valign="top">{{ $baptism->registered ? '✔' : '✘' }}</td>
         </tr>
@@ -31,7 +31,7 @@
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="left" valign="top">Formular erstellt
             </td>
-            <td class="text-right"
+            <td class="text-end"
                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="right" valign="top">{{ $baptism->registration_document ? '✔' : '✘' }}</td>
         </tr>
@@ -39,7 +39,7 @@
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="left" valign="top">Anmeldung unterschrieben
             </td>
-            <td class="text-right"
+            <td class="text-end"
                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="right" valign="top">{{ $baptism->signed ? '✔' : '✘' }}</td>
         </tr>
@@ -47,7 +47,7 @@
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="left" valign="top">Urkunden erstellt
             </td>
-            <td class="text-right"
+            <td class="text-end"
                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="right" valign="top">{{ $baptism->docs_ready ? '✔' : '✘' }}</td>
         </tr>

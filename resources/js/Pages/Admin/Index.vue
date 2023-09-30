@@ -37,7 +37,7 @@
                 <div class="col-md-6 mb-2 mb-md-0">
                     <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
                 </div>
-                <div class="col-md-5 text-right">
+                <div class="col-md-5 text-end">
                     <dataset-show class="float-right" />
                 </div>
             </div>

@@ -48,7 +48,7 @@
                 <td v-if="editing == songbookIndex">
                     <form-selectize :options="colors" v-model="songbook.pivot.color" />
                 </td>
-                <td class="text-right">
+                <td class="text-end">
                     <nav-button icon="mdi mdi-pencil" title="Eintrag bearbeiten" v-if="editing != songbookIndex"
                                 class="btn-sm"
                                 force-no-text force-icon @click="editEntry(songbookIndex)" />

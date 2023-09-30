@@ -68,7 +68,7 @@
                                          :locations="locations" :ministries="ministries" />
                                 </div>
                             </div>
-                            <div class="col-2 text-right">
+                            <div class="col-2 text-end">
                                 <button v-if="Object.entries(tab.config).length" class="btn btn-light btn-sm"
                                         @click="toggleConfig(tabIndex)"
                                     :title="tab.configVisible ? 'Konfiguration einklappen' : 'Dieser Reiter kann weiter konfiguriert werden'">
@@ -84,7 +84,7 @@
             </div>
             <div class="col-md-3">
                 <h3>Hinzufügen</h3>
-                <div class="available-tab btn btn-light mb-1 text-left" v-for="(tab,tabIndex) in availableTabs"
+                <div class="available-tab btn btn-light mb-1 text-start" v-for="(tab,tabIndex) in availableTabs"
                     @click="addTab(tab.type)">
                     <div class="text-bold">
                         <span class="mdi mdi-toy-brick"></span> {{ tab.title }}

@@ -42,7 +42,7 @@
                 <div class="col-md-6 mb-2 mb-md-0">
                     <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
                 </div>
-                <div class="col-md-5 text-right">
+                <div class="col-md-5 text-end">
                     <dataset-show class="float-right" />
                 </div>
             </div>
@@ -70,7 +70,7 @@
                                         <td><div class="text-bold">{{ row.name }}</div>
                                             <div class="text-small">{{ row.description }}</div>
                                         </td>
-                                        <td class="text-right">
+                                        <td class="text-end">
                                             <nav-button v-if="row.can.update" class="btn-sm"
                                                         type="primary" icon="mdi mdi-pencil" title="Liederbuch bearbeiten"
                                                         force-icon force-no-text :href="route('songbook.edit', row.id)" />

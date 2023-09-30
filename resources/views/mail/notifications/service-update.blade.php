@@ -326,7 +326,7 @@
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 0; border-bottom-width: 0; margin: 0;"
                 align="left">© {{ \Carbon\Carbon::now()->format('Y') }} Pfarrplaner
             </td>
-            <td class="text-right"
+            <td class="text-end"
                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 0; border-bottom-width: 0; margin: 0;"
                 align="right">
                 <a class="text-muted" href="{{ env('APP_URL') }}" style="color: #636c72;">Jetzt einloggen</a>

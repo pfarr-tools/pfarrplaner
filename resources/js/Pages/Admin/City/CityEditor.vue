@@ -123,7 +123,7 @@
                     <div class="card">
                         <div class="card-header" id="headingKonfiApp">
                             <h2 class="mb-0">
-                                <button class="btn btn-block text-left pl-0 accordion-button collapsed" type="button" data-bs-toggle="collapse" data-target="#collapseKonfiApp" aria-expanded="false" aria-controls="collapseKonfiApp">
+                                <button class="btn btn-block text-start pl-0 accordion-button collapsed" type="button" data-bs-toggle="collapse" data-target="#collapseKonfiApp" aria-expanded="false" aria-controls="collapseKonfiApp">
                                     <img class="mx-2" style="max-height: 2em" src="https://www.pfarrplaner.de/img/external/konfiapp.png?v=2">KonfiApp
 
                                 </button>
@@ -167,7 +167,7 @@
                     <div class="card">
                         <div class="card-header" id="headingCommuniApp">
                             <h2 class="mb-0">
-                                <button class="btn btn-block text-left pl-0 accordion-button collapsed" type="button" data-bs-toggle="collapse" data-target="#collapseCommuniApp" aria-expanded="false" aria-controls="collapseCommuniApp">
+                                <button class="btn btn-block text-start pl-0 accordion-button collapsed" type="button" data-bs-toggle="collapse" data-target="#collapseCommuniApp" aria-expanded="false" aria-controls="collapseCommuniApp">
                                     <img class="mx-2" style="max-height: 2em" src="/img/external/communiapp.png">CommuniApp
                                 </button>
                             </h2>

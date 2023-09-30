@@ -45,7 +45,7 @@
                 <div class="col-md-6 mb-2 mb-md-0">
                     <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
                 </div>
-                <div class="col-md-5 text-right">
+                <div class="col-md-5 text-end">
                     <dataset-show class="float-right" />
                 </div>
             </div>
@@ -72,7 +72,7 @@
 
                                         </td>
                                         <td>{{ row.title }}</td>
-                                        <td class="text-right">
+                                        <td class="text-end">
                                             <nav-button class="btn-sm"
                                                         type="light" icon="mdi mdi-music-note-eighth" title="Noten bearbeiten"
                                                         force-icon force-no-text :href="route('liturgy.song.musiceditor', row.id)" />

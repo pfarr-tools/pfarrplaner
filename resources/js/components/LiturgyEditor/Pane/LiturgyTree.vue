@@ -44,7 +44,7 @@
                     <button class="btn btn-light" @click.prevent="modalOpen = true">Ablaufelemente importieren...
                     </button>
                 </div>
-                <div class="col-md-6 text-right">
+                <div class="col-md-6 text-end">
                     <div class="dropdown" v-if="hasDownload()">
                         <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
@@ -72,7 +72,7 @@
                               title="Klicken und ziehen, um die Position im Ablauf zu verändern"></span>
                             <span class="mdi mdi-chevron-right-circle" style="display: none;"></span> {{ block.title }}
                         </div>
-                        <div class="col-1 text-right" v-if="editable">
+                        <div class="col-1 text-end" v-if="editable">
                             <button @click.stop="deleteBlock(blockIndex)" class="btn btn-sm btn-danger"
                                     title="Abschnitt löschen">
                                 <span class="mdi mdi-delete"></span>
@@ -159,7 +159,7 @@
                                         <item-text-stats class="col-6" :item="item" :service="service"/>
                                     </div>
                                 </div>
-                                <div class="col-1 text-right" v-if="editable">
+                                <div class="col-1 text-end" v-if="editable">
                                     <button @click.stop="deleteItem(blockIndex, itemIndex)"
                                             class="btn btn-sm btn-danger" title="Element löschen">
                                         <span class="mdi mdi-delete"></span>

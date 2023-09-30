@@ -42,7 +42,7 @@
                 <details-info :service="service" />
             </div>
             <div class="col-md-2">{{ service.freeSeatsText}}</div>
-            <div class="col-md-4 text-right">
+            <div class="col-md-4 text-end">
                 <nav-button :href="route('seatfinder', service.slug)" title="Anmeldung hinzufügen"
                             type="success" icon="mdi mdi-ticket">Neue Anmeldung</nav-button>
                 <nav-button type="light" icon="mdi mdi-ticket" title="Anmeldungen anzeigen"

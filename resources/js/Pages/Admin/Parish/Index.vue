@@ -62,7 +62,7 @@
                                         <td>
                                             {{ row.owning_city.name }}
                                         </td>
-                                        <td class="text-right">
+                                        <td class="text-end">
                                             <nav-button type="light" icon="mdi mdi-pencil" title="Pfarramt bearbeiten"
                                                         @click="editParish(row)" force-icon force-no-text/>
                                             <nav-button type="danger" icon="mdi mdi-delete"

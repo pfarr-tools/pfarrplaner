@@ -56,13 +56,13 @@
                             <td>
                                 <avatar :username="displayName(person)" :src="person.image" />
                             </td>
-                            <td class="text-left">
+                            <td class="text-start">
                                 <div class="text-bold">{{ displayName(person, true) }}</div>
                                 <div>
                                     <span class="text-sm">in Kirchengemeinde</span><span v-if="person.city_scopes.length > 1">n</span>: <div class="badge bg-light" v-for="city in person.city_scopes">{{ city.name }}</div>
                                 </div>
                             </td>
-                            <td class="text-right">
+                            <td class="text-end">
                                 <nav-button type="primary"
                                             @click="extendPersonScopeAndCloseModal(person)">Diese Person übernehmen</nav-button>
                             </td>
@@ -72,7 +72,7 @@
                     <hr />
                     <p>
                         <span v-if="searchResults.length > 1">Die gesuchte Person ist nicht dabei?</span><span v-else>Das ist nicht die gesuchte Person?</span> Dann kannst du hier eine neue Person anlegen:</p>
-                    <div class="text-right">
+                    <div class="text-end">
                         <button class="btn btn-warning btn-sm" @click.prevent.stop="setIgnoreSearchResults">Als neue Person anlegen</button>
                     </div>
                 </div>

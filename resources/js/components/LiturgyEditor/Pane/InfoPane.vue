@@ -55,7 +55,7 @@
                               class="badge bg-light">{{ subject.subjectTitle }}</span>
                                 </div>
                             </div>
-                            <div class="col-3 col-md-12 text-right text-md-left">
+                            <div class="col-3 col-md-12 text-end text-md-left">
                                 <button class="btn btn-sm btn-light" @click.prevent="$emit('info')"
                                         title="Weitere Informationen">
                                     <span class="mdi mdi-information"></span> <span class="d-none d-md-inline">Weitere Infos</span>
@@ -99,8 +99,8 @@
                         Für {{ moment(myService.date).locale('de').format('dddd, DD.MM.YYYY') }} sind keine
                         liturgischen Informationen vorhanden.
                     </div>
-                    <div class="col-md-4 text-right">
-                        <div class="text-left">
+                    <div class="col-md-4 text-end">
+                        <div class="text-start">
                             <form-date-picker v-model="myService.alt_liturgy_date"
                                               label="Informationen für abweichendes Datum anzeigen"
                                               @input="setAlternativeDate"/>

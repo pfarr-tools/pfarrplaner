@@ -53,8 +53,8 @@
                         :title="service.timeText+': '+service.titleText+' ('+service.locationText+')'"
                         :key="serviceKey">
                         <td>{{ service.timeText + ': ' + service.titleText + ' (' + service.locationText + ')' }}</td>
-                        <td class="text-right">
-                            <form-selectize :options="types" v-model="service.konfiapp_event_type" class="text-left"/>
+                        <td class="text-end">
+                            <form-selectize :options="types" v-model="service.konfiapp_event_type" class="text-start"/>
                             <button class="btn btn-sm btn-secondary" @click="createQR(service)"><span class="mdi mdi-qrcode"></span> Anlegen</button>
                         </td>
                     </tr>

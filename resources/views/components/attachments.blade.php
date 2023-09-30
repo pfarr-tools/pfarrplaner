@@ -18,7 +18,7 @@
                             <td><span class="fa {{ \App\Helpers\FileHelper::icon($attachment->file) }}"></span> {{ $attachment->title }}</td>
                             <td>{{ \App\Helpers\FileHelper::bytesToHuman(Storage::size($attachment->file)) }}</td>
                             <td>{{ Storage::mimeType($attachment->file) }}</td>
-                            <td class="text-right">
+                            <td class="text-end">
                                 <button class="btn btn-sm btn-danger btn-remove-attachment" title="Anhang entfernen" data-attachment="{{ $attachment->id }}"><span class="fa fa-trash"></span></button>
                             </td>
                         </tr>

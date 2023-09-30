@@ -48,7 +48,7 @@
             <div class="row p-1" v-for="(calendarConnection, key) in calendarConnections" :key="key">
                 <div class="col-md-5">{{ calendarConnection.title }}</div>
                 <div class="col-md-5"><copyable-code :content="calendarConnection.uri" /></div>
-                <div class="col-md-2 text-right">
+                <div class="col-md-2 text-end">
                     <button class="btn btn-primary btn-sm" @click="editConnection(calendarConnection)"
                             title="Verbindung bearbeiten">
                         <span class="mdi mdi-pencil"></span>

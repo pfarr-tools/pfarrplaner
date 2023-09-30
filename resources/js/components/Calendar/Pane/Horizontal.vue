@@ -32,7 +32,7 @@
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th class="no-print text-left"></th>
+                <th class="no-print text-start"></th>
                 <calendar-day-header
                     v-for="(day,index) in myDays"
                     :day="day"

@@ -49,7 +49,7 @@
                         <span v-if="checkbox.label">{{ checkbox.label }}</span>
                     </label>
                 </div>
-                <div class="col-md-5 text-right">
+                <div class="col-md-5 text-end">
                     <dataset-show class="float-right" />
                 </div>
             </div>
@@ -86,7 +86,7 @@
                                             <div>{{ row.email }}</div>
                                             <role-badge v-for="role in row.roles" :role="role" :key="role.name"/>
                                         </td>
-                                        <td class="text-right">
+                                        <td class="text-end">
                                             <nav-button type="primary" icon="mdi mdi-account-edit" title="Person bearbeiten"
                                                         class="btn-sm" v-if="canEdit(row)"
                                                         force-icon force-no-text @click="editUser(row)"/>

@@ -54,7 +54,7 @@
                             {{ moment(absence.to).locale('de').format('DD.MM.YYYY') }}
                         </div>
                         <div class="col-md-3"></div>
-                        <div class="col-md-3 text-right">
+                        <div class="col-md-3 text-end">
                             <nav-button v-if="!absence.checking" type="success" icon="mdi mdi-check"
                                         title="Als überprüft markieren" force-icon @click="absence.checking=true; forceChecked(absence)" />
                             <span v-else class="mdi mdi-spin mdi-loading" title="Wird als überprüft markiert..."></span>
@@ -91,7 +91,7 @@
                                 </template>
                             </checked-process-item>
                         </div>
-                        <div class="col-md-3 text-right">
+                        <div class="col-md-3 text-end">
                             <nav-button v-if="!absence.approving" type="success" icon="mdi mdi-check"
                                         title="Als genehmigt markieren" force-icon @click="absence.approving=true; forceApproved(absence)" />
                             <span v-else class="mdi mdi-spin mdi-loading" title="Wird als genehmigt markiert..."></span>

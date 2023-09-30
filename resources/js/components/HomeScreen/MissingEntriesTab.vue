@@ -44,7 +44,7 @@
                     <span v-for="(ministry,ministryIndex) in missingMinistries(service)" :key="serviceIndex+'_missing_'+ministryIndex"
                           class="badge bg-danger">{{ ministry }}</span>
                 </div>
-                <div class="col-md-2 text-right">
+                <div class="col-md-2 text-end">
                     <inertia-link class="btn btn-primary" :href="route('service.edit', service.slug)"
                        title="Eintrag bearbeiten"><span class="mdi mdi-pencil"></span></inertia-link>
                 </div>

@@ -45,7 +45,7 @@
                 <div class="col-md-4">
                     <details-info :service="service" />
                 </div>
-                <div class="col-md-2 text-right">
+                <div class="col-md-2 text-end">
                     <inertia-link class="btn btn-light" title="Im Kalender ansehen"
                                   :href="route('calendar', moment(service.date).format('YYYY-MM'))">
                         <span class="mdi mdi-calendar"></span>

@@ -37,7 +37,7 @@
                         <span v-if="comment.private" class="mdi mdi-lock" title="Dieser Kommentar ist nur für mich sichtbar."></span><br />
                         {{ moment(comment.created_at).locale('de-DE').format('LLLL') }}</p>
                 </div>
-                <div class="col-1 text-right">
+                <div class="col-1 text-end">
                     <button class="btn btn-sm btn-danger" title="Kommentar löschen" @click.prevent="deleteComment(comment.id, key, index)">
                         <span class="mdi mdi-delete"></span>
                     </button>

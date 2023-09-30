@@ -70,7 +70,7 @@
                                 Strophe
                             </div>
                         </div>
-                        <div class="col-1 text-right" style="margin-top: 2em;">
+                        <div class="col-1 text-end" style="margin-top: 2em;">
                             <button class="btn btn-sm btn-danger" @click.prevent="deleteVerse(verseKey)">
                                 <span class="mdi mdi-delete"></span>
                             </button>

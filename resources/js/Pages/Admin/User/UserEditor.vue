@@ -189,7 +189,7 @@
                                 <vue-json-pretty v-else @click="editSetting = settingKey"
                                                  :data="mySettings[settingKey]"/>
                             </div>
-                            <div class="col-md-1 text-right">
+                            <div class="col-md-1 text-end">
                                 <nav-button type="danger" icon="mdi mdi-delete" force-no-text force-icon
                                             class="btn-sm pull-right"
                                             title="Einstellung löschen" @click="mySettings[settingKey] = null"/>

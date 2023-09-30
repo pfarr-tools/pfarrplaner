@@ -1271,9 +1271,9 @@ url("./fonts/bootstrap-icons.woff?a74547b2f0863226942ff8ded57db345") format("wof
 .bi-text-center::before { content: "\f5c4"; }
 .bi-text-indent-left::before { content: "\f5c5"; }
 .bi-text-indent-right::before { content: "\f5c6"; }
-.bi-text-left::before { content: "\f5c7"; }
+.bi-text-start::before { content: "\f5c7"; }
 .bi-text-paragraph::before { content: "\f5c8"; }
-.bi-text-right::before { content: "\f5c9"; }
+.bi-text-end::before { content: "\f5c9"; }
 .bi-textarea-resize::before { content: "\f5ca"; }
 .bi-textarea-t::before { content: "\f5cb"; }
 .bi-textarea::before { content: "\f5cc"; }

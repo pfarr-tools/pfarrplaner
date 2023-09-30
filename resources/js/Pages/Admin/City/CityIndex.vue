@@ -48,7 +48,7 @@
                         <span v-if="checkbox.label">{{ checkbox.label }}</span>
                     </label>
                 </div>
-                <div class="col-md-5 text-right">
+                <div class="col-md-5 text-end">
                     <dataset-show class="float-right" />
                 </div>
             </div>
@@ -66,7 +66,7 @@
                                 <template #default="{ row, rowIndex }">
                                     <tr>
                                         <td>{{ row.name }}</td>
-                                        <td class="text-right">
+                                        <td class="text-end">
                                             <inertia-link v-if="row.canEdit" class="btn btn-sm btn-primary" title="Kirchengemeinde bearbeiten"
                                                           :href="route('city.edit', {city: row.name})">
                                                 <span class="mdi mdi-pencil"></span>

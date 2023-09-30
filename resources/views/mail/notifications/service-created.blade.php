@@ -978,7 +978,7 @@
                                                                                             align="left" valign="top">
                                                                                             Taufgespräch
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">@if($baptism->appointment){{ $baptism->appointment->format('d.m.Y') }} {{ $baptism->appointment <= \Carbon\Carbon::now()? '✔' : '✘' }} @else
@@ -989,7 +989,7 @@
                                                                                             align="left" valign="top">
                                                                                             Anmeldung erhalten
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">{{ $baptism->registered ? '✔' : '✘' }}</td>
@@ -999,7 +999,7 @@
                                                                                             align="left" valign="top">
                                                                                             Formular erstellt
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">{{ $baptism->registration_document ? '✔' : '✘' }}</td>
@@ -1009,7 +1009,7 @@
                                                                                             align="left" valign="top">
                                                                                             Anmeldung unterschrieben
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">{{ $baptism->signed ? '✔' : '✘' }}</td>
@@ -1019,7 +1019,7 @@
                                                                                             align="left" valign="top">
                                                                                             Urkunden erstellt
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">{{ $baptism->docs_ready ? '✔' : '✘' }}</td>
@@ -1062,7 +1062,7 @@
                                                                                             align="left" valign="top">
                                                                                             Traugespräch
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">@if($wedding->appointment){{ $wedding->appointment->format('d.m.Y') }} {{ $wedding->appointment <= \Carbon\Carbon::now()? '✔' : '✘' }} @else
@@ -1073,7 +1073,7 @@
                                                                                             align="left" valign="top">
                                                                                             Anmeldung erhalten
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">{{ $wedding->registered ? '✔' : '✘' }}</td>
@@ -1083,7 +1083,7 @@
                                                                                             align="left" valign="top">
                                                                                             Formular erstellt
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">{{ $wedding->registration_document ? '✔' : '✘' }}</td>
@@ -1093,7 +1093,7 @@
                                                                                             align="left" valign="top">
                                                                                             Anmeldung unterschrieben
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">{{ $wedding->signed ? '✔' : '✘' }}</td>
@@ -1103,7 +1103,7 @@
                                                                                             align="left" valign="top">
                                                                                             Urkunden erstellt
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">{{ $wedding->docs_ready ? '✔' : '✘' }}</td>
@@ -1146,7 +1146,7 @@
                                                                                             align="left" valign="top">
                                                                                             Abkündigung
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">@if($funeral->announcement){{ $funeral->announcement->format('d.m.Y') }} {{ $funeral->announcement <= \Carbon\Carbon::now()? '✔' : '✘' }} @else
@@ -1157,7 +1157,7 @@
                                                                                             align="left" valign="top">
                                                                                             Bestattungsart
                                                                                         </td>
-                                                                                        <td class="text-right"
+                                                                                        <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
                                                                                             valign="top">{{ $funeral->type }}</td>
@@ -1321,7 +1321,7 @@
                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 0; border-bottom-width: 0; margin: 0;"
                                                 align="left">© 2019 Pfarrplaner
                                             </td>
-                                            <td class="text-right"
+                                            <td class="text-end"
                                                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 0; border-bottom-width: 0; margin: 0;"
                                                 align="right">
                                                 <a class="text-muted" href="{{ env('APP_URL') }}"

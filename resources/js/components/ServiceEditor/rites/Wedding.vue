@@ -109,7 +109,7 @@
                 <attachment  v-for="(attachment,key,index) in wedding.attachments" :key="'attachment'+key" :attachment="attachment" />
             </file-drag-receiver>
         </div>
-        <div class="col-md-1 text-right">
+        <div class="col-md-1 text-end">
             <a class="btn btn-sm btn-light" title="Trauung bearbeiten"
                :href="route('weddings.edit', {wedding: wedding.id})"><span class="mdi mdi-pencil"></span></a>
             <button class="btn btn-sm btn-danger" title="Trauung löschen"

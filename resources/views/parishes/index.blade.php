@@ -25,7 +25,7 @@
                 <tr>
                     <td>{{$parish->name}}</td>
                     <td>{{$parish->owningCity->name}}</td>
-                    <td class="text-right" style="min-width: 100px;">
+                    <td class="text-end" style="min-width: 100px;">
                         @can('update', $parish)
                             <a href="{{ route('parishes.edit',$parish->id)}}" class="btn btn-primary"
                                title="Bearbeiten"><span class="fa fa-edit"></span></a>

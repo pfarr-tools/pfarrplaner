@@ -13,7 +13,7 @@
                             {{ \Carbon\Carbon::createFromTimestamp(Storage::lastModified($value))->format('d.m.Y H:i:s') }}
                             (<a href="{{ route('storage', ['path' => pathinfo($value, PATHINFO_FILENAME), 'prettyName' => ($prettyName ?? $name).'.'.(isset($forceExtension) ? $forceExtension :  pathinfo($value, PATHINFO_EXTENSION))]) }}">Ansehen</a>)<br />
                         </div>
-                        <div class="col-sm-4 text-right">
+                        <div class="col-sm-4 text-end">
                             <label><input type="checkbox" name="remove_{{ $name }}" value="1" /> Entfernen</label>
                         </div>
                     </div>

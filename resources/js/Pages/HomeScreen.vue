@@ -56,7 +56,7 @@
                         <div v-for="service in myQuickPickerServices" class="mb-2" style="font-size: .8em;">
                             <div class="text-bold">{{ service.timeText }} {{ service.titleText }}</div>
                             <div class="text-sm text-muted">{{ service.locationText }}</div>
-                            <div class="text-right">
+                            <div class="text-end">
                                 <nav-button type="primary btn-sm" icon="mdi mdi-pencil" force-icon
                                             title="Gottesdienst bearbeiten" @click="editService(service)"/>
                                 <nav-button type="light  btn-sm" icon="mdi mdi-view-list" force-icon

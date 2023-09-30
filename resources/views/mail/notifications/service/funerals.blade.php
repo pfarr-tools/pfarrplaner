@@ -5,11 +5,11 @@
         <tbody>
         <tr>
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;" align="left" valign="top">Abkündigung</td>
-            <td class="text-right" style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;" align="right" valign="top">@if($funeral->announcement){{ $funeral->announcement->format('d.m.Y') }} {{ $funeral->announcement <= \Carbon\Carbon::now()? '✔' : '✘' }} @else ✘ @endif</td>
+            <td class="text-end" style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;" align="right" valign="top">@if($funeral->announcement){{ $funeral->announcement->format('d.m.Y') }} {{ $funeral->announcement <= \Carbon\Carbon::now()? '✔' : '✘' }} @else ✘ @endif</td>
         </tr>
         <tr>
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;" align="left" valign="top">Bestattungsart</td>
-            <td class="text-right" style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;" align="right" valign="top">{{ $funeral->type }}</td>
+            <td class="text-end" style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;" align="right" valign="top">{{ $funeral->type }}</td>
         </tr>
         <tr>
             @component('mail.layout.blocks.cell')Dateianhänge @endcomponent

@@ -45,7 +45,7 @@
                 <div class="col-md-6 mb-2 mb-md-0">
                     <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
                 </div>
-                <div class="col-md-5 text-right">
+                <div class="col-md-5 text-end">
                     <dataset-show class="float-right" />
                 </div>
             </div>
@@ -65,7 +65,7 @@
                                     <tr>
                                         <td >{{ String((row.songbook_abbreviation || row.songbook || '')+' '+(row.reference || '')).trim() }}</td>
                                         <td>{{ row.title }}</td>
-                                        <td class="text-right">
+                                        <td class="text-end">
                                             <nav-button class="btn-sm"
                                                         type="primary" icon="mdi mdi-pencil" title="Psalm bearbeiten"
                                                         force-icon force-no-text :href="route('psalm.edit', row.id)" />

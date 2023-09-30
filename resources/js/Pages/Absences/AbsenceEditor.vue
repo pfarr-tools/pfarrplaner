@@ -140,7 +140,7 @@
                                               @input="setReplacementDateRange(replacement, $event)"
                                               :disabled="!mayEdit"/>
                         </div>
-                        <div class="col-md-1 text-right">
+                        <div class="col-md-1 text-end">
                             <button class="btn btn-danger" @click.prevent="deleteReplacement(replacementKey)"
                                     title="Vertretung entfernen" :disabled="!mayEdit">
                                 <span class="mdi mdi-delete"></span>

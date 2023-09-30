@@ -61,7 +61,7 @@
                                         <td>{{ row.name }}</td>
                                         <td>{{ row.city.name }}</td>
                                         <td>{{ row.default_time ? row.default_time.substr(0,5)+' Uhr' : ''}}</td>
-                                        <td class="text-right">
+                                        <td class="text-end">
                                             <nav-button type="light" icon="mdi mdi-pencil" title="Ort bearbeiten"
                                                         @click="editLocation(row)" force-icon force-no-text/>
                                             <nav-button type="danger" icon="mdi mdi-delete"

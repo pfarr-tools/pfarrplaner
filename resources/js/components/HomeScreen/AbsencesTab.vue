@@ -49,7 +49,7 @@
                             {{ absence.replacement_notes }}
                         </div>
                     </div>
-                    <div class="col-md-3 text-right">
+                    <div class="col-md-3 text-end">
                         <a class="btn btn-primary" :href="route('absence.edit', absence.id)" title="Eintrag bearbeiten">
                             <span class="mdi mdi-pencil"></span>
                         </a>

@@ -129,7 +129,7 @@
                         <div class="col-md-3">
                             <participants :participants="myWedding.service.pastors"></participants>
                         </div>
-                        <div class="col-md-3 text-right">
+                        <div class="col-md-3 text-end">
                             <inertia-link :href="route('service.edit', wedding.service.slug)"
                                           title="Gottesdienst bearbeiten"
                                           class="btn btn-light">

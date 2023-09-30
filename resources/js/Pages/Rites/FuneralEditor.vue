@@ -159,7 +159,7 @@
                         <div class="col-md-3">
                             <participants :participants="myFuneral.service.pastors"></participants>
                         </div>
-                        <div class="col-md-3 text-right">
+                        <div class="col-md-3 text-end">
                             <inertia-link :href="route('service.edit', funeral.service.slug)"
                                           title="Gottesdienst bearbeiten"
                                           class="btn btn-light">
@@ -268,7 +268,7 @@
                     <hr/>
                 </div>
                 <div class="row">
-                    <div class="col-12 text-right">
+                    <div class="col-12 text-end">
                         <button v-if="!showStoryEditor" class="btn btn-light" @click="showStoryEditor = true">
                             <span class="mdi mdi-chevron-left"></span> Editor für Lebenslauf einblenden
                         </button>

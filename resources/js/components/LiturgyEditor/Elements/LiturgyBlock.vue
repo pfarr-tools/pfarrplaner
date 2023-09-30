@@ -31,7 +31,7 @@
     <div class="liturgy-block" :class="{focused: focused}" @click="focus">
         <div class="row">
             <div class="col-6 liturgy-block-title" @click="changeTitle">{{ block.title }}</div>
-            <div class="col-6 text-right">
+            <div class="col-6 text-end">
                 <button @click="addItem" class="btn btn-sm btn-light" title="Freitext hinzufügen"><span class="mdi mdi-text"></span>
                 </button>
                 <button @click="addItem" class="btn btn-sm btn-light" title="Psalm hinzufügen"><span class="mdi mdi-hands-pray"></span>

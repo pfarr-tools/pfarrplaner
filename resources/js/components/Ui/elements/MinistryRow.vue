@@ -38,7 +38,7 @@
                            :include-teams-from-city="includeTeamsFromCity" :city="city"
                            @count="$emit('count')" />
         </div>
-        <div class="col-md-1 text-right">
+        <div class="col-md-1 text-end">
             <button class="btn btn-danger btn-sm" @click.prevent="deleteRow()" title="Reihe entfernen"><span class="mdi mdi-delete"></span></button>
         </div>
     </div>

@@ -12,7 +12,7 @@
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="left" valign="top">Traugespräch
             </td>
-            <td class="text-right"
+            <td class="text-end"
                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="right"
                 valign="top">@if($wedding->appointment){{ $wedding->appointment->format('d.m.Y') }} {{ $wedding->appointment <= \Carbon\Carbon::now()? '✔' : '✘' }} @else
@@ -22,7 +22,7 @@
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="left" valign="top">Anmeldung erhalten
             </td>
-            <td class="text-right"
+            <td class="text-end"
                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="right" valign="top">{{ $wedding->registered ? '✔' : '✘' }}</td>
         </tr>
@@ -30,7 +30,7 @@
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="left" valign="top">Formular erstellt
             </td>
-            <td class="text-right"
+            <td class="text-end"
                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="right" valign="top">{{ $wedding->registration_document ? '✔' : '✘' }}</td>
         </tr>
@@ -38,7 +38,7 @@
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="left" valign="top">Anmeldung unterschrieben
             </td>
-            <td class="text-right"
+            <td class="text-end"
                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="right" valign="top">{{ $wedding->signed ? '✔' : '✘' }}</td>
         </tr>
@@ -46,7 +46,7 @@
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="left" valign="top">Urkunden erstellt
             </td>
-            <td class="text-right"
+            <td class="text-end"
                 style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                 align="right" valign="top">{{ $wedding->docs_ready ? '✔' : '✘' }}</td>
         </tr>

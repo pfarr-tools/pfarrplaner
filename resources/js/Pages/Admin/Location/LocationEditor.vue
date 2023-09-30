@@ -97,7 +97,7 @@
                                                 </td>
                                                 <td>{{ row.seats }}</td>
                                                 <td>{{ row.split }}</td>
-                                                <td class="text-right">
+                                                <td class="text-end">
                                                     <nav-button type="light" icon="mdi mdi-pencil" title="Reihe bearbeiten"
                                                                 @click="editRow(row)" force-icon force-no-text/>
                                                     <nav-button type="danger" icon="mdi mdi-delete"
