@@ -32,7 +32,7 @@
         <template #navbar-left>
             <calendar-nav-top :date="new Date(myDate)" :years="years" @collapseall="toggleCollapse"
                               :orientation="orientation" :targetMode="targetMode" :target="target"
-                              :people-loaded="peopleLoaded"
+                              :people-loaded="peopleLoaded" :writable-cities="writableCities" :can-create="canCreate"
                               @toggle-target-mode="toggleTargetMode"
                               @navigate="navigateTo"
             />
@@ -107,7 +107,7 @@ import FormCheck from "../../components/Ui/forms/FormCheck";
 
 export default {
     components: {FormCheck, FormSelectize, PeopleSelect, Modal, CalendarPaneMobile},
-    props: ['date', 'days', 'cities', 'years', 'absences', 'canCreate', 'services', 'ministries'],
+    props: ['date', 'days', 'cities', 'years', 'absences', 'canCreate', 'services', 'ministries', 'writableCities'],
     provide() {
         return {
             settings: this.$page.props.settings || {},

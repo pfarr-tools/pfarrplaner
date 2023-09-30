@@ -45,9 +45,6 @@
             <tbody>
                 <tr v-for="city in cities">
                     <th class="city-title">
-                        <nav-button class="btn-xs mt-3" type="success" force-no-text force-icon
-                                    icon="mdi mdi-plus" :title="'Gottesdienst für '+city.name+' hinzufügen'"
-                                    @click="addService(city)" />
                         <span class="pt-2">{{ city.name }}</span><span class="mdi mdi-arrow-down-circle pt-2"></span>
                     </th>
                     <calendar-cell v-for="(day,index) in myDays" :day="day"
@@ -86,9 +83,6 @@ export default {
             if (this.services[city.id][day.id] == undefined) return [];
             return this.services[city.id][day.id];
         },
-        addService(city) {
-            this.$inertia.get(route('service.create', {city: city.id, date: this.date}));
-        }
     },
     computed: {
         serviceCount() {

@@ -103,6 +103,7 @@ class CalController extends Controller
 
         $user = Auth::user();
         $cities = $user->cities;
+        $writableCities = $user->writableCities;
 
         $services = [];
         foreach ($cities as $city) {
@@ -126,7 +127,7 @@ class CalController extends Controller
 
         return Inertia::render(
             'Calendar/Calendar',
-            compact('date', 'days', 'cities', 'years', 'absences', 'canCreate', 'services', )
+            compact('date', 'days', 'cities', 'years', 'absences', 'canCreate', 'services', 'writableCities')
         );
     }
 

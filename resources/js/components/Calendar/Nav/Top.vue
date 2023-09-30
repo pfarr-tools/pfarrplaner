@@ -92,6 +92,9 @@
                 <span class="mdi mdi-chevron-right"></span>
             </button>
         </div>
+
+        <create-service-wizard-button v-if="canCreate" type="success" :cities="writableCities" class="mr-2" />
+
         <nav-button class="mr-2"
                     :type="targetMode ? 'warning' : 'default'"
                     :icon="targetMode ? (target.exclusive ? 'mdi mdi-account-convert-outline': 'mdi mdi-account-arrow-down-outline') : 'mdi mdi-target-account'"
@@ -113,9 +116,10 @@
 import EventBus from "../../../plugins/EventBus";
 import {CalendarToggleDayColumnEvent} from "../../../events/CalendarToggleDayColumnEvent";
 import NavButton from "../../Ui/buttons/NavButton";
+import CreateServiceWizardButton from "../../Ui/wizards/CreateServiceWizardButton.vue";
 
 export default {
-    components: {NavButton},
+    components: {CreateServiceWizardButton, NavButton},
     data() {
         return {
             slave: false,
@@ -124,11 +128,13 @@ export default {
         }
     },
     props: {
-        date: {type: Date},
-        years: {type: Array},
-        orientation: {type: String},
-        targetMode: {type: Boolean},
-        target: {type: Object},
+        date: Date,
+        writableCities: Array,
+        years: Array,
+        orientation: String,
+        targetMode: Boolean,
+        target: Object,
+        canCreate: Boolean,
     },
     methods: {
         monthLink: function (month) {

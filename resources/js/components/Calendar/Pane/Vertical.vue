@@ -36,9 +36,6 @@
                 <th v-for="city in cities" class="city-title">
                     <span class="mdi mdi-arrow-down-circle pr-2"></span>
                     {{ city.name }}
-                    <nav-button class="btn-xs" type="success" force-no-text force-icon
-                                icon="mdi mdi-plus" :title="'Gottesdienst für '+city.name+' hinzufügen'"
-                                @click="addService(city)" />
                 </th>
             </tr>
             </thead>
@@ -88,9 +85,6 @@ export default {
             if (this.services[city.id][day.id] == undefined) return [];
             return this.services[city.id][day.id];
         },
-        addService(city) {
-            this.$inertia.get(route('service.create', {city: city.id, date: moment(this.date).format('YYYY-MM-DD')}));
-        }
     }
 }
 </script>
