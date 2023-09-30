@@ -86,6 +86,7 @@ class InstallUpdates extends Command
 
         // pull
         $this->getOutput()->section('Fetching updates to '.$files->count().' files');
+        if (file_exists(base_path('package-lock.json'))) unlink(base_path('package-lock.json'));
         exec('git pull');
 
 
