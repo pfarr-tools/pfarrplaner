@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.30.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.29.0...v2023.30.0) (2023-09-30)
+
+
+### Features
+
+* Assistent zum Anlegen von Gottesdiensten auch im Kalender verwenden ([2f1e17b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2f1e17bc0f7c806c755d13360ef26431a5b36115))
+* Zahlreiche Verbesserungen an der Benutzeroberfläche ([b4a6df3](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b4a6df31884fcaef734b120c027c6646210d76ce))
+
+
+### Bug Fixes
+
+* Firefox warnt vor inkorrekten Same-Site-Attribut ([23978ac](https://codeberg.org/pfarr.tools/pfarrplaner/commit/23978ac8bd1b130f16b2a4b52f42ed5998d15460))
+* Vue warnt vor doppelten Schlüsselwerten ([3d47e80](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3d47e805af92c14fd00750b6fae935b6b1e7ccda))
+
 ## [2023.29.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.28.0...v2023.29.0) (2023-09-29)
 
 
