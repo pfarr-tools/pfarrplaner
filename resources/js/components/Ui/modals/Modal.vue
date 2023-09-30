@@ -29,29 +29,30 @@
 
 <template>
     <form @submit.prevent="closeModal">
-        <div class="modal-mask">
-            <div class="modal-wrapper">
-                <div class="modal-dialog" role="document" tabindex="-1" :style="{maxWidth: maxWidth, minHeight: minHeight || 'auto', maxHeight: maxHeight || 'auto'}">
-                    <div class="modal-content" :style="{maxWidth: maxWidth, minHeight: minHeight || 'auto', maxHeight: maxHeight || 'auto'}">
-                        <div class="modal-header">
-                            <h5 class="modal-title">{{ title }}</h5>
-                            <button v-if="allowCancel" type="button" class="close" data-dismiss="modal"
-                                    aria-label="Fenster schließen" @click.prevent="cancelModal('window')">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body" ref="body">
-                            <slot />
-                        </div>
-                        <div class="modal-footer">
-                            <slot name="additional-buttons" />
-                            <button  v-if="allowClose" type="button" :class="'btn btn-'+submitButtonType"
-                                    @click.prevent="closeModal">{{ closeButtonLabel }}
-                            </button>
-                            <button v-if="allowCancel" type="button" :class="'btn btn-'+cancelButtonType" @click.prevent="cancelModal('button')">
-                                {{ cancelButtonLabel }}
-                            </button>
-                        </div>
+        <!-- Modal -->
+        <div class="modal fade show d-block" :data-bs-backdrop="allowCancel ? '' : 'static'" tabindex="-1" aria-hidden="true"
+             @keyup.esc="handleEsc" @keyup.enter="closeModal" @click="handleEsc">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document" :style="{maxWidth: maxWidth, minHeight: minHeight || 'auto', maxHeight: maxHeight || 'auto'}"
+                 @click.stop="nop">
+                <div class="modal-content" :style="{maxWidth: maxWidth, minHeight: minHeight || 'auto', maxHeight: maxHeight || 'auto'}">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ title }}</h5>
+                        <button v-if="allowCancel" type="button" class="btn-close" data-dismiss="modal"
+                                aria-label="Fenster schließen" @click.prevent="cancelModal('window')">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div class="modal-body" ref="body">
+                        <slot />
+                    </div>
+                    <div class="modal-footer">
+                        <slot name="additional-buttons" />
+                        <button  v-if="allowClose" type="button" :class="'btn btn-'+submitButtonType"
+                                 @click.prevent="closeModal">{{ closeButtonLabel }}
+                        </button>
+                        <button v-if="allowCancel" type="button" :class="'btn btn-'+cancelButtonType" @click.prevent="cancelModal('button')">
+                            {{ cancelButtonLabel }}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -117,26 +118,19 @@ export default {
             document.body.classList.remove("modal-open");
             this.$emit('cancel', source);
         },
+        nop() {},
+        handleEsc() {
+            if (!this.allowCancel) return;
+            this.cancelModal('esc');
+        },
     }
 }
 </script>
 
 <style scoped>
-.modal-mask {
-    position: fixed;
-    z-index: 9998;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, .5);
-    display: table;
-    transition: opacity .3s ease;
-}
 
-.modal-wrapper {
-    display: table-cell;
-    vertical-align: middle;
+.modal {
+    background-color: #000A;
 }
 
 .modal-dialog {
