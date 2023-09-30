@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.30.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.2...v2023.30.3) (2023-09-30)
+
+
+### Bug Fixes
+
+* Dialogfelder sind unsichtbar ([da897b7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/da897b7c44be9fa46fe3b252b75d5da6ff76e5d6))
+
 ### [2023.30.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.1...v2023.30.2) (2023-09-30)
 
 
