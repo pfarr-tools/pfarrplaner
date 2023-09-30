@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.30.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.0...v2023.30.1) (2023-09-30)
+
+
+### Bug Fixes
+
+* Leere Benutzeroberfläche, wenn der Benutzer kein Bild hochgeladen hat ([030377b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/030377bf93f9961f4d499924d3037dff6f23955a))
+* Updates schlagen fehl, weil package-lock.json nicht überschrieben werden kann ([6cb7842](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6cb78425be7578924e4c1b5b134073618af01d8c))
+
 ## [2023.30.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.29.0...v2023.30.0) (2023-09-30)
 
 
