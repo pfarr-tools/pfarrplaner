@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.30.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.3...v2023.30.4) (2023-10-01)
+
+
+### Bug Fixes
+
+* Kalendereinträge mit eigenen Beerdigungen sind nicht lesbar ([102a58e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/102a58e2dd70319edbf9a2fff2308dd12d13861a))
+
 ### [2023.30.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.2...v2023.30.3) (2023-09-30)
 
 
