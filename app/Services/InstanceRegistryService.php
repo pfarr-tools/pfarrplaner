@@ -59,7 +59,7 @@ class InstanceRegistryService
             'version' => $package['versionString'],
             'buildDate' => $package['buildDateString'],
             'appName' => config('app.name'),
-            'commit' => UpdateService::currentCommit(),
+            'commit' => (new UpdateService())->currentCommit(),
             'churches' => City::count(),
             'people' => User::count(),
             'services' => Service::count(),
