@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.30.7](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.6...v2023.30.7) (2023-10-02)
+
+
+### Bug Fixes
+
+* Fehler beim Registrieren der Instanz ([ee3bbe2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ee3bbe26a2cffcc61edd3023eb20e4c60fbd5984))
+
 ### [2023.30.6](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.5...v2023.30.6) (2023-10-02)
 
 
