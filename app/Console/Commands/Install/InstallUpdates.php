@@ -61,7 +61,9 @@ class InstallUpdates extends Command
      */
     public function handle()
     {
-        $files = UpdateService::getUpdateableFiles();
+        $updateService = new UpdateService();
+
+        $files = $updateService->getUpdateableFiles();
         $this->line('');
 
         if ($files->count() == 0) {
@@ -69,7 +71,7 @@ class InstallUpdates extends Command
             return Command::SUCCESS;
         }
 
-        $actions = UpdateService::getUpdateActions($files);
+        $actions = $updateService->getUpdateActions($files);
 
         if (true === $this->options('dry-run')) {
             $this->line('The following '.$files->count().' files will be affected by the next update: ');

@@ -36,11 +36,72 @@ use Illuminate\Support\Str;
 class UpdateService
 {
 
+    protected $cachedJson = [];
+
+    public function __construct()
+    {
+        $this->cachedJson['package'] = $d = $this->getJson('package.json');
+        $this->cachedJson['composer'] = $c = $this->getJson('composer.json');
+    }
+
+
+    /**
+     * Read the specified file
+     * @param $jsonFile Path to Json file
+     * @return array|mixed
+     */
+    protected function getJson($jsonFile)
+    {
+        return json_decode(file_get_contents($jsonFile), true) ?? [];
+    }
+
+    /**
+     * Check if the only change in a json object is the version string
+     * @param array $json JSON data
+     * @param string $cacheKey Cache key
+     * @return bool
+     */
+    protected function checkIfJsonHasOnlyVersionUpdate($json, $cacheKey)
+    {
+        $diff = array_keys($this->arrayRecursiveDiff($json, $this->cachedJson[$cacheKey])) ?? [];
+        return (count($diff) == 1) && ($diff[0] == 'version');
+    }
+
+    /**
+     * Compare two arrays recursively and return difference
+     * @param $aArray1 First array
+     * @param $aArray2 Second array
+     * @return array
+     */
+    protected function arrayRecursiveDiff($aArray1, $aArray2)
+    {
+        $aReturn = array();
+
+        foreach ($aArray1 as $mKey => $mValue) {
+            if (array_key_exists($mKey, $aArray2)) {
+                if (is_array($mValue)) {
+                    $aRecursiveDiff = $this->arrayRecursiveDiff($mValue, $aArray2[$mKey]);
+                    if (count($aRecursiveDiff)) {
+                        $aReturn[$mKey] = $aRecursiveDiff;
+                    }
+                } else {
+                    if ($mValue != $aArray2[$mKey]) {
+                        $aReturn[$mKey] = $mValue;
+                    }
+                }
+            } else {
+                $aReturn[$mKey] = $mValue;
+            }
+        }
+        return $aReturn;
+    }
+
     /**
      * Return current commit ID
      * @return string
      */
-    public static function currentCommit(): ?string {
+    public function currentCommit(): ?string
+    {
         return shell_exec('git rev-parse HEAD');
     }
 
@@ -48,11 +109,12 @@ class UpdateService
      * Get all files that would be affected by pulling an update
      * @return Collection
      */
-    public static function getUpdateableFiles(): Collection {
+    public function getUpdateableFiles(): Collection
+    {
         exec('git fetch');
         $log = shell_exec('git log --name-status origin/main');
 
-        $log = explode("\n", substr($log, 0, strpos($log, static::currentCommit())));
+        $log = explode("\n", substr($log, 0, strpos($log, $this->currentCommit())));
         $files = collect();
 
         foreach ($log as $line) {
@@ -69,9 +131,9 @@ class UpdateService
      * @param Collection|null $files optional file collection to check against
      * @return bool
      */
-    public static function hasUpdate(Collection $files = null): bool
+    public function hasUpdate(Collection $files = null): bool
     {
-        $files ??= static::getUpdateableFiles();
+        $files ??= $this->getUpdateableFiles();
         return $files->count() > 0;
     }
 
@@ -80,17 +142,33 @@ class UpdateService
      * @param Collection|null $files optional file collection to check against
      * @return array Actions
      */
-    public static function getUpdateActions(Collection $files = null): array
+    public function getUpdateActions(Collection $files = null): array
     {
-        $files ??= static::getUpdateableFiles();
+        $files ??= $this->getUpdateableFiles();
         $actions = [];
 
-        if (static::hasFileChanges('composer.', $files)) $actions['composer'] = 'Composer updates';
-        if (static::hasFileChanges('package.json', $files)) $actions['npm'] = 'NPM package installs';
+        if ($this->hasFileChanges('composer.json', $files) && (!$this->checkIfJsonHasOnlyVersionUpdate(
+                $this->getJson('composer.json'),
+                'composer'
+            ))) {
+            $actions['composer'] = 'Composer updates';
+        }
+        if ($this->hasFileChanges('package.json', $files) && (!$this->checkIfJsonHasOnlyVersionUpdate(
+                $this->getJson('package.json'),
+                'package'
+            ))) {
+            $actions['npm'] = 'NPM package installs';
+        }
         $actions['browserslist'] = 'Browserlist update';
-        if (static::hasFileChanges('resources/js/', $files) || isset($actions['npm'])) $actions['webpack'] = 'Webpack (compiling resources)';
-        if (static::hasFileChanges('resources/views/', $files)) $actions['view-cache'] = 'Clear view cache';
-        if (static::hasFileChanges('database/migrations/', $files)) $actions['migrations'] = 'Database migrations';
+        if ($this->hasFileChanges('resources/js/', $files) || isset($actions['npm'])) {
+            $actions['webpack'] = 'Webpack (compiling resources)';
+        }
+        if ($this->hasFileChanges('resources/views/', $files)) {
+            $actions['view-cache'] = 'Clear view cache';
+        }
+        if ($this->hasFileChanges('database/migrations/', $files)) {
+            $actions['migrations'] = 'Database migrations';
+        }
         $actions['optimizations'] = 'Cache optimizations';
         $actions['queue'] = 'Restart queue workers';
         return $actions;
@@ -102,9 +180,11 @@ class UpdateService
      * @param Collection|null $files optional file collection to check against
      * @return bool
      */
-    public static function hasFileChanges($path, Collection $files = null): bool
+    public function hasFileChanges($path, Collection $files = null): bool
     {
-        return $files->filter(function ($item) use ($path) { return Str::startsWith($item, $path); })->count() > 0;
+        return $files->filter(function ($item) use ($path) {
+                return Str::startsWith($item, $path);
+            })->count() > 0;
     }
 
 
