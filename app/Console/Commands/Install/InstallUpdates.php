@@ -97,12 +97,19 @@ class InstallUpdates extends Command
             passthru('composer update');
             $this->line('');
         }
+        if (isset($actions['skip_composer'])) {
+            $this->info($actions['skip_composer']);
+        }
 
         // npm install
         if (isset($actions['npm'])) {
             $this->getOutput()->section('NPM packages');
             passthru('npm install');
             $this->line('');
+        }
+
+        if (isset($actions['skip_npm'])) {
+            $this->info($actions['skip_npm']);
         }
 
         // npx browserslist@latest --update-db

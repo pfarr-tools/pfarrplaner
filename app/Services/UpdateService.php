@@ -147,20 +147,29 @@ class UpdateService
         $files ??= $this->getUpdateableFiles();
         $actions = [];
 
-        if ($this->hasFileChanges('composer.json', $files) && (!$this->checkIfJsonHasOnlyVersionUpdate(
+        if ($this->hasFileChanges('composer.json', $files)) {
+            if (!$this->checkIfJsonHasOnlyVersionUpdate(
                 $this->getJson('composer.json'),
                 'composer'
-            ))) {
-            $actions['composer'] = 'Composer updates';
+            )) {
+                $actions['composer'] = 'Composer updates';
+            } else {
+                $actions['skip_composer'] = 'Skipping composer update, only package version has changed.';
+            }
         }
-        if ($this->hasFileChanges('package.json', $files) && (!$this->checkIfJsonHasOnlyVersionUpdate(
+        if ($this->hasFileChanges('package.json', $files)) {
+            if ((!$this->checkIfJsonHasOnlyVersionUpdate(
                 $this->getJson('package.json'),
                 'package'
             ))) {
-            $actions['npm'] = 'NPM package installs';
+                $actions['npm'] = 'NPM package installs';
+                $actions['browserslist'] = 'Browserlist update';
+            } else {
+                $actions['skip_npm'] = 'Skipping NPM package installs, only package version has changed.';
+            }
         }
-        $actions['browserslist'] = 'Browserlist update';
         if ($this->hasFileChanges('resources/js/', $files) || isset($actions['npm'])) {
+            $actions['browserslist'] = 'Browserlist update';
             $actions['webpack'] = 'Webpack (compiling resources)';
         }
         if ($this->hasFileChanges('resources/views/', $files)) {
