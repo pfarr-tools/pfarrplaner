@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.30.6](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.5...v2023.30.6) (2023-10-02)
+
+
+### Bug Fixes
+
+* Updates lösen immer composer/npm aus, auch wenn nur die Versionsnummer geändert wurde ([a55a96b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a55a96bca019d085e272a5966bd0b1df50134dbf))
+
 ### [2023.30.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.4...v2023.30.5) (2023-10-02)
 
 ### [2023.30.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.3...v2023.30.4) (2023-10-01)
