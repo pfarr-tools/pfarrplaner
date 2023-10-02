@@ -40,8 +40,8 @@ class UpdateService
 
     public function __construct()
     {
-        $this->cachedJson['package'] = $d = $this->getJson('package.json');
-        $this->cachedJson['composer'] = $c = $this->getJson('composer.json');
+        $this->cachedJson['package'] = $this->getJson(base_path('package.json'));
+        $this->cachedJson['composer'] = $this->getJson(base_path('composer.json'));
     }
 
 
@@ -52,6 +52,7 @@ class UpdateService
      */
     protected function getJson($jsonFile)
     {
+        if (!file_exists($jsonFile)) return [];
         return json_decode(file_get_contents($jsonFile), true) ?? [];
     }
 
@@ -149,7 +150,7 @@ class UpdateService
 
         if ($this->hasFileChanges('composer.json', $files)) {
             if (!$this->checkIfJsonHasOnlyVersionUpdate(
-                $this->getJson('composer.json'),
+                $this->getJson(base_path('composer.json')),
                 'composer'
             )) {
                 $actions['composer'] = 'Composer updates';
@@ -159,7 +160,7 @@ class UpdateService
         }
         if ($this->hasFileChanges('package.json', $files)) {
             if ((!$this->checkIfJsonHasOnlyVersionUpdate(
-                $this->getJson('package.json'),
+                $this->getJson(base_path('package.json')),
                 'package'
             ))) {
                 $actions['npm'] = 'NPM package installs';
