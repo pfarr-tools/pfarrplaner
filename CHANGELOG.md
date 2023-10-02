@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.30.8](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.7...v2023.30.8) (2023-10-02)
+
+
+### Bug Fixes
+
+* Update/Ping schlagen fehl, weil package.json nicht gefunden wird ([5114619](https://codeberg.org/pfarr.tools/pfarrplaner/commit/51146195b7202a7832a71946ad0e8130514a30aa))
+
 ### [2023.30.7](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.6...v2023.30.7) (2023-10-02)
 
 
