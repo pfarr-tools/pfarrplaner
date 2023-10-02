@@ -66,15 +66,22 @@ class SermonController extends Controller
     public function headers()
     {
         $user = Auth::user();
-        $sermons = Sermon::setEagerLoads([])->with([])->select(['id', 'slug', 'updated_at'])
-            ->whereHas(
-                'services',
-                function ($query) use ($user) {
-                    $query->userParticipates($user, 'P');
-                    $query->endingAt(Carbon::now());
-                }
-            )->get();
-        return response()->json($sermons);
+
+        $services = Service::with('sermon')->userParticipates($user, 'P')->whereHas('sermon')->orderedDesc()->get();
+        $sermons = [];
+        foreach ($services as $service) {
+            if (!isset($sermons[$service->sermon_id])) {
+                $sermons[$service->sermon_id] = [
+                    'title' => $service->sermon->fullTitle,
+                    'date' => $service->date->format('c'),
+                    'id' => $service->sermon->id,
+                    'slug' => $service->sermon->slug,
+                    'location' => $service->locationText(),
+                    'time' => $service->timeText(),
+                ];
+            }
+        }
+        return response()->json(array_values($sermons));
     }
 
     public function latest(Request $request)
