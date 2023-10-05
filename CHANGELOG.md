@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.30.9](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.8...v2023.30.9) (2023-10-05)
+
+
+### Bug Fixes
+
+* Anmeldesystem für Gottesdienste verweist auf obsolete CoronaVO ([de44895](https://codeberg.org/pfarr.tools/pfarrplaner/commit/de448953efbfce2cc7244367d50ae9729f305d56))
+
 ### [2023.30.8](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.7...v2023.30.8) (2023-10-02)
 
 
