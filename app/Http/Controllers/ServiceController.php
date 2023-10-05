@@ -224,6 +224,9 @@ class ServiceController extends Controller
             if ($route) {
                 return redirect($route)->with('success', $success);
             } else {
+                if (RedirectorService::backRoute() == route('calendar')) {
+                    RedirectorService::setReturnRoute(route('calendar', ['date' => $service->date->format('Y-m')]));
+                }
                 return RedirectorService::back();
             }
         } else {
