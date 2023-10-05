@@ -60,6 +60,11 @@
                         </ul>
                     </li>
 
+                    <li v-if="layout.adminUserSwitchBack" class="nav-item">
+                        <a class="btn btn-warning mr-1" :href="route('user.switchback')">
+                            <i class="mdi mdi-account-switch"></i>
+                        </a>
+                    </li>
 
                     <!--begin::User Menu Dropdown-->
                     <li class="nav-item dropdown user-menu">
