@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <admin-layout enable-control-sidebar="true" :title="title(date)" no-padding no-content-header :key="calendarState">
+    <admin-layout enable-control-sidebar="true" :title="pageTitle" no-padding no-content-header :key="calendarState">
         <template #navbar-left>
             <calendar-nav-top :date="new Date(myDate)" :years="years" @collapseall="toggleCollapse"
                               :orientation="orientation" :targetMode="targetMode" :target="target"
@@ -175,9 +175,6 @@ export default {
         EventBus.listen(CalendarNewOrientationEvent, this.orientationHandler);
     },
     methods: {
-        title: function (d) {
-            return moment(d).locale('de-DE').format('MMMM YYYY');
-        },
         sortHandler: function (e) {
             this.cityList = e.list;
         },
@@ -254,9 +251,9 @@ export default {
         },
     },
     computed: {
-        storedDays() {
-            return this.$store.days;
-        }
+        pageTitle() {
+            return moment(this.myDate).locale('de-DE').format('MMMM YYYY');
+        },
     }
 }
 </script>

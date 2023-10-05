@@ -153,7 +153,7 @@
             <div class="app-content-header">
                 <!--begin::Container-->
                 <div class="container-fluid mb-0 pb-0">
-                    <h1 v-if="title" class="m-0 mb-4 text-dark">{{ title }}</h1>
+                    <h1 v-if="title" class="m-0 mb-4 text-dark" :key="title">{{ title }}</h1>
                     <!-- flash messages here -->
                     <slot name="before-flash" />
                     <div v-if="(layout.errors.length > 0) || layout.flash.error" class="alert alert-danger">
