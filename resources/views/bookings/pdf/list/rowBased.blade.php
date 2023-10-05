@@ -21,12 +21,9 @@
 </head>
 <body>
 <div style="padding-top: 17mm; padding-left: 12mm; width: 97mm; height: 57mm;">
-    <b>Besucherliste für den Gottesdienst<br />{{ $service->date->format('d.m.Y') }} um {{ $service->timeText() }}<br />{{ $service->locationText() }}</b><br /><br />
-    Nach §8 Abs. 1 CoronaVO<br />
-    verwahren bis einschl. <br />
-    <span style="color: red; font-weight: bold;">{{ $service->date->clone()->addWeek(4)->format('d.m.Y') }}</span>
+    <b>Besucherliste für: {{ $service->titleText() }}<br />{{ $service->date->format('d.m.Y') }} um {{ $service->timeText() }}<br />{{ $service->locationText() }}</b><br /><br />
 </div>
-<h1>Besucherliste für den Gottesdienst<br />{{ $service->date->format('d.m.Y') }} um {{ $service->timeText() }}, {{ $service->locationText() }}</h1>
+<h1>Besucherliste für: {{ $service->titleText() }}<br />{{ $service->date->format('d.m.Y') }} um {{ $service->timeText() }}, {{ $service->locationText() }}</h1>
 @if (count($list))
 <h2>Angemeldete Besucher</h2>
 <table width="100%">
@@ -68,17 +65,16 @@
 @if(($service->exclude_sections != '') || ($service->exclude_places != ''))
     <h2>Reservierte/Gesperrte Bereiche</h2>
     @if((trim($service->exclude_sections) != ''))
-        <p><b>Folgende Zonen sind für diesen Gottesdienst reserviert/gesperrt:</b><br /> {{ str_replace(',', ', ', $service->exclude_sections) }}</p>
+        <p><b>Folgende Zonen sind reserviert/gesperrt:</b><br /> {{ str_replace(',', ', ', $service->exclude_sections) }}</p>
     @endif
     @if(($service->exclude_places != ''))
-        <p><b>Folgende Sitzplätze/Reihen sind für diesen Gottesdienst reserviert/gesperrt:</b><br /> {{ str_replace(',', ', ', $service->exclude_places) }}</p>
+        <p><b>Folgende Sitzplätze/Reihen sind reserviert/gesperrt:</b><br /> {{ str_replace(',', ', ', $service->exclude_places) }}</p>
     @endif
 @endif
 <h2>Freie Plätze</h2>
-<p><b>Bitte nur ausfüllen, wenn das für diesen Gottesdienst erlaubt ist.</b></p>
+<p><b>Bitte nur ausfüllen, wenn das für diese Veranstaltung vorgesehen ist.</b></p>
 @endif
 @if(count($empty))
-<p><span style="text-decoration: underline;">Hinweis:</span> Die Datenerhebung ist nach §8 Abs. 1 CoronaVO gestattet. Nach §8 Abs. 2-3 CoronaVO ist der Zutritt zum Gottesdienst nur nach vollständiger und korrekter Erhebung dieser Kontaktdaten gestattet.</p>
 <p>Wird eine teilbare Reihe ganz belegt, bitte unter Platz A eintragen und alle weiteren Plätze streichen.</p>
 <hr />
 <table width="100%">
