@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.30.11](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.10...v2023.30.11) (2023-10-05)
+
+
+### Bug Fixes
+
+* Schaltfläche zum Benutzerwechsel für Admins fehlt ([253ab04](https://codeberg.org/pfarr.tools/pfarrplaner/commit/253ab043ddcf7bfc8a5ccce8cbe3d7964787e394))
+
 ### [2023.30.10](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.9...v2023.30.10) (2023-10-05)
 
 
