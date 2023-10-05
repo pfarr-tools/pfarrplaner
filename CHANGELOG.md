@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.30.10](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.9...v2023.30.10) (2023-10-05)
+
+
+### Bug Fixes
+
+* Anmeldesystem für Gottesdienste verweist auf obsolete CoronaVO ([4d1ca76](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4d1ca766db01c013daadbccc3b0b745c9b9d39be))
+* Kalender springt zurück zu aktuellem Monat, wenn ein Gottesdienst bearbeitet wurde ([409692a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/409692a0a67db4a8788a9bb242af392bf5297c9d))
+* Kalendertitel (Monat) wird beim Blättern nicht aktualisiert ([d686bc6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d686bc6b2307c25567a3b7a46fe24ca03b5ed350))
+
 ### [2023.30.9](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.8...v2023.30.9) (2023-10-05)
 
 
