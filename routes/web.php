@@ -55,6 +55,16 @@ Route::prefix('admin')->group(function () {
     }
 });
 
+// update trigger
+Route::get('/ping/update', function(\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Log::debug('Update triggered via remote ping from '.gethostbyaddr($request->ip()).' ['.$request->ip().']');
+    //exec ('php artisan install:updates >/storage/logs/update.log  &');
+    \Illuminate\Support\Facades\Artisan::call('install:updates');
+    $result = \Illuminate\Support\Facades\Artisan::output();
+    \Illuminate\Support\Facades\Log::debug('Update terminated: '.$result);
+    return $result;
+})->middleware('signed')->name('ping.update');
+
 Route::get('/panic', function() {
     throw new \Exception('Whoops');
 });

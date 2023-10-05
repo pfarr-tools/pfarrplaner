@@ -40,7 +40,7 @@ class Ping extends Command
      *
      * @var string
      */
-    protected $signature = 'Ping';
+    protected $signature = 'ping';
 
     /**
      * The console command description.
@@ -56,7 +56,7 @@ class Ping extends Command
      */
     public function handle()
     {
-        $this->line('Pinging the central istances registry...');
+        $this->line('Pinging the central instances registry...');
         InstanceRegistryService::ping(true);
         return Command::SUCCESS;
     }

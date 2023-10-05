@@ -36,6 +36,7 @@ use App\User;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 
 class InstanceRegistryService
 {
@@ -65,6 +66,7 @@ class InstanceRegistryService
             'services' => Service::count(),
             'env' => App::environment(),
             'administrator' => config('app.administrator'),
+            'update_url' => URL::signedRoute('ping.update'),
         ];
 
         Log::debug('Pinging central registry');
