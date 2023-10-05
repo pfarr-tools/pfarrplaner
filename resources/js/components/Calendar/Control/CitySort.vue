@@ -50,6 +50,7 @@ import EventBus from "../../../plugins/EventBus";
 import {CalendarNewSortOrderEvent} from '../../../events/CalendarNewSortOrderEvent';
 
 export default {
+    name: 'CalendarControlCitySort',
     components: {
         draggable,
     },

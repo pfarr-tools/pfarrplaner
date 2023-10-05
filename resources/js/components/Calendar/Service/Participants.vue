@@ -40,6 +40,7 @@ import EventBus from "../../../plugins/EventBus";
 import {CalendarNewNameFormatEvent} from "../../../events/CalendarNewNameFormatEvent";
 
 export default {
+    name: 'CalendarServiceParticipants',
     props: ['participants', 'category', 'predicant'],
     data() {
         return {

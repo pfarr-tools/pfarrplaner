@@ -62,7 +62,8 @@
             </div>
             <div class="d-inline d-md-none">
                 <!-- mobile version -->
-                <calendar-pane-mobile :date="myDate" :days="myDays" :cities="cityList" :services="services" :years="years"
+                <calendar-pane-mobile :date="myDate" :days="myDays" :cities="cityList" :services="services"
+                                      :years="years"
                                       :key="myDate"
                                       :absences="absences" :can-create="canCreate" :loading="loading"/>
             </div>
@@ -87,7 +88,7 @@
             </div>
             <div v-if="ministriesLoaded" :key="myMinistries.length">
                 <form-selectize label="Für folgenden Dienst eintragen" v-model="target.ministry" :options="myMinistries"
-                                :key="myMinistries.length" />
+                                :key="myMinistries.length"/>
             </div>
             <form-check label="Bestehende Einträge überschreiben" v-model="target.exclusive"/>
         </modal>
@@ -99,14 +100,28 @@ import moment from 'moment';
 import EventBus from "../../plugins/EventBus";
 import {CalendarNewSortOrderEvent} from "../../events/CalendarNewSortOrderEvent";
 import {CalendarNewOrientationEvent} from "../../events/CalendarNewOrientationEvent";
+import CalendarPaneHorizontal from '../../components/Calendar/Pane/Horizontal.vue';
+import CalendarPaneVertical from '../../components/Calendar/Pane/Vertical.vue';
 import CalendarPaneMobile from "../../components/Calendar/Pane/Mobile";
 import Modal from "../../components/Ui/modals/Modal";
 import PeopleSelect from "../../components/Ui/elements/PeopleSelect";
 import FormSelectize from "../../components/Ui/forms/FormSelectize";
 import FormCheck from "../../components/Ui/forms/FormCheck";
+import CalendarNavTop from "../../components/Calendar/Nav/Top.vue";
+import CalendarNavControlSidebar from "../../components/Calendar/Nav/ControlSidebar.vue";
 
 export default {
-    components: {FormCheck, FormSelectize, PeopleSelect, Modal, CalendarPaneMobile},
+    components: {
+        CalendarNavControlSidebar,
+        CalendarNavTop,
+        FormCheck,
+        FormSelectize,
+        PeopleSelect,
+        Modal,
+        CalendarPaneMobile,
+        CalendarPaneHorizontal,
+        CalendarPaneVertical
+    },
     props: ['date', 'days', 'cities', 'years', 'absences', 'canCreate', 'services', 'ministries', 'writableCities'],
     provide() {
         return {
@@ -163,7 +178,10 @@ export default {
                 {id: 'M', 'name': 'Mesner:in'},
             ];
             for (const ministryKey in response.data) {
-                this.myMinistries.push({id: response.data[ministryKey].category, name: response.data[ministryKey].category});
+                this.myMinistries.push({
+                    id: response.data[ministryKey].category,
+                    name: response.data[ministryKey].category
+                });
             }
             this.ministriesLoaded = true;
         });
@@ -175,10 +193,10 @@ export default {
         EventBus.listen(CalendarNewOrientationEvent, this.orientationHandler);
     },
     methods: {
-        sortHandler: function (e) {
+        sortHandler(e) {
             this.cityList = e.list;
         },
-        orientationHandler: function (e) {
+        orientationHandler(e) {
             this.orientation = e.orientation;
         },
         toggleCollapse(e) {

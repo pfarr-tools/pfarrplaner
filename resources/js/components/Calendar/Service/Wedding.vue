@@ -36,6 +36,7 @@
 
 <script>
 export default {
+    name: 'CalendarServiceWedding',
     props: ['wedding', 'trail', 'trailer']
 }
 </script>

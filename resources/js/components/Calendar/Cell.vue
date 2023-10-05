@@ -70,10 +70,12 @@ import {CalendarToggleDayColumnEvent} from "../../events/CalendarToggleDayColumn
 import Popper from 'vue-popperjs';
 import 'vue-popperjs/dist/vue-popper.css';
 import NavButton from "../Ui/buttons/NavButton";
+import CalendarService from "./Service.vue";
 
 export default {
+    name: 'CalendarCell',
     props: ['city', 'day', 'services', 'targetMode', 'target'],
-    components: {NavButton, Popper},
+    components: {CalendarService, NavButton, Popper},
     methods: {
         edit(service, myRoute, clickEvent) {
             if (clickEvent.ctrlKey) {

@@ -75,6 +75,7 @@ import { CalendarToggleDayColumnEvent} from "../../../events/CalendarToggleDayCo
 import BibleReference from "../../LiturgyEditor/Elements/BibleReference";
 
 export default {
+    name: 'CalendarDayHeader',
     components: {BibleReference},
     props: ['day', 'index', 'absences', 'scrollToDate'],
     computed: {

@@ -63,9 +63,12 @@ import draggable from 'vuedraggable'
 import {CalendarNewOrientationEvent} from "../../../events/CalendarNewOrientationEvent";
 import {CalendarNewNameFormatEvent} from "../../../events/CalendarNewNameFormatEvent";
 import FormCheck from "../../Ui/forms/FormCheck";
+import CalendarControlCitySort from "../Control/CitySort.vue";
 
 export default {
+    name: 'CalendarNavControlSidebar',
     components: {
+        CalendarControlCitySort,
         FormCheck,
         draggable,
     },

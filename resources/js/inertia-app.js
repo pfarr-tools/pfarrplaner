@@ -27,17 +27,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { InertiaApp } from '@inertiajs/inertia-vue'
+import {InertiaApp} from '@inertiajs/inertia-vue'
 import EventBus from './plugins/EventBus.js';
 import Vue from 'vue'
-import { InertiaProgress } from '@inertiajs/progress'
+import {InertiaProgress} from '@inertiajs/progress'
 
 import AdminLayout from "./Pages/Layouts/AdminLayout";
 
 import LaravelPermission from "./plugins/LaravelPermission";
-
-import CalendarPaneHorizontal from './components/Calendar/Pane/Horizontal';
-import CalendarPaneVertical from './components/Calendar/Pane/Vertical';
 import CalendarNavTop from './components/Calendar/Nav/Top.vue';
 import CalendarNavControlSidebar from './components/Calendar/Nav/ControlSidebar';
 import CalendarDayHeader from './components/Calendar/Day/Header';
@@ -116,18 +113,6 @@ Vue.use(datePicker);
 
 Vue.component('admin-layout', AdminLayout)
 
-Vue.component('calendar-pane-horizontal', CalendarPaneHorizontal);
-Vue.component('calendar-pane-vertical', CalendarPaneVertical);
-Vue.component('calendar-nav-top', CalendarNavTop);
-Vue.component('calendar-nav-control-sidebar', CalendarNavControlSidebar);
-Vue.component('calendar-day-header', CalendarDayHeader);
-Vue.component('calendar-cell', CalendarCell);
-Vue.component('calendar-service', CalendarService);
-Vue.component('calendar-service-participants', CalendarServiceParticipants);
-Vue.component('calendar-service-wedding', CalendarServiceWedding);
-Vue.component('calendar-service-funeral', CalendarServiceFuneral);
-Vue.component('calendar-service-baptism', CalendarServiceBaptism);
-Vue.component('calendar-control-city-sort', CalendarControlCitySort);
 
 
 InertiaProgress.init({

@@ -33,6 +33,7 @@
 
 <script>
 export default {
+    name: 'CalendarServiceFuneral',
     props: ['funeral']
 }
 </script>

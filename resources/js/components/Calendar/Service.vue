@@ -101,9 +101,16 @@
 
 
 import ControlledAccess from "./Element/ControlledAccess";
+import CalendarServiceParticipants from "./Service/Participants.vue";
+import CalendarServiceBaptism from "./Service/Baptism.vue";
+import CalendarServiceFuneral from "./Service/Funeral.vue";
+import CalendarServiceWedding from "./Service/Wedding.vue";
 
 export default {
-    components: {ControlledAccess},
+    name: 'CalendarService',
+    components: {
+        CalendarServiceWedding,
+        CalendarServiceFuneral, CalendarServiceBaptism, CalendarServiceParticipants, ControlledAccess},
     props: ['service', 'targetMode', 'target'],
     inject: ['settings'],
     data() {

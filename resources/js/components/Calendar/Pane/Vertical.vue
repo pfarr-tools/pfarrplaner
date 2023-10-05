@@ -58,8 +58,11 @@
 <script>
 
 import NavButton from "../../Ui/buttons/NavButton";
+import CalendarDayHeader from "../Day/Header.vue";
+import CalendarCell from "../Cell.vue";
 export default {
-    components: {NavButton},
+    name: 'CalendarNavVertical',
+    components: {CalendarCell, CalendarDayHeader, NavButton},
     props: ['date', 'days', 'cities', 'services', 'years', 'absences', 'canCreate', 'collapseState', 'targetMode', 'target'],
     data() {
         var myDays = this.days;

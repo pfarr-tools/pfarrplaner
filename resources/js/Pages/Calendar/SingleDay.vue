@@ -80,8 +80,11 @@
 </template>
 
 <script>
+import CalendarCell from "../../components/Calendar/Cell.vue";
+
 export default {
     name: "SingleDay",
+    components: {CalendarCell},
     props: ['services', 'day', 'city', 'absences', 'canCreate'],
     provide() {
         return {

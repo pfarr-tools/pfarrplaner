@@ -119,6 +119,7 @@ import NavButton from "../../Ui/buttons/NavButton";
 import CreateServiceWizardButton from "../../Ui/wizards/CreateServiceWizardButton.vue";
 
 export default {
+    name: 'CalendarNavTop',
     components: {CreateServiceWizardButton, NavButton},
     data() {
         return {
