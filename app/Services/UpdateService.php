@@ -71,7 +71,7 @@ class UpdateService
     /**
      * Compare two arrays recursively and return difference
      * @param $aArray1 First array
-     * @param $aArray2 Second array
+     * @param $aArray2 Second array1
      * @return array
      */
     protected function arrayRecursiveDiff($aArray1, $aArray2)

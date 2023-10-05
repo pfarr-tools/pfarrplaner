@@ -74,15 +74,9 @@
                                 <label for="number">Anzahl Personen</label>
                                 <input style="width: 100%; margin-bottom: 3px; "  name="number" value="1" type="text"/><br/><br/>
                                 <a class="btn btn-secondary submit-reg-form" href="#"
-                                        style="width: auto; height: auto; position: relative; background-color: none;"
+                                        style="width: auto; height: auto; position: relative; background-color: transparent;"
                                    data-container="#{{ $randomId }}-{{ $dayKey }}-{{ $serviceKey }}">Anmeldung absenden</a>
                                 <br/>
-                                <small>Die Erhebung dieser Daten erfolgt nach §8 Abs. 1 CoronaVO. Nach §8 Abs. 2-3 CoronaVO
-                                    können Sie nur
-                                    nach korrekter Angabe Ihrer Kontaktdaten am Gottesdienst teilnehmen. Wir bitten hierfür
-                                    um
-                                    Verständnis.
-                                </small>
                             </div>
                         </div>
                     @endforeach

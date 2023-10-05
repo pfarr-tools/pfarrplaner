@@ -168,11 +168,11 @@ class EmbedRegistrationReport extends AbstractEmbedReport
                     $data['code'] = Booking::createCode();
                     $booking = Booking::create($data);
                     $message = (($data['number'] == 1) ? 'Ihr Platz wurde ' : $data['number'].' Plätze wurden ')
-                        .'erfolgreich reserviert. Am Eingang zum Gottesdienst erfahren Sie, '
+                        .'erfolgreich reserviert. Falls eine individuelle Platzvergabe erfolgt, erfahren Sie am Eingang, '
                         .'wo genau Sie sitzen.';
                     $success->add('success', $message);
                 } else {
-                    $message = ($data['number'] == 1 ? 'Leider konnte in diesem Gottesdienst kein Platz reserviert werden.' : 'Leider konnten in diesem Gottesdiens tkeine ' . $data['number'] . ' zusammenhängenden Platz reserviert werden.');
+                    $message = ($data['number'] == 1 ? 'Leider konnte kein Platz für Sie reserviert werden.' : 'Leider konnten keine ' . $data['number'] . ' zusammenhängendende Plätze für Sie reserviert werden.');
                     $errors->add('sorry', $message);
                 }
             }
