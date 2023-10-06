@@ -60,14 +60,24 @@ class UserRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(User $user)
+    public function rules()
     {
+
+        // Find existing user data.
+        // This is needed to prevent the "unique" validator for the "email" field to produce an error
+        // when saving an existing user.
+        $user = null;
+        if ($this->request->has('id')) {
+            $user = User::find($this->request->get('id'));
+        }
+
         $rules = [
             'name' => 'required|string|max:255',
             'first_name' => 'nullable|string',
             'last_name' => 'nullable|string',
             'title' => 'nullable|string',
-            'email' => 'nullable|string|email|max:255|unique:users,email' . ($this->user ? ',' . $this->user->id : ''),
+            // add an exception to "unique" when an existing user account is updated
+            'email' => 'nullable|string|email|max:255|unique:users,email' . (($user && $user->id) ? ',' . $user->id : ''),
             'password' => 'nullable|string',
             'office' => 'nullable|string',
             'address' => 'nullable|string',
