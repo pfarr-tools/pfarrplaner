@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.31.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.2...v2023.31.3) (2023-10-06)
+
+
+### Bug Fixes
+
+* Fristen zur Anmeldung werden in der falschen Zeitzone angezeigt ([d75f817](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d75f817a84063fe1ba700d9b18e64ec3ce9c6d18))
+
 ### [2023.31.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.1...v2023.31.2) (2023-10-06)
 
 
