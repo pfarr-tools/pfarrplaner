@@ -61,8 +61,13 @@
 </template>
 
 <script>
+import CalendarServiceWedding from "../Calendar/Service/Wedding.vue";
+import CalendarServiceFuneral from "../Calendar/Service/Funeral.vue";
+import CalendarServiceParticipants from "../Calendar/Service/Participants.vue";
+
 export default {
     name: "DetailsInfo",
+    components: {CalendarServiceParticipants, CalendarServiceFuneral, CalendarServiceWedding},
     props: ['service'],
     data() {
         let myService = this.service;
