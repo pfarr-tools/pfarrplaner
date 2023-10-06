@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.31.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.0...v2023.31.1) (2023-10-06)
+
+
+### Bug Fixes
+
+* Informationen fehlen auf Homepage-Tabs ([60c7a96](https://codeberg.org/pfarr.tools/pfarrplaner/commit/60c7a96fbfa2d702aa5b7591119b3922a92326ed))
+
 ## [2023.31.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.30.11...v2023.31.0) (2023-10-05)
 
 
