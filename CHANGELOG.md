@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.31.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.1...v2023.31.2) (2023-10-06)
+
+
+### Bug Fixes
+
+* UI lässt anlegen von Benutzern mit bereits vorhandender E-Mailadresse zu ([aebf6be](https://codeberg.org/pfarr.tools/pfarrplaner/commit/aebf6be6625d1985b4571b2e1018d61e21b95009))
+
 ### [2023.31.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.0...v2023.31.1) (2023-10-06)
 
 
