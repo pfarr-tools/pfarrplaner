@@ -27,7 +27,7 @@
                                     <td valign="top" style="text-align: right;">
                                         @if($service->registration_active)
                                             @if(isset($service->registration_online_start) && ($service->registration_online_start > \Carbon\Carbon::now()))
-                                                Reservierung erst ab {{ $service->registration_online_start->format('d.m.Y, H:i') }} Uhr möglich
+                                                Reservierung erst ab {{ $service->registration_online_start->setTimezone('Europe/Berlin')->format('d.m.Y, H:i') }} Uhr möglich
                                             @elseif(isset($service->registration_online_end) && ($service->registration_online_end < \Carbon\Carbon::now()))
                                                 <b>Keine Online-Anmeldung mehr möglich.</b>
                                                 @if($service->getSeatFinder()->remainingCapacity() > 0)

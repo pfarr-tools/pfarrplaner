@@ -426,7 +426,7 @@ class Service extends Model implements HasDAVCalendarItems
     {
         $desc = [];
         if ($this->needs_reservations) {
-            $desc['needs_reservations'] = ($this->registration_online_end ? 'Anmeldung nötig bis ' . $this->registration_online_end->format(
+            $desc['needs_reservations'] = ($this->registration_online_end ? 'Anmeldung nötig bis ' . $this->registration_online_end->setTimezone('Europe/Berlin')->format(
                     'd.m.Y, H:i'
                 ) . ' Uhr' : 'Anmeldung nötig');
         }
