@@ -29,15 +29,15 @@
 
 <template>
     <card>
-        <card-header :id="'heading'+uid">
+        <card-header :id="'heading'+uid" @click="open = !open">
             <h2 class="mb-0">
-                <button class="btn btn-block text-start pl-0 accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-target="'#collapse'+uid" aria-expanded="false" :aria-controls="'collapse'+uid">
+                <button class="btn btn-block text-left pl-0 accordion-button" :class="{ collapsed : !open}" type="button" data-bs-toggle="collapse" :data-target="'#collapse'+uid" aria-expanded="false" :aria-controls="'collapse'+uid"
+                @click="open = !open">
                     <span v-if="icon" :class="icon"></span>
                     {{ title }}
                 </button>
-            </h2>
-        </card-header>
-        <div :id="'collapse'+uid" class="collapse" :aria-labelledby="'heading'+uid" :data-parent="'#'+accordionId">
+            </h2>        </card-header>
+        <div :id="'collapse'+uid" class="collapse" :class="{ show: open}" :aria-labelledby="'heading'+uid" :data-parent="'#'+accordionId">
         <card-body>
             <slot />
         </card-body>
@@ -57,6 +57,7 @@ export default {
     data() {
         return {
             accordionId: this.accordionId,
+            open: false,
             uid: this._uid,
         }
     }
@@ -64,20 +65,13 @@ export default {
 </script>
 
 <style scoped>
+.btn.accordion-button {
+    background-color: transparent !important;
+    border-width: 0 !important;
+}
+
 .btn.accordion-button:focus {
     box-shadow: none;
-}
-
-.btn.accordion-button:before {
-    content: "\F0140";
-    font-family: 'Material Design Icons';
-    font-weight: 900;
-    float: left;
-    margin-right: .25em;
-}
-
-.btn.accordion-button.collapsed:before {
-    content: "\F0142";
 }
 
 </style>

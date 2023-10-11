@@ -281,7 +281,6 @@
                     <div :class="showStoryEditor ? 'col-lg-4': 'col-md-6'">
                         <form-textarea label="Eltern, Herkunftsfamilie" v-model="funeral.parents"
                                        name="parents"/>
-
                         <accordion id="casesAccordion">
                             <accordion-element title="Taufe" icon="mdi mdi-water">
                                 <form-textarea label="Taufe" v-model="funeral.baptism" name="baptism"/>
