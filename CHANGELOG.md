@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.31.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.3...v2023.31.4) (2023-10-11)
+
+
+### Bug Fixes
+
+* Accordion-Felder lassen sich nicht öffnen ([6591fe3](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6591fe35a2a15f447af8fd701208388d667ca5a6)), closes [#377](https://codeberg.org/pfarr.tools/pfarrplaner/issues/377)
+
 ### [2023.31.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.2...v2023.31.3) (2023-10-06)
 
 
