@@ -43,7 +43,7 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <dataset-item class="form-row mb-3">
+                    <dataset-item class="form-row row mb-3">
                         <template #default="{ row, rowIndex }">
                             <div class="col-md-4">
                                 <a @click.prevent.stop="createReport(row)" href="#" class="report-link">
@@ -53,10 +53,10 @@
                                             {{ row.group }}
                                         </card-header>
                                         <card-body>
-                                            <h3 class="card-title text-truncate mb-2" :title="`Index: ${rowIndex}`">
+                                            <h3 class="card-title mb-2" :title="`Index: ${rowIndex}`">
                                                 <span :class="row.icon"></span> {{ row.title }}
                                             </h3>
-                                            <p class="card-text text-truncate mb-0">{{ row.description }}</p>
+                                            <div class="card-text mb-0 ps-4">{{ row.description }}</div>
                                         </card-body>
                                     </card>
                                 </a>
@@ -132,6 +132,8 @@ export default {
 
 .report-card .card-body h3 {
     font-weight: bold;
+    width: 100%;
+    display: block;
 }
 
 a.report-link, a.report-link:hover {
