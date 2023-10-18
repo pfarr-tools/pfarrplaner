@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.31.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.4...v2023.31.5) (2023-10-18)
+
+
+### Bug Fixes
+
+* Darstellungsfehler bei der Übersicht über Berichte/Assistenten ([abcb36d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/abcb36db490cfb0cb30cf66317cb220f0073d2bd))
+* Darstellungsfehler in Datasets ([f0f8931](https://codeberg.org/pfarr.tools/pfarrplaner/commit/f0f8931055324143cb203559af05cb3bbbd216d7))
+* Microsoft Edge lädt Exceldatei ohne Dateiendung herunter ([46315d2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/46315d21e3616519ed4cc7082a818cbf7f1754f3))
+
 ### [2023.31.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.3...v2023.31.4) (2023-10-11)
 
 
