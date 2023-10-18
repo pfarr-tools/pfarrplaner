@@ -164,7 +164,7 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
         }
 
         // output
-        $filename = 'Beerdigungen ab ' . $start->format('Y-m-d') . ', ' . $city->name;
+        $filename = 'Beerdigungen ab ' . $start->format('Y-m-d') . ', ' . $city->name.'.xlsx';
         $this->sendToBrowser($filename);
     }
 
