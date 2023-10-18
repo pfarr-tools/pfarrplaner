@@ -69,3 +69,10 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    .form-control {
+        display: inline-block;
+        width: auto !important;
+    }
+</style>
