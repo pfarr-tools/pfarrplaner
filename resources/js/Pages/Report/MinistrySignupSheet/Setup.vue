@@ -34,7 +34,7 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'ministrySignupSheet'})" ref="myForm">
             <form-csrf-token />
-            <form-selectize name="city" label="Plan für folgende Kirchengemeinde erstellen" :options="cities" v-model="myCity"/>
+            <form-selectize name="cities[]" label="Plan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple />
             <form-selectize name="ministries[]" label="Plan für folgende Dienste erstellen" :options="ministries" v-model="myMinistries" multiple/>
             <form-date-picker name="start" label="Gottesdienste von" v-model="myStart" iso-date />
             <form-date-picker name="end" label="Bis" v-model="myEnd" iso-date />
@@ -58,7 +58,7 @@ export default {
             myStart: moment(),
             myEnd: moment().endOf('year'),
             myMinistries: ['P'],
-            myCity: this.cities.length > 0 ? this.cities[0].id : null,
+            myCities: this.cities.length > 0 ? [this.cities[0].id] : [],
         }
     },
     methods: {

@@ -17,8 +17,8 @@
     </style>
 </head>
 <body>
-<h1>Dienstplan für {{ join(', ', $ministries) }}</h1>
-<b>Von {{ $start->format('d.m.Y') }} bis {{ $end->format('d.m.Y') }}</b>
+<h1>Dienstplan für {{ collect($ministries)->map(function($item) { return App\Ministry::title($item ); })->join(', ') }}</h1>
+<b>Von {{ $start->format('d.m.Y') }} bis {{ $end->format('d.m.Y') }}@if(count($cities)  > 1) für  {{ $cities->pluck('name')->join(', ') }}@endif</b>
 <hr/>
 <table>
     <thead>
@@ -36,6 +36,7 @@
         <tr @if($loop->index % 2 == 0)class="even" @endif>
             <td valign="top" width="20%"><small>
                 <b>{{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }}</b><br />
+                @if(count($cities) > 1)<b>{{ $service->city->name }}</b><br />@endif
                 {{ $service->locationText() }}<br />
                 {{ $service->titleText(false) }}<br />
                     P: {{ $service->participantsText('P') }}

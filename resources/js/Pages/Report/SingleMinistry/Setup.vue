@@ -30,7 +30,7 @@
 <template>
     <admin-layout title="Dienstplan für einzelne Dienste erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Dienstplan für einen Dienst erstellen" @click="renderReport" />
+            <save-button label="Erstellen" title="Dienstplan für einzelne Dienste erstellen" @click="renderReport" />
         </template>
         <form method="post" :action="route('reports.render', {report: 'singleMinistry'})" ref="myForm">
             <form-csrf-token />

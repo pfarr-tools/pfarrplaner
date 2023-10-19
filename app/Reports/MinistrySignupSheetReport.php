@@ -75,19 +75,23 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
     public function render(Request $request)
     {
         $data = $request->validate([
-                                       'city' => 'required|int|exists:cities,id',
+                                       'cities.*' => 'required|int|exists:cities,id',
                                        'ministries.*' => 'string',
                                        'start' => 'required|date_format:d.m.Y',
                                        'end' => 'required|date_format:d.m.Y',
                                    ]);
 
-        $data['city'] = City::find($data['city']);
+        foreach ($data['cities'] as $key => $id) {
+            $data['cities'][$key] = City::find($id);
+        }
+        $data['cities'] = collect($data['cities']);
         $data['start'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['start'] . ' 0:00:00');
         $data['end'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['end'] . ' 23:59:00');
-        $data['services'] = Service::between($data['start'], $data['end'])->inCity($data['city'])->ordered()->get();
+        $data['services'] = Service::between($data['start'], $data['end'])
+            ->whereIn('city_id', $data['cities']->pluck('id'))->ordered()->get();
 
         return $this->sendToBrowser(
-            date('Ymd') . ' Leerer Dienstplan '.join(', ', $data['ministries'])  . '.pdf',
+            date('Ymd') . ' Leerer Dienstplan ' . join(', ', $data['ministries']) . '.pdf',
             $data,
             ['format' => 'A4-L']
         );
