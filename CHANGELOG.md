@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.32.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.5...v2023.32.0) (2023-10-19)
+
+
+### Features
+
+* Leerer Dienstplan kann nun für mehrere Orte gleichzeitig gedruckt werden ([ac9f6cb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ac9f6cb7303ae7d8dd09002849888b9fb91f6fb9))
+
 ### [2023.31.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.4...v2023.31.5) (2023-10-18)
 
 
