@@ -30,7 +30,7 @@
 <template>
     <div :class="{
         'service-entry': 1,
-        'editable': myService.isEditable,
+        'editable': myService.isEditable && (!foreign),
         'mine': myService.isMine,
         'bg-success': myService.isMine,
         'highlighted': 0,

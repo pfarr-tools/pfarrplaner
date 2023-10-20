@@ -37,7 +37,7 @@
         <div class="celldata">
             <div v-if="city.loading" class="city-loading"><span class="mdi mdi-spin mdi-loading"></span></div>
             <div v-for="(service,index) in services" :key="service.id">
-                <popper v-if="service.isEditable" trigger="hover" :options="{placement: 'bottom-end'}">
+                <popper v-if="service.isEditable && (service.city_id == city.id)" trigger="hover" :options="{placement: 'bottom-end'}">
                     <div class="popper">
                         <a href="#" class="btn btn-primary" role="button"
                            title="Gottesdienst bearbeiten" @click.prevent.stop="edit(service, 'service.edit', $event)">
@@ -50,6 +50,10 @@
                         <a href="#" class="btn btn-light" role="button"
                            title="Predigt bearbeiten" @click.prevent.stop="edit(service, 'service.sermon.editor', $event)">
                             <span class="mdi mdi-microphone"></span>
+                        </a>
+                        <a href="#" class="btn btn-danger" role="button"
+                           title="Gottesdienst löschen" @click.prevent.stop="deleteService(service)">
+                            <span class="mdi mdi-delete"></span>
                         </a>
                     </div>
                     <div slot="reference">
@@ -83,7 +87,12 @@ export default {
             } else {
                 this.$inertia.visit(route(myRoute, service.slug));
             }
-        }
+        },
+        deleteService(service) {
+            if (confirm('Willst du diesen Gottesdienst wirklich komplett löschen?')) {
+                this.$inertia.delete(route('service.destroy', service.slug), {}, {preserveState: false});
+            }
+        },
     }
 }
 </script>
