@@ -198,6 +198,7 @@ export default {
             editing: false,
             clicked: false,
             personCreated: false,
+            personCreatedData: null,
             showNewPersonModal: false,
             searchingForPerson: false,
             searchResults: [],
@@ -271,8 +272,10 @@ export default {
                 externalValue.push(this.myPeopleReference[item]);
             })
 
+            if (this.personCreatedData) this.$emit('added', this.personCreatedData);
             this.$emit('input', externalValue);
             this.$emit('count');
+            this.personCreatedData = null;
             this.myValue = newVal2;
             this.$forceUpdate();
         },
@@ -290,6 +293,7 @@ export default {
 
                     this.myPeople.push(data);
                     this.myPeopleReference[data.id] = data;
+                    component.personCreatedData = data;
                     this.createCallback(data);
                     this.changed(this.myValue);
                     component.personCreated = true;
@@ -314,6 +318,7 @@ export default {
             person.type='mdi mdi-account';
             person.category = 'Personen';
             this.myPeople.push(person);
+            component.personCreatedData = person;
             this.myPeopleReference[person.id] = person;
             this.createCallback(person);
             this.changed(this.myValue);
@@ -346,11 +351,10 @@ export default {
                 api_token: this.apiToken,
                 searchString: item,
             })).then(response => {
-                console.log('found', response.data);
                 this.searchResults = response.data;
                 this.searchingForPerson = false;
             });
-            return fa
+            return false;
         },
         setIgnoreSearchResults() {
             if (confirm('Willst du wirklich die Suchergebnisse ignorieren und stattdessen eine neue Person anlegen? Das solltest du nur tun, wenn du sicher bist, dass die von dir gemeinte Person nicht in der Liste der Suchergebnisse vorhanden ist.')) {

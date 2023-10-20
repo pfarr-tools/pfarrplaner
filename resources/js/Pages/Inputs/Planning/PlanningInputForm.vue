@@ -69,16 +69,21 @@
                                                 <div>
                                                     <nav-button type="primary" icon="mdi mdi-pencil" force-icon
                                                                 class="btn-sm"
-                                                                force-no-text title="Gottesdienst bearbeiten (in neuem Tab)"
-                                                                @click="editService(row)">Bearbeiten</nav-button>
+                                                                force-no-text
+                                                                title="Gottesdienst bearbeiten (in neuem Tab)"
+                                                                @click="editService(row)">Bearbeiten
+                                                    </nav-button>
 
                                                 </div>
                                             </td>
-                                            <td v-for="(ministry,ministryKey,ministryIndex) in ministries" :key="ministryKey+rowIndex">
+                                            <td v-for="(ministry,ministryKey,ministryIndex) in ministries"
+                                                :key="ministryKey+rowIndex">
                                                 <people-select :label="ministry" :people="users" :teams="teams"
                                                                :include-teams-from-city="row.city" :city="row.city"
                                                                v-model="row.ministries[ministryKey]"
-                                                               @input="saveService(row.slug, row)"/>
+                                                               :key="'people_'+rowIndex+'_'+ministryKey+'_'+(users.length)"
+                                                               @added="onPersonAdded"
+                                                               @input="saveService(row.slug, row, rowIndex, ministryKey)"/>
                                             </td>
                                         </tr>
                                     </template>
@@ -173,10 +178,11 @@ export default {
             saving: false,
             saved: false,
             showEntries: 25,
+            addPerson: null,
         }
     },
     methods: {
-        saveService(slug, service) {
+        saveService(slug, service, index, ministryKey) {
             this.saved = false;
             this.saving = true;
             this.$forceUpdate();
@@ -184,12 +190,21 @@ export default {
             axios.post(route('inputs.save', 'planning'), service).then(response => {
                 this.saving = false;
                 this.saved = true;
+                if (this.addPerson) {
+                    this.$forceUpdate();
+                    this.users.push(this.addPerson);
+                    this.services[index].ministries[ministryKey].push(this.addPerson);
+                    //this.addPerson = null;
+                }
                 this.$forceUpdate();
             });
         },
         editService(service) {
             window.open(route('service.edit', service.slug));
         },
+        onPersonAdded(person) {
+            this.addPerson = person;
+        }
     }
 
 }
