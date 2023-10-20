@@ -37,7 +37,7 @@
                 <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                     <h1 class="ps-0 pl-0 ms-0 ms-0 mb-4">{{ layout.appName }}</h1>
                     <form method="POST" :action="route('login')" id="loginForm">
-                        <input type="hidden" name="_token" :value="csrf">
+                        <input type="hidden" name="_token" :value="csrf" :key="csrf">
                         <div v-if="!demo">
                             <!-- Email input -->
                             <div class="form-outline mb-4">
@@ -122,13 +122,24 @@ export default {
         return {
             dev: this.$page.props.dev,
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            lastRefresh: -1,
         };
     },
     mounted() {
-        setTimeout(function() {
-            window.location.reload();
-        }, 600000);
-    }
+        if (this.lastRefresh == -1) this.refreshToken();
+        setTimeout(this.refreshToken, 600000);
+    },
+    methods: {
+        refreshToken() {
+            axios.get(route('csrf.keepalive')).then(response => {
+                this.csrf = response.data.token;
+                axios.defaults.headers.common['X-CSRF-TOKEN'] = this.csrf;
+                document.querySelector('meta[name="csrf-token"]').setAttribute('content', this.csrf);
+                this.lastRefresh = (new Date()).getTime();
+            })
+        },
+    },
+
 }
 </script>
 

@@ -71,14 +71,6 @@
 
     window.Laravel.assetUrl = '{{ asset('') }}';
 
-    window.setTimeout(function () {
-        if (window.Laravel.loggedIn) {
-            location.href = '{!! route('logout') !!}';
-        } else {
-            console.log('Refreshing window to update crsf token.');
-            location.reload();
-        }
-    }, window.Laravel.timeout);
 </script>
 <!-- other libraries -->
 @yield('scripts')
