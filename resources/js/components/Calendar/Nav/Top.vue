@@ -93,7 +93,7 @@
             </button>
         </div>
 
-        <create-service-wizard-button v-if="canCreate" type="success" :cities="writableCities" class="me-2" />
+        <create-service-wizard-button v-if="canCreate" type="success" :cities="writableCities" class="me-2" :date="date" :key="moment(date).toISOString()" />
 
         <nav-button class="me-2"
                     :type="targetMode ? 'warning' : 'default'"

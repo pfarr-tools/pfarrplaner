@@ -30,11 +30,11 @@
 <script>
     export default {
         name: 'CreateServiceWizardButton',
-        props: ['cities', 'type'],
+        props: ['cities', 'type', 'date'],
         data() {
             return {
                 myClass: this.type ? 'btn-'+this.type : 'btn-light',
-                myDate: moment().format('Y-m-d'),
+                myDate: moment(this.date).format('YYYY-MM-DD'),
             }
         },
     }
@@ -44,7 +44,7 @@
 <template>
     <div class="createServiceWizardButton">
         <inertia-link v-if="cities.length == 1" class="btn" :class="myClass"
-                      :href="route('service.create', {city: cities[0].id})">
+                      :href="route('service.create', {city: cities[0].id, date: myDate})">
             <span class="mdi mdi-church"></span> <span
             class="d-none d-md-inline">Gottesdienst anlegen</span>
         </inertia-link>
@@ -56,7 +56,7 @@
             </button>
             <div class="dropdown-menu p-1">
                 <inertia-link v-for="city in cities" class="dropdown-item" :key="city.name+city.id"
-                   :href="route('service.create', {city: city.id})">{{ city.name }}</inertia-link>
+                   :href="route('service.create', {city: city.id, date: myDate})">{{ city.name }}</inertia-link>
             </div>
         </div>
 
