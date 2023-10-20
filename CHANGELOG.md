@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.33.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.33.0...v2023.33.1) (2023-10-20)
+
+
+### Bug Fixes
+
+* Neue Kirchen/GD-Orte können nicht angelegt werden ([349c945](https://codeberg.org/pfarr.tools/pfarrplaner/commit/349c94534ef224299d755202d98f7cde62962514))
+
 ## [2023.33.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.32.1...v2023.33.0) (2023-10-20)
 
 
