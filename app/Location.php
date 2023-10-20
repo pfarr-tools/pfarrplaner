@@ -109,6 +109,7 @@ class Location extends Model
      */
     public function getFullNameAttribute()
     {
+        if (!$this->city) return '';
         $name = $this->name;
         if (!Str::contains($name, $this->city->name)) $name .= ' '.$this->city->name;
         return $name;
