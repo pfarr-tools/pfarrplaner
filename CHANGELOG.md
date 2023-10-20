@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.33.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.32.1...v2023.33.0) (2023-10-20)
+
+
+### Features
+
+*  Andere Anzeigefarbe, wenn Gottesdienst von anderer Gemeinde angezeigt wird ([c8c3723](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c8c37238d48c12d7bf2daff0c7149cc8db3ec1bd)), closes [#384](https://codeberg.org/pfarr.tools/pfarrplaner/issues/384)
+*  Gottesdienst direkt aus dem Popup im Kalender löschen ([9fe6e11](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9fe6e118cedc3576ff10dfba63b58bd60cfeace4)), closes [#381](https://codeberg.org/pfarr.tools/pfarrplaner/issues/381)
+* Ortsnamen bei Kirchen hinzufügen ([596b308](https://codeberg.org/pfarr.tools/pfarrplaner/commit/596b308c213623978d3d740584831ac3b8152762)), closes [#382](https://codeberg.org/pfarr.tools/pfarrplaner/issues/382)
+
+
+### Bug Fixes
+
+* "Prädikant benötigt" ist nicht gegendert ([6bab064](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6bab064b75e7300dc97954f71427b4a5921e62fa))
+* Alle Personenauswahlen aktualisieren, wenn aus der Planungsansicht eine neue Person angelegt wird ([3e82f9f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3e82f9f34a518d4bedabed933ce035637ed05f15)), closes [#385](https://codeberg.org/pfarr.tools/pfarrplaner/issues/385)
+* Beim Anlegen eines Gottesdiensts aus dem Kalender aktuellen Monat voreinstellen ([7ed0597](https://codeberg.org/pfarr.tools/pfarrplaner/commit/7ed05975a87699c5919468e12c59ec3637bad739)), closes [#378](https://codeberg.org/pfarr.tools/pfarrplaner/issues/378)
+* Login-Bildschirm verursacht Fehler 419 ([0820b28](https://codeberg.org/pfarr.tools/pfarrplaner/commit/0820b285bacb26c4e8c4604b4375064d5ead44aa)), closes [#386](https://codeberg.org/pfarr.tools/pfarrplaner/issues/386)
+* Logo ist zentriert im geöffneten Menü ([3e284d1](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3e284d12e1c55fcd04b3afe7c7a5b11e8363627c))
+* Zusatz "mit Abendmahl" / "mit Taufe" vermeiden, wenn bereits im Titel vorhanden ([a491e1f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a491e1f63d1a6d60d50b4f52c5fcc9dfc332f39a))
+
 ### [2023.32.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.32.0...v2023.32.1) (2023-10-19)
 
 ## [2023.32.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.31.5...v2023.32.0) (2023-10-19)
