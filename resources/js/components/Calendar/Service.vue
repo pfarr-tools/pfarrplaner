@@ -38,6 +38,7 @@
         'funeral': myService.funerals.length > 0,
         'bg-dark': myService.funerals.length > 0,
         'reloading': loading,
+        'foreign': foreign,
         'hidden': myService.hidden}"
          :title="myService.isEditable ? clickTitle(service) : null"
          @click="myService.isEditable ? edit(service, $event) : null"
@@ -111,7 +112,7 @@ export default {
     components: {
         CalendarServiceWedding,
         CalendarServiceFuneral, CalendarServiceBaptism, CalendarServiceParticipants, ControlledAccess},
-    props: ['service', 'targetMode', 'target'],
+    props: ['service', 'targetMode', 'target', 'city'],
     inject: ['settings'],
     data() {
         let myService = this.service;
@@ -125,6 +126,7 @@ export default {
             myService,
             apiToken: this.$page.props.currentUser.data.api_token,
             loading: false,
+            foreign: this.city ? (this.city.id != myService.city_id) : false,
         }
     },
     methods: {
@@ -197,6 +199,16 @@ export default {
 
 .service-entry.editable.possible-target {
     cursor: crosshair;
+}
+
+.service-entry.foreign {
+    background-color: #eee !important;
+    color: #bbb !important;
+}
+
+.service-entry.foreign .service-location {
+    color: orange;
+    font-weight: bold;
 }
 
 .youtube-link {

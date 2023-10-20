@@ -53,12 +53,12 @@
                         </a>
                     </div>
                     <div slot="reference">
-                        <calendar-service :service="service" :key="service.id" :index="index"
+                        <calendar-service :service="service" :key="service.id" :index="index" :city="city"
                                           :targetMode="targetMode" :target="target"/>
                     </div>
                 </popper>
 
-                <calendar-service v-else :service="service" :key="service.id" :index="index"
+                <calendar-service v-else :service="service" :key="service.id" :index="index" :city="city"
                                   :targetMode="targetMode" :target="target"/>
             </div>
         </div>
