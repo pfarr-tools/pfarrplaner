@@ -213,6 +213,7 @@ class Service extends Model implements HasDAVCalendarItems
         'otherParticipants',
         'descriptionText',
         'locationText',
+        'locationTextWithCity',
         'dateText',
         'timeText',
         'baptismsText',
@@ -513,6 +514,14 @@ class Service extends Model implements HasDAVCalendarItems
     public function locationText()
     {
         return $this->special_location ?: (is_object($this->location) ? $this->location->name : '');
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getLocationTextWithCityAttribute()
+    {
+        return $this->special_location ?: (is_object($this->location) ? $this->location->fullName : '');
     }
 
     public function getMaximumCapacityAttribute()

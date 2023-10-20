@@ -50,7 +50,7 @@
             </div>
             <span class="separator">|</span>
             <div :class="{'service-location': 1, 'service-special-location text-warning': isSpecialLocation(service)}">
-                {{ isSpecialLocation(service) ? myService.special_location : myService.location.name }}
+                {{ foreign ? myService.locationTextWithCity : myService.locationText }}
             </div>
             <img v-if="(!settings.show_cc_details) && (myService.cc)" src="/img/cc.png" :title="ccTitle(service)">
             <span v-if="myService.youtube_url">

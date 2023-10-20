@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 /**
  * Class Location
@@ -56,6 +57,8 @@ class Location extends Model
     ];
 
     protected $with = ['seatingSections', 'city'];
+
+    protected $appends = ['fullName'];
 
     /**
      * @return BelongsTo
@@ -99,6 +102,16 @@ class Location extends Model
 
     public function scopeInCities(Builder $query, $cities) {
         return $query->whereIn('city_id', $cities);
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getFullNameAttribute()
+    {
+        $name = $this->name;
+        if (!Str::contains($name, $this->city->name)) $name .= ' '.$this->city->name;
+        return $name;
     }
 
 }
