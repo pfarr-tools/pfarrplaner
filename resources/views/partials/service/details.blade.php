@@ -16,7 +16,7 @@
 <div class="service-team service-pastor"><span
             class="designation">P: </span>
     @if ($service->need_predicant)
-        <span class="need-predicant">Prädikant benötigt</span>
+        <span class="need-predicant">Prädikant:in benötigt</span>
     @else
         {{ $service->participantsText('P') }}
     @endif

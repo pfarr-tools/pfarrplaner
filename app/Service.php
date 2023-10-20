@@ -119,7 +119,7 @@ class Service extends Model implements HasDAVCalendarItems
         'description' => 'Besonderheiten',
         'city_id' => 'Kirchengemeinde',
         'special_location' => 'Ort (Freitext)',
-        'need_predicant' => 'Prädikant benötigt',
+        'need_predicant' => 'Prädikant:in benötigt',
         'baptism' => 'Taufe',
         'eucharist' => 'Abendmahl',
         'offerings_counter1' => 'Opferzähler 1',

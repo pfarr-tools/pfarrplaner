@@ -28,13 +28,13 @@
   -->
 
 <template>
-    <admin-layout title="Prädikantenanforderung erstellen">
+    <admin-layout title="Prädikant:innenanforderung erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Prädikantenanforderung erstellen" @click="renderReport" />
+            <save-button label="Erstellen" title="Prädikant:innenanforderung erstellen" @click="renderReport" />
         </template>
         <form method="post" :action="route('reports.render', {report: 'predicants'})" ref="myForm">
             <form-csrf-token />
-            <form-selectize name="city" label="Prädikanten für folgende Kirchengemeinde anfordern" v-model="myCity" :options="cities" />
+            <form-selectize name="city" label="Prädikant:innen für folgende Kirchengemeinde anfordern" v-model="myCity" :options="cities" />
             <input type="hidden" name="city" v-model="myCity" />
             <form-date-picker name="start" label="Gottesdienste von" v-model="from" iso-date />
             <form-date-picker name="end" label="Bis" v-model="to" iso-date />

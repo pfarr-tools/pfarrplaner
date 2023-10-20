@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Prädikantenanforderung erstellen')
+@section('title', 'Prädikant:innenanforderung erstellen')
 
 @section('content')
     <form method="post" action="{{ route('reports.render', $report) }}">
@@ -8,7 +8,7 @@
             <div class="card-body">
                 @csrf
                 <div class="form-group"> <!-- Radio group !-->
-                    <label class="control-label">Prädikanten für folgende Kirchengemeinde anfordern:</label>
+                    <label class="control-label">Prädikant:innen für folgende Kirchengemeinde anfordern:</label>
                     <select class="form-control" name="city">
                         @foreach ($cities as $city)
                             <option value="{{ $city->id }}">

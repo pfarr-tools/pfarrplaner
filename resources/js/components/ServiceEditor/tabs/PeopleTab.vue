@@ -36,7 +36,7 @@
                                :include-teams-from-city="myService.city" :city="myService.city"
                                 @count="updatePeopleCounter" />
                 <form-check name="need_predicant"
-                            label="Für diesen Gottesdienst wird ein*e Prädikant:in benötigt."
+                            label="Für diesen Gottesdienst wird ein:e Prädikant:in benötigt."
                             v-model="myService.need_predicant" />
             </div>
             <div class="col-md-4">

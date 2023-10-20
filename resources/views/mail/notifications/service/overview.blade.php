@@ -48,7 +48,7 @@
             @component('mail.layout.blocks.cell'){{ $service->eucharist ? '✔' : '✘'}} @endcomponent
         </tr>
         <tr>
-            @component('mail.layout.blocks.cell')Prädikant benötigt @endcomponent
+            @component('mail.layout.blocks.cell')Prädikant:in benötigt @endcomponent
             @component('mail.layout.blocks.cell'){{ $service->need_predicant ? '✔' : '✘'}} @endcomponent
         </tr>
         <tr>

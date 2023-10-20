@@ -55,7 +55,7 @@ class PredicantsReport extends AbstractWordDocumentReport
     /**
      * @var string
      */
-    public $title = 'Prädikantenanforderung';
+    public $title = 'Prädikant:innenanforderung';
     /**
      * @var string
      */
@@ -63,7 +63,7 @@ class PredicantsReport extends AbstractWordDocumentReport
     /**
      * @var string
      */
-    public $description = 'Vorausgefülltes Prädikantenformular für das Dekanatamt';
+    public $description = 'Vorausgefülltes Prädikant:innenformular für das Dekanatamt';
 
     protected $inertia = true;
 
@@ -117,7 +117,7 @@ class PredicantsReport extends AbstractWordDocumentReport
 
 
         $section->addText(
-            'Anforderung von Prädikant/innen bzw. Pfarrer/innen im Ruhestand über das Dekanatamt',
+            'Anforderung von Prädikant:innen bzw. Pfarrer:innen im Ruhestand über das Dekanatamt',
             [
                 'size' => 13,
                 'bold' => true,
@@ -184,7 +184,7 @@ class PredicantsReport extends AbstractWordDocumentReport
             }
         }
 
-        $filename = date('Ymd') . ' Prädikantenanforderung ' . $city->name;
+        $filename = date('Ymd') . ' Prädikant_innenanforderung ' . $city->name;
         $this->sendToBrowser($filename);
     }
 

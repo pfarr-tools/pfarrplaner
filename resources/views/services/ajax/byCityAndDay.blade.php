@@ -39,7 +39,7 @@
         <div class="service-team service-pastor"><span
                     class="designation">P: </span>
             @if ($service->need_predicant)
-                <span class="need-predicant">Prädikant benötigt</span>
+                <span class="need-predicant">Prädikant:in benötigt</span>
             @else
                 @foreach($service->pastors as $participant)
                     <span @can('urlaub-lesen') @if (in_array($participant->lastName(), array_keys($vacations[$day->id]))) class="vacation-conflict" title="Konflikt mit Urlaub!" @endif @endcan>{{ $participant->lastName(true) }}</span>

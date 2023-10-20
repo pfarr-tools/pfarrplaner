@@ -48,7 +48,7 @@
         <img v-if="service.cc" src="/img/cc.png" :title="ccInfo()"/>
         <div class="service-team service-pastor">
             <span class="designation">P: </span>
-            <span v-if="service.need_predicant" class="need-predicant">Prädikant benötigt</span>
+            <span v-if="service.need_predicant" class="need-predicant">Prädikant:in benötigt</span>
             <span v-for="person in service.pastors">{{ person.name }} </span>
         </div>
         <div class="service-team service-organist">
