@@ -432,10 +432,10 @@ class Service extends Model implements HasDAVCalendarItems
                 ) . ' Uhr' : 'Anmeldung nötig');
         }
         if ($this->baptism) {
-            $desc['baptism'] = 'mit Taufen';
+            if (!Str::contains(Str::lower($this->titleText()), 'tauf')) $desc['baptism'] = 'mit Taufen';
         }
         if ($this->eucharist) {
-            $desc['eucharist'] = 'mit Abendmahl';
+            if (!Str::contains(Str::lower($this->titleText()), 'abendmahl')) $desc['eucharist'] = 'mit Abendmahl';
         }
         if ($this->getAttribute('description') != '') {
             $desc['description'] = $this->getAttribute('description');
@@ -725,7 +725,7 @@ class Service extends Model implements HasDAVCalendarItems
                 $includeDefaultServiceTitle = false;
             }
             if ($this->baptismsText() != '') {
-                $elements[] = $x = 'Taufe(n)';
+                if (!Str::contains(Str::lower(join(' / ', $elements)), 'tauf')) $elements[] = $x = 'Taufe(n)';
             }
         }
         if ($includeDefaultServiceTitle && (count($elements) == 1) && ($x != '') && ($x != $this->title)) {
