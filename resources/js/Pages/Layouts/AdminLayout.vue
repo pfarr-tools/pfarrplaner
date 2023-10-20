@@ -250,4 +250,8 @@ export default {
     margin-top: 2px;
 }
 
+.sidebar-brand .brand-link {
+    align-items: left !important;
+}
+
 </style>
