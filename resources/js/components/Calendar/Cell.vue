@@ -52,7 +52,7 @@
                             <span class="mdi mdi-microphone"></span>
                         </a>
                         <a href="#" class="btn btn-danger" role="button"
-                           title="Gottesdienst löschen" @click.prevent.stop="deleteService(service)">
+                           title="Gottesdienst löschen" @click.prevent.stop="deleteService(service, index)">
                             <span class="mdi mdi-delete"></span>
                         </a>
                     </div>
@@ -80,6 +80,11 @@ export default {
     name: 'CalendarCell',
     props: ['city', 'day', 'services', 'targetMode', 'target'],
     components: {CalendarService, NavButton, Popper},
+    data() {
+        return {
+            apiToken: this.$page.props.currentUser.data.api_token,
+        }
+    },
     methods: {
         edit(service, myRoute, clickEvent) {
             if (clickEvent.ctrlKey) {
@@ -88,9 +93,14 @@ export default {
                 this.$inertia.visit(route(myRoute, service.slug));
             }
         },
-        deleteService(service) {
+        deleteService(service, index) {
             if (confirm('Willst du diesen Gottesdienst wirklich komplett löschen?')) {
-                this.$inertia.delete(route('service.destroy', service.slug), {}, {preserveState: false});
+                axios.delete(route('api.service.destroy', {
+                    api_token: this.apiToken,
+                    service: service.slug,
+                })).then(response => {
+                    this.services = this.services.splice(index, 1);
+                });
             }
         },
     }
