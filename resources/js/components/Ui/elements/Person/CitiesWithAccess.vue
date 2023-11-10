@@ -46,13 +46,13 @@ export default {
         allCities() {
             let cities = {};
             this.user.admin_cities.forEach(city => {
-                if (undefined == cities[city.name]) cities[city.name] = {name: city.name, badge: 'badge-admin', id: city.id};
+                if (undefined == cities[city.name]) cities[city.name] = {name: city.name, badge: 'bg-admin', id: city.id};
             });
             this.user.writable_cities.forEach(city => {
-                if (undefined == cities[city.name]) cities[city.name] = {name: city.name, badge: 'badge-success', id: city.id};
+                if (undefined == cities[city.name]) cities[city.name] = {name: city.name, badge: 'bg-success', id: city.id};
             });
             this.user.cities.forEach(city => {
-                if (undefined == cities[city.name]) cities[city.name] = {name: city.name, badge: 'badge-warning', id: city.id};
+                if (undefined == cities[city.name]) cities[city.name] = {name: city.name, badge: 'bg-warning', id: city.id};
             });
             if (this.$page.props.currentUser.data.isAdmin) return cities;
 
@@ -67,7 +67,7 @@ export default {
 </script>
 
 <style scoped>
-    .badge-admin {
+    .bg-admin {
         background-color: purple;
         color: white;
     }
