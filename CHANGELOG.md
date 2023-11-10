@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.33.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.33.1...v2023.33.2) (2023-11-10)
+
+
+### Bug Fixes
+
+* In der Benutzerübersicht fehlen die Farben für die Berechtigungen ([a47b90a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a47b90a26447ff017752689112c8413fd3b4fe10))
+* Nach dem Löschen eines Gottesdienstes über den Tooltip ist der Monatskalender leer ([e5d01d2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e5d01d2fa0691617d87c6addb53a9dee665f63f4)), closes [#392](https://codeberg.org/pfarr.tools/pfarrplaner/issues/392)
+* Neue Person erscheint nicht sofort in der Liste (erst nach Speichern) ([4d1e4a2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4d1e4a22e1713c7e447bd21780ece8bea4c76470)), closes [#391](https://codeberg.org/pfarr.tools/pfarrplaner/issues/391)
+
 ### [2023.33.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.33.0...v2023.33.1) (2023-10-20)
 
 
