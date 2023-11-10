@@ -33,7 +33,7 @@
             <div ref="container">
                 <selectize class="form-control" :class="{'is-invalid': error}" :name="name" :id="myId+'Input'"
                            :value="myValue" multiple @input="changed" @blur="editing = false" :settings="settings"
-                           :options="people" :disabled="disabled"/>
+                           :options="people" :disabled="disabled" :key="personCreatedCounter"/>
                 <small class="form-text text-muted">Eine oder mehrere Personen (keine Anmerkungen, Notizen,
                     usw.)</small>
             </div>
@@ -198,6 +198,7 @@ export default {
             editing: false,
             clicked: false,
             personCreated: false,
+            personCreatedCounter: 0,
             personCreatedData: null,
             showNewPersonModal: false,
             searchingForPerson: false,
@@ -291,11 +292,15 @@ export default {
                     data.category = 'Personen';
                     data.userString = '';
 
-                    this.myPeople.push(data);
-                    this.myPeopleReference[data.id] = data;
+                    component.myPeople.push(data);
+                    component.myPeopleReference[data.id] = data;
+
                     component.personCreatedData = data;
-                    this.createCallback(data);
-                    this.changed(this.myValue);
+                    component.createCallback(data);
+                    component.myValue.push(data.id);
+                    component.personCreatedCounter++;
+                    component.$forceUpdate();
+                    component.changed(component.myValue);
                     component.personCreated = true;
                 });
         },
@@ -321,7 +326,10 @@ export default {
             component.personCreatedData = person;
             this.myPeopleReference[person.id] = person;
             this.createCallback(person);
-            this.changed(this.myValue);
+            component.myValue.push(data.id);
+            component.personCreatedCounter++;
+            component.$forceUpdate();
+            component.changed(component.myValue);
             component.personCreated = true;
         },
         newPersonModalShown(ref) {
