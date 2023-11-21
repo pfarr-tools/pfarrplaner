@@ -101,6 +101,7 @@ return [
             'host' => env('SFTP_BACKUP_HOST'),
             'username' => env('SFTP_BACKUP_USER'),
             'password' => env('SFTP_BACKUP_PASSWORD'),
+            'root' => env('SFTP_BACKUP_ROOT', ''),
         ]
 
     ],
