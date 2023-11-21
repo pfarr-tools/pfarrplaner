@@ -55,7 +55,9 @@ class UserPolicy
         if ($user->hasRole(RoleService::ROLE_ADMIN)) {
             return true;
         }
-        if ($user->adminCities->count() > 0) return true;
+        if ($user->adminCities->count() > 0) {
+            return true;
+        }
         return $user->hasPermissionTo('benutzerliste-lokal-sehen') || $user->hasPermissionTo('benutzer-bearbeiten');
     }
 
@@ -110,7 +112,7 @@ class UserPolicy
                 }
             }
         }
-        if ($user->isLocalAdmin && ($model->password == '')) {
+        if ($user->isLocalAdmin) {
             return true;
         }
         return false;
