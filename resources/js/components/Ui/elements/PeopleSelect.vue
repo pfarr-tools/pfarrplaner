@@ -110,6 +110,11 @@ import FormInput from "../forms/FormInput";
 import Modal from "../modals/Modal";
 import NavButton from "../buttons/NavButton.vue";
 import Avatar from 'vue-avatar';
+import EventBus from "../../../plugins/EventBus";
+import {NewPersonAddedEvent} from "../../../events/NewPersonAddedEvent";
+import {CalendarNewSortOrderEvent} from "../../../events/CalendarNewSortOrderEvent";
+
+let uuid = 0;
 
 export default {
     name: "PeopleSelect",
@@ -137,8 +142,16 @@ export default {
         },
         city: Object,
     },
+    beforeCreate() {
+        this.uuid = uuid.toString();
+        uuid += 1;
+    },
     mounted() {
         if (this.myId == '') this.myId = this._uid;
+        EventBus.listen(NewPersonAddedEvent, this.handleGlobalAddNewPersonEvent);
+    },
+    beforeDestroy() {
+        EventBus.remove(NewPersonAddedEvent, this.handleGlobalAddNewPersonEvent);
     },
     data() {
         var myValue = [];
@@ -302,6 +315,7 @@ export default {
                     component.$forceUpdate();
                     component.changed(component.myValue);
                     component.personCreated = true;
+                    EventBus.publish(new NewPersonAddedEvent(this.uuid, data));
                 });
         },
         cancelNewPersonModal() {
@@ -331,6 +345,7 @@ export default {
             component.$forceUpdate();
             component.changed(component.myValue);
             component.personCreated = true;
+            EventBus.publish(new NewPersonAddedEvent(this.uuid, person));
         },
         newPersonModalShown(ref) {
         },
@@ -368,9 +383,13 @@ export default {
             if (confirm('Willst du wirklich die Suchergebnisse ignorieren und stattdessen eine neue Person anlegen? Das solltest du nur tun, wenn du sicher bist, dass die von dir gemeinte Person nicht in der Liste der Suchergebnisse vorhanden ist.')) {
                 this.ignoreSearchResults = true;
             }
+        },
+        handleGlobalAddNewPersonEvent(e) {
+            if (e.origin == this.uuid) return;
+            this.myPeople.push(e.person);
+            this.$forceUpdate();
         }
     }
-
 }
 </script>
 
