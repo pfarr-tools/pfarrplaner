@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.34.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.33.2...v2023.34.0) (2023-11-21)
+
+
+### Bug Fixes
+
+* Beim SFTP-Backup kann kein Ordner angegeben werden. ([2862aa7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2862aa711730dc9d76f5672bd52fe45fac420694))
+* Lokaler Administrator kann keine Berechtigungen für seine Gemeinde verleihen. ([2de73f9](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2de73f96f23ea374b4682596fae60c82f754bff6))
+* Neu angelegte Person fehlt in weiteren PeopleSelect-Komponenten auf derselben Seite ([5ec6264](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5ec6264c136a25860b98bb7c1e15238fc6875a35))
+
 ### [2023.33.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.33.1...v2023.33.2) (2023-11-10)
 
 
