@@ -84,9 +84,9 @@ class Liturgy
             $tmpData = json_decode(Storage::get('liturgy.json'), true);
             $overrides = config('liturgy')['overrides'];
             foreach ($tmpData['content']['days'] as $key => $val) {
-                $dateComponents = explode('-', $val['dateSql']);
-                if (isset($overrides[$dateComponents[1]][$dateComponents[2]])) {
-                    $val = array_replace_recursive($val, $overrides[$dateComponents[1]][$dateComponents[2]]);
+                $dateComponents = explode('.', $val['date']);
+                if (isset($overrides[$dateComponents[1]][$dateComponents[0]])) {
+                    $val = array_replace_recursive($val, $overrides[$dateComponents[1]][$dateComponents[0]]);
                 }
                 if (!isset($data[$val['date']])) {
                     $data[$val['date']] = $val;
