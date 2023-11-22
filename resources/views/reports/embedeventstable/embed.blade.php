@@ -41,27 +41,16 @@
                 <th>Ort</th>
                 </thead>
                 <tbody>
-                <?php $lastDate = ''; ?>
-
-                @foreach ($events as $theseEvents)
+                @foreach ($events as $occasion => $theseEvents)
+                    <tr style="background-color: #ccc !important;">
+                        <td valign="top"
+                            style="vertical-align:top;">{!! \Carbon\Carbon::parse(substr($occasion, 0, 10))->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
+                        <td></td>
+                        <td valign="top" colspan="2"
+                            style="vertical-align:top; font-weight: bold;">@if(substr($occasion, 16) != '-'){{ ucfirst(str_replace('So.', 'Sonntag', substr($occasion, 16))) }}@endif</td>
+                    </tr>
                     @foreach($theseEvents as $event)
-
                         <?php $eventStart = is_array($event) ? $event['start'] : $event->date ?>
-                        @if ($lastDate != $eventStart->format('Ymd') )
-                            <?php
-                            $lastDate = $eventStart->format('Ymd');
-                            $liturgy = \App\Liturgy::getDayInfo($eventStart->format('d.m.Y'));
-                            ?>
-                            @if($liturgy['title'] ?? '')
-                                <tr style="background-color: #ccc !important;">
-                                    <td valign="top"
-                                        style="vertical-align:top;">{!! $eventStart->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
-                                    <td></td>
-                                    <td valign="top" colspan="2"
-                                        style="vertical-align:top; font-weight: bold;">{{ ucfirst(str_replace('So.', 'Sonntag', $liturgy['title'])) }}</td>
-                                </tr>
-                            @endif
-                        @endif
                         @if (!is_object($event))
                             @include('reports.embedeventstable.parts.op_event')
                         @else

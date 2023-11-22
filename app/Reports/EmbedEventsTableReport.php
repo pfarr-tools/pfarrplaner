@@ -152,6 +152,42 @@ class EmbedEventsTableReport extends AbstractEmbedReport
         $customerKey = $city->op_customer_key;
         $randomId = uniqid();
 
+        // group by day
+        $tmpEvents = [];
+        foreach ($events as $key => $events) {
+            $dayKey = substr($key, 0, 8);
+            $tmpEvents[$dayKey] = array_merge($events, $tmpEvents[$dayKey] ?? []);
+        }
+
+        // further group by occasion
+        $events = $tmpEvents;
+        $tmpEvents = [];
+        foreach ($events as $day => $dayEvents) {
+            if (count($dayEvents)) {
+                $eventStart = is_array($dayEvents[0]) ? $dayEvents[0]['start'] : $dayEvents[0]->date;
+                $lastDayKey = $zeroDayKey = $eventStart->format('Y-m-d') . '--';
+                foreach ($dayEvents as $event) {
+                    $eventStart = is_array($event) ? $event['start'] : $event->date;
+                    $dayKey = (is_a($event, Service::class)) ? $eventStart->format('Y-m-d').'-'.($event->liturgical_info['title'] ?? '-') : $lastDayKey;
+                    $tmpEvents[$dayKey][] = $event;
+                }
+            }
+        }
+
+        $events = $tmpEvents;
+        // correctly sort by time
+        $tmpEvents = [];
+
+        foreach ($events as $occasion => $dayEvents) {
+            // get earliest time
+            $times = [];
+            foreach ($dayEvents as $event) $times[] = is_array($event) ? $event['start'] : $event->date;
+            $key = substr($occasion, 0,10).'-'.(min($times)->format('Hi')).'-'.substr($occasion, 11);
+            $tmpEvents[$key] = $dayEvents;
+        }
+        ksort($tmpEvents);
+        $events = $tmpEvents;
+
         return $this->renderView(
             'embed',
             compact('start', 'days', 'city', 'events', 'customerKey', 'customerToken', 'randomId')
