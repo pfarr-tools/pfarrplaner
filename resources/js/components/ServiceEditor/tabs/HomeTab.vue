@@ -40,8 +40,7 @@
                 />
             </div>
             <div class="col-md-4">
-                <form-date-picker name="alt_liturgy_date" label="Datum für Liturgische Informationen " v-model="service.alt_liturgy_date"
-                                  help="Zeigt liturgische Information für ein abweichendes Datum an."/>
+                <proprium-select label="Zugehöriges Proprium" :liturgy-info="liturgyInfo" v-model="myService.liturgy_info_id" />
             </div>
         </div>
         <div class="row">
@@ -123,10 +122,12 @@ import DatePickerConfig from "../../Ui/config/DatePickerConfig.js";
 import TagSelect from "../../Ui/elements/TagSelect";
 import ServiceGroupSelect from "../../Ui/elements/ServiceGroupSelect";
 import FormDatePicker from "../../Ui/forms/FormDatePicker";
+import PropriumSelect from "../PropriumSelect.vue";
 
 export default {
     name: "HomeTab",
     components: {
+        PropriumSelect,
         FormDatePicker,
         ServiceGroupSelect,
         TagSelect,
@@ -147,6 +148,7 @@ export default {
         tags: Array,
         serviceGroups: Array,
         cities: Array,
+        liturgyInfo: Array,
     },
     computed: {
         hasAnnouncements() {

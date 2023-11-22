@@ -32,6 +32,7 @@ namespace App\Traits;
 
 use App\Day;
 use App\Liturgy;
+use App\LiturgyInfo;
 
 trait HasLiturgicalInfo
 {
@@ -42,14 +43,23 @@ trait HasLiturgicalInfo
      */
     public function getLiturgicalInfoAttribute(): array
     {
-        return Liturgy::getDayInfo($this->alt_liturgy_date ?: $this->date);
+        if ($this->liturgy_info_id) return LiturgyInfo::find($this->liturgy_info_id)->toArray() ?? [];
+        return Liturgy::getLiturgyInfoByDate($this->alt_liturgy_date ?: $this->date)->first() ?? [];
     }
 
     public function getLiturgicalInfoDateAttribute()
     {
-        return $this->alt_liturgy_date ?: $this->date;
+        return $this->liturgical_info['date'] ?? $this->date;
     }
 
-
+    public function getIsAlternatePropriumAttribute(): bool
+    {
+        if (!$this->liturgy_info_id) return false;
+        if ($this->liturgical_info['date'] != $this->date->format('d.m.Y')) return true;
+        $firstRecord = Liturgy::getLiturgyInfoByDate($this->alt_liturgy_date ?: $this->date)->first();
+        if (!$firstRecord) return false;
+        if ($this->liturgy_info_id != ($firstRecord['id'] ?? -1)) return true;
+        return false;
+    }
 
 }

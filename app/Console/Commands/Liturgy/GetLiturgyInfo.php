@@ -30,6 +30,7 @@
 
 namespace App\Console\Commands\Liturgy;
 
+use App\LiturgyInfo;
 use Illuminate\Console\Command;
 use Storage;
 
@@ -72,6 +73,19 @@ class GetLiturgyInfo extends Command
                 'https://www.kirchenjahr-evangelisch.de/service.php?o=lcf&f=gaa&r=json&dl=user'
             )
         );
+
+        $ctr = 0;
+        $list = json_decode(Storage::get('liturgy.json'), true)['content']['days'];
+        foreach ($list as $id => $data) {
+            $data['date'] = $data['dateSql'];
+            $data['id'] = $id;
+            if (!LiturgyInfo::where('id', $id)->where('date', $data['date'])->count()) {
+                $ctr++;
+                LiturgyInfo::create($data);
+            }
+        }
+
         $this->line('Renewed the liturgical calendar');
+        if ($ctr) $this->line('Added '.$ctr.' new records.');
     }
 }

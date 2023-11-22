@@ -120,6 +120,7 @@ class ServiceRequest extends FormRequest
             'alt_liturgy_date' => 'nullable|date_format:d.m.Y',
             'date' => 'nullable|date',
             'wtc_category' => 'nullable|string',
+            'liturgy_info_id' => 'nullable|int|exists:liturgy_info,id',
         ];
     }
 

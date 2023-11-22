@@ -59,6 +59,12 @@
             <a v-if="myService.city.youtube_channel_url" :href="myService.liveDashboardUrl" target="_blank"
                class="youtube-livedashboard-link" title="Zum LiveDashboard"><span class="mdi mdi-video"></span></a>
         </span>
+            <div v-if="service.isAlternateProprium" title="Für diesen Gottesdienst wurde ein vom normalen Kalender abweichendes Proprium festgelegt.">
+                <div class="service-description">
+                    <div :style="'background-color: '+myService.liturgicalInfo.litColor" class="liturgy-color"></div>
+                    {{ myService.liturgicalInfo.title }}
+                </div>
+            </div>
             <controlled-access v-if="myService.controlled_access" :service="service"/>
             <div
                 v-if="(myService.titleText != 'Gottesdienst') && (myService.titleText != 'GD') && (myService.funerals.length == 0)"
@@ -218,4 +224,27 @@ export default {
 .youtube-livedashboard-link {
     color: darkgray;
 }
+
+.liturgy-color {
+    display: inline-block;
+    border: solid 1px gray;
+    min-width: 10px;
+    min-height: 10px;
+    border-radius: 5px;
+    border-radius: .5em;
+}
+.liturgy-color.white {
+    background-color: white;
+    border-color: darkgray;
+}
+.liturgy-color.black {
+    background-color:black;
+}
+.liturgy-color.green {
+    background-color: darkgreen;
+}
+.liturgy-color.purple {
+    background-color: rebeccapurple;
+}
+
 </style>

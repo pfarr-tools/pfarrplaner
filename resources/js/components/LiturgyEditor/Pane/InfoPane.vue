@@ -31,9 +31,8 @@
     <div class="liturgy-editor-info-pane">
         <div class="card" v-if="liturgy['title']">
             <div class="card-body">
-                <div v-if="myService.date != myService.liturgicalInfoDate" class="alert alert-warning mb-1">
-                    Aufgrund der Gottesdiensteinstellungen werden hier die liturgischen Informationen für
-                    <b>{{ moment(myService.liturgicalInfoDate).locale('de').format('dddd, DD.MM.YYYY') }}</b> angezeigt.
+                <div v-if="myService.isAlternateProprium" class="alert alert-warning mb-1">
+                    In den Gottesdiensteinstellungen wurde ein vom normalen Kalender abweichendes Proprium festgelegt.
                 </div>
                 <div class="row" v-if="liturgy['title']">
                     <div class="col-12 col-md-2">
@@ -101,9 +100,8 @@
                     </div>
                     <div class="col-md-4 text-end">
                         <div class="text-start">
-                            <form-date-picker v-model="myService.alt_liturgy_date"
-                                              label="Informationen für abweichendes Datum anzeigen"
-                                              @input="setAlternativeDate"/>
+                            <proprium-select label="Proprium auswählen" @input="setAlternativeProprium"
+                                v-model="myService.liturgy_info_id" :liturgy-info="liturgyInfo" />
                         </div>
                     </div>
                 </div>
@@ -121,10 +119,11 @@ import FuneralInfoPane from "./FuneralInfoPane";
 import CardBody from "../../Ui/cards/cardBody";
 import Card from "../../Ui/cards/card";
 import FormDatePicker from "../../Ui/forms/FormDatePicker";
+import PropriumSelect from "../../ServiceEditor/PropriumSelect.vue";
 
 export default {
     name: "InfoPane",
-    components: {FormDatePicker, Card, CardBody, FuneralInfoPane, BibleReference},
+    components: {PropriumSelect, FormDatePicker, Card, CardBody, FuneralInfoPane, BibleReference},
     data() {
         return {
             myService: this.service,
@@ -132,7 +131,7 @@ export default {
             originalAltDate: this.service.alt_liturgy_date,
         };
     },
-    props: ['service'],
+    props: ['service', 'liturgyInfo'],
     methods: {
         /**
          * @source http://blog.stevenlevithan.com/archives/javascript-roman-numeral-converter
@@ -152,15 +151,13 @@ export default {
                 roman = (key[+digits.pop() + (i * 10)] || "") + roman;
             return Array(+digits.join("") + 1).join("M") + roman;
         },
-        setAlternativeDate(e) {
-            if (e != moment(this.myService.liturgicalInfoDate).format('DD.MM.YYYY')) {
-                let record = this.myService;
-                delete record.participants;
-                axios.patch(route('service.update', {service: this.myService.slug, format: 'json'}), record)
-                    .then(response => {
-                        window.location.reload();
-                    });
-            }
+        setAlternativeProprium(e) {
+            let record = this.myService;
+            delete record.participants;
+            axios.patch(route('service.update', {service: this.myService.slug, format: 'json'}), record)
+                .then(response => {
+                    window.location.reload();
+                });
         }
     }
 }

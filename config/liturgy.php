@@ -31,10 +31,7 @@
 
 return [
     'overrides' => [
-        12 => [
-            24 => [
-                'title' => 'Heiligabend',
-            ],
-        ],
+        'Christvesper' => 'Heiligabend (Christvesper)',
+        'Christnacht' => 'Heiligabend (Christnacht)',
     ],
 ];

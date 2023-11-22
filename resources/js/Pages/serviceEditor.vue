@@ -99,7 +99,7 @@
                 <tabs>
                     <tab id="home" :active-tab="activeTab">
                         <home-tab :service="editedService" :locations="locations"
-                                  :cities="availableCities"
+                                  :cities="availableCities" :liturgy-info="liturgyInfo"
                                   :tags="tags" :service-groups="serviceGroups"/>
                     </tab>
                     <tab id="people" :active-tab="activeTab">
@@ -178,6 +178,7 @@ export default {
         liturgySheets: Object,
         backRoute: String,
         availableCities: Array,
+        liturgyInfo: Array,
     },
     computed: {
         hasAnnouncements() {

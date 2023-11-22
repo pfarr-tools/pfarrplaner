@@ -47,7 +47,7 @@
             <button class="btn btn-sm btn-primary" @click.prevent.stop="reloadPage">Anwenden</button>
         </template>
         <template slot="after-flash">
-            <info-pane v-if="!agendaMode" :service="service" @info="infoWindow = true"/>
+            <info-pane v-if="!agendaMode" :service="service" :liturgy-info="liturgyInfo" @info="infoWindow = true"/>
             <agenda-info-pane v-if="agendaMode" :agenda="service"/>
         </template>
         <liturgy-tree :service="service" :sheets="agendaMode ? {} : liturgySheets" :agenda-mode="agendaMode"
@@ -87,7 +87,8 @@ export default {
         markers: {
             type: Object,
             default: null,
-        }
+        },
+        liturgyInfo: Array,
     },
     components: {
         FormInput,

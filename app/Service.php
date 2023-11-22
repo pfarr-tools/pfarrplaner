@@ -201,6 +201,7 @@ class Service extends Model implements HasDAVCalendarItems
         'alt_liturgy_date',
         'date',
         'wtc_category',
+        'liturgy_info_id',
     ];
 
     /**
@@ -230,6 +231,7 @@ class Service extends Model implements HasDAVCalendarItems
         'liturgicalInfoDate',
         'liturgicalInfo',
         'keyDate',
+        'isAlternateProprium',
     ];
 
     /**

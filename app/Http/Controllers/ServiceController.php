@@ -43,6 +43,7 @@ use App\Http\Requests\ServiceRequest;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Liturgy;
 use App\Liturgy\LiturgySheets\LiturgySheets;
+use App\LiturgyInfo;
 use App\Location;
 use App\Service;
 use App\ServiceGroup;
@@ -158,6 +159,9 @@ class ServiceController extends Controller
         $locations = Location::whereIn('city_id', Auth::user()->cities->pluck('id'))->get();
         $liturgySheets = LiturgySheets::all();
 
+        $liturgyInfo = LiturgyInfo::select(['id', 'date', 'title', 'litColor'])->orderBy('date')->get();
+        $service->liturgy_info_id ??= LiturgyInfo::whereDate('date', $service->date->format('Y-m-d'))->orderBy('date')->first()->id;
+
         $backRoute = RedirectorService::backRoute();
 
         $tags = Tag::all();
@@ -173,6 +177,7 @@ class ServiceController extends Controller
                 'liturgySheets',
                 'backRoute',
                 'availableCities',
+                'liturgyInfo',
             )
         );
     }

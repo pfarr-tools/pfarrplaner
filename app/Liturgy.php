@@ -33,6 +33,7 @@ namespace App;
 use App\Liturgy\Bible\BibleText;
 use App\Liturgy\Bible\ReferenceParser;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Storage;
 
@@ -76,27 +77,57 @@ class Liturgy
         return self::$instance;
     }
 
-    public static function getCompleteLiturgyInfoArray():array {
-        if (!Cache::has('liturgicalDays')) {
-            if (!Storage::exists('liturgy.json')) {
-                return [];
+    public static function getCompleteLiturgyInfoArray(): array
+    {
+        if (!Storage::exists('liturgy.json')) {
+            return [];
+        }
+        $tmpData = json_decode(Storage::get('liturgy.json'), true);
+        $overrides = config('liturgy')['overrides'];
+        foreach ($tmpData['content']['days'] as $key => $val) {
+            $dateComponents = explode('.', $val['date']);
+            if (isset($overrides[$dateComponents[1]][$dateComponents[0]])) {
+                $val = array_replace_recursive($val, $overrides[$dateComponents[1]][$dateComponents[0]]);
             }
-            $tmpData = json_decode(Storage::get('liturgy.json'), true);
-            $overrides = config('liturgy')['overrides'];
-            foreach ($tmpData['content']['days'] as $key => $val) {
-                $dateComponents = explode('.', $val['date']);
-                if (isset($overrides[$dateComponents[1]][$dateComponents[0]])) {
-                    $val = array_replace_recursive($val, $overrides[$dateComponents[1]][$dateComponents[0]]);
-                }
-                if (!isset($data[$val['date']])) {
-                    $data[$val['date']] = $val;
-                }
+            if (!isset($data[$val['date']])) {
+                $data[$val['date']] = $val;
             }
-            Cache::put('liturgicalDays', $data, 86400);
-        } else {
-            $data = Cache::get('liturgicalDays');
         }
         return $data ?: [];
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getCompleteLiturgyInfoCollection(): Collection
+    {
+        if (!Storage::exists('liturgy.json')) {
+            return collect();
+        }
+        $list = json_decode(Storage::get('liturgy.json'), true)['content']['days'];
+        $overrides = config('liturgy.overrides');
+        foreach ($list as $key => $val) {
+            $list[$key]['title'] = $overrides[$val['title']] ?? $val['title'];
+        }
+        return collect($list);
+    }
+
+    public static function getLiturgyInfoByDate($date)
+    {
+        if (!is_a(Carbon::class, $date)) {
+            $date = Carbon::parse($date);
+        }
+        $list = self::getCompleteLiturgyInfoCollection()->filter(function ($item) use ($date) {
+            return ($item['date'] == $date->format('d.m.Y'));
+        });
+        return $list;
+    }
+
+    public static function getLiturgyInfoByDayId($dayId = null)
+    {
+        $list = self::getCompleteLiturgyInfoCollection()->groupBy('dayId');
+        if ($dayId) return $list[$dayId] ?? null;
+        return $list;
     }
 
     /**
@@ -108,10 +139,16 @@ class Liturgy
     public static function getDayInfo($date, $fallback = false): array
     {
         // fallback for obsolete code that still uses Day objects
-        if (is_a($date, Day::class)) $date = $date->date;
+        if (is_a($date, Day::class)) {
+            $date = $date->date;
+        }
 
-        if (is_string($date)) $date = Carbon::parse($date);
-        if (!$date) return [];
+        if (is_string($date)) {
+            $date = Carbon::parse($date);
+        }
+        if (!$date) {
+            return [];
+        }
         $data = self::getCompleteLiturgyInfoArray();
 
         $result = null;
