@@ -44,7 +44,9 @@ trait HasLiturgicalInfo
     public function getLiturgicalInfoAttribute(): array
     {
         if ($this->liturgy_info_id) return LiturgyInfo::find($this->liturgy_info_id)->toArray() ?? [];
-        return Liturgy::getLiturgyInfoByDate($this->alt_liturgy_date ?: $this->date)->first() ?? [];
+        $info = Liturgy::getLiturgyInfoByDate($this->alt_liturgy_date ?: $this->date)->first();
+        if ($info) return $info->toArray();
+        return [];
     }
 
     public function getLiturgicalInfoDateAttribute()

@@ -117,10 +117,7 @@ class Liturgy
         if (!is_a(Carbon::class, $date)) {
             $date = Carbon::parse($date);
         }
-        $list = self::getCompleteLiturgyInfoCollection()->filter(function ($item) use ($date) {
-            return ($item['date'] == $date->format('d.m.Y'));
-        });
-        return $list;
+        return LiturgyInfo::whereDate('date', $date->format('Y-m-d'))->get();
     }
 
     public static function getLiturgyInfoByDayId($dayId = null)
