@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.35.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.34.1...v2023.35.0) (2023-11-22)
+
+
+### Features
+
+* Auswahl des Propriums für jeden Gottesdienst erlauben ([1a0d8a2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1a0d8a20d2514824018e6583e50f43e94ef101dd)), closes [#393](https://codeberg.org/pfarr.tools/pfarrplaner/issues/393)
+* Tage mit verschiedenen Proprien werden auf der Homepage entsprechend angezeigt ([9451d1e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9451d1ec9557409e76942d81212ecb9143f93539)), closes [#393](https://codeberg.org/pfarr.tools/pfarrplaner/issues/393)
+
 ### [2023.34.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.34.0...v2023.34.1) (2023-11-21)
 
 
