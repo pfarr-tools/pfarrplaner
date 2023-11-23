@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.36.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.35.0...v2023.36.0) (2023-11-23)
+
+
+### Features
+
+* Leseansicht für Predigten ([df4dec9](https://codeberg.org/pfarr.tools/pfarrplaner/commit/df4dec99b6ae227893f9c6bd36a867c4eaf1879a))
+
+
+### Bug Fixes
+
+* Fehlende Authentifizierung im Extranet ([5927f53](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5927f534270b98c2367f4e7378196b7c853239c7))
+* Fehler bei der Liturgieanzeige auf dem Startbildschirm ([9c03a35](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9c03a35cffc8d4c95152d4db7ebe57b59422656a))
+
 ## [2023.35.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.34.1...v2023.35.0) (2023-11-22)
 
 
