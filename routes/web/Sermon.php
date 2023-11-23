@@ -47,6 +47,7 @@ use App\Http\Controllers\SermonController;
 
 // one sermon
 Route::get('/predigt/{sermon}', [SermonController::class, 'editor'])->name('sermon.editor');
+Route::get('/predigt/{sermon}/leseansicht', [SermonController::class, 'reader'])->name('sermon.reader');
 Route::patch('/predigt/{sermon}', [SermonController::class, 'update'])->name('sermon.update');
 Route::delete('/predigt/abkoppeln/{service:slug}', [SermonController::class, 'uncouple'])->name('sermon.uncouple');
 Route::post('/predigt/{model}/bild', [SermonController::class, 'attachImage'])->name('sermon.image.attach');
@@ -54,6 +55,7 @@ Route::delete('/predigt/{model}/bild', [SermonController::class, 'detachImage'])
 
 // one sermon via-service
 Route::get('/gottesdienst/{service:slug}/predigt', [SermonController::class, 'editorByService'])->name('service.sermon.editor');
+Route::get('/gottesdienst/{service:slug}/predigt/leseansicht', [SermonController::class, 'readerByService'])->name('service.sermon.reader');
 Route::post('/gottesdienst/{service:slug}/predigt', [SermonController::class, 'store'])->name('sermon.store');
 
 

@@ -102,6 +102,17 @@ class SermonController extends Controller
         }
     }
 
+    public function reader(Sermon $sermon)
+    {
+        return Inertia::render('Sermon/Reader', compact('sermon'));
+    }
+
+    public function readerByService(Service $service)
+    {
+        if (!$service->sermon_id) abort(404);
+        return $this->reader($service->sermon);
+    }
+
     protected function handleCheckBoxes($data, $keys) {
         foreach ($keys as $key) {
             if (null !== $data[$key]) $data[$key] = (bool)$data[$key];
