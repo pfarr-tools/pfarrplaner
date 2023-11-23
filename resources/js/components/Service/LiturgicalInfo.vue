@@ -29,17 +29,16 @@
 
 <template>
     <div class="liturgical-info">
-        <div v-if="liturgy.title">
+        <span v-if="liturgy.title">
             {{ liturgy.title }}
-            <span v-if="service.date != service.liturgicalInfoDate"
-                  class="mdi mdi-calendar text-warning"
-                  :title="'Aufgrund der Gottesdiensteinstellungen werden abweichend die Informationen für '
-                  +moment(service.liturgicalInfoDate).locale('de').format('dddd, DD.MM.YYYY')+' angezeigt'">
+        </span>
+        <span v-if="service.isAlternateProprium"
+              class="mdi mdi-calendar text-warning"
+              :title="'In den Gottesdiensteinstellungen wurde ein vom normalen Kalender abweichendes Proprium festgelegt.'">
             </span>
-        </div>
-        <div v-if="liturgy.currentPerikopeLink">
-            <a :href="liturgy.currentPerikopeLink" target="_blank">
-                {{ liturgy.currentPerikope }}</a>
+        <div v-if="liturgy['litTextsPerikope'+liturgy.perikope]">
+            <a :href="liturgy['litTextsPerikope'+liturgy.perikope+'Link']" target="_blank">
+                {{ liturgy['litTextsPerikope'+liturgy.perikope] }}</a>
         </div>
     </div>
 </template>
