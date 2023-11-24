@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.36.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.36.0...v2023.36.1) (2023-11-24)
+
+
+### Bug Fixes
+
+* Fehler bei Gottesdiensten, bei denen kein Proprium erraten werden kann. ([1ccec21](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1ccec21131e4f55905f926a4b604714ae78ec60d))
+
 ## [2023.36.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.35.0...v2023.36.0) (2023-11-23)
 
 
