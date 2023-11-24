@@ -213,7 +213,8 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
     {
         $text = '';
         if ($item->data['description']) {
-            $text = (false !== strpos($item->data['description'], "\n")) ? explode("\n", $item->data['description'])[0] : substr($item->data['description'], 0, 80).'...';
+            $text = Replacement::replaceAll($item->getHelper()->getText(), $this->service);
+            $text = (false !== strpos($text, "\n")) ? explode("\n", $text)[0] : substr($text, 0, 80).'...';
         }
         $this->renderRow($table, $item, $text);
     }
@@ -243,11 +244,10 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         $this->renderRow($table, $item, $item->data['reference'] ?? '');
     }
 
-
     protected function renderFreetextItem(DefaultWordDocument $doc, Item $item)
     {
         if (!$item->data['description']) return;
-        $doc->renderNormalText(Replacement::replaceAll($item->data['description'], $this->service));
+        $doc->renderNormalText(Replacement::replaceAll($item->getHelper()->getText(), $this->service));
     }
 
     protected function renderSermonItem(DefaultWordDocument $doc, Item $item)

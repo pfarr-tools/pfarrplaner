@@ -51,6 +51,7 @@ class FreetextItemHelper extends AbstractItemHelper
             '<br/>' => "\n",
             '<br />' => '\n',
             '<p>' => '',
+            '&nbsp;' => ' ',
         ]);
         if ($shorten) {
             return str_contains($s, "\n") ? explode("\n", $s)[0] : substr($s, 0, $shorten).'...';
