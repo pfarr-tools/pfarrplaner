@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.36.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.36.1...v2023.36.2) (2023-11-24)
+
+
+### Bug Fixes
+
+* Export "Ablaufplan und Texte" enthält HTML-Tags ([883d91b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/883d91bbb4a786d58a1339f945a9f82b734472ea))
+* Volltextexport funktioniert nicht, wenn ein Lied noch nicht ausgewählt wurde. ([346c675](https://codeberg.org/pfarr.tools/pfarrplaner/commit/346c675da6443a59761a45b96439cc8dae5b0ead))
+
 ### [2023.36.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.36.0...v2023.36.1) (2023-11-24)
 
 
