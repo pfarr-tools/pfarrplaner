@@ -86,6 +86,8 @@ class SongItemHelper extends AbstractItemHelper
     public function getTitleText()
     {
         if (!isset($this->item->data['song'])) return '';
+        if (!isset($this->item->data['song']['song'])) return '';
+        if (!isset($this->item->data['song']['song']['title'])) return '';
         $code = $this->getCodeText();
         $title = ($code ? $code.' ' : '').$this->item->data['song']['song']['title'];
         return trim(str_replace('  ', ' ', $title));
