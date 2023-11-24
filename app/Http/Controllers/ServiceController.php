@@ -160,7 +160,6 @@ class ServiceController extends Controller
         $liturgySheets = LiturgySheets::all();
 
         $liturgyInfo = LiturgyInfo::select(['id', 'date', 'title', 'litColor'])->orderBy('date')->get();
-        $service->liturgy_info_id ??= LiturgyInfo::whereDate('date', $service->date->format('Y-m-d'))->orderBy('date')->first()->id;
 
         $backRoute = RedirectorService::backRoute();
 
