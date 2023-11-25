@@ -32,8 +32,8 @@
         <admin-layout title="Predigt bearbeiten">
             <template slot="navbar-left">
                 <button class="btn btn-primary" @click.prevent="saveSermon">Speichern</button>&nbsp;
-                <a class="btn btn-light"
-                              :href="route('sermon.reader', {sermon: sermon.id})" target="_blank"
+                <a class="btn btn-light" v-if="editedSermon.id"
+                              :href="route('sermon.reader', {sermon: editedSermon.id})" target="_blank"
                               title="Zur Leseansicht">
                     <span class="mdi mdi-text-box-outline"></span> Zur Leseansicht
                 </a>
