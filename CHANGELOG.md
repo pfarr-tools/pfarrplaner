@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.37.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.36.2...v2023.37.0) (2023-11-28)
+
+
+### Features
+
+* Titel der Standarddienste (Pfarrer:in, Organist:in, Mesner:in) können pro Server verändert werden ([244b095](https://codeberg.org/pfarr.tools/pfarrplaner/commit/244b09526f69b1652010ee3a67f28f9d9171efd7))
+
+
+### Bug Fixes
+
+* Predigteditor wird bei neuen Predigten nicht angezeigt ([74c0b81](https://codeberg.org/pfarr.tools/pfarrplaner/commit/74c0b819de50873a4c7c0f3763dd9d00324c5555))
+
 ### [2023.36.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.36.1...v2023.36.2) (2023-11-24)
 
 
