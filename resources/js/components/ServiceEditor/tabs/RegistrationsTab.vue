@@ -74,7 +74,7 @@
                              :location="myService.location"
                              :exclude-sections="myService.exclude_sections"
                              multiple
-                             label="Folgende Plätze zurückhalten" help="z.B. für Mesner, Ordner, usw."/>
+                             label="Folgende Plätze zurückhalten" :help="'z.B. für '+this.$page.props.labels.sacristan+', Ordner:in, usw.'"/>
             </div>
         </div>
         <hr/>

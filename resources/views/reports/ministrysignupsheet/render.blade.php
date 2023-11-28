@@ -39,16 +39,16 @@
                 @if(count($cities) > 1)<b>{{ $service->city->name }}</b><br />@endif
                 {{ $service->locationText() }}<br />
                 {{ $service->titleText(false) }}<br />
-                    P: {{ $service->participantsText('P') }}
-                    O: {{ $service->participantsText('O') }}
-                    M: {{ $service->participantsText('M') }}
+                    config('labels.code_pastor') {{ $service->participantsText('P') }}
+                    config('labels.code_organist'): {{ $service->participantsText('O') }}
+                    config('labels.code_sacristan'): {{ $service->participantsText('M') }}
                 </small>
             </td>
             @foreach($ministries as $ministry)
                 @php
-                    if ($ministry == 'Pfarrer:in') $ministry = 'P';
-                    if ($ministry == 'Organist:in') $ministry = 'O';
-                    if ($ministry == 'Mesner:in') $ministry = 'M';
+                    if ($ministry == config('labels.pastor')) $ministry = 'P';
+                    if ($ministry == config('labels.organist')) $ministry = 'O';
+                    if ($ministry == config('labels.sacristan')) $ministry = 'M';
                 @endphp
                 <td valign="top"><small>{{ $service->participantsText($ministry)}}</small></td>
             @endforeach

@@ -8,7 +8,7 @@ METHOD:PUBLISH
 BEGIN:VEVENT
 UID:{{ $service->id }}{{ '@' }}{{ parse_url(env('APP_URL'), PHP_URL_HOST) }}
 LOCATION:{{ $service->locationText() }}
-SUMMARY:{{ wordwrap($service->titleText().' P: '.$service->participantsText('P').' O: '.$service->participantsText('O').' M: '.$service->participantsText('M').($service->description ? ' ('.$service->description.')' : ''), 64, "\r\n  ") }}
+SUMMARY:{{ wordwrap($service->titleText().' '.config('labels.code_pastor').': '.$service->participantsText('P').' '.config('labels.code_organist').': '.$service->participantsText('O').' '.config('labels.code_sacristan').': '.$service->participantsText('M').($service->description ? ' ('.$service->description.')' : ''), 64, "\r\n  ") }}
 @if($service->description)DESCRIPTION: {{ wordwrap ($service->description, 62, "\r\n  ") }}
 @endif
 CLASS:PUBLIC

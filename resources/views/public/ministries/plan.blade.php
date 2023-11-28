@@ -28,9 +28,9 @@
                             {{ $service->locationText() }}
                         </td>
                         <td>
-                            P: {{ $service->participantsText('P', true) }}<br />
-                            O: {{ $service->participantsText('O', true) }}<br />
-                            M: {{ $service->participantsText('M', true) }}<br />
+                            {{ config('labels.code_pastor') }}: {{ $service->participantsText('P', true) }}<br />
+                            {{ config('labels.code_organist') }}: {{ $service->participantsText('O', true) }}<br />
+                            {{ config('labels.code_sacristan') }}: {{ $service->participantsText('M', true) }}<br />
                         </td>
                             @foreach ($ministries as $ministry)
                             <td>

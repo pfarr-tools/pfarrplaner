@@ -41,15 +41,15 @@
                 <label class="control-label">Folgende Informationen mit einbeziehen:</label>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="includePastor" value="1" checked >
-                    <label class="form-check-label" for="includePastor">Pfarrer:in</label>
+                    <label class="form-check-label" for="includePastor">{{ globalLabels.pastor}}</label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="includeOrganist" value="1" checked >
-                    <label class="form-check-label" for="includeOrganist">Organist:in</label>
+                    <label class="form-check-label" for="includeOrganist">{{ globalLabels.organist }}</label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="includeSacristan" value="1" checked >
-                    <label class="form-check-label" for="includeSacristan">Mesner:in</label>
+                    <label class="form-check-label" for="includeSacristan">{{ globalLabels.sacristan }}</label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="includeDescription" value="1" checked >
@@ -98,6 +98,7 @@ export default {
             myNotes1: this.$page.props.settings.quarterly_events_report_notes1 || '',
             myNotes2: this.$page.props.settings.quarterly_events_report_notes2 || '',
             myIncludeContact: true,
+            globalLabels: this.$page.props.labels,
         }
     },
     methods: {

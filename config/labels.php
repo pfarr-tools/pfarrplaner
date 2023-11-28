@@ -28,40 +28,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Liturgy\LiturgySheets;
 
-
-use App\Service;
-
-class OrganistLiturgySheet extends AbstractLiturgySheet
-{
-    protected $title = 'Ablaufplan für Organist:innen (DIN A4)';
-    protected $icon = 'fa fa-file-pdf';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->title = 'Ablaufplan für '.config('labels.organist').'nen (DIN A4)';
-    }
-
-    protected function getData(Service $service) {
-        // temporary override:
-        return ['recipients' => []];
-
-        if (request()->has('noRecipients')) return ['recipients' => []];
-
-        $recipients = [];
-        foreach ($service->liturgyBlocks as $block) {
-            foreach ($block->items as $item) {
-                $recipients = array_merge($item->recipients(), $recipients);
-            }
-        }
-        $recipients2 = array_unique($recipients);
-        $recipients = [];
-        foreach ($recipients2 as $recipient) {
-            if ($recipient != '') $recipients[] = $recipient;
-        }
-        sort($recipients);
-        return compact('recipients');
-    }
-}
+return [
+    'pastor' => env('LABEL_PASTOR', 'Pfarrer:in'),
+    'organist' => env('LABEL_ORGANIST', 'Organist:in'),
+    'sacristan' => env('LABEL_SACRISTAN', 'Mesner:in'),
+    'predicant' => env('LABEL_PREDICANT', 'Prädikant:in'),
+    'code_pastor' => env('CODE_PASTOR', 'P'),
+    'code_organist' => env('CODE_ORGANIST', 'O'),
+    'code_sacristan' => env('CODE_SACRISTAN', 'M'),
+];

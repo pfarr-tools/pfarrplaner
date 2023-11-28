@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Prädikant:innenanforderung erstellen')
+@section('title', config('label.predicant').'enanforderung erstellen')
 
 @section('content')
     <form method="post" action="{{ route('reports.render', $report) }}">

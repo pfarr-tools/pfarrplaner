@@ -31,22 +31,22 @@
     <div class="people-tab">
         <div class="row">
             <div class="col-md-4">
-                <people-select name="participants[P][]" label="Pfarrer:in" :people="people" :teams="teams"
+                <people-select name="participants[P][]" :label="$page.props.labels.pastor" :people="people" :teams="teams"
                                v-model="myService.pastors"
                                :include-teams-from-city="myService.city" :city="myService.city"
                                 @count="updatePeopleCounter" />
                 <form-check name="need_predicant"
-                            label="Für diesen Gottesdienst wird ein:e Prädikant:in benötigt."
+                            :label="'Für diesen Gottesdienst wird ein:e '+$page.props.labels.predicant+' benötigt.'"
                             v-model="myService.need_predicant" />
             </div>
             <div class="col-md-4">
-                <people-select name="participants[O][]" label="Organist:in" :people="people" :teams="teams"
+                <people-select name="participants[O][]" :label="$page.props.labels.organist" :people="people" :teams="teams"
                                v-model="myService.organists"
                                :include-teams-from-city="myService.city" :city="myService.city"
                                @count="updatePeopleCounter"  />
             </div>
             <div class="col-md-4">
-                <people-select name="participants[M][]" label="Mesner:in" :people="people" :teams="teams"
+                <people-select name="participants[M][]" :label="$page.props.labels.sacristan" :people="people" :teams="teams"
                                v-model="myService.sacristans"
                                :include-teams-from-city="myService.city" :city="myService.city"
                                @count="updatePeopleCounter"  />
@@ -141,7 +141,10 @@ export default {
             this.$forceUpdate();
         },
         copyCredits() {
-            var credits = { Liturgie: [], Orgel: [], Mesnerdienst: []};
+            var credits = { Liturgie: [], Orgel: []};
+            let sacristanKey = this.$page.props.labels.sacristan.replaceAll(':in', '');
+            credits[sacristanKey] = [];
+
             this.myService.pastors.forEach(person => {
                 credits.Liturgie.push(person.name);
             });
@@ -155,7 +158,7 @@ export default {
                 });
             })
             this.myService.sacristans.forEach(person => {
-                credits.Mesnerdienst.push(person.name);
+                credits[sacristanKey].push(person.name);
             });
 
             var creditsText = [];

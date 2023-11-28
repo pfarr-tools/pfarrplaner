@@ -255,17 +255,17 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
             switch ($ministry) {
                 case 'P':
                     if (Auth::user()->can('gd-pfarrer-bearbeiten')) {
-                        $ministries[$ministry] = 'Pfarrer:in';
+                        $ministries[$ministry] = config('labels.pastor');
                     }
                     break;
                 case 'O':
                     if (Auth::user()->can('gd-organist-bearbeiten')) {
-                        $ministries[$ministry] = 'Organist:in';
+                        $ministries[$ministry] = config('labels.organist');
                     }
                     break;
                 case 'M':
                     if (Auth::user()->can('gd-mesner-bearbeiten')) {
-                        $ministries[$ministry] = 'Mesner:in';
+                        $ministries[$ministry] = config('labels.sacristan');
                     }
                     break;
                 case 'A':

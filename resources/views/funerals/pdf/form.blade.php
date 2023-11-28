@@ -113,8 +113,8 @@
             <div class="input">
                 {{ $funeral->service->participantsText('O', true) }}
             </div>
-            <div class="input-label">Pfarrer:in</div>
-            <div class="input-label">Organist:in</div>
+            <div class="input-label">{{ config('labels.pastor') }}</div>
+            <div class="input-label">{{ config('labels.organist') }}</div>
             <div class="clear"></div>
             <div class="input">
                 {{ $funeral->text }}

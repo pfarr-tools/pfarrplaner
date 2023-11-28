@@ -736,7 +736,7 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
-                                                                                align="left" valign="top">Pfarrer:in
+                                                                                align="left" valign="top">{{ config('labels.pastor') }}
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                 align="left"
@@ -744,7 +744,7 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
-                                                                                align="left" valign="top">Prädikant:in
+                                                                                align="left" valign="top">{{ config('labels.predicant') }}
                                                                                 benötigt
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
@@ -753,7 +753,7 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
-                                                                                align="left" valign="top">Organist:in
+                                                                                align="left" valign="top">{{ config('labels.organist') }}
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                 align="left"
@@ -761,7 +761,7 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
-                                                                                align="left" valign="top">Mesner:in
+                                                                                align="left" valign="top">{{ config('labels.sacristan') }}
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                 align="left"

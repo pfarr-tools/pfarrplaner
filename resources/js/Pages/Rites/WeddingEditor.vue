@@ -117,7 +117,7 @@
                 </fieldset>
             </tab>
             <tab id="prep" :active-tab="activeTab">
-                <fake-table :columns="[2,2,2,3,3]" :headers="['Datum', 'Uhrzeit', 'Ort', 'Pfarrer:in', '']"
+                <fake-table :columns="[2,2,2,3,3]" :headers="['Datum', 'Uhrzeit', 'Ort', $page.props.labels.pastor, '']"
                             collapsed-header="Bestattung">
                     <div class="row p-1">
                         <div class="col-md-2">{{

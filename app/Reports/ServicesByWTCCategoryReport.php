@@ -194,9 +194,9 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
             $sheet->getStyle("A{$rowCtr}")->getFont()->setBold(true);
             foreach ($record['categories'] as $key => $categoryData) {
                 $title = $key;
-                if ($title == 'P') $title = 'Pfarrer:in';
-                if ($title == 'O') $title = 'Organist:in';
-                if ($title == 'M') $title = 'Mesner:in';
+                if ($title == 'P') $title = config('labels.pastor');
+                if ($title == 'O') $title = config('labels.organist');
+                if ($title == 'M') $title = config('labels.sacristan');
                 if ($title == 'A') $title = 'Sonstige';
                 $sheet->setCellValue("B{$rowCtr}", $title);
                 $sheet->setCellValue("C{$rowCtr}", $categoryData['HG']);

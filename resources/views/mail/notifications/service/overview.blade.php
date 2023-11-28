@@ -48,11 +48,11 @@
             @component('mail.layout.blocks.cell'){{ $service->eucharist ? '✔' : '✘'}} @endcomponent
         </tr>
         <tr>
-            @component('mail.layout.blocks.cell')Prädikant:in benötigt @endcomponent
+            @component('mail.layout.blocks.cell'){{ config('labels.predicant') }} benötigt @endcomponent
             @component('mail.layout.blocks.cell'){{ $service->need_predicant ? '✔' : '✘'}} @endcomponent
         </tr>
         <tr>
-            @component('mail.layout.blocks.cell')Pfarrer:in @endcomponent
+            @component('mail.layout.blocks.cell'){{ config('labels.pastor') }} @endcomponent
             @component('mail.layout.blocks.cell')
                 @foreach($service->pastors as $person)
                     <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px; border-radius: 3px;">
@@ -62,7 +62,7 @@
             @endcomponent
         </tr>
         <tr>
-            @component('mail.layout.blocks.cell')Organist:in @endcomponent
+            @component('mail.layout.blocks.cell'){{ config('labels.organist') }} @endcomponent
             @component('mail.layout.blocks.cell')
                 @foreach($service->organists as $person)
                     <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px; border-radius: 3px;">
@@ -72,7 +72,7 @@
             @endcomponent
         </tr>
         <tr>
-            @component('mail.layout.blocks.cell')Mesner:in @endcomponent
+            @component('mail.layout.blocks.cell'){{ config('labels.sacristan') }} @endcomponent
             @component('mail.layout.blocks.cell')
                 @foreach($service->sacristans as $person)
                     <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px; border-radius: 3px;">

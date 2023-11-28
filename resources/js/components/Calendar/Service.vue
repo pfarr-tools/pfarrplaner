@@ -82,10 +82,10 @@
                 {{ myService.internal_remarks }}
             </div>
 
-            <calendar-service-participants :participants="myService.pastors" category="P"
+            <calendar-service-participants :participants="myService.pastors" :category="$page.props.labels.code_pastor"
                                            :predicant="myService.need_predicant"/>
-            <calendar-service-participants :participants="myService.organists" category="O" :predicant="0"/>
-            <calendar-service-participants :participants="myService.sacristans" category="M" :predicant="0"/>
+            <calendar-service-participants :participants="myService.organists" :category="$page.props.labels.code_organist" :predicant="0"/>
+            <calendar-service-participants :participants="myService.sacristans" :category="$page.props.labels.code_sacristan" :predicant="0"/>
             <calendar-service-participants v-for="participants,ministry in myService.ministriesByCategory"
                                            :key="ministry"
                                            :participants="participants" :category="ministry" :predicant="0"/>

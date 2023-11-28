@@ -72,13 +72,13 @@ class Ministry
     public static function title($title): string
     {
         if ($title == 'P') {
-            return 'Pfarrer:in';
+            return config('labels.pastor');
         }
         if ($title == 'O') {
-            return 'Organist:in';
+            return config('labels.organist');
         }
         if ($title == 'M') {
-            return 'Mesner:in';
+            return config('labels.sacristan');
         }
         if ($title == 'A') {
             return 'Weitere Beteiligte';
@@ -91,7 +91,7 @@ class Ministry
      */
     public static function POMA(): array
     {
-        return ['P' => 'Pfarrer:in', 'O' => 'Organist:in', 'M' => 'Mesner:in', 'A' => 'Weitere Beteiligte'];
+        return ['P' => config('labels.pastor'), 'O' => config('labels.organist'), 'M' => config('labels.sacristan'), 'A' => 'Weitere Beteiligte'];
     }
 
     /**

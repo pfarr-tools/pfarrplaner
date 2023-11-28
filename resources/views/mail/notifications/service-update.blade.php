@@ -66,7 +66,7 @@
 
             @if(isset($changes['need_predicant']))
             @include('mail.notifications.service.changed-attribute', [
-                     'title' => 'Prädikant:in benötigt',
+                     'title' => config('label.predicant').' benötigt',
                      'key' => 'need_predicant',
                      'old' => $changes['need_predicant']['original'] ? '✔' : '✘',
                      'new' => $changes['need_predicant']['changed'] ? '✔' : '✘',

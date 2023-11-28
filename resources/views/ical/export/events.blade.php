@@ -7,7 +7,7 @@ BEGIN:VEVENT
 @if (is_object($event))
 UID:{{ $event->id }}{{ '@' }}{{ parse_url(env('APP_URL'), PHP_URL_HOST) }}
 LOCATION:{{ $event->locationText() }}
-SUMMARY:{{ $event->titleText().' P: '.$event->participantsText('P').' O: '.$event->participantsText('O').' M: '.$event->participantsText('M').($event->description ? ' ('.$event->description.')' : '') }}
+SUMMARY:{{ $event->titleText().' '.config('labels.code_pastor').': '.$event->participantsText('P').' '.config('labels.code_organist').': '.$event->participantsText('O').' '.config('labels.code_sacristan').': '.$event->participantsText('M').($event->description ? ' ('.$event->description.')' : '') }}
 DESCRIPTION: {{ strtr(wordwrap ($event->descriptionText(), 62, "\\n  "), ["\r" =>'', "\n"=>'\\n']) }}
 
 CLASS:PUBLIC

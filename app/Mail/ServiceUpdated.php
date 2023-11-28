@@ -68,13 +68,13 @@ class ServiceUpdated extends AbstractServiceMailable
                     $category = $participant['pivot']['category'];
                     switch ($category) {
                         case 'P':
-                            $category = 'Pfarrer:in';
+                            $category = config('labels.pastor');
                             break;
                         case 'O':
-                            $category = 'Organist:in';
+                            $category = config('labels.organist');
                             break;
                         case 'M':
-                            $category = 'Mesner:in';
+                            $category = config('labels.sacristan');
                             break;
                         case 'A':
                             $category = 'Andere Beteiligte';

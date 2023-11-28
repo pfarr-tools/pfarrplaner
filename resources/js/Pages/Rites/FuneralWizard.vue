@@ -44,7 +44,7 @@
                          label="Ort" @set-location="setLocation"/>
         <form-input label="Verstorbene:r" placeholder="Nachname, Vorname" name="name"
                     v-model="funeral.name"/>
-        <form-group label="Pfarrer:in">
+        <form-group :label="$page.props.labels.pastor">
             <people-select :people="people" v-model="funeral.pastor" :city="{id: funeral.city}"/>
         </form-group>
     </admin-layout>

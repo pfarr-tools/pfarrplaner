@@ -47,9 +47,9 @@
             <span class="mdi mdi-eye-off" title="Anmerkung nur für den internen Gebrauch"></span> {{ service.internal_remarks }}
         </div>
 
-        <calendar-service-participants :participants="service.pastors" category="P" :predicant="service.need_predicant" />
-        <calendar-service-participants :participants="service.organists" category="O" :predicant="0" />
-        <calendar-service-participants :participants="service.sacristans" category="M" :predicant="0" />
+        <calendar-service-participants :participants="service.pastors" :category="$page.props.labels.code_pastor" :predicant="service.need_predicant" />
+        <calendar-service-participants :participants="service.organists" :category="$page.props.labels.code_organist" :predicant="0" />
+        <calendar-service-participants :participants="service.sacristans" :category="$page.props.labels.code_sacristan" :predicant="0" />
         <calendar-service-participants v-for="participants,ministry in myService.ministriesByCategory" :key="ministry"
                                        :participants="participants" :category="ministry" :predicant="0" />
         <div v-if="$can('gd-kasualien-lesen') || $can('gd-kasualien-nur-statistik')">

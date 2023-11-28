@@ -14,17 +14,17 @@
 @endif
 @endcanany
 <div class="service-team service-pastor"><span
-            class="designation">P: </span>
+            class="designation">{{ $page.props.labels.code_pastor }}: </span>
     @if ($service->need_predicant)
-        <span class="need-predicant">Prädikant:in benötigt</span>
+        <span class="need-predicant">{{ $page.props.labels.predicant }} benötigt</span>
     @else
         {{ $service->participantsText('P') }}
     @endif
 </div>
 <div class="service-team service-organist"><span
-            class="designation">O: </span>{{ $service->participantsText('O') }}</div>
+            class="designation">{{ $page.props.labels.code_organist }}: </span>{{ $service->participantsText('O') }}</div>
 <div class="service-team service-sacristan"><span
-            class="designation">M: </span>{{ $service->participantsText('M') }}</div>
+            class="designation">{{ $page.props.labels.code_sacristan }}: </span>{{ $service->participantsText('M') }}</div>
 @foreach($service->ministries() as $ministry => $people)
     <div class="service-team"><span class="designation">{{ $ministry }}: </span>{{ $people->implode('planName', ' | ') }}</div>
 @endforeach

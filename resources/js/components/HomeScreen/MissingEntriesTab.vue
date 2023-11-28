@@ -64,13 +64,13 @@ export default {
             this.config.ministries.forEach(ministry => {
                 let examine = null;
                 switch (ministry) {
-                    case 'Pfarrer:in':
+                    case this.$page.props.labels.pastor:
                         examine = service.pastors;
                         break;
-                    case 'Organist:in':
+                    case this.$page.props.labels.organist:
                         examine = service.organists;
                         break;
-                    case 'Mesner:in':
+                    case this.$page.props.labels.sacristan:
                         examine = service.sacristans;
                         break;
                     default:

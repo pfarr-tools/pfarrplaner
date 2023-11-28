@@ -67,6 +67,13 @@ class PredicantsReport extends AbstractWordDocumentReport
 
     protected $inertia = true;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->title = config('labels.predicant').'nenanforderung';
+        $this->description = 'Vorausgefülltes '.config('labels.predicant').'nenformular für das Dekanatamt';
+    }
+
     /**
      * @return \Inertia\Response
      */
@@ -117,7 +124,7 @@ class PredicantsReport extends AbstractWordDocumentReport
 
 
         $section->addText(
-            'Anforderung von Prädikant:innen bzw. Pfarrer:innen im Ruhestand über das Dekanatamt',
+            'Anforderung von '.config('label.predicant').'nen bzw. Pfarrer:innen im Ruhestand über das Dekanatamt',
             [
                 'size' => 13,
                 'bold' => true,

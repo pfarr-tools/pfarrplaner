@@ -127,6 +127,13 @@ export default {
         var myDays = [];
         Object.entries(this.days).forEach(day => myDays.push(day[1]));
 
+        let mask = {
+            'Eigenes Konto': true,
+        };
+        mask[this.$page.props.labels.pastor+'nen'] = true;
+        mask['Mitarbeitende'] = true;
+        mask['Ausgeblendete Mitarbeitende'] = true;
+
         return {
             myDays,
             users: {},
@@ -134,12 +141,7 @@ export default {
             loadingUsers: true,
             loadingDates: 0,
             sections: [],
-            openSections: this.sectionConfig || {
-                'Eigenes Konto': true,
-                'Pfarrer:innen': true,
-                'Mitarbeitende': true,
-                'Ausgeblendete Mitarbeitende': false,
-            },
+            openSections: this.sectionConfig || mask,
             pinnedUsers: this.pinList,
             isPastor: this.$page.props.currentUser.data.isPastor,
         }
@@ -205,12 +207,12 @@ export default {
             });
 
             if (this.$page.props.currentUser.data.isPastor) {
-                sortedUsers['Pfarrer:innen'] = [];
-                this.sections.push('Pfarrer:innen');
+                sortedUsers[this.$page.props.labels.pastor+'nen'] = [];
+                this.sections.push(this.$page.props.labels.pastor+'nen');
                 users.forEach(user => {
                     if (usedIds.includes(user.id)) return;
                     if (user.isPastor) {
-                        sortedUsers['Pfarrer:innen'].push(user);
+                        sortedUsers[this.$page.props.labels.pastor+'nen'].push(user);
                         usedIds.push(user.id);
                     }
                     ;

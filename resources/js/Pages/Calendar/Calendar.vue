@@ -173,9 +173,9 @@ export default {
             api_token: this.apiToken,
         })).then(response => {
             this.myMinistries = [
-                {id: 'P', 'name': 'Pfarrer:in'},
-                {id: 'O', 'name': 'Organist:in'},
-                {id: 'M', 'name': 'Mesner:in'},
+                {id: 'P', 'name': this.$page.props.labels.pastor},
+                {id: 'O', 'name': this.$page.props.labels.organist},
+                {id: 'M', 'name': this.$page.props.labels.sacristan},
             ];
             for (const ministryKey in response.data) {
                 this.myMinistries.push({

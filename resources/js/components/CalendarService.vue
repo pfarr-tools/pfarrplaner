@@ -47,16 +47,16 @@
         </template>
         <img v-if="service.cc" src="/img/cc.png" :title="ccInfo()"/>
         <div class="service-team service-pastor">
-            <span class="designation">P: </span>
-            <span v-if="service.need_predicant" class="need-predicant">Prädikant:in benötigt</span>
+            <span class="designation">{{ $page.props.labels.code_pastor }}: </span>
+            <span v-if="service.need_predicant" class="need-predicant">{{ $page.props.labels.predicant }} benötigt</span>
             <span v-for="person in service.pastors">{{ person.name }} </span>
         </div>
         <div class="service-team service-organist">
-            <span class="designation">O: </span>
+            <span class="designation">{{ $page.props.labels.code_organist }}: </span>
             <span v-for="person in service.organists">{{ person.name }} </span>
         </div>
         <div class="service-team service-sacristan">
-            <span class="designation">M: </span>
+            <span class="designation">{{ $page.props.labels.code_sacristan }}: </span>
             <span v-for="person in service.sacristans">{{ person.name }} </span>
         </div>
         <div class="service-description" v-html="service.descriptionText"></div>
