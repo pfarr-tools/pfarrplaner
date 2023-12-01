@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.38.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.37.1...v2023.38.0) (2023-12-01)
+
+
+### Features
+
+* Liturgische Texte können jetzt wieder bearbeitet werden ([f7ea846](https://codeberg.org/pfarr.tools/pfarrplaner/commit/f7ea846f791126dcaa3c97d6a1b6a48f70fc3b37))
+
 ### [2023.37.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.37.0...v2023.37.1) (2023-12-01)
 
 ## [2023.37.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.36.2...v2023.37.0) (2023-11-28)
