@@ -42,8 +42,10 @@ class BibleText
     public function __construct($version = 'LUT17')
     {
         $this->version=$version;
-        $textFile = resource_path('bible/'.strtolower($version).'.txt');
-        if (file_exists($textFile)) $this->text = explode("\n", file_get_contents($textFile));
+        $textFile = config('bible.versions')[$version] ?? null;
+        if (!$textFile) throw new \Exception('Bibeltextdatei für '.$version.' nicht gefunden.');
+        if (!file_exists($textFile)) throw new \Exception('Bibeltextdatei für '.$version.' nicht gefunden.');
+        $this->text = explode("\n", file_get_contents($textFile));
     }
 
     public function get(array $reference): array {

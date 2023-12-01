@@ -53,7 +53,7 @@ class ReferenceParser
 
     public function __construct()
     {
-        $this->map = yaml_parse_file(resource_path('bible/BookMap.yaml'));
+        $this->map = config('bible.parser.books');
         $this->buildRawMap();
     }
 
