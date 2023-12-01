@@ -41,12 +41,23 @@ class LiturgicalTextsController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->authorizeResource(Text::class, 'text');
     }
 
     public function index()
     {
-        $texts = Text::all();
-        return Inertia::render('texts', compact('texts'));
+        $texts = Text::orderBy('title')->get();
+        return Inertia::render('Admin/LiturgicalTexts/Index', compact('texts'));
+    }
+
+    public function edit(Text $text) {
+        $agendaCodes = Text::select('agenda_code')->orderBy('agenda_code')->get()->pluck('agenda_code')->unique();
+        $codes = [];
+        foreach ($agendaCodes as $agendaCode) {
+            $codes[] = ['id' => $agendaCode, 'name' => $agendaCode];
+        }
+
+        return Inertia::render('Admin/LiturgicalTexts/LiturgicalTextEditor', compact('text', 'codes'));
     }
 
     public function list()
@@ -54,15 +65,18 @@ class LiturgicalTextsController extends Controller
         return response()->json(Text::all());
     }
 
+    public function create()
+    {
+        return $this->edit((new Text())->fill(['title' => '', 'text' => '', 'agenda_code' => '', 'source' => '', 'needs_replacement' => '', 'notice' => '']));
+    }
+
     /**
      * @param Request $request
      */
     public function store(Request $request)
     {
-        $data = $this->validateRequest($request);
-        $text = Text::create($data);
-        $texts = Text::all();
-        return response()->json(compact('text', 'texts'));
+        Text::create($this->validateRequest($request));
+        return redirect()->route('admin.text.index')->with('success', 'Der Text wurde gespeichert.');
     }
 
     /**
@@ -71,10 +85,8 @@ class LiturgicalTextsController extends Controller
      */
     public function update(Request $request, Text $text)
     {
-        $data = $this->validateRequest($request);
-        $text->update($data);
-        $texts = Text::all();
-        return response()->json(compact('text', 'texts'));
+        $text->update($this->validateRequest($request));
+        return redirect()->route('admin.text.index')->with('success', 'Der Text wurde gespeichert.');
     }
 
     public function import(Request $request)
@@ -141,6 +153,12 @@ class LiturgicalTextsController extends Controller
                 'notice' => 'nullable|string',
             ]
         );
+    }
+
+    public function destroy(Text $text)
+    {
+        $text->delete();
+        return redirect()->route('admin.text.index')->with('success', 'Der Text wurde gelöscht.');
     }
 
 }

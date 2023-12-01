@@ -43,8 +43,12 @@
 
 use App\Http\Controllers\LiturgicalTextsController;
 
-Route::get('/liturgie/texte', [LiturgicalTextsController::class, 'index'])->name('liturgy.text.index');
-Route::get('/liturgie/texte/liste', [LiturgicalTextsController::class, 'list'])->name('liturgy.text.list');
-Route::post('/liturgie/texte', [LiturgicalTextsController::class, 'store'])->name('liturgy.text.store');
-Route::post('/liturgie/texte/import', [LiturgicalTextsController::class, 'import'])->name('liturgy.text.import');
-Route::patch('/liturgie/texte/{text}', [LiturgicalTextsController::class, 'update'])->name('liturgy.text.update');
+Route::get('/texte', [LiturgicalTextsController::class, 'index'])->name('admin.text.index');
+Route::get('/texte/liste', [LiturgicalTextsController::class, 'list'])->name('admin.text.list');
+Route::post('/texte/import', [LiturgicalTextsController::class, 'import'])->name('admin.text.import');
+
+Route::get('/text/neu', [LiturgicalTextsController::class, 'create'])->name('admin.text.create');
+Route::post('/text', [LiturgicalTextsController::class, 'store'])->name('admin.text.store');
+Route::get('/text/{text}', [LiturgicalTextsController::class, 'edit'])->name('admin.text.edit');
+Route::patch('/text/{text}', [LiturgicalTextsController::class, 'update'])->name('admin.text.update');
+Route::delete('/text/{text}', [LiturgicalTextsController::class, 'destroy'])->name('admin.text.destroy');

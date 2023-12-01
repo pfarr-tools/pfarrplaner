@@ -36,6 +36,7 @@ use App\Inputs\Inputs;
 use App\Liturgy\Psalm;
 use App\Liturgy\Song;
 use App\Liturgy\Songbook;
+use App\Liturgy\Text;
 use App\Location;
 use App\Parish;
 use App\Tag;
@@ -155,6 +156,15 @@ class AdminModule extends AbstractModule
                 'icon' => 'mdi mdi-music',
                 'url' => route('songs.index'),
                 'active' => $route == 'songs.index',
+                'inertia' => true,
+            ];
+        }
+        if ($user->can('viewAny', Text::class)) {
+            $adminMenu[] = [
+                'text' => 'Liturgische Texte',
+                'icon' => 'mdi mdi-text',
+                'url' => route('admin.text.index'),
+                'active' => $route == 'admin.text.index',
                 'inertia' => true,
             ];
         }
