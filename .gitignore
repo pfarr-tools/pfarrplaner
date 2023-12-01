@@ -5,3 +5,14 @@ package-lock.json
 .idea
 .github
 .husky
+*.sql
+.env
+public/js/*.js
+public/js/*.map
+bootstrap/cache
+config/client_secret.json
+public/css/app.css
+public/mix-manifest.json
+public/user-images
+storage.old
+
