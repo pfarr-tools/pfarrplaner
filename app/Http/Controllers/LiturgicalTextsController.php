@@ -60,11 +60,6 @@ class LiturgicalTextsController extends Controller
         return Inertia::render('Admin/LiturgicalTexts/LiturgicalTextEditor', compact('text', 'codes'));
     }
 
-    public function list()
-    {
-        return response()->json(Text::all());
-    }
-
     public function create()
     {
         return $this->edit((new Text())->fill(['title' => '', 'text' => '', 'agenda_code' => '', 'source' => '', 'needs_replacement' => '', 'notice' => '']));

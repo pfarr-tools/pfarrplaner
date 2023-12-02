@@ -28,26 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
 
+use App\Http\Controllers\Api\LiturgicalTextsController;
 
-
-use App\Http\Controllers\LiturgicalTextsController;
-
-Route::get('/texte', [LiturgicalTextsController::class, 'index'])->name('admin.text.index');
-Route::post('/texte/import', [LiturgicalTextsController::class, 'import'])->name('admin.text.import');
-
-Route::get('/text/neu', [LiturgicalTextsController::class, 'create'])->name('admin.text.create');
-Route::post('/text', [LiturgicalTextsController::class, 'store'])->name('admin.text.store');
-Route::get('/text/{text}', [LiturgicalTextsController::class, 'edit'])->name('admin.text.edit');
-Route::patch('/text/{text}', [LiturgicalTextsController::class, 'update'])->name('admin.text.update');
-Route::delete('/text/{text}', [LiturgicalTextsController::class, 'destroy'])->name('admin.text.destroy');
+Route::get('/texte/liste', [LiturgicalTextsController::class, 'list'])->name('text.list');
