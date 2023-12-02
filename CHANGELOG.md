@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2023.39.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.38.1...v2023.39.0) (2023-12-02)
+
+
+### Features
+
+* Agenden können über die Administration bearbeitet werden. ([da9eb61](https://codeberg.org/pfarr.tools/pfarrplaner/commit/da9eb618dfa2966e2996320aaf2ece77f0d5037c))
+
 ### [2023.38.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.38.0...v2023.38.1) (2023-12-02)
 
 
