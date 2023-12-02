@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.38.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.38.0...v2023.38.1) (2023-12-02)
+
+
+### Bug Fixes
+
+* Auf der Homepage werden bei den Gottesdiensten nach Ort keine Titel angezeigt. ([3c34264](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3c34264646da24d81c356dcf3054c8bf07fd044d))
+* Lieder und liturgische Texte werden nicht geladen. ([83851b2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/83851b279645660b07b72963c6c23f4e04aa4798))
+
 ## [2023.38.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.37.1...v2023.38.0) (2023-12-01)
 
 
