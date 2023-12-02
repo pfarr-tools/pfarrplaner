@@ -234,7 +234,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
                         'id' => $service->id,
                         'date' => 0,
                         'name' => $service->title . ($service->source ? ' (' . $service->source . ')' : ''),
-                        'group' => 'Agenden',
+                        'group' => 'Vorlagen',
                     ];
                 } else {
                     $sources[] = [

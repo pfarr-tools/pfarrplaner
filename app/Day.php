@@ -161,7 +161,7 @@ class Day extends Model
                 [
                     'date' => Carbon::create(1978, 3, 5, 0, 0, 0),
                     'name' => '__AgendaDay',
-                    'description' => 'Hier werden alle Agenden angelegt.'
+                    'description' => 'Hier werden alle Vorlagen angelegt.'
                 ]
             );
         }

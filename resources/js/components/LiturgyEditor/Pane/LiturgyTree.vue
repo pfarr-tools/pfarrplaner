@@ -373,7 +373,7 @@ export default {
                 optgroupField: 'group',
                 optgroupLabelField: 'groupName',
                 optgroupValueField: 'groupName',
-                optgroups: [{groupName: 'Agenden'}, {groupName: 'Gottesdienste'}],
+                optgroups: [{groupName: 'Vorlagen'}, {groupName: 'Gottesdienste'}],
             }
         }
     },
