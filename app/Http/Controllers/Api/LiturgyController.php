@@ -222,7 +222,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
                 ->get(),
             Service::setEagerLoads([])->with([])
                 ->select(['id', 'title', 'date'])
-                ->isAgenda()
+                ->isTemplate()
                 ->get(),
         ];
 

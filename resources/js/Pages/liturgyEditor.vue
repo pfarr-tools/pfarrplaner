@@ -30,14 +30,19 @@
 <template>
     <admin-layout enable-control-sidebar="true" :title="title(service)">
         <template slot="navbar-left">
-            <inertia-link class="btn btn-light" :href="route('service.edit', service.slug)"
-                          title="Gottesdienst bearbeiten"><span class="mdi mdi-pencil"></span> Gottesdienst
-            </inertia-link>&nbsp;
-            <inertia-link class="btn btn-light" :href="route('service.sermon.editor', service.slug)"
-                          title="Predigt zu diesem Gottesdienst bearbeiten"><span class="mdi mdi-microphone"></span>
-                Predigt
-            </inertia-link>&nbsp;
-            <slot name="toolbar" />
+            <span v-if="!templateMode">
+                <inertia-link class="btn btn-light" :href="route('service.edit', service.slug)"
+                              title="Gottesdienst bearbeiten"><span class="mdi mdi-pencil"></span> Gottesdienst
+                </inertia-link>&nbsp;
+                <inertia-link class="btn btn-light" :href="route('service.sermon.editor', service.slug)"
+                              title="Predigt zu diesem Gottesdienst bearbeiten"><span class="mdi mdi-microphone"></span>
+                    Predigt
+                </inertia-link>&nbsp;
+            </span>
+            <span v-else>
+                <save-button @click="saveTemplate">Vorlage speichern</save-button>
+            </span>
+            <slot name="toolbar"/>
         </template>
         <template slot="control-sidebar">
             <form-check label="Zeitangaben runden" v-model="$page.props.settings.liturgy_times_rounded"
@@ -47,10 +52,10 @@
             <button class="btn btn-sm btn-primary" @click.prevent.stop="reloadPage">Anwenden</button>
         </template>
         <template slot="after-flash">
-            <info-pane v-if="!agendaMode" :service="service" :liturgy-info="liturgyInfo" @info="infoWindow = true"/>
-            <agenda-info-pane v-if="agendaMode" :agenda="service"/>
+            <info-pane v-if="!templateMode" :service="service" :liturgy-info="liturgyInfo" @info="infoWindow = true"/>
+            <template-info-pane v-if="templateMode" v-model="service"/>
         </template>
-        <liturgy-tree :service="service" :sheets="agendaMode ? {} : liturgySheets" :agenda-mode="agendaMode"
+        <liturgy-tree :service="service" :sheets="templateMode ? {} : liturgySheets" :agenda-mode="templateMode"
                       :auto-focus-block="autoFocusBlock" :auto-focus-item="autoFocusItem"
                       :ministries="ministries" :markers="markers"
                       @update-focus="updateFocus"/>
@@ -63,9 +68,10 @@ import moment from 'moment';
 import InfoWindow from "../components/LiturgyEditor/Pane/InfoWindow";
 import FormCheck from "../components/Ui/forms/FormCheck";
 import FormInput from "../components/Ui/forms/FormInput";
+import SaveButton from "../components/Ui/buttons/SaveButton.vue";
 
 const InfoPane = () => import('../components/LiturgyEditor/Pane/InfoPane');
-const AgendaInfoPane = () => import('../components/AgendaEditor/Pane/InfoPane');
+const TemplateInfoPane = () => import('../components/TemplateEditor/Pane/InfoPane');
 const LiturgyTree = () => import('../components/LiturgyEditor/Pane/LiturgyTree');
 
 export default {
@@ -91,11 +97,12 @@ export default {
         liturgyInfo: Array,
     },
     components: {
+        SaveButton,
         FormInput,
         FormCheck,
         InfoWindow,
         InfoPane,
-        AgendaInfoPane,
+        TemplateInfoPane,
         LiturgyTree,
     },
     data() {
@@ -107,12 +114,12 @@ export default {
             itemIndex: null,
             element: null,
             infoWindow: false,
-            agendaMode: moment(this.service.date).format('YYYYMMDD') == 19780305,
+            templateMode: moment(this.service.date).format('YYYYMMDD') == 19780305,
         }
     },
     methods: {
         title(service) {
-            if (this.agendaMode) return 'Agende bearbeiten';
+            if (this.templateMode) return 'Vorlage bearbeiten';
             return 'Liturgie für ' + moment(service.date).locale('de-DE').format('DD.MM.YYYY') + ', ' + service.timeText;
         },
         updateFocus(blockIndex, itemIndex, element) {
@@ -139,7 +146,11 @@ export default {
         },
         reloadPage() {
             window.location.reload();
-        }
+        },
+        saveTemplate() {
+            this.$inertia.patch(route('template.update', this.service.id), this.service);
+        },
+        deleteTemplate() {},
     }
 }
 </script>

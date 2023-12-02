@@ -32,63 +32,63 @@ namespace App\Http\Controllers;
 
 
 use App\Day;
+use App\Liturgy\Agenda;
 use App\Service;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class AgendaController extends Controller
+class TemplateController extends Controller
 {
 
     public function __construct()
     {
         $this->middleware('auth');
+        $this->authorizeResource(Service::class, 'template');
     }
 
 
     public function index()
     {
-        $agendas = Service::whereHas(
-            'day',
-            function ($query) {
-                $query->where('date', '1978-03-05');
-            }
-        )->orderBy('title')->get();
-        return Inertia::render('agendas', compact('agendas'));
+        $templates = Service::orderBy('title')->isTemplate()->get();
+        return Inertia::render('Liturgy/Template/Index', compact('templates'));
     }
 
     public function create()
     {
-        $agenda = new Service(
-            [
-                'day_id' => Day::getAgendaDay()->id,
-                'title' => 'Neue Agende',
-                'description' => 'Gib hier die Beschreibung der neuen Agende ein.',
-                'special_location' => 'code_fuer_neue_agende',
-            ]
+        $template = Service::create([
+                                      'date' => Carbon::parse('1978-03-05 0:00:00'),
+                                      'title' => 'Neue Vorlage',
+                                      'description' => '',
+                                      'special_location' => '',
+                                  ]
         );
-        return response()->json($agenda);
+        $template->update(['slug' => $template->createSlug()]);
+        return redirect()->route('liturgy.editor', $template->slug);
     }
 
     public function store(Request $request)
     {
-        $data = $this->validateRequest($request);
-        $data['day_id'] = Day::getAgendaDay()->id;
-        $agenda = Service::create($data);
-        $agenda->update(['slug' => $agenda->createSlug()]);
-        return redirect()->route('liturgy.editor', $agenda->slug);
+        $template = Service::create($this->validateRequest($request));
+        $template->update(['slug' => $template->createSlug()]);
+        return redirect()->route('liturgy.editor', $template->slug);
     }
 
-    public function update(Request $request, Service $agenda)
+    public function update(Request $request, Service $template)
     {
-        $data = $this->validateRequest($request);
-        $data['day_id'] = Day::getAgendaDay()->id;
-        $agenda->update($data);
-        return redirect()->route('liturgy.editor', $agenda->slug);
+        $template->update($this->validateRequest($request));
+        return redirect()->route('template.index');
+    }
+
+    public function delete(Service $template)
+    {
+        $template->delete();
+        return redirect()->route('template.index')->with('success', 'Die Vorlage wurde gelöscht.');
     }
 
     protected function validateRequest(Request $request): array
     {
-        return $request->validate(
+        $data = $request->validate(
             [
                 'title' => 'required|string',
                 'description' => 'nullable|string',
@@ -96,5 +96,7 @@ class AgendaController extends Controller
                 'internal_remarks' => 'nullable|string',
             ]
         );
+        $data['date'] = Carbon::parse('1978-03-05 0:00:00');
+        return $data;
     }
 }

@@ -43,6 +43,16 @@ class ServicePolicy
 {
     use HandlesAuthorization;
 
+    public function index(User $user)
+    {
+        return $user->hasPermissionTo('gd-bearbeiten');
+    }
+
+    public function viewAny(User $user)
+    {
+        return $user->hasPermissionTo('gd-bearbeiten');
+    }
+
     /**
      * Determine whether the user can view the service.
      *
@@ -75,6 +85,7 @@ class ServicePolicy
      */
     public function update(User $user, Service $service)
     {
+        if ($service->isTemplate()) return $user->hasPermissionTo('gd-bearbeiten');
         if ($service->pastors->contains($user)) return true;
         if ($user->hasRole(AuthServiceProvider::ADMIN) && $this->hasCityPermission($user, $service)) {
             return true;
@@ -104,6 +115,7 @@ class ServicePolicy
      */
     public function delete(User $user, Service $service)
     {
+        if ($service->isTemplate()) return $user->hasPermissionTo('gd-bearbeiten');
         return $user->hasPermissionTo('gd-allgemein-bearbeiten') && $this->hasCityPermission($user, $service);
     }
 
@@ -116,6 +128,7 @@ class ServicePolicy
      */
     public function restore(User $user, Service $service)
     {
+        if ($service->isTemplate()) return $user->hasPermissionTo('gd-bearbeiten');
         return $user->hasPermissionTo('gd-allgemein-bearbeiten') && $this->hasCityPermission($user, $service);
     }
 
@@ -128,6 +141,7 @@ class ServicePolicy
      */
     public function forceDelete(User $user, Service $service)
     {
+        if ($service->isTemplate()) return $user->hasPermissionTo('gd-bearbeiten');
         return $user->hasPermissionTo('gd-allgemein-bearbeiten') && $this->hasCityPermission($user, $service);
     }
 }

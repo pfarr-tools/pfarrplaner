@@ -902,11 +902,11 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * Get services used as agenda
+     * Get services used as template
      * @param Builder $query
      * @return Builder
      */
-    public function scopeIsAgenda(Builder $query)
+    public function scopeIsTemplate(Builder $query)
     {
         return $query->whereDate('date', '1978-03-05');
     }
@@ -1240,6 +1240,10 @@ class Service extends Model implements HasDAVCalendarItems
 
     public function createSlug()
     {
+        if ($this->isTemplate()) {
+            return $this->id.'-'.Str::slug($this->title);
+        }
+
         return $this->date->copy()->setTimeZone('Europe/Berlin')->format('Ymd-Hi') . '-' . $this->id
             . ($this->city ? '-' . Str::slug($this->city->name) : '');
     }
@@ -1583,5 +1587,10 @@ class Service extends Model implements HasDAVCalendarItems
             [],
             ['Gottesdienst']
         );
+    }
+
+    public function isTemplate(): bool
+    {
+        return $this->date->format('Y-m-d') == '1978-03-05';
     }
 }

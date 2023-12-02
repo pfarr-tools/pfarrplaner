@@ -31,14 +31,13 @@
 namespace App\UI\Modules;
 
 use App\City;
-use App\Inputs\AbstractInput;
-use App\Inputs\Inputs;
 use App\Liturgy\Psalm;
 use App\Liturgy\Song;
 use App\Liturgy\Songbook;
 use App\Liturgy\Text;
 use App\Location;
 use App\Parish;
+use App\Service;
 use App\Tag;
 use App\Team;
 use App\User;
@@ -165,6 +164,15 @@ class AdminModule extends AbstractModule
                 'icon' => 'mdi mdi-text',
                 'url' => route('admin.text.index'),
                 'active' => $route == 'admin.text.index',
+                'inertia' => true,
+            ];
+        }
+        if ($user->can('viewAny', Service::class)) {
+            $adminMenu[] = [
+                'text' => 'Vorlagen',
+                'icon' => 'mdi mdi-text',
+                'url' => route('template.index'),
+                'active' => $route == 'template.index',
                 'inertia' => true,
             ];
         }

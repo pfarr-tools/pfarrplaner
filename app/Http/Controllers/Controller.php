@@ -53,43 +53,47 @@ class Controller extends BaseController
         $key = strtolower(str_replace('Controller', '', $className));
         $plural = Str::plural($key);
 
+        $urlPrefix = Str::replace('routes.', '', __('routes.'.$prefix));
+        $localizedKey = Str::replace('routes.', '', __('routes.'.$key));
+        $localizedPlural = Str::replace('routes.', '', __('routes.'.$plural));
+
 
         // default routes
         if (method_exists($class, 'index')) {
-            Route::get(($prefix ? '/' . $prefix : '') . '/' . $plural, $className . '@index')->name(
+            Route::get(($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedPlural, $className . '@index')->name(
                 ($prefix ? $prefix . '.' : '') . $key . '.index'
             );
         }
         if (method_exists($class, 'create')) {
-            Route::get(($prefix ? '/' . $prefix : '') . '/create' . $plural, $className . '@create')->name(
+            Route::get(($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedKey.'/neu', $className . '@create')->name(
                 ($prefix ? $prefix . '.' : '') . $key . '.create'
             );
         }
         if (method_exists($class, 'store')) {
-            Route::post(($prefix ? '/' . $prefix : '') . '/' . $plural, $className . '@store')->name(
+            Route::post(($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedPlural, $className . '@store')->name(
                 ($prefix ? $prefix . '.' : '') . $key . '.store'
             );
         }
         if (method_exists($class, 'show')) {
-            Route::get(($prefix ? '/' . $prefix : '') . '/' . $plural . '/{' . $key . '}', $className . '@show')->name(
+            Route::get(($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedKey . '/{' . $key . '}', $className . '@show')->name(
                 ($prefix ? $prefix . '.' : '') . $key . '.show'
             );
         }
         if (method_exists($class, 'edit')) {
             Route::get(
-                ($prefix ? '/' . $prefix : '') . '/' . $plural . '/{' . $key . '}/edit',
+                ($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedKey . '/{' . $key . '}/edit',
                 $className . '@edit'
             )->name(($prefix ? $prefix . '.' : '') . $key . '.edit');
         }
         if (method_exists($class, 'update')) {
             Route::patch(
-                ($prefix ? '/' . $prefix : '') . '/' . $plural . '/{' . $key . '}',
+                ($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedKey . '/{' . $key . '}',
                 $className . '@update'
             )->name(($prefix ? $prefix . '.' : '') . $key . '.update');
         }
         if (method_exists($class, 'delete')) {
             Route::delete(
-                ($prefix ? '/' . $prefix : '') . '/' . $plural . '/{' . $key . '}',
+                ($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedKey . '/{' . $key . '}',
                 $className . '@destroy'
             )->name(($prefix ? $prefix . '.' : '') . $key . '.destroy');
         }

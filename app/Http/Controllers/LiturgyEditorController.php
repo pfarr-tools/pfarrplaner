@@ -161,7 +161,7 @@ class LiturgyEditorController extends Controller
             ];
         }
         krsort($services);
-        $agendas1 = Service::with(['day'])->isAgenda()->get();
+        $agendas1 = Service::with(['day'])->isTemplate()->get();
         $agendas = [];
         foreach ($agendas1 as $agenda) {
             $agendas[] = [
