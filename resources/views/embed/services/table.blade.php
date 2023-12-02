@@ -69,6 +69,9 @@
                                       data-location="https://www.kirchenjahr-evangelisch.de/article.php#{{ $service->liturgicalInfo['dayId'] }}"></span>
                             </div>
                         @endif
+                        @if($service->titleText(true) != 'GD')
+                            <div><b>{{ $service->titleText(false) }}</b></div>
+                        @endif
                         {{ $service->descriptionText() }}
                         @if($service->controlled_access)
                             @component('components.service.controlledAccess', ['service' => $service]) @endcomponent
