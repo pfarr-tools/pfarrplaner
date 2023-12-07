@@ -48,7 +48,7 @@ class CalendarService
     public static function initializeMonth($year, $month)
     {
         $days = collect();
-        $today = Carbon::create($year, $month, 1,0,0,0);
+        $today = Carbon::create($year, $month, 1, 0, 0, 0);
         while ($today->month == $month) {
             if ($today->dayOfWeek == 0) {
                 $day = Day::create(
@@ -108,18 +108,24 @@ class CalendarService
     public static function getHolidays(Carbon $start, Carbon $end)
     {
         try {
-            $raw = json_decode(file_get_contents('https://ferien-api.de/api/v1/holidays/BW'), true);
+            $url = 'https://openholidaysapi.org/SchoolHolidays?countryIsoCode=DE&subdivisionCode=DE-'
+                . config('calendar.vacation_state')
+                . '&languageIsoCode=DE&validFrom='
+                . $start->format('Y-m-d')
+                . '&validTo='
+                . $end->format('Y-m-d');
+
+            $raw = json_decode(file_get_contents($url), true);
         } catch (Exception $e) {
             return [];
         }
         $holidays = [];
         foreach ($raw as $holiday) {
-            $holiday['start'] = new Carbon($holiday['start']);
-            $holiday['end'] = (new Carbon($holiday['end']))->subSecond(1);
-            $holiday['name'] = ucfirst($holiday['name']);
-            if (($holiday['start'] <= $end) && ($holiday['end'] >= $start)) {
-                $holidays[] = $holiday;
-            }
+            $holidays[] = [
+                'start' => new Carbon($holiday['startDate']),
+                'end' => (new Carbon($holiday['endDate']))->addDay(1)->subSecond(1),
+                'name' => $holiday['name'][0]['text'],
+            ];
         }
         return $holidays;
     }
@@ -132,7 +138,9 @@ class CalendarService
      */
     public static function getStartOfPeriod($year, $month = null)
     {
-        if (is_a($year, Carbon::class)) return $year->setDay(1)->setTime(0,0,0);
+        if (is_a($year, Carbon::class)) {
+            return $year->setDay(1)->setTime(0, 0, 0);
+        }
         if (!$month) {
             list($year, $month) = explode('-', $year);
         }
@@ -140,13 +148,16 @@ class CalendarService
     }
 
 
-    public static function addMissingDefaultDays($date, $days) {
-        $currentDate = $date->copy()->setDay(1)->setTime(0,0,0);
+    public static function addMissingDefaultDays($date, $days)
+    {
+        $currentDate = $date->copy()->setDay(1)->setTime(0, 0, 0);
         $month = $currentDate->month;
         $litInfo = Liturgy::getCompleteLiturgyInfoArray();
 
         while ($month == $currentDate->month) {
-            if (isset($litInfo[$currentDate->format('d.m.Y')])) $days->push($currentDate->format('Y-m-d'));
+            if (isset($litInfo[$currentDate->format('d.m.Y')])) {
+                $days->push($currentDate->format('Y-m-d'));
+            }
             $currentDate->addDay(1);
         }
         return $days->unique()->sort();
