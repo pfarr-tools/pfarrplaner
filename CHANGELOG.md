@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.39.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.39.0...v2023.39.1) (2023-12-07)
+
+
+### Bug Fixes
+
+* Urlaubsplaner kann keine Ferien mehr abrufen ([70fc98e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/70fc98e0ac871bc8af5b655eaca385711c3f6580))
+
 ## [2023.39.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.38.1...v2023.39.0) (2023-12-02)
 
 
