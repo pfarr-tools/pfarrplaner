@@ -90,99 +90,90 @@ class ReferenceParser
         }
     }
 
+
+    public function parseSingleVerseReference($reference, $inferBook, $inferChapter)
+    {
+        preg_match(
+            '/^(?:(?<book>[\p{L}\d\s\.]+)\s+)?(?:(?<chapter>\d+),)?(?<verse>\d+)[a-zA-Z]?\.?$/u',
+            $reference,
+            $matches
+        );
+
+        $bookRaw = ($matches['book'] ?? '') ?: $inferBook;
+        $book = $this->matchBook(preg_replace('/(\d).\s?/', '$1', $bookRaw));
+        return [
+            'book' => $book,
+            'bookTitle' => $this->getBookTitle($book),
+            'bookRaw' => ($matches['book'] ?? '') ?: $inferBook,
+            'chapter' => ($matches['chapter'] ?? '') ?: $inferChapter,
+            'verse' => $matches['verse'] ?? '',
+        ];
+    }
+
     /**
      * Get a parsed reference from a text
      *
      * Text reference may include optional verses in parentheses, like:
-     * Jesaja 42,1-4 (5-9)
+     * Jesaja 42,1-4(5-9)13-14.16f.
      *
-     * originally based on:
-     * @source https://stackoverflow.com/a/23720736
-     * @author Jonny 5
+     * Note that partial verse references like 20a are expanded to full verses.
      *
-     * @param string $reference Reference string
-     * @param bool $getOptionalReferenceInstead Return the full reference for the optional verses instead
-     * @return array
+     * @param string $reference ReferenceText
+     * @return array Parsed reference
      */
-    public function parse(string $reference, bool $getOptionalReferenceInstead = false): array
+    public function parse(string $reference): array
     {
         $originalReference = $reference;
 
-        // check for multiple commas: all but first should be replaced with periods
-        $firstComma = strpos($reference, ',');
-        $reference = substr($reference, 0, $firstComma+1).str_replace(',', '.', substr($reference, $firstComma+1));
-
-        // consider parentheses: should be preceded and followed by periods
-        $reference = strtr($reference, ['(' => '.(', ')' => ').']);
-
-        // eliminate space after period
-        $reference = trim(str_replace('. ', '.', $reference));
-
-        // elliminate doubled periods
-        $reference = trim(str_replace('..', '.', $reference));
-
-        // removing trailing dot
-        while (substr($reference, -1) == '.') $reference = substr($reference, 0, -1);
-
-
-        // split verses from book chapters
-        $parts = preg_split('/\s*,\s*/', trim($reference, " ;"));
-
-        // init book
-        $bible = array('book' => "", 'chapter' => "", 'verses' => array());
-
-        // $part[0] = book + chapter, if isset $part[1] is verses
-        if(isset($parts[0]))
-        {
-            // 1.) get chapter
-            if(preg_match('/\d+\s*$/', $parts[0], $out)) {
-                $bible['chapter'] = rtrim($out[0]);
+        $reference = trim($reference);
+        // add semicola before and after parentheses, fix dash
+        $reference = strtr($reference, ['(' => ';(', ')' => ');', '–' => '-']);
+        // take care of 'f.' (replace it by a verse range)
+        if (preg_match_all('/(\d+)f./', $reference, $matches)) {
+            foreach ($matches[0] as $matchIndex => $matched) {
+                $rangeEnd = $matches[1][$matchIndex]+1;
+                $reference = str_replace($matched, $matches[1][$matchIndex].'-'.$rangeEnd, $reference);
             }
-
-            // 2.) book name
-            $bookCode = trim(preg_replace('/\d+\s*$/', "", $parts[0]));
-            $bible['book'] = $this->matchBook($bookCode);
         }
+        // replace dots, which are not part of the book name, with semicola
+        $reference = preg_replace('/(?<=\d|[)])\.(?=\d|\()/', ';', $reference);
+        // separate parts of the reference
+        $parts = explode(';', $reference);
 
-        // 3.) verses
-        if(isset($parts[1])) {
-            $bible['verses'] = preg_split('~\s*\.\s*~', $parts[1]);
-        }
-
-        $references = [];
-        foreach ($bible['verses'] as $verse) {
+        $refs = [];
+        $currentBook = '';
+        $currentChapter = '';
+        foreach ($parts as $part) {
+            $optional = false;
+            if (str_starts_with($part, '(')) {
+                $optional = true;
+            }
+            $part = strtr($part, ['(' => '', ')' => '']);
+            $rangeParts = explode('-', $part);
             $ref = [];
-            $ref['optional'] = (substr($verse, 0, 1) == '(');
-            if ($ref['optional']) $verse = strtr($verse, ['('=> '', ')' => '']);
-            if (false !== strpos($verse, '-')) {
-                list($start,$end) = explode('-', $verse);
-            } else {
-                $start = $end = $verse;
+            foreach ($rangeParts as $rangeIndex => $rangePart) {
+                $parsed = $this->parseSingleVerseReference($rangePart, $currentBook, $currentChapter);
+                $currentBook = $parsed['bookRaw'];
+                $currentChapter = $parsed['chapter'];
+                $ref[$rangeIndex] = $parsed;
             }
-            $ref['range'] = [
-                0 => [
-                    'book' => $bible['book'],
-                    'bookTitle' => $this->getBookTitle($bible['book']),
-                    'chapter' => $bible['chapter'],
-                    'verse' => filter_var($start, FILTER_SANITIZE_NUMBER_INT),
-                    'verseRaw' => $start,
-                ],
-                1 => [
-                    'book' => $bible['book'],
-                    'bookTitle' => $this->getBookTitle($bible['book']),
-                    'chapter' => $bible['chapter'],
-                    'verse' => filter_var($end, FILTER_SANITIZE_NUMBER_INT),
-                    'verseRaw' => $end,
-                ],
-            ];
-            $references[] = $ref;
+            if (!isset($ref[1])) {
+                $ref[1] = $ref[0];
+            }
+            $refs[] = ['range' => $ref, 'optional' => $optional];
         }
 
+        $correctedReference = $originalReference;
+        foreach ($refs as $ref) {
+            foreach ($ref['range'] as $part) {
+                $correctedReference = str_replace($part['bookRaw'], $part['bookTitle'], $originalReference);
+            }
+        }
         return ([
-                'originalReference' => $originalReference,
-                'correctedReference' => str_replace($bookCode, $this->getBookTitle($bible['book']), $originalReference),
-                'parsed' => $references,
-            ]);
+            'originalReference' => $originalReference,
+            'correctedReference' => $correctedReference,
+            'parsed' => $refs,
+        ]);
     }
 
     protected function matchBook($bookCode)
@@ -203,7 +194,9 @@ class ReferenceParser
 
     public function getBookTitle($bookCode)
     {
-        if (!isset($this->map[$bookCode])) return '';
+        if (!isset($this->map[$bookCode])) {
+            return '';
+        }
         $title = is_array($this->map[$bookCode]) ? $this->map[$bookCode][0] : $this->map[$bookCode];
         if (substr($title, 1, 1) == '.') {
             $title = substr($title, 0, 1) . '. ' . substr($title, 2);
