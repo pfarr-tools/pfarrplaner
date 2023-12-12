@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.39.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.39.1...v2023.39.2) (2023-12-12)
+
+
+### Bug Fixes
+
+* Bibelstellenangaben werden nicht korrekt interpretiert. ([ca77231](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ca772312e673c9496dded00ee5a91867e57753b3))
+
 ### [2023.39.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.39.0...v2023.39.1) (2023-12-07)
 
 
