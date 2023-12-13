@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2023.39.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.39.2...v2023.39.3) (2023-12-13)
+
+
+### Bug Fixes
+
+* WebDAV liefert keine Ergebnisse, wenn Ortsangabe bei Beerdigung fehlt. ([8abc693](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8abc693bc5c7790a5c8146a7e33ad2b1421d8f60))
+
 ### [2023.39.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.39.1...v2023.39.2) (2023-12-12)
 
 
