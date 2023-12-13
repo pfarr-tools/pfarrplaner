@@ -337,7 +337,7 @@ class Funeral extends Model implements HasDAVCalendarItems
                     'Trauergespräch ' . $this->buried_name,
                     $this->appointment->copy(),
                     $this->appointment->copy()->addHour(1),
-                    $this->appointment_address,
+                    $this->appointment_address ?? '',
                     $this->type . ' am ' . $this->service->date->format(
                         'd.m.Y'
                     ) . ' um ' . $this->service->timeText() . ' (' . $this->service->locationText() . ")\n"
@@ -355,7 +355,7 @@ class Funeral extends Model implements HasDAVCalendarItems
                     '1. Jahrestag der Beerdigung von ' . $this->buried_name,
                     $this->service->date->copy()->addYear(1),
                     $this->service->date->copy()->addYear(1)->addDay(1)->startOfDay(),
-                    $this->relative_address,
+                    $this->relative_address ?? '',
                     $this->type . ' am ' . $this->service->date->format(
                         'd.m.Y'
                     ) . ' um ' . $this->service->timeText() . ' (' . $this->service->locationText()
