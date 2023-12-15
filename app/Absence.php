@@ -84,11 +84,11 @@ class Absence extends Model implements HasDAVCalendarItems
     /**
      * @var string[]
      */
-    protected $dates = [
-        'from',
-        'to',
-        'checked_at',
-        'approved_at',
+    protected $casts = [
+        'from' => 'datetime',
+        'to' => 'datetime',
+        'checked_at' => 'datetime',
+        'approved_at' => 'datetime',
     ];
 
     protected $appends = [

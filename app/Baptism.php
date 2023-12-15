@@ -80,17 +80,7 @@ class Baptism extends Model implements HasDAVCalendarItems
         'birth_place'
     ];
 
-    /**
-     * @var string[]
-     */
-    protected $dates = [
-        'first_contact_on',
-        'appointment',
-        'dimissorial_requested',
-        'dimissorial_received',
-    ];
-
-    /** @var array */
+    /** @var string[] */
     protected $casts = [
         'candidate_name' => EncryptedAttribute::class,
         'candidate_address' => EncryptedAttribute::class,
@@ -99,6 +89,10 @@ class Baptism extends Model implements HasDAVCalendarItems
         'candidate_phone' => EncryptedAttribute::class,
         'text' => EncryptedAttribute::class,
         'birth_place' => EncryptedAttribute::class,
+        'first_contact_on' => 'datetime',
+        'appointment' => 'datetime',
+        'dimissorial_requested' => 'datetime',
+        'dimissorial_received' => 'datetime',
     ];
 
     protected $with = ['attachments'];

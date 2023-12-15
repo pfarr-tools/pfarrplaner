@@ -57,11 +57,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();ba
-
-        //$schedule->command('queue:work --once')->everyMinute()->withoutOverlapping();
-
+        $schedule->command('cache:prune-stale-tags')->hourly();
     }
 
     /**

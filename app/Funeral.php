@@ -117,21 +117,6 @@ class Funeral extends Model implements HasDAVCalendarItems
     /**
      * @var string[]
      */
-    protected $dates = [
-        'announcement',
-        'wake',
-        'appointment',
-        'dob',
-        'dod',
-        'dimissorial_requested',
-        'dimissorial_received',
-        'baptism_date',
-        'confirmation_date',
-        'wedding_date',
-        'dod_spouse',
-    ];
-
-    /** @var array */
     protected $casts = [
         'buried_name' => EncryptedAttribute::class,
         'buried_address' => EncryptedAttribute::class,
@@ -167,6 +152,17 @@ class Funeral extends Model implements HasDAVCalendarItems
         'birth_place' => EncryptedAttribute::class,
         'death_place' => EncryptedAttribute::class,
         'birth_name' => EncryptedAttribute::class,
+        'announcement' => 'datetime',
+        'wake' => 'datetime',
+        'appointment' => 'datetime',
+        'dob' => 'datetime',
+        'dod' => 'datetime',
+        'dimissorial_requested' => 'datetime',
+        'dimissorial_received' => 'datetime',
+        'baptism_date' => 'datetime',
+        'confirmation_date' => 'datetime',
+        'wedding_date' => 'datetime',
+        'dod_spouse' => 'datetime',
     ];
 
     protected $appends = ['age', 'dimissorialUrl'];

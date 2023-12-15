@@ -49,7 +49,7 @@ class Replacement extends Model
     /**
      * @var string[]
      */
-    protected $dates = ['from', 'to'];
+    protected $casts = ['from' => 'datetime', 'to' => 'datetime'];
 
     /**
      * @return BelongsTo

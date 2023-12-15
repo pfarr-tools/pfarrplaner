@@ -110,8 +110,8 @@ class User extends Authenticatable
     /**
      * @var string[]
      */
-    protected $dates = [
-        'new_features',
+    protected $casts = [
+        'new_features' => 'datetime',
     ];
     /**
      * The attributes that should be hidden for arrays.

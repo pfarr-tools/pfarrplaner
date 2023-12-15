@@ -102,19 +102,6 @@ class Wedding extends Model implements HasDAVCalendarItems
     /**
      * @var string[]
      */
-    protected $dates = [
-        'appointment',
-        'spouse1_dob',
-        'spouse2_dob',
-        'spouse1_dimissorial_requested',
-        'spouse1_dimissorial_received',
-        'spouse2_dimissorial_requested',
-        'spouse2_dimissorial_received',
-        'permission_requested',
-        'permission_received',
-    ];
-
-    /** @var array $encrypted These fields are en-/decrypted on-the-fly */
     protected $casts = [
         'spouse1_name' => EncryptedAttribute::class,
         'spouse1_birth_name' => EncryptedAttribute::class,
@@ -131,6 +118,15 @@ class Wedding extends Model implements HasDAVCalendarItems
         'spouse2_zip' => EncryptedAttribute::class,
         'spouse2_city' => EncryptedAttribute::class,
         'notes' => EncryptedAttribute::class,
+        'appointment' => 'datetime',
+        'spouse1_dob' => 'datetime',
+        'spouse2_dob' => 'datetime',
+        'spouse1_dimissorial_requested' => 'datetime',
+        'spouse1_dimissorial_received' => 'datetime',
+        'spouse2_dimissorial_requested' => 'datetime',
+        'spouse2_dimissorial_received' => 'datetime',
+        'permission_requested' => 'datetime',
+        'permission_received' => 'datetime',
     ];
 
     protected $with = ['attachments'];

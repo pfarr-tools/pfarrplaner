@@ -60,7 +60,7 @@ class Day extends Model
     /**
      * @var string[]
      */
-    protected $dates = ['date'];
+    protected $casts = ['date' => 'datetime'];
     /**
      * @var string[]
      */

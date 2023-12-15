@@ -103,6 +103,11 @@ class Service extends Model implements HasDAVCalendarItems
         'cc' => 'boolean',
         'baptism' => 'boolean',
         'eucharist' => 'boolean',
+        'date' => 'datetime',
+        'registration_online_start' => 'datetime',
+        'registration_online_end' => 'datetime',
+        'communiapp_listing_start' => 'datetime',
+        'alt_liturgy_date' => 'datetime',
     ];
 
     /**
@@ -248,13 +253,6 @@ class Service extends Model implements HasDAVCalendarItems
         'offering_type' => 'eO',
     ];
 
-    protected $dates = [
-        'date',
-        'registration_online_start',
-        'registration_online_end',
-        'communiapp_listing_start',
-        'alt_liturgy_date',
-    ];
     /** @var AbstractSeatFinder */
     protected $seatFinder = null;
     /**
