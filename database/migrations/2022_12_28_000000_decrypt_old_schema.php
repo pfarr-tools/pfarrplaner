@@ -28,19 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use App\Baptism;
 use App\Casts\EncryptedAttribute;
-use App\Funeral;
-use App\Liturgy\PronounSets\AbstractPronounSet;
-use App\Liturgy\PronounSets\PronounSets;
-use App\Service;
-use App\Services\NameService;
-use App\Wedding;
-use Carbon\Carbon;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-use App\Liturgy\Item;
 use Illuminate\Support\Str;
 
 return new class extends Migration {
@@ -61,10 +50,7 @@ return new class extends Migration {
         foreach ($this->getModels() as $model) {
             $ct = 1;
             $records = $model['class']::all();
-            $consoleSection = $console->section();
-            $consoleSection->write('<comment>Decrypting</comment> '.$model['table'].' [1 / '.count($records).']...');
             foreach ($records as $record) {
-                $consoleSection->overwrite('<comment>Decrypting</comment> '.$model['table'].' ['.$ct.' / '.count($records).']...');
                 $update = [];
                 foreach ($model['encrypted'] as $property) {
                     $field = $property['field'];
@@ -83,7 +69,6 @@ return new class extends Migration {
                 $ct++;
             }
 
-            $consoleSection->overwrite('<info>Success:</info> Decrypted '.count($records).' '.$model['table'].'.');
         }
 
     }
