@@ -59,8 +59,7 @@ class RefactorLiturgyItems extends Migration
     {
         Schema::table('liturgy_items', function(Blueprint $table){
             $table->unsignedBigInteger('data_id');
-            $table->dropColumn('serialized_data');
-            $table->dropColumn('sortable');
+            $table->dropColumn(['serialized_data', 'sortable']);
         });
     }
 }

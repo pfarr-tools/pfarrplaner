@@ -55,8 +55,7 @@ return new class extends Migration {
     public function down()
     {
         Schema::table('calendar_connections', function (Blueprint $table) {
-            $table->dropColumn('include_vacations');
-            $table->dropColumn('include_rite_anniversaries');
+            $table->dropColumn(['include_vacations', 'include_rite_anniversaries']);
         });
     }
 

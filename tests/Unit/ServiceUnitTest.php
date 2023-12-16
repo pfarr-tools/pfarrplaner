@@ -98,7 +98,7 @@ class ServiceUnitTest extends TestCase
         unset($service['need_predicant']);
         $validator = app('validator')->make($service, $rules);
         $data = $validator->validate();
-        $this->assertEquals(0, $data['need_predicant']);
+        $this->assertArrayNotHasKey('need_predicant', $data);
     }
 
 

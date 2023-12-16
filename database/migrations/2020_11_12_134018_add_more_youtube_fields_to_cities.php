@@ -56,9 +56,7 @@ class AddMoreYoutubeFieldsToCities extends Migration
     public function down()
     {
         Schema::table('cities', function (Blueprint $table) {
-            $table->dropColumn('youtube_active_stream_id');
-            $table->dropColumn('youtube_passive_stream_id');
-            $table->dropColumn('youtube_auto_startstop');
+            $table->dropColumn(['youtube_active_stream_id', 'youtube_passive_stream_id', 'youtube_auto_startstop']);
         });
     }
 }

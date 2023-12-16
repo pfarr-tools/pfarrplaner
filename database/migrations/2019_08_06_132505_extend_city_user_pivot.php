@@ -63,8 +63,7 @@ class ExtendCityUserPivot extends Migration
             'city_user',
             function ($table) {
                 /** @var \Doctrine\DBAL\Schema\Table $table */
-                $table->dropColumn('permission');
-                $table->dropColumn('sorting');
+                $table->dropColumn(['permission', 'sorting']);
             }
         );
     }

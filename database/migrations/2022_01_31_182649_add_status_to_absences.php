@@ -63,13 +63,7 @@ class AddStatusToAbsences extends Migration
     public function down()
     {
         Schema::table('absences', function (Blueprint $table) {
-            $table->dropColumn('workflow_status');
-            $table->dropColumn('admin_notes');
-            $table->dropColumn('approver_notes');
-            $table->dropColumn('admin_id');
-            $table->dropColumn('approver_id');
-            $table->dropColumn('checked_at');
-            $table->dropColumn('approved_at');
+            $table->dropColumn(['workflow_status', 'admin_notes', 'approver_notes', 'admin_id', 'approver_id', 'checked_at', 'approved_at']);
         });
     }
 }

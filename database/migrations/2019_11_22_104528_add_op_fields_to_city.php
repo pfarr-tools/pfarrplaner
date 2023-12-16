@@ -64,9 +64,7 @@ class AddOpFieldsToCity extends Migration
         Schema::table(
             'cities',
             function (Blueprint $table) {
-                $table->dropColumn('op_domain');
-                $table->dropColumn('op_customer_key');
-                $table->dropColumn('op_customer_token');
+                $table->dropColumn(['op_domain', 'op_customer_key', 'op_customer_token']);
             }
         );
     }

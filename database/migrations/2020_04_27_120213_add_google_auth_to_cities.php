@@ -64,9 +64,7 @@ class AddGoogleAuthToCities extends Migration
         Schema::table(
             'cities',
             function (Blueprint $table) {
-                $table->dropColumn('google_auth_code');
-                $table->dropColumn('google_access_token');
-                $table->dropColumn('google_refresh_token');
+                $table->dropColumn(['google_auth_code', 'google_access_token', 'google_refresh_token']);
             }
         );
     }

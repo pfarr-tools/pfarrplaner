@@ -190,7 +190,7 @@ class CityController extends Controller
     public function destroy(City $city)
     {
         $city->delete();
-        return route('cities.index')->with('success', 'Die Kirchengemeinde wurde gelöscht.');
+        return redirect()->route('cities.index')->with('success', 'Die Kirchengemeinde wurde gelöscht.');
     }
 
 

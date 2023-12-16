@@ -67,8 +67,7 @@ class AddPronounToRitesTables extends Migration
             $table->dropColumn('pronoun_set');
         });
         Schema::table('weddings', function (Blueprint $table) {
-            $table->dropColumn('pronoun_set1');
-            $table->dropColumn('pronoun_set2');
+            $table->dropColumn(['pronoun_set1', 'pronoun_set2']);
         });
     }
 }

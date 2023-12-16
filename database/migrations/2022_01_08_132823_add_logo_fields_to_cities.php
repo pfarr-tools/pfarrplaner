@@ -55,8 +55,7 @@ class AddLogoFieldsToCities extends Migration
     public function down()
     {
         Schema::table('cities', function (Blueprint $table) {
-            $table->dropColumn('official_name');
-            $table->dropColumn('logo');
+            $table->dropColumn(['official_name', 'logo']);
         });
     }
 }

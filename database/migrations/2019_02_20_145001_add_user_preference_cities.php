@@ -64,10 +64,7 @@ class AddUserPreferenceCities extends Migration
         Schema::table(
             'users',
             function ($table) {
-                $table->dropColumn('office');
-                $table->dropColumn('address');
-                $table->dropColumn('phone');
-                $table->dropColumn('preference_cities');
+                $table->dropColumn(['office', 'address', 'phone', 'preference_cities']);
             }
         );
     }

@@ -62,10 +62,7 @@ class AddEvenMoreRegistrationFieldsToServices extends Migration
         Schema::table(
             'services',
             function (Blueprint $table) {
-                $table->dropColumn('registration_online_start');
-                $table->dropColumn('registration_online_end');
-                $table->dropColumn('registration_max');
-                $table->dropColumn('reserved_places');
+                $table->dropColumn(['registration_online_start', 'registration_online_end', 'registration_max', 'reserved_places']);
             }
         );
     }

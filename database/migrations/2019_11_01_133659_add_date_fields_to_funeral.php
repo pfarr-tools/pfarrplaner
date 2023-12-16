@@ -64,9 +64,7 @@ class AddDateFieldsToFuneral extends Migration
         Schema::table(
             'funerals',
             function (Blueprint $table) {
-                $table->dropColumn('appointment');
-                $table->dropColumn('dob');
-                $table->dropColumn('dod');
+                $table->dropColumn(['appointment', 'dob', 'dod']);
             }
         );
     }

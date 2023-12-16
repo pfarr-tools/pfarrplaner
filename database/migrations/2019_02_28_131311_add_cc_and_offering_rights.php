@@ -62,8 +62,7 @@ class AddCcAndOfferingRights extends Migration
         Schema::table(
             'users',
             function ($table) {
-                $table->dropColumn('canEditOfferings');
-                $table->dropColumn('canEditCC');
+                $table->dropColumn(['canEditOfferings','canEditCC']);
             }
         );
     }

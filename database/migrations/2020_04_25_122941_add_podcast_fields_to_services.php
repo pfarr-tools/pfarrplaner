@@ -74,19 +74,14 @@ class AddPodcastFieldsToServices extends Migration
         Schema::table(
             'services',
             function (Blueprint $table) {
-                $table->dropColumn('external_url');
-                $table->dropColumn('sermon_title');
-                $table->dropColumn('sermon_reference');
+                $table->dropColumn(['external_url', 'sermon_title', 'sermon_reference', 'sermon_description']);
                 $table->string('sermon_image')->default('')->nullable();
-                $table->dropColumn('sermon_description');
             }
         );
         Schema::table(
             'cities',
             function (Blueprint $table) {
-                $table->dropColumn('podcast_title');
-                $table->dropColumn('podcast_logo');
-                $table->dropColumn('sermon_default_image');
+                $table->dropColumn(['podcast_title', 'podcast_logo', 'sermon_default_image']);
             }
         );
     }

@@ -67,12 +67,7 @@ class AddStreamingFieldsToServices extends Migration
         Schema::table(
             'services',
             function (Blueprint $table) {
-                $table->dropColumn('youtube_url');
-                $table->dropColumn('cc_streaming_url');
-                $table->dropColumn('offerings_url');
-                $table->dropColumn('meeting_url');
-                $table->dropColumn('recording_url');
-                $table->dropColumn('songsheet');
+                $table->dropColumn(['youtube_url', 'cc_streaming_url', 'offerings_url', 'meeting_url', 'recording_url', 'songsheet']);
             }
         );
     }

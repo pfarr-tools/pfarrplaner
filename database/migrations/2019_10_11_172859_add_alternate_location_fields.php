@@ -70,8 +70,7 @@ class AddAlternateLocationFields extends Migration
         Schema::table(
             'locations',
             function (Blueprint $table) {
-                $table->dropColumn('alternate_location_id');
-                $table->dropColumn('general_location_name');
+                $table->dropColumn(['alternate_location_id','general_location_name']);
             }
         );
         Schema::table(

@@ -72,7 +72,7 @@ class ServiceFeatureTest extends TestCase
         $response = $this->actingAs($this->user)
             ->patch(
                 route('service.update', Service::first()->slug),
-                factory(Service::class)->raw(['description' => 'cool title'])
+                ['description' => 'cool title']
             );
         $response->assertStatus(302);
         $this->assertEquals('cool title', Service::first()->description);
@@ -86,12 +86,12 @@ class ServiceFeatureTest extends TestCase
     public function testServiceCannotBeUpdatedForCityWithoutWritePermissions()
     {
         $city = factory(City::class)->create();
-        $service = factory(Service::class)->create(['city_id' => $city]);
+        $service = factory(Service::class)->create(['city_id' => $city->id]);
         $title = $service->description;
         $response = $this->actingAs($this->user)
             ->patch(
                 route('service.update', Service::first()->slug),
-                factory(Service::class)->raw(['description' => 'cool title'])
+                ['description' => 'cool title']
             );
         $response->assertStatus(403);
         $this->assertEquals($title, Service::first()->description);

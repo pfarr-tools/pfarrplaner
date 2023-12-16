@@ -64,9 +64,7 @@ class AddMorePodcastFieldsToCities extends Migration
         Schema::table(
             'cities',
             function (Blueprint $table) {
-                $table->dropColumn('homepage');
-                $table->dropColumn('podcast_owner_name');
-                $table->dropColumn('podcast_owner_email');
+                $table->dropColumn(['homepage', 'podcast_owner_name', 'podcast_owner_email']);
             }
         );
     }

@@ -67,12 +67,7 @@ class AddDefaultOfferingGoals extends Migration
         Schema::table(
             'cities',
             function (Blueprint $table) {
-                $table->dropColumn('default_offering_goal');
-                $table->dropColumn('default_offering_description');
-                $table->dropColumn('default_funeral_offering_goal');
-                $table->dropColumn('default_funeral_offering_description');
-                $table->dropColumn('default_wedding_offering_goal');
-                $table->dropColumn('default_wedding_offering_description');
+                $table->dropColumn(['default_offering_goal', 'default_offering_description', 'default_funeral_offering_goal', 'default_funeral_offering_description', 'default_wedding_offering_goal', 'default_wedding_offering_description']);
             }
         );
     }

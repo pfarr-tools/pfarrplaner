@@ -58,12 +58,7 @@ return new class extends Migration {
     public function down()
     {
         Schema::table('baptisms', function (Blueprint $table) {
-            $table->dropColumn('baptism_date');
-            $table->dropColumn('confirmation_date');
-            $table->dropColumn('confirmation_text');
-            $table->dropColumn('wedding_date');
-            $table->dropColumn('edding_text');
-            $table->dropColumn('dod_spouse');
+            $table->dropColumn(['baptism_date', 'confirmation_date', 'confirmation_text', 'wedding_date', 'edding_text', 'dod_spouse']);
         });
     }
 };

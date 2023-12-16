@@ -41,9 +41,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::table('calendar_connections', function (Blueprint $table) {
-            $table->dropColumn('credentials1');
-            $table->dropColumn('credentials2');
-            $table->dropColumn('connection_string');
+            //$table->dropColumn(['credentials1', 'credentials2', 'connection_string']);
         });
     }
 

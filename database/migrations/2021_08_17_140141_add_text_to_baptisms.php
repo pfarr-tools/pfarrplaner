@@ -55,10 +55,7 @@ class AddTextToBaptisms extends Migration
     public function down()
     {
         Schema::table('baptisms', function (Blueprint $table) {
-            $table->dropColumn('text');
-        });
-        Schema::table('baptisms', function (Blueprint $table) {
-            $table->dropColumn('notes');
+            $table->dropColumn(['text','notes']);
         });
     }
 }

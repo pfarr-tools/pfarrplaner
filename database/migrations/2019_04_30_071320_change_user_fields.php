@@ -69,9 +69,7 @@ class ChangeUserFields extends Migration
                 $table->integer('canEditGeneral')->nullable;
                 $table->integer('canEditChurch')->nullable;
                 $table->string('canEditFields')->nullable;
-                $table->dropColumn('first_name');
-                $table->dropColumn('last_name');
-                $table->dropColumn('title');
+                $table->dropColumn(['first_name', 'last_name', 'title']);
             }
         );
     }

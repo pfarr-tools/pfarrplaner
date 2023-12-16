@@ -63,8 +63,7 @@ class AddKonfiappFieldsToServices extends Migration
         Schema::table(
             'services',
             function (Blueprint $table) {
-                $table->dropColumn('konfiapp_event_type');
-                $table->dropColumn('konfiapp_event_qr');
+                $table->dropColumn(['konfiapp_event_type', 'konfiapp_event_qr']);
             }
         );
     }

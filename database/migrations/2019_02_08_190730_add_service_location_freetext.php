@@ -62,8 +62,7 @@ class AddServiceLocationFreetext extends Migration
         Schema::table(
             'locations',
             function ($table) {
-                $table->dropColumn('city_id');
-                $table->dropColumn('special_location');
+                $table->dropColumn(['city_id', 'special_location']);
             }
         );
     }

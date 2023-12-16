@@ -35,7 +35,7 @@ use App\Http\Middleware\Authenticate;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
@@ -60,7 +60,7 @@ class CityTest extends TestCase
     {
         $response = $this->actingAs($this->user)->get(route('cities.index'));
         $response->assertStatus(200)
-            ->assertViewIs('cities.index');
+            ->assertInertia(fn(Assert $page) => $page->component('Admin/City/CityIndex'));
     }
 
     /**
@@ -68,11 +68,12 @@ class CityTest extends TestCase
      * @return void
      * @test
      */
-    public function testCityCreateWorks() {
-        $response = $this->actingAs($this->user)->get(route('cities.create'));
-        $response->assertStatus(200)
-            ->assertViewIs('cities.create');
-
+    public function testCityCreateWorks()
+    {
+        $response = $this->followingRedirects()
+            ->actingAs($this->user)
+            ->get(route('cities.create'));
+        $response->assertStatus(200)->assertInertia(fn (Assert $page) => $page->component('Admin/City/CityEditor'));
     }
 
     /**
@@ -80,67 +81,19 @@ class CityTest extends TestCase
      * @return void
      * @test
      */
-    public function testCityEditWorks() {
+    public function testCityEditWorks()
+    {
         $city = factory(City::class)->create();
         $response = $this->actingAs($this->user)->get(route('city.edit', $city->name));
         $response->assertStatus(200)
-            ->assertViewIs('cities.edit');
-
+            ->assertInertia(fn(Assert $page) => $page
+                ->component('Admin/City/CityEditor')
+                ->has('city', fn(Assert $page) => $page
+                    ->where('id', $city->id)
+                    ->where('name', $city->name)
+                    ->etc()));
     }
 
-
-    /**
-     * Test that a city can be successfully added
-     * @return void
-     * @test
-     */
-    public function testACityCanBeAdded()
-    {
-        $response = $this->post(route('cities.store'), factory(City::class)->raw());
-
-        $response->assertStatus(302);
-        $this->assertCount(1, City::all());
-    }
-
-    /**
-     * Test that a city cannot be created without name
-     * @return void
-     * @test
-     */
-    public function testCityNeedsName()
-    {
-        $response = $this->post(
-            route('cities.store'),
-            factory(City::class)->raw(
-                [
-                    'name' => '',
-                ]
-            )
-        );
-
-        $response->assertSessionHasErrors('name');
-        $this->assertCount(0, City::all());
-    }
-
-    /**
-     * Test that a city cannot be created without name
-     * @return void
-     * @test
-     */
-    public function testCityNeedsNameShorterThan255()
-    {
-        $response = $this->post(
-            route('cities.store'),
-            factory(City::class)->raw(
-                [
-                    'name' => Str::random(256),
-                ]
-            )
-        );
-
-        $response->assertSessionHasErrors('name');
-        $this->assertCount(0, City::all());
-    }
 
     /**
      * Test that a city can be updated
@@ -154,7 +107,7 @@ class CityTest extends TestCase
         $this->assertTrue($city->update(['name' => 'New York']));
 
         $response = $this->patch(
-            route('city.update', $city->name),
+            route('city.update', $city->id),
             [
                 'name' => 'Hamburg',
             ]
@@ -172,7 +125,7 @@ class CityTest extends TestCase
     public function testCityCanBeDeleted()
     {
         $city = factory(City::class)->create();
-        $response = $this->delete(route('city.destroy', $city->name));
+        $response = $this->delete(route('city.delete', $city->name));
         $response->assertStatus(302);
         $this->assertCount(0, City::all());
     }
@@ -188,11 +141,15 @@ class CityTest extends TestCase
         Permission::create(['name' => 'benutzerliste-lokal-sehen']);
         Permission::create(['name' => 'rollen-bearbeiten']);
         Permission::create(['name' => 'pfarramt-bearbeiten']);
+        Permission::create(['name' => 'liederbuecher-bearbeiten']);
+        Permission::create(['name' => 'gd-bearbeiten']);
 
         $this->user = factory(User::class)->create();
         $this->user->givePermissionTo('benutzerliste-lokal-sehen');
         $this->user->givePermissionTo('rollen-bearbeiten');
         $this->user->givePermissionTo('pfarramt-bearbeiten');
+        $this->user->givePermissionTo('liederbuecher-bearbeiten');
+        $this->user->givePermissionTo('gd-bearbeiten');
     }
 
 

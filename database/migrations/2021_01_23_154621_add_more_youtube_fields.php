@@ -61,8 +61,7 @@ class AddMoreYoutubeFields extends Migration
             $table->dropColumn('youtube_self_declared_for_children');
         });
         Schema::table('services', function (Blueprint $table) {
-            $table->dropColumn('youtube_prefix_description');
-            $table->dropColumn('youtube_postfix_description');
+            $table->dropColumn(['youtube_prefix_description', 'youtube_postfix_description']);
         });
     }
 }

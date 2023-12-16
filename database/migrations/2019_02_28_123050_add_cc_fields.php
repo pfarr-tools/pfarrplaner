@@ -77,11 +77,7 @@ class AddCcFields extends Migration
         Schema::table(
             'services',
             function ($table) {
-                $table->dropColumn('others');
-                $table->dropColumn('cc');
-                $table->dropColumn('cc_location');
-                $table->dropColumn('cc_lesson');
-                $table->dropColumn('cc_staff');
+                $table->dropColumn(['others', 'cc', 'cc_location', 'cc_lesson', 'cc_staff']);
             }
         );
     }

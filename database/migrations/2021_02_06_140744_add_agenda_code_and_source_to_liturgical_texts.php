@@ -56,9 +56,7 @@ class AddAgendaCodeAndSourceToLiturgicalTexts extends Migration
     public function down()
     {
         Schema::table('liturgical_texts', function (Blueprint $table) {
-            $table->dropColumn('agenda_code');
-            $table->dropColumn('needs_replacement');
-            $table->dropColumn('source');
+            $table->dropColumn(['agenda_code', 'needs_replacement', 'source']);
         });
     }
 }

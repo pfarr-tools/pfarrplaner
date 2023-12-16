@@ -56,9 +56,7 @@ class AddFixedSeatToBookings extends Migration
     public function down()
     {
         Schema::table('bookings', function (Blueprint $table) {
-            $table->dropColumn('fixed_seat');
-            $table->dropColumn('override_seats');
-            $table->dropColumn('override_split');
+            $table->dropColumn(['fixed_seat', 'override_seats', 'override_split']);
         });
     }
 }

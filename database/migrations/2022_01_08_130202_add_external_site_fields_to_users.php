@@ -58,11 +58,7 @@ class AddExternalSiteFieldsToUsers extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('own_website');
-            $table->dropColumn('own_podcast_title');
-            $table->dropColumn('own_podcast_url');
-            $table->dropColumn('own_podcast_spotify');
-            $table->dropColumn('own_podcast_itunes');
+            $table->dropColumn(['own_website', 'own_podcast_title', 'own_podcast_url', 'own_podcast_spotify', 'own_podcast_itunes']);
         });
     }
 }

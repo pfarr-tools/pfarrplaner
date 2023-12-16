@@ -66,12 +66,7 @@ class AddServiceFields2 extends Migration
         Schema::table(
             'services',
             function ($table) {
-                $table->dropColumn('baptism');
-                $table->dropColumn('eucharist');
-                $table->dropColumn('offerings_counter1');
-                $table->dropColumn('offerings_counter2');
-                $table->dropColumn('offering_goal');
-                $table->dropColumn('offering_description');
+                $table->dropColumn(['baptism', 'eucharist', 'offerings_counter1', 'offerings_counter2', 'offering_goal','offering_description']);
             }
         );
     }

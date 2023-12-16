@@ -75,10 +75,7 @@ class AddUserFields extends Migration
         Schema::table(
             'users',
             function ($table) {
-                $table->dropColumn('isAdmin');
-                $table->dropColumn('canEditGeneral');
-                $table->dropColumn('canEditChurch');
-                $table->dropColumn('canEditFields');
+                $table->dropColumn(['isAdmin', 'canEditGeneral','canEditChurch', 'canEditFields']);
             }
         );
     }

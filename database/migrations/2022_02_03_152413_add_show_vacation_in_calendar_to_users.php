@@ -60,8 +60,7 @@ class AddShowVacationInCalendarToUsers extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('show_vacations_with_services');
-            $table->dropColumn('needs_replacement');
+            $table->dropColumn(['show_vacations_with_services', 'needs_replacement']);
         });
     }
 }

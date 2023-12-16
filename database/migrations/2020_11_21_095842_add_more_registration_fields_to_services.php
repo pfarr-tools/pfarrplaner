@@ -56,9 +56,7 @@ class AddMoreRegistrationFieldsToServices extends Migration
     public function down()
     {
         Schema::table('services', function (Blueprint $table) {
-            $table->dropColumn('registration_active');
-            $table->dropColumn('exclude_places');
-            $table->dropColumn('registration_phone');
+            $table->dropColumn(['registration_active', 'exclude_places', 'registration_phone']);
         });
     }
 }

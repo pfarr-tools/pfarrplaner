@@ -52,7 +52,7 @@ class LocationTest extends TestCase
      */
     public function testLocationCanBeCreated()
     {
-        $response = $this->post(route('locations.store'), factory(Location::class)->raw());
+        $response = $this->post(route('location.store'), factory(Location::class)->raw());
 
         $response->assertStatus(302);
         $this->assertCount(1, Location::all());
@@ -65,7 +65,7 @@ class LocationTest extends TestCase
      */
     public function testLocationNeedsName()
     {
-        $response = $this->post(route('locations.store'), factory(Location::class)->raw(['name' => '']));
+        $response = $this->post(route('location.store'), factory(Location::class)->raw(['name' => '']));
         $response->assertSessionHasErrors('name');
         $this->assertCount(0, Location::all());
     }
@@ -77,7 +77,7 @@ class LocationTest extends TestCase
      */
     public function testLocationNeedsCity()
     {
-        $response = $this->post(route('locations.store'), factory(Location::class)->raw(['city_id' => null]));
+        $response = $this->post(route('location.store'), factory(Location::class)->raw(['city_id' => null]));
         $response->assertSessionHasErrors('city_id');
         $this->assertCount(0, Location::all());
     }
@@ -90,7 +90,7 @@ class LocationTest extends TestCase
     public function testLocationNeedsValidDefaultTime()
     {
         $response = $this->post(
-            route('locations.store'),
+            route('location.store'),
             factory(Location::class)->raw(['default_time' => Str::random(5)])
         );
         $response->assertSessionHasErrors('default_time');

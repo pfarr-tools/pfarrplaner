@@ -63,13 +63,7 @@ class AddNotationFieldsToSongs extends Migration
     public function down()
     {
         Schema::table('songs', function (Blueprint $table) {
-            $table->dropColumn('key');
-            $table->dropColumn('measure');
-            $table->dropColumn('note_length');
-            $table->dropColumn('prolog');
-            $table->dropColumn('notation');
-            $table->dropColumn('refrain_notation');
-            $table->dropColumn('refrain_text_notation');
+            $table->dropColumn(['key', 'measure', 'note_length', 'prolog', 'notation', 'refrain_notation', 'refrain_text_notation']);
         });
         Schema::table('song_verses', function (Blueprint $table) {
             $table->dropColumn('notation');

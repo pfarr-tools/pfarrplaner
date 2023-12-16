@@ -69,11 +69,6 @@ return new class extends Migration {
 
         $this->migrateLiturgyItems();
 
-        /*
-        Schema::table('songs', function (Blueprint $table) {
-            $table->dropColumn(['songbook', 'songbook_abbreviation', 'reference']);
-        });
-        */
     }
 
     /**
