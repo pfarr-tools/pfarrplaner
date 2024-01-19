@@ -31,7 +31,7 @@
 namespace Tests\Unit;
 
 use App\Http\Requests\ServiceRequest;
-use App\Service;
+use App\Models\Service;
 use Tests\TestCase;
 
 /**
@@ -49,7 +49,7 @@ class ServiceUnitTest extends TestCase
      */
     public function testServiceCanBeCreated()
     {
-        factory(Service::class)->create();
+        Service::factory()->create();
         $this->assertCount(1, Service::all());
     }
 
@@ -61,7 +61,7 @@ class ServiceUnitTest extends TestCase
      */
     public function testServiceCanBeUpdated()
     {
-        $service = factory(Service::class)->create();
+        $service = Service::factory()->create();
         $this->assertCount(1, Service::all());
         $service->update(['description' => 'cool title']);
         $this->assertEquals('cool title', Service::first()->description);
@@ -75,7 +75,7 @@ class ServiceUnitTest extends TestCase
      */
     public function testServiceCanBeDeleted()
     {
-        $service = factory(Service::class)->create();
+        $service = Service::factory()->create();
         $this->assertCount(1, Service::all());
         $service->delete();
         $this->assertCount(0, Service::all());
@@ -89,7 +89,7 @@ class ServiceUnitTest extends TestCase
      */
     public function testCheckBoxesCanBeSetAndUnset()
     {
-        $service = factory(Service::class)->raw(['need_predicant' => 1]);
+        $service = Service::factory()->raw(['need_predicant' => 1]);
         $rules = (new ServiceRequest())->rules();
         $validator = app('validator')->make($service, $rules);
         $this->assertTrue($validator->passes());
@@ -110,7 +110,7 @@ class ServiceUnitTest extends TestCase
      */
     public function testServiceCanHaveTitle()
     {
-        $data = factory(Service::class)->raw();
+        $data = Service::factory()->raw();
         $data['title'] = 'Cool title';
         $service = Service::create($data);
         $service->update(['slug' => $service->createSlug()]);

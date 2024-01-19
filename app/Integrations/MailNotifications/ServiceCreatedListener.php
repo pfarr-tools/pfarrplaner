@@ -32,7 +32,7 @@ namespace App\Integrations\MailNotifications;
 
 
 use App\Events\ServiceCreated;
-use App\Subscription;
+use App\Models\Subscription;
 use Illuminate\Support\Facades\Log;
 
 class ServiceCreatedListener

@@ -31,7 +31,7 @@
 namespace App\Liturgy\ItemHelpers;
 
 
-use App\Liturgy\Item;
+use App\Models\Liturgy\Item;
 
 class AbstractItemHelper
 {

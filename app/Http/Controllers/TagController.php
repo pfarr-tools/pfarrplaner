@@ -30,8 +30,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Tag;
-use Aws\Inspector\Exception\InspectorException;
+use App\Models\Tag;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Inertia\Inertia;

@@ -30,9 +30,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Absence;
 use App\Mail\Absence\AbsenceApproved;
 use App\Mail\Absence\AbsenceChecked;
+use App\Models\Leave\Absence;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;

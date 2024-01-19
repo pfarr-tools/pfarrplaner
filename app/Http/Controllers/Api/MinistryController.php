@@ -30,7 +30,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Ministry;
+use App\Services\MinistryService;
 
 class MinistryController extends \App\Http\Controllers\Controller
 {
@@ -47,7 +47,7 @@ class MinistryController extends \App\Http\Controllers\Controller
     public function list()
     {
         $ministries = [];
-        foreach (Ministry::all() as $ministry) {
+        foreach (MinistryService::all() as $ministry) {
             $ministries[] = ['category' => $ministry];
         }
         return response()->json($ministries);

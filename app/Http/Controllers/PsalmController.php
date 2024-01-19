@@ -31,7 +31,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Liturgy\Psalm;
+use App\Models\Liturgy\Psalm;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

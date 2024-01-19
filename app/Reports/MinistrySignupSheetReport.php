@@ -30,19 +30,14 @@
 
 namespace App\Reports;
 
-use App\City;
-use App\Day;
-use App\Ministry;
-use App\Service;
-use App\User;
+use App\Models\Calendar\Day;
+use App\Services\MinistryService;
+use App\Models\Places\City;
+use App\Models\Service;
 use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class MinistrySignupSheetReport extends AbstractPDFDocumentReport
 {
@@ -68,7 +63,7 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
     public function setup()
     {
         $cities = Auth::user()->writableCities;
-        $ministries = Ministry::selectList();
+        $ministries = MinistryService::selectList();
         return Inertia::render('Report/MinistrySignupSheet/Setup', compact('cities', 'ministries'));
     }
 

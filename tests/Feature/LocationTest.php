@@ -31,7 +31,8 @@
 namespace Tests\Feature;
 
 use App\Http\Middleware\Authenticate;
-use App\Location;
+use App\Models\Location;
+use App\Models\Places\City;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -52,7 +53,7 @@ class LocationTest extends TestCase
      */
     public function testLocationCanBeCreated()
     {
-        $response = $this->post(route('location.store'), factory(Location::class)->raw());
+        $response = $this->post(route('location.store'), Location::factory()->for(City::factory(), 'city')->raw());
 
         $response->assertStatus(302);
         $this->assertCount(1, Location::all());
@@ -65,7 +66,7 @@ class LocationTest extends TestCase
      */
     public function testLocationNeedsName()
     {
-        $response = $this->post(route('location.store'), factory(Location::class)->raw(['name' => '']));
+        $response = $this->post(route('location.store'), Location::factory()->raw(['name' => '']));
         $response->assertSessionHasErrors('name');
         $this->assertCount(0, Location::all());
     }
@@ -77,7 +78,7 @@ class LocationTest extends TestCase
      */
     public function testLocationNeedsCity()
     {
-        $response = $this->post(route('location.store'), factory(Location::class)->raw(['city_id' => null]));
+        $response = $this->post(route('location.store'), Location::factory()->raw(['city_id' => null]));
         $response->assertSessionHasErrors('city_id');
         $this->assertCount(0, Location::all());
     }
@@ -91,7 +92,7 @@ class LocationTest extends TestCase
     {
         $response = $this->post(
             route('location.store'),
-            factory(Location::class)->raw(['default_time' => Str::random(5)])
+            Location::factory()->raw(['default_time' => Str::random(5)])
         );
         $response->assertSessionHasErrors('default_time');
         $this->assertCount(0, Location::all());
@@ -104,10 +105,11 @@ class LocationTest extends TestCase
      */
     public function testLocationCanBeUpdated()
     {
-        $location = factory(Location::class)->create(['name' => 'Pauluskirche']);
+        $city = City::factory()->create();
+        $location = Location::factory()->create(['name' => 'Pauluskirche', 'city_id' => $city->id]);
         $response = $this->patch(
             route('location.update', $location->id),
-            factory(Location::class)->raw(['name' => 'Peterskirche'])
+            Location::factory()->raw(['name' => 'Peterskirche', 'city_id' => $city->id])
         );
         $response->assertStatus(302);
         $this->assertEquals('Peterskirche', Location::first()->name);
@@ -120,7 +122,7 @@ class LocationTest extends TestCase
      */
     public function testLocationCanBeDeleted()
     {
-        $location = factory(Location::class)->create();
+        $location = Location::factory()->for(City::factory(), 'city')->create();
         $this->assertTrue($location->exists);
         $response = $this->delete(route('location.destroy', $location->id));
         $response->assertStatus(302);

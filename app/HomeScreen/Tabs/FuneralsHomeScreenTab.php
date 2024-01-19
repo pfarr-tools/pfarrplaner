@@ -31,9 +31,7 @@
 namespace App\HomeScreen\Tabs;
 
 
-use App\Baptism;
-use App\Funeral;
-use App\Service;
+use App\Models\Rites\Funeral;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 

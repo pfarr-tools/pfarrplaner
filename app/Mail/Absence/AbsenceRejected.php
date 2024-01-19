@@ -30,10 +30,9 @@
 
 namespace App\Mail\Absence;
 
-use App\Absence;
-use App\User;
+use App\Models\Leave\Absence;
+use App\Models\People\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;

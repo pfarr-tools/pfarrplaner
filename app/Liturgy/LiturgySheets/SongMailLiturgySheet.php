@@ -32,10 +32,8 @@ namespace App\Liturgy\LiturgySheets;
 
 
 use App\Liturgy\ItemHelpers\SongItemHelper;
-use App\Service;
+use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Pluralizer;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class SongMailLiturgySheet extends AbstractLiturgySheet

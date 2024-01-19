@@ -30,10 +30,8 @@
 
 namespace App\Liturgy\SongBeamer;
 
-use App\Liturgy\Item;
 use App\Liturgy\ItemHelpers\SongItemHelper;
-use App\Services\PackageService;
-use Illuminate\Support\Str;
+use App\Models\Liturgy\Item;
 
 class Song extends AbstractSngFile
 {

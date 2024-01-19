@@ -32,7 +32,7 @@ namespace App\Reports;
 
 
 use App\Mail\RegulatoryReportMail;
-use App\Service;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;

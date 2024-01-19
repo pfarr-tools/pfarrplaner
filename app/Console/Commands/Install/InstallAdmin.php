@@ -31,7 +31,7 @@
 namespace App\Console\Commands\Install;
 
 use App\Services\PasswordService;
-use App\User;
+use App\Models\People\User;
 use Illuminate\Console\Command;
 use Illuminate\Console\Command\Install;
 use Spatie\Permission\Models\Role;

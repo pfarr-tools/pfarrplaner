@@ -31,7 +31,7 @@
 namespace App\Helpers;
 
 
-use App\City;
+use App\Models\Places\City;
 
 /**
  * Class YoutubeHelper

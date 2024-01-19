@@ -32,7 +32,7 @@ namespace App\Integrations\MailNotifications;
 
 
 use App\Events\ServiceUpdated;
-use App\Subscription;
+use App\Models\Subscription;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 

@@ -30,17 +30,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\CalendarConnection;
-use App\CalendarConnectionEntry;
 use App\Calendars\Exchange\ExchangeCalendar;
-use App\DiaryEntry;
-use App\Service;
+use App\Models\Calendar\External\CalendarConnection;
+use App\Models\Calendar\External\CalendarConnectionEntry;
+use App\Models\DiaryEntry;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use jamesiarmes\PhpEws\ArrayType\NonEmptyArrayOfBaseFolderIdsType;
-use jamesiarmes\PhpEws\Request\FindItemType;
 
 class DiaryController extends \App\Http\Controllers\Controller
 {

@@ -32,11 +32,11 @@ namespace App\Liturgy\LiturgySheets;
 
 
 use App\Helpers\PPTUnitsHelper;
-use App\Liturgy;
+use App\Services\LiturgyService;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Music\ABCMusic;
-use App\Service;
+use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpPresentation\DocumentLayout;
 use PhpOffice\PhpPresentation\IOFactory;
@@ -46,9 +46,7 @@ use PhpOffice\PhpPresentation\Slide;
 use PhpOffice\PhpPresentation\Style\Alignment;
 use PhpOffice\PhpPresentation\Style\Border;
 use PhpOffice\PhpPresentation\Style\Color;
-use PhpOffice\PhpSpreadsheet\Shared\Drawing;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use Symfony\Component\Mime\DraftEmail;
 
 class SongPPTLiturgySheet extends AbstractLiturgySheet
 {
@@ -181,7 +179,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 if (($item->data_type == 'song') && (isset($item->data['song']))){
                     $refColor = '';
                     if (isset($item->data['song']['id'])) {
-                        $songRef = Liturgy\SongReference::find($item->data['song']['id']);
+                        $songRef = \App\Models\Liturgy\SongReference::find($item->data['song']['id']);
                         $refColor = $songRef->color ?? '';
                     };
                     $listItems[] = [
@@ -197,7 +195,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                     $songbook = null;
                     if (isset($item->data['psalm']['songbook_abbreviation'])) {
                         $refColor = ($item->data['psalm']['songbook_abbreviation'] == 'EG') ? '#c8baf7' : '';
-                        $songbook = Liturgy\Songbook::where('code', $item->data['psalm']['songbook_abbreviation'])->first();
+                        $songbook = \App\Models\Liturgy\Songbook::where('code', $item->data['psalm']['songbook_abbreviation'])->first();
                     }
 
                     $listItems[] = [
@@ -263,7 +261,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
     }
 
-    protected function renderSongItem(Liturgy\Item $item)
+    protected function renderSongItem(\App\Models\Liturgy\Item $item)
     {
         if ($this->config['includeSongbookReference']) {
             $this->songbookReferenceSlide($item);
@@ -312,9 +310,9 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
     }
 
-    protected function renderSongItemWithMusic(Liturgy\Item $item)
+    protected function renderSongItemWithMusic(\App\Models\Liturgy\Item $item)
     {
-        $song = Liturgy\Song::find($item->data['song']['song_id']);
+        $song = \App\Models\Liturgy\Song::find($item->data['song']['song_id']);
         $colorSet = $this->musicColorSet[$this->config['backgroundColor']];
         $images = ABCMusic::images($song, $item->data['verses'], $colorSet);
 
@@ -383,7 +381,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         return $slide;
     }
 
-    protected function songbookReferenceSlide(Liturgy\Item $item)
+    protected function songbookReferenceSlide(\App\Models\Liturgy\Item $item)
     {
         $data = $item->data;
         if ($item->data_type == 'song') {
@@ -400,7 +398,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 return;
             }
             if (isset($item->data['psalm']['songbook_abbreviation'])) {
-                $songbook = Liturgy\Songbook::where('code', $item->data['psalm']['songbook_abbreviation'])->first();
+                $songbook = \App\Models\Liturgy\Songbook::where('code', $item->data['psalm']['songbook_abbreviation'])->first();
                 $data[$key]['songbook'] = [
                     'code' => $item->data['psalm']['songbook_abbreviation'],
                     'image' => $songbook ? ($songbook->image ?: '') : '',

@@ -32,7 +32,7 @@ namespace App\Policies;
 
 use App\Providers\AuthServiceProvider;
 use App\Services\RoleService;
-use App\User;
+use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**

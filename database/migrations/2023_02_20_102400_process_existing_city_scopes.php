@@ -28,10 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use App\User;
+use App\Models\People\User;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 return new class extends Migration {
     /**
@@ -42,7 +40,7 @@ return new class extends Migration {
     public function up()
     {
         foreach (User::all() as $user) {
-            $cityIds = \App\City::whereHas('services', function ($q) use ($user) {
+            $cityIds = \App\Models\Places\City::whereHas('services', function ($q) use ($user) {
                 $q->userParticipates($user);
             })->get()->pluck('id');
             $user->cityScopes()->sync($cityIds);

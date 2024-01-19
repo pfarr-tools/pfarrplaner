@@ -30,7 +30,7 @@
 
 namespace App\Events;
 
-use App\Absence;
+use App\Models\Leave\Absence;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;

@@ -31,7 +31,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Liturgy\Text;
+use App\Models\Liturgy\Text;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

@@ -31,9 +31,9 @@
 namespace App\Traits;
 
 
-use App\City;
 use App\Http\Middleware\Authenticate;
-use App\User;
+use App\Models\Places\City;
+use App\Models\People\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -55,10 +55,10 @@ trait TestWithCredentialsTrait
 
         Permission::create(['name' => 'gd-bearbeiten']);
 
-        $this->city = factory(City::class)->create();
+        $this->city = (City::class)::factory()->create();
 
         /** @var User */
-        $this->user = factory(User::class)->create();
+        $this->user = User::factory()->create();
         $this->user->givePermissionTo('gd-bearbeiten');
         $this->user->writableCities()->attach($this->city);
     }

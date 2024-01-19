@@ -30,26 +30,16 @@
 
 namespace App\Http\Controllers;
 
-use App\City;
 use App\Facades\Settings;
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
-use App\Location;
-use App\Misc\VersionInfo;
-use App\Replacement;
-use App\Service;
 use App\Services\RedirectorService;
-use App\User;
 use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\View\View;
 use Inertia\Inertia;
 
 /**

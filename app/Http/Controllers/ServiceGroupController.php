@@ -30,7 +30,7 @@
 
 namespace App\Http\Controllers;
 
-use App\ServiceGroup;
+use App\Models\ServiceGroup;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 

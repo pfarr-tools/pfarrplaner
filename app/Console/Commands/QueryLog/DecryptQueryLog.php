@@ -30,7 +30,7 @@
 
 namespace App\Console\Commands\QueryLog;
 
-use App\QueryLog;
+use App\Services\QueryLogService;
 use Illuminate\Console\Command;
 
 /**
@@ -71,7 +71,7 @@ class DecryptQueryLog extends Command
     public function handle()
     {
         $log = $this->argument('log') ?? '';
-        $queries = QueryLog::all();
+        $queries = QueryLogService::all();
         foreach ($queries as $query) {
             $this->line($query['query']);
         }

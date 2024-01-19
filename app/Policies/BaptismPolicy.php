@@ -30,8 +30,8 @@
 
 namespace App\Policies;
 
-use App\Baptism;
-use App\User;
+use App\Models\People\User;
+use App\Models\Rites\Baptism;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class BaptismPolicy

@@ -30,12 +30,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Attachment;
-use App\Baptism;
 use App\Events\ServiceUpdated;
 use App\Http\Requests\StoreBaptismRequest;
 use App\Liturgy\PronounSets\PronounSets;
-use App\Service;
+use App\Models\Attachment;
+use App\Models\Rites\Baptism;
+use App\Models\Service;
 use App\Traits\HandlesAttachmentsTrait;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;

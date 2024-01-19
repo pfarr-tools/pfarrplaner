@@ -31,12 +31,11 @@
 namespace App\Http\Controllers;
 
 
-use App\Liturgy\Block;
-use App\Liturgy\Item;
-use App\Service;
+use App\Models\Liturgy\Block;
+use App\Models\Liturgy\Item;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use Inertia\Inertia;
 
 class LiturgyBlockController extends Controller
 {

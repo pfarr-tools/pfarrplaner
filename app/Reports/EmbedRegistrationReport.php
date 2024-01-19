@@ -38,9 +38,9 @@
 namespace App\Reports;
 
 
-use App\Booking;
 use App\Http\CORS;
-use App\Service;
+use App\Models\Seating\Booking;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;

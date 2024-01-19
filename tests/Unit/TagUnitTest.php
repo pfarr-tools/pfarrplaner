@@ -30,7 +30,7 @@
 
 namespace Tests\Unit;
 
-use App\Tag;
+use App\Models\Tag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
@@ -53,7 +53,7 @@ class TagUnitTest extends TestCase
      */
     public function testTagCanBeCreated()
     {
-        Tag::create(factory(Tag::class)->raw());
+        Tag::create(Tag::factory()->raw());
         $this->assertCount(1, Tag::all());
     }
 
@@ -64,7 +64,7 @@ class TagUnitTest extends TestCase
      */
     public function testTagCanBeUpdated()
     {
-        $tag = Tag::create(factory(Tag::class)->raw());
+        $tag = Tag::create(Tag::factory()->raw());
         $code2 = Str::random(20);
         $this->assertEquals($tag->code, Tag::first()->code);
         $tag->update(['code' => $code2]);
@@ -79,7 +79,7 @@ class TagUnitTest extends TestCase
      */
     public function testTagCanBeDeleted()
     {
-        $tag = Tag::create(factory(Tag::class)->raw());
+        $tag = Tag::create(Tag::factory()->raw());
         $this->assertCount(1, Tag::all());
         $tag->delete();
         $this->assertCount(0, Tag::all());

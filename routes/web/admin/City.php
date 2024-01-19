@@ -43,13 +43,15 @@
 
 use App\Http\Controllers\CityController;
 
-Route::get('/kirchengemeinden', [CityController::class, 'index'])->name('cities.index');
+/*
+Route::get('/kirchengemeinden', [CityController::class, 'index'])->name('admin.cities.index');
 Route::get('/kirchengemeinden/neu', [CityController::class, 'create'])->name('cities.create');
 
 
 Route::get('/kirchengemeinde/{city:name}', [CityController::class, 'edit'])->name('city.edit');
 Route::patch('/kirchengemeinde/{city:id}', [CityController::class, 'update'])->name('city.update');
 Route::delete('/kirchengemeinde/{city:name}', [CityController::class, 'destroy'])->name('city.delete');
+*/
 
 Route::post('/city/{city}/attach/{field}', [CityController::class, 'attachImage'])->name('city.attach');
 Route::delete('/city/{city}/detach/{field}', [CityController::class, 'detachImage'])->name('city.detach');

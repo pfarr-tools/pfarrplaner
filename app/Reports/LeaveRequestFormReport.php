@@ -31,7 +31,7 @@
 namespace App\Reports;
 
 
-use App\Absence;
+use App\Models\Leave\Absence;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

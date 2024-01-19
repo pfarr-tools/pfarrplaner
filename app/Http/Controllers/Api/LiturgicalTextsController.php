@@ -30,8 +30,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Liturgy\Text;
-use http\Env\Response;
+use App\Models\Liturgy\Text;
 use Illuminate\Http\Request;
 use PhpOffice\PhpWord\IOFactory;
 

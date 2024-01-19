@@ -34,7 +34,7 @@ Route::get('urlaubsplan/{year?}/{month?}', [AbsenceController::class, 'index'])
     ->name('absences.index');
 Route::get('urlaubsplan/neu/{year}/{month}/{user}/{day?}', [AbsenceController::class, 'create'])
     ->name('absence.create')
-    ->middleware('can:create,App\Absence');
+    ->middleware('can:create,App\Models\Absence');
 
 
 Route::get('urlaub/{absence}', [AbsenceController::class, 'edit'])

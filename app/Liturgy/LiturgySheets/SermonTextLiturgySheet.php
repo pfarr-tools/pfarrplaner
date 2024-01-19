@@ -32,8 +32,8 @@ namespace App\Liturgy\LiturgySheets;
 
 
 use App\Documents\Word\DefaultWordDocument;
-use App\Liturgy\Item;
-use App\Service;
+use App\Models\Liturgy\Item;
+use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\Shared\Html;
 

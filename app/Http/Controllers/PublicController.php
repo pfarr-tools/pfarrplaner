@@ -30,16 +30,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Baptism;
-use App\City;
-use App\Day;
-use App\Funeral;
 use App\Mail\ContactFormMessage;
 use App\Mail\MinistryRequestFilled;
-use App\Ministry;
-use App\Service;
-use App\User;
-use App\Wedding;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Rites\Baptism;
+use App\Models\Rites\Funeral;
+use App\Models\Rites\Wedding;
+use App\Models\Service;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\Foundation\Application;
@@ -48,7 +46,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use niklasravnsborg\LaravelPdf\Facades\Pdf;
@@ -191,7 +188,7 @@ class PublicController extends Controller
             ->ordered()
             ->get();
         $report = 'ministryRequest';
-        $ministryTitle = Ministry::all(true)[$ministry];
+        $ministryTitle = MinistryService::all(true)[$ministry];
         return view(
             'reports.ministryrequest.request',
             compact('ministry', 'ministryTitle', 'user', 'services', 'report', 'sender')
@@ -218,7 +215,7 @@ class PublicController extends Controller
             }
         }
 
-        $ministryTitle = Ministry::all(true)[$ministry];
+        $ministryTitle = MinistryService::all(true)[$ministry];
 
         return view('reports.ministryrequest.thanks', compact('user', 'ministry', 'ministryTitle'));
     }

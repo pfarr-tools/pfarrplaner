@@ -31,8 +31,8 @@
 namespace App\Calendars\SyncEngines;
 
 
-use App\CalendarConnection;
 use App\Calendars\Exchange\ExchangeCalendar;
+use App\Models\Calendar\External\CalendarConnection;
 
 class ExchangeSyncEngine extends AbstractSyncEngine
 {

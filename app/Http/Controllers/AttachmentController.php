@@ -30,18 +30,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Attachment;
-use App\City;
-use App\Integrations\KonfiApp\KonfiAppIntegration;
-use App\Integrations\Youtube\YoutubeIntegration;
-use App\Service;
-use App\Traits\HandlesAttachedImageTrait;
-use App\Traits\HandlesAttachmentsTrait;
-use Carbon\Carbon;
+use App\Models\Attachment;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
 
 /**
  * Class AttachmentController

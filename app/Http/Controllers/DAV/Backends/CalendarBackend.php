@@ -30,14 +30,13 @@
 
 namespace App\Http\Controllers\DAV\Backends;
 
-use App\CalendarConnection;
 use App\DAV\DAVCalendarItem;
-use App\User;
+use App\Models\Calendar\External\CalendarConnection;
+use App\Models\People\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Sabre\CalDAV\Backend\AbstractBackend;
 use Sabre\CalDAV\Backend\SyncSupport;
-use Sabre\CalDAV\Calendar;
 use Sabre\CalDAV\Plugin as CalDAVPlugin;
 use Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet;
 

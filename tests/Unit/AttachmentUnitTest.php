@@ -30,8 +30,9 @@
 
 namespace Tests\Unit;
 
-use App\Attachment;
-use App\Funeral;
+use App\Models\Attachment;
+use App\Models\Rites\Funeral;
+use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -64,7 +65,7 @@ class AttachmentUnitTest extends TestCase
     public function testAttachmentCanBeCreatedForFuneral()
     {
         $this->withoutExceptionHandling();
-        $funeral = factory(Funeral::class)->create();
+        $funeral = Funeral::factory()->for(Service::factory(), 'service')->create();
         $this->assertCount(1, Funeral::all());
         $funeral->attachments()->create(['title' => 'cool title', 'file' => 'file.txt']);
         $this->assertCount(1, Funeral::first()->attachments);

@@ -30,11 +30,11 @@
 
 namespace App\Reports;
 
-use App\City;
-use App\Participant;
-use App\Service;
+use App\Models\People\Participant;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Service;
 use App\Services\NameService;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

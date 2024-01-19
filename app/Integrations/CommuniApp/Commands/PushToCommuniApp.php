@@ -30,10 +30,9 @@
 
 namespace App\Integrations\CommuniApp\Commands;
 
-use App\City;
-use App\Events\ServiceUpdated;
 use App\Integrations\CommuniApp\CommuniAppIntegration;
-use App\Service;
+use App\Models\Places\City;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;

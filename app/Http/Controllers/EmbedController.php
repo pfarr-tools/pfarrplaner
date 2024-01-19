@@ -38,9 +38,9 @@
 namespace App\Http\Controllers;
 
 
-use App\Absence;
-use App\Service;
-use App\User;
+use App\Models\Leave\Absence;
+use App\Models\People\User;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;

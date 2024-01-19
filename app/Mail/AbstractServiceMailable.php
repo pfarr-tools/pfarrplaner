@@ -38,8 +38,8 @@
 namespace App\Mail;
 
 
-use App\Service;
-use App\User;
+use App\Models\Service;
+use App\Models\People\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;

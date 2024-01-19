@@ -30,9 +30,9 @@
 
 namespace App\Http\Controllers;
 
-use App\City;
-use App\Team;
-use App\User;
+use App\Models\Places\City;
+use App\Models\People\Team;
+use App\Models\People\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;

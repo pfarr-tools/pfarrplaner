@@ -31,15 +31,6 @@
 namespace App\Liturgy\ItemHelpers;
 
 
-use App\Baptism;
-use App\Funeral;
-use App\Liturgy\PronounSets\AbstractPronounSet;
-use App\Liturgy\PronounSets\PronounSets;
-use App\Service;
-use App\Services\NameService;
-use App\Wedding;
-use Carbon\Carbon;
-
 class FreetextItemHelper extends AbstractItemHelper
 {
 

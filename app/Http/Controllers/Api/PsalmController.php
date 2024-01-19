@@ -32,7 +32,7 @@ namespace App\Http\Controllers\Api;
 
 
 use App\Http\Controllers\Controller;
-use App\Liturgy\Psalm;
+use App\Models\Liturgy\Psalm;
 use Illuminate\Http\Request;
 
 class PsalmController extends Controller

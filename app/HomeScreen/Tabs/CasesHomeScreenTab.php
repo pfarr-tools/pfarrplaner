@@ -31,12 +31,9 @@
 namespace App\HomeScreen\Tabs;
 
 
-use App\Baptism;
-use App\Funeral;
-use App\Service;
-use App\Wedding;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Rites\Baptism;
+use App\Models\Rites\Funeral;
+use App\Models\Rites\Wedding;
 
 class CasesHomeScreenTab extends AbstractHomeScreenTab
 {

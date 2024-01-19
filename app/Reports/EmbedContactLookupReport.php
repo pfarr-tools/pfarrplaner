@@ -38,9 +38,8 @@
 namespace App\Reports;
 
 
-use App\City;
-use App\Parish;
-use App\StreetRange;
+use App\Models\Parish;
+use App\Models\Places\StreetRange;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;

@@ -46,7 +46,7 @@
                     </a>
                 @endcan
                 @canany(['ort-bearbeiten', 'gd-opfer-bearbeiten'])
-                <a class="dropdown-item" href="{{ route('cities.index') }}">
+                <a class="dropdown-item" href="{{ route('admin.cities.index') }}">
                     Kirchengemeinden
                 </a>
                 @endcan

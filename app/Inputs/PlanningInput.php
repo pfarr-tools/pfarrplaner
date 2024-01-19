@@ -30,15 +30,12 @@
 
 namespace App\Inputs;
 
-use App\City;
-use App\Day;
 use App\Events\ServiceUpdated;
-use App\Location;
-use App\Participant;
-use App\Service;
-use App\Subscription;
-use App\Team;
-use App\User;
+use App\Models\Location;
+use App\Models\People\Participant;
+use App\Models\People\Team;
+use App\Models\Service;
+use App\Models\People\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;

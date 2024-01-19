@@ -31,7 +31,7 @@
 namespace App\Console\Commands\Install;
 
 use App\Actions\Setup\CreateSuperAdmin;
-use App\User;
+use App\Models\People\User;
 use Illuminate\Console\Command;
 use Illuminate\Console\Command\Install;
 use Illuminate\Support\Facades\Artisan;

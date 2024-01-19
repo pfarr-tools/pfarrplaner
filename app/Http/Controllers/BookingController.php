@@ -31,8 +31,8 @@
 namespace App\Http\Controllers;
 
 
-use App\Booking;
-use App\Service;
+use App\Models\Seating\Booking;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;

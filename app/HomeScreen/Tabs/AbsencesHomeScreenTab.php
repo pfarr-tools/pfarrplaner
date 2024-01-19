@@ -31,9 +31,8 @@
 namespace App\HomeScreen\Tabs;
 
 
-use App\Absence;
-use App\Replacement;
-use App\Service;
+use App\Models\Leave\Absence;
+use App\Models\Leave\Replacement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 

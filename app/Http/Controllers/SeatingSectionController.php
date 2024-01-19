@@ -30,10 +30,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Location;
+use App\Models\Location;
+use App\Models\Seating\SeatingSection;
 use App\Seating\RowBasedSeatingModel;
 use App\Seating\SeatingModels;
-use App\SeatingSection;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -82,7 +82,7 @@ class SeatingSectionController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\SeatingSection $seatingSection
+     * @param \App\Models\Seating\SeatingSection $seatingSection
      * @return \Inertia\Response
      */
     public function edit(SeatingSection $seatingSection)
@@ -94,7 +94,7 @@ class SeatingSectionController extends Controller
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @param \App\SeatingSection $seatingSection
+     * @param \App\Models\Seating\SeatingSection $seatingSection
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, SeatingSection $seatingSection)
@@ -106,7 +106,7 @@ class SeatingSectionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\SeatingSection $seatingSection
+     * @param \App\Models\Seating\SeatingSection $seatingSection
      * @return \Illuminate\Http\Response
      */
     public function destroy(SeatingSection $seatingSection)

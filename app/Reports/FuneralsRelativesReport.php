@@ -30,10 +30,10 @@
 
 namespace App\Reports;
 
-use App\City;
-use App\Day;
-use App\Funeral;
-use App\Liturgy;
+use App\Services\LiturgyService;
+use App\Models\Places\City;
+use App\Models\Calendar\Day;
+use App\Models\Rites\Funeral;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -74,7 +74,7 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
         $start = Carbon::now();
         $cities = Auth::user()->cities;
         $year = Carbon::now()->year;
-        $liturgy = Liturgy::getCompleteLiturgyInfoArray();
+        $liturgy = LiturgyService::getCompleteLiturgyInfoArray();
         foreach ($liturgy as $date => $litInfo) {
             if (($litInfo['calendarYear'] == $year) && ($litInfo['title'] == '1. Advent')) {
                 $start = Carbon::parse($litInfo['dateSql'])->setTime(0,0,0)->subDays(6);

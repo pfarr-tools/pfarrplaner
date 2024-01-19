@@ -31,7 +31,7 @@
 namespace App\Traits;
 
 
-use App\Attachment;
+use App\Models\Attachment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;

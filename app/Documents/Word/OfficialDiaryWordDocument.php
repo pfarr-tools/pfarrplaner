@@ -30,10 +30,9 @@
 
 namespace App\Documents\Word;
 
-use App\Absence;
-use App\DiaryEntry;
+use App\Models\DiaryEntry;
+use App\Models\Leave\Absence;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\Element\Footer;
 use PhpOffice\PhpWord\Shared\Converter;

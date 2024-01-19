@@ -30,27 +30,19 @@
 
 namespace App\Reports;
 
-use App\Baptism;
-use App\City;
-use App\Day;
-use App\Funeral;
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
-use App\Service;
+use App\Models\Places\City;
+use App\Models\Rites\Baptism;
+use App\Models\Rites\Funeral;
+use App\Models\Rites\Wedding;
+use App\Models\Service;
 use App\Tools\StringTool;
-use App\Wedding;
 use Carbon\Carbon;
-use http\Env\Response;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
-use Illuminate\View\View;
 use Inertia\Inertia;
-use NumberFormatter;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Exception\Exception;

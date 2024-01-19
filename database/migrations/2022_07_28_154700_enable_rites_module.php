@@ -28,14 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use App\Liturgy\Item;
-use App\Liturgy\Song;
-use App\Liturgy\Songbook;
-use App\Liturgy\SongReference;
-use App\Service;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     /**
@@ -49,7 +42,7 @@ return new class extends Migration {
         $old = $new;
         unset($old['rites']);
 
-        foreach (\App\User::all() as $user) {
+        foreach (\App\Models\People\User::all() as $user) {
             if ($user->getSetting('modules', []) == $old) $user->setSetting('modules', $new);
         }
 
@@ -66,7 +59,7 @@ return new class extends Migration {
         $new = $old;
         unset($new['rites']);
 
-        foreach (\App\User::all() as $user) {
+        foreach (\App\Models\People\User::all() as $user) {
             if ($user->getSetting('modules', []) == $old) $user->setSetting('modules', $new);
         }
     }

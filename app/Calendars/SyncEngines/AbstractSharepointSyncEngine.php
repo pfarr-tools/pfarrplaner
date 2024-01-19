@@ -31,8 +31,8 @@
 namespace App\Calendars\SyncEngines;
 
 
-use App\CalendarConnection;
 use App\Calendars\SharePoint\SharePointCalendar;
+use App\Models\Calendar\External\CalendarConnection;
 use Illuminate\Support\Facades\Log;
 
 /**

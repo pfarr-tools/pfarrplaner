@@ -13,34 +13,35 @@
                 <button type="submit" class="btn btn-primary">Weiter &gt;</button>
             @endslot
 
-            @peopleselect(['name' => 'recipients[]', 'label' => 'Anfrage senden an', 'people' => \App\User::visibleFor(Auth::user()), 'value' => $users ])
+            @peopleselect(['name' => 'recipients[]', 'label' => 'Anfrage senden an', 'people' => \App\Models\People\User::visibleFor(Auth::user()), 'value' => $users ])
 
             <label>Folgende Gottesdienste anfragen</label>
-                <table class="table table-striped">
-                    <thead>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Zusagen</th>
+                    <th>Gottesdienst</th>
+                    <th>Bereits eingetragen</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($services as $service)
                     <tr>
-                        <th>Zusagen</th>
-                        <th>Gottesdienst</th>
-                        <th>Bereits eingetragen</th>
+                        <td>@checkbox(['name' => 'services['.$service->id.']', 'label' => '', 'value' => ($service->participantsText($ministry) == '')])</td>
+                        <td>
+                            <b>{{$service->date->formatLocalized('%A, %d.%m.%Y')}} {{$service->timeText()}}</b><br/> {{$service->locationText()}}
+                        </td>
+                        <td>{{ $service->participantsText($ministry) }}</td>
                     </tr>
-                    </thead>
-                    <tbody>
-                    @foreach ($services as $service)
-                        <tr>
-                            <td>@checkbox(['name' => 'services['.$service->id.']', 'label' => '', 'value' => ($service->participantsText($ministry) == '')])</td>
-                            <td><b>{{$service->date->formatLocalized('%A, %d.%m.%Y')}} {{$service->timeText()}}</b><br /> {{$service->locationText()}}</td>
-                            <td>{{ $service->participantsText($ministry) }}</td>
-                        </tr>
-                    @endforeach
+                @endforeach
 
-                    </tbody>
-                </table>
+                </tbody>
+            </table>
 
             @hidden(['name' => 'locations', 'value' => join(',', $locations)])
             @hidden(['name' => 'start', 'value' => $start->format('d.m.Y')])
             @hidden(['name' => 'end', 'value' => $end->format('d.m.Y')])
             @hidden(['name' => 'ministry', 'value' => $ministry])
-
 
         @endcomponent
     </form>

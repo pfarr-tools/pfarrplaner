@@ -30,8 +30,8 @@
 
 namespace App\Mail;
 
-use App\Ministry;
-use App\User;
+use App\Services\MinistryService;
+use App\Models\People\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -80,7 +80,7 @@ class MinistryRequest extends Mailable
         ];
         $url = URL::signedRoute('ministry.request', $urlData);
 
-        $ministryTitle = Ministry::all(true)[$this->ministry];
+        $ministryTitle = MinistryService::all(true)[$this->ministry];
 
 
         return $this->subject('Anfrage: ' . $ministryTitle . ' im Gottesdienst')->markdown('mail.ministry.request')->with(

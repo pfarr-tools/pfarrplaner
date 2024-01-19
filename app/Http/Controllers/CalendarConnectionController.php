@@ -30,8 +30,8 @@
 
 namespace App\Http\Controllers;
 
-use App\CalendarConnection;
 use App\Calendars\Exchange\ExchangeCalendar;
+use App\Models\Calendar\External\CalendarConnection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -104,7 +104,7 @@ class CalendarConnectionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param \App\CalendarConnection $calendarConnection
+     * @param \App\Models\Calendar\External\CalendarConnection $calendarConnection
      * @return \Illuminate\Http\Response
      */
     public function show(CalendarConnection $calendarConnection)
@@ -115,7 +115,7 @@ class CalendarConnectionController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\CalendarConnection $calendarConnection
+     * @param \App\Models\Calendar\External\CalendarConnection $calendarConnection
      * @return \Inertia\Response
      */
     public function edit(CalendarConnection $calendarConnection)
@@ -128,7 +128,7 @@ class CalendarConnectionController extends Controller
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @param \App\CalendarConnection $calendarConnection
+     * @param \App\Models\Calendar\External\CalendarConnection $calendarConnection
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, CalendarConnection $calendarConnection)
@@ -159,7 +159,7 @@ class CalendarConnectionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\CalendarConnection $calendarConnection
+     * @param \App\Models\Calendar\External\CalendarConnection $calendarConnection
      * @return \Illuminate\Http\Response
      */
     public function destroy(CalendarConnection $calendarConnection)

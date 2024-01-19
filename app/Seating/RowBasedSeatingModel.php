@@ -31,8 +31,8 @@
 namespace App\Seating;
 
 
-use App\Booking;
-use App\SeatingRow;
+use App\Models\Seating\Booking;
+use App\Models\Seating\SeatingRow;
 
 class RowBasedSeatingModel extends AbstractSeatingModel
 {

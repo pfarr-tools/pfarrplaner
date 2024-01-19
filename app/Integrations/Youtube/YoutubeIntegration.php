@@ -31,8 +31,8 @@
 namespace App\Integrations\Youtube;
 
 
-use App\City;
 use App\Integrations\AbstractIntegration;
+use App\Models\Places\City;
 use Google_Client;
 use Google_Service_YouTube;
 use Google_Service_YouTube_LiveChatMessage;

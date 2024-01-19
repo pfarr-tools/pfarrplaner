@@ -30,8 +30,8 @@
 
 namespace App\Console\Commands\Registrations;
 
-use App\Booking;
-use App\Service;
+use App\Models\Seating\Booking;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 

@@ -30,18 +30,14 @@
 
 namespace App\Http\Controllers;
 
-use App\CalendarConnection;
 use App\Calendars\Exchange\ExchangeCalendar;
-use App\DiaryEntry;
 use App\Documents\Word\OfficialDiaryWordDocument;
-use App\Service;
+use App\Models\Calendar\External\CalendarConnection;
+use App\Models\DiaryEntry;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use PhpOffice\PhpWord\Shared\Converter;
-use PhpOffice\PhpWord\SimpleType\Jc;
-use PhpOffice\PhpWord\SimpleType\LineSpacingRule;
-use PhpOffice\PhpWord\Style\Tab;
 
 class DiaryController extends Controller
 {

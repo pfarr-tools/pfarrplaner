@@ -30,10 +30,8 @@
 
 namespace App\Liturgy\SongBeamer;
 
-use App\Liturgy\Item;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
-use App\Liturgy\ItemHelpers\SongItemHelper;
-use App\Services\PackageService;
+use App\Models\Liturgy\Item;
 use Illuminate\Support\Str;
 
 class Psalm extends AbstractSngFile

@@ -62,7 +62,7 @@ class MigrateHomescreentabsSetting extends Migration
      */
     public function up()
     {
-        foreach (\App\User::all() as $user) {
+        foreach (\App\Models\People\User::all() as $user) {
             $setting = $user->getSetting('homeScreenTabsConfig', null);
             if ($setting) {
                 if (!isset($setting['migrated'])) {
@@ -81,7 +81,7 @@ class MigrateHomescreentabsSetting extends Migration
      */
     public function down()
     {
-        foreach (\App\User::all() as $user) {
+        foreach (\App\Models\People\User::all() as $user) {
             $setting = $user->getSetting('homeScreenTabsConfig', null);
             if ($setting) {
                 if (isset($setting['migrated'])) {

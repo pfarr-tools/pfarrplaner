@@ -30,7 +30,7 @@
 
 namespace App\Console\Commands\QueryLog;
 
-use App\QueryLog;
+use App\Services\QueryLogService;
 use Illuminate\Console\Command;
 
 /**
@@ -70,7 +70,7 @@ class TruncateQueryLog extends Command
      */
     public function handle()
     {
-        QueryLog::clear();
+        QueryLogService::clear();
         $this->info('Query log cleared');
     }
 }

@@ -30,8 +30,8 @@
 
 namespace App\Inputs;
 
-use App\City;
 use App\Day;
+use App\Models\Places\City;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;

@@ -28,13 +28,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(
-    App\ServiceGroup::class,
-    function (Faker $faker) {
-        return [
-            //
-        ];
+use App\Models\ServiceGroup;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class ServiceGroupFactory extends Factory
+{
+    protected $model = ServiceGroup::class;
+
+    public function definition()
+    {
+        // TODO: Implement definition() method.
+        return [];
     }
-);
+
+}
+

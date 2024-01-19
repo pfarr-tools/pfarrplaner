@@ -30,8 +30,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Comment;
-use App\Service;
+use App\Models\Comment;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;

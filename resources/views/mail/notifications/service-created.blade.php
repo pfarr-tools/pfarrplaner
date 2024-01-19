@@ -663,7 +663,8 @@
                                                                         , {{ $service->timeText() }}
                                                                         <br>{{ $service->locationText() }}</h5>
                                                                     <small style="font-size: 8pt;">
-                                                                        Angelegt am {{ date('d.m.Y') }} um {{ date('H:i') }} Uhr
+                                                                        Angelegt am {{ date('d.m.Y') }}
+                                                                        um {{ date('H:i') }} Uhr
                                                                         durch {{ $originatingUser->name }}
                                                                     </small>
 
@@ -720,7 +721,8 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
-                                                                                align="left" valign="top">In öffentlichen Listen verbergen
+                                                                                align="left" valign="top">In
+                                                                                öffentlichen Listen verbergen
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                 align="left"
@@ -736,7 +738,8 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
-                                                                                align="left" valign="top">{{ config('labels.pastor') }}
+                                                                                align="left"
+                                                                                valign="top">{{ config('labels.pastor') }}
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                 align="left"
@@ -744,7 +747,8 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
-                                                                                align="left" valign="top">{{ config('labels.predicant') }}
+                                                                                align="left"
+                                                                                valign="top">{{ config('labels.predicant') }}
                                                                                 benötigt
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
@@ -753,7 +757,8 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
-                                                                                align="left" valign="top">{{ config('labels.organist') }}
+                                                                                align="left"
+                                                                                valign="top">{{ config('labels.organist') }}
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                 align="left"
@@ -761,7 +766,8 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
-                                                                                align="left" valign="top">{{ config('labels.sacristan') }}
+                                                                                align="left"
+                                                                                valign="top">{{ config('labels.sacristan') }}
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                 align="left"
@@ -769,7 +775,8 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
-                                                                                align="left" valign="top">Weitere Beteiligte
+                                                                                align="left" valign="top">Weitere
+                                                                                Beteiligte
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                 align="left"
@@ -802,7 +809,8 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
-                                                                                align="left" valign="top">Interne Anmerkungen
+                                                                                align="left" valign="top">Interne
+                                                                                Anmerkungen
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                 align="left"
@@ -981,8 +989,11 @@
                                                                                         <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
-                                                                                            valign="top">@if($baptism->appointment){{ $baptism->appointment->format('d.m.Y') }} {{ $baptism->appointment <= \Carbon\Carbon::now()? '✔' : '✘' }} @else
-                                                                                                ✘ @endif</td>
+                                                                                            valign="top">@if($baptism->appointment)
+                                                                                                {{ $baptism->appointment->format('d.m.Y') }} {{ $baptism->appointment <= \Carbon\Carbon::now()? '✔' : '✘' }}
+                                                                                            @else
+                                                                                                ✘
+                                                                                            @endif</td>
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
@@ -1065,8 +1076,11 @@
                                                                                         <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
-                                                                                            valign="top">@if($wedding->appointment){{ $wedding->appointment->format('d.m.Y') }} {{ $wedding->appointment <= \Carbon\Carbon::now()? '✔' : '✘' }} @else
-                                                                                                ✘ @endif</td>
+                                                                                            valign="top">@if($wedding->appointment)
+                                                                                                {{ $wedding->appointment->format('d.m.Y') }} {{ $wedding->appointment <= \Carbon\Carbon::now()? '✔' : '✘' }}
+                                                                                            @else
+                                                                                                ✘
+                                                                                            @endif</td>
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
@@ -1149,8 +1163,11 @@
                                                                                         <td class="text-end"
                                                                                             style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                             align="right"
-                                                                                            valign="top">@if($funeral->announcement){{ $funeral->announcement->format('d.m.Y') }} {{ $funeral->announcement <= \Carbon\Carbon::now()? '✔' : '✘' }} @else
-                                                                                                ✘ @endif</td>
+                                                                                            valign="top">@if($funeral->announcement)
+                                                                                                {{ $funeral->announcement->format('d.m.Y') }} {{ $funeral->announcement <= \Carbon\Carbon::now()? '✔' : '✘' }}
+                                                                                            @else
+                                                                                                ✘
+                                                                                            @endif</td>
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
@@ -1250,13 +1267,16 @@
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-radius: 4px; margin: 0;"
                                                                                 align="center" bgcolor="#007bff">
-                                                                                @if($user->can('update', $service))<a
-                                                                                        href="{{ route('service.edit', $service) }}"
-                                                                                        style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 4.8px; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Diesen
-                                                                                    Gottesdienst ansehen</a>
-                                                                                @else <a href="{{ route('calendar') }}"
-                                                                                         style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 4.8px; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Kalender
-                                                                                    öffnen</a>@endif
+                                                                                @if($user->can('update', $service))
+                                                                                    <a
+                                                                                            href="{{ route('service.edit', $service) }}"
+                                                                                            style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 4.8px; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Diesen
+                                                                                        Gottesdienst ansehen</a>
+                                                                                @else
+                                                                                    <a href="{{ route('calendar') }}"
+                                                                                       style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 4.8px; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Kalender
+                                                                                        öffnen</a>
+                                                                                @endif
                                                                             </td>
                                                                         </tr>
                                                                         </tbody>
@@ -1289,7 +1309,7 @@
 
                                     <div class="text-center text-muted"
                                          style="color: #636c72; font-size: 8pt; line-height: 9pt;" align="center">
-                                        @if($user->getSubscriptionType($service->city) == \App\Subscription::SUBSCRIBE_ALL)
+                                        @if($user->getSubscriptionType($service->city) == \App\Models\Subscription::SUBSCRIBE_ALL)
                                             Du erhältst diese Nachricht, weil du über alle Änderungen an Gottesdiensten
                                             in {{ $service->city->name }} benachrichtigt werden willst.
                                         @elseif($user->getSubscriptionType($service->city) == \App\Subscription::SUBSCRIBE_OWN)

@@ -31,9 +31,9 @@
 namespace App\Seating;
 
 
-use App\Booking;
-use App\SeatingRow;
-use App\Service;
+use App\Models\Seating\Booking;
+use App\Models\Seating\SeatingRow;
+use App\Models\Service;
 
 class MaximumBasedSeatFinder extends AbstractSeatFinder
 {

@@ -2,10 +2,10 @@
     <thead></thead>
     <tbody>
     @foreach($events as $dateCode => $theseEvents)
-        <?php
-        $date = \Carbon\Carbon::createFromFormat('YmdHis', $dateCode)->setTime(0, 0, 0);
-        $liturgy = \App\Liturgy::getDayInfo($date->format('d.m.Y'));
-        ?>
+            <?php
+            $date = \Carbon\Carbon::createFromFormat('YmdHis', $dateCode)->setTime(0, 0, 0);
+            $liturgy = \App\LiturgyService::getDayInfo($date->format('d.m.Y'));
+            ?>
         <tr>
             <td colspan="3"
                 style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 12px 0 12px 0; color: #804070;">
@@ -35,8 +35,11 @@
                     <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0 0;"
                         valign="top">
                         <strong>{{ $event['title'] }}</strong>@if($event['subtitle'] ?? '')
-                            <br/>{{ $event['subtitle'] }} @endif
-                        @if($event['locationtitle'] ?? '')({{ $event['locationtitle'] }})@endif
+                            <br/>{{ $event['subtitle'] }}
+                        @endif
+                        @if($event['locationtitle'] ?? '')
+                            ({{ $event['locationtitle'] }})
+                        @endif
                     </td>
                     <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0;"
                         valign="top"></td>

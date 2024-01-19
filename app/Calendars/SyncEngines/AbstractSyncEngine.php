@@ -30,12 +30,12 @@
 
 namespace App\Calendars\SyncEngines;
 
-use App\Absence;
-use App\CalendarConnection;
-use App\CalendarConnectionEntry;
 use App\Calendars\AbstractCalendar;
 use App\Calendars\AbstractCalendarItem;
-use App\Service;
+use App\Models\Calendar\External\CalendarConnection;
+use App\Models\Calendar\External\CalendarConnectionEntry;
+use App\Models\Leave\Absence;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 

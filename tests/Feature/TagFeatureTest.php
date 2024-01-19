@@ -31,7 +31,7 @@
 namespace Tests\Feature;
 
 use App\Http\Middleware\Authenticate;
-use App\Tag;
+use App\Models\Tag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -52,7 +52,7 @@ class TagFeatureTest extends TestCase
      */
     public function testTagCanBeCreated()
     {
-        $response = $this->post(route('tag.store'), factory(Tag::class)->raw());
+        $response = $this->post(route('tag.store'), Tag::factory()->raw());
         $response->assertStatus(302);
         $response->assertRedirect(route('tags.index'));
         $this->assertCount(1, Tag::all());
@@ -65,7 +65,7 @@ class TagFeatureTest extends TestCase
      */
     public function testTagCannotBeCreatedWithoutName()
     {
-        $response = $this->post(route('tag.store'), factory(Tag::class)->raw(['name' => null]));
+        $response = $this->post(route('tag.store'), Tag::factory()->raw(['name' => null]));
         $response->assertSessionHasErrors('name');
         $this->assertCount(0, Tag::all());
     }
@@ -77,7 +77,7 @@ class TagFeatureTest extends TestCase
      */
     public function testTagCanBeUpdated()
     {
-        $tag = factory(Tag::class)->create();
+        $tag = Tag::factory()->create();
         $response = $this->patch(route('tag.update', $tag->id), ['name' => 'cool name']);
         $response->assertStatus(302);
         $response->assertRedirect(route('tags.index'));
@@ -91,7 +91,7 @@ class TagFeatureTest extends TestCase
      */
     public function testTagCannotBeUpdatedWithoutName()
     {
-        $tag = factory(Tag::class)->create(['name' => 'cool name']);
+        $tag = Tag::factory()->create(['name' => 'cool name']);
         $response = $this->patch(route('tag.update', $tag->id), ['name' => null]);
         $response->assertSessionHasErrors('name');
         $this->assertEquals('cool name', Tag::first()->name);
@@ -104,7 +104,7 @@ class TagFeatureTest extends TestCase
      */
     public function testTagCodeIsSlug()
     {
-        $this->post(route('tag.store'), factory(Tag::class)->raw(['code' => null]));
+        $this->post(route('tag.store'), Tag::factory()->raw(['code' => null]));
         $tag = Tag::first();
         $this->assertEquals(Str::slug($tag->name), $tag->code);
     }
@@ -116,7 +116,7 @@ class TagFeatureTest extends TestCase
      */
     public function testTagCanBeDeleted()
     {
-        $tag = factory(Tag::class)->create();
+        $tag = Tag::factory()->create();
         $this->assertCount(1, Tag::all());
         $response = $this->delete(route('tag.destroy', $tag->id));
         $response->assertStatus(302);

@@ -30,10 +30,10 @@
 
 namespace App\Integrations\Youtube\Commands;
 
-use App\City;
 use App\Helpers\YoutubeHelper;
 use App\Integrations\Youtube\YoutubeIntegration;
-use App\Service;
+use App\Models\Places\City;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;

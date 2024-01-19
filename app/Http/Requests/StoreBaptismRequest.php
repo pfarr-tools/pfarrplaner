@@ -30,7 +30,7 @@
 
 namespace App\Http\Requests;
 
-use App\Baptism;
+use App\Models\Rites\Baptism;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 

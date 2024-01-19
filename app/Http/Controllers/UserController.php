@@ -30,38 +30,29 @@
 
 namespace App\Http\Controllers;
 
-use App\CalendarConnection;
-use App\City;
 use App\Facades\Settings;
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
 use App\Http\Requests\UserRequest;
-use App\Location;
-use App\Mail\User\AccountData;
-use App\Ministry;
-use App\Parish;
+use App\Services\MinistryService;
+use App\Models\Calendar\External\CalendarConnection;
+use App\Models\Location;
+use App\Models\Parish;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Subscription;
 use App\Rules\CreatedInLocalAdminDomainRule;
-use App\Service;
-use App\Services\PasswordService;
-use App\Subscription;
 use App\Traits\HandlesAttachedImageTrait;
 use App\Traits\HandlesAttachmentsTrait;
 use App\UI\Modules\Modules;
-use App\User;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -165,7 +156,7 @@ class UserController extends Controller
                 'settings' => [],
                 'availableTabs' => HomeScreenTabFactory::available(),
                 'locations' => Location::inCities(Auth::user()->cities->pluck('id'))->get(),
-                'ministries' => Ministry::all(),
+                'ministries' => MinistryService::all(),
                 'modules' => Modules::tree(),
             ]
         );
@@ -239,7 +230,7 @@ class UserController extends Controller
         $settings = Settings::all($user);
         $availableTabs = HomeScreenTabFactory::available();
         $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
-        $ministries = Ministry::all();
+        $ministries = MinistryService::all();
         $modules = Modules::tree();
 
 
@@ -291,7 +282,7 @@ class UserController extends Controller
 
         $calendarConnections = CalendarConnection::where('user_id', $user->id)->get();
         $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
-        $ministries = Ministry::all();
+        $ministries = MinistryService::all();
 
         $tab = $request->get('tab', '');
 

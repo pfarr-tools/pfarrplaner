@@ -30,7 +30,6 @@
 
 namespace App\Traits;
 
-use App\Sermon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;

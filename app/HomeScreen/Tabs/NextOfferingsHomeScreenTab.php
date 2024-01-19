@@ -31,7 +31,7 @@
 namespace App\HomeScreen\Tabs;
 
 
-use App\Service;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 

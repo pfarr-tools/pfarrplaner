@@ -32,7 +32,7 @@ namespace App\Http\Requests;
 
 use App\Rules\CreatedInLocalAdminDomainRule;
 use App\Services\RoleService;
-use App\User;
+use App\Models\People\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;

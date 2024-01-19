@@ -31,12 +31,11 @@
 namespace App\Integrations\CommuniApp;
 
 
-use App\City;
 use App\Integrations\AbstractIntegration;
-use App\Service;
+use App\Models\Places\City;
+use App\Models\Service;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Log;
 
 class CommuniAppIntegration extends AbstractIntegration
 {

@@ -31,11 +31,13 @@
 namespace Tests;
 
 use App\Console\Kernel;
+use Database\Seeders\RoleSeeder;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Class TestCase
@@ -46,15 +48,19 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
     use RefreshDatabase;
 
-    protected function output($line) {
-        fwrite(STDERR, $line.PHP_EOL);
+    protected $seed = true;
+    protected $seeder = RoleSeeder::class;
+
+    protected function output($line)
+    {
+        fwrite(STDERR, $line . PHP_EOL);
     }
 
     protected function refreshTestDatabase()
     {
-        if (! RefreshDatabaseState::$migrated) {
+        if (!RefreshDatabaseState::$migrated) {
             $files = scandir(base_path('/tests/database/'), SCANDIR_SORT_DESCENDING);
-            DB::unprepared(file_get_contents(base_path('/tests/database/'.$files[0])));
+            DB::unprepared(file_get_contents(base_path('/tests/database/' . $files[0])));
 
             $this->artisan('migrate');
 
@@ -64,5 +70,14 @@ abstract class TestCase extends BaseTestCase
         }
 
         $this->beginDatabaseTransaction();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Factory::guessFactoryNamesUsing(function (string $modelName) {
+            return Str::replace('App\\Models\\', '\\Database\\Factories\\', $modelName) . 'Factory';
+        });
     }
 }

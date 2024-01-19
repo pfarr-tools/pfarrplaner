@@ -38,18 +38,9 @@
 namespace App\UI;
 
 
-use App\City;
-use App\Inputs\AbstractInput;
-use App\Inputs\Inputs;
-use App\Location;
-use App\Parish;
-use App\Tag;
-use App\Team;
 use App\UI\Modules\Modules;
-use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Spatie\Permission\Models\Role;
 
 /**
  * Class MenuBuilder

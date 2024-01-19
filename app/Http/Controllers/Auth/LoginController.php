@@ -30,15 +30,9 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\City;
 use App\Http\Controllers\Controller;
-use App\Service;
-use App\User;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
+use App\Models\People\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Support\Facades\Session;
-use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

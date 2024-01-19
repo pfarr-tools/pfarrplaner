@@ -30,8 +30,8 @@
 
 namespace App\Policies;
 
-use App\Parish;
-use App\User;
+use App\Models\Parish;
+use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**

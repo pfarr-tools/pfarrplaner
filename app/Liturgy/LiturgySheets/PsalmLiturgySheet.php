@@ -33,9 +33,9 @@ namespace App\Liturgy\LiturgySheets;
 
 use App\Documents\Word\DefaultA5WordDocument;
 use App\Documents\Word\DefaultWordDocument;
-use App\Liturgy\Item;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
-use App\Service;
+use App\Models\Liturgy\Item;
+use App\Models\Service;
 
 class PsalmLiturgySheet extends AbstractLiturgySheet
 {

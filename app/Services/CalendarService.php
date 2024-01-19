@@ -31,8 +31,7 @@
 namespace App\Services;
 
 
-use App\Day;
-use App\Liturgy;
+use App\Models\Calendar\Day;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -152,7 +151,7 @@ class CalendarService
     {
         $currentDate = $date->copy()->setDay(1)->setTime(0, 0, 0);
         $month = $currentDate->month;
-        $litInfo = Liturgy::getCompleteLiturgyInfoArray();
+        $litInfo = LiturgyService::getCompleteLiturgyInfoArray();
 
         while ($month == $currentDate->month) {
             if (isset($litInfo[$currentDate->format('d.m.Y')])) {

@@ -30,19 +30,15 @@
 
 namespace App\Inputs;
 
-use App\Day;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
-use App\Location;
 use App\Mail\ServiceCreatedMultiple;
-use App\Service;
-use App\Subscription;
+use App\Models\Location;
+use App\Models\Service;
+use App\Models\Subscription;
 use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use Inertia\Inertia;
 
 /**

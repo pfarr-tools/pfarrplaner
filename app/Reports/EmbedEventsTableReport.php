@@ -38,10 +38,10 @@
 namespace App\Reports;
 
 
-use App\City;
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
-use App\Service;
+use App\Models\Places\City;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;

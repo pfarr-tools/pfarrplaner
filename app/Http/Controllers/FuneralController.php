@@ -30,16 +30,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Attachment;
-use App\City;
 use App\Events\ServiceUpdated;
-use App\Funeral;
 use App\Http\Requests\FuneralStoreRequest;
 use App\Liturgy\PronounSets\PronounSets;
-use App\Location;
-use App\Service;
+use App\Models\Attachment;
+use App\Models\Location;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Rites\Funeral;
+use App\Models\Service;
 use App\Traits\HandlesAttachmentsTrait;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;

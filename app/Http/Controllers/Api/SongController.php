@@ -33,14 +33,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Liturgy\Music\ABCMusic;
-use App\Liturgy\Psalm;
-use App\Liturgy\Song;
-use App\Liturgy\SongReference;
-use App\Liturgy\SongVerse;
+use App\Models\Liturgy\Psalm;
+use App\Models\Liturgy\Song;
+use App\Models\Liturgy\SongReference;
+use App\Models\Liturgy\SongVerse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-
-use function PHPUnit\Framework\isEmpty;
 
 class SongController extends Controller
 {

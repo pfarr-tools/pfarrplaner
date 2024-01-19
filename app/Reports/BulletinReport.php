@@ -30,17 +30,14 @@
 
 namespace App\Reports;
 
-use App\Day;
-use App\Liturgy;
-use App\Service;
+use App\Models\Calendar\Day;
+use App\Models\Liturgy;
+use App\Models\Service;
+use App\Services\LiturgyService;
 use Carbon\Carbon;
-use Carbon\PHPStan\AbstractMacro;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use Inertia\Inertia;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Shared\Converter;
@@ -198,7 +195,7 @@ class BulletinReport extends AbstractWordDocumentReport
         $table = $section->addTable('table');
 
         foreach ($serviceList as $day => $dayList) {
-            $liturgy = Liturgy::getDayInfo($day);
+            $liturgy = LiturgyService::getDayInfo($day);
             /** @var Service $service */
             $first = true;
             foreach ($dayList as $service) {

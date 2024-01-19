@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Liturgy\Text;
-use App\User;
+use App\Models\Liturgy\Text;
+use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class TextPolicy

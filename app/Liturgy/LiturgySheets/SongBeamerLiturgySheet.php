@@ -31,25 +31,9 @@
 namespace App\Liturgy\LiturgySheets;
 
 
-use App\Helpers\PPTUnitsHelper;
-use App\Liturgy;
-use App\Liturgy\ItemHelpers\PsalmItemHelper;
-use App\Liturgy\ItemHelpers\SongItemHelper;
-use App\Liturgy\Music\ABCMusic;
+use App\Services\LiturgyService;
 use App\Liturgy\SongBeamer\ImportableSchedule;
-use App\Service;
-use Illuminate\Support\Facades\Auth;
-use PhpOffice\PhpPresentation\DocumentLayout;
-use PhpOffice\PhpPresentation\IOFactory;
-use PhpOffice\PhpPresentation\PhpPresentation;
-use PhpOffice\PhpPresentation\Shape\RichText;
-use PhpOffice\PhpPresentation\Slide;
-use PhpOffice\PhpPresentation\Style\Alignment;
-use PhpOffice\PhpPresentation\Style\Border;
-use PhpOffice\PhpPresentation\Style\Color;
-use PhpOffice\PhpSpreadsheet\Shared\Drawing;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use Symfony\Component\Mime\DraftEmail;
+use App\Models\Service;
 
 class SongBeamerLiturgySheet extends AbstractLiturgySheet
 {
@@ -155,7 +139,7 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
                 if (($item->data_type == 'song') && (isset($item->data['song']))){
                     $refColor = '';
                     if (isset($item->data['song']['id'])) {
-                        $songRef = Liturgy\SongReference::find($item->data['song']['id']);
+                        $songRef = \App\Models\Liturgy\SongReference::find($item->data['song']['id']);
                         $refColor = $songRef->color ?? '';
                     };
                     $listItems[] = [
@@ -171,7 +155,7 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
                     $songbook = null;
                     if (isset($item->data['psalm']['songbook_abbreviation'])) {
                         $refColor = ($item->data['psalm']['songbook_abbreviation'] == 'EG') ? '#c8baf7' : '';
-                        $songbook = Liturgy\Songbook::where('code', $item->data['psalm']['songbook_abbreviation'])->first();
+                        $songbook = \App\Models\Liturgy\Songbook::where('code', $item->data['psalm']['songbook_abbreviation'])->first();
                     }
 
                     $listItems[] = [

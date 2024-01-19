@@ -30,10 +30,13 @@
 
 namespace App\Providers;
 
-use App\Absence;
-use App\City;
-use App\Day;
-use App\Location;
+use App\Models\Calendar\Day;
+use App\Models\Leave\Absence;
+use App\Models\Location;
+use App\Models\People\Team;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Tag;
 use App\Policies\AbsencePolicy;
 use App\Policies\CityPolicy;
 use App\Policies\DayPolicy;
@@ -44,9 +47,6 @@ use App\Policies\ServicePolicy;
 use App\Policies\TagPolicy;
 use App\Policies\TeamPolicy;
 use App\Policies\UserPolicy;
-use App\Tag;
-use App\Team;
-use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
@@ -77,8 +77,8 @@ class AuthServiceProvider extends ServiceProvider
         Location::class => LocationPolicy::class,
         City::class => CityPolicy::class,
         //Service::class => ServicePolicy::class,
-        '\App\Service' => ServicePolicy::class,
-        'App\Service' => ServicePolicy::class,
+        '\App\Models\Service' => ServicePolicy::class,
+        'App\Models\Service' => ServicePolicy::class,
         Day::class => DayPolicy::class,
         Role::class => RolePolicy::class,
         Absence::class => AbsencePolicy::class,

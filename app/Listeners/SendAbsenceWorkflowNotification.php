@@ -30,12 +30,11 @@
 
 namespace App\Listeners;
 
-use App\Absence;
-use App\Events\AbsenceApproved;
 use App\Events\AbsenceUpdated;
 use App\Events\OrderShipped;
 use App\Mail\Absence\AbsenceChecked;
 use App\Mail\Absence\AbsenceRequested;
+use App\Models\Leave\Absence;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 

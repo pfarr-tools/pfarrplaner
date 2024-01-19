@@ -38,8 +38,8 @@
 namespace App\CalendarLinks;
 
 
-use App\Absence;
-use App\User;
+use App\Models\Leave\Absence;
+use App\Models\People\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

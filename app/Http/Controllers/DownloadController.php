@@ -30,14 +30,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Attachment;
 use App\Helpers\FileHelper;
-use App\Service;
+use App\Models\Attachment;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Matrix\Decomposition\QR;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**

@@ -38,8 +38,8 @@
 namespace App\HomeScreens;
 
 
-use App\Absence;
-use App\Replacement;
+use App\Models\Leave\Absence;
+use App\Models\Leave\Replacement;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

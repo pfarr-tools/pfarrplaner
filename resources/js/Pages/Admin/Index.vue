@@ -29,46 +29,15 @@
 
 <template>
     <admin-layout title="Administration">
-        <dataset v-slot="{ ds }"
-                 :ds-data="modules"
-                 ds-sort-by="text"
-                 :ds-search-in="['text']">
-            <div class="row mb-3" :data-page-count="ds.dsPagecount">
-                <div class="col-md-6 mb-2 mb-md-0">
-                    <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
-                </div>
-                <div class="col-md-5 text-end">
-                    <dataset-show class="float-right" />
-                </div>
+        <div class="admin-index row">
+            <div v-for="module in modules"
+                 class="col-md-4 p-3 btn btn-light"
+                 @click="$inertia.get(module.url)"
+                 :title="'Klicken, um '+module.text+' zu verwalten'">
+                <span v-if="module.icon" :class="module.icon" class="me-1"></span>
+                {{ module.text }}
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover d-md-table">
-                            <thead>
-                            <tr>
-                                <th>Bereich</th>
-                            </tr>
-                            </thead>
-                            <dataset-item tag="tbody">
-                                <template #default="{ row, rowIndex }">
-                                    <tr @click="$inertia.get(row.url)" style="cursor:pointer;" title="Klicken, um diesen Bereich zu öffnen">
-                                        <td>
-                                            <span :class="row.icon" class="me-1"></span>
-                                            {{ row.text }}
-                                        </td>
-                                    </tr>
-                                </template>
-                            </dataset-item>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
-            </div>
-        </dataset>
+        </div>
     </admin-layout>
 </template>
 

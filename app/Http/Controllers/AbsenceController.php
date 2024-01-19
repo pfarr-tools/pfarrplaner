@@ -30,24 +30,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Absence;
-use App\Attachment;
-use App\Events\AbsenceApproved;
 use App\Events\AbsenceBeforeDelete;
-use App\Events\AbsenceDemanded;
-use App\Events\AbsenceRejected;
 use App\Events\AbsenceUpdated;
-use App\Funeral;
 use App\Http\Requests\AbsenceRequest;
-use App\Mail\Absence\AbsenceChecked;
-use App\Mail\Absence\AbsenceRequested;
-use App\Replacement;
-use App\Service;
+use App\Models\Attachment;
+use App\Models\Leave\Absence;
+use App\Models\Leave\Replacement;
+use App\Models\People\User;
+use App\Models\Service;
 use App\Services\CalendarService;
 use App\Traits\HandlesAttachmentsTrait;
-use App\User;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

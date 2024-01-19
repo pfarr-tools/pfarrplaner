@@ -30,9 +30,9 @@
 
 namespace App\Integrations\CommuniApp\Commands;
 
-use App\City;
 use App\Integrations\CommuniApp\CommuniAppIntegration;
-use App\Service;
+use App\Models\Places\City;
+use App\Models\Service;
 use Illuminate\Console\Command;
 
 class KillCommuniApp extends Command

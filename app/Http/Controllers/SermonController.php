@@ -30,8 +30,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Sermon;
-use App\Service;
+use App\Models\Sermon;
+use App\Models\Service;
 use App\Traits\HandlesAttachedImageTrait;
 use App\Traits\HandlesAttachmentsTrait;
 use Illuminate\Http\Request;

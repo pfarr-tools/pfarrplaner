@@ -30,7 +30,7 @@
 
 namespace App\Mail;
 
-use App\Service;
+use App\Models\Service;
 use App\User;
 
 /**

@@ -30,19 +30,19 @@
 
 namespace App\Console\Commands\DevBuilder;
 
-use App\Absence;
-use App\Attachment;
-use App\Baptism;
-use App\City;
-use App\Comment;
-use App\Funeral;
-use App\Location;
-use App\Parish;
-use App\Service;
+use App\Models\Attachment;
+use App\Models\Places\City;
+use App\Models\Comment;
+use App\Models\Leave\Absence;
+use App\Models\Location;
+use App\Models\Parish;
+use App\Models\People\User;
+use App\Models\Places\StreetRange;
+use App\Models\Rites\Baptism;
+use App\Models\Rites\Funeral;
+use App\Models\Rites\Wedding;
+use App\Models\Service;
 use App\Services\PackageService;
-use App\StreetRange;
-use App\User;
-use App\Wedding;
 use Carbon\Carbon;
 use Faker\Factory;
 use Faker\Generator;
@@ -52,7 +52,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Output\Output;
 
 /**
  * Class DemoBuilder

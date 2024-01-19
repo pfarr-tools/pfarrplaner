@@ -31,11 +31,11 @@
 namespace App\Reports;
 
 
-use App\Location;
 use App\Mail\MinistryRequest;
-use App\Ministry;
-use App\Service;
-use App\Team;
+use App\Services\MinistryService;
+use App\Models\Location;
+use App\Models\People\Team;
+use App\Models\Service;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
@@ -77,7 +77,7 @@ class MinistryRequestReport extends AbstractReport
     {
         $cities = Auth::user()->writableCities;
         $locations = Location::whereIn('city_id', Auth::user()->writableCities->pluck('id'))->get();
-        $ministries = Ministry::all(true);
+        $ministries = MinistryService::all(true);
         $users = User::visibleFor(Auth::user())->get();
 
         $teams = Team::with('users')->whereIn('city_id', $cities->pluck('id'))->get()->groupBy('city_id');
@@ -156,7 +156,7 @@ class MinistryRequestReport extends AbstractReport
             ->ordered()
             ->get();
 
-        $ministries = Ministry::all();
+        $ministries = MinistryService::all();
 
 
         foreach ($data['recipients'] as $user) {

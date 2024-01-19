@@ -30,12 +30,12 @@
 
 namespace App\Reports;
 
-use App\Day;
 use App\FileFormats\IDML;
-use App\Liturgy;
-use App\Location;
-use App\Service;
-use App\ServiceGroup;
+use App\Services\LiturgyService;
+use App\Models\Calendar\Day;
+use App\Models\Location;
+use App\Models\Service;
+use App\Models\ServiceGroup;
 use App\Tools\StringTool;
 use Carbon\Carbon;
 use Debugbar;
@@ -392,7 +392,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
         $rowCtr = 0;
         foreach ($days as $day) {
             $rowCtr++;
-            $liturgy = Liturgy::getDayInfo($day);
+            $liturgy = LiturgyService::getDayInfo($day);
 
             if ($rowCtr % 2 == 0) {
                 // even rows: render rectangles

@@ -31,8 +31,8 @@
 namespace App\Http\Controllers\Api;
 
 
-use App\Booking;
 use App\Http\Controllers\Controller;
+use App\Models\Seating\Booking;
 
 class BookingController extends Controller
 {

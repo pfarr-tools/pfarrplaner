@@ -30,10 +30,10 @@
 
 namespace Tests\Feature;
 
-use App\City;
 use App\Http\Middleware\Authenticate;
-use App\Service;
-use App\User;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Service;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
@@ -66,8 +66,8 @@ class ServiceFeatureTest extends TestCase
      */
     public function testServiceCanBeUpdated()
     {
-        $city = factory(City::class)->create();
-        $service = factory(Service::class)->create(['city_id' => $city]);
+        $city = (City::class)::factory()->create();
+        $service = Service::factory()->create(['city_id' => $city]);
         $this->user->writableCities()->attach($city->id);
         $response = $this->actingAs($this->user)
             ->patch(
@@ -85,8 +85,8 @@ class ServiceFeatureTest extends TestCase
      */
     public function testServiceCannotBeUpdatedForCityWithoutWritePermissions()
     {
-        $city = factory(City::class)->create();
-        $service = factory(Service::class)->create(['city_id' => $city->id]);
+        $city = (City::class)::factory()->create();
+        $service = Service::factory()->create(['city_id' => $city->id]);
         $title = $service->description;
         $response = $this->actingAs($this->user)
             ->patch(
@@ -104,7 +104,7 @@ class ServiceFeatureTest extends TestCase
      */
     public function testServiceCanBeDeleted()
     {
-        $service = factory(Service::class)->create(['city_id' => $this->city]);
+        $service = Service::factory()->create(['city_id' => $this->city]);
         $this->assertCount(1, Service::all());
         $response = $this->actingAs($this->user)
             ->delete(route('service.destroy', $service->slug));
@@ -123,10 +123,10 @@ class ServiceFeatureTest extends TestCase
         Permission::create(['name' => 'gd-bearbeiten']);
         Permission::create(['name' => 'gd-allgemein-bearbeiten']);
 
-        $this->city = factory(City::class)->create();
+        $this->city = (City::class)::factory()->create();
 
         /** @var User */
-        $this->user = factory(User::class)->create();
+        $this->user = User::factory()->create();
         $this->user->givePermissionTo('gd-bearbeiten');
         $this->user->writableCities()->attach($this->city);
     }

@@ -30,7 +30,7 @@
 
 namespace App\Services;
 
-use App\User;
+use App\Models\People\User;
 
 class NameService
 {

@@ -18,24 +18,25 @@
                     @while($date < $end )
                         <td class="day
                                     @if(isset($existing[$date->format('Y-m-d')]))
-                        @if ($existing[$date->format('Y-m-d')]->day_type == \App\Day::DAY_TYPE_LIMITED) day-type-limited @else day-type-default @endif
+                        @if ($existing[$date->format('Y-m-d')]->day_type == \App\Models\Calendar\Day::DAY_TYPE_LIMITED) day-type-limited @else day-type-default @endif
                             exists
                         @else new @endif
                             " id="day_{{ $date->day }}"
                             data-day="{{ $date->day }}" data-weekday="{{ $date->formatLocalized('%A') }}"
                             data-date="{{ $date->format('d.m.Y') }}"
-                            @if(isset($existing[$date->format('Y-m-d')]) && $existing[$date->format('Y-m-d')]->day_type == \App\Day::DAY_TYPE_LIMITED)
-                            data-cities="{{ $existing[$date->format('Y-m-d')]->cities->pluck('id')->join(',') }}"
+                            @if(isset($existing[$date->format('Y-m-d')]) && $existing[$date->format('Y-m-d')]->day_type == \App\Models\Calendar\Day::DAY_TYPE_LIMITED)
+                                data-cities="{{ $existing[$date->format('Y-m-d')]->cities->pluck('id')->join(',') }}"
                             @endif
                             @if(isset($existing[$date->format('Y-m-d')]))
-                            @if ($existing[$date->format('Y-m-d')]->day_type == \App\Day::DAY_TYPE_LIMITED)
-                            title="Dieser Tag existiert bereits, wird aber noch nicht für alle Gemeinden angezeigt."
+                                @if ($existing[$date->format('Y-m-d')]->day_type == \App\Models\Calendar\Day::DAY_TYPE_LIMITED)
+                                    title="Dieser Tag existiert bereits, wird aber noch nicht für alle Gemeinden angezeigt."
                             @else
-                            title="Dieser Tag existiert bereits."
-                                @if(isset($existingCities[$date->format('Y-m-d')])) data-cities="{{ $existingCities[$date->format('Y-m-d')]->join(',') }}" @endif
+                                title="Dieser Tag existiert bereits."
+                            @if(isset($existingCities[$date->format('Y-m-d')])) data-cities="{{ $existingCities[$date->format('Y-m-d')]->join(',') }}"
+                            @endif
                             @endif
                             @else
-                            title="Diesen Tag neu anlegen"
+                                title="Diesen Tag neu anlegen"
                             @endif
 
                         >
@@ -44,7 +45,7 @@
                                 class="weekday-label weekday-label-{{ $date->formatLocalized('%a') }}">{!! $date->formatLocalized('%a') !!}</span><br/>
                             {{ $date->day }}
                         </td>
-                        <?php $date->addDay(1) ?>
+                            <?php $date->addDay(1) ?>
                     @endwhile
                 </tr>
             </table>
@@ -72,7 +73,7 @@
                     <div class="form-group">
                         <label style="display:block;">Anzeige</label>
                         <div class="form-check">
-                            <input type="radio" name="day_type" value="{{ \App\Day::DAY_TYPE_DEFAULT }}"
+                            <input type="radio" name="day_type" value="{{ \App\Models\Calendar\Day::DAY_TYPE_DEFAULT }}"
                                    autocomplete="off" id="check-type-default">
                             <label class="form-check-label" style="color: red;">
                                 Diesen Tag für alle Gemeinden anzeigen
@@ -82,7 +83,7 @@
                             </div>
                         </div>
                         <div class="form-check">
-                            <input type="radio" name="day_type" value="{{ \App\Day::DAY_TYPE_LIMITED }}"
+                            <input type="radio" name="day_type" value="{{ \App\Models\Calendar\Day::DAY_TYPE_LIMITED }}"
                                    autocomplete="off" id="check-type-limited" checked>
                             <label class="form-check-label" style="background-color: #dcd0ff;">
                                 Diesen Tag nur für folgende Gemeinden im Kalender anzeigen:
@@ -151,10 +152,10 @@
                 }
             });
 
-            $('#check-type-default, #check-type-limited').change(function(){
-               if ($('#check-type-default').is(':checked')) {
-                   alert('Bitte lege Tage dieses Typs nur an, wenn du sicher bist, dass alle Gemeinden den Tag in ihrem Kalender sehen wollen. Im Normalfall trifft das nur auf allgemeine kirchliche Feiertage zu. Wenn du dir nicht sicher bist, wähle "Diesen Tag nur für folgende Gemeinden anzeigen" und schalte den Tag für deine Gemeinde frei.');
-               }
+            $('#check-type-default, #check-type-limited').change(function () {
+                if ($('#check-type-default').is(':checked')) {
+                    alert('Bitte lege Tage dieses Typs nur an, wenn du sicher bist, dass alle Gemeinden den Tag in ihrem Kalender sehen wollen. Im Normalfall trifft das nur auf allgemeine kirchliche Feiertage zu. Wenn du dir nicht sicher bist, wähle "Diesen Tag nur für folgende Gemeinden anzeigen" und schalte den Tag für deine Gemeinde frei.');
+                }
             });
 
             selectDay(1);

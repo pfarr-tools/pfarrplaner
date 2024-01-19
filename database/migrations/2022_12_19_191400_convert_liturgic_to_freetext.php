@@ -28,18 +28,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use App\Baptism;
-use App\Funeral;
 use App\Liturgy\PronounSets\AbstractPronounSet;
 use App\Liturgy\PronounSets\PronounSets;
-use App\Service;
+use App\Models\Liturgy\Item;
+use App\Models\Rites\Baptism;
+use App\Models\Rites\Funeral;
+use App\Models\Rites\Wedding;
+use App\Models\Service;
 use App\Services\NameService;
-use App\Wedding;
 use Carbon\Carbon;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-use App\Liturgy\Item;
 
 return new class extends Migration {
     /**
@@ -59,7 +57,7 @@ return new class extends Migration {
             $item->data = $data;
 
             if ($item->block && $item->block->service) {
-                $newItem = new \App\Liturgy\Item([
+                $newItem = new \App\Models\Liturgy\Item([
                                                      'title' => $item->title,
                                                      'data_type' => 'freetext',
                                                      'liturgy_block_id' => $item->liturgy_block_id,

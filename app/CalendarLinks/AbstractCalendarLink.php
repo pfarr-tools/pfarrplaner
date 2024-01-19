@@ -38,7 +38,7 @@
 namespace App\CalendarLinks;
 
 
-use App\User;
+use App\Models\People\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;

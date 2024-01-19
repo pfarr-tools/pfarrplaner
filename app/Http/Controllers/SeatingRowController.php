@@ -30,9 +30,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Location;
-use App\SeatingRow;
-use App\SeatingSection;
+use App\Models\Location;
+use App\Models\Seating\SeatingRow;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -82,7 +81,7 @@ class SeatingRowController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param \App\SeatingRow $seatingRow
+     * @param \App\Models\Seating\SeatingRow $seatingRow
      * @return \Illuminate\Http\Response
      */
     public function show(SeatingRow $seatingRow)
@@ -93,7 +92,7 @@ class SeatingRowController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\SeatingRow $seatingRow
+     * @param \App\Models\Seating\SeatingRow $seatingRow
      * @return \Inertia\Response
      */
     public function edit(SeatingRow $seatingRow)
@@ -107,7 +106,7 @@ class SeatingRowController extends Controller
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @param \App\SeatingRow $seatingRow
+     * @param \App\Models\Seating\SeatingRow $seatingRow
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, SeatingRow $seatingRow)
@@ -122,7 +121,7 @@ class SeatingRowController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\SeatingRow $seatingRow
+     * @param \App\Models\Seating\SeatingRow $seatingRow
      * @return \Illuminate\Http\Response
      */
     public function destroy(SeatingRow $seatingRow)

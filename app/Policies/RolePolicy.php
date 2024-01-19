@@ -30,7 +30,7 @@
 
 namespace App\Policies;
 
-use App\User;
+use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Spatie\Permission\Models\Role;
 

@@ -31,13 +31,10 @@
 namespace App\Liturgy\Replacement;
 
 
-use App\Baptism;
-use App\Funeral;
-use App\Imports\EventCalendarImport;
-use App\Imports\OPEventsImport;
-use App\Service;
+use App\Models\Rites\Baptism;
+use App\Models\Rites\Funeral;
+use App\Models\Rites\Wedding;
 use App\Tools\StringTool;
-use App\Wedding;
 use Carbon\Carbon;
 
 class KasualienReplacer extends AbstractReplacer

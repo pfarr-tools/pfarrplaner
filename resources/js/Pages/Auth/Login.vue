@@ -41,7 +41,7 @@
                         <div v-if="!demo">
                             <!-- Email input -->
                             <div class="form-outline mb-4">
-                                <label class="form-label" for="form3Example3">E-Mailaddresse</label>
+                                <label class="form-label" for="form3Example3">E-Mailadresse</label>
                                 <input type="email" name="email" class="form-control form-control-lg"
                                        value=""
                                        placeholder="deine@email.de" autofocus/>
@@ -56,7 +56,7 @@
                         </div>
                         <div v-else>
                             <div class="form-outline mb-4">
-                                <label class="form-label" for="form3Example3">E-Mailaddresse</label>
+                                <label class="form-label" for="form3Example3">E-Mailadresse</label>
 
                                 <select id="users" name="email" class="form-control">
                                     <select id="users" name="email" class="form-control" :value="users[0].email"

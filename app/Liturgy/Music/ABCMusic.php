@@ -30,7 +30,7 @@
 
 namespace App\Liturgy\Music;
 
-use App\Liturgy\Song;
+use App\Models\Liturgy\Song;
 use Illuminate\Support\Facades\Storage;
 
 class ABCMusic

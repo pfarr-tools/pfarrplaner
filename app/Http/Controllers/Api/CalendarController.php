@@ -30,11 +30,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Absence;
-use App\City;
-use App\Liturgy;
-use App\Service;
+use App\Models\Leave\Absence;
+use App\Models\Places\City;
+use App\Models\Service;
 use App\Services\CalendarService;
+use App\Services\LiturgyService;
 use App\Services\RedirectorService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -71,7 +71,7 @@ class CalendarController extends \App\Http\Controllers\Controller
         $dates = CalendarService::addMissingDefaultDays($date, $dates);
         $days = [];
         foreach ($dates as $thisDate) {
-            $days[$thisDate] = ['date' => $thisDate, 'liturgy' => Liturgy::getDayInfo($thisDate)];
+            $days[$thisDate] = ['date' => $thisDate, 'liturgy' => LiturgyService::getDayInfo($thisDate)];
         }
 
         // absences

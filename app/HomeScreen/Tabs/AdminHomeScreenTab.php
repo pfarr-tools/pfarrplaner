@@ -31,7 +31,7 @@
 namespace App\HomeScreen\Tabs;
 
 use App\UI\Modules\AdminModule;
-use App\User;
+use App\Models\People\User;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Backup\BackupDestination\Backup;
 use Spatie\Backup\Commands\ListCommand;

@@ -32,12 +32,12 @@ namespace App\Liturgy\LiturgySheets;
 
 
 use App\Documents\Word\DefaultWordDocument;
-use App\Liturgy\Item;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Music\ABCMusic;
-use App\Liturgy\Song;
-use App\Service;
+use App\Models\Liturgy\Item;
+use App\Models\Liturgy\Song;
+use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Shared\Converter;

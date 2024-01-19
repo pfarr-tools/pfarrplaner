@@ -32,7 +32,7 @@ namespace App\Http\Controllers\Extranet;
 
 
 use App\Http\Controllers\Controller;
-use App\Service;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 

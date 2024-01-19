@@ -30,8 +30,8 @@
 
 namespace App\Policies;
 
-use App\Tag;
-use App\User;
+use App\Models\Tag;
+use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**

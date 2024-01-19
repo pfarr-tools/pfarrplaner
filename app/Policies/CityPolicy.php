@@ -30,9 +30,9 @@
 
 namespace App\Policies;
 
-use App\City;
+use App\Models\People\User;
+use App\Models\Places\City;
 use App\Services\RoleService;
-use App\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**

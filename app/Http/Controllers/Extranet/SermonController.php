@@ -32,8 +32,8 @@ namespace App\Http\Controllers\Extranet;
 
 
 use App\Http\Controllers\Controller;
-use App\Sermon;
-use App\Service;
+use App\Models\Sermon;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,7 +48,7 @@ class SermonController extends Controller
             $isPrivate = $isPrivate || (count($service->funerals) || count($service->weddings));
             if (($service->date <= Carbon::now()) || ($includePreview)) {
                 $services[] = [
-                    /** @var \App\Service $service */
+                    /** @var \App\Models\Service $service */
                     'date' => $service->dateTime,
                     'time' => $service->timeText(),
                     'title' => $service->titleText(false),

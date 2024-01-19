@@ -30,15 +30,12 @@
 
 namespace App\Reports;
 
-use App\Day;
-use App\Service;
-use App\User;
+use App\Models\Calendar\Day;
+use App\Models\Service;
+use App\Models\People\User;
 use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use Inertia\Inertia;
 
 

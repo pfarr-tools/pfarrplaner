@@ -28,15 +28,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(
-    App\Tag::class,
-    function (Faker $faker) {
-        $name = $faker->sentence();
+use App\Models\Tag;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class TagFactory extends Factory
+{
+    protected $model = Tag::class;
+
+    public function definition()
+    {
+        $name = fake()->sentence();
         return [
             'code' => \Illuminate\Support\Str::slug($name),
             'name' => $name,
         ];
     }
-);
+
+}

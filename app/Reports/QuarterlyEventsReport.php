@@ -30,16 +30,13 @@
 
 namespace App\Reports;
 
-use App\Day;
-use App\Location;
-use App\Service;
+use App\Models\Calendar\Day;
+use App\Models\Location;
+use App\Models\Service;
 use Carbon\Carbon;
 use DateTimeZone;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use Inertia\Inertia;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Style\Font;

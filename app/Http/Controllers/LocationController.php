@@ -30,8 +30,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Location;
-use App\SeatingRow;
+use App\Models\Location;
+use App\Models\Seating\SeatingRow;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;

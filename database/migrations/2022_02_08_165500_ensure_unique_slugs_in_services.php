@@ -28,9 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use App\Service;
-use App\UI\Modules\Modules;
-use App\User;
+use App\Models\Service;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration {

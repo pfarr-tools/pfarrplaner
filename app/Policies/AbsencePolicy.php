@@ -30,8 +30,8 @@
 
 namespace App\Policies;
 
-use App\Absence;
-use App\User;
+use App\Models\Leave\Absence;
+use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**

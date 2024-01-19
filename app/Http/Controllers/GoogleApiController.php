@@ -30,9 +30,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Broadcast;
-use App\City;
-use App\Service;
+use App\Models\Places\City;
+use App\Models\Service;
+use App\Models\Streaming\Broadcast;
 use Google_Client;
 use Google_Exception;
 use Google_Service_YouTube;

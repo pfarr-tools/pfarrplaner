@@ -30,10 +30,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\City;
-use App\Team;
-use App\ListedPerson;
-use App\User;
+use App\Models\People\ListedPerson;
+use App\Models\People\Team;
+use App\Models\People\User;
+use App\Models\Places\City;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends \App\Http\Controllers\Controller

@@ -30,7 +30,7 @@
 
 namespace App\Console\Commands\QueryLog;
 
-use App\QueryLog;
+use App\Services\QueryLogService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -71,7 +71,7 @@ class RestoreFromQueryLog extends Command
      */
     public function handle()
     {
-        $queries = QueryLog::all();
+        $queries = QueryLogService::all();
 
         if (count($queries) == 0) {
             $this->error('There are no queries to restore.');
@@ -80,7 +80,7 @@ class RestoreFromQueryLog extends Command
 
         $start = $queries[0]['time'];
 
-        $this->warn('CAUTION! This will re-execute '.count($queries).' queries from '.$start->format('Y-m-d H:i:s').' to '.QueryLog::date()->format('Y-m-d H:i:s').'.');
+        $this->warn('CAUTION! This will re-execute '.count($queries).' queries from '.$start->format('Y-m-d H:i:s').' to '.QueryLogService::date()->format('Y-m-d H:i:s').'.');
         $this->warn('Using this function could seriously mess up your database!');
         $this->warn('This command is only meant to be used after restoring from a nightly backup.');
         if ($this->confirm('Do you really want to do this?')) {
@@ -90,8 +90,8 @@ class RestoreFromQueryLog extends Command
                 $this->line('Restoring archived query #'.$ctr.' from '.$query['time']->format('Y-m-d H:i:s'));
                 DB::query($query['query']);
             }
-            $this->info('Restored '.count($queries).' queries. DB is now up-to-date as of '.QueryLog::date()->format('Y-m-d H:i:s').'.');
-            QueryLog::clear();
+            $this->info('Restored '.count($queries).' queries. DB is now up-to-date as of '.QueryLogService::date()->format('Y-m-d H:i:s').'.');
+            QueryLogService::clear();
             $this->info('Query log cleared');
         }
     }

@@ -30,9 +30,9 @@
 
 namespace App\Policies;
 
-use App\User;
+use App\Models\Liturgy\Songbook;
+use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use App\Liturgy\Songbook;
 
 class SongbookPolicy
 {

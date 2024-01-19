@@ -25,9 +25,15 @@
             @slot('subtitle')
             @endslot
             @slot('header')
-                @component('mail.layout.blocks.cell', ['type' => 'th']) Datenfeld @endcomponent
-                @component('mail.layout.blocks.cell', ['type' => 'th']) Vorher @endcomponent
-                @component('mail.layout.blocks.cell', ['type' => 'th']) Nachher @endcomponent
+                @component('mail.layout.blocks.cell', ['type' => 'th'])
+                    Datenfeld
+                @endcomponent
+                @component('mail.layout.blocks.cell', ['type' => 'th'])
+                    Vorher
+                @endcomponent
+                @component('mail.layout.blocks.cell', ['type' => 'th'])
+                    Nachher
+                @endcomponent
             @endslot
 
             @foreach ([
@@ -59,18 +65,18 @@
                 @include('mail.notifications.service.changed-attribute', [
                          'title' => 'Kirchengemeinde',
                          'key' => 'city_id',
-                         'old' => \App\City::find($changes['city_id']['original'])->name,
+                         'old' => \App\Models\Places\City::find($changes['city_id']['original'])->name,
                          'new' => $service->city->name,
                          ])
             @endif
 
             @if(isset($changes['need_predicant']))
-            @include('mail.notifications.service.changed-attribute', [
-                     'title' => config('label.predicant').' benötigt',
-                     'key' => 'need_predicant',
-                     'old' => $changes['need_predicant']['original'] ? '✔' : '✘',
-                     'new' => $changes['need_predicant']['changed'] ? '✔' : '✘',
-                     ])
+                @include('mail.notifications.service.changed-attribute', [
+                         'title' => config('label.predicant').' benötigt',
+                         'key' => 'need_predicant',
+                         'old' => $changes['need_predicant']['original'] ? '✔' : '✘',
+                         'new' => $changes['need_predicant']['changed'] ? '✔' : '✘',
+                         ])
             @endif
 
             @foreach ($participants as $category => $categoryParticipants)
@@ -81,21 +87,21 @@
             @endforeach
 
             @if(isset($changes['baptism']))
-            @include('mail.notifications.service.changed-attribute', [
-                     'title' => 'Taufgottesdienst',
-                     'key' => 'baptism',
-                     'old' => $changes['baptism']['original'] ? '✔' : '✘',
-                     'new' => $changes['baptism']['changed'] ? '✔' : '✘',
-                     ])
+                @include('mail.notifications.service.changed-attribute', [
+                         'title' => 'Taufgottesdienst',
+                         'key' => 'baptism',
+                         'old' => $changes['baptism']['original'] ? '✔' : '✘',
+                         'new' => $changes['baptism']['changed'] ? '✔' : '✘',
+                         ])
             @endif
 
             @if(isset($changes['eucharist']))
-            @include('mail.notifications.service.changed-attribute', [
-                     'title' => 'Abendmahlsgottesdienst',
-                     'key' => 'eucharist',
-                     'old' => $changes['eucharist']['original'] ? '✔' : '✘',
-                     'new' => $changes['eucharist']['changed'] ? '✔' : '✘',
-                     ])
+                @include('mail.notifications.service.changed-attribute', [
+                         'title' => 'Abendmahlsgottesdienst',
+                         'key' => 'eucharist',
+                         'old' => $changes['eucharist']['original'] ? '✔' : '✘',
+                         'new' => $changes['eucharist']['changed'] ? '✔' : '✘',
+                         ])
             @endif
 
 
@@ -118,12 +124,12 @@
             @endforeach
 
             @if(isset($changes['cc']))
-            @include('mail.notifications.service.changed-attribute', [
-                     'title' => 'Kinderkirche',
-                     'key' => 'cc',
-                     'old' => $changes['cc']['original'] ? '✔' : '✘',
-                     'new' => $changes['cc']['changed'] ? '✔' : '✘',
-                     ])
+                @include('mail.notifications.service.changed-attribute', [
+                         'title' => 'Kinderkirche',
+                         'key' => 'cc',
+                         'old' => $changes['cc']['original'] ? '✔' : '✘',
+                         'new' => $changes['cc']['changed'] ? '✔' : '✘',
+                         ])
             @endif
 
             @foreach ([
@@ -200,9 +206,7 @@
                          ])
             @endif
 
-
         @endcomponent
-
 
     @endcomponent
 
@@ -224,7 +228,6 @@
                 @endslot
 
             @endcomponent
-
 
         @endif
 
@@ -276,13 +279,16 @@
                                         <tr>
                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-radius: 4px; margin: 0;"
                                                 align="center" bgcolor="#007bff">
-                                                @if($user->can('update', $service))<a
-                                                    href="{{ route('service.edit', $service) }}"
-                                                    style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 4.8px; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #a61380; color: #ffffff; padding: 8px 16px;">Diesen
-                                                    Gottesdienst ansehen</a>
-                                                @else <a href="{{ route('calendar') }}"
-                                                         style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 4.8px; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Kalender
-                                                    öffnen</a>@endif
+                                                @if($user->can('update', $service))
+                                                    <a
+                                                        href="{{ route('service.edit', $service) }}"
+                                                        style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 4.8px; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #a61380; color: #ffffff; padding: 8px 16px;">Diesen
+                                                        Gottesdienst ansehen</a>
+                                                @else
+                                                    <a href="{{ route('calendar') }}"
+                                                       style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 4.8px; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Kalender
+                                                        öffnen</a>
+                                                @endif
                                             </td>
                                         </tr>
                                         </tbody>
@@ -306,10 +312,10 @@
 
     <div class="text-center text-muted" style="color: #636c72; font-size: 8pt; line-height: 9pt; margin-top: 10px;"
          align="center">
-        @if($user->getSubscriptionType($service->city) == \App\Subscription::SUBSCRIBE_ALL)
+        @if($user->getSubscriptionType($service->city) == \App\Models\Subscription::SUBSCRIBE_ALL)
             Du erhältst diese Nachricht, weil du über alle Änderungen an Gottesdiensten in {{ $service->city->name }}
             benachrichtigt werden willst.
-        @elseif($user->getSubscriptionType($service->city) == \App\Subscription::SUBSCRIBE_OWN)
+        @elseif($user->getSubscriptionType($service->city) == \App\Models\Subscription::SUBSCRIBE_OWN)
             Du erhältst diese Nachricht, weil du über Änderungen an Gottesdiensten in {{ $service->city->name }}, an
             denen du beteiligt bist, benachrichtigt werden willst.
         @endif
@@ -345,8 +351,5 @@
         </tr>
         </tbody>
     </table>
-
-
-
 
 @endsection

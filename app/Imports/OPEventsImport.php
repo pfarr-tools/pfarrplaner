@@ -38,7 +38,7 @@
 namespace App\Imports;
 
 
-use App\City;
+use App\Models\Places\City;
 use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Client;

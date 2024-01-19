@@ -30,17 +30,14 @@
 
 namespace App\Reports;
 
-use App\City;
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
-use App\Liturgy;
-use App\Service;
+use App\Services\LiturgyService;
+use App\Models\Places\City;
+use App\Models\Service;
 use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use Inertia\Inertia;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
@@ -204,7 +201,7 @@ class EventListReport extends AbstractWordDocumentReport
                     /* @var Service $event */
                     // only services this time
 
-                    $liturgy = Liturgy::getDayInfo($event->day);
+                    $liturgy = LiturgyService::getDayInfo($event->day);
                     $pericope = (isset($liturgy['perikope']) ? $liturgy['litTextsPerikope' . $liturgy['perikope']] : '');
 
                     // remove optional verses

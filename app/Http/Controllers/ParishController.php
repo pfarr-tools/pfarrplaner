@@ -30,9 +30,8 @@
 
 namespace App\Http\Controllers;
 
-use App\City;
-use App\Parish;
-use App\StreetRange;
+use App\Models\Parish;
+use App\Models\Places\StreetRange;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;

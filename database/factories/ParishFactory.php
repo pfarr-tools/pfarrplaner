@@ -28,13 +28,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(
-    App\Parish::class,
-    function (Faker $faker) {
-        return [
-            //
-        ];
+use App\Models\Parish;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class ParishFactory extends Factory
+{
+    protected $model = Parish::class;
+
+    public function definition()
+    {
+        // TODO: Implement definition() method.
+        return [];
     }
-);
+
+}

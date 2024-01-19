@@ -28,34 +28,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(
-    App\Service::class,
-    function (Faker $faker) {
-        $church = $faker->name('male');
+use App\Models\Location;
+use App\Models\Places\City;
+use App\Models\Service;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class ServiceFactory extends Factory {
+
+    protected $model = Service::class;
+    public function definition()
+    {
+        $church = fake()->name();
         $church .= (substr($church, -1) == 's' ? '' : 's') . 'kirche';
         return [
-            'date' => $faker->dateTime(),
-            'location_id' => factory(\App\Location::class),
-            'city_id' => factory(\App\City::class),
-            'time' => $faker->time('H:i'),
-            'description' => $faker->sentence(),
-            'need_predicant' => $faker->numberBetween(0, 1),
-            'baptism' => $faker->numberBetween(0, 1),
-            'eucharist' => $faker->numberBetween(0, 1),
-            'offerings_counter1' => $faker->name(),
-            'offerings_counter2' => $faker->name(),
-            'offering_goal' => $faker->sentence(),
-            'offering_description' => $faker->sentence(),
-            'offering_type' => $faker->randomElement(['PO', 'eO', '']),
-            'cc' => $faker->numberBetween(0, 1),
-            'cc_alt_time' => $faker->time('H:i'),
+            'date' => fake()->dateTime(),
+            'time' => fake()->time('H:i'),
+            'description' => fake()->sentence(),
+            'need_predicant' => fake()->numberBetween(0, 1),
+            'baptism' => fake()->numberBetween(0, 1),
+            'eucharist' => fake()->numberBetween(0, 1),
+            'offerings_counter1' => fake()->name(),
+            'offerings_counter2' => fake()->name(),
+            'offering_goal' => fake()->sentence(),
+            'offering_description' => fake()->sentence(),
+            'offering_type' => fake()->randomElement(['PO', 'eO', '']),
+            'cc' => fake()->numberBetween(0, 1),
+            'cc_alt_time' => fake()->time('H:i'),
             'cc_location' => $church,
-            'cc_lesson' => $faker->sentence(),
-            'cc_staff' => $faker->firstName() . ', ' . $faker->firstName(),
-            'internal_remarks' => $faker->sentence(),
-            'offering_amount' => $faker->randomFloat(2),
+            'cc_lesson' => fake()->sentence(),
+            'cc_staff' => fake()->firstName() . ', ' . fake()->firstName(),
+            'internal_remarks' => fake()->sentence(),
+            'offering_amount' => fake()->randomFloat(2),
         ];
     }
-);
+
+
+}

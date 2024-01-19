@@ -30,8 +30,8 @@
 
 namespace App\Policies;
 
-use App\Location;
-use App\User;
+use App\Models\Location;
+use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**

@@ -31,10 +31,9 @@
 namespace App\Integrations\KonfiApp;
 
 
-use App\City;
 use App\Integrations\AbstractIntegration;
-use App\Service;
-use Carbon\Carbon;
+use App\Models\Places\City;
+use App\Models\Service;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;

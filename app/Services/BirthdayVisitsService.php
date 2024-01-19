@@ -30,9 +30,9 @@
 
 namespace App\Services;
 
-use App\CalendarConnection;
 use App\Calendars\AbstractCalendarItem;
 use App\Calendars\Exchange\ExchangeCalendar;
+use App\Models\Calendar\External\CalendarConnection;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 

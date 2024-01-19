@@ -31,7 +31,7 @@
 namespace App\Traits;
 
 
-use App\Attachment;
+use App\Models\Attachment;
 
 /**
  * Trait HasAttachmentsTrait

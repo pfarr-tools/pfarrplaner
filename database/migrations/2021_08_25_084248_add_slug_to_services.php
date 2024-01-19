@@ -45,7 +45,7 @@ class AddSlugToServices extends Migration
             $table->string('slug')->nullable();
         });
 
-        foreach (\App\Service::all() as $service) {
+        foreach (\App\Models\Service::all() as $service) {
             $slug = $service->createSlug();
             $service->update(['slug' => $slug]);
             echo 'Created slug '.$slug.' for service #'.$service->id.PHP_EOL;

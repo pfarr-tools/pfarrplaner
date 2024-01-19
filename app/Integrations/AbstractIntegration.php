@@ -31,7 +31,7 @@
 namespace App\Integrations;
 
 
-use App\City;
+use App\Models\Places\City;
 
 /**
  * Class AbstractIntegration

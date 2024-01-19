@@ -30,15 +30,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Absence;
-use App\City;
-use App\Day;
-use App\Liturgy;
-use App\Ministry;
-use App\Service;
+use App\Models\Calendar\Day;
+use App\Models\Leave\Absence;
+use App\Models\Places\City;
+use App\Models\Service;
 use App\Services\CalendarService;
+use App\Services\LiturgyService;
 use App\Services\RedirectorService;
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -92,7 +90,7 @@ class CalController extends Controller
         $dates = CalendarService::addMissingDefaultDays($date, $dates);
         $days = [];
         foreach ($dates as $thisDate) {
-            $days[$thisDate] = ['date' => $thisDate, 'liturgy' => Liturgy::getDayInfo($thisDate)];
+            $days[$thisDate] = ['date' => $thisDate, 'liturgy' => LiturgyService::getDayInfo($thisDate)];
         }
 
         $years = Service::select(DB::raw('DISTINCT YEAR(DATE(services.date)) as year'))

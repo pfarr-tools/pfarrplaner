@@ -31,7 +31,11 @@
 namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -48,6 +52,22 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         //
     ];
+
+    /**
+     * Create a new console kernel instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @return void
+     */
+    public function __construct(Application $app, Dispatcher $events)
+    {
+        parent::__construct($app, $events);
+        Factory::guessFactoryNamesUsing(function (string $modelName) {
+            return Str::replace('App\\Models\\', '\\Database\\Factories\\', $modelName).'Factory';
+        });
+
+    }
 
     /**
      * Define the application's command schedule.

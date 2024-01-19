@@ -38,7 +38,7 @@
 namespace App\Reports;
 
 
-use App\Location;
+use App\Models\Location;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;

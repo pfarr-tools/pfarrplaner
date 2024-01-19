@@ -30,7 +30,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Liturgy\Songbook;
+use App\Models\Liturgy\Songbook;
 use App\Services\ResourcePolicyService;
 use App\Traits\HandlesAttachedImageTrait;
 use Illuminate\Http\Request;

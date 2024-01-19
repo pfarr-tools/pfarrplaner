@@ -31,8 +31,8 @@
 namespace App\HomeScreen\Tabs;
 
 
-use App\Broadcast;
-use App\Service;
+use App\Models\Service;
+use App\Models\Streaming\Broadcast;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;

@@ -30,9 +30,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Liturgy\Songbook;
+use App\Models\Liturgy\Songbook;
 use Illuminate\Http\Request;
-use jamesiarmes\PhpEws\Response\SetHoldOnMailboxesResponseMessageType;
 
 class SongbookController extends \App\Http\Controllers\Controller
 {

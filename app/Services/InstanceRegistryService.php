@@ -30,9 +30,9 @@
 
 namespace App\Services;
 
-use App\City;
-use App\Service;
-use App\User;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Service;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
@@ -74,8 +74,6 @@ class InstanceRegistryService
         try {
             $client->post('https://instances.pfarrplaner.de/api/ping', ['form_params' => $data]);
         } catch (\Exception $exception) {
-            Log::debug('Pinging central registry failed', $exception);
-            if ($debug) dd($data, $exception);
             return;
         }
     }

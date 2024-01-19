@@ -30,8 +30,8 @@
 
 namespace App\Events;
 
-use App\Broadcast;
-use App\Service;
+use App\Models\Service;
+use App\Models\Streaming\Broadcast;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;

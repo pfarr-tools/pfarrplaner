@@ -31,8 +31,7 @@
 namespace App\HomeScreen\Tabs;
 
 
-use App\Service;
-use App\Wedding;
+use App\Models\Rites\Wedding;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 

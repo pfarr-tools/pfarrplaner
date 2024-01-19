@@ -30,14 +30,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Broadcast;
-use App\City;
 use App\Helpers\YoutubeHelper;
 use App\Integrations\Youtube\YoutubeIntegration;
-use App\Service;
+use App\Models\Places\City;
+use App\Models\Service;
+use App\Models\Streaming\Broadcast;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 

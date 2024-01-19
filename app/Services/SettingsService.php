@@ -31,8 +31,8 @@
 namespace App\Services;
 
 
-use App\User;
-use App\UserSetting;
+use App\Models\UserSetting;
+use App\Models\People\User;
 
 class SettingsService
 {

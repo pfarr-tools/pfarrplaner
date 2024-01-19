@@ -30,7 +30,7 @@
 
 namespace App\Console\Commands\Liturgy;
 
-use App\LiturgyInfo;
+use App\Models\LiturgyInfo;
 use Illuminate\Console\Command;
 use Storage;
 

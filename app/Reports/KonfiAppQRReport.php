@@ -30,11 +30,10 @@
 
 namespace App\Reports;
 
-use App\City;
-use App\Day;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
-use App\Service;
-use App\User;
+use App\Models\Calendar\Day;
+use App\Models\Places\City;
+use App\Models\Service;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
@@ -43,10 +42,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-
 use Inertia\Inertia;
-
-use function PHPUnit\Framework\returnArgument;
 
 
 /**

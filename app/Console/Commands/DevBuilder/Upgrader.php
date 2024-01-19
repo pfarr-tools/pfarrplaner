@@ -30,30 +30,10 @@
 
 namespace App\Console\Commands\DevBuilder;
 
-use App\Absence;
-use App\Attachment;
-use App\Baptism;
-use App\City;
-use App\Comment;
-use App\Funeral;
-use App\Location;
-use App\Parish;
-use App\Service;
 use App\Services\PackageService;
-use App\StreetRange;
-use App\User;
-use App\Wedding;
 use Carbon\Carbon;
-use Faker\Factory;
-use Faker\Generator;
 use Illuminate\Console\Command;
 use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\Console\Output\Output;
 
 /**
  * Class DemoBuilder

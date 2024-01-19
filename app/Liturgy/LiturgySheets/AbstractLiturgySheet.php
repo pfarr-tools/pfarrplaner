@@ -31,7 +31,7 @@
 namespace App\Liturgy\LiturgySheets;
 
 
-use App\Service;
+use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use PDF;
 

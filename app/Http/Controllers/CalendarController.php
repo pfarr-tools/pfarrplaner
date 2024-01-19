@@ -30,12 +30,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Absence;
-use App\City;
-use App\Day;
-use App\Liturgy;
-use App\Location;
-use App\Service;
+use App\Models\Calendar\Day;
+use App\Models\Leave\Absence;
+use App\Models\Location;
+use App\Models\Service;
 use App\Services\CalendarService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
@@ -46,7 +44,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
-use PDF;
 
 /**
  * Class CalendarController

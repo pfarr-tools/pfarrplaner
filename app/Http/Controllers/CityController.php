@@ -30,16 +30,17 @@
 
 namespace App\Http\Controllers;
 
-use App\City;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Integrations\Youtube\YoutubeIntegration;
-use App\Ministry;
-use App\Service;
+use App\Services\MinistryService;
+use App\Models\Places\City;
+use App\Models\Service;
 use App\Traits\HandlesAttachedImageTrait;
 use App\Traits\HandlesAttachmentsTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -47,13 +48,13 @@ use Inertia\Inertia;
  * Class CityController
  * @package App\Http\Controllers
  */
-class CityController extends Controller
+class CityController extends AbstractCRUDController
 {
 
     use HandlesAttachmentsTrait;
     use HandlesAttachedImageTrait;
 
-    protected $model = City::class;
+    protected string $modelClass = City::class;
 
     public function __construct()
     {
@@ -61,136 +62,13 @@ class CityController extends Controller
     }
 
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Inertia\Response
-     */
-    public function index(Request $request)
-    {
-        if (Auth::user()->is_admin) {
-            $cities = City::orderBy('name')->get();
+    protected function getModelsForIndex(): Collection {
+        $user = Auth::user();
+        if ($user->isAdmin) {
+            return ($this->modelClass)::all();
         } else {
-            $cities = Auth::user()->cities->sortBy('name');
+            return $user->cities()->get();
         }
-        foreach ($cities as $cityKey => $city) {
-            $cities[$cityKey]['canEdit'] = Auth::user()->can('update', $city);
-            $cities[$cityKey]['canDelete'] = Auth::user()->can('delete', $city);
-        }
-
-        return Inertia::render('Admin/City/CityIndex', ['cities' => array_values($cities->all())]);
-    }
-
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        $city = City::create(['name' => 'Neue-Kirchengemeinde '.(City::count()), 'default_ministries' => []]);
-        return redirect()->route('city.edit', $city);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-    }
-
-    /**
-     * Validate a city request
-     * @return mixed
-     */
-    protected function validateRequest()
-    {
-        $data = request()->validate(
-            [
-                'name' => 'required|max:255',
-                'public_events_calendar_url' => 'nullable',
-                'default_offering_goal' => 'nullable',
-                'default_offering_description' => 'nullable',
-                'default_funeral_offering_goal' => 'nullable',
-                'default_funeral_offering_description' => 'nullable',
-                'default_wedding_offering_goal' => 'nullable',
-                'default_wedding_offering_description' => 'nullable',
-                'op_domain' => 'nullable',
-                'op_customer_key' => 'nullable',
-                'op_customer_token' => 'nullable',
-                'podcast_title' => 'nullable|string',
-                'homepage' => 'nullable|string',
-                'podcast_owner_name' => 'nullable|string',
-                'podcast_owner_email' => 'nullable|email',
-                'youtube_channel_url' => 'nullable|string',
-                'konfiapp_apikey' => 'nullable|string',
-                'youtube_active_stream_id' => 'nullable|string',
-                'youtube_passive_stream_id' => 'nullable|string',
-                'youtube_auto_startstop' => 'nullable|int',
-                'youtube_cutoff_days' => 'nullable|int',
-                'default_offering_url' => 'nullable|string',
-                'youtube_self_declared_for_children' => 'nullable|int',
-                'communiapp_url' => 'nullable|string',
-                'communiapp_token' => 'nullable|string',
-                'communiapp_default_group_id' => 'nullable|int',
-                'communiapp_use_outlook' => 'nullable|bool',
-                'communiapp_use_op' => 'nullable|bool',
-                'konfiapp_default_type' => 'nullable|string',
-                'logo' => 'nullable|string',
-                'official_name' => 'nullable|string',
-                'default_ministries' => 'nullable',
-                'default_ministries.*' => 'nullable|string',
-            ]
-        );
-        return $data;
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param City $city
-     * @return Response
-     */
-    public function edit(City $city)
-    {
-        if ($city->google_access_token) {
-            $streams = YoutubeIntegration::get($city)->getAllStreams();
-        } else {
-            $streams = [];
-        }
-
-        return Inertia::render('Admin/City/CityEditor', compact('city', 'streams'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param City $city
-     * @param Request $request
-     * @return Response
-     */
-    public function update(Request $request, City $city)
-    {
-        $city->update($this->validateRequest());
-        $this->handleIndividualAttachment($request, $city, 'podcast_logo');
-        $this->handleIndividualAttachment($request, $city, 'sermon_default_image');
-        return redirect()->route('cities.index')->with('success', 'Die Kirchengemeinde wurde geändert.');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param City $city
-     * @return Response
-     */
-    public function destroy(City $city)
-    {
-        $city->delete();
-        return redirect()->route('cities.index')->with('success', 'Die Kirchengemeinde wurde gelöscht.');
     }
 
 

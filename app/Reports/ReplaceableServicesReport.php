@@ -30,15 +30,15 @@
 
 namespace App\Reports;
 
-use App\Baptism;
-use App\Funeral;
-use App\ListedPerson;
-use App\Ministry;
-use App\Participant;
-use App\Service;
-use App\Team;
-use App\User;
-use App\Wedding;
+use App\Services\MinistryService;
+use App\Models\People\ListedPerson;
+use App\Models\People\Participant;
+use App\Models\People\Team;
+use App\Models\People\User;
+use App\Models\Rites\Baptism;
+use App\Models\Rites\Funeral;
+use App\Models\Rites\Wedding;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -161,7 +161,7 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
                 })
             ->where('user_id', $user->id)->orderBy('date')->get();
 
-        $ministries = Ministry::POMA();
+        $ministries = MinistryService::POMA();
         return Inertia::render('Report/ReplaceableServices/Wizard', compact('user', 'people', 'services', 'ministries', 'teams'));
     }
 

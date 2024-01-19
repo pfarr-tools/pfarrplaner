@@ -30,8 +30,8 @@
 
 namespace Tests\Feature;
 
-use App\Attachment;
-use App\Funeral;
+use App\Models\Rites\Funeral;
+use App\Models\Service;
 use App\Traits\TestWithCredentialsTrait;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -58,7 +58,7 @@ class AttachmentFeatureTest extends TestCase
      */
     public function testFuneralAttachmentCanBeCreated()
     {
-        $funeral = factory(Funeral::class)->create();
+        $funeral = Funeral::factory()->for(Service::factory(), 'service')->create();
         $this->actingAs($this->user)
             ->post(route('funeral.attach', $funeral->id), $this->fakeFuneralAttachmentData())
             ->assertStatus(200)
@@ -75,7 +75,7 @@ class AttachmentFeatureTest extends TestCase
      */
     public function testFuneralAttachmentCanBeRemoved()
     {
-        $funeral = factory(Funeral::class)->create();
+        $funeral = Funeral::factory()->for(Service::factory(), 'service')->create();
         $this->actingAs($this->user)
             ->post(route('funeral.attach', $funeral->id), $this->fakeFuneralAttachmentData())
             ->assertStatus(200)

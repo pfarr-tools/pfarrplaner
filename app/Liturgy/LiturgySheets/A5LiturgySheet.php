@@ -31,8 +31,6 @@
 namespace App\Liturgy\LiturgySheets;
 
 
-use App\Service;
-
 class A5LiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Ablaufplan (DIN A5)';

@@ -38,20 +38,18 @@
 namespace App\Http\Controllers\Api;
 
 
-use App\City;
-use App\Day;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ServiceRequest;
-use App\Liturgy;
-use App\Mail\ServiceUpdated;
-use App\Service;
-use App\ServiceGroup;
-use App\Subscription;
+use App\Models\Calendar\Day;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Service;
+use App\Models\ServiceGroup;
+use App\Services\LiturgyService;
 use App\Traits\HandlesAttachmentsTrait;
-use App\User;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * Class ServiceController
@@ -86,7 +84,7 @@ class ServiceController extends Controller
         $service->load(
             ['location', 'city', 'participants', 'weddings', 'funerals', 'baptisms', 'day', 'tags', 'serviceGroups']
         );
-        $service->liturgy = Liturgy::getDayInfo($service->day);
+        $service->liturgy = LiturgyService::getDayInfo($service->day);
         if (isset($liturgy['title']) && ($service->day->name == '')) {
             $service->day->name = $service->liturgy['title'];
         }
@@ -113,7 +111,7 @@ class ServiceController extends Controller
 
 
         foreach ($services as $service) {
-            $service->liturgy = Liturgy::getDayInfo($service->day);
+            $service->liturgy = LiturgyService::getDayInfo($service->day);
         }
         return response()->json(compact('services'))->header('Access-Control-Allow-Origin', '*');
     }

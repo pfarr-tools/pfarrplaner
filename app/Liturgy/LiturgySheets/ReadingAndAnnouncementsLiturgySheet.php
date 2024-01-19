@@ -34,17 +34,16 @@ namespace App\Liturgy\LiturgySheets;
 use App\Documents\Word\DefaultWordDocument;
 use App\Liturgy\Bible\BibleText;
 use App\Liturgy\Bible\ReferenceParser;
-use App\Liturgy\Item;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Replacement\Replacement;
-use App\Ministry;
-use App\Service;
+use App\Models\Liturgy\Item;
+use App\Services\MinistryService;
+use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\Element\Table;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Shared\Converter;
-use PhpOffice\PhpWord\Shared\Html;
 use PhpOffice\PhpWord\SimpleType\JcTable;
 
 class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
@@ -94,7 +93,7 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
 
         foreach (['P', 'O', 'M', 'Schriftlesung'] as $category) {
             if (count($this->service->participantsByCategory($category))) {
-                $doc->getSection()->addText(Ministry::title($category).":\t"
+                $doc->getSection()->addText(MinistryService::title($category).":\t"
                                             .$this->renderParticipantRow($category)."\n");
             }
         }

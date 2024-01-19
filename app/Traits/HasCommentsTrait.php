@@ -38,8 +38,8 @@
 namespace App\Traits;
 
 
-use App\Comment;
-use App\User;
+use App\Models\Comment;
+use App\Models\People\User;
 use Illuminate\Support\Facades\Auth;
 
 /**

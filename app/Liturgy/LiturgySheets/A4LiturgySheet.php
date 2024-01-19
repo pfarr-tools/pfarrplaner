@@ -31,7 +31,7 @@
 namespace App\Liturgy\LiturgySheets;
 
 
-use App\Service;
+use App\Models\Service;
 
 class A4LiturgySheet extends AbstractLiturgySheet
 {

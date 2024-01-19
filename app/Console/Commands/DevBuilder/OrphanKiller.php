@@ -30,21 +30,21 @@
 
 namespace App\Console\Commands\DevBuilder;
 
-use App\Absence;
-use App\Baptism;
-use App\Booking;
-use App\CalendarConnection;
-use App\Funeral;
-use App\Location;
-use App\Parish;
-use App\Replacement;
-use App\SeatingRow;
-use App\SeatingSection;
-use App\Service;
-use App\StreetRange;
-use App\Subscription;
-use App\UserSetting;
-use App\Wedding;
+use App\Models\Calendar\External\CalendarConnection;
+use App\Models\Leave\Absence;
+use App\Models\Leave\Replacement;
+use App\Models\Location;
+use App\Models\Parish;
+use App\Models\Places\StreetRange;
+use App\Models\Rites\Baptism;
+use App\Models\Rites\Funeral;
+use App\Models\Rites\Wedding;
+use App\Models\Seating\Booking;
+use App\Models\Seating\SeatingRow;
+use App\Models\Seating\SeatingSection;
+use App\Models\Service;
+use App\Models\Subscription;
+use App\Models\UserSetting;
 use Illuminate\Console\Command;
 
 class OrphanKiller extends Command

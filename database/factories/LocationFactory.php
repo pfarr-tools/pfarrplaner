@@ -28,18 +28,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(
-    \App\Location::class,
-    function (Faker $faker) {
-        $name = $faker->firstName('male');
-        $name2 = $faker->firstName('male');
+
+use App\Models\Location;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class LocationFactory extends Factory
+{
+
+    protected $model = Location::class;
+
+    public function definition()
+    {
+        $name = fake()->firstName();
+        $name2 = fake()->firstName();
         return [
             'name' => $name . (substr($name, -1) == 's' ? '' : 's') . 'kirche',
-            'city_id' => factory(\App\City::class),
             'default_time' => '',
             'cc_default_location' => $name2 . (substr($name2, -1) == 's' ? '' : 's') . 'kirche',
         ];
     }
-);
+
+}
+
+

@@ -31,10 +31,8 @@
 namespace App\Http\Controllers;
 
 use App\Facades\Settings;
-use App\User;
-use App\UserSetting;
+use App\Models\People\User;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class SettingsController extends Controller
 {

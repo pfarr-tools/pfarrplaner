@@ -31,10 +31,10 @@
 namespace App\Seating;
 
 
-use App\Booking;
-use App\Location;
-use App\SeatingSection;
-use App\Service;
+use App\Models\Location;
+use App\Models\Seating\Booking;
+use App\Models\Seating\SeatingSection;
+use App\Models\Service;
 use Illuminate\Support\Collection;
 
 class RowBasedSeatFinder extends AbstractSeatFinder

@@ -30,8 +30,8 @@
 
 namespace App\Policies;
 
-use App\Day;
-use App\User;
+use App\Models\Calendar\Day;
+use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**

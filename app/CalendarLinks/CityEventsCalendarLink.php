@@ -38,11 +38,11 @@
 namespace App\CalendarLinks;
 
 
-use App\City;
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
-use App\Service;
-use App\User;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

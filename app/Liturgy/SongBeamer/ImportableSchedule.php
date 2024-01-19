@@ -30,7 +30,7 @@
 
 namespace App\Liturgy\SongBeamer;
 
-use App\Liturgy\Item;
+use App\Models\Liturgy\Item;
 use ErrorException;
 use ZipArchive;
 

@@ -29,7 +29,7 @@
  */
 
 use App\UI\Modules\Modules;
-use App\User;
+use App\Models\People\User;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration {

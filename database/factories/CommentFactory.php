@@ -28,13 +28,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(
-    App\Comment::class,
-    function (Faker $faker) {
-        return [
-            //
-        ];
+use App\Models\Comment;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class CommentFactory extends Factory
+{
+    protected $model = Comment::class;
+
+    public function definition()
+    {
+        // TODO: Implement definition() method.
+        return [];
     }
-);
+
+}

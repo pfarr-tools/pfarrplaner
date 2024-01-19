@@ -30,7 +30,7 @@
 
 namespace App\Http\Controllers\DAV\Backends;
 
-use App\User;
+use App\Models\People\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 

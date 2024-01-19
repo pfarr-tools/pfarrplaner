@@ -30,7 +30,7 @@
 
 namespace App\Providers;
 
-use App\User;
+use App\Models\People\User;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
@@ -86,6 +86,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
+        Route::middleware('api')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api_auto.php'));
         Route::prefix('api')
             ->middleware('api')
             ->namespace($this->namespace)

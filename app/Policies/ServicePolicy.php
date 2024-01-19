@@ -30,9 +30,9 @@
 
 namespace App\Policies;
 
+use App\Models\Service;
 use App\Providers\AuthServiceProvider;
-use App\Service;
-use App\User;
+use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**

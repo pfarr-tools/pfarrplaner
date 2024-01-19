@@ -30,19 +30,20 @@
 
 namespace App\UI\Modules;
 
-use App\City;
-use App\Liturgy\Psalm;
-use App\Liturgy\Song;
-use App\Liturgy\Songbook;
-use App\Liturgy\Text;
-use App\Location;
-use App\Parish;
-use App\Service;
-use App\Tag;
-use App\Team;
-use App\User;
+use App\Models\Liturgy\Psalm;
+use App\Models\Liturgy\Song;
+use App\Models\Liturgy\Songbook;
+use App\Models\Liturgy\Text;
+use App\Models\Location;
+use App\Models\Parish;
+use App\Models\People\Team;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Service;
+use App\Models\Tag;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class AdminModule extends AbstractModule
@@ -68,6 +69,17 @@ class AdminModule extends AbstractModule
         $adminMenu = [];
         $user = Auth::user();
         $route = Route::currentRouteName();
+
+        // auto-register model routes
+        foreach (\File::allFiles(app_path('Models')) as $file) {
+            if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract'))) {
+                $className = substr('App\\Models\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+                if (method_exists($className, 'getAdminModuleConfig')) {
+                    if ($config = $className::getAdminModuleConfig()) $adminMenu[] = $config;
+                }
+            }
+        };
+
         if ($user->can('index', User::class)) {
             $adminMenu[] = [
                 'text' => 'Benutzer',
@@ -92,15 +104,6 @@ class AdminModule extends AbstractModule
                 'icon' => 'mdi mdi-badge-account',
                 'url' => route('roles.index'),
                 'active' => $route == 'roles.index',
-                'inertia' => true,
-            ];
-        }
-        if ($user->can('index', City::class)) {
-            $adminMenu[] = [
-                'text' => 'Kirchengemeinden',
-                'icon' => 'mdi mdi-church',
-                'url' => route('cities.index'),
-                'active' => $route == 'cities.index',
                 'inertia' => true,
             ];
         }

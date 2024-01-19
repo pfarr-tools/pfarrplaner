@@ -31,7 +31,7 @@
 namespace App\Liturgy\Replacement;
 
 
-use App\Service;
+use App\Models\Service;
 
 class Replacement
 {

@@ -30,7 +30,7 @@
 
 namespace App\Calendars\SyncEngines;
 
-use App\CalendarConnection;
+use App\Models\Calendar\External\CalendarConnection;
 
 /**
  * Class SyncEngines

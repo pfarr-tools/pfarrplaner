@@ -30,22 +30,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Attachment;
-use App\City;
-use App\Day;
 use App\Events\ServiceUpdated;
 use App\Liturgy\PronounSets\PronounSets;
-use App\Location;
-use App\Service;
+use App\Models\Attachment;
+use App\Models\Calendar\Day;
+use App\Models\Location;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Rites\Wedding;
+use App\Models\Service;
 use App\Traits\HandlesAttachmentsTrait;
-use App\User;
-use App\Wedding;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;

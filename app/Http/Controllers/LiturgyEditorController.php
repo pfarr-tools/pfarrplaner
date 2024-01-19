@@ -30,17 +30,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Liturgy\Block;
-use App\Liturgy\Item;
 use App\Liturgy\LiturgySheets\AbstractLiturgySheet;
 use App\Liturgy\LiturgySheets\LiturgySheets;
 use App\Liturgy\Replacement\Replacement;
 use App\Liturgy\Resources\BlockResourceCollection;
-use App\LiturgyInfo;
-use App\Participant;
-use App\Sermon;
-use App\Service;
-use App\User;
+use App\Models\Liturgy\Block;
+use App\Models\Liturgy\Item;
+use App\Models\LiturgyInfo;
+use App\Models\People\Participant;
+use App\Models\Sermon;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;

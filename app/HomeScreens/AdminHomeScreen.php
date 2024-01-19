@@ -38,8 +38,8 @@
 namespace App\HomeScreens;
 
 
-use App\Service;
-use App\User;
+use App\Models\Service;
+use App\Models\People\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Auth;

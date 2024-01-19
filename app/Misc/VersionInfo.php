@@ -137,7 +137,7 @@ class VersionInfo
                 [
                     'date' => Carbon::createFromFormat('d.m.Y', '14.11.2019'),
                     'text' => 'Für jede <a href="' . route(
-                            'cities.index'
+                            'admin.cities.index'
                         ) . '">Kirchengemeinde</a> können nun Standard-Opferzwecke für Beerdigungen und Trauungen angegeben werden. Diese werden im Opferplan separat aufgelistet und bei entsprechenden Gottesdiensten mit leerem Opferzweck-Feld automatisch eingesetzt.',
                 ],
                 [

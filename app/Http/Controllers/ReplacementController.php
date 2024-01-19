@@ -30,7 +30,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Replacement;
+use App\Models\Leave\Replacement;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 

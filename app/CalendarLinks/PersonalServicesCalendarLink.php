@@ -38,8 +38,8 @@
 namespace App\CalendarLinks;
 
 
-use App\Service;
-use App\User;
+use App\Models\Service;
+use App\Models\People\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 

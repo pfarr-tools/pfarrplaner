@@ -28,7 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use App\Liturgy\Text;
+use App\Models\Liturgy\Text;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration {

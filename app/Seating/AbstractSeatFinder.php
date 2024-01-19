@@ -31,8 +31,8 @@
 namespace App\Seating;
 
 
-use App\Booking;
-use App\Service;
+use App\Models\Seating\Booking;
+use App\Models\Service;
 use Illuminate\Support\Collection;
 
 class AbstractSeatFinder

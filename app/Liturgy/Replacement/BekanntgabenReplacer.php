@@ -33,7 +33,7 @@ namespace App\Liturgy\Replacement;
 
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
-use App\Service;
+use App\Models\Service;
 use App\Tools\StringTool;
 use Carbon\Carbon;
 

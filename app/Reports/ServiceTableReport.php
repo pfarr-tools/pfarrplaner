@@ -30,19 +30,15 @@
 
 namespace App\Reports;
 
-use App\City;
-use App\Day;
-use App\Liturgy;
-use App\Ministry;
-use App\Participant;
-use App\Service;
+use App\Services\LiturgyService;
+use App\Services\MinistryService;
+use App\Models\Calendar\Day;
+use App\Models\Places\City;
+use App\Models\Service;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 use Inertia\Inertia;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -81,7 +77,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
     public function setup()
     {
         $cities = Auth::user()->cities;
-        $ministries = Ministry::selectList();
+        $ministries = MinistryService::selectList();
         return Inertia::render('Report/ServiceTable/Setup', compact('cities', 'ministries'));
     }
 
@@ -363,7 +359,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
         $row = 3;
         foreach ($serviceList as $services) {
             foreach ($services as $service) {
-                $liturgy = Liturgy::getDayInfo($service->date, true);
+                $liturgy = LiturgyService::getDayInfo($service->date, true);
 
                 $row += 2;
                 $row2 = $row + 1;

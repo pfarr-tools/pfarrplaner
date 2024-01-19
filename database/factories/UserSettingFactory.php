@@ -28,13 +28,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Faker\Generator as Faker;
+namespace Database\Factories;
 
-$factory->define(
-    App\UserSetting::class,
-    function (Faker $faker) {
-        return [
-            //
-        ];
+use App\Models\UserSetting;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class UserSettingFactory extends Factory
+{
+    use HasFactory;
+
+    protected $model = UserSetting::class;
+
+    public function definition()
+    {
+        // TODO: Implement definition() method.
+        return [];
     }
-);
+
+}

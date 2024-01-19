@@ -28,11 +28,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use App\Liturgy\Item;
-use App\Liturgy\Song;
-use App\Liturgy\Songbook;
-use App\Liturgy\SongReference;
-use App\Service;
+use App\Models\Liturgy\Item;
+use App\Models\Liturgy\Song;
+use App\Models\Liturgy\Songbook;
+use App\Models\Liturgy\SongReference;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

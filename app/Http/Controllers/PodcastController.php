@@ -30,8 +30,8 @@
 
 namespace App\Http\Controllers;
 
-use App\City;
-use App\Service;
+use App\Models\Places\City;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 

@@ -30,8 +30,9 @@
 
 namespace App\Providers;
 
-use App\QueryLog;
+use App\Services\QueryLogService;
 use App\Seating\SeatingValidators;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -39,6 +40,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 /**
@@ -54,6 +56,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+
+        Factory::guessFactoryNamesUsing(function (string $modelName) {
+            return Str::replace('App\\Models\\', '\\Database\\Factories\\', $modelName).'Factory';
+        });
+
+
         Blade::withoutComponentTags();
         Blade::aliasComponent('partials.form.tabheader', 'tabheader');
         Blade::aliasComponent('partials.form.tabheaders', 'tabheaders');
@@ -113,7 +121,7 @@ class AppServiceProvider extends ServiceProvider
         // seating Validators
         SeatingValidators::register();
 
-        QueryLog::register();
+        QueryLogService::register();
 
         Inertia::setRootView('inertia-app');
 
