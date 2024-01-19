@@ -102,6 +102,14 @@ class LiturgyInfo extends Model
         'litTextsPerikope4Link',
         'litTextsPerikope5Link',
         'litTextsPerikope6Link',
+        'currentPerikope',
+        'currentPerikopeLink',
+        'songs',
     ];
+
+    protected $casts = [
+        'songs' => 'array'
+    ];
+
 
 }

@@ -78,10 +78,15 @@ class GetLiturgyInfo extends Command
         $list = json_decode(Storage::get('liturgy.json'), true)['content']['days'];
         foreach ($list as $id => $data) {
             $data['date'] = $data['dateSql'];
+            unset($data['dateSql']);
             $data['id'] = $id;
+            $data['currentPerikope'] = $data['litTextsPerikope'.$data['perikope']];
+            $data['currentPerikopeLink'] = $data['litTextsPerikope'.$data['perikope'].'Link'];
             if (!LiturgyInfo::where('id', $id)->where('date', $data['date'])->count()) {
                 $ctr++;
                 LiturgyInfo::create($data);
+            } else {
+                LiturgyInfo::where('id', $id)->where('date', $data['date'])->update($data);
             }
         }
 
