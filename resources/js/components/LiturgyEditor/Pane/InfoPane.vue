@@ -87,6 +87,15 @@
                         <div v-if="liturgy['songs']" v-for="song in liturgy['songs']">
                             {{ song.number }} {{ song.title }}
                         </div>
+                        <div v-if="liturgy.links">
+                            <div class="dropdown">
+                                <button type="button" id="dropdownLinksMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Links zu Predigthilfen" class="btn btn-light dropdown-toggle"><span data-v-5d98b2c4="" class="mdi mdi-text"></span> Predigthilfen</button>
+                                <div aria-labelledby="dropdownLinksMenuButton" class="dropdown-menu">
+                                    <a v-for="(link,linkTitle) in liturgy.links" target="_blank"
+                                        :href="link" class="dropdown-item"> <span class="mdi mdi-text"></span> {{ linkTitle }}</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

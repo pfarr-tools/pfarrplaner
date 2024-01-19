@@ -105,10 +105,12 @@ class LiturgyInfo extends Model
         'currentPerikope',
         'currentPerikopeLink',
         'songs',
+        'links',
     ];
 
     protected $casts = [
-        'songs' => 'array'
+        'songs' => 'array',
+        'links' => 'array',
     ];
 
 
