@@ -65,7 +65,6 @@ class City extends AbstractModel
 
     public static $adminIcon = 'mdi mdi-church';
 
-    protected static $modelKeyInRoute = 'name';
 
 
     /**
