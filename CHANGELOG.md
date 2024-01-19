@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.0.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.0.0...v2024.0.1) (2024-01-19)
+
+
+### Bug Fixes
+
+* Kalender lädt keine Einträge mehr ([cdfa9ba](https://codeberg.org/pfarr.tools/pfarrplaner/commit/cdfa9baaa5475c7e93003be9adbbbe0921c81c08))
+
 ## [2024.0.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.39.3...v2024.0.0) (2024-01-19)
 
 ### [2023.39.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2023.39.2...v2023.39.3) (2023-12-13)
