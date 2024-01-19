@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.1.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.0.1...v2024.1.0) (2024-01-19)
+
+
+### Features
+
+* Auf Predigtressourcen verlinken ([c2f0e61](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c2f0e61ea01ef8f33538af99c1496dd8bc798afd)), closes [#395](https://codeberg.org/pfarr.tools/pfarrplaner/issues/395)
+
+
+### Bug Fixes
+
+* Fehlende Wochenlieder und Predigttexte ([d55b8a5](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d55b8a504109a5de254d0a5dac58fd69158fc563)), closes [#397](https://codeberg.org/pfarr.tools/pfarrplaner/issues/397) [#396](https://codeberg.org/pfarr.tools/pfarrplaner/issues/396)
+
 ### [2024.0.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.0.0...v2024.0.1) (2024-01-19)
 
 
