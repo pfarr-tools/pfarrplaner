@@ -54,11 +54,28 @@
                               class="badge bg-light">{{ subject.subjectTitle }}</span>
                                 </div>
                             </div>
-                            <div class="col-3 col-md-12 text-end text-md-left">
-                                <button class="btn btn-sm btn-light" @click.prevent="$emit('info')"
-                                        title="Weitere Informationen">
-                                    <span class="mdi mdi-information"></span> <span class="d-none d-md-inline">Weitere Infos</span>
-                                </button>
+                        </div>
+                        <div class="dropdown">
+                            <button type="button" id="dropdownLinksMenuButton" data-bs-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false" title="Links zu Predigthilfen"
+                                    class="btn btn-light btn-sm mt-1 dropdown-toggle"><span data-v-5d98b2c4=""
+                                                                                class="mdi mdi-text"></span>
+                                Materialsammlung
+                            </button>
+                            <div aria-labelledby="dropdownLinksMenuButton" class="dropdown-menu">
+                                <a :href="'https://www.kirchenjahr-evangelisch.de/article.php#'+liturgy['dayId']" class="dropdown-item"
+                                   target="_blank">
+                                    <div class="fw-bold">Kirchenjahr Evangelisch</div>
+                                    <div>{{ liturgy['title'] }}</div>
+                                </a>
+                                <a v-for="(link,linkTitle) in liturgy.links" target="_blank"
+                                   :href="link" class="dropdown-item">
+                                    <div class="fw-bold">{{ linkTitle.substring(1, linkTitle.indexOf(']')) }}</div>
+                                    <div v-if="getLinkAuthor(linkTitle)" class="text-small fst-italic">
+                                        {{ getLinkAuthor(linkTitle) }}
+                                    </div>
+                                    <div>{{ getLinkTitle(linkTitle) }}</div>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -87,15 +104,6 @@
                         <div v-if="liturgy['songs']" v-for="song in liturgy['songs']">
                             {{ song.number }} {{ song.title }}
                         </div>
-                        <div v-if="liturgy.links">
-                            <div class="dropdown">
-                                <button type="button" id="dropdownLinksMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Links zu Predigthilfen" class="btn btn-light dropdown-toggle"><span data-v-5d98b2c4="" class="mdi mdi-text"></span> Predigthilfen</button>
-                                <div aria-labelledby="dropdownLinksMenuButton" class="dropdown-menu">
-                                    <a v-for="(link,linkTitle) in liturgy.links" target="_blank"
-                                        :href="link" class="dropdown-item"> <span class="mdi mdi-text"></span> {{ linkTitle }}</a>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -110,7 +118,7 @@
                     <div class="col-md-4 text-end">
                         <div class="text-start">
                             <proprium-select label="Proprium auswählen" @input="setAlternativeProprium"
-                                v-model="myService.liturgy_info_id" :liturgy-info="liturgyInfo" />
+                                             v-model="myService.liturgy_info_id" :liturgy-info="liturgyInfo"/>
                         </div>
                     </div>
                 </div>
@@ -167,6 +175,17 @@ export default {
                 .then(response => {
                     window.location.reload();
                 });
+        },
+        getLinkTitle(link) {
+            if (link.includes(']')) link = link.substring(link.indexOf(']') + 1).trim();
+            if (link.includes('(')) link = link.substring(0, link.indexOf('(')).trim();
+            return link;
+        },
+        getLinkAuthor(link) {
+            if (!link.includes('(')) return '';
+            link = (link.substring(link.indexOf('(') + 1, link.indexOf(')')));
+            if (isNaN(link.substring(0, 1))) return link;
+            return '';
         }
     }
 }
@@ -183,5 +202,9 @@ export default {
     min-height: 10px;
     border-radius: 5px;
     display: inline-block;
+}
+
+.text-small {
+    font-size: .8em;
 }
 </style>

@@ -59,13 +59,11 @@
                       :auto-focus-block="autoFocusBlock" :auto-focus-item="autoFocusItem"
                       :ministries="ministries" :markers="markers"
                       @update-focus="updateFocus"/>
-        <info-window v-if="infoWindow" @close="infoWindow = false" :service="service"/>
     </admin-layout>
 </template>
 
 <script>
 import moment from 'moment';
-import InfoWindow from "../components/LiturgyEditor/Pane/InfoWindow";
 import FormCheck from "../components/Ui/forms/FormCheck";
 import FormInput from "../components/Ui/forms/FormInput";
 import SaveButton from "../components/Ui/buttons/SaveButton.vue";
@@ -100,7 +98,6 @@ export default {
         SaveButton,
         FormInput,
         FormCheck,
-        InfoWindow,
         InfoPane,
         TemplateInfoPane,
         LiturgyTree,

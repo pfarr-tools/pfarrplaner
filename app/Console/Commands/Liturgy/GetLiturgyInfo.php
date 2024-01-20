@@ -31,6 +31,7 @@
 namespace App\Console\Commands\Liturgy;
 
 use App\Models\LiturgyInfo;
+use App\StudyHelpers\AbstractStudyHelper;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -70,8 +71,18 @@ class GetLiturgyInfo extends Command
      */
     public function handle()
     {
-        $this->getOutput()->section('Verzeichnisse lesen');
+        // get StudyHelper providers
+        $studyHelperProviders = [];
+        foreach (\File::allFiles(app_path('StudyHelpers')) as $file) {
+            if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract'))) {
+                $className = substr('App\\StudyHelpers\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+                $studyHelperProvider = new $className($this);
+                $studyHelperProviders[$studyHelperProvider->title] = $studyHelperProvider;
+            }
+        };
 
+
+        $this->getOutput()->section('Verzeichnisse lesen');
         $this->processItem('Liturgische Informationen (kirchenjahr-evangelisch.de)', function() {
             Storage::put(
                 'liturgy.json',
@@ -80,8 +91,11 @@ class GetLiturgyInfo extends Command
                 )
             );
         });
-
-        $efp = $this->processItem('Exegese für die Predigt (bibelwissenschaft.de)', [$this, 'getEFPLinks']);
+        foreach ($studyHelperProviders as $studyHelperProvider) {
+            $this->processItem($studyHelperProvider->title, function () use ($studyHelperProvider) {
+                $studyHelperProvider->read();
+            });
+        }
 
 
         $this->getOutput()->section('Liturgiedatenbank aktualisieren');
@@ -92,13 +106,10 @@ class GetLiturgyInfo extends Command
             $formattedDate = $data['date'];
 
             $data['links'] = [];
-            if (isset($efp[$formattedDate])) {
-                $data['links']['[Exegese für die Predigt] '.$efp[$formattedDate]['date'].': '.$efp[$formattedDate]['ref'].' (bibelwissenschaft.de)'] = $efp[$formattedDate]['url'];
+            /** @var AbstractStudyHelper $studyHelperProvider */
+            foreach ($studyHelperProviders as $studyHelperProvider) {
+                $data = $studyHelperProvider->getLinks($data);
             }
-            $data['links'] = $this->processItem('Suche nach Predigthilfe für '.$data['title'], function() use ($data) {
-                return array_merge($data['links'], $this->getPMWueLinks($this->getDaySlug($data)));
-            });
-
             ksort($data['links']);
 
             $data['date'] = $data['dateSql'];
@@ -128,100 +139,6 @@ class GetLiturgyInfo extends Command
         }
     }
 
-    protected function getEFPLinks(): array
-    {
-        $client = new Client();
-        try {
-            $result = $client->get('https://www.bibelwissenschaft.de/efp');
-        } catch (\Exception $e) {
-            return [];
-        }
-        if (!$result->getStatusCode() == 200) {
-            return [];
-        }
-
-        $table = preg_match('/<table>(.*)<\/table>/m', $result->getBody()->getContents(), $matches);
-        $doc = new \DOMDocument();
-        $doc->loadHTML(utf8_decode($matches[0]));
-
-        $records = [];
-        foreach ($doc->getElementsByTagName('tr') as $tr) {
-            $colIdx = 0;
-            $record = [];
-            foreach ($tr->getElementsByTagName('td') as $td) {
-                switch ($colIdx) {
-                    case 0:
-                        $record['url'] = 'https://www.bibelwissenschaft.de' . $td->childNodes[0]->getAttribute('href');
-                        break;
-                    case 1:
-                        $record['date'] = $td->nodeValue;
-                        break;
-                    case 2:
-                        $record['ref'] = $td->nodeValue;
-                        break;
-                }
-                $colIdx++;
-            }
-            if ($record['date']) {
-                $records[$record['date']] = $record;
-            }
-        }
-        return $records;
-    }
-
-    protected function getDaySlug($data): string
-    {
-        if (!isset($data['title'])) {
-            return '';
-        }
-        $title = Str::contains($data['title'], '(') ? trim(Str::before($data['title'], '(')) : trim($data['title']);
-        $title = Str::replace('So.', 'Sonntag', $title);
-        $title = Str::replace('. Advent', '. Sonntag im Advent', $title);
-        return Str::slug($title);
-    }
-
-    protected function getPMWueLinks($slug)
-    {
-        if (Cache::has('pmwue-'.$slug)) {
-            return Cache::get('pmwue-'.$slug);
-        } else {
-            $client = new Client();
-            try {
-                $result = $client->get(
-                    'https://www.fachstelle-gottesdienst.de/predigt/predigtmeditationen-aus-wuerttemberg/' . $slug
-                );
-            } catch (\Exception $e) {
-                return [];
-            }
-            if (!$result->getStatusCode() == 200) {
-                return [];
-            }
-            $links = [];
-
-            $doc = new \DOMDocument();
-            $doc->loadHTML(
-                utf8_decode(Str::between($result->getBody()->getContents(), '<!--TYPO3SEARCH_begin-->', '<!--TYPO3SEARCH_end-->'))
-            );
-            $finder = new \DomXPath($doc);
-            $sections = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' section ')]");
-            $sectionIdx = 0;
-            foreach ($sections as $section) {
-                if ($sectionIdx > 0) {
-                    foreach ($section->getElementsByTagName('h2') as $h2) {
-                        $sectionTitle = (trim($h2->nodeValue));
-                    }
-                    foreach ($section->getElementsByTagName('a') as $link) {
-                        $url = $link->getAttribute('href');
-                        if (!Str::startsWith($url, 'http')) $url = 'https://www.fachstelle-gottesdienst.de/'.$url;
-                        $links['[' . $sectionTitle . '] ' . trim($link->nodeValue)] = $url;
-                    }
-                }
-                $sectionIdx++;
-            }
-            Cache::put('pmwue-'.$slug, $links);
-            return $links;
-        }
-    }
 
     protected function processItem($title, $callback) {
         $this->getOutput()->write(Str::padRight($title, 75));
