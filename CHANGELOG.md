@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.2.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.1.0...v2024.2.0) (2024-01-20)
+
+
+### Features
+
+* Auf Predigtressourcen verlinken ([66edd71](https://codeberg.org/pfarr.tools/pfarrplaner/commit/66edd71c38cd45520e481bc74dbb110b80643c54)), closes [#395](https://codeberg.org/pfarr.tools/pfarrplaner/issues/395)
+
 ## [2024.1.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.0.1...v2024.1.0) (2024-01-19)
 
 
