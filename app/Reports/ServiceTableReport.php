@@ -35,7 +35,7 @@ use App\Services\MinistryService;
 use App\Models\Calendar\Day;
 use App\Models\Places\City;
 use App\Models\Service;
-use App\User;
+use App\Models\People\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

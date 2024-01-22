@@ -31,7 +31,7 @@
 namespace App\Mail;
 
 use App\Models\Service;
-use App\User;
+use App\Models\People\User;
 
 /**
  * Class ServiceUpdated

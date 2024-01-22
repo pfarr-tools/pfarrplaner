@@ -36,7 +36,7 @@ use App\Services\MinistryService;
 use App\Models\Location;
 use App\Models\People\Team;
 use App\Models\Service;
-use App\User;
+use App\Models\People\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
