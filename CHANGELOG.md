@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.2.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.2.1...v2024.2.2) (2024-01-27)
+
+
+### Bug Fixes
+
+* API-Calls mit access token produzieren nur Fehler ([518ce3b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/518ce3b04b7fee31b1f77f42782b2a65983f76f4))
+
 ### [2024.2.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.2.0...v2024.2.1) (2024-01-22)
 
 
