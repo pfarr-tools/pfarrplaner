@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.2.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.2.2...v2024.2.3) (2024-01-29)
+
+
+### Bug Fixes
+
+* Antwortformular für Dienstanfrage hat kein Styling ([cf64a48](https://codeberg.org/pfarr.tools/pfarrplaner/commit/cf64a48f991f90ca8a9089035717fa580af4e93e))
+* Dienstanfragen können nicht mehr beantwortet werden- ([69a942f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/69a942f1e82fe1631776419a630952f17e95b5ec))
+* Formular für Dienstanfragen berücksichtigt keine Ortsauswahl bei der Liste von Personen ([7137a18](https://codeberg.org/pfarr.tools/pfarrplaner/commit/7137a188380c0784b48afc80cb72beeb3d800fb4))
+* Syntaxfehler ([37d9f86](https://codeberg.org/pfarr.tools/pfarrplaner/commit/37d9f86426ffd1eed9c012ab4e8673471802f80d))
+
 ### [2024.2.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.2.1...v2024.2.2) (2024-01-27)
 
 
