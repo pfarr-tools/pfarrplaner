@@ -59,7 +59,7 @@
 
         <div v-if="usersLoading"><span class="mdi mdi-spin mdi-loading"></span> Mitarbeiterliste wird geladen...</div>
         <div v-if="(!usersLoading)">
-            <people-select label="Empfänger" :people="users" :teams="myTeams" v-model="recipients" :key="usersLoaded"/>
+            <people-select label="Empfänger" :people="users" :teams="myTeams" v-model="recipients" :key="usersLoaded" :city="myCityObject"/>
         </div>
 
         <div v-if="servicesLoading"><span class="mdi mdi-spin mdi-loading"></span> Gottesdienstliste wird geladen...
@@ -118,6 +118,12 @@ export default {
             }
             return s;
         },
+        myTeams() {
+            return this.teams[this.myCity] || [];
+        },
+        myCityObject() {
+            return this.cities.filter(city => city.id == this.myCity)[0];
+        }
     },
     mounted() {
         this.getServices();
@@ -136,7 +142,6 @@ export default {
             myMinistry: null,
             myLocations: [],
             myCity: (this.cities.length ? this.cities[0].id : null),
-            myTeams: this.cities.length ? (this.teams[this.cities[0].id] || []) : [],
             services: [],
             apiToken: this.$page.props.currentUser.data.api_token,
             usersLoading: false,
@@ -190,9 +195,6 @@ export default {
             });
         },
         async getRecipients() {
-            console.log('selecting teams for ', this.myCity, this.teams[this.myCity] || []);
-            if (!this.myCity) return [];
-            this.myTeams = this.teams[this.myCity] || [];
             this.usersLoaded++;
             this.$forceUpdate();
         },
