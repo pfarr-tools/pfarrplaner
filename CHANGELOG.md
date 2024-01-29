@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.2.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.2.3...v2024.2.4) (2024-01-29)
+
+
+### Bug Fixes
+
+* Datumsangaben in Dienstanfragen erscheinen auf Englisch ([1f4141d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1f4141dff816fff9bcf5ad7ae03f9ab2d28e36a7))
+
 ### [2024.2.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.2.2...v2024.2.3) (2024-01-29)
 
 
