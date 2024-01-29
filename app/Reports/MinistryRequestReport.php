@@ -42,7 +42,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use Inertia\Inertia;
 
