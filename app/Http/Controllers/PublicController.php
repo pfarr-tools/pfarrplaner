@@ -38,6 +38,7 @@ use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
 use App\Models\Service;
+use App\Services\MinistryService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Contracts\Foundation\Application;
