@@ -445,7 +445,7 @@ class Service extends Model implements HasDAVCalendarItems
         }
         if ($this->baptism) {
             if (!Str::contains(Str::lower($this->titleText()), 'tauf')) {
-                $desc['baptism'] = 'mit Taufen';
+                 $desc['baptism'] = $this->baptisms->count() ? 'mit Taufen' : 'möglicher Taufgottesdienst';
             }
         }
         if ($this->eucharist) {
@@ -742,7 +742,7 @@ class Service extends Model implements HasDAVCalendarItems
             }
             if ($this->baptismsText() != '') {
                 if (!Str::contains(Str::lower(join(' / ', $elements)), 'tauf')) {
-                    $elements[] = $x = 'Taufe(n)';
+                    $elements[] = $x = ($this->baptisms->count() > 1 ? 'Taufen' : 'Taufe');
                 }
             }
         }
