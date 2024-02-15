@@ -93,7 +93,17 @@
             </button>
         </div>
 
-        <create-service-wizard-button v-if="canCreate" type="success" :cities="writableCities" class="me-2" :date="date" :key="moment(date).toISOString()" />
+        <div class="btn-group" role="group" aria-label="Ansicht umschalten">
+            <input type="radio" class="btn-check" name="calendarMode" id="calendarModeServices" autocomplete="off" v-model="calendarMode"
+                   value="services" @input="$emit('toggle-calendar-mode', 'services')" title="Nur Gottesdienste anzeigen"/>
+            <label class="btn btn-light" for="calendarModeServices" ><span class="mdi mdi-church"></span></label>
+
+            <input type="radio" class="btn-check" name="calendarMode" id="calendarModeEvents" autocomplete="off" v-model="calendarMode"
+                   value="events" @input="$emit('toggle-calendar-mode', 'events')" />
+            <label class="btn btn-light" for="calendarModeEvents"><span class="mdi mdi-calendar"></span></label>
+        </div>
+
+        <create-service-wizard-button v-if="canCreate" type="success" :cities="writableCities" class="ms-2 me-2" :date="date" :key="moment(date).toISOString()" />
 
         <nav-button class="me-2"
                     :type="targetMode ? 'warning' : 'default'"
@@ -136,6 +146,7 @@ export default {
         targetMode: Boolean,
         target: Object,
         canCreate: Boolean,
+        calendarMode: String,
     },
     methods: {
         monthLink: function (month) {

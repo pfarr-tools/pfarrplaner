@@ -40,6 +40,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ServiceRequest;
+use App\Http\Resources\CalendarServicesCollectionResource;
 use App\Models\Calendar\Day;
 use App\Models\People\User;
 use App\Models\Places\City;
@@ -91,6 +92,15 @@ class ServiceController extends Controller
         return response()->json($service);
     }
 
+
+    public function byMonth($date, $cities)
+    {
+        $date = Carbon::parse($date);
+        $start = $date->copy()->firstOfMonth()->setTime(0,0,0);
+        $end = $start->copy()->addMonth(1)->subSecond(1);
+        $services = Service::whereIn('city_id', explode(',', $cities))->between($start, $end)->ordered()->get();
+        return new CalendarServicesCollectionResource($services);
+    }
 
     /**
      * @param User $user

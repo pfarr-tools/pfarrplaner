@@ -50,20 +50,19 @@
             <div class="liturgy">
                 <div class="liturgy-sermon" v-if="day.liturgy.perikope">
                     <div :class="day.liturgy.litColor" class="liturgy-color" :title="day.liturgy.feastCircleName"></div>
-                    <bible-reference :liturgy="day.liturgy" liturgy-key="currentPerikope" title="" />
+                    <bible-reference :liturgy="day.liturgy" liturgy-key="currentPerikope" title=""/>
                 </div>
             </div>
             <div class="card-footer day-name" :title="day.liturgy.litProfileGist" v-if="day.liturgy.title">
-                {{day.liturgy.title}}
+                {{ day.liturgy.title }}
             </div>
         </div>
         <div v-if="hasPermission('urlaub-lesen')">
-        <div class="vacation me-1" v-for="(absence,absenceIndex,absenceKey) in absences" :absence="absence" :key="absenceKey"
-             :title="absence.user.name+': '
-             +absenceReasonText(absence)
-             +' ('+absence.durationText+') '
-             +replacementText(absence)">
-            <span class="mdi mdi-earth"></span> {{ absence.user.last_name }}</div>
+            <div class="vacation me-1" v-for="(absence,absenceIndex,absenceKey) in day.absences" :absence="absence"
+                 :key="absenceKey"
+                 :title="absence.label">
+                <span class="mdi mdi-earth"></span> {{ absence.name }}
+            </div>
         </div>
     </th>
 </template>
@@ -71,19 +70,19 @@
 <script>
 import moment from "moment";
 import EventBus from "../../../plugins/EventBus";
-import { CalendarToggleDayColumnEvent} from "../../../events/CalendarToggleDayColumnEvent";
+import {CalendarToggleDayColumnEvent} from "../../../events/CalendarToggleDayColumnEvent";
 import BibleReference from "../../LiturgyEditor/Elements/BibleReference";
 
 export default {
     name: 'CalendarDayHeader',
     components: {BibleReference},
-    props: ['day', 'index', 'absences', 'scrollToDate'],
+    props: ['day', 'index', 'scrollToDate'],
     computed: {
         today() {
             return moment(this.day.date).locale('de-DE');
         },
     },
-    data: function() {
+    data: function () {
         var scrollToMe = false;
         if (this.scrollToDate) {
             if (moment(this.scrollToDate).format('YYYYMMDD') == moment(this.date).format('YYYYMMDD')) {
@@ -99,39 +98,34 @@ export default {
         }
     },
     methods: {
-        clickHandler: function() {
+        clickHandler: function () {
             this.$emit('collapse', {day: this.day, state: !(this.day.collapsed)});
             this.$forceUpdate();
         },
-        replacementText: function (absence) {
-            if (this.currentUser != absence.user.id) return '';
-            return absence.replacementText ? '[V: '+absence.replacementText+']' : '';
-        },
-        absenceReasonText(absence) {
-            if (this.currentUser == absence.user.id) return absence.reason;
-            return '';
-        }
     },
 }
 </script>
 
 <style scoped>
-    .liturgy-color.white {
-        background-color: white;
-        border-color: darkgray;
-    }
-    .liturgy-color.black {
-        background-color:black;
-    }
-    .liturgy-color.green {
-        background-color: darkgreen;
-    }
-    .liturgy-color.purple {
-        background-color: rebeccapurple;
-    }
+.liturgy-color.white {
+    background-color: white;
+    border-color: darkgray;
+}
 
-    /deep/ .bible-reference, /deep/ .bible-reference div {
-        display: inline;
-    }
+.liturgy-color.black {
+    background-color: black;
+}
+
+.liturgy-color.green {
+    background-color: darkgreen;
+}
+
+.liturgy-color.purple {
+    background-color: rebeccapurple;
+}
+
+/deep/ .bible-reference, /deep/ .bible-reference div {
+    display: inline;
+}
 
 </style>

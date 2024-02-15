@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CalendarDayCollectionResource;
 use App\Models\Calendar\Day;
 use App\Models\Leave\Absence;
 use App\Models\Places\City;
@@ -81,18 +82,6 @@ class CalController extends Controller
         if ($date->format('Ym') < 201801) abort(404);
         $monthEnd = $date->copy()->addMonth(1)->subSecond(1);
 
-        $dates = Service::select(DB::raw('DISTINCT DATE(services.date) as day'))
-            ->inCities(Auth::user()->visibleCities)
-            ->inMonthByDate($date)
-            ->orderBy('day', 'ASC')
-            ->get()->pluck('day');
-
-        $dates = CalendarService::addMissingDefaultDays($date, $dates);
-        $days = [];
-        foreach ($dates as $thisDate) {
-            $days[$thisDate] = ['date' => $thisDate, 'liturgy' => LiturgyService::getDayInfo($thisDate)];
-        }
-
         $years = Service::select(DB::raw('DISTINCT YEAR(DATE(services.date)) as year'))
             ->inCities(Auth::user()->visibleCities)
             ->orderBy('year', 'ASC')
@@ -100,32 +89,14 @@ class CalController extends Controller
 
 
         $user = Auth::user();
-        $cities = $user->cities;
         $writableCities = $user->writableCities;
-
-        $services = [];
-        foreach ($cities as $city) {
-            foreach ($dates as $day) {
-                $services[$city->id][$day] = [];
-            }
-        }
-
         $cities = array_values($user->getSortedCities()->all());
-
-        // absences
-        $absences = Absence::getByDays(
-            Absence::with('user')->byPeriod($date, $monthEnd)
-                ->visibleForUser(Auth::user())
-                ->showInCalendar()
-                ->get(),
-            $dates
-        );
 
         $canCreate = $user->can('create', Service::class);
 
         return Inertia::render(
             'Calendar/Calendar',
-            compact('date', 'days', 'cities', 'years', 'absences', 'canCreate', 'services', 'writableCities')
+            compact('date', 'cities', 'years', 'canCreate', 'writableCities')
         );
     }
 

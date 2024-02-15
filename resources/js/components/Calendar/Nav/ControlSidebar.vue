@@ -29,28 +29,6 @@
 
 <template>
     <div>
-        <div class="mb-1">
-            <a class="btn btn-primary" :href="route('calendar', {
-                date: moment(date).format('YYYY-MM'), slave: 1
-            })"
-               target="_blank"
-               title="Öffnet ein weiteres Fenster mit einer Kalenderansicht, die der hier dargestellten automatisch folgt.">
-                <span class="mdi mdi-monitor"></span> 2. Bildschirm anzeigen
-            </a>
-        </div>
-        <hr class="mb-2">
-        <h6>Anordnung</h6>
-        <div class="mb-1">
-            <input name="orientation" value="horizontal" type="radio" v-model="orientation" @change="handleOrientationChange"> Horizontale
-            Ansicht <br/>
-            <small>(Tage als Spalten)</small>
-            <br/>
-            <input name="orientation" value="vertical" type="radio" v-model="orientation" @change="handleOrientationChange"> Vertikale
-            Ansicht <br/>
-            <small>(Tage als Zeilen)</small>
-            <br/>
-        </div>
-        <hr class="mb-2">
         <calendar-control-city-sort :cities="cities" />
         <hr class="mb-2">
         <form-check label="Details zur Kinderkirche anzeigen" v-model="mySettings.show_cc_details" @input="setSetting('show_cc_details', $event)"/>

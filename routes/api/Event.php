@@ -29,11 +29,6 @@
  */
 
 
-use App\Http\Controllers\Api\CalendarController;
+use App\Http\Controllers\Api\EventController;
 
-Route::get('/cal/city/{city}/{date}', [CalendarController::class, 'city'])->name('calendar.byCityAndMonth');
-Route::get('/quick-pick/{date}', [CalendarController::class, 'quickPick'])->name('calendar.quick-pick');
-
-Route::get('/kalender/monat/{date}', [CalendarController::class, 'month'])->name('calendar.month')->middleware('auth:api');
-Route::get('/kalender/gottesdienst/{service}', [CalendarController::class, 'service'])->name('calendar.service')->middleware('auth:api');
-
+Route::get('veranstaltungen/{start}/{end}', [EventController::class, 'byRange'])->name('events.range');

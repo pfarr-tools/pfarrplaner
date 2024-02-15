@@ -86,6 +86,7 @@ class ServicePolicy
     public function update(User $user, Service $service)
     {
         if ($service->isTemplate()) return $user->hasPermissionTo('gd-bearbeiten');
+        $service->load('pastors');
         if ($service->pastors->contains($user)) return true;
         if ($user->hasRole(AuthServiceProvider::ADMIN) && $this->hasCityPermission($user, $service)) {
             return true;

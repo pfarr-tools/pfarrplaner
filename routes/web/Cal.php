@@ -40,7 +40,7 @@
 */
 
 
-
+use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\CalController;
 
 Route::get('/kalender/{date?}/{month?}', [CalController::class, 'index'])->name('calendar');
@@ -48,4 +48,4 @@ Route::get('/kalender/ort/{date}/{city}', [CalController::class, 'city'])->name(
 Route::get('/kalender/tag/{day}/{city}', [CalController::class, 'day'])->name('cal.day');
 Route::get('/kalender/einzelner-tag/{day}/{city}', [CalController::class, 'singleDay'])->name('calendar.day');
 
-Route::get('/api/cal/navigate/{date}', [\App\Http\Controllers\Api\CalendarController::class, 'navigate'])->name('api.calendar.navigate')->middleware('auth');
+

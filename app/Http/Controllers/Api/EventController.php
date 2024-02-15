@@ -28,12 +28,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Api\CalendarController;
+use App\Http\Resources\EventResource;
+use App\Models\Service;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
-Route::get('/cal/city/{city}/{date}', [CalendarController::class, 'city'])->name('calendar.byCityAndMonth');
-Route::get('/quick-pick/{date}', [CalendarController::class, 'quickPick'])->name('calendar.quick-pick');
+class EventController
+{
 
-Route::get('/kalender/monat/{date}', [CalendarController::class, 'month'])->name('calendar.month')->middleware('auth:api');
-Route::get('/kalender/gottesdienst/{service}', [CalendarController::class, 'service'])->name('calendar.service')->middleware('auth:api');
+    public function byRange(Request $request, $start, $end)
+    {
+        $start = Carbon::parse(Str::beforeLast($start, '('));
+        $end = Carbon::parse(Str::beforeLast($end, '('));
 
+        $servicesQuery = Service::between($start, $end)->ordered();
+        if ($request->has('calendars')) {
+            $servicesQuery->whereIn('city_id', explode(',', $request->get('calendars', '')));
+        }
+        return EventResource::collection($servicesQuery->get());
+    }
+
+}

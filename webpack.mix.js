@@ -85,7 +85,7 @@ mix.js('resources/js/inertia-app.js', 'public/js')
         ],
         resolve: {
             alias: {
-                vue$: 'vue/dist/vue.runtime.esm.js',
+                vue$: 'vue/dist/vue.esm.js',
                 '@': path.resolve('resources/js/components'),
             },
         }})

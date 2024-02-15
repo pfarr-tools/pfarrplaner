@@ -38,7 +38,6 @@
                     :day="day"
                     :key="'_day_'+index"
                     :index="index"
-                    :absences="absences[day.id]"
                 />
             </tr>
             </thead>
@@ -66,7 +65,7 @@ import CalendarCell from "../Cell.vue";
 export default {
     name: 'CalendarNavHorizontal',
     components: {CalendarCell, CalendarDayHeader, NavButton},
-    props: ['date', 'days', 'cities', 'services', 'years', 'absences', 'canCreate','collapseState', 'targetMode', 'target'],
+    props: ['date', 'days', 'cities', 'services', 'years', 'canCreate','collapseState', 'targetMode', 'target'],
     data() {
         var myDays = this.days;
 

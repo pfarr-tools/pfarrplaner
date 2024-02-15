@@ -1,4 +1,3 @@
-<?php
 /*
  * Pfarrplaner
  *
@@ -28,12 +27,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-use App\Http\Controllers\Api\CalendarController;
-
-Route::get('/cal/city/{city}/{date}', [CalendarController::class, 'city'])->name('calendar.byCityAndMonth');
-Route::get('/quick-pick/{date}', [CalendarController::class, 'quickPick'])->name('calendar.quick-pick');
-
-Route::get('/kalender/monat/{date}', [CalendarController::class, 'month'])->name('calendar.month')->middleware('auth:api');
-Route::get('/kalender/gottesdienst/{service}', [CalendarController::class, 'service'])->name('calendar.service')->middleware('auth:api');
-
+module.exports = {
+    data() {
+        return {
+            '$componentState': Math.random().toString(36).substr(2, 9),
+        }
+    },
+    methods: {
+        $api() {
+            let myApiAxios = window.api;
+            myApiAxios.defaults.headers.common['Authorization'] = 'Bearer '+this.$page.props.currentUser.data.api_token;
+            myApiAxios.defaults.headers.common['Accept'] = 'application/json';
+            return myApiAxios;
+        },
+        setUserSetting(key, value) {
+            this.$api().post(route('setting.set', {
+                user: this.$page.props.currentUser.data.id,
+                key: key,
+            }), {value: value});
+            this.$page.props.settings[key] = value;
+        },
+        $updateComponentState() {
+            this.$componentState = Math.random().toString(36).substr(2, 9);
+        }
+    }
+};

@@ -65,7 +65,7 @@
 
 export default {
     name: 'CalendarPaneMobile',
-    props: ['date', 'days', 'cities', 'services', 'years', 'absences', 'canCreate', 'loading'],
+    props: ['date', 'days', 'cities', 'services', 'years', 'canCreate', 'loading'],
     methods: {
         title: function (d) {
             return moment(d).locale('de-DE').format('MMMM YYYY');

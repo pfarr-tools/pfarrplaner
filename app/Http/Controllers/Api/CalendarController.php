@@ -30,6 +30,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\CalendarAbsenceResource;
+use App\Http\Resources\CalendarDayCollectionResource;
+use App\Http\Resources\CalendarDayResource;
+use App\Http\Resources\CalendarServiceResource;
 use App\Models\Leave\Absence;
 use App\Models\Places\City;
 use App\Models\Service;
@@ -54,7 +58,7 @@ class CalendarController extends \App\Http\Controllers\Controller
      * @param $date
      * @return \Illuminate\Http\JsonResponse
      */
-    public function navigate($date)
+    public function month($date)
     {
         $date = Carbon::parse($date . '-01 0:00:00');
 
@@ -62,30 +66,21 @@ class CalendarController extends \App\Http\Controllers\Controller
         RedirectorService::setReturnRoute(route('calendar', $date->format('Y-m')));
         $returnRoute = RedirectorService::backRoute();
 
-        $dates = Service::select(DB::raw('DISTINCT DATE(services.date) as day'))
+        $dates = Service::setEagerLoads([])->with([])
+            ->select(DB::raw('DISTINCT DATE(services.date) as day'))
             ->inCities(Auth::user()->visibleCities)
             ->inMonthByDate($date)
             ->orderBy('day', 'ASC')
             ->get()->pluck('day');
 
         $dates = CalendarService::addMissingDefaultDays($date, $dates);
-        $days = [];
-        foreach ($dates as $thisDate) {
-            $days[$thisDate] = ['date' => $thisDate, 'liturgy' => LiturgyService::getDayInfo($thisDate)];
-        }
 
-        // absences
-        $absences = Absence::getByDays(
-            Absence::with('user')
-                ->byPeriod($date, $date->copy()->endOfMonth())
-                ->visibleForUser(Auth::user())
-                ->showInCalendar()
-                ->get(),
-            $dates
-        );
+        return new CalendarDayCollectionResource($dates);
+    }
 
-
-        return response()->json(compact('days', 'absences', 'returnRoute'));
+    public function service(Service $service)
+    {
+        return new CalendarServiceResource($service);
     }
 
 

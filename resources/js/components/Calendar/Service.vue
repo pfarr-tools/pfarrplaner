@@ -28,7 +28,10 @@
   -->
 
 <template>
-    <div :class="{
+    <div>
+        <div v-if="loading" class="service-loading text-center py-3 fs-3 mb-1 text-muted"><span class="mdi mdi-spin mdi-loading"></span></div>
+        <div v-else :key="$componentState"
+             :class="{
         'service-entry': 1,
         'editable': myService.isEditable && (!foreign),
         'mine': myService.isMine,
@@ -40,26 +43,25 @@
         'reloading': loading,
         'foreign': foreign,
         'hidden': myService.hidden}"
-         :title="myService.isEditable ? clickTitle(service) : null"
-         @click="myService.isEditable ? edit(service, $event) : null"
-    >
-        <div v-if="loading" class="text-center"><span class="mdi mdi-spin mdi-loading"></span></div>
-        <div v-else>
-            <div :class="{'service-time': 1,  'service-special-time text-warning': isSpecialTime(service)}">
+             :title="myService.isEditable ? clickTitle(myService) : null"
+             @click="myService.isEditable ? edit(service, $event) : null"
+        >
+            <div :class="{'service-time': 1,  'service-special-time text-warning': isSpecialTime(myService)}">
                 {{ myService.timeText }}
             </div>
             <span class="separator">|</span>
-            <div :class="{'service-location': 1, 'service-special-location text-warning': isSpecialLocation(service)}">
+            <div :class="{'service-location': 1, 'service-special-location text-warning': isSpecialLocation(myService)}">
                 {{ foreign ? myService.locationTextWithCity : myService.locationText }}
             </div>
-            <img v-if="(!settings.show_cc_details) && (myService.cc)" src="/img/cc.png" :title="ccTitle(service)">
+            <img v-if="(!settings.show_cc_details) && (myService.cc)" src="/img/cc.png" :title="ccTitle(myService)">
             <span v-if="myService.youtube_url">
             <a :href="myService.youtube_url" target="_blank" class="youtube-link" title="Zum Youtube-Video"><span
                 class="mdi mdi-youtube"></span></a>
             <a v-if="myService.city.youtube_channel_url" :href="myService.liveDashboardUrl" target="_blank"
                class="youtube-livedashboard-link" title="Zum LiveDashboard"><span class="mdi mdi-video"></span></a>
         </span>
-            <div v-if="service.isAlternateProprium" title="Für diesen Gottesdienst wurde ein vom normalen Kalender abweichendes Proprium festgelegt.">
+            <div v-if="myService.isAlternateProprium"
+                 title="Für diesen Gottesdienst wurde ein vom normalen Kalender abweichendes Proprium festgelegt.">
                 <div class="service-description">
                     <div :style="'background-color: '+myService.liturgicalInfo.litColor" class="liturgy-color"></div>
                     {{ myService.liturgicalInfo.title }}
@@ -84,8 +86,10 @@
 
             <calendar-service-participants :participants="myService.pastors" :category="$page.props.labels.code_pastor"
                                            :predicant="myService.need_predicant"/>
-            <calendar-service-participants :participants="myService.organists" :category="$page.props.labels.code_organist" :predicant="0"/>
-            <calendar-service-participants :participants="myService.sacristans" :category="$page.props.labels.code_sacristan" :predicant="0"/>
+            <calendar-service-participants :participants="myService.organists"
+                                           :category="$page.props.labels.code_organist" :predicant="0"/>
+            <calendar-service-participants :participants="myService.sacristans"
+                                           :category="$page.props.labels.code_sacristan" :predicant="0"/>
             <calendar-service-participants v-for="participants,ministry in myService.ministriesByCategory"
                                            :key="ministry"
                                            :participants="participants" :category="ministry" :predicant="0"/>
@@ -98,9 +102,31 @@
             </div>
             <div v-if="settings.show_cc_details && (myService.cc)">
                 <hr/>
-                <img src="/img/cc.png" :title="ccTitle(service)">
+                <img src="/img/cc.png" :title="ccTitle(myService)">
                 Kinderkirche: {{ myService.cc_lesson }} ({{ myService.cc_staff }})
             </div>
+            <div v-if="myService.isEditable" class="overlay">
+                <div class="buttons">
+                    <a href="#" class="btn btn-primary mb-1" role="button"
+                       title="Gottesdienst bearbeiten" @click.prevent.stop="editFromButton(myService, 'myService.edit', $event)">
+                        <span class="mdi mdi-pencil"></span>
+                    </a>
+                    <a href="#" class="btn btn-light mb-1" role="button"
+                       title="Liturgie bearbeiten" @click.prevent.stop="editFromButton(myService, 'liturgy.editor', $event)">
+                        <span class="mdi mdi-view-list"></span>
+                    </a><br />
+                    <a href="#" class="btn btn-light mb-1" role="button"
+                       title="Predigt bearbeiten" @click.prevent.stop="editFromButton(myService, 'myService.sermon.editor', $event)">
+                        <span class="mdi mdi-microphone"></span>
+                    </a>
+                    <a href="#" class="btn btn-danger mb-1" role="button"
+                       title="Gottesdienst löschen" @click.prevent.stop="deleteService(myService, index)">
+                        <span class="mdi mdi-delete"></span>
+                    </a>
+
+                </div>
+            </div>
+
         </div>
     </div>
 </template>
@@ -117,38 +143,57 @@ export default {
     name: 'CalendarService',
     components: {
         CalendarServiceWedding,
-        CalendarServiceFuneral, CalendarServiceBaptism, CalendarServiceParticipants, ControlledAccess},
-    props: ['service', 'targetMode', 'target', 'city'],
+        CalendarServiceFuneral, CalendarServiceBaptism, CalendarServiceParticipants, ControlledAccess
+    },
+    props: ['serviceId', 'targetMode', 'target', 'city'],
     inject: ['settings'],
+    computed: {
+        foreign() {
+            if (this.loading) return false;
+            return this.city ? (this.city.id != this.myService.city_id) : false;
+        }
+    },
     data() {
-        let myService = this.service;
+        /*
         if (Array.isArray(myService.ministriesByCategory)) myService.ministriesByCategory = {};
         if (!myService.ministriesByCategory) myService.ministriesByCategory = {};
         this.service.city.default_ministries.forEach(ministry => {
             if (!myService.ministriesByCategory[ministry]) myService.ministriesByCategory[ministry] = [];
         });
+         */
 
         return {
-            myService,
-            apiToken: this.$page.props.currentUser.data.api_token,
-            loading: false,
-            foreign: this.city ? (this.city.id != myService.city_id) : false,
+            myService: null,
+            loading: true,
         }
     },
+    mounted() {
+        this.loadData();
+    },
     methods: {
-        isSpecialTime: function (service) {
+        loadData() {
+            this.loading = true;
+            console.log('service, serviceId', this.serviceId, this.myService);
+            this.$api().get(route('api.calendar.service', { service: this.serviceId })).then(response => {
+                this.myService = response.data.data;
+                this.loading = false;
+                this.$updateComponentState();
+                this.$forceUpdate();
+            })
+        },
+        isSpecialTime(service) {
             if (null == service.location) return true;
             if (null == service.location.default_time) return true;
             if ('' == service.location.default_time) return true;
             return service.time != service.location.default_time.substr(0, 5);
         },
-        isSpecialLocation: function (service) {
+        isSpecialLocation(service) {
             return service.location == null;
         },
-        ccTitle: function (service) {
+        ccTitle(service) {
             return 'Parallel Kinderkirche (' + service.cc_location + ') zum Thema "' + service.cc_lesson + '": ' + service.cc_staff;
         },
-        clickTitle: function (service) {
+        clickTitle(service) {
             if (this.targetMode && service.isEditable) {
                 let people = [];
                 this.target.people.forEach(person => people.push(person.name));
@@ -156,17 +201,16 @@ export default {
             }
             return '';
         },
-        redirect: function (url) {
+        redirect(url) {
             window.location.href = url;
         },
-        edit: function (service, clickEvent) {
+        edit(service, clickEvent) {
             if (this.targetMode) {
                 let peopleIds = [];
                 this.target.people.forEach(person => peopleIds.push(person.id));
                 this.loading = true;
 
-                axios.post(route('api.service.assign', service.id), {
-                    api_token: this.apiToken,
+                this.$api().post(route('api.service.assign', service.id), {
                     ministry: this.target.ministry,
                     users: peopleIds,
                     exclusive: this.target.exclusive,
@@ -179,12 +223,37 @@ export default {
                 clickEvent.stopPropagation();
             }
         },
+        editFromButton(service, myRoute, clickEvent) {
+            if (clickEvent.ctrlKey) {
+                window.open(route(myRoute, service.slug), '_blank');
+            } else {
+                this.$inertia.visit(route(myRoute, service.slug));
+            }
+        },
+        deleteService(service, index) {
+            if (confirm('Willst du diesen Gottesdienst wirklich komplett löschen?')) {
+                this.$api().delete(route('api.service.destroy', {
+                    service: service.slug,
+                })).then(response => {
+                    this.services = this.services.splice(index, 1);
+                });
+            }
+        },
+
+
     }
 }
 
 </script>
 
 <style scoped>
+
+.service-loading {
+    background-color: lightgray;
+    border-radius: .25em;
+    text-align: center;
+}
+
 .service-entry.reloading {
     border-color: lightgoldenrodyellow;
     background-color: transparent !important;
@@ -233,18 +302,54 @@ export default {
     border-radius: 5px;
     border-radius: .5em;
 }
+
 .liturgy-color.white {
     background-color: white;
     border-color: darkgray;
 }
+
 .liturgy-color.black {
-    background-color:black;
+    background-color: black;
 }
+
 .liturgy-color.green {
     background-color: darkgreen;
 }
+
 .liturgy-color.purple {
     background-color: rebeccapurple;
+}
+
+.overlay {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background-color: #7777;
+    overflow: hidden;
+    width: 100%;
+    height: 0;
+}
+
+.service-entry {
+    position: relative;
+}
+
+.service-entry:hover .overlay {
+    bottom: 0;
+    height: 100%;
+}
+
+.buttons {
+    white-space: nowrap;
+    color: white;
+    font-size: 20px;
+    position: absolute;
+    overflow: hidden;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
 }
 
 </style>

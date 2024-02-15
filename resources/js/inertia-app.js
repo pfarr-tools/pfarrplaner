@@ -79,6 +79,10 @@ window.moment = require('moment');
 window.axios = require('axios');
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
+window.api = require('axios');
+window.api.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.api.defaults.withCredentials = true;
+
 
 /**
  * Bootstrap plugins etc.
@@ -98,6 +102,7 @@ window.moment = require('moment');
 let token = document.head.querySelector('meta[name="csrf-token"]');
 if (token) {
     window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+    window.api.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 } else {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
@@ -107,32 +112,19 @@ if (token) {
  * VUE app configuration
  */
 
+
 Vue.use(datePicker);
-
-
-
 Vue.component('admin-layout', AdminLayout)
-
-
-
 InertiaProgress.init({
     delay: 100,
     color: '#29d',
     includeCSS: true,
     showSpinner: true,
 });
-
 Vue.use(InertiaProgress);
-
-
 Vue.use(LaravelPermission);
-
-
 Vue.use(EventBus);
-
-
 Vue.config.productionTip = false
-
 
 Vue.mixin({
     methods: {
@@ -141,6 +133,7 @@ Vue.mixin({
     }
 });
 Vue.mixin(require('./mixins/Asset.js'));
+Vue.mixin(require('./mixins/PfarrplanerAPI'));
 
 
 // Register a global custom directive called `v-focus`

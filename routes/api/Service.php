@@ -40,6 +40,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('service/{service:slug}', [ServiceController::class, 'destroy'])->name('service.destroy');
 
     Route::post('/service/{service}/assign', [ServiceController::class, 'assign'])->name('service.assign');
+
+    Route::get('gottesdienste/{date}/{cities}', [ServiceController::class, 'byMonth'])->name('services.calendar.month');
+
 });
 
 

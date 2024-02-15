@@ -29,29 +29,34 @@
 
 <template>
     <div class="calendar-month calendar-vertical">
-        <table class="table table-bordered">
-            <thead>
-            <tr>
-                <th class="no-print text-start city-title"><!-- // TODO: slave mode --></th>
-                <th v-for="city in cities" class="city-title">
-                    <span class="mdi mdi-arrow-down-circle pr-2"></span>
-                    {{ city.name }}
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-                <tr v-for="day,index in myDays">
+        <div v-if="!loading">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th class="no-print text-start city-title"><!-- // TODO: slave mode --></th>
+                    <th v-for="city in cities" class="city-title">
+                        <span class="mdi mdi-arrow-down-circle pr-2"></span>
+                        {{ city.name }}
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(day,dayDate) in data">
                     <calendar-day-header
                         :day="day"
-                        :key="day.id"
-                        :scroll-to-date="scrollToDate"
-                        :absences="absences[day.id]"  />
+                        :key="dayDate"
+                    />
                     <calendar-cell v-for="(city,index) in cities" :day="day" :key="city.id" :targetMode="targetMode" :target="target"
-                                   :services="getServices(city,day)" :city="city" :can-create="canCreate"
-                                    />
+                                   :services="getServices(city,dayDate)" :city="city" :can-create="canCreate"
+                    />
                 </tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
+        <div v-else class="month-loading">
+            <div><span class="mdi mdi-spin mdi-loading"></span></div>
+            <div>Kalender wird geladen</div>
+        </div>
     </div>
 </template>
 
@@ -61,32 +66,39 @@ import NavButton from "../../Ui/buttons/NavButton";
 import CalendarDayHeader from "../Day/Header.vue";
 import CalendarCell from "../Cell.vue";
 export default {
-    name: 'CalendarNavVertical',
+    name: 'CalendarPaneVertical',
     components: {CalendarCell, CalendarDayHeader, NavButton},
-    props: ['date', 'days', 'cities', 'services', 'years', 'absences', 'canCreate', 'collapseState', 'targetMode', 'target'],
+    props: ['date', 'cities', 'canCreate', 'collapseState', 'targetMode', 'target'],
     data() {
-        var myDays = this.days;
-        var scrollToDate = null;
-
-        for (let dayId in myDays) {
-            myDays[dayId].index = dayId;
-            if (moment(myDays[dayId].date) <= moment()) scrollToDate = myDays[dayId].date;
-
-        }
-
         return {
-            myDays: myDays,
-            scrollToDate,
+            loading: false,
+            data: null,
         }
     },
+    mounted() {
+        this.loadServices();
+    },
+    watch: {
+        date(newVal, oldVal) {
+            this.loadServices();
+        },
+    },
     methods: {
-        title: function (d) {
-            return moment(d).locale('de-DE').format('MMMM YYYY');
+        loadServices() {
+            this.loading = true;
+            this.$api().get(route('api.calendar.month', {
+                date: this.date,
+            })).then(response => {
+                this.data = response.data.data;
+                this.loading = false;
+                this.$forceUpdate();
+            });
         },
         getServices(city, day) {
-            if (this.services[city.id] == undefined) return [];
-            if (this.services[city.id][day.id] == undefined) return [];
-            return this.services[city.id][day.id];
+            if (this.data[day] == undefined) return [];
+            if (this.data[day].services == undefined) return [];
+            if (this.data[day].services[city.id] == undefined) return [];
+            return this.data[day].services[city.id];
         },
     }
 }
@@ -101,5 +113,14 @@ export default {
     .btn-xs {
         padding: 0.75em 1em;
     }
+
+    .month-loading {
+        font-size: 3em;
+        font-width: bold;
+        color: lightgray;
+        text-align: center;
+        padding-top: 25vh;
+    }
+
 
 </style>
