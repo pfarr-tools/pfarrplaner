@@ -108,7 +108,7 @@
             <div v-if="myService.isEditable" class="overlay">
                 <div class="buttons">
                     <a href="#" class="btn btn-primary mb-1" role="button"
-                       title="Gottesdienst bearbeiten" @click.prevent.stop="editFromButton(myService, 'myService.edit', $event)">
+                       title="Gottesdienst bearbeiten" @click.prevent.stop="editFromButton(myService, 'service.edit', $event)">
                         <span class="mdi mdi-pencil"></span>
                     </a>
                     <a href="#" class="btn btn-light mb-1" role="button"
