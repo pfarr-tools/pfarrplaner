@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.3.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.3.0...v2024.3.1) (2024-02-15)
+
+
+### Bug Fixes
+
+* Gottesdienste können vom Kalender aus nicht bearbeitet werden ([99c20ca](https://codeberg.org/pfarr.tools/pfarrplaner/commit/99c20cab215fe65872029c6d866c9205e576228a))
+
 ## [2024.3.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.2.5...v2024.3.0) (2024-02-15)
 
 
