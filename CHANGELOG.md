@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.4.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.3.1...v2024.4.0) (2024-02-16)
+
+
+### Features
+
+* Hinweis auf fehlendes Proprium bei Beerdigungen ausblenden ([b87ce59](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b87ce5961557c71bc62d2f447950e5e71e4066b4)), closes [#400](https://codeberg.org/pfarr.tools/pfarrplaner/issues/400)
+* Homescreen beschleunigen, indem weniger Daten übertragen werden ([520f759](https://codeberg.org/pfarr.tools/pfarrplaner/commit/520f759de07471548acca3fffbfbc0f03cbf2b8b)), closes [#401](https://codeberg.org/pfarr.tools/pfarrplaner/issues/401)
+
 ### [2024.3.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.3.0...v2024.3.1) (2024-02-15)
 
 
