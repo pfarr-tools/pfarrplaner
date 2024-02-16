@@ -29,6 +29,7 @@
 
 <template xmlns="http://www.w3.org/1999/html">
     <div class="liturgy-editor-info-pane">
+        <div v-if="showable">
         <div class="card" v-if="liturgy['title']">
             <div class="card-body">
                 <div v-if="myService.isAlternateProprium" class="alert alert-warning mb-1">
@@ -124,6 +125,7 @@
                 </div>
             </card-body>
         </card>
+        </div>
         <funeral-info-pane v-for="funeral in myService.funerals"
                            :key="'funeral_info_'+funeral.id"
                            :funeral="funeral" :service="service"/>
@@ -147,6 +149,12 @@ export default {
             liturgy: this.service.liturgicalInfo,
             originalAltDate: this.service.alt_liturgy_date,
         };
+    },
+    computed: {
+        showable() {
+            if ((!this.liturgy['title']) && (this.myService.funerals.length > 0)) return false;
+            return true;
+        }
     },
     props: ['service', 'liturgyInfo'],
     methods: {
