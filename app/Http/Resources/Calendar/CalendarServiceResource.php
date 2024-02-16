@@ -51,6 +51,7 @@ class CalendarServiceResource extends JsonResource
             'id' => $this->id,
             'slug' => $this->slug,
             'title' => $this->titleText(false),
+            'date' => $this->date,
             'description' => $this->description,
             'descriptionText' => $this->descriptionText(),
             'internal_remarks' => $this->internal_remarks,
