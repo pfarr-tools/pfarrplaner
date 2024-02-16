@@ -30,15 +30,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Resources\CalendarAbsenceResource;
-use App\Http\Resources\CalendarDayCollectionResource;
-use App\Http\Resources\CalendarDayResource;
-use App\Http\Resources\CalendarServiceResource;
-use App\Models\Leave\Absence;
+use App\Http\Resources\Calendar\CalendarDayCollectionResource;
+use App\Http\Resources\Calendar\CalendarServiceResource;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\CalendarService;
-use App\Services\LiturgyService;
 use App\Services\RedirectorService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;

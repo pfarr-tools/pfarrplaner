@@ -231,18 +231,16 @@ export default {
         }
     },
     async mounted() {
-        await axios.get(route('api.tab', {
-            api_token: this.apiToken,
+        await this.$api().get(route('api.tab', {
             tab: this.myActiveTab,
         })).then(response => {
-            this.myTabs[this.myActiveTab] = response.data;
+            this.myTabs[this.myActiveTab] = response.data.data;
             this.myTabs[this.myActiveTab].loaded = true;
             this.$forceUpdate();
         })
 
         await Object.keys(this.myTabs).forEach(function (tabKey) {
-            axios.get(route('api.tab.count', {
-                api_token: this.apiToken,
+            this.$api().get(route('api.tab.count', {
                 tab: tabKey,
             })).then(response => {
                 this.myTabs[response.data.key].count = response.data.count;
@@ -252,11 +250,10 @@ export default {
 
         await Object.keys(this.myTabs).forEach(function (tabKey) {
             if (!this.myTabs[tabKey].loaded) {
-                axios.get(route('api.tab', {
-                    api_token: this.apiToken,
+                this.$api().get(route('api.tab', {
                     tab: tabKey,
                 })).then(response => {
-                    this.myTabs[tabKey] = response.data;
+                    this.myTabs[tabKey] = response.data.data;
                     this.myTabs[tabKey].loaded = true;
                     this.$forceUpdate();
                 });

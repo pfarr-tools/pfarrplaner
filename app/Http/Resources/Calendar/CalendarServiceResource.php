@@ -68,10 +68,7 @@ class CalendarServiceResource extends JsonResource
             'timeText' => $this->timeText(),
             'liveDashboardUrl' => $this->liveDashboardUrl,
             'isAlternateProprium' => $this->isAlternateProprium,
-            'liturgicalInfo' => $this->liturgicalInfo ? [
-                'title' => $this->liturgicalInfo['title'],
-                'litColor' => $this->liturgicalInfo['litColor'],
-            ] : [],
+            'liturgicalInfo' => new CalendarLiturgicalInfoResource($this->liturgicalInfo),
             'hidden' => $this->hidden,
             'ministriesByCategory' => new CalendarMinistriesResource($this),
             'pastors' => CalendarParticipantResource::collection($this->pastors),

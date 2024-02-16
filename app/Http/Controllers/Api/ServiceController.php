@@ -40,7 +40,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ServiceRequest;
-use App\Http\Resources\CalendarServicesCollectionResource;
+use App\Http\Resources\Calendar\CalendarServicesCollectionResource;
 use App\Models\Calendar\Day;
 use App\Models\People\User;
 use App\Models\Places\City;

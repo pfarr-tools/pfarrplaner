@@ -31,7 +31,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
 class TabController extends \App\Http\Controllers\Controller
@@ -45,20 +47,20 @@ class TabController extends \App\Http\Controllers\Controller
     /**
      * Retrieve data for a single tab
      * @param $tab Tab key
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse|JsonResource
      */
     public function tab($tab)
     {
         $config = Auth::user()->getSetting('homeScreenTabsConfig') ?? [];
         $tabIndex = filter_var($tab, FILTER_SANITIZE_NUMBER_INT);
         $tab = HomeScreenTabFactory::getOne($config['tabs'][$tabIndex], $tabIndex);
-        return response()->json($tab);
+        return is_a($tab, JsonResource::class) ? $tab : response()->json(['data' => $tab]);
     }
 
     /**
      * Retrieve item count for a single tab
      * @param $tab Tab key
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function tabCount($tab)
     {
