@@ -45,7 +45,7 @@ class VELKDStudyHelper extends AbstractStudyHelper
         $content = Str::replace("\n", '', $content);
         preg_match('/<li><a href="(.*?)"(?:.*?)Lesepredigt für(?:.*)(\d\d\.\d\d\.\d\d\d\d)/', $content, $matches);
 
-        $this->records[$matches[2]] = ['[VELKD] Lesepredigt für den '.$matches[2] => $matches[1]];
+        $this->records[$matches[2]] = ['[VELKD] Lesepredigt für den '.$matches[2] => 'https://www.velkd.de'.$matches[1]];
     }
 
     function getLinks(array $data): array
