@@ -135,7 +135,7 @@ class BulletinReport extends AbstractWordDocumentReport
                     $textRun->addText($service->date->format('d.m.Y'));
                 }
                 if ($ctr == 2) {
-                    $textRun->addText(htmlspecialchars(Liturgy::getDayInfo($service->date)['title'] ?? ''));
+                    $textRun->addText(htmlspecialchars(LiturgyService::getDayInfo($service->date)['title'] ?? ''));
                 }
                 $textRun->addText("\t");
                 $textRun->addText($service->timeText()."\t");

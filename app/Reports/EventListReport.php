@@ -222,16 +222,7 @@ class EventListReport extends AbstractWordDocumentReport
                         0
                     );
 
-                    if ($event->day->description) {
-                        $this->renderParagraph(
-                            self::DEFAULT,
-                            [
-                                [$event->day->description . ' – ', []],
-                            ],
-                            0,
-                            $run
-                        );
-                    } elseif (isset($liturgy['title'])) {
+                    if (isset($liturgy['title'])) {
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
