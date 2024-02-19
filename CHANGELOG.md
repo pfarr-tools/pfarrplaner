@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.4.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.4.1...v2024.4.2) (2024-02-19)
+
+
+### Bug Fixes
+
+* Fehler bei Ausgabeformaten ([62a7c5c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/62a7c5cca2a8f2cae12f11e21a3b53dd9a176563))
+* VELKD-Lesepredigten werden falsch verlinkt ([e6fa3c7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e6fa3c71d19b5f69ab30fad66312b6e49660f82e))
+
 ### [2024.4.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.4.0...v2024.4.1) (2024-02-16)
 
 

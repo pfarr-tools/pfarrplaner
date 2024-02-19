@@ -1,5 +1,5 @@
 {
-    "version": "2024.4.1",
+    "version": "2024.4.2",
     "private": true,
     "scripts": {
         "dev": "npm run development",
@@ -61,6 +61,7 @@
         "luxon": "^2.0.2",
         "moment-timezone": "^0.5.33",
         "momentjs": "^2.0.0",
+        "rrule": "^2.8.1",
         "selectize": "^0.12.6",
         "tempusdominus-bootstrap-4": "^5.1.2",
         "verte": "^0.0.12",
