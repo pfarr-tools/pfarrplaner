@@ -70,7 +70,7 @@ class RitesController extends Controller
             ] as $riteType => $queryFields
         ) {
             $key = strtolower($riteType) . 's';
-            $riteType = 'App\\' . $riteType;
+            $riteType = 'App\\Models\\Rites\\' . $riteType;
             $ids = [];
 
             $selectFields = array_merge(['id'], $queryFields);
