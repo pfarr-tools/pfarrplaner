@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.4.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.4.3...v2024.4.4) (2024-02-22)
+
+
+### Bug Fixes
+
+* Falscher Namespace ([239d45c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/239d45c8cbacdc9875e1e544049b35fcbe011774))
+* Gottesdienste aus anderen Gemeinde werden trotz entsprechender Einstellung nicht im Kalender angezeigt ([c66c001](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c66c00179b1d7b008bf42afca3854ed647ef85f7))
+* Organistenablauf führt bei leerer Liedauswahl zu Fehler ([cb559cc](https://codeberg.org/pfarr.tools/pfarrplaner/commit/cb559ccc04d0ea34a1b6bbbaeecfa14edd8e165a))
+
 ### [2024.4.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.4.2...v2024.4.3) (2024-02-19)
 
 
