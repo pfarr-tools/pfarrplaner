@@ -279,7 +279,7 @@
                                 (EG {{ $item->data['song']['altEG'] }})@endif
                         </td>
                         <td valign="top" style="font-weight: bold">{{ $helper->forceVerseString() }}</td>
-                        <td valign="top" style="font-weight: bold">{{ $item->data['song']['song']['title'] }}</td>
+                        <td valign="top" style="font-weight: bold">{{ $item->data['song']['song']['title'] ?? ''}}</td>
                         <td valign="top" style="font-weight: bold">{{ $helper->getActiveVerseCount(true, true) }}</td>
                     @else
                         <td></td>
