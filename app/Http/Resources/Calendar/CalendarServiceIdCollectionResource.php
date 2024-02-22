@@ -30,6 +30,7 @@
 
 namespace App\Http\Resources\Calendar;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
@@ -48,6 +49,9 @@ class CalendarServiceIdCollectionResource extends ResourceCollection
         $items = [];
         foreach ($this->collection as $item) {
             $items[$item->city_id][] = $item;
+            foreach (DB::select('SELECT city_id FROM city_service WHERE service_id=?', [$item->id]) as $id) {
+                $items[$id->city_id][] = $item;
+            }
         }
         return $items;
     }
