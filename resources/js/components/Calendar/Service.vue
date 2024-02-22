@@ -173,7 +173,6 @@ export default {
     methods: {
         loadData() {
             this.loading = true;
-            console.log('service, serviceId', this.serviceId, this.myService);
             this.$api().get(route('api.calendar.service', { service: this.serviceId })).then(response => {
                 this.myService = response.data.data;
                 this.loading = false;
