@@ -2,10 +2,9 @@
 
 @section('title', 'HTML-Code einbinden')
 
-@section('content')
-    @component('reports.embedhtml')<script src="https://code.jquery.com/jquery-3.3.1.min.js" type="text/javascript"></script>
-        <script defer>$(document).ready(function () {
-                var url = '{{ $url }}';
+@section('content')<script defer>document.addEventListener("DOMContentLoaded", function(event) {
+                @component('reports.embedhtml')
+        var url = '{{ $url }}';
                 var parish;
                 if (parish=localStorage.getItem('parish')) url = url + '&parish='+parish;
                 fetch(url).then((res) => {return res.text();}).then((data) => {$('#{{ $randomId }}').html(data);});});

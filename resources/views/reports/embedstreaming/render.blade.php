@@ -1,5 +1,4 @@
-<script src="https://code.jquery.com/jquery-3.3.1.min.js" type="text/javascript"></script>
-<script defer>$(document).ready(function () {
+<script defer>document.addEventListener("DOMContentLoaded", function(event) {
         fetch('{{ $url }}').then((res) => {
             return res.text();
         }).then((data) => {
