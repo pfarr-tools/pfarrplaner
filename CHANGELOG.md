@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.4.6](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.4.5...v2024.4.6) (2024-03-01)
+
+
+### Bug Fixes
+
+* Alternativer Titel und Youtube-Symbol fehlen im Kalender ([475997c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/475997cdd849fe6b51807a5609d45b8c5dd448e7))
+
 ### [2024.4.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.4.4...v2024.4.5) (2024-02-29)
 
 ### [2024.4.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.4.3...v2024.4.4) (2024-02-22)
