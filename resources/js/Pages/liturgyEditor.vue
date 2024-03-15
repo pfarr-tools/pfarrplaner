@@ -31,20 +31,20 @@
     <admin-layout enable-control-sidebar="true" :title="title(service)">
         <template slot="navbar-left">
             <span v-if="!templateMode">
-                <inertia-link class="btn btn-light" :href="route('service.edit', service.slug)"
+                <inertia-link v-if="service.isEditable" class="btn btn-light" :href="route('service.edit', service.slug)"
                               title="Gottesdienst bearbeiten"><span class="mdi mdi-pencil"></span> Gottesdienst
                 </inertia-link>&nbsp;
-                <inertia-link class="btn btn-light" :href="route('service.sermon.editor', service.slug)"
+                <inertia-link v-if="service.isEditable" class="btn btn-light" :href="route('service.sermon.editor', service.slug)"
                               title="Predigt zu diesem Gottesdienst bearbeiten"><span class="mdi mdi-microphone"></span>
                     Predigt
                 </inertia-link>&nbsp;
             </span>
             <span v-else>
-                <save-button @click="saveTemplate">Vorlage speichern</save-button>
+                <save-button v-if="service.isEditable" @click="saveTemplate">Vorlage speichern</save-button>
             </span>
             <slot name="toolbar"/>
         </template>
-        <template slot="control-sidebar">
+        <template slot="control-sidebar" v-if="service.isEditable" >
             <form-check label="Zeitangaben runden" v-model="$page.props.settings.liturgy_times_rounded"
                         @input="setLiturgyTimesRounded"/>
             <form-input class="mt-2" label="Sprechgeschwindigkeit" v-model="$page.props.settings.wpm" @input="setWPM"
@@ -55,10 +55,11 @@
             <info-pane v-if="!templateMode" :service="service" :liturgy-info="liturgyInfo" @info="infoWindow = true"/>
             <template-info-pane v-if="templateMode" v-model="service"/>
         </template>
-        <liturgy-tree :service="service" :sheets="templateMode ? {} : liturgySheets" :agenda-mode="templateMode"
+        <liturgy-tree v-if="service.isEditable" :service="service" :sheets="templateMode ? {} : liturgySheets" :agenda-mode="templateMode"
                       :auto-focus-block="autoFocusBlock" :auto-focus-item="autoFocusItem"
                       :ministries="ministries" :markers="markers"
                       @update-focus="updateFocus"/>
+        <liturgy-viewer v-else="service.isEditable" :service="service" :sheets="templateMode ? {} : liturgySheets" />
     </admin-layout>
 </template>
 
@@ -71,6 +72,7 @@ import SaveButton from "../components/Ui/buttons/SaveButton.vue";
 const InfoPane = () => import('../components/LiturgyEditor/Pane/InfoPane');
 const TemplateInfoPane = () => import('../components/TemplateEditor/Pane/InfoPane');
 const LiturgyTree = () => import('../components/LiturgyEditor/Pane/LiturgyTree');
+const LiturgyViewer = () => import('../components/LiturgyEditor/Pane/LiturgyViewer');
 
 export default {
     props: {
@@ -101,6 +103,7 @@ export default {
         InfoPane,
         TemplateInfoPane,
         LiturgyTree,
+        LiturgyViewer,
     },
     data() {
         if (undefined == this.$page.props.settings.liturgy_times_rounded) this.$page.props.settings.liturgy_times_rounded = false;

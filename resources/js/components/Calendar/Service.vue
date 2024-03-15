@@ -126,6 +126,14 @@
 
                 </div>
             </div>
+            <div v-if="!myService.isEditable" class="overlay">
+                <div class="buttons">
+                    <a href="#" class="btn btn-light mb-1" role="button"
+                       title="Liturgie ansehen" @click.prevent.stop="editFromButton(myService, 'liturgy.editor', $event)">
+                        <span class="mdi mdi-view-list"></span>
+                    </a><br />
+                </div>
+            </div>
 
         </div>
     </div>

@@ -57,6 +57,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
     protected $extension = 'docx';
     protected $configurationPage = 'Liturgy/LiturgySheets/FullTextSongSheetConfiguration';
     protected $configurationComponent = 'FullTextLiturgySheetConfiguration';
+    protected $privileged = true;
 
     protected $defaultConfig = [
         'includeSongTexts' => 1,

@@ -56,7 +56,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="dropdown">
+                        <div v-if="service.isEditable" class="dropdown">
                             <button type="button" id="dropdownLinksMenuButton" data-bs-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="false" title="Links zu Predigthilfen"
                                     class="btn btn-light btn-sm mt-1 dropdown-toggle"><span data-v-5d98b2c4=""
@@ -126,7 +126,7 @@
             </card-body>
         </card>
         </div>
-        <funeral-info-pane v-for="funeral in myService.funerals"
+        <funeral-info-pane v-if="service.isEditable" v-for="funeral in myService.funerals"
                            :key="'funeral_info_'+funeral.id"
                            :funeral="funeral" :service="service"/>
     </div>

@@ -45,6 +45,7 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
     /** @var Service $service */
     protected $service = null;
     protected $extension = 'docx';
+    protected $privileged = true;
 
     public function __construct()
     {

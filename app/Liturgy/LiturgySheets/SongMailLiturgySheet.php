@@ -42,6 +42,7 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
     protected $title = 'E-Mail mit Liederliste';
     protected $icon = 'fa fa-envelope';
     protected $isNotAFile = true;
+    protected $privileged = true;
 
     public function render(Service $service)
     {

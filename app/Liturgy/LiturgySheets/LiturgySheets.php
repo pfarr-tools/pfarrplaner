@@ -52,6 +52,7 @@ class LiturgySheets
                     'configurationPage' => $object->getConfigurationPage(),
                     'configurationComponent' => $object->getConfigurationComponent(),
                     'config' => $object->getConfiguration(),
+                    'privileged' => $object->isPrivileged(),
                 ];
             }
         }

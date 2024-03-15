@@ -50,6 +50,8 @@ class AbstractLiturgySheet
     protected $defaultConfig = [];
     protected $config = [];
 
+    protected $privileged = false;
+
     public function __construct() {
         $this->config = $this->getConfiguration();
     }
@@ -267,6 +269,18 @@ class AbstractLiturgySheet
     {
         $this->configurationComponent = $configurationComponent;
     }
+
+    public function isPrivileged(): bool
+    {
+        return $this->privileged;
+    }
+
+    public function setPrivileged(bool $privileged): void
+    {
+        $this->privileged = $privileged;
+    }
+
+
 
 
 
