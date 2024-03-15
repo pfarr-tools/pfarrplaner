@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.5.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.4.6...v2024.5.0) (2024-03-15)
+
+
+### Features
+
+* Liturgie ansehen ohne Schreibrecht möglich ([4d7d242](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4d7d242ed5a2c8e7e527e3c9e4e3dd2526edea0b))
+
 ### [2024.4.6](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.4.5...v2024.4.6) (2024-03-01)
 
 
