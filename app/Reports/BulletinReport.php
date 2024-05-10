@@ -30,14 +30,14 @@
 
 namespace App\Reports;
 
-use App\Models\Calendar\Day;
-use App\Models\Liturgy;
+use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Shared\Converter;
@@ -67,7 +67,9 @@ class BulletinReport extends AbstractWordDocumentReport
     /**
      * @var string[]
      */
-    public $formats = ['Tailfingen', 'Truchtelfingen'];
+    public $formats = ['Tailfingen', 'Truchtelfingen', 'Gäufelden'];
+
+    public $cities = [];
 
 
     protected $inertia = true;
@@ -102,12 +104,15 @@ class BulletinReport extends AbstractWordDocumentReport
 
         $serviceList = Service::between(Carbon::parse($data['start']), Carbon::parse($data['end']))
             ->notHidden()
-            ->whereIn('city_id', $request->get('includeCities'))
+            ->whereIn('city_id', $data['includeCities'])
             ->ordered()
             ->get()
             ->groupBy('key_date');
 
-        $format = $data['format'] ?? $this->formats[0];
+        $this->cities = $data['includeCities'];
+
+
+        $format = ucfirst(Str::slug($data['format'] ?? $this->formats[0]));
 
         $renderMethod = "render{$format}Format";
         if (method_exists($this, $renderMethod)) {
@@ -138,7 +143,7 @@ class BulletinReport extends AbstractWordDocumentReport
                     $textRun->addText(htmlspecialchars(LiturgyService::getDayInfo($service->date)['title'] ?? ''));
                 }
                 $textRun->addText("\t");
-                $textRun->addText($service->timeText()."\t");
+                $textRun->addText($service->timeText() . "\t");
                 if (!is_object($service->location)) {
                     $textRun->addText(htmlspecialchars($service->special_location) . "\t");
                 } else {
@@ -213,6 +218,87 @@ class BulletinReport extends AbstractWordDocumentReport
                     $service->offering_goal ? 'Opfer für ' . $service->offering_goal : ''
                 );
                 $first = false;
+            }
+        }
+
+        $filename = date('Ymd') . ' Gottesdienstliste Gemeindebrief';
+        $this->sendToBrowser($filename);
+    }
+
+
+    public function renderGaufeldenFormat($serviceList)
+    {
+        $this->wordDocument->setDefaultFontSize(10);
+        $this->wordDocument->setDefaultFontName('Quicksand');
+        $section = $this->commonDocumentSetup();
+        Carbon::setLocale(config('app.locale'));
+
+        $list = [];
+        foreach ($serviceList as $date => $services) {
+            foreach ($services as $service) {
+                $list[substr($date, 0, 7)][$service->city_id][$date] = $services;
+            }
+        }
+
+        foreach ($list as $month => $cities) {
+            $monthDate = Carbon::parse($month . '-01 0:00:00');
+            $section->addText(
+                $monthDate->getTranslatedMonthName() . ' ' . $monthDate->format('Y'),
+                ['name' => 'Quicksand', 'bold' => true, 'size' => 24]
+            );
+            $section->addTextBreak(1);
+            $index = 0;
+            foreach ($this->cities as $cityId) {
+                $city = City::find($cityId);
+                $days = $cities[$cityId];
+                $run = $section->addTextRun();
+                $run->addText($city->name.'<w:br /><w:br />', ['name' => 'Quicksand', 'bold' => true, 'size' => 16]);
+                foreach ($days as $day => $services) {
+                    $dayDate = Carbon::parse($day . ' 0:00:00');
+                    if ($index == 0) {
+                        $liturgy = LiturgyService::getLiturgyInfoByDate($dayDate);
+
+                        $run->addText(
+                            substr($dayDate->getTranslatedDayName(), 0, 2)
+                            . '., '
+                            . $dayDate->format('d. ')
+                            . $dayDate->getTranslatedMonthName(),
+                            ['name' => 'Quicksand', 'bold' => true, 'size' => 10]
+                        );
+                        if (count($liturgy)) {
+                            $run->addText(' | '.$liturgy[0]->title, ['name' => 'Quicksand', 'bold' => true, 'size' => 8]);
+                        }
+                    }
+                    $run->addText('<w:br />');
+                    foreach ($services as $service) {
+                        /** @var Service $service */
+                        if ($service->city_id == $city->id) {
+                            $run->addText($service->timeText().'<w:br />', ['name' => 'Quicksand']);
+
+                            $location = $service->locationText();
+                            if (!Str::contains($location, $city->name)) $location .= ' '.$city->name;
+                            $run->addText($location.'<w:br />', ['name' => 'Quicksand']);
+
+                            if ($service->description && (substr($service->description,0,1)=='"')) {
+                                $run->addText($service->description.'<w:br />', ['name' => 'Quicksand']);
+                            }
+
+                            $run->addText(
+                                $service->titleText(false) . ' mit '
+                                . $service->participantsText('P', true).'<w:br />',
+                                ['name' => 'Quicksand']
+                            );
+
+                            if ($service->description && (substr($service->description,0,1)!='"')) {
+                                $run->addText($service->description.'<w:br />', ['name' => 'Quicksand']);
+                            }
+
+                            $run->addText('<w:br /><w:br />', ['name' => 'Quicksand']);
+                        }
+                    }
+                }
+                $run->addText('<w:br />');
+                $index++;
             }
         }
 
