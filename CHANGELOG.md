@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.6.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.6.0...v2024.6.2) (2024-05-18)
+
+
+### Bug Fixes
+
+* Änderungen an Kirchengemeinden lassen sich nicht speichern ([eb5a522](https://codeberg.org/pfarr.tools/pfarrplaner/commit/eb5a5220d002cc57604293db821756f6c1b6629c))
+
 ### [2024.6.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.6.0...v2024.6.1) (2024-05-18)
 
 
