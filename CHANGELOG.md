@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.6.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.6.1...v2024.6.3) (2024-05-18)
+
+
+### Bug Fixes
+
+* Falsche Route ([006f16f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/006f16f26159c35c19873744e18116f603e49b98))
+
 ### [2024.6.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.6.0...v2024.6.2) (2024-05-18)
 
 
