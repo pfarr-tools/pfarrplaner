@@ -57,7 +57,7 @@ class Song extends AbstractSngFile
     {
         $this->setHeaders([
             'LangCount' => 1,
-            'Title' => $this->item->data['song']['song']['title'],
+            'Title' => $this->item->data['song']['song']['title'] ?? '',
             'ChurchSongID' => $this->helper->getCodeText(),
             'Songbook' => $this->helper->getCodeText(),
             'CCLI' => '-',
@@ -78,16 +78,16 @@ class Song extends AbstractSngFile
         $text = $this->headersToText();
 
 
-        if ($this->item->data['song']['song']['refrain']) {
+        if ($this->item->data['song']['song']['refrain'] ?? '') {
             $text .= $this->line('---')
                 . $this->line('Refrain')
-                . $this->wordWrap($this->item->data['song']['song']['refrain']);
+                . $this->wordWrap($this->item->data['song']['song']['refrain'] ?? '');
         }
 
-        foreach ($this->item->data['song']['song']['verses'] as $verse) {
+        foreach ($this->item->data['song']['song']['verses'] ?? [] as $verse) {
             $text .= $this->line('---')
-                . $this->line('Vers ' . $verse['number'])
-                . $this->wordWrap($verse['text']);
+                . $this->line('Vers ' . $verse['number'] ?? '')
+                . $this->wordWrap($verse['text'] ?? '');
         }
 
         return utf8_decode($text);

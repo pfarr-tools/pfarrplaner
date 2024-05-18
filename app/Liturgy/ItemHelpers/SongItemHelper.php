@@ -40,7 +40,7 @@ class SongItemHelper extends AbstractItemHelper
 
     public function extractInfo()
     {
-        $rights = $this->item->data['song']['song']['copyrights'];
+        $rights = $this->item->data['song']['song']['copyrights'] ?? '';
         if (str_contains($rights, '/')) {
             $parts = explode('/', $rights);
             foreach ($parts as $part) {
