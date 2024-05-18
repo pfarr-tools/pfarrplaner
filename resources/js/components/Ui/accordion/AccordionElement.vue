@@ -34,6 +34,7 @@
                 <button class="btn btn-block text-left pl-0 accordion-button" :class="{ collapsed : !open}" type="button" data-bs-toggle="collapse" :data-target="'#collapse'+uid" aria-expanded="false" :aria-controls="'collapse'+uid"
                 @click="open = !open">
                     <span v-if="icon" :class="icon"></span>
+                    <img v-if="image" class="mx-2" style="max-height: 2em" :src="image" />
                     {{ title }}
                 </button>
             </h2>        </card-header>
@@ -51,7 +52,7 @@ import CardHeader from "../cards/cardHeader";
 import CardBody from "../cards/cardBody";
 export default {
     name: "AccordionElement",
-    props: ['title', 'icon'],
+    props: ['title', 'icon', 'image'],
     components: {CardBody, CardHeader, Card},
     inject: ['accordionId'],
     data() {

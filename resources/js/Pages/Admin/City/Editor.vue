@@ -119,83 +119,58 @@
                             v-model="myCity.podcast_owner_email"/>
             </tab>
             <tab id="integrations" :active-tab="activeTab">
-                <div class="accordion" id="integrationsAccordion">
-                    <div class="card">
-                        <div class="card-header" id="headingKonfiApp">
-                            <h2 class="mb-0">
-                                <button class="btn btn-block text-start pl-0 accordion-button collapsed" type="button" data-bs-toggle="collapse" data-target="#collapseKonfiApp" aria-expanded="false" aria-controls="collapseKonfiApp">
-                                    <img class="mx-2" style="max-height: 2em" src="https://www.pfarrplaner.de/img/external/konfiapp.png?v=2">KonfiApp
-
-                                </button>
-                            </h2>
-                        </div>
-
-                        <div id="collapseKonfiApp" class="collapse" aria-labelledby="headingKonfiApp" data-parent="#integrationsAccordion">
-                            <div class="card-body">
-                                <p>Die <a href="https://konfiapp.de" target="_blank">KonfiApp</a> von Philipp Dormann bietet
-                                    viele Möglichkeiten, mit Konfis in Kontakt zu bleiben.</p>
-                                <h5>Der Pfarrplaner bietet aktuell folgende Integrationsmöglichkeiten:</h5>
-                                <ul>
-                                    <li>Im Pfarrplaner angelegte Gottesdienste können einem Veranstaltungstyp in der
-                                        KonfiApp
-                                        zugewiesen werden. Beim Speichern wird dann automatisch ein passender QR-Code in der
-                                        KonfiApp angelegt.
-                                    </li>
-                                </ul>
-                                <p>Für die Integration der KonfiApp ist ein API-Schlüssel erforderlich. Dieser kann im
-                                    Verwaltungsbereich der KonfiApp über folgenden Link angelegt werden:
-                                    <a href="https://verwaltung.konfiapp.de/administration/api-tokens/" target="_blank">https://verwaltung.konfiapp.de/administration/api-tokens/</a>.
-                                    Der dort erstellte Schlüssel muss in das untenstehende Eingabefeld kopiert werden. In
-                                    der
-                                    anschließenden Übersicht in der KonfiApp können für den Schlüssel
-                                    sogenannte "Scopes" aktiviert werden. Folgende Scopes sind für das Funktionieren der
-                                    Integration erforderlich:</p>
-                                <p>
-                                    <span class="badge bg-secondary">veranstaltungen.read</span>
-                                    <span class="badge bg-secondary">veranstaltungen.qr.read</span>
-                                    <span class="badge bg-secondary">veranstaltungen.qr.create</span>
-                                    <span class="badge bg-secondary">veranstaltungen.qr.delete</span>
-                                </p>
-                                <form-input name="konfiapp_apikey" label="API-Schlüssel für die KonfiApp"
-                                            v-model="myCity.konfiapp_apikey"/>
-                                <konfi-app-event-type-select v-if="myCity.konfiapp_apikey" name="konfiapp_event_type"
-                                                             label="Veranstaltungsart in der KonfiApp"
-                                                             :city="myCity" v-model="myCity.konfiapp_default_type"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header" id="headingCommuniApp">
-                            <h2 class="mb-0">
-                                <button class="btn btn-block text-start pl-0 accordion-button collapsed" type="button" data-bs-toggle="collapse" data-target="#collapseCommuniApp" aria-expanded="false" aria-controls="collapseCommuniApp">
-                                    <img class="mx-2" style="max-height: 2em" src="/img/external/communiapp.png">CommuniApp
-                                </button>
-                            </h2>
-                        </div>
-
-                        <div id="collapseCommuniApp" class="collapse" aria-labelledby="headingCommuniApp" data-parent="#integrationsAccordion">
-                            <div class="card-body">
-                                <p>Die <a href="https://www.communiapp.de" target="_blank">CommuniApp</a> bietet viele
-                                    Möglichkeiten, als Gemeinde in Kontakt zu bleiben.</p>
-                                <h5>Der Pfarrplaner bietet aktuell folgende Integrationsmöglichkeiten:</h5>
-                                <ul>
-                                    <li>Im Pfarrplaner angelegte Gottesdienste können automatisch in der CommuniApp angelegt
-                                        werden. Bei dieser Integration können auch weitere Termine aus Outlook bzw. aus dem
-                                        OnlinePlaner verwendet werden.
-                                    </li>
-                                </ul>
-                                <p>Für die Integration der CommuniApp ist ein API-Schlüssel erforderlich. Dieser kann im
-                                    Verwaltungsbereich der CommuniApp unter Admin > Integrationen > Rest-Api angelegt werden.
-                                    Der dort erstellte Schlüssel muss in das untenstehende Eingabefeld kopiert werden. </p>
-                                <form-textarea name="communiapp_token" v-model="myCity.communiapp_token"
-                                               label="Zugangstoken für die CommuniApp"/>
-                                <form-input name="communiapp_default_group_id" v-model="myCity.communiapp_default_group_id"
-                                            label="Gruppen-ID der Hauptgruppe"/>
-                                <form-input name="communiapp_url" v-model="myCity.communiapp_url" label="URL der App"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <accordion id="integrationsAccordion2">
+                    <accordion-element title="KonfiApp" image="/img/external/konfiapp.png">
+                        <p>Die <a href="https://konfiapp.de" target="_blank">KonfiApp</a> von Philipp Dormann bietet
+                            viele Möglichkeiten, mit Konfis in Kontakt zu bleiben.</p>
+                        <h5>Der Pfarrplaner bietet aktuell folgende Integrationsmöglichkeiten:</h5>
+                        <ul>
+                            <li>Im Pfarrplaner angelegte Gottesdienste können einem Veranstaltungstyp in der
+                                KonfiApp
+                                zugewiesen werden. Beim Speichern wird dann automatisch ein passender QR-Code in der
+                                KonfiApp angelegt.
+                            </li>
+                        </ul>
+                        <p>Für die Integration der KonfiApp ist ein API-Schlüssel erforderlich. Dieser kann im
+                            Verwaltungsbereich der KonfiApp über folgenden Link angelegt werden:
+                            <a href="https://verwaltung.konfiapp.de/administration/api-tokens/" target="_blank">https://verwaltung.konfiapp.de/administration/api-tokens/</a>.
+                            Der dort erstellte Schlüssel muss in das untenstehende Eingabefeld kopiert werden. In
+                            der
+                            anschließenden Übersicht in der KonfiApp können für den Schlüssel
+                            sogenannte "Scopes" aktiviert werden. Folgende Scopes sind für das Funktionieren der
+                            Integration erforderlich:</p>
+                        <p>
+                            <span class="badge bg-secondary">veranstaltungen.read</span>
+                            <span class="badge bg-secondary">veranstaltungen.qr.read</span>
+                            <span class="badge bg-secondary">veranstaltungen.qr.create</span>
+                            <span class="badge bg-secondary">veranstaltungen.qr.delete</span>
+                        </p>
+                        <form-input name="konfiapp_apikey" label="API-Schlüssel für die KonfiApp"
+                                    v-model="myCity.konfiapp_apikey"/>
+                        <konfi-app-event-type-select v-if="myCity.konfiapp_apikey" name="konfiapp_event_type"
+                                                     label="Veranstaltungsart in der KonfiApp"
+                                                     :city="myCity" v-model="myCity.konfiapp_default_type"/>
+                    </accordion-element>
+                    <accordion-element title="CommuniApp" image="/img/external/communiapp.png">
+                        <p>Die <a href="https://www.communiapp.de" target="_blank">CommuniApp</a> bietet viele
+                            Möglichkeiten, als Gemeinde in Kontakt zu bleiben.</p>
+                        <h5>Der Pfarrplaner bietet aktuell folgende Integrationsmöglichkeiten:</h5>
+                        <ul>
+                            <li>Im Pfarrplaner angelegte Gottesdienste können automatisch in der CommuniApp angelegt
+                                werden. Bei dieser Integration können auch weitere Termine aus Outlook bzw. aus dem
+                                OnlinePlaner verwendet werden.
+                            </li>
+                        </ul>
+                        <p>Für die Integration der CommuniApp ist ein API-Schlüssel erforderlich. Dieser kann im
+                            Verwaltungsbereich der CommuniApp unter Admin > Integrationen > Rest-Api angelegt werden.
+                            Der dort erstellte Schlüssel muss in das untenstehende Eingabefeld kopiert werden. </p>
+                        <form-textarea name="communiapp_token" v-model="myCity.communiapp_token"
+                                       label="Zugangstoken für die CommuniApp"/>
+                        <form-input name="communiapp_default_group_id" v-model="myCity.communiapp_default_group_id"
+                                    label="Gruppen-ID der Hauptgruppe"/>
+                        <form-input name="communiapp_url" v-model="myCity.communiapp_url" label="URL der App"/>
+                    </accordion-element>
+                </accordion>
             </tab>
         </tabs>
     </admin-layout>
@@ -215,10 +190,14 @@ import FormCheck from "../../../components/Ui/forms/FormCheck";
 import FormImageAttacher from "../../../components/Ui/forms/FormImageAttacher";
 import FormTextarea from "../../../components/Ui/forms/FormTextarea";
 import KonfiAppEventTypeSelect from "../../../components/Ui/elements/KonfiAppEventTypeSelect";
+import Accordion from "../../../components/Ui/accordion/Accordion.vue";
+import AccordionElement from "../../../components/Ui/accordion/AccordionElement.vue";
 
 export default {
     name: "Editor",
     components: {
+        AccordionElement,
+        Accordion,
         KonfiAppEventTypeSelect,
         FormTextarea,
         FormImageAttacher,
