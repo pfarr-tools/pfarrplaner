@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.6.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.5.0...v2024.6.0) (2024-05-18)
+
+
+### Features
+
+* Layout "Gäufelden" für die Gottesdienstliste im Gemeindebrief ([e892708](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e892708bb02c6be0ad4457399e6cd87cbc4bcb85))
+* Liste aller Wochensprüche (z.B. für Canva) ([d16472e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d16472e6bc9ec8923fed0df043f5179b54120040))
+* Neue Ausgabe für "Freud&Leid" im Gemeindebrief ([33cf289](https://codeberg.org/pfarr.tools/pfarrplaner/commit/33cf28917da8fa7ea7c2de518813dd729209b092))
+
+
+### Bug Fixes
+
+* Integrationen für Kirchengemeinden lassen sich nicht konfigurieren ([4790ae0](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4790ae030182206dcf90fc3d98854c0097ca6993))
+* SongBeamer-Export stürzt bei leerem Liedeintrag ab ([a14cc40](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a14cc40b57f4a99b142001bfa385b5e3e7444cc7))
+
 ## [2024.5.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.4.6...v2024.5.0) (2024-03-15)
 
 
