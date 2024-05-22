@@ -30,11 +30,11 @@
 <template>
     <div class="reservations-tab">
         <div v-if="!myService.registration_active" class="alert alert-warning">
-            Die Anmeldung für diesen Gottesdienst ist momentan nicht aktiv.
+            Die Anmeldung für diese Veranstaltung ist momentan nicht aktiv.
         </div>
         <div class="row">
             <div class="col-md-6">
-                <form-check name="needs_reservations" label="Für diesen Gottesdienst ist eine Anmeldung notwendig."
+                <form-check name="needs_reservations" label="Für diese Veranstaltung ist eine Anmeldung notwendig."
                             v-model="myService.needs_reservations"/>
                 <form-check name="registration_active" label="Online-Anmeldung aktiv"
                             v-model="myService.registration_active"/>
@@ -84,7 +84,7 @@
             Anmeldeliste</a>
         <div class="bookings mt-3">
             <div class="alert alert-info" v-if="service.bookings.length == 0">
-                Für diesen Gottesdienst gibt es noch keine Anmeldungen.
+                Für diese Veranstaltung gibt es noch keine Anmeldungen.
             </div>
             <div v-else>
                 <p v-if="myService.seating.count">

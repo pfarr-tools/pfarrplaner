@@ -94,18 +94,29 @@
         </div>
 
         <div class="btn-group" role="group" aria-label="Ansicht umschalten">
-            <input type="radio" class="btn-check" name="calendarMode" id="calendarModeServices" autocomplete="off" v-model="calendarMode"
-                   value="services" @input="$emit('toggle-calendar-mode', 'services')" title="Nur Gottesdienste anzeigen"/>
-            <label class="btn btn-light" for="calendarModeServices" ><span class="mdi mdi-church"></span></label>
+            <input type="radio" class="btn-check" name="calendarMode" id="calendarModeServices" autocomplete="off"
+                   v-model="calendarMode"
+                   value="services" @input="$emit('toggle-calendar-mode', 'services')"
+                   title="Nur Gottesdienste anzeigen"/>
+            <label class="btn btn-light" for="calendarModeServices"><span class="mdi mdi-church"></span></label>
 
-            <input type="radio" class="btn-check" name="calendarMode" id="calendarModeEvents" autocomplete="off" v-model="calendarMode"
-                   value="events" @input="$emit('toggle-calendar-mode', 'events')" />
+            <input type="radio" class="btn-check" name="calendarMode" id="calendarModeEvents" autocomplete="off"
+                   v-model="calendarMode"
+                   value="events" @input="$emit('toggle-calendar-mode', 'events')"/>
             <label class="btn btn-light" for="calendarModeEvents"><span class="mdi mdi-calendar"></span></label>
         </div>
 
-        <create-service-wizard-button v-if="canCreate" type="success" :cities="writableCities" class="ms-2 me-2" :date="date" :key="moment(date).toISOString()" />
+        <create-service-wizard-button v-if="(calendarMode == 'services') && canCreate" type="success"
+                                      :cities="writableCities" class="ms-2 me-2" :date="date"
+                                      :key="moment(date).toISOString()"/>
+        <nav-button v-if="canCreate && (calendarMode != 'services')" type="success" class="ms-2 me-2"
+                    @click="createNewEvent"
+                    icon="mdi mdi-plus" force-icon>
+            Veranstaltung anlegen
+        </nav-button>
 
-        <nav-button class="me-2"
+        <nav-button v-if="(calendarMode == 'services')"
+                    class="me-2"
                     :type="targetMode ? 'warning' : 'default'"
                     :icon="targetMode ? (target.exclusive ? 'mdi mdi-account-convert-outline': 'mdi mdi-account-arrow-down-outline') : 'mdi mdi-target-account'"
                     :force-no-text="!targetMode"
@@ -115,8 +126,12 @@
             {{ targetTitle() }}
         </nav-button>
 
-        <a class="btn btn-default" :href="route('reports.setup', {report: 'ministryRequest'})"
+        <a v-if="(calendarMode == 'services')" class="btn btn-default"
+           :href="route('reports.setup', {report: 'ministryRequest'})"
            title="Dienstanfrage per E-Mail senden"><span class="mdi mdi-email"></span> <span class="d-none d-md-inline">Anfrage senden...</span></a>
+        <calendar-select v-if="(calendarMode == 'events')" :calendars="calendars" v-model="mySelectedCalendar"
+                         @input="$emit('calendar-select', $event)"/>
+
 
     </div>
 
@@ -127,15 +142,17 @@ import EventBus from "../../../plugins/EventBus";
 import {CalendarToggleDayColumnEvent} from "../../../events/CalendarToggleDayColumnEvent";
 import NavButton from "../../Ui/buttons/NavButton";
 import CreateServiceWizardButton from "../../Ui/wizards/CreateServiceWizardButton.vue";
+import CalendarSelect from "./CalendarSelect.vue";
 
 export default {
     name: 'CalendarNavTop',
-    components: {CreateServiceWizardButton, NavButton},
+    components: {CalendarSelect, CreateServiceWizardButton, NavButton},
     data() {
         return {
             slave: false,
             allColumnsOpen: false,
             numericDate: parseInt(moment(this.date).format('YYYYMM')),
+            mySelectedCalendar: this.selectedCalendar
         }
     },
     props: {
@@ -147,6 +164,8 @@ export default {
         target: Object,
         canCreate: Boolean,
         calendarMode: String,
+        calendars: Array,
+        selectedCalendar: String,
     },
     methods: {
         monthLink: function (month) {
@@ -159,12 +178,8 @@ export default {
                 date: year + '-' + (this.date.getUTCMonth() + 1)
             });
         },
-        toggleColumns() {
-            this.allColumnsOpen = !this.allColumnsOpen;
-            this.$emit('collapseall', this.allColumnsOpen);
-        },
         today() {
-            if ((this.orientation == 'vertical') && (moment(this.date).format('YYYYMM') == moment().format('YYYYMM'))) {
+            if (moment(this.date).format('YYYYMM') == moment().format('YYYYMM')) {
                 var el = document.getElementsByClassName('scroll-to-me');
                 if (el) {
                     el[0].parentElement.scrollIntoView();
@@ -179,6 +194,12 @@ export default {
             let people = [];
             this.target.people.forEach(person => people.push(person.name));
             return this.target.ministry + ': ' + people.join(', ');
+        },
+        createNewEvent() {
+            this.$inertia.get(route('event.create', {
+                filter: this.mySelectedCalendar,
+                date: moment(this.date).format('YYYY-MM'),
+            }))
         }
     }
 }

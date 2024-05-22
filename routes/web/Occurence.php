@@ -28,34 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Http\Controllers\Api;
+use App\Http\Controllers\OccurenceController;
 
-use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
-use App\Http\Resources\OccurenceResource;
-use App\Models\Calendar\Occurence;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-
-class EventController
-{
-
-    public function byRange(Request $request, $calendar, $start, $end)
-    {
-        $start = Carbon::parse(Str::beforeLast($start, '('));
-        $end = Carbon::parse(Str::beforeLast($end, '('));
-
-        $calendar = LocalEventCalendarFactory::get($calendar);
-
-        $occurences = Occurence::with('event')
-            ->between($start, $end)
-            ->whereHas('service', function ($query) use ($calendar) {
-                $query = $calendar->adjustQuery($query);
-            })
-            ->orderBy('start')
-            ->get();
-
-        return OccurenceResource::collection($occurences);
-    }
-
-}
+Route::get('/termin/{occurence}', [OccurenceController::class, 'editDecoupled'])->name('occurence.edit');
+Route::delete('/termin/{occurence}', [OccurenceController::class, 'destroy'])->name('occurence.destroy');

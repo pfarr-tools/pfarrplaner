@@ -121,6 +121,9 @@ class ServiceRequest extends FormRequest
             'date' => 'nullable|date',
             'wtc_category' => 'nullable|string',
             'liturgy_info_id' => 'nullable|int|exists:liturgy_info,id',
+            'event_class' => 'nullable|string|in:service,event',
+            'end' => 'nullable|date',
+            'rrule' => 'nullable|string',
         ];
     }
 
@@ -187,6 +190,10 @@ class ServiceRequest extends FormRequest
 
         if (isset($data['date'])) {
             $data['time'] = Carbon::parse($data['date'])->setTimezone('Europe/Berlin')->format('H:i:s');
+        }
+
+        if ($data['event_class'] == 'service') {
+            $data['end'] = Carbon::parse($data['date'])->addHour(1);
         }
 
         return $data;

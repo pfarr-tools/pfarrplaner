@@ -31,7 +31,8 @@
     <div class="home-tab">
         <div class="row">
             <div class="col-md-4">
-                <form-date-picker name="date" label="Datum und Uhrzeit" v-model="myService.date" :config="myDateTimePickerConfig" iso-date/>
+                <form-date-picker name="date" label="Datum und Uhrzeit" v-model="myService.date"
+                                  :config="myDateTimePickerConfig" iso-date/>
             </div>
             <div class="col-md-4">
                 <location-select name="location_id" label="Ort" :value="myLocation" v-if="!locationUpdating"
@@ -40,44 +41,53 @@
                 />
             </div>
             <div class="col-md-4">
-                <proprium-select label="Zugehöriges Proprium" :liturgy-info="liturgyInfo" v-model="myService.liturgy_info_id" />
+                <form-radio-group label="Typ der Veranstaltung" v-model="myService.event_class"
+                                  :items="{service: 'Gottesdienst', event: 'Andere Veranstaltung'}"/>
             </div>
-        </div>
-        <div class="row">
+            <div class="col-md-4" v-if="(myService.event_class == 'event')">
+                <form-date-picker name="date" label="Ende der Veranstaltung" v-model="myService.end"
+                                  :config="myDateTimePickerConfig" iso-date/>
+            </div>
             <div class="col-md-4">
                 <form-selectize name="controlled_access" :options="controlledAccessOptions"
                                 label="Zugangsbeschränkung"
-                                v-model="myService.controlled_access" />
+                                v-model="myService.controlled_access"/>
             </div>
             <div v-if="myService.city.konfiapp_apikey" class="col-md-4">
                 <konfi-app-event-type-select name="konfiapp_event_type" label="Veranstaltungsart in der KonfiApp"
-                    :city="myService.city" v-model="service.konfiapp_event_type"
+                                             :city="myService.city" v-model="service.konfiapp_event_type"
                                              :help="service.konfiapp_event_qr ? 'Ein QR-Code mit der ID '+service.konfiapp_event_qr+' wurde angelegt.' : 'Es wurde noch kein QR-Code angelegt.'"
                 />
             </div>
             <div v-if="myService.city.communiapp_token" class="col-md-4">
-                <form-group label="In der CommuniApp anzeigen ab" help="Leer lassen für den Standard (8 Tage vor Beginn)">
-                    <date-picker v-model="myService.communiapp_listing_start" :config="myDatePickerConfig" />
+                <form-group label="In der CommuniApp anzeigen ab"
+                            help="Leer lassen für den Standard (8 Tage vor Beginn)">
+                    <date-picker v-model="myService.communiapp_listing_start" :config="myDatePickerConfig"/>
                 </form-group>
             </div>
-        </div>
-        <div class="row">
             <div class="col-md-4">
+                <form-selectize name="related_cities[]" label="Auch in folgenden Kirchengemeinden anzeigen"
+                                v-model="service.related_cities"
+                                :options="cities" multiple/>
+            </div>
+            <div class="col-md-4" v-if="myService.event_class == 'service'">
+                <proprium-select label="Zugehöriges Proprium" :liturgy-info="liturgyInfo"
+                                 v-model="myService.liturgy_info_id"/>
+            </div>
+            <div class="col-md-4" v-if="myService.event_class == 'service'">
                 <label>Sakramente</label>
                 <form-check name="baptism" label="Dies ist ein Taufgottesdienst." v-model="service.baptism"/>
                 <form-check name="eucharist" label="Dies ist ein Abendmahlsgottesdienst." v-model="service.eucharist"/>
             </div>
-            <div class="col-md-4">
-                <form-selectize name="related_cities[]" label="Auch in folgenden Kirchengemeinden anzeigen" v-model="service.related_cities"
-                                :options="cities" multiple />
-            </div>
         </div>
         <hr/>
-        <form-check name="hidden" label="Diesen Gottesdienst in öffentlichen Listen nicht anzeigen."
-                    v-model="service.hidden" />
+        <form-check name="hidden" label="Diese Veranstaltung in öffentlichen Listen nicht anzeigen."
+                    v-model="service.hidden"/>
         <div class="row">
             <div class="col-md-6">
-                <form-input name="title" label="Abweichender Titel" v-model="service.title"
+                <form-input name="title" :label="myService.event_class == 'service' ? 'Abweichender Titel' : 'Titel der Veranstaltung'"
+                            v-model="service.title"
+                            :required="myService.event_class != 'service'"
                             help="z.B. für öffentliche Listen"/>
             </div>
             <div class="col-md-6">
@@ -91,19 +101,24 @@
         <div class="row">
             <div class="col-md-6">
                 <tag-select name="tags" label="Kennzeichnungen" v-model="service.tags"
-                                help="Kennzeichnungen z.B. für den Gemeindebrief" :tags="tags" />
+                            help="Kennzeichnungen z.B. für den Gemeindebrief" :tags="tags"/>
             </div>
             <div class="col-md-6">
-                <service-group-select name="service_groups" label="Dieser Gottesdienst gehört zu folgenden Gruppen"
-                                v-model="service.service_groups" help="Gruppen z.B. für den Gemeindebrief"
-                                :service-groups="serviceGroups" />
+                <service-group-select name="service_groups" label="Diese Veranstaltung gehört zu folgenden Gruppen"
+                                      v-model="service.service_groups" help="Gruppen z.B. für den Gemeindebrief"
+                                      :service-groups="serviceGroups"/>
             </div>
         </div>
-        <hr/>
-        <div v-if="hasAnnouncements" class="alert alert-warning"><b>Bitte beachte:</b> Diesem Gottesdienst wurde eine Datei namens "Bekanntgaben" angehängt.
-            Diese überschreibt die automatisch erstellten Bekanntmachungen. Änderungen an diesem Feld werden daher möglicherweise nicht berücksichtigt.</div>
-        <form-textarea name="announcements" label="Zusätzliche Bekanntgaben" v-model="service.announcements"
-                       help="Bekanntgaben, die über die automatisch erstellte Terminliste hinausgehen."/>
+        <div v-if="myService.event_class == 'service'">
+            <hr/>
+            <div v-if="hasAnnouncements" class="alert alert-warning"><b>Bitte beachte:</b> Diesem Gottesdienst wurde
+                eine Datei namens "Bekanntgaben" angehängt.
+                Diese überschreibt die automatisch erstellten Bekanntmachungen. Änderungen an diesem Feld werden daher
+                möglicherweise nicht berücksichtigt.
+            </div>
+            <form-textarea name="announcements" label="Zusätzliche Bekanntgaben" v-model="service.announcements"
+                           help="Bekanntgaben, die über die automatisch erstellte Terminliste hinausgehen."/>
+        </div>
     </div>
 </template>
 
@@ -123,10 +138,12 @@ import TagSelect from "../../Ui/elements/TagSelect";
 import ServiceGroupSelect from "../../Ui/elements/ServiceGroupSelect";
 import FormDatePicker from "../../Ui/forms/FormDatePicker";
 import PropriumSelect from "../PropriumSelect.vue";
+import FormRadioGroup from "../../Ui/forms/FormRadioGroup.vue";
 
 export default {
     name: "HomeTab",
     components: {
+        FormRadioGroup,
         PropriumSelect,
         FormDatePicker,
         ServiceGroupSelect,
@@ -160,26 +177,27 @@ export default {
         },
     },
     data() {
-        let myDatePickerConfig =  {
+        let myDatePickerConfig = {
             format: 'DD.MM.YYYY',
             locale: 'de',
             showClear: true,
         }
         let myService = this.service;
         myService.communiapp_listing_start = moment(this.service.communiapp_listing_start).format('DD.MM.YYYY');
+        myService.event_class = myService.event_class || 'service';
         return {
-            myService: this.service,
+            myService,
             myLocation: this.service.location || this.service.special_location,
             myDatePickerConfig: myDatePickerConfig,
             locationUpdating: false,
             controlledAccessOptions: [
-                { id: 0, name: 'keine Zugangsbeschränkung'},
-                { id: 1, name: '3G'},
-                { id: 2, name: '2G'},
-                { id: 3, name: '2G+'},
-                { id: 4, name: 'Schnelltest für alle Besucher'},
-                { id: 5, name: 'Schnelltest empfohlen'},
-                { id: 6, name: 'Geschlossene Gruppe'},
+                {id: 0, name: 'keine Zugangsbeschränkung'},
+                {id: 1, name: '3G'},
+                {id: 2, name: '2G'},
+                {id: 3, name: '2G+'},
+                {id: 4, name: 'Schnelltest für alle Besucher'},
+                {id: 5, name: 'Schnelltest empfohlen'},
+                {id: 6, name: 'Geschlossene Gruppe'},
             ],
             myDateTimePickerConfig: {
                 locale: 'de',
@@ -192,7 +210,7 @@ export default {
     methods: {
         setLocation(location) {
             this.locationUpdating = true;
-            if(typeof location == 'object') {
+            if (typeof location == 'object') {
                 this.myLocation = location;
                 this.myService.location_id = location.id;
                 this.myService.location = location;

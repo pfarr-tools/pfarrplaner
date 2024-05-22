@@ -41,7 +41,7 @@ class CalendarDayCollectionResource extends ResourceCollection
      *
      * @return array<int|string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray(Request $request)
     {
         $items = [];
         foreach ($this->collection as $item) {

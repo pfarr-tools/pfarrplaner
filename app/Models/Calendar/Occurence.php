@@ -28,34 +28,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Http\Controllers\Api;
+namespace App\Models\Calendar;
 
-use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
-use App\Http\Resources\OccurenceResource;
-use App\Models\Calendar\Occurence;
+use App\Models\Scopes\ServicesOnlyScope;
+use App\Models\Service;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
-class EventController
+class Occurence extends Model
 {
 
-    public function byRange(Request $request, $calendar, $start, $end)
+    protected $guarded = [];
+    protected $casts = ['start' => 'datetime', 'end' => 'datetime'];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function service()
     {
-        $start = Carbon::parse(Str::beforeLast($start, '('));
-        $end = Carbon::parse(Str::beforeLast($end, '('));
-
-        $calendar = LocalEventCalendarFactory::get($calendar);
-
-        $occurences = Occurence::with('event')
-            ->between($start, $end)
-            ->whereHas('service', function ($query) use ($calendar) {
-                $query = $calendar->adjustQuery($query);
-            })
-            ->orderBy('start')
-            ->get();
-
-        return OccurenceResource::collection($occurences);
+        return $this->belongsTo(Service::class, 'service_id')->withoutGlobalScope(ServicesOnlyScope::class);
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function event()
+    {
+        return $this->belongsTo(Service::class, 'service_id')->withoutGlobalScope(ServicesOnlyScope::class);
+    }
+
+    public function scopeBetween(Builder $query, Carbon $start, Carbon $end)
+    {
+        return $query->where('start', '<=', $end)
+            ->where('end', '>=', $start);
+    }
+
 
 }

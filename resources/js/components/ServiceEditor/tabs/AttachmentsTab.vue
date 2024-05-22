@@ -57,7 +57,7 @@
                             @delete-attachment="deleteAttachment(attachment, key)" allow-delete />
             </div>
         </div>
-        <div v-else class="alert alert-info">Zu diesem Gottesdienst gibt es keine Dateianhänge.</div>
+        <div v-else class="alert alert-info">Zu dieser Veranstaltung gibt es keine Dateianhänge.</div>
         <hr/>
         <h3>Dateien hinzufügen</h3>
         <div v-if="uploading">Datei wird hochgeladen... <span class="mdi mdi-spin mdi-loading"></span></div>
@@ -111,9 +111,10 @@ export default {
     },
     computed: {
         hasAutoAttachments() {
-            return true;
+            return this.myService.event_class == 'service';
         },
         hasAnnouncements() {
+            if (this.myService.event_class != 'service') return false;
             let found = false;
             this.service.attachments.forEach(attachment => {
                 found = found || (attachment.title == 'Bekanntgaben');

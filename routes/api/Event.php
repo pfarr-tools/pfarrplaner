@@ -31,4 +31,4 @@
 
 use App\Http\Controllers\Api\EventController;
 
-Route::get('veranstaltungen/{start}/{end}', [EventController::class, 'byRange'])->name('events.range');
+Route::get('veranstaltungen/{calendar}/{start}/{end}', [EventController::class, 'byRange'])->name('events.range')->middleware('auth:api');

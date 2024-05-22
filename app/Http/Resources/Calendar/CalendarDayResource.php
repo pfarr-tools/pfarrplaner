@@ -51,7 +51,7 @@ class CalendarDayResource extends JsonResource
         $liturgy = LiturgyService::getLiturgyInfoByDate($date);
 
         // use raw query to avoid any relationships
-        $services = DB::select('SELECT id, slug, date, city_id FROM services WHERE date(`date`) = ? ORDER BY date', [$this->resource]);
+        $services = DB::select('SELECT id, slug, date, city_id FROM services WHERE date(`date`) = ? AND event_class=\'service\' ORDER BY date', [$this->resource]);
 
         $absences = Absence::setEagerLoads([])->with('user', function ($query) {
             $query->setEagerLoads([])->with([]);

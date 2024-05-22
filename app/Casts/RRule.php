@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Casts;
+
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\Model;
+use Recurr\Rule;
+
+class RRule implements CastsAttributes
+{
+    /**
+     * Cast the given value.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public function get(Model $model, string $key, mixed $value, array $attributes): mixed
+    {
+        if ($value == '') return null;
+        return new Rule($value);
+    }
+
+    /**
+     * Prepare the given value for storage.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public function set(Model $model, string $key, mixed $value, array $attributes): mixed
+    {
+        if (!$value) return '';
+        if (!is_a($value, Rule::class)) return '';
+        /** @var Rule $value */
+        return $value->getString();
+    }
+}

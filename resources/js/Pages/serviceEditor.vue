@@ -29,7 +29,7 @@
 
 <template>
     <div class="service-editor">
-        <admin-layout title="Gottesdienst bearbeiten">
+        <admin-layout title="Veranstaltung bearbeiten">
             <template v-slot:navbar-left>
                 <div class="btn-group me-1">
                     <button type="button" class="btn btn-primary" @click.prevent="saveService(true)"
@@ -68,23 +68,30 @@
                             -->
                     </div>
                 </div>
-                <nav-button :href="route('liturgy.editor', service.slug)" v-if="service.slug"
+                <nav-button v-if="(editedService.event_class == 'service') && service.slug"
+                            :href="route('liturgy.editor', service.slug)"
                             icon="mdi mdi-view-list" force-icon type="light"
                             title="Liturgie zu diesem Gottesdienst bearbeiten">Liturgie</nav-button>
-                <nav-button :href="route('service.sermon.editor', service.slug)" v-if="service.slug"
+                <nav-button v-if="(editedService.event_class == 'service') && service.slug"
+                            :href="route('service.sermon.editor', service.slug)"
                             icon="mdi mdi-microphone" force-icon type="light"
                             title="Predigt zu diesem Gottesdienst bearbeiten">Predigt</nav-button>
             </template>
             <template v-slot:tab-headers>
                 <tab-headers>
                     <tab-header id="home" title="Allgemeines" :active-tab="activeTab"/>
-                    <tab-header id="people" title="Mitwirkende" :active-tab="activeTab" :count="peopleCount"/>
-                    <tab-header id="offerings" title="Opfer" :active-tab="activeTab"/>
-                    <tab-header v-if="service.id"
+                    <tab-header v-if="editedService.event_class == 'service'"
+                                id="people" title="Mitwirkende" :active-tab="activeTab" :count="peopleCount" />
+                    <tab-header v-if="editedService.event_class == 'event'"
+                                id="recurrence" title="Wiederholungen" :active-tab="activeTab" />
+                    <tab-header  v-if="(editedService.event_class == 'service')"
+                                 id="offerings" title="Opfer" :active-tab="activeTab"/>
+                    <tab-header  v-if="(editedService.event_class == 'service') && (service.id)"
                                 id="rites" title="Kasualien" :active-tab="activeTab"
                                 :count="service.funerals.length+service.baptisms.length+service.weddings.length"/>
-                    <tab-header id="cc" title="Kinderkirche" :active-tab="activeTab"/>
-                    <tab-header v-if="service.id && hasStreaming"
+                    <tab-header v-if="(editedService.event_class == 'service')"
+                                id="cc" title="Kinderkirche" :active-tab="activeTab"/>
+                    <tab-header v-if="(editedService.event_class == 'service') && service.id && hasStreaming"
                                 id="streaming" title="Streaming" :active-tab="activeTab"/>
                     <tab-header id="registrations" title="Anmeldungen" :active-tab="activeTab"
                                 :count="service.seating ? service.seating.count : 0"/>
@@ -102,7 +109,12 @@
                                   :cities="availableCities" :liturgy-info="liturgyInfo"
                                   :tags="tags" :service-groups="serviceGroups"/>
                     </tab>
-                    <tab id="people" :active-tab="activeTab">
+                    <tab v-if="(editedService.event_class == 'event')"
+                         id="recurrence" :active-tab="activeTab">
+                        <recurrence-tab :service="editedService" />
+                    </tab>
+                    <tab id="people" v-if="editedService.event_class == 'service'"
+                         :active-tab="activeTab">
                         <people-tab v-if="(peopleLoaded) && (ministriesLoaded)"
                                     :service="service" :teams="lists.teams"
                                     :people="lists.users" :ministries="lists.ministries"
@@ -111,16 +123,20 @@
                             <span class="mdi mdi-spin mdi-loading"></span>
                         </div>
                     </tab>
-                    <tab id="offerings" :active-tab="activeTab">
+                    <tab v-if="editedService.event_class == 'service'"
+                         id="offerings" :active-tab="activeTab">
                         <offerings-tab :service="service"/>
                     </tab>
-                    <tab id="rites" :active-tab="activeTab">
+                    <tab v-if="editedService.event_class == 'service'"
+                         id="rites" :active-tab="activeTab">
                         <rites-tab :service="service"/>
                     </tab>
-                    <tab id="cc" :active-tab="activeTab">
+                    <tab v-if="editedService.event_class == 'service'"
+                         id="cc" :active-tab="activeTab">
                         <c-c-tab :service="service"/>
                     </tab>
-                    <tab id="streaming" :active-tab="activeTab" v-if="hasStreaming">
+                    <tab v-if="(editedService.event_class == 'service') && hasStreaming"
+                         id="streaming" :active-tab="activeTab">
                         <streaming-tab :service="service"/>
                     </tab>
                     <tab id="registrations" :active-tab="activeTab">
@@ -156,10 +172,12 @@ import PeopleTab from "../components/ServiceEditor/tabs/PeopleTab";
 import CommentsTab from "../components/ServiceEditor/tabs/CommentsTab";
 import RegistrationsTab from "../components/ServiceEditor/tabs/RegistrationsTab";
 import NavButton from "../components/Ui/buttons/NavButton";
+import RecurrenceTab from "../components/ServiceEditor/tabs/RecurrenceTab.vue";
 
 export default {
     name: "serviceEditor",
     components: {
+        RecurrenceTab,
         NavButton,
         RegistrationsTab,
         CommentsTab,
@@ -195,10 +213,13 @@ export default {
             this.service.related_cities[relatedCityId] = this.service.related_cities[relatedCityId].id;
         }
 
+        let myService = this.service;
+        myService.event_class = myService.event_class || 'service';
+
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
             activeTab: this.tab,
-            editedService: this.service,
+            editedService: myService,
             files: {attachments: [null], attachment_text: ['']},
             counted: 0,
             peopleCount: 0,

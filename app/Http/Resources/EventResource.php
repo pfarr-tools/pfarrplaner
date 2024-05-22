@@ -16,8 +16,9 @@ class EventResource extends JsonResource
     public function toArray(Request $request): array
     {
         /** @var Service $this */
+        dd(Auth::guest(), Auth::user());
         return [
-            'id' => $this->id,
+            'id' => $this->slug,
             'title' => $this->titleText(false),
             'body' => $this->description,
             'location' => $this->locationText(),
@@ -25,6 +26,7 @@ class EventResource extends JsonResource
             'end' => $this->date->copy()->addHour(1),
             'calendar_id' => $this->city_id,
             'state' => 'Busy',
+            'isReadOnly' => !$this->isEditable,
         ];
     }
 }

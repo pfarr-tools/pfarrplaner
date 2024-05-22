@@ -28,34 +28,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Http\Controllers\Api;
+namespace App\Calendars\LocalEventCalendars;
 
-use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
-use App\Http\Resources\OccurenceResource;
-use App\Models\Calendar\Occurence;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
+use File;
 use Illuminate\Support\Str;
 
-class EventController
+class LocalEventCalendarFactory
 {
 
-    public function byRange(Request $request, $calendar, $start, $end)
-    {
-        $start = Carbon::parse(Str::beforeLast($start, '('));
-        $end = Carbon::parse(Str::beforeLast($end, '('));
-
-        $calendar = LocalEventCalendarFactory::get($calendar);
-
-        $occurences = Occurence::with('event')
-            ->between($start, $end)
-            ->whereHas('service', function ($query) use ($calendar) {
-                $query = $calendar->adjustQuery($query);
-            })
-            ->orderBy('start')
-            ->get();
-
-        return OccurenceResource::collection($occurences);
+    public static function all(): array {
+        $classes = [];
+        foreach (File::allFiles(app_path('Calendars/LocalEventCalendars')) as $file) {
+            if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract')) && (!Str::contains($file->getPathname(), 'Factory'))) {
+                $classes[] = substr('App\\Calendars\\LocalEventCalendars\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+            }
+        };
+        return $classes;
     }
+
+    public static function list(): array {
+        $calendars = [];
+        foreach (static::all() as $calendar) {
+            $calendars = array_merge($calendars, $calendar::list());
+        }
+        return $calendars;
+    }
+
+    public static function get($key): AbstractLocalEventCalendar
+    {
+        if (!Str::contains($key, ':')) abort(404);
+        $parts = explode(':', $key);
+        $class = 'App\\Calendars\\LocalEventCalendars\\'.ucfirst($parts[0]).'LocalEventCalendar';
+        if (!class_exists($class)) abort(404);
+        return new $class($parts[1]);
+    }
+
 
 }

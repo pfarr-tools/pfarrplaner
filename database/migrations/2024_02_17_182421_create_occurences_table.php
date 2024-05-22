@@ -28,34 +28,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Http\Controllers\Api;
-
-use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
-use App\Http\Resources\OccurenceResource;
 use App\Models\Calendar\Occurence;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use App\Models\Service;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class EventController
-{
-
-    public function byRange(Request $request, $calendar, $start, $end)
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        $start = Carbon::parse(Str::beforeLast($start, '('));
-        $end = Carbon::parse(Str::beforeLast($end, '('));
+        Schema::create('occurences', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedInteger('service_id');
+            $table->dateTime('start');
+            $table->dateTime('end');
+            $table->timestamps();
 
-        $calendar = LocalEventCalendarFactory::get($calendar);
+            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
+        });
 
-        $occurences = Occurence::with('event')
-            ->between($start, $end)
-            ->whereHas('service', function ($query) use ($calendar) {
-                $query = $calendar->adjustQuery($query);
-            })
-            ->orderBy('start')
-            ->get();
-
-        return OccurenceResource::collection($occurences);
+        foreach (Service::select(['services.id','date','end'])->get() as $service) {
+            Occurence::create([
+                                  'service_id' => $service->id,
+                                  'start' => $service->date,
+                                  'end' => $service->date->copy()->addMinutes(60)
+                              ]);
+        }
     }
 
-}
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('occurences');
+    }
+};

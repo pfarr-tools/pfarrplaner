@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
 use App\Events\ServiceBeforeDelete;
 use App\Events\ServiceBeforeUpdate;
 use App\Events\ServiceUpdated;
@@ -41,6 +42,7 @@ use App\Models\Places\City;
 use App\Models\Calendar\Day;
 use App\Models\LiturgyInfo;
 use App\Models\Location;
+use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Models\ServiceGroup;
 use App\Models\Tag;
@@ -69,6 +71,7 @@ class ServiceController extends Controller
     public function __construct()
     {
         $this->middleware('auth')->except('createQR');
+        ServicesOnlyScope::deactivate();
     }
 
     /**
@@ -85,20 +88,32 @@ class ServiceController extends Controller
         $service->updateRelatedCitiesFromRequest($request);
     }
 
-    public function create(City $city, $date = null)
-    {
-        $location = $city->locations->first();
+    protected function presetDataForNewService($date = null, City $city = null): Array {
+        $data = [];
+        $location = $city ? $city->locations->first() : null;
         $date = $date ? Carbon::parse($date) : Carbon::parse('next Sunday');
         if ($location && $location->default_time) {
             $date = Carbon::parse($date->format('Y-m-d') . ' ' . $location->default_time, 'Europe/Berlin');
         } else {
             $date = Carbon::parse($date->format('Y-m-d') . ' 10:00:00', 'Europe/Berlin');
         }
-        $service = Service::create([
-                                       'city_id' => $city->id,
-                                       'date' => $date->setTimezone('UTC'),
-                                       'location_id' => $location ? $location->id : null,
-                                   ]);
+        return [
+            'city_id' => $city ? $city->id : null,
+            'date' => $date->setTimezone('UTC'),
+            'location_id' => $location ? $location->id : null,
+        ];
+    }
+
+    public function create(City $city, $date = null)
+    {
+        $service = Service::create($this->presetDataForNewService($date, $city));
+        return redirect()->route('service.edit', $service->slug);
+    }
+
+    public function createEvent($filter, $date = null)
+    {
+        $localCalendar = LocalEventCalendarFactory::get($filter);
+        $service = Service::create($localCalendar->presetData($this->presetDataForNewService($date, null)));
         return redirect()->route('service.edit', $service->slug);
     }
 
@@ -245,7 +260,7 @@ class ServiceController extends Controller
 
         $service->delete();
         return redirect()->route('calendar', $date)
-            ->with('success', 'Der Gottesdiensteintrag wurde gelöscht.');
+            ->with('success', 'Die Veranstaltung wurde gelöscht.');
     }
 
     /**
@@ -278,6 +293,7 @@ class ServiceController extends Controller
      */
     public function ical(Service $service)
     {
+        ServicesOnlyScope::activate();
         $services = [$service];
         $raw = View::make('ical.ical', ['services' => $services, 'token' => null]);
 
@@ -298,6 +314,7 @@ class ServiceController extends Controller
      */
     public function lastUpdate()
     {
+        ServicesOnlyScope::activate();
         $lastUpdated = Service::whereIn('city_id', Auth::user()->cities->pluck('id'))
             ->orderBy('updated_at', 'DESC')
             ->first();

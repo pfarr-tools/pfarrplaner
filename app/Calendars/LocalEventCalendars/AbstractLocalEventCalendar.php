@@ -28,34 +28,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Http\Controllers\Api;
+namespace App\Calendars\LocalEventCalendars;
 
-use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
-use App\Http\Resources\OccurenceResource;
-use App\Models\Calendar\Occurence;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
-class EventController
+abstract class AbstractLocalEventCalendar
 {
 
-    public function byRange(Request $request, $calendar, $start, $end)
+    protected static $group = '';
+
+    protected $id;
+
+    public function __construct($id)
     {
-        $start = Carbon::parse(Str::beforeLast($start, '('));
-        $end = Carbon::parse(Str::beforeLast($end, '('));
+        $this->id = $id;
+    }
 
-        $calendar = LocalEventCalendarFactory::get($calendar);
+    abstract public static function list(): array;
 
-        $occurences = Occurence::with('event')
-            ->between($start, $end)
-            ->whereHas('service', function ($query) use ($calendar) {
-                $query = $calendar->adjustQuery($query);
-            })
-            ->orderBy('start')
-            ->get();
+    abstract public function adjustQuery(Builder $query): Builder;
 
-        return OccurenceResource::collection($occurences);
+    public static function getKey()
+    {
+        return Str::lcfirst(Str::replace(['App\\Calendars\\LocalEventCalendars\\', 'LocalEventCalendar'], ['', ''], get_called_class()));
+    }
+
+    public static function getEntry($id, $name)
+    {
+        return ['id' => static::getKey().':'.$id, 'name' => $name, 'group' => static::$group];
+    }
+
+    /**
+     * Preset the data from the chosen local calendar for a new event
+     * @param array $data
+     * @return array
+     */
+    public function presetData(array $data): array {
+        $data['event_class'] = 'event';
+        return $data;
     }
 
 }

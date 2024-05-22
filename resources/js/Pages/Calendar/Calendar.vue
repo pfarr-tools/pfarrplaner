@@ -33,9 +33,10 @@
             <calendar-nav-top :date="new Date(myDate)" :years="years"
                               :orientation="orientation" :targetMode="targetMode" :target="target"
                               :people-loaded="peopleLoaded" :writable-cities="writableCities" :can-create="canCreate"
-                              :calendar-mode="calendarMode"
+                              :calendar-mode="calendarMode" :calendars="calendars" :selected-calendar="selectedCalendar"
                               @toggle-calendar-mode="toggleCalendarMode"
                               @toggle-target-mode="toggleTargetMode"
+                              @calendar-select="selectCalendar"
                               @navigate="navigateTo"
             />
         </template>
@@ -52,7 +53,7 @@
             </div>
         </div>
         <div v-if="calendarMode == 'events'">
-            <events-calendar :date="myDate" :calendars="cities"/>
+            <events-calendar :date="myDate" :calendar="selectedCalendar" :key="selectedCalendar+myDate"/>
         </div>
         <modal v-if="showTargetModeModal" title="Person(en) schnell eintragen"
                @close="setTarget" :key="peopleLoaded"
@@ -106,7 +107,7 @@ export default {
         CalendarPaneHorizontal,
         CalendarPaneVertical
     },
-    props: ['date', 'cities', 'years', 'canCreate', 'ministries', 'writableCities'],
+    props: ['date', 'cities', 'years', 'canCreate', 'ministries', 'writableCities', 'calendars'],
     provide() {
         return {
             settings: this.$page.props.settings || {},
@@ -137,6 +138,7 @@ export default {
             },
             data: null,
             dataDate: null,
+            selectedCalendar: this.$page.props.settings.calendar_select || this.calendars[0].id || null,
         }
     },
     created() {
@@ -204,6 +206,10 @@ export default {
         changeState() {
             this.calendarState = Math.random().toString(36).substr(2, 9);
         },
+        selectCalendar(e) {
+            this.selectedCalendar = e;
+            this.setUserSetting('calendar_select', this.selectedCalendar);
+        }
     },
     computed: {
         pageTitle() {

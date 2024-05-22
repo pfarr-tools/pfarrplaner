@@ -269,4 +269,10 @@ class ReferenceParser
 
         return $output;
     }
+
+    public function beautify($reference): string
+    {
+        $data = $this->parse($reference);
+        return $data['correctedReference'] ?? $reference;
+    }
 }

@@ -44,21 +44,45 @@
 use App\Http\Controllers\ServiceController;
 
 // multiple services
-Route::get('/gottesdienste/neu/{city}/{date?}', [ServiceController::class, 'create'])->name('service.create');
-Route::get('/gottesdienste/meine/letzte-aktualisierung', [ServiceController::class, 'lastUpdate'])->name('services.currentUser.lastUpdate');
+Route::get('/veranstaltungen/neu/{city?}/{date?}', [ServiceController::class, 'create'])->name('service.create');
+Route::get('/veranstaltungen/neue-veranstaltung/{filter}/{date?}', [ServiceController::class, 'createEvent'])->name('event.create');
+Route::get('/veranstaltungen/meine/letzte-aktualisierung', [ServiceController::class, 'lastUpdate'])->name('services.currentUser.lastUpdate');
 
 // one service
-Route::get('/gottesdienst/{service:slug}', [ServiceController::class, 'edit'])->name('service.edit');
-Route::patch('/gottesdienst/{service:slug}', [ServiceController::class, 'update'])->name('service.update');
-Route::delete('/gottesdienst/{service:slug}', [ServiceController::class, 'destroy'])->name('service.destroy');
-Route::get('/gottesdienst-daten/{service:slug}', [ServiceController::class, 'data'])->name('service.data');
-Route::patch('/gottesdienst-predigt/{service:slug}', [ServiceController::class, 'setSermon'])->name('service.setsermon');
+Route::get('/veranstaltung/{service:slug}', [ServiceController::class, 'edit'])->name('service.edit');
+Route::patch('/veranstaltung/{service:slug}', [ServiceController::class, 'update'])->name('service.update');
+Route::delete('/veranstaltung/{service:slug}', [ServiceController::class, 'destroy'])->name('service.destroy');
+Route::get('/veranstaltung-daten/{service:slug}', [ServiceController::class, 'data'])->name('service.data');
+Route::patch('/veranstaltung-predigt/{service:slug}', [ServiceController::class, 'setSermon'])->name('service.setsermon');
 
 // additional service routes
-Route::get('/gottesdienst/{service:slug}/ical', [ServiceController::class, 'ical'])->name('service.ical');
-Route::get('/gottesdienst/{service:slug}/liedblatt', [ServiceController::class, 'songsheet'])->name('service.songsheet');
-Route::post('/gottesdienst/{service:slug}/dateien', [ServiceController::class, 'attach'])->name('service.attach');
-Route::delete('/gottesdienst/{service:slug}/datei/{attachment}', [ServiceController::class, 'detach'])->name('service.detach');
+Route::get('/veranstaltung/{service:slug}/ical', [ServiceController::class, 'ical'])->name('service.ical');
+Route::get('/veranstaltung/{service:slug}/liedblatt', [ServiceController::class, 'songsheet'])->name('service.songsheet');
+Route::post('/veranstaltung/{service:slug}/dateien', [ServiceController::class, 'attach'])->name('service.attach');
+Route::delete('/veranstaltung/{service:slug}/datei/{attachment}', [ServiceController::class, 'detach'])->name('service.detach');
 
-Route::post('/gottesdienst/{service:slug}/qr', [ServiceController::class, 'createQR'])->name('service.createQR');
+Route::post('/veranstaltung/{service:slug}/qr', [ServiceController::class, 'createQR'])->name('service.createQR');
+
+
+
+// KEEP FOR THE MOMENT (for backwards compatibility)
+
+// multiple services
+Route::get('/gottesdienste/neu/{city}/{date?}', [ServiceController::class, 'create']);
+Route::get('/gottesdienste/meine/letzte-aktualisierung', [ServiceController::class, 'lastUpdate']);
+
+// one service
+Route::get('/gottesdienst/{service:slug}', [ServiceController::class, 'edit']);
+Route::patch('/gottesdienst/{service:slug}', [ServiceController::class, 'update']);
+Route::delete('/gottesdienst/{service:slug}', [ServiceController::class, 'destroy']);
+Route::get('/gottesdienst-daten/{service:slug}', [ServiceController::class, 'data']);
+Route::patch('/gottesdienst-predigt/{service:slug}', [ServiceController::class, 'setSermon']);
+
+// additional service routes
+Route::get('/gottesdienst/{service:slug}/ical', [ServiceController::class, 'ical']);
+Route::get('/gottesdienst/{service:slug}/liedblatt', [ServiceController::class, 'songsheet']);
+Route::post('/gottesdienst/{service:slug}/dateien', [ServiceController::class, 'attach']);
+Route::delete('/gottesdienst/{service:slug}/datei/{attachment}', [ServiceController::class, 'detach']);
+
+Route::post('/gottesdienst/{service:slug}/qr', [ServiceController::class, 'createQR']);
 

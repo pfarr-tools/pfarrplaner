@@ -32,6 +32,8 @@ namespace App\Providers;
 
 use App\Events\AbsenceUpdated;
 use App\Listeners\PingInstancesRegistry;
+use App\Models\Service;
+use App\Observers\EventRecurrenceObserver;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -70,6 +72,11 @@ class EventServiceProvider extends ServiceProvider
 
     protected $subscribe = [
     ];
+
+    public function boot(): void
+    {
+        Service::observe(EventRecurrenceObserver::class);
+    }
 
     /**
      * Determine if events and listeners should be automatically discovered.

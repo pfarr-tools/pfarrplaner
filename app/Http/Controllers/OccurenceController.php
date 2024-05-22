@@ -28,34 +28,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
-use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
-use App\Http\Resources\OccurenceResource;
+use App\Http\Controllers\Controller;
 use App\Models\Calendar\Occurence;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Gate;
 
-class EventController
+class OccurenceController extends Controller
 {
 
-    public function byRange(Request $request, $calendar, $start, $end)
+    public function __construct()
     {
-        $start = Carbon::parse(Str::beforeLast($start, '('));
-        $end = Carbon::parse(Str::beforeLast($end, '('));
+        $this->middleware('auth');
+    }
 
-        $calendar = LocalEventCalendarFactory::get($calendar);
+    public function editDecoupled(Occurence $occurence)
+    {
+        Gate::authorize('update', $occurence->event);
+        $newEvent = $occurence->event->replicate()->fill([
+            'rrule' => '',
+            'date' => $occurence->start
+                                                         ]);
+        $newEvent->save();
+        $occurence->delete();
+        return redirect(route('service.edit', $newEvent->slug));
+    }
 
-        $occurences = Occurence::with('event')
-            ->between($start, $end)
-            ->whereHas('service', function ($query) use ($calendar) {
-                $query = $calendar->adjustQuery($query);
-            })
-            ->orderBy('start')
-            ->get();
-
-        return OccurenceResource::collection($occurences);
+    public function destroy(Occurence $occurence)
+    {
+        Gate::authorize('update', $occurence->event);
+        $date = $occurence->event->date;
+        $occurence->delete();
+        return redirect(route('calendar', $date->format('Y-m')));
     }
 
 }

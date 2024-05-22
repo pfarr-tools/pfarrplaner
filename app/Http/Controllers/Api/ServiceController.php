@@ -44,6 +44,7 @@ use App\Http\Resources\Calendar\CalendarServicesCollectionResource;
 use App\Models\Calendar\Day;
 use App\Models\People\User;
 use App\Models\Places\City;
+use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Models\ServiceGroup;
 use App\Services\LiturgyService;
@@ -61,6 +62,11 @@ class ServiceController extends Controller
 
     use HandlesAttachmentsTrait;
 
+    public function __construct()
+    {
+        ServicesOnlyScope::deactivate();
+    }
+
     /**
      * @param Day $day
      * @param City $city
@@ -68,6 +74,7 @@ class ServiceController extends Controller
      */
     public function byDayAndCity(Day $day, City $city)
     {
+        ServicesOnlyScope::activate();
         return Service::select('id')
             ->where('city_id', $city->id)
             ->where('day_id', '=', $day->id)
@@ -95,6 +102,7 @@ class ServiceController extends Controller
 
     public function byMonth($date, $cities)
     {
+        ServicesOnlyScope::activate();
         $date = Carbon::parse($date);
         $start = $date->copy()->firstOfMonth()->setTime(0,0,0);
         $end = $start->copy()->addMonth(1)->subSecond(1);
@@ -108,6 +116,7 @@ class ServiceController extends Controller
      */
     public function byUser(User $user)
     {
+        ServicesOnlyScope::activate();
         $services = Service::select('services.*')
             ->with('location', 'city', 'participants', 'funerals', 'baptisms', 'weddings')
             ->whereHas(

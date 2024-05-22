@@ -28,34 +28,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Http\Controllers\Api;
+namespace App\Models\Scopes;
 
-use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
-use App\Http\Resources\OccurenceResource;
-use App\Models\Calendar\Occurence;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Scope;
 
-class EventController
+class ServicesOnlyScope implements Scope
 {
 
-    public function byRange(Request $request, $calendar, $start, $end)
+    private static $active = true;
+
+    /**
+     * Apply the scope to a given Eloquent query builder.
+     */
+    public function apply(Builder $builder, Model $model): void
     {
-        $start = Carbon::parse(Str::beforeLast($start, '('));
-        $end = Carbon::parse(Str::beforeLast($end, '('));
-
-        $calendar = LocalEventCalendarFactory::get($calendar);
-
-        $occurences = Occurence::with('event')
-            ->between($start, $end)
-            ->whereHas('service', function ($query) use ($calendar) {
-                $query = $calendar->adjustQuery($query);
-            })
-            ->orderBy('start')
-            ->get();
-
-        return OccurenceResource::collection($occurences);
+        if (static::$active) $builder->where('event_class', 'service');
     }
 
+    public static function activate()
+    {
+        static::$active = true;
+    }
+
+    public static function deactivate()
+    {
+        static::$active = false;
+    }
+
+    public static function toggle()
+    {
+        static::$active = !static::$active;
+    }
 }

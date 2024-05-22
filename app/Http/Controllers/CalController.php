@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
 use App\Models\Calendar\Day;
 use App\Models\Leave\Absence;
 use App\Models\Places\City;
@@ -90,10 +91,11 @@ class CalController extends Controller
         $cities = array_values($user->getSortedCities()->all());
 
         $canCreate = $user->can('create', Service::class);
+        $calendars = LocalEventCalendarFactory::list();
 
         return Inertia::render(
             'Calendar/Calendar',
-            compact('date', 'cities', 'years', 'canCreate', 'writableCities')
+            compact('date', 'cities', 'years', 'canCreate', 'writableCities', 'calendars')
         );
     }
 

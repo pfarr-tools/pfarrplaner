@@ -30,16 +30,19 @@
 
 namespace App\Models;
 
+use App\Casts\RRule;
 use App\DAV\DAVCalendarItem;
 use App\DAV\HasDAVCalendarItems;
 use App\Helpers\YoutubeHelper;
 use App\Models\Calendar\Day;
+use App\Models\Calendar\Occurence;
 use App\Models\Liturgy\Block;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
+use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Seating\Booking;
 use App\Seating\AbstractSeatFinder;
 use App\Seating\MaximumBasedSeatFinder;
@@ -118,6 +121,7 @@ class Service extends Model implements HasDAVCalendarItems
         'registration_online_end' => 'datetime',
         'communiapp_listing_start' => 'datetime',
         'alt_liturgy_date' => 'datetime',
+        'end' => 'datetime',
     ];
 
     /**
@@ -217,6 +221,9 @@ class Service extends Model implements HasDAVCalendarItems
         'date',
         'wtc_category',
         'liturgy_info_id',
+        'event_class',
+        'end',
+        'rrule',
     ];
 
     /**
@@ -301,6 +308,14 @@ class Service extends Model implements HasDAVCalendarItems
     public function diaryEntries()
     {
         return $this->hasMany(DiaryEntry::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function occurences()
+    {
+        return $this->hasMany(Occurence::class);
     }
 
     /**
@@ -1090,6 +1105,21 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
+     * Booted lifecycle method
+     * -> register global scopes
+     * @return void
+     */
+    protected static function booted(): void
+    {
+        /*
+         * For backwards compatibility, we're adding a ServicesOnlyScope to all queries, so all existing code will only
+         * work on service events, not on other event_classes. Eventually, this scope won't be necessary any more, but
+         * for the moment, it's the easiest way to slowly introduce new event_classes.
+         */
+        static::addGlobalScope(new ServicesOnlyScope());
+    }
+
+    /**
      * @param $request
      * @param Service $service
      * @return array
@@ -1608,5 +1638,11 @@ class Service extends Model implements HasDAVCalendarItems
     public function isTemplate(): bool
     {
         return $this->date->format('Y-m-d') == '1978-03-05';
+    }
+
+    public function getDurationAttribute()
+    {
+        if (!$this->end) return 60;
+        return $this->end->diffInMinutes($this->date);
     }
 }
