@@ -32,7 +32,7 @@
         <div class="btn-group me-2" role="group">
             <button class="btn btn-default"
                     v-if="numericDate > 201801"
-                    @click.prevent.stop="$emit('navigate', moment(date).subtract(1, 'months').format('YYYY-MM'))"
+                    @click.prevent.stop="navigate(moment(date).subtract(1, 'months').format('YYYY-MM'))"
                     title="Einen Monat zurück">
                 <span class="mdi mdi-chevron-left"></span>
             </button>
@@ -48,29 +48,29 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-01')">Januar</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-01')">Januar</a>
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-02')">Februar</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-02')">Februar</a>
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-03')">März</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-03')">März</a>
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-04')">April</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-04')">April</a>
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-05')">Mai</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-05')">Mai</a>
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-06')">Juni</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-06')">Juni</a>
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-07')">Juli</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-07')">Juli</a>
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-08')">August</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-08')">August</a>
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-09')">September</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-09')">September</a>
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-10')">Oktober</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-10')">Oktober</a>
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-11')">November</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-11')">November</a>
                     <a class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', moment(date).format('YYYY')+'-12')">Dezember</a>
+                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-12')">Dezember</a>
                 </div>
             </div>
             <div class="btn-group" role="group">
@@ -80,14 +80,14 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop2">
                     <a v-for="year in years" class="dropdown-item" href="#"
-                       @click.prevent.stop="$emit('navigate', year+'-'+moment(date).format('MM'))"
+                       @click.prevent.stop="navigate(year+'-'+moment(date).format('MM'))"
                        :key="year">{{ year }}
                     </a>
                 </div>
             </div>
             <button class="btn btn-default"
                     v-if="numericDate > 201801"
-                    @click.prevent.stop="$emit('navigate', moment(date).add(1, 'months').format('YYYY-MM'))"
+                    @click.prevent.stop="navigate(moment(date).add(1, 'months').format('YYYY-MM'))"
                     title="Einen Monat weiter">
                 <span class="mdi mdi-chevron-right"></span>
             </button>
@@ -186,7 +186,7 @@ export default {
                     window.scroll(0, window.scrollY - 84);
                 }
             } else {
-                this.$emit('navigate', moment().format('YYYY-MM'));
+                this.navigate(moment().format('YYYY-MM'));
             }
         },
         targetTitle() {
@@ -200,6 +200,9 @@ export default {
                 filter: this.mySelectedCalendar,
                 date: moment(this.date).format('YYYY-MM'),
             }))
+        },
+        navigate(targetDate) {
+            this.$inertia.get(route('calendar', {date: targetDate}));
         }
     }
 }
