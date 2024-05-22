@@ -133,6 +133,8 @@ class OPEventsImport
      */
     public function getUrl($url)
     {
+        // temporarily disabled:
+        return [];
         $client = new Client();
         $response = $client->request(
             'GET',
