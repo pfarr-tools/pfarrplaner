@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.7.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.6.3...v2024.7.0) (2024-05-22)
+
+
+### Features
+
+* Termine, die keine Gottesdienste sind, verwalten ([a6bbe26](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a6bbe2677c65b49078378d391670d3e5fe08f975))
+
+
+### Bug Fixes
+
+* Kalendernavigation ändert die URL im Browser nicht ([a085258](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a0852583b24e71a908cf42eff3ade8ff768e8b1e))
+
 ### [2024.6.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.6.1...v2024.6.3) (2024-05-18)
 
 
