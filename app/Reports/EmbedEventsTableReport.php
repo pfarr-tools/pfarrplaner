@@ -40,6 +40,7 @@ namespace App\Reports;
 
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
+use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
 use App\Models\Service;
 use Carbon\Carbon;
@@ -123,74 +124,25 @@ class EmbedEventsTableReport extends AbstractEmbedReport
         $city = City::findOrFail($request->get('city'));
         $days = $request->get('days');
 
-        $start = Carbon::now('Europe/Berlin')->setTime(0, 0, 0);
-        $end = $start->copy()->addDays($days)->setTime(23, 59, 59);
+        $start = Carbon::now('Europe/Berlin')->startOfDay();
+        $end = $start->copy()->addDays($days)->endOfDay();
 
-        $services = Service::with(['day', 'location'])
-            ->notHidden()
-            ->whereDoesntHave('funerals')
-            ->inCity($city)
-            ->dateRange($start, $end)
-            ->ordered()
-            ->get();
+        $events = Occurence::with('event')
+            ->between($start, $end)
+            ->whereHas('service', function($query) use ($city) {
+                $query->inCity($city)->notHidden();
+            })
+            ->orderBy('start')
+            ->get()
+            ->groupBy(function (Occurence $item, int $key) {
+                return $item->start->format('Ymd');
+            });
 
-        $events = [];
-
-        $calendar = new EventCalendarImport($city->public_events_calendar_url);
-        $events = $calendar->mix($events, $start, $end, true, ($request->get('mixOutlook', 1) != 0));
-
-        // mix in services
-        $events = Service::mix($events, $services, $start, $end);
-
-        // mix in OP events?
-        if ($request->get('mixOP')) {
-            $op = new OPEventsImport($city);
-            $events = $op->mix($events, $start, $end, true);
-        }
-
-        $customerToken = $city->op_customer_token;
-        $customerKey = $city->op_customer_key;
         $randomId = uniqid();
-
-        // group by day
-        $tmpEvents = [];
-        foreach ($events as $key => $events) {
-            $dayKey = substr($key, 0, 8);
-            $tmpEvents[$dayKey] = array_merge($events, $tmpEvents[$dayKey] ?? []);
-        }
-
-        // further group by occasion
-        $events = $tmpEvents;
-        $tmpEvents = [];
-        foreach ($events as $day => $dayEvents) {
-            if (count($dayEvents)) {
-                $eventStart = is_array($dayEvents[0]) ? $dayEvents[0]['start'] : $dayEvents[0]->date;
-                $lastDayKey = $zeroDayKey = $eventStart->format('Y-m-d') . '--';
-                foreach ($dayEvents as $event) {
-                    $eventStart = is_array($event) ? $event['start'] : $event->date;
-                    $dayKey = (is_a($event, Service::class)) ? $eventStart->format('Y-m-d').'-'.($event->liturgical_info['title'] ?? '-') : $lastDayKey;
-                    $tmpEvents[$dayKey][] = $event;
-                }
-            }
-        }
-
-        $events = $tmpEvents;
-        // correctly sort by time
-        $tmpEvents = [];
-
-        foreach ($events as $occasion => $dayEvents) {
-            // get earliest time
-            $times = [];
-            foreach ($dayEvents as $event) $times[] = is_array($event) ? $event['start'] : $event->date;
-            $key = substr($occasion, 0,10).'-'.(min($times)->format('Hi')).'-'.substr($occasion, 11);
-            $tmpEvents[$key] = $dayEvents;
-        }
-        ksort($tmpEvents);
-        $events = $tmpEvents;
 
         return $this->renderView(
             'embed',
-            compact('start', 'days', 'city', 'events', 'customerKey', 'customerToken', 'randomId')
+            compact('start', 'days', 'city', 'events', 'randomId')
         );
     }
 }

@@ -41,111 +41,61 @@
                 <th>Ort</th>
                 </thead>
                 <tbody>
-                @foreach ($events as $occasion => $theseEvents)
+                @foreach ($events as $theseEvents)
                     <tr style="background-color: #ccc !important;">
                         <td valign="top"
-                            style="vertical-align:top;">{!! \Carbon\Carbon::parse(substr($occasion, 0, 10))->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
+                            style="vertical-align:top;">{!! $theseEvents->first()->start->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
                         <td></td>
                         <td valign="top" colspan="2"
-                            style="vertical-align:top; font-weight: bold;">@if(substr($occasion, 16) != '-'){{ ucfirst(str_replace('So.', 'Sonntag', substr($occasion, 16))) }}@endif</td>
+                            style="vertical-align:top; font-weight: bold;">{{ str_replace('So.', 'Sonntag', $theseEvents->first()->event->liturgicalInfo['title'] ?? '') }}</td>
                     </tr>
-                    @foreach($theseEvents as $event)
-                        <?php $eventStart = is_array($event) ? $event['start'] : $event->date ?>
-                        @if (!is_object($event))
-                            @include('reports.embedeventstable.parts.op_event')
-                        @else
+                    @foreach($theseEvents as $occurence)
                             <tr>
                                 <td valign="top"
-                                    style="vertical-align:top;">{!! $eventStart->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
-                                <td valign="top">{{ $event->timeText(true, '.') }}</td>
+                                    style="vertical-align:top;">{!! $occurence->start->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
+                                <td valign="top">{{ $occurence->event->timeText(true, '.') }}</td>
                                 <td valign="top">
-                                    <b>{{ $event->titleText(false, false) }}</b> @if($event->participantsText('P') != '')
-                                        ({{ $event->participantsText('P') }})@endif
-                                    @if($event->descriptionText())<br/>{{ $event->descriptionText() }}@endif
-                                    @if($event->controlled_access) @component('components.service.controlledAccess', ['service' => $event]) @endcomponent @endif
-                                    @if ($event->offering_goal)<br/>Opfer: {{ $event->offering_goal }}@endif
+                                    <b>{{ $occurence->event->titleText(false, false) }}</b> @if($occurence->event->participantsText('P') != '')
+                                        ({{ $occurence->event->participantsText('P') }})@endif
+                                    @if($occurence->event->descriptionText())<br/>{{ $occurence->event->descriptionText() }}@endif
+                                    @if($occurence->event->controlled_access) @component('components.service.controlledAccess', ['service' => $occurence->event]) @endcomponent @endif
+                                    @if ($occurence->event->offering_goal)<br/>Opfer: {{ $occurence->event->offering_goal }}@endif
+                                    @if ($occurence->event->event_class == 'service')
                                     <div>
-                                    @if ($event->songsheet) <span class="small-button" href="{{ $event->songsheetUrl }}" title="Klicken Sie hier, um das Liedblatt herunterzuladen"><span class="fa fa-file-pdf"></span> Liedblatt</span> @endif
-                                    @if ($event->offerings_url) <span class="small-button" href="{{ $event->offerings_url }}" title="Klicken Sie hier, um online zu spenden"><span class="fa fa-coins"></span> Opfer</span> @endif
-                                    @if ($event->cc_streaming_url) <span class="small-button" href="{{ $event->cc_streaming_url }}"title="Klicken Sie hier, um den Kindergottesdienst auf YouTube anzuschauen"><img src="{{ asset('img/cc.png') }}" height="12px"> Kinderkirche</span> @endif
-                                    @if ($event->external_url) <span class="small-button" href="{{ $event->external_url }}"  title="Klicken Sie hier, um zur Predigtseite zu gelangen"><span class="fa fa-globe"></span> Externe Seite zur Predigt</span> @endif
+                                    @if ($occurence->event->songsheet) <span class="small-button" href="{{ $occurence->event->songsheetUrl }}" title="Klicken Sie hier, um das Liedblatt herunterzuladen"><span class="fa fa-file-pdf"></span> Liedblatt</span> @endif
+                                    @if ($occurence->event->offerings_url) <span class="small-button" href="{{ $occurence->event->offerings_url }}" title="Klicken Sie hier, um online zu spenden"><span class="fa fa-coins"></span> Opfer</span> @endif
+                                    @if ($occurence->event->cc_streaming_url) <span class="small-button" href="{{ $occurence->event->cc_streaming_url }}"title="Klicken Sie hier, um den Kindergottesdienst auf YouTube anzuschauen"><img src="{{ asset('img/cc.png') }}" height="12px"> Kinderkirche</span> @endif
+                                    @if ($occurence->event->external_url) <span class="small-button" href="{{ $occurence->event->external_url }}"  title="Klicken Sie hier, um zur Predigtseite zu gelangen"><span class="fa fa-globe"></span> Externe Seite zur Predigt</span> @endif
                                     </div>
+                                    @endif
                                 </td>
                                 <td valign="top" style="vertical-align:top;">
-                                    @if (is_array($event)) @if(isset($event['place'])){{ $event['place'] }} @endif
-                                    @else {{ $event->locationText() }} @if($event->youtube_url)
-                                        <div><a class="youtube-button" target="_blank" href="{{ $event->youtube_url }}"><span class="fab fa-youtube"></span> Auf YouTube ansehen</a></div>
-                                    @endif @if (is_object($event->location) && ($event->location->instructions != ''))<div>
-                                                                           <small>{!! nl2br($event->location->instructions) !!}</small></div>@endif
+                                    {{ $occurence->event->locationText() }}
+                                    @if($occurence->event->youtube_url)
+                                        <div><a class="youtube-button" target="_blank" href="{{ $occurence->event->youtube_url }}"><span class="fab fa-youtube"></span> Auf YouTube ansehen</a></div>
+                                    @endif
+                                    @if ($occurence->event->location && ($occurence->event->location->instructions != ''))<div>
+                                                                           <small>{!! nl2br($occurence->event->location->instructions) !!}</small></div>
                                     @endif
                                 </td>
                             </tr>
-                            @if ($event->cc)
+                            @if ($occurence->event->cc)
                                 <tr>
                                     <td valign="top"
-                                        style="vertical-align:top;">{!! $eventStart->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
-                                    <td valign="top">{{ str_replace(':', '.', ($event->cc_alt_text ?? $event->timeText(true, '.'))) }}</td>
+                                        style="vertical-align:top;">{!! $occurence->event->date->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
+                                    <td valign="top">{{ str_replace(':', '.', ($occurence->event->cc_alt_text ?? $occurence->event->timeText(true, '.'))) }}</td>
                                     <td valign="top">
                                         <b>Kinderkirche</b>
                                     </td>
                                     <td valign="top" style="vertical-align:top;">
-                                        {{ $event->cc_location ?? $event->locationText() }}
+                                        {{ $occurence->event->cc_location ?? $occurence->event->locationText() }}
                                     </td>
                                 </tr>
                             @endif
-                        @endif
                         @endforeach
                     @endforeach
                 </tbody>
             </table>
-    </div>
-    <div id="{{ $randomId }}_details" style="display:none;">
-        <div id="{{ $randomId }}_details_content"></div>
-        <hr/>
-        <div>
-            <a href="" class="back-link"
-               onclick="back_{{ $randomId }}(event)">&lt;
-                Zurück zur Übersicht</a>
-        </div>
+        @endif
     </div>
 </div>
-<script defer>
-    $('<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" />').appendTo("head");
-    $("<style type='text/css'>" + $('#buttonstyles').html() + "</style>").appendTo("head");
-
-    function back_{{ $randomId }}(event) {
-        event.preventDefault();
-        $('#{{ $randomId }}_details').hide();
-        $('#{{ $randomId }}_table').show();
-        var hash = document.location.hash;
-        document.location.hash = '';
-        hash = hash.replace('#', '#{{ $randomId }}_') + '_row';
-        $(hash).scrollIntoView();
-    }
-
-
-    $('<style type="text/css"></style>').appendTo('head');
-    $('#{{ $randomId }} tr.clickable').addClass('hoverable');
-    $('#{{ $randomId }} tr.clickable').hover(function () {
-        $(this).css('cursor', 'pointer');
-    }, function () {
-        $(this).css('cursor', 'inherit');
-    });
-    $('#{{ $randomId }} tr.clickable').click(function () {
-        document.location.hash = $(this).data('id');
-        $('#{{ $randomId }}_details_content').html($(this).find('div.details').first().html());
-        $('#{{ $randomId }}_details').show();
-        $('#{{ $randomId }}_table').hide();
-        window.scrollTo(0, 0);
-    });
-
-    if ((document.location.hash != '') && (document.location.hash != '#')) {
-        t = document.location.hash;
-        if (t.charAt(0) == '#') t = t.substr(1);
-        t = '#{{ $randomId }}_' + t;
-        $('#{{ $randomId }}_details_content').html($(t).html());
-        $('#{{ $randomId }}_details').show();
-        $('#{{ $randomId }}_table').hide();
-    }
-</script>
-@endif
