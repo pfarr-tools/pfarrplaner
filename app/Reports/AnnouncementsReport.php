@@ -264,7 +264,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $events = Occurence::with('event')
             ->between($service->date, $nextWeek)
             ->whereHas('service', function($query) use ($service) {
-                $query->inCity($service->city);
+                $query->inCity($service->city)->notHidden();
             })
             ->orderBy('start')
             ->get();
