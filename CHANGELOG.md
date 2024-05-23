@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.10.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.9.1...v2024.10.0) (2024-05-23)
+
+
+### Features
+
+* Alle Veranstaltungen in der einbettbaren Veranstaltungsliste ([59ab2c5](https://codeberg.org/pfarr.tools/pfarrplaner/commit/59ab2c539fce2014d290cf3989dcd0eb3edf8f63))
+
+
+### Bug Fixes
+
+* Versteckte Veranstaltungen werden in Bekanntmachungen angezeigt ([a32b3ae](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a32b3ae2609c9b2bff870f2f56b22d862580040c))
+
 ### [2024.9.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.9.0...v2024.9.1) (2024-05-23)
 
 
