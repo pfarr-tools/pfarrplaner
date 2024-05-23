@@ -124,23 +124,6 @@ export default {
         this.calendarInstance.setOptions({
             usageStatistics: false,
             useDetailPopup: false,
-            calendars: [
-                {
-                    id: 'read',
-                    name: 'read',
-                    color: 'black',
-                    backgroundColor: 'lightgray',
-                    dragBackgroundColor: '#eee',
-                },
-                {
-                    id: 'write',
-                    name: 'write',
-                    color: 'black',
-                    backgroundColor: 'red',
-                    dragBackgroundColor: '#eee',
-                    borderColor: 'darkgray',
-                },
-            ]
         })
         this.$api().get(route('api.events.range', {
             calendar: this.calendar,
@@ -149,7 +132,6 @@ export default {
         })).then(response => {
             for (let index in response.data.data) {
                 if (response.data.data[index].isReadOnly) response.data.data[index].customStyle = {cursor: 'not-allowed'}
-                response.data.data[index].calendarId = response.data.data[index].isReadOnly ? 'read' : 'write';
             }
 
             this.calendarInstance.createEvents(response.data.data);
@@ -167,12 +149,6 @@ export default {
             console.log(e.event);
             this.selectedEvent = e.event;
             this.showModal = true;
-            return;
-            if (e.event.isReadOnly) return;
-            if (!e.event.raw.isRecurring) {
-                this.$inertia.get(route('service.edit', {service: e.event.id}));
-            } else if (1) {
-            }
         },
         editSelectedEvent() {
             let event = this.selectedEvent;
@@ -193,9 +169,16 @@ export default {
             let myStart = moment(event.start.toDate()).locale('de');
             let myEnd = moment(event.end.toDate()).locale('de');
             let dt = myStart.format('LL');
-            if (!event.isAllday) dt += ', '+myStart.format('HH:mm');
+            let sameDate = (myEnd.format('YYYYMMDD') == myStart.format('YYYYMMDD'));
+
+            if (!event.isAllday) {
+                dt += ', ' + myStart.format('HH:mm');
+                if (!event.end) dt += ' Uhr';
+            }
+            if ((!event.end) || sameDate) return dt;
+
             dt += ' - ';
-            if (myStart.format('YYYYMMDD') != myEnd.format('YYYYMMDD')) {
+            if (!sameDate) {
                 dt = myEnd.format('LL')+', ';
             }
             if (!event.isAllday) dt += myEnd.format('HH:mm')+' Uhr';

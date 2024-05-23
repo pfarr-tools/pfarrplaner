@@ -39,13 +39,29 @@ class OccurenceResource extends JsonResource
 {
 
     protected function getBackgroundColor() {
-        if ($this->event->event_class != 'service') return 'lightgray';
-        return '#yellow';
+        if ($this->event->hidden) return 'lightgray';
+        if ($this->event->event_class != 'service') {
+            if ($this->event->is_allday) return 'white';
+            return 'burlywood';
+        }
+        if (count($this->event->funerals)) {
+            if ($this->event->isMine) return 'seagreen';
+            return 'darkgray';
+        }
+        if ($this->event->isMine) return 'lightgreen';
+        return 'lightblue';
     }
 
     protected function getColor()
     {
-        return 'red';
+        if (count($this->event->funerals)) return 'white';
+        return 'black';
+    }
+
+    protected function getBorderColor()
+    {
+        if (count($this->event->funerals) && $this->event->isMine) return 'rgb(19, 185, 85)';
+        return '';
     }
 
     /**
@@ -66,8 +82,13 @@ class OccurenceResource extends JsonResource
             'calendar_id' => $this->event->city_id,
             'state' => 'Busy',
             'isReadOnly' => !$this->event->isEditable,
-            'backgroundColor' => $this->getBackgroundColor(),
-            'color' => $this->getColor(),
+            'isAllday' => (bool)$this->event->is_allday,
+            'category' => $this->event->is_allday ? 'allday' : 'time',
+            'customStyle' => [
+                'color' => $this->getColor(),
+                'backgroundColor' => $this->getBackgroundColor(),
+                'borderColor' => $this->getBorderColor(),
+            ],
             'raw' => [
                 'occurence_id' => $this->id,
                 'isRecurring' => $this->event->rrule != '',

@@ -124,6 +124,7 @@ class ServiceRequest extends FormRequest
             'event_class' => 'nullable|string|in:service,event',
             'end' => 'nullable|date',
             'rrule' => 'nullable|string',
+            'is_allday' => 'nullable|int|in:0,1',
         ];
     }
 

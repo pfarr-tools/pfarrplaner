@@ -224,6 +224,7 @@ class Service extends Model implements HasDAVCalendarItems
         'event_class',
         'end',
         'rrule',
+        'is_allday'
     ];
 
     /**
