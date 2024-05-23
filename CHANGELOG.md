@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.9.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.9.0...v2024.9.1) (2024-05-23)
+
+
+### Bug Fixes
+
+* Falsche Datumsangaben in Bekanntmachungen ([4911a75](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4911a750f7650c5cba252a419aa600710edb0df8))
+* Überzählige Leerzeilen in Bekanntmachungen ([925a574](https://codeberg.org/pfarr.tools/pfarrplaner/commit/925a5747e5ff0ad6ca2389ff87a9dee4acdb628d))
+
 ## [2024.9.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.8.0...v2024.9.0) (2024-05-23)
 
 
