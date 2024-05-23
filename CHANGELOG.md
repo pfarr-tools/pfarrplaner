@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.9.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.8.0...v2024.9.0) (2024-05-23)
+
+
+### Features
+
+* Abkündigungen inklusive Terminen automatisch erstellen. ([497fca6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/497fca6ca67fad53bb253dfb78aad205fd8d0b77))
+
 ## [2024.8.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.7.0...v2024.8.0) (2024-05-23)
 
 
