@@ -823,8 +823,8 @@ Amen.'
         foreach ($events as $event) {
             $days[$event->start->format('Ymd')][$event->start->format('Hi')] = $event;
         }
-        foreach ($days as $d => $events) {
-            $this->renderParagraph(self::NO_INDENT, [[Carbon::parse($d)->formatLocalized('%A, %d. %B'), self::BOLD]]);
+        foreach ($days as $events) {
+            $this->renderParagraph(self::NO_INDENT, [[array_values($events)[0]->start->formatLocalized('%A, %d. %B'), self::BOLD]]);
             foreach ($events as $event) {
                 $this->renderParagraph(self::INDENT, [[
                     $event->event->timeText()."\t".$event->event->titleText(false)

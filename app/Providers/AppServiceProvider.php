@@ -32,9 +32,11 @@ namespace App\Providers;
 
 use App\Services\QueryLogService;
 use App\Seating\SeatingValidators;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Hash;
@@ -56,6 +58,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+
+        App::setLocale(config('app.locale'));
+        Carbon::setLocale(config('app.locale'));
 
         Factory::guessFactoryNamesUsing(function (string $modelName) {
             return Str::replace('App\\Models\\', '\\Database\\Factories\\', $modelName).'Factory';
