@@ -32,16 +32,23 @@ namespace App\Reports;
 
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
+use App\Liturgy\Bible\BibleText;
+use App\Liturgy\Bible\ReferenceParser;
+use App\Liturgy\ItemHelpers\PsalmItemHelper;
+use App\Liturgy\ItemHelpers\SongItemHelper;
+use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
 use App\Models\Service;
+use App\Services\NameService;
 use App\Tools\StringTool;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
@@ -142,8 +149,8 @@ class AnnouncementsReport extends AbstractWordDocumentReport
     public function lastServiceDays(Request $request)
     {
         $data = $request->validate([
-            'city' => 'required|int|exists:cities,id',
-            'service' => 'required|int|exists:services,id'
+                                       'city' => 'required|int|exists:cities,id',
+                                       'service' => 'required|int|exists:services,id'
                                    ]);
 
         $city = City::findOrFail($data['city']);
@@ -169,10 +176,11 @@ class AnnouncementsReport extends AbstractWordDocumentReport
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function offerings(Request $request) {
+    public function offerings(Request $request)
+    {
         $data = $request->validate([
-            'city' => 'required|int|exists:cities,id',
-            'day' => 'required|date'
+                                       'city' => 'required|int|exists:cities,id',
+                                       'day' => 'required|date'
                                    ]);
         $services = Service::whereDate('date', Carbon::parse($data['day']))
             ->where('city_id', $data['city'])
@@ -202,8 +210,6 @@ class AnnouncementsReport extends AbstractWordDocumentReport
                                 'offerings' => $lastService->offering_amount,
                                 'offering_text' => $service->offering_text,
                                 'service' => $service,
-                                'mix_outlook' => $service->city->public_events_calendar_url ? true : false,
-                                'mix_op' => $service->city->op_customer_token ? true : false,
                             ]);
     }
 
@@ -214,7 +220,6 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         $lastService = $data['lastService'];
         $offerings = $data['offerings'];
-        $offeringText = $data['offering_text'] ?? '';
 
         $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d') . ' 0:00:00 last Sunday');
         $nextWeek = $lastWeek->copy()->addWeeks(2)->setTime(
@@ -236,14 +241,10 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             ->whereHas(
                 'service',
                 function ($query) use ($service, $nextWeek) {
-                    $query->notHidden()->whereHas(
-                        'day',
-                        function ($query2) use ($service, $nextWeek) {
-                            $query2->where('date', '>=', $service->date);
-                            $query2->where('date', '<=', $nextWeek);
-                            $query2->where('city_id', $service->city->id);
-                        }
-                    );
+                    $query->between($service->date, $nextWeek)
+                        ->inCity($service->city)
+                        ->notHidden()
+                        ->ordered();
                 }
             )->get();
 
@@ -251,52 +252,40 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             ->whereHas(
                 'service',
                 function ($query) use ($service, $nextWeek) {
-                    $query->notHidden()
-                        ->whereHas(
-                            'day',
-                            function ($query2) use ($service, $nextWeek) {
-                                $query2->where('date', '>=', $service->date);
-                                $query2->where('date', '<=', $nextWeek);
-                                $query2->where('city_id', $service->city->id);
-                            }
-                        );
+                    $query->between($service->date, $nextWeek)
+                        ->inCity($service->city)
+                        ->notHidden()
+                        ->ordered();
                 }
             )->get();
 
+        $liturgicalInfo = $service->liturgicalInfo;
 
-        $services = Service::with(['location'])
-            ->notHidden()
+        $events = Occurence::with('event')
             ->between($service->date, $nextWeek)
-            ->inCity($service->city)
-            ->where('id', '!=', $service->id)
-            ->ordered()
+            ->whereHas('service', function($query) use ($service) {
+                $query->inCity($service->city);
+            })
+            ->orderBy('start')
             ->get();
+        //dd($events);
 
-        $events = [];
+        ////////////////////////////////////////////////////////////////////////////////////////////////
 
-        if ($data['mix_outlook'] ?? false) {
-            $calendar = new EventCalendarImport($city->public_events_calendar_url);
-            $events = $calendar->mix($events, $service->date, $nextWeek, true);
-        }
-
-        $events = Service::mix($events, $services, $service->date, $nextWeek);
-
-        if ($data['mix_op'] ?? false) {
-            $op = new OPEventsImport($city);
-            $events = $op->mix($events, $service->date, $nextWeek);
-        }
 
         $this->section = $this->wordDocument->addSection(
             [
-                'orientation' => 'portrait',
+                'orientation' => 'landscape',
                 'pageSizeH' => Converter::cmToTwip(21),
                 'pageSizeW' => Converter::cmToTwip(14.85),
-                'marginTop' => Converter::cmToTwip(0.75),
-                'marginBottom' => Converter::cmToTwip(0.25),
-                'marginLeft' => Converter::cmToTwip(2),
-                'marginRight' => Converter::cmToTwip(0.8),
+                'marginTop' => Converter::cmToTwip(1),
+                'marginBottom' => Converter::cmToTwip(1),
+                'marginLeft' => Converter::cmToTwip(1),
+                'marginRight' => Converter::cmToTwip(1),
             ]
         );
+        $this->wordDocument->getSettings()->setBookFoldPrinting(true);
+        $this->wordDocument->setDefaultFontSize(12);
 
         $this->wordDocument->addParagraphStyle(
             self::INDENT,
@@ -324,173 +313,49 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         $textRun = $this->section->addTextRun('Bekanntgaben');
         $textRun->addText(
-            'Bekanntgaben für ' . $service->date->formatLocalized('%A, %d. %B %Y'),
+            $service->date->formatLocalized('%d. %B %Y')
+            . ($service->liturgicalInfo['title'] ? ' - ' . $service->liturgicalInfo['title'] : ''),
             ['bold' => true]
         );
 
+        $textRun = $this->section->addTextRun('Bekanntgaben');
+        $textRun->addText($service->timeText() . ' ' . $service->locationText());
 
-        $ctr = 0;
-        $offeringsDone = false;
-        $lastDay = $nextWeek->format('Ymd');
-        foreach ($events as $eventsArray) {
-            foreach ($eventsArray as $event) {
-                $eventStart = is_array($event) ? $event['start'] : $event->date;
+        $this->section->addTextBreak();
 
-
-                $dateFormat = $ctr ? '%A, %d. %B' : '%A, %d. %B %Y';
-
-                $done = false;
-
-                if (is_array($event)) {
-                    if ($service->date->format('Ymd') == $eventStart->format('Ymd')) {
-                        if (isset($event['allDay']) && ($event['allDay'])) {
-                            $textRun = $this->section->addTextRun('Bekanntgaben ohne Einrückung');
-                            $textRun->addText($event['title']);
-                            $done = true;
-                        }
-                    }
-                }
-
-                if (!$offeringsDone) {
-                    $this->renderParagraph(
-                        self::NO_INDENT,
-                        [
-                            ['**************************************************************************', []],
-                        ]
-                    );
-
-                    $this->renderParagraph(
-                        self::NO_INDENT,
-                        [
-                            [
-                                'Herzlichen Dank für das Opfer der Gottesdienste vom '
-                                . $lastService
-                                . ' in Höhe von ' . $offerings . ' Euro.',
-                                []
-                            ]
-                        ]
-                    );
-
-                    $textRun = $this->renderParagraph(
-                        self::NO_INDENT,
-                        [
-                            [
-                                'Das heutige Opfer ist für folgenden Zweck bestimmt: ' . $service->offering_goal,
-                                []
-                            ]
-                        ],
-                        1
-                    );
-
-                    if ($offeringText) {
-                        $this->renderLiteral($offeringText);
-                        $this->renderParagraph();
-                    }
-
-                    $offeringsDone = true;
-                }
-
-                if (!$done) {
-                    if ($lastDay != $eventStart->format('Ymd')) {
-                        $this->renderParagraph();
-                        if ($nextWeek->format('Ymd') == $eventStart->format('Ymd')) {
-                            $this->renderParagraph(
-                                self::NO_INDENT,
-                                [
-                                    [
-                                        'Vorschau',
-                                        self::BOLD_UNDERLINE,
-                                    ]
-                                ],
-                                1
-                            );
-                        }
-
-                        $this->renderParagraph(
-                            self::NO_INDENT,
-                            [
-                                [
-                                    ($service->date->format('Ymd') == $eventStart->format('Ymd')) ?
-                                        'Heute' : strftime($dateFormat, $eventStart->getTimestamp()),
-                                    self::BOLD_UNDERLINE,
-                                ]
-                            ]
-                        );
-                    }
-
-                    if (is_array($event)) {
-                        $textRun = $this->renderParagraph(
-                            self::INDENT,
-                            [
-                                [
-                                    (isset($event['allDay']) && $event['allDay']) ? '' : strftime(
-                                            '%H.%M Uhr',
-                                            $eventStart->getTimestamp()
-                                        ) . "\t",
-                                    []
-                                ],
-                                [
-                                    trim(
-                                        StringTool::sanitizeXMLString(
-                                            $event['title']
-                                        ) . ' (' . StringTool::sanitizeXMLString($event['place']) . ')'
-                                    ),
-                                    []
-                                ]
-                            ]
-                        );
-                    } else {
-                        $description = $event->descriptionText();
-                        $description = $description ? ' mit ' . $description : '';
-                        // take care of ampersands
-                        $description = preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
-                        $textRun = $this->renderParagraph(
-                            self::INDENT,
-                            [
-                                [
-                                    $event->timeText(true, '.') . "\t",
-                                    []
-                                ],
-                                [
-                                    trim(
-                                        ($event->title ?: 'Gottesdienst') . $description . ' (' . $event->locationText(
-                                        ) . ')'
-                                    ),
-                                    []
-                                ]
-                            ]
-                        );
-
-                        // add children's church
-                        if ($event->cc) {
-                            $this->renderParagraph(
-                                self::INDENT,
-                                [
-                                    [
-                                        Carbon::createFromFormat(
-                                            'Y-m-d H:i',
-                                            $event->date->format('Y-m-d') . ' ' . ($event->cc_alt_time ?? $event->time)
-                                        )->formatLocalized('%H.%M Uhr') . "\t",
-                                        []
-                                    ],
-                                    ['Kinderkirche', []],
-                                    [' (' . ($event->cc_location ?? $event->locationText()) . ')', []],
-                                ]
-                            );
-                        }
-                    }
-
-
-                    if ((isset($event['allDay']) && $event['allDay'])) {
-                        $textRun = $this->renderParagraph();
-                    }
-
-                    $lastDay = $eventStart->format('Ymd');
-                }
-
-                $ctr++;
-            }
+        foreach (
+            [
+                'Liturgie' => $service->pastors,
+                'Orgel' => $service->organists,
+                'Mesnerdienst' => $service->sacristans,
+            ] as $ministry => $people
+        ) {
+            $this->renderMinistryLine($ministry, $people);
         }
+        foreach ($service->ministries() as $ministry => $people) {
+            $this->renderMinistryLine($ministry, $people);
+        }
+
+        if ($service->offering_goal) {
+            $this->renderParagraph(self::INDENT, [
+                ["Opfer:\t{$service->offering_goal}", []]
+            ]);
+        }
+
+        $this->renderLiturgy($service);
+
+        $this->renderReadings($service);
+
+        $this->renderParagraph(self::NO_INDENT, [
+            ['Abkündigungen', self::BOLD_UNDERLINE],
+        ]);
+        $this->section->addTextBreak();
+
+        $this->renderThanks($service);
+
+        $this->renderOfferings($service, $lastService, $offerings);
+
+        $this->renderEvents($events);
 
         $textRun = $this->renderParagraph();
 
@@ -708,7 +573,6 @@ in guten und in schweren Tagen.'
             $textRun = $this->renderLiteral(
                 'Wir nehmen teil an der Trauer der Angehörigen und befehlen die Toten, die Trauernden und uns der Güte Gottes an.'
             );
-            $textRun = $this->renderLiteral('_Wir bekennen gemeinsam:');
             $textRun = $this->renderLiteral('Unser keiner lebt sich selber, und keiner stirbt sich selber.');
             $textRun = $this->renderLiteral(
                 'Leben wir, so leben wir dem Herrn;
@@ -725,6 +589,8 @@ Amen.'
             $this->renderParagraph();
             $textRun = $this->renderLiteral($service->announcements);
         }
+
+        $this->renderFinalSong($service);
 
 
         $filename = $service->date->format('Y_m_d') . ' Bekanntgaben';
@@ -768,7 +634,7 @@ Amen.'
     ) {
         $textRun = $existingTextRun ?: $this->section->addTextRun($template);
         foreach ($blocks as $block) {
-            $textRun->addText($block[0], $block[1]);
+            $textRun->addText($block[0], $block[1] ?? []);
         }
         for ($i = 0; $i < $emptyParagraphsAfter; $i++) {
             $textRun = $this->section->addTextRun($template);
@@ -822,4 +688,171 @@ Amen.'
         }
         return $s;
     }
+
+    protected function getNameListLine($people, $and = ', ')
+    {
+        $names = collect();
+        foreach ($people as $person) {
+            $names->push(NameService::fromUser($person)->format(NameService::TITLE_FIRST_LAST));
+        }
+        return $names->join(', ', $and);
+    }
+
+    protected function renderMinistryLine($ministry, $people)
+    {
+        $this->renderParagraph(self::INDENT, [
+            [$ministry . ":\t" . $this->getNameListLine($people), []]
+        ]);
+    }
+
+    protected function renderLiturgy(Service $service)
+    {
+        if (!count($service->liturgyBlocks)) {
+            return;
+        }
+        $this->section->addTextBreak(2);
+        foreach ($service->liturgyBlocks as $block) {
+            $this->renderParagraph(self::NO_INDENT, [
+                [$block->title, ['bold' => true]],
+            ]);
+            foreach ($block->items as $item) {
+                $title = '';
+                if ($item->data_type == 'song') {
+                    $helper = new SongItemHelper($item);
+                    $title = ': ' . $helper->getTitleText(
+                        ) . (($item->data['verses'] ?? '') ? ', ' . $item->data['verses'] : '');
+                }
+                if ($item->data_type == 'psalm') {
+                    $helper = new PsalmItemHelper($item);
+                    $title = ': ' . $helper->getTitleText();
+                }
+                if ($item->data_type == 'reading') {
+                    $title = ': ' . $item->data['reference'] ?? '';
+                }
+
+                $this->renderParagraph(self::NO_INDENT, [
+                    [$item->title . trim($title), []]
+                ]);
+            }
+        }
+    }
+
+    protected function renderReadings(Service $service)
+    {
+        foreach ($service->liturgyBlocks as $block) {
+            foreach ($block->items as $item) {
+                if ($item->data_type == 'reading') {
+                    $this->section->addTextBreak(2);
+
+                    $this->renderParagraph(self::NO_INDENT, [
+                        ['Schriftlesung aus ' . ($item->data['reference'] ?? ''), self::BOLD_UNDERLINE],
+                    ]);
+                    $this->section->addTextBreak();
+
+                    $ref = ReferenceParser::getInstance()->parse($item->data['reference']);
+                    $bibleText = (new BibleText())->get($ref);
+
+                    $run = [];
+                    foreach ($bibleText as $range) {
+                        foreach ($range['text'] as $verse) {
+                            $run[] = [$verse['verse'] . ' ', ['superScript' => true]];
+                            $run[] = [$verse['text'] . "\n", []];
+                        }
+                    }
+
+                    $this->renderParagraph(self::NO_INDENT, $run, 1);
+                    $this->renderParagraph(self::NO_INDENT, [
+                        ['Der Herr segne sein Wort an uns. Amen.', ['italic' => true]],
+                    ],1 );
+                }
+            }
+        }
+    }
+
+    protected function renderThanks(Service $service)
+    {
+        $music = $service->organists;
+        foreach (['Musik', 'Band', 'Klavier', 'Schlagzeug', 'Cajon', 'Bass'] as $instrument) {
+            if ($people = $service->participantsByCategory($instrument)) {
+                $music->merge($people);
+            }
+        }
+        $musicians = collect();
+        foreach ($music as $musician) {
+            $musicians->push(NameService::fromUser($musician)->format(NameService::FIRST_LAST));
+        }
+
+        $this->renderParagraph(self::NO_INDENT, [
+            [
+                'Herzlichen Dank an ' . $musicians->join(
+                    ', ',
+                    ' und '
+                ) . ' für die schöne musikalische Begleitung des Gottesdiensts.'
+            ]
+        ]);
+        $this->section->addTextBreak();
+    }
+
+    protected function renderOfferings(Service $service, $lastService, $offerings)
+    {
+        $lastService = Carbon::parse($lastService)->formatLocalized('%A');
+        if ($offerings == "0,00\u{A0}€") $offerings = '';
+        $this->renderParagraph(self::NO_INDENT, [
+            ['Das Opfer vom letzten '.$lastService.' ergab '.($offerings ?: '______________').'.', []]
+        ], 1);
+        $this->renderParagraph(self::NO_INDENT, [
+            ['Das Opfer heute erbitten wir für: '.$service->offering_goal, []]
+        ], 1);
+
+        if ($service->offering_text) {
+            $this->renderParagraph(self::NO_INDENT, [
+                [$service->offering_text, []]
+            ], 1);
+
+        }
+        $this->renderParagraph(self::NO_INDENT, [
+            ['Herzlichen Dank für alles, was Sie geben.', []]
+        ], 2);
+    }
+
+    protected function renderEvents($events)
+    {
+        if (!count($events)) return;
+        $this->renderParagraph(self::NO_INDENT, [['Zu folgenden Veranstaltungen laden wir Sie ein:', ['italic' => true]]], 1);
+        $days = [];
+        foreach ($events as $event) {
+            $days[$event->start->format('Ymd')][$event->start->format('Hi')] = $event;
+        }
+        foreach ($days as $d => $events) {
+            $this->renderParagraph(self::NO_INDENT, [[Carbon::parse($d)->formatLocalized('%A, %d. %B'), self::BOLD]]);
+            foreach ($events as $event) {
+                $this->renderParagraph(self::INDENT, [[
+                    $event->event->timeText()."\t".$event->event->titleText(false)
+                        .(count($event->event->pastors ?? []) ? ' mit '.$this->getNameListLine($event->event->pastors) : '')
+                    .' ('.$event->event->locationText().')', []
+                ]]);
+            }
+        }
+    }
+
+    protected function renderFinalSong(Service $service)
+    {
+        if (!count($service->liturgyBlocks)) {
+            return;
+        }
+        $announcements = false;
+        $this->section->addTextBreak(2);
+        foreach ($service->liturgyBlocks as $block) {
+            foreach ($block->items as $item) {
+                if ($announcements && ($item->data_type == 'song')) {
+                    $this->renderParagraph(self::NO_INDENT, [['Wir singen gemeinsam:', []]]);
+                    $helper = new SongItemHelper($item);
+                    $this->renderParagraph(self::NO_INDENT, [[$helper->getTitleText() . (($item->data['verses'] ?? '') ? ', ' . $item->data['verses'] : ''), self::BOLD]]);
+                }
+                $announcements = in_array($item->title, ['Abkündigungen', 'Ankündigungen', 'Bekanntgaben', 'Bekanntmachungen']);
+            }
+        }
+
+    }
+
 }

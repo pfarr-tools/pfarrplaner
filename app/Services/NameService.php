@@ -39,17 +39,20 @@ class NameService
     public const FIRST_LAST = 2;
     public const LAST_FIRST = 3;
     public const LAST_FIRST_ARRAY = 4;
+    public const TITLE_FIRST_LAST = 5;
 
     protected $firstName = '';
     protected $lastName = '';
+    protected $title = '';
 
-    public function __construct($firstName, $lastName)
+    public function __construct($firstName, $lastName, $title = '')
     {
         $this->firstName = trim($firstName);
         $this->lastName = trim($lastName);
+        $this->title = trim($title);
     }
 
-    public static function fromName($name): NameService {
+    public static function fromName($name, $title = ''): NameService {
         if (str_contains($name, ',')) {
             list($lastName, $firstName) = explode(',', $name);
         } else {
@@ -57,11 +60,11 @@ class NameService
             $lastName = array_pop($parts);
             $firstName = join(' ', $parts);
         }
-        return new self($firstName, $lastName);
+        return new self($firstName, $lastName, $title);
     }
 
     public static function fromUser(User $user): NameService {
-        return self::fromName($user->name);
+        return self::fromName($user->name, $user->title);
     }
 
     public function format($format = self::LAST_COMMA_FIRST)
@@ -75,6 +78,8 @@ class NameService
                 return strtoupper($this->lastName).' '.$this->firstName;
             case self::LAST_FIRST_ARRAY:
                 return [$this->lastName, $this->firstName];
+            case self::TITLE_FIRST_LAST:
+                return trim($this->title.' '.$this->firstName.' '.$this->lastName);
         }
     }
 

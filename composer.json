@@ -11,10 +11,6 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/potofcoffee/PHPWord"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/potofcoffee/PHPPresentation"
         }
     ],
@@ -38,7 +34,7 @@
         "php-ews/php-ews": "^1.0",
         "phpoffice/phppresentation": "dev-fix-video",
         "phpoffice/phpspreadsheet": "^1.8",
-        "phpoffice/phpword": "dev-develop",
+        "phpoffice/phpword": "^1.2.0",
         "predis/predis": "^1.1",
         "psr/log": "^2",
         "revolution/laravel-amazon-product-api": "^4.5",

@@ -50,14 +50,7 @@
                 <form-input label="... in Höhe von ..."
                             :key="amountLoaded"
                             name="offerings" v-model="amount"/>
-
-                <form-textarea name="offering_text"
-                               label="Text zum Opfer" placeholder="Wenn vorhanden, z.B. Brief des Landesbischofs"/>
             </div>
-            <form-check name="mix_outlook" label="Veranstaltungen aus dem Outlook-Kalender mit aufnehmen."
-                        v-model="mixOutlook" :key="servicesLoaded"/>
-            <form-check name="mix_op" label="Veranstaltungen aus dem Online-Planer mit aufnehmen."
-                        v-model="mixOP" :key="servicesLoaded"/>
         </form>
     </admin-layout>
 
