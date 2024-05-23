@@ -710,7 +710,7 @@ Amen.'
         if (!count($service->liturgyBlocks)) {
             return;
         }
-        $this->section->addTextBreak(2);
+        $this->section->addTextBreak(1);
         foreach ($service->liturgyBlocks as $block) {
             $this->renderParagraph(self::NO_INDENT, [
                 [$block->title, ['bold' => true]],
@@ -742,7 +742,6 @@ Amen.'
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
                 if ($item->data_type == 'reading') {
-                    $this->section->addTextBreak(2);
 
                     $this->renderParagraph(self::NO_INDENT, [
                         ['Schriftlesung aus ' . ($item->data['reference'] ?? ''), self::BOLD_UNDERLINE],
@@ -799,12 +798,13 @@ Amen.'
         if ($offerings == "0,00\u{A0}€") $offerings = '';
         $this->renderParagraph(self::NO_INDENT, [
             ['Das Opfer vom letzten '.$lastService.' ergab '.($offerings ?: '______________').'.', []]
-        ], 1);
+        ], );
         $this->renderParagraph(self::NO_INDENT, [
             ['Das Opfer heute erbitten wir für: '.$service->offering_goal, []]
-        ], 1);
+        ]);
 
         if ($service->offering_text) {
+            $this->renderParagraph();
             $this->renderParagraph(self::NO_INDENT, [
                 [$service->offering_text, []]
             ], 1);
@@ -812,7 +812,7 @@ Amen.'
         }
         $this->renderParagraph(self::NO_INDENT, [
             ['Herzlichen Dank für alles, was Sie geben.', []]
-        ], 2);
+        ], 1);
     }
 
     protected function renderEvents($events)
