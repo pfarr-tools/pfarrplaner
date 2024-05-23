@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.8.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.7.0...v2024.8.0) (2024-05-23)
+
+
+### Features
+
+* Kalenderfarben und Formularverbesserungen ([6168822](https://codeberg.org/pfarr.tools/pfarrplaner/commit/61688228aabde41ffd277d1a4e4f928cb2a5d43b))
+
+
+### Bug Fixes
+
+* Online-geplant steht nicht mehr zur Verfügung (temporärer Fix) ([717f2b6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/717f2b623131d6d915f1e4943a4a13330d06db7c))
+* Regel für Wiederholungsende geht bei erneutem Speichern verloren ([6e92138](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6e92138c743940df5a13b5e861e9745bee624ba3))
+
 ## [2024.7.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.6.3...v2024.7.0) (2024-05-22)
 
 
