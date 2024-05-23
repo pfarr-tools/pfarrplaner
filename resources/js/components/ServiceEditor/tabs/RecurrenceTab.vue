@@ -276,7 +276,6 @@ export default {
             }
         },
         parse(service) {
-            console.log('parse()', service.rrule);
             if (service.rrule == '') return this.setDefaults(service);
             let parsed = {};
             let parts = service.rrule.replace('RRULE:', '').split(';');
@@ -284,10 +283,9 @@ export default {
                 let pSet = parts[key].split('=');
                 parsed[pSet[0].toLowerCase()] = pSet[1];
             }
-            console.log('parsed', parsed, {
-                ...(this.setDefaults(service)),
-                ...parsed,
-            });
+            if (parsed['interval']) parsed['repeatMode'] = 'count';
+            if (parsed['until']) parsed['repeatMode'] = 'until';
+
             return {
                 ...(this.setDefaults(service)),
                 ...parsed,
