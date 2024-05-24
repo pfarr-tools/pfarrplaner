@@ -32,12 +32,21 @@ namespace App\Reports;
 
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
+use App\Liturgy\Bible\ReferenceParser;
 use App\Models\Calendar\Day;
+use App\Models\Calendar\Occurence;
+use App\Models\Leave\Absence;
+use App\Models\Parish;
+use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\LiturgyService;
+use App\Services\NameService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
@@ -65,6 +74,7 @@ class BillBoardReport extends AbstractWordDocumentReport
      */
     protected const BOLD_UNDERLINE = ['bold' => true, 'underline' => Font::UNDERLINE_SINGLE];
     protected const DEFAULT = 'Kirchzettel';
+    protected const INDENT = 'Kirchzettel eingerückt';
     /**
      *
      */
@@ -77,7 +87,7 @@ class BillBoardReport extends AbstractWordDocumentReport
     /**
      * @var string
      */
-    public $title = 'Kirchzettel';
+    public $title = 'Kirchliche Nachrichten';
     /**
      * @var string
      */
@@ -85,7 +95,7 @@ class BillBoardReport extends AbstractWordDocumentReport
     /**
      * @var string
      */
-    public $description = 'Kirchzettel zum Aushang im Schaukasten';
+    public $description = 'Kirchliche Nachrichten zum Aushang im Schaukasten';
 
     /** @var Section */
     protected $section;
@@ -99,7 +109,12 @@ class BillBoardReport extends AbstractWordDocumentReport
     {
         $cities = Auth::user()->cities;
 
-        return Inertia::render('Report/BillBoard/Setup', compact('cities'));
+        $parishes = [];
+        foreach ($cities as $city) {
+            $parishes[$city->id] = Parish::with('users')->where('city_id', $city->id)->get();
+        }
+
+        return Inertia::render('Report/BillBoard/Setup', compact('cities', 'parishes'));
     }
 
     /**
@@ -109,59 +124,65 @@ class BillBoardReport extends AbstractWordDocumentReport
      */
     public function render(Request $request)
     {
-        $request->validate(
+        $data = $request->validate(
             [
                 'city' => 'required|int',
+                'altCity' => 'nullable|string',
                 'start' => 'required|date',
-                'mixOutlook' => 'nullable|bool',
-                'mixOP' => 'nullable|bool',
+                'parishes.*' => 'nullable|int|exists:parishes,id',
+                'pastors.*' => 'nullable|int|exists:users,id',
             ]
         );
 
-        $start = Carbon::parse( $request->get('start'))->setTime(0,0,0);
-        $city = City::findOrFail($request->get('city'));
+        $start = Carbon::parse($data['start'])->startOfDay();
+        $end = $start->copy()->addDays(7)->endOfDay();
+        $city = City::findOrFail($data['city']);
+        $parishes = Parish::with('users')->whereIn('id', $data['parishes'])->get();
 
-        $end = $start->copy()->addDays(8)->subSecond(1);
+        $events = Occurence::with('event')
+            ->between($start, $end)
+            ->whereHas('service', function ($query) use ($city) {
+                $query->inCity($city)->notHidden();
+            })
+            ->orderBy('start')
+            ->get()
+            ->groupBy(function (Occurence $item, int $key) {
+                return $item->start->format('Ymd');
+            });
 
-        $services = Service::with(['day', 'location'])
-            ->notHidden()
-            ->regularForCity($city)
-            ->dateRange($start, $end)
-            ->get();
+        $firstService = Service::inCity($city)->between($start, $end)->ordered()->first();
 
-        $events = [];
-
-        if ($data['mixOutlook'] ?? false) {
-            $calendar = new EventCalendarImport($city->public_events_calendar_url);
-            $events = $calendar->mix($events, $start, $end->copy()->subDay(1), true);
-        }
-
-        $events = Service::mix($events, $services, $start, $end);
-
-        if ($data['mixOP'] ?? false) {
-            $op = new OPEventsImport($city);
-            $events = $op->mix($events, $start, $end);
-        }
+        $absences = Absence::whereIn('user_id', $data['pastors'])->byPeriod($start, $end)->get();
 
         $this->section = $this->wordDocument->addSection(
             [
                 'orientation' => 'portrait',
-                'marginTop' => Converter::cmToTwip(0.75),
-                'marginBottom' => Converter::cmToTwip(0.25),
-                'marginLeft' => Converter::cmToTwip(1.59),
-                'marginRight' => Converter::cmToTwip(0.25),
+                'marginTop' => Converter::cmToTwip(2),
+                'marginBottom' => Converter::cmToTwip(2),
+                'marginLeft' => Converter::cmToTwip(2),
+                'marginRight' => Converter::cmToTwip(2),
             ]
         );
 
         $this->wordDocument->addParagraphStyle(
-            self::DEFAULT,
+            static::DEFAULT,
+            [
+                'spaceAfter' => 0,
+                'tabs' => [
+                    new Tab('right', Converter::cmToTwip(13.5)),
+                ],
+            ]
+        );
+
+        $this->wordDocument->addParagraphStyle(
+            static::INDENT,
             array(
                 'indentation' => [
-                    'left' => Converter::cmToTwip(5.5),
-                    'hanging' => Converter::cmToTwip(5.5),
+                    'left' => Converter::cmToTwip(3),
+                    'hanging' => Converter::cmToTwip(3),
                 ],
                 'tabs' => [
-                    new Tab('left', Converter::cmToTwip(5.5)),
+                    new Tab('left', Converter::cmToTwip(3)),
                     new Tab('right', Converter::cmToTwip(18)),
                 ],
                 'spaceAfter' => 0,
@@ -169,18 +190,15 @@ class BillBoardReport extends AbstractWordDocumentReport
         );
 
         $this->wordDocument->addParagraphStyle(
-            self::HEADING1,
+            static::HEADING1,
             array(
-                'indentation' => [
-                    'left' => Converter::cmToTwip(5.5),
-                    'firstLine' => Converter::cmToTwip(1.25),
-                ],
+                'align' => 'center',
                 'spaceAfter' => 0,
             )
         );
 
         $this->wordDocument->addParagraphStyle(
-            self::HEADING2,
+            static::HEADING2,
             array(
                 'indentation' => [
                     'left' => Converter::cmToTwip(7.5),
@@ -189,64 +207,147 @@ class BillBoardReport extends AbstractWordDocumentReport
             )
         );
 
-        // headings
-        $this->renderParagraph(self::HEADING1, [['Evang. Kirchengemeinde', ['size' => 27]]]);
-        $this->renderParagraph(self::HEADING2, [["   \t   " . $city->name, ['size' => 27]]]);
-        $this->renderParagraph();
+        $this->wordDocument->setDefaultFontName('Arial');
+        $this->wordDocument->setDefaultFontSize(12);
 
 
-        $lastDay = '';
-        $ctr = 0;
-        foreach ($events as $theseEvents) {
-            foreach ($theseEvents as $event) {
-                $dateFormat = $ctr ? '%A, %d. %B' : '%A, %d. %B %Y';
+        $this->renderParagraph(static::HEADING1, [['Kirchliche Nachrichten '.($data['altCity'] ?: $city->name), ['size' => 27]]]);
+        $this->renderBibleText($start);
+        $this->section->addTextBreak(2);
 
-                /** @var Carbon $eventStart */
-                $eventStart = is_array($event) ? $event['start'] : $event->date;
-                $done = false;
-
-                // header for the day
-                if ($lastDay != $eventStart->format('Ymd')) {
-                    $this->renderParagraph();
-
-                    if ($end->format('Ymd') == $eventStart->format('Ymd')) {
-                        $this->renderParagraph(self::DEFAULT, [['Vorschau', self::BOLD_UNDERLINE]]);
-                    }
-
-                    $day = Day::where('date', $eventStart->copy()->setTime(0, 0, 0))->first();
-                    if ($day) {
-                        $dayTitle = $day->name;
-                    } elseif (is_array($event) && (isset($event['allDay']) && $event['allDay'])) {
-                        $dayTitle = $event['title'];
-                    } else {
-                        $dayTitle = '';
-                    }
-
-                    $this->renderParagraph(
-                        self::DEFAULT,
-                        [
-                            [$eventStart->formatLocalized($dateFormat), self::BOLD_UNDERLINE],
-                            [($dayTitle ? "\t" : ''), []],
-                            [($dayTitle ? $dayTitle : ''), self::BOLD_UNDERLINE],
-                        ]
-                    );
-
-                    $done = (isset($event['allDay']) && $event['allDay']);
-                }
-
-                if (!$done) {
-                    $this->renderSingleEvent($event);
-                }
-
-                $lastDay = $eventStart->format('Ymd');
-                $ctr++;
+        if ($firstService->announcements) {
+            foreach (explode("\n", str_replace("\r", '', $firstService->announcements)) as $announcement) {
+                $this->renderParagraph(static::DEFAULT, [[$announcement, []]]);
             }
+            $this->section->addTextBreak(2);
         }
 
+        $this->renderInfoHeader($city, $parishes);
+        $this->section->addTextBreak(2);
+        $this->renderEvents($events);
+        $this->section->addTextBreak(3);
+        $this->renderAbsences($absences);
 
-        $filename = $start->format('Y_m_d') . ' Kirchzettel';
+
+        $filename = '97.8_' . $start->format('Ymd') . ' Kirchliche Nachrichten ' . $city->name;
         $this->sendToBrowser($filename);
     }
+
+    protected function renderBibleText($start)
+    {
+        if($liturgy = LiturgyService::getDayInfo($start)) {
+            $this->renderParagraph(static::HEADING1, [['Wochenspruch:', ['size' => 18, 'color' => '#0070c0']]]);
+            $this->renderParagraph(static::HEADING1, [[$liturgy['litTextsWeeklyQuoteText'], ['size' => 16, 'color' => '#0070c0']]]);
+            $this->renderParagraph(static::HEADING1, [[ReferenceParser::getInstance()->beautify($liturgy['litTextsWeeklyQuote']), ['size' => 12, 'color' => '#0070c0']]]);
+        }
+    }
+
+    protected function renderParagraphWithImage($text, $textFormat, $image, $imageOptions = []) {
+        $run = $this->section->addTextRun(static::DEFAULT);
+        $run->addText($text."\t", $textFormat);
+        if ($image) {
+            $run->addImage(storage_path('app/'.$image), $imageOptions);
+        }
+    }
+
+    protected function renderInfoHeader($city, $parishes)
+    {
+
+        // headings
+        $title = $city->official_title ?: 'Evangelische Kirchengemeinde ' . $city->name;
+        $this->renderParagraph(static::DEFAULT, [[$title, ['size' => 22]]]);
+
+        $pastors = collect();
+        foreach ($parishes as $parish) {
+            if (count($parish->users)) {
+                $pastors = $parish->users->map(function (User $item, int $key) {
+                    return NameService::fromUser($item)->format(NameService::TITLE_FIRST_LAST);
+                })->join(', ', ' und ');
+                $this->renderParagraphWithImage($pastors, static::BOLD, $city->logo, [
+                    'width' => Converter::cmToPoint(3.5),
+                    'positioning' => 'relative',
+                    'wrappingStyle' => 'tight',
+                ]);
+                $firstPastor = $parish->users->first();
+                $this->renderParagraph(static::DEFAULT, [[trim(explode("\r\n", $firstPastor->address)[0]), []]]);
+                $this->renderParagraph(static::DEFAULT, [['Telefon ' . $firstPastor->phone, []]]);
+            }
+
+            $emails = [];
+            foreach ($parish->users as $pastor) {
+                if ($pastor->email) {
+                    $emails[] = $pastor->email;
+                }
+            }
+            if ($parish->email) {
+                $emails[] = $parish->email;
+            }
+            $this->renderParagraph(static::INDENT, [["E-Mail:\t" . join('<w:br/>', $emails), []]]);
+            $this->renderParagraph(static::INDENT, [["Homepage:\t" . parse_url($city->homepage, PHP_URL_HOST), []]]);
+            if ($parish->opening_hours) {
+                $this->renderParagraph(static::DEFAULT, [['Sprechzeiten im Pfarrbüro'.($parish->assistant ? ', '.$parish->assistant : ''), []]]);
+                $this->renderParagraph(static::DEFAULT, [[$parish->opening_hours, []]], 1);
+            }
+        }
+    }
+
+    protected function renderEvents($events)
+    {
+        if (!count($events)) {
+            return;
+        }
+        $this->renderParagraph(static::DEFAULT, [['Termine', static::BOLD]], 2);
+        foreach ($events as $dayEvents) {
+            $title = $dayEvents->first()->start->formatLocalized('%A, %d. %B') . ' ';
+            if ($dayEvents->first()->event->liturgicalInfo['title'] ?? false) {
+                $title .= ' - ' . $dayEvents->first()->event->liturgicalInfo['title'] . ' - ';
+            }
+            $this->renderParagraph(static::DEFAULT, [[trim($title), static::BOLD]]);
+            foreach ($dayEvents as $event) {
+                $line = [
+                    $event->event->titleText(false) . (count(
+                        $event->event->pastors ?? []
+                    ) ? ' mit ' . $this->getNameListLine($event->event->pastors) : '')
+                ];
+                if ($event->event->event_class == 'service') {
+                    $line[] = 'Musik: ' . $this->getNameListLine($event->event->organists);
+                    $line[] = 'Opfer: ' . $event->event->offering_goal;
+                    $line[] = '';
+                }
+                $this->renderParagraph(
+                    static::INDENT,
+                    [[$event->event->timeText() . "\t" . join('<w:br />', $line), []]]
+                );
+            }
+            $this->section->addTextBreak();
+        }
+    }
+
+    protected function renderAbsences(Collection $absences)
+    {
+        if (!count($absences)) {
+            return;
+        }
+        /** @var Absence $absence */
+        foreach ($absences as $absence) {
+            $this->renderParagraph(static::DEFAULT, [[$absence->descriptiveText, []]], 1);
+        }
+    }
+
+    /**
+     * @param $people
+     * @param $and
+     * @return string
+     */
+    protected function getNameListLine($people, $and = ', ')
+    {
+        $names = collect();
+        foreach ($people as $person) {
+            $names->push(NameService::fromUser($person)->format(NameService::TITLE_FIRST_LAST));
+        }
+        return $names->join(', ', $and);
+    }
+
 
     /**
      * @param string $template
@@ -263,7 +364,7 @@ class BillBoardReport extends AbstractWordDocumentReport
     ) {
         $textRun = $existingTextRun ?: $this->section->addTextRun($template);
         foreach ($blocks as $block) {
-            $textRun->addText($block[0], $block[1]);
+            $textRun->addText($block[0], $block[1] ?? []);
         }
         for ($i = 0; $i < $emptyParagraphsAfter; $i++) {
             $textRun = $this->section->addTextRun($template);
@@ -271,93 +372,6 @@ class BillBoardReport extends AbstractWordDocumentReport
         return $textRun;
     }
 
-    /**
-     * @param $event
-     */
-    protected function renderSingleEvent($event)
-    {
-        if (is_array($event)) {
-            $this->renderParagraph(
-                self::DEFAULT,
-                [
-                    [$event['start']->formatLocalized('%H.%M Uhr') . "\t", []],
-                    [$event['title'], self::BOLD],
-                    [' (' . $event['place'] . ')', []],
-                    [(isset($event['P']) ? "\t" . $event['P'] : ''), self::BOLD]
-                ]
-            );
-        } else {
-            $description = $event->descriptionText();
-            if ($description) {
-                if (substr($description, 0, 4) != 'mit ') {
-                    $description = 'mit ' . $description;
-                }
-                if (strlen($description) > 25) {
-                    $description = str_replace('; ', ';<w:br />', $description);
-                }
-                // take care of ampersands
-                $description = preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
-                $description = ' ' . trim($description);
-            }
-
-            $this->renderParagraph(
-                self::DEFAULT,
-                [
-                    [
-                        Carbon::createFromFormat(
-                            'Y-m-d H:i',
-                            $event->date->format('Y-m-d') . ' ' . $event->time
-                        )->formatLocalized('%H.%M Uhr') . "\t",
-                        []
-                    ],
-                    [($event->title ?: 'Gottesdienst') . $description, self::BOLD],
-                    [' (' . $event->locationText() . ')', []],
-                    ["\t" . $event->participantsText('P'), self::BOLD]
-                ]
-            );
-
-            if ($event->offering_goal) {
-                $this->renderParagraph(
-                    self::DEFAULT,
-                    [
-                        ["\t" . 'Opfer: ' . $event->offering_goal, []]
-                    ]
-                );
-            }
-
-            // add children's church
-            if ($event->cc) {
-                $this->renderParagraph(
-                    self::DEFAULT,
-                    [
-                        [
-                            Carbon::createFromFormat(
-                                'Y-m-d H:i',
-                                $event->date->format('Y-m-d') . ' ' . ($event->cc_alt_time ?? $event->time)
-                            )->formatLocalized('%H.%M Uhr') . "\t",
-                            []
-                        ],
-                        ['Kinderkirche', self::BOLD],
-                        [' (' . ($event->cc_location ?? $event->locationText()) . ')', []],
-                    ]
-                );
-
-            }
-        }
-    }
-
-    /**
-     * @param $s
-     * @return string
-     */
-    protected function renderName($s)
-    {
-        if (false !== strpos($s, ',')) {
-            $t = explode(',', $s);
-            $s = trim($t[1]) . ' ' . trim($t[0]);
-        }
-        return $s;
-    }
 
     /**
      * @param $text
@@ -370,11 +384,11 @@ class BillBoardReport extends AbstractWordDocumentReport
         foreach ($text as $paragraph) {
             switch (substr($paragraph, 0, 1)) {
                 case '*':
-                    $format = self::BOLD;
+                    $format = static::BOLD;
                     $paragraph = substr($paragraph, 1);
                     break;
                 case '_':
-                    $format = self::UNDERLINE;
+                    $format = static::UNDERLINE;
                     $paragraph = substr($paragraph, 1);
                     break;
                 default:
@@ -389,7 +403,7 @@ class BillBoardReport extends AbstractWordDocumentReport
                     ]
                 )
             );
-            $this->renderParagraph(self::NO_INDENT, [[$paragraph, $format]], 1);
+            $this->renderParagraph(static::NO_INDENT, [[$paragraph, $format]], 1);
         }
     }
 }

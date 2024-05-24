@@ -141,6 +141,12 @@ export default {
             },
         },
         city: Object,
+        allowCreate: {
+            type: Boolean,
+            default() {
+                return true;
+            },
+        }
     },
     beforeCreate() {
         this.uuid = uuid.toString();
@@ -199,6 +205,49 @@ export default {
             myPeople.push(tempTeam);
         });
 
+        let mySettings = {
+            valueField: 'id',
+            labelField: 'name',
+            searchField: ['name', 'category', 'userString'],
+            optgroupField: 'category',
+            optgroupLabelField: 'groupName',
+            optgroupValueField: 'groupName',
+            optgroups: [{groupName: 'Ich'}, {groupName: 'Andere Personen'}, {groupName: 'Teams'}],
+            options: myPeople,
+            render: {
+                item: function (item, escape) {
+                    if (item.type == 'mdi mdi-account') {
+                        return '<div><span class="mdi mdi-account"></span> ' + escape(item.name) + '</div>';
+                    } else {
+                        let users = [];
+                        item.users.forEach(user => {
+                            users.push(user.name);
+                        });
+                        return '<div><span class="mdi mdi-account-multiple"></span> ' + escape(item.name) + ': ' + escape(users.join(', ')) + '</div>';
+                    }
+                },
+                option: function (item, escape) {
+                    var t = '<div><span class="ms-1 ' + item.type + '"></span> ' + escape(item.name);
+
+                    if (item.type == 'mdi mdi-account-multiple') {
+                        t += '<span class="ms-1 badge bg-dark">' + item.users.length + '</span>'
+                        if (item.users.length > 0) t += '<div>';
+                        item.users.forEach(user => {
+                            t += '<span class="ms-1 badge bg-light">' + user.name + '</span>'
+                        });
+                        if (item.users.length > 0) t += '</div>';
+                    }
+                    t += '</div>';
+                    return t;
+                }
+            },
+        };
+        if (this.allowCreate) {
+            mySettings.create = this.addPerson;
+            mySettings.render.option_create = function (data, escape) {
+                return '<div class="create">Neue Person anlegen: <strong>' + escape(data.input) + '</strong>&hellip;</div>';
+            };
+        }
 
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
@@ -224,47 +273,7 @@ export default {
                 title: '',
             },
             myTeamReference: myTeamReference,
-            settings: {
-                valueField: 'id',
-                labelField: 'name',
-                searchField: ['name', 'category', 'userString'],
-                optgroupField: 'category',
-                optgroupLabelField: 'groupName',
-                optgroupValueField: 'groupName',
-                optgroups: [{groupName: 'Ich'}, {groupName: 'Andere Personen'}, {groupName: 'Teams'}],
-                create: this.addPerson,
-                options: myPeople,
-                render: {
-                    option_create: function (data, escape) {
-                        return '<div class="create">Neue Person anlegen: <strong>' + escape(data.input) + '</strong>&hellip;</div>';
-                    },
-                    item: function (item, escape) {
-                        if (item.type == 'mdi mdi-account') {
-                            return '<div><span class="mdi mdi-account"></span> ' + escape(item.name) + '</div>';
-                        } else {
-                            let users = [];
-                            item.users.forEach(user => {
-                                users.push(user.name);
-                            });
-                            return '<div><span class="mdi mdi-account-multiple"></span> ' + escape(item.name) + ': ' + escape(users.join(', ')) + '</div>';
-                        }
-                    },
-                    option: function (item, escape) {
-                        var t = '<div><span class="ms-1 ' + item.type + '"></span> ' + escape(item.name);
-
-                        if (item.type == 'mdi mdi-account-multiple') {
-                            t += '<span class="ms-1 badge bg-dark">' + item.users.length + '</span>'
-                            if (item.users.length > 0) t += '<div>';
-                            item.users.forEach(user => {
-                                t += '<span class="ms-1 badge bg-light">' + user.name + '</span>'
-                            });
-                            if (item.users.length > 0) t += '</div>';
-                        }
-                        t += '</div>';
-                        return t;
-                    }
-                },
-            },
+            settings: mySettings,
         }
     },
     methods: {

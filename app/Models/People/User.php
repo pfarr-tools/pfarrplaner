@@ -43,6 +43,7 @@ use App\Models\Service;
 use App\Models\Subscription;
 use App\Models\UserSetting;
 use App\Providers\AuthServiceProvider;
+use App\Services\NameService;
 use App\Services\PasswordService;
 use App\Services\RoleService;
 use Carbon\Carbon;
@@ -1132,5 +1133,22 @@ class User extends Authenticatable
     public function writableCitiesWithoutAdmin()
     {
         return $this->belongsToMany(City::class)->withPivot('permission')->wherePivotIn('permission', ['w']);
+    }
+
+    /**
+     * @return NameService
+     */
+    public function nameService(): NameService
+    {
+        return NameService::fromUser($this);
+    }
+
+    /**
+     * @param $format
+     * @return array|string|null
+     */
+    public function formatName($format)
+    {
+        return $this->nameService()->format($format);
     }
 }

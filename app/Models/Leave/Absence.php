@@ -491,4 +491,43 @@ class Absence extends Model implements HasDAVCalendarItems
             $categories,
         );
     }
+
+    protected function periodText(Carbon $from, Carbon $to)
+    {
+        if ($from->format('Ymd') == $to->format('Ymd')) {
+            return ' am ' . $from->format('%d. %B');
+        }
+        $format = ($from->month == $to->month) ? '%d.' : '%d. %B';
+        if ($from->year != $to->year) {
+            $format = '%d. %B %Y';
+        }
+        return ' vom ' . $from->formatLocalized($format) . ' bis '
+            . $to->formatLocalized($format == '%d.' ? '%d. %B' : $format);
+    }
+
+    public function getDescriptiveTextAttribute()
+    {
+        $line = $this->user->formatName(NameService::TITLE_FIRST_LAST) . ' ist'
+            .$this->periodText($this->from, $this->to). ' abwesend.';
+        $replacements = collect();
+        $replaceCtr = 0;
+        foreach ($this->replacements as $replacement) {
+            $replaceCtr += count($replacement->users);
+            $replacements->push(
+                (($replacement->from != $this->from) || ($replacement->to != $this->to) ?
+                    $this->periodText($replacement->from, $replacement->to) : '')
+                     . ' ' . $replacement->users->map(
+                    function (User $item) {
+                        return trim($item->formatName(NameService::TITLE_FIRST_LAST)
+                                    .($item->phone ? ' (Telefon '.$item->phone.')' : ''));
+                    }
+                )->join(', ', ' und ')
+            );
+        }
+        if ($replaceCtr) {
+            $line .= ' Die Vertretung ' . ($replaceCtr > 1 ? 'übernehmen' : 'übernimmt') . ' '
+                .trim($replacements->join('; ',' und ')) . '.';
+        }
+        return $line;
+    }
 }

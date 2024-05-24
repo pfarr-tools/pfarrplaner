@@ -28,16 +28,24 @@
   -->
 
 <template>
-    <admin-layout title="Kirchzettel erstellen">
+    <admin-layout title="Kirchliche Nachrichten erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Kirchzettel erstellen" @click="renderReport" />
+            <save-button label="Erstellen" title="Kirchliche Nachrichten erstellen" @click="renderReport" />
         </template>
         <form method="post" :action="route('reports.render', {report: 'billBoard'})" ref="myForm">
             <form-csrf-token />
-            <form-selectize name="city" label="Kirchzettel für folgende Kirchengemeinde erstellen" v-model="myCity" :options="cities" />
-            <form-date-picker name="start" label="Gottesdienste von" v-model="myStart" iso-date />
-            <form-check name="mixOutlook" label="Veranstaltungen aus dem Outlook-Kalender mit aufnehmen." />
-            <form-check name="mixOP" label="Veranstaltungen aus dem Online Planer mit aufnehmen." />
+            <form-selectize name="city" label="Kirchliche Nachrichten für folgende Kirchengemeinde erstellen" v-model="myCity"
+                            @input="setParishes"
+                            :options="cities" />
+            <form-input name="altCity" label="Alternative Ortsbezeichnung" />
+            <form-date-picker name="start" label="Gottesdienste ab" v-model="myStart" iso-date />
+            <form-selectize name="parishes[]" label="Folgende Pfarrämter mit einbeziehen"
+                            v-model="myParishes" :key="'parish_'+cityUpdated"
+                            @input="setPastors"
+                            :options="availableParishes" multiple />
+            <people-select name="pastors[]" label="Urlaub für folgende Pfarrer:innen mit einbeziehen"
+                           v-model="myPastors" :key="'pastors_'+parishUpdated" :allow-create="false"
+                           :people="availablePastors" multiple />
         </form>
     </admin-layout>
 </template>
@@ -49,21 +57,49 @@ import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
+import PeopleSelect from "../../../components/Ui/elements/PeopleSelect.vue";
 export default {
     name: "Setup",
-    props: ['cities'],
-    components: {FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    props: ['cities', 'parishes'],
+    components: {PeopleSelect, FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    computed: {
+        availableParishes() {
+            return this.parishes[this.myCity] ?? [];
+        },
+        availablePastors() {
+            let p = [];
+            this.availableParishes.forEach(parish => p.push(...parish.users));
+            return p;
+        },
+    },
     data() {
         let myStart = moment().startOf('isoWeek').add(6, 'days');
 
         return {
             myCity: this.cities.length ? this.cities[0].id : null,
+            myParishes: [],
+            myPastors: [],
+            cityUpdated: 0,
+            parishUpdated: 0,
             myStart,
         }
+    },
+    mounted() {
+        this.$forceUpdate();
+        this.setParishes(this.myCity);
     },
     methods: {
         renderReport() {
             this.$refs.myForm.submit();
+        },
+        setParishes(e) {
+            this.myParishes = this.availableParishes.map(({id}) => id);
+            this.cityUpdated++;
+            this.setPastors(this.myParishes);
+        },
+        setPastors(e) {
+            this.myPastors = this.availablePastors.map(({id}) => id);
+            this.parishUpdated++;
         },
     }
 }
