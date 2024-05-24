@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.11.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.10.0...v2024.11.0) (2024-05-24)
+
+
+### Features
+
+* Bei Pfarrämtern können der Name der Assistenz und die Öffnungszeiten angegeben werden. ([47662eb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/47662eb9628fa35ce9d93fd863201ca58a15932e))
+* Kirchliche Nachrichten für den Schaukasten ([06ed0c1](https://codeberg.org/pfarr.tools/pfarrplaner/commit/06ed0c1116bb60241fd6b2422d6ad916cdb9c614))
+
+
+### Bug Fixes
+
+* Logo der Kirchengemeinde kann nicht hochgeladen werden ([66fd218](https://codeberg.org/pfarr.tools/pfarrplaner/commit/66fd2183d72434832b5c972e571075b026dd64a5))
+* Lokale Administratoren können Kirchengemeinde nicht bearbeiten ([f59465d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/f59465db6c6281623d7167f07e7fd9a2fd1ae1e0))
+
 ## [2024.10.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.9.1...v2024.10.0) (2024-05-23)
 
 
