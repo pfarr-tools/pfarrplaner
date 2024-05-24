@@ -165,6 +165,8 @@ class ParishController extends Controller
                 'city' => 'nullable|string',
                 'phone' => 'nullable|phone_number',
                 'email' => 'nullable|email',
+                'assistant' => 'nullable|string',
+                'opening_hours' => 'nullable|string',
             ]
         );
     }

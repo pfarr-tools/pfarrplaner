@@ -63,6 +63,8 @@ class Parish extends Model
         'email',
         'congregation_name',
         'congregation_url',
+        'assistant',
+        'opening_hours',
     ];
 
     /**

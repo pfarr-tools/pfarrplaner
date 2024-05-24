@@ -47,6 +47,8 @@
         <form-input name="city" label="Ort" v-model="myParish.city" />
         <form-input name="phone" label="Telefon" v-model="myParish.phone" />
         <form-input name="email" label="E-Mailadresse" v-model="myParish.email" />
+        <form-input name="assistant" label="Assistenz im Büro" v-model="myParish.assistant" />
+        <form-input name="opening_hours" label="Öffnungszeiten" v-model="myParish.opening_hours" />
         <form-textarea name="csv" label="CSV-formatierte Straßeneinträge aus DaviP" rows="15" v-model="myParish.csv" />
     </admin-layout>
 </template>
