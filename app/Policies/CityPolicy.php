@@ -49,7 +49,7 @@ class CityPolicy
      */
     public function index(User $user)
     {
-        if ($user->isAdmin) {
+        if ($user->isAdmin || $user->isLocalAdmin) {
             return true;
         }
         if ($user->can('ort-bearbeiten')) return true;

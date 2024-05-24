@@ -95,7 +95,7 @@ class AbstractCRUDController extends Controller
      */
     public function index(Request $request)
     {
-        Gate::authorize('viewAny', $this->modelClass);
+        Gate::authorize('index', $this->modelClass);
         $records = $this->addRightsToModelCollection($this->getModelsForIndex());
         return Inertia::render(($this->modelClass)::getVuePath('index'), [
             ($this->modelClass)::pluralKey() => $records,
