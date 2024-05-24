@@ -55,6 +55,7 @@ class CityController extends AbstractCRUDController
     use HandlesAttachedImageTrait;
 
     protected string $modelClass = City::class;
+    protected $model = City::class;
 
     public function __construct()
     {
