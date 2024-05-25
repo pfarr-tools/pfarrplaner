@@ -229,7 +229,7 @@ class BillBoardReport extends AbstractWordDocumentReport
         $this->renderAbsences($absences);
 
 
-        $filename = '97.8_' . $start->format('Ymd') . ' Kirchliche Nachrichten ' . $city->name;
+        $filename = '91.8_' . $start->format('Ymd') . ' Kirchliche Nachrichten ' . $city->name;
         $this->sendToBrowser($filename);
     }
 
