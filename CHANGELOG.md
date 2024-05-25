@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.12.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.11.0...v2024.12.0) (2024-05-25)
+
+
+### Features
+
+* Erinnerung an die Trauerfeier ([0b95d20](https://codeberg.org/pfarr.tools/pfarrplaner/commit/0b95d20484c87a92f082045847eee49715d79911))
+
+
+### Bug Fixes
+
+* Falsches Aktenzeichen ([33ee4b7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/33ee4b76e6ca201afe62e0bd30028917a8d4668b))
+
 ## [2024.11.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.10.0...v2024.11.0) (2024-05-24)
 
 
