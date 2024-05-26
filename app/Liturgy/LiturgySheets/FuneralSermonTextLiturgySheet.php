@@ -32,6 +32,7 @@ namespace App\Liturgy\LiturgySheets;
 
 
 use App\Documents\Word\DefaultA5WordDocument;
+use App\Documents\Word\DefaultFoldedBooklet;
 use App\Documents\Word\DefaultWordDocument;
 use App\Models\Liturgy\Item;
 use App\Models\Service;
@@ -54,13 +55,15 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
         parent::__construct();
     }
 
+
+
+
     public function render(Service $service)
     {
         $this->service = $service;
         if (!count($service->funerals)) return;
 
-        $doc = new DefaultA5WordDocument();
-        $doc->getPhpWord()->getSettings()->setBookFoldPrinting(true);
+        $doc = new DefaultFoldedBooklet();
         $this->setProperties($doc);
         $doc->setInstructionsFontStyle(['size' => 8, 'italic' => true]);
 

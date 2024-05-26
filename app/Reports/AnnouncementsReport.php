@@ -275,9 +275,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         $this->section = $this->wordDocument->addSection(
             [
-                'orientation' => 'landscape',
-                'pageSizeH' => Converter::cmToTwip(21),
-                'pageSizeW' => Converter::cmToTwip(14.85),
+                'orientation' => \PhpOffice\PhpWord\Style\Section::ORIENTATION_LANDSCAPE,
+                'pageSizeH' => 11906,
+                'pageSizeW' => 8419,
                 'marginTop' => Converter::cmToTwip(1),
                 'marginBottom' => Converter::cmToTwip(1),
                 'marginLeft' => Converter::cmToTwip(1),

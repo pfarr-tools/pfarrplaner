@@ -33,19 +33,18 @@ namespace App\Documents\Word;
 
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Style\Paper;
+use PhpOffice\PhpWord\Style\Section;
 
-class DefaultA5WordDocument extends DefaultWordDocument
+class DefaultFoldedBooklet extends DefaultWordDocument
 {
 
     protected function configureLayout() {
-        $paper = new Paper();
-        $paper->setSize('A5');
-
+        $this->getPhpWord()->getSettings()->setBookFoldPrinting(true);
         $this->section = $this->phpWord->addSection(
             [
-                'orientation' => 'portrait',
-                'pageSizeH' => $paper->getHeight(),
-                'pageSizeW' => $paper->getWidth(),
+                'orientation' => Section::ORIENTATION_LANDSCAPE,
+                'pageSizeH' => 11906,
+                'pageSizeW' => 8419,
                 'marginTop' => Converter::cmToTwip(0.75),
                 'marginBottom' => Converter::cmToTwip(0.75),
                 'marginLeft' => Converter::cmToTwip(2),
