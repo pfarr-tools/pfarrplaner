@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.12.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.12.0...v2024.12.1) (2024-05-26)
+
+
+### Bug Fixes
+
+* Probleme beim Drucken von auf A5 gefalteten Dokumenten ([99c59b5](https://codeberg.org/pfarr.tools/pfarrplaner/commit/99c59b523598a47e99609b07e2ce431b6f6b49f0))
+
 ## [2024.12.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.11.0...v2024.12.0) (2024-05-25)
 
 
