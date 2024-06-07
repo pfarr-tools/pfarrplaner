@@ -246,7 +246,12 @@ class DefaultWordDocument
     ) {
         $textRun = $existingTextRun ?: $this->section->addTextRun($template);
         foreach ($blocks as $block) {
-            $textRun->addText($block[0], $block[1]);
+            if (null !== $block[0]) {
+                foreach (explode("\n", $block[0]) as $item) {
+                    $textRun->addText($item, $block[1]);
+                    if (isset($block[2]) && $block[2]) $textRun->addTextBreak();
+                }
+            }
         }
         for ($i = 0; $i < $emptyParagraphsAfter; $i++) {
             $textRun = $this->section->addTextRun($template);

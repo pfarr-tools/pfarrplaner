@@ -56,12 +56,12 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
     }
 
 
-
-
     public function render(Service $service)
     {
         $this->service = $service;
-        if (!count($service->funerals)) return;
+        if (!count($service->funerals)) {
+            return;
+        }
 
         $doc = new DefaultFoldedBooklet();
         $this->setProperties($doc);
@@ -78,23 +78,31 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
             $names->push($name);
             $doc->getSection()->addText($name, ['size' => 24], ['align' => 'center']);
             $doc->getSection()->addText(
-                $funeral->dob->format('d.m.Y').' - '.$funeral->dod->format('d.m.Y'),
-                ['size' => 12], ['align' => 'center']);
+                $funeral->dob->format('d.m.Y') . ' - ' . $funeral->dod->format('d.m.Y'),
+                ['size' => 12],
+                ['align' => 'center']
+            );
         }
         $doc->getSection()->addTextBreak(4);
         $doc->getSection()->addText(
-            'Trauerfeier am '.$service->date->format('d.m.Y'),
-            ['size' => 12], ['align' => 'center']);
+            'Trauerfeier am ' . $service->date->format('d.m.Y'),
+            ['size' => 12],
+            ['align' => 'center']
+        );
         $doc->getSection()->addText(
             $service->locationText(),
-            ['size' => 12], ['align' => 'center']);
+            ['size' => 12],
+            ['align' => 'center']
+        );
 
         $doc->getSection()->addPageBreak();
 
         // heading
         if (($this->service) && ($this->service->sermon)) {
             $doc->getSection()->addTitle($this->service->sermon->title, 1);
-            if ($this->service->sermon->subtitle) $doc->getSection()->addTitle($this->service->sermon->subtitle, 2);
+            if ($this->service->sermon->subtitle) {
+                $doc->getSection()->addTitle($this->service->sermon->subtitle, 2);
+            }
             $doc->getSection()->addTextBreak();
         }
 
@@ -106,7 +114,43 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
             }
         }
 
-        $doc->sendToBrowser($this->getFileName($service, (($this->service) && ($this->service->sermon) ? ' - Trauerfeier für ' .$names->join(', ', ' und ')  : '')));
+        $doc->getSection()->addPageBreak();
+        $doc->getSection()->addText('Sehr geehrte Angehörige,');
+        $doc->getSection()->addText(
+            'Es war '
+            . ($service->pastors->count() == 1 ? 'mir' : 'uns')
+            . ' ein großes Vorrecht, Sie beim Abschied von '
+            . $names->join(', ', ' und ')
+            . ' begleiten zu dürfen. Gerne '
+            . ($service->pastors->count() == 1 ? 'bin ich' : 'sind wir')
+            . ' auch weiterhin für Sie da. Nehmen Sie dazu jederzeit Kontakt mit '
+            . ($service->pastors->count() == 1 ? 'mir' : 'uns')
+            . ' auf.'
+        );
+        $doc->getSection()->addText('Bleiben Sie behütet!');
+        $doc->getSection()->addTextBreak(2);
+        $doc->getSection()->addText($service->pastors->pluck('name')->join(', ', ' und '));
+        foreach ($service->pastors as $pastor) {
+            $doc->getSection()->addTextBreak(1);
+            $run = $doc->getSection()->addTextRun();
+            $doc->renderParagraph(DefaultWordDocument::NORMAL, [
+                [NameService::fromUser($pastor)->format(NameService::TITLE_FIRST_LAST), ['bold' => true], true],
+                [$pastor->office ?: null, [], true],
+                [$pastor->address ?: null, [], true],
+                [$pastor->phone ? 'Telefon ' . $pastor->phone : null, [], true],
+                [$pastor->email ? 'E-Mail ' . $pastor->email : null, [], true],
+            ]);
+        }
+
+        $doc->sendToBrowser(
+            $this->getFileName(
+                $service,
+                (($this->service) && ($this->service->sermon) ? ' - Trauerfeier für ' . $names->join(
+                        ', ',
+                        ' und '
+                    ) : '')
+            )
+        );
     }
 
     protected function setProperties(DefaultWordDocument $doc)
@@ -114,7 +158,9 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
         $properties = $doc->getPhpWord()->getDocInfo();
         $properties->setCreator(Auth::user()->name);
         $properties->setCompany(Auth::user()->office ?? '');
-        $properties->setTitle($this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi') . ' ' . $this->getFileTitle());
+        $properties->setTitle(
+            $this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi') . ' ' . $this->getFileTitle()
+        );
         $properties->setDescription($this->getFileTitle() . ' (' . $this->title . ')');
         $properties->setCategory('Gottesdienste');
         $properties->setLastModifiedBy(Auth::user()->name);
