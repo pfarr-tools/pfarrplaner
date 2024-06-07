@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.12.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.12.1...v2024.12.2) (2024-06-07)
+
+
+### Bug Fixes
+
+* .ics-Dateien haben Zeilen über 75 Zeichen (vgl. RFC 5541 3.1) ([5c97c22](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5c97c22ee93efafae1ca403e1d8d746eb7ade9ad))
+
 ### [2024.12.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.12.0...v2024.12.1) (2024-05-26)
 
 
