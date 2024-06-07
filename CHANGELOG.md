@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.14.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.13.0...v2024.14.0) (2024-06-07)
+
+
+### Features
+
+* Gottesdienste eines Ortes als CSV ausgeben ([6dea691](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6dea6918bf127c39077af7e5bb684d07015c8f3f))
+
 ## [2024.13.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.12.3...v2024.13.0) (2024-06-07)
 
 
