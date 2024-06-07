@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.14.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.14.0...v2024.14.1) (2024-06-07)
+
+
+### Bug Fixes
+
+* Falsche Zeitzone in der Ausgabe ([24ffcfc](https://codeberg.org/pfarr.tools/pfarrplaner/commit/24ffcfcdffde4c19a6ee0a67071c134863e3d7c0))
+
 ## [2024.14.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.13.0...v2024.14.0) (2024-06-07)
 
 
