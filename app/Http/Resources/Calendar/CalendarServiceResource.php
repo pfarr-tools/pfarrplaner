@@ -75,6 +75,7 @@ class CalendarServiceResource extends JsonResource
             'hidden' => $this->hidden,
             'ministriesByCategory' => new CalendarMinistriesResource($this),
             'pastors' => CalendarParticipantResource::collection($this->pastors),
+            'need_predicant' => $this->need_predicant,
             'organists' => CalendarParticipantResource::collection($this->organists),
             'sacristans' => CalendarParticipantResource::collection($this->sacristans),
             'isMine' => $this->isMine,
