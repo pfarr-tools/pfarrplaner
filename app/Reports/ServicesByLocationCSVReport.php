@@ -87,10 +87,10 @@ class ServicesByLocationCSVReport extends AbstractCSVReport
             $services,
             [
                 'Datum' => function ($item, $key) {
-                    return $item->date->formatLocalized('%A, %d. %B');
+                    return $item->date->setTimezone('Europe/Berlin')->formatLocalized('%A, %d. %B');
                 },
                 'Uhrzeit' => function ($item, $key) {
-                    return $item->date->format('H:i') . ' Uhr';
+                    return $item->date->setTimezone('Europe/Berlin')->format('H:i') . ' Uhr';
                 },
                 'Titel' => function ($item, $key) {
                     if ($item->titleText() == 'GD') {
