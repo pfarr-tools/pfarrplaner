@@ -152,7 +152,7 @@ export default {
             // funeral
             if (this.replacementFuneral && text.includes('[bestattung:')) {
                 let funeral = this.service.funerals.filter(item => item.id == this.replacementFuneral)[0];
-                let nameSet = new NameService(funeral.buried_name)
+                let nameSet = new NameService(funeral.buried_name, funeral.spoken_name || null)
 
                 let pronounset1 = PronounSetFactory.get(funeral.pronoun_set);
 

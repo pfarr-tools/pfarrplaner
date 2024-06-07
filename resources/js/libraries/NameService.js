@@ -33,7 +33,7 @@ export class NameService {
     last = '';
     name = '';
     split= [];
-    constructor(myName) {
+    constructor(myName, spokenName = null) {
         if (myName.includes(',')) {
             let t = myName.split(',')
             this.first = t[1].trim();
@@ -43,6 +43,7 @@ export class NameService {
             this.last = t.splice(t.length-1).join(' ');
             this.first = t.join(' ');
         }
+        if (spokenName) this.first = spokenName;
         this.name = this.first+' '+this.last;
         this.split = [this.last, this.first];
         return this;
