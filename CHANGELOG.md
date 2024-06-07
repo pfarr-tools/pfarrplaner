@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.13.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.12.3...v2024.13.0) (2024-06-07)
+
+
+### Features
+
+* Kontaktdaten der Pfarrer:innen in der Erinnerung an die Trauerfeier ([86377a5](https://codeberg.org/pfarr.tools/pfarrplaner/commit/86377a56902edc7d2ea60c9011a7f68fe10a7acf))
+* Rufname bei Ersetzungen berücksichtigen ([c549bdf](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c549bdf75837bf59d11e883cae18c3df03fa8f7c)), closes [#389](https://codeberg.org/pfarr.tools/pfarrplaner/issues/389)
+
+
+### Bug Fixes
+
+* Prädikantenanforderung fehlt im Kalender ([06f52da](https://codeberg.org/pfarr.tools/pfarrplaner/commit/06f52da82f9366081aa6caf62aa4f6e5db39dd93)), closes [#403](https://codeberg.org/pfarr.tools/pfarrplaner/issues/403)
+
 ### [2024.12.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.12.2...v2024.12.3) (2024-06-07)
 
 
