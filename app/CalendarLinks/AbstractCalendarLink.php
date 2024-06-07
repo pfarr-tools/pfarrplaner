@@ -44,6 +44,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
 
 /**
  * Class AbstractCalendarLink
@@ -163,6 +164,10 @@ class AbstractCalendarLink
     public function getLink()
     {
         return route('ical.export', $this->data);
+    }
+
+    public function wrap($s) {
+        return join("\n ", str_split($s, 32));
     }
 
     /**
