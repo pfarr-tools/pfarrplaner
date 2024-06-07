@@ -83,7 +83,7 @@ class PersonalServicesCalendarLink extends AbstractCalendarLink
      */
     public function getRenderData(Request $request, User $user)
     {
-        $servicesQuery = Service::with('location')
+        $servicesQuery = Service::setEagerLoads([])->with('location')
             ->userParticipates($user)
             ->ordered();
         return $servicesQuery->get();

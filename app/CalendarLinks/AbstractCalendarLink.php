@@ -166,6 +166,17 @@ class AbstractCalendarLink
     }
 
     /**
+     * Convert line endings to CR+LF and remove empty lines
+     * @param $s
+     * @return array|string|string[]
+     */
+    protected function normalizeLineEndings($s) {
+        $s = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $s);
+        $s = str_replace("\n", "\r\n", $s);
+        return $s;
+    }
+
+    /**
      * @param Request $request
      * @param User $user
      * @return string|string[]|null
@@ -177,20 +188,7 @@ class AbstractCalendarLink
         $data = $this->getRenderData($request, $user);
         $calendarLink = $this;
         $raw = View::make('ical.export.' . $this->viewName, compact('calendarLink', 'data'));
-        $s = str_replace(
-            "\r\n\r\n",
-            "\r\n",
-            str_replace(
-                '@@@@',
-                "\r\n",
-                str_replace(
-                    "\n",
-                    "\r\n",
-                    str_replace("\r\n", '@@@@', str_replace(' ,', ',', $raw))
-                )
-            )
-        );
-        return preg_replace('/^(\s*)/m', '', $s);
+        return $this->normalizeLineEndings(str_replace(' ,', ',', $raw));
     }
 
     /**
