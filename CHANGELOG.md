@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.12.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.12.2...v2024.12.3) (2024-06-07)
+
+
+### Bug Fixes
+
+* In .ics-Dateien fehlen Leerzeichen ([90d8f30](https://codeberg.org/pfarr.tools/pfarrplaner/commit/90d8f3001502c123a21f54582ca77d24285e43f2))
+
 ### [2024.12.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.12.1...v2024.12.2) (2024-06-07)
 
 
