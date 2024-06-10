@@ -41,7 +41,7 @@
                 <th>Ort</th>
                 </thead>
                 <tbody>
-                @foreach ($events as $theseEvents)
+                @foreach ($events as $theseEvents)@if(trim($theseEvents->first()->event->liturgicalInfo['title'] ?? '') && (substr($theseEvents->first()->event->liturgicalInfo['date'] ?? '',0,10) == $theseEvents->first()->event->date->format('Y-m-d')))
                     <tr style="background-color: #ccc !important;">
                         <td valign="top"
                             style="vertical-align:top;">{!! $theseEvents->first()->start->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
@@ -49,7 +49,7 @@
                         <td valign="top" colspan="2"
                             style="vertical-align:top; font-weight: bold;">{{ str_replace('So.', 'Sonntag', $theseEvents->first()->event->liturgicalInfo['title'] ?? '') }}</td>
                     </tr>
-                    @foreach($theseEvents as $occurence)
+                    @endif @foreach($theseEvents as $occurence)
                             <tr>
                                 <td valign="top"
                                     style="vertical-align:top;">{!! $occurence->start->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
