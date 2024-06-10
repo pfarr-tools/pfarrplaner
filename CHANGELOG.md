@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.14.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.14.1...v2024.14.2) (2024-06-10)
+
+
+### Bug Fixes
+
+* Eingebettete Terminübersicht zeigt leere Überschriften für Tage ohne liturgische Bezeichnung ([2311428](https://codeberg.org/pfarr.tools/pfarrplaner/commit/23114287a27e3e769c39c472b7571bc947784b99))
+
 ### [2024.14.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.14.0...v2024.14.1) (2024-06-07)
 
 
