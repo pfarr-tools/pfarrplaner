@@ -78,18 +78,22 @@ class HomeController extends Controller
         $activeTab = $request->get('tab', $activeTab);
 
         $homeScreenSetting = Auth::user()->getSetting('homeScreen', 'homescreen:configurable');
-        if (is_array($homeScreenSetting)) $homeScreenSetting = $homeScreenSetting[0];
+        if (is_array($homeScreenSetting)) {
+            $homeScreenSetting = $homeScreenSetting[0];
+        }
         if (substr($homeScreenSetting, 0, 6) == 'route:') {
             return redirect()->route(substr($homeScreenSetting, 6));
         }
 
 
-
-        $user = Auth::user()->load(['userSettings', 'roles', 'permissions']);
+        $user = Auth::user()->load(['userSettings', 'roles', 'permissions', 'pools']);
         $user->ensureDefaultSettings();
         $settings = Settings::all($user);
 
-        $replacements = ($settings['homeScreenConfig']['showReplacements'] ?? false) ? $user->currentReplacements() : [];
+        $replacements = ($settings['homeScreenConfig']['showReplacements'] ?? false) ? $user->currentReplacements(
+        ) : [];
+        $masteredPools = ($settings['homeScreenConfig']['showReplacements'] ?? false) ? $user->currentlyMasteredPools(
+        ) : [];
 
         $activeTabIndex = filter_var($activeTab, FILTER_SANITIZE_NUMBER_INT) ?: 0;
         $config = Auth::user()->getSetting('homeScreenTabsConfig') ?? [];
@@ -100,7 +104,10 @@ class HomeController extends Controller
 
         $cities = $user->writableCities;
 
-        return Inertia::render('HomeScreen', compact('user', 'settings', 'activeTab', 'replacements', 'tab', 'tabTitles', 'cities'));
+        return Inertia::render(
+            'HomeScreen',
+            compact('user', 'settings', 'activeTab', 'replacements', 'tab', 'tabTitles', 'cities', 'masteredPools')
+        );
     }
 
     /**
@@ -146,7 +153,10 @@ class HomeController extends Controller
         $laravelVersion = app()->version();
         $appName = config('app.name');
 
-        return Inertia::render('About', compact('version', 'date', 'changelog', 'env', 'phpVersion', 'laravelVersion', 'appName'));
+        return Inertia::render(
+            'About',
+            compact('version', 'date', 'changelog', 'env', 'phpVersion', 'laravelVersion', 'appName')
+        );
     }
 
 

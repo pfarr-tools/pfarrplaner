@@ -34,6 +34,7 @@ use App\Events\ServiceUpdated;
 use App\Http\Requests\FuneralStoreRequest;
 use App\Liturgy\PronounSets\PronounSets;
 use App\Models\Attachment;
+use App\Models\Leave\Poolmaster;
 use App\Models\Location;
 use App\Models\People\User;
 use App\Models\Places\City;
@@ -97,11 +98,25 @@ class FuneralController extends Controller
      */
     public function wizard(Request $request)
     {
-        $cities = Auth::user()->writableCities;
+        $user = Auth::user();
+        $cities = $user->writableCities;
+        $mastered = Poolmaster::with(['pool', 'pool.users', 'pool.cities'])
+            ->where('user_id', $user->id)
+            ->where('start', '<=', now()->startOfDay())
+            ->where('end', '>=', now()->endOfDay())
+            ->get();
+        foreach ($mastered as $poolmaster) {
+            foreach ($poolmaster->pool->cities as $city) {
+                $cities->push($city);
+            }
+        }
+        $cities = $cities->unique();
+
         $locations = Location::whereIn('city_id', $cities->pluck('id'))->get();
         $people = User::visibleFor(Auth::user())->get();
-        $user = Auth::user();
-        return Inertia::render('Rites/FuneralWizard', compact('cities', 'locations', 'people', 'user'));
+
+
+        return Inertia::render('Rites/FuneralWizard', compact('cities', 'locations', 'people', 'user', 'mastered'));
     }
 
     public function wizardSave(Request $request)

@@ -82,6 +82,9 @@ class AbstractModel extends Model
 
     protected static $modelKeyInRoute = 'id';
 
+    public static $relationsForIndex = [];
+    public static $relationsForEditor = [];
+
     /**
      * @return array|bool
      */

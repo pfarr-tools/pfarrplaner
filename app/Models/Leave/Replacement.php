@@ -32,6 +32,7 @@ namespace App\Models\Leave;
 
 use App\Models\People\User;
 use App\Tools\StringTool;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -49,11 +50,13 @@ class Replacement extends Model
     /**
      * @var string[]
      */
-    protected $fillable = ['absence_id', 'from', 'to'];
+    protected $fillable = ['absence_id', 'from', 'to', 'pool_id'];
     /**
      * @var string[]
      */
     protected $casts = ['from' => 'datetime', 'to' => 'datetime'];
+
+    protected $with = ['pool'];
 
     /**
      * @return BelongsTo
@@ -72,6 +75,14 @@ class Replacement extends Model
     }
 
     /**
+     * @return BelongsTo
+     */
+    public function pool()
+    {
+        return $this->belongsTo(Pool::class);
+    }
+
+    /**
      * @return string
      */
     public function toText()
@@ -81,6 +92,26 @@ class Replacement extends Model
         foreach ($this->users as $user) {
             $u[] = $user->lastName();
         }
-        return join(' | ', $u) . ' (' . StringTool::durationText($this->from, $this->to) . ')';
+        if (!$this->pool_id) {
+            return join(' | ', $u) . ' (' . StringTool::durationText($this->from, $this->to) . ')';
+        } else {
+            $texts = [];
+            if (count($this->users)) $texts = [join(' | ', $u) . ' (' . StringTool::durationText($this->from, $this->to) . ')'];
+
+            $poolmasters = Poolmaster::with('user')
+                ->where('pool_id', $this->pool_id)
+                ->where('start', '<=', $this->to)
+                ->where('end', '>=', $this->from)
+                ->get();
+            foreach ($poolmasters as $poolmaster) {
+                $from = max(Carbon::parse($poolmaster->start.' 0:00:00'), $this->from);
+                $to = min(Carbon::parse($poolmaster->end.' 23:59:59'), $this->to);
+
+                $texts[] = $poolmaster->user->name.' [Poolmaster "'.$poolmaster->pool->name.'"]'
+                    . ' (' . StringTool::durationText($from, $to) . ')';
+            }
+
+            return join(' | ', $texts);
+        }
     }
 }

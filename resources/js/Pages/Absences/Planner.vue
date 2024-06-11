@@ -68,9 +68,15 @@
                               :title="user.pinned ? 'Klicken, wenn diese Person ausgeblendet werden soll' : 'Klicken, wenn diese Person immer angezeigt werden soll'"
                               @click="togglePinned(user)"
                         />
-                        <a v-if="user.canEdit" class="btn btn-sm btn-success"
+                        <inertia-link v-if="user.canEdit" class="btn btn-sm btn-success me-1"
+                           title="Neuen Urlaubseintrag hinzufügen"
                            :href="route('absence.create', {year: year, month: month, user: user.id})"><span
-                            class="mdi mdi-briefcase-plus"></span></a>
+                            class="mdi mdi-briefcase-plus"></span></inertia-link>
+                        <inertia-link v-if="(user.canEdit) && (pools.length > 0)"
+                           title="Poolmaster werden"
+                           class="btn btn-sm btn-primary"
+                           :href="route('admin.poolmasters.create', {user: user.id, year, month})">
+                            <span class="mdi mdi-account-tie"></span></inertia-link>
                     </th>
                     <td v-for="(day,index,key) in myDays" :key="key" :index="index"
                         class="cal-cell"
@@ -104,7 +110,7 @@ import AbsenceNav from "./AbsenceNav";
 export default {
     name: "Planner",
     components: {AbsenceNav},
-    props: ['start', 'end', 'year', 'month', 'months', 'years', 'now', 'holidays', 'days', 'sectionConfig', 'pinList'],
+    props: ['start', 'end', 'year', 'month', 'months', 'years', 'now', 'holidays', 'days', 'sectionConfig', 'pinList', 'pools'],
     mounted() {
         axios.get(route('planner.users')).then(response => {
             var users = this.sortUsers(response.data);
@@ -156,6 +162,10 @@ export default {
         edit(user, day, absence) {
             if (user.canEdit || absence.canEdit) {
                 if (absence) {
+                    if (absence.poolmaster_id) {
+                        if (!absence.canEdit) return;
+                        this.$inertia.visit(route('admin.poolmaster.edit', { modelId: absence.poolmaster_id }));
+                    }
                     this.$inertia.visit(route('absence.edit', {absence: absence.id}));
                 } else {
                     this.$inertia.visit(route('absence.create', {
@@ -173,6 +183,7 @@ export default {
             if (user.canEdit) editable = ' editable';
             if (this.userDays[user.id][day.day].absence.canEdit) editable = ' editable';
             if (this.userDays[user.id][day.day].absence.sick_days && (this.userDays[user.id][day.day].absence.canEdit || user.canEdit)) editable = ' sick editable';
+            if (this.userDays[user.id][day.day].absence.poolmaster) return 'poolmaster' + editable;
             if (this.userDays[user.id][day.day].absence.replacing) return 'replacing' + editable;
             return 'absent' + absenceStatus + editable;
         },
@@ -180,11 +191,16 @@ export default {
             if ((!user.canEdit) && (!absence.canEdit) && (!absence.replacing)) return absence.user.name + ' (' + moment(absence.from).format('DD.MM.YYYY') + ' - '
                 + moment(absence.to).format('DD.MM.YYYY') + ')';
             let statusText = '';
+            let replacementText = '';
             if (absence.workflow_status == 0) statusText = ' Status: Warte auf Überprüfung. ';
             if (absence.workflow_status == 1) statusText = ' Status: Warte auf Genehmigung. ';
             if (absence.workflow_status == 10) statusText = ' Status: Warte auf Genehmigung. ';
+            if (!absence.poolmaster) {
+                replacementText = 'V: '+absence.replacementText;
+            }
+
             return absence.reason + ' (' + moment(absence.from).format('DD.MM.YYYY') + ' - '
-                + moment(absence.to).format('DD.MM.YYYY') + ') V:' + statusText + absence.replacementText + (user.canEdit ? ' --> Klicken, um zu bearbeiten' : '');
+                + moment(absence.to).format('DD.MM.YYYY') + ') ' + replacementText + statusText + (user.canEdit ? ' --> Klicken, um zu bearbeiten' : '');
         },
         colspan(user, day) {
             if (undefined == this.userDays[user.id]) return 31;
@@ -310,6 +326,11 @@ export default {
 
 .replacing {
     background-color: lightblue;
+}
+
+.poolmaster {
+    background-color: #593196;
+    color: white;
 }
 
 .sunday {

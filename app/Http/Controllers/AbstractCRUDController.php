@@ -52,7 +52,7 @@ class AbstractCRUDController extends Controller
 
     protected function getModelsForIndex(): Collection
     {
-        return ($this->modelClass)::all();
+        return ($this->modelClass)::with(($this->modelClass)::$relationsForIndex)->get();
     }
 
     protected function addRightsToModelCollection(Collection $collection): Collection
@@ -72,7 +72,13 @@ class AbstractCRUDController extends Controller
         });
     }
 
-    protected function getSingleModel(Request $request, $modelId = null): AbstractModel
+    /**
+     * @param Request $request
+     * @param $modelId
+     * @param $relations
+     * @return AbstractModel
+     */
+    protected function getSingleModel(Request $request, $modelId = null, $relations = []): AbstractModel
     {
         if (!($id = $modelId)) {
             if (!$request->has($this->modelName())) {
@@ -80,7 +86,7 @@ class AbstractCRUDController extends Controller
             }
             $id = $request->get($this->modelName());
         }
-        return ($this->modelClass)::findOrFail($id);
+        return ($this->modelClass)::with($relations)->findOrFail($id);
     }
 
     protected function returnResult($action, $result = null)
@@ -104,6 +110,17 @@ class AbstractCRUDController extends Controller
     }
 
     /**
+     * Get additional resources needed to display the editor component
+     * @param Request $request
+     * @param $model
+     * @return array
+     */
+    protected function getResourcesForEditor(Request $request, $model = null): array
+    {
+        return [];
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Inertia\Response
@@ -111,7 +128,7 @@ class AbstractCRUDController extends Controller
     public function create(Request $request)
     {
         Gate::authorize('create', $this->modelClass);
-        return Inertia::render(($this->modelClass)::getVuePath('editor'));
+        return Inertia::render(($this->modelClass)::getVuePath('editor'), $this->getResourcesForEditor($request));
     }
 
     /**
@@ -133,11 +150,11 @@ class AbstractCRUDController extends Controller
      */
     public function edit(Request $request, $modelId)
     {
-        $model = $this->getSingleModel($request, $modelId);
+        $model = $this->getSingleModel($request, $modelId, ($this->modelClass)::$relationsForEditor);
         Gate::authorize('update', $model);
-        return Inertia::render(($this->modelClass)::getVuePath('editor'), [
-            ($this->modelClass)::singularKey() => $model,
-        ]);
+        return Inertia::render(($this->modelClass)::getVuePath('editor'),
+            array_merge([($this->modelClass)::singularKey() => $model], $this->getResourcesForEditor($request, $model))
+        );
     }
 
     /**

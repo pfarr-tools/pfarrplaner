@@ -67,12 +67,12 @@ export default {
         setFrom(e) {
             this.myFrom = e;
 //            this.myDatePickerConfig2.minDate = e ? moment(e, 'DD.MM.YYYY') : moment().format('DD.MM.YYYY');
-            this.$emit('input', [moment(this.myFrom, 'DD.MM.YYYY'), moment(this.myTo, 'DD.MM.YYYY')]);
+            this.$emit('input', [moment(this.myFrom, 'DD.MM.YYYY').startOf('day'), moment(this.myTo, 'DD.MM.YYYY').endOf('day')]);
         },
         setTo(e) {
             this.myTo = e;
 //            this.myDatePickerConfig1.maxDate = e ? moment(e, 'DD.MM.YYYY') : moment().addYears(5).format('DD.MM.YYYY');
-            this.$emit('input', [moment(this.myFrom, 'DD.MM.YYYY'), moment(this.myTo, 'DD.MM.YYYY')]);
+            this.$emit('input', [moment(this.myFrom, 'DD.MM.YYYY').startOf('day'), moment(this.myTo, 'DD.MM.YYYY').endOf('day')]);
         }
     }
 }

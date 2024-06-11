@@ -36,6 +36,8 @@ use App\Mail\User\AccountData;
 use App\Models\Calendar\External\CalendarConnection;
 use App\Models\Comment;
 use App\Models\Leave\Absence;
+use App\Models\Leave\Pool;
+use App\Models\Leave\Poolmaster;
 use App\Models\Leave\Replacement;
 use App\Models\Parish;
 use App\Models\Places\City;
@@ -280,6 +282,14 @@ class User extends Authenticatable
             })
             ->where('from', '<=', Carbon::now())
             ->where('to', '>=', Carbon::now())
+            ->get();
+    }
+
+    public function currentlyMasteredPools()
+    {
+        return Poolmaster::where('user_id', $this->id)
+            ->where('start', '<=', Carbon::now())
+            ->where('end', '>=', Carbon::now())
             ->get();
     }
 // END ACCESSORS
@@ -935,6 +945,14 @@ class User extends Authenticatable
     /**
      * @return BelongsToMany
      */
+    public function pools()
+    {
+        return $this->belongsToMany(Pool::class);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
     public function relatedUsers()
     {
         return $this->belongsToMany(User::class, 'user_user', 'user_id', 'related_user_id')->withPivot('relation');
@@ -1150,5 +1168,15 @@ class User extends Authenticatable
     public function formatName($format)
     {
         return $this->nameService()->format($format);
+    }
+
+    public function isCurrentlyPoolmasterForCity(City $city)
+    {
+        return Poolmaster::where('user_id', $this->id)
+            ->whereHas('pool', function ($query) use ($city) {
+                $query->whereHas('cities', function ($query2) use ($city) {
+                    $query2->where('city_id', $city->id);
+                });
+            })->where('start', '<=', now()->endOfDay())->where('end', '>=', now()->startOfDay())->count() > 0;
     }
 }

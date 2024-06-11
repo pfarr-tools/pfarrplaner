@@ -341,6 +341,7 @@ class Absence extends Model implements HasDAVCalendarItems
                     'absence_id' => $this->id,
                     'from' => max(Carbon::createFromFormat('d.m.Y', $replacementData['from']), $this->from),
                     'to' => min(Carbon::createFromFormat('d.m.Y', $replacementData['to']), $this->to),
+                    'pool_id' => $replacementData['pool_id'] ?? null,
                 ]
             );
             $replacement->save();

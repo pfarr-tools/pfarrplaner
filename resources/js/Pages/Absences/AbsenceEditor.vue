@@ -126,16 +126,19 @@
 
             </tab>
             <tab v-if="myAbsence.user.needs_replacement" id="replacement" :active-tab="activeTab">
-                <fake-table :columns="[5,6,1]" :headers="['Vertreter:in', 'Zeitraum', '']"
-                            collapsed-header="Vertreter:innen" class="mt-3" :key="myAbsence.replacements.length">
+                <fake-table :columns="[3,2,4,1]" :headers="['Vertreter:in', 'oder: Pool', 'Zeitraum', '']"
+                            collapsed-header="Vertreten durch" class="mt-3" :key="myAbsence.replacements.length">
                     <div class="row py-1 fake-table-row"
                          v-for="(replacement, replacementKey, replacementIndex) in myAbsence.replacements">
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             <people-select :people="users" v-model="replacement.users"
                                            :city="myAbsence.user.cities[0]"
                                            :disabled="!mayEdit"/>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-2">
+                            <form-selectize :options="myAbsence.user.pools" v-model="replacement.pool_id" />
+                        </div>
+                        <div class="col-md-4">
                             <date-range-input :from="replacement.from" :to="replacement.to"
                                               @input="setReplacementDateRange(replacement, $event)"
                                               :disabled="!mayEdit"/>
@@ -221,10 +224,12 @@ import Tab from "../../components/Ui/tabs/tab";
 import AttachmentList from "../../components/Ui/elements/AttachmentList";
 import FakeAttachment from "../../components/Ui/elements/FakeAttachment";
 import FormFileUploader from "../../components/Ui/forms/FormFileUploader";
+import FormSelectize from "../../components/Ui/forms/FormSelectize.vue";
 
 export default {
     name: "AbsenceEditor",
     components: {
+        FormSelectize,
         FormFileUploader,
         FakeAttachment,
         AttachmentList,

@@ -107,6 +107,16 @@
                     </li>
                 </ul>
             </div>
+            <div v-if="settings.homeScreenConfig.showReplacements && (masteredPools.length > 0)"
+                 class="alert alert-info">
+                <div class="text-bold">Du bist aktuell Poolmaster:in für folgende Pools:</div>
+                <ul>
+                    <li v-for="masteredPool in masteredPools">
+                        {{ masteredPool.pool.name }} ({{ moment(masteredPool.start+' 0:00:00').format('DD.MM.YYYY') }} -
+                        {{ moment(masteredPool.end+' 23:59:59').format('DD.MM.YYYY') }})
+                    </li>
+                </ul>
+            </div>
         </template>
         <template slot="tab-headers">
             <tab-headers>
@@ -189,7 +199,7 @@ export default {
         StreamingTab,
         WeddingsTab,
     },
-    props: ['user', 'settings', 'activeTab', 'replacements', 'tab', 'tabTitles', 'cities'],
+    props: ['user', 'settings', 'activeTab', 'replacements', 'tab', 'tabTitles', 'cities', 'masteredPools'],
     created() {
         var index = 0;
         this.myTabsConfig.tabs.forEach(function (tab, tabIndex) {

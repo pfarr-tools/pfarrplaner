@@ -35,6 +35,7 @@ use App\Events\AbsenceUpdated;
 use App\Http\Requests\AbsenceRequest;
 use App\Models\Attachment;
 use App\Models\Leave\Absence;
+use App\Models\Leave\Poolmaster;
 use App\Models\Leave\Replacement;
 use App\Models\People\User;
 use App\Models\Service;
@@ -81,8 +82,10 @@ class AbsenceController extends Controller
         $pinList = $request->user()->getSetting('planner_pinned_users', []);
         $sectionConfig = $request->user()->getSetting('planner_open_sections', null);
 
+        $pools = Auth::user()->pools;
+
         return Inertia::render('Absences/Planner',
-                               compact('start', 'days', 'year', 'month', 'years', 'pinList', 'sectionConfig'));
+                               compact('start', 'days', 'year', 'month', 'years', 'pinList', 'sectionConfig', 'pools'));
     }
 
     /**
@@ -151,6 +154,12 @@ class AbsenceController extends Controller
             ->where('from', '<=', $end)
             ->get();
 
+        $poolmasters = Poolmaster::with('pool')
+            ->where('user_id', $user->id)
+            ->where('start', '<=', $end)
+            ->where('end', '>=', $start)
+            ->get();
+
         // Find out whether current user is a replacement for this absence
         if ($user->id != Auth::user()->id) {
             foreach ($absences as $absence) {
@@ -163,6 +172,20 @@ class AbsenceController extends Controller
                     }
                 }
             }
+        }
+        // add poolmaster "absences"
+        foreach ($poolmasters as $poolmaster) {
+            $absence = new Absence([
+                'reason' => 'Poolmaster für "'.$poolmaster->pool->name.'"',
+                'from' => $poolmaster->start,
+                'to' => $poolmaster->end,
+                'user_id' => $user->id,
+                                   ]);
+            $absence->poolmaster = true;
+            $absence->poolmaster_id = $poolmaster->id;
+            $absence->user = $user;
+            $absence->canEdit = Auth::user()->can('update', $poolmaster);
+            $absences->push($absence);
         }
 
         foreach ($days as $index => $day) {
@@ -202,7 +225,7 @@ class AbsenceController extends Controller
     public function edit(Request $request, Absence $absence)
     {
         $absence->load(['replacements', 'user', 'checkedBy', 'approvedBy']);
-        $absence->user->load(['vacationAdmins', 'vacationApprovers', 'cities']);
+        $absence->user->load(['vacationAdmins', 'vacationApprovers', 'cities', 'pools']);
 
         $mayCheck = $absence->user->vacationAdmins->pluck('id')->contains(Auth::user()->id);
         $mayApprove = $absence->user->vacationApprovers->pluck('id')->contains(Auth::user()->id);
@@ -220,6 +243,7 @@ class AbsenceController extends Controller
             $year = date('m');
         }
         $users = User::visibleFor(Auth::user())->get();
+
         return Inertia::render(
             'Absences/AbsenceEditor',
             compact('absence', 'month', 'year', 'users', 'mayCheck', 'mayApprove', 'maySelfAdminister')

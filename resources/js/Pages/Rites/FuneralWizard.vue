@@ -35,7 +35,7 @@
             </button>
         </template>
         <form-group label="Datum">
-            <date-picker :config="myDatePickerConfig" v-model="funeral.date" iso-date />
+            <date-picker :config="myDatePickerConfig" v-model="funeral.date" iso-date @input="checkPools"/>
         </form-group>
         <form-selectize v-model="funeral.city" :options="cities" name="city"
                         id-key="id" title-key="name"
@@ -44,9 +44,55 @@
                          label="Ort" @set-location="setLocation"/>
         <form-input label="Verstorbene:r" placeholder="Nachname, Vorname" name="name"
                     v-model="funeral.name"/>
-        <form-group :label="$page.props.labels.pastor">
+        <form-group :label="$page.props.labels.pastor" :key="pastorUpdated">
             <people-select :people="people" v-model="funeral.pastor" :city="{id: funeral.city}"/>
         </form-group>
+        <div v-if="mastered.length">
+            <hr/>
+            <div v-for="masteredPool in mastered">
+                <h3><span class="mdi mdi-pool"></span> Pool "{{ masteredPool.pool.name }}"</h3>
+                <div class="text-sm text-muted">(Du bist Poolmaster:in von
+                    {{ moment(masteredPool.start).format('DD.MM.YYYY') }}
+                    bis {{ moment(masteredPool.end).format('DD.MM.YYYY') }})
+                </div>
+
+                <fake-table v-if="Object.keys(poolUsers).length > 0" :key="'pools_'+poolsUpdated"
+                            :columns="[3,4,4, 1]" :headers="['Name', 'Vorhandene Dienste', 'Abwesenheiten', '']"
+                            collapsed-header="Anwesende Kolleg:innen">
+                    <div v-for="(user,userIndex) in masteredPool.pool.users" :key="'pool_user_'+userIndex">
+                        <div class="row mb-3 p-1" :class="{'stripe-odd': (userIndex % 2 == 0)}" v-if="!poolUsers[user.id].absent">
+                            <div class="col-md-3 font-bold">
+                                {{ user.name }}
+                                <div class="text-sm" v-if="user.phone">{{ user.phone }}</div>
+                                <div class="text-sm" v-if="user.email"><a :href="'mailto:'+user.email">{{ user.email }}</a></div>
+                            </div>
+                            <div class="col-md-4">
+                                <div v-if="poolUsers[user.id].services.length == 0">keine</div>
+                                <ul v-else class="text-sm">
+                                    <li v-for="service in poolUsers[user.id].services">
+                                        {{ moment(service.date).format('DD.MM.YYYY, HH:mm') }} Uhr, {{ service.locationText }}<br />
+                                        <b>{{ service.titleText }}</b>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <div v-if="poolUsers[user.id].absences.length == 0">keine</div>
+                                <ul v-else class="text-sm">
+                                    <li v-for="absence in poolUsers[user.id].absences">
+                                        {{ moment(absence.from).format('DD.MM.YYYY') }}-{{ moment(absence.to).format('DD.MM.YYYY') }}<br />
+                                        <b>{{ absence.reason }}</b>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-1">
+                                <button class="btn btn-primary me-2" @click="setPastor(user)">Übernehmen</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </fake-table>
+            </div>
+        </div>
     </admin-layout>
 </template>
 
@@ -56,11 +102,12 @@ import FormGroup from "../../components/Ui/forms/FormGroup";
 import LocationSelect from "../../components/Ui/elements/LocationSelect";
 import FormInput from "../../components/Ui/forms/FormInput";
 import PeopleSelect from "../../components/Ui/elements/PeopleSelect";
+import FakeTable from "../../components/Ui/FakeTable.vue";
 
 export default {
     name: "FuneralWizard",
-    components: {PeopleSelect, FormInput, LocationSelect, FormGroup, FormSelectize},
-    props: ['cities', 'locations', 'people', 'user'],
+    components: {FakeTable, PeopleSelect, FormInput, LocationSelect, FormGroup, FormSelectize},
+    props: ['cities', 'locations', 'people', 'user', 'mastered'],
     data() {
         return {
             myDatePickerConfig: {
@@ -74,6 +121,11 @@ export default {
                 name: null,
                 pastor: [this.$page.props.currentUser.data],
             },
+            poolsUpdated: 0,
+            pastorUpdated: 0,
+            poolUsers: [],
+            myCities: this.cities,
+            originalCities: Object.assign(this.cities),
         }
     },
     methods: {
@@ -82,11 +134,26 @@ export default {
         },
         createFuneral() {
             this.$inertia.post(route('funerals.wizard.save'), this.funeral);
+        },
+        checkPools(date) {
+            console.log('checkPools', date);
+            this.$api()
+                .get(route('api.pools.mastered', {user: this.user.id, date: date.substring(0, 10)}))
+                .then(response => {
+                    this.poolUsers = response.data.users;
+                    this.poolsUpdated++;
+                });
+        },
+        setPastor(user) {
+            this.funeral.pastor = [user];
+            this.pastorUpdated++;
         }
     }
 }
 </script>
 
 <style scoped>
-
+    .text-sm {
+        font-size: .8em;
+    }
 </style>

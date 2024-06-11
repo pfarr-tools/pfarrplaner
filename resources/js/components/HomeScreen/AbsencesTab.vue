@@ -31,9 +31,10 @@
     <div class="absences-tab">
         <h2>Mein Urlaub</h2>
         <div>
-            <a class="btn btn-primary" :href="route('absences.index')" title="Urlaubskalender öffnen">Urlaubskalender öffnen</a>
+            <a class="btn btn-primary" :href="route('absences.index')" title="Urlaubskalender öffnen">Urlaubskalender
+                öffnen</a>
         </div>
-        <hr />
+        <hr/>
         <div v-if="absences.length == 0" class="alert alert-info">Zur Zeit hast du keinen Urlaub geplant.</div>
         <div v-else>
             <h3>Urlaub / Abwesenheit</h3>
@@ -76,8 +77,10 @@
                 </div>
             </fake-table>
         </div>
-        <hr />
-        <div v-if="absences.length == 0" class="alert alert-info">Zur Zeit bist du für keine Vertretungen eingeplant.</div>
+        <hr/>
+        <div v-if="replacements.length == 0" class="alert alert-info">Zur Zeit bist du für keine Vertretungen
+            eingeplant.
+        </div>
         <div v-else>
             <h3>Vertretungen</h3>
             <fake-table :columns="[3,3,6]" :headers="['Zeitraum', 'Vertretung für', 'Vertretungsregelung']"
@@ -95,15 +98,36 @@
                 </div>
             </fake-table>
         </div>
+        <hr/>
+        <div v-if="user.pools.length > 0">
+            <div v-if="masteredPools.length == 0" class="alert alert-info">Zur Zeit bist du für keine Pools als
+                Poolmaster:in eingeplant.
+            </div>
+            <div v-else>
+                <h3>Poolmaster:in</h3>
+                <fake-table :columns="[4,8]" :headers="['Zeitraum', 'Pool' ]"
+                            collapsed-header="Poolmaster:in">
+                    <div v-for="(pool,poolIndex) in masteredPools" :key="'poolmaster_'+poolIndex"
+                         class="row mb-3 p-1" :class="{'stripe-odd': (poolIndex % 2 == 0)}">
+                        <div class="col-md-4">
+                            {{ moment(pool.start + ' 0:00:00').format('DD.MM.YYY') }} -
+                            {{ moment(pool.end + ' 23:59:59').format('DD.MM.YYY') }}
+                        </div>
+                        <div class="col-md-8">{{ pool.pool.name }}</div>
+                    </div>
+                </fake-table>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import FakeTable from "../Ui/FakeTable";
+
 export default {
     name: "AbsencesTab",
     components: {FakeTable},
-    props: ['title', 'description', 'user', 'settings', 'absences', 'replacements', 'count', 'config']
+    props: ['title', 'description', 'user', 'settings', 'absences', 'replacements', 'count', 'config', 'masteredPools']
 
 }
 </script>

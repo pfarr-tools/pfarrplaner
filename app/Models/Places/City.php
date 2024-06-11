@@ -31,6 +31,7 @@
 namespace App\Models\Places;
 
 use App\Models\AbstractModel;
+use App\Models\Leave\Pool;
 use App\Models\Location;
 use App\Models\People\User;
 use App\Models\Service;
@@ -125,6 +126,14 @@ class City extends AbstractModel
     public function locations()
     {
         return $this->hasMany(Location::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function pools()
+    {
+        return $this->belongsToMany(Pool::class);
     }
 
     /**

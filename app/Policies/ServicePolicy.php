@@ -30,6 +30,7 @@
 
 namespace App\Policies;
 
+use App\Models\Leave\Poolmaster;
 use App\Models\Service;
 use App\Providers\AuthServiceProvider;
 use App\Models\People\User;
@@ -94,6 +95,9 @@ class ServicePolicy
         if ($user->hasPermissionTo('gd-bearbeiten') && $this->hasCityPermission($user, $service)) {
             return true;
         }
+
+        if ($user->isCurrentlyPoolmasterForCity($service->city)) return true;
+
         return false;
     }
 
@@ -117,6 +121,7 @@ class ServicePolicy
     public function delete(User $user, Service $service)
     {
         if ($service->isTemplate()) return $user->hasPermissionTo('gd-bearbeiten');
+        if ($user->isCurrentlyPoolmasterForCity($service->city)) return true;
         return $user->hasPermissionTo('gd-allgemein-bearbeiten') && $this->hasCityPermission($user, $service);
     }
 
