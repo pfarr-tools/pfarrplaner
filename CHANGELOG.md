@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.15.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.14.2...v2024.15.0) (2024-06-11)
+
+
+### Features
+
+* Für die Urlaubsvertretung können Pools und Poolmaster angelegt werden. ([0a596eb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/0a596eb33c3384595a0577171b99e872444a20f3)), closes [#398](https://codeberg.org/pfarr.tools/pfarrplaner/issues/398)
+
 ### [2024.14.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.14.1...v2024.14.2) (2024-06-10)
 
 
