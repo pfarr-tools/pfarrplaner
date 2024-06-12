@@ -96,7 +96,9 @@ class Replacement extends Model
             return join(' | ', $u) . ' (' . StringTool::durationText($this->from, $this->to) . ')';
         } else {
             $texts = [];
-            if (count($this->users)) $texts = [join(' | ', $u) . ' (' . StringTool::durationText($this->from, $this->to) . ')'];
+            if (count($this->users)) {
+                $texts = [join(' | ', $u) . ' (' . StringTool::durationText($this->from, $this->to) . ')'];
+            }
 
             $poolmasters = Poolmaster::with('user')
                 ->where('pool_id', $this->pool_id)
@@ -104,14 +106,66 @@ class Replacement extends Model
                 ->where('end', '>=', $this->from)
                 ->get();
             foreach ($poolmasters as $poolmaster) {
-                $from = max(Carbon::parse($poolmaster->start.' 0:00:00'), $this->from);
-                $to = min(Carbon::parse($poolmaster->end.' 23:59:59'), $this->to);
+                $from = max(Carbon::parse($poolmaster->start . ' 0:00:00'), $this->from);
+                $to = min(Carbon::parse($poolmaster->end . ' 23:59:59'), $this->to);
 
-                $texts[] = $poolmaster->user->name.' [Poolmaster "'.$poolmaster->pool->name.'"]'
+                $texts[] = $poolmaster->user->name . ' [Poolmaster "' . $poolmaster->pool->name . '"]'
                     . ' (' . StringTool::durationText($from, $to) . ')';
             }
 
             return join(' | ', $texts);
         }
+    }
+
+    public function toUserArray()
+    {
+        $users = [];
+        foreach ($this->users as $user) {
+            $users[$this->from->format('Ymd') . $this->to->format('Ymd') . $user->last_name . $user->id] = [
+                'from' => $this->from,
+                'to' => $this->to,
+                'period' => StringTool::durationText($this->from, $this->to),
+                'user' => $user,
+                'poolmaster' => null,
+            ];
+        }
+
+        if ($this->pool->contact) {
+            $users[$this->from->format('Ymd') . $this->to->format('Ymd') . $this->pool->name] = [
+                'from' => $this->from,
+                'to' => $this->to,
+                'period' => StringTool::durationText($this->from, $this->to),
+                'user' => new User([
+                                       'name' => $this->pool->contact,
+                                       'office' => $this->pool->office,
+                                       'phone' => $this->pool->phone,
+                                       'email' => $this->pool->email,
+                                   ]),
+                'poolmaster' => $this->pool->name,
+            ];
+        } else {
+            $poolmasters = Poolmaster::with('user')
+                ->where('pool_id', $this->pool_id)
+                ->where('start', '<=', $this->to)
+                ->where('end', '>=', $this->from)
+                ->get();
+            foreach ($poolmasters as $poolmaster) {
+                $from = max(Carbon::parse($poolmaster->start . ' 0:00:00'), $this->from);
+                $to = min(Carbon::parse($poolmaster->end . ' 23:59:59'), $this->to);
+
+                $users[$from->format('Ymd') . $to->format(
+                    'Ymd'
+                ) . $poolmaster->user->last_name . $poolmaster->user->id] = [
+                    'from' => $from,
+                    'to' => $to,
+                    'period' => StringTool::durationText($from, $to),
+                    'user' => $poolmaster->user,
+                    'poolmaster' => $poolmaster->pool->name,
+                ];
+            }
+        }
+
+        ksort($users);
+        return $users;
     }
 }

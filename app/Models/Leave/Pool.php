@@ -34,18 +34,22 @@ use App\Models\AbstractModel;
 use App\Models\People\User;
 use App\Models\Places\City;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class Pool extends AbstractModel
 {
     use HasFactory;
 
-    protected $fillable = ['id', 'name'];
+    protected $fillable = ['id', 'name', 'slug', 'contact', 'office', 'phone', 'email'];
 
     protected static string $prefix = 'pool';
     protected static string $prefixPlural = 'pools';
     public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
     public static array $validationRules = [
         'name' => 'required|max:255',
+        'contact' => 'nullable|string',
+        'phone' => 'nullable|string',
+        'email' => 'nullable|email',
         'users.*' => 'nullable|int|exists:users,id',
         'cities.*' => 'nullable|int|exists:cities,id',
     ];
@@ -68,5 +72,21 @@ class Pool extends AbstractModel
     public function poolmasters() {
         return $this->belongsToMany(User::class, 'poolmasters', 'pool_id', 'user_id');
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($pool) {
+            $pool->slug = Str::slug($pool->name, '-', 'de');
+        });
+
+        static::updating(function ($pool) {
+            $pool->slug = Str::slug($pool->name, '-', 'de');
+        });
+    }
+
+
+
 
 }

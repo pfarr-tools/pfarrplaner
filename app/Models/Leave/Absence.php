@@ -48,6 +48,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use jamesiarmes\PhpEws\Type\AlternatePublicFolderIdType;
 
 /**
  * Class Absence
@@ -531,4 +532,28 @@ class Absence extends Model implements HasDAVCalendarItems
         }
         return $line;
     }
+
+    public function getFullReplacementArrayAttribute()
+    {
+        $records = [];
+        foreach ($this->replacements as $replacement) {
+            $users = $replacement->toUserArray();
+            if (!$users) {
+            }
+            $records = array_merge($users, $records);
+        }
+        if (!count($records)) {
+            $records = [
+                $this->from->format('Ymd').$this->to->format('Ymd') => [
+                    'from' => $this->from,
+                    'to' => $this->to,
+                    'period' => StringTool::durationText($this->from, $this->to),
+                    'poolmaster' => false,
+                    'user' => null,
+                ]
+            ];
+        }
+        return $records;
+    }
+
 }

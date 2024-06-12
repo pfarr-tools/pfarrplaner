@@ -33,6 +33,7 @@ namespace App\Models\Places;
 use App\Models\AbstractModel;
 use App\Models\Leave\Pool;
 use App\Models\Location;
+use App\Models\Parish;
 use App\Models\People\User;
 use App\Models\Service;
 use App\Services\RoleService;
@@ -142,6 +143,20 @@ class City extends AbstractModel
     public function services()
     {
         return $this->hasManyThrough(Service::class, Location::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function parishes()
+    {
+        return $this->hasMany(Parish::class);
+    }
+
+
+    public function pastors()
+    {
+        return $this->belongsToMany(User::class, 'user_home')->role('Pfarrer:in');
     }
 
     /**

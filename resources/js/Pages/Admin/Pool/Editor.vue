@@ -37,6 +37,13 @@
         <form-input label="Bezeichnung des Pools" v-model="myPool.name" autofocus />
         <form-selectize label="Zugehörige Kirchengemeinden" v-model="myPool.cities" :options="cities" multiple />
         <people-select label="Zugehörige Personen" v-model="myPool.users" :people="people" multiple />
+        <hr />
+        <p>In besonderen Fällen können für einen Pool feste Kontaktinformationen (z.B. Dekanatamt) hinterlegt werden.
+            Diese sind dann nicht mit einem Benutzer verknüpft.</p>
+        <form-input label="Ansprechperson" v-model="myPool.contact" />
+        <form-input label="Institution/Amt" v-model="myPool.office" />
+        <form-input label="Telefon" v-model="myPool.phone" />
+        <form-input label="E-Mailadresse" v-model="myPool.email" />
     </admin-layout>
 </template>
 
@@ -58,6 +65,10 @@ export default {
             } : {
                 id: null,
                 name: '',
+                contact: '',
+                office: '',
+                phone: '',
+                email: '',
                 cities: [],
                 users: [],
             }
