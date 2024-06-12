@@ -99,18 +99,21 @@ class Replacement extends Model
             if (count($this->users)) {
                 $texts = [join(' | ', $u) . ' (' . StringTool::durationText($this->from, $this->to) . ')'];
             }
+            if ($this->pool->contact) {
+                $texts[] = $this->pool->contact.($this->pool->office ? ', '.$this->pool->office : '').' [Kontakt für Pool "'.$this->pool->name.'"]';
+            } else {
+                $poolmasters = Poolmaster::with('user')
+                    ->where('pool_id', $this->pool_id)
+                    ->where('start', '<=', $this->to)
+                    ->where('end', '>=', $this->from)
+                    ->get();
+                foreach ($poolmasters as $poolmaster) {
+                    $from = max(Carbon::parse($poolmaster->start . ' 0:00:00'), $this->from);
+                    $to = min(Carbon::parse($poolmaster->end . ' 23:59:59'), $this->to);
 
-            $poolmasters = Poolmaster::with('user')
-                ->where('pool_id', $this->pool_id)
-                ->where('start', '<=', $this->to)
-                ->where('end', '>=', $this->from)
-                ->get();
-            foreach ($poolmasters as $poolmaster) {
-                $from = max(Carbon::parse($poolmaster->start . ' 0:00:00'), $this->from);
-                $to = min(Carbon::parse($poolmaster->end . ' 23:59:59'), $this->to);
-
-                $texts[] = $poolmaster->user->name . ' [Poolmaster "' . $poolmaster->pool->name . '"]'
-                    . ' (' . StringTool::durationText($from, $to) . ')';
+                    $texts[] = $poolmaster->user->name . ' [Poolmaster "' . $poolmaster->pool->name . '"]'
+                        . ' (' . StringTool::durationText($from, $to) . ')';
+                }
             }
 
             return join(' | ', $texts);
