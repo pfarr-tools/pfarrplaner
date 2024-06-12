@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.16.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.16.1...v2024.16.2) (2024-06-12)
+
+
+### Bug Fixes
+
+* Beim Speichern von Pools bleibt "Institution/Amt" leer ([a740b8f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a740b8f277e226b18164f77d06f05f0b58dbbe1c))
+* Fehler bei Vertretungstexten mit allgemeinen Pools ([9bbb193](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9bbb193acd38c3ae5cc1dc2df81f649f10638ab1))
+* Fehler beim Anzeigen von Abwesenheiten ([bb1263f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/bb1263f9fd268abe988e6158491f188641ca7219))
+
 ### [2024.16.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.16.0...v2024.16.1) (2024-06-12)
 
 
