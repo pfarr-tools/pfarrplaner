@@ -61,7 +61,7 @@ class CreatePool extends AbstractCreateAction implements CreatesPools
     public function create(User $user, array $input): Pool
     {
         Gate::forUser($user)->authorize('create', Pool::class);
-        Validator::make($input, Pool::$validationRules)->validateWithBag('createPool');
+        $input = Validator::make($input, Pool::$validationRules)->validateWithBag('createPool');
         $pool = Pool::create($input);
         $pool->cities()->sync($input['cities'] ?? []);
         $pool->users()->sync($input['users'] ?? []);
