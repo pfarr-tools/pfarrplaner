@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.16.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.15.0...v2024.16.0) (2024-06-12)
+
+
+### Features
+
+* Ansprechpartnerseite für Pools; Pools mit allgemeinen Kontaktdaten ([000c303](https://codeberg.org/pfarr.tools/pfarrplaner/commit/000c3036dbbf4b45a6f772bd472ac588ef0a6287))
+
+
+### Bug Fixes
+
+* Beim Anlegen von Beerdigungen wird der falsche Zeitpunkt für Poolmaster berücksichtigt ([5ded412](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5ded412665d470c4fcd657fa2f453af38dc659f8))
+
 ## [2024.15.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.14.2...v2024.15.0) (2024-06-11)
 
 
