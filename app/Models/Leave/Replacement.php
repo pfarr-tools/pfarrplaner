@@ -130,7 +130,7 @@ class Replacement extends Model
             ];
         }
 
-        if ($this->pool->contact) {
+        if ($this->pool && $this->pool->contact) {
             $users[$this->from->format('Ymd') . $this->to->format('Ymd') . $this->pool->name] = [
                 'from' => $this->from,
                 'to' => $this->to,
