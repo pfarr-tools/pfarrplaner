@@ -83,12 +83,12 @@ export default {
             if (!this.myPool.id) {
                 this.$inertia.post(route('admin.pools.store'), {
                     ...this.myPool,
-                    users: this.myPool.users.map(user => user.id)
+                    users: this.myPool.users.map(user => isNaN(user) ? user.id : user)
                 });
             } else {
                 this.$inertia.patch(route('admin.pool.update', {modelId: this.myPool.id}), {
                     ...this.myPool,
-                    users: this.myPool.users.map(user => user.id)
+                    users: this.myPool.users.map(user => isNaN(user) ? user.id : user)
                 });
             }
         },
