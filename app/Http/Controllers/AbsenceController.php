@@ -176,7 +176,7 @@ class AbsenceController extends Controller
         // add poolmaster "absences"
         foreach ($poolmasters as $poolmaster) {
             $absence = new Absence([
-                'reason' => 'Poolmaster für "'.$poolmaster->pool->name.'"',
+                'reason' => 'Poolmaster:in für "'.$poolmaster->pool->name.'"',
                 'from' => $poolmaster->start,
                 'to' => $poolmaster->end,
                 'user_id' => $user->id,

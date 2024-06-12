@@ -73,7 +73,7 @@
                            :href="route('absence.create', {year: year, month: month, user: user.id})"><span
                             class="mdi mdi-briefcase-plus"></span></inertia-link>
                         <inertia-link v-if="(user.canEdit) && (pools.length > 0)"
-                           title="Poolmaster werden"
+                           title="Poolmaster:in werden"
                            class="btn btn-sm btn-primary"
                            :href="route('admin.poolmasters.create', {user: user.id, year, month})">
                             <span class="mdi mdi-account-tie"></span></inertia-link>

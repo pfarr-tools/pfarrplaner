@@ -62,7 +62,7 @@ class CreatePoolmaster extends AbstractCreateAction implements CreatesPoolmaster
         Validator::make($input, Poolmaster::$validationRules)->validateWithBag('createPoolmaster');
         $poolmaster = Poolmaster::create($input);
         CreatedPoolmaster::dispatch($user, $poolmaster);
-        $this->messages = ['success' => 'Der Einsatz als Poolmaster wurde gespeichert.'];
+        $this->messages = ['success' => 'Der Einsatz als Poolmaster:in wurde gespeichert.'];
         return $poolmaster;
     }
 }

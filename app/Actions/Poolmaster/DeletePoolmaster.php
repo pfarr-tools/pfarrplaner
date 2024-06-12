@@ -60,7 +60,7 @@ class DeletePoolmaster extends AbstractDeleteAction implements DeletesPoolmaster
     {
         Gate::forUser($user)->authorize('delete', $poolmaster);
         DeletedPoolmaster::dispatch($user, $poolmaster);
-        $this->messages = ['success' => 'Der Einsatz als Poolmaster wurde gelöscht.'];
+        $this->messages = ['success' => 'Der Einsatz als Poolmaster:in wurde gelöscht.'];
         return $poolmaster->delete();
 
     }

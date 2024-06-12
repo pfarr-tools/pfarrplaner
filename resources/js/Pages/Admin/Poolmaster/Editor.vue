@@ -70,8 +70,8 @@ export default {
     },
     methods: {
         getTitle() {
-            if (!this.myPoolmaster.id) return 'Poolmaster werden';
-            return 'Einsatz als Poolmaster bearbeiten';
+            if (!this.myPoolmaster.id) return 'Poolmaster:in werden';
+            return 'Einsatz als Poolmaster:in bearbeiten';
         },
         setDateRange(e) {
             this.myPoolmaster.start = moment(e[0]).format('YYYY-MM-DD HH:mm:ss');
