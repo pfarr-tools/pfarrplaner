@@ -73,8 +73,8 @@ class PoolController extends AbstractApiCRUDController
         $date = Carbon::parse($date);
         $mastered = Poolmaster::with(['pool', 'pool.users', 'pool.cities'])
             ->where('user_id', $user->id)
-            ->where('start', '<=', $date->startOfDay())
-            ->where('end', '>=', $date->copy()->subdays(1)->endOfDay())
+            ->where('start', '<=', now()->startOfDay())
+            ->where('end', '>=', now()->endOfDay())
             ->get();
 
         $startOfRelevantPeriod = $date->copy()->subDays(4)->startOfDay();
