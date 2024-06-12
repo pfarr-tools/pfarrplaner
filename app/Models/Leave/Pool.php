@@ -48,6 +48,7 @@ class Pool extends AbstractModel
     public static array $validationRules = [
         'name' => 'required|max:255',
         'contact' => 'nullable|string',
+        'office' => 'nullable|string',
         'phone' => 'nullable|string',
         'email' => 'nullable|email',
         'users.*' => 'nullable|int|exists:users,id',
