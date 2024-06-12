@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.16.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.16.0...v2024.16.1) (2024-06-12)
+
+
+### Bug Fixes
+
+* Falsche Tabelle beim Rollback ([d3b6f35](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d3b6f351e4e1f2bd52159faff5e5a3e849e32562))
+* Fehler beim Speichern von Änderungen an einem Pool ([a2f57db](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a2f57dbf9041ecc6378fb17478c2717c6d5bd288))
+* Validierungsregeln werden nicht angewandt ([db78dff](https://codeberg.org/pfarr.tools/pfarrplaner/commit/db78dff08184d66acfaee5b9323932b47725324c))
+
 ## [2024.16.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.15.0...v2024.16.0) (2024-06-12)
 
 
