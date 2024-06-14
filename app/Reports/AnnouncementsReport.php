@@ -157,7 +157,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $service = Service::findOrFail($data['service']);
 
         $days = Service::select(DB::raw('DISTINCT DATE(date) AS day'))
-            ->endingAt($service->date)
+            ->endingAt($service->date->copy()->subDays(1))
             ->regularForCity($city)
             ->orderBy('day', 'DESC')
             ->limit(10)

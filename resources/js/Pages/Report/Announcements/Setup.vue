@@ -34,6 +34,9 @@
                         @click="submitForm">Erstellen
             </nav-button>
         </template>
+        <template v-slot:before-flash>
+            <div v-if="servicesLoading || lastServiceLoading" class="alert alert-warning">Lade Daten, bitte warten...</div>
+        </template>
         <form method="post" :action="route('reports.render', {report: 'announcements'})" ref="myForm">
             <form-csrf-token/>
             <form-selectize label="Kirchengemeinde" name="city" v-model="myCity" :options="cities"/>
@@ -131,13 +134,12 @@ export default {
                 step: 'services',
                 city: this.myCity,
             })).then(response => {
+                this.services = response.data.services;
+                if (this.services.length) this.myService = this.services[0].id;
                 this.servicesLoading = false;
                 this.servicesLoaded++;
-                this.mixOutlook = response.data.mixOutlook;
-                this.mixOP = response.data.mixOP;
                 return response.data.services;
             });
-            if (this.services.length) this.myService = this.services[0].id;
         },
         async getLastServiceDays() {
             if ((!this.myCity) || (!this.myService)) return [];
@@ -149,6 +151,8 @@ export default {
                 city: this.myCity,
                 service: this.myService,
             })).then(response => {
+                this.myLastServiceDays = response.data;
+                if (this.myLastServiceDays.length) this.myLastServiceDay = this.myLastServiceDays[0].id;
                 this.lastServiceLoading = false;
                 this.lastServiceDaysLoaded++;
                 return response.data;
