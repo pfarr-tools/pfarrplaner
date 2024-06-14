@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.17.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.16.2...v2024.17.0) (2024-06-14)
+
+
+### Features
+
+* Taufen: Bibeleinleger und Adressetiketten für Taufbriefe drucken ([6ee3279](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6ee3279fc0f411fd09845f19c93278e39510b15e))
+* Taufen: Bibeleinleger und Adressetiketten für Taufbriefe drucken ([7dec4dd](https://codeberg.org/pfarr.tools/pfarrplaner/commit/7dec4dd3f3d5a6b158277792b5f7008841cdb965))
+
+
+### Bug Fixes
+
+* Bekanntgaben: Formular lädt neue Kirchengemeinde nicht korrekt nach ([7233ddc](https://codeberg.org/pfarr.tools/pfarrplaner/commit/7233ddc2a0d23062f6aaefc57eb30fb5ec95e383))
+
 ### [2024.16.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.16.1...v2024.16.2) (2024-06-12)
 
 
