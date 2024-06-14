@@ -67,7 +67,6 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
 
         $this->fromAddress = $fromParts->join(' · ');
 
-
         $this->renderLabels(
             $addresses,
             3,

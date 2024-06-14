@@ -101,7 +101,7 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
 
         $doc = new DefaultAddressLabelSheetDocument([
             'label' => [
-                'height' => Converter::cmToTwip($config['size']),
+                'height' => $config['size'],
             ],
             'skipLabels' => $config['skipLabels'],
                                                     ]);
