@@ -30,7 +30,8 @@
 <template>
     <div class="attachment btn btn-light" @click="download" :title="title + ' herunterladen'">
         <b><span class="fa" :class="icon"></span> {{ title }}</b><br/>
-        <small>.{{ extension }}, {{ size }}</small>
+        <small v-if="description">{{ description }}<br /></small>
+        <small>.{{ extension }}{{ size ? ', '+size : '' }}</small>
         <span class="float-right mdi mdi-download"></span>
     </div>
 </template>
@@ -38,7 +39,7 @@
 <script>
 export default {
     name: "FakeAttachment",
-    props: ['title', 'icon', 'extension', 'size', 'href'],
+    props: ['title', 'icon', 'extension', 'size', 'href', 'description'],
     methods: {
         download(e) {
             if (this.href) {

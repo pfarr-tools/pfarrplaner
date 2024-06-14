@@ -28,24 +28,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+namespace App\Attachments;
 
+use Illuminate\Support\Str;
 
+class AttachmentFactory
+{
+    public static function getList($type) {
+        if (!in_array($type, ['baptism', 'funeral', 'wedding'])) return [];
+        return collect(glob(app_path('Attachments/' . ucfirst($type) . '/*.php')))
+        ->reject(function ($file) { return Str::startsWith(basename($file), 'Abstract'); })
+            ->map(function ($file) {
+                return (static::getClassFromFile($file))::getInfo();
+        });
 
-use App\Http\Controllers\DownloadController;
+    }
 
-Route::get('download/{storage}/{code}/{prettyName?}', [DownloadController::class, 'download'])->name('download');
-Route::get('attachment/{attachment}', [DownloadController::class, 'attachment'])->name('attachment');
-Route::get('attachment/auto/{type}/{attachable}/{attachment}', [DownloadController::class, 'autoAttachment'])->name('auto-attachment');
-Route::get('files/{path}/{prettyName?}', [DownloadController::class, 'storage'])->name('storage');
-Route::get('image/{path}/{prettyName?}', [DownloadController::class, 'image'])->name('image');
-Route::get('qrcode/{value}', [DownloadController::class, 'qr'])->name('qrcode');
+    public static function get($type, $key, $id): ?AbstractAttachment
+    {
+        $item = static::getList($type)->first(function ($item) use ($key) {
+            return $item['key'] == $key;
+        });
+        if (!$item) return null;
+        return ($item['class'])::fromId($id);
+    }
+
+    protected static function getClassFromFile($file)
+    {
+        return 'App\\'.Str::replace(['/', '.php'], ['\\', ''], Str::after($file, 'app/'));
+    }
+}

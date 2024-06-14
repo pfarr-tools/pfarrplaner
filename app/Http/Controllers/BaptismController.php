@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Attachments\AttachmentFactory;
 use App\Events\ServiceUpdated;
 use App\Http\Requests\StoreBaptismRequest;
 use App\Liturgy\PronounSets\PronounSets;
@@ -144,6 +145,8 @@ class BaptismController extends Controller
 
         $otherServices = $this->getBaptismalServices(0);
 
+        $attachments = AttachmentFactory::getList('baptism');
+
         $services = [];
         foreach (
             [
@@ -165,7 +168,7 @@ class BaptismController extends Controller
             }
         }
 
-        return Inertia::render('Rites/BaptismEditor', compact('baptism', 'services', 'cities', 'pronounSets'));
+        return Inertia::render('Rites/BaptismEditor', compact('baptism', 'services', 'cities', 'pronounSets', 'attachments'));
     }
 
     /**

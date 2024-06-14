@@ -28,24 +28,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+namespace App\Attachments;
 
+use Illuminate\Support\Str;
 
+abstract class AbstractAttachment
+{
 
-use App\Http\Controllers\DownloadController;
+    protected static $title = '';
+    protected static $description = '';
+    protected static $icon = '';
+    protected static $extension = '';
+    protected static $mimeType = '';
+    protected static $callSign = '';
+    protected static $fileTitle = '';
 
-Route::get('download/{storage}/{code}/{prettyName?}', [DownloadController::class, 'download'])->name('download');
-Route::get('attachment/{attachment}', [DownloadController::class, 'attachment'])->name('attachment');
-Route::get('attachment/auto/{type}/{attachable}/{attachment}', [DownloadController::class, 'autoAttachment'])->name('auto-attachment');
-Route::get('files/{path}/{prettyName?}', [DownloadController::class, 'storage'])->name('storage');
-Route::get('image/{path}/{prettyName?}', [DownloadController::class, 'image'])->name('image');
-Route::get('qrcode/{value}', [DownloadController::class, 'qr'])->name('qrcode');
+    public static function getKey()
+    {
+        return Str::lcfirst(Str::replace('Attachment', '', Str::afterLast(get_called_class(), '\\')));
+    }
+
+    public static function getInfo()
+    {
+        return [
+            'key' => static::getKey(),
+            'class' => static::class,
+            'title' => static::$title,
+            'description' => static::$description,
+            'icon' => static::$icon,
+            'extension' => static::$extension,
+            'mimeType' => static::$mimeType,
+        ];
+    }
+
+    public function getFileName()
+    {
+        return trim((static::$callSign ? static::$callSign.'_' : '').static::$fileTitle).'.'.static::$extension;
+    }
+
+    abstract public function download();
+    abstract public static function fromId($id);
+}

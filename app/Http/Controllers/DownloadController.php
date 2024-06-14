@@ -30,6 +30,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Attachments\AbstractAttachment;
+use App\Attachments\AttachmentFactory;
 use App\Helpers\FileHelper;
 use App\Models\Attachment;
 use App\Models\Service;
@@ -68,11 +70,11 @@ class DownloadController extends Controller
 
     /**
      * @param Request $request
-     * @param Attachment $attachment
+     * @param $attachment
      * @param string $prettyName
      * @return StreamedResponse
      */
-    public function attachment(Request $request, Attachment $attachment, $prettyName = '')
+    public function attachment(Request $request, $attachment, $prettyName = '')
     {
         if (get_class($attachment->attachable) == Service::class) {
             if (!Auth::user()->can('update', $attachment->attachable)) {
@@ -153,5 +155,11 @@ class DownloadController extends Controller
         $png = file_get_contents($file);
         unlink($file);
         return response($png)->header('Content-Type', 'image/png');
+    }
+
+
+    public function autoAttachment($type, $attachable, $attachment)
+    {
+        return AttachmentFactory::get($type, $attachment, $attachable)->download();
     }
 }

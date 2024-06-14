@@ -44,7 +44,7 @@
                 <tab-header title="Vorbereitung" id="prep" :active-tab="activeTab" :is-checked-item="true"
                             :check-value="prepChecks()"/>
                 <tab-header title="Dateien" id="attachments" :active-tab="activeTab"
-                            :count="myBaptism.attachments.length"/>
+                            :count="myBaptism.attachments.length+Object.keys(attachments).length"/>
             </tab-headers>
         </template>
         <tabs>
@@ -175,6 +175,10 @@
             <tab id="attachments" :active-tab="activeTab">
                 <fieldset>
                     <legend>Angehängte Dateien</legend>
+                    <fake-attachment v-for="(attachment,attachmentIndex) in attachments" :title="attachment.title" :icon="attachment.icon"
+                                     :description="attachment.description" :extension="attachment.extension"
+                                     :key="'_auto_attachment_'+attachmentIndex"
+                                     :href="route('auto-attachment', {type: 'baptism', attachment: attachment.key, attachable:myBaptism.id})" />
                     <attachment-list v-model="myBaptism.attachments" delete-route-name="baptism.detach"
                                      :parent-object="myBaptism" parent-type="baptism"
                                      :key="myBaptism.attachments.length"/>
@@ -208,10 +212,12 @@ import CheckedProcessItem from "../../components/Ui/elements/CheckedProcessItem"
 import FormTextarea from "../../components/Ui/forms/FormTextarea";
 import DimissorialFormPart from "../../components/RiteEditors/DimissorialFormPart";
 import FormBibleReferenceInput from "../../components/Ui/forms/FormBibleReferenceInput";
+import FakeAttachment from "../../components/Ui/elements/FakeAttachment.vue";
 
 export default {
     name: "BaptismEditor",
     components: {
+        FakeAttachment,
         FormBibleReferenceInput,
         DimissorialFormPart,
         FormTextarea,
@@ -221,7 +227,7 @@ export default {
         FormSelectize,
         FormCheck, Tabs, Tab, FormInput, FormGroup, TabHeader, TabHeaders,
     },
-    props: ['baptism', 'services', 'cities', 'pronounSets'],
+    props: ['baptism', 'services', 'cities', 'pronounSets', 'attachments'],
     data() {
         var myBaptism = this.baptism;
         myBaptism.dob = myBaptism.dob ? moment(myBaptism.dob).format('DD.MM.YYYY') : null;

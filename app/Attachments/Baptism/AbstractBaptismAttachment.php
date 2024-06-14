@@ -28,24 +28,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+namespace App\Attachments\Baptism;
+
+use App\Attachments\AbstractAttachment;
+use App\Models\Rites\Baptism;
+use App\Services\FileNameService;
+
+abstract class AbstractBaptismAttachment extends AbstractAttachment
+{
+    /** @var Baptism $baptism */
+    protected $baptism;
+
+    public function __construct(Baptism $baptism)
+    {
+        $this->baptism = $baptism;
+    }
 
 
+    public static function fromId($id)
+    {
+        return new (get_called_class())(Baptism::findOrFail($id));
+    }
 
-use App\Http\Controllers\DownloadController;
+    public function getFileName()
+    {
+        return FileNameService::make(
+            static::$fileTitle ?: static::$title,
+            static::$extension,
+            static::$callSign,
+            $this->baptism->service->date,
+            false,
+            $this->baptism->candidate_name
+        );
+    }
 
-Route::get('download/{storage}/{code}/{prettyName?}', [DownloadController::class, 'download'])->name('download');
-Route::get('attachment/{attachment}', [DownloadController::class, 'attachment'])->name('attachment');
-Route::get('attachment/auto/{type}/{attachable}/{attachment}', [DownloadController::class, 'autoAttachment'])->name('auto-attachment');
-Route::get('files/{path}/{prettyName?}', [DownloadController::class, 'storage'])->name('storage');
-Route::get('image/{path}/{prettyName?}', [DownloadController::class, 'image'])->name('image');
-Route::get('qrcode/{value}', [DownloadController::class, 'qr'])->name('qrcode');
+}

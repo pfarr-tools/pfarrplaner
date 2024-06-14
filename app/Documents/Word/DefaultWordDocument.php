@@ -61,34 +61,37 @@ class DefaultWordDocument
     public const UNDERLINE = ['underline' => Font::UNDERLINE_SINGLE];
     public const BOLD_UNDERLINE = ['bold' => true, 'underline' => Font::UNDERLINE_SINGLE];
 
-    public function __construct()
+    public function __construct($config = [])
     {
         Settings::setOutputEscapingEnabled(true);
         $this->phpWord = new PhpWord();
         $this->phpWord->getSettings()->setThemeFontLang(new Language(Language::DE_DE));
-        $this->configureLayout();;
-        $this->setDefaultDocumentStyles();
+        $this->configureLayout($config['layout'] ?? []);;
+        $this->setDefaultDocumentStyles($config);
     }
 
-    protected function configureLayout()
+    protected function configureLayout($config)
     {
         $this->section = $this->phpWord->addSection(
-            [
-                'orientation' => 'portrait',
-                'pageSizeH' => Converter::cmToTwip(29.7),
-                'pageSizeW' => Converter::cmToTwip(21),
-                'marginTop' => Converter::cmToTwip(1.5),
-                'marginBottom' => Converter::cmToTwip(1.5),
-                'marginLeft' => Converter::cmToTwip(1.5),
-                'marginRight' => Converter::cmToTwip(1.5),
-            ]
+            array_merge(
+                [
+                    'orientation' => 'portrait',
+                    'pageSizeH' => Converter::cmToTwip(29.7),
+                    'pageSizeW' => Converter::cmToTwip(21),
+                    'marginTop' => Converter::cmToTwip(1.5),
+                    'marginBottom' => Converter::cmToTwip(1.5),
+                    'marginLeft' => Converter::cmToTwip(1.5),
+                    'marginRight' => Converter::cmToTwip(1.5),
+                ],
+                $config
+            )
         );
     }
 
-    protected function setDefaultDocumentStyles()
+    protected function setDefaultDocumentStyles($config = [])
     {
-        $this->phpWord->setDefaultFontName('Helvetica Condensed');
-        $this->phpWord->setDefaultFontSize(11);
+        $this->phpWord->setDefaultFontName($config['defaultFont'] ?? 'Helvetica Condensed');
+        $this->phpWord->setDefaultFontSize($config['defaultFontSize'] ?? 11);
 
         // Standard
         $this->phpWord->setDefaultParagraphStyle(
@@ -249,7 +252,9 @@ class DefaultWordDocument
             if (null !== $block[0]) {
                 foreach (explode("\n", $block[0]) as $item) {
                     $textRun->addText($item, $block[1]);
-                    if (isset($block[2]) && $block[2]) $textRun->addTextBreak();
+                    if (isset($block[2]) && $block[2]) {
+                        $textRun->addTextBreak();
+                    }
                 }
             }
         }
@@ -321,7 +326,10 @@ class DefaultWordDocument
                 }
                 if ($keyWord == $this->recipient) {
                     // highlight for current recipient
-                    $textRun->addText($keyWord . "\t", array_merge($this->getInstructionsFontStyle(), ['fgColor' => 'yellow']));
+                    $textRun->addText(
+                        $keyWord . "\t",
+                        array_merge($this->getInstructionsFontStyle(), ['fgColor' => 'yellow'])
+                    );
                 } else {
                     $textRun->addText($keyWord . "\t", $this->getInstructionsFontStyle());
                 }

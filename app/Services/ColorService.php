@@ -30,6 +30,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str;
+
 class ColorService
 {
 
@@ -41,7 +43,7 @@ class ColorService
      */
     public static function rainbowArray($a) {
         $rainbow = [];
-        $numberOfSteps = count($a);
+        $numberOfSteps = is_numeric($a) ? $a : count($a);
         $step = 0;
         foreach($a as $key) {
             $step++;
@@ -63,6 +65,11 @@ class ColorService
                 .str_pad(dechex(round($b*255)),2,'0', STR_PAD_LEFT);
         }
         return $rainbow;
+    }
+
+    public static function rainbowTextArray($text) {
+        $a = range(0, Str::length($text));
+        return static::rainbowArray($a);
     }
 
     /**

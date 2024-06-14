@@ -28,24 +28,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+namespace App\Services;
+
+use App\Models\People\User;
+use Carbon\Carbon;
+
+class FileNameService
+{
+
+    public static function make($title, $extension, $callSign = '', $date = null, $withTime = false, $person = null): string {
+        if ($date) {
+            if (!is_a($date, Carbon::class)) $date = Carbon::parse($date);
+            $date = $date->format($withTime ? 'Ymd-Hi': 'Ymd').' ';
+        } else {
+            $date = ' ';
+        }
+
+        if ($person) {
+            $name = (is_a($person, User::class) ? NameService::fromUser($person) : NameService::fromName($person))->format(NameService::LAST_COMMA_FIRST).' ';
+        } else {
+            $name = '';
+        }
 
 
+        return ($callSign ? $callSign.($date ? '_' : ' ') : '')
+            .$date.$name.$title.'.'.$extension;
 
-use App\Http\Controllers\DownloadController;
+    }
 
-Route::get('download/{storage}/{code}/{prettyName?}', [DownloadController::class, 'download'])->name('download');
-Route::get('attachment/{attachment}', [DownloadController::class, 'attachment'])->name('attachment');
-Route::get('attachment/auto/{type}/{attachable}/{attachment}', [DownloadController::class, 'autoAttachment'])->name('auto-attachment');
-Route::get('files/{path}/{prettyName?}', [DownloadController::class, 'storage'])->name('storage');
-Route::get('image/{path}/{prettyName?}', [DownloadController::class, 'image'])->name('image');
-Route::get('qrcode/{value}', [DownloadController::class, 'qr'])->name('qrcode');
+}
