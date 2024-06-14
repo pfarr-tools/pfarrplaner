@@ -178,7 +178,10 @@
                     <fake-attachment v-for="(attachment,attachmentIndex) in attachments" :title="attachment.title" :icon="attachment.icon"
                                      :description="attachment.description" :extension="attachment.extension"
                                      :key="'_auto_attachment_'+attachmentIndex"
-                                     :href="route('auto-attachment', {type: 'baptism', attachment: attachment.key, attachable:myBaptism.id})" />
+                                     :use-inertia="attachment.hasSetup"
+                                     :href="route(
+                                         attachment.hasSetup ? 'auto-attachment.setup' : 'auto-attachment',
+                                         {type: 'baptism', attachment: attachment.key, attachable:myBaptism.id})" />
                     <attachment-list v-model="myBaptism.attachments" delete-route-name="baptism.detach"
                                      :parent-object="myBaptism" parent-type="baptism"
                                      :key="myBaptism.attachments.length"/>

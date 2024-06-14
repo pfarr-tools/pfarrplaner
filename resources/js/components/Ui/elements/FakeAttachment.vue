@@ -39,12 +39,16 @@
 <script>
 export default {
     name: "FakeAttachment",
-    props: ['title', 'icon', 'extension', 'size', 'href', 'description'],
+    props: ['title', 'icon', 'extension', 'size', 'href', 'description', 'useInertia'],
     methods: {
         download(e) {
             if (this.href) {
                 e.preventDefault();
-                window.location.href = this.href;
+                if (this.useInertia) {
+                    this.$inertia.get(this.href)
+                } else {
+                    window.location.href = this.href;
+                }
             } else {
                 this.$emit('download');
             }

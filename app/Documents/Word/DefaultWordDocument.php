@@ -61,6 +61,8 @@ class DefaultWordDocument
     public const UNDERLINE = ['underline' => Font::UNDERLINE_SINGLE];
     public const BOLD_UNDERLINE = ['bold' => true, 'underline' => Font::UNDERLINE_SINGLE];
 
+    protected $config = [];
+
     public function __construct($config = [])
     {
         Settings::setOutputEscapingEnabled(true);
@@ -68,6 +70,7 @@ class DefaultWordDocument
         $this->phpWord->getSettings()->setThemeFontLang(new Language(Language::DE_DE));
         $this->configureLayout($config['layout'] ?? []);;
         $this->setDefaultDocumentStyles($config);
+        $this->config = $config;
     }
 
     protected function configureLayout($config)

@@ -44,6 +44,12 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
     public const FONT8 = ['name' => 'Arial', 'size' => 8];
     public const FONT10 = ['name' => 'Arial', 'size' => 10];
 
+    public function __construct($config = [])
+    {
+        if (!isset($config['label'])) $config['label'] = [];
+        parent::__construct($config);
+    }
+
     public function renderAddresses($addresses, $fromAddress)
     {
 
@@ -66,11 +72,12 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
             $addresses,
             3,
             Converter::cmToTwip(7),
-            Converter::cmToTwip(3.7),
+            Converter::cmToTwip($this->config['label']['height'] ?? 3.7),
             [
 
             ],
-            [$this, 'renderAddress']
+            [$this, 'renderAddress'],
+            $this->config['skipLabels'] ?? 0,
         );
     }
 

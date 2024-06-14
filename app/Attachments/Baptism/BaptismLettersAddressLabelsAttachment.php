@@ -33,7 +33,9 @@ namespace App\Attachments\Baptism;
 use App\Documents\Word\DefaultAddressLabelSheetDocument;
 use App\Models\Rites\Baptism;
 use App\Services\NameService;
+use Inertia\Inertia;
 use PhpOffice\PhpWord\Element\Cell;
+use PhpOffice\PhpWord\Shared\Converter;
 
 class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
 {
@@ -43,6 +45,7 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
     protected static $extension = 'docx';
     protected static $icon = 'mdi mdi-file-word';
     protected static $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    protected static $hasSetup = true;
 
     protected const FONT18 = ['name' => 'Lucida Handwriting', 'size' => 18, 'bold' => true];
     protected const FONT20 = ['name' => 'Lucida Handwriting', 'size' => 20, 'bold' => true];
@@ -85,16 +88,32 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
 
     public function download()
     {
-        $doc = new DefaultAddressLabelSheetDocument();
+        $config = array_merge([
+                                  'size' => 3.7,
+                                  'years' => 9,
+                                  'skipLabels' => 0,
+                              ],
+                              request()->validate([
+                                                      'size' => 'nullable|numeric',
+                                                      'years' => 'nullable|int|min:1',
+                                                      'skipLabels' => 'nullable|int',
+                                                  ]));
+
+        $doc = new DefaultAddressLabelSheetDocument([
+            'label' => [
+                'height' => Converter::cmToTwip($config['size']),
+            ],
+            'skipLabels' => $config['skipLabels'],
+                                                    ]);
 
         $data = [];
-        for ($i=1; $i<=9; $i++) {
+        for ($i = 1; $i <= $config['years']; $i++) {
             $data[] = [
                 'name' => NameService::fromName($this->baptism->candidate_name)->format(NameService::FIRST_LAST),
                 'address' => $this->baptism->candidate_address,
                 'zip' => $this->baptism->candidate_zip,
                 'city' => $this->baptism->candidate_city,
-                'info' => $this->baptism->service->date->copy()->addYears($i)->format('d.m.Y').' / #'.$i,
+                'info' => $this->baptism->service->date->copy()->addYears($i)->format('d.m.Y') . ' / #' . $i,
             ];
         }
 
@@ -103,8 +122,14 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
         return $doc->sendToBrowser(static::getFileName());
     }
 
-    public function renderCell (Cell $cell, $record, $index) {
-        $cell->addText($record.' | '.$index);
+    public function renderCell(Cell $cell, $record, $index)
+    {
+        $cell->addText($record . ' | ' . $index);
+    }
+
+    public function setup()
+    {
+        return Inertia::render('Attachments/Baptism/BaptismLettersAddressLabels/Setup', ['baptism' => $this->baptism]);
     }
 
 }

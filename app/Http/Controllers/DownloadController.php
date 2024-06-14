@@ -162,4 +162,9 @@ class DownloadController extends Controller
     {
         return AttachmentFactory::get($type, $attachment, $attachable)->download();
     }
+
+    public function autoAttachmentSetup($type, $attachable, $attachment)
+    {
+        return AttachmentFactory::get($type, $attachment, $attachable)->setup();
+    }
 }

@@ -42,6 +42,7 @@ abstract class AbstractAttachment
     protected static $mimeType = '';
     protected static $callSign = '';
     protected static $fileTitle = '';
+    protected static $hasSetup = false;
 
     public static function getKey()
     {
@@ -58,6 +59,7 @@ abstract class AbstractAttachment
             'icon' => static::$icon,
             'extension' => static::$extension,
             'mimeType' => static::$mimeType,
+            'hasSetup' => static::$hasSetup,
         ];
     }
 

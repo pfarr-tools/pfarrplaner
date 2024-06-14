@@ -53,11 +53,18 @@ class DefaultLabelSheetDocument extends DefaultWordDocument
         );
     }
 
-    public function renderLabels($data, $columns, $width, $height, $cellStyle, $renderFunction)
+    public function renderLabels($data, $columns, $width, $height, $cellStyle, $renderFunction, $skipLabels = 0)
     {
         $table = $this->section->addTable();
         $x = 0;
         $index = 0;
+
+        for ($i=0; $i<$skipLabels; $i++) {
+            if ($x == 0) $row = $table->addRow($height);
+            $row->addCell($width, $cellStyle)->addText('  ');
+            $x = ($x+1) % $columns;
+        }
+
         foreach ($data as $record) {
             if ($x == 0) $row = $table->addRow($height);
             $cell = $row->addCell($width, $cellStyle);
