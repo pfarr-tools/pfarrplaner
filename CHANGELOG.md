@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.17.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.17.0...v2024.17.1) (2024-06-14)
+
+
+### Bug Fixes
+
+* Falsche Etikettengröße ([05630f9](https://codeberg.org/pfarr.tools/pfarrplaner/commit/05630f98d78146a1cd2a17d57c8c8a58f77749c9))
+
 ## [2024.17.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.16.2...v2024.17.0) (2024-06-14)
 
 
