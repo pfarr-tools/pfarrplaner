@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.17.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.17.2...v2024.17.3) (2024-06-15)
+
+
+### Features
+
+* Hervorhebungen in der Leseansicht werden deutlicher sichtbar ([1bc49ab](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1bc49ab3d287b05236015800eaa8342a0df67eac))
+
 ### [2024.17.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.17.1...v2024.17.2) (2024-06-15)
 
 
