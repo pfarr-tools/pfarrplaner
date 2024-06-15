@@ -37,7 +37,7 @@ use PhpOffice\PhpWord\Style\Paper;
 class DefaultA5WordDocument extends DefaultWordDocument
 {
 
-    protected function configureLayout() {
+    protected function configureLayout($config) {
         $paper = new Paper();
         $paper->setSize('A5');
 

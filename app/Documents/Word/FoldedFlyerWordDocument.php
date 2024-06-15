@@ -34,7 +34,7 @@ use PhpOffice\PhpWord\Shared\Converter;
 
 class FoldedFlyerWordDocument extends DefaultWordDocument
 {
-    protected function configureLayout()
+    protected function configureLayout($config)
     {
         $this->section = $this->phpWord->addSection(
             [

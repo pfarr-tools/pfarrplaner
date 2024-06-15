@@ -38,7 +38,7 @@ use PhpOffice\PhpWord\Style\Section;
 class DefaultFoldedBooklet extends DefaultWordDocument
 {
 
-    protected function configureLayout() {
+    protected function configureLayout($config) {
         $this->getPhpWord()->getSettings()->setBookFoldPrinting(true);
         $this->section = $this->phpWord->addSection(
             [

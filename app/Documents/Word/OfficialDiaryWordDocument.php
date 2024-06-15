@@ -43,7 +43,7 @@ use PhpOffice\PhpWord\Style\Tab;
 class OfficialDiaryWordDocument extends DefaultWordDocument
 {
 
-    protected function configureLayout()
+    protected function configureLayout($config)
     {
         $firstPage = request()->get('page', 1);
 
