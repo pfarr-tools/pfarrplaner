@@ -59,6 +59,7 @@ export default {
 
             const markElement = document.createElement("mark");
             markElement.className = "highlighted-text";
+            markElement.style="background-color: lightcoral;";
             range.surroundContents(markElement);
 
             if (window.getSelection) {
@@ -86,7 +87,7 @@ export default {
     font-size: 3em;
 }
 
-.highlighted-text {
+mark, .highlighted-text {
     background-color: red;
     color: white;
 }
