@@ -87,7 +87,7 @@ export default {
 }
 
 .highlighted-text {
-    background-color: green;
+    background-color: red;
     color: white;
 }
 </style>
