@@ -74,7 +74,7 @@ class DownloadController extends Controller
      * @param string $prettyName
      * @return StreamedResponse
      */
-    public function attachment(Request $request, $attachment, $prettyName = '')
+    public function attachment(Request $request, Attachment $attachment, $prettyName = '')
     {
         if (get_class($attachment->attachable) == Service::class) {
             if (!Auth::user()->can('update', $attachment->attachable)) {
