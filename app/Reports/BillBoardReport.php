@@ -30,10 +30,7 @@
 
 namespace App\Reports;
 
-use App\Imports\EventCalendarImport;
-use App\Imports\OPEventsImport;
 use App\Liturgy\Bible\ReferenceParser;
-use App\Models\Calendar\Day;
 use App\Models\Calendar\Occurence;
 use App\Models\Leave\Absence;
 use App\Models\Parish;
@@ -43,10 +40,8 @@ use App\Models\Service;
 use App\Services\LiturgyService;
 use App\Services\NameService;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
@@ -137,7 +132,7 @@ class BillBoardReport extends AbstractWordDocumentReport
         $start = Carbon::parse($data['start'])->startOfDay();
         $end = $start->copy()->addDays(7)->endOfDay();
         $city = City::findOrFail($data['city']);
-        $parishes = Parish::with('users')->whereIn('id', $data['parishes'])->get();
+        $parishes = (count($data['parishes'] ?? [])) ? Parish::with('users')->whereIn('id', $data['parishes'])->get() : collect();
 
         $events = Occurence::with('event')
             ->between($start, $end)
@@ -152,7 +147,7 @@ class BillBoardReport extends AbstractWordDocumentReport
 
         $firstService = Service::inCity($city)->between($start, $end)->ordered()->first();
 
-        $absences = Absence::whereIn('user_id', $data['pastors'])->byPeriod($start, $end)->get();
+        $absences = (count($data['pastors'] ?? [])) ? Absence::whereIn('user_id', $data['pastors'])->byPeriod($start, $end)->get() : collect();
 
         $this->section = $this->wordDocument->addSection(
             [
@@ -323,7 +318,7 @@ class BillBoardReport extends AbstractWordDocumentReport
         }
     }
 
-    protected function renderAbsences(Collection $absences)
+    protected function renderAbsences($absences)
     {
         if (!count($absences)) {
             return;
