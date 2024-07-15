@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.17.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.17.4...v2024.17.5) (2024-07-15)
+
+
+### Bug Fixes
+
+* Kirchliche Nachrichten können nicht erstellt werden, wenn kein örtliches Pfarramt vorhanden ist. ([6e970fc](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6e970fc9305faa8c996bab7cb3b466850f809bbd))
+
 ### [2024.17.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.17.3...v2024.17.4) (2024-06-22)
 
 
