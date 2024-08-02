@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.18.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.17.5...v2024.18.0) (2024-08-02)
+
+
+### Features
+
+* Mitarbeitende sehen den Urlaub von Kolleg:innen aus ihrer Gemeinde ([24a83d9](https://codeberg.org/pfarr.tools/pfarrplaner/commit/24a83d9a3ce462fdd0911f0cbc7cd1a29f21588b))
+
+
+### Bug Fixes
+
+* Angaben zur Vertretung sind nicht sichtbar ([c4f9ce0](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c4f9ce018361477a848c7f395ed3bbe571579665))
+
 ### [2024.17.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.17.4...v2024.17.5) (2024-07-15)
 
 
