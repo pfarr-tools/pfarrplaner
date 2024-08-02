@@ -727,43 +727,29 @@ class User extends Authenticatable
      * Find all users for which this user may see the absences
      *
      * Permission logic:
-     * (A) Pastors may see all fellow pastors in their district (cities with view rights) and all staff in their home cities
-     * (B) Staff may see all fellow staff in their home city, if "fremden-urlaub-bearbeiten" permission is set
-     * (C) All others only see themselves
-     * (D) Users without the manage_absences flag see nothing at all
+     * (A) Pastors (role Pastor:in, Diakon:in) may see all fellow pastors in their district (cities with view rights) and all staff in their home cities
+     * (B) Staff (users with manage_absences flag set) may see all fellow staff in their home city
+     * (C) Users without the manage_absences flag see nothing at all
      */
     public function getViewableAbsenceUsers()
     {
-        if (!$this->manage_absences) {
-            if (!$this->isAdmin) {
-                return new Collection();
-            } else {
-                if (Cache::has('viewAbleAbsenceUsers__' . $this->id)) {
-                    return Cache::get('viewAbleAbsenceUsers__' . $this->id);
-                } else {
-                    $users = User::where('manage_absences', 1)->orderBy('last_name')->orderBy('first_name')->get();
-                    Cache::put('viewAbleAbsenceUsers__' . $this->id, $users);
-                    return $users;
-                }
+        // (C) Users without the manage_absences flag see nothing at all
+        if (!$this->manage_absences) return new Collection();
+
+        // always include the user
+        $ids = [$this->id];
+
+        // (B) Staff (users with manage_absences flag set) may see all fellow staff in their home city
+        $newIds = User::whereHas(
+            'homeCities',
+            function ($query) {
+                $query->whereIn('cities.id', $this->homeCities->pluck('id'));
             }
-        }
-        $ids = [];
-        $ids[] = $this->id;
+        )->where('manage_absences', 1)
+            ->get()->pluck('id')->toArray();
+        $ids = array_merge($ids, $newIds);
 
-        $userQuery = User::where('manage_absences', 1)
-            ->where('id', $this->id);
-
-        if ($this->hasRole('Pfarrer:in') || $this->hasPermissionTo('fremden-urlaub-bearbeiten')) {
-            $newIds = User::whereHas(
-                'homeCities',
-                function ($query) {
-                    $query->whereIn('cities.id', $this->homeCities->pluck('id'));
-                }
-            )->where('manage_absences', 1)
-                ->get()->pluck('id')->toArray();
-            $ids = array_merge($ids, $newIds);
-        }
-
+        // (A) Pastors (role Pastor:in, Diakon:in) may also see all fellow pastors in their district (cities with view rights)
         if ($this->hasRole('Pfarrer:in') || $this->hasRole('Diakon:in')) {
             $newIds = User::where(
                 function ($query2) {
