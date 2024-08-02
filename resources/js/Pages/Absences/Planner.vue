@@ -90,10 +90,11 @@
                             <b>{{ userDays[user.id][day.day].absence.user.name }}</b>
                             <span
                                 v-if="user.canEdit || userDays[user.id][day.day].absence.canEdit || userDays[user.id][day.day].absence.replacing">
-                                ({{ userDays[user.id][day.day].absence.reason }})<br/>
-                                <small v-if="userDays[user.id][day.day].absence.replacementText">
-                                    V: {{ userDays[user.id][day.day].absence.replacementText }}</small>
+                                ({{ userDays[user.id][day.day].absence.reason }})
                             </span>
+                            <br/>
+                            <small v-if="userDays[user.id][day.day].absence.replacementText">
+                                V: {{ userDays[user.id][day.day].absence.replacementText }}</small>
                         </div>
                     </td>
                 </tr>
