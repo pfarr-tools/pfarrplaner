@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.18.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.18.0...v2024.18.1) (2024-09-09)
+
+
+### Bug Fixes
+
+* Poolmaster in Ausgabe nicht gegendert ([acea95a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/acea95a16c2017ad72552ec4e5f82e3b4d0ccf58))
+* QuarterlyEventsReport produziert unlesbare Worddatei ([96e02eb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/96e02eb9f7de59a64154222b9fbdb1b5240c9e8a))
+
 ## [2024.18.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.17.5...v2024.18.0) (2024-08-02)
 
 
