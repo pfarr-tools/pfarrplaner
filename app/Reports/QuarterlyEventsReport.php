@@ -176,7 +176,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
                     $table->addCell()->addText($service->participantsText('M'));
                 }
                 if ($request->get('includeDescription')) {
-                    $table->addCell()->addText($service->descriptionText());
+                    $table->addCell()->addText(htmlspecialchars($service->descriptionText()));
                 }
             }
         }
@@ -216,5 +216,4 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         $filename = $quarter->year . '-' . $quarter->quarter . ' ' . $title;
         $this->sendToBrowser($filename);
     }
-
 }
