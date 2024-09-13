@@ -314,7 +314,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $textRun = $this->section->addTextRun('Bekanntgaben');
         $textRun->addText(
             $service->date->formatLocalized('%d. %B %Y')
-            . ($service->liturgicalInfo['title'] ? ' - ' . $service->liturgicalInfo['title'] : ''),
+            . (($service->liturgicalInfo['title'] ?? false) ? ' - ' . $service->liturgicalInfo['title'] : ''),
             ['bold' => true]
         );
 
