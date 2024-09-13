@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.18.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.18.1...v2024.18.2) (2024-09-13)
+
+
+### Bug Fixes
+
+* AnnouncementsReport crasht wenn kein liturgischer Titel vorhanden ist. ([25dca9c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/25dca9c65628862d5821acb24aa74a0d0ee06f70))
+* Fehlende Anrede in der E-Mail mit Liederlist ([c4df477](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c4df477947a41639f6a2b57d85ca30724d4f3eef))
+
 ### [2024.18.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.18.0...v2024.18.1) (2024-09-09)
 
 
