@@ -50,12 +50,12 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
                 'dddd, DD.MM.YYYY'
             ) . ', ' . $service->timeText() . ', ' . $service->locationText();
 
-        $body = 'Hier der geplante Ablauf für den Gottesdienst' . ' am ' . $service->date->isoFormat(
+        $body = 'Sehr geehrte Mitwirkende am Gottesdienst' . ' am ' . $service->date->isoFormat(
                 'dddd, DD. MMMM YYYY'
             )
             . ', ' . $service->timeText() .
             (($service->location && $service->location->at_text) ? ' ' . $service->location->at_text : ', ' . $service->locationText())
-            . ':' . PHP_EOL . PHP_EOL;
+            . ',' . PHP_EOL . PHP_EOL.'Hier der geplante Ablauf für den Gottesdienst:'.PHP_EOL.PHP_EOL;
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
 
