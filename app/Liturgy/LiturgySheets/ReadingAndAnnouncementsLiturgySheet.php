@@ -243,14 +243,18 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
         if (!$item->data['reference']) {
             return;
         }
+        $ref = ReferenceParser::getInstance()->parse($item->data['reference']);
         $doc->getSection()->addTitle($item->title, 2);
-        $doc->getSection()->addTitle($item->data['reference'], 3);
+
+        $doc->getSection()->addTitle($ref['correctedReference'], 3);
         if (!$this->config['includeFullReadings']) {
             return;
         }
+        if ($ref['versionCopyrights']) {
+            $doc->renderNormalText($ref['versionCopyrights'], ['size' => 8]);
+        }
 
-        $ref = ReferenceParser::getInstance()->parse($item->data['reference']);
-        $bibleText = (new BibleText())->get($ref);
+        $bibleText = (new BibleText($ref['version']))->get($ref);
 
         $run = [];
         foreach ($bibleText as $range) {

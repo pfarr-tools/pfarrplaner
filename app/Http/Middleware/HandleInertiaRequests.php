@@ -95,6 +95,9 @@ class HandleInertiaRequests extends Middleware
             'version' => $version,
             'activeTab' => request()->get('tab', 'home'),
             'labels' => fn() => config('labels'),
+            'bible' => fN() => [
+                'versions' => array_keys(config('bible.versions', [])),
+            ],
         ]);
 
         if (!Auth::guest()) {

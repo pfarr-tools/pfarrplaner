@@ -38,7 +38,14 @@
                         <a v-for="(option,optionIndex) in myOptions" class="dropdown-item" @click.prevent.stop="setTextFromList(option.id); dropDownVisible = false;" :key="optionIndex">{{ option.name }}</a>
                     </div>
                 </div>
-                <input type="text" class="form-control" :aria-label="label" :name="name" :value="myValue" @input="handleInput" :key="valueChanged">
+                <input type="text" class="form-control" :aria-label="label" :name="name" :value="myReference" @input="handleInput" :key="valueChanged">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" @click="bibleDropDownVisible = !bibleDropDownVisible">
+                        {{ myVersion }}</button>
+                    <div class="dropdown-menu" :style="{display : bibleDropDownVisible ? 'block' : 'none'}">
+                        <a v-for="(option,optionIndex) in availableVersions" class="dropdown-item" @click.prevent.stop="setVersion(option); dropDownVisible = false;" :key="optionIndex">{{ option }}</a>
+                    </div>
+                </div>
             </div>
         </form-group>
         <small class="form-text text-muted mt-0 p-0" :title="myBibleText">
@@ -100,6 +107,14 @@ export default {
             type: Boolean,
             default: false,
         },
+        version: {
+            type: String,
+            default: '',
+        },
+        noVersion: {
+            type: Boolean,
+            default: false,
+        }
     },
     mounted() {
         if (this.myId == '') this.myId = this._uid;
@@ -113,14 +128,23 @@ export default {
             myOptions.push({ id: this.sources[sourceKey], name: sourceKey+': '+this.sources[sourceKey]});
         }
 
+        let myValue = this.value || '';
+        if (!myValue.includes('[')) myValue += ' ['+(this.version || this.$page.props.bible.versions[0] || '')+']';
+        let parts = myValue.split('[');
+        let myVersion = parts[1].replace(']', '').trim();
+        let myReference = parts[0].trim();
+
+
         return {
             errors: this.$page.props.errors,
             error: this.$page.props.errors[this.name] || false,
             myId: this.id || '',
-            myValue: this.value,
+            myValue,
             myBibleText: '',
             myBibleTextLoading: false,
-            myReference: {},
+            myReference,
+            myVersion,
+            availableVersions: this.$page.props.bible.versions,
             component: this,
             myOptions,
             mySettings: {
@@ -134,6 +158,7 @@ export default {
             },
             valueChanged: 0,
             dropDownVisible: false,
+            bibleDropDownVisible: false,
         }
     },
     watch: {
@@ -152,14 +177,14 @@ export default {
             if (!component.myValue.includes(',')) return;
             component.myBibleText = '';
             component.myBibleTextLoading = true;
-            axios.get(route('bible.text', {reference: component.myValue}))
+            axios.get(route('bible.text', {reference: component.myReference, version: component.myVersion}))
                 .then(result => {
                     component.myBibleText = result.data.text;
                     component.myReference = result.data.reference;
                     component.myBibleTextLoading = false;
-                    if (component.myValue != result.data.reference.correctedReference) {
-                        component.myValue = result.data.reference.correctedReference;
-                        component.returnInput();
+                    if (component.myReference != result.data.reference.correctedReference) {
+                        component.myReference = result.data.reference.correctedReference;
+                        component.setNewValue(false);
                     }
                 });
         }, 1000),
@@ -168,15 +193,23 @@ export default {
             cb.writeText(this.myBibleText+"\n("+this.myReference.correctedReference+')').then(result => {});
         },
         setTextFromList(e) {
-            this.myValue = e;
+            this.myReference = e;
             this.valueChanged++;
-            this.$emit('input', this.myValue);
-            this.bibleText(this);
+            this.setNewValue();
+        },
+        setVersion(e) {
+            this.myVersion = e;
+            this.valueChanged++;
+            this.setNewValue();
+        },
+        setNewValue(fetchBibleText = true) {
+            this.myValue = this.myReference+' ['+this.myVersion+']';
+            this.returnInput();
+            if (fetchBibleText) this.bibleText(this);
         },
         handleInput(e) {
-            this.myValue = e.target.value;
-            this.bibleText(this);
-            this.returnInput();
+            this.myReference = e.target.value;
+            this.setNewValue();
         },
         returnInput() {
             this.$emit('input', this.fullText ? this.myBibleText+" \n("+this.myReference.correctedReference+')' : this.myValue);

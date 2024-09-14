@@ -31,6 +31,8 @@
 namespace App\Liturgy\Bible;
 
 
+use Illuminate\Support\Str;
+
 class ReferenceParser
 {
 
@@ -119,13 +121,22 @@ class ReferenceParser
      * Note that partial verse references like 20a are expanded to full verses.
      *
      * @param string $reference ReferenceText
+     * @param string? $version Version
      * @return array Parsed reference
      */
-    public function parse(string $reference): array
+    public function parse(string $reference, string $version = null): array
     {
         $originalReference = $reference;
-
         $reference = trim($reference);
+
+        // determine version, if given
+        if (preg_match('/(.*?)\[(.*)]/', $reference, $parts)) {
+            $version = $parts[2];
+            $reference = trim($parts[1]);
+        } else {
+            $version = $version ?? array_keys(config('bible.versions', []))[0] ?? '';
+        }
+
         // add semicola before and after parentheses, fix dash
         $reference = strtr($reference, ['(' => ';(', ')' => ');', '–' => '-']);
         // take care of 'f.' (replace it by a verse range)
@@ -163,15 +174,17 @@ class ReferenceParser
             $refs[] = ['range' => $ref, 'optional' => $optional];
         }
 
-        $correctedReference = $originalReference;
+        $correctedReference = trim(Str::before($originalReference, '[' ));
         foreach ($refs as $ref) {
             foreach ($ref['range'] as $part) {
-                $correctedReference = str_replace($part['bookRaw'], $part['bookTitle'], $originalReference);
+                $correctedReference = str_replace($part['bookRaw'], $part['bookTitle'], trim(Str::before($originalReference, '[' )));
             }
         }
         return ([
             'originalReference' => $originalReference,
             'correctedReference' => $correctedReference,
+            'version' => $version,
+            'versionCopyrights' => config('bible.copyrights', [])[$version] ?? '',
             'parsed' => $refs,
         ]);
     }

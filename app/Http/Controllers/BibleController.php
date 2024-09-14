@@ -48,7 +48,7 @@ class BibleController extends Controller
         $reference = str_replace('–', '-', $reference);
         $ref = ReferenceParser::getInstance()->parse($reference);
         $text = '';
-        $bibleText = (new BibleText())->get($ref);
+        $bibleText = (new BibleText($version))->get($ref);
 
         $showVerseNumbers = $request->get('showVerseNumbers', true);
         $showReference = $request->get('showReference', false);

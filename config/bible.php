@@ -30,7 +30,14 @@
 
 return [
     'versions' => [
+
         'LUT17' => resource_path('bible/lut17.txt'), // BITTE BEACHTEN: Diese Datei wird nicht mit dem Pfarrplaner mitgeliefert,
+        'BB' => resource_path('bible/bb.txt'), // BITTE BEACHTEN: Diese Datei wird nicht mit dem Pfarrplaner mitgeliefert,
+    ],
+    'copyrights' => [
+
+        'LUT17' => 'Lutherbibel, revidiert 2017, © 2016 Deutsche Bibelgesellschaft, Stuttgart',
+        'BB' => 'BasisBibel, © 2021 Deutsche Bibelgesellschaft, Stuttgart',
     ],
     'parser' => [
         'books' => [
