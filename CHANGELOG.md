@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.19.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.18.2...v2024.19.0) (2024-09-14)
+
+
+### Features
+
+* Bibeltexte können in verschiedenen Übersetzungen (soweit vorhanden) ausgegeben werden ([3ff23c4](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3ff23c4ddcfdd2e72d8ac6679325937e5e0dad4f))
+
 ### [2024.18.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.18.1...v2024.18.2) (2024-09-13)
 
 
