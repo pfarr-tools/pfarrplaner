@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.19.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.19.0...v2024.19.1) (2024-09-17)
+
+
+### Bug Fixes
+
+* BillBoardReport produziert nicht lesbare Worddateien ([c90febf](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c90febf2095e83aeb21aef887d7d8916e4810daa))
+
 ## [2024.19.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.18.2...v2024.19.0) (2024-09-14)
 
 
