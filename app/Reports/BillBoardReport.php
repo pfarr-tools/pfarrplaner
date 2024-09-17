@@ -300,7 +300,7 @@ class BillBoardReport extends AbstractWordDocumentReport
             $this->renderParagraph(static::DEFAULT, [[trim($title), static::BOLD]]);
             foreach ($dayEvents as $event) {
                 $line = [
-                    $event->event->titleText(false) . (count(
+                    htmlspecialchars($event->event->titleText(false)) . (count(
                         $event->event->pastors ?? []
                     ) ? ' mit ' . $this->getNameListLine($event->event->pastors) : '')
                 ];
