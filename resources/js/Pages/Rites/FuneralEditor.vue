@@ -569,6 +569,7 @@ export default {
             });
         },
         deleteFuneral() {
+            if (!confirm('Willst du diese Beerdigung wirklich unwiderruflich löschen?')) return;
             this.$inertia.delete(route('funerals.destroy', this.myFuneral.id), {
                 preserveState: false,
             })

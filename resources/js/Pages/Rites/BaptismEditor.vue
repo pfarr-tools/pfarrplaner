@@ -288,6 +288,7 @@ export default {
             this.$inertia.patch(route('baptisms.update', {baptism: this.myBaptism.id}), this.myBaptism);
         },
         deleteBaptism() {
+            if (!confirm('Willst du diese Taufe wirklich unwiderruflich löschen?')) return;
             this.$inertia.delete(route('baptisms.destroy', {baptism: this.myBaptism.id}));
         },
     }

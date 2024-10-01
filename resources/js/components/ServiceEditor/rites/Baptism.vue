@@ -135,6 +135,7 @@ export default {
     },
     methods: {
         deleteBaptism() {
+            if (!confirm('Willst du diese Taufe wirklich unwiderruflich löschen?')) return;
             this.$inertia.delete(route('baptisms.destroy', {baptism: this.baptism.id}), {preserveState: false});
         }
     }

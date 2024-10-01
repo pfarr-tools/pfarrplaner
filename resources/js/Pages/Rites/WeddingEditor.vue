@@ -372,6 +372,7 @@ export default {
             this.$inertia.patch(route('weddings.update', this.myWedding.id), result);
         },
         deleteWedding() {
+            if (!confirm('Willst du diese Trauung wirklich unwiderruflich löschen?')) return;
             this.$inertia.delete(route('weddings.destroy', this.myWedding.id), this.myWedding);
         }
     }
