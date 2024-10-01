@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.19.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.19.1...v2024.19.2) (2024-10-01)
+
+
+### Bug Fixes
+
+* Beerdigungen werden öffentlich nur angezeigt, wenn sie auch schon abgekündigt werden dürfen ([eb34f43](https://codeberg.org/pfarr.tools/pfarrplaner/commit/eb34f43cffb8822341424071af84429cf8b2eec1))
+* EmbedEventsTableReport zeigt keine Termine aus Nachbargemeinden an ([e6cdeb6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e6cdeb6f6a51e108f892eb03bb528acf31a27d68))
+* Löschen von Kasualien erfolgt ohne Bestätigung ([2de6b92](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2de6b927b23e1bb34c2b6733498d89233c5f9951))
+
 ### [2024.19.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.19.0...v2024.19.1) (2024-09-17)
 
 
