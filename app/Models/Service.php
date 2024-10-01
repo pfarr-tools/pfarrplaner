@@ -306,19 +306,6 @@ class Service extends Model implements HasDAVCalendarItems
             . join('; ', $baptisms);
     }
 
-    public function diaryEntries()
-    {
-        return $this->hasMany(DiaryEntry::class);
-    }
-
-    /**
-     * @return HasMany
-     */
-    public function occurences()
-    {
-        return $this->hasMany(Occurence::class);
-    }
-
     /**
      * @return HasMany
      */
@@ -414,7 +401,6 @@ class Service extends Model implements HasDAVCalendarItems
         $separator = utf8_encode(' ' . chr(183) . ' ');
         return join($separator, $credits);
     }
-//
 
     /**
      * @return mixed
@@ -432,6 +418,7 @@ class Service extends Model implements HasDAVCalendarItems
     {
         return $this->date->formatLocalized($format);
     }
+//
 
     public function getDatetimeAttribute()
     {
@@ -480,6 +467,77 @@ class Service extends Model implements HasDAVCalendarItems
         return join('; ', $desc);
     }
 
+    /**
+     * @param bool $short
+     * @param bool $skipRites
+     * @return string
+     */
+    public function titleText($short = true, $skipRites = false)
+    {
+        $includeDefaultServiceTitle = true;
+        $elements = [];
+        if ($this->title != '') {
+            $elements[] = $x = $this->title;
+        }
+        if (!$skipRites) {
+            if ($this->weddingsText() != '') {
+                $elements[] = $x = $this->weddingsText();
+                $includeDefaultServiceTitle = false;
+            }
+            if ($this->funeralsText() != '') {
+                $elements[] = $x = $this->funeralsText();
+                $includeDefaultServiceTitle = false;
+            }
+            if ($this->baptismsText() != '') {
+                if (!Str::contains(Str::lower(join(' / ', $elements)), 'tauf')) {
+                    $elements[] = $x = ($this->baptisms->count() > 1 ? 'Taufen' : 'Taufe');
+                }
+            }
+        }
+        if ($includeDefaultServiceTitle && (count($elements) == 1) && ($x != '') && ($x != $this->title)) {
+            $elements[0] = ($short ? 'GD' : 'Gottesdienst') . ' mit ' . $elements[0];
+        }
+        return join(' / ', $elements) ?: ($short ? 'GD' : 'Gottesdienst');
+    }
+
+    /**
+     * @return string
+     */
+    public function weddingsText()
+    {
+        $weddings = [];
+        /** @var Wedding $wedding */
+        foreach ($this->weddings as $wedding) {
+            $weddings[] = 'Trauung von ' . NameService::fromName($wedding->spouse1_name)->format(
+                    NameService::FIRST_LAST
+                )
+                . ($wedding->spouse1_birth_name ? ' (' . $wedding->spouse1_birth_name . ')' : '')
+                . ' und ' . NameService::fromName($wedding->spouse2_name)->format(NameService::FIRST_LAST)
+                . ($wedding->spouse2_birth_name ? ' (' . $wedding->spouse2_birth_name . ')' : '');
+        }
+        return (join('; ', $weddings));
+    }
+
+    /**
+     * @return string
+     */
+    public function funeralsText()
+    {
+        $funerals = [];
+        foreach ($this->funerals as $funeral) {
+            $funerals[] = ($funeral->type ?: 'Bestattung') . ' von ' . NameService::fromName(
+                    $funeral->buried_name
+                )->format(NameService::FIRST_LAST);
+        }
+        return (join('; ', $funerals));
+    }
+
+    public function getDurationAttribute()
+    {
+        if (!$this->end) return 60;
+        return $this->end->diffInMinutes($this->date);
+    }
+
     public function getFreeSeatsTextAttribute()
     {
         return $this->getSeatFinder()->freeSeatsText();
@@ -511,6 +569,11 @@ class Service extends Model implements HasDAVCalendarItems
     public function getIsMineAttribute()
     {
         return $this->participants->contains(Auth::user());
+    }
+
+    public function getKeyDateAttribute()
+    {
+        return $this->date->format('Y-m-d');
     }
 
     /**
@@ -736,71 +799,6 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @param bool $short
-     * @param bool $skipRites
-     * @return string
-     */
-    public function titleText($short = true, $skipRites = false)
-    {
-        $includeDefaultServiceTitle = true;
-        $elements = [];
-        if ($this->title != '') {
-            $elements[] = $x = $this->title;
-        }
-        if (!$skipRites) {
-            if ($this->weddingsText() != '') {
-                $elements[] = $x = $this->weddingsText();
-                $includeDefaultServiceTitle = false;
-            }
-            if ($this->funeralsText() != '') {
-                $elements[] = $x = $this->funeralsText();
-                $includeDefaultServiceTitle = false;
-            }
-            if ($this->baptismsText() != '') {
-                if (!Str::contains(Str::lower(join(' / ', $elements)), 'tauf')) {
-                    $elements[] = $x = ($this->baptisms->count() > 1 ? 'Taufen' : 'Taufe');
-                }
-            }
-        }
-        if ($includeDefaultServiceTitle && (count($elements) == 1) && ($x != '') && ($x != $this->title)) {
-            $elements[0] = ($short ? 'GD' : 'Gottesdienst') . ' mit ' . $elements[0];
-        }
-        return join(' / ', $elements) ?: ($short ? 'GD' : 'Gottesdienst');
-    }
-
-    /**
-     * @return string
-     */
-    public function weddingsText()
-    {
-        $weddings = [];
-        /** @var Wedding $wedding */
-        foreach ($this->weddings as $wedding) {
-            $weddings[] = 'Trauung von ' . NameService::fromName($wedding->spouse1_name)->format(
-                    NameService::FIRST_LAST
-                )
-                . ($wedding->spouse1_birth_name ? ' (' . $wedding->spouse1_birth_name . ')' : '')
-                . ' und ' . NameService::fromName($wedding->spouse2_name)->format(NameService::FIRST_LAST)
-                . ($wedding->spouse2_birth_name ? ' (' . $wedding->spouse2_birth_name . ')' : '');
-        }
-        return (join('; ', $weddings));
-    }
-
-    /**
-     * @return string
-     */
-    public function funeralsText()
-    {
-        $funerals = [];
-        foreach ($this->funerals as $funeral) {
-            $funerals[] = ($funeral->type ?: 'Bestattung') . ' von ' . NameService::fromName(
-                    $funeral->buried_name
-                )->format(NameService::FIRST_LAST);
-        }
-        return (join('; ', $funerals));
-    }
-
-    /**
      * @return string
      */
     public function getVideoTimeStringAttribute()
@@ -857,6 +855,25 @@ class Service extends Model implements HasDAVCalendarItems
         $start = $start->copy()->setTime(0, 0, 0);
         $end = $end->copy()->setTime(23, 59, 59);
         return $query->whereBetween('date', [$start, $end]);
+    }
+
+    /**
+     * Filter services which should not be publically displayed before a specific date
+     * This includes notHidden() and checks for funerals which have not been announced yet
+     * @param Builder $query
+     * @param $date
+     * @return void
+     */
+    public function scopeDisplayable(Builder $query, $date = null)
+    {
+        $date = $date ?? Carbon::now();
+        $query->notHidden()->where(function ($query) use ($date) {
+            $query->doesntHave('funerals')
+            ->doesntHave('funerals', 'or', function ($query) use ($date) {
+                $query->whereNull('announcement')
+                    ->orWhereDate('announcement', '>', $date);
+            });
+        });
     }
 
     /**
@@ -934,16 +951,6 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * Get services used as template
-     * @param Builder $query
-     * @return Builder
-     */
-    public function scopeIsTemplate(Builder $query)
-    {
-        return $query->whereDate('date', '1978-03-05');
-    }
-
-    /**
      * Get services not used as agenda
      * @param Builder $query
      * @return Builder
@@ -951,6 +958,16 @@ class Service extends Model implements HasDAVCalendarItems
     public function scopeIsNotAgenda(Builder $query)
     {
         return $query->whereDate('date', '!=', '1978-03-05');
+    }
+
+    /**
+     * Get services used as template
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsTemplate(Builder $query)
+    {
+        return $query->whereDate('date', '1978-03-05');
     }
 
     /**
@@ -1027,7 +1044,7 @@ class Service extends Model implements HasDAVCalendarItems
     {
         return $query->whereIn('city_id', Auth::user()->writableCities->pluck('id'));
     }
-
+// SETTERS
 // SETTERS
 // SETTERS
 // SETTERS
@@ -1105,6 +1122,21 @@ class Service extends Model implements HasDAVCalendarItems
         });
     }
 
+    public function createSlug()
+    {
+        if ($this->isTemplate()) {
+            return $this->id . '-' . Str::slug($this->title);
+        }
+
+        return $this->date->copy()->setTimeZone('Europe/Berlin')->format('Ymd-Hi') . '-' . $this->id
+            . ($this->city ? '-' . Str::slug($this->city->name) : '');
+    }
+
+    public function isTemplate(): bool
+    {
+        return $this->date->format('Y-m-d') == '1978-03-05';
+    }
+
     /**
      * Booted lifecycle method
      * -> register global scopes
@@ -1169,18 +1201,6 @@ class Service extends Model implements HasDAVCalendarItems
             }
         }
         return $participants;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSyncableParticipantsArray()
-    {
-        $data = [];
-        foreach ($this->participants as $participant) {
-            $data[$participant->pivot->category][$participant->id]['category'] = $participant->pivot->category;
-        }
-        return $data;
     }
 
     /**
@@ -1285,31 +1305,17 @@ class Service extends Model implements HasDAVCalendarItems
         return $this->belongsTo(City::class);
     }
 
-    public function createSlug()
-    {
-        if ($this->isTemplate()) {
-            return $this->id . '-' . Str::slug($this->title);
-        }
-
-        return $this->date->copy()->setTimeZone('Europe/Berlin')->format('Ymd-Hi') . '-' . $this->id
-            . ($this->city ? '-' . Str::slug($this->city->name) : '');
-    }
-
-    /**
-     * @return Carbon
-     * @deprecated
-     */
-    public function dateTime()
-    {
-        return $this->date->copy()->setTimeZone('Europe/Berlin');
-    }
-
     /**
      * @return BelongsTo
      */
     public function day()
     {
         return $this->belongsTo(Day::class);
+    }
+
+    public function diaryEntries()
+    {
+        return $this->hasMany(DiaryEntry::class);
     }
 
     /**
@@ -1334,6 +1340,15 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
+     * @return Carbon
+     * @deprecated
+     */
+    public function dateTime()
+    {
+        return $this->date->copy()->setTimeZone('Europe/Berlin');
+    }
+
+    /**
      * @return HasMany
      */
     public function funerals()
@@ -1348,6 +1363,76 @@ class Service extends Model implements HasDAVCalendarItems
         $broadcastSnippet->setDescription($this->broadcastDescription);
         $broadcastSnippet->setScheduledStartTime($this->videoTimeString);
         return $broadcastSnippet;
+    }
+
+    /**
+     * Get all calendar items related to this service for CalDAV
+     * @param bool $includeAlternate Include alternate calendar items
+     * @param bool $includeRiteAnniversaries Include one-year anniversary for rites
+     * @return DAVCalendarItem[]
+     */
+    public function getCalendarItems(bool $includeAlternate, bool $includeRiteAnniversaries): array
+    {
+        $items = [
+            $this->getCalendarItem(''),
+        ];
+        foreach (['baptisms', 'funerals', 'weddings'] as $rites) {
+            foreach ($this->$rites as $rite) {
+                foreach ($rite->getCalendarItems($includeAlternate, $includeRiteAnniversaries) as $item) {
+                    $items[] = $item;
+                }
+            }
+        }
+        return $items;
+    }
+
+    /**
+     * Get a single calendar item related to this service for CalDAV
+     * @param string $itemType
+     * @return DAVCalendarItem
+     */
+    public function getCalendarItem(string $itemType): DAVCalendarItem
+    {
+        return new DAVCalendarItem(
+            $this,
+            $this->titleTextWithParticipants(),
+            $this->date,
+            $this->date->copy()->addHour(1),
+            $this->locationText(),
+            'Im Pfarrplaner ansehen: ' . route(
+                'service.edit',
+                $this->slug
+            ) . "\n\n" . DAVCalendarItem::AUTO_WARNING,
+            '',
+            [],
+            ['Gottesdienst']
+        );
+    }
+
+    /**
+     * Get title plus some participants (for calendar entries)
+     * @param string[] $categories
+     * @return string
+     */
+    public function titleTextWithParticipants($categories = ['P', 'O', 'M'])
+    {
+        $participants = [];
+        foreach ($categories as $category) {
+            $participants[] = $category . ': ' . $this->participantsText($category);
+        }
+        return trim($this->titleText() . ' ' . join(' ', $participants));
+    }
+
+    /**
+     * @return array
+     */
+    public function getSyncableParticipantsArray()
+    {
+        $data = [];
+        foreach ($this->participants as $participant) {
+            $data[$participant->pivot->category][$participant->id]['category'] = $participant->pivot->category;
+        }
+        return $data;
     }
 
     public function getVideoSnippet(): Google_Service_YouTube_VideoSnippet
@@ -1401,6 +1486,14 @@ class Service extends Model implements HasDAVCalendarItems
     public function ministryParticipants($ministry)
     {
         return $this->belongsToMany(User::class)->wherePivot('category', $ministry)->withTimestamps();
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function occurences()
+    {
+        return $this->hasMany(Occurence::class);
     }
 
     /**
@@ -1514,20 +1607,6 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * Get title plus some participants (for calendar entries)
-     * @param string[] $categories
-     * @return string
-     */
-    public function titleTextWithParticipants($categories = ['P', 'O', 'M'])
-    {
-        $participants = [];
-        foreach ($categories as $category) {
-            $participants[] = $category . ': ' . $this->participantsText($category);
-        }
-        return trim($this->titleText() . ' ' . join(' ', $participants));
-    }
-
-    /**
      * @return Carbon
      */
     public function trueDate()
@@ -1585,86 +1664,5 @@ class Service extends Model implements HasDAVCalendarItems
     public function weddings()
     {
         return $this->hasMany(Wedding::class);
-    }
-
-    public function getKeyDateAttribute()
-    {
-        return $this->date->format('Y-m-d');
-    }
-
-    /**
-     * Get all calendar items related to this service for CalDAV
-     * @param bool $includeAlternate Include alternate calendar items
-     * @param bool $includeRiteAnniversaries Include one-year anniversary for rites
-     * @return DAVCalendarItem[]
-     */
-    public function getCalendarItems(bool $includeAlternate, bool $includeRiteAnniversaries): array
-    {
-        $items = [
-            $this->getCalendarItem(''),
-        ];
-        foreach (['baptisms', 'funerals', 'weddings'] as $rites) {
-            foreach ($this->$rites as $rite) {
-                foreach ($rite->getCalendarItems($includeAlternate, $includeRiteAnniversaries) as $item) {
-                    $items[] = $item;
-                }
-            }
-        }
-        return $items;
-    }
-
-    /**
-     * Get a single calendar item related to this service for CalDAV
-     * @param string $itemType
-     * @return DAVCalendarItem
-     */
-    public function getCalendarItem(string $itemType): DAVCalendarItem
-    {
-        return new DAVCalendarItem(
-            $this,
-            $this->titleTextWithParticipants(),
-            $this->date,
-            $this->date->copy()->addHour(1),
-            $this->locationText(),
-            'Im Pfarrplaner ansehen: ' . route(
-                'service.edit',
-                $this->slug
-            ) . "\n\n" . DAVCalendarItem::AUTO_WARNING,
-            '',
-            [],
-            ['Gottesdienst']
-        );
-    }
-
-    public function isTemplate(): bool
-    {
-        return $this->date->format('Y-m-d') == '1978-03-05';
-    }
-
-    public function getDurationAttribute()
-    {
-        if (!$this->end) return 60;
-        return $this->end->diffInMinutes($this->date);
-    }
-
-
-    /**
-     * Filter services which should not be publically displayed before a specific date
-     * This includes notHidden() and checks for funerals which have not been announced yet
-     * @param Builder $query
-     * @param $date
-     * @return void
-     */
-    public function scopeDisplayable(Builder $query, $date = null)
-    {
-        $date = $date ?? Carbon::now();
-        $query->where(function ($query) use ($date) {
-            $query->notHidden()
-            ->doesntHave('funerals')
-            ->doesntHave('funerals', 'or', function ($query) use ($date) {
-                $query->whereNull('announcement')
-                    ->orWhereDate('announcement', '>', $date);
-            });
-        });
     }
 }

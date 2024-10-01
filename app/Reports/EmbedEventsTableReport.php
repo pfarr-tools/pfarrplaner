@@ -130,7 +130,7 @@ class EmbedEventsTableReport extends AbstractEmbedReport
         $events = Occurence::with('event')
             ->between($start, $end)
             ->whereHas('service', function($query) use ($city) {
-                $query->inCity($city)->displayable();
+                $query->inCities([$city->id])->displayable();
             })
             ->orderBy('start')
             ->get()
