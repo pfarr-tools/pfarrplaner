@@ -1646,4 +1646,25 @@ class Service extends Model implements HasDAVCalendarItems
         if (!$this->end) return 60;
         return $this->end->diffInMinutes($this->date);
     }
+
+
+    /**
+     * Filter services which should not be publically displayed before a specific date
+     * This includes notHidden() and checks for funerals which have not been announced yet
+     * @param Builder $query
+     * @param $date
+     * @return void
+     */
+    public function scopeDisplayable(Builder $query, $date = null)
+    {
+        $date = $date ?? Carbon::now();
+        $query->where(function ($query) use ($date) {
+            $query->notHidden()
+            ->doesntHave('funerals')
+            ->doesntHave('funerals', 'or', function ($query) use ($date) {
+                $query->whereNull('announcement')
+                    ->orWhereDate('announcement', '>', $date);
+            });
+        });
+    }
 }

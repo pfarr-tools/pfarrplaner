@@ -48,7 +48,7 @@ class TermineReplacer extends AbstractReplacer
         $nextWeek = Carbon::createFromTimeString($service->date->format('Y-m-d') . ' 0:00:00 next Sunday');
 
         $services = Service::with(['day', 'location'])
-            ->notHidden()
+            ->displayable()
             ->whereDoesntHave('funerals')
             ->whereHas(
                 'day',

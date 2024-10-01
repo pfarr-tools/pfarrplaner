@@ -185,7 +185,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
         ->between(
             Carbon::createFromFormat('d.m.Y H:i:s', $request->get('start') . ' 0:00:00'),
             Carbon::createFromFormat('d.m.Y H:i:s', $request->get('end') . ' 23:59:59')
-        )->notHidden()
+        )->displayable()
             ->whereDoesntHave('funerals')
             ->orderBy('day', 'ASC')
             ->get()
@@ -194,7 +194,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
         foreach ($dates as $day) {
             foreach ($locations as $location) {
                 $service = Service::where('location_id', $location->id)
-                    ->notHidden()
+                    ->displayable()
                     ->whereDate('date', $day)
                     ->get();
                 if (!count($service)) {
@@ -202,7 +202,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                     $replacement = '';
                     if (null !== $location->alternateLocation) {
                         $service = Service::where('location_id', $location->alternateLocation->id)
-                            ->notHidden()
+                            ->displayable()
                             ->whereDate('date', $day)
                             ->get();
                         if (count($service)) {
@@ -267,7 +267,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
 
         $serviceList = Service::whereRaw('DATE(date) IN (\''.join("','",$data['dayList'])."'".')')
             ->whereIn('location_id', $data['locations'])
-            ->notHidden()
+            ->displayable()
             ->whereDoesntHave('funerals')
             ->whereDoesntHave('serviceGroups')
             ->ordered()
@@ -303,7 +303,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                 Carbon::createFromFormat('d.m.Y', $data['end']),
             )
                 ->whereIn('city_id', $data['includeCities'])
-                ->notHidden()
+                ->displayable()
                 ->whereDoesntHave('funerals')
                 ->whereHas('serviceGroups')
                 ->ordered()

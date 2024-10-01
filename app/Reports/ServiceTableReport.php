@@ -115,7 +115,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
         $serviceList = Service::between(
             Carbon::createFromDate($data['year'], 1, 1),
             Carbon::createFromDate($data['year'], 12, 31)->setTime(23, 59, 59),
-        )->notHidden()
+        )->displayable()
             ->whereIn('city_id', $data['cities'])
             ->ordered()
             ->get()

@@ -112,14 +112,14 @@ class EmbedStreamingReport extends AbstractEmbedReport
         }
         $nextService = Service::where('city_id', $request->get('city'))
             ->startingFrom(Carbon::now())
-            ->notHidden()
+            ->displayable()
             ->where('youtube_url', '!=', '')
             ->ordered()
             ->first();
 
         $lastServices = Service::where('city_id', $request->get('city'))
             ->startingFrom(Carbon::now())
-            ->notHidden()
+            ->displayable()
             ->orderedDesc()
             ->limit(100)
             ->get();

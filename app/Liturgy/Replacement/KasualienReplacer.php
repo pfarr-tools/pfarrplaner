@@ -60,7 +60,7 @@ class KasualienReplacer extends AbstractReplacer
             ->whereHas(
                 'service',
                 function ($query) use ($service, $nextWeek) {
-                    $query->notHidden()->whereHas(
+                    $query->displayable()->whereHas(
                         'day',
                         function ($query2) use ($service, $nextWeek) {
                             $query2->where('date', '>=', $service->date);
@@ -75,7 +75,7 @@ class KasualienReplacer extends AbstractReplacer
             ->whereHas(
                 'service',
                 function ($query) use ($service, $nextWeek) {
-                    $query->notHidden()
+                    $query->displayable()
                         ->whereHas(
                             'day',
                             function ($query2) use ($service, $nextWeek) {

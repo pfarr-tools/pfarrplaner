@@ -100,7 +100,7 @@ class NewsletterReport extends AbstractWordDocumentReport
         $end = Carbon::parse($data['end'])->setTime(23,59,59);
 
         $services = Service::with(['location', 'day'])
-            ->notHidden()
+            ->displayable($start)
             ->between($start, $end)
             ->where('city_id', $city->id)
             ->whereDoesntHave('funerals')

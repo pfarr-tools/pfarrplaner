@@ -86,7 +86,7 @@ class ChildrensChurchReport extends AbstractPDFDocumentReport
         );
 
         $serviceList = Service::between(Carbon::parse($data['start']), Carbon::parse($data['end']))
-            ->notHidden()
+            ->displayable()
             ->where('city_id', $data['city'])
             ->where('cc', 1)
             ->ordered()
@@ -95,7 +95,7 @@ class ChildrensChurchReport extends AbstractPDFDocumentReport
 
         $dates = Service::select(DB::raw('DISTINCT DATE(date) as day'))
             ->between(Carbon::createFromFormat('d.m.Y', $data['start'])->subWeek(1), Carbon::createFromFormat('d.m.Y', $data['end']))
-            ->notHidden()
+            ->displayable()
             ->where('city_id', $data['city'])
             ->where('cc', 1)
             ->orderBy('day', 'ASC')

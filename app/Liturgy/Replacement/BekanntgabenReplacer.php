@@ -69,7 +69,7 @@ class BekanntgabenReplacer extends AbstractReplacer
         }
 
         $services = Service::with(['day', 'location'])
-            ->notHidden()
+            ->displayable()
             ->whereHas(
                 'day',
                 function ($query) use ($service, $nextWeek) {

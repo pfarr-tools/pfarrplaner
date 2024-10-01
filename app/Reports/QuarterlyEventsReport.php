@@ -95,7 +95,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         $quarter = Carbon::createFromFormat('Y-m-d', $data['quarter']);
 
         $serviceList = Service::between($quarter, $quarter->copy()->endOfQuarter())
-            ->notHidden()
+            ->displayable($quarter)
             ->where('location_id', $location->id)
             ->ordered()
             ->get()

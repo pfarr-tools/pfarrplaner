@@ -136,8 +136,8 @@ class BillBoardReport extends AbstractWordDocumentReport
 
         $events = Occurence::with('event')
             ->between($start, $end)
-            ->whereHas('service', function ($query) use ($city) {
-                $query->inCity($city)->notHidden();
+            ->whereHas('service', function ($query) use ($city, $start) {
+                $query->inCity($city)->displayable($start);
             })
             ->orderBy('start')
             ->get()

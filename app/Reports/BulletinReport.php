@@ -102,8 +102,9 @@ class BulletinReport extends AbstractWordDocumentReport
         );
 
 
-        $serviceList = Service::between(Carbon::parse($data['start']), Carbon::parse($data['end']))
-            ->notHidden()
+        $start = Carbon::parse($data['start']);
+        $serviceList = Service::between($start, Carbon::parse($data['end']))
+            ->displayable($start)
             ->whereIn('city_id', $data['includeCities'])
             ->ordered()
             ->get()

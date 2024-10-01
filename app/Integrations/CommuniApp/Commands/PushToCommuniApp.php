@@ -74,7 +74,7 @@ class PushToCommuniApp extends Command
             if (CommuniAppIntegration::isActive($city)) {
                 $this->line('Updating future services for "'.$city->name.'"');
                 $communiApp = CommuniAppIntegration::get($city);
-                $services = Service::notHidden()
+                $services = Service::displayable()
                     ->inCity($city)
                     ->notHidden()
                     ->whereDoesntHave('funerals')

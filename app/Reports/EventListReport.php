@@ -119,7 +119,7 @@ class EventListReport extends AbstractWordDocumentReport
 
         $services = Service::with(['location'])
             ->regularForCity($city)
-            ->notHidden()
+            ->displayable()
             ->between($start, $end)
             ->ordered()
             ->get();

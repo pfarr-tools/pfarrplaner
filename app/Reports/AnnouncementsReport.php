@@ -122,7 +122,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $city = City::findOrFail($data['city']);
         $serviceList = Service::with(['location'])
             ->regularForCity($city)
-            ->notHidden()
+            ->displayable()
             ->startingFrom(Carbon::now()->subHours(8))
             ->ordered()
             ->get();
@@ -243,7 +243,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
                 function ($query) use ($service, $nextWeek) {
                     $query->between($service->date, $nextWeek)
                         ->inCity($service->city)
-                        ->notHidden()
+                        ->displayable($service->date)
                         ->ordered();
                 }
             )->get();
@@ -254,7 +254,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
                 function ($query) use ($service, $nextWeek) {
                     $query->between($service->date, $nextWeek)
                         ->inCity($service->city)
-                        ->notHidden()
+                        ->displayable($service->date)
                         ->ordered();
                 }
             )->get();
@@ -264,7 +264,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $events = Occurence::with('event')
             ->between($service->date, $nextWeek)
             ->whereHas('service', function($query) use ($service) {
-                $query->inCity($service->city)->notHidden();
+                $query->inCity($service->city)->displayable($service->date);
             })
             ->orderBy('start')
             ->get();
