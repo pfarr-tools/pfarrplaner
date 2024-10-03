@@ -83,6 +83,7 @@ class GetLiturgyInfo extends Command
 
 
         $this->getOutput()->section('Verzeichnisse lesen');
+        /*
         $this->processItem('Liturgische Informationen (kirchenjahr-evangelisch.de)', function() {
             Storage::put(
                 'liturgy.json',
@@ -91,6 +92,7 @@ class GetLiturgyInfo extends Command
                 )
             );
         });
+        */
         foreach ($studyHelperProviders as $studyHelperProvider) {
             $this->processItem($studyHelperProvider->title, function () use ($studyHelperProvider) {
                 $studyHelperProvider->read();
