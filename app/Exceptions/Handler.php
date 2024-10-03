@@ -97,6 +97,16 @@ class Handler extends ExceptionHandler
 
     public function report(Throwable $e)
     {
+        if (in_array(get_class($e), $this->dontReport)) {
+            return;
+        }
+        foreach ($this->dontReport as $exemptedClass) {
+            if (is_a($e, $exemptedClass)) {
+                return;
+            }
+        }
+
+
         parent::report($e);
 
         // abort here, if 'mail.manager' is not available
@@ -107,27 +117,28 @@ class Handler extends ExceptionHandler
         }
 
 
-        if (in_array(get_class($e), $this->dontReport)) return;
 
         $flat = $this->getFlattenedException($e);
         $flare = Flare::make()
             ->setStage(app()->environment())
             ->setContextProviderDetector(new LaravelContextProviderDetector())
             ->setApiToken('')
-            ->registerMiddleware(collect(config('flare.flare_middleware'))
-                                     ->map(function ($value, $key) {
-                                         if (is_string($key)) {
-                                             $middlewareClass = $key;
-                                             $parameters = $value ?? [];
-                                         } else {
-                                             $middlewareClass = $value;
-                                             $parameters = [];
-                                         }
+            ->registerMiddleware(
+                collect(config('flare.flare_middleware'))
+                    ->map(function ($value, $key) {
+                        if (is_string($key)) {
+                            $middlewareClass = $key;
+                            $parameters = $value ?? [];
+                        } else {
+                            $middlewareClass = $value;
+                            $parameters = [];
+                        }
 
-                                         return new $middlewareClass(...array_values($parameters));
-                                     })
-                                     ->values()
-                                     ->toArray());
+                        return new $middlewareClass(...array_values($parameters));
+                    })
+                    ->values()
+                    ->toArray()
+            );
         $report = $flare->createReport($e);
         Mail::to('dev@toph.de')->send(new ExceptionMail($flat, $report->toArray()));
     }
