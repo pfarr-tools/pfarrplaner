@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.19.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.19.2...v2024.19.3) (2024-10-03)
+
+
+### Bug Fixes
+
+* Reporting für bestimmte Exceptions komplett abschalten ([d26bf71](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d26bf71739127804648d6b35b0f57d483aab5517))
+* Vorübergehend kein Import von kirchenjahr-evangelisch.de ([9bfa4be](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9bfa4be479ba1cc42292e16c5f8899e843fc51a1))
+
 ### [2024.19.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.19.1...v2024.19.2) (2024-10-01)
 
 
