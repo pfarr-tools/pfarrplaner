@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.19.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.19.3...v2024.19.4) (2024-10-06)
+
+
+### Bug Fixes
+
+* Kinderkirche wird auf der Homepage nicht angezeigt ([6a95a55](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6a95a558bbe9cc70ce880449e0fd401f72419ce9))
+
 ### [2024.19.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.19.2...v2024.19.3) (2024-10-03)
 
 
