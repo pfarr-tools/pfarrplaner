@@ -38,6 +38,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Calendar\Occurence;
 use App\Models\Leave\Absence;
 use App\Models\People\User;
 use App\Models\Service;
@@ -116,24 +117,14 @@ class EmbedController extends Controller
     {
         $ids = explode(',', $ids);
         $title = $request->has('title') ? $request->get('title') : '';
-        $services = Service::with(['location', 'participants'])
-            ->select('services.*')
-            ->join('days', 'services.day_id', '=', 'days.id')
-            ->where('hidden', '!=', 1)
+        $services = Service::with('location', 'baptisms')
+            ->startingFrom(Carbon::now('Europe/Berlin')->setTime(0,0,0))
+            ->where('baptism', true)
             ->whereIn('city_id', $ids)
-            ->whereHas(
-                'day',
-                function ($query) {
-                    $query->where('date', '>=', Carbon::now('Europe/Berlin')->setTime(0, 0, 0));
-                }
-            )
-            ->doesntHave('funerals')
-            ->doesntHave('weddings')
-            ->where('cc', true)
-            ->orderBy('days.date', 'ASC')
-            ->orderBy('time', 'ASC')
+            ->ordered()
             ->limit($limit)
             ->get();
+
         return response()
             ->view('embed.services.ccTable', compact('services', 'ids', 'title'));
     }
