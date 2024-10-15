@@ -35,6 +35,7 @@ use App\Events\ServiceBeforeDelete;
 use App\Events\ServiceBeforeUpdate;
 use App\Events\ServiceUpdated;
 use App\Http\Requests\ServiceRequest;
+use App\Http\Resources\ServiceResource;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Liturgy\LiturgySheets\LiturgySheets;
 use App\Models\Attachment;
@@ -58,6 +59,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
+
 
 /**
  * Class ServiceController
@@ -424,13 +426,8 @@ class ServiceController extends Controller
         if ($request->has('append')) $service->setAppends($appends);
         foreach ($load as $l) $service->load($l);
 
-        /*
-        $service->liturgy = Liturgy::getDayInfo($service->day);
-        if (isset($liturgy['title']) && ($service->day->name == '')) {
-            $service->day->name = $service->liturgy['title'];
-        }
-        */
-        return response()->json($service);
+        // NOTE: This overrides buggy JSON conversion in JsonResponse
+        return response($service->toJson())->withHeaders(['Content-Type' => 'application/json']);
     }
 
     /**
