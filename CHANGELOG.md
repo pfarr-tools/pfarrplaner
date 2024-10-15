@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.19.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.19.4...v2024.19.5) (2024-10-15)
+
+
+### Bug Fixes
+
+* Änderungen an Kirchengemeinden werden nicht gespeichert. ([b5d729f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b5d729fe92bd6fa0da16eb7a3924d85884f510d8))
+* Bei "fremden" Gottesdiensten wird im Kalender kein Ort angezeigt ([85a922c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/85a922cb9eade6b804c33a6b4f68de9831660f80))
+* Planungstabelle lädt bestimmte Gottesdienste nicht ([eb4d516](https://codeberg.org/pfarr.tools/pfarrplaner/commit/eb4d5166338ca94fb2fafb0a266b384a6a07a728))
+
 ### [2024.19.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.19.3...v2024.19.4) (2024-10-06)
 
 
