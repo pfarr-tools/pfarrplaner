@@ -36,24 +36,20 @@
                 </div>
                 <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                     <h1 class="ps-0 pl-0 ms-0 ms-0 mb-4">{{ layout.appName }}</h1>
-                    <form method="POST" :action="route('login')" id="loginForm">
+                    <form method="POST" id="loginForm" @submit.prevent="submit">
                         <input type="hidden" name="_token" :value="csrf" :key="csrf">
+                        <!-- Email input -->
                         <div v-if="!demo">
-                            <!-- Email input -->
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="form3Example3">E-Mailadresse</label>
-                                <input type="email" name="email" class="form-control form-control-lg"
-                                       value=""
-                                       placeholder="deine@email.de" autofocus/>
-                            </div>
+                            <form-input v-if="!demo"
+                                v-model="form.email"
+                                name="email" label="E-Mailadresse" autofocus placeholder="deine@email.de"/>
+                            <form-input class="my-3"
+                                        type="password" name="password" v-model="form.password"
+                                        label="Passwort" />
+                            <form-check v-model="form.remember" label="Angemeldet bleiben" />
 
-                            <!-- Password input -->
-                            <div class="form-outline mb-3">
-                                <label class="form-label" for="form3Example4">Passwort</label>
-                                <input type="password" name="password" class="form-control form-control-lg"
-                                       placeholder="Dein Passwort"/>
-                            </div>
                         </div>
+
                         <div v-else>
                             <div class="form-outline mb-4">
                                 <label class="form-label" for="form3Example3">E-Mailadresse</label>
@@ -66,20 +62,10 @@
                                 </select>
                             </div>
                         </div>
-
-                        <div class="d-flex justify-content-between align-items-center">
-                            <!-- Checkbox -->
-                            <div class="form-check mb-0">
-                                <input class="form-check-input me-2" type="checkbox" value="1" name="remember"/>
-                                <label class="form-check-label" for="form2Example3">
-                                    Angemeldet bleiben
-                                </label>
-                            </div>
-                        </div>
-
                         <div class="text-end text-lg-start mt-4 pt-2">
-                            <input type="submit" class="btn btn-primary btn-lg"
-                                   style="padding-left: 2.5rem; padding-right: 2.5rem;" value="Anmelden"/>
+                            <button  class="btn btn-primary btn-lg"
+                                     @click="submit"
+                                     style="padding-left: 2.5rem; padding-right: 2.5rem;">Anmelden</button>
                         </div>
 
 
@@ -110,8 +96,12 @@
 
 
 <script>
+import FormInput from "../../components/Ui/forms/FormInput.vue";
+import FormCheck from "../../components/Ui/forms/FormCheck.vue";
+
 export default {
     name: "Login",
+    components: {FormCheck, FormInput},
     props: ['users', 'demo'],
     computed: {
         layout() {
@@ -123,6 +113,11 @@ export default {
             dev: this.$page.props.dev,
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             lastRefresh: -1,
+            form: {
+                email: '',
+                password: '',
+                remember: false,
+            }
         };
     },
     mounted() {
@@ -138,6 +133,9 @@ export default {
                 this.lastRefresh = (new Date()).getTime();
             })
         },
+        submit() {
+            this.$inertia.post(route('login'), this.form);
+        }
     },
 
 }
