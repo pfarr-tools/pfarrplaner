@@ -18,9 +18,9 @@
             @else
                 <td></td>
             @endif
-            <td>{{ $service->timeText() }}</td>
+            <td>{{ $service->cc_alt_time ? \Illuminate\Support\Str::substr($service->cc_alt_time, 0, 5).' Uhr' : $service->timeText() }}</td>
             @if (!isset($locationIds) || count($locationIds) >1)
-                <td>{{ $service->locationText() }}</td>
+                <td>{{ $service->cc_location ?? ($service->location ? $service->location->cc_default_location : null) ?? $service->locationText() }}</td>
             @endif
             <td>{{ $service->cc_lesson }}</td>
         </tr>

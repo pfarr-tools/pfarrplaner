@@ -118,8 +118,9 @@ class EmbedController extends Controller
         $ids = explode(',', $ids);
         $title = $request->has('title') ? $request->get('title') : '';
         $services = Service::with('location', 'baptisms')
+            ->notHidden()
             ->startingFrom(Carbon::now('Europe/Berlin')->setTime(0,0,0))
-            ->where('baptism', true)
+            ->where('cc', true)
             ->whereIn('city_id', $ids)
             ->ordered()
             ->limit($limit)
