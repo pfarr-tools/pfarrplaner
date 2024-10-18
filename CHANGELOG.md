@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.20.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.19.5...v2024.20.0) (2024-10-18)
+
+
+### Features
+
+* Inertia-basiertes Anmeldeformular ([aacd6a5](https://codeberg.org/pfarr.tools/pfarrplaner/commit/aacd6a54b8821c7d0c82df3250d90179f96d1565))
+
 ### [2024.19.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.19.4...v2024.19.5) (2024-10-15)
 
 
