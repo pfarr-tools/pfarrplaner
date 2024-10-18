@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.20.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.20.1...v2024.20.2) (2024-10-18)
+
+
+### Bug Fixes
+
+* Falsche Einträge zur Kinderkirche auf der Homepage ([e7b3feb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e7b3feb80bacfc0af020fd7e698b191800d5e525))
+
 ### [2024.20.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.20.0...v2024.20.1) (2024-10-18)
 
 
