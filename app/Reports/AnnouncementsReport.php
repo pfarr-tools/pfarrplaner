@@ -827,7 +827,7 @@ Amen.'
             $this->renderParagraph(self::NO_INDENT, [[array_values($events)[0]->start->formatLocalized('%A, %d. %B'), self::BOLD]]);
             foreach ($events as $event) {
                 $this->renderParagraph(self::INDENT, [[
-                    $event->event->timeText()."\t".$event->event->titleText(false)
+                    $event->event->timeText()."\t".Str::replace('&', '&amp;', $event->event->titleText(false))
                         .(count($event->event->pastors ?? []) ? ' mit '.$this->getNameListLine($event->event->pastors) : '')
                     .' ('.$event->event->locationText().')', []
                 ]]);
