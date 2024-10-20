@@ -87,8 +87,9 @@ class EventRecurrenceObserver
             } catch (InvalidRRule $exception) {
                 return;
             }
-            $rrule->setStartDate($service->date);
-            $rrule->setEndDate($service->date->copy()->addMinutes($service->duration));
+            $rrule->setTimezone('Europe/Berlin');
+            $rrule->setStartDate($service->date->copy()->setTimezone('Europe/Berlin'));
+            $rrule->setEndDate($service->date->copy()->setTimezone('Europe/Berlin')->addMinutes($service->duration));
 
             // sanity check: no more than 5 years, no more than 5000 occurrences
             if ((!$rrule->getCount()) && (!$rrule->getUntil())) {
@@ -102,8 +103,8 @@ class EventRecurrenceObserver
                 if (!($recurrence->getStart() == $service->date)) {
                     Occurence::create([
                                           'service_id' => $service->id,
-                                          'start' => $recurrence->getStart(),
-                                          'end' => $recurrence->getEnd(),
+                                          'start' => Carbon::instance($recurrence->getStart())->setTimezone('UTC'),
+                                          'end' => Carbon::instance($recurrence->getEnd())->setTimezone('UTC'),
                                       ]);
                 }
             }
