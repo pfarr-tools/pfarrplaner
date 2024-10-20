@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.20.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.20.2...v2024.20.3) (2024-10-20)
+
+
+### Bug Fixes
+
+* Kopierte Bibeltexte aus FormBibleReferenceInput enthalten keine korrekte Stellenangabe ([c37bd49](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c37bd4984d3da11ccea4fb95ccb49b457095bb5f))
+* Kopierte Bibeltexte aus FormBibleReferenceInput enthalten keine korrekte Stellenangabe ([5e0ce0a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5e0ce0a532e87d7dac66fd6a0b308ffbaf6bddbb))
+* Validierungsfehler werden beim Login nicht angezeigt ([cbe3140](https://codeberg.org/pfarr.tools/pfarrplaner/commit/cbe31408b7e8acc155c7f50aacbe6f50525b4bd3))
+
 ### [2024.20.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.20.1...v2024.20.2) (2024-10-18)
 
 
