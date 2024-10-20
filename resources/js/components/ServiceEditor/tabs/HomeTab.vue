@@ -108,7 +108,7 @@
                 <div class="col-md-4">
                     <form-selectize name="related_cities[]" label="Auch in folgenden Kirchengemeinden anzeigen"
                                     v-model="service.related_cities"
-                                    :options="cities" multiple/>
+                                    :options="relatableCities" multiple/>
                 </div>
             </div>
         </icon-block>
@@ -222,6 +222,10 @@ export default {
     },
     data() {
         let myService = this.service;
+        let relatableCities = [];
+        this.cities.forEach(city => {
+            if (city.id != this.service.city_id) relatableCities.push(city);
+        });
         myService.communiapp_listing_start = moment(this.service.communiapp_listing_start).format('DD.MM.YYYY');
         myService.event_class = myService.event_class || 'service';
         return {
@@ -249,6 +253,7 @@ export default {
                 sideBySide: true,
             },
             endTimeUpdated: 0,
+            relatableCities,
         }
     },
     methods: {
