@@ -190,7 +190,7 @@ export default {
         }, 1000),
         copyToClipboard() {
             const cb = navigator.clipboard;
-            cb.writeText(this.myBibleText+"\n("+this.myReference+')').then(result => {});
+            cb.writeText(this.myBibleText+"\n("+this.myReference.correctedReference+')').then(result => {});
         },
         setTextFromList(e) {
             this.myReference = e;
