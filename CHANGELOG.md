@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.20.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.20.3...v2024.20.4) (2024-10-20)
+
+
+### Bug Fixes
+
+* Terminserien berücksichtigen Zeitumstellung nicht ([dee8e78](https://codeberg.org/pfarr.tools/pfarrplaner/commit/dee8e78c488990f2657823c570ab46618bea1c2f))
+
 ### [2024.20.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.20.2...v2024.20.3) (2024-10-20)
 
 
