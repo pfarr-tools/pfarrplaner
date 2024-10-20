@@ -32,8 +32,8 @@
         <value-check v-if="isCheckedItem" :value="value" />
         <label v-if="label" :for="id+'Input'" class="control-label"><span v-if="preLabel" :class="preLabel"></span> {{ label }}</label>
         <slot />
-        <small v-if="error" :key="error" class="invalid-feedback">{{ error || false }}</small>
-        <div v-else><small v-if="help" class="form-text text-muted">{{ help }}</small></div>
+        <small v-if="error" :key="error" class="message invalid-feedback">{{ error.join(' ') || false }}</small>
+        <div v-else><small v-if="help" class="message form-text text-muted">{{ help }}</small></div>
     </div>
 </template>
 
@@ -51,7 +51,7 @@ export default {
         const errors = this.$page.props.errors;
         return {
             errors: errors,
-            error: errors[this.name] || false,
+            error: errors[this.name] ? (Array.isArray(errors[this.name]) ? errors[this.name].join('<br />') : errors[this.name]) : false,
         }
     },
     watch: {
@@ -78,6 +78,10 @@ export default {
     content: "*";
     position: absolute;
     margin-left: 3px;
+}
+
+.message {
+    font-size: .8em;
 }
 
 </style>

@@ -28,9 +28,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
-Auth::routes(['logout' => false, 'register' => false]);
 
-Route::get('/logout', [UserController::class, 'logout'])->name('logout');
+Auth::routes(['logout' => false, 'register' => false]);
+Route::match(['GET', 'POST'], '/logout', [UserController::class, 'logout'])->name('logout');
 

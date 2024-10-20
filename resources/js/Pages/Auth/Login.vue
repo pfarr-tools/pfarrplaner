@@ -62,7 +62,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="text-end text-lg-start mt-4 pt-2">
+                        <div class="text-end text-lg-start mt-4 pt-2" :key="attempts">
                             <button  class="btn btn-primary btn-lg"
                                      @click="submit"
                                      style="padding-left: 2.5rem; padding-right: 2.5rem;">Anmelden</button>
@@ -111,30 +111,22 @@ export default {
     data() {
         return {
             dev: this.$page.props.dev,
-            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            lastRefresh: -1,
+            attempts: 0,
+            loggingIn: false,
             form: {
                 email: '',
                 password: '',
                 remember: false,
+                '_token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             }
         };
     },
-    mounted() {
-        if (this.lastRefresh == -1) this.refreshToken();
-        setTimeout(this.refreshToken, 600000);
-    },
     methods: {
-        refreshToken() {
-            axios.get(route('csrf.keepalive')).then(response => {
-                this.csrf = response.data.token;
-                axios.defaults.headers.common['X-CSRF-TOKEN'] = this.csrf;
-                document.querySelector('meta[name="csrf-token"]').setAttribute('content', this.csrf);
-                this.lastRefresh = (new Date()).getTime();
-            })
-        },
         submit() {
-            this.$inertia.post(route('login'), this.form);
+            axios.get(route('csrf.keepalive')).then(response => {
+                this.form._token = response.data.token;
+                this.$inertia.post(route('login'), this.form, {preserveState: false});
+            })
         }
     },
 

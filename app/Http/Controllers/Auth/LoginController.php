@@ -34,6 +34,9 @@ use App\Http\Controllers\Controller;
 use App\Models\People\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 /**
@@ -78,7 +81,6 @@ class LoginController extends Controller
      */
     public function showLoginForm(Request $request)
     {
-        $request->session()->invalidate();
         $request->session()->regenerateToken();
         $demo = (app()->environment() == 'demo');
         $users = $demo ? User::with('roles', 'homeCities')->where('password', '!=', '')->orderBy('id')->get() : [];
