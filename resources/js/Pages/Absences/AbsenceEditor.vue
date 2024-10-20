@@ -30,7 +30,8 @@
 <template>
     <admin-layout title="Abwesenheit bearbeiten">
         <template slot="navbar-left">
-            <nav-button v-if="role == 'editor'" @click="saveAbsence" type="primary" icon="mdi mdi-content-save" force-icon
+            <nav-button v-if="role == 'editor'" @click="saveAbsence" type="primary" icon="mdi mdi-content-save"
+                        force-icon
                         title="Abwesenheitseintrag speichern  und zur Überprüfung absenden">Zur Überprüfung absenden
             </nav-button>
             <save-button v-if="role == 'self-editor'" @click="saveAbsence" class="btn btn-primary"
@@ -39,10 +40,12 @@
                         title="Antrag als überprüft markieren und zur Genehmigung weiterleiten">Zur Genehmigung
                 weiterleiten
             </nav-button>
-            <nav-button v-if="role == 'approver'" @click="approveAndSave()" type="success" icon="mdi mdi-check" force-icon
+            <nav-button v-if="role == 'approver'" @click="approveAndSave()" type="success" icon="mdi mdi-check"
+                        force-icon
                         title="Antrag genehmigen">Genehmigen
             </nav-button>
-            <nav-button v-if="role == 'approver'" @click="returnAndSave()" class="ms-1" type="warning" icon="mdi mdi-undo"
+            <nav-button v-if="role == 'approver'" @click="returnAndSave()" class="ms-1" type="warning"
+                        icon="mdi mdi-undo"
                         force-icon
                         title="Abwesenheitseintrag zurück zur Überprüfung verweisen">Erneut überprüfen lassen
             </nav-button>
@@ -94,9 +97,10 @@
 
         <template slot="tab-headers">
             <tab-headers>
-                <tab-header id="home" :active-tab="activeTab" title="Abwesenheit" />
-                <tab-header v-if="myAbsence.user.needs_replacement" id="replacement" :active-tab="activeTab" title="Vertretung" />
-                <tab-header id="attachments" :active-tab="activeTab" title="Dateien" :count="fileCount" />
+                <tab-header id="home" :active-tab="activeTab" title="Abwesenheit"/>
+                <tab-header v-if="myAbsence.user.needs_replacement" id="replacement" :active-tab="activeTab"
+                            title="Vertretung"/>
+                <tab-header id="attachments" :active-tab="activeTab" title="Dateien" :count="fileCount"/>
             </tab-headers>
         </template>
 
@@ -136,7 +140,7 @@
                                            :disabled="!mayEdit"/>
                         </div>
                         <div class="col-md-2">
-                            <form-selectize :options="myAbsence.user.pools" v-model="replacement.pool_id" />
+                            <form-selectize :options="myAbsence.user.pools" v-model="replacement.pool_id"/>
                         </div>
                         <div class="col-md-4">
                             <date-range-input :from="replacement.from" :to="replacement.to"
@@ -159,6 +163,56 @@
                 <hr/>
                 <form-textarea label="Notizen für die Vertretung" v-model="myAbsence.replacement_notes"
                                name="replacement_notes" :disabled="!mayEdit"/>
+                <div class="post-absence-availabilities mt-4">
+                    <h3>Verfügbarkeit für Beerdigungen nach dem Urlaub</h3>
+                    <div class="row d-none d-md-block">
+                        <div class="text-center"
+                             style="width: 14.2857143%; float: left; color: white; background-color:black">
+                            Montag
+                        </div>
+                        <div class="text-center"
+                             style="width: 14.2857143%; float: left; color: white; background-color:black">
+                            Dienstag
+                        </div>
+                        <div class="text-center"
+                             style="width: 14.2857143%; float: left; color: white; background-color:black">
+                            Mittwoch
+                        </div>
+                        <div class="text-center"
+                             style="width: 14.2857143%; float: left; color: white; background-color:black">
+                            Donnerstag
+                        </div>
+                        <div class="text-center"
+                             style="width: 14.2857143%; float: left; color: white; background-color:black">
+                            Freitag
+                        </div>
+                        <div class="text-center"
+                             style="width: 14.2857143%; float: left; color: white; background-color:black">
+                            Samstag
+                        </div>
+                        <div class="text-center"
+                             style="width: 14.2857143%; float: left; color: white; background-color:black">
+                            Sonntag
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div style="float: left;"
+                             :style="{width: ((availabilityDates[0].isoWeekday()-1)*14.2857143)+'%'}"></div>
+                        <div v-for="day in availabilityDates" class="text-center"
+                             style="width: 14.2857143%; float: left; border: solid 1px gray;">
+                            <div :key="updatedAvailability"
+                                 :class="(myAvailability[day.format('YYYYMMDD')].available ? (myAvailability[day.format('YYYYMMDD')].note ? 'partly-available' : 'available') : 'unavailable')">
+                                <input type="checkbox" v-model="myAvailability[day.format('YYYYMMDD')].available"
+                                       @change="updateAvailability"/><br/>
+                                <div class="text-xl text-bold">{{ day.locale('de').format('DD.') }}</div>
+                                <div class="text-small">{{ day.locale('de').format('MMMM') }}</div>
+                            </div>
+                            <form-input class="mb-2" v-model="myAvailability[day.format('YYYYMMDD')].note"
+                                        @input="updatedAvailability++"
+                                        :disabled="!(myAvailability[day.format('YYYYMMDD')].available)"/>
+                        </div>
+                    </div>
+                </div>
             </tab>
             <tab id="attachments" :active-tab="activeTab">
 
@@ -198,7 +252,6 @@
         </div>
 
 
-
     </admin-layout>
 </template>
 
@@ -225,6 +278,7 @@ import AttachmentList from "../../components/Ui/elements/AttachmentList";
 import FakeAttachment from "../../components/Ui/elements/FakeAttachment";
 import FormFileUploader from "../../components/Ui/forms/FormFileUploader";
 import FormSelectize from "../../components/Ui/forms/FormSelectize.vue";
+import debounce from 'lodash.debounce';
 
 export default {
     name: "AbsenceEditor",
@@ -248,12 +302,19 @@ export default {
     computed: {
         fileCount() {
             let count = this.myAbsence.attachments.length;
-            if (this.role == 'self-editor') count +=2;
+            if (this.role == 'self-editor') count += 2;
             return count;
         },
         visibleTo() {
             return [...[this.myAbsence.user], ...this.myAbsence.user.vacation_admins, ...this.myAbsence.user.vacation_approvers];
         },
+        availabilityDates() {
+            let dates = [];
+            for (let i = 1; i <= 14; i++) {
+                dates.push(moment(this.myAbsence.to).startOf('day').add(i, 'day'));
+            }
+            return dates;
+        }
     },
     data() {
         let role = 'readonly';
@@ -271,10 +332,15 @@ export default {
             setChecked: (this.absence.workflow_status == 1) || (this.absence.workflow_status == 2),
             setApproved: (this.absence.workflow_status == 2) || (this.absence.workflow_status == 11),
             mayEdit: mayEdit,
+            myAvailability: {},
+            updatedAvailability: 0,
             role: role,
             editingUser: this.$page.props.currentUser.data.id,
             isForeignEditor: this.hasPermission('fremden-urlaub-bearbeiten') && (this.$page.props.currentUser.data.id != this.absence.user.id),
         }
+    },
+    created() {
+        this.initAvailability();
     },
     methods: {
         setDateRange(e) {
@@ -402,7 +468,18 @@ export default {
                 return confirm('Diese Aktion löscht den Abwesenheitseintrag komplett, ohne irgendjemanden zu benachrichtigen. Wenn eine Benachrichtigung versandt werden soll, benutze die Schaltfläche "Ablehnen".');
             }
             return true;
-        }
+        },
+        initAvailability() {
+            this.availabilityDates.forEach(item => {
+                if (undefined === this.myAvailability[item.format('YYYYMMDD')]) this.myAvailability[item.format('YYYYMMDD')] = {
+                    available: false,
+                    note: '',
+                }
+            });
+        },
+        updateAvailability: debounce(function () {
+            this.updatedAvailability++;
+        }, 500),
     }
 }
 </script>
@@ -420,4 +497,17 @@ export default {
 .row.fake-table-row .col-md-1:last-child {
     padding-right: 0;
 }
+
+div.available {
+    background-color: lightgreen;
+}
+
+div.unavailable {
+    background-color: lightcoral;
+}
+
+div.partly-available {
+    background-color: lightgoldenrodyellow;
+}
+
 </style>

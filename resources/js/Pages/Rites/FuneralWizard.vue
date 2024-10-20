@@ -81,6 +81,7 @@
                                     <li v-for="absence in poolUsers[user.id].absences">
                                         {{ moment(absence.from).format('DD.MM.YYYY') }}-{{ moment(absence.to).format('DD.MM.YYYY') }}<br />
                                         <b>{{ absence.reason }}</b>
+                                        <div v-if="absence.replacement_notes" class="text-sm text-muted fst-italic">Hinweis: {{ absence.replacement_notes }}</div>
                                     </li>
                                 </ul>
                             </div>
