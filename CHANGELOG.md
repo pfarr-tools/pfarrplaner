@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.20.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.20.4...v2024.20.5) (2024-10-22)
+
+
+### Bug Fixes
+
+* Liste für "Auch in folgenden Kirchengemeinden anzeigen" enthält ursprüngliche Kirchengemeinde ([efff4ff](https://codeberg.org/pfarr.tools/pfarrplaner/commit/efff4ffb60049bab75434755e2c2358cda3f634f))
+* Login schlägt unter Microsoft Edge manchmal fehl ([8f26d60](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8f26d600da1e3b80719afd026a6f15723eac008d))
+
 ### [2024.20.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.20.3...v2024.20.4) (2024-10-20)
 
 
