@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.21.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.20.5...v2024.21.0) (2024-11-05)
+
+
+### Features
+
+* Neue "Veranstaltungswerbung"-Ausgabe (WebBuilder) ([cb90719](https://codeberg.org/pfarr.tools/pfarrplaner/commit/cb90719ffbfa0a51d3b8aef24b920ad19f1eb9dc))
+
+
+### Bug Fixes
+
+* Konsole meldet Fehler auf der Loginseite ([c06aae7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c06aae77a31d92ce1edcc0ec6803d493c70d071f))
+* PlanningInput speichert Änderungen nicht ([2aba23e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2aba23e79409ad19d45db84ed85cf6fa9b49c77f))
+
 ### [2024.20.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.20.4...v2024.20.5) (2024-10-22)
 
 
