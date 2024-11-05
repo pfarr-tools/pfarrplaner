@@ -187,7 +187,7 @@ export default {
             this.saving = true;
             this.$forceUpdate();
 
-            axios.post(route('inputs.save', 'planning'), service).then(response => {
+            this.$api().post(route('inputs.save', 'planning'), service).then(response => {
                 this.saving = false;
                 this.saved = true;
                 if (this.addPerson) {
