@@ -110,6 +110,7 @@ export default {
     },
     data() {
         return {
+            csrf: null,
             dev: this.$page.props.dev,
             attempts: 0,
             loggingIn: false,
