@@ -1611,7 +1611,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function trueDate()
     {
-        return Carbon::createFromTimeString($this->date->format('Y-m-d') . ' ' . $this->time);
+        return $this->date;
     }
 
     public function unsetAdditionalFields()
