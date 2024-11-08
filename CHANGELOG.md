@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.21.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.21.0...v2024.21.1) (2024-11-08)
+
+
+### Bug Fixes
+
+* Fehler in der trueDate()-Funktion von Service.php ([1bc75b0](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1bc75b074c721da34cb1bfd3859718b34bee06dc))
+
 ## [2024.21.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.20.5...v2024.21.0) (2024-11-05)
 
 
