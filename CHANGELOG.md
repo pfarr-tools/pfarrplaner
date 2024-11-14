@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.22.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.21.1...v2024.22.0) (2024-11-14)
+
+
+### Features
+
+* Ausgabeformate haben Dateinamen mit Aktenzeichen ([e1ef232](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e1ef232e9e76eece4760cb39a2cbb642fb4b9236))
+
 ### [2024.21.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.21.0...v2024.21.1) (2024-11-08)
 
 
