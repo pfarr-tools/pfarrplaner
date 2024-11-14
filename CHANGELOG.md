@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.22.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.22.0...v2024.22.1) (2024-11-14)
+
+
+### Bug Fixes
+
+* Beerdigungen und Trauungen sollten eigene Aktenzeichen haben ([981e899](https://codeberg.org/pfarr.tools/pfarrplaner/commit/981e899e10b15c58713d95b7b130f33332e5b3bf))
+
 ## [2024.22.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.21.1...v2024.22.0) (2024-11-14)
 
 
