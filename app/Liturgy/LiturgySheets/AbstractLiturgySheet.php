@@ -38,8 +38,6 @@ use PDF;
 
 class AbstractLiturgySheet
 {
-    public const FILE_SIGNATURE = '50.0';
-
     protected $title = '';
 
     protected $icon = 'fa fa-file';
@@ -96,12 +94,19 @@ class AbstractLiturgySheet
         return 'liturgy.sheets.' . strtolower($this->getKey() . '.render');
     }
 
+    public function getFileSignature(Service $service)
+    {
+        if ($service->funerals->count()) return '51.6';
+        if ($service->weddings->count()) return '51.5';
+        return '50.0';
+    }
+
     public function getFileName(Service $service, $title = null)
     {
         return FileNameService::make(
             ($title ?? $this->getFileTitle()),
             ($this->extension ? '.'.$this->extension : ''),
-            self::FILE_SIGNATURE,
+            $this->getFileSignature($service),
             $service->date,
             true
         );
