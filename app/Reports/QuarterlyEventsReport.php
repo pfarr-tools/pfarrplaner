@@ -33,6 +33,7 @@ namespace App\Reports;
 use App\Models\Calendar\Day;
 use App\Models\Location;
 use App\Models\Service;
+use App\Services\FileNameService;
 use Carbon\Carbon;
 use DateTimeZone;
 use Illuminate\Http\Request;
@@ -49,6 +50,10 @@ use PhpOffice\PhpWord\Style\Section;
  */
 class QuarterlyEventsReport extends AbstractWordDocumentReport
 {
+
+    public const FILE_SIGNATURE = '35.2';
+    public const FILE_TITLE = 'Quartalsprogramm';
+
 
     /**
      * @var string
@@ -213,7 +218,16 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         Auth::user()->setSetting('quarterly_events_report_notes2', $request->get('notes2', ''));
 
 
-        $filename = $quarter->year . '-' . $quarter->quarter . ' ' . $title;
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE,
+                null,
+                static::FILE_SIGNATURE,
+                $quarter,
+                false,
+                null,
+                'Y-Q'.$quarter->quarter,
+            )
+        );
     }
 }

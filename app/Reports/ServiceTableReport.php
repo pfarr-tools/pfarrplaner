@@ -30,6 +30,7 @@
 
 namespace App\Reports;
 
+use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use App\Services\MinistryService;
 use App\Models\Calendar\Day;
@@ -55,6 +56,10 @@ use PhpOffice\PhpWord\Shared\Converter;
  */
 class ServiceTableReport extends AbstractExcelDocumentReport
 {
+    public const FILE_TITLE = 'Jahresplan';
+    public const FILE_SIGNATURE = '50.0';
+
+
     /**
      * @var string
      */
@@ -482,8 +487,13 @@ class ServiceTableReport extends AbstractExcelDocumentReport
         }
 
         // output
-        $filename = $data['year'] . ' Plan für Gottesdienste ' . $cities->pluck('name')->join(', ') . '.xlsx';
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                'xlsx',
+                static::FILE_SIGNATURE,
+                $data['year'].'-01-01', false, null, 'Y')
+        );
     }
 
     /**

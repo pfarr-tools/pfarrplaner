@@ -42,6 +42,7 @@ use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
 use App\Models\Service;
+use App\Services\FileNameService;
 use App\Services\NameService;
 use App\Tools\StringTool;
 use Carbon\Carbon;
@@ -83,6 +84,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
      *
      */
     protected const NO_INDENT = 'Bekanntgaben ohne Einrückung';
+
+    public const FILE_TITLE = 'Bekanntgaben';
+    public const FILE_SIGNATURE = '91.8';
 
     /**
      * @var string
@@ -263,7 +267,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         $events = Occurence::with('event')
             ->between($service->date, $nextWeek)
-            ->whereHas('service', function($query) use ($service) {
+            ->whereHas('service', function ($query) use ($service) {
                 $query->inCity($service->city)->displayable($service->date);
             })
             ->orderBy('start')
@@ -593,8 +597,13 @@ Amen.'
         $this->renderFinalSong($service);
 
 
-        $filename = $service->date->format('Y_m_d') . ' Bekanntgaben';
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE,
+                null,
+                static::FILE_SIGNATURE,
+                $service->date)
+        );
     }
 
     /**
@@ -742,7 +751,6 @@ Amen.'
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
                 if ($item->data_type == 'reading') {
-
                     $this->renderParagraph(self::NO_INDENT, [
                         ['Schriftlesung aus ' . ($item->data['reference'] ?? ''), self::BOLD_UNDERLINE],
                     ]);
@@ -762,7 +770,7 @@ Amen.'
                     $this->renderParagraph(self::NO_INDENT, $run, 1);
                     $this->renderParagraph(self::NO_INDENT, [
                         ['Der Herr segne sein Wort an uns. Amen.', ['italic' => true]],
-                    ],1 );
+                    ],                     1);
                 }
             }
         }
@@ -795,42 +803,57 @@ Amen.'
     protected function renderOfferings(Service $service, $lastService, $offerings)
     {
         $lastService = Carbon::parse($lastService)->formatLocalized('%A');
-        if ($offerings == "0,00\u{A0}€") $offerings = '';
+        if ($offerings == "0,00\u{A0}€") {
+            $offerings = '';
+        }
         $this->renderParagraph(self::NO_INDENT, [
-            ['Das Opfer vom letzten '.$lastService.' ergab '.($offerings ?: '______________').'.', []]
-        ], );
+            ['Das Opfer vom letzten ' . $lastService . ' ergab ' . ($offerings ?: '______________') . '.', []]
+        ],);
         $this->renderParagraph(self::NO_INDENT, [
-            ['Das Opfer heute erbitten wir für: '.$service->offering_goal, []]
+            ['Das Opfer heute erbitten wir für: ' . $service->offering_goal, []]
         ]);
 
         if ($service->offering_text) {
             $this->renderParagraph();
             $this->renderParagraph(self::NO_INDENT, [
                 [$service->offering_text, []]
-            ], 1);
-
+            ],                     1);
         }
         $this->renderParagraph(self::NO_INDENT, [
             ['Herzlichen Dank für alles, was Sie geben.', []]
-        ], 1);
+        ],                     1);
     }
 
     protected function renderEvents($events)
     {
-        if (!count($events)) return;
-        $this->renderParagraph(self::NO_INDENT, [['Zu folgenden Veranstaltungen laden wir Sie ein:', ['italic' => true]]], 1);
+        if (!count($events)) {
+            return;
+        }
+        $this->renderParagraph(
+            self::NO_INDENT,
+            [['Zu folgenden Veranstaltungen laden wir Sie ein:', ['italic' => true]]],
+            1
+        );
         $days = [];
         foreach ($events as $event) {
             $days[$event->start->format('Ymd')][$event->start->format('Hi')] = $event;
         }
         foreach ($days as $events) {
-            $this->renderParagraph(self::NO_INDENT, [[array_values($events)[0]->start->formatLocalized('%A, %d. %B'), self::BOLD]]);
+            $this->renderParagraph(
+                self::NO_INDENT,
+                [[array_values($events)[0]->start->formatLocalized('%A, %d. %B'), self::BOLD]]
+            );
             foreach ($events as $event) {
-                $this->renderParagraph(self::INDENT, [[
-                    $event->event->timeText()."\t".Str::replace('&', '&amp;', $event->event->titleText(false))
-                        .(count($event->event->pastors ?? []) ? ' mit '.$this->getNameListLine($event->event->pastors) : '')
-                    .' ('.$event->event->locationText().')', []
-                ]]);
+                $this->renderParagraph(self::INDENT, [
+                    [
+                        $event->event->timeText() . "\t" . Str::replace('&', '&amp;', $event->event->titleText(false))
+                        . (count($event->event->pastors ?? []) ? ' mit ' . $this->getNameListLine(
+                                $event->event->pastors
+                            ) : '')
+                        . ' (' . $event->event->locationText() . ')',
+                        []
+                    ]
+                ]);
             }
         }
     }
@@ -847,12 +870,23 @@ Amen.'
                 if ($announcements && ($item->data_type == 'song')) {
                     $this->renderParagraph(self::NO_INDENT, [['Wir singen gemeinsam:', []]]);
                     $helper = new SongItemHelper($item);
-                    $this->renderParagraph(self::NO_INDENT, [[$helper->getTitleText() . (($item->data['verses'] ?? '') ? ', ' . $item->data['verses'] : ''), self::BOLD]]);
+                    $this->renderParagraph(
+                        self::NO_INDENT,
+                        [
+                            [
+                                $helper->getTitleText(
+                                ) . (($item->data['verses'] ?? '') ? ', ' . $item->data['verses'] : ''),
+                                self::BOLD
+                            ]
+                        ]
+                    );
                 }
-                $announcements = in_array($item->title, ['Abkündigungen', 'Ankündigungen', 'Bekanntgaben', 'Bekanntmachungen']);
+                $announcements = in_array(
+                    $item->title,
+                    ['Abkündigungen', 'Ankündigungen', 'Bekanntgaben', 'Bekanntmachungen']
+                );
             }
         }
-
     }
 
 }

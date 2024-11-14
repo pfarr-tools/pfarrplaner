@@ -32,6 +32,7 @@ namespace App\Reports;
 
 use App\Liturgy\Bible\BibleText;
 use App\Liturgy\Bible\ReferenceParser;
+use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -39,6 +40,10 @@ use Inertia\Inertia;
 
 class WeeklyVerseReport extends AbstractCSVReport
 {
+
+    public const FILE_TITLE = 'Wochensprueche';
+    public const FILE_SIGNATURE = '50.1';
+
 
     /**
      * @var string
@@ -85,7 +90,12 @@ class WeeklyVerseReport extends AbstractCSVReport
         $bible = new BibleText();
 
         return $this->csv(
-            $start->format('Ymd').'-'.$end->format('Ymd').' Wochensprueche.csv',
+            FileNameService::make(
+                static::FILE_TITLE,
+                'csv',
+                static::FILE_SIGNATURE,
+                [$start, $end],
+            ),
             $records,
             [
             'Datum' => function($item, $key) { return $key; },

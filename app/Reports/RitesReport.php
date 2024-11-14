@@ -33,6 +33,7 @@ namespace App\Reports;
 use App\Models\Liturgy\Text;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use App\Services\NameService;
 use Carbon\Carbon;
@@ -54,6 +55,10 @@ use PhpOffice\PhpWord\Style\Tab;
  */
 class RitesReport extends AbstractWordDocumentReport
 {
+
+    public const FILE_TITLE = 'Freud und Leid';
+    public const FILE_SIGNATURE = '91.8';
+
 
     /**
      * @var string
@@ -138,7 +143,7 @@ class RitesReport extends AbstractWordDocumentReport
         $this->renderFunerals(
             $section,
             Service::with('funerals')
-                ->whereHas('funerals', function($q) {
+                ->whereHas('funerals', function ($q) {
                     $q->where('funerals.type', '!=', 'Urnenbeisetzung');
                 })
                 ->whereIn('city_id', $this->data['includeCities'])
@@ -147,8 +152,15 @@ class RitesReport extends AbstractWordDocumentReport
                 ->get()
         );
 
-        $filename = $start->format('Ymd') . '-' . $end->format('Ymd') . ' Freud und Leid Gemeindebrief';
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE,
+                null,
+                static::FILE_SIGNATURE,
+                [$start, $end]
+            )
+
+        );
         return;
     }
 
@@ -249,7 +261,8 @@ class RitesReport extends AbstractWordDocumentReport
         }
     }
 
-    public function renderBaptismDates(Section $section, Collection $baptismalServices): void {
+    public function renderBaptismDates(Section $section, Collection $baptismalServices): void
+    {
         if (!count($baptismalServices)) {
             return;
         }
@@ -259,7 +272,7 @@ class RitesReport extends AbstractWordDocumentReport
         foreach ($this->data['includeCities'] as $cityId) {
             $city = City::find($cityId);
             $run->addText("\t");
-            $run->addText($city->name."\t\t");
+            $run->addText($city->name . "\t\t");
 
             $dates = [];
             foreach ($baptismalServices[$cityId] as $baptismalService) {
@@ -270,7 +283,6 @@ class RitesReport extends AbstractWordDocumentReport
             $run->addTextBreak();
         }
     }
-
 
 
     public function renderFunerals(Section $section, Collection $funerals): void

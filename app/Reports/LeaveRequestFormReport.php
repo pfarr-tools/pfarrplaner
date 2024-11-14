@@ -32,6 +32,7 @@ namespace App\Reports;
 
 
 use App\Models\Leave\Absence;
+use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,10 @@ use Mpdf\Mpdf;
 
 class LeaveRequestFormReport extends AbstractPDFDocumentReport
 {
+
+    public const FILE_SIGNATURE = '21.1';
+    public const FILE_TITLE = 'Urlaubsantrag';
+
 
     /**
      * @var string
@@ -86,11 +91,6 @@ class LeaveRequestFormReport extends AbstractPDFDocumentReport
         $packageConfig = json_decode(file_get_contents(base_path('package.json')), true);
         $data['version'] = $packageConfig['version'];
 
-
-        $fileName = $data['absence']->from->format('Ymd')
-            . ($data['absence']->to != $data['absence']->from ? '-' . $data['absence']->to->format('Ymd') : '')
-            . ' Urlaubsantrag ' . Auth::user()->name . '.pdf';
-
         $config = [
             'instanceConfigurator' => function ($mpdf) {
                 /** @var $mpdf Mpdf */
@@ -100,7 +100,15 @@ class LeaveRequestFormReport extends AbstractPDFDocumentReport
         ];
 
         $pdf = $this->renderPDF($data, $config);
-        return $pdf->download($fileName);
+
+        return $pdf->download(FileNameService::make(
+            self::FILE_TITLE,
+            'pdf',
+            self::FILE_SIGNATURE,
+            [$data['absence']->from, $data['absence']->to],
+            false,
+            Auth::user(),
+        ));
 
     }
 

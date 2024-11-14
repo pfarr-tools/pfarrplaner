@@ -41,7 +41,7 @@ export default {
         this.calendars.forEach(item => {
             if (undefined == setGroups[item.group]) {
                 setGroups[item.group] = true;
-                myGroups.push({group: item.group});
+                myGroups.push({groupName: item.group});
             }
         });
 
@@ -50,10 +50,10 @@ export default {
             mySettings: {
                 valueField: 'id',
                 labelField: 'name',
-                searchField: ['name', 'category'],
-                optgroupField: 'category',
-                optgroupLabelField: 'group',
-                optgroupValueField: 'group',
+                searchField: ['name', 'group'],
+                optgroupField: 'group',
+                optgroupLabelField: 'groupName',
+                optgroupValueField: 'groupName',
                 optgroups: myGroups,
                 options: this.calendars,
             }
@@ -64,7 +64,7 @@ export default {
 
 <template>
     <div class="calendar-select">
-        <selectize class="form-control ms-1 mt-1" v-model="myValue" :options="calendars" :settings="mySettings" @input="$emit('input', $event)"/>
+        <selectize class="form-control ms-1 mt-1" v-model="myValue" :options="calendars" :settings="mySettings" @input="$emit('input', $event)" multiple/>
     </div>
 </template>
 

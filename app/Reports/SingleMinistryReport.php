@@ -32,6 +32,7 @@ namespace App\Reports;
 
 use App\Models\People\Participant;
 use App\Models\Service;
+use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,6 +49,10 @@ use PhpOffice\PhpWord\Shared\Converter;
  */
 class SingleMinistryReport extends AbstractPDFDocumentReport
 {
+
+    public const FILE_TITLE = 'Dienstplan';
+    public const FILE_SIGNATURE = '50.0';
+
 
     /**
      * @var string
@@ -118,7 +123,12 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
     public function renderDataToPDF($data, $services)
     {
         return $this->sendToBrowser(
-            date('Ymd') . ' Dienstplan ' . join(',', $data['ministries']) . '.pdf',
+            FileNameService::make(
+                static::FILE_TITLE . ' ' . join(',', $data['ministries']),
+                'pdf',
+                static::FILE_SIGNATURE,
+                [$data['start'], $data['end']]
+            ),
             [
                 'start' => $data['start'],
                 'end' => $data['end'],
@@ -192,37 +202,46 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         foreach ($data['ministries'] as $ministryKey => $ministry) {
             $cols[$ministry] = 12;
         }
-        if (count($data['cities'])<2) unset($cols['-']);
+        if (count($data['cities']) < 2) {
+            unset($cols['-']);
+        }
 
         $c = 64;
         foreach ($cols as $header => $size) {
             $c++;
             $sheet->getColumnDimension(chr($c))->setWidth($size);
-            if ($header != '-')
-                $sheet->setCellValue(chr($c).$row, $header)->getStyle(chr($c).$row)
+            if ($header != '-') {
+                $sheet->setCellValue(chr($c) . $row, $header)->getStyle(chr($c) . $row)
                     ->getFont()->setBold(true);
+            }
         }
         $row++;
 
         foreach ($services as $service) {
-            $sheet->setCellValue('A'.$row, $service->date->format('d.m.Y'));
-            $sheet->setCellValue('B'.$row, $service->timeText());
+            $sheet->setCellValue('A' . $row, $service->date->format('d.m.Y'));
+            $sheet->setCellValue('B' . $row, $service->timeText());
             $c = 67;
             if (count($data['cities']) > 1) {
-                $sheet->setCellValue('C'.$row, $service->city->name);
+                $sheet->setCellValue('C' . $row, $service->city->name);
                 $c = 68;
             }
-            $sheet->setCellValue(chr($c).$row, $service->locationText());
+            $sheet->setCellValue(chr($c) . $row, $service->locationText());
             foreach ($data['ministries'] as $ministryKey => $ministry) {
                 $c++;
-                $sheet->setCellValue(chr($c).$row, $service->participantsText($ministryKey));
+                $sheet->setCellValue(chr($c) . $row, $service->participantsText($ministryKey));
             }
 
             $row++;
         }
 
 
-        $fileName = date('Ymd') . ' Dienstplan ' . join(',', $data['ministries']) . '.xlsx';
+        $fileName = FileNameService::make(
+            static::FILE_TITLE . ' ' . join(',', $data['ministries']),
+            'xlsx',
+            static::FILE_SIGNATURE,
+            [$data['start'], $data['end']]
+        );
+
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $fileName . '"');
         header('Cache-Control: max-age=0');

@@ -32,6 +32,7 @@ namespace App\Reports;
 
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\FileNameService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -43,6 +44,8 @@ use Inertia\Inertia;
  */
 class OfferingPlanReport extends AbstractPDFDocumentReport
 {
+    public const FILE_SIGNATURE = '77';
+    public const FILE_TITLE = 'Opferplan';
 
     /**
      * @var string
@@ -96,7 +99,15 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
         $maxDate = max($dates);
 
         return $this->sendToFile(
-            $data['year'] . ' Opferplan ' . $city->name . '.pdf',
+            FileNameService::make(
+                static::FILE_TITLE. ' '.$city->name,
+                'pdf',
+                static::FILE_SIGNATURE,
+                $data['year'].'-01-01',
+                false,
+                null,
+                'Y'
+            ),
             [
                 'start' => $minDate,
                 'end' => $maxDate,

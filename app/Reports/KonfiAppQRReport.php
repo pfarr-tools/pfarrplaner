@@ -34,6 +34,7 @@ use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Models\Calendar\Day;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\FileNameService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
@@ -51,6 +52,10 @@ use Inertia\Inertia;
  */
 class KonfiAppQRReport extends AbstractPDFDocumentReport
 {
+
+    public const FILE_SIGNATURE = '50';
+    public const FILE_TITLE = 'QR-Codes KonfiApp';
+
 
     /**
      * @var string
@@ -130,8 +135,13 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
         $types = KonfiAppIntegration::get(City::find($data['city']))->listEventTypes();
 
 
+
         return $this->sendToFile(
-            date('Ymd') . ' QR-Codes.pdf',
+            FileNameService::make(
+                static::FILE_TITLE,
+                'pdf',
+                static::FILE_SIGNATURE,
+                $service->date),
             [
                 'services' => $services,
                 'types' => $types,

@@ -33,6 +33,7 @@ namespace App\Reports;
 use App\Models\Places\City;
 use App\Models\Calendar\Day;
 use App\Models\Service;
+use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,6 +49,10 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
  */
 class OfferingAmountsReport extends AbstractExcelDocumentReport
 {
+    public const FILE_SIGNATURE = '77';
+    public const FILE_TITLE = 'Opfersummen';
+
+
     /**
      * @var string
      */
@@ -163,10 +168,14 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
         }
 
         // output
-        $filename = 'Opfersummen von ' . Carbon::parse($data['start'])->format('Y-m-d') . ' bis ' . Carbon::parse($data['end'])->format(
-                'Y-m-d'
-            ) . ' -- ' . $cities->pluck('name')->join(', ');
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                'xlsx',
+                static::FILE_SIGNATURE,
+                [$data['start'], $data['end']])
+
+        );
     }
 
 

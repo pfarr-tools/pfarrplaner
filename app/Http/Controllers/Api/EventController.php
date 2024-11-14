@@ -45,12 +45,25 @@ class EventController
         $start = Carbon::parse(Str::beforeLast($start, '('));
         $end = Carbon::parse(Str::beforeLast($end, '('));
 
-        $calendar = LocalEventCalendarFactory::get($calendar);
+        $calendars = explode(',', $calendar);
 
         $occurences = Occurence::with('event')
             ->between($start, $end)
-            ->whereHas('service', function ($query) use ($calendar) {
-                $query = $calendar->adjustQuery($query);
+            ->whereHas('service', function ($query) use ($calendars) {
+                $ct = 0;
+                foreach ($calendars as $calendarReference) {
+                    $calendar = LocalEventCalendarFactory::get($calendarReference);
+                    if ($ct == 0) {
+                        $query->where(function ($q) use ($calendar) {
+                            $q = $calendar->adjustQuery($q);
+                        });
+                    } else {
+                        $query->orWhere(function ($q) use ($calendar) {
+                            $q = $calendar->adjustQuery($q);
+                        });
+                    }
+                    $ct++;
+                }
             })
             ->orderBy('start')
             ->get();

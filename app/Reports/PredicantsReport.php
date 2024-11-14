@@ -33,6 +33,7 @@ namespace App\Reports;
 use App\Models\Places\City;
 use App\Models\Calendar\Day;
 use App\Models\Service;
+use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,6 +49,8 @@ use PhpOffice\PhpWord\Style\Section;
  */
 class PredicantsReport extends AbstractWordDocumentReport
 {
+    public const FILE_SIGNATURE = '50.0';
+    public const FILE_TITLE = 'Prädikant_innenanforderung';
 
     /**
      * @var string
@@ -188,8 +191,13 @@ class PredicantsReport extends AbstractWordDocumentReport
             }
         }
 
-        $filename = date('Ymd') . ' Prädikant_innenanforderung ' . $city->name;
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE.' '.$city->name,
+                null,
+                static::FILE_SIGNATURE,
+                [$data['start'], $data['end']])
+        );
     }
 
 }

@@ -37,6 +37,7 @@ use App\Models\Parish;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use App\Services\NameService;
 use Carbon\Carbon;
@@ -70,6 +71,7 @@ class BillBoardReport extends AbstractWordDocumentReport
     protected const BOLD_UNDERLINE = ['bold' => true, 'underline' => Font::UNDERLINE_SINGLE];
     protected const DEFAULT = 'Kirchzettel';
     protected const INDENT = 'Kirchzettel eingerückt';
+
     /**
      *
      */
@@ -78,6 +80,10 @@ class BillBoardReport extends AbstractWordDocumentReport
      *
      */
     protected const HEADING2 = 'Kirchzettel Überschrift 2';
+
+    public const FILE_SIGNATURE = '91.8';
+    public const FILE_TITLE = 'Kirchliche Nachrichten';
+
 
     /**
      * @var string
@@ -224,8 +230,13 @@ class BillBoardReport extends AbstractWordDocumentReport
         $this->renderAbsences($absences);
 
 
-        $filename = '91.8_' . $start->format('Ymd') . ' Kirchliche Nachrichten ' . $city->name;
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE.' '.$city->name,
+                null,
+                static::FILE_SIGNATURE,
+                Carbon::now())
+        );
     }
 
     protected function renderBibleText($start)

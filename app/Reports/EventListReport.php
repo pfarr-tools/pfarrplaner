@@ -32,6 +32,7 @@ namespace App\Reports;
 
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
+use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use App\Models\Places\City;
 use App\Models\Service;
@@ -68,6 +69,10 @@ class EventListReport extends AbstractWordDocumentReport
      *
      */
     protected const LIST2 = 'Termine';
+
+
+    public const FILE_SIGNATURE = '91.8';
+    public const FILE_TITLE = 'Terminliste';
 
     /**
      * @var string
@@ -355,8 +360,13 @@ class EventListReport extends AbstractWordDocumentReport
         }
 
 
-        $filename = $start->format('Y_m_d') . ' Terminliste';
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE.' '.$city->name,
+                null,
+                static::FILE_SIGNATURE,
+                Carbon::now())
+        );
     }
 
 

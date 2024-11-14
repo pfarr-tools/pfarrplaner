@@ -31,6 +31,7 @@
 namespace App\Reports;
 
 use App\Models\Calendar\Day;
+use App\Services\FileNameService;
 use App\Services\MinistryService;
 use App\Models\Places\City;
 use App\Models\Service;
@@ -41,6 +42,10 @@ use Inertia\Inertia;
 
 class MinistrySignupSheetReport extends AbstractPDFDocumentReport
 {
+
+    public const FILE_SIGNATURE = '50.0';
+    public const FILE_TITLE = 'Leerer Dienstplan';
+
 
     /**
      * @var string
@@ -86,7 +91,12 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
             ->whereIn('city_id', $data['cities']->pluck('id'))->ordered()->get();
 
         return $this->sendToBrowser(
-            date('Ymd') . ' Leerer Dienstplan ' . join(', ', $data['ministries']) . '.pdf',
+            FileNameService::make(
+                static::FILE_TITLE . ' ' . join(', ', $data['ministries']),
+                'pdf',
+                static::FILE_SIGNATURE,
+                [$data['start'], $data['end']]
+            ),
             $data,
             ['format' => 'A4-L']
         );

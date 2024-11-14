@@ -32,6 +32,7 @@ namespace App\Reports;
 
 
 use App\Models\Leave\Absence;
+use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,9 @@ use Mpdf\Mpdf;
 
 class TravelRequestFormReport extends AbstractPDFDocumentReport
 {
+    public const FILE_SIGNATURE = '21.3';
+    public const FILE_TITLE = 'Dienstreiseantrag';
+
 
     /**
      * @var string
@@ -88,10 +92,6 @@ class TravelRequestFormReport extends AbstractPDFDocumentReport
         $data['version'] = $packageConfig['version'];
 
 
-        $fileName = $data['absence']->from->format('Ymd')
-            . ($data['absence']->to != $data['absence']->from ? '-' . $data['absence']->to->format('Ymd') : '')
-            . ' Dienstreiseantrag ' . Auth::user()->name . '.pdf';
-
         $config = [
             'instanceConfigurator' => function ($mpdf) {
                 /** @var $mpdf Mpdf */
@@ -103,7 +103,14 @@ class TravelRequestFormReport extends AbstractPDFDocumentReport
         ];
 
         $pdf = $this->renderPDF($data, $config);
-        return $pdf->download($fileName);
+        return $pdf->download(FileNameService::make(
+            self::FILE_TITLE,
+            'pdf',
+            self::FILE_SIGNATURE,
+            [$data['absence']->from, $data['absence']->to],
+            false,
+            Auth::user(),
+        ));
 
     }
 

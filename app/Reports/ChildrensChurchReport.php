@@ -33,6 +33,7 @@ namespace App\Reports;
 use App\Models\Calendar\Day;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,6 +47,10 @@ use Inertia\Inertia;
  */
 class ChildrensChurchReport extends AbstractPDFDocumentReport
 {
+
+    public const FILE_SIGNATURE = '50.8';
+    public const FILE_TITLE = 'Kinderkirche';
+
 
     /**
      * @var string
@@ -112,7 +117,11 @@ class ChildrensChurchReport extends AbstractPDFDocumentReport
         }
 
         return $this->sendToBrowser(
-            date('Ymd') . ' Kinderkirche ' . $city->name . '.pdf',
+            FileNameService::make(
+                static::FILE_TITLE.' '.$city->name,
+                'pdf',
+                static::FILE_SIGNATURE,
+                now()),
             [
                 'start' => $minDate,
                 'end' => $maxDate,

@@ -34,6 +34,7 @@ use App\Models\People\Participant;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\FileNameService;
 use App\Services\NameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -45,6 +46,10 @@ use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
 class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
 {
+
+    public const FILE_TITLE = 'AZE-Statistik';
+    public const FILE_SIGNATURE = '39.4';
+
 
     /**
      * @var string
@@ -227,7 +232,13 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
         $filename = 'AZE-Statistik von ' . Carbon::parse($data['start'])->format('Y-m-d') . ' bis ' . Carbon::parse($data['end'])->format(
                 'Y-m-d'
             ) . ' -- ' . $cities->pluck('name')->join(', ');
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
+                null,
+                static::FILE_SIGNATURE,
+                [$data['start'], $data['end']]),
+        );
 
 
     }

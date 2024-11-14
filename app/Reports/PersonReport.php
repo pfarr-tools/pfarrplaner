@@ -33,6 +33,7 @@ namespace App\Reports;
 use App\Models\Calendar\Day;
 use App\Models\Service;
 use App\Models\People\User;
+use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,9 @@ use Inertia\Inertia;
  */
 class PersonReport extends AbstractPDFDocumentReport
 {
+
+    public const FILE_SIGNATURE = '50.0';
+    public const FILE_TITLE = 'Gottesdienstliste';
 
     /**
      * @var string
@@ -98,7 +102,11 @@ class PersonReport extends AbstractPDFDocumentReport
             ->get();
 
         return $this->sendToBrowser(
-            date('Ymd') . ' Gottesdienstliste ' . $request->get('highlight') . '.pdf',
+            FileNameService::make(
+                static::FILE_TITLE.' '. $request->get('highlight'),
+                'pdf',
+                static::FILE_SIGNATURE,
+                [$data['start'], $data['end']]),
             [
                 'start' => $request->get('start'),
                 'end' => $request->get('end'),

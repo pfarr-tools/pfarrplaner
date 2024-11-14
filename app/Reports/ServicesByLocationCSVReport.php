@@ -34,6 +34,7 @@ use App\Liturgy\Bible\BibleText;
 use App\Liturgy\Bible\ReferenceParser;
 use App\Models\Location;
 use App\Models\Service;
+use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -42,6 +43,8 @@ use Inertia\Inertia;
 
 class ServicesByLocationCSVReport extends AbstractCSVReport
 {
+    public const FILE_TITLE = 'Gottesdienste';
+    public const FILE_SIGNATURE = '50.0';
 
     /**
      * @var string
@@ -83,7 +86,12 @@ class ServicesByLocationCSVReport extends AbstractCSVReport
         Carbon::setLocale('de');
 
         return $this->csv(
-            $start->format('Ymd') . '-' . $end->format('Ymd') . ' ' . $location->name . ' Gottesdienste.csv',
+            FileNameService::make(
+                static::FILE_TITLE . ' ' . $location->name,
+                null,
+                static::FILE_SIGNATURE,
+                [$start, $end]
+            ),
             $services,
             [
                 'Datum' => function ($item, $key) {

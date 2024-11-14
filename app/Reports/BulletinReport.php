@@ -32,6 +32,7 @@ namespace App\Reports;
 
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -50,6 +51,8 @@ use PhpOffice\PhpWord\Style\Tab;
  */
 class BulletinReport extends AbstractWordDocumentReport
 {
+    public const FILE_SIGNATURE = '91.8';
+    public const FILE_TITLE = 'Gottesdienstliste Gemeindebrief';
 
     /**
      * @var string
@@ -158,8 +161,13 @@ class BulletinReport extends AbstractWordDocumentReport
             $textRun = $section->addTextRun('list');
         }
 
-        $filename = date('Ymd') . ' Gottesdienstliste Gemeindebrief';
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE,
+                null,
+                static::FILE_SIGNATURE,
+                $service->date)
+        );
     }
 
     /**
@@ -222,8 +230,14 @@ class BulletinReport extends AbstractWordDocumentReport
             }
         }
 
-        $filename = date('Ymd') . ' Gottesdienstliste Gemeindebrief';
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE,
+                null,
+                static::FILE_SIGNATURE,
+                Carbon::now())
+        );
+
     }
 
 
@@ -303,8 +317,13 @@ class BulletinReport extends AbstractWordDocumentReport
             }
         }
 
-        $filename = date('Ymd') . ' Gottesdienstliste Gemeindebrief';
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE,
+                null,
+                static::FILE_SIGNATURE,
+                $service->date)
+        );
     }
 
 }

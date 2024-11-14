@@ -44,7 +44,7 @@
                                                   :negative="localStreams.streams.length == 0 ? 'Kein aktiver Stream' : 'Mehrere aktive Streams'">
                             </checked-process-item>
                             <div v-for="stream in localStreams.streams" class="my-1">
-                                <div>{{ stream.service.titleText }}</div>
+                                <div>{{ stream.service.titleText || '' }}</div>
                                 <div>{{ moment(stream.service.date).locale('de').format('LLLL') }}</div>
                                 <div>{{ stream.service.locationText }}</div>
                             </div>

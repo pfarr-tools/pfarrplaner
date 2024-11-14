@@ -30,6 +30,7 @@
 
 namespace App\Reports;
 
+use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use App\Models\Places\City;
 use App\Models\Calendar\Day;
@@ -49,6 +50,10 @@ use PhpOffice\PhpSpreadsheet\Exception;
  */
 class FuneralsRelativesReport extends AbstractExcelDocumentReport
 {
+    public const FILE_SIGNATURE = '51.6';
+    public const FILE_TITLE = 'Beerdigungen';
+
+
     /**
      * @var string
      */
@@ -164,8 +169,15 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
         }
 
         // output
-        $filename = 'Beerdigungen ab ' . $start->format('Y-m-d') . ', ' . $city->name.'.xlsx';
-        $this->sendToBrowser($filename);
+        $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE.' '.$city->name.' ab '.$start->format('Y-m-d'),
+                null,
+                static::FILE_SIGNATURE,
+                now())
+        );
+
+
     }
 
 

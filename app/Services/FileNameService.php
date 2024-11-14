@@ -36,12 +36,15 @@ use Carbon\Carbon;
 class FileNameService
 {
 
-    public static function make($title, $extension, $callSign = '', $date = null, $withTime = false, $person = null): string {
-        if ($date) {
-            if (!is_a($date, Carbon::class)) $date = Carbon::parse($date);
-            $date = $date->format($withTime ? 'Ymd-Hi': 'Ymd').' ';
-        } else {
-            $date = ' ';
+    public static function make($title, $extension, $callSign = '', $dates = null, $withTime = false, $person = null, $forceDateFormat = null): string {
+        if ($dates) {
+            if (!is_array($dates)) $dates = [$dates];
+            foreach ($dates as $index => $date) {
+                if (!is_a($date, Carbon::class)) $date = Carbon::parse($date);
+                $dateFormat = $forceDateFormat ?? ($withTime ? 'Ymd-Hi': 'Ymd');
+                $dates[$index] = $date->setTimezone('Europe/Berlin')->format($dateFormat);
+            }
+            $date = join('-', $dates).' ';
         }
 
         if ($person) {
@@ -51,8 +54,8 @@ class FileNameService
         }
 
 
-        return ($callSign ? $callSign.($date ? '_' : ' ') : '')
-            .$date.$name.$title.'.'.$extension;
+        return ($callSign ? $callSign.($date ? '_' : '') : '')
+            .($date ?? ' ').$name.$title.($extension ? '.'.$extension : '');
 
     }
 

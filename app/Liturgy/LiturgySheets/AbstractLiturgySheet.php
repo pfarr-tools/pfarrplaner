@@ -32,11 +32,13 @@ namespace App\Liturgy\LiturgySheets;
 
 
 use App\Models\Service;
+use App\Services\FileNameService;
 use Illuminate\Support\Facades\Auth;
 use PDF;
 
 class AbstractLiturgySheet
 {
+    public const FILE_SIGNATURE = '50.0';
 
     protected $title = '';
 
@@ -96,8 +98,13 @@ class AbstractLiturgySheet
 
     public function getFileName(Service $service, $title = null)
     {
-        return $service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi').' '.($title ?? $this->getFileTitle())
-            .($this->extension ? '.'.$this->extension : '');
+        return FileNameService::make(
+            ($title ?? $this->getFileTitle()),
+            ($this->extension ? '.'.$this->extension : ''),
+            self::FILE_SIGNATURE,
+            $service->date,
+            true
+        );
     }
 
     /**

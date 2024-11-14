@@ -30,6 +30,7 @@
 
 namespace App\Reports;
 
+use App\Services\FileNameService;
 use App\Services\MinistryService;
 use App\Models\People\ListedPerson;
 use App\Models\People\Participant;
@@ -51,6 +52,10 @@ use Inertia\Inertia;
  */
 class ReplaceableServicesReport extends AbstractPDFDocumentReport
 {
+
+    public const FILE_TITLE = 'Gottesdienstvertretung';
+    public const FILE_SIGNATURE = '50.0';
+
 
     /**
      * @var string
@@ -123,7 +128,14 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
             })->orderBy('date')->get();
 
         return $this->sendToBrowser(
-            date('Ymd') . ' Zu vertretende Dienste ' . $request->get('highlight') . '.pdf',
+            FileNameService::make(
+                static::FILE_TITLE,
+                'pdf',
+                static::FILE_SIGNATURE,
+                [$request->get('start'), $request->get('end')],
+                false,
+                $user
+            ),
             [
                 'start' => $request->get('start'),
                 'end' => $request->get('end'),
