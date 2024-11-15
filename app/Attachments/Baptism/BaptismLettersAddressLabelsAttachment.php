@@ -39,9 +39,9 @@ use PhpOffice\PhpWord\Shared\Converter;
 
 class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
 {
-
     protected static $title = 'Adressetiketten für Taufbriefe';
     protected static $description = 'Für die Taufjubiläen im 1.-9. Jahr nach der Taufe';
+    protected static $fileTitle = 'Adressetiketten für Taufbriefe';
     protected static $extension = 'docx';
     protected static $icon = 'mdi mdi-file-word';
     protected static $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -78,13 +78,6 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
         '#ff92bb',
     ];
 
-    public function __construct(Baptism $baptism)
-    {
-        parent::__construct($baptism);
-        static::$fileTitle = $baptism->service->date->format(
-                'Ymd'
-            ) . ' ' . $baptism->candidate_name . ' ' . static::$title;
-    }
 
     public function download()
     {

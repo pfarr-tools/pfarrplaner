@@ -36,6 +36,8 @@ use App\Services\FileNameService;
 
 abstract class AbstractBaptismAttachment extends AbstractAttachment
 {
+    public const FILE_SIGNATURE = '51.1';
+
     /** @var Baptism $baptism */
     protected $baptism;
 
@@ -55,7 +57,7 @@ abstract class AbstractBaptismAttachment extends AbstractAttachment
         return FileNameService::make(
             static::$fileTitle ?: static::$title,
             static::$extension,
-            static::$callSign,
+            self::FILE_SIGNATURE,
             $this->baptism->service->date,
             false,
             $this->baptism->candidate_name

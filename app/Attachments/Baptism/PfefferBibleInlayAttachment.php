@@ -47,7 +47,6 @@ class PfefferBibleInlayAttachment extends AbstractBaptismAttachment
     protected static $extension = 'docx';
     protected static $icon = 'mdi mdi-file-word';
     protected static $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-    protected static $callSign = '51.1';
 
     protected const FONT18 = ['name' => 'Lucida Handwriting', 'size' => 18, 'bold' => true];
     protected const FONT20 = ['name' => 'Lucida Handwriting', 'size' => 20, 'bold' => true];
