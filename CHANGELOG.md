@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.23.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.22.1...v2024.23.0) (2024-11-15)
+
+
+### Features
+
+* Aktenzeichen für Dokumente zur Taufe ([29b5636](https://codeberg.org/pfarr.tools/pfarrplaner/commit/29b56367c1618ba1470268d074e948452995a340))
+
 ### [2024.22.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.22.0...v2024.22.1) (2024-11-14)
 
 
