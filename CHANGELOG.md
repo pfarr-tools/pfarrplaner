@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.23.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.23.0...v2024.23.1) (2024-11-20)
+
+
+### Bug Fixes
+
+* Terminliste zeigt bei externen Veranstaltungen den Ort nicht korrekt an ([64ada48](https://codeberg.org/pfarr.tools/pfarrplaner/commit/64ada48baa2858423b02d0c54cb2355a9ac66bc5))
+
 ## [2024.23.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.22.1...v2024.23.0) (2024-11-15)
 
 
