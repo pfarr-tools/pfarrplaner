@@ -57,7 +57,7 @@ class FoldedFlyerWordDocument extends DefaultWordDocument
         switch ($style) {
             case 'heading1':
                 return [
-                    'name' => 'Helvetica Condensed',
+                    'name' => 'Sarabun Light',
                     'size' => 20,
                     'bold' => false,
                     'italic' => false,
@@ -65,7 +65,7 @@ class FoldedFlyerWordDocument extends DefaultWordDocument
                 ];
             case 'heading2':
                 return [
-                    'name' => 'Helvetica Condensed',
+                    'name' => 'Sarabun Light',
                     'size' => 14,
                     'bold' => false,
                     'italic' => false,
@@ -73,7 +73,7 @@ class FoldedFlyerWordDocument extends DefaultWordDocument
                 ];
             case 'heading3':
                 return [
-                    'name' => 'Helvetica Condensed',
+                    'name' => 'Sarabun Light',
                     'size' => 12,
                     'bold' => false,
                     'italic' => false,
@@ -81,7 +81,7 @@ class FoldedFlyerWordDocument extends DefaultWordDocument
                 ];
             case 'heading4':
                 return [
-                    'name' => 'Helvetica Condensed',
+                    'name' => 'Sarabun Light',
                     'size' => 11,
                     'bold' => true,
                     'italic' => false,

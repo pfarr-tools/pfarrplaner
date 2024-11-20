@@ -186,7 +186,7 @@ class BulletinReport extends AbstractWordDocumentReport
                 'spaceAfter' => 0,
             ]
         );
-        $this->wordDocument->setDefaultFontName('Helvetica Condensed');
+        $this->wordDocument->setDefaultFontName('Sarabun Light');
         $this->wordDocument->setDefaultFontSize(10);
         $section = $this->wordDocument->addSection(
             [

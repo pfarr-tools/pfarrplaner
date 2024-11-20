@@ -8,7 +8,7 @@
         }
 
         body {
-            font-family: helveticacondensed;
+            font-family: sarabunlight;
         }
 
         table { font-size: 1.2em;}

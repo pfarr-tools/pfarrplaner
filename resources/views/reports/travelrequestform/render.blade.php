@@ -9,7 +9,7 @@
         }
 
         body {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: sarabunlight, Arial, Helvetica, sans-serif;
             font-size: 7.5pt;
         }
 

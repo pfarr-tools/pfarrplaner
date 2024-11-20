@@ -87,7 +87,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                 '{PAGE}',
                 [
                     'size' => 8,
-                    'name' => 'Helvetica Condensed'
+                    'name' => 'Sarabun Light'
                 ],
                 [
                     'align' => 'right',
@@ -98,7 +98,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                 '{PAGE}',
                 [
                     'size' => 8,
-                    'name' => 'Helvetica Condensed'
+                    'name' => 'Sarabun Light'
                 ],
                 [
                     'align' => 'left',

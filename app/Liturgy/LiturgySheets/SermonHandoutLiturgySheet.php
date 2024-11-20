@@ -209,10 +209,10 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         $table->addRow(Converter::cmToTwip($centerHeight));
         $cell = $table->addCell(Converter::cmToTwip(9.75), ['gridSpan' => 2, 'valign' => 'center']);
         $run = $cell->addTextRun([]);
-        $run->addText($this->service->sermon->title ?? 'Predigttitel', ['name' => 'Helvetica Condensed', 'size' => 20, 'bold' => true, 'color' => '951981']);
+        $run->addText($this->service->sermon->title ?? 'Predigttitel', ['name' => 'Sarabun Semibold', 'size' => 20, 'bold' => false, 'color' => '951981']);
         if ($this->service->sermon->subtitle) {
             $run->addTextBreak();
-            $run->addText($this->service->sermon->subtitle , ['name' => 'Helvetica Condensed', 'size' => 20, 'bold' => false, 'color' => '951981']);
+            $run->addText($this->service->sermon->subtitle , ['name' => 'Sarabun Light', 'size' => 20, 'bold' => false, 'color' => '951981']);
         }
         if ($this->service->sermon->image) {
             $run->addTextBreak();

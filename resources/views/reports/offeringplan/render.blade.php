@@ -4,7 +4,7 @@
     <title>Opferplan {{ $year }} für {{ $city->name }}</title>
     <style>
         body, * {
-            font-family: helveticacondensed;
+            font-family: sarabunlight;
         }
         .table {
             border-collapse: collapse;

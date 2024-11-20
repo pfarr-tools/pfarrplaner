@@ -6,7 +6,7 @@
         }
 
         body, * {
-            font-family: 'helveticacondensed', sans-serif;
+            font-family: 'sarabunlight', sans-serif;
             text-align: center;
         }
 

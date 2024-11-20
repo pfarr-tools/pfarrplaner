@@ -93,7 +93,7 @@ class DefaultWordDocument
 
     protected function setDefaultDocumentStyles($config = [])
     {
-        $this->phpWord->setDefaultFontName($config['defaultFont'] ?? 'Helvetica Condensed');
+        $this->phpWord->setDefaultFontName($config['defaultFont'] ?? 'Sarabun Light');
         $this->phpWord->setDefaultFontSize($config['defaultFontSize'] ?? 11);
 
         // Standard
@@ -113,7 +113,7 @@ class DefaultWordDocument
         );
 
         $this->phpWord->addFontStyle(self::NORMAL, [
-            'name' => 'Helvetica Condensed',
+            'name' => 'Sarabun Light',
             'size' => 11,
             'bold' => false,
             'italic' => false,
@@ -124,9 +124,9 @@ class DefaultWordDocument
 
         // Überschrift 2
         $this->phpWord->addTitleStyle(2, [
-            'name' => 'Helvetica Condensed',
+            'name' => 'Sarabun Semibold',
             'size' => 13,
-            'bold' => true,
+            'bold' => false,
             'italic' => false,
         ],                            [
                                           'alignment' => Jc::START,
@@ -144,9 +144,9 @@ class DefaultWordDocument
 
         // Überschrift 3
         $this->phpWord->addTitleStyle(3, [
-            'name' => 'Helvetica Condensed',
+            'name' => 'Sarabun Semibold',
             'size' => 12,
-            'bold' => true,
+            'bold' => false,
             'italic' => false,
         ],                            [
                                           'alignment' => Jc::START,
@@ -177,7 +177,7 @@ class DefaultWordDocument
         ]);
 
         $this->phpWord->addFontStyle(self::BLOCKQUOTE, [
-            'name' => 'Helvetica Condensed',
+            'name' => 'Sarabun Light',
             'size' => 10,
             'bold' => false,
             'italic' => false,
@@ -388,9 +388,9 @@ class DefaultWordDocument
         switch ($style) {
             case 'heading1':
                 return [
-                    'name' => 'Helvetica Condensed',
+                    'name' => 'Sarabun Semibold',
                     'size' => 16,
-                    'bold' => true,
+                    'bold' => false,
                     'italic' => false,
                 ];
         }

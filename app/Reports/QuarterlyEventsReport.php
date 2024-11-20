@@ -107,7 +107,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
             ->groupBy('key_date');
 
 
-        $this->wordDocument->setDefaultFontName('Helvetica Condensed');
+        $this->wordDocument->setDefaultFontName('Sarabun Light');
         $this->wordDocument->setDefaultFontSize(14);
         $section = $this->wordDocument->addSection(
             [

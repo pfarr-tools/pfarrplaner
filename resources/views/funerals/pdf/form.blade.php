@@ -9,11 +9,11 @@
         }
 
         body, * {
-            font-family: 'helveticacondensed', sans-serif;
+            font-family: 'sarabunlight', sans-serif;
         }
 
         h1 {
-            font-family: 'helveticacondensed', sans-serif;
+            font-family: 'sarabunlight', sans-serif;
             font-size: 18px;
         }
 

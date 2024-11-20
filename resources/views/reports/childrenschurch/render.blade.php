@@ -4,7 +4,7 @@
     <title>Kinderkirche {{ $city->name }} :: Pfarrplaner</title>
     <style>
         body, * {
-            font-family: helveticacondensed;
+            font-family: sarabunlight;
         }
         .table {
             border-collapse: collapse;

@@ -3,7 +3,7 @@
 <head>
     <style>
         @font-face {
-            font-face-name: 'Helvetica Condensed';
+            font-face-name: 'Sarabun Light';
         }
 
         @page {
@@ -16,7 +16,7 @@
         body {
             line-height: 1.1em;
             font-size: 11pt;
-            font-family: 'Helvetica Condensed', sans-serif;
+            font-family: 'Sarabun Light', sans-serif;
         }
 
         h1 {

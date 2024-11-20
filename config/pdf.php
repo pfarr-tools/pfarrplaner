@@ -43,6 +43,22 @@ return [
             'R' => 'HelveticaCondensed.ttf',
             'B' => 'HelveticaCdBd.ttf',
         ],
+        'sarabunlight' => [
+            'R' => 'Sarabun-Light.ttf',
+            'I' => 'Sarabun-LightItalic.ttf',
+        ],
+        'sarabunsemibold' => [
+            'R' => 'Sarabun-SemiBold.ttf',
+            'I' => 'Sarabun-SemiBoldItalic.ttf',
+        ],
+        'Sarabun Light' => [
+            'R' => 'Sarabun-Light.ttf',
+            'I' => 'Sarabun-LightItalic.ttf',
+        ],
+        'Sarabun Semibold' => [
+            'R' => 'Sarabun-SemiBold.ttf',
+            'I' => 'Sarabun-SemiBoldItalic.ttf',
+        ],
         'ptsans' => [
             'R' => 'PTSans-Regular.ttf',
             'I' => 'PTSans-Italic.ttf',

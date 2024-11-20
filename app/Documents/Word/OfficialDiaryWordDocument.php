@@ -64,7 +64,7 @@ class OfficialDiaryWordDocument extends DefaultWordDocument
 
     protected function setDefaultDocumentStyles()
     {
-        $this->phpWord->setDefaultFontName('Helvetica Condensed');
+        $this->phpWord->setDefaultFontName('Sarabun Light');
         $this->phpWord->setDefaultFontSize(11);
 
         // Standard
@@ -118,9 +118,9 @@ class OfficialDiaryWordDocument extends DefaultWordDocument
 
         // Überschrift 2
         $this->phpWord->addTitleStyle(2, [
-            'name' => 'Helvetica Condensed',
+            'name' => 'Sarabun Semibold',
             'size' => 13,
-            'bold' => true,
+            'bold' => false,
             'italic' => false,
         ],                            [
                                           'alignment' => Jc::START,
@@ -138,9 +138,9 @@ class OfficialDiaryWordDocument extends DefaultWordDocument
 
         // Überschrift 3
         $this->phpWord->addTitleStyle(3, [
-            'name' => 'Helvetica Condensed',
+            'name' => 'Sarabun Semibold',
             'size' => 12,
-            'bold' => true,
+            'bold' => false,
             'italic' => false,
         ],                            [
                                           'alignment' => Jc::START,
@@ -171,7 +171,7 @@ class OfficialDiaryWordDocument extends DefaultWordDocument
         ]);
 
         $this->phpWord->addFontStyle(self::BLOCKQUOTE, [
-            'name' => 'Helvetica Condensed',
+            'name' => 'Sarabun Light',
             'size' => 10,
             'bold' => false,
             'italic' => false,

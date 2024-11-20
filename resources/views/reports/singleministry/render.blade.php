@@ -2,7 +2,7 @@
 <head>
     <style>
         body, * {
-            font-family: 'helveticacondensed', sans-serif;
+            font-family: 'sarabunlight', sans-serif;
         }
         tr.even {
             background-color: lightgray;

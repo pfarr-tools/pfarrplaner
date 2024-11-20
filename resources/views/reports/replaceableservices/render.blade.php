@@ -2,7 +2,7 @@
 <head>
     <style>
         body, * {
-            font-family: 'helveticacondensed', sans-serif;
+            font-family: 'sarabunlightbunlight', sans-serif;
             font-size: 1.2em;
         }
         td {
