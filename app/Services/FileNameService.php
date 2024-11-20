@@ -36,7 +36,8 @@ use Carbon\Carbon;
 class FileNameService
 {
 
-    public static function make($title, $extension, $callSign = '', $dates = null, $withTime = false, $person = null, $forceDateFormat = null): string {
+    public static function make($title, $extension='', $callSign = '', $dates = null, $withTime = false, $person = null, $forceDateFormat = null): string {
+        if ((!empty($extension)) && (substr($extension, 0, 1) != '.')) $extension = '.' . $extension;
         if ($dates) {
             if (!is_array($dates)) $dates = [$dates];
             foreach ($dates as $index => $date) {
@@ -55,7 +56,7 @@ class FileNameService
 
 
         return ($callSign ? $callSign.($date ? '_' : '') : '')
-            .($date ?? ' ').$name.$title.($extension ? '.'.$extension : '');
+            .($date ?? ' ').$name.$title.($extension ?: '');
 
     }
 
