@@ -140,7 +140,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: .35rem;
+     border-radius: 0;
     font-weight: bold;
     color: darkgray;
 

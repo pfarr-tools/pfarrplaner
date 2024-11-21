@@ -141,6 +141,6 @@ export default {
         width: 10px;
         border: solid 1px lightgray;
         background-color: transparent;
-        border-radius: .25em;
+         border-radius: 0;
     }
 </style>

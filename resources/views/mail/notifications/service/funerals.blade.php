@@ -28,7 +28,7 @@
         </tr>
         <tr>
             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;" align="left" valign="top" colspan="2">
-                <a style="padding: 5px; border-radius: 5px; background-color: #a61380; color: white;" href="{{ route('funerals.edit', $funeral) }}">Bestattung im Pfarrplaner öffnen</a>
+                <a style="padding: 5px;  border-radius: 0; background-color: #a61380; color: white;" href="{{ route('funerals.edit', $funeral) }}">Bestattung im Pfarrplaner öffnen</a>
             </td>
         </tr>
         </tbody>

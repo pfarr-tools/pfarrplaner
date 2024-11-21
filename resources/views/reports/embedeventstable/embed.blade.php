@@ -10,7 +10,7 @@
         font-size: .8em;
         border: solid 1px darkgray;
         padding: 4px 7px;
-        border-radius: 3px;
+         border-radius: 0;
         color: black;
         cursor: pointer;
     }
@@ -18,7 +18,7 @@
         font-size: 1.2em;
         border: solid 1px darkgray;
         padding: 4px 7px;
-        border-radius: 3px;
+         border-radius: 0;
         cursor: pointer;
     }
     .youtube-button .fab {

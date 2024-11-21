@@ -80,8 +80,8 @@ export default {
     border: solid 1px gray;
     min-width: 10px;
     min-height: 10px;
-    border-radius: 5px;
-    border-radius: .5em;
+     border-radius: 0;
+     border-radius: 0;
 }
 >>> .liturgy-color.white {
     background-color: white;

@@ -407,7 +407,7 @@ export default {
     width: 100%;
     min-height: 2.2rem;
     border: 1px solid #ced4da;
-    border-radius: .25rem;
+     border-radius: 0;
     padding: .2rem .75rem;
 }
 

@@ -14,7 +14,7 @@
             .youtube-button {
             display: inline-block;
             margin-top: 1px; margin-bottom: 3px;
-            border: solid 1px darkgray; background-color: white; padding: 7px; border-radius: 3px;
+            border: solid 1px darkgray; background-color: white; padding: 7px;  border-radius: 0;
             }
             .youtube-button:hover {
             background-color: #dddddd;
@@ -23,7 +23,7 @@
             font-size: .8em;
             border: solid 1px darkgray;
             padding: 4px 7px;
-            border-radius: 3px;
+             border-radius: 0;
             color: black;
             }
             .fa-info-circle {

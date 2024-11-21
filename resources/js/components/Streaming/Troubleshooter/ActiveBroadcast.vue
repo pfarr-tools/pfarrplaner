@@ -90,7 +90,7 @@
             </checked-process-item>
         </div>
         <div v-else>
-            <checked-process-item :check="false" color-negative="#ffc107" icon-negative="mdi mdi-alert">
+            <checked-process-item :check="false" color-negative="#f5d403" icon-negative="mdi mdi-alert">
                 <template slot="negative">
                     Dieser Stream wurde nicht über den Pfarrplaner angelegt und ist auch keinem Gottesdienst zugeordnet.
                     Eventuell handelt es sich um eine besondere Veranstaltung. Wenn nicht, solltest du überprüfen, ob

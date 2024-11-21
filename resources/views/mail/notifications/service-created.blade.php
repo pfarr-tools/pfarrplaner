@@ -639,7 +639,7 @@
 
 
                                     <table class="card " border="0" cellpadding="0" cellspacing="0"
-                                           style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important; border-radius: 4px; width: 100%; overflow: hidden; border: 1px solid #dee2e6;"
+                                           style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important;  border-radius: 0; width: 100%; overflow: hidden; border: 1px solid #dee2e6;"
                                            bgcolor="#ffffff">
                                         <tbody>
                                         <tr>
@@ -925,7 +925,7 @@
                                     @if($user->can('gd-kasualien-lesen') || $user->can('gd-kasualien-bearbeiten'))
                                         @if($service->baptisms->count() || $service->funerals->count() || $service->weddings->count())
                                             <table class="card w-100 " border="0" cellpadding="0" cellspacing="0"
-                                                   style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important; border-radius: 4px; width: 100%; overflow: hidden; border: 1px solid #dee2e6;"
+                                                   style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important;  border-radius: 0; width: 100%; overflow: hidden; border: 1px solid #dee2e6;"
                                                    bgcolor="#ffffff">
                                                 <tbody>
                                                 <tr>
@@ -1224,7 +1224,7 @@
 
 
                                     <table class="card w-100 " border="0" cellpadding="0" cellspacing="0"
-                                           style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important; border-radius: 4px; width: 100%; overflow: hidden; border: 1px solid #dee2e6;"
+                                           style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important;  border-radius: 0; width: 100%; overflow: hidden; border: 1px solid #dee2e6;"
                                            bgcolor="#ffffff">
                                         <tbody>
                                         <tr>
@@ -1262,19 +1262,19 @@
                                                                     <table class="btn btn-primary btn-lg mx-auto "
                                                                            align="center" border="0" cellpadding="0"
                                                                            cellspacing="0"
-                                                                           style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important; border-radius: 4px; margin: 0 auto;">
+                                                                           style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important;  border-radius: 0; margin: 0 auto;">
                                                                         <tbody>
                                                                         <tr>
-                                                                            <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-radius: 4px; margin: 0;"
+                                                                            <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px;  border-radius: 0; margin: 0;"
                                                                                 align="center" bgcolor="#007bff">
                                                                                 @if($user->can('update', $service))
                                                                                     <a
                                                                                             href="{{ route('service.edit', $service) }}"
-                                                                                            style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 4.8px; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Diesen
+                                                                                            style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none;  border-radius: 0; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Diesen
                                                                                         Gottesdienst ansehen</a>
                                                                                 @else
                                                                                     <a href="{{ route('calendar') }}"
-                                                                                       style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none; border-radius: 4.8px; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Kalender
+                                                                                       style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none;  border-radius: 0; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Kalender
                                                                                         öffnen</a>
                                                                                 @endif
                                                                             </td>

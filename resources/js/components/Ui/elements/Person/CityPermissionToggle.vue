@@ -73,7 +73,7 @@ export default {
         background-color: lightyellow;
     }
     .btn-light.rights-read.active {
-        background-color: #ffc107;
+        background-color: #f5d403;
     }
     .btn-light.rights-write:hover {
         background-color: lightgreen;

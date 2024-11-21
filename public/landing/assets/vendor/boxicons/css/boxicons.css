@@ -539,14 +539,14 @@
     padding: .25em;
 
     border: .07em solid rgba(0,0,0,.1);
-    border-radius: .25em;
+     border-radius: 0;
 }
 .bx-border-circle
 {
     padding: .25em;
 
     border: .07em solid rgba(0,0,0,.1);
-    border-radius: 50%;
+     border-radius: 0;
 }
 
   .bxl-500px:before {

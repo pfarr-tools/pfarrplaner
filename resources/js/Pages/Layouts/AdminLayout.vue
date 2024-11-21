@@ -192,7 +192,7 @@
 
 <script>
 
-import 'admin-lte/dist/css/adminlte.css';
+import '../../../sass/adminlte.scss';
 import 'admin-lte/dist/js/adminlte.min';
 
 export default {

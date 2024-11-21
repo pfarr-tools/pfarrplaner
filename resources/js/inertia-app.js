@@ -47,7 +47,7 @@ import CalendarServiceBaptism from './components/Calendar/Service/Baptism.vue';
 import CalendarControlCitySort from './components/Calendar/Control/CitySort';
 
 import datePicker from 'vue-bootstrap-datetimepicker';
-import 'bootswatch/dist/pulse/bootstrap.min.css'
+//import 'bootswatch/dist/pulse/bootstrap.min.css'
 import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.min.css';
 import "@mdi/font/css/materialdesignicons.min.css"
 

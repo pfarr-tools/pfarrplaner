@@ -272,15 +272,13 @@ body.calendar .content-header {
 .calendar-month .vacation  {
     display: inline-block;
     font-weight: normal;
-    background-color: orange;
+    background-color: #dc9018;
     font-size: 0.7em;
     padding: 2px;
-    border: solid 1px darkorange;
-    border-radius: 2px;
 }
 
 span.vacation-conflict {
-    background-color: orange;
+    background-color: #dc9018;
     text-decoration: underline;
     text-decoration-color: red;
 }
@@ -299,7 +297,7 @@ span.vacation-conflict {
     width: 10px;
     height: 10px;
     border: solid 1px transparent;
-    border-radius: 5px;
+     border-radius: 0;
 }
 
 .calendar-month td.now,
@@ -309,7 +307,7 @@ span.vacation-conflict {
 
 .calendar-month .service-entry {
     background-color: white;
-    border: solid 1px darkgray;
+    border: solid 1px #474f60;
     padding: 5px;
     margin-bottom: 3px;
 }
@@ -338,14 +336,13 @@ span.vacation-conflict {
 }
 
 .calendar-month .service-entry.funeral {
-    background-color: darkgray;
+    background-color: #474f60;
     color: white;
 }
 
 .calendar-month .service-entry.funeral.mine {
-    background-color: #a9cda9;
-    color: white !important;
-    border: solid 8px var(--bs-success);
+    background-color: #a9cda9 !important;
+    color: black !important;
 }
 
 .calendar-month .service-entry h3 {
@@ -425,9 +422,9 @@ span.vacation-conflict {
 }
 
 pre {
-    border: solid 1px darkgray;
+    border: solid 1px #474f60;
     padding: 5px;
-    border-radius: 3px;
+     border-radius: 0;
 }
 
 ol.steps li {
@@ -443,7 +440,7 @@ ol.steps img {
 }
 
 .service-row.no-cc {
-    color: darkgray;
+    color: #474f60;
 }
 
 .data-row.no-cc {
@@ -485,7 +482,7 @@ ul.sortable li {
     list-style: none;
     padding: 5px;
     margin: 1px;
-    border-radius: 3px;
+     border-radius: 0;
 }
 
 ul.sortable li:hover {
@@ -545,14 +542,14 @@ ul.sortable li.placeholder:before {
 
 
 .tbl-absences .cal-cell.absent {
-    background-color: orange;
-    border-right-color: orange;
+    background-color: #dc9018;
+    border-right-color: #dc9018;
 }
 
 
 .tbl-absences .cal-cell.absent.editable:hover {
-    background-color: darkorange;
-    border-right-color: darkorange;
+    background-color: #dc9018;
+    border-right-color: #dc9018;
     cursor: pointer;
 }
 
@@ -610,7 +607,7 @@ ul.sortable li.placeholder:before {
 }
 
 #absencesTab a.active {
-    background-color: orange;
+    background-color: #dc9018;
 }
 
 .card-counter{
@@ -619,7 +616,7 @@ ul.sortable li.placeholder:before {
     padding: 20px 10px;
     background-color: #fff;
     height: 100px;
-    border-radius: 5px;
+     border-radius: 0;
     transition: .3s linear all;
 }
 
@@ -724,7 +721,7 @@ body.login .main-sidebar:hover .login-form.hidden-collapsed {
 }
 
 .badge-permission-r {
-    background-color: orange !important;
+    background-color: #dc9018 !important;
 }
 
 .badge-permission-n {
@@ -742,11 +739,11 @@ tr.changed, tr.changed td, tr.changed th {
 .content .footer {
     padding-left: 10px;
     font-size: .6em;
-    color: darkgray;
+    color: #474f60;
 }
 
 .content .footer a {
-    color: darkgray;
+    color: #474f60;
     font-weight: bold;
 }
 
@@ -777,6 +774,7 @@ tr.changed, tr.changed td, tr.changed th {
 
 .calendar-vertical .day-header-cell {
     max-width: 150px;
+    padding-top: 0 !important;
 }
 
 

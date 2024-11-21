@@ -39,7 +39,7 @@
 import FormGroup from "./FormGroup";
 import ValueCheck from "../elements/ValueCheck";
 
-import 'bootswatch/dist/pulse/_variables.scss'
+//import 'bootswatch/dist/pulse/_variables.scss'
 import 'pc-bootstrap4-datetimepicker/src/sass/bootstrap-datetimepicker-build.scss'
 
 export default {

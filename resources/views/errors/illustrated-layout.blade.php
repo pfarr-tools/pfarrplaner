@@ -264,7 +264,7 @@
             }
 
             .rounded-lg {
-                border-radius: .5rem;
+                 border-radius: 0;
             }
 
             .border-2 {

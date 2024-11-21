@@ -2,11 +2,11 @@
     <div id="{{ $randomId }}_form" class="row ctype-textbox listtype-none showmobdesk-0">
         @foreach($errors->all() as $error)
             <div
-                    style="border-radius: 3px; margin: 3px 10px; padding: 3px; background-color:red; color:white;">{{ $error }}</div>
+                    style=" border-radius: 0; margin: 3px 10px; padding: 3px; background-color:red; color:white;">{{ $error }}</div>
         @endforeach
         @foreach($success->all() as $message)
             <div
-                    style="border-radius: 3px; margin: 3px 10px; padding: 3px; background-color:green; color:white;">{{ $message }}</div>
+                    style=" border-radius: 0; margin: 3px 10px; padding: 3px; background-color:green; color:white;">{{ $message }}</div>
         @endforeach
         <div id="{{ $randomId }}" class="col s12 bullme ">
             @if(count($services))

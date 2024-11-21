@@ -47,7 +47,7 @@
 }
 .quill-editor.focused {
     border: solid 1px #80bdff;
-    border-radius: .25rem;
+     border-radius: 0;
 }
 
 .quill-editor.focused .ql-toolbar {

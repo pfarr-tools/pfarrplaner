@@ -219,7 +219,7 @@
 
         #days {
             border: solid 1px gray;
-            border-radius: 3px;
+             border-radius: 0;
             margin-bottom: 10px;
         }
 

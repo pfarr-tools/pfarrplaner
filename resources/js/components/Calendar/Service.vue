@@ -35,7 +35,7 @@
         'service-entry': 1,
         'editable': myService.isEditable && (!foreign),
         'mine': myService.isMine,
-        'bg-success': myService.isMine,
+        'bg-success': myService.isMine && (myService.funerals.length == 0),
         'highlighted': 0,
         'possible-target': targetMode,
         'funeral': myService.funerals.length > 0,
@@ -46,11 +46,11 @@
              :title="myService.isEditable ? clickTitle(myService) : null"
              @click="myService.isEditable ? edit(service, $event) : null"
         >
-            <div :class="{'service-time': 1,  'service-special-time text-warning': isSpecialTime(myService)}">
+            <div :class="{'service-time': 1,  'service-special-time text-danger': isSpecialTime(myService)}">
                 {{ myService.timeText }}
             </div>
             <span class="separator">|</span>
-            <div :class="{'service-location': 1, 'service-special-location text-warning': isSpecialLocation(myService)}">
+            <div :class="{'service-location': 1, 'service-special-location text-danger': isSpecialLocation(myService)}">
                 {{ foreign ? myService.locationTextWithCity : myService.locationText }}
             </div>
             <img v-if="(!settings.show_cc_details) && (myService.cc)" src="/img/cc.png" :title="ccTitle(myService)">
@@ -257,14 +257,14 @@ export default {
 
 .service-loading {
     background-color: lightgray;
-    border-radius: .25em;
+     border-radius: 0;
     text-align: center;
 }
 
 .service-entry.reloading {
     border-color: lightgoldenrodyellow;
     background-color: transparent !important;
-    color: #ffc107 !important;
+    color: #f5d403 !important;
     font-size: 3em !important;
 }
 
@@ -273,7 +273,7 @@ export default {
 }
 
 .service-entry.editable.possible-target:hover {
-    background-color: #ffc107;
+    background-color: #f5d403;
     box-shadow: 0 0 0 .2rem lightgoldenrodyellow;
     border: 0;
 }
@@ -306,8 +306,8 @@ export default {
     border: solid 1px gray;
     min-width: 10px;
     min-height: 10px;
-    border-radius: 5px;
-    border-radius: .5em;
+     border-radius: 0;
+     border-radius: 0;
 }
 
 .liturgy-color.white {

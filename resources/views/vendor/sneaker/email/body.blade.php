@@ -13,9 +13,9 @@
                 background-color: #FFFFFF;
                 padding: 15px 28px;
                 margin-bottom: 20px;
-                -webkit-border-radius: 10px;
-                -moz-border-radius: 10px;
-                border-radius: 10px;
+                -webkit- border-radius: 0;
+                -moz- border-radius: 0;
+                 border-radius: 0;
                 border: 1px solid #ccc;
             }
             {!! $css !!}

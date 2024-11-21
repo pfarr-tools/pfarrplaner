@@ -55,7 +55,7 @@
             @component('mail.layout.blocks.cell'){{ config('labels.pastor') }} @endcomponent
             @component('mail.layout.blocks.cell')
                 @foreach($service->pastors as $person)
-                    <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px; border-radius: 3px;">
+                    <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px;  border-radius: 0;">
                         {{ $person->fullName(true) }}
                     </span><br />
                 @endforeach
@@ -65,7 +65,7 @@
             @component('mail.layout.blocks.cell'){{ config('labels.organist') }} @endcomponent
             @component('mail.layout.blocks.cell')
                 @foreach($service->organists as $person)
-                    <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px; border-radius: 3px;">
+                    <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px;  border-radius: 0;">
                         {{ $person->fullName(true) }}
                     </span><br />
                 @endforeach
@@ -75,7 +75,7 @@
             @component('mail.layout.blocks.cell'){{ config('labels.sacristan') }} @endcomponent
             @component('mail.layout.blocks.cell')
                 @foreach($service->sacristans as $person)
-                    <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px; border-radius: 3px;">
+                    <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px;  border-radius: 0;">
                         {{ $person->fullName(true) }}
                     </span><br />
                 @endforeach
@@ -86,7 +86,7 @@
                 @component('mail.layout.blocks.cell'){{ $ministry }} @endcomponent
                 @component('mail.layout.blocks.cell')
                     @foreach($people as $person)
-                        <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px; border-radius: 3px;">
+                        <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px;  border-radius: 0;">
                         {{ $person->fullName(true) }}
                     </span><br />
                     @endforeach
@@ -97,7 +97,7 @@
             @component('mail.layout.blocks.cell')Weitere Beteiligte @endcomponent
             @component('mail.layout.blocks.cell')
                 @foreach($service->otherParticipants as $person)
-                    <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px; border-radius: 3px;">
+                    <span  style=" @if($user->id == $person->id) background-color: lightgreen; @endif padding: 2px;  border-radius: 0;">
                         {{ $person->fullName(true) }}
                     </span><br />
                 @endforeach

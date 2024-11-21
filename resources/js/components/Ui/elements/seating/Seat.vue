@@ -53,7 +53,7 @@ export default {
 <style scoped>
     div.seat {
         display: inline-block;
-        border: solid 1px darkgray; border-radius: 3px;
+        border: solid 1px darkgray;  border-radius: 0;
         box-shadow: darkgray 0px 0px 1px 1px;
         margin-right: 3px;
         margin-bottom: 3px;

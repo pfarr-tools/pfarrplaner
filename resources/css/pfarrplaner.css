@@ -76,13 +76,13 @@ ul.nav-tabs {
 }
 
 .button-row .btn-default {
-    border-color: rgba(0,0,0,.2);
+    border-color: rgba(0, 0, 0, .2);
     background-color: #ffffff;
-    color: rgba(0,0,0,.5);
+    color: rgba(0, 0, 0, .5);
 }
 
 .button-row .btn-default:hover {
-    color: rgba(0,0,0,.7);
+    color: rgba(0, 0, 0, .7);
 }
 
 .button-row .btn-toggle-limited-days {
@@ -104,7 +104,6 @@ body.login .content-wrapper {
     margin-left: 0 !important;
     font-size: .8rem;
 }
-
 
 
 body.calendar .content,
@@ -183,8 +182,8 @@ body.calendar .content-header {
 }
 
 
-.calendar-horizontal  th.limited.collapsed,
-.calendar-horizontal  td.limited.collapsed {
+.calendar-horizontal th.limited.collapsed,
+.calendar-horizontal td.limited.collapsed {
     width: 10px !important;
     max-width: 10px !important;
     overflow: hidden;
@@ -192,8 +191,8 @@ body.calendar .content-header {
     border-right: solid 1px #F8FAFC;
 }
 
-.calendar-horizontal  th.limited.collapsed:hover,
-.calendar-horizontal  td.limited.collapsed:hover {
+.calendar-horizontal th.limited.collapsed:hover,
+.calendar-horizontal td.limited.collapsed:hover {
     width: 50px !important;
     max-width: 50px !important;
 }
@@ -208,8 +207,8 @@ body.calendar .content-header {
     padding: 0;
 }
 
-.calendar-vertical  th.limited.collapsed:hover,
-.calendar-vertical  td.limited.collapsed:hover {
+.calendar-vertical th.limited.collapsed:hover,
+.calendar-vertical td.limited.collapsed:hover {
     height: 50px !important;
     max-height: 50px !important;
 }
@@ -221,7 +220,7 @@ body.calendar .content-header {
 }
 
 
-.calendar-month td.limited.collapsed:not(.for-city){
+.calendar-month td.limited.collapsed:not(.for-city) {
     background-color: #e7e7e7 !important;
 }
 
@@ -237,16 +236,15 @@ body.calendar .content-header {
 
 
 .calendar-month .special-weekday {
-    color: red;
+    color: #b61231;
 }
 
 
-.calendar-month th .card-effect
-{
+.calendar-month th .card-effect {
     position: relative;
 }
-.calendar-month th .card-effect:before, .calendar-month th .card-effect:after
-{
+
+.calendar-month th .card-effect:before, .calendar-month th .card-effect:after {
     z-index: -1;
     position: absolute;
     content: "";
@@ -254,13 +252,13 @@ body.calendar .content-header {
     left: 10px;
     width: 50%;
     top: 80%;
-    max-width:300px;
+    max-width: 300px;
     background: #777;
     box-shadow: 0 15px 10px #777;
     transform: rotate(-3deg);
 }
-.effect2:after
-{
+
+.effect2:after {
     transform: rotate(3deg);
     right: 10px;
     left: auto;
@@ -275,7 +273,7 @@ body.calendar .content-header {
 }
 
 .calendar-month th .day-header-So {
-    background-color: red;
+    background-color: #b61231;
 }
 
 .calendar-month th .card-body {
@@ -291,26 +289,25 @@ body.calendar .content-header {
 }
 
 
-
 .calendar-month .day-description {
     font-weight: normal;
     font-style: italic;
 }
 
-.calendar-month .vacation  {
+.calendar-month .vacation {
     display: inline-block;
     font-weight: normal;
     background-color: orange;
     font-size: 0.7em;
     padding: 2px;
     border: solid 1px darkorange;
-    border-radius: 2px;
+    border-radius: 0;
 }
 
 span.vacation-conflict {
     background-color: orange;
     text-decoration: underline;
-    text-decoration-color: red;
+    text-decoration-color: #b61231;
 }
 
 .calendar-month .liturgy {
@@ -327,7 +324,7 @@ span.vacation-conflict {
     width: 10px;
     height: 10px;
     border: solid 1px transparent;
-    border-radius: 5px;
+    border-radius: 0;
 }
 
 .calendar-month td.now,
@@ -362,17 +359,17 @@ span.vacation-conflict {
 .calendar-month .service-entry.editable:hover {
     border-color: #a1cbef;
     outline: 0;
-    box-shadow: 0 0 0 .2rem rgba(52,144,220,.25);
+    box-shadow: 0 0 0 .2rem rgba(52, 144, 220, .25);
 }
 
 .calendar-month .service-entry.funeral {
     background-color: darkgray;
-    color: white;
+    color: black;
 }
 
 .calendar-month .service-entry.funeral.mine {
-    background-color: #a9cda9;
-    color: black;
+    background-color: #518471 !important;
+    color: black !important;
 }
 
 .calendar-month .service-entry h3 {
@@ -388,12 +385,12 @@ span.vacation-conflict {
 }
 
 .calendar-month .service-time.service-special-time {
-    color: red;
+    color: #b61231;
     font-weight: bold;
 }
 
 .calendar-month .service-special-location {
-    color: red;
+    color: #b61231;
     font-weight: bold;
 }
 
@@ -403,7 +400,7 @@ span.vacation-conflict {
 
 .calendar-month .need-predicant {
     font-weight: bold;
-    color: red;
+    color: #b61231;
 }
 
 .calendar-month .designation {
@@ -432,7 +429,6 @@ span.vacation-conflict {
 }
 
 
-
 .print-only {
     display: none;
 }
@@ -454,7 +450,7 @@ span.vacation-conflict {
 pre {
     border: solid 1px darkgray;
     padding: 5px;
-    border-radius: 3px;
+    border-radius: 0;
 }
 
 ol.steps li {
@@ -487,7 +483,7 @@ table.table .fa-check-circle {
 }
 
 table.table .fa-times-circle {
-    color: red;
+    color: #b61231;
 }
 
 
@@ -512,7 +508,7 @@ ul.sortable li {
     list-style: none;
     padding: 5px;
     margin: 1px;
-    border-radius: 3px;
+    border-radius: 0;
 }
 
 ul.sortable li:hover {
@@ -525,6 +521,7 @@ ul.sortable li.placeholder {
     border: none;
     /** More li styles **/
 }
+
 ul.sortable li.placeholder:before {
     position: absolute;
     /** Define arrowhead **/
@@ -540,16 +537,14 @@ ul.sortable li.placeholder:before {
 .tbl-absences td.cal-cell.day_Sun,
 .tbl-absences th.cal-cell.day_Sun,
 .tbl-absences td.cal-cell.day_So,
-.tbl-absences th.cal-cell.day_So
-{
+.tbl-absences th.cal-cell.day_So {
     background-color: lightpink;
 }
 
 
 .tbl-absences th.cal-cell.day_Sun,
-.tbl-absences th.cal-cell.day_So
-{
-    color: red;
+.tbl-absences th.cal-cell.day_So {
+    color: #b61231;
 }
 
 .tbl-absences .cal-cell.today {
@@ -568,7 +563,6 @@ ul.sortable li.placeholder:before {
 .tbl-absences td.cal-cell.busy.day_So {
     background-color: #ff6666;
 }
-
 
 
 .tbl-absences .cal-cell.absent {
@@ -596,7 +590,6 @@ ul.sortable li.placeholder:before {
 }
 
 
-
 .tbl-absences .cal-cell.replacing {
     background-color: lightblue;
     border-right-color: lightblue;
@@ -613,16 +606,16 @@ ul.sortable li.placeholder:before {
 }
 
 .loader {
-    position:fixed;
+    position: fixed;
     padding: 10em 0 0;
-    margin:0;
+    margin: 0;
 
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
 
     width: 100%;
     height: 100%;
-    background:rgba(255,255,255,0.8);
+    background: rgba(255, 255, 255, 0.8);
     text-align: center;
     display: table-cell;
     vertical-align: middle;
@@ -640,48 +633,48 @@ ul.sortable li.placeholder:before {
     background-color: orange;
 }
 
-.card-counter{
+.card-counter {
     box-shadow: 2px 2px 10px #DADADA;
     margin: 5px;
     padding: 20px 10px;
     background-color: #fff;
     height: 100px;
-    border-radius: 5px;
+    border-radius: 0;
     transition: .3s linear all;
 }
 
-.card-counter:hover{
+.card-counter:hover {
     box-shadow: 4px 4px 20px #DADADA;
     transition: .3s linear all;
     cursor: pointer;
 }
 
-.card-counter.primary{
+.card-counter.primary {
     background-color: #007bff;
     color: #FFF;
 }
 
-.card-counter.danger{
+.card-counter.danger {
     background-color: #ef5350;
     color: #FFF;
 }
 
-.card-counter.success{
+.card-counter.success {
     background-color: #66bb6a;
     color: #FFF;
 }
 
-.card-counter.info{
+.card-counter.info {
     background-color: #26c6da;
     color: #FFF;
 }
 
-.card-counter i{
+.card-counter i {
     font-size: 5em;
     opacity: 0.2;
 }
 
-.card-counter .count-numbers{
+.card-counter .count-numbers {
     position: absolute;
     right: 35px;
     top: 20px;
@@ -689,7 +682,7 @@ ul.sortable li.placeholder:before {
     display: block;
 }
 
-.card-counter .count-name{
+.card-counter .count-name {
     position: absolute;
     right: 35px;
     top: 65px;
@@ -704,6 +697,7 @@ ul.sortable li.placeholder:before {
     position: relative;
     overflow: hidden;
 }
+
 .btn-file input[type=file] {
     position: absolute;
     top: 0;
@@ -739,7 +733,7 @@ body.login .main-sidebar:hover .login-form.hidden-collapsed {
 
 .form-group.required label:after {
     content: ' *';
-    color: red;
+    color: #b61231;
 }
 
 .badge-permission-a {

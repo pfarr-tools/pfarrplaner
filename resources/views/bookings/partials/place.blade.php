@@ -4,7 +4,7 @@
         @if(is_numeric($place) && ($seating['grid'][$place]->seats > 1))
         padding: 1px 30px 1px 30px;
         @else padding: 1px 3px; @endif
-        border: solid 1px darkgray; border-radius: 3px;
+        border: solid 1px darkgray;  border-radius: 0;
         box-shadow: darkgray 0px 0px 1px 1px;
         margin-right: 3px;
         margin-bottom: 3px;

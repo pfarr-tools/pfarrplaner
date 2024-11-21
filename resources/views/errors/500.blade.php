@@ -8,7 +8,7 @@
 @endsection
 @section('button')
     <div style="margin-top: 1em;">
-        <a style="padding: .75em; border: solid 1px black; border-radius: .25em;"
+        <a style="padding: .75em; border: solid 1px black;  border-radius: 0;"
            href="mailto:christoph.fischer@elkw.de">Eigene Anmerkungen senden</a>
     </div>
 @endsection

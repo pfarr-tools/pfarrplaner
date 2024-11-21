@@ -88,7 +88,7 @@ export default {
         list-style: none;
         padding: 5px;
         margin: 1px;
-        border-radius: 3px;
+         border-radius: 0;
         cursor: move !important;
     }
 </style>

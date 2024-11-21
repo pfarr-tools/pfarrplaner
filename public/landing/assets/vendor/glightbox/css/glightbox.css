@@ -446,7 +446,7 @@
   animation: lightboxLoader 0.8s infinite linear;
   border: 2px solid #fff;
   border-right-color: transparent;
-  border-radius: 50%;
+   border-radius: 0;
   position: absolute;
   display: block;
   z-index: 9999;
@@ -564,7 +564,7 @@ iframe.wait-autoplay {
     .glightbox-clean .gnext,
     .glightbox-clean .gclose {
   background-color: rgba(0, 0, 0, 0.75);
-  border-radius: 4px;
+   border-radius: 0;
 }
 
 .glightbox-clean .gprev path,

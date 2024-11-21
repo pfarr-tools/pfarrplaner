@@ -105,7 +105,7 @@
       background: #fff;
       box-shadow: 0px 0px 30px rgba(127, 137, 161, 0.25);
       transition: 0.3s;
-      border-radius: 4px;
+       border-radius: 0;
 
       li {
         min-width: 200px;
@@ -213,7 +213,7 @@
     bottom: 15px;
     left: 15px;
     padding: 10px 0;
-    border-radius: 8px;
+     border-radius: 0;
     background-color: #fff;
     overflow-y: auto;
     transition: 0.3s;

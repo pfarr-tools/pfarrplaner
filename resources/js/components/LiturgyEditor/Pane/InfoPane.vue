@@ -208,7 +208,7 @@ export default {
     border: solid 1px gray;
     min-width: 10px;
     min-height: 10px;
-    border-radius: 5px;
+     border-radius: 0;
     display: inline-block;
 }
 

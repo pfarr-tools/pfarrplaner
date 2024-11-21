@@ -77,7 +77,7 @@ h1, h2, h3, h4, h5, h6 {
   left: calc(50% - 30px);
   border: 6px solid #1acc8d;
   border-top-color: #d2f9eb;
-  border-radius: 50%;
+   border-radius: 0;
   width: 60px;
   height: 60px;
   -webkit-animation: animate-preloader 1s linear infinite;
@@ -114,7 +114,7 @@ h1, h2, h3, h4, h5, h6 {
   background: #1acc8d;
   width: 40px;
   height: 40px;
-  border-radius: 50px;
+   border-radius: 0;
   transition: all 0.4s;
 }
 .back-to-top i {
@@ -241,7 +241,7 @@ h1, h2, h3, h4, h5, h6 {
   background: #fff;
   box-shadow: 0px 0px 30px rgba(127, 137, 161, 0.25);
   transition: 0.3s;
-  border-radius: 4px;
+   border-radius: 0;
 }
 .navbar .dropdown ul li {
   min-width: 200px;
@@ -329,7 +329,7 @@ h1, h2, h3, h4, h5, h6 {
   bottom: 15px;
   left: 15px;
   padding: 10px 0;
-  border-radius: 8px;
+   border-radius: 0;
   background-color: #fff;
   overflow-y: auto;
   transition: 0.3s;
@@ -416,7 +416,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 1px;
   display: inline-block;
   padding: 10px 30px;
-  border-radius: 50px;
+   border-radius: 0;
   transition: 0.5s;
   color: #fff;
   background: #1acc8d;
@@ -679,7 +679,7 @@ section {
   width: 64px;
   height: 64px;
   border: 2px solid #7ceec6;
-  border-radius: 50px;
+   border-radius: 0;
   transition: 0.5s;
 }
 .about .icon-box .icon i {
@@ -720,7 +720,7 @@ section {
   width: 94px;
   height: 94px;
   background: radial-gradient(#3f43fd 50%, rgba(63, 67, 253, 0.4) 52%);
-  border-radius: 50%;
+   border-radius: 0;
   display: block;
   position: absolute;
   left: calc(50% - 47px);
@@ -757,7 +757,7 @@ section {
   -webkit-animation-timing-function: steps;
   animation-timing-function: steps;
   opacity: 1;
-  border-radius: 50%;
+   border-radius: 0;
   border: 5px solid rgba(63, 67, 253, 0.7);
   top: -15%;
   left: -15%;
@@ -862,7 +862,7 @@ section {
   background: #1acc8d;
   padding: 12px;
   color: #fff;
-  border-radius: 50px;
+   border-radius: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -956,7 +956,7 @@ section {
 }
 .testimonials .testimonial-item .testimonial-img {
   width: 100px;
-  border-radius: 50%;
+   border-radius: 0;
   border: 6px solid rgba(255, 255, 255, 0.15);
   margin: 0 auto;
 }
@@ -1027,7 +1027,7 @@ section {
   position: relative;
 }
 .team .member .pic {
-  border-radius: 4px;
+   border-radius: 0;
   overflow: hidden;
 }
 .team .member img {
@@ -1093,7 +1093,7 @@ section {
   background: #fff;
   text-align: center;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.12);
-  border-radius: 5px;
+   border-radius: 0;
   position: relative;
   overflow: hidden;
 }
@@ -1153,7 +1153,7 @@ section {
   background: #1acc8d;
   display: inline-block;
   padding: 8px 35px 10px 35px;
-  border-radius: 50px;
+   border-radius: 0;
   color: #fff;
   transition: none;
   font-size: 14px;
@@ -1198,7 +1198,7 @@ section {
 .faq .faq-list li {
   padding: 20px;
   background: #fff;
-  border-radius: 4px;
+   border-radius: 0;
   position: relative;
 }
 .faq .faq-list a {
@@ -1267,7 +1267,7 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 50px;
+   border-radius: 0;
   transition: all 0.3s ease-in-out;
 }
 .contact .info h4 {
@@ -1325,7 +1325,7 @@ section {
 .contact .php-email-form .loading:before {
   content: "";
   display: inline-block;
-  border-radius: 50%;
+   border-radius: 0;
   width: 24px;
   height: 24px;
   margin: 0 10px -6px 0;
@@ -1351,7 +1351,7 @@ section {
   padding: 10px 30px;
   color: #fff;
   transition: 0.4s;
-  border-radius: 50px;
+   border-radius: 0;
 }
 .contact .php-email-form button[type=submit]:hover {
   background: #34e5a6;
@@ -1413,7 +1413,7 @@ section {
   line-height: 1;
   padding: 8px 0;
   margin-right: 4px;
-  border-radius: 50%;
+   border-radius: 0;
   text-align: center;
   width: 36px;
   height: 36px;
@@ -1467,7 +1467,7 @@ section {
   background: #fff;
   padding: 6px 10px 6px 15px;
   position: relative;
-  border-radius: 50px;
+   border-radius: 0;
 }
 #footer .footer-top .footer-newsletter form input[type=email] {
   border: 0;
@@ -1486,7 +1486,7 @@ section {
   background: #1acc8d;
   color: #fff;
   transition: 0.3s;
-  border-radius: 50px;
+   border-radius: 0;
 }
 #footer .footer-top .footer-newsletter form input[type=submit]:hover {
   background: #149f6e;
