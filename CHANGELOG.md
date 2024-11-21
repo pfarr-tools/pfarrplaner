@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.24.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.23.1...v2024.24.0) (2024-11-21)
+
+
+### Features
+
+* Farbschema und Schriftarten der Landeskirche angepasst ([52ab6f6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/52ab6f6581d46ee9fd4edea53ae8af844863ca87))
+* Umstellung von Helvetica Condensed auf Sarabun (Light/Semibold) ([dd8a8eb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/dd8a8eb0718637d4acf9468e141dd8b9702590fa))
+
+
+### Bug Fixes
+
+* Doppelter Punkt vor Dateiendung ([fccf344](https://codeberg.org/pfarr.tools/pfarrplaner/commit/fccf344ddb1650e3d9efb14acc55eaa67de7b773))
+
 ### [2024.23.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.23.0...v2024.23.1) (2024-11-20)
 
 
