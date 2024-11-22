@@ -213,6 +213,20 @@ export default {
     },
     mounted() {
         if (this.title != '') document.title = this.title + ' :: ' + this.layout.appName;
+
+        let token = document.head.querySelector('meta[name="csrf-token"]');
+
+        if (token) {
+            window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+            window.api.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+        } else {
+            window.axios.get(route('csrf.keepalive')).then(response => {
+                token = response.data.token;
+                window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+                window.api.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+            });
+        }
+
     },
     data() {
         return {

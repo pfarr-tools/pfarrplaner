@@ -85,6 +85,27 @@ window.api.defaults.withCredentials = true;
 
 
 /**
+* Next we will register the CSRF Token as a common header with Axios so that
+* all outgoing HTTP requests automatically have it attached. This is just
+* a simple convenience so we don't have to attach every token manually.
+*/
+
+token = document.head.querySelector('meta[name="csrf-token"]');
+
+if (token) {
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+    window.api.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+} else {
+    window.axios.get(route('csrf.keepalive')).then(response => {
+        token = response.data.token;
+        window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+        window.api.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+    });
+}
+
+
+
+/**
  * Bootstrap plugins etc.
  */
 
