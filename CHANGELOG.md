@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.24.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.24.0...v2024.24.1) (2024-11-22)
+
+
+### Features
+
+* Weitere Farbanpassungen ([948ab6f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/948ab6f525af776f2c9968e91f1c6995cef85a6f))
+
+
+### Bug Fixes
+
+* Edge produziert häufig Fehler 419 ([0686961](https://codeberg.org/pfarr.tools/pfarrplaner/commit/0686961cb7802e43f16d8728d83031a69de3994e))
+
 ## [2024.24.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.23.1...v2024.24.0) (2024-11-21)
 
 
