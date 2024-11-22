@@ -35,7 +35,7 @@
         'service-entry': 1,
         'editable': myService.isEditable && (!foreign),
         'mine': myService.isMine,
-        'bg-success': myService.isMine && (myService.funerals.length == 0),
+        'bg-info': myService.isMine && (myService.funerals.length == 0),
         'highlighted': 0,
         'possible-target': targetMode,
         'funeral': myService.funerals.length > 0,

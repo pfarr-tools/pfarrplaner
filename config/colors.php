@@ -31,5 +31,25 @@
 return [
     'songbooks' => [
         'EG gelb' => '#fdf538',
-    ]
+    ],
+    'elkw' => [
+        'violett' => '#8d197c',
+        'dunkelviolett' => '#591855',
+        'dunkelgrau' => '#474f60',
+        'dunkelblau' => '#29447b',
+        'taubenblau' => '#707aa0',
+        'hellblau' => '#5eb3d2',
+        'graublau' => '#6290b1',
+        'pastellviolett' => '#988fa0',
+        'gelbgrün' => '#b3ff00',
+        'hellgrün' => '#a3b37a',
+        'dunkelgrün' => '#518471',
+        'blaugrün' => '#318294',
+        'türkis' => '#298fa5',
+        'gelb' => '#f5d403',
+        'orange' => '#dc9018',
+        'apricot' => '#cb957d',
+        'rot' => '#b61231',
+        'dunkelrot' => '#9c2049',
+    ],
 ];

@@ -28,34 +28,6 @@
  */
 
 @charset "UTF-8";
-/*
- * Pfarrplaner
- *
- * @package Pfarrplaner
- * @author Christoph Fischer <chris@toph.de>
- * @copyright (c) Christoph Fischer, https://christoph-fischer.de
- * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
- * @link https://codeberg.org/pfarr.tools/pfarrplaner
- * @version git: $Id$
- *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
- *
- * Pfarrplaner is based on the Laravel framework (https://laravel.com).
- * This file may contain code created by Laravel's scaffolding functions.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 @import url(https://www.pfarrplaner.de/css/google-fonts.css);
 
@@ -75,19 +47,6 @@ ul.nav-tabs {
     margin: 0 0 3px 5px;
 }
 
-.button-row .btn-default {
-    border-color: rgba(0, 0, 0, .2);
-    background-color: #ffffff;
-    color: rgba(0, 0, 0, .5);
-}
-
-.button-row .btn-default:hover {
-    color: rgba(0, 0, 0, .7);
-}
-
-.button-row .btn-toggle-limited-days {
-    background-color: #DCD0FF;
-}
 
 body.slave nav,
 body.slave aside,
@@ -134,21 +93,6 @@ body.calendar .content-header {
     font-size: 0.5em;
 }
 
-.calendar-month th.limited,
-.calendar-month td.limited.for-city {
-    background-color: #DCD0FF;
-}
-
-.calendar-horizontal th.limited.collapsed,
-.calendar-horizontal td.limited.for-city.collapsed {
-    background: #DCD0FF;
-}
-
-.calendar-vertical th.limited.collapsed,
-.calendar-vertical td.limited.for-city.collapsed {
-    background: linear-gradient(180deg, #DCD0FF 80%, #f4f6f9 100%);
-}
-
 .calendar-month th .day-header-collapse-hover {
     display: none;
 }
@@ -182,48 +126,6 @@ body.calendar .content-header {
 }
 
 
-.calendar-horizontal th.limited.collapsed,
-.calendar-horizontal td.limited.collapsed {
-    width: 10px !important;
-    max-width: 10px !important;
-    overflow: hidden;
-    border-left: solid 1px #F8FAFC;
-    border-right: solid 1px #F8FAFC;
-}
-
-.calendar-horizontal th.limited.collapsed:hover,
-.calendar-horizontal td.limited.collapsed:hover {
-    width: 50px !important;
-    max-width: 50px !important;
-}
-
-.calendar-vertical th.limited.collapsed,
-.calendar-vertical td.limited.collapsed {
-    height: 10px !important;
-    max-height: 10px !important;
-    overflow: hidden;
-    border-left: solid 1px #F8FAFC;
-    border-right: solid 1px #F8FAFC;
-    padding: 0;
-}
-
-.calendar-vertical th.limited.collapsed:hover,
-.calendar-vertical td.limited.collapsed:hover {
-    height: 50px !important;
-    max-height: 50px !important;
-}
-
-
-.calendar-month th.limited.collapsed .celldata,
-.calendar-month td.limited.collapsed .celldata {
-    display: none;
-}
-
-
-.calendar-month td.limited.collapsed:not(.for-city) {
-    background-color: #e7e7e7 !important;
-}
-
 .calendar-month td.limited.not-my-city .btn-add-day,
 .calendar-month td.limited:not(.for-city) .btn-add-day {
     display: none;
@@ -236,7 +138,7 @@ body.calendar .content-header {
 
 
 .calendar-month .special-weekday {
-    color: #b61231;
+    color: map-get($theme-colors, 'danger');
 }
 
 
@@ -253,8 +155,8 @@ body.calendar .content-header {
     width: 50%;
     top: 80%;
     max-width: 300px;
-    background: #777;
-    box-shadow: 0 15px 10px #777;
+    background: map-get($theme-colors, 'light');
+    box-shadow: 0 15px 10px map-get($theme-colors, 'light');
     transform: rotate(-3deg);
 }
 
@@ -273,7 +175,7 @@ body.calendar .content-header {
 }
 
 .calendar-month th .day-header-So {
-    background-color: #b61231;
+    background-color: map-get($theme-colors, 'danger');
 }
 
 .calendar-month th .card-body {
@@ -297,17 +199,16 @@ body.calendar .content-header {
 .calendar-month .vacation {
     display: inline-block;
     font-weight: normal;
-    background-color: orange;
+    background-color: map-get($elkw-colors, "orange");
     font-size: 0.7em;
-    padding: 2px;
-    border: solid 1px darkorange;
-    border-radius: 0;
+    padding: 3px;
+    margin: 0 1px 1px 1px;
 }
 
 span.vacation-conflict {
-    background-color: orange;
+    background-color: map-get($elkw-colors, "orange");
     text-decoration: underline;
-    text-decoration-color: #b61231;
+    text-decoration-color: map-get($theme-colors, 'danger');
 }
 
 .calendar-month .liturgy {
@@ -334,42 +235,45 @@ span.vacation-conflict {
 
 .calendar-month .service-entry {
     background-color: white;
-    border: solid 1px darkgray;
+    border: solid 1px map-get($elkw-colors, 'dunkelgrau');
     padding: 5px;
     margin-bottom: 3px;
 }
 
 .calendar-month .service-entry.mine {
-    background-color: lightgreen;
+    background-color: map-get($theme-colors, 'info');
 }
 
 .calendar-month .service-entry.highlighted {
-    background-color: yellow;
+    background-color: map-get($theme-colors, 'warning');
 }
 
 .calendar-month .service-entry.hidden {
-    background-color: lightgray !important;
+    background-color: white !important;
+    color: gray;
+    border-color: gray;
 }
 
 .calendar-month .service-entry.mine.hidden {
-    background-color: #7aa07a !important;
+    background-color: white !important;
+    color: map-get($theme-colors, 'info');
 }
 
 
 .calendar-month .service-entry.editable:hover {
-    border-color: #a1cbef;
+    border-color: map-get($theme-colors, 'primary');
     outline: 0;
     box-shadow: 0 0 0 .2rem rgba(52, 144, 220, .25);
 }
 
 .calendar-month .service-entry.funeral {
-    background-color: darkgray;
-    color: black;
+    background-color: map-get($elkw-colors, 'dunkelgrau');
+    color: white !important;
 }
 
 .calendar-month .service-entry.funeral.mine {
-    background-color: #518471 !important;
-    color: black !important;
+    background-color: map-get($elkw-colors, 'dunkelblau') !important;
+    color: white !important;
 }
 
 .calendar-month .service-entry h3 {
@@ -385,12 +289,12 @@ span.vacation-conflict {
 }
 
 .calendar-month .service-time.service-special-time {
-    color: #b61231;
+    color: map-get($theme-colors, 'danger');
     font-weight: bold;
 }
 
 .calendar-month .service-special-location {
-    color: #b61231;
+    color: map-get($theme-colors, 'danger');
     font-weight: bold;
 }
 
@@ -400,7 +304,7 @@ span.vacation-conflict {
 
 .calendar-month .need-predicant {
     font-weight: bold;
-    color: #b61231;
+    color: map-get($theme-colors, 'danger');
 }
 
 .calendar-month .designation {
@@ -448,7 +352,7 @@ span.vacation-conflict {
 }
 
 pre {
-    border: solid 1px darkgray;
+    border: solid 1px map-get($elkw-colors, 'dunkelgrau');
     padding: 5px;
     border-radius: 0;
 }
@@ -462,11 +366,11 @@ ol.steps img {
 }
 
 .service-row.cc {
-    background-color: lightgreen;
+    background-color: map-get($elkw-colors, 'hellgrün');
 }
 
 .service-row.no-cc {
-    color: darkgray;
+    color: map-get($elkw-colors, 'dunkelgrau');
 }
 
 .data-row.no-cc {
@@ -475,15 +379,15 @@ ol.steps img {
 
 
 table.table tr.past td {
-    background-color: lightslategray;
+    background-color: map-get($elkw-colors, 'pastellviolett');
 }
 
 table.table .fa-check-circle {
-    color: green;
+    color: map-get($theme-colors, "success");
 }
 
 table.table .fa-times-circle {
-    color: #b61231;
+    color: map-get($theme-colors, 'danger');
 }
 
 
@@ -517,7 +421,7 @@ ul.sortable li:hover {
 
 ul.sortable li.placeholder {
     position: relative;
-    background-color: lightyellow;
+    background-color: map-get($elkw-colors, "apricot");
     border: none;
     /** More li styles **/
 }
@@ -527,77 +431,6 @@ ul.sortable li.placeholder:before {
     /** Define arrowhead **/
 }
 
-.tbl-absences .cal-cell {
-    font-size: 0.7em;
-    padding: 0;
-    max-width: 15px;
-    overflow: hidden;
-}
-
-.tbl-absences td.cal-cell.day_Sun,
-.tbl-absences th.cal-cell.day_Sun,
-.tbl-absences td.cal-cell.day_So,
-.tbl-absences th.cal-cell.day_So {
-    background-color: lightpink;
-}
-
-
-.tbl-absences th.cal-cell.day_Sun,
-.tbl-absences th.cal-cell.day_So {
-    color: #b61231;
-}
-
-.tbl-absences .cal-cell.today {
-    background-color: lightyellow;
-}
-
-.tbl-absences .cal-cell.holiday {
-    background-color: #e9fce9;
-}
-
-.tbl-absences td.cal-cell.busy {
-    background-color: lightgreen;
-}
-
-.tbl-absences td.cal-cell.busy.day_Sun,
-.tbl-absences td.cal-cell.busy.day_So {
-    background-color: #ff6666;
-}
-
-
-.tbl-absences .cal-cell.absent {
-    background-color: orange;
-    border-right-color: orange;
-}
-
-
-.tbl-absences .cal-cell.absent.editable:hover {
-    background-color: darkorange;
-    border-right-color: darkorange;
-    cursor: pointer;
-}
-
-
-.tbl-absences .cal-cell.absent.absence-status-pending {
-    background-color: mediumpurple;
-    border-right-color: mediumpurple;
-}
-
-.tbl-absences .cal-cell.absent.editable.absence-status-pending:hover {
-    background-color: purple;
-    border-right-color: purple;
-    color: white;
-}
-
-
-.tbl-absences .cal-cell.replacing {
-    background-color: lightblue;
-    border-right-color: lightblue;
-}
-
-.tbl-absences .cal-cell.selected {
-    background-color: blue !important;
-}
 
 .date-picker-wrapper {
     border: 0;
@@ -626,11 +459,11 @@ ul.sortable li.placeholder:before {
 }
 
 #absencesTab a {
-    background-color: sandybrown;
+    background-color: map-get($elkw-colors, "orange");
 }
 
 #absencesTab a.active {
-    background-color: orange;
+    background-color: map-get($elkw-colors, "orange");
 }
 
 .card-counter {
@@ -650,23 +483,23 @@ ul.sortable li.placeholder:before {
 }
 
 .card-counter.primary {
-    background-color: #007bff;
+    background-color: map-get($theme-colors, "primary");
     color: #FFF;
 }
 
 .card-counter.danger {
-    background-color: #ef5350;
+    background-color: map-get($theme-colors, "danger");
     color: #FFF;
 }
 
 .card-counter.success {
-    background-color: #66bb6a;
+    background-color: map-get($theme-colors, "success");
     color: #FFF;
 }
 
 .card-counter.info {
-    background-color: #26c6da;
-    color: #FFF;
+    background-color: map-get($theme-colors, "info");
+    color: black;
 }
 
 .card-counter i {
@@ -733,23 +566,23 @@ body.login .main-sidebar:hover .login-form.hidden-collapsed {
 
 .form-group.required label:after {
     content: ' *';
-    color: #b61231;
+    color: map-get($theme-colors, 'danger');
 }
 
 .badge-permission-a {
-    background-color: purple !important;
+    background-color: map-get($theme-colors, "primary") !important;
 }
 
 .badge-permission-w {
-    background-color: green !important;
+    background-color: map-get($theme-colors, "success") !important;
 }
 
 .badge-permission-r {
-    background-color: orange !important;
+    background-color: map-get($theme-colors, "warning") !important;
 }
 
 .badge-permission-n {
-    background-color: red !important;
+    background-color: map-get($theme-colors, 'danger') !important;
 }
 
 .attachment-row {
@@ -757,17 +590,17 @@ body.login .main-sidebar:hover .login-form.hidden-collapsed {
 }
 
 tr.changed, tr.changed td, tr.changed th {
-    background-color: lightgreen;
+    background-color: map-get($elkw-colors, "hellgrün");
 }
 
 .content .footer {
     padding-left: 10px;
     font-size: .6em;
-    color: darkgray;
+    color: map-get($elkw-colors, 'dunkelgrau');
 }
 
 .content .footer a {
-    color: darkgray;
+    color: map-get($elkw-colors, 'dunkelgrau');
     font-weight: bold;
 }
 
@@ -793,11 +626,12 @@ tr.changed, tr.changed td, tr.changed th {
 }
 
 .nav-tabs .nav-item.tabheader-absences a.nav-link {
-    background-color: sandybrown !important;
+    background-color: map-get($elkw-colors, "orange") !important;
 }
 
 .calendar-vertical .day-header-cell {
     max-width: 150px;
+    padding: 0;
 }
 
 
@@ -825,4 +659,28 @@ tr.changed, tr.changed td, tr.changed th {
 
 .ql-picker.float-right .ql-picker-options {
     right: 0;
+}
+
+#nprogress .bar {
+    background: map-get($elkw-colors, "violett") !important;
+}
+
+#nprogress .peg {
+    box-shadow: 0 0 10px map-get($elkw-colors, "violett"), 0 0 5px map-get($elkw-colors, "violett");
+}
+
+#nprogress .spinner-icon {
+    border-top-color: map-get($elkw-colors, "violett");
+    border-left-color: map-get($elkw-colors, "violett");
+}
+
+
+
+.admin-layout .datepicker table tr td.today {
+    background-color: tint-color(map-get($theme-colors, "warning"), 50%) !important;
+}
+
+.admin-layout .datepicker table tr td.today.active,
+.admin-layout .datepicker table tr td.active {
+    background-color: map-get($theme-colors, "primary") !important;
 }

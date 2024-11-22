@@ -34,7 +34,7 @@ class AbsencesModule extends AbstractModule
 {
     protected $title = 'Urlaub';
     protected $icon = 'mdi mdi-earth';
-    protected $color = 'orange';
+    protected $color = '#dc9018';
     protected $defaultRoute = 'absences.index';
 
 

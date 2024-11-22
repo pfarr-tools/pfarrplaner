@@ -34,7 +34,7 @@ class CalendarModule extends AbstractModule
 {
     protected $title = 'Kalender';
     protected $icon = 'mdi mdi-calendar';
-    protected $color = 'blue';
+    protected $color = '#29447b';
     protected $defaultRoute = 'calendar';
 
     public function addItems(array $items): array

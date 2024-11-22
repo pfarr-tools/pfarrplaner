@@ -48,16 +48,20 @@ $green: #518471;
 $teal: #a4b37a;
 $cyan: #5eb3d2;
 
+@import 'elkw-colors/elkw-colors';
 
 $theme-colors: (
-    "primary": #591855,
-    "success": #b3ff00,
-    "info": #418417,
-    "warning": #f4d403,
-    "danger": #b61231,
-    "light": #988fa0,
-    "secondary": #474f60,
+    "primary": map-get($elkw-colors, "dunkelviolett"),
+    "success": map-get($elkw-colors, "gelbgrün"),
+    "info": map-get($elkw-colors, "blaugrün"),
+    "warning": map-get($elkw-colors, "gelb"),
+    "danger": map-get($elkw-colors, "rot"),
+    "light": map-get($elkw-colors, "taubenblau"),
+    "default": map-get($elkw-colors, "taubenblau"),
+    "secondary": map-get($elkw-colors, "dunkelgrau"),
 );
+
+
 
 $enable-rounded: false;
 

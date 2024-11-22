@@ -29,14 +29,25 @@
 
 
 // Fonts
-@import url('/css/google-fonts.css');
+@import url('../../public/css/google-fonts.css');
 
 // Variables
 @import '_variables';
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css');
+
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
-$font-family-sans-serif: "Nunito", sans-serif;
+
+@import url('https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.20.0/daterangepicker.min.css');
+@import '../../node_modules/selectize/dist/css/selectize.css';
+@import '../../node_modules/selectize/dist/css/selectize.bootstrap3.css';
+
+
+@import 'adminlte';
+@import 'pfarrplaner';
 
 .navbar-laravel {
   background-color: #fff;

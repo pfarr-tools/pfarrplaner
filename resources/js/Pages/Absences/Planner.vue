@@ -302,9 +302,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+
+@import '../../../../node_modules/bootstrap/scss/functions';
+@import '../../../sass/_variables.scss';
+
 .absent {
-    background-color: orange;
+    background-color: map-get($elkw-colors, "orange");
 }
 
 .tbl-absences .table th,
@@ -319,28 +323,41 @@ export default {
 }
 
 
+.tbl-absences .cal-cell {
+    font-size: 0.7em;
+    padding: 0;
+    max-width: 15px;
+    overflow: hidden;
+}
+
+
+.tbl-absences .cal-cell.absent {
+    background-color: map-get($elkw-colors, "orange");
+    border-right-color: map-get($elkw-colors, "orange");
+}
+
 .tbl-absences .cal-cell.absent.absence-status-0,
 .tbl-absences .cal-cell.absent.absence-status-1,
 .tbl-absences .cal-cell.absent.absence-status-10 {
-    background-color: papayawhip !important;
+    background-color: tint-color(map-get($theme-colors, "warning"), 50%);
 }
 
 .replacing {
-    background-color: lightblue;
+    background-color: map-get($elkw-colors, "hellblau");
 }
 
 .poolmaster {
-    background-color: #593196;
+    background-color: map-get($elkw-colors, "dunkelblau");
     color: white;
 }
 
 .sunday {
-    background-color: lightpink;
-    color: red;
+    background-color: tint-color(map-get($theme-colors, "danger"), 50%);
+    color: map-get($theme-colors, "danger");
 }
 
 .vacation {
-    background-color: #e9fce9;
+    background-color: map-get($elkw-colors, "hellgrün");
 }
 
 .not-editable {
@@ -353,20 +370,21 @@ export default {
 }
 
 .sick.editable {
-    background-color: lightcoral;
+    background-color: tint-color(map-get($elkw-colors, "dunkelrot"), 70%);
 }
 
 .sick.replacing {
-    background-color: lightblue;
+    background-color: tint-color(map-get($elkw-colors, "hellblau"), 50%);
 }
 
 
 .editable:hover {
-    background-color: darkorange;
+    background-color: map-get($theme-colors, "primary");
+    color: white !important;
 }
 
 .day.editable:hover, .sunday.editable:hover, .vacation.editable:hover {
-    background-color: #218838;
+    background-color: map-get($theme-colors, "success");
 }
 
 tr.category-header,
@@ -375,11 +393,11 @@ tr.category-header th {
 }
 
 .mdi.mdi-eye {
-    color: gray;
+    color: map-get($theme-colors, "secondary");
 }
 
 .mdi.mdi-eye-off {
-    color: lightgray;
+    color: tint-color(map-get($theme-colors, "secondary"), 50%);
 }
 
 .mdi.eye-toggle {

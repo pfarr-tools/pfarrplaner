@@ -43,13 +43,13 @@
 
 <template>
     <div class="createServiceWizardButton">
-        <inertia-link v-if="cities.length == 1" class="btn" :class="myClass"
+        <inertia-link v-if="cities.length == 1" class="btn me-1" :class="myClass"
                       :href="route('service.create', {city: cities[0].id, date: myDate})">
             <span class="mdi mdi-church"></span> <span
             class="d-none d-md-inline">Gottesdienst anlegen</span>
         </inertia-link>
         <div class="dropdown" v-if="cities.length > 1">
-            <button v-if="cities.length > 1" type="button" class="btn dropdown-toggle" :class="myClass"
+            <button v-if="cities.length > 1" type="button" class="btn dropdown-toggle me-1" :class="myClass"
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="mdi mdi-church"></span> <span
                 class="d-none d-md-inline">Gottesdienst anlegen</span>
                 <span class="sr-only">Weitere Optionen aufklappen</span>

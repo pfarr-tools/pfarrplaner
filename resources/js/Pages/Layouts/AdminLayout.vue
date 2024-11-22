@@ -192,9 +192,6 @@
 
 <script>
 
-import '../../../sass/adminlte.scss';
-import 'admin-lte/dist/js/adminlte.min';
-
 export default {
     props: {
         'enableControlSidebar': {
