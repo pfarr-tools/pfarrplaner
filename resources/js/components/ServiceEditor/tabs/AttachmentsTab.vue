@@ -203,7 +203,8 @@ export default {
 }
 
 .mdi-download {
-    color: gray;
+    color: white;
+    float: right;
 }
 
 .uploader {

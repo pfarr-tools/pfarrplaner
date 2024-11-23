@@ -569,6 +569,39 @@ body.login .main-sidebar:hover .login-form.hidden-collapsed {
     color: map-get($theme-colors, 'danger');
 }
 
+.form-control, input.form-check-input {
+    background-color: white;
+}
+
+input.form-control, textarea.form-control {
+    border-width: 0 0 1px 1px;
+}
+
+input.form-control:focus, textarea.form-control:focus {
+    background-color: tint-color(map-get($elkw-colors, "hellblau"), 70%);
+    font-weight: bold;
+    box-shadow: none;
+    border-color: map-get($elkw-colors, "dunkelblau");
+}
+
+.form-check-input:checked {
+    background-color: map-get($theme-colors, "primary");
+    border-color: map-get($theme-colors, "primary");
+}
+
+.selectize-input {
+    border-radius: 0;
+    border-width: 0 0 1px 1px;
+}
+
+.selectize-input:focus, .selectize-input.focus {
+    border-radius: 0 !important;
+    border-color: map-get($elkw-colors, "dunkelblau");
+    box-shadow: none;
+    background-color: tint-color(map-get($elkw-colors, "hellblau"), 70%) !important;
+    font-weight: bold;
+}
+
 .badge-permission-a {
     background-color: map-get($theme-colors, "primary") !important;
 }
@@ -684,3 +717,22 @@ tr.changed, tr.changed td, tr.changed th {
 .admin-layout .datepicker table tr td.active {
     background-color: map-get($theme-colors, "primary") !important;
 }
+
+
+.nav-tabs .nav-link {
+    background-color: lightgray;
+}
+
+.badge-primary {
+    background-color: map-get($theme-colors, "primary") !important;
+}
+
+.mdi.mdi-youtube, span.mdi-youtube {
+    background-color: map-get($elkw-colors, "red") !important;
+}
+
+.stripe-odd {
+    background-color: #f2f2f2;
+}
+
+

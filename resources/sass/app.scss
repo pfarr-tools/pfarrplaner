@@ -29,7 +29,7 @@
 
 
 // Fonts
-@import url('../../public/css/google-fonts.css');
+@import 'sarabun';
 
 // Variables
 @import '_variables';
@@ -48,14 +48,4 @@
 
 @import 'adminlte';
 @import 'pfarrplaner';
-
-.navbar-laravel {
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-}
-
-.stripe-odd {
-    background-color: #f2f2f2;
-}
-
 

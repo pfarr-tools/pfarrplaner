@@ -161,7 +161,4 @@ export default {
 </script>
 
 <style scoped>
-    .mdi.mdi-youtube {
-        color: red;
-    }
 </style>

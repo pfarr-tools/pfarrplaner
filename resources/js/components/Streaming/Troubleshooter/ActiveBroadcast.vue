@@ -304,8 +304,5 @@ export default {
     height: 100%;
 }
 
-.mdi.mdi-youtube {
-    color: red;
-}
 </style>
 

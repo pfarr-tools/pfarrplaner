@@ -142,7 +142,4 @@ export default {
 </script>
 
 <style scoped>
-    span.mdi.mdi-youtube {
-        color: red;
-    }
 </style>
