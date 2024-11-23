@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.25.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.25.0...v2024.25.1) (2024-11-23)
+
+
+### Bug Fixes
+
+* Demoversion erlaubt keine Anmeldung mehr. ([689af8b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/689af8b1dbba5fa0c21a0ad5835d6699bd8594e4))
+* Korrupte Worddokumente bei den Abkündigungen ([a4d9258](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a4d925828a239c731e2bbd33e28431d3f7669b40))
+
 ## [2024.25.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.24.1...v2024.25.0) (2024-11-23)
 
 
