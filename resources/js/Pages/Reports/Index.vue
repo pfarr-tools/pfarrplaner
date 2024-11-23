@@ -29,83 +29,32 @@
 
 <template>
     <admin-layout title="Ausgabeformat wählen">
-        <dataset v-slot="{ ds }"
-                 :ds-data="myReports"
-                 ds-sort-by="name"
-                 :ds-search-in="['title', 'description', 'group']">
-            <div class="row mb-3" :data-page-count="ds.dsPagecount">
-                <div class="col-md-6 mb-2 mb-md-0">
-                    <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus/>
-                </div>
-                <div class="col-md-6 text-end">
-                    <dataset-show class="float-right" :ds-show-entries="showEntries"/>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <dataset-item class="form-row row mb-3">
-                        <template #default="{ row, rowIndex }">
-                            <div class="col-md-4">
-                                <a @click.prevent.stop="createReport(row)" href="#" class="report-link">
-                                    <card class="mb-2 report-card" title="Klicken, um dieses Ausgabeformat zu wählen"
-                                          @click="createReport(row)">
-                                        <card-header :style="{backgroundColor: row.backgroundColor, color: row.color}">
-                                            {{ row.group }}
-                                        </card-header>
-                                        <card-body>
-                                            <h3 class="card-title mb-2" :title="`Index: ${rowIndex}`">
-                                                <span :class="row.icon"></span> {{ row.title }}
-                                            </h3>
-                                            <div class="card-text mb-0 ps-4">{{ row.description }}</div>
-                                        </card-body>
-                                    </card>
-                                </a>
-                            </div>
-                        </template>
-                        <template #noDataFound>
-                            <div class="col-md-12 pt-2">
-                                <p class="text-center">No results found</p>
-                            </div>
-                        </template>
-                    </dataset-item>
+        <div v-for="(groupReports, groupTitle) in reports">
+            <h3 v-if="groupReports.length" class="mt-3">{{ groupTitle}}</h3>
+            <div v-if="groupReports.length" class="row">
+                <div v-for="report in groupReports" class="col-md-4 p-2 border-light report-card"
+                @click="createReport(report)">
+                    <div class="fw-semibold">
+                        <span :class="report.icon"></span>
+                        {{ report.title }}
+                    </div>
+                    <div>{{ report.description }}</div>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
-            </div>
-        </dataset>
+        </div>
     </admin-layout>
 </template>
 
 <script>
-import NavButton from "../../components/Ui/buttons/NavButton";
-import CardBody from "../../components/Ui/cards/cardBody";
-import Card from "../../components/Ui/cards/card";
-import {Dataset, DatasetItem, DatasetSearch} from "vue-dataset";
-import DatasetInfo from "../../components/Ui/dataset/DatasetInfo";
-import DatasetPager from "../../components/Ui/dataset/DatasetPager";
-import DatasetShow from "../../components/Ui/dataset/DatasetShow";
-import CardHeader from "../../components/Ui/cards/cardHeader";
+
+import Card from "../../components/Ui/cards/card.vue";
+import CardBody from "../../components/Ui/cards/cardBody.vue";
 
 export default {
     name: "Index",
     props: ['reports'],
     components: {
-        CardHeader,
-        NavButton, CardBody, Card,
-        Dataset,
-        DatasetItem,
-        DatasetInfo,
-        DatasetPager,
-        DatasetSearch,
-        DatasetShow
-    },
-    data() {
-        return {
-            showEntries: 50,
-            myReports: typeof this.reports == 'object' ? Object.values(this.reports) : this.reports,
-        }
+        Card, CardBody
     },
     methods: {
         createReport(report) {
@@ -119,25 +68,17 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+
+@import '../../../sass/_variables.scss';
+
 .report-card {
     cursor: pointer;
 }
 
 .report-card:hover {
-    border-color: #80bdff;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    background-color: map-get($theme-colors, "secondary");
+    color: white;
 }
 
-.report-card .card-body h3 {
-    font-weight: bold;
-    width: 100%;
-    display: block;
-}
-
-a.report-link, a.report-link:hover {
-    text-decoration: none;
-    color: black;
-}
 </style>

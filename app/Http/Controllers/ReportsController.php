@@ -76,15 +76,9 @@ class ReportsController extends Controller
                 }
             }
         }
-        $rainbow = ColorService::rainbowArray($reports->pluck('group')->unique());
-
         $reports = $reports
-            ->map(function ($item) use ($rainbow) {
-                $item['backgroundColor'] = $rainbow[$item['group']];
-                $item['color'] = ColorService::contrastColor($item['backgroundColor']);
-                return $item;
-            })
-            ->sortBy(['group','title']);
+            ->sortBy(['group','title'])->groupBy('group');
+
         return Inertia::render('Reports/Index', compact('reports'));
     }
 
