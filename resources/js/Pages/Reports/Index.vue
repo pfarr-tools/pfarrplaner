@@ -72,6 +72,12 @@ export default {
 
 @import '../../../sass/_variables.scss';
 
+h3 {
+    width: 100%;
+    border-bottom: solid 1px lightgray;
+}
+
+
 .report-card {
     cursor: pointer;
 }

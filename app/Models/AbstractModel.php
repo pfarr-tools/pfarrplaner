@@ -76,7 +76,9 @@ class AbstractModel extends Model
     protected static string $path = 'admin';
     protected $guarded = [];
 
+    public static $adminTitle = '';
     public static $adminIcon = '';
+    public static $adminGroup = '';
 
     protected $appends = ['label'];
 
@@ -93,7 +95,8 @@ class AbstractModel extends Model
         if (!static::$adminIcon) false;
         if (!Auth::user() || !Auth::user()->can('index', get_called_class())) false;
         return [
-            'text' => ucfirst(static::$prefixPlural),
+            'text' => static::$adminTitle ?: ucfirst(static::$prefixPlural),
+            'group' => static::$adminGroup,
             'icon' => static::$adminIcon,
             'url' => static::getSingleRoute('web', 'index'),
             'active' => Route::currentRouteName() == static::getSingleRouteName('web', 'index'),

@@ -56,6 +56,8 @@ class Pool extends AbstractModel
     ];
 
     public static $adminIcon = 'mdi mdi-pool';
+    public static $adminGroup = 'Personen';
+    public static $adminTitle = 'Vertretungs-Pools';
 
     public static $relationsForIndex = ['cities', 'users'];
     public static $relationsForEditor = ['cities', 'users'];

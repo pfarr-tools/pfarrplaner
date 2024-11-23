@@ -46,7 +46,7 @@ class AdminController extends Controller
      */
     public function index()
     {
-        $modules = AdminModule::modules();
+        $modules = collect(AdminModule::modules())->sortBy(['group', 'text'])->groupBy('group');
         return Inertia::render('Admin/Index', compact('modules'));
     }
 }

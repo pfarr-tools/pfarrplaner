@@ -90,6 +90,7 @@ class City extends AbstractModel
     ];
 
     public static $adminIcon = 'mdi mdi-church';
+    public static $adminGroup = 'Orte';
 
 
 

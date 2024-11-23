@@ -29,13 +29,22 @@
 
 <template>
     <admin-layout title="Administration">
-        <div class="admin-index row">
-            <div v-for="module in modules"
-                 class="col-md-4 p-3 btn btn-light"
-                 @click="$inertia.get(module.url)"
-                 :title="'Klicken, um '+module.text+' zu verwalten'">
-                <span v-if="module.icon" :class="module.icon" class="me-1"></span>
-                {{ module.text }}
+        <div class="admin-index">
+            <div v-for="(groupModules, groupName) in modules">
+                <h3 v-if="groupModules.length" class="mt-3">{{ groupName }}</h3>
+                <div v-if="groupModules.length" class="row">
+                    <div v-for="module in groupModules"
+                         class="col-md-4 p-2 module"
+                         @click="$inertia.get(module.url)"
+                         :title="'Klicken, um '+module.text+' zu verwalten'">
+                        <div class="fw-semibold">
+                        <span v-if="module.icon" :class="module.icon" class="me-1"></span>
+                        {{ module.text }}
+                        </div>
+
+                    </div>
+
+                </div>
             </div>
         </div>
     </admin-layout>
@@ -63,6 +72,20 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../../sass/_variables.scss';
 
+h3 {
+    width: 100%;
+    border-bottom: solid 1px lightgray;
+}
+
+.module {
+    cursor: pointer;
+}
+
+.module:hover {
+    background-color: map-get($theme-colors, "secondary");
+    color: white;
+}
 </style>

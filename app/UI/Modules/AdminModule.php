@@ -83,6 +83,7 @@ class AdminModule extends AbstractModule
         if ($user->can('index', User::class)) {
             $adminMenu[] = [
                 'text' => 'Benutzer',
+                'group' => 'Personen',
                 'icon' => 'mdi mdi-account',
                 'url' => route('users.index'),
                 'active' => $route == 'users.index',
@@ -92,6 +93,7 @@ class AdminModule extends AbstractModule
         if ($user->can('index', Team::class)) {
             $adminMenu[] = [
                 'text' => 'Teams',
+                'group' => 'Personen',
                 'icon' => 'mdi mdi-account-multiple',
                 'url' => route('teams.index'),
                 'active' => $route == 'teams.index',
@@ -101,6 +103,7 @@ class AdminModule extends AbstractModule
         if ($user->can('index', Role::class)) {
             $adminMenu[] = [
                 'text' => 'Benutzerrollen',
+                'group' => 'Personen',
                 'icon' => 'mdi mdi-badge-account',
                 'url' => route('roles.index'),
                 'active' => $route == 'roles.index',
@@ -110,6 +113,7 @@ class AdminModule extends AbstractModule
         if ($user->can('index', Location::class)) {
             $adminMenu[] = [
                 'text' => 'Kirche / GD-Orte',
+                'group' => 'Orte',
                 'icon' => 'mdi mdi-map-marker',
                 'url' => route('locations.index'),
                 'active' => $route == 'locations.index',
@@ -119,6 +123,7 @@ class AdminModule extends AbstractModule
         if ($user->can('index', Tag::class)) {
             $adminMenu[] = [
                 'text' => 'Kennzeichnungen',
+                'group' => 'Veranstaltungen',
                 'icon' => 'mdi mdi-tag',
                 'url' => route('tags.index'),
                 'active' => $route == 'tags.index',
@@ -128,6 +133,7 @@ class AdminModule extends AbstractModule
         if ($user->can('index', Parish::class)) {
             $adminMenu[] = [
                 'text' => 'Pfarrämter',
+                'group' => 'Orte',
                 'icon' => 'mdi mdi-home-variant-outline',
                 'url' => route('parishes.index'),
                 'active' => $route == 'parishes.index',
@@ -137,6 +143,7 @@ class AdminModule extends AbstractModule
         if ($user->can('viewAny', Psalm::class)) {
             $adminMenu[] = [
                 'text' => 'Psalmen',
+                'group' => 'Liturgie',
                 'icon' => 'mdi mdi-hands-pray',
                 'url' => route('psalms.index'),
                 'active' => $route == 'psalms.index',
@@ -146,6 +153,7 @@ class AdminModule extends AbstractModule
         if ($user->can('viewAny', Songbook::class)) {
             $adminMenu[] = [
                 'text' => 'Liederbücher',
+                'group' => 'Liturgie',
                 'icon' => 'mdi mdi-book-music-outline',
                 'url' => route('songbooks.index'),
                 'active' => $route == 'songbooks.index',
@@ -155,6 +163,7 @@ class AdminModule extends AbstractModule
         if ($user->can('viewAny', Song::class)) {
             $adminMenu[] = [
                 'text' => 'Lieder',
+                'group' => 'Liturgie',
                 'icon' => 'mdi mdi-music',
                 'url' => route('songs.index'),
                 'active' => $route == 'songs.index',
@@ -164,6 +173,7 @@ class AdminModule extends AbstractModule
         if ($user->can('viewAny', Text::class)) {
             $adminMenu[] = [
                 'text' => 'Liturgische Texte',
+                'group' => 'Liturgie',
                 'icon' => 'mdi mdi-text',
                 'url' => route('admin.text.index'),
                 'active' => $route == 'admin.text.index',
@@ -173,6 +183,7 @@ class AdminModule extends AbstractModule
         if ($user->can('viewAny', Service::class)) {
             $adminMenu[] = [
                 'text' => 'Vorlagen',
+                'group' => 'Liturgie',
                 'icon' => 'mdi mdi-text',
                 'url' => route('template.index'),
                 'active' => $route == 'template.index',
