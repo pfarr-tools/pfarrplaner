@@ -740,7 +740,7 @@ Amen.'
                 }
 
                 $this->renderParagraph(self::NO_INDENT, [
-                    [$item->title . trim($title), []]
+                    [Str::replace('&', '&amp;', $item->title . trim($title)), []]
                 ]);
             }
         }
