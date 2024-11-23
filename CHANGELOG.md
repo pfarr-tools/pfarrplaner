@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.25.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.24.1...v2024.25.0) (2024-11-23)
+
+
+### Features
+
+* Neues Design für die Übersicht in der Administration ([fe8ded8](https://codeberg.org/pfarr.tools/pfarrplaner/commit/fe8ded84b792dc10d9e27846fba7a12d80c0dae3))
+* Neues Design für Übersicht der Ausgabeformate ([5c1b46a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5c1b46a3ee79e197cd14362067b8f6b1c03ff49b))
+
+
+### Bug Fixes
+
+* Fehlende Schriftarten hinzugefügt ([5830cb2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5830cb2762dd02f437c96e846a66347a2139713a))
+* Öffentliche Schriftarten hinzugefügt ([2924cce](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2924cce8d2288a095fa3f0d66d584e8ebe09fd2c))
+
 ### [2024.24.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.24.0...v2024.24.1) (2024-11-22)
 
 
