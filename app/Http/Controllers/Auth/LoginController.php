@@ -83,7 +83,6 @@ class LoginController extends Controller
     {
         $request->session()->regenerateToken();
         $demo = (app()->environment() == 'demo');
-        $demo = true;
         $users = $demo ? User::with('roles', 'homeCities')->where('password', '!=', '')->orderBy('id')->get() : [];
 
 
