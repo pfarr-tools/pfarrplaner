@@ -192,13 +192,13 @@ body.calendar .content-header {
 
 
 .calendar-month .day-description {
-    font-weight: normal;
+    font-weight: $font-weight-base;
     font-style: italic;
 }
 
 .calendar-month .vacation {
     display: inline-block;
-    font-weight: normal;
+    font-weight: $font-weight-base;
     background-color: map-get($elkw-colors, "orange");
     font-size: 0.7em;
     padding: 3px;
@@ -213,7 +213,7 @@ span.vacation-conflict {
 
 .calendar-month .liturgy {
     font-size: 0.6em;
-    font-weight: normal;
+    font-weight: $font-weight-base;
 }
 
 .calendar-month .liturgy-sermon,
@@ -290,25 +290,25 @@ span.vacation-conflict {
 
 .calendar-month .service-time.service-special-time {
     color: map-get($theme-colors, 'danger');
-    font-weight: bold;
+    font-weight: $font-weight-semibold;
 }
 
 .calendar-month .service-special-location {
     color: map-get($theme-colors, 'danger');
-    font-weight: bold;
+    font-weight: $font-weight-semibold;
 }
 
 .calendar-month .service-pastor {
-    font-weight: bold;
+    font-weight: $font-weight-semibold;
 }
 
 .calendar-month .need-predicant {
-    font-weight: bold;
+    font-weight: $font-weight-semibold;
     color: map-get($theme-colors, 'danger');
 }
 
 .calendar-month .designation {
-    font-weight: normal;
+    font-weight: $font-weight-base;
 }
 
 .calendar-month .service-team, .calendar-month .service-description {
@@ -329,7 +329,7 @@ span.vacation-conflict {
 
 .instructions li {
     margin-bottom: 1em;
-    font-weight: bold;
+    font-weight: $font-weight-semibold;
 }
 
 
@@ -579,7 +579,7 @@ input.form-control, textarea.form-control {
 
 input.form-control:focus, textarea.form-control:focus {
     background-color: tint-color(map-get($elkw-colors, "hellblau"), 70%);
-    font-weight: bold;
+    font-weight: $font-weight-semibold;
     box-shadow: none;
     border-color: map-get($elkw-colors, "dunkelblau");
 }
@@ -599,7 +599,7 @@ input.form-control:focus, textarea.form-control:focus {
     border-color: map-get($elkw-colors, "dunkelblau");
     box-shadow: none;
     background-color: tint-color(map-get($elkw-colors, "hellblau"), 70%) !important;
-    font-weight: bold;
+    font-weight: $font-weight-semibold;
 }
 
 .badge-permission-a {
@@ -634,7 +634,7 @@ tr.changed, tr.changed td, tr.changed th {
 
 .content .footer a {
     color: map-get($elkw-colors, 'dunkelgrau');
-    font-weight: bold;
+    font-weight: $font-weight-semibold;
 }
 
 .profile-homescreen-accordion {
@@ -649,7 +649,7 @@ tr.changed, tr.changed td, tr.changed th {
 }
 
 .fake-table-head {
-    font-weight: bold;
+    font-weight: $font-weight-semibold;
     border-top: solid 1px #dee2e6;
     border-bottom: solid 2px #dee2e6;
 }
