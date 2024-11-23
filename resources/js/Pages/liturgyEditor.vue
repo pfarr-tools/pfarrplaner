@@ -51,10 +51,9 @@
                         help="Wörter pro Minute"/>
             <button class="btn btn-sm btn-primary" @click.prevent.stop="reloadPage">Anwenden</button>
         </template>
-        <template slot="after-flash">
-            <info-pane v-if="!templateMode" :service="service" :liturgy-info="liturgyInfo" @info="infoWindow = true"/>
-            <template-info-pane v-if="templateMode" v-model="service"/>
-        </template>
+        <info-pane v-if="!templateMode" :service="service" :liturgy-info="liturgyInfo" @info="infoWindow = true"/>
+        <template-info-pane v-if="templateMode" v-model="service"/>
+        <hr />
         <liturgy-tree v-if="service.isEditable" :service="service" :sheets="templateMode ? {} : liturgySheets" :agenda-mode="templateMode"
                       :auto-focus-block="autoFocusBlock" :auto-focus-item="autoFocusItem"
                       :ministries="ministries" :markers="markers"
