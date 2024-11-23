@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.25.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.25.1...v2024.25.2) (2024-11-23)
+
+
+### Bug Fixes
+
+* Demologin für alle Benutzer angezeigt ([71f5b7c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/71f5b7c7b52653313fc382dec35bcb5e39222c6e))
+
 ### [2024.25.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.25.0...v2024.25.1) (2024-11-23)
 
 
