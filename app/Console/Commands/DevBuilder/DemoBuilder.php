@@ -391,7 +391,7 @@ class DemoBuilder extends Command
                 $data['password'] = 'test';
             }
         } else {
-            $data['password'] = 'admin';
+            $data['password'] = 'test';
         }
         $user->update($data);
         $user->calendarConnections()->delete();

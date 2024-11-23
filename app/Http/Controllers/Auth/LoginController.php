@@ -83,9 +83,15 @@ class LoginController extends Controller
     {
         $request->session()->regenerateToken();
         $demo = (app()->environment() == 'demo');
+        $demo = true;
         $users = $demo ? User::with('roles', 'homeCities')->where('password', '!=', '')->orderBy('id')->get() : [];
 
-        return Inertia::render('Auth/Login', compact('users', 'demo'));
+
+        if ($demo) {
+            return Inertia::render('Auth/DemoLogin', compact('users' ));
+        } else {
+            return Inertia::render('Auth/Login');
+        }
     }
 
     public function setInitialPassword()

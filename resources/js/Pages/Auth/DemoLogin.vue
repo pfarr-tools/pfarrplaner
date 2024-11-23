@@ -36,36 +36,25 @@
                 </div>
                 <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                     <h1 class="ps-0 pl-0 ms-0 ms-0 mb-4">{{ layout.appName }}</h1>
+                    <p>Diese Demoversion wird aus anonymisierten Daten einer realen Installation genutzt
+                        und bietet dadurch Einblicke in die Verwendung des Dienstes.
+                        Ein Passwort ist nicht erforderlich. Bitte wähle den gewünschten Benutzer einfach unten aus.
+                    </p>
                     <form method="POST" id="loginForm" @submit.prevent.stop="submit">
                         <input type="hidden" name="_token" :value="csrf" :key="csrf">
                         <!-- Email input -->
-                        <div v-if="!demo">
-                            <form-input v-if="!demo"
-                                v-model="form.email"
-                                name="email" label="E-Mailadresse" autofocus placeholder="deine@email.de"/>
-                            <form-input class="my-3"
-                                        type="password" name="password" v-model="form.password"
-                                        label="Passwort" />
-                            <form-check v-model="form.remember" label="Angemeldet bleiben" />
-
-                        </div>
-
-                        <div v-else>
-                            <div class="form-outline mb-4">
-                                <label class="form-label" for="form3Example3">E-Mailadresse</label>
-
-                                <select id="users" name="email" class="form-control">
-                                    <select id="users" name="email" class="form-control" :value="users[0].email"
-                                    <option v-for="user in users" :value="user.email">
-                                        {{ user.title ? user.title+' ' : ''}}{{ user.name }} ({{ user.email }})
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
+                        <form-group label="E-Mailadresse">
+                            <select name="email" class="form-control" v-model="form.email">
+                                <option v-for="user in users" :value="user.email">
+                                    {{ user.title ? user.title + ' ' : '' }}{{ user.name }} ({{ user.email }})
+                                </option>
+                            </select>
+                        </form-group>
                         <div class="text-end text-lg-start mt-4 pt-2" :key="attempts">
-                            <button  class="btn btn-primary btn-lg"
-                                     @click="submit"
-                                     style="padding-left: 2.5rem; padding-right: 2.5rem;">Anmelden</button>
+                            <button class="btn btn-primary btn-lg"
+                                    @click="submit"
+                                    style="padding-left: 2.5rem; padding-right: 2.5rem;">Anmelden
+                            </button>
                         </div>
 
 
@@ -102,6 +91,7 @@ import FormCheck from "../../components/Ui/forms/FormCheck.vue";
 export default {
     name: "Login",
     components: {FormCheck, FormInput},
+    props: ['users'],
     computed: {
         layout() {
             return this.$page.props;
@@ -115,7 +105,7 @@ export default {
             loggingIn: false,
             form: {
                 email: '',
-                password: '',
+                password: 'test',
                 remember: false,
                 '_token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             }
