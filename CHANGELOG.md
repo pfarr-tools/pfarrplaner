@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.25.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.25.2...v2024.25.3) (2024-11-26)
+
+
+### Bug Fixes
+
+* Kasualgottesdienste können nicht angelegt werden ([2274a6f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2274a6f875b1b38bf741496e9042f2371889650d))
+
 ### [2024.25.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.25.1...v2024.25.2) (2024-11-23)
 
 
