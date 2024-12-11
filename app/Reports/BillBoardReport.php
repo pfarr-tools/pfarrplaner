@@ -127,7 +127,8 @@ class BillBoardReport extends AbstractWordDocumentReport
     {
         $data = $request->validate(
             [
-                'city' => 'required|int',
+                'cities' => 'required',
+                'cities.*' => 'int|exists:cities,id',
                 'altCity' => 'nullable|string',
                 'start' => 'required|date',
                 'parishes.*' => 'nullable|int|exists:parishes,id',
@@ -137,13 +138,13 @@ class BillBoardReport extends AbstractWordDocumentReport
 
         $start = Carbon::parse($data['start'])->startOfDay();
         $end = $start->copy()->addDays(7)->endOfDay();
-        $city = City::findOrFail($data['city']);
+        $cities = City::whereIn('id', $data['cities'])->get();
         $parishes = (count($data['parishes'] ?? [])) ? Parish::with('users')->whereIn('id', $data['parishes'])->get() : collect();
 
         $events = Occurence::with('event')
             ->between($start, $end)
-            ->whereHas('service', function ($query) use ($city, $start) {
-                $query->inCity($city)->displayable($start);
+            ->whereHas('service', function ($query) use ($cities, $start) {
+                $query->inCities($cities)->displayable($start);
             })
             ->orderBy('start')
             ->get()
@@ -151,7 +152,7 @@ class BillBoardReport extends AbstractWordDocumentReport
                 return $item->start->format('Ymd');
             });
 
-        $firstService = Service::inCity($city)->between($start, $end)->ordered()->first();
+        $firstService = Service::inCities($cities)->between($start, $end)->ordered()->first();
 
         $absences = (count($data['pastors'] ?? [])) ? Absence::whereIn('user_id', $data['pastors'])->byPeriod($start, $end)->get() : collect();
 
@@ -212,7 +213,8 @@ class BillBoardReport extends AbstractWordDocumentReport
         $this->wordDocument->setDefaultFontSize(12);
 
 
-        $this->renderParagraph(static::HEADING1, [['Kirchliche Nachrichten '.($data['altCity'] ?: $city->name), ['size' => 27]]]);
+        $cityTitle = $data['altCity'] ?? $cities->pluck('name')->join(', ', ' und ');
+        $this->renderParagraph(static::HEADING1, [['Kirchliche Nachrichten '.$cityTitle, ['size' => 27]]]);
         $this->renderBibleText($start);
         $this->section->addTextBreak(2);
 
@@ -223,16 +225,16 @@ class BillBoardReport extends AbstractWordDocumentReport
             $this->section->addTextBreak(2);
         }
 
-        $this->renderInfoHeader($city, $parishes);
+        $this->renderInfoHeader($cities, $parishes);
         $this->section->addTextBreak(2);
-        $this->renderEvents($events);
+        $this->renderEvents($events, $cities);
         $this->section->addTextBreak(3);
         $this->renderAbsences($absences);
 
 
         $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$city->name,
+                static::FILE_TITLE.' '.$cityTitle,
                 null,
                 static::FILE_SIGNATURE,
                 Carbon::now())
@@ -256,48 +258,56 @@ class BillBoardReport extends AbstractWordDocumentReport
         }
     }
 
-    protected function renderInfoHeader($city, $parishes)
+    protected function renderInfoHeader($cities, $parishes)
     {
+        $rendered = [];
+        foreach ($cities as $city) {
 
-        // headings
-        $title = $city->official_title ?: 'Evangelische Kirchengemeinde ' . $city->name;
-        $this->renderParagraph(static::DEFAULT, [[$title, ['size' => 22]]]);
+            // headings
+            $title = $city->official_title ?: 'Evangelische Kirchengemeinde ' . $city->name;
+            if (in_array($title, $rendered)) continue;
+            $rendered[] = $title;
 
-        $pastors = collect();
-        foreach ($parishes as $parish) {
-            if (count($parish->users)) {
-                $pastors = $parish->users->map(function (User $item, int $key) {
-                    return NameService::fromUser($item)->format(NameService::TITLE_FIRST_LAST);
-                })->join(', ', ' und ');
-                $this->renderParagraphWithImage($pastors, static::BOLD, $city->logo, [
-                    'width' => Converter::cmToPoint(3.5),
-                    'positioning' => 'relative',
-                    'wrappingStyle' => 'tight',
-                ]);
-                $firstPastor = $parish->users->first();
-                $this->renderParagraph(static::DEFAULT, [[trim(explode("\r\n", $firstPastor->address)[0]), []]]);
-                $this->renderParagraph(static::DEFAULT, [['Telefon ' . $firstPastor->phone, []]]);
-            }
+            $this->renderParagraph(static::DEFAULT, [[$title, ['size' => 22]]]);
 
-            $emails = [];
-            foreach ($parish->users as $pastor) {
-                if ($pastor->email) {
-                    $emails[] = $pastor->email;
+            $pastors = collect();
+            foreach ($parishes as $parish) {
+                if (count($parish->users)) {
+                    $pastors = $parish->users->map(function (User $item, int $key) {
+                        return NameService::fromUser($item)->format(NameService::TITLE_FIRST_LAST);
+                    })->join(', ', ' und ');
+                    $this->renderParagraphWithImage($pastors, static::BOLD, $city->logo, [
+                        'width' => Converter::cmToPoint(3.5),
+                        'positioning' => 'relative',
+                        'wrappingStyle' => 'tight',
+                    ]);
+                    $firstPastor = $parish->users->first();
+                    $this->renderParagraph(static::DEFAULT, [[trim(explode("\r\n", $firstPastor->address)[0]), []]]);
+                    $this->renderParagraph(static::DEFAULT, [['Telefon ' . $firstPastor->phone, []]]);
+                }
+
+                $emails = [];
+                foreach ($parish->users as $pastor) {
+                    if ($pastor->email) {
+                        $emails[] = $pastor->email;
+                    }
+                }
+                if ($parish->email) {
+                    $emails[] = $parish->email;
+                }
+                $this->renderParagraph(static::INDENT, [["E-Mail:\t" . join('<w:br/>', $emails), []]]);
+                $this->renderParagraph(static::INDENT, [["Homepage:\t" . parse_url($city->homepage, PHP_URL_HOST), []]]);
+                if ($parish->opening_hours) {
+                    $this->renderParagraph(static::DEFAULT, [['Sprechzeiten im Pfarrbüro'.($parish->assistant ? ', '.$parish->assistant : ''), []]]);
+                    $this->renderParagraph(static::DEFAULT, [[$parish->opening_hours, []]], 1);
                 }
             }
-            if ($parish->email) {
-                $emails[] = $parish->email;
-            }
-            $this->renderParagraph(static::INDENT, [["E-Mail:\t" . join('<w:br/>', $emails), []]]);
-            $this->renderParagraph(static::INDENT, [["Homepage:\t" . parse_url($city->homepage, PHP_URL_HOST), []]]);
-            if ($parish->opening_hours) {
-                $this->renderParagraph(static::DEFAULT, [['Sprechzeiten im Pfarrbüro'.($parish->assistant ? ', '.$parish->assistant : ''), []]]);
-                $this->renderParagraph(static::DEFAULT, [[$parish->opening_hours, []]], 1);
-            }
+
         }
+
     }
 
-    protected function renderEvents($events)
+    protected function renderEvents($events, $cities)
     {
         if (!count($events)) {
             return;
@@ -315,9 +325,14 @@ class BillBoardReport extends AbstractWordDocumentReport
                         $event->event->pastors ?? []
                     ) ? ' mit ' . $this->getNameListLine($event->event->pastors) : '')
                 ];
+                if ((count($cities) == 1) && ((null === $event->location) || ($event->location->city_id == $cities[0]->id))) {
+                    $line[] = $event->event->locationText;
+                } else {
+                    $line[] = $event->event->locationTextWithCity;
+                }
                 if ($event->event->event_class == 'service') {
-                    $line[] = 'Musik: ' . $this->getNameListLine($event->event->organists);
-                    $line[] = 'Opfer: ' . $event->event->offering_goal;
+                    if ($s = $this->getNameListLine($event->event->organists))$line[] = 'Musik: ' . $s;
+                    if ($event->event->offering_goal) $line[] = 'Opfer: ' . $event->event->offering_goal;
                     $line[] = '';
                 }
                 $this->renderParagraph(

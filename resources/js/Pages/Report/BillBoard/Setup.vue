@@ -34,8 +34,8 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'billBoard'})" ref="myForm">
             <form-csrf-token />
-            <form-selectize name="city" label="Kirchliche Nachrichten für folgende Kirchengemeinde erstellen" v-model="myCity"
-                            @input="setParishes"
+            <form-selectize name="cities[]" label="Kirchliche Nachrichten für folgende Kirchengemeinden erstellen" v-model="myCities"
+                            @input="setParishes" multiple
                             :options="cities" />
             <form-input name="altCity" label="Alternative Ortsbezeichnung" />
             <form-date-picker name="start" label="Gottesdienste ab" v-model="myStart" iso-date />
@@ -64,7 +64,9 @@ export default {
     components: {PeopleSelect, FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     computed: {
         availableParishes() {
-            return this.parishes[this.myCity] ?? [];
+            let p = [];
+            this.myCities.forEach(city => p = p.concat(this.parishes[city]));
+            return p;
         },
         availablePastors() {
             let p = [];
@@ -76,7 +78,7 @@ export default {
         let myStart = moment().startOf('isoWeek').add(6, 'days');
 
         return {
-            myCity: this.cities.length ? this.cities[0].id : null,
+            myCities: this.cities.length ? [this.cities[0].id] : null,
             myParishes: [],
             myPastors: [],
             cityUpdated: 0,
