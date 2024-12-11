@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.26.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.25.3...v2024.26.0) (2024-12-11)
+
+
+### Features
+
+* BillBoardReport kann jetzt mehrere Kirchengemeinden gleichzeitig anzeigen ([b48f282](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b48f282f3cf95767de8f056317952ca386b0ab4c))
+
 ### [2024.25.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.25.2...v2024.25.3) (2024-11-26)
 
 
