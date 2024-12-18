@@ -40,6 +40,12 @@
             <a :href="liturgy['litTextsPerikope'+liturgy.perikope+'Link']" target="_blank">
                 {{ liturgy['litTextsPerikope'+liturgy.perikope] }}</a>
         </div>
+        <div>
+            <span class="mdi mdi-view-list indicator" :class="{'indicator-active' :service.hasLiturgy }"
+                  :title="(service.hasLiturgy ? '' : 'keine ')+'Liturgie vorhanden'"></span>
+            <span class="mdi mdi-microphone indicator"  :class="{'indicator-active' :service.hasSermon }"
+                  :title="(service.hasSermon ? '' : 'keine ')+'Predigt vorhanden'"></span>
+        </div>
     </div>
 </template>
 
@@ -55,6 +61,14 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '../../../sass/_variables';
 
+    .indicator {
+        color: lightgrey;
+    }
+
+    .indicator-active {
+        color: map-get($theme-colors, 'secondary');
+    }
 </style>

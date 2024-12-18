@@ -81,6 +81,8 @@ class CalendarServiceResource extends JsonResource
             'sacristans' => CalendarParticipantResource::collection($this->sacristans),
             'isMine' => $this->isMine,
             'isEditable' => $this->isEditable,
+            'hasSermon' => $this->sermon_id !== null,
+            'hasLiturgy' => $this->liturgyBlocks->count() > 0,
         ];
     }
 }
