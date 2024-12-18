@@ -29,6 +29,7 @@
 
 <template xmlns="http://www.w3.org/1999/html">
     <div class="liturgy-editor-info-pane">
+        <div class="mb-3" v-html="credits"></div>
         <div v-if="showable && liturgy['title']">
             <div v-if="myService.isAlternateProprium" class="alert alert-warning mb-1">
                 In den Gottesdiensteinstellungen wurde ein vom normalen Kalender abweichendes Proprium
@@ -147,7 +148,22 @@ export default {
         showable() {
             if ((!this.liturgy['title']) && (this.myService.funerals.length > 0)) return false;
             return true;
-        }
+        },
+        credits() {
+            let ministries = {
+                'P': this.myService.pastors,
+                'O': this.myService.organists,
+                'M': this.myService.sacristans,
+                ...this.myService.ministriesByCategory,
+            }
+            let c = [];
+            for (const category in ministries) {
+                let names = [];
+                ministries[category].forEach(person => names.push(person.name));
+                c.push(category+': '+names.join(', '));
+            }
+            return c.join(' &middot; ');
+        },
     },
     props: ['service', 'liturgyInfo'],
     methods: {
