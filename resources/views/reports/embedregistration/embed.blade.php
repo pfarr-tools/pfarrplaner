@@ -149,7 +149,7 @@
                                     return res.text();
                                 })
                                 .then((data) => {
-                                    $('#{{ $randomId }}').html(data);
+                                    document.getElementById('{{ $randomId }}').innerHTML = data;
                                     blockSubmission = false;
                                 });
                         }
