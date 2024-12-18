@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2024.27.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.26.0...v2024.27.0) (2024-12-18)
+
+
+### Features
+
+* Mitwirkende werden in der Liturgieansicht angezeigt ([051e2b4](https://codeberg.org/pfarr.tools/pfarrplaner/commit/051e2b46c815e9686e6fd49438bee0830a2b78bd))
+* Symbole für "Liturgie vorhanden" und "Predigt vorhanden" in der Gottesdienstübersicht ([644ba57](https://codeberg.org/pfarr.tools/pfarrplaner/commit/644ba57004ad6afb35b19aba00ed019889600ea0)), closes [#414](https://codeberg.org/pfarr.tools/pfarrplaner/issues/414)
+
+
+### Bug Fixes
+
+* CSRF-Token fehlt bei vielen Requests ([7b7b57e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/7b7b57ee82495957c9f3b2b79791f2d155c855c3))
+
 ## [2024.26.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.25.3...v2024.26.0) (2024-12-11)
 
 
