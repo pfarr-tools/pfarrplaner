@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.27.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.27.0...v2024.27.1) (2024-12-18)
+
+
+### Bug Fixes
+
+* Abhängigkeit von jQuery bei Einbettung auf der Homepage entfernt ([067e009](https://codeberg.org/pfarr.tools/pfarrplaner/commit/067e0097a5c617fb6002ac23a792d7445d6b7b08))
+
 ## [2024.27.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.26.0...v2024.27.0) (2024-12-18)
 
 
