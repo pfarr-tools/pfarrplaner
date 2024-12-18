@@ -90,18 +90,33 @@ window.api.defaults.withCredentials = true;
 * a simple convenience so we don't have to attach every token manually.
 */
 
-token = document.head.querySelector('meta[name="csrf-token"]');
+window.token = async function() {
+    console.log('Checking CSRF token...');
+    currentToken = document.head.querySelector('meta[name="csrf-token"]');
 
-if (token) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-    window.api.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-} else {
-    window.axios.get(route('csrf.keepalive')).then(response => {
-        token = response.data.token;
-        window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-        window.api.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-    });
+    if (currentToken) {
+        console.log('CSRF token is present.');
+        window.axios.defaults.headers.common['X-CSRF-TOKEN'] = currentToken.content;
+        window.api.defaults.headers.common['X-CSRF-TOKEN'] = currentToken.content;
+        return currentToken.content;
+    } else {
+        try {
+            console.log('Retrieving new CSRF token...');
+            const response = await window.axios.get(route('csrf.keepalive'));
+            currentToken = response.data.token;
+            window.axios.defaults.headers.common['X-CSRF-TOKEN'] = currentToken;
+            window.api.defaults.headers.common['X-CSRF-TOKEN'] = currentToken;
+            console.log('CSRF token is present.');
+            return currentToken;
+        } catch(error) {
+            console.error('Error retrieving token: '+error);
+            return null;
+        }
+    }
+
 }
+window.csrf_token = window.token();
+
 
 
 
@@ -120,10 +135,10 @@ window.moment = require('moment');
  * all outgoing HTTP requests automatically have it attached. This is just
  * a simple convenience so we don't have to attach every token manually.
  */
-let token = document.head.querySelector('meta[name="csrf-token"]');
-if (token) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-    window.api.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+let currentToken = document.head.querySelector('meta[name="csrf-token"]');
+if (currentToken) {
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = currentToken.content;
+    window.api.defaults.headers.common['X-CSRF-TOKEN'] = currentToken.content;
 } else {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
