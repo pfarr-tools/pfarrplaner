@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.27.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.27.2...v2024.27.3) (2024-12-20)
+
+
+### Bug Fixes
+
+* Planer lässt sich nicht öffnen, wenn die OpenHolidays API einen Fehler liefert. ([1e5dc7c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1e5dc7c1ff5d501cacf63097113a6413efe088fe))
+
 ### [2024.27.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.27.1...v2024.27.2) (2024-12-20)
 
 
