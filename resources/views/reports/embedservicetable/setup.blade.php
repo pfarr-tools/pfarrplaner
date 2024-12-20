@@ -74,7 +74,7 @@
             $(showGroup + ' input').removeAttr('disabled');
         }
 
-        $(document).ready(function () {
+        document.addEventListener("DOMContentLoaded", function(event) {
             $('select[name=listType]').on('change', function () {
                 adjustForm();
             });

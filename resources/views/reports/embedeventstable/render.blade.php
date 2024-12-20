@@ -1,4 +1,4 @@
-<script defer>$(document).ready(function () {fetch('{!! $url !!}').then((res) => {
+<script defer>document.addEventListener("DOMContentLoaded", function(event) {fetch('{!! $url !!}').then((res) => {
         return res.text();
     }).then((data) => {
         document.getElementById('{{ $randomId }}').innerHTML = data;
