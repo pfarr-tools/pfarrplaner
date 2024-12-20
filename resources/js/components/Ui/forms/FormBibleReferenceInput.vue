@@ -190,7 +190,7 @@ export default {
         }, 1000),
         copyToClipboard() {
             const cb = navigator.clipboard;
-            cb.writeText(this.myBibleText+"\n("+this.myReference.correctedReference+')').then(result => {});
+            cb.writeText(this.myBibleText+" ("+this.myReference+')').then(result => {});
         },
         setTextFromList(e) {
             this.myReference = e;
@@ -212,7 +212,7 @@ export default {
             this.setNewValue();
         },
         returnInput() {
-            this.$emit('input', this.fullText ? this.myBibleText+" \n("+this.myReference.correctedReference+')' : this.myValue);
+            this.$emit('input', this.fullText ? this.myBibleText+" \n("+this.myReference+')' : this.myValue);
         }
     },
 }
