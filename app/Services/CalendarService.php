@@ -115,7 +115,7 @@ class CalendarService
                 . $end->format('Y-m-d');
 
             $raw = json_decode(file_get_contents($url), true);
-        } catch (Exception $e) {
+        } catch (\ErrorException $e) {
             return [];
         }
         $holidays = [];
