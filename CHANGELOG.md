@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.27.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.27.1...v2024.27.2) (2024-12-20)
+
+
+### Bug Fixes
+
+* Fehlende Stellenangabe beim Kopieren von Bibeltexten ([e484262](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e48426242c1936db4eb858436c5e7f42f97d81d4))
+
 ### [2024.27.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.27.0...v2024.27.1) (2024-12-18)
 
 
