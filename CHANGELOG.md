@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2024.27.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.27.3...v2024.27.4) (2024-12-24)
+
+
+### Bug Fixes
+
+* Fehler beim Erstellen der PowerPoint-Präsentation wenn Liederbuch kein Bild hat ([1b9bc9d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1b9bc9dbc037147f52a18a1525356f614176c6af))
+
 ### [2024.27.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.27.2...v2024.27.3) (2024-12-20)
 
 
