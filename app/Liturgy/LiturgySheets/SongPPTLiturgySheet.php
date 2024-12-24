@@ -431,13 +431,15 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 ->setName('Calibri');
             $paragraph->createTextRun($data[$key]['songbook']['name']);
         } else {
-            $shape = $slide->createDrawingShape();
-            $shape->setName('')
-                ->setPath(storage_path('app/' . $data[$key]['songbook']['image']))
-                ->setResizeProportional(true)
-                ->setWidth(PPTUnitsHelper::convert(4, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-                ->setOffsetX(PPTUnitsHelper::convert(10.7, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
-                ->setOffsetY(PPTUnitsHelper::convert(1.7, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL));
+            if (trim($data[$key]['songbook']['image'])) {
+                $shape = $slide->createDrawingShape();
+                $shape->setName('')
+                    ->setPath(storage_path('app/' . $data[$key]['songbook']['image']))
+                    ->setResizeProportional(true)
+                    ->setWidth(PPTUnitsHelper::convert(4, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
+                    ->setOffsetX(PPTUnitsHelper::convert(10.7, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
+                    ->setOffsetY(PPTUnitsHelper::convert(1.7, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL));
+            }
         }
         $shape2 = $slide->createRichTextShape()
             ->setOffsetX(0)
