@@ -756,6 +756,7 @@ Amen.'
                     ]);
                     $this->section->addTextBreak();
 
+                    if (!$item->data['reference']) continue;
                     $ref = ReferenceParser::getInstance()->parse($item->data['reference']);
                     $bibleText = (new BibleText())->get($ref);
 
