@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.0.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.0.1...v2025.0.2) (2025-01-09)
+
+
+### Bug Fixes
+
+* AnnouncementReport produziert Fehler wenn keine Schriftlesung definiert ist. ([75e7aab](https://codeberg.org/pfarr.tools/pfarrplaner/commit/75e7aabca82997d606d66a226f77384596106793))
+* AnnouncementReport, BillboardReport zeigen "möglichen Taufgottesdienst" an. ([de0bd26](https://codeberg.org/pfarr.tools/pfarrplaner/commit/de0bd262880042ce431759f4de8f900858b2bfc1))
+
 ### [2025.0.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.0.0...v2025.0.1) (2025-01-09)
 
 
