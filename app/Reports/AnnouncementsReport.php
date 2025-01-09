@@ -846,7 +846,7 @@ Amen.'
             foreach ($events as $event) {
                 $this->renderParagraph(self::INDENT, [
                     [
-                        $event->event->timeText() . "\t" . Str::replace('&', '&amp;', $event->event->titleText(false))
+                        $event->event->timeText() . "\t" . Str::replace('&', '&amp;', $event->event->titleText(false, false))
                         . (count($event->event->pastors ?? []) ? ' mit ' . $this->getNameListLine(
                                 $event->event->pastors
                             ) : '')

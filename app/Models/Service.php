@@ -436,7 +436,7 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * @return string
      */
-    public function descriptionText($exclude = [])
+    public function descriptionText($exclude = [], $excludeBaptismIfNoCandidates = false)
     {
         $desc = [];
         if ($this->needs_reservations) {
@@ -448,7 +448,9 @@ class Service extends Model implements HasDAVCalendarItems
         }
         if ($this->baptism) {
             if (!Str::contains(Str::lower($this->titleText()), 'tauf')) {
-                 $desc['baptism'] = $this->baptisms->count() ? 'mit Taufen' : 'möglicher Taufgottesdienst';
+                if ((!$excludeBaptismIfNoCandidates) || ($this->baptisms->count())) {
+                    $desc['baptism'] = $this->baptisms->count() ? 'mit Taufen' : 'möglicher Taufgottesdienst';
+                }
             }
         }
         if ($this->eucharist) {
