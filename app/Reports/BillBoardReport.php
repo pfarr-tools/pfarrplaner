@@ -325,6 +325,9 @@ class BillBoardReport extends AbstractWordDocumentReport
                         $event->event->pastors ?? []
                     ) ? ' mit ' . $this->getNameListLine($event->event->pastors) : '')
                 ];
+                if ($event->event->description) {
+                    $line[] = $event->event->description;
+                }
                 if ((count($cities) == 1) && ((null === $event->location) || ($event->location->city_id == $cities[0]->id))) {
                     $line[] = $event->event->locationText;
                 } else {

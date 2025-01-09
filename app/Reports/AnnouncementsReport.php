@@ -850,7 +850,9 @@ Amen.'
                         . (count($event->event->pastors ?? []) ? ' mit ' . $this->getNameListLine(
                                 $event->event->pastors
                             ) : '')
-                        . ' (' . $event->event->locationText() . ')',
+                        . ' (' . $event->event->locationText() . ')'
+                        .($event->event->description ? '<w:br />'.$event->event->description : '')
+                        ,
                         []
                     ]
                 ]);
