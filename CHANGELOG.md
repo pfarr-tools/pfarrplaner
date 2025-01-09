@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.0.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.0.0...v2025.0.1) (2025-01-09)
+
+
+### Bug Fixes
+
+* AnnouncementsReport, BillboardReport enthalten keine Beschreibungszeile ([e4128f5](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e4128f5f0d6709778af4d4cf34fa2eca5143a3e4))
+
 ## [2025.0.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2024.27.4...v2025.0.0) (2025-01-09)
 
 
