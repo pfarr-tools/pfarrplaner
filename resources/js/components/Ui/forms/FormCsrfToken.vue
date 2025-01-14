@@ -38,7 +38,10 @@ export default {
         return {
             token: document.querySelector('meta[name="csrf-token"]').content,
         }
-    }
+    },
+    mounted() {
+        this.token = document.querySelector('meta[name="csrf-token"]').content;
+    },
 }
 </script>
 

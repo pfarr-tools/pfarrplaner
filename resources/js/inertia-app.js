@@ -106,6 +106,7 @@ window.token = async function() {
             currentToken = response.data.token;
             window.axios.defaults.headers.common['X-CSRF-TOKEN'] = currentToken;
             window.api.defaults.headers.common['X-CSRF-TOKEN'] = currentToken;
+            document.querySelector('meta[name="description"]').setAttribute("content", currentToken);
             console.log('CSRF token is present.');
             return currentToken;
         } catch(error) {
