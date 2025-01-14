@@ -34,8 +34,7 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'predicants'})" ref="myForm">
             <form-csrf-token />
-            <form-selectize name="city" :label="$page.props.labels.predicant+'nen für folgende Kirchengemeinde anfordern'" v-model="myCity" :options="cities" />
-            <input type="hidden" name="city" v-model="myCity" />
+            <form-selectize name="cities[]" :label="$page.props.labels.predicant+'nen für folgende Kirchengemeinden anfordern'" v-model="myCities" :options="cities" multiple />
             <form-date-picker name="start" label="Gottesdienste von" v-model="from" iso-date />
             <form-date-picker name="end" label="Bis" v-model="to" iso-date />
         </form>
@@ -62,7 +61,7 @@ export default {
 
 
         return {
-            myCity: this.cities.length ? this.cities[0].id : null,
+            myCities: this.cities.length ? [this.cities[0].id] : [],
             from,
             to,
         }

@@ -93,22 +93,22 @@ class PredicantsReport extends AbstractWordDocumentReport
     {
         $data = $request->validate(
             [
-                'city' => 'required|int|exists:cities,id',
+                'cities.*' => 'required|int|exists:cities,id',
                 'start' => 'required|date|date_format:d.m.Y',
                 'end' => 'required|date|date_format:d.m.Y',
             ]
         );
 
+        $cities = City::whereIn('id', $data['cities'])->get();
         $serviceList = Service::between(Carbon::createFromFormat('d.m.Y', $data['start']), Carbon::createFromFormat('d.m.Y', $data['end']))
             ->notHidden()
             ->whereDoesntHave('funerals')
             ->where('need_predicant', 1)
-            ->where('city_id', $data['city'])
+            ->inCities($cities)
             ->ordered()
             ->get()
             ->groupBy('key_date');
 
-        $city = City::find($data['city']);
 
         $this->wordDocument->setDefaultFontName('Arial');
         $this->wordDocument->setDefaultFontSize(11);
@@ -141,7 +141,7 @@ class PredicantsReport extends AbstractWordDocumentReport
             $section->addText('', [], ['spaceAfter' => 0]);
         }
         $section->addText(
-            'Evang. Kirchengemeinde ' . $city->name,
+            'Für ' . $cities->pluck('name')->join(' / '),
             [],
             [
                 "borderSize" => 6,
@@ -184,8 +184,8 @@ class PredicantsReport extends AbstractWordDocumentReport
             foreach ($services as $service) {
                 $table->addRow();
                 $table->addCell(Converter::cmToTwip(3.25))->addText($service->date->format('d.m.Y') . '<w:br />');
-                $table->addCell(Converter::cmToTwip(5))->addText($service->locationText());
-                $table->addCell(Converter::cmToTwip(3.25))->addText(strftime('%H:%M Uhr', strtotime($service->time)));
+                $table->addCell(Converter::cmToTwip(5))->addText($service->locationTextWithCity);
+                $table->addCell(Converter::cmToTwip(3.25))->addText($service->timeText());
                 $table->addCell(Converter::cmToTwip(6))->addText($service->descriptionText());
                 $table->addCell(Converter::cmToTwip(7.25));
             }
@@ -193,7 +193,7 @@ class PredicantsReport extends AbstractWordDocumentReport
 
         $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '.$city->name,
+                static::FILE_TITLE.' '.$cities->pluck('name')->join(' '),
                 null,
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']])
