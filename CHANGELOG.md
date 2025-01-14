@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.0.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.0.2...v2025.0.3) (2025-01-14)
+
+
+### Bug Fixes
+
+* FormCsrfToken hat oft kein gültiges Token ([8a0d506](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8a0d5065c4cef50315a7ec17226b1e87f4c6146e))
+
 ### [2025.0.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.0.1...v2025.0.2) (2025-01-09)
 
 
