@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2025.1.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.0.3...v2025.1.0) (2025-01-14)
+
+
+### Features
+
+* Prädikant:innen für mehrere Gemeinden gleichzeitig anfordern ([bead2bb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/bead2bb4f1ee54f7233c8338c4b6204fa60aa222))
+
 ### [2025.0.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.0.2...v2025.0.3) (2025-01-14)
 
 
