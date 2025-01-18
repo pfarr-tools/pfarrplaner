@@ -64,6 +64,15 @@ trait HandlesAttachmentsTrait
             Storage::put($path, file_get_contents($request->get('uploadFromUrl')));
             $description = $request->get('attachment_text') ?: 'ohne Beschreibung';
             $object->attachments()->create(['title' => $description, 'file' => $path]);
+        } elseif ($request->has('uploadFromInbox')) {
+            $description = $request->get('attachment_text') ?: 'ohne Beschreibung';
+            $fileOrigin = storage_path(config('inbox.path').'/'.$request->get('uploadFromInbox'));
+            if (file_exists($fileOrigin)) {
+                $path = 'attachments/'.Str::random(32).'.'.pathinfo($request->get('uploadFromUrl'), PATHINFO_EXTENSION);
+                Storage::put($path, file_get_contents($fileOrigin));
+                unlink($fileOrigin);
+                $object->attachments()->create(['title' => $description, 'file' => $path]);
+            }
         }
 
         $this->removeAttachments($request, $object);

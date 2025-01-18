@@ -29,7 +29,7 @@
 
 <template>
     <div>
-    <form-group :name="name" :label="label" :help="help">
+    <form-group :name="name" :label="label" :help="help" :key="tabUpdate">
         <ul class="nav nav-pills mb-1">
             <li class="nav-item">
                 <a class="nav-link" :class="{active: showTab == 0}" @click="showTab = 0">Lokale Dateien</a>
@@ -40,8 +40,11 @@
             <li class="nav-item" v-if="!noCamera">
                 <a class="nav-link" :class="{active: showTab == 2}" @click="showTab = 2">Von der Kamera</a>
             </li>
+            <li class="nav-item" v-if="showInbox">
+                <a class="nav-link" :class="{active: showTab == 3}" @click="showTab = 3">Aus der Ablage</a>
+            </li>
             <li class="nav-item" v-if="!noPixabay">
-                <a class="nav-link" :class="{active: showTab == 3}" @click="showTab = 3">Von Pixabay</a>
+                <a class="nav-link" :class="{active: showTab == 4}" @click="showTab = 4">Von Pixabay</a>
             </li>
         </ul>
         <div class="upload-container" v-if="showTab == 0">
@@ -65,6 +68,15 @@
             </div>
         </div>
         <div  v-if="showTab == 3">
+            <div class="row inbox-row" v-for="inboxFile in inboxFiles" @click="uploadFromInbox(inboxFile)">
+                <div class="col-md-8"><b><span :class="inboxFile.icon"></span> {{ inboxFile.name }}</b></div>
+                <div class="col-md-2 text-muted">{{ moment(inboxFile.date).format('DD.MM.YYYY HH:mm') }}</div>
+                <div class="col-md-2 text-right text-muted" style="text-align: right">{{ fileSize(inboxFile.filesize) }}</div>
+            </div>
+            <hr />
+            <nav-button icon="mdi-refresh" @click="refreshInboxIndex">Ablage neu einlesen</nav-button>
+        </div>
+        <div  v-if="showTab == 4">
             <form-pixabay-picker @input="uploadFromPixabay" />
         </div>
     </form-group>
@@ -80,7 +92,7 @@ import __ from 'lodash';
 
 export default {
     name: "FormFileUpload",
-    props: ['name', 'label', 'help', 'multiple', 'helpText', 'noCamera', 'noUrl', 'noPixabay', 'noDescription'],
+    props: ['name', 'label', 'help', 'multiple', 'helpText', 'noCamera', 'noUrl', 'noPixabay', 'noDescription', 'noInbox'],
     components: {FormPixabayPicker, FormInput, NavButton, FormGroup},
     data() {
         return {
@@ -90,7 +102,13 @@ export default {
             uploadUrl: '',
             description: '',
             info: null,
+            inboxFiles: [],
+            showInbox: !this.noInbox,
+            tabUpdate: 0,
         }
+    },
+    mounted() {
+        this.refreshInboxIndex();
     },
     methods: {
         handleInput(event) {
@@ -110,6 +128,29 @@ export default {
             this.dragging = false;
         },
         drop(e) {},
+        /**
+         * Get human-readable file size
+         * @param size
+         * @returns {string}
+         * @source https://programanddesign.com/js/human-readable-file-size-in-javascript/
+         */
+        fileSize(size) {
+            var i = Math.floor(Math.log(size) / Math.log(1024));
+            return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+        },
+        refreshInboxIndex() {
+            this.$api().get(route('api.inbox.index')).then(response => {
+                if (!response.data) {
+                    this.showInbox = false;
+                } else {
+                    this.inboxFiles = response.data;
+                    console.log('inbox', this.inboxFiles);
+                    this.showInbox = true;
+                    this.tabUpdate++;
+                    this.$forceUpdate();
+                }
+            });
+        },
         uploadFromUrl() {
             this.$emit('upload-url', {url: this.uploadUrl, description: this.description, info: this.info});
         },
@@ -118,12 +159,20 @@ export default {
             this.uploadUrl = e.fullHDURL;
             this.info = e;
             this.uploadFromUrl();
+        },
+        uploadFromInbox(e) {
+            this.$emit('upload-inbox', e);
         }
     }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+
+@import '../../../../../node_modules/bootstrap/scss/functions';
+@import '../../../../sass/_variables.scss';
+
+
 
 .upload-container {
     display: inline-block;
@@ -170,4 +219,20 @@ export default {
 .nav-pills {
     font-size: .8em;
 }
+
+.inbox-row:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+
+.inbox-row:hover {
+    background-color: map-get($theme-colors, "primary") !important;
+    color: white;
+    cursor: pointer !important;
+}
+
+.inbox-row:hover .text-muted {
+    color: white !important;
+}
+
+
 </style>

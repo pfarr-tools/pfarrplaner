@@ -30,7 +30,7 @@
 <template>
     <div class="form-file-uploader">
         <div v-if="uploading">Datei wird hochgeladen... <span class="mdi mdi-spin mdi-loading"></span></div>
-        <form-file-upload @input="upload" @upload-url="uploadUrl" multiple="1" />
+        <form-file-upload @input="upload" @upload-url="uploadUrl" @upload-inbox="uploadInbox" multiple="1" :key="updateUploader" />
         <modal title="Bild zuschneiden" v-if="modalCropperOpen" min-height="50vh"
                @close="cropImage" @cancel="modalCropperOpen = false;"
                close-button-label="Zuschneiden" cancel-button-label="Original verwenden" max-width="800">
@@ -73,6 +73,7 @@ export default {
             canvasSettings,
             stencilSettings,
             info: null,
+            updateUploader: 0,
         }
     },
     methods: {
@@ -113,6 +114,19 @@ export default {
                     let attachments = response.data;
                     this.$emit('input', attachments);
                     this.uploading = false;
+                    this.allowCropping(attachments);
+                });
+        },
+        uploadInbox(inboxFile) {
+            let title = inboxFile.name
+            title = window.prompt('Bitte gib eine Beschreibung für die Datei "' + inboxFile.name + '" an.', title);
+            this.uploading = true;
+            axios.post(this.uploadRoute, {uploadFromInbox: inboxFile.name, attachment_text: title })
+                .then(response => {
+                    let attachments = response.data;
+                    this.$emit('input', attachments);
+                    this.uploading = false;
+                    this.updateUploader++;
                     this.allowCropping(attachments);
                 });
         },
