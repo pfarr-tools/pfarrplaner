@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2025.2.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.1.0...v2025.2.0) (2025-01-18)
+
+
+### Features
+
+* Dateianhänge können aus einer FTP-Inbox (z.B. vom Scanner) importiert werden ([c38d745](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c38d7450f5b6fc0e69d6f3fa2c0008340edc3119))
+
 ## [2025.1.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.0.3...v2025.1.0) (2025-01-14)
 
 
