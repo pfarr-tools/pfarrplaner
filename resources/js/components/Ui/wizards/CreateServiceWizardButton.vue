@@ -30,13 +30,26 @@
 <script>
     export default {
         name: 'CreateServiceWizardButton',
-        props: ['cities', 'type', 'date'],
+        props: ['cities', 'type', 'date', 'events', 'title'],
         data() {
             return {
                 myClass: this.type ? 'btn-'+this.type : 'btn-light',
                 myDate: moment(this.date).format('YYYY-MM-DD'),
+                myTitle: this.title || 'Gottesdienst anlegen',
             }
         },
+        methods: {
+            createNewEntry(city) {
+                if (!this.events) {
+                    this.$inertia.get(route('service.create', {city: city.id, date: this.myDate}));
+                } else {
+                    this.$inertia.get(route('event.create', {
+                        filter: 'city:'+city.id,
+                        date: moment(this.date).format('YYYY-MM'),
+                    }));
+                }
+            }
+        }
     }
 
 </script>
@@ -46,17 +59,17 @@
         <inertia-link v-if="cities.length == 1" class="btn me-1" :class="myClass"
                       :href="route('service.create', {city: cities[0].id, date: myDate})">
             <span class="mdi mdi-church"></span> <span
-            class="d-none d-md-inline">Gottesdienst anlegen</span>
+            class="d-none d-md-inline">{{ myTitle }}</span>
         </inertia-link>
         <div class="dropdown" v-if="cities.length > 1">
             <button v-if="cities.length > 1" type="button" class="btn dropdown-toggle me-1" :class="myClass"
                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="mdi mdi-church"></span> <span
-                class="d-none d-md-inline">Gottesdienst anlegen</span>
+                class="d-none d-md-inline">{{ myTitle }}</span>
                 <span class="sr-only">Weitere Optionen aufklappen</span>
             </button>
             <div class="dropdown-menu p-1">
-                <inertia-link v-for="city in cities" class="dropdown-item" :key="city.name+city.id"
-                   :href="route('service.create', {city: city.id, date: myDate})">{{ city.name }}</inertia-link>
+                <a v-for="city in cities" class="dropdown-item" :key="city.name+city.id"
+                   @click="createNewEntry(city)">{{ city.name }}</a>
             </div>
         </div>
 

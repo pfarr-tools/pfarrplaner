@@ -106,14 +106,10 @@
             <label class="btn btn-light" for="calendarModeEvents"><span class="mdi mdi-calendar"></span></label>
         </div>
 
-        <create-service-wizard-button v-if="(calendarMode == 'services') && canCreate" type="success"
+        <create-service-wizard-button v-if="canCreate" type="success"
                                       :cities="writableCities" class="ms-2 me-2" :date="date"
-                                      :key="moment(date).toISOString()"/>
-        <nav-button v-if="canCreate && (calendarMode != 'services')" type="success" class="ms-2 me-2"
-                    @click="createNewEvent"
-                    icon="mdi mdi-plus" force-icon>
-            Veranstaltung anlegen
-        </nav-button>
+                                      :events="!(calendarMode == 'services')" :title="(calendarMode == 'services') ? 'Gottesdienst anlegen' : 'Veranstaltung anlegen'"
+                                      :key="moment(date).toISOString()+calendarMode"/>
 
         <nav-button v-if="(calendarMode == 'services')"
                     class="me-2"
