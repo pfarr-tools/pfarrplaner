@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.2.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.2.0...v2025.2.1) (2025-01-21)
+
+
+### Bug Fixes
+
+* Veranstaltungen können nicht angelegt werden, wenn mehr als ein Ort im Kalender sichtbar ist ([8ef9a6e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8ef9a6ebe39a3f7a68c42f1a471b067e2fc811a9))
+
 ## [2025.2.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.1.0...v2025.2.0) (2025-01-18)
 
 
