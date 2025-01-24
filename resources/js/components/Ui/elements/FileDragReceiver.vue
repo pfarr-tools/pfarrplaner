@@ -66,6 +66,7 @@ export default {
                 title = file.name;
                 title = title.substr(0, title.lastIndexOf('.'));
                 title = title.charAt(0).toUpperCase() + title.slice(1);
+                if (title == 'Brief ans Pfarramt') title = 'Datenblatt';
                 title = window.prompt('Bitte gib eine Beschreibung für die Datei "'+fileName+'" an.', title);
             }
             if (null == title) return;
