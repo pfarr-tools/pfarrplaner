@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2025.3.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.2.1...v2025.3.0) (2025-01-24)
+
+
+### Features
+
+* "Brief ans Pfarramt" automatisch in "Datenblatt" umbenennen. ([6661ab7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6661ab7f4a34488ca81e421bcb8bc2808c8f1596)), closes [#415](https://codeberg.org/pfarr.tools/pfarrplaner/issues/415)
+
 ### [2025.2.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.2.0...v2025.2.1) (2025-01-21)
 
 
