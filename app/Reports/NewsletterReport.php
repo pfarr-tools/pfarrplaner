@@ -32,6 +32,7 @@ namespace App\Reports;
 
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
+use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
 use App\Models\Service;
 use Carbon\Carbon;
@@ -87,45 +88,30 @@ class NewsletterReport extends AbstractWordDocumentReport
     {
         $data = $request->validate(
             [
-                'city' => 'required|int|exists:cities,id',
+                'cities.*' => 'required|int|exists:cities,id',
                 'start' => 'required|date',
                 'end' => 'required|date',
-                'mixOP' => 'nullable|bool',
-                'mixOutlook' => 'nullable|bool',
+                'includeWeeklyVerse' => 'bool'
             ]
         );
 
-        $city = City::findOrFail($request->get('city'));
         $start = Carbon::parse($data['start'])->setTime(0,0,0);
         $end = Carbon::parse($data['end'])->setTime(23,59,59);
 
-        $services = Service::with(['location', 'day'])
-            ->displayable($start)
+        $events = Occurence::with('event')
             ->between($start, $end)
-            ->where('city_id', $city->id)
-            ->whereDoesntHave('funerals')
-            ->whereDoesntHave('weddings')
-            ->ordered()
-            ->get();
+            ->whereHas('service', function ($query) use ($data, $start, $end) {
+                $query->whereIn('city_id', $data['cities'])
+                    ->displayable($start)
+                    ->notHidden();
+            })
+            ->orderBy('start')
+            ->get()
+            ->groupBy(function ($item) {
+                return $item->start->format('Y-m-d');
+            });
 
-        $events = [];
-        $calendar = new EventCalendarImport($city->public_events_calendar_url);
-        $events = $calendar->mix($events, $start, $end, true, ($request->get('mixOutlook', 1) != 0));
-
-        // mix in services
-        if ($request->get('mixOutlook')) {
-            $events = Service::mix($events, $services, $start, $end);
-        } else {
-            $events = Service::mix([], $services, $start, $end);
-        }
-
-        // mix in OP events?
-        if ($request->get('mixOP')) {
-            $op = new OPEventsImport($city);
-            $events = $op->mix($events, $start, $end, true);
-        }
-
-        $html = View::make('reports.newsletter.html', compact('services', 'events'))->render();
+        $html = View::make('reports.newsletter.html', compact('events', 'data', 'start', 'end'))->render();
 
         return Inertia::render('Report/Newsletter/Render', compact('html'));
 

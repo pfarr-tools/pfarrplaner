@@ -34,11 +34,10 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'newsletter'})" ref="myForm">
             <form-csrf-token />
-            <form-selectize name="city" label="Newsletter für folgende Kirchengemeinde erstellen" v-model="myForm.city" :options="cities" />
+            <form-selectize name="cities[]" label="Newsletter für folgende Kirchengemeinden erstellen" v-model="myForm.cities" :options="cities" multiple />
+            <form-check name="includeWeeklyVerse" label="Wochenspruch mit aufnehmen." v-model="myForm.includeWeeklyVerse"/>
             <form-date-picker name="start" label="Gottesdienste von" v-model="myForm.start" iso-date />
             <form-date-picker name="end" label="Bis" v-model="myForm.end" iso-date />
-            <form-check name="mixOutlook" label="Veranstaltungen aus dem Outlook-Kalender mit aufnehmen." v-model="myForm.mixOutlook"/>
-            <form-check name="mixOP" label="Veranstaltungen aus dem Online Planer mit aufnehmen." v-model="myForm.mixOP"/>
         </form>
     </admin-layout>
 </template>
@@ -60,11 +59,10 @@ export default {
 
         return {
             myForm: {
-                city: this.cities.length ? this.cities[0].id : null,
+                cities: this.cities.length ? [this.cities[0].id] : null,
                 start: myStart,
                 end: myEnd,
-                mixOutlook: false,
-                mixOP: false,
+                includeWeeklyVerse: false,
             }
         }
     },
