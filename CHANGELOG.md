@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2025.4.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.3.0...v2025.4.0) (2025-01-29)
+
+
+### Features
+
+* Neue Newsletterausgabe ([e8e9512](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e8e95123a6ff9f77a2c2100a6e66b459b1927e30))
+
 ## [2025.3.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.2.1...v2025.3.0) (2025-01-24)
 
 
