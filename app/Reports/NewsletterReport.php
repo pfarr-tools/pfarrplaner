@@ -102,7 +102,7 @@ class NewsletterReport extends AbstractWordDocumentReport
             ->between($start, $end)
             ->whereHas('service', function ($query) use ($data, $start, $end) {
                 $query->whereIn('city_id', $data['cities'])
-                    ->displayable($start)
+                    ->displayable(Carbon::now())
                     ->notHidden();
             })
             ->orderBy('start')
