@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.4.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.0...v2025.4.1) (2025-01-30)
+
+
+### Bug Fixes
+
+* Newsletter enthält falsche Daten bei wiederholenden Terminen. ([8c99a2d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8c99a2dd66566b13f076ee55be3ed547ab4ecd14))
+
 ## [2025.4.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.3.0...v2025.4.0) (2025-01-29)
 
 
