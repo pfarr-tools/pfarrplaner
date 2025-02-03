@@ -21,12 +21,12 @@
                 <div class="form-group">
                     <label for="start">Von:</label>
                     <input class="form-control datepicker" type="text" name="start" placeholder="TT.MM.JJJJ"
-                           value="{{ \Carbon\Carbon::now()->formatLocalized('01.01.%Y') }}"/>
+                           value="{{ \Carbon\Carbon::now()->isoFormat('01.01.YYYY') }}"/>
                 </div>
                 <div class="form-group">
                     <label for="end">Bis:</label>
                     <input class="form-control datepicker" type="text" name="end" placeholder="TT.MM.JJJJ"
-                           value="{{ \Carbon\Carbon::now()->formatLocalized('01.01.%Y') }}"/>
+                           value="{{ \Carbon\Carbon::now()->isoFormat('01.01.YYYY') }}"/>
                 </div>
             </div>
             <div class="card-footer">

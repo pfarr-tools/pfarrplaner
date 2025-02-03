@@ -111,7 +111,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         $run->addText($service->titleText(false), $doc->getFontStyle('heading1'));
         $run->addTextBreak();
         $run->addText(
-            $service->date->setTimeZone('Europe/Berlin')->formatLocalized('%d.%m.%Y, %H:%M Uhr') . ', '
+            $service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr' . ', '
             . $service->locationText(),
             $doc->getFontStyle('heading1')
         );
@@ -141,7 +141,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                 $doc->renderNormalText($text);
             }
             $doc->renderNormalText(
-                'Gültig nur am ' . $service->dateTime->formatLocalized('%A, %d. %B %Y')
+                'Gültig nur am ' . $service->dateTime->isoFormat('dddd, DD. MMMM YYYY')
                 . ' von ' . $service->date->setTimezone('Europe/Berlin')->format('H:i')
                 . ' bis ' . $service->date->setTimezone('Europe/Berlin')->copy()->addHours(3)->format('H:i') . ' Uhr.'
             );

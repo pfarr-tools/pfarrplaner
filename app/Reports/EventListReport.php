@@ -349,7 +349,7 @@ class EventListReport extends AbstractWordDocumentReport
                     $run = $this->renderParagraph(
                         self::LIST2,
                         [
-                            [$event['start']->formatLocalized('%a.'), []],
+                            [$event['start']->isoFormat('dd.'), []],
                             ["\t" . $event['start']->format('d.m.'), []],
                             ["\t" . $event['start']->format('H:i') . ' Uhr', []],
                             ["\t" . $event['title'], []],

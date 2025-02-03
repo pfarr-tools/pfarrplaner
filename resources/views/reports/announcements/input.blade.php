@@ -14,7 +14,7 @@
                     <select class="form-control" name="lastService">
                         @foreach ($lastDaysWithServices as $day)
                             <option value="{{ \Carbon\Carbon::parse($day)->format('d.m.Y') }}"
-                                    data-offering="{{ $offerings[$day] }}">{{ \Carbon\Carbon::parse($day)->formatLocalized('%A, %d.%m.%Y') }}</option>
+                                    data-offering="{{ $offerings[$day] }}">{{ \Carbon\Carbon::parse($day)->isoFormat('dddd, DD.MM.YYYY') }}</option>
                         @endforeach
                     </select>
                     @component('components.validation', ['name' => 'lastService']) @endcomponent

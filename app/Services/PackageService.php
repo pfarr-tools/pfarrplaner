@@ -48,7 +48,7 @@ class PackageService
             ),
             'env' => App::environment(),
         ];
-        $package['buildDateString'] = $package['date']->formatLocalized('%A, %d. %B %Y %H:%M');
+        $package['buildDateString'] = $package['date']->isoFormat('dddd, DD. MMMM YYYY HH:mm');
         $package['buildVersion'] = $package['info']['version'].'-'.$package['env'];
         $package['versionString'] = $package['buildVersion'].', '.$package['buildDateString'];
         return $package;

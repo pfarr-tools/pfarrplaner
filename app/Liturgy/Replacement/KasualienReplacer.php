@@ -196,8 +196,8 @@ class KasualienReplacer extends AbstractReplacer
                     $text .= $this->renderParagraph($this->renderName($funeral->buried_name) . ', '
                                 . $funeral->buried_address
                                 . ($funeral->age() ? ', ' . $funeral->age() . ' Jahre' : '')
-                                . '. Die ' . $mode . ' findet am ' . $funeral->service->date->formatLocalized(
-                                    '%A, %d. %B'
+                                . '. Die ' . $mode . ' findet am ' . $funeral->service->date->isoFormat(
+                                    'dddd, DD. MMMM'
                                 )
                                 . ' um ' . $funeral->service->timeText(true, '.')
                                 . ' ' . $funeral->service->atText() . ' statt.');

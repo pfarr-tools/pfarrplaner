@@ -10,7 +10,7 @@
             @slot('cardFooter')
                 <input id='submitCheckIn' class="btn btn-primary" type="submit" value="Einchecken" />
             @endslot
-            <p>Hier kannst du für den Gottesdienst am {{ $service->dateTime()->formatLocalized('%d.%m.%Y um %H:%M Uhr') }} einchecken.</p>
+            <p>Hier kannst du für den Gottesdienst am {{ $service->dateTime()->isoFormat('DD.MM.YYYY \u\m HH:mm \U\h\r') }} einchecken.</p>
             <small><b>Bitte beachte: </b>Es handelt sich nicht um eine Sitzplatzreservierung. Ein Check-In garantiert nicht, dass ein Sitzplatz für dich zur Verfügung steht.</small>
             <hr />
             @input(['label' => 'Nachname', 'name' => 'name'])

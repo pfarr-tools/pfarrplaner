@@ -29,7 +29,7 @@
                     <div class="row">
                         <div class="col-md-2">
                             <input type="checkbox" name="dayList[]" value="{{ $date }}" checked>
-                            {{ \Carbon\Carbon::parse($date)->formatLocalized('%A, %d.%m.%Y') }}
+                            {{ \Carbon\Carbon::parse($date)->isoFormat('dddd, DD.MM.YYYY') }}
                         </div>
                         @foreach($locations as $location)
                             <div class="col-md-2">

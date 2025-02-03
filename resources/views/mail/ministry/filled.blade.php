@@ -9,7 +9,7 @@ Hallo {{ $sender->name }},
 {{ $user->name }} hat zugesagt, bei folgenden Gottesdiensten den Dienst "{{ $ministry }}" zu übernehmen:
 
 @foreach($services as $service)
-- {{ $service->date->formatLocalized('%A, %d. %B %Y') }}, {{ $service->timeText() }}, {{ $service->locationText() }}
+- {{ $service->date->isoFormat('dddd, DD. MMMM YYYY') }}, {{ $service->timeText() }}, {{ $service->locationText() }}
 @endforeach
 
 

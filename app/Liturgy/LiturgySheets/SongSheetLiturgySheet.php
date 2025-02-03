@@ -73,7 +73,7 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
         $run = new TextRun($doc->getParagraphStyle('heading1'));
         $run->addText($service->titleText(false), $doc->getFontStyle('heading1'));
         $run->addTextBreak();
-        $run->addText($service->date->setTimeZone('Europe/Berlin')->formatLocalized('%d.%m.%Y, %H:%M Uhr').', '
+        $run->addText($service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr'.', '
                       .$service->locationText(), $doc->getFontStyle('heading1'));
         $doc->getSection()->addTitle($run, 0);
 

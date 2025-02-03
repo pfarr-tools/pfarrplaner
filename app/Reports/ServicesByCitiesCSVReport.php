@@ -106,7 +106,7 @@ class ServicesByCitiesCSVReport extends AbstractCSVReport
             $services,
             [
                 'Datum' => function ($item, $key) {
-                    return $item[0]->date->setTimezone('Europe/Berlin')->formatLocalized('%A, %d. %B');
+                    return $item[0]->date->setTimezone('Europe/Berlin')->isoFormat('dddd, DD. MMMM');
                 },
                 'Gottesdienste' => function ($item, $key) use ($data) {
                     $records = [];

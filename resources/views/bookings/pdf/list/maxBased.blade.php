@@ -126,7 +126,7 @@
     <table width="100%" style="font-size: 0.7em;">
         <tr>
             <td>Erstellt
-                am {{ Carbon\Carbon::now()->setTimeZone('Europe/Berlin')->formatLocalized('%A, %d. %B %Y um %H:%M')  }}
+                am {{ Carbon\Carbon::now()->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM YYYY \u\m HH:mm')  }}
                 Uhr von {{ \Illuminate\Support\Facades\Auth::user()->name }}</td>
             <td style="text-align: right;">Seite {PAGENO} / {nbpg}</td>
         </tr>

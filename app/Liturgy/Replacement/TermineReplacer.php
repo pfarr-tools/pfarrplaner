@@ -133,8 +133,8 @@ class TermineReplacer extends AbstractReplacer
                                     $event->date->format(
                                         'Y-m-d'
                                     ) . ' ' . ($event->cc_alt_time ?? $event->time)
-                                )->formatLocalized(
-                                    '%H.%M Uhr'
+                                )->isoFormat(
+                                    'HH.mm \U\h\r'
                                 ) . "\t" . 'Kinderkirche' . ' (' . ($event->cc_location ?? $event->locationText()) . ')'
                             );
                         }

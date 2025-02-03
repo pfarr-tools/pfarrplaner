@@ -4,13 +4,13 @@ Antrag abgelehnt
 
 Hallo {{ $absence->user->first_name }},
 
-Der folgende Abwesenheitsantrag wurde am {{ \Carbon\Carbon::now()->formatLocalized('%A, %d.%m.%Y, um %H:%M Uhr') }} von
+Der folgende Abwesenheitsantrag wurde am {{ \Carbon\Carbon::now()->isoFormat('dddd, DD.MM.YYYY, \u\m HH:mm \U\h\r') }} von
 {{ $author->name }} abgelehnt.
 
 @component('mail::panel')
 **{{ $absence->reason }}**
 
-{{ $absence->from->formatLocalized('%A, %d.%m.%Y') }} bis {{ $absence->to->formatLocalized('%A, %d.%m.%Y') }}
+{{ $absence->from->isoFormat('dddd, DD.MM.YYYY') }} bis {{ $absence->to->isoFormat('dddd, DD.MM.YYYY') }}
 @endcomponent
 
 @if($absence->admin_notes)

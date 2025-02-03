@@ -200,14 +200,14 @@ return new class extends Migration {
             return 'vorgestern';
         }
         if ($diff >= 3 && $diff <= 6) {
-            return 'am ' . $dateToDescribe->formatLocalized('%A');
+            return 'am ' . $dateToDescribe->isoFormat('DDDD');
         }
-        if ( $diff == 7) return 'am ' . $dateToDescribe->formatLocalized('%A').' der letzten Woche';
+        if ( $diff == 7) return 'am ' . $dateToDescribe->isoFormat('DDDD').' der letzten Woche';
         if ($diff <= 12) {
-            return 'am ' . $dateToDescribe->formatLocalized('%A').' vor einer Woche';
+            return 'am ' . $dateToDescribe->isoFormat('DDDD').' vor einer Woche';
         }
         $weeks = sprintf('%d', floor(($diff+1) / 7));
-        return 'am ' . $dateToDescribe->formatLocalized('%A').' vor '.$weeks.' Wochen';
+        return 'am ' . $dateToDescribe->isoFormat('DDDD').' vor '.$weeks.' Wochen';
     }
 
 

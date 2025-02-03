@@ -414,9 +414,9 @@ class Service extends Model implements HasDAVCalendarItems
      * @param string $format
      * @return mixed
      */
-    public function dateText($format = '%d.%m.%Y')
+    public function dateText($format = 'DD.MM.YYYY')
     {
-        return $this->date->formatLocalized($format);
+        return $this->date->isoFormat($format);
     }
 //
 
@@ -1338,7 +1338,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function formatTime($s)
     {
-        return (false !== strpos($s, '%')) ? $this->dateTime()->formatLocalized($s) : $this->dateTime()->format($s);
+        return (false !== strpos($s, '%')) ? $this->dateTime()->isoFormat($s) : $this->dateTime()->format($s);
     }
 
     /**

@@ -11,7 +11,7 @@
                 <a class="btn btn-secondary" href="{{ route('calendar', $year.'-'.$month) }}">Zurück</a>
             @endslot
             <input type="hidden" name="date"/>
-            <label>{{ $start->formatLocalized ('%B %Y') }}</label>
+            <label>{{ $start->isoFormat ('MMMM YYYY') }}</label>
             <table width="100%;" id="days">
                 <tr>
                     <?php $date = $start->copy() ?>
@@ -22,7 +22,7 @@
                             exists
                         @else new @endif
                             " id="day_{{ $date->day }}"
-                            data-day="{{ $date->day }}" data-weekday="{{ $date->formatLocalized('%A') }}"
+                            data-day="{{ $date->day }}" data-weekday="{{ $date->isoFormat('DDDD') }}"
                             data-date="{{ $date->format('d.m.Y') }}"
                             @if(isset($existing[$date->format('Y-m-d')]) && $existing[$date->format('Y-m-d')]->day_type == \App\Models\Calendar\Day::DAY_TYPE_LIMITED)
                                 data-cities="{{ $existing[$date->format('Y-m-d')]->cities->pluck('id')->join(',') }}"
@@ -42,7 +42,7 @@
                         >
 
                             <span
-                                class="weekday-label weekday-label-{{ $date->formatLocalized('%a') }}">{!! $date->formatLocalized('%a') !!}</span><br/>
+                                class="weekday-label weekday-label-{{ $date->isoFormat('dd') }}">{!! $date->isoFormat('dd') !!}</span><br/>
                             {{ $date->day }}
                         </td>
                             <?php $date->addDay(1) ?>
@@ -56,14 +56,14 @@
                             <th>
                                 <div class="card card-effect">
                                     <div class="card-header day-header-so">
-                                        {{ $start->formatLocalized('%A') }}
+                                        {{ $start->isoFormat('DDDD') }}
                                     </div>
                                     <div class="card-body">
                                         <span class="day-label">{{ $start->day }}</span>
                                         <div class="liturgy"></div>
                                     </div>
                                     <div class="card-footer day-name"
-                                         title="">{{ $start->formatLocalized('%B') }}</div>
+                                         title="">{{ $start->isoFormat('MMMM') }}</div>
                                 </div>
                             </th>
                         </tr>

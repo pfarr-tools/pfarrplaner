@@ -7,10 +7,10 @@ Abwesenheitsantrag: Bitte um Genehmigung
 @component('mail::panel')
 **{{ $absence->reason }}**
 
-{{ $absence->from->formatLocalized('%A, %d.%m.%Y') }} bis {{ $absence->to->formatLocalized('%A, %d.%m.%Y') }}
+{{ $absence->from->isoFormat('dddd, DD.MM.YYYY') }} bis {{ $absence->to->isoFormat('dddd, DD.MM.YYYY') }}
 @endcomponent
 
-Der Antrag wurde am {{ \Carbon\Carbon::now()->formatLocalized('%A, %d.%m.%Y, um %H:%M Uhr') }} von
+Der Antrag wurde am {{ \Carbon\Carbon::now()->isoFormat('dddd, DD.MM.YYYY, \u\m HH:mm \U\h\r') }} von
 {{ $absence->checkedBy->name }} überprüft und zur Genehmigung weitergeleitet.
 
 @component('mail::button', ['url' => route('absence.edit', $absence->id)])

@@ -169,7 +169,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         foreach ($serviceList as $dayList) {
             foreach ($dayList as $service) {
                 $table->addRow();
-                $table->addCell()->addText($service->date->formatLocalized('%a., %d. %B'));
+                $table->addCell()->addText($service->date->isoFormat('dd, DD. MMMM'));
                 $table->addCell()->addText($service->timeText());
                 if ($request->get('includePastor')) {
                     $table->addCell()->addText($service->participantsText('P'));

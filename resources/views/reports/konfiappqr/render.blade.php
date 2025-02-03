@@ -49,7 +49,7 @@
 
                 <p style="font-size: 0.4em;">
                     {{ $service->konfiapp_event_qr }} | Gedruckt
-                    am {{ \Carbon\Carbon::now()->setTimezone('Europe/Berlin')->formatLocalized('%d.%m.%Y um %H:%M Uhr') }}
+                    am {{ \Carbon\Carbon::now()->setTimezone('Europe/Berlin')->isoFormat('DD.MM.YYYY \u\m HH:mm \U\h\r') }}
                     von {{ \Illuminate\Support\Facades\Auth::user()->name }}.
                 </p>
             </div>

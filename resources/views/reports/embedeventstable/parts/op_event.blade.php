@@ -2,10 +2,10 @@
     data-id="{{ $event['event_id'] }}" id="{{ $randomId }}_{{ $event['event_id'] }}_row"
     title="Klicken, um mehr zu erfahren" @else class="not_OP_Event" @endif>
     <td valign="top"
-        style="vertical-align:top;">{!! $eventStart->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
+        style="vertical-align:top;">{!! $eventStart->isoFormat('dd.,\&\n\b\s\p;DD.MM.') !!}</td>
     <td valign="top" style="vertical-align:top;">@if (is_array($event))
-            {!! $eventStart->formatLocalized('%H.%M&nbsp;Uhr') !!}
-        @else{!! $event->trueDate()->formatLocalized('%H.%M&nbsp;Uhr') !!}@endif</td>
+            {!! $eventStart->isoFormat('HH:mm\&\n\b\s\p;\U\h\r') !!}
+        @else{!! $event->trueDate()->isoFormat('HH:mm\&\n\b\s\p;\U\h\r') !!}@endif</td>
     <td valign="top" style="vertical-align:top;">
     @if (!is_object($event))
         <!-- {{ $event['record_type'] }} -->
@@ -47,12 +47,12 @@
                                         @if(isset($date['start']))
                                             <span
                                                 @if($date['eventdate_id'] == $event['eventdate_id']) style="font-weight: bold;" @endif>
-                                                                    {{ $date['start']->formatLocalized('%d.%m.%Y, %H:%M Uhr') }}
+                                                                    {{ $date['start']->isoFormat('DD.MM.YYYY, HH:mm').' Uhr' }}
                                                 @if (isset($date['end']))
                                                     - @if($date['startyearmonthdate'] != $date['endyearmonthdate'])
-                                                        {{ $date['end']->formatLocalized('%d.%m.%Y, %H:%M Uhr') }}
+                                                        {{ $date['end']->isoFormat('DD.MM.YYYY, HH:mm').' Uhr' }}
                                                     @else
-                                                        {{ $date['end']->formatLocalized('%H:%M Uhr') }}
+                                                        {{ $date['end']->isoFormat('HH:mm \U\h\r') }}
                                                     @endif
                                                 @endif
                                                                     </span>

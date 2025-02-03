@@ -44,7 +44,7 @@
                 @foreach ($events as $theseEvents)@if(trim($theseEvents->first()->event->liturgicalInfo['title'] ?? '') && (substr($theseEvents->first()->event->liturgicalInfo['date'] ?? '',0,10) == $theseEvents->first()->event->date->format('Y-m-d')))
                     <tr style="background-color: #ccc !important;">
                         <td valign="top"
-                            style="vertical-align:top;">{!! $theseEvents->first()->start->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
+                            style="vertical-align:top;">{!! $theseEvents->first()->start->isoFormat('dd.,\&\n\b\s\p;DD.MM.') !!}</td>
                         <td></td>
                         <td valign="top" colspan="2"
                             style="vertical-align:top; font-weight: bold;">{{ str_replace('So.', 'Sonntag', $theseEvents->first()->event->liturgicalInfo['title'] ?? '') }}</td>
@@ -52,7 +52,7 @@
                     @endif @foreach($theseEvents as $occurence)
                             <tr>
                                 <td valign="top"
-                                    style="vertical-align:top;">{!! $occurence->start->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
+                                    style="vertical-align:top;">{!! $occurence->start->isoFormat('dd.,\&\n\b\s\p;DD.MM.') !!}</td>
                                 <td valign="top">{{ $occurence->event->timeText(true, '.') }}</td>
                                 <td valign="top">
                                     <b>{{ $occurence->event->titleText(false, false) }}</b> @if($occurence->event->participantsText('P') != '')
@@ -82,7 +82,7 @@
                             @if ($occurence->event->cc)
                                 <tr>
                                     <td valign="top"
-                                        style="vertical-align:top;">{!! $occurence->event->date->formatLocalized('%a.,&nbsp;%d.%m.') !!}</td>
+                                        style="vertical-align:top;">{!! $occurence->event->date->isoFormat('dd.,\&\n\b\s\p;DD.MM.') !!}</td>
                                     <td valign="top">{{ str_replace(':', '.', ($occurence->event->cc_alt_text ?? $occurence->event->timeText(true, '.'))) }}</td>
                                     <td valign="top">
                                         <b>Kinderkirche</b>

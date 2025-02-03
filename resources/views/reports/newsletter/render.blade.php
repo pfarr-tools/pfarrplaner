@@ -12,7 +12,7 @@
             <tr>
                 <td colspan="3"
                     style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 12px 0 12px 0; color: #804070;">
-                    <strong>{{ $date->formatLocalized('%A, %d. %B %Y') }}</strong>
+                    <strong>{{ $date->isoFormat('dddd, DD. MMMM YYYY') }}</strong>
                 </td>
             </tr>
             @foreach($theseEvents as $event)
@@ -80,7 +80,7 @@
             <td colspan="3"
             style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 12px 0 12px 0; color:
             #804070;">
-            <strong>{{ $date->formatLocalized('%A, %d. %B %Y') }}</strong>
+            <strong>{{ $date->isoFormat('dddd, DD. MMMM YYYY') }}</strong>
             </td>
             </tr>
             @foreach($theseEvents as $event)

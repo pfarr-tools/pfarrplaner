@@ -54,7 +54,7 @@ class StringTool
      */
     public static function timeString($s, $clockText = true, $separator = ':')
     {
-        return Carbon::createFromTimeString($s)->formatLocalized('%H' . $separator . '%M') . ($clockText ? ' Uhr' : '');
+        return Carbon::createFromTimeString($s)->isoFormat('HH' . $separator . 'mm') . ($clockText ? ' Uhr' : '');
     }
 
     public static function durationText(Carbon $from, Carbon $to): string

@@ -499,12 +499,12 @@ class Absence extends Model implements HasDAVCalendarItems
         if ($from->format('Ymd') == $to->format('Ymd')) {
             return ' am ' . $from->format('%d. %B');
         }
-        $format = ($from->month == $to->month) ? '%d.' : '%d. %B';
+        $format = ($from->month == $to->month) ? 'DD.' : 'DD. MMMM';
         if ($from->year != $to->year) {
-            $format = '%d. %B %Y';
+            $format = 'DD. MMMM YYYY';
         }
-        return ' vom ' . $from->formatLocalized($format) . ' bis '
-            . $to->formatLocalized($format == '%d.' ? '%d. %B' : $format);
+        return ' vom ' . $from->isoFormat($format) . ' bis '
+            . $to->isoFormat($format == 'DD.' ? 'DD. MMMM' : $format);
     }
 
     public function getDescriptiveTextAttribute()

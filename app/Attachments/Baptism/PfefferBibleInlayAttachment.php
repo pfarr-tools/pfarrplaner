@@ -104,7 +104,7 @@ class PfefferBibleInlayAttachment extends AbstractBaptismAttachment
         );
         $doc->getSection()->addTextBreak(1);
         $doc->getSection()->addText(
-            'am ' . $this->baptism->service->date->formatLocalized('%d. %B %Y'),
+            'am ' . $this->baptism->service->date->isoFormat('DD. MMMM YYYY'),
             static::FONT18,
             static::PARAGRAPH
         );

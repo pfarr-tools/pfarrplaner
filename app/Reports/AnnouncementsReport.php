@@ -170,7 +170,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         $lastServiceDays = [];
         foreach ($days as $day) {
-            $lastServiceDays[] = ['id' => $day, 'name' => Carbon::parse($day)->formatLocalized('%A, %d. %B %Y')];
+            $lastServiceDays[] = ['id' => $day, 'name' => Carbon::parse($day)->isoFormat('dddd, DD. MMMM YYYY')];
         }
 
         return response()->json($lastServiceDays);
@@ -317,7 +317,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         $textRun = $this->section->addTextRun('Bekanntgaben');
         $textRun->addText(
-            $service->date->formatLocalized('%d. %B %Y')
+            $service->date->isoFormat('DD. MMMM YYYY')
             . (($service->liturgicalInfo['title'] ?? false) ? ' - ' . $service->liturgicalInfo['title'] : ''),
             ['bold' => true]
         );
@@ -560,8 +560,8 @@ in guten und in schweren Tagen.'
                                 $this->renderName($funeral->buried_name) . ', '
                                 . $funeral->buried_address
                                 . ($funeral->age() ? ', ' . $funeral->age() . ' Jahre' : '')
-                                . '. Die ' . $mode . ' findet am ' . $funeral->service->date->formatLocalized(
-                                    '%A, %d. %B'
+                                . '. Die ' . $mode . ' findet am ' . $funeral->service->date->isoFormat(
+                                    'dddd, DD. MMMM'
                                 )
                                 . ' um ' . $funeral->service->timeText(true, '.')
                                 . ' ' . $funeral->service->atText() . ' statt.',
@@ -803,7 +803,7 @@ Amen.'
 
     protected function renderOfferings(Service $service, $lastService, $offerings)
     {
-        $lastService = Carbon::parse($lastService)->formatLocalized('%A');
+        $lastService = Carbon::parse($lastService)->isoFormat('DDDD');
         if ($offerings == "0,00\u{A0}€") {
             $offerings = '';
         }
@@ -842,7 +842,7 @@ Amen.'
         foreach ($days as $events) {
             $this->renderParagraph(
                 self::NO_INDENT,
-                [[array_values($events)[0]->start->formatLocalized('%A, %d. %B'), self::BOLD]]
+                [[array_values($events)[0]->start->isoFormat('dddd, DD. MMMM'), self::BOLD]]
             );
             foreach ($events as $event) {
                 $this->renderParagraph(self::INDENT, [

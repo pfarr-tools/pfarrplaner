@@ -179,7 +179,7 @@
                 <a href="{{ config('app.build_repository') }}" target="_blank">Pfarrplaner</a> &middot;
                 &copy; 2018-{{ \Carbon\Carbon::now()->format('Y') }} Christoph Fischer
                 &middot; Session läuft
-                um {{ \Carbon\Carbon::now()->addMinutes(config('session.lifetime'))->setTimezone('Europe/Berlin')->format('H:i:s') }}
+                um {{ \Carbon\Carbon::now()->addMinutes((int)config('session.lifetime'))->setTimezone('Europe/Berlin')->format('H:i:s') }}
                 Uhr ab.
             </div>
         </div>
@@ -213,7 +213,7 @@
 
     window.Laravel.loggedIn = {{ json_encode(!Auth::guest()) }};
     window.Laravel.timeout = {{ (config('session.lifetime')*60000)-30000 }};
-    window.Laravel.expires = new Date('{!! \Carbon\Carbon::now()->addMinutes(config('session.lifetime'))->toIso8601String() !!}');
+    window.Laravel.expires = new Date('{!! \Carbon\Carbon::now()->addMinutes((int)config('session.lifetime'))->toIso8601String() !!}');
 
     window.setTimeout(function () {
         if (window.Laravel.loggedIn) {

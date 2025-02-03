@@ -247,7 +247,7 @@ class OfficialDiaryWordDocument extends DefaultWordDocument
         ];
 
         foreach ($categoryGroups as $categoryIndex => $categoryGroup) {
-            $this->getSection()->addTitle($start->formatLocalized('%B %Y'), 1);
+            $this->getSection()->addTitle($start->isoFormat('MMMM YYYY'), 1);
             $table = $this->getSection()->addTable('table');
             $table->addRow();
             foreach ($categoryGroup as $categoryKey => $category) {
@@ -267,7 +267,7 @@ class OfficialDiaryWordDocument extends DefaultWordDocument
                 }
             }
         }
-        $this->getSection()->addTitle($start->formatLocalized('%B %Y'), 1);
+        $this->getSection()->addTitle($start->isoFormat('MMMM YYYY'), 1);
 
         // setup page numbering
         if (request()->get('page', false)) {
@@ -320,7 +320,7 @@ class OfficialDiaryWordDocument extends DefaultWordDocument
                                                                                     'spaceAfter' => 0,
                                                                                 ]);
             }
-            $run1->addText("\t".$day->day."\t".$day->formatLocalized('%a'), ['name' => 'Times New Roman', 'size' => 10]);
+            $run1->addText("\t".$day->day."\t".$day->isoFormat('dd'), ['name' => 'Times New Roman', 'size' => 10]);
             $run1->addTextBreak($day->dayOfWeek == 6 ? 1 : 2);
 
             $dayEvents = [];
