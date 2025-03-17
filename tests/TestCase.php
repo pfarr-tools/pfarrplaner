@@ -51,10 +51,12 @@ abstract class TestCase extends BaseTestCase
     protected $seed = true;
     protected $seeder = RoleSeeder::class;
 
+    /*
     protected function output($line)
     {
         fwrite(STDERR, $line . PHP_EOL);
     }
+    */
 
     protected function refreshTestDatabase()
     {
