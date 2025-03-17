@@ -217,7 +217,7 @@ class UserController extends Controller
                 $adminCityIds[] = $city->id;
             }
         }
-        $roles = Role::all()->sortBy('name');
+        $roles = Role::all()->sortBy('name')->reject(function ($item) { return $item->name == 'Super-Administrator:in'; });
 
         $parishes = Parish::whereIn('city_id', Auth::user()->adminCities->pluck('id'))->get();
         $homescreen = $user->getSetting('homeScreen', 'route:calendar');

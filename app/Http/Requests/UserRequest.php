@@ -129,23 +129,20 @@ class UserRequest extends FormRequest
         $superAdminRole = Role::where('name',RoleService::ROLE_SUPER_ADMIN)->first()->id;
         $adminRole = Role::where('name', RoleService::ROLE_ADMIN)->first()->id;
 
-        $roles = $this->getRelationIdsForSync('roles');
+        $roles = collect($this->getRelationIdsForSync('roles'));
         if (!count($roles)) {
             return [];
         }
 
-        if (!$this->user()->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
-            if (($key = array_search(RoleService::ROLE_SUPER_ADMIN, $roles)) !== false) {
-                unset($roles[$key]);
-            }
+
+        if (!$this->user->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
+            $roles = $roles->reject(function ($item) use ($superAdminRole) { return $item == $superAdminRole; });
         }
-        if (!$this->user()->hasRole(RoleService::ROLE_SUPER_ADMIN)
+        if (!$this->user->hasRole(RoleService::ROLE_SUPER_ADMIN)
             || $this->user()->hasRole(RoleService::ROLE_ADMIN)) {
-            if (($key = array_search(RoleService::ROLE_ADMIN, $roles)) !== false) {
-                unset($roles[$key]);
-            }
+            $roles = $roles->reject(function ($item) use ($adminRole) { return $item == $adminRole; });
         }
-        return $roles;
+        return $roles->toArray();
     }
 
 }
