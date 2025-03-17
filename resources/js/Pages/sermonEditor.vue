@@ -184,10 +184,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="height: 100%;">
                     <label>Literaturhinweise</label>
                     <quill-editor :class="{focused: literatureEditorActive}" ref="literatureEditor"
-                                  v-model="editedSermon.literature"
+                                  v-model="editedSermon.literature" scrolling-container="html"
                                   :options="editorOptionListOnly" @focus="literatureEditorActive = true"
                                   @blur="literatureEditorActive = false"/>
                 </div>
@@ -377,7 +377,10 @@ export default {
                     text = e;
             }
 
-            if (text) quill.insertText(quill.getSelection(true).index, text);
+            if (text) {
+                quill.insertText(quill.getSelection(true).index, text);
+                quill.scrollSelectionIntoView();
+            }
         },
         quillInsertBible() {
             var reference = window.prompt('Welche Bibelstelle möchtest du einfügen?');
@@ -407,6 +410,14 @@ export default {
 </script>
 
 <style scoped>
+>>> .quill {
+    height: 100%;
+}
+
+.ql-clipboard, >>> .ql-clipboard {
+    position: fixed;
+}
+
 .ql-toolbar .quill-mdi-button {
     padding-top: 1px;
 }
