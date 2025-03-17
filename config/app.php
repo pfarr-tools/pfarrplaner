@@ -50,6 +50,7 @@ return [
 
     'name' => env('APP_NAME', 'Dienstplan'),
     'administrator' => env('APP_ADMINISTRATOR', ''),
+    'provider' => env('APP_PROVIDER', ''),
 
     /*
     |--------------------------------------------------------------------------

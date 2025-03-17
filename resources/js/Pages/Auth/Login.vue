@@ -36,6 +36,7 @@
                 </div>
                 <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                     <h1 class="ps-0 pl-0 ms-0 ms-0 mb-4">{{ layout.appName }}</h1>
+                    <h2 v-if="layout.appProvider" class="ps-0 pl-0 ms-0 ms-0 mb-4">&mdash; {{ layout.appProvider }} &mdash;</h2>
                     <form method="POST" id="loginForm" @submit.prevent.stop="submit">
                         <input type="hidden" name="_token" :value="csrf" :key="csrf">
                         <!-- Email input -->
