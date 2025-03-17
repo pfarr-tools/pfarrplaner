@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.4.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.2...v2025.4.3) (2025-03-17)
+
+
+### Features
+
+* Provider der Instanz wird beim Login angezeigt ([356049f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/356049f235451cde5f8d134d7fde5caa867a3f6f))
+
+
+### Bug Fixes
+
+* Neuer Benutzer kann nicht gespeichert werden ([67874a6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/67874a6e5ce103a063204b05a1888703bea44f0d))
+* Predigteditor springt zum Anfang, wenn Text eingefügt wurde ([2d6fe00](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2d6fe00957c3a94fc8697928e4b9bd25d98e60bc)), closes [#420](https://codeberg.org/pfarr.tools/pfarrplaner/issues/420)
+
 ### [2025.4.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.1...v2025.4.2) (2025-03-17)
 
 
