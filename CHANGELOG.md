@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.4.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.1...v2025.4.2) (2025-03-17)
+
+
+### Features
+
+* Klarere Beschreibungsseite für den Wartungsmodus ([54d74e3](https://codeberg.org/pfarr.tools/pfarrplaner/commit/54d74e35e79c5f06df08ffc7c9b80a0980ba4482))
+
+
+### Bug Fixes
+
+* HomeCities können im Benutzereditor auch ohne entsprechende Admin-Rechte zugewiesen werden. ([1fd14f7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1fd14f72ab0e4d7866298714eb761e55a7e6388d))
+* Privilege Escalation zu Super-Administrator:in möglich ([2161adb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2161adb6ba9bef4d04631f4a75a33bb890c9c7a7))
+
 ### [2025.4.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.0...v2025.4.1) (2025-01-30)
 
 
