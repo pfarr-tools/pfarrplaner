@@ -217,6 +217,9 @@ class UserController extends Controller
                 $adminCityIds[] = $city->id;
             }
         }
+
+        $cities = $user->homeCities->merge(collect($adminCities));
+
         $roles = Role::all()->sortBy('name')->reject(function ($item) { return $item->name == 'Super-Administrator:in'; });
 
         $parishes = Parish::whereIn('city_id', Auth::user()->adminCities->pluck('id'))->get();
@@ -382,7 +385,9 @@ class UserController extends Controller
      */
     protected function updateUserDataFromRequest(UserRequest $request, User $user)
     {
-        $user->homeCities()->sync($request->getRelationIdsForSync('home_cities', 'cities'));
+        $user->homeCities()->sync(collect($request->getRelationIdsForSync('home_cities', 'cities'))->reject(function ($item) use ($user, $request) {
+            return !(($user->homeCities->pluck('id')->contains($item)) || ($request->user->adminCities->pluck('id')->contains($item)));
+        }));
         $user->parishes()->sync($request->getRelationIdsForSync('parishes'));
         $user->syncRelatedUsers(
             'vacationAdmins',
