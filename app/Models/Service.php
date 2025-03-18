@@ -537,7 +537,7 @@ class Service extends Model implements HasDAVCalendarItems
     public function getDurationAttribute()
     {
         if (!$this->end) return 60;
-        return $this->end->diffInMinutes($this->date);
+        return abs((int)$this->end->diffInMinutes($this->date));
     }
 
     public function getFreeSeatsTextAttribute()

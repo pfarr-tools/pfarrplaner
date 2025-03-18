@@ -183,7 +183,7 @@ class Funeral extends Model implements HasDAVCalendarItems
     public function age()
     {
         if (($this->dob) && ($this->dod)) {
-            return $this->dod->diffInYears($this->dob);
+            return abs((int)$this->dod->diffInYears($this->dob));
         }
         return '';
     }

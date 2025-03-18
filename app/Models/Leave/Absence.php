@@ -366,7 +366,7 @@ class Absence extends Model implements HasDAVCalendarItems
     {
         $myFrom = max($start, $this->from);
         $myTo = min($end, $this->to);
-        return $myTo->diffInDays($myFrom) + 1;
+        return abs((int)$myTo->diffInDays($myFrom)) + 1;
     }
 
     /**
