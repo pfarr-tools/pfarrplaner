@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.4.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.3...v2025.4.4) (2025-03-18)
+
+
+### Bug Fixes
+
+* Datumsdifferenzen (z.B. Alter bei Beerdigung) falsch berechnet ([eba8c41](https://codeberg.org/pfarr.tools/pfarrplaner/commit/eba8c418e33c5f518852cad2a3593901c25b2dd3))
+
 ### [2025.4.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.2...v2025.4.3) (2025-03-17)
 
 
