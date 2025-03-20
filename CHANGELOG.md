@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.4.6](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.5...v2025.4.6) (2025-03-20)
+
+
+### Bug Fixes
+
+* Im Lebenslaufeditor können keine Textbausteine eingefügt werden. ([2962e4b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2962e4b0674db42d32f6ef8e4a6c3c7eb46dd1a7))
+
 ### [2025.4.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.4...v2025.4.5) (2025-03-20)
 
 
