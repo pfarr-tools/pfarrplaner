@@ -386,7 +386,7 @@ class UserController extends Controller
     protected function updateUserDataFromRequest(UserRequest $request, User $user)
     {
         $user->homeCities()->sync(collect($request->getRelationIdsForSync('home_cities', 'cities'))->reject(function ($item) use ($user, $request) {
-            return !((($user->homeCities ?? collect())->pluck('id')->contains($item)) || ($request->user->adminCities->pluck('id')->contains($item)));
+            return !((($user->homeCities ?? collect())->pluck('id')->contains($item)) || (Auth::user()->adminCities->pluck('id')->contains($item)));
         }));
         $user->parishes()->sync($request->getRelationIdsForSync('parishes'));
         $user->syncRelatedUsers(

@@ -1199,7 +1199,7 @@ class Service extends Model implements HasDAVCalendarItems
         $this->participants()->sync([]);
         if (count($participants)) {
             foreach ($participants as $category => $participant) {
-                $this->participants()->attach($participant);
+                if ($category) $this->participants()->attach($participant);
             }
         }
         return $participants;

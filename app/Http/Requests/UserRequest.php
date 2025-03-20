@@ -134,6 +134,7 @@ class UserRequest extends FormRequest
             return [];
         }
 
+        if (!$this->user) return $roles->toArray();
 
         if (!$this->user->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
             $roles = $roles->reject(function ($item) use ($superAdminRole) { return $item == $superAdminRole; });
@@ -144,5 +145,8 @@ class UserRequest extends FormRequest
         }
         return $roles->toArray();
     }
+
+
+
 
 }

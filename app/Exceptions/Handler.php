@@ -30,9 +30,11 @@
 
 namespace App\Exceptions;
 
+use App\Http\Kernel;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelIgnition\ContextProviders\LaravelContextProviderDetector;
 use Spatie\LaravelIgnition\Facades\Flare;
@@ -142,4 +144,18 @@ class Handler extends ExceptionHandler
         $report = $flare->createReport($e);
         Mail::to('dev@toph.de')->send(new ExceptionMail($flat, $report->toArray()));
     }
+
+    public function render($request, Throwable $e)
+    {
+        if ($e instanceof \ErrorException) {
+            if (Str::contains($e->getMessage(), 'Increment on type bool has no effect')) {
+                $kernel = app(Kernel::class);
+                $response = $kernel->handle($request)->send();
+                return $kernel->terminate($request, $response);
+            }
+        }
+        return parent::render($request, $e); 
+    }
+
+
 }

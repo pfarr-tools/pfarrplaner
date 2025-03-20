@@ -88,8 +88,9 @@ class EventRecurrenceObserver
                 return;
             }
             $rrule->setTimezone('Europe/Berlin');
-            $rrule->setStartDate($service->date->copy()->setTimezone('Europe/Berlin'));
-            $rrule->setEndDate($service->date->copy()->setTimezone('Europe/Berlin')->addMinutes($service->duration));
+            // Dates need to be converted to DateTime, since RRule has problems dealing with Carbon 3 objects
+            $rrule->setStartDate($service->date->copy()->setTimezone('Europe/Berlin')->toDateTime());
+            $rrule->setEndDate($service->date->copy()->setTimezone('Europe/Berlin')->addMinutes($service->duration)->toDateTime());
 
             // sanity check: no more than 5 years, no more than 5000 occurrences
             if ((!$rrule->getCount()) && (!$rrule->getUntil())) {
