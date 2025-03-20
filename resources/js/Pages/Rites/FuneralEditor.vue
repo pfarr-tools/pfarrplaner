@@ -354,26 +354,11 @@
                                                 <button class="ql-indent" value="+1"></button>
                                             </span>
                                     <button class="ql-clean me-2"></button>
-                                    <select class="ql-custom" data-label="Texte">
-                                        <option value="dob" data-label="Geburtsdatum" data-value="dob">Geburtsdatum
-                                        </option>
-                                        <option value="dod" data-label="Sterbedatum" data-value="dod">Sterbedatum
-                                        </option>
-                                        <option value="birth_place" data-label="Geburtsort" data-value="birth_place">
-                                            Geburtsort
-                                        </option>
-                                        <option value="death_place" data-label="Sterbeort" data-value="death_place">
-                                            Sterbeort
-                                        </option>
-                                        <option value="birth_name" data-label="Geburtsname" data-value="birth_name">
-                                            Geburtsname
-                                        </option>
-                                        <option value="spoken_name" data-label="Rufname" data-value="spoken_name">
-                                            Rufname
-                                        </option>
-                                        <option value="age" data-label="Sterbealter" data-value="age">Sterbealter
-                                        </option>
-                                    </select>
+                                    <quill-dropdown :key="funeral.id"
+                                                    label="Texte"
+                                                    :title="'Textbausteine zur Beerdigung von '+funeral.buried_name"
+                                                    icon="mdi mdi-grave-stone" :items="funeralDataset"
+                                                    class="float-right" @input="quillInsertText($event)"/>
                                 </div>
                             </quill-editor>
                             <text-stats :text="funeral.life"/>
@@ -432,6 +417,7 @@ import FormBibleReferenceInput from "../../components/Ui/forms/FormBibleReferenc
 import __ from 'lodash';
 import Accordion from "../../components/Ui/accordion/Accordion";
 import AccordionElement from "../../components/Ui/accordion/AccordionElement";
+import QuillDropdown from "../../components/LiturgyEditor/Editors/Quill/QuillDropdown.vue";
 
 
 export default {
@@ -455,6 +441,7 @@ export default {
         FormTextarea,
         FakeTable,
         BasicInfo, FormGroup, FormInput, TabHeader, TabHeaders, Tabs, Tab,
+        QuillDropdown,
     },
     props: ['funeral', 'pronounSets', 'activeTab'],
     computed: {
@@ -486,7 +473,7 @@ export default {
             if (this.myFuneral.confirmation_text) sources['Denkspruch'] = this.myFuneral.confirmation_text;
             if (this.myFuneral.wedding_text) sources['Trauspruch'] = this.myFuneral.wedding_text;
             return sources;
-        }
+        },
     },
     created() {
         if (this.myFuneral.dob) this.myFuneral.dob = moment(this.myFuneral.dob).format('DD.MM.YYYY');
@@ -507,6 +494,15 @@ export default {
         let inLocalStorage = (undefined !== ls.funerals[this.funeral.id]);
 
         return {
+            funeralDataset: {
+                'Geburtsdatum': 'dob',
+                'Sterbedatum': 'dod',
+                'Geburtsort': 'birth_place',
+                'Sterbeort': 'death_place',
+                'Geburtsname': 'birth_name',
+                'Rufname': 'spoken_name',
+                'Sterbealter': 'age',
+            },
             formKey: 0,
             referenceCopied: 0,
             myDatePickerConfig: {
