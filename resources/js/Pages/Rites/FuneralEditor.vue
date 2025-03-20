@@ -337,7 +337,7 @@
                     <div v-if="showStoryEditor" class="col-lg-4">
                         <div class="form-group">
                             <label>Lebenslauf</label>
-                            <quill-editor :class="{focused: textEditorActive}" ref="textEditor"
+                            <quill-editor class="focused" ref="textEditor"
                                           v-model="funeral.life"
                                           :options="editorOption" @focus="textEditorActive = true"
                                           @blur="textEditorActive = false">
@@ -592,7 +592,7 @@ export default {
                     if (this.myFuneral[e]) text = this.myFuneral[e];
             }
 
-            if (text) quill.insertText(quill.getSelection(true).index, text);
+            if (text) quill.insertText(quill.getSelection(true).index, text+' ');
         },
         setFuneralText(t) {
             this.myFuneral.text = t;
