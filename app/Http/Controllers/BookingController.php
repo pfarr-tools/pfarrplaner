@@ -147,15 +147,17 @@ class BookingController extends Controller
                 'author' => isset(Auth::user()->name) ? Auth::user()->name : Auth::user()->email,
             ]
         );
-        return $pdf->download(
-            $service->date->format('Ymd') . '-' . $service->timeText(
+
+        $filename = $service->date->format('Ymd') . '-' . $service->timeText(
                 false,
                 '',
                 false,
                 false,
                 true
-            ) . ' Sitzplan.pdf'
-        );
+            ) . ' Sitzplan.pdf';
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $pdf->save($tempFile);
+        return response()->download($tempFile, $filename, ['Content-Type', 'application/pdf']);
     }
 
     /**

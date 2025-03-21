@@ -30,7 +30,7 @@
 <template>
     <div class="row">
         <div class="col-md-6">
-            <selectize class="form-group" :name="'ministries['+index+']'+'[description]'" v-model="myDescription" :settings="settings" />
+            <selectize class="form-group" :name="'ministries['+index+']'+'[description]'" v-model="myDescription" :settings="settings" :required="myMembers"/>
         </div>
         <div class="col-md-5">
             <people-select :name="'ministries['+index+']'+'[people][]'" v-model="myMembers" :teams="teams"

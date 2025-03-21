@@ -142,7 +142,7 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
             ]);
         }
 
-        $doc->sendToBrowser(
+        return $doc->sendToBrowser(
             $this->getFileName(
                 $service,
                 (($this->service) && ($this->service->sermon) ? ' - Trauerfeier für ' . $names->join(

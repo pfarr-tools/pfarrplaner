@@ -232,10 +232,10 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
         $filename = 'AZE-Statistik von ' . Carbon::parse($data['start'])->format('Y-m-d') . ' bis ' . Carbon::parse($data['end'])->format(
                 'Y-m-d'
             ) . ' -- ' . $cities->pluck('name')->join(', ');
-        $this->sendToBrowser(
+        return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
-                null,
+                'xlsx',
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']]),
         );

@@ -232,10 +232,10 @@ class BillBoardReport extends AbstractWordDocumentReport
         $this->renderAbsences($absences);
 
 
-        $this->sendToBrowser(
+        return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE.' '.$cityTitle,
-                null,
+                '.docx',
                 static::FILE_SIGNATURE,
                 Carbon::now())
         );

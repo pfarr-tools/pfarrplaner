@@ -112,7 +112,7 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
         }
 
 
-        $this->sendToBrowser($this->getFileName($service, 'Texte und Lieder'), $songBeamerSchedule);
+        return $this->sendToBrowser($this->getFileName($service, 'Texte und Lieder'), $songBeamerSchedule);
     }
 
     protected function sendToBrowser($filename, ImportableSchedule $sb)
@@ -123,8 +123,9 @@ class SongBeamerLiturgySheet extends AbstractLiturgySheet
         header('Content-Transfer-Encoding: binary');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Expires: 0');
-        $sb->toZip();
-        exit();
+        $tempFile = $sb->toZip();
+        return response()->download($tempFile, $filename, ['Content-Type' => 'application/zip'])
+            ->deleteFileAfterSend(true);
     }
 
 

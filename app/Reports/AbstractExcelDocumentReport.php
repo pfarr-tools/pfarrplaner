@@ -69,9 +69,11 @@ class AbstractExcelDocumentReport extends AbstractReport
         header('Cache-Control: cache, must-revalidate'); // HTTP/1.1
         header('Pragma: public'); // HTTP/1.0
 
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $writer = IOFactory::createWriter($this->spreadsheet, 'Xlsx');
-        $writer->save('php://output');
-        exit;
+        $objWriter->save($filename);
+        return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+            ->deleteFileAfterSend(true);
     }
 
 }

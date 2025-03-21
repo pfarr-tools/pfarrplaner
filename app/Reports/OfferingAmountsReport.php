@@ -168,7 +168,7 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
         }
 
         // output
-        $this->sendToBrowser(
+        return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
                 'xlsx',

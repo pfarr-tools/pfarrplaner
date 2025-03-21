@@ -169,10 +169,10 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
         }
 
         // output
-        $this->sendToBrowser(
+        return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE.' '.$city->name.' ab '.$start->format('Y-m-d'),
-                null,
+                'xlsx',
                 static::FILE_SIGNATURE,
                 now())
         );

@@ -182,10 +182,7 @@ class ImportableSchedule
         }
 
         $zip->close();
-        if (file_exists($zipPath)) {
-            readfile($zipPath);
-            unlink($zipPath);
-        }
+        return $zipPath;
     }
 
     /**

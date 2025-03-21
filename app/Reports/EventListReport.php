@@ -360,10 +360,10 @@ class EventListReport extends AbstractWordDocumentReport
         }
 
 
-        $this->sendToBrowser(
+        return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE.' '.$city->name,
-                null,
+                '.docx',
                 static::FILE_SIGNATURE,
                 Carbon::now())
         );

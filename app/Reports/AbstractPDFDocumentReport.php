@@ -85,6 +85,10 @@ class AbstractPDFDocumentReport extends AbstractReport
      */
     public function sendToFile($filename, $data, $layout)
     {
-        return $this->renderPDF($data, $layout)->download($filename);
+
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $pdf = $this->renderPDF($data, $layout)->save($filename);
+        return response()->download($tempFile, $filename, ['Content-Type' => 'application/pdf'])
+            ->deleteFileAfterSend(true);
     }
 }

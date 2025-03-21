@@ -218,10 +218,10 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         Auth::user()->setSetting('quarterly_events_report_notes2', $request->get('notes2', ''));
 
 
-        $this->sendToBrowser(
+        return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE,
-                null,
+                'docx',
                 static::FILE_SIGNATURE,
                 $quarter,
                 false,

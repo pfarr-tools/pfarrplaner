@@ -152,10 +152,10 @@ class RitesReport extends AbstractWordDocumentReport
                 ->get()
         );
 
-        $this->sendToBrowser(
+        return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE,
-                null,
+                'docx',
                 static::FILE_SIGNATURE,
                 [$start, $end]
             )

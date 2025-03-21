@@ -510,9 +510,14 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         header('Content-Transfer-Encoding: binary');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Expires: 0');
+
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+
+
         $objWriter = IOFactory::createWriter($this->ppt, 'PowerPoint2007');
-        $objWriter->save('php://output');
-        exit();
+        $objWriter->save($tempFile);
+        return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation'])
+            ->deleteFileAfterSend(true);
     }
 
     protected function setDocumentProperties(Service $service)

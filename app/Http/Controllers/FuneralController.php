@@ -275,13 +275,9 @@ class FuneralController extends Controller
         $pdf = PDF::loadView('funerals.pdf.form', compact('funeral'), [], ['format' => 'A5', 'useActiveForms' => true]);
 
 
-        header("Content-Description: File Transfer");
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Content-Type: application/pdf');
-        header('Content-Transfer-Encoding: binary');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Expires: 0');
-        return $pdf->download($filename);
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $pdf->save($tempFile);
+        return response()->download($tempFile, $filename, ['Content-Type', 'application/pdf']);
     }
 
 

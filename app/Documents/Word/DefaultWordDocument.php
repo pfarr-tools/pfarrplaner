@@ -31,6 +31,7 @@
 namespace App\Documents\Word;
 
 
+use Illuminate\Support\Facades\Response;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Exception\Exception;
@@ -274,15 +275,11 @@ class DefaultWordDocument
      */
     public function sendToBrowser($filename)
     {
-        header("Content-Description: File Transfer");
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        header('Content-Transfer-Encoding: binary');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Expires: 0');
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $objWriter = IOFactory::createWriter($this->phpWord, 'Word2007');
-        $objWriter->save('php://output');
-        exit();
+        $objWriter->save($tempFile);
+        return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
+            ->deleteFileAfterSend(true);
     }
 
     /**

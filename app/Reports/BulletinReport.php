@@ -161,10 +161,10 @@ class BulletinReport extends AbstractWordDocumentReport
             $textRun = $section->addTextRun('list');
         }
 
-        $this->sendToBrowser(
+        return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE,
-                null,
+                '.docx',
                 static::FILE_SIGNATURE,
                 $service->date)
         );
@@ -230,10 +230,10 @@ class BulletinReport extends AbstractWordDocumentReport
             }
         }
 
-        $this->sendToBrowser(
+        return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE,
-                null,
+                '.docx',
                 static::FILE_SIGNATURE,
                 Carbon::now())
         );
@@ -317,10 +317,10 @@ class BulletinReport extends AbstractWordDocumentReport
             }
         }
 
-        $this->sendToBrowser(
+        return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE,
-                null,
+                '.docx',
                 static::FILE_SIGNATURE,
                 $service->date)
         );

@@ -111,7 +111,7 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
             }
         }
 
-        $doc->sendToBrowser($this->getFileName($service));
+        return $doc->sendToBrowser($this->getFileName($service));
     }
 
     public function renderParticipantRow($category)

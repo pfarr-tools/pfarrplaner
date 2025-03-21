@@ -78,7 +78,7 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
             }
         }
 
-        $doc->sendToBrowser($this->getFileName($service, (($this->service) && ($this->service->sermon) ? ' - ' . $this->service->sermon->title : '')));
+        return $doc->sendToBrowser($this->getFileName($service, (($this->service) && ($this->service->sermon) ? ' - ' . $this->service->sermon->title : '')));
     }
 
     protected function setProperties(DefaultWordDocument $doc)

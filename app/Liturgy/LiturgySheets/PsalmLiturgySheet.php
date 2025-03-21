@@ -62,7 +62,7 @@ class PsalmLiturgySheet extends AbstractLiturgySheet
                 }
             }
         }
-        $doc->sendToBrowser($this->getFileName($service));
+        return $doc->sendToBrowser($this->getFileName($service));
     }
 
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)

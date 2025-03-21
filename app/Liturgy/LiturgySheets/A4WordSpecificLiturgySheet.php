@@ -139,7 +139,7 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
             $this->renderLiturgyTable($doc);
         }
 
-        $doc->sendToBrowser($this->getFileName($service));
+        return $doc->sendToBrowser($this->getFileName($service));
     }
 
     protected function renderLiturgyTable(DefaultWordDocument $doc, $recipient = '') {

@@ -84,7 +84,7 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
                 }
             }
         }
-        $doc->sendToBrowser($this->getFileName($service));
+        return $doc->sendToBrowser($this->getFileName($service));
     }
 
     protected function setProperties (DefaultWordDocument $doc) {

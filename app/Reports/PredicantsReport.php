@@ -191,10 +191,10 @@ class PredicantsReport extends AbstractWordDocumentReport
             }
         }
 
-        $this->sendToBrowser(
+        return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE.' '.$cities->pluck('name')->join(' '),
-                null,
+                'docx',
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']])
         );

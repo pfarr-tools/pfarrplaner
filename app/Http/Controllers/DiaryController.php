@@ -253,7 +253,7 @@ class DiaryController extends Controller
 
         $doc = new OfficialDiaryWordDocument();
         $doc->render($start, $end, $diaryEntries);
-        $doc->sendToBrowser($date.' Amtskalender '.$user->lastName().' '.$user->first_name);
+        return $doc->sendToBrowser($date.' Amtskalender '.$user->lastName().' '.$user->first_name);
 
     }
 

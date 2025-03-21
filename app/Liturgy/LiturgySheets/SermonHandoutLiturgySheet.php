@@ -70,7 +70,7 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         $this->renderColumn5($doc);
         $this->renderColumn6($doc);
 
-        $doc->sendToBrowser($this->getFileName($service, 'Begleitzettel zur Predigt'));
+        return $doc->sendToBrowser($this->getFileName($service, 'Begleitzettel zur Predigt'));
 
     }
 

@@ -35,6 +35,7 @@ use App\Models\Service;
 use App\Services\FileNameService;
 use Illuminate\Support\Facades\Auth;
 use PDF;
+use PhpOffice\PhpWord\IOFactory;
 
 class AbstractLiturgySheet
 {
@@ -86,7 +87,11 @@ class AbstractLiturgySheet
             $this->layout
         );
 
-        return $pdf->download($this->getFileName($service));
+        $filename = $this->getFileName($service);
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $pdf->save($tempFile);
+        return response()->download($tempFile, $filename, ['Content-Type' => 'application/pdf'])
+            ->deleteFileAfterSend(true);
     }
 
     protected function getRenderViewName()

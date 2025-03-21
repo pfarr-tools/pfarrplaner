@@ -103,14 +103,17 @@ class TravelRequestFormReport extends AbstractPDFDocumentReport
         ];
 
         $pdf = $this->renderPDF($data, $config);
-        return $pdf->download(FileNameService::make(
+        $filename = FileNameService::make(
             self::FILE_TITLE,
             'pdf',
             self::FILE_SIGNATURE,
             [$data['absence']->from, $data['absence']->to],
             false,
             Auth::user(),
-        ));
+        );
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $pdf->save($tempFile);
+        return response()->download($tempFile, $filename, ['Content-Type', 'application/pdf']);
 
     }
 
