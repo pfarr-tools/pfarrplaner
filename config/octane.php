@@ -51,7 +51,7 @@ use Laravel\Octane\Listeners\ReportException;
 use Laravel\Octane\Listeners\StopWorkerIfNecessary;
 use Laravel\Octane\Octane;
 
-return [
+return (class_exists('Laravel\\Octane\\Octane') ? [
 
     /*
     |--------------------------------------------------------------------------
@@ -250,4 +250,4 @@ return [
 
     'max_execution_time' => 30,
 
-];
+] : []);
