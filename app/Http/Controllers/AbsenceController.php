@@ -203,7 +203,7 @@ class AbsenceController extends Controller
         foreach ($absences as $absence) {
             $index = ($absence->from < $start ? 1 : $absence->from->day);
             $days[$index]['absence'] = $absence;
-            $days[$index]['duration'] = $absence->to->diff($days[$index]['date'])->days + 1;
+            $days[$index]['duration'] = abs((int)$absence->to->diffInDays($days[$index]['date']))+1;
             $endIndex = ($absence->to > $end ? $end->day : $absence->to->day);
             for ($i = $index; $i <= $endIndex; $i++) {
                 $days[$i]['absent'] = true;
