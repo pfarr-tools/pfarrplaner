@@ -56,12 +56,16 @@ abstract class AbstractCSVReport extends AbstractReport
             $records[] = $record;
         }
 
+
+
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ];
 
-        $handle = fopen(storage_path($fileName), 'w');
+        $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+
+        $handle = fopen($tempFile, 'w');
         if (isset($records[0])) {
             fputcsv($handle, array_keys($records[0]));
         }
@@ -69,7 +73,7 @@ abstract class AbstractCSVReport extends AbstractReport
         foreach ($records as $record) fputcsv($handle, array_values($record));
         fclose ($handle);
 
-        return Response::download(storage_path($fileName), $fileName, $headers)->deleteFileAfterSend(true);
+        return Response::download($tempFile, $fileName, $headers)->deleteFileAfterSend(true);
 
     }
 
