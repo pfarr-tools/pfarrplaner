@@ -71,7 +71,7 @@ class AbstractExcelDocumentReport extends AbstractReport
 
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $writer = IOFactory::createWriter($this->spreadsheet, 'Xlsx');
-        $objWriter->save($filename);
+        $writer->save($filename);
         return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
             ->deleteFileAfterSend(true);
     }
