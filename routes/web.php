@@ -81,6 +81,7 @@ Route::prefix('admin')->group(function () {
 
 // update trigger
 Route::get('/ping/update', function (\Illuminate\Http\Request $request) {
+    exit();
     \Illuminate\Support\Facades\Log::debug(
         'Update triggered via remote ping from ' . gethostbyaddr($request->ip()) . ' [' . $request->ip() . ']'
     );

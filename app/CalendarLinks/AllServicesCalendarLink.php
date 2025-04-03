@@ -40,6 +40,7 @@ namespace App\CalendarLinks;
 
 use App\Models\Service;
 use App\Models\People\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -89,7 +90,7 @@ class AllServicesCalendarLink extends AbstractCalendarLink
     {
         $cityIds = explode('-', $request->get('cities', ''));
         $serviceQuery = Service::with(['location'])
-            ->whereIn('city_id', $cityIds);
+            ->whereIn('city_id', $cityIds)->startingFrom(Carbon::now()->subYears(1)->startOfYear());
         if (!$request->get('includeHidden', 0)) $serviceQuery->notHidden();
         return $serviceQuery->get();
     }
