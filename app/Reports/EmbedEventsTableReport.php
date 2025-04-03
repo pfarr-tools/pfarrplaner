@@ -125,7 +125,7 @@ class EmbedEventsTableReport extends AbstractEmbedReport
         $days = $request->get('days');
 
         $start = Carbon::now('Europe/Berlin')->startOfDay();
-        $end = $start->copy()->addDays($days)->endOfDay();
+        $end = $start->copy()->addDays((int)$days)->endOfDay();
 
         $events = Occurence::with('event')
             ->between($start, $end)
