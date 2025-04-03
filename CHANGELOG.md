@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2025.5.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.8...v2025.5.0) (2025-04-03)
+
+
+### Features
+
+* allServices-ICal-Export geht nun rückwärts nur bis zum Start des vorigen Kalenderjahrs. ([4cfe074](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4cfe0740a5699d2e9b58b683a4ff31df040686f6))
+
+
+### Bug Fixes
+
+* Abwesenheiten werden im Planer nur als 1 Tag angezeigt ([0b83bf4](https://codeberg.org/pfarr.tools/pfarrplaner/commit/0b83bf4b22629f9a08bb1e16ac8de218ea65ddf9))
+* CSV-Ausgabeformate lassen sich nicht herunterladen ([6a0fc86](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6a0fc864e1f03502ae25bc6a6295814208d565d6))
+* EmbedEventsTableReport ist nicht mit Carbon 3 kompatibel ([e6f4e0f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e6f4e0f80b3f85c89ea6e1f0269058582d8d3740))
+* Falscher Variablenname ([aaa4627](https://codeberg.org/pfarr.tools/pfarrplaner/commit/aaa4627e789cf8a2e5a7dad10e03b8a3a464dfe5))
+
 ### [2025.4.8](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.7...v2025.4.8) (2025-03-21)
 
 
