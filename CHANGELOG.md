@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2025.6.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.5.0...v2025.6.0) (2025-04-05)
+
+
+### Bug Fixes
+
+* YouTube-Icons werden riesengroß ([913332b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/913332b52d45dcbdf018a9d783e034d41a32ecdb))
+
 ## [2025.5.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.4.8...v2025.5.0) (2025-04-03)
 
 
