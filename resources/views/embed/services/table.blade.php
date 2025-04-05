@@ -82,7 +82,7 @@
                         @endif
                             @if ($service->youtube_url)
                                 @if ($service->descriptionText()!='')<br/>@endif
-                                <img src="{{ asset('img/brands/youtube.png') }}" height="10px"/> Klicken Sie hier, um
+                                <img src="{{ asset('img/brands/youtube.png') }}" style="max-height: 16px; display: inline; margin-right: 4px;"/> Klicken Sie hier, um
                                 den Gottesdienst auf YouTube anzuschauen
                             @endif
                         <br />
