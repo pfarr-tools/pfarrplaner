@@ -119,10 +119,11 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
     {
         if (!isset($item->data['song'])) return;
         if (null === $item->data['song']) return;
+        if ($item->data['song']['id'] == -1) return;
         /** @var SongItemHelper $helper */
         $helper = $item->getHelper();
         $doc->getSection()->addTitle($helper->getTitleText(),3);
-        if ($item->data['song']['song']['copyrights']) {
+        if ($item->data['song']['song']['copyrights'] ?? '') {
             $doc->renderNormalText($item->data['song']['song']['copyrights'], ['size' => 8]);
         }
 
