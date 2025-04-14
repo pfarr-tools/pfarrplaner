@@ -162,7 +162,7 @@ class UpdateService
         if ($this->hasFileChanges('package.json', $files)) {
             if ((!$this->checkIfJsonHasOnlyVersionUpdate(
                 $this->getJson(base_path('package.json')),
-                'version'
+                'package'
             ))) {
                 $actions['npm'] = 'NPM package installs';
                 $actions['browserslist'] = 'Browserlist update';
