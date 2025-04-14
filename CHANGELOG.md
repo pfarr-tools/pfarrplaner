@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.6.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.6.0...v2025.6.1) (2025-04-14)
+
+
+### Bug Fixes
+
+* SongSheetLiturgySheet produziert Fehler 500 wenn ein Lied nicht gewählt ist. ([0e11598](https://codeberg.org/pfarr.tools/pfarrplaner/commit/0e115984ae371967ed228fd365dc35a54a96dbb9))
+
 ## [2025.6.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.5.0...v2025.6.0) (2025-04-05)
 
 
