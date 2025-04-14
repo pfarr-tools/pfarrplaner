@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.6.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.6.1...v2025.6.2) (2025-04-14)
+
+
+### Bug Fixes
+
+* artisan install:updates führt immer npm run prod aus. ([59a9d54](https://codeberg.org/pfarr.tools/pfarrplaner/commit/59a9d5440c193670b5041e58611993fc09d8dcf3))
+
 ### [2025.6.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.6.0...v2025.6.1) (2025-04-14)
 
 
