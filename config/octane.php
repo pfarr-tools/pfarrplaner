@@ -74,6 +74,7 @@ return (class_exists('Laravel\\Octane\\Octane') ? [
             'package_max_length' => 100 * 1024 * 1024,
         ],
     ],
+    'trust_proxies' => [env('TRUST_PROXY', '127.0.0.1')],
 
     /*
     |--------------------------------------------------------------------------
