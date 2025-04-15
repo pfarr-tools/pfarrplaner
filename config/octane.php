@@ -68,6 +68,12 @@ return (class_exists('Laravel\\Octane\\Octane') ? [
 
     'server' => env('OCTANE_SERVER', 'swoole'),
     'workers' => env('OCTANE_WORKERS', 16),
+    'swoole' => [
+        'options' => [
+            'log_file' => storage_path('logs/swoole_http.log'),
+            'package_max_length' => 100 * 1024 * 1024,
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
