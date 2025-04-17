@@ -52,7 +52,9 @@ class AbstractPDFDocumentReport extends AbstractReport
      */
     public function sendToBrowser($filename, $data, $layout)
     {
-        return $this->renderPDF($data, $layout)->stream($filename);
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $this->renderPDF($data, $layout)->save($tempFile);
+        return response()->download($tempFile, $filename, ['Content-Type' => 'application/pdf']);
     }
 
     /**
