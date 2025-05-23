@@ -32,6 +32,7 @@ namespace App\Services;
 
 use App\Models\People\User;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class FileNameService
 {
@@ -54,6 +55,9 @@ class FileNameService
             $name = '';
         }
 
+
+        $title = Str::replace(' /', ',', $title);
+        $title = Str::replace('/', ',', $title);
 
         return ($callSign ? $callSign.($date ? '_' : '') : '')
             .($date ?? ' ').$name.$title.($extension ?: '');
