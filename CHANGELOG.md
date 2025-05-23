@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.6.8](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.6.7...v2025.6.8) (2025-05-23)
+
+
+### Bug Fixes
+
+* Fehler bei Ausgabeformaten .pdf oder .xlsx ([7927024](https://codeberg.org/pfarr.tools/pfarrplaner/commit/792702478683000fb592f611c9a13e640859f7ea))
+* FileNameService produziert Fehler wenn der Titel des Gottesdienstes einen Slash enthält ([c5b6298](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c5b6298437e84d36f9f5c76b5cb3f8de74e7b3de))
+* Leere Einrückungen werden gelb hervorgehoben ([77443e6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/77443e6c926923dc76ef089828dfa59ebed2bf7f))
+
 ### [2025.6.7](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.6.6...v2025.6.7) (2025-04-17)
 
 
