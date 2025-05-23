@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.7.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.7.0...v2025.7.1) (2025-05-23)
+
+
+### Bug Fixes
+
+* Initialisierung der TrustProxies schlägt fehl ([49e3f7b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/49e3f7b98ae5b6abeb27ae2fc5756a51e7f96bda))
+
 ## [2025.7.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.6.7...v2025.7.0) (2025-05-23)
 
 
