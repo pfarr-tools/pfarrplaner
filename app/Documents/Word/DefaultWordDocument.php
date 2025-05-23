@@ -324,7 +324,7 @@ class DefaultWordDocument
                     $paragraph = trim(str_replace('[' . $keyWord . ']', '', $paragraph));
                     $paragraph = strtr($paragraph, ["\r" => '', "\n" => '', '>>' => "\t"]);
                 }
-                if ($keyWord == $this->recipient) {
+                if (trim($keyWord) && ($keyWord == $this->recipient)) {
                     // highlight for current recipient
                     $textRun->addText(
                         $keyWord . "\t",
