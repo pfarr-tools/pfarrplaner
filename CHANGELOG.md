@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.7.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.7.2...v2025.7.3) (2025-05-27)
+
+
+### Bug Fixes
+
+* Fehlerbeseitigung und kein Caching mehr im kombinierten Veranstaltungskalender ([57e6224](https://codeberg.org/pfarr.tools/pfarrplaner/commit/57e6224077e195c4bff4462a7725f9079f1eb755))
+
 ### [2025.7.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.7.1...v2025.7.2) (2025-05-27)
 
 
