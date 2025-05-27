@@ -32,6 +32,7 @@ namespace App\Models\Calendar;
 
 use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
+use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -64,5 +65,13 @@ class Occurence extends Model
             ->where('end', '>=', $start);
     }
 
+
+    public function getLiturgicalInfoAttribute()
+    {
+        if (!$this->event) return [];
+        if ($this->event->isAlternateProprium) return $this->event->liturgicalInfo;
+        $info = LiturgyService::getLiturgyInfoByDate($this->start);
+        return $info[0] ?? [];
+    }
 
 }

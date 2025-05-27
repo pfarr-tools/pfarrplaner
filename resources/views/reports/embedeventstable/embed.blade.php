@@ -41,13 +41,13 @@
                 <th>Ort</th>
                 </thead>
                 <tbody>
-                @foreach ($events as $theseEvents)@if(trim($theseEvents->first()->event->liturgicalInfo['title'] ?? '') && (substr($theseEvents->first()->event->liturgicalInfo['date'] ?? '',0,10) == $theseEvents->first()->event->date->format('Y-m-d')))
+                @foreach ($events as $theseEvents)@if(trim($theseEvents->first()->liturgicalInfo['title'] ?? '') && (substr($theseEvents->first()->liturgicalInfo['date'] ?? '',0,10) == $theseEvents->first()->event->date->format('Y-m-d')))
                     <tr style="background-color: #ccc !important;">
                         <td valign="top"
                             style="vertical-align:top;">{!! $theseEvents->first()->start->isoFormat('dd.,\&\n\b\s\p;DD.MM.') !!}</td>
                         <td></td>
                         <td valign="top" colspan="2"
-                            style="vertical-align:top; font-weight: bold;">{{ str_replace('So.', 'Sonntag', $theseEvents->first()->event->liturgicalInfo['title'] ?? '') }}</td>
+                            style="vertical-align:top; font-weight: bold;">{{ str_replace('So.', 'Sonntag', $theseEvents->first()->liturgicalInfo['title'] ?? '') }}</td>
                     </tr>
                     @endif @foreach($theseEvents as $occurence)
                             <tr>
