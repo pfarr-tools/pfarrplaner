@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.7.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.7.1...v2025.7.2) (2025-05-27)
+
+
+### Bug Fixes
+
+* EmbedByCities enthält alle Termine statt nur Gottesdienste ([85735bc](https://codeberg.org/pfarr.tools/pfarrplaner/commit/85735bc02a0bf44a69da3dc44f5e22ebec0ae3c9))
+* EmbedEventsTable zeigt falsche Proprien bei wiederholten Terminen ([360e63a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/360e63aedcfde75cc345a1a362220de6ada3ccd4))
+* Kombinierter Veranstaltungskalender berücksichtigt nur Gottesdienste ([a4cb76b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a4cb76bc3af96e70e2b4c708702641546761b478))
+
 ### [2025.7.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.7.0...v2025.7.1) (2025-05-23)
 
 
