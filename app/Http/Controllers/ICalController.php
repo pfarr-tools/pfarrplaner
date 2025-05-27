@@ -87,7 +87,9 @@ class ICalController extends Controller
     protected function checkToken($token)
     {
         $tokenUser = User::where('api_token', $token)->first();
-        if (!$tokenUser) abort(401);
+        if (!$tokenUser) {
+            abort(401);
+        }
         $this->user = $tokenUser;
     }
 
@@ -210,10 +212,10 @@ class ICalController extends Controller
             $data = $calendarLink->export($request, $user);
         }
 
-
-        return response($data)
-            ->header('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
-            ->header('Expires', $expires)
-            ->header('Content-Type', 'text/calendar');
+        return response($data, 200, [
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => $expires,
+            'Content-Type' => 'text/calendar',
+        ]);
     }
 }

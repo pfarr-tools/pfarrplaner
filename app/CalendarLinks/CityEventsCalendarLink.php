@@ -40,6 +40,7 @@ namespace App\CalendarLinks;
 
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
+use App\Models\Calendar\Occurence;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
@@ -65,7 +66,7 @@ class CityEventsCalendarLink extends AbstractCalendarLink
     /**
      * @var string
      */
-    protected $viewName = 'events';
+    protected $viewName = 'occurences';
 
     /** @var string[]  */
     protected $needs = ['cities', 'includeHidden'];
@@ -84,8 +85,13 @@ class CityEventsCalendarLink extends AbstractCalendarLink
      */
     public function setDataFromRequest(Request $request)
     {
-        $request->validate(['city' => 'required']);
-        $this->data['city'] = $request->get('city');
+        if ($request->has('cities')) {
+            $this->data['cities'] = explode(',', $request->get('cities'));
+        } elseif ($request->has('city')) {
+            $this->data['cities'] = [$request->get('city')];
+        } else {
+            abort(404);
+        }
     }
 
     /**
@@ -95,35 +101,24 @@ class CityEventsCalendarLink extends AbstractCalendarLink
      */
     public function getRenderData(Request $request, User $user)
     {
-        $city = City::findOrFail($request->get('city'));
+        $hidden = $request->get('includeHidden', false);
         $events = [];
 
-        $servicesQuery = Service::with(['location'])
-            ->startingFrom(Carbon::now()->subMonth(1))
-            ->whereDoesntHave('funerals')
-            ->where('city_id', $city->id);
-
-        if (!$request->get('includeHidden', 0)) $servicesQuery->notHidden();
-        $services = $servicesQuery->get();
-
-        $start = Carbon::now()->subMonth(1);
-        $end = Carbon::createFromDate(2070, 1, 1);
-
-        if (isset($city->public_events_calendar_url)) {
-            $calendar = new EventCalendarImport($city->public_events_calendar_url);
-            $calendar->timeZone = 'Europe/Berlin';
-            $events = $calendar->mix($events, $start, $end, true);
-        }
-
-        $events = Service::mix($events, $services, $start, $end);
-
-        if (($city->op_domain != '') && ($city->op_customer_key != '') && ($city->op_customer_token != '')) {
-            $op = new OPEventsImport($city);
-            $events = $op->mix($events, $start, $end, true);
-        }
-
+        $events = Occurence::with('event')
+            ->startingFrom(Carbon::now()->subYear(1))
+            ->whereHas('event', function($query) use ($hidden) {
+                $query->whereIn('city_id', $this->data['cities']);
+                if (!$hidden) $query->notHidden();
+            })
+            ->orderBy('start')
+            ->get();
         return $events;
     }
 
+
+    public function setCity(City $city)
+    {
+        $this->data['city'] = $city->id;
+    }
 
 }

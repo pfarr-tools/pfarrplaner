@@ -65,6 +65,10 @@ class Occurence extends Model
             ->where('end', '>=', $start);
     }
 
+    public function scopeStartingFrom(Builder $query, Carbon $start)
+    {
+        return $query->where('end', '>=', $start);
+    }
 
     public function getLiturgicalInfoAttribute()
     {
