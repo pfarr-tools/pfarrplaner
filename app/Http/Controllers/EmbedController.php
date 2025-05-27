@@ -93,8 +93,9 @@ class EmbedController extends Controller
         $title = $request->has('title') ? $request->get('title') : '';
         $withStreaming = $request->get('withStreaming', false);
         $services = Service::with(['location', 'participants'])
+            ->where('event_class', 'service')
             ->inCities($ids)
-            ->where('hidden', '!=', 1)
+            ->notHidden()
             ->startingFrom(Carbon::now()->setTime(0,0,0))
             ->doesntHave('funerals')
             ->doesntHave('weddings')
