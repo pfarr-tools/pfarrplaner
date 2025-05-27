@@ -237,4 +237,9 @@ class AbstractCalendarLink
         ];
     }
 
+    public function filename()
+    {
+        return join('-', [$this->data['user']->id, $this->getKey()]).'.ics';
+    }
+
 }

@@ -44,6 +44,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Class ICalController
@@ -186,7 +187,7 @@ class ICalController extends Controller
      * @param User $user
      * @param $token
      * @param $key
-     * @return Application|ResponseFactory|Response|void
+     * @return Application|ResponseFactory|StreamedResponse|void
      */
     public function export(Request $request, User $user, $token, $key)
     {
@@ -197,22 +198,12 @@ class ICalController extends Controller
         /** @var AbstractCalendarLink $calendarLink */
         $calendarLink = CalendarLinks::findKey($key);
 
-
         $expires = 0;
-        if ($key == 'cityEvents') {
-            $expires = Carbon::now()->addMinutes(60)->format('D, d M Y H:i:s \G\M\T');
-            $cacheKey = 'ical_export_' . $key . '_' . $token;
-            if ((!$request->has('no_cache')) && Cache::has($cacheKey)) {
-                $data = Cache::get($cacheKey);
-            } else {
-                $data = $calendarLink->export($request, $user);
-                Cache::put($cacheKey, $data, 3600);
-            }
-        } else {
-            $data = $calendarLink->export($request, $user);
-        }
+        $data = $calendarLink->export($request, $user);
 
-        return response($data, 200, [
+        return response()->streamDownload(function () use ($data) {
+            echo $data;
+        }, $calendarLink->filename(), [
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => $expires,
             'Content-Type' => 'text/calendar',

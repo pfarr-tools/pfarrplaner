@@ -47,6 +47,7 @@ use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 /**
  * Class CityEventsCalendarLink
@@ -116,9 +117,18 @@ class CityEventsCalendarLink extends AbstractCalendarLink
     }
 
 
-    public function setCity(City $city)
+    public function setCities($cities)
     {
-        $this->data['city'] = $city->id;
+        $this->data['cities'] = $cities;
     }
+
+    public function filename()
+    {
+        return 'veranstaltungen-'.City::whereIn('id', $this->data['cities'] ?? [])->pluck('name')->map(function ($item) {
+                return Str::replace('/', '_', Str::slug($item));
+            })->implode('-').'.ics';
+    }
+
+
 
 }
