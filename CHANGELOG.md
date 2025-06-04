@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.7.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.7.3...v2025.7.4) (2025-06-04)
+
+
+### Bug Fixes
+
+* Fehler bei der Ausgabe von PDF-Dokumenten ([0dedf50](https://codeberg.org/pfarr.tools/pfarrplaner/commit/0dedf5057f97919f8923f1f1fcd4fed2b7de37d1))
+
 ### [2025.7.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.7.2...v2025.7.3) (2025-05-27)
 
 
