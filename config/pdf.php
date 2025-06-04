@@ -34,9 +34,9 @@ return [
     'author' => '',
     'subject' => '',
     'keywords' => 'dienstplan,gottesdienste',
-    'creator' => 'Online-Dienstplan des Distrikts Albstadt-Nord',
+    'creator' => env('APP_NAME', 'Pfarrplaner').' ('.env('APP_PROVIDER', 'generic').')',
     'display_mode' => 'fullpage',
-    'tempDir' => base_path('../temp/'),
+    'tempDir' => storage_path('app/mpdf'),
     'font_path' => base_path('resources/fonts/'),
     'font_data' => [
         'helveticacondensed' => [
