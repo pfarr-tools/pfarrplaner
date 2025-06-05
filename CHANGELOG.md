@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2025.8.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.7.4...v2025.8.0) (2025-06-05)
+
+
+### Features
+
+* Neue Optionen bei der Ausgabe des Opferplans ([cc0b15c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/cc0b15cb31f712c5242a57f2002b414069887ca9))
+
 ### [2025.7.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.7.3...v2025.7.4) (2025-06-04)
 
 
