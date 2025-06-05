@@ -1046,7 +1046,18 @@ class Service extends Model implements HasDAVCalendarItems
     {
         return $query->whereIn('city_id', Auth::user()->writableCities->pluck('id'));
     }
-// SETTERS
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeServicesOnly(Builder $query)
+    {
+        return $query->where('event_class', 'service');
+    }
+
+
+    // SETTERS
 // SETTERS
 // SETTERS
 // SETTERS

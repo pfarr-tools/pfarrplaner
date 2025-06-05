@@ -34,8 +34,12 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'offeringPlan'})" ref="myForm">
             <form-csrf-token />
-            <form-selectize name="city" label="Opferplan für folgende Kirchengemeinde erstellen" :options="cities" v-model="myCity" />
+            <form-selectize name="cities[]" label="Opferplan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple />
             <form-input name="year" label="Jahr" v-model="myYear" type="number" />
+            <br />
+            <form-check name="includeOfferingCounters" v-model="myIncludeOfferingCounters" label="Opferzähler mit ausgeben"/>
+            <form-check name="emptyAsOwn" v-model="myEmptyAsOwn" label="Leere Felder als &quot;eigene Gemeinde&quot; ausgeben"/>
+            <form-check name="highlightEmpty" v-model="myHighlightEmpty" label="Fehlende Einträge hervorheben"/>
         </form>
     </admin-layout>
 </template>
@@ -46,14 +50,18 @@ import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import FormCheck from "../../../components/Ui/forms/FormCheck.vue";
 export default {
     name: "Setup",
     props: ['cities'],
-    components: {FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         return {
-            myCity: this.cities.length > 0 ? this.cities[0].id : null,
+            myCities: this.cities.length > 0 ? [this.cities[0].id] : null,
             myYear: moment().format('YYYY'),
+            myIncludeOfferingCounters: false,
+            myEmptyAsOwn: true,
+            myHighlightEmpty: false,
         }
     },
     methods: {

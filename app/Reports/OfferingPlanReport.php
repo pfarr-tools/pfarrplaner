@@ -30,11 +30,15 @@
 
 namespace App\Reports;
 
+use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
+use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Services\FileNameService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 
 
@@ -77,30 +81,29 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
      */
     public function render(Request $request)
     {
+
         $data = $request->validate(
             [
-                'city' => 'required|int|exists:cities,id',
-                'year' => 'required|int'
+                'cities.*' => 'required|int|exists:cities,id',
+                'year' => 'required|int',
+                'includeOfferingCounters' => 'bool',
+                'emptyAsOwn' => 'bool',
+                'highlightEmpty' => 'bool',
             ]
         );
 
-        $city = City::findOrFail($data['city']);
+        $data['occurences'] = Occurence::with('event')->whereHas('event', function ($query) use ($data) {
+            $query->servicesOnly()
+                ->inCities($data['cities'])
+                ->between(Carbon::parse('01-01-'.$data['year'])->startOfYear(), Carbon::parse('01-01-'.$data['year'])->endOfYear())
+                ->ordered();
+        })->orderBy('start')->get();
+        $data['cities'] = City::whereIn('id', $data['cities'])->get();
 
-        $serviceList = Service::inCity($city)
-            ->whereYear('date', $data['year'])
-            ->ordered()
-            ->get();
-
-        $dates = $serviceList->pluck('date')->toArray();
-        $serviceList = $serviceList->groupBy('key_date');
-
-
-        $minDate = min($dates);
-        $maxDate = max($dates);
 
         return $this->sendToFile(
             FileNameService::make(
-                static::FILE_TITLE. ' '.$city->name,
+                static::FILE_TITLE. ' '.$data['cities']->pluck('name')->join(' '),
                 'pdf',
                 static::FILE_SIGNATURE,
                 $data['year'].'-01-01',
@@ -108,14 +111,7 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
                 null,
                 'Y'
             ),
-            [
-                'start' => $minDate,
-                'end' => $maxDate,
-                'city' => $city,
-                'services' => $serviceList,
-                'count' => count($dates),
-                'year' => $data['year'],
-            ],
+            $data,
             ['format' => 'A4']
         );
     }
