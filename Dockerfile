@@ -18,7 +18,7 @@ RUN apk add --no-cache \
     npm \
     yarn \
     icu-dev \
-    libcurl \
+    curl-dev \
  && docker-php-ext-install \
     pdo \
     pdo_mysql \
