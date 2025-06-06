@@ -14,22 +14,38 @@ RUN apk add --no-cache \
     libjpeg-turbo-dev \
     libwebp-dev \
     zlib-dev \
+    icu-dev \
+    libcurl \
     nodejs \
     npm \
     yarn \
-    icu-dev \
-    curl-dev \
- && docker-php-ext-install \
+    g++ \
+    make \
+    autoconf
+
+# Install core PHP extensions
+RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
     zip \
     soap \
     dom \
     curl \
- && apk add --no-cache --virtual .build-deps g++ make autoconf \
- && pecl install yaml \
- && docker-php-ext-enable yaml \
- && apk del .build-deps
+    intl
+
+# Install GD (with freetype, jpeg, webp)
+RUN docker-php-ext-configure gd \
+    --with-freetype \
+    --with-jpeg \
+    --with-webp \
+ && docker-php-ext-install gd
+
+# Install YAML extension
+RUN pecl install yaml \
+ && docker-php-ext-enable yaml
+
+# Clean up
+RUN apk del g++ make autoconf
 
 # Set working directory
 WORKDIR /var/www
@@ -40,7 +56,7 @@ COPY . .
 # Install Composer dependencies (no post-autoload scripts)
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Install Node/Vite assets (optional)
+# Install Node/Vite assets
 RUN yarn install && yarn run build
 
 # Permissions (Laravel expects writable dirs)
@@ -49,4 +65,4 @@ RUN chmod -R 775 storage bootstrap/cache || true
 # Expose Octane port (defined in pfarrplaner-dockerized)
 EXPOSE 9500
 
-# No CMD/ENTRYPOINT here – pfarrplaner-dockerized takes over
+# Hinweis: kein CMD/ENTRYPOINT – wird extern über pfarrplaner-dockerized gesteuert
