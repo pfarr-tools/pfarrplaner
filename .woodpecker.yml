@@ -19,5 +19,3 @@ services:
   docker:
     image: docker:dind
 
-clone:
-  depth: 1
