@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.8.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.8.4...v2025.8.5) (2025-06-06)
+
 ### [2025.8.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.8.3...v2025.8.4) (2025-06-06)
 
 ### [2025.8.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.8.2...v2025.8.3) (2025-06-06)
