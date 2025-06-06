@@ -6,6 +6,7 @@ steps:
       - docker ps
   build-and-push:
     image: docker
+    privileged: true
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
