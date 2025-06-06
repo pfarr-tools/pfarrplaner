@@ -60,7 +60,7 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Install Node/Vite assets
-RUN yarn install && yarn run build
+RUN yarn install && yarn run prod
 
 # Set permissions
 RUN chmod -R 775 storage bootstrap/cache || true
