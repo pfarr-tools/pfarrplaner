@@ -1,7 +1,11 @@
-pipeline:
+steps:
+  docker-test:
+    image: docker
+    commands:
+      - docker version
+      - docker ps
   build-and-push:
     image: docker
-    privileged: true
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
@@ -15,8 +19,3 @@ pipeline:
       - docker push pfarrtools/pfarrplaner:latest
     when:
       event: tag
-
-services:
-  docker:
-    image: docker:dind
-
