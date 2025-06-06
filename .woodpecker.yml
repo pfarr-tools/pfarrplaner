@@ -16,10 +16,10 @@ steps:
         from_secret: DOCKER_PASSWORD
     commands:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      - docker build -t pfarrtools/pfarrplaner:${CI_COMMIT_TAG} .
-      - docker tag pfarrtools/pfarrplaner:${CI_COMMIT_TAG} pfarrtools/pfarrplaner:latest
-      - docker push pfarrtools/pfarrplaner:${CI_COMMIT_TAG}
-      - docker push pfarrtools/pfarrplaner:latest
+      - "docker build -t pfarrtools/pfarrplaner:${CI_COMMIT_TAG} ."
+      - "docker tag pfarrtools/pfarrplaner:${CI_COMMIT_TAG} pfarrtools/pfarrplaner:latest"
+      - "docker push pfarrtools/pfarrplaner:${CI_COMMIT_TAG}"
+      - "docker push pfarrtools/pfarrplaner:latest"
     when:
       event: tag
 
