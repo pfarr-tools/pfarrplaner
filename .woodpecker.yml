@@ -2,6 +2,8 @@ steps:
   docker-test:
     image: docker
     privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - docker version
       - docker ps
@@ -9,7 +11,8 @@ steps:
   build-and-push:
     image: docker
     privileged: true
-    environment:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock    environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
