@@ -14,38 +14,42 @@ RUN apk add --no-cache \
     libjpeg-turbo-dev \
     libwebp-dev \
     zlib-dev \
-    icu-dev \
-    libcurl \
     nodejs \
     npm \
     yarn \
-    g++ \
-    make \
-    autoconf
-
-# Install core PHP extensions
-RUN docker-php-ext-install \
+    icu-dev \
+    libcurl-dev \
+    curl-dev \
+    pkgconfig \
+    gcompat \
+    tzdata \
+    gettext \
+    musl-locales \
+ && docker-php-ext-configure gd \
+    --with-freetype \
+    --with-jpeg \
+    --with-webp \
+ && docker-php-ext-install \
     pdo \
     pdo_mysql \
     zip \
     soap \
     dom \
     curl \
-    intl
+    intl \
+    gd \
+ && apk add --no-cache --virtual .build-deps g++ make autoconf \
+ && pecl install yaml \
+ && docker-php-ext-enable yaml \
+ && apk del .build-deps
 
-# Install GD (with freetype, jpeg, webp)
-RUN docker-php-ext-configure gd \
-    --with-freetype \
-    --with-jpeg \
-    --with-webp \
- && docker-php-ext-install gd
+# Set locale to German (de_DE.UTF-8)
+ENV LANG=de_DE.UTF-8 \
+    LANGUAGE=de_DE:de \
+    LC_ALL=de_DE.UTF-8
 
-# Install YAML extension
-RUN pecl install yaml \
- && docker-php-ext-enable yaml
-
-# Clean up
-RUN apk del g++ make autoconf
+# Set timezone to Europe/Berlin
+ENV TZ=Europe/Berlin
 
 # Set working directory
 WORKDIR /var/www
@@ -59,10 +63,10 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 # Install Node/Vite assets
 RUN yarn install && yarn run build
 
-# Permissions (Laravel expects writable dirs)
+# Set permissions
 RUN chmod -R 775 storage bootstrap/cache || true
 
-# Expose Octane port (defined in pfarrplaner-dockerized)
+# Expose Octane port
 EXPOSE 9500
 
-# Hinweis: kein CMD/ENTRYPOINT – wird extern über pfarrplaner-dockerized gesteuert
+# No CMD/ENTRYPOINT – handled by pfarrplaner-dockerized
