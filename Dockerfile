@@ -18,7 +18,6 @@ RUN apk add --no-cache \
     npm \
     yarn \
     icu-dev \
-    libcurl-dev \
     curl-dev \
     pkgconfig \
     gcompat \
