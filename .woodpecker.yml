@@ -12,7 +12,8 @@ steps:
     image: docker
     privileged: true
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock    environment:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
