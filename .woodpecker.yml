@@ -1,20 +1,19 @@
 steps:
   docker-test:
     image: docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    privileged: true
     commands:
       - docker version
       - docker ps
+
   build-and-push:
     image: docker
+    privileged: true
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - docker build -t pfarrtools/pfarrplaner:${CI_COMMIT_TAG} .
@@ -23,3 +22,4 @@ steps:
       - docker push pfarrtools/pfarrplaner:latest
     when:
       event: tag
+
