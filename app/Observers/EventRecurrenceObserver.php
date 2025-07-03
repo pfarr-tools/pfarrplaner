@@ -45,7 +45,7 @@ class EventRecurrenceObserver
      */
     public function created(Service $service): void
     {
-        //
+        $this->updated($service);
     }
 
     /**
