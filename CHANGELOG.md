@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2025.9.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.8.22...v2025.9.0) (2025-07-22)
+
+
+### Features
+
+* EmbedEventsTableReport kann jetzt mehrere Kirchengemeinden anzeigen ([26bff74](https://codeberg.org/pfarr.tools/pfarrplaner/commit/26bff74eadfdeb104fb0ce4fe955391fb8ee8113))
+
 ### [2025.8.22](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.8.21...v2025.8.22) (2025-07-03)
 
 
