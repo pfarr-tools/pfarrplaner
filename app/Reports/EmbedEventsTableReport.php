@@ -96,16 +96,17 @@ class EmbedEventsTableReport extends AbstractEmbedReport
         $data = $request->validate(
             [
                 'cors-origin' => 'required|url',
-                'city' => 'required|int|exists:cities,id',
+                'cities.*' => 'required|int|exists:cities,id',
                 'numDays' => 'required|int',
             ]
         );
-        $city = City::findOrFail($request->get('city'));
+
+            $cities = $data['cities'];
         $days = $request->get('numDays');
         $corsOrigin = $request->get('cors-origin');
         $report = $this->getKey();
 
-        $url = route('report.embed', compact('report', 'days', 'city', 'corsOrigin'));
+        $url = route('report.embed', compact('report', 'days', 'cities', 'corsOrigin'));
         $randomId = uniqid();
 
         $html = \Illuminate\Support\Facades\View::make('reports.embedeventstable.render', compact('url', 'randomId'))
@@ -122,16 +123,19 @@ class EmbedEventsTableReport extends AbstractEmbedReport
      */
     public function embed(Request $request)
     {
-        $city = City::findOrFail($request->get('city'));
-        $days = $request->get('days');
+
+        $cityIds = $request->get('cities', [$request->get('city')]);
+        if (empty($cityIds)) abort(404);
+
+        $days = $request->get('days', 8);
 
         $start = Carbon::now('Europe/Berlin')->startOfDay();
         $end = $start->copy()->addDays((int)$days)->endOfDay();
 
         $events = Occurence::with('event')
             ->between($start, $end)
-            ->whereHas('service', function($query) use ($city) {
-                $query->inCities([$city->id])->displayable();
+            ->whereHas('service', function($query) use ($cityIds) {
+                $query->inCities($cityIds)->displayable();
             })
             ->orderBy('start')
             ->get()
@@ -143,7 +147,7 @@ class EmbedEventsTableReport extends AbstractEmbedReport
 
         return $this->renderView(
             'embed',
-            compact('start', 'days', 'city', 'events', 'randomId')
+            compact('start', 'days', 'cityIds', 'events', 'randomId')
         );
     }
 }

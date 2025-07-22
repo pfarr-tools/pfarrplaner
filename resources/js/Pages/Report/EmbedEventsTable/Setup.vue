@@ -33,8 +33,8 @@
             <save-button label="Erstellen" title="HTML-Code für eine Veranstaltungstabelle erstellen"
                          @click="renderReport"/>
         </template>
-        <form-selectize name="city" label="Tabelle für folgende Kirchengemeinde erstellen"
-                        v-model="myForm.city" :options="cities"/>
+        <form-selectize name="cities" label="Tabelle für folgende Kirchengemeinden erstellen"
+                        v-model="myForm.cities" :options="cities" multiple/>
         <form-input name="numDays" label="Anzahl der angezeigten Tage" type="number"
                     v-model="myForm.numDays" />
         <form-input name="cors-origin" label="Aufrufende Website"
@@ -61,7 +61,7 @@ export default {
 
         return {
             myForm: {
-                city: this.cities.length ? this.cities[0].id : null,
+                cities: this.cities.length ? [this.cities[0].id] : null,
                 numDays: 8,
                 'cors-origin': null,
             }

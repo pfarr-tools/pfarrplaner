@@ -70,7 +70,7 @@
                                     @endif
                                 </td>
                                 <td valign="top" style="vertical-align:top;">
-                                    {{ $occurence->event->city_id == $city->id ? $occurence->event->locationText() : $occurence->event->locationTextWithCity }}
+                                    {{ count($cityIds) > 1 ? $occurence->event->locationText() : $occurence->event->locationTextWithCity }}
                                     @if($occurence->event->youtube_url)
                                         <div><a class="youtube-button" target="_blank" href="{{ $occurence->event->youtube_url }}"><span class="fab fa-youtube"></span> Auf YouTube ansehen</a></div>
                                     @endif
