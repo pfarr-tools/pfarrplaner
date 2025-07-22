@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2025.10.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.9.0...v2025.10.0) (2025-07-22)
+
+
+### Features
+
+* Veranstaltungsliste für den WebBuilder ([4e9264b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4e9264b8bd396101c17bdab9e25d08c18a1e8e01))
+
 ## [2025.9.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.8.22...v2025.9.0) (2025-07-22)
 
 
