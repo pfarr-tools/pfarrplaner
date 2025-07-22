@@ -144,7 +144,6 @@ export default {
                     this.showInbox = false;
                 } else {
                     this.inboxFiles = response.data;
-                    console.log('inbox', this.inboxFiles);
                     this.showInbox = true;
                     this.tabUpdate++;
                     this.$forceUpdate();
