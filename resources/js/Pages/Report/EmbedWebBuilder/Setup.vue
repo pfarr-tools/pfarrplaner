@@ -103,6 +103,8 @@ export default {
         let myTemplates = [];
         let myLayouts = [];
 
+        console.log('layouts', this.layouts);
+
         for (const layoutKey in this.layouts) {
             myLayouts.push({id: this.layouts[layoutKey].id, name: this.layouts[layoutKey].name});
             for (const templateKey in this.layouts[layoutKey].templates) {

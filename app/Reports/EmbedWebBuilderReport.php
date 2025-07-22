@@ -48,6 +48,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\View\View;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\URL;
@@ -98,7 +99,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
             $templates = 0;
             $existingTemplates = [];
             foreach ($configuredLayout['templates'] ?? [] as $key => $template) {
-                if (\Illuminate\Support\Facades\View::exists('embed.webbuilder.'.$configuredLayout['id'].'.'.$key)) {
+                if (ViewFacade::exists('embed.webbuilder.'.$configuredLayout['id'].'.'.$key)) {
                     $existingTemplates[$key] = $template;
                     $templates++;
                 }
@@ -139,7 +140,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         $url = URL::signedRoute('embed.report', $data).'&cors-origin='.urlencode($corsOrigin);
         $randomId = uniqid();
 
-        $html = \Illuminate\Support\Facades\View::make('reports.embedservicetable.render', compact('url', 'randomId'))->render();
+        $html = ViewFacade::make('reports.embedservicetable.render', compact('url', 'randomId'))->render();
         $title= 'HTML-Code für Veranstaltungswerbung erstellen';
         return Inertia::render('Report/EmbedServiceTable/Render', compact('html', 'title'));
     }
@@ -158,7 +159,9 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         $data['maxDays'] ??= 730;
 
         $start = Carbon::now();
-        $end = $start->copy()->addDays($data['maxDays']);
+        $end = $start->copy()->addDays((int)$data['maxDays']);
+        $randomId = uniqid();
+
 
         $eventQuery = Occurence::with('event')
             ->between($start, $end)
@@ -200,7 +203,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
 
         if ($data['limit'] ?? null) $eventQuery->limit($data['limit']);
 
-        return view('embed.webbuilder.'.$data['template'], ['options' => $data, 'occurences' => $eventQuery->get()]);
+        return view('embed.webbuilder.'.$data['template'], ['options' => $data, 'occurences' => $eventQuery->get(), 'randomId' => $randomId]);
     }
 
 }
