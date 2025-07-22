@@ -1,4 +1,5 @@
 @php
+    /** @var \Illuminate\Support\Collection $occurences */
     $events = $occurences->groupBy(function (App\Models\Calendar\Occurence $item, int $key) {
                 return $item->start->format('Ymd');
             });
