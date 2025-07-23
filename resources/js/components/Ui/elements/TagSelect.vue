@@ -32,7 +32,7 @@
         <form-selectize :name="name" :label="label" :help="help"
                         :options="tags" :value="myValue"
                         :item-renderer="renderOption" :option-renderer="renderOption"
-                        @input="handleInput"
+                        @input="handleInput" :settings="mySelectizeSettings"
                         multiple />
     </div>
 </template>
@@ -49,8 +49,19 @@ export default {
             this.value.forEach(item => { myValue.push(item.id)});
         }
 
+        let myTags = this.tags;
+
         return {
             myValue: myValue,
+            mySelectizeSettings: {
+                options: myTags,
+                create: this.addTag,
+                render: {
+                    option_create: function (data, escape) {
+                        return '<div class="create">Neue Kennzeichnung anlegen: <strong>' + escape(data.input) + '</strong>&hellip;</div>';
+                    },
+                },
+            }
         }
     },
     methods: {
@@ -62,6 +73,10 @@ export default {
             this.tags.forEach(tag => { if (e.includes(tag.id.toString())) items.push(tag); });
             this.$emit('input', items);
         },
+        addTag(e) {
+            console.log('add tag', e)
+            return {name: e};
+        }
     }
 }
 </script>

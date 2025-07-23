@@ -384,6 +384,7 @@ class Service extends Model implements HasDAVCalendarItems
 
     public function getCreditsAttribute()
     {
+        $credits = [];
         if ($t = $this->participantsText('P', true, true)) {
             $credits['Liturgie'] = 'Liturgie: ' . $t;
         }

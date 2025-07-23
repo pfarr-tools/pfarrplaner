@@ -58,7 +58,7 @@ class EncryptedAttribute implements CastsAttributes
 
     private function isEncrypted($string)
     {
-        return isset(json_decode(base64_decode($string), true)['mac']);
+        return isset(json_decode(base64_decode($string ?? ''), true)['mac']);
     }
 
     private function hasObsoleteEncryption($string)

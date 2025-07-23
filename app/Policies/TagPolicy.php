@@ -59,7 +59,7 @@ class TagPolicy
      */
     public function index(User $user)
     {
-        return false;
+        return true;
     }
 
     /**
@@ -69,7 +69,7 @@ class TagPolicy
      */
     public function create(User $user, Tag $model)
     {
-        return false;
+        return true;
     }
 
     /**
@@ -79,7 +79,7 @@ class TagPolicy
      */
     public function update(User $user, Tag $model)
     {
-        return false;
+        return true;
     }
 
     /**
@@ -89,7 +89,7 @@ class TagPolicy
      */
     public function delete(User $user, Tag $model)
     {
-        return false;
+        return true;
     }
 
     /**
@@ -99,7 +99,7 @@ class TagPolicy
      */
     public function forceDelete(User $user, Tag $model)
     {
-        return false;
+        return true;
     }
 
     /**
@@ -109,6 +109,6 @@ class TagPolicy
      */
     public function restore(User $user, Tag $model)
     {
-        return false;
+        return true;
     }
 }
