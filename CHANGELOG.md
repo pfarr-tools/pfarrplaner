@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.10.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.10.0...v2025.10.1) (2025-07-26)
+
+
+### Bug Fixes
+
+* Fehler bei leeren Credits ([b76b26d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b76b26d22e1ae97c163f0100117aac22f3f1bb93))
+
 ## [2025.10.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.9.0...v2025.10.0) (2025-07-22)
 
 
