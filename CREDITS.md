@@ -11,34 +11,37 @@ Pfarrplaner uses the following open-source libraries:
  - [aws/aws-crt-php](https://packagist.org/packages/aws/aws-crt-php) v1.2.7
     under the Apache-2.0 license
 
- - [aws/aws-sdk-php](https://packagist.org/packages/aws/aws-sdk-php) 3.324.11
+ - [aws/aws-sdk-php](https://packagist.org/packages/aws/aws-sdk-php) 3.351.7
     under the Apache-2.0 license
 
  - [bacon/bacon-qr-code](https://packagist.org/packages/bacon/bacon-qr-code) 2.0.8
     under the BSD-2-Clause license
 
- - [barryvdh/laravel-debugbar](https://packagist.org/packages/barryvdh/laravel-debugbar) v3.14.6
+ - [barryvdh/laravel-debugbar](https://packagist.org/packages/barryvdh/laravel-debugbar) v3.16.0
     under the MIT license
 
- - [barryvdh/laravel-ide-helper](https://packagist.org/packages/barryvdh/laravel-ide-helper) v2.15.1
+ - [barryvdh/laravel-ide-helper](https://packagist.org/packages/barryvdh/laravel-ide-helper) v3.6.0
     under the MIT license
 
- - [barryvdh/reflection-docblock](https://packagist.org/packages/barryvdh/reflection-docblock) v2.1.3
+ - [barryvdh/reflection-docblock](https://packagist.org/packages/barryvdh/reflection-docblock) v2.4.0
     under the MIT license
 
- - [beyondcode/laravel-dump-server](https://packagist.org/packages/beyondcode/laravel-dump-server) 1.9.0
+ - [beyondcode/laravel-dump-server](https://packagist.org/packages/beyondcode/laravel-dump-server) 2.1.0
     under the MIT license
 
- - [brick/math](https://packagist.org/packages/brick/math) 0.12.1
+ - [brick/math](https://packagist.org/packages/brick/math) 0.12.3
     under the MIT license
 
  - [carbonphp/carbon-doctrine-types](https://packagist.org/packages/carbonphp/carbon-doctrine-types) 2.1.0
     under the MIT license
 
- - [composer/class-map-generator](https://packagist.org/packages/composer/class-map-generator) 1.4.0
+ - [composer/class-map-generator](https://packagist.org/packages/composer/class-map-generator) 1.6.1
     under the MIT license
 
- - [composer/pcre](https://packagist.org/packages/composer/pcre) 3.3.1
+ - [composer/pcre](https://packagist.org/packages/composer/pcre) 3.3.2
+    under the MIT license
+
+ - [composer/semver](https://packagist.org/packages/composer/semver) 3.4.3
     under the MIT license
 
  - [dasprid/enum](https://packagist.org/packages/dasprid/enum) 1.0.6
@@ -47,16 +50,13 @@ Pfarrplaner uses the following open-source libraries:
  - [dflydev/dot-access-data](https://packagist.org/packages/dflydev/dot-access-data) v3.0.3
     under the MIT license
 
- - [doctrine/cache](https://packagist.org/packages/doctrine/cache) 2.2.0
+ - [doctrine/collections](https://packagist.org/packages/doctrine/collections) 2.3.0
     under the MIT license
 
- - [doctrine/collections](https://packagist.org/packages/doctrine/collections) 2.2.2
+ - [doctrine/dbal](https://packagist.org/packages/doctrine/dbal) 3.10.0
     under the MIT license
 
- - [doctrine/dbal](https://packagist.org/packages/doctrine/dbal) 3.9.3
-    under the MIT license
-
- - [doctrine/deprecations](https://packagist.org/packages/doctrine/deprecations) 1.1.3
+ - [doctrine/deprecations](https://packagist.org/packages/doctrine/deprecations) 1.1.5
     under the MIT license
 
  - [doctrine/event-manager](https://packagist.org/packages/doctrine/event-manager) 2.0.1
@@ -65,25 +65,22 @@ Pfarrplaner uses the following open-source libraries:
  - [doctrine/inflector](https://packagist.org/packages/doctrine/inflector) 2.0.10
     under the MIT license
 
- - [doctrine/instantiator](https://packagist.org/packages/doctrine/instantiator) 2.0.0
-    under the MIT license
-
  - [doctrine/lexer](https://packagist.org/packages/doctrine/lexer) 3.0.1
     under the MIT license
 
  - [dragonmantank/cron-expression](https://packagist.org/packages/dragonmantank/cron-expression) v3.4.0
     under the MIT license
 
- - [egulias/email-validator](https://packagist.org/packages/egulias/email-validator) 4.0.2
+ - [egulias/email-validator](https://packagist.org/packages/egulias/email-validator) 4.0.4
     under the MIT license
 
- - [ezyang/htmlpurifier](https://packagist.org/packages/ezyang/htmlpurifier) v4.17.0
+ - [ezyang/htmlpurifier](https://packagist.org/packages/ezyang/htmlpurifier) v4.18.0
     under the LGPL-2.1-or-later license
 
- - [filp/whoops](https://packagist.org/packages/filp/whoops) 2.16.0
+ - [filp/whoops](https://packagist.org/packages/filp/whoops) 2.18.3
     under the MIT license
 
- - [firebase/php-jwt](https://packagist.org/packages/firebase/php-jwt) v6.10.1
+ - [firebase/php-jwt](https://packagist.org/packages/firebase/php-jwt) v6.11.1
     under the BSD-3-Clause license
 
  - [fruitcake/php-cors](https://packagist.org/packages/fruitcake/php-cors) v1.3.0
@@ -92,88 +89,103 @@ Pfarrplaner uses the following open-source libraries:
  - [fzaninotto/faker](https://packagist.org/packages/fzaninotto/faker) dev-master 5ffe7db
     under the MIT license
 
- - [google/apiclient](https://packagist.org/packages/google/apiclient) v2.18.0
+ - [google/apiclient](https://packagist.org/packages/google/apiclient) v2.18.3
     under the Apache-2.0 license
 
- - [google/apiclient-services](https://packagist.org/packages/google/apiclient-services) v0.379.0
+ - [google/apiclient-services](https://packagist.org/packages/google/apiclient-services) v0.404.0
     under the Apache-2.0 license
 
- - [google/auth](https://packagist.org/packages/google/auth) v1.42.0
+ - [google/auth](https://packagist.org/packages/google/auth) v1.44.0
     under the Apache-2.0 license
+
+ - [google/protobuf](https://packagist.org/packages/google/protobuf) v4.31.1
+    under the BSD-3-Clause license
 
  - [graham-campbell/result-type](https://packagist.org/packages/graham-campbell/result-type) v1.1.3
     under the MIT license
 
- - [guzzlehttp/guzzle](https://packagist.org/packages/guzzlehttp/guzzle) 7.9.2
+ - [guzzlehttp/guzzle](https://packagist.org/packages/guzzlehttp/guzzle) 7.9.3
     under the MIT license
 
- - [guzzlehttp/promises](https://packagist.org/packages/guzzlehttp/promises) 2.0.4
+ - [guzzlehttp/promises](https://packagist.org/packages/guzzlehttp/promises) 2.2.0
     under the MIT license
 
- - [guzzlehttp/psr7](https://packagist.org/packages/guzzlehttp/psr7) 2.7.0
+ - [guzzlehttp/psr7](https://packagist.org/packages/guzzlehttp/psr7) 2.7.1
     under the MIT license
 
- - [guzzlehttp/uri-template](https://packagist.org/packages/guzzlehttp/uri-template) v1.0.3
+ - [guzzlehttp/uri-template](https://packagist.org/packages/guzzlehttp/uri-template) v1.0.4
     under the MIT license
 
- - [hamcrest/hamcrest-php](https://packagist.org/packages/hamcrest/hamcrest-php) v2.0.1
+ - [hamcrest/hamcrest-php](https://packagist.org/packages/hamcrest/hamcrest-php) v2.1.1
     under the BSD-3-Clause license
 
- - [inertiajs/inertia-laravel](https://packagist.org/packages/inertiajs/inertia-laravel) v0.6.11
+ - [inertiajs/inertia-laravel](https://packagist.org/packages/inertiajs/inertia-laravel) v1.3.3
     under the MIT license
 
  - [jamesiarmes/php-ntlm](https://packagist.org/packages/jamesiarmes/php-ntlm) 1.0.0
     under the MIT license
 
+ - [laminas/laminas-diactoros](https://packagist.org/packages/laminas/laminas-diactoros) 3.6.0
+    under the BSD-3-Clause license
+
  - [laravel-lang/lang](https://packagist.org/packages/laravel-lang/lang) 9.1.2
     under the MIT license
 
- - [laravel/dusk](https://packagist.org/packages/laravel/dusk) v7.13.0
+ - [laravel/dusk](https://packagist.org/packages/laravel/dusk) v8.3.3
     under the MIT license
 
- - [laravel/framework](https://packagist.org/packages/laravel/framework) v10.48.22
+ - [laravel/framework](https://packagist.org/packages/laravel/framework) v11.45.1
     under the MIT license
 
- - [laravel/legacy-factories](https://packagist.org/packages/laravel/legacy-factories) v1.4.0
+ - [laravel/legacy-factories](https://packagist.org/packages/laravel/legacy-factories) v1.4.1
     under the MIT license
 
- - [laravel/prompts](https://packagist.org/packages/laravel/prompts) v0.1.25
+ - [laravel/octane](https://packagist.org/packages/laravel/octane) v2.12.0
     under the MIT license
 
- - [laravel/sanctum](https://packagist.org/packages/laravel/sanctum) v3.3.3
+ - [laravel/prompts](https://packagist.org/packages/laravel/prompts) v0.3.6
     under the MIT license
 
- - [laravel/serializable-closure](https://packagist.org/packages/laravel/serializable-closure) v1.3.5
+ - [laravel/sanctum](https://packagist.org/packages/laravel/sanctum) v4.2.0
     under the MIT license
 
- - [laravel/tinker](https://packagist.org/packages/laravel/tinker) v2.10.0
+ - [laravel/serializable-closure](https://packagist.org/packages/laravel/serializable-closure) v2.0.4
     under the MIT license
 
- - [laravel/ui](https://packagist.org/packages/laravel/ui) v4.5.2
+ - [laravel/tinker](https://packagist.org/packages/laravel/tinker) v2.10.1
     under the MIT license
 
- - [league/commonmark](https://packagist.org/packages/league/commonmark) 2.5.3
+ - [laravel/ui](https://packagist.org/packages/laravel/ui) v4.6.1
+    under the MIT license
+
+ - [league/commonmark](https://packagist.org/packages/league/commonmark) 2.7.1
     under the BSD-3-Clause license
 
  - [league/config](https://packagist.org/packages/league/config) v1.2.0
     under the BSD-3-Clause license
 
- - [league/flysystem](https://packagist.org/packages/league/flysystem) 3.29.1
+ - [league/flysystem](https://packagist.org/packages/league/flysystem) 3.30.0
     under the MIT license
 
  - [league/flysystem-aws-s3-v3](https://packagist.org/packages/league/flysystem-aws-s3-v3) 3.29.0
     under the MIT license
 
- - [league/flysystem-local](https://packagist.org/packages/league/flysystem-local) 3.29.0
+ - [league/flysystem-local](https://packagist.org/packages/league/flysystem-local) 3.30.0
     under the MIT license
 
- - [league/flysystem-sftp-v3](https://packagist.org/packages/league/flysystem-sftp-v3) 3.29.0
+ - [league/flysystem-sftp-v3](https://packagist.org/packages/league/flysystem-sftp-v3) 3.30.0
     under the MIT license
 
  - [league/mime-type-detection](https://packagist.org/packages/league/mime-type-detection) 1.16.0
     under the MIT license
 
- - [maennchen/zipstream-php](https://packagist.org/packages/maennchen/zipstream-php) 3.1.1
+ - [league/uri](https://packagist.org/packages/league/uri) 7.5.1
+    under the MIT license
+
+ - [league/uri-interfaces](https://packagist.org/packages/league/uri-interfaces) 7.5.0
+    under the MIT license
+
+ - [maennchen/zipstream-php](https://packagist.org/packages/maennchen/zipstream-php) 3.2.0
     under the MIT license
 
  - [markbaker/complex](https://packagist.org/packages/markbaker/complex) 3.0.2
@@ -182,16 +194,13 @@ Pfarrplaner uses the following open-source libraries:
  - [markbaker/matrix](https://packagist.org/packages/markbaker/matrix) 3.0.1
     under the MIT license
 
- - [maximebf/debugbar](https://packagist.org/packages/maximebf/debugbar) v1.23.2
-    under the MIT license
-
  - [mockery/mockery](https://packagist.org/packages/mockery/mockery) 1.6.12
     under the BSD-3-Clause license
 
- - [monolog/monolog](https://packagist.org/packages/monolog/monolog) 3.7.0
+ - [monolog/monolog](https://packagist.org/packages/monolog/monolog) 3.9.0
     under the MIT license
 
- - [mpdf/mpdf](https://packagist.org/packages/mpdf/mpdf) v8.2.4
+ - [mpdf/mpdf](https://packagist.org/packages/mpdf/mpdf) v8.2.5
     under the GPL-2.0-only license
 
  - [mpdf/psr-http-message-shim](https://packagist.org/packages/mpdf/psr-http-message-shim) v2.0.1
@@ -206,28 +215,28 @@ Pfarrplaner uses the following open-source libraries:
  - [mtdowling/jmespath.php](https://packagist.org/packages/mtdowling/jmespath.php) 2.8.0
     under the MIT license
 
- - [myclabs/deep-copy](https://packagist.org/packages/myclabs/deep-copy) 1.12.0
+ - [myclabs/deep-copy](https://packagist.org/packages/myclabs/deep-copy) 1.13.3
     under the MIT license
 
- - [nesbot/carbon](https://packagist.org/packages/nesbot/carbon) 2.72.5
+ - [nesbot/carbon](https://packagist.org/packages/nesbot/carbon) 3.10.1
     under the MIT license
 
  - [nette/schema](https://packagist.org/packages/nette/schema) v1.3.2
     under the BSD-3-Clause / GPL-2.0-only / GPL-3.0-only licenses
 
- - [nette/utils](https://packagist.org/packages/nette/utils) v4.0.5
+ - [nette/utils](https://packagist.org/packages/nette/utils) v4.0.7
     under the BSD-3-Clause / GPL-2.0-only / GPL-3.0-only licenses
 
- - [nikic/php-parser](https://packagist.org/packages/nikic/php-parser) v5.3.1
+ - [nikic/php-parser](https://packagist.org/packages/nikic/php-parser) v5.5.0
     under the BSD-3-Clause license
 
  - [niklasravnsborg/laravel-pdf](https://packagist.org/packages/niklasravnsborg/laravel-pdf) v4.1.0
     under the MIT license
 
- - [nunomaduro/collision](https://packagist.org/packages/nunomaduro/collision) v6.4.0
+ - [nunomaduro/collision](https://packagist.org/packages/nunomaduro/collision) v8.8.2
     under the MIT license
 
- - [nunomaduro/termwind](https://packagist.org/packages/nunomaduro/termwind) v1.16.0
+ - [nunomaduro/termwind](https://packagist.org/packages/nunomaduro/termwind) v2.3.1
     under the MIT license
 
  - [paragonie/constant_time_encoding](https://packagist.org/packages/paragonie/constant_time_encoding) v3.0.0
@@ -245,58 +254,52 @@ Pfarrplaner uses the following open-source libraries:
  - [phar-io/version](https://packagist.org/packages/phar-io/version) 3.2.1
     under the BSD-3-Clause license
 
+ - [php-debugbar/php-debugbar](https://packagist.org/packages/php-debugbar/php-debugbar) v2.2.4
+    under the MIT license
+
  - [php-ews/php-ews](https://packagist.org/packages/php-ews/php-ews) 1.0.0
     under the MIT license
 
- - [php-webdriver/webdriver](https://packagist.org/packages/php-webdriver/webdriver) 1.15.1
+ - [php-webdriver/webdriver](https://packagist.org/packages/php-webdriver/webdriver) 1.15.2
     under the MIT license
 
- - [phpdocumentor/reflection-common](https://packagist.org/packages/phpdocumentor/reflection-common) 2.2.0
-    under the MIT license
-
- - [phpdocumentor/type-resolver](https://packagist.org/packages/phpdocumentor/type-resolver) 1.8.2
-    under the MIT license
-
- - [phpoffice/common](https://packagist.org/packages/phpoffice/common) 1.0.3
+ - [phpoffice/common](https://packagist.org/packages/phpoffice/common) 1.0.5
     under the LGPL-3.0-only license
 
- - [phpoffice/math](https://packagist.org/packages/phpoffice/math) 0.2.0
+ - [phpoffice/math](https://packagist.org/packages/phpoffice/math) 0.3.0
     under the MIT license
 
- - [phpoffice/phppresentation](https://packagist.org/packages/phpoffice/phppresentation) dev-fix-video 0245429
+ - [phpoffice/phppresentation](https://packagist.org/packages/phpoffice/phppresentation) 1.2.0
     under the LGPL-3.0-only license
 
- - [phpoffice/phpspreadsheet](https://packagist.org/packages/phpoffice/phpspreadsheet) 1.29.2
+ - [phpoffice/phpspreadsheet](https://packagist.org/packages/phpoffice/phpspreadsheet) 1.29.12
     under the MIT license
 
- - [phpoffice/phpword](https://packagist.org/packages/phpoffice/phpword) 1.3.0
-    under the LGPL-3.0 license
+ - [phpoffice/phpword](https://packagist.org/packages/phpoffice/phpword) 1.4.0
+    under the LGPL-3.0-only license
 
  - [phpoption/phpoption](https://packagist.org/packages/phpoption/phpoption) 1.9.3
     under the Apache-2.0 license
 
- - [phpseclib/phpseclib](https://packagist.org/packages/phpseclib/phpseclib) 3.0.42
+ - [phpseclib/phpseclib](https://packagist.org/packages/phpseclib/phpseclib) 3.0.46
     under the MIT license
 
- - [phpstan/phpdoc-parser](https://packagist.org/packages/phpstan/phpdoc-parser) 1.33.0
-    under the MIT license
-
- - [phpunit/php-code-coverage](https://packagist.org/packages/phpunit/php-code-coverage) 9.2.32
+ - [phpunit/php-code-coverage](https://packagist.org/packages/phpunit/php-code-coverage) 11.0.10
     under the BSD-3-Clause license
 
- - [phpunit/php-file-iterator](https://packagist.org/packages/phpunit/php-file-iterator) 3.0.6
+ - [phpunit/php-file-iterator](https://packagist.org/packages/phpunit/php-file-iterator) 5.1.0
     under the BSD-3-Clause license
 
- - [phpunit/php-invoker](https://packagist.org/packages/phpunit/php-invoker) 3.1.1
+ - [phpunit/php-invoker](https://packagist.org/packages/phpunit/php-invoker) 5.0.1
     under the BSD-3-Clause license
 
- - [phpunit/php-text-template](https://packagist.org/packages/phpunit/php-text-template) 2.0.4
+ - [phpunit/php-text-template](https://packagist.org/packages/phpunit/php-text-template) 4.0.1
     under the BSD-3-Clause license
 
- - [phpunit/php-timer](https://packagist.org/packages/phpunit/php-timer) 5.0.3
+ - [phpunit/php-timer](https://packagist.org/packages/phpunit/php-timer) 7.0.1
     under the BSD-3-Clause license
 
- - [phpunit/phpunit](https://packagist.org/packages/phpunit/phpunit) 9.6.21
+ - [phpunit/phpunit](https://packagist.org/packages/phpunit/phpunit) 11.5.27
     under the BSD-3-Clause license
 
  - [predis/predis](https://packagist.org/packages/predis/predis) v1.1.10
@@ -329,22 +332,25 @@ Pfarrplaner uses the following open-source libraries:
  - [psr/simple-cache](https://packagist.org/packages/psr/simple-cache) 3.0.0
     under the MIT license
 
- - [psy/psysh](https://packagist.org/packages/psy/psysh) v0.12.4
+ - [psy/psysh](https://packagist.org/packages/psy/psysh) v0.12.9
     under the MIT license
 
  - [ralouphie/getallheaders](https://packagist.org/packages/ralouphie/getallheaders) 3.0.3
     under the MIT license
 
- - [ramsey/collection](https://packagist.org/packages/ramsey/collection) 2.0.0
+ - [ramsey/collection](https://packagist.org/packages/ramsey/collection) 2.1.1
     under the MIT license
 
- - [ramsey/uuid](https://packagist.org/packages/ramsey/uuid) 4.7.6
+ - [ramsey/uuid](https://packagist.org/packages/ramsey/uuid) 4.9.0
     under the MIT license
 
- - [revolution/laravel-amazon-product-api](https://packagist.org/packages/revolution/laravel-amazon-product-api) 4.8.0
+ - [revolution/laravel-amazon-product-api](https://packagist.org/packages/revolution/laravel-amazon-product-api) 4.9.1
     under the MIT license
 
- - [sabre/dav](https://packagist.org/packages/sabre/dav) 4.6.0
+ - [roadrunner-php/roadrunner-api-dto](https://packagist.org/packages/roadrunner-php/roadrunner-api-dto) v1.12.0
+    under the MIT license
+
+ - [sabre/dav](https://packagist.org/packages/sabre/dav) 4.7.0
     under the BSD-3-Clause license
 
  - [sabre/event](https://packagist.org/packages/sabre/event) 5.1.7
@@ -356,193 +362,244 @@ Pfarrplaner uses the following open-source libraries:
  - [sabre/uri](https://packagist.org/packages/sabre/uri) 2.3.4
     under the BSD-3-Clause license
 
- - [sabre/vobject](https://packagist.org/packages/sabre/vobject) 4.5.6
+ - [sabre/vobject](https://packagist.org/packages/sabre/vobject) 4.5.7
     under the BSD-3-Clause license
 
  - [sabre/xml](https://packagist.org/packages/sabre/xml) 2.2.11
     under the BSD-3-Clause license
 
- - [sebastian/cli-parser](https://packagist.org/packages/sebastian/cli-parser) 1.0.2
+ - [sebastian/cli-parser](https://packagist.org/packages/sebastian/cli-parser) 3.0.2
     under the BSD-3-Clause license
 
- - [sebastian/code-unit](https://packagist.org/packages/sebastian/code-unit) 1.0.8
+ - [sebastian/code-unit](https://packagist.org/packages/sebastian/code-unit) 3.0.3
     under the BSD-3-Clause license
 
- - [sebastian/code-unit-reverse-lookup](https://packagist.org/packages/sebastian/code-unit-reverse-lookup) 2.0.3
+ - [sebastian/code-unit-reverse-lookup](https://packagist.org/packages/sebastian/code-unit-reverse-lookup) 4.0.1
     under the BSD-3-Clause license
 
- - [sebastian/comparator](https://packagist.org/packages/sebastian/comparator) 4.0.8
+ - [sebastian/comparator](https://packagist.org/packages/sebastian/comparator) 6.3.1
     under the BSD-3-Clause license
 
- - [sebastian/complexity](https://packagist.org/packages/sebastian/complexity) 2.0.3
+ - [sebastian/complexity](https://packagist.org/packages/sebastian/complexity) 4.0.1
     under the BSD-3-Clause license
 
- - [sebastian/diff](https://packagist.org/packages/sebastian/diff) 4.0.6
+ - [sebastian/diff](https://packagist.org/packages/sebastian/diff) 6.0.2
     under the BSD-3-Clause license
 
- - [sebastian/environment](https://packagist.org/packages/sebastian/environment) 5.1.5
+ - [sebastian/environment](https://packagist.org/packages/sebastian/environment) 7.2.1
     under the BSD-3-Clause license
 
- - [sebastian/exporter](https://packagist.org/packages/sebastian/exporter) 4.0.6
+ - [sebastian/exporter](https://packagist.org/packages/sebastian/exporter) 6.3.0
     under the BSD-3-Clause license
 
- - [sebastian/global-state](https://packagist.org/packages/sebastian/global-state) 5.0.7
+ - [sebastian/global-state](https://packagist.org/packages/sebastian/global-state) 7.0.2
     under the BSD-3-Clause license
 
- - [sebastian/lines-of-code](https://packagist.org/packages/sebastian/lines-of-code) 1.0.4
+ - [sebastian/lines-of-code](https://packagist.org/packages/sebastian/lines-of-code) 3.0.1
     under the BSD-3-Clause license
 
- - [sebastian/object-enumerator](https://packagist.org/packages/sebastian/object-enumerator) 4.0.4
+ - [sebastian/object-enumerator](https://packagist.org/packages/sebastian/object-enumerator) 6.0.1
     under the BSD-3-Clause license
 
- - [sebastian/object-reflector](https://packagist.org/packages/sebastian/object-reflector) 2.0.4
+ - [sebastian/object-reflector](https://packagist.org/packages/sebastian/object-reflector) 4.0.1
     under the BSD-3-Clause license
 
- - [sebastian/recursion-context](https://packagist.org/packages/sebastian/recursion-context) 4.0.5
+ - [sebastian/recursion-context](https://packagist.org/packages/sebastian/recursion-context) 6.0.2
     under the BSD-3-Clause license
 
- - [sebastian/resource-operations](https://packagist.org/packages/sebastian/resource-operations) 3.0.4
+ - [sebastian/type](https://packagist.org/packages/sebastian/type) 5.1.2
     under the BSD-3-Clause license
 
- - [sebastian/type](https://packagist.org/packages/sebastian/type) 3.2.1
+ - [sebastian/version](https://packagist.org/packages/sebastian/version) 5.0.2
     under the BSD-3-Clause license
 
- - [sebastian/version](https://packagist.org/packages/sebastian/version) 3.0.2
-    under the BSD-3-Clause license
-
- - [setasign/fpdi](https://packagist.org/packages/setasign/fpdi) v2.6.1
+ - [setasign/fpdi](https://packagist.org/packages/setasign/fpdi) v2.6.3
     under the MIT license
 
  - [simplesoftwareio/simple-qrcode](https://packagist.org/packages/simplesoftwareio/simple-qrcode) 4.2.0
     under the MIT license
 
- - [simshaun/recurr](https://packagist.org/packages/simshaun/recurr) v5.0.2
+ - [simshaun/recurr](https://packagist.org/packages/simshaun/recurr) v5.0.3
     under the MIT license
 
- - [spatie/backtrace](https://packagist.org/packages/spatie/backtrace) 1.6.2
+ - [spatie/backtrace](https://packagist.org/packages/spatie/backtrace) 1.7.4
     under the MIT license
 
- - [spatie/db-dumper](https://packagist.org/packages/spatie/db-dumper) 3.7.0
+ - [spatie/db-dumper](https://packagist.org/packages/spatie/db-dumper) 3.8.0
     under the MIT license
 
- - [spatie/error-solutions](https://packagist.org/packages/spatie/error-solutions) 1.1.1
+ - [spatie/error-solutions](https://packagist.org/packages/spatie/error-solutions) 1.1.3
     under the MIT license
 
- - [spatie/flare-client-php](https://packagist.org/packages/spatie/flare-client-php) 1.8.0
+ - [spatie/flare-client-php](https://packagist.org/packages/spatie/flare-client-php) 1.10.1
     under the MIT license
 
- - [spatie/ignition](https://packagist.org/packages/spatie/ignition) 1.15.0
+ - [spatie/ignition](https://packagist.org/packages/spatie/ignition) 1.15.1
     under the MIT license
 
  - [spatie/laravel-backup](https://packagist.org/packages/spatie/laravel-backup) 8.8.2
     under the MIT license
 
- - [spatie/laravel-ignition](https://packagist.org/packages/spatie/laravel-ignition) 2.8.0
+ - [spatie/laravel-ignition](https://packagist.org/packages/spatie/laravel-ignition) 2.9.1
     under the MIT license
 
- - [spatie/laravel-package-tools](https://packagist.org/packages/spatie/laravel-package-tools) 1.16.5
+ - [spatie/laravel-package-tools](https://packagist.org/packages/spatie/laravel-package-tools) 1.92.7
     under the MIT license
 
- - [spatie/laravel-permission](https://packagist.org/packages/spatie/laravel-permission) 5.11.1
+ - [spatie/laravel-permission](https://packagist.org/packages/spatie/laravel-permission) 6.21.0
     under the MIT license
 
- - [spatie/laravel-signal-aware-command](https://packagist.org/packages/spatie/laravel-signal-aware-command) 1.3.0
+ - [spatie/laravel-signal-aware-command](https://packagist.org/packages/spatie/laravel-signal-aware-command) 2.1.0
     under the MIT license
 
- - [spatie/temporary-directory](https://packagist.org/packages/spatie/temporary-directory) 2.2.1
+ - [spatie/temporary-directory](https://packagist.org/packages/spatie/temporary-directory) 2.3.0
     under the MIT license
 
- - [staudenmeir/belongs-to-through](https://packagist.org/packages/staudenmeir/belongs-to-through) v2.15.1
+ - [spiral/core](https://packagist.org/packages/spiral/core) 3.15.8
     under the MIT license
 
- - [symfony/console](https://packagist.org/packages/symfony/console) v6.4.13
+ - [spiral/goridge](https://packagist.org/packages/spiral/goridge) 4.2.1
     under the MIT license
 
- - [symfony/css-selector](https://packagist.org/packages/symfony/css-selector) v7.1.6
+ - [spiral/hmvc](https://packagist.org/packages/spiral/hmvc) 3.15.8
+    under the MIT license
+
+ - [spiral/interceptors](https://packagist.org/packages/spiral/interceptors) 3.15.8
+    under the MIT license
+
+ - [spiral/logger](https://packagist.org/packages/spiral/logger) 3.15.8
+    under the MIT license
+
+ - [spiral/roadrunner](https://packagist.org/packages/spiral/roadrunner) v2025.1.2
+    under the MIT license
+
+ - [spiral/roadrunner-cli](https://packagist.org/packages/spiral/roadrunner-cli) v2.7.1
+    under the MIT license
+
+ - [spiral/roadrunner-http](https://packagist.org/packages/spiral/roadrunner-http) v3.5.2
+    under the MIT license
+
+ - [spiral/roadrunner-worker](https://packagist.org/packages/spiral/roadrunner-worker) v3.6.2
+    under the MIT license
+
+ - [spiral/security](https://packagist.org/packages/spiral/security) 3.15.8
+    under the MIT license
+
+ - [spiral/tokenizer](https://packagist.org/packages/spiral/tokenizer) 3.15.8
+    under the MIT license
+
+ - [staabm/side-effects-detector](https://packagist.org/packages/staabm/side-effects-detector) 1.0.5
+    under the MIT license
+
+ - [staudenmeir/belongs-to-through](https://packagist.org/packages/staudenmeir/belongs-to-through) v2.16.4
+    under the MIT license
+
+ - [symfony/clock](https://packagist.org/packages/symfony/clock) v7.3.0
+    under the MIT license
+
+ - [symfony/console](https://packagist.org/packages/symfony/console) v7.3.1
+    under the MIT license
+
+ - [symfony/css-selector](https://packagist.org/packages/symfony/css-selector) v7.3.0
     under the MIT license
 
  - [symfony/debug](https://packagist.org/packages/symfony/debug) v4.4.44
     under the MIT license
 
- - [symfony/deprecation-contracts](https://packagist.org/packages/symfony/deprecation-contracts) v3.5.0
+ - [symfony/deprecation-contracts](https://packagist.org/packages/symfony/deprecation-contracts) v3.6.0
     under the MIT license
 
- - [symfony/error-handler](https://packagist.org/packages/symfony/error-handler) v6.4.13
+ - [symfony/error-handler](https://packagist.org/packages/symfony/error-handler) v7.3.1
     under the MIT license
 
- - [symfony/event-dispatcher](https://packagist.org/packages/symfony/event-dispatcher) v7.1.6
+ - [symfony/event-dispatcher](https://packagist.org/packages/symfony/event-dispatcher) v7.3.0
     under the MIT license
 
- - [symfony/event-dispatcher-contracts](https://packagist.org/packages/symfony/event-dispatcher-contracts) v3.5.0
+ - [symfony/event-dispatcher-contracts](https://packagist.org/packages/symfony/event-dispatcher-contracts) v3.6.0
     under the MIT license
 
- - [symfony/finder](https://packagist.org/packages/symfony/finder) v6.4.13
+ - [symfony/finder](https://packagist.org/packages/symfony/finder) v7.3.0
     under the MIT license
 
- - [symfony/http-foundation](https://packagist.org/packages/symfony/http-foundation) v6.4.13
+ - [symfony/http-client](https://packagist.org/packages/symfony/http-client) v7.3.1
     under the MIT license
 
- - [symfony/http-kernel](https://packagist.org/packages/symfony/http-kernel) v6.4.13
+ - [symfony/http-client-contracts](https://packagist.org/packages/symfony/http-client-contracts) v3.6.0
     under the MIT license
 
- - [symfony/mailer](https://packagist.org/packages/symfony/mailer) v6.4.13
+ - [symfony/http-foundation](https://packagist.org/packages/symfony/http-foundation) v7.3.1
     under the MIT license
 
- - [symfony/mime](https://packagist.org/packages/symfony/mime) v6.4.13
+ - [symfony/http-kernel](https://packagist.org/packages/symfony/http-kernel) v7.3.1
     under the MIT license
 
- - [symfony/polyfill-ctype](https://packagist.org/packages/symfony/polyfill-ctype) v1.31.0
+ - [symfony/mailer](https://packagist.org/packages/symfony/mailer) v7.3.1
     under the MIT license
 
- - [symfony/polyfill-intl-grapheme](https://packagist.org/packages/symfony/polyfill-intl-grapheme) v1.31.0
+ - [symfony/mime](https://packagist.org/packages/symfony/mime) v7.3.0
     under the MIT license
 
- - [symfony/polyfill-intl-idn](https://packagist.org/packages/symfony/polyfill-intl-idn) v1.31.0
+ - [symfony/polyfill-ctype](https://packagist.org/packages/symfony/polyfill-ctype) v1.32.0
     under the MIT license
 
- - [symfony/polyfill-intl-normalizer](https://packagist.org/packages/symfony/polyfill-intl-normalizer) v1.31.0
+ - [symfony/polyfill-intl-grapheme](https://packagist.org/packages/symfony/polyfill-intl-grapheme) v1.32.0
     under the MIT license
 
- - [symfony/polyfill-mbstring](https://packagist.org/packages/symfony/polyfill-mbstring) v1.31.0
+ - [symfony/polyfill-intl-idn](https://packagist.org/packages/symfony/polyfill-intl-idn) v1.32.0
     under the MIT license
 
- - [symfony/polyfill-php80](https://packagist.org/packages/symfony/polyfill-php80) v1.31.0
+ - [symfony/polyfill-intl-normalizer](https://packagist.org/packages/symfony/polyfill-intl-normalizer) v1.32.0
     under the MIT license
 
- - [symfony/polyfill-php83](https://packagist.org/packages/symfony/polyfill-php83) v1.31.0
+ - [symfony/polyfill-mbstring](https://packagist.org/packages/symfony/polyfill-mbstring) v1.32.0
     under the MIT license
 
- - [symfony/polyfill-uuid](https://packagist.org/packages/symfony/polyfill-uuid) v1.31.0
+ - [symfony/polyfill-php80](https://packagist.org/packages/symfony/polyfill-php80) v1.32.0
     under the MIT license
 
- - [symfony/process](https://packagist.org/packages/symfony/process) v6.4.13
+ - [symfony/polyfill-php83](https://packagist.org/packages/symfony/polyfill-php83) v1.32.0
     under the MIT license
 
- - [symfony/routing](https://packagist.org/packages/symfony/routing) v6.4.13
+ - [symfony/polyfill-php84](https://packagist.org/packages/symfony/polyfill-php84) v1.32.0
     under the MIT license
 
- - [symfony/service-contracts](https://packagist.org/packages/symfony/service-contracts) v3.5.0
+ - [symfony/polyfill-uuid](https://packagist.org/packages/symfony/polyfill-uuid) v1.32.0
     under the MIT license
 
- - [symfony/string](https://packagist.org/packages/symfony/string) v7.1.6
+ - [symfony/process](https://packagist.org/packages/symfony/process) v7.3.0
     under the MIT license
 
- - [symfony/translation](https://packagist.org/packages/symfony/translation) v6.4.13
+ - [symfony/psr-http-message-bridge](https://packagist.org/packages/symfony/psr-http-message-bridge) v7.3.0
     under the MIT license
 
- - [symfony/translation-contracts](https://packagist.org/packages/symfony/translation-contracts) v3.5.0
+ - [symfony/routing](https://packagist.org/packages/symfony/routing) v7.3.0
     under the MIT license
 
- - [symfony/uid](https://packagist.org/packages/symfony/uid) v6.4.13
+ - [symfony/service-contracts](https://packagist.org/packages/symfony/service-contracts) v3.6.0
     under the MIT license
 
- - [symfony/var-dumper](https://packagist.org/packages/symfony/var-dumper) v6.4.13
+ - [symfony/string](https://packagist.org/packages/symfony/string) v7.3.0
+    under the MIT license
+
+ - [symfony/translation](https://packagist.org/packages/symfony/translation) v7.3.1
+    under the MIT license
+
+ - [symfony/translation-contracts](https://packagist.org/packages/symfony/translation-contracts) v3.6.0
+    under the MIT license
+
+ - [symfony/uid](https://packagist.org/packages/symfony/uid) v7.3.1
+    under the MIT license
+
+ - [symfony/var-dumper](https://packagist.org/packages/symfony/var-dumper) v7.3.1
+    under the MIT license
+
+ - [symfony/yaml](https://packagist.org/packages/symfony/yaml) v7.3.1
     under the MIT license
 
  - [theseer/tokenizer](https://packagist.org/packages/theseer/tokenizer) 1.2.3
     under the BSD-3-Clause license
 
- - [thewirecutter/paapi5-php-sdk](https://packagist.org/packages/thewirecutter/paapi5-php-sdk) v1.2.1
+ - [thewirecutter/paapi5-php-sdk](https://packagist.org/packages/thewirecutter/paapi5-php-sdk) v1.2.2
     under the Apache-2.0 license
 
  - [thybag/php-sharepoint-lists-api](https://packagist.org/packages/thybag/php-sharepoint-lists-api) dev-master cb3479d
@@ -551,16 +608,16 @@ Pfarrplaner uses the following open-source libraries:
  - [tightenco/ziggy](https://packagist.org/packages/tightenco/ziggy) v1.8.2
     under the MIT license
 
- - [tijsverkoyen/css-to-inline-styles](https://packagist.org/packages/tijsverkoyen/css-to-inline-styles) v2.2.7
+ - [tijsverkoyen/css-to-inline-styles](https://packagist.org/packages/tijsverkoyen/css-to-inline-styles) v2.3.0
     under the BSD-3-Clause license
 
- - [venturecraft/revisionable](https://packagist.org/packages/venturecraft/revisionable) 1.41.0
+ - [venturecraft/revisionable](https://packagist.org/packages/venturecraft/revisionable) 1.42.0
     under the MIT license
 
- - [vlucas/phpdotenv](https://packagist.org/packages/vlucas/phpdotenv) v5.6.1
+ - [vlucas/phpdotenv](https://packagist.org/packages/vlucas/phpdotenv) v5.6.2
     under the BSD-3-Clause license
 
- - [voku/portable-ascii](https://packagist.org/packages/voku/portable-ascii) 2.0.1
+ - [voku/portable-ascii](https://packagist.org/packages/voku/portable-ascii) 2.0.3
     under the MIT license
 
  - [webmozart/assert](https://packagist.org/packages/webmozart/assert) 1.11.0
@@ -569,6 +626,10 @@ Pfarrplaner uses the following open-source libraries:
 
 
 ## Node packages
+
+ - [](https://github.com/ampproject/remapping) ampproject/remapping
+    by Justin Ridgewell (jridgewell@google.com)
+    under the Apache-2.0 license
 
  - [](https://github.com/babel/babel) babel/code-frame
     by The Babel Team
@@ -590,10 +651,6 @@ Pfarrplaner uses the following open-source libraries:
     by The Babel Team
     under the MIT license
 
- - [](https://github.com/babel/babel) babel/helper-builder-binary-assignment-operator-visitor
-    by The Babel Team
-    under the MIT license
-
  - [](https://github.com/babel/babel) babel/helper-compilation-targets
     by The Babel Team
     under the MIT license
@@ -609,19 +666,7 @@ Pfarrplaner uses the following open-source libraries:
  - [](https://github.com/babel/babel-polyfills) babel/helper-define-polyfill-provider
     under the MIT license
 
- - [](https://github.com/babel/babel) babel/helper-explode-assignable-expression
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/helper-function-name
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/helper-get-function-arity
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/helper-hoist-variables
+ - [](https://github.com/babel/babel) babel/helper-globals
     by The Babel Team
     under the MIT license
 
@@ -653,15 +698,11 @@ Pfarrplaner uses the following open-source libraries:
     by The Babel Team
     under the MIT license
 
- - [](https://github.com/babel/babel) babel/helper-simple-access
-    by The Babel Team
-    under the MIT license
-
  - [](https://github.com/babel/babel) babel/helper-skip-transparent-expression-wrappers
     by The Babel Team
     under the MIT license
 
- - [](https://github.com/babel/babel) babel/helper-split-export-declaration
+ - [](https://github.com/babel/babel) babel/helper-string-parser
     by The Babel Team
     under the MIT license
 
@@ -681,11 +722,19 @@ Pfarrplaner uses the following open-source libraries:
     by The Babel Team
     under the MIT license
 
- - [](https://github.com/babel/babel) babel/highlight
+ - [](https://github.com/babel/babel) babel/parser
     by The Babel Team
     under the MIT license
 
- - [](https://github.com/babel/babel) babel/parser
+ - [](https://github.com/babel/babel) babel/plugin-bugfix-firefox-class-in-computed-class-key
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-bugfix-safari-class-field-initializer-scope
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression
     by The Babel Team
     under the MIT license
 
@@ -693,39 +742,7 @@ Pfarrplaner uses the following open-source libraries:
     by The Babel Team
     under the MIT license
 
- - [](https://github.com/babel/babel) babel/plugin-proposal-async-generator-functions
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-class-properties
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-class-static-block
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-dynamic-import
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-export-namespace-from
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-json-strings
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-logical-assignment-operators
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-nullish-coalescing-operator
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-numeric-separator
+ - [](https://github.com/babel/babel) babel/plugin-bugfix-v8-static-class-fields-redefine-readonly
     by The Babel Team
     under the MIT license
 
@@ -733,72 +750,33 @@ Pfarrplaner uses the following open-source libraries:
     by The Babel Team
     under the MIT license
 
- - [](https://github.com/babel/babel) babel/plugin-proposal-optional-catch-binding
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-optional-chaining
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-private-methods
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-private-property-in-object
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-proposal-unicode-property-regex
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel/tree/master/packages/babel-plugin-syntax-async-generators) babel/plugin-syntax-async-generators
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-syntax-class-properties
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-syntax-class-static-block
+ - [](https://github.com/babel/babel-plugin-proposal-private-property-in-object) babel/plugin-proposal-private-property-in-object
     by The Babel Team
     under the MIT license
 
  - [](https://github.com/babel/babel/tree/master/packages/babel-plugin-syntax-dynamic-import) babel/plugin-syntax-dynamic-import
     under the MIT license
 
- - [](https://github.com/babel/babel/tree/master/packages/babel-plugin-syntax-export-namespace-from) babel/plugin-syntax-export-namespace-from
+ - [](https://github.com/babel/babel) babel/plugin-syntax-import-assertions
+    by The Babel Team
     under the MIT license
 
- - [](https://github.com/babel/babel/tree/master/packages/babel-plugin-syntax-json-strings) babel/plugin-syntax-json-strings
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-syntax-logical-assignment-operators
-    under the MIT license
-
- - [](https://github.com/babel/babel/tree/master/packages/babel-plugin-syntax-nullish-coalescing-operator) babel/plugin-syntax-nullish-coalescing-operator
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-syntax-numeric-separator
+ - [](https://github.com/babel/babel) babel/plugin-syntax-import-attributes
+    by The Babel Team
     under the MIT license
 
  - [](https://github.com/babel/babel/tree/master/packages/babel-plugin-syntax-object-rest-spread) babel/plugin-syntax-object-rest-spread
     under the MIT license
 
- - [](https://github.com/babel/babel/tree/master/packages/babel-plugin-syntax-optional-catch-binding) babel/plugin-syntax-optional-catch-binding
-    under the MIT license
-
- - [](https://github.com/babel/babel/tree/master/packages/babel-plugin-syntax-optional-chaining) babel/plugin-syntax-optional-chaining
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-syntax-private-property-in-object
-    by The Babel Team
-    under the MIT license
-
- - [](https://github.com/babel/babel) babel/plugin-syntax-top-level-await
+ - [](https://github.com/babel/babel) babel/plugin-syntax-unicode-sets-regex
     by The Babel Team
     under the MIT license
 
  - [](https://github.com/babel/babel) babel/plugin-transform-arrow-functions
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-async-generator-functions
     by The Babel Team
     under the MIT license
 
@@ -811,6 +789,14 @@ Pfarrplaner uses the following open-source libraries:
     under the MIT license
 
  - [](https://github.com/babel/babel) babel/plugin-transform-block-scoping
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-class-properties
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-class-static-block
     by The Babel Team
     under the MIT license
 
@@ -834,7 +820,23 @@ Pfarrplaner uses the following open-source libraries:
     by The Babel Team
     under the MIT license
 
+ - [](https://github.com/babel/babel) babel/plugin-transform-duplicate-named-capturing-groups-regex
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-dynamic-import
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-explicit-resource-management
+    by The Babel Team
+    under the MIT license
+
  - [](https://github.com/babel/babel) babel/plugin-transform-exponentiation-operator
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-export-namespace-from
     by The Babel Team
     under the MIT license
 
@@ -846,7 +848,15 @@ Pfarrplaner uses the following open-source libraries:
     by The Babel Team
     under the MIT license
 
+ - [](https://github.com/babel/babel) babel/plugin-transform-json-strings
+    by The Babel Team
+    under the MIT license
+
  - [](https://github.com/babel/babel) babel/plugin-transform-literals
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-logical-assignment-operators
     by The Babel Team
     under the MIT license
 
@@ -878,11 +888,39 @@ Pfarrplaner uses the following open-source libraries:
     by The Babel Team
     under the MIT license
 
+ - [](https://github.com/babel/babel) babel/plugin-transform-nullish-coalescing-operator
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-numeric-separator
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-object-rest-spread
+    by The Babel Team
+    under the MIT license
+
  - [](https://github.com/babel/babel) babel/plugin-transform-object-super
     by The Babel Team
     under the MIT license
 
+ - [](https://github.com/babel/babel) babel/plugin-transform-optional-catch-binding
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-optional-chaining
+    by The Babel Team
+    under the MIT license
+
  - [](https://github.com/babel/babel) babel/plugin-transform-parameters
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-private-methods
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-private-property-in-object
     by The Babel Team
     under the MIT license
 
@@ -891,6 +929,10 @@ Pfarrplaner uses the following open-source libraries:
     under the MIT license
 
  - [](https://github.com/babel/babel) babel/plugin-transform-regenerator
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-regexp-modifiers
     by The Babel Team
     under the MIT license
 
@@ -926,7 +968,15 @@ Pfarrplaner uses the following open-source libraries:
     by The Babel Team
     under the MIT license
 
+ - [](https://github.com/babel/babel) babel/plugin-transform-unicode-property-regex
+    by The Babel Team
+    under the MIT license
+
  - [](https://github.com/babel/babel) babel/plugin-transform-unicode-regex
+    by The Babel Team
+    under the MIT license
+
+ - [](https://github.com/babel/babel) babel/plugin-transform-unicode-sets-regex
     by The Babel Team
     under the MIT license
 
@@ -934,7 +984,7 @@ Pfarrplaner uses the following open-source libraries:
     by The Babel Team
     under the MIT license
 
- -  babel/preset-modules
+ - [](https://github.com/babel/preset-modules) babel/preset-modules
     under the MIT license
 
  - [](https://github.com/babel/babel) babel/runtime
@@ -1038,6 +1088,22 @@ Pfarrplaner uses the following open-source libraries:
     by Pictogrammers, James Coyle
     under the MIT license
 
+ - [](https://github.com/jridgewell/sourcemaps) jridgewell/gen-mapping
+    by Justin Ridgewell (justin@ridgewell.name)
+    under the MIT license
+
+ - [](https://github.com/jridgewell/resolve-uri) jridgewell/resolve-uri
+    by Justin Ridgewell (justin@ridgewell.name)
+    under the MIT license
+
+ - [](https://github.com/jridgewell/sourcemaps) jridgewell/sourcemap-codec
+    by Justin Ridgewell (justin@ridgewell.name)
+    under the MIT license
+
+ - [](https://github.com/jridgewell/sourcemaps) jridgewell/trace-mapping
+    by Justin Ridgewell (justin@ridgewell.name)
+    under the MIT license
+
  - [](https://github.com/Kassaila/vue-json-editor) kassaila/vue-json-editor
     by Dmytro Symonov (kasela.kassaila@gmail.com)
     under the Apache-2.0 license
@@ -1055,6 +1121,15 @@ Pfarrplaner uses the following open-source libraries:
     under the MIT license
 
  - [](https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.stat) nodelib/fs.stat
+    under the MIT license
+
+ - [](https://github.com/parcel-bundler/watcher) parcel/watcher-linux-x64-glibc
+    under the MIT license
+
+ - [](https://github.com/parcel-bundler/watcher) parcel/watcher-linux-x64-musl
+    under the MIT license
+
+ - [](https://github.com/parcel-bundler/watcher) parcel/watcher
     under the MIT license
 
  - [](https://github.com/popperjs/popper-core) popperjs/core
@@ -1102,6 +1177,9 @@ Pfarrplaner uses the following open-source libraries:
 
  - [](https://github.com/DefinitelyTyped/DefinitelyTyped) types/trusted-types
     under the MIT license
+
+ -  vue/compiler-sfc
+    under the MIT* license
 
  - [](https://github.com/vuejs/component-compiler-utils) vue/component-compiler-utils
     by Evan You
@@ -1197,15 +1275,7 @@ Pfarrplaner uses the following open-source libraries:
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
 
- - [abcjs](https://github.com/paulrosen/abcjs) 5.10.3
-    by Paul Rosen (paul@paulrosen.net)
-    under the MIT license
-
- - [abcjs](https://github.com/paulrosen/abcjs) 5.11.0
-    by Paul Rosen (paul@paulrosen.net)
-    under the MIT license
-
- - [abcjs](https://github.com/paulrosen/abcjs) 5.12.0
+ - [abcjs](https://github.com/paulrosen/abcjs) 6.5.1
     by Paul Rosen (paul@paulrosen.net)
     under the MIT license
 
@@ -1216,13 +1286,13 @@ Pfarrplaner uses the following open-source libraries:
     by ForbesLindesay
     under the MIT license
 
- - [acorn-walk](https://github.com/acornjs/acorn) 8.3.2
+ - [acorn-walk](https://github.com/acornjs/acorn) 8.3.4
     under the MIT license
 
  - [acorn](https://github.com/acornjs/acorn) 6.4.2
     under the MIT license
 
- - [acorn](https://github.com/acornjs/acorn) 8.11.3
+ - [acorn](https://github.com/acornjs/acorn) 8.15.0
     under the MIT license
 
  - [add-stream](https://github.com/wilsonjackson/add-stream) 1.0.0
@@ -1233,7 +1303,7 @@ Pfarrplaner uses the following open-source libraries:
     by bholloway
     under the MIT license
 
- - [admin-lte](https://github.com/ColorlibHQ/AdminLTE) 4.0.0-alpha3
+ - [admin-lte](https://github.com/ColorlibHQ/AdminLTE) 4.0.0-rc3
     by Colorlib (https://colorlib.com)
     under the MIT license
 
@@ -1300,7 +1370,7 @@ Pfarrplaner uses the following open-source libraries:
     by Elan Shanker
     under the ISC license
 
- - [anymatch](https://github.com/micromatch/anymatch) 3.1.2
+ - [anymatch](https://github.com/micromatch/anymatch) 3.1.3
     by Elan Shanker
     under the ISC license
 
@@ -1321,6 +1391,10 @@ Pfarrplaner uses the following open-source libraries:
 
  - [arr-union](https://github.com/jonschlinkert/arr-union) 3.1.0
     by Jon Schlinkert
+    under the MIT license
+
+ - [array-buffer-byte-length](https://github.com/inspect-js/array-buffer-byte-length) 1.0.2
+    by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
  - [array-find-index](https://github.com/sindresorhus/array-find-index) 1.0.2
@@ -1355,6 +1429,14 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
+ - [array.prototype.reduce](https://github.com/es-shims/Array.prototype.reduce) 1.0.8
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [arraybuffer.prototype.slice](https://github.com/es-shims/ArrayBuffer.prototype.slice) 1.0.4
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
  - [arrify](https://github.com/sindresorhus/arrify) 1.0.1
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
@@ -1362,11 +1444,11 @@ Pfarrplaner uses the following open-source libraries:
  - [asap](https://github.com/kriskowal/asap) 2.0.6
     under the MIT license
 
- - [asn1.js](https://github.com/indutny/asn1.js) 5.4.1
+ - [asn1.js](https://github.com/indutny/asn1.js) 4.10.1
     by Fedor Indutny
     under the MIT license
 
- - [assert](https://github.com/browserify/commonjs-assert) 1.5.0
+ - [assert](https://github.com/browserify/commonjs-assert) 1.5.1
     under the MIT license
 
  - [assign-symbols](https://github.com/jonschlinkert/assign-symbols) 1.0.0
@@ -1377,8 +1459,12 @@ Pfarrplaner uses the following open-source libraries:
     by Ben Newman (bn@cs.stanford.edu)
     under the MIT license
 
- - [async-each](https://github.com/paulmillr/async-each) 1.0.3
+ - [async-each](https://github.com/paulmillr/async-each) 1.0.6
     by Paul Miller
+    under the MIT license
+
+ - [async-function](https://github.com/ljharb/async-function) 1.0.0
+    by Jordan Harbamd (ljharb@gmail.com)
     under the MIT license
 
  - [async-limiter](https://github.com/strml/async-limiter) 1.0.1
@@ -1386,6 +1472,10 @@ Pfarrplaner uses the following open-source libraries:
     under the MIT license
 
  - [async](https://github.com/caolan/async) 2.6.4
+    by Caolan McMahon
+    under the MIT license
+
+ - [async](https://github.com/caolan/async) 3.2.6
     by Caolan McMahon
     under the MIT license
 
@@ -1401,8 +1491,12 @@ Pfarrplaner uses the following open-source libraries:
     by AJ ONeal (coolaj86@gmail.com)
     under the (MIT OR Apache-2.0) license
 
- - [autoprefixer](https://github.com/postcss/autoprefixer) 9.8.7
+ - [autoprefixer](https://github.com/postcss/autoprefixer) 9.8.8
     by Andrey Sitnik (andrey@sitnik.ru)
+    under the MIT license
+
+ - [available-typed-arrays](https://github.com/inspect-js/available-typed-arrays) 1.0.7
+    by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
  - [axios](https://github.com/axios/axios) 0.20.0
@@ -1417,7 +1511,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sebastian McKenzie (sebmck@gmail.com)
     under the MIT license
 
- - [babel-loader](https://github.com/babel/babel-loader) 8.2.2
+ - [babel-loader](https://github.com/babel/babel-loader) 8.4.1
     by Luis Couto (hello@luiscouto.pt)
     under the MIT license
 
@@ -1425,17 +1519,13 @@ Pfarrplaner uses the following open-source libraries:
     by Eli Perelman (eli@eliperelman.com)
     under the MIT license
 
- - [babel-plugin-dynamic-import-node](https://github.com/airbnb/babel-plugin-dynamic-import-node) 2.3.3
-    by Jordan Gensler (jordan.gensler@airbnb.com)
+ - [babel-plugin-polyfill-corejs2](https://github.com/babel/babel-polyfills) 0.4.14
     under the MIT license
 
- - [babel-plugin-polyfill-corejs2](https://github.com/babel/babel-polyfills) 0.2.2
+ - [babel-plugin-polyfill-corejs3](https://github.com/babel/babel-polyfills) 0.13.0
     under the MIT license
 
- - [babel-plugin-polyfill-corejs3](https://github.com/babel/babel-polyfills) 0.2.5
-    under the MIT license
-
- - [babel-plugin-polyfill-regenerator](https://github.com/babel/babel-polyfills) 0.2.2
+ - [babel-plugin-polyfill-regenerator](https://github.com/babel/babel-polyfills) 0.6.5
     under the MIT license
 
  - [babel-runtime](https://github.com/babel/babel/tree/master/packages/babel-runtime) 6.26.0
@@ -1466,7 +1556,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [binary-extensions](https://github.com/sindresorhus/binary-extensions) 2.2.0
+ - [binary-extensions](https://github.com/sindresorhus/binary-extensions) 2.3.0
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
@@ -1474,15 +1564,15 @@ Pfarrplaner uses the following open-source libraries:
     by Petka Antonov (petka_antonov@hotmail.com)
     under the MIT license
 
- - [bn.js](https://github.com/indutny/bn.js) 4.12.0
+ - [bn.js](https://github.com/indutny/bn.js) 4.12.2
     by Fedor Indutny (fedor@indutny.com)
     under the MIT license
 
- - [bn.js](https://github.com/indutny/bn.js) 5.2.0
+ - [bn.js](https://github.com/indutny/bn.js) 5.2.2
     by Fedor Indutny (fedor@indutny.com)
     under the MIT license
 
- - [body-parser](https://github.com/expressjs/body-parser) 1.20.1
+ - [body-parser](https://github.com/expressjs/body-parser) 1.20.3
     under the MIT license
 
  - [bonjour](https://github.com/watson/bonjour) 3.5.0
@@ -1493,7 +1583,7 @@ Pfarrplaner uses the following open-source libraries:
     by Felix Boehm (me@feedic.com)
     under the ISC license
 
- - [bootstrap-datepicker](https://github.com/uxsolutions/bootstrap-datepicker) 1.9.0
+ - [bootstrap-datepicker](https://github.com/uxsolutions/bootstrap-datepicker) 1.10.0
     by Andrew Rowls (eternicode@gmail.com)
     under the Apache-2.0 license
 
@@ -1501,15 +1591,15 @@ Pfarrplaner uses the following open-source libraries:
     by The Bootstrap Authors
     under the MIT license
 
- - [bootstrap](https://github.com/twbs/bootstrap) 5.3.2
+ - [bootstrap](https://github.com/twbs/bootstrap) 5.3.7
     by The Bootstrap Authors
     under the MIT license
 
- - [bootswatch](https://github.com/thomaspark/bootswatch) 5.3.2
+ - [bootswatch](https://github.com/thomaspark/bootswatch) 5.3.7
     by Thomas Park
     under the MIT license
 
- - [brace-expansion](https://github.com/juliangruber/brace-expansion) 1.1.11
+ - [brace-expansion](https://github.com/juliangruber/brace-expansion) 1.1.12
     by Julian Gruber (mail@juliangruber.com)
     under the MIT license
 
@@ -1517,7 +1607,7 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [braces](https://github.com/micromatch/braces) 3.0.2
+ - [braces](https://github.com/micromatch/braces) 3.0.3
     by Jon Schlinkert
     under the MIT license
 
@@ -1536,17 +1626,17 @@ Pfarrplaner uses the following open-source libraries:
     by Calvin Metcalf (calvin.metcalf@gmail.com)
     under the MIT license
 
- - [browserify-rsa](https://github.com/crypto-browserify/browserify-rsa) 4.1.0
+ - [browserify-rsa](https://github.com/crypto-browserify/browserify-rsa) 4.1.1
     under the MIT license
 
- - [browserify-sign](https://github.com/crypto-browserify/browserify-sign) 4.2.1
+ - [browserify-sign](https://github.com/crypto-browserify/browserify-sign) 4.2.3
     under the ISC license
 
  - [browserify-zlib](https://github.com/devongovett/browserify-zlib) 0.2.0
     by Devon Govett (devongovett@gmail.com)
     under the MIT license
 
- - [browserslist](https://github.com/browserslist/browserslist) 4.22.1
+ - [browserslist](https://github.com/browserslist/browserslist) 4.25.1
     by Andrey Sitnik (andrey@sitnik.ru)
     under the MIT license
 
@@ -1569,10 +1659,6 @@ Pfarrplaner uses the following open-source libraries:
     by Ben Drucker (bvdrucker@gmail.com)
     under the MIT license
 
- - [bytes](https://github.com/visionmedia/bytes.js) 3.0.0
-    by TJ Holowaychuk (tj@vision-media.ca)
-    under the MIT license
-
  - [bytes](https://github.com/visionmedia/bytes.js) 3.1.2
     by TJ Holowaychuk (tj@vision-media.ca)
     under the MIT license
@@ -1585,11 +1671,19 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [call-bind](https://github.com/ljharb/call-bind) 1.0.2
+ - [call-bind-apply-helpers](https://github.com/ljharb/call-bind-apply-helpers) 1.0.2
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [call-me-maybe](https://github.com/limulus/call-me-maybe) 1.0.1
+ - [call-bind](https://github.com/ljharb/call-bind) 1.0.8
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [call-bound](https://github.com/ljharb/call-bound) 1.0.4
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [call-me-maybe](https://github.com/limulus/call-me-maybe) 1.0.2
     by Eric McCarthy (eric@limulus.net)
     under the MIT license
 
@@ -1632,7 +1726,7 @@ Pfarrplaner uses the following open-source libraries:
  - [caniuse-api](https://github.com/nyalab/caniuse-api) 3.0.0
     under the MIT license
 
- - [caniuse-lite](https://github.com/browserslist/caniuse-lite) 1.0.30001541
+ - [caniuse-lite](https://github.com/browserslist/caniuse-lite) 1.0.30001727
     by Ben Briggs (beneb.info@gmail.com)
     under the CC-BY-4.0 license
 
@@ -1657,7 +1751,11 @@ Pfarrplaner uses the following open-source libraries:
     by Paul Miller
     under the MIT license
 
- - [chokidar](https://github.com/paulmillr/chokidar) 3.5.2
+ - [chokidar](https://github.com/paulmillr/chokidar) 3.6.0
+    by Paul Miller
+    under the MIT license
+
+ - [chokidar](https://github.com/paulmillr/chokidar) 4.0.3
     by Paul Miller
     under the MIT license
 
@@ -1665,11 +1763,11 @@ Pfarrplaner uses the following open-source libraries:
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
 
- - [chrome-trace-event](https://github.com/samccone/chrome-trace-event) 1.0.3
+ - [chrome-trace-event](https://github.com/samccone/chrome-trace-event) 1.0.4
     by Trent Mick, Sam Saccone
     under the MIT license
 
- - [cipher-base](https://github.com/crypto-browserify/cipher-base) 1.0.4
+ - [cipher-base](https://github.com/crypto-browserify/cipher-base) 1.0.6
     by Calvin Metcalf (calvin.metcalf@gmail.com)
     under the MIT license
 
@@ -1677,11 +1775,11 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [classnames](https://github.com/JedWatson/classnames) 2.3.1
+ - [classnames](https://github.com/JedWatson/classnames) 2.5.1
     by Jed Watson
     under the MIT license
 
- - [clean-css](https://github.com/jakubpawlowicz/clean-css) 4.2.3
+ - [clean-css](https://github.com/jakubpawlowicz/clean-css) 4.2.4
     by Jakub Pawlowicz (contact@jakubpawlowicz.com)
     under the MIT license
 
@@ -1713,7 +1811,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [collect.js](https://github.com/ecrmnn/collect.js) 4.29.0
+ - [collect.js](https://github.com/ecrmnn/collect.js) 4.36.1
     by Daniel Eckermann (danieleckermann@gmail.com)
     under the MIT license
 
@@ -1744,7 +1842,7 @@ Pfarrplaner uses the following open-source libraries:
     by DY (dfcreative@gmail.com)
     under the MIT license
 
- - [color-string](https://github.com/Qix-/color-string) 1.6.0
+ - [color-string](https://github.com/Qix-/color-string) 1.9.1
     by Heather Arthur (fayearthur@gmail.com)
     under the MIT license
 
@@ -1775,13 +1873,13 @@ Pfarrplaner uses the following open-source libraries:
     by Steve Mao (maochenyan@gmail.com)
     under the MIT license
 
- - [component-emitter](https://github.com/component/emitter) 1.3.0
+ - [component-emitter](https://github.com/sindresorhus/component-emitter) 1.3.1
     under the MIT license
 
  - [compressible](https://github.com/jshttp/compressible) 2.0.18
     under the MIT license
 
- - [compression](https://github.com/expressjs/compression) 1.7.4
+ - [compression](https://github.com/expressjs/compression) 1.8.1
     under the MIT license
 
  - [concat-map](https://github.com/substack/node-concat-map) 0.0.1
@@ -1839,11 +1937,7 @@ Pfarrplaner uses the following open-source libraries:
  - [conventional-changelog-config-spec](https://github.com/conventional-changelog/conventional-changelog-config-spec) 2.1.0
     under the MIT license
 
- - [conventional-changelog-conventionalcommits](https://github.com/conventional-changelog/conventional-changelog) 4.5.0
-    by Ben Coe
-    under the ISC license
-
- - [conventional-changelog-conventionalcommits](https://github.com/conventional-changelog/conventional-changelog) 4.6.1
+ - [conventional-changelog-conventionalcommits](https://github.com/conventional-changelog/conventional-changelog) 4.6.3
     by Ben Coe
     under the ISC license
 
@@ -1873,18 +1967,18 @@ Pfarrplaner uses the following open-source libraries:
  - [conventional-changelog-preset-loader](https://github.com/conventional-changelog/conventional-changelog) 2.3.4
     under the MIT license
 
- - [conventional-changelog-writer](https://github.com/conventional-changelog/conventional-changelog) 5.0.0
+ - [conventional-changelog-writer](https://github.com/conventional-changelog/conventional-changelog) 5.0.1
     by Steve Mao (maochenyan@gmail.com)
     under the MIT license
 
- - [conventional-changelog](https://github.com/conventional-changelog/conventional-changelog) 3.1.24
+ - [conventional-changelog](https://github.com/conventional-changelog/conventional-changelog) 3.1.25
     under the MIT license
 
  - [conventional-commits-filter](https://github.com/conventional-changelog/conventional-changelog) 2.0.7
     by Steve Mao (maochenyan@gmail.com)
     under the MIT license
 
- - [conventional-commits-parser](https://github.com/conventional-changelog/conventional-changelog) 3.2.2
+ - [conventional-commits-parser](https://github.com/conventional-changelog/conventional-changelog) 3.2.4
     by Steve Mao (maochenyan@gmail.com)
     under the MIT license
 
@@ -1896,7 +1990,11 @@ Pfarrplaner uses the following open-source libraries:
     by Thorsten Lorenz (thlorenz@gmx.de)
     under the MIT license
 
- - [convert-source-map](https://github.com/thlorenz/convert-source-map) 1.8.0
+ - [convert-source-map](https://github.com/thlorenz/convert-source-map) 1.9.0
+    by Thorsten Lorenz (thlorenz@gmx.de)
+    under the MIT license
+
+ - [convert-source-map](https://github.com/thlorenz/convert-source-map) 2.0.0
     by Thorsten Lorenz (thlorenz@gmx.de)
     under the MIT license
 
@@ -1904,7 +2002,7 @@ Pfarrplaner uses the following open-source libraries:
     by TJ Holowaychuk (tj@learnboost.com)
     under the MIT license
 
- - [cookie](https://github.com/jshttp/cookie) 0.5.0
+ - [cookie](https://github.com/jshttp/cookie) 0.7.1
     by Roman Shtylman (shtylman@gmail.com)
     under the MIT license
 
@@ -1916,14 +2014,15 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [core-js-compat](https://github.com/zloirock/core-js) 3.32.2
+ - [core-js-compat](https://github.com/zloirock/core-js) 3.44.0
     by Denis Pushkarev (zloirock@zloirock.ru)
     under the MIT license
 
  - [core-js](https://github.com/zloirock/core-js) 2.6.12
     under the MIT license
 
- - [core-js](https://github.com/zloirock/core-js) 3.18.1
+ - [core-js](https://github.com/zloirock/core-js) 3.44.0
+    by Denis Pushkarev (zloirock@zloirock.ru)
     under the MIT license
 
  - [core-util-is](https://github.com/isaacs/core-util-is) 1.0.3
@@ -1934,12 +2033,15 @@ Pfarrplaner uses the following open-source libraries:
     by David Clark (david.dave.clark@gmail.com)
     under the MIT license
 
- - [cosmiconfig](https://github.com/davidtheclark/cosmiconfig) 7.0.1
+ - [cosmiconfig](https://github.com/davidtheclark/cosmiconfig) 7.1.0
     by David Clark (david.dave.clark@gmail.com)
     under the MIT license
 
  - [create-ecdh](https://github.com/crypto-browserify/createECDH) 4.0.4
     by Calvin Metcalf
+    under the MIT license
+
+ - [create-hash](https://github.com/crypto-browserify/createHash) 1.1.3
     under the MIT license
 
  - [create-hash](https://github.com/crypto-browserify/createHash) 1.2.0
@@ -1952,7 +2054,7 @@ Pfarrplaner uses the following open-source libraries:
     by Kent C. Dodds (kent@doddsfamily.us)
     under the MIT license
 
- - [cross-spawn](https://github.com/moxystudio/node-cross-spawn) 6.0.5
+ - [cross-spawn](https://github.com/moxystudio/node-cross-spawn) 6.0.6
     by André Cruz (andre@moxy.studio)
     under the MIT license
 
@@ -1960,7 +2062,7 @@ Pfarrplaner uses the following open-source libraries:
     by Paul Vorbach (paul@vorb.de)
     under the BSD-3-Clause license
 
- - [crypto-browserify](https://github.com/crypto-browserify/crypto-browserify) 3.12.0
+ - [crypto-browserify](https://github.com/browserify/crypto-browserify) 3.12.1
     by Dominic Tarr (dominic.tarr@gmail.com)
     under the MIT license
 
@@ -2055,11 +2157,15 @@ Pfarrplaner uses the following open-source libraries:
  - [cssstyle](https://github.com/jsdom/cssstyle) 2.3.0
     under the MIT license
 
+ - [csstype](https://github.com/frenic/csstype) 3.1.3
+    by Fredrik Nicol (fredrik.nicol@gmail.com)
+    under the MIT license
+
  - [csv-parse](https://github.com/wdavidw/node-csv-parse) 4.16.3
     by David Worms (david@adaltas.com)
     under the MIT license
 
- - [cyclist](https://github.com/mafintosh/cyclist) 1.0.1
+ - [cyclist](https://github.com/mafintosh/cyclist) 1.0.2
     by Mathias Buus Madsen (mathiasbuus@gmail.com)
     under the MIT license
 
@@ -2069,6 +2175,18 @@ Pfarrplaner uses the following open-source libraries:
 
  - [data-urls](https://github.com/jsdom/data-urls) 3.0.2
     by Domenic Denicola (d@domenic.me)
+    under the MIT license
+
+ - [data-view-buffer](https://github.com/inspect-js/data-view-buffer) 1.0.2
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [data-view-byte-length](https://github.com/inspect-js/data-view-byte-length) 1.0.2
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [data-view-byte-offset](https://github.com/inspect-js/data-view-byte-offset) 1.0.1
+    by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
  - [dateformat](https://github.com/felixge/node-dateformat) 3.0.3
@@ -2090,15 +2208,15 @@ Pfarrplaner uses the following open-source libraries:
     by TJ Holowaychuk (tj@vision-media.ca)
     under the MIT license
 
- - [debug](https://github.com/visionmedia/debug) 4.3.2
-    by TJ Holowaychuk (tj@vision-media.ca)
+ - [debug](https://github.com/debug-js/debug) 4.4.1
+    by Josh Junon
     under the MIT license
 
  - [debuglog](https://github.com/sam-github/node-debuglog) 1.0.1
     by Sam Roberts (sam@strongloop.com)
     under the MIT license
 
- - [decamelize-keys](https://github.com/dsblv/decamelize-keys) 1.1.0
+ - [decamelize-keys](https://github.com/sindresorhus/decamelize-keys) 1.1.1
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
@@ -2106,7 +2224,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [decimal.js](https://github.com/MikeMcl/decimal.js) 10.4.3
+ - [decimal.js](https://github.com/MikeMcl/decimal.js) 10.6.0
     by Michael Mclaughlin (M8ch88l@gmail.com)
     under the MIT license
 
@@ -2117,7 +2235,7 @@ Pfarrplaner uses the following open-source libraries:
  - [decompress-response](https://github.com/sindresorhus/decompress-response) 3.3.0
     under the MIT license
 
- - [deep-equal](https://github.com/substack/node-deep-equal) 1.1.1
+ - [deep-equal](https://github.com/inspect-js/node-deep-equal) 1.1.2
     by James Halliday (mail@substack.net)
     under the MIT license
 
@@ -2125,15 +2243,19 @@ Pfarrplaner uses the following open-source libraries:
     by Nick Fisher
     under the MIT license
 
- - [deepmerge](https://github.com/TehShrike/deepmerge) 4.2.2
+ - [deepmerge](https://github.com/TehShrike/deepmerge) 4.3.1
     under the MIT license
 
  - [default-gateway](https://github.com/silverwind/default-gateway) 4.2.0
     by silverwind (me@silverwind.io)
     under the BSD-2-Clause license
 
- - [define-properties](https://github.com/ljharb/define-properties) 1.1.3
-    by Jordan Harband
+ - [define-data-property](https://github.com/ljharb/define-data-property) 1.1.4
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [define-properties](https://github.com/ljharb/define-properties) 1.2.1
+    by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
  - [define-property](https://github.com/jonschlinkert/define-property) 0.2.5
@@ -2164,7 +2286,7 @@ Pfarrplaner uses the following open-source libraries:
     by Douglas Christopher Wilson (doug@somethingdoug.com)
     under the MIT license
 
- - [des.js](https://github.com/indutny/des.js) 1.0.1
+ - [des.js](https://github.com/indutny/des.js) 1.1.0
     by Fedor Indutny (fedor@indutny.com)
     under the MIT license
 
@@ -2180,6 +2302,10 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
+ - [detect-libc](https://github.com/lovell/detect-libc) 1.0.3
+    by Lovell Fuller (npm@lovell.info)
+    under the Apache-2.0 license
+
  - [detect-newline](https://github.com/sindresorhus/detect-newline) 3.1.0
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
@@ -2188,7 +2314,7 @@ Pfarrplaner uses the following open-source libraries:
     by Ilya Kantor
     under the MIT license
 
- - [dezalgo](https://github.com/npm/dezalgo) 1.0.3
+ - [dezalgo](https://github.com/npm/dezalgo) 1.0.4
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
 
@@ -2224,7 +2350,7 @@ Pfarrplaner uses the following open-source libraries:
     by Felix Boehm (me@feedic.com)
     under the BSD-2-Clause license
 
- - [domelementtype](https://github.com/fb55/domelementtype) 2.2.0
+ - [domelementtype](https://github.com/fb55/domelementtype) 2.3.0
     by Felix Boehm (me@feedic.com)
     under the BSD-2-Clause license
 
@@ -2232,7 +2358,7 @@ Pfarrplaner uses the following open-source libraries:
     by Domenic Denicola (d@domenic.me)
     under the MIT license
 
- - [dompurify](https://github.com/cure53/DOMPurify) 2.4.7
+ - [dompurify](https://github.com/cure53/DOMPurify) 2.5.8
     by Mario Heiderich (mario@cure53.de)
     under the (MPL-2.0 OR Apache-2.0) license
 
@@ -2255,6 +2381,10 @@ Pfarrplaner uses the following open-source libraries:
     by Ben Coe (ben@npmjs.com)
     under the ISC license
 
+ - [dunder-proto](https://github.com/es-shims/dunder-proto) 1.0.1
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
  - [duplexify](https://github.com/mafintosh/duplexify) 3.7.1
     by Mathias Buus
     under the MIT license
@@ -2266,7 +2396,7 @@ Pfarrplaner uses the following open-source libraries:
     by Jonathan Ong (me@jongleberry.com)
     under the MIT license
 
- - [electron-to-chromium](https://github.com/kilian/electron-to-chromium) 1.4.537
+ - [electron-to-chromium](https://github.com/kilian/electron-to-chromium) 1.5.191
     by Kilian Valkhof
     under the ISC license
 
@@ -2274,7 +2404,7 @@ Pfarrplaner uses the following open-source libraries:
     by Christoph Fischer (chris@toph.de)
     under the GPL-3.0-or-later license
 
- - [elliptic](https://github.com/indutny/elliptic) 6.5.4
+ - [elliptic](https://github.com/indutny/elliptic) 6.6.1
     by Fedor Indutny (fedor@indutny.com)
     under the MIT license
 
@@ -2293,7 +2423,10 @@ Pfarrplaner uses the following open-source libraries:
  - [encodeurl](https://github.com/pillarjs/encodeurl) 1.0.2
     under the MIT license
 
- - [end-of-stream](https://github.com/mafintosh/end-of-stream) 1.4.4
+ - [encodeurl](https://github.com/pillarjs/encodeurl) 2.0.0
+    under the MIT license
+
+ - [end-of-stream](https://github.com/mafintosh/end-of-stream) 1.4.5
     by Mathias Buus (mathiasbuus@gmail.com)
     under the MIT license
 
@@ -2309,7 +2442,7 @@ Pfarrplaner uses the following open-source libraries:
     by Felix Boehm (me@feedic.com)
     under the BSD-2-Clause license
 
- - [entities](https://github.com/fb55/entities) 4.5.0
+ - [entities](https://github.com/fb55/entities) 6.0.1
     by Felix Boehm (me@feedic.com)
     under the BSD-2-Clause license
 
@@ -2319,14 +2452,34 @@ Pfarrplaner uses the following open-source libraries:
  - [error-ex](https://github.com/qix-/node-error-ex) 1.3.2
     under the MIT license
 
- - [error-stack-parser](https://github.com/stacktracejs/error-stack-parser) 2.0.6
+ - [error-stack-parser](https://github.com/stacktracejs/error-stack-parser) 2.1.4
     under the MIT license
 
- - [es-abstract](https://github.com/ljharb/es-abstract) 1.19.0
+ - [es-abstract](https://github.com/ljharb/es-abstract) 1.24.0
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [es-to-primitive](https://github.com/ljharb/es-to-primitive) 1.2.1
+ - [es-array-method-boxes-properly](https://github.com/ljharb/es-array-method-boxes-properly) 1.0.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [es-define-property](https://github.com/ljharb/es-define-property) 1.0.1
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [es-errors](https://github.com/ljharb/es-errors) 1.3.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [es-object-atoms](https://github.com/ljharb/es-object-atoms) 1.1.1
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [es-set-tostringtag](https://github.com/es-shims/es-set-tostringtag) 2.1.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [es-to-primitive](https://github.com/ljharb/es-to-primitive) 1.3.0
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -2334,7 +2487,7 @@ Pfarrplaner uses the following open-source libraries:
     by Square, Inc.
     under the Apache* license
 
- - [escalade](https://github.com/lukeed/escalade) 3.1.1
+ - [escalade](https://github.com/lukeed/escalade) 3.2.0
     by Luke Edwards (luke.edwards05@gmail.com)
     under the MIT license
 
@@ -2390,7 +2543,7 @@ Pfarrplaner uses the following open-source libraries:
     by Irakli Gozalishvili (rfobic@gmail.com)
     under the MIT license
 
- - [eventsource](https://github.com/EventSource/eventsource) 1.1.2
+ - [eventsource](https://github.com/EventSource/eventsource) 2.0.2
     by Aslak Hellesøy (aslak.hellesoy@gmail.com)
     under the MIT license
 
@@ -2414,7 +2567,7 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [express](https://github.com/expressjs/express) 4.18.2
+ - [express](https://github.com/expressjs/express) 4.21.2
     by TJ Holowaychuk (tj@vision-media.ca)
     under the MIT license
 
@@ -2486,11 +2639,11 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [fill-range](https://github.com/jonschlinkert/fill-range) 7.0.1
+ - [fill-range](https://github.com/jonschlinkert/fill-range) 7.1.1
     by Jon Schlinkert
     under the MIT license
 
- - [finalhandler](https://github.com/pillarjs/finalhandler) 1.2.0
+ - [finalhandler](https://github.com/pillarjs/finalhandler) 1.3.1
     by Douglas Christopher Wilson (doug@somethingdoug.com)
     under the MIT license
 
@@ -2524,8 +2677,12 @@ Pfarrplaner uses the following open-source libraries:
     by Mathias Buus
     under the MIT license
 
- - [follow-redirects](https://github.com/follow-redirects/follow-redirects) 1.15.3
+ - [follow-redirects](https://github.com/follow-redirects/follow-redirects) 1.15.9
     by Ruben Verborgh (ruben@verborgh.org)
+    under the MIT license
+
+ - [for-each](https://github.com/Raynos/for-each) 0.3.5
+    by Raynos (raynos2@gmail.com)
     under the MIT license
 
  - [for-in](https://github.com/jonschlinkert/for-in) 1.0.2
@@ -2536,7 +2693,7 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [form-data](https://github.com/form-data/form-data) 4.0.0
+ - [form-data](https://github.com/form-data/form-data) 4.0.4
     by Felix Geisendörfer (felix@debuggable.com)
     under the MIT license
 
@@ -2563,10 +2720,6 @@ Pfarrplaner uses the following open-source libraries:
     by Hugh Kennedy (hughskennedy@gmail.com)
     under the MIT license
 
- - [fs-access](https://github.com/sindresorhus/fs-access) 1.0.1
-    by Sindre Sorhus (sindresorhus@gmail.com)
-    under the MIT license
-
  - [fs-extra](https://github.com/jprichardson/node-fs-extra) 7.0.1
     by JP Richardson (jprichardson@gmail.com)
     under the MIT license
@@ -2583,11 +2736,19 @@ Pfarrplaner uses the following open-source libraries:
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
 
- - [function-bind](https://github.com/Raynos/function-bind) 1.1.1
+ - [function-bind](https://github.com/Raynos/function-bind) 1.1.2
     by Raynos (raynos2@gmail.com)
     under the MIT license
 
- - [fuse.js](https://github.com/krisk/Fuse) 6.4.6
+ - [function.prototype.name](https://github.com/es-shims/Function.prototype.name) 1.1.8
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [functions-have-names](https://github.com/inspect-js/functions-have-names) 1.2.3
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [fuse.js](https://github.com/krisk/Fuse) 6.6.2
     by Kiro Risk (kirollos@gmail.com)
     under the Apache-2.0 license
 
@@ -2603,7 +2764,7 @@ Pfarrplaner uses the following open-source libraries:
     by Stefan Penner
     under the ISC license
 
- - [get-intrinsic](https://github.com/ljharb/get-intrinsic) 1.1.1
+ - [get-intrinsic](https://github.com/ljharb/get-intrinsic) 1.3.0
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -2611,11 +2772,15 @@ Pfarrplaner uses the following open-source libraries:
     by Steve Mao (maochenyan@gmail.com)
     under the MIT license
 
+ - [get-proto](https://github.com/ljharb/get-proto) 1.0.1
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
  - [get-stream](https://github.com/sindresorhus/get-stream) 4.1.0
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [get-symbol-description](https://github.com/inspect-js/get-symbol-description) 1.0.0
+ - [get-symbol-description](https://github.com/inspect-js/get-symbol-description) 1.1.0
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -2623,7 +2788,7 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [git-raw-commits](https://github.com/conventional-changelog/conventional-changelog) 2.0.10
+ - [git-raw-commits](https://github.com/conventional-changelog/conventional-changelog) 2.0.11
     by Steve Mao (maochenyan@gmail.com)
     under the MIT license
 
@@ -2659,7 +2824,7 @@ Pfarrplaner uses the following open-source libraries:
     by Nick Fitzgerald (fitzgen@gmail.com)
     under the BSD* license
 
- - [glob](https://github.com/isaacs/node-glob) 7.2.0
+ - [glob](https://github.com/isaacs/node-glob) 7.2.3
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
 
@@ -2683,8 +2848,8 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [globals](https://github.com/sindresorhus/globals) 11.12.0
-    by Sindre Sorhus (sindresorhus@gmail.com)
+ - [globalthis](https://github.com/ljharb/System.global) 1.0.4
+    by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
  - [globby](https://github.com/sindresorhus/globby) 6.1.0
@@ -2699,7 +2864,11 @@ Pfarrplaner uses the following open-source libraries:
     by Stephen Mathieson (me@stephenmathieson.com)
     under the MIT license
 
- - [graceful-fs](https://github.com/isaacs/node-graceful-fs) 4.2.8
+ - [gopd](https://github.com/ljharb/gopd) 1.2.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [graceful-fs](https://github.com/isaacs/node-graceful-fs) 4.2.11
     under the ISC license
 
  - [growly](https://github.com/theabraham/growly) 1.3.0
@@ -2710,7 +2879,7 @@ Pfarrplaner uses the following open-source libraries:
     by Fedor Indutny (fedor@indutny.com)
     under the MIT license
 
- - [handlebars](https://github.com/wycats/handlebars.js) 4.7.7
+ - [handlebars](https://github.com/handlebars-lang/handlebars.js) 4.7.8
     by Yehuda Katz
     under the MIT license
 
@@ -2722,7 +2891,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [has-bigints](https://github.com/ljharb/has-bigints) 1.0.1
+ - [has-bigints](https://github.com/ljharb/has-bigints) 1.1.0
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -2734,11 +2903,19 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [has-symbols](https://github.com/inspect-js/has-symbols) 1.0.2
+ - [has-property-descriptors](https://github.com/inspect-js/has-property-descriptors) 1.0.2
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [has-tostringtag](https://github.com/inspect-js/has-tostringtag) 1.0.0
+ - [has-proto](https://github.com/inspect-js/has-proto) 1.2.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [has-symbols](https://github.com/inspect-js/has-symbols) 1.1.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [has-tostringtag](https://github.com/inspect-js/has-tostringtag) 1.0.2
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -2758,11 +2935,15 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [has](https://github.com/tarruda/has) 1.0.3
+ - [has](https://github.com/tarruda/has) 1.0.4
     by Thiago de Arruda (tpadilha84@gmail.com)
     under the MIT license
 
- - [hash-base](https://github.com/crypto-browserify/hash-base) 3.1.0
+ - [hash-base](https://github.com/crypto-browserify/hash-base) 2.0.2
+    by Kirill Fomichev (fanatid@ya.ru)
+    under the MIT license
+
+ - [hash-base](https://github.com/crypto-browserify/hash-base) 3.0.5
     by Kirill Fomichev (fanatid@ya.ru)
     under the MIT license
 
@@ -2771,6 +2952,10 @@ Pfarrplaner uses the following open-source libraries:
 
  - [hash.js](https://github.com/indutny/hash.js) 1.1.7
     by Fedor Indutny (fedor@indutny.com)
+    under the MIT license
+
+ - [hasown](https://github.com/inspect-js/hasOwn) 2.0.2
+    by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
  - [he](https://github.com/mathiasbynens/he) 1.2.0
@@ -2797,7 +2982,7 @@ Pfarrplaner uses the following open-source libraries:
     by Rebecca Turner (me@re-becca.org)
     under the ISC license
 
- - [hosted-git-info](https://github.com/npm/hosted-git-info) 4.0.2
+ - [hosted-git-info](https://github.com/npm/hosted-git-info) 4.1.0
     by Rebecca Turner (me@re-becca.org)
     under the ISC license
 
@@ -2841,7 +3026,7 @@ Pfarrplaner uses the following open-source libraries:
     by Jonathan Ong (me@jongleberry.com)
     under the MIT license
 
- - [http-parser-js](https://github.com/creationix/http-parser-js) 0.5.3
+ - [http-parser-js](https://github.com/creationix/http-parser-js) 0.5.10
     by Tim Caswell
     under the MIT license
 
@@ -2912,6 +3097,10 @@ Pfarrplaner uses the following open-source libraries:
     by Michel Weststrate
     under the MIT license
 
+ - [immutable](https://github.com/immutable-js/immutable-js) 5.1.3
+    by Lee Byron
+    under the MIT license
+
  - [import-cwd](https://github.com/sindresorhus/import-cwd) 2.1.0
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
@@ -2920,7 +3109,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [import-fresh](https://github.com/sindresorhus/import-fresh) 3.3.0
+ - [import-fresh](https://github.com/sindresorhus/import-fresh) 3.3.1
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
@@ -2952,9 +3141,6 @@ Pfarrplaner uses the following open-source libraries:
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
 
- - [inherits](https://github.com/isaacs/inherits) 2.0.1
-    under the ISC license
-
  - [inherits](https://github.com/isaacs/inherits) 2.0.3
     under the ISC license
 
@@ -2969,7 +3155,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [internal-slot](https://github.com/ljharb/internal-slot) 1.0.3
+ - [internal-slot](https://github.com/ljharb/internal-slot) 1.1.0
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -2985,7 +3171,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [ip](https://github.com/indutny/node-ip) 1.1.5
+ - [ip](https://github.com/indutny/node-ip) 1.1.9
     by Fedor Indutny (fedor@indutny.com)
     under the MIT license
 
@@ -3001,15 +3187,15 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [is-accessor-descriptor](https://github.com/jonschlinkert/is-accessor-descriptor) 0.1.6
+ - [is-accessor-descriptor](https://github.com/inspect-js/is-accessor-descriptor) 1.0.1
     by Jon Schlinkert
     under the MIT license
 
- - [is-accessor-descriptor](https://github.com/jonschlinkert/is-accessor-descriptor) 1.0.0
-    by Jon Schlinkert
+ - [is-arguments](https://github.com/inspect-js/is-arguments) 1.2.0
+    by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [is-arguments](https://github.com/inspect-js/is-arguments) 1.1.1
+ - [is-array-buffer](https://github.com/inspect-js/is-array-buffer) 3.0.5
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -3021,7 +3207,11 @@ Pfarrplaner uses the following open-source libraries:
     by Qix
     under the MIT license
 
- - [is-bigint](https://github.com/inspect-js/is-bigint) 1.0.4
+ - [is-async-function](https://github.com/inspect-js/is-async-function) 2.1.1
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [is-bigint](https://github.com/inspect-js/is-bigint) 1.1.0
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -3033,7 +3223,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [is-boolean-object](https://github.com/inspect-js/is-boolean-object) 1.1.2
+ - [is-boolean-object](https://github.com/inspect-js/is-boolean-object) 1.2.2
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -3041,7 +3231,7 @@ Pfarrplaner uses the following open-source libraries:
     by Feross Aboukhadijeh (feross@feross.org)
     under the MIT license
 
- - [is-callable](https://github.com/inspect-js/is-callable) 1.2.4
+ - [is-callable](https://github.com/inspect-js/is-callable) 1.2.7
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -3049,27 +3239,27 @@ Pfarrplaner uses the following open-source libraries:
     by pigcan (jiangjay818@gmail.com)
     under the MIT license
 
- - [is-core-module](https://github.com/inspect-js/is-core-module) 2.7.0
+ - [is-core-module](https://github.com/inspect-js/is-core-module) 2.16.1
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [is-data-descriptor](https://github.com/jonschlinkert/is-data-descriptor) 0.1.4
+ - [is-data-descriptor](https://github.com/inspect-js/is-data-descriptor) 1.0.1
     by Jon Schlinkert
     under the MIT license
 
- - [is-data-descriptor](https://github.com/jonschlinkert/is-data-descriptor) 1.0.0
-    by Jon Schlinkert
+ - [is-data-view](https://github.com/inspect-js/is-data-view) 1.0.2
+    by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [is-date-object](https://github.com/inspect-js/is-date-object) 1.0.5
+ - [is-date-object](https://github.com/inspect-js/is-date-object) 1.1.0
     by Jordan Harband
     under the MIT license
 
- - [is-descriptor](https://github.com/jonschlinkert/is-descriptor) 0.1.6
+ - [is-descriptor](https://github.com/inspect-js/is-descriptor) 0.1.7
     by Jon Schlinkert
     under the MIT license
 
- - [is-descriptor](https://github.com/jonschlinkert/is-descriptor) 1.0.2
+ - [is-descriptor](https://github.com/inspect-js/is-descriptor) 1.0.3
     by Jon Schlinkert
     under the MIT license
 
@@ -3093,6 +3283,10 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
+ - [is-finalizationregistry](https://github.com/inspect-js/is-finalizationregistry) 1.1.1
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
  - [is-fullwidth-code-point](https://github.com/sindresorhus/is-fullwidth-code-point) 1.0.0
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
@@ -3105,6 +3299,10 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
+ - [is-generator-function](https://github.com/inspect-js/is-generator-function) 1.1.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
  - [is-glob](https://github.com/jonschlinkert/is-glob) 3.1.0
     by Jon Schlinkert
     under the MIT license
@@ -3113,11 +3311,15 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [is-negative-zero](https://github.com/inspect-js/is-negative-zero) 2.0.1
+ - [is-map](https://github.com/inspect-js/is-map) 2.0.3
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [is-number-object](https://github.com/inspect-js/is-number-object) 1.0.6
+ - [is-negative-zero](https://github.com/inspect-js/is-negative-zero) 2.0.3
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [is-number-object](https://github.com/inspect-js/is-number-object) 1.1.1
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -3165,7 +3367,7 @@ Pfarrplaner uses the following open-source libraries:
     by Mathias Bynens
     under the MIT license
 
- - [is-regex](https://github.com/inspect-js/is-regex) 1.1.4
+ - [is-regex](https://github.com/inspect-js/is-regex) 1.2.1
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -3173,7 +3375,11 @@ Pfarrplaner uses the following open-source libraries:
     by Shinnosuke Watanabe
     under the ISC license
 
- - [is-shared-array-buffer](https://github.com/inspect-js/is-shared-array-buffer) 1.0.1
+ - [is-set](https://github.com/inspect-js/is-set) 2.0.3
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [is-shared-array-buffer](https://github.com/inspect-js/is-shared-array-buffer) 1.0.4
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -3181,11 +3387,11 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [is-string](https://github.com/ljharb/is-string) 1.0.7
+ - [is-string](https://github.com/inspect-js/is-string) 1.1.1
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [is-symbol](https://github.com/inspect-js/is-symbol) 1.0.4
+ - [is-symbol](https://github.com/inspect-js/is-symbol) 1.1.1
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -3193,7 +3399,19 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [is-weakref](https://github.com/inspect-js/is-weakref) 1.0.1
+ - [is-typed-array](https://github.com/inspect-js/is-typed-array) 1.1.15
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [is-weakmap](https://github.com/inspect-js/is-weakmap) 2.0.2
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [is-weakref](https://github.com/inspect-js/is-weakref) 1.1.1
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [is-weakset](https://github.com/inspect-js/is-weakset) 2.0.4
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -3213,6 +3431,10 @@ Pfarrplaner uses the following open-source libraries:
     by Julian Gruber (mail@juliangruber.com)
     under the MIT license
 
+ - [isarray](https://github.com/juliangruber/isarray) 2.0.5
+    by Julian Gruber (mail@juliangruber.com)
+    under the MIT license
+
  - [isexe](https://github.com/isaacs/isexe) 2.0.0
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
@@ -3228,16 +3450,12 @@ Pfarrplaner uses the following open-source libraries:
  - [isomorphic-dompurify](https://github.com/kkomelin/isomorphic-dompurify) 0.20.0
     under the MIT license
 
- - [jquery-ui](https://github.com/jquery/jquery-ui) 1.13.2
-    by jQuery Foundation and other contributors
+ - [jquery-ui](https://github.com/jquery/jquery-ui) 1.14.1
+    by OpenJS Foundation and other contributors
     under the MIT license
 
  - [jquery](https://github.com/jquery/jquery) 3.5.0
     by JS Foundation and other contributors
-    under the MIT license
-
- - [jquery](https://github.com/jquery/jquery) 3.6.0
-    by OpenJS Foundation and other contributors
     under the MIT license
 
  - [jquery](https://github.com/jquery/jquery) 3.7.1
@@ -3259,11 +3477,11 @@ Pfarrplaner uses the following open-source libraries:
  - [jsdom](https://github.com/jsdom/jsdom) 20.0.3
     under the MIT license
 
- - [jsesc](https://github.com/mathiasbynens/jsesc) 0.5.0
+ - [jsesc](https://github.com/mathiasbynens/jsesc) 3.0.2
     by Mathias Bynens
     under the MIT license
 
- - [jsesc](https://github.com/mathiasbynens/jsesc) 2.5.2
+ - [jsesc](https://github.com/mathiasbynens/jsesc) 3.1.0
     by Mathias Bynens
     under the MIT license
 
@@ -3282,10 +3500,6 @@ Pfarrplaner uses the following open-source libraries:
  - [json-stringify-safe](https://github.com/isaacs/json-stringify-safe) 5.0.1
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
-
- - [json3](https://github.com/bestiejs/json3) 3.3.3
-    by Kit Cambridge (github@kitcambridge.be)
-    under the MIT license
 
  - [json5](https://github.com/json5/json5) 1.0.2
     by Aseem Kishore (aseem.kishore@gmail.com)
@@ -3322,10 +3536,6 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [kind-of](https://github.com/jonschlinkert/kind-of) 5.1.0
-    by Jon Schlinkert
-    under the MIT license
-
  - [kind-of](https://github.com/jonschlinkert/kind-of) 6.0.3
     by Jon Schlinkert
     under the MIT license
@@ -3346,8 +3556,8 @@ Pfarrplaner uses the following open-source libraries:
     by Dav Glass (davglass@gmail.com)
     under the BSD-3-Clause license
 
- - [lines-and-columns](https://github.com/eventualbuddha/lines-and-columns) 1.1.6
-    by Brian Donovan (me@brian-donovan.com)
+ - [lines-and-columns](https://github.com/eventualbuddha/lines-and-columns) 1.2.4
+    by Brian Donovan (brian@donovans.cc)
     under the MIT license
 
  - [linkify-it](https://github.com/markdown-it/linkify-it) 1.2.4
@@ -3366,6 +3576,10 @@ Pfarrplaner uses the following open-source libraries:
     under the MIT license
 
  - [loader-utils](https://github.com/webpack/loader-utils) 1.4.2
+    by Tobias Koppers @sokra
+    under the MIT license
+
+ - [loader-utils](https://github.com/webpack/loader-utils) 2.0.4
     by Tobias Koppers @sokra
     under the MIT license
 
@@ -3465,7 +3679,7 @@ Pfarrplaner uses the following open-source libraries:
     by John-David Dalton (john.david.dalton@gmail.com)
     under the MIT license
 
- - [loglevel](https://github.com/pimterry/loglevel) 1.7.1
+ - [loglevel](https://github.com/pimterry/loglevel) 1.9.2
     by Tim Perry (pimterry@gmail.com)
     under the MIT license
 
@@ -3575,6 +3789,10 @@ Pfarrplaner uses the following open-source libraries:
  - [match-at](https://github.com/sophiebits/match-at) 0.1.1
     under the MIT* license
 
+ - [math-intrinsics](https://github.com/es-shims/math-intrinsics) 1.1.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
  - [math-random](https://github.com/michaelrhodes/math-random) 1.0.4
     by Michael Rhodes
     under the MIT license
@@ -3618,7 +3836,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [merge-descriptors](https://github.com/component/merge-descriptors) 1.0.1
+ - [merge-descriptors](https://github.com/sindresorhus/merge-descriptors) 1.0.3
     by Jonathan Ong (me@jongleberry.com)
     under the MIT license
 
@@ -3636,13 +3854,13 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
+ - [micromatch](https://github.com/micromatch/micromatch) 4.0.8
+    by Jon Schlinkert
+    under the MIT license
+
  - [microplugin](https://github.com/brianreavis/microplugin.js) 0.0.3
     by Brian Reavis (brian@thirdroute.com)
     under the Apache* license
-
- - [midi](https://github.com/mudcube/MIDI.js) 0.4.2
-    by Michael Deal
-    under the MIT license
 
  - [miller-rabin](https://github.com/indutny/miller-rabin) 4.0.1
     by Fedor Indutny (fedor@indutny.com)
@@ -3658,7 +3876,7 @@ Pfarrplaner uses the following open-source libraries:
     by Robert Kieffer (robert@broofa.com)
     under the MIT license
 
- - [mime](https://github.com/broofa/mime) 2.5.2
+ - [mime](https://github.com/broofa/mime) 2.6.0
     by Robert Kieffer (robert@broofa.com)
     under the MIT license
 
@@ -3705,7 +3923,7 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [mkdirp](https://github.com/substack/node-mkdirp) 0.5.5
+ - [mkdirp](https://github.com/substack/node-mkdirp) 0.5.6
     by James Halliday (mail@substack.net)
     under the MIT license
 
@@ -3721,11 +3939,15 @@ Pfarrplaner uses the following open-source libraries:
     by Tim Wood (washwithcare@gmail.com)
     under the MIT license
 
- - [moment-timezone](https://github.com/moment/moment-timezone) 0.5.43
+ - [moment-timezone](https://github.com/moment/moment-timezone) 0.5.48
     by Tim Wood (washwithcare@gmail.com)
     under the MIT license
 
  - [moment](https://github.com/moment/moment) 2.29.4
+    by Iskren Ivov Chernev (iskren.chernev@gmail.com)
+    under the MIT license
+
+ - [moment](https://github.com/moment/moment) 2.30.1
     by Iskren Ivov Chernev (iskren.chernev@gmail.com)
     under the MIT license
 
@@ -3739,9 +3961,6 @@ Pfarrplaner uses the following open-source libraries:
  - [ms](https://github.com/zeit/ms) 2.0.0
     under the MIT license
 
- - [ms](https://github.com/zeit/ms) 2.1.2
-    under the MIT license
-
  - [ms](https://github.com/vercel/ms) 2.1.3
     under the MIT license
 
@@ -3753,7 +3972,7 @@ Pfarrplaner uses the following open-source libraries:
     by Mathias Buus
     under the MIT license
 
- - [nanocolors](https://github.com/ai/nanocolors) 0.2.12
+ - [nanoid](https://github.com/ai/nanoid) 3.3.11
     by Andrey Sitnik (andrey@sitnik.ru)
     under the MIT license
 
@@ -3764,6 +3983,9 @@ Pfarrplaner uses the following open-source libraries:
  - [negotiator](https://github.com/jshttp/negotiator) 0.6.3
     under the MIT license
 
+ - [negotiator](https://github.com/jshttp/negotiator) 0.6.4
+    under the MIT license
+
  - [neo-async](https://github.com/suguru03/neo-async) 2.6.2
     under the MIT license
 
@@ -3772,6 +3994,9 @@ Pfarrplaner uses the following open-source libraries:
 
  - [no-case](https://github.com/blakeembrey/no-case) 2.3.2
     by Blake Embrey (hello@blakeembrey.com)
+    under the MIT license
+
+ - [node-addon-api](https://github.com/nodejs/node-addon-api) 7.1.1
     under the MIT license
 
  - [node-forge](https://github.com/digitalbazaar/forge) 0.10.0
@@ -3786,7 +4011,7 @@ Pfarrplaner uses the following open-source libraries:
     by Mikael Brevik
     under the MIT license
 
- - [node-releases](https://github.com/chicoxyzzy/node-releases) 2.0.13
+ - [node-releases](https://github.com/chicoxyzzy/node-releases) 2.0.19
     by Sergey Rubanov (chi187@gmail.com)
     under the MIT license
 
@@ -3834,10 +4059,6 @@ Pfarrplaner uses the following open-source libraries:
     by Felix Boehm (me@feedic.com)
     under the BSD-2-Clause license
 
- - [null-check](https://github.com/sindresorhus/null-check) 1.0.0
-    by Sindre Sorhus (sindresorhus@gmail.com)
-    under the MIT license
-
  - [num2fraction](https://github.com/yisibl/num2fraction) 1.2.2
     by yisi (yiorsi@gmail.com)
     under the MIT license
@@ -3846,7 +4067,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [nwsapi](https://github.com/dperini/nwsapi) 2.2.7
+ - [nwsapi](https://github.com/dperini/nwsapi) 2.2.21
     by Diego Perini (diego.perini@gmail.com)
     under the MIT license
 
@@ -3858,11 +4079,11 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [object-inspect](https://github.com/inspect-js/object-inspect) 1.11.0
+ - [object-inspect](https://github.com/inspect-js/object-inspect) 1.13.4
     by James Halliday (mail@substack.net)
     under the MIT license
 
- - [object-is](https://github.com/es-shims/object-is) 1.1.5
+ - [object-is](https://github.com/es-shims/object-is) 1.1.6
     by Jordan Harband
     under the MIT license
 
@@ -3878,11 +4099,11 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [object.assign](https://github.com/ljharb/object.assign) 4.1.2
+ - [object.assign](https://github.com/ljharb/object.assign) 4.1.7
     by Jordan Harband
     under the MIT license
 
- - [object.getownpropertydescriptors](https://github.com/es-shims/object.getownpropertydescriptors) 2.1.2
+ - [object.getownpropertydescriptors](https://github.com/es-shims/object.getownpropertydescriptors) 2.1.8
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -3898,7 +4119,7 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [object.values](https://github.com/es-shims/Object.values) 1.1.4
+ - [object.values](https://github.com/es-shims/Object.values) 1.2.1
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -3909,7 +4130,7 @@ Pfarrplaner uses the following open-source libraries:
  - [on-finished](https://github.com/jshttp/on-finished) 2.4.1
     under the MIT license
 
- - [on-headers](https://github.com/jshttp/on-headers) 1.0.2
+ - [on-headers](https://github.com/jshttp/on-headers) 1.1.0
     by Douglas Christopher Wilson (doug@somethingdoug.com)
     under the MIT license
 
@@ -3952,6 +4173,10 @@ Pfarrplaner uses the following open-source libraries:
  - [osenv](https://github.com/npm/osenv) 0.1.5
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
+
+ - [own-keys](https://github.com/ljharb/own-keys) 1.0.1
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
 
  - [p-defer](https://github.com/sindresorhus/p-defer) 1.0.0
     by Sindre Sorhus (sindresorhus@gmail.com)
@@ -4036,7 +4261,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [parse-asn1](https://github.com/crypto-browserify/parse-asn1) 5.1.6
+ - [parse-asn1](https://github.com/crypto-browserify/parse-asn1) 5.1.7
     under the ISC license
 
  - [parse-json](https://github.com/sindresorhus/parse-json) 4.0.0
@@ -4055,7 +4280,7 @@ Pfarrplaner uses the following open-source libraries:
     by Brian Woodward
     under the MIT license
 
- - [parse5](https://github.com/inikulin/parse5) 7.1.2
+ - [parse5](https://github.com/inikulin/parse5) 7.3.0
     by Ivan Nikulin (ifaaan@gmail.com)
     under the MIT license
 
@@ -4098,7 +4323,7 @@ Pfarrplaner uses the following open-source libraries:
     by Javier Blanco (http://jbgutierrez.info)
     under the MIT license
 
- - [path-to-regexp](https://github.com/component/path-to-regexp) 0.1.7
+ - [path-to-regexp](https://github.com/pillarjs/path-to-regexp) 0.1.12
     under the MIT license
 
  - [path-type](https://github.com/sindresorhus/path-type) 3.0.0
@@ -4109,7 +4334,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [pbkdf2](https://github.com/crypto-browserify/pbkdf2) 3.1.2
+ - [pbkdf2](https://github.com/crypto-browserify/pbkdf2) 3.1.3
     by Daniel Cousens
     under the MIT license
 
@@ -4117,7 +4342,11 @@ Pfarrplaner uses the following open-source libraries:
     by Jonathan Peterson
     under the MIT license
 
- - [picocolors](https://github.com/alexeyraspopov/picocolors) 1.0.0
+ - [picocolors](https://github.com/alexeyraspopov/picocolors) 0.2.1
+    by Alexey Raspopov
+    under the ISC license
+
+ - [picocolors](https://github.com/alexeyraspopov/picocolors) 1.1.1
     by Alexey Raspopov
     under the ISC license
 
@@ -4157,12 +4386,16 @@ Pfarrplaner uses the following open-source libraries:
     by Federico Zivolo (federico.zivolo@gmail.com)
     under the MIT license
 
- - [portfinder](https://github.com/http-party/node-portfinder) 1.0.28
+ - [portfinder](https://github.com/http-party/node-portfinder) 1.0.37
     by Charlie Robbins (charlie.robbins@gmail.com)
     under the MIT license
 
  - [posix-character-classes](https://github.com/jonschlinkert/posix-character-classes) 0.1.1
     by Jon Schlinkert
+    under the MIT license
+
+ - [possible-typed-array-names](https://github.com/ljharb/possible-typed-array-names) 1.1.0
+    by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
  - [postcss-calc](https://github.com/postcss/postcss-calc) 7.0.5
@@ -4292,7 +4525,7 @@ Pfarrplaner uses the following open-source libraries:
  - [postcss-selector-parser](https://github.com/postcss/postcss-selector-parser) 3.1.2
     under the MIT license
 
- - [postcss-selector-parser](https://github.com/postcss/postcss-selector-parser) 6.0.6
+ - [postcss-selector-parser](https://github.com/postcss/postcss-selector-parser) 6.1.2
     under the MIT license
 
  - [postcss-svgo](https://github.com/cssnano/cssnano) 4.0.3
@@ -4307,7 +4540,7 @@ Pfarrplaner uses the following open-source libraries:
     by Bogdan Chadkin (trysound@yandex.ru)
     under the MIT license
 
- - [postcss-value-parser](https://github.com/TrySound/postcss-value-parser) 4.1.0
+ - [postcss-value-parser](https://github.com/TrySound/postcss-value-parser) 4.2.0
     by Bogdan Chadkin (trysound@yandex.ru)
     under the MIT license
 
@@ -4315,7 +4548,11 @@ Pfarrplaner uses the following open-source libraries:
     by Andrey Sitnik (andrey@sitnik.ru)
     under the MIT license
 
- - [postcss](https://github.com/postcss/postcss) 7.0.38
+ - [postcss](https://github.com/postcss/postcss) 7.0.39
+    by Andrey Sitnik (andrey@sitnik.ru)
+    under the MIT license
+
+ - [postcss](https://github.com/postcss/postcss) 8.5.6
     by Andrey Sitnik (andrey@sitnik.ru)
     under the MIT license
 
@@ -4323,10 +4560,10 @@ Pfarrplaner uses the following open-source libraries:
     by Jason Miller (jason@developit.ca)
     under the MIT license
 
- - [preact](https://github.com/preactjs/preact) 10.19.4
+ - [preact](https://github.com/preactjs/preact) 10.26.9
     under the MIT license
 
- - [prettier](https://github.com/prettier/prettier) 1.19.1
+ - [prettier](https://github.com/prettier/prettier) 2.8.8
     by James Long
     under the MIT license
 
@@ -4361,7 +4598,7 @@ Pfarrplaner uses the following open-source libraries:
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
 
- - [psl](https://github.com/lupomontero/psl) 1.9.0
+ - [psl](https://github.com/lupomontero/psl) 1.15.0
     by Lupo Montero (lupomontero@gmail.com)
     under the MIT license
 
@@ -4373,7 +4610,7 @@ Pfarrplaner uses the following open-source libraries:
     by Mathias Buus Madsen (mathiasbuus@gmail.com)
     under the MIT license
 
- - [pump](https://github.com/mafintosh/pump) 3.0.0
+ - [pump](https://github.com/mafintosh/pump) 3.0.3
     by Mathias Buus Madsen (mathiasbuus@gmail.com)
     under the MIT license
 
@@ -4381,15 +4618,11 @@ Pfarrplaner uses the following open-source libraries:
     by Mathias Buus
     under the MIT license
 
- - [punycode](https://github.com/bestiejs/punycode.js) 1.3.2
-    by Mathias Bynens
-    under the MIT license
-
  - [punycode](https://github.com/bestiejs/punycode.js) 1.4.1
     by Mathias Bynens
     under the MIT license
 
- - [punycode](https://github.com/bestiejs/punycode.js) 2.1.1
+ - [punycode](https://github.com/mathiasbynens/punycode.js) 2.3.1
     by Mathias Bynens
     under the MIT license
 
@@ -4397,17 +4630,13 @@ Pfarrplaner uses the following open-source libraries:
     by Kris Kowal (kris@cixar.com)
     under the MIT license
 
- - [qs](https://github.com/ljharb/qs) 6.11.0
+ - [qs](https://github.com/ljharb/qs) 6.13.0
     under the BSD-3-Clause license
 
- - [qs](https://github.com/ljharb/qs) 6.11.2
+ - [qs](https://github.com/ljharb/qs) 6.14.0
     under the BSD-3-Clause license
 
  - [querystring-es3](https://github.com/mike-spainhower/querystring) 0.2.1
-    by Irakli Gozalishvili (rfobic@gmail.com)
-    under the MIT license
-
- - [querystring](https://github.com/Gozala/querystring) 0.2.0
     by Irakli Gozalishvili (rfobic@gmail.com)
     under the MIT license
 
@@ -4441,7 +4670,7 @@ Pfarrplaner uses the following open-source libraries:
     by TJ Holowaychuk (tj@vision-media.ca)
     under the MIT license
 
- - [raw-body](https://github.com/stream-utils/raw-body) 2.5.1
+ - [raw-body](https://github.com/stream-utils/raw-body) 2.5.2
     by Jonathan Ong (me@jongleberry.com)
     under the MIT license
 
@@ -4469,10 +4698,10 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [readable-stream](https://github.com/nodejs/readable-stream) 2.3.7
+ - [readable-stream](https://github.com/nodejs/readable-stream) 2.3.8
     under the MIT license
 
- - [readable-stream](https://github.com/nodejs/readable-stream) 3.6.0
+ - [readable-stream](https://github.com/nodejs/readable-stream) 3.6.2
     under the MIT license
 
  - [readdir-scoped-modules](https://github.com/npm/readdir-scoped-modules) 1.1.0
@@ -4484,6 +4713,10 @@ Pfarrplaner uses the following open-source libraries:
     under the MIT license
 
  - [readdirp](https://github.com/paulmillr/readdirp) 3.6.0
+    by Thorsten Lorenz (thlorenz@gmx.de)
+    under the MIT license
+
+ - [readdirp](https://github.com/paulmillr/readdirp) 4.1.2
     by Thorsten Lorenz (thlorenz@gmx.de)
     under the MIT license
 
@@ -4499,7 +4732,11 @@ Pfarrplaner uses the following open-source libraries:
     by Thorsten Lorenz (thlorenz@gmx.de)
     under the MIT license
 
- - [regenerate-unicode-properties](https://github.com/mathiasbynens/regenerate-unicode-properties) 9.0.0
+ - [reflect.getprototypeof](https://github.com/es-shims/Reflect.getPrototypeOf) 1.0.10
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [regenerate-unicode-properties](https://github.com/mathiasbynens/regenerate-unicode-properties) 10.2.0
     by Mathias Bynens
     under the MIT license
 
@@ -4511,35 +4748,27 @@ Pfarrplaner uses the following open-source libraries:
     by Ben Newman (bn@cs.stanford.edu)
     under the MIT license
 
- - [regenerator-runtime](https://github.com/facebook/regenerator/tree/master/packages/runtime) 0.13.9
-    by Ben Newman (bn@cs.stanford.edu)
-    under the MIT license
-
- - [regenerator-transform](https://github.com/facebook/regenerator/tree/master/packages/regenerator-transform) 0.14.5
-    by Ben Newman (bn@cs.stanford.edu)
-    under the MIT license
-
  - [regex-not](https://github.com/jonschlinkert/regex-not) 1.0.2
     by Jon Schlinkert
     under the MIT license
 
- - [regex-parser](https://github.com/IonicaBizau/regex-parser.js) 2.2.11
+ - [regex-parser](https://github.com/IonicaBizau/regex-parser.js) 2.3.1
     by Ionică Bizău (bizauionica@gmail.com)
     under the MIT license
 
- - [regexp.prototype.flags](https://github.com/es-shims/RegExp.prototype.flags) 1.3.1
+ - [regexp.prototype.flags](https://github.com/es-shims/RegExp.prototype.flags) 1.5.4
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [regexpu-core](https://github.com/mathiasbynens/regexpu-core) 4.8.0
+ - [regexpu-core](https://github.com/mathiasbynens/regexpu-core) 6.2.0
     by Mathias Bynens
     under the MIT license
 
- - [regjsgen](https://github.com/bnjmnt4n/regjsgen) 0.5.2
+ - [regjsgen](https://github.com/bnjmnt4n/regjsgen) 0.8.0
     by Benjamin Tan
     under the MIT license
 
- - [regjsparser](https://github.com/jviereck/regjsparser) 0.7.0
+ - [regjsparser](https://github.com/jviereck/regjsparser) 0.12.0
     by 'Julian Viereck' (julian.viereck@gmail.com)
     under the BSD-2-Clause license
 
@@ -4611,7 +4840,7 @@ Pfarrplaner uses the following open-source libraries:
     by Simon Lydell
     under the MIT license
 
- - [resolve](https://github.com/browserify/resolve) 1.20.0
+ - [resolve](https://github.com/browserify/resolve) 1.22.10
     by James Halliday (mail@substack.net)
     under the MIT license
 
@@ -4646,6 +4875,9 @@ Pfarrplaner uses the following open-source libraries:
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
 
+ - [ripemd160](https://github.com/crypto-browserify/ripemd160) 2.0.1
+    under the MIT license
+
  - [ripemd160](https://github.com/crypto-browserify/ripemd160) 2.0.2
     under the MIT license
 
@@ -4657,12 +4889,24 @@ Pfarrplaner uses the following open-source libraries:
     by Rebecca Turner (me@re-becca.org)
     under the ISC license
 
+ - [safe-array-concat](https://github.com/ljharb/safe-array-concat) 1.1.3
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
  - [safe-buffer](https://github.com/feross/safe-buffer) 5.1.2
     by Feross Aboukhadijeh (feross@feross.org)
     under the MIT license
 
  - [safe-buffer](https://github.com/feross/safe-buffer) 5.2.1
     by Feross Aboukhadijeh (feross@feross.org)
+    under the MIT license
+
+ - [safe-push-apply](https://github.com/ljharb/safe-push-apply) 1.0.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [safe-regex-test](https://github.com/ljharb/safe-regex-test) 1.1.0
+    by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
  - [safe-regex](https://github.com/substack/safe-regex) 1.1.0
@@ -4677,7 +4921,7 @@ Pfarrplaner uses the following open-source libraries:
     by J. Tangelder
     under the MIT license
 
- - [sass](https://github.com/sass/dart-sass) 1.42.1
+ - [sass](https://github.com/sass/dart-sass) 1.89.2
     by Natalie Weizenbaum (nweiz@google.com)
     under the MIT license
 
@@ -4724,11 +4968,11 @@ Pfarrplaner uses the following open-source libraries:
  - [semver](https://github.com/npm/node-semver) 7.3.5
     under the ISC license
 
- - [semver](https://github.com/npm/node-semver) 7.5.4
+ - [semver](https://github.com/npm/node-semver) 7.7.2
     by GitHub Inc.
     under the ISC license
 
- - [send](https://github.com/pillarjs/send) 0.18.0
+ - [send](https://github.com/pillarjs/send) 0.19.0
     by TJ Holowaychuk (tj@vision-media.ca)
     under the MIT license
 
@@ -4740,13 +4984,25 @@ Pfarrplaner uses the following open-source libraries:
     by Douglas Christopher Wilson (doug@somethingdoug.com)
     under the MIT license
 
- - [serve-static](https://github.com/expressjs/serve-static) 1.15.0
+ - [serve-static](https://github.com/expressjs/serve-static) 1.16.2
     by Douglas Christopher Wilson (doug@somethingdoug.com)
     under the MIT license
 
  - [set-blocking](https://github.com/yargs/set-blocking) 2.0.0
     by Ben Coe (ben@npmjs.com)
     under the ISC license
+
+ - [set-function-length](https://github.com/ljharb/set-function-length) 1.2.2
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [set-function-name](https://github.com/ljharb/set-function-name) 2.0.2
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [set-proto](https://github.com/ljharb/set-proto) 1.0.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
 
  - [set-value](https://github.com/jonschlinkert/set-value) 2.0.1
     by Jon Schlinkert
@@ -4764,7 +5020,7 @@ Pfarrplaner uses the following open-source libraries:
     by Wes Todd
     under the ISC license
 
- - [sha.js](https://github.com/crypto-browserify/sha.js) 2.4.11
+ - [sha.js](https://github.com/crypto-browserify/sha.js) 2.4.12
     by Dominic Tarr (dominic.tarr@gmail.com)
     under the (MIT AND BSD-3-Clause) license
 
@@ -4784,7 +5040,19 @@ Pfarrplaner uses the following open-source libraries:
     by Jimmy Cuadra (jimmy@jimmycuadra.com)
     under the MIT license
 
- - [side-channel](https://github.com/ljharb/side-channel) 1.0.4
+ - [side-channel-list](https://github.com/ljharb/side-channel-list) 1.0.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [side-channel-map](https://github.com/ljharb/side-channel-map) 1.0.1
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [side-channel-weakmap](https://github.com/ljharb/side-channel-weakmap) 1.0.2
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [side-channel](https://github.com/ljharb/side-channel) 1.1.0
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -4792,7 +5060,7 @@ Pfarrplaner uses the following open-source libraries:
     by Brian Reavis (brian@thirdroute.com)
     under the Apache-2.0 license
 
- - [signal-exit](https://github.com/tapjs/signal-exit) 3.0.5
+ - [signal-exit](https://github.com/tapjs/signal-exit) 3.0.7
     by Ben Coe (ben@npmjs.com)
     under the ISC license
 
@@ -4828,11 +5096,11 @@ Pfarrplaner uses the following open-source libraries:
     by Jon Schlinkert
     under the MIT license
 
- - [sockjs-client](https://github.com/sockjs/sockjs-client) 1.5.2
+ - [sockjs-client](https://github.com/sockjs/sockjs-client) 1.6.1
     by Bryce Kahle
     under the MIT license
 
- - [sockjs](https://github.com/sockjs/sockjs-node) 0.3.21
+ - [sockjs](https://github.com/sockjs/sockjs-node) 0.3.24
     by Marek Majkowski
     under the MIT license
 
@@ -4843,11 +5111,15 @@ Pfarrplaner uses the following open-source libraries:
     by Tobias Koppers @sokra
     under the MIT license
 
+ - [source-map-js](https://github.com/7rulnik/source-map-js) 1.2.1
+    by Valentin 7rulnik Semirulnik (v7rulnik@gmail.com)
+    under the BSD-3-Clause license
+
  - [source-map-resolve](https://github.com/lydell/source-map-resolve) 0.5.3
     by Simon Lydell
     under the MIT license
 
- - [source-map-support](https://github.com/evanw/node-source-map-support) 0.5.20
+ - [source-map-support](https://github.com/evanw/node-source-map-support) 0.5.21
     under the MIT license
 
  - [source-map-url](https://github.com/lydell/source-map-url) 0.4.1
@@ -4866,11 +5138,10 @@ Pfarrplaner uses the following open-source libraries:
     by Kyle E. Mitchell (kyle@kemitchell.com)
     under the MIT license
 
- - [spdx-correct](https://github.com/jslicense/spdx-correct.js) 3.1.1
-    by Kyle E. Mitchell (kyle@kemitchell.com)
+ - [spdx-correct](https://github.com/jslicense/spdx-correct.js) 3.2.0
     under the Apache-2.0 license
 
- - [spdx-exceptions](https://github.com/kemitchell/spdx-exceptions.json) 2.3.0
+ - [spdx-exceptions](https://github.com/kemitchell/spdx-exceptions.json) 2.5.0
     by The Linux Foundation
     under the CC-BY-3.0 license
 
@@ -4878,7 +5149,7 @@ Pfarrplaner uses the following open-source libraries:
     by Kyle E. Mitchell (kyle@kemitchell.com)
     under the MIT license
 
- - [spdx-license-ids](https://github.com/jslicense/spdx-license-ids) 3.0.10
+ - [spdx-license-ids](https://github.com/jslicense/spdx-license-ids) 3.0.21
     by Shinnosuke Watanabe
     under the CC0-1.0 license
 
@@ -4922,10 +5193,10 @@ Pfarrplaner uses the following open-source libraries:
     by Angry Bytes (info@angrybytes.com)
     under the MIT license
 
- - [stackframe](https://github.com/stacktracejs/stackframe) 1.2.0
+ - [stackframe](https://github.com/stacktracejs/stackframe) 1.3.4
     under the MIT license
 
- - [standard-version](https://github.com/conventional-changelog/standard-version) 9.3.1
+ - [standard-version](https://github.com/conventional-changelog/standard-version) 9.5.0
     by Ben Coe (ben@npmjs.com)
     under the ISC license
 
@@ -4937,6 +5208,10 @@ Pfarrplaner uses the following open-source libraries:
     under the MIT license
 
  - [statuses](https://github.com/jshttp/statuses) 2.0.1
+    under the MIT license
+
+ - [stop-iteration-iterator](https://github.com/ljharb/stop-iteration-iterator) 1.1.0
+    by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
  - [stream-browserify](https://github.com/browserify/stream-browserify) 2.0.2
@@ -4951,7 +5226,7 @@ Pfarrplaner uses the following open-source libraries:
     by John Hiesey
     under the MIT license
 
- - [stream-shift](https://github.com/mafintosh/stream-shift) 1.0.1
+ - [stream-shift](https://github.com/mafintosh/stream-shift) 1.0.3
     by Mathias Buus
     under the MIT license
 
@@ -4971,11 +5246,15 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [string.prototype.trimend](https://github.com/es-shims/String.prototype.trimEnd) 1.0.4
+ - [string.prototype.trim](https://github.com/es-shims/String.prototype.trim) 1.2.10
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [string.prototype.trimstart](https://github.com/es-shims/String.prototype.trimStart) 1.0.4
+ - [string.prototype.trimend](https://github.com/es-shims/String.prototype.trimEnd) 1.0.9
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [string.prototype.trimstart](https://github.com/es-shims/String.prototype.trimStart) 1.0.8
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
@@ -5038,6 +5317,10 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
+ - [supports-preserve-symlinks-flag](https://github.com/inspect-js/node-supports-preserve-symlinks-flag) 1.0.0
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
  - [svgo](https://github.com/svg/svgo) 1.3.2
     by Kir Belevich (kir@belevi.ch)
     under the MIT license
@@ -5058,7 +5341,7 @@ Pfarrplaner uses the following open-source libraries:
     by Jonathan Peterson
     under the MIT license
 
- - [terser-webpack-plugin](https://github.com/webpack-contrib/terser-webpack-plugin) 1.4.5
+ - [terser-webpack-plugin](https://github.com/webpack-contrib/terser-webpack-plugin) 1.4.6
     by webpack Contrib Team
     under the MIT license
 
@@ -5102,8 +5385,8 @@ Pfarrplaner uses the following open-source libraries:
     by John Hiesey
     under the MIT license
 
- - [to-fast-properties](https://github.com/sindresorhus/to-fast-properties) 2.0.0
-    by Sindre Sorhus (sindresorhus@gmail.com)
+ - [to-buffer](https://github.com/browserify/to-buffer) 1.2.1
+    by Mathias Buus
     under the MIT license
 
  - [to-gfm-code-block](https://github.com/jonschlinkert/to-gfm-code-block) 0.1.1
@@ -5130,7 +5413,7 @@ Pfarrplaner uses the following open-source libraries:
     by Douglas Christopher Wilson (doug@somethingdoug.com)
     under the MIT license
 
- - [tough-cookie](https://github.com/salesforce/tough-cookie) 4.1.3
+ - [tough-cookie](https://github.com/salesforce/tough-cookie) 4.1.4
     by Jeremy Stashewsky (jstash@gmail.com)
     under the BSD-3-Clause license
 
@@ -5146,7 +5429,7 @@ Pfarrplaner uses the following open-source libraries:
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
 
- - [tslib](https://github.com/Microsoft/tslib) 2.6.2
+ - [tslib](https://github.com/Microsoft/tslib) 2.8.1
     by Microsoft Corp.
     under the 0BSD license
 
@@ -5177,6 +5460,22 @@ Pfarrplaner uses the following open-source libraries:
  - [type-is](https://github.com/jshttp/type-is) 1.6.18
     under the MIT license
 
+ - [typed-array-buffer](https://github.com/inspect-js/typed-array-buffer) 1.0.3
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [typed-array-byte-length](https://github.com/inspect-js/typed-array-byte-length) 1.0.3
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [typed-array-byte-offset](https://github.com/inspect-js/typed-array-byte-offset) 1.0.4
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [typed-array-length](https://github.com/inspect-js/typed-array-length) 1.0.7
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
  - [typedarray](https://github.com/substack/typedarray) 0.0.6
     by James Halliday (mail@substack.net)
     under the MIT license
@@ -5188,11 +5487,14 @@ Pfarrplaner uses the following open-source libraries:
     by Mihai Bazon (mihai.bazon@gmail.com)
     under the BSD-2-Clause license
 
- - [unbox-primitive](https://github.com/ljharb/unbox-primitive) 1.0.1
+ - [unbox-primitive](https://github.com/ljharb/unbox-primitive) 1.1.0
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [unicode-canonical-property-names-ecmascript](https://github.com/mathiasbynens/unicode-canonical-property-names-ecmascript) 2.0.0
+ - [undici-types](https://github.com/nodejs/undici) 7.8.0
+    under the MIT license
+
+ - [unicode-canonical-property-names-ecmascript](https://github.com/mathiasbynens/unicode-canonical-property-names-ecmascript) 2.0.1
     by Mathias Bynens
     under the MIT license
 
@@ -5200,11 +5502,11 @@ Pfarrplaner uses the following open-source libraries:
     by Mathias Bynens
     under the MIT license
 
- - [unicode-match-property-value-ecmascript](https://github.com/mathiasbynens/unicode-match-property-value-ecmascript) 2.0.0
+ - [unicode-match-property-value-ecmascript](https://github.com/mathiasbynens/unicode-match-property-value-ecmascript) 2.2.0
     by Mathias Bynens
     under the MIT license
 
- - [unicode-property-aliases-ecmascript](https://github.com/mathiasbynens/unicode-property-aliases-ecmascript) 2.0.0
+ - [unicode-property-aliases-ecmascript](https://github.com/mathiasbynens/unicode-property-aliases-ecmascript) 2.1.0
     by Mathias Bynens
     under the MIT license
 
@@ -5236,7 +5538,7 @@ Pfarrplaner uses the following open-source libraries:
     by Ryan Zimmerman (opensrc@ryanzim.com)
     under the MIT license
 
- - [universalify](https://github.com/RyanZim/universalify) 2.0.0
+ - [universalify](https://github.com/RyanZim/universalify) 2.0.1
     by Ryan Zimmerman (opensrc@ryanzim.com)
     under the MIT license
 
@@ -5260,7 +5562,7 @@ Pfarrplaner uses the following open-source libraries:
     by Angelos Pikoulas (agelos.pikoulas@gmail.com)
     under the MIT license
 
- - [update-browserslist-db](https://github.com/browserslist/update-db) 1.0.13
+ - [update-browserslist-db](https://github.com/browserslist/update-db) 1.1.3
     by Andrey Sitnik (andrey@sitnik.ru)
     under the MIT license
 
@@ -5280,7 +5582,8 @@ Pfarrplaner uses the following open-source libraries:
     by Arnout Kazemier
     under the MIT license
 
- - [url](https://github.com/defunctzombie/node-url) 0.11.0
+ - [url](https://github.com/defunctzombie/node-url) 0.11.4
+    by defunctzombie
     under the MIT license
 
  - [use](https://github.com/jonschlinkert/use) 3.1.1
@@ -5302,7 +5605,7 @@ Pfarrplaner uses the following open-source libraries:
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [util](https://github.com/defunctzombie/node-util) 0.10.3
+ - [util](https://github.com/defunctzombie/node-util) 0.10.4
     by Joyent
     under the MIT license
 
@@ -5320,7 +5623,7 @@ Pfarrplaner uses the following open-source libraries:
  - [uuid](https://github.com/uuidjs/uuid) 8.3.2
     under the MIT license
 
- - [v8-compile-cache](https://github.com/zertosh/v8-compile-cache) 2.3.0
+ - [v8-compile-cache](https://github.com/zertosh/v8-compile-cache) 2.4.0
     by Andres Suarez (zertosh@gmail.com)
     under the MIT license
 
@@ -5343,7 +5646,7 @@ Pfarrplaner uses the following open-source libraries:
     by James Halliday (mail@substack.net)
     under the MIT license
 
- - [vue-advanced-cropper](https://github.com/Norserium/vue-advanced-cropper) 1.10.1
+ - [vue-advanced-cropper](https://github.com/advanced-cropper/vue-advanced-cropper) 1.11.7
     by Norserium
     under the MIT license
 
@@ -5363,7 +5666,7 @@ Pfarrplaner uses the following open-source libraries:
     by Fangdun Cai (cfddream@gmail.com)
     under the MIT license
 
- - [vue-dataset](https://github.com/kouts/vue-dataset) 1.1.12
+ - [vue-dataset](https://github.com/kouts/vue-dataset) 1.1.18
     by Giannis Koutsaftakis
     under the MIT license
 
@@ -5371,11 +5674,11 @@ Pfarrplaner uses the following open-source libraries:
     by Evan You
     under the MIT license
 
- - [vue-json-pretty](https://github.com/leezng/vue-json-pretty) 1.8.2
+ - [vue-json-pretty](https://github.com/leezng/vue-json-pretty) 1.9.5
     by leezng (im.leezng@gmail.com)
     under the MIT license
 
- - [vue-loader](https://github.com/vuejs/vue-loader) 15.9.8
+ - [vue-loader](https://github.com/vuejs/vue-loader) 15.11.1
     by Evan You
     under the MIT license
 
@@ -5399,7 +5702,7 @@ Pfarrplaner uses the following open-source libraries:
     by Evan You
     under the MIT license
 
- - [vue-template-compiler](https://github.com/vuejs/vue) 2.6.14
+ - [vue-template-compiler](https://github.com/vuejs/vue) 2.7.16
     by Evan You
     under the MIT license
 
@@ -5411,7 +5714,7 @@ Pfarrplaner uses the following open-source libraries:
     by https://github.com/rhyek
     under the ISC license
 
- - [vue](https://github.com/vuejs/vue) 2.6.14
+ - [vue](https://github.com/vuejs/vue) 2.7.16
     by Evan You
     under the MIT license
 
@@ -5456,7 +5759,7 @@ Pfarrplaner uses the following open-source libraries:
     by Juho Vepsalainen (bebraw@gmail.com)
     under the MIT license
 
- - [webpack-notifier](https://github.com/Turbo87/webpack-notifier) 1.13.0
+ - [webpack-notifier](https://github.com/Turbo87/webpack-notifier) 1.15.0
     by Tobias Bieniek (tobias.bieniek@gmx.de)
     under the ISC license
 
@@ -5464,7 +5767,7 @@ Pfarrplaner uses the following open-source libraries:
     by Tobias Koppers @sokra
     under the MIT license
 
- - [webpack](https://github.com/webpack/webpack) 4.46.0
+ - [webpack](https://github.com/webpack/webpack) 4.47.0
     by Tobias Koppers @sokra
     under the MIT license
 
@@ -5488,13 +5791,25 @@ Pfarrplaner uses the following open-source libraries:
     by Sebastian Mayr (github@smayr.name)
     under the MIT license
 
- - [which-boxed-primitive](https://github.com/inspect-js/which-boxed-primitive) 1.0.2
+ - [which-boxed-primitive](https://github.com/inspect-js/which-boxed-primitive) 1.1.1
     by Jordan Harband (ljharb@gmail.com)
     under the MIT license
 
- - [which-module](https://github.com/nexdrew/which-module) 2.0.0
+ - [which-builtin-type](https://github.com/inspect-js/which-builtin-type) 1.2.1
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [which-collection](https://github.com/inspect-js/which-collection) 1.0.2
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
+
+ - [which-module](https://github.com/nexdrew/which-module) 2.0.1
     by nexdrew
     under the ISC license
+
+ - [which-typed-array](https://github.com/inspect-js/which-typed-array) 1.1.19
+    by Jordan Harband (ljharb@gmail.com)
+    under the MIT license
 
  - [which](https://github.com/isaacs/node-which) 1.3.1
     by Isaac Z. Schlueter (i@izs.me)
@@ -5531,11 +5846,11 @@ Pfarrplaner uses the following open-source libraries:
     by Isaac Z. Schlueter (i@izs.me)
     under the ISC license
 
- - [ws](https://github.com/websockets/ws) 6.2.2
+ - [ws](https://github.com/websockets/ws) 6.2.3
     by Einar Otto Stangvik (einaros@gmail.com)
     under the MIT license
 
- - [ws](https://github.com/websockets/ws) 8.16.0
+ - [ws](https://github.com/websockets/ws) 8.18.3
     by Einar Otto Stangvik (einaros@gmail.com)
     under the MIT license
 
