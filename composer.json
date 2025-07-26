@@ -19,7 +19,7 @@
         "inertiajs/inertia-laravel": "^1.0",
         "laravel-lang/lang": "~9.0",
         "laravel/framework": "^11.0",
-        "laravel/octane": "^2.8",
+        "laravel/octane": "2.11.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.6.1",
         "laravel/ui": "^4.0",
