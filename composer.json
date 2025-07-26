@@ -8,10 +8,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/potofcoffee/laravel-database-encryption.git"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/potofcoffee/PHPPresentation"
         }
     ],
     "require": {
@@ -33,7 +29,7 @@
         "nesbot/carbon": "^3.0",
         "niklasravnsborg/laravel-pdf": "^4.1.0",
         "php-ews/php-ews": "^1.0",
-        "phpoffice/phppresentation": "dev-fix-video",
+        "phpoffice/phppresentation": "^1.2.0",
         "phpoffice/phpspreadsheet": "^1.8",
         "phpoffice/phpword": "^1.2.0",
         "predis/predis": "^1.1",
