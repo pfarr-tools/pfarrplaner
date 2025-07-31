@@ -118,7 +118,7 @@
                         Dort vertrittst du aktuell:
                         <ul>
                             <li v-for="(replacement,replacementIndex) in masteredPool.current_replacements">
-                                {{ replacement.absence.user?.name }} ({{ replacement.absence.reason }},
+                                {{ replacement.absence.user.name }} ({{ replacement.absence.reason }},
                                 {{ moment(replacement.from).format('DD.MM.YYYY') }} -
                                 {{ moment(replacement.to).format('DD.MM.YYYY') }})
                                 <div v-if="replacement.absence.replacement_notes"><small><span
