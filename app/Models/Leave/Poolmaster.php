@@ -32,6 +32,8 @@ namespace App\Models\Leave;
 
 use App\Models\AbstractModel;
 use App\Models\People\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
 
 class Poolmaster extends AbstractModel
 {
@@ -58,6 +60,15 @@ class Poolmaster extends AbstractModel
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+
+    public function currentReplacements(): HasMany
+    {
+        return $this->hasMany(Replacement::class, 'pool_id', 'pool_id')
+            ->with('absence')
+            ->where('from', '<=', Carbon::now())
+            ->where('to', '>=', Carbon::now());
     }
 
     public static function getAdminModuleConfig()

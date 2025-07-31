@@ -103,7 +103,7 @@
                         {{ moment(replacement.from).format('DD.MM.YYYY') }} -
                         {{ moment(replacement.to).format('DD.MM.YYYY') }})
                         <div v-if="replacement.absence.replacement_notes"><small><span
-                            class="text-bold">Hinweis: </span>{{ replacement.absence.replacement_notes }}</small></div>
+                            class="fw-bold">Hinweis: </span><span v-html="replacement.absence.replacement_notes.replaceAll(/(\r)*\n/g, '<br />')"></span></small></div>
                     </li>
                 </ul>
             </div>
@@ -112,8 +112,21 @@
                 <div class="text-bold">Du bist aktuell Poolmaster:in für folgende Pools:</div>
                 <ul>
                     <li v-for="masteredPool in masteredPools">
-                        {{ masteredPool.pool.name }} ({{ moment(masteredPool.start+' 0:00:00').format('DD.MM.YYYY') }} -
-                        {{ moment(masteredPool.end+' 23:59:59').format('DD.MM.YYYY') }})
+                        <b>{{ masteredPool.pool.name }}</b> ({{ moment(masteredPool.start+' 0:00:00').format('DD.MM.YYYY') }} -
+                        {{ moment(masteredPool.end+' 23:59:59').format('DD.MM.YYYY') }})<br />
+                        <template v-if="masteredPool.current_replacements.length > 0">
+                        Dort vertrittst du aktuell:
+                        <ul>
+                            <li v-for="(replacement,replacementIndex) in masteredPool.current_replacements">
+                                {{ replacement.absence.user?.name }} ({{ replacement.absence.reason }},
+                                {{ moment(replacement.from).format('DD.MM.YYYY') }} -
+                                {{ moment(replacement.to).format('DD.MM.YYYY') }})
+                                <div v-if="replacement.absence.replacement_notes"><small><span
+                                    class="fw-bold">Hinweis: </span><span v-html="replacement.absence.replacement_notes.replaceAll(/(\r)*\n/g, '<br />')"></span></small></div>
+                            </li>
+                        </ul>
+                        </template>
+                        <template v-else>Dort musst du aktuell niemanden vertreten.</template>
                     </li>
                 </ul>
             </div>

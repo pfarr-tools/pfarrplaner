@@ -287,7 +287,8 @@ class User extends Authenticatable
 
     public function currentlyMasteredPools()
     {
-        return Poolmaster::where('user_id', $this->id)
+        return Poolmaster::with('currentReplacements')
+            ->where('user_id', $this->id)
             ->where('start', '<=', Carbon::now())
             ->where('end', '>=', Carbon::now())
             ->get();
