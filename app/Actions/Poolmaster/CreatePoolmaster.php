@@ -35,18 +35,22 @@ use App\Contracts\Poolmaster\CreatesPoolmasters;
 use App\Events\Models\Poolmaster\CreatedPoolmaster;
 use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class CreatePoolmaster extends AbstractCreateAction implements CreatesPoolmasters
 {
 
+    /** @var Poolmaster|null  */
+    protected $poolmaster = null;
+
     /**
      * @inheritDoc
      */
     public function redirectTo(): string
     {
-        return route('absences.index');
+        return route('absences.index', $this->poolmaster ? ['year' => Carbon::parse($this->poolmaster->start)->year, 'month' => Carbon::parse($this->poolmaster->start)->month]: null);
     }
 
     /**
@@ -60,9 +64,9 @@ class CreatePoolmaster extends AbstractCreateAction implements CreatesPoolmaster
     {
         Gate::forUser($user)->authorize('create', Poolmaster::class);
         $input = Validator::make($input, Poolmaster::$validationRules)->validateWithBag('createPoolmaster');
-        $poolmaster = Poolmaster::create($input);
-        CreatedPoolmaster::dispatch($user, $poolmaster);
+        $this->poolmaster = Poolmaster::create($input);
+        CreatedPoolmaster::dispatch($user, $this->poolmaster);
         $this->messages = ['success' => 'Der Einsatz als Poolmaster:in wurde gespeichert.'];
-        return $poolmaster;
+        return $this->poolmaster;
     }
 }

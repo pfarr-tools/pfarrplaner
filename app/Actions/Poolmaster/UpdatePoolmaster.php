@@ -35,28 +35,33 @@ use App\Contracts\Poolmaster\UpdatesPoolmasters;
 use App\Events\Models\Poolmaster\UpdatedPoolmaster;
 use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class UpdatePoolmaster extends AbstractUpdateAction implements UpdatesPoolmasters
 {
 
+    /** @var Poolmaster|null  */
+    protected $poolmaster = null;
+
     /**
      * @inheritDoc
      */
     public function redirectTo(): string
     {
-        return route('absences.index');
+        return route('absences.index', $this->poolmaster ? ['year' => Carbon::parse($this->poolmaster->start)->year, 'month' => Carbon::parse($this->poolmaster->start)->month]: null);
     }
 
-    public function update(User $user, Poolmaster $pool, array $input): Poolmaster
+    public function update(User $user, Poolmaster $poolmaster, array $input): Poolmaster
     {
-        Gate::forUser($user)->authorize('update', $pool);
+        Gate::forUser($user)->authorize('update', $poolmaster);
         $input = Validator::make($input, Poolmaster::$validationRules)->validateWithBag(('updatePool'));
-        $pool->update($input);
-        $pool->refresh();
-        UpdatedPoolmaster::dispatch($user, $pool);
+        $poolmaster->update($input);
+        $poolmaster->refresh();
+        $this->poolmaster = $poolmaster;
+        UpdatedPoolmaster::dispatch($user, $poolmaster);
         $this->messages = ['success' => 'Der Einsatz als Poolmaster wurde geändert.'];
-        return $pool;
+        return $poolmaster;
     }
 }
