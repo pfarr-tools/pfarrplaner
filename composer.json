@@ -1,7 +1,7 @@
 {
     "name": "potofcoffee/pfarrplaner",
     "type": "project",
-    "description": "Service and vacation planning for a district of Lutheran churches",
+    "description": "Eine kollaborative Plattform, die es evangelischen Kirchengemeinden erlaubt, gemeinsam Gottesdienste zu planen, Urlaubskalender zu verwalten und Kasualien zu bearbeiten.",
     "license": "GPL-3.0-or-later",
     "version": "2023.25.0",
     "repositories": [
