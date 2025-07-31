@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2025.11.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.10.1...v2025.11.0) (2025-07-31)
+
+
+### Features
+
+* Vertretungsanzeige für Poolmaster:in ([85539ab](https://codeberg.org/pfarr.tools/pfarrplaner/commit/85539abb18741d0410f5e544e44114b85a3e06ac))
+
+
+### Bug Fixes
+
+* Nach dem Anlegen/Ändern/Löschen von Poolmaster:innen springt der Urlaubskalender immer zum aktuellen Monat ([21191ac](https://codeberg.org/pfarr.tools/pfarrplaner/commit/21191ac0fe18b3d199ec0eceff560986d402b40d))
+
 ### [2025.10.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.10.0...v2025.10.1) (2025-07-26)
 
 
