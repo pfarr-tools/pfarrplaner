@@ -47,7 +47,7 @@
             <hr />
             <form-check label="Schaltflächen für das schnelle Erstellen von Kasualien anzeigen"
                         v-model="settings.homeScreenConfig.wizardButtons" />
-            <form-check :label="thirdParty ? 'Aktuell von dieser Person vertretene Kollegen anzeigen' : 'Aktuell von mir vertretene Kollegen anzeigen'"
+            <form-check :label="thirdParty ? 'Aktuell von dieser Person vertretene Kolleg:innen anzeigen' : 'Aktuell von mir vertretene Kolleg:innen anzeigen'"
                         v-model="settings.homeScreenConfig.showReplacements" />
         </div>
         <div class="row" v-if="settings.homeScreen == 'homescreen:configurable'">
