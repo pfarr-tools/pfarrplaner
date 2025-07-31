@@ -28,7 +28,6 @@
         "mpdf/qrcode": "^1.0",
         "nesbot/carbon": "^3.0",
         "niklasravnsborg/laravel-pdf": "^4.1.0",
-        "php-ews/php-ews": "^1.0",
         "phpoffice/phppresentation": "^1.2.0",
         "phpoffice/phpspreadsheet": "^1.8",
         "phpoffice/phpword": "^1.2.0",
@@ -45,7 +44,6 @@
         "spiral/roadrunner-http": "*",
         "staudenmeir/belongs-to-through": "^2.3",
         "symfony/debug": "^4.4",
-        "thybag/php-sharepoint-lists-api": "dev-master",
         "tightenco/ziggy": "^1.0",
         "venturecraft/revisionable": "1.*"
     },

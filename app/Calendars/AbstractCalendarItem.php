@@ -32,7 +32,6 @@ namespace App\Calendars;
 
 
 use Carbon\Carbon;
-use jamesiarmes\PhpEws\ArrayType\ArrayOfStringsType;
 
 class AbstractCalendarItem
 {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cc0fae647320bdd0da41337bc00250e5",
+    "content-hash": "6c15aea688f83bea7032fb30a316683c",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -2479,52 +2479,6 @@
                 "source": "https://github.com/inertiajs/inertia-laravel/tree/v1.3.3"
             },
             "time": "2025-06-06T14:51:50+00:00"
-        },
-        {
-            "name": "jamesiarmes/php-ntlm",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jamesiarmes/php-ntlm.git",
-                "reference": "08fa988af7506b8dc366737b06c86633ba8cecbc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jamesiarmes/php-ntlm/zipball/08fa988af7506b8dc366737b06c86633ba8cecbc",
-                "reference": "08fa988af7506b8dc366737b06c86633ba8cecbc",
-                "shasum": ""
-            },
-            "require": {
-                "ext-soap": "*",
-                "php": ">=5.3.9"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "jamesiarmes\\PhpNtlm\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "James Armes",
-                    "email": "jamesiarmes@gmail.com"
-                }
-            ],
-            "description": "Library for communicating with Microsoft services using NTLM authentication.",
-            "support": {
-                "issues": "https://github.com/jamesiarmes/php-ntlm/issues",
-                "source": "https://github.com/jamesiarmes/php-ntlm/tree/master"
-            },
-            "time": "2017-10-04T01:14:17+00:00"
         },
         {
             "name": "laminas/laminas-diactoros",
@@ -5207,57 +5161,6 @@
                 "source": "https://github.com/ivanlanin/pclzip/tree/master"
             },
             "time": "2014-06-05T11:42:24+00:00"
-        },
-        {
-            "name": "php-ews/php-ews",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/jamesiarmes/php-ews.git",
-                "reference": "405f03cb679eff59c84f223962c9cadf14b38450"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/jamesiarmes/php-ews/zipball/405f03cb679eff59c84f223962c9cadf14b38450",
-                "reference": "405f03cb679eff59c84f223962c9cadf14b38450",
-                "shasum": ""
-            },
-            "require": {
-                "ext-soap": "*",
-                "jamesiarmes/php-ntlm": "~1.0",
-                "php": ">=5.3.9"
-            },
-            "require-dev": {
-                "mustache/mustache": "~2.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "jamesiarmes\\PhpEws\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "James Armes",
-                    "email": "jamesiarmes@gmail.com"
-                }
-            ],
-            "description": "Library for communicating with Exchange Web Services.",
-            "homepage": "http://jamesarmes.com/php-ews/",
-            "support": {
-                "issues": "https://github.com/jamesiarmes/php-ews/issues",
-                "source": "https://github.com/jamesiarmes/php-ews/tree/master"
-            },
-            "time": "2017-10-04T01:18:36+00:00"
         },
         {
             "name": "phpoffice/common",
@@ -11905,48 +11808,6 @@
             "time": "2025-02-21T17:33:02+00:00"
         },
         {
-            "name": "thybag/php-sharepoint-lists-api",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thybag/PHP-SharePoint-Lists-API.git",
-                "reference": "cb3479d96ec848cb0657555b4367394b799841be"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thybag/PHP-SharePoint-Lists-API/zipball/cb3479d96ec848cb0657555b4367394b799841be",
-                "reference": "cb3479d96ec848cb0657555b4367394b799841be",
-                "shasum": ""
-            },
-            "require": {
-                "ext-soap": "*",
-                "php": "^7.1 || ^8.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Thybag": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Carl Saggs",
-                    "email": "carl@userbag.co.uk"
-                }
-            ],
-            "description": "A simple PHP API to make working with SharePoint lists easy.",
-            "homepage": "https://github.com/thybag/PHP-SharePoint-Lists-API",
-            "support": {
-                "issues": "https://github.com/thybag/PHP-SharePoint-Lists-API/issues",
-                "source": "https://github.com/thybag/PHP-SharePoint-Lists-API/tree/master"
-            },
-            "time": "2023-01-20T09:09:02+00:00"
-        },
-        {
             "name": "tightenco/ziggy",
             "version": "v1.8.2",
             "source": {
@@ -14737,13 +14598,11 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "thybag/php-sharepoint-lists-api": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.0"
+        "php": "^8.4"
     },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"
