@@ -59,13 +59,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
-use Venturecraft\Revisionable\Revision;
 
 /**
  * Class User
@@ -872,7 +870,6 @@ class User extends Authenticatable
         CalendarConnection::where('user_id', $this->id)->update(['user_id' => $user->id]);
         Comment::where('user_id', $this->id)->update(['user_id' => $user->id]);
         Participant::where('user_id', $this->id)->update(['user_id' => $user->id]);
-        Revision::where('user_id', $this->id)->update(['user_id' => $user->id]);
         Subscription::where('user_id', $this->id)->update(['user_id' => $user->id]);
         UserSetting::where('user_id', $this->id)->update(['user_id' => $user->id]);
 

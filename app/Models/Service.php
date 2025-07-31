@@ -78,7 +78,6 @@ use Venturecraft\Revisionable\RevisionableTrait;
 class Service extends Model implements HasDAVCalendarItems
 {
     use HasFactory;
-    use RevisionableTrait;
     use HasCommentsTrait;
     use TracksChangesTrait;
     use HasAttachmentsTrait;
@@ -123,40 +122,6 @@ class Service extends Model implements HasDAVCalendarItems
         'alt_liturgy_date' => 'datetime',
         'end' => 'datetime',
     ];
-
-    /**
-     * @var bool
-     */
-    protected $revisionEnabled = true;
-    /**
-     * @var string[]
-     */
-    protected $revisionFormattedFieldNames = array(
-        'day_id' => 'Tag',
-        'location_id' => 'Ort',
-        'time' => 'Uhrzeit',
-        'description' => 'Besonderheiten',
-        'city_id' => 'Kirchengemeinde',
-        'special_location' => 'Ort (Freitext)',
-        'need_predicant' => 'Prädikant:in benötigt',
-        'baptism' => 'Taufe',
-        'eucharist' => 'Abendmahl',
-        'offerings_counter1' => 'Opferzähler 1',
-        'offerings_counter2' => 'Opferzähler 2',
-        'offering_goal' => 'Opferzweck',
-        'offering_description' => 'Anmerkungen zum Opfer',
-        'offering_type' => 'Opfertyp',
-        'others' => 'Weitere Beteiligte',
-        'cc' => 'Kinderkirche findet statt',
-        'cc_location' => 'Ort der Kinderkirche',
-        'cc_lesson' => 'Lektion für die Kinderkirche',
-        'cc_staff' => 'Mitarbeiter in der Kinderkirche',
-        'cc_alt_time' => 'Alternative Uhrzeit für die Kinderkirche',
-        'internal_remarks' => 'Interne Anmerkungen',
-        'offering_amount' => 'Opferbetrag',
-        'title' => 'Titel',
-        'hidden' => 'Versteckt',
-    );
 
     /**
      * @var string[]
