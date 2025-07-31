@@ -1,3 +1,4 @@
+<?php
 /*
  * Pfarrplaner
  *
@@ -27,18 +28,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const GTA = 'Gottesdienst, Taufe und Abendmahl';
-const AMT = 'Amtshandlungen';
-const SSD = 'Seelsorge, Diakonie';
-const UJU = 'Unterricht, Jugendarbeit';
-const BEB = 'Bibelarbeit, Erwachsenenbildung';
-const MGD = 'Mitarbeiterschaft, Gremien, Dienstbesprechung';
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-export const DiaryCategories =  {
-    GTA: GTA,
-    AMT: AMT,
-    SSD: SSD,
-    UJU: UJU,
-    BEB: BEB,
-    MGD: MGD,
-};
+class RemoveDiaryEntriesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::dropIfExists('diary_entries');
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::create('diary_entries', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('service_id')->nullable();
+            $table->string('event_id')->nullable();
+            $table->dateTime('date')->nullable();
+            $table->text('title')->nullable();
+            $table->string('category');
+            $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
+        });
+    }
+}

@@ -35,7 +35,6 @@ return [
             \App\UI\Modules\CalendarModule::class,
             \App\UI\Modules\RitesModule::class,
             \App\UI\Modules\AbsencesModule::class,
-            \App\UI\Modules\DiaryModule::class,
         ],
         'Eingabe' => [
             \App\UI\Modules\InputsModule::class,

@@ -1327,11 +1327,6 @@ class Service extends Model implements HasDAVCalendarItems
         return $this->belongsTo(Day::class);
     }
 
-    public function diaryEntries()
-    {
-        return $this->hasMany(DiaryEntry::class);
-    }
-
     /**
      * Get total number of participants + bookings
      */
