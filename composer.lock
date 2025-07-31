@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6c15aea688f83bea7032fb30a316683c",
+    "content-hash": "38da0bdb3a9ae2ad4857adfdf9eed064",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -6544,72 +6544,6 @@
             "time": "2025-06-25T14:20:11+00:00"
         },
         {
-            "name": "revolution/laravel-amazon-product-api",
-            "version": "4.9.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/invokable/laravel-amazon-product-api.git",
-                "reference": "e7e33568ac9e2d3d0fa61db3e69bc2efdf9c079b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/invokable/laravel-amazon-product-api/zipball/e7e33568ac9e2d3d0fa61db3e69bc2efdf9c079b",
-                "reference": "e7e33568ac9e2d3d0fa61db3e69bc2efdf9c079b",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "^7.5",
-                "illuminate/support": "^11.0||^12.0",
-                "php": "^8.2",
-                "thewirecutter/paapi5-php-sdk": "^1.2"
-            },
-            "require-dev": {
-                "laravel/pint": "^1.22",
-                "orchestra/testbench": "^10.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "AmazonProduct": "Revolution\\Amazon\\ProductAdvertising\\Facades\\AmazonProduct"
-                    },
-                    "providers": [
-                        "Revolution\\Amazon\\ProductAdvertising\\Providers\\AmazonProductServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Revolution\\Amazon\\ProductAdvertising\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "kawax",
-                    "email": "kawaxbiz@gmail.com"
-                }
-            ],
-            "description": "Amazon Product Advertising API for Laravel",
-            "keywords": [
-                "amazon",
-                "laravel"
-            ],
-            "support": {
-                "source": "https://github.com/invokable/laravel-amazon-product-api/tree/4.9.1"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/invokable",
-                    "type": "github"
-                }
-            ],
-            "time": "2025-06-02T01:51:00+00:00"
-        },
-        {
             "name": "roadrunner-php/roadrunner-api-dto",
             "version": "v1.12.0",
             "source": {
@@ -11740,72 +11674,6 @@
                 }
             ],
             "time": "2025-06-03T06:57:57+00:00"
-        },
-        {
-            "name": "thewirecutter/paapi5-php-sdk",
-            "version": "v1.2.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thewirecutter/paapi5-php-sdk.git",
-                "reference": "a5ada3d9f708d97a42705d2c15865e722917c354"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thewirecutter/paapi5-php-sdk/zipball/a5ada3d9f708d97a42705d2c15865e722917c354",
-                "reference": "a5ada3d9f708d97a42705d2c15865e722917c354",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "guzzlehttp/guzzle": "^6.2|^7.0",
-                "php": "^8.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "~2.12",
-                "phpunit/phpunit": "^9.0",
-                "squizlabs/php_codesniffer": "^3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Amazon\\ProductAdvertisingAPI\\v1\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Product Advertising API Team",
-                    "homepage": "https://webservices.amazon.com/paapi5/documentation/index.html"
-                },
-                {
-                    "name": "Justin Yost",
-                    "email": "justin.yost@wirecutter.com"
-                }
-            ],
-            "description": "ProductAdvertisingAPI 5.0 PHP SDK",
-            "homepage": "https://webservices.amazon.com/paapi5/documentation/index.html",
-            "keywords": [
-                "ProductAdvertisingAPI",
-                "amazon",
-                "getbrowsenodes",
-                "getitems",
-                "getvariations",
-                "pa-api",
-                "paapi",
-                "paapi5",
-                "paapi5-php-sdk",
-                "paapi5.0",
-                "searchitems"
-            ],
-            "support": {
-                "source": "https://github.com/thewirecutter/paapi5-php-sdk/tree/v1.2.2"
-            },
-            "time": "2025-02-21T17:33:02+00:00"
         },
         {
             "name": "tightenco/ziggy",

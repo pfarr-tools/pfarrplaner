@@ -33,7 +33,6 @@
         "phpoffice/phpword": "^1.2.0",
         "predis/predis": "^1.1",
         "psr/log": "^2",
-        "revolution/laravel-amazon-product-api": "^4.5",
         "sabre/dav": "^4.4",
         "simplesoftwareio/simple-qrcode": "^4.1",
         "simshaun/recurr": "^5.0",
