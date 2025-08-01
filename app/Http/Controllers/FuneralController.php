@@ -50,7 +50,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
-use PDF;
+use App\Documents\PDF;
 
 /**
  * Class FuneralController
@@ -187,8 +187,9 @@ class FuneralController extends Controller
         } else {
             $sync = [];
             foreach ($data['pastor'] as $person) {
-                if (null !== $person) $sync[(is_numeric($person) ? $person : $person['id'])] = ['category' => 'P'];
-
+                if (null !== $person) {
+                    $sync[(is_numeric($person) ? $person : $person['id'])] = ['category' => 'P'];
+                }
             }
             $service->pastors()->sync($sync);
         }
@@ -272,12 +273,10 @@ class FuneralController extends Controller
         $funeral->service->load('location', 'city');
         $filename = $funeral->service->date->format('Ymd') . ' ' . $funeral->buried_name . ' KRA.pdf';
 
-        $pdf = PDF::loadView('funerals.pdf.form', compact('funeral'), [], ['format' => 'A5', 'useActiveForms' => true]);
-
-
-        $tempFile = tempnam(sys_get_temp_dir(), $filename);
-        $pdf->save($tempFile);
-        return response()->download($tempFile, $filename, ['Content-Type', 'application/pdf']);
+        return PDF::fromView('funerals.pdf.form', compact('funeral'))
+            ->format('A5')
+            ->margins(10, 10, 10, 10)
+            ->download($filename);
     }
 
 

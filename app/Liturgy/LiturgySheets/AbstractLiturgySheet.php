@@ -31,11 +31,10 @@
 namespace App\Liturgy\LiturgySheets;
 
 
+use App\Documents\PDF;
 use App\Models\Service;
 use App\Services\FileNameService;
 use Illuminate\Support\Facades\Auth;
-use PDF;
-use PhpOffice\PhpWord\IOFactory;
 
 class AbstractLiturgySheet
 {
@@ -68,30 +67,10 @@ class AbstractLiturgySheet
      */
     public function render(Service $service)
     {
-        if (Auth::guest()) {
-            $authorData = ['author' => config('app.name')];
-        } else {
-            $authorData = [
-                'author' => isset(Auth::user()->name) ? Auth::user()->name : Auth::user()->email,
-            ];
-        }
 
-        $pdf = PDF::loadView(
-            $this->getRenderViewName(),
-            array_merge(compact('service'), $this->getData($service)),
-            [],
-            array_merge(
-                $authorData,
-                $this->layout,
-            ),
-            $this->layout
-        );
-
-        $filename = $this->getFileName($service);
-        $tempFile = tempnam(sys_get_temp_dir(), $filename);
-        $pdf->save($tempFile);
-        return response()->download($tempFile, $filename, ['Content-Type' => 'application/pdf'])
-            ->deleteFileAfterSend(true);
+        return PDF::fromView($this->getRenderViewName(),
+                                            array_merge(compact('service'), $this->getData($service)))
+            ->download($this->getFileName($service));
     }
 
     protected function getRenderViewName()

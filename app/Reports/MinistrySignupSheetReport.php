@@ -45,6 +45,7 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
 
     public const FILE_SIGNATURE = '50.0';
     public const FILE_TITLE = 'Leerer Dienstplan';
+    protected $landscape = true;
 
 
     /**
@@ -98,7 +99,7 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
                 [$data['start'], $data['end']]
             ),
             $data,
-            ['format' => 'A4-L']
+            null
         );
     }
 

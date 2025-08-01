@@ -20132,54 +20132,6 @@ namespace Illuminate\Support\Facades {
             }
     }
 
-namespace niklasravnsborg\LaravelPdf\Facades {
-    /**
-     */
-    class Pdf {
-        /**
-         * Load a HTML string
-         *
-         * @param string $html
-         * @return \Pdf
-         * @static
-         */
-        public static function loadHTML($html, $config = [])
-        {
-            /** @var \niklasravnsborg\LaravelPdf\PdfWrapper $instance */
-            return $instance->loadHTML($html, $config);
-        }
-
-        /**
-         * Load a HTML file
-         *
-         * @param string $file
-         * @return \Pdf
-         * @static
-         */
-        public static function loadFile($file, $config = [])
-        {
-            /** @var \niklasravnsborg\LaravelPdf\PdfWrapper $instance */
-            return $instance->loadFile($file, $config);
-        }
-
-        /**
-         * Load a View and convert to HTML
-         *
-         * @param string $view
-         * @param array $data
-         * @param array $mergeData
-         * @return \Pdf
-         * @static
-         */
-        public static function loadView($view, $data = [], $mergeData = [], $config = [])
-        {
-            /** @var \niklasravnsborg\LaravelPdf\PdfWrapper $instance */
-            return $instance->loadView($view, $data, $mergeData, $config);
-        }
-
-            }
-    }
-
 namespace App\Facades {
     /**
      */
@@ -26259,7 +26211,6 @@ namespace  {
     class URL extends \Illuminate\Support\Facades\URL {}
     class Validator extends \Illuminate\Support\Facades\Validator {}
     class View extends \Illuminate\Support\Facades\View {}
-    class PDF extends \niklasravnsborg\LaravelPdf\Facades\Pdf {}
     class Settings extends \App\Facades\Settings {}
     class Debugbar extends \Barryvdh\Debugbar\Facades\Debugbar {}
     class Octane extends \Laravel\Octane\Facades\Octane {}

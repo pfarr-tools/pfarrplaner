@@ -42,6 +42,10 @@
 
 use Illuminate\Support\Str;
 
+Route::get('/test-node', function () {
+    return shell_exec('node -v') ?: 'node not found';
+});
+
 Route::resource('baptisms', 'BaptismController')->middleware('auth');
 Route::resource('weddings', 'WeddingController')->middleware('auth');
 

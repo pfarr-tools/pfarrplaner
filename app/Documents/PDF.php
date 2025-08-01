@@ -28,54 +28,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Reports;
+namespace App\Documents;
 
-use App\Documents\PDF;
 use Illuminate\Support\Facades\View;
+use Spatie\Browsershot\Browsershot;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-/**
- * Class AbstractPDFDocumentReport
- * @package App\Reports
- */
-class AbstractPDFDocumentReport extends AbstractReport
+class PDF extends Browsershot
 {
 
-    /** @var bool  */
-    protected $landscape = false;
 
-    /**
-     * @var string
-     */
-    public $icon = 'fa fa-file-pdf';
 
-    /**
-     * @param $filename
-     * @param $data
-     * @param $layout
-     * @return mixed
-     */
-    public function sendToBrowser($filename, $data, $layout)
-    {
-        return $this->sendToFile($filename, $data, $layout);
-    }
-
-    /**
-     * @param $data
-     * @return string
-     */
-    public function renderPDF($data)
-    {
-        return View::make($this->getRenderViewName(), $data)->render();
+    public static function fromView($viewName, $data) {
+        return static::html(View::make($viewName, $data)->render())
+            ->format('A4')
+            ->margins(10, 20, 10, 20)
+            ->showBackground()
+            ->waitUntilNetworkIdle();
     }
 
     /**
      * @param $filename
-     * @param $data
-     * @param $layout
-     * @return mixed
+     * @return BinaryFileResponse
+     * @throws \Spatie\Browsershot\Exceptions\CouldNotTakeBrowsershot
      */
-    public function sendToFile($filename, $data, $layout)
+    public function download($filename): BinaryFileResponse
     {
-        return PDF::fromView($this->getRenderViewName(), $data)->download($filename);
+        $tempFile = storage_path('app/tmp/'.$filename);
+        $this->save($tempFile);
+
+        return response()->download($tempFile, $filename, ['Content-Type' => 'application/pdf'])
+            ->deleteFileAfterSend(true);
+
     }
+
+
+
 }

@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Documents\PDF;
 use App\Mail\ContactFormMessage;
 use App\Mail\MinistryRequestFilled;
 use App\Models\People\User;
@@ -38,6 +39,7 @@ use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
 use App\Models\Service;
+use App\Services\FileNameService;
 use App\Services\MinistryService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
@@ -49,7 +51,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
-use niklasravnsborg\LaravelPdf\Facades\Pdf;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Class PublicController
@@ -70,7 +72,7 @@ class PublicController extends Controller
     /**
      * @param Request $request
      * @param $city
-     * @return Factory|RedirectResponse|View
+     * @return Factory|RedirectResponse|BinaryFileResponse
      */
     public function childrensChurch(Request $request, $city)
     {
@@ -113,20 +115,15 @@ class PublicController extends Controller
         }
 
         if ($request->is('*/pdf')) {
-            $pdf = Pdf::loadView(
-                'reports.childrenschurch.render',
-                [
-                    'start' => $minDate,
-                    'end' => $maxDate,
-                    'city' => $city,
-                    'services' => $serviceList,
-                    'count' => $count,
-                ]
-            );
-            $filename = $minDate->format('Ymd') . '-' . $maxDate->format(
-                    'Ymd'
-                ) . ' Kinderkirche ' . $city->name . '.pdf';
-            return $pdf->stream($filename);
+            return PDF::fromView('reports.childrenschurch.render',
+                                                [
+                                                    'start' => $minDate,
+                                                    'end' => $maxDate,
+                                                    'city' => $city,
+                                                    'services' => $serviceList,
+                                                    'count' => $count,
+                                                ])
+                ->download(FileNameService::make('Kinderkirche '. $city->name, 'pdf', [$minDate, $maxDate]));
         }
 
         return view(

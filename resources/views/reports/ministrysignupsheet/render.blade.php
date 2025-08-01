@@ -47,9 +47,9 @@
                     @endif
                     {{ $service->locationText() }}<br/>
                     {{ $service->titleText(false) }}<br/>
-                    config('labels.code_pastor') {{ $service->participantsText('P') }}
-                    config('labels.code_organist'): {{ $service->participantsText('O') }}
-                    config('labels.code_sacristan'): {{ $service->participantsText('M') }}
+                {{config('labels.code_pastor')}}: {{ $service->participantsText('P') }}
+                {{config('labels.code_organist')}}: {{ $service->participantsText('O') }}
+                {{config('labels.code_sacristan')}}: {{ $service->participantsText('M') }}
                 </small>
             </td>
             @foreach($ministries as $ministry)

@@ -33,10 +33,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Seating\Booking;
 use App\Models\Service;
+use App\Services\FileNameService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use niklasravnsborg\LaravelPdf\Facades\Pdf;
+use App\Documents\PDF;
 
 class BookingController extends Controller
 {
@@ -138,26 +138,10 @@ class BookingController extends Controller
         $participants = array_unique($participants);
         sort($participants);
 
-        $pdf = PDF::loadView(
-            'bookings.pdf.list.' . $viewName,
-            array_merge($result, compact('service', 'participants')),
-            [],
-            [
-                'format' => 'A4',
-                'author' => isset(Auth::user()->name) ? Auth::user()->name : Auth::user()->email,
-            ]
-        );
 
-        $filename = $service->date->format('Ymd') . '-' . $service->timeText(
-                false,
-                '',
-                false,
-                false,
-                true
-            ) . ' Sitzplan.pdf';
-        $tempFile = tempnam(sys_get_temp_dir(), $filename);
-        $pdf->save($tempFile);
-        return response()->download($tempFile, $filename, ['Content-Type', 'application/pdf']);
+        return PDF::fromView('bookings.pdf.list.' . $viewName,
+                                            array_merge($result, compact('service', 'participants')))
+            ->download(FileNameService::make('Sitzplan', 'pdf', '50.0', $service->date, true));
     }
 
     /**
