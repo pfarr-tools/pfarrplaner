@@ -38,7 +38,6 @@ use App\Models\Service;
 use App\Models\ServiceGroup;
 use App\Tools\StringTool;
 use Carbon\Carbon;
-use Debugbar;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
@@ -331,9 +330,6 @@ class BulletinBLReport extends AbstractPDFDocumentReport
         }
 
         $empty = $request->get('empty') ?: [];
-
-        // Debugbar needs to be off or it will interfere with rendering!
-        Debugbar::disable();
 
         $this->idml = new IDML(base_path('assets/idml/ev3.idml'), 'ev3');
         $spreadCode = '';

@@ -130,7 +130,6 @@ class PlanningInput extends AbstractInput
      */
     public function input(Request $request)
     {
-        \Debugbar::disable();
         $setup = $request->validate(
             [
                 'from' => 'required|date_format:d.m.Y',
