@@ -154,15 +154,20 @@ class AppServiceProvider extends ServiceProvider
         }
     }
 
-    /**
+    /**com
      * Register any application services.
      *
      * @return void
      */
     public function register()
     {
-        //$this->app->bind(
-        //'Auth0\Login\Contract\Auth0UserRepository',
-        //'Auth0\Login\Repository\Auth0UserRepository');
+
+        // DEV dependencies:
+        if ($this->app->environment('local')) {
+            if (class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+                $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+                //$this->app->register(TelescopeServiceProvider::class);
+            }
+        }
     }
 }
