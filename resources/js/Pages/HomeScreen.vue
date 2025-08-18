@@ -107,14 +107,14 @@
                     </li>
                 </ul>
             </div>
-            <div v-if="settings.homeScreenConfig.showReplacements && (masteredPools.length > 0)"
+            <div v-if="settings.homeScreenConfig.showReplacements && (masteredPools && (masteredPools.length > 0))"
                  class="alert alert-info">
                 <div class="text-bold">Du bist aktuell Poolmaster:in für folgende Pools:</div>
                 <ul>
                     <li v-for="masteredPool in masteredPools">
                         <b>{{ masteredPool.pool.name }}</b> ({{ moment(masteredPool.start+' 0:00:00').format('DD.MM.YYYY') }} -
                         {{ moment(masteredPool.end+' 23:59:59').format('DD.MM.YYYY') }})<br />
-                        <template v-if="masteredPool.current_replacements.length > 0">
+                        <template v-if="masteredPool.current_replacements && (masteredPool.current_replacements.length > 0)">
                         Dort vertrittst du aktuell:
                         <ul>
                             <li v-for="(replacement,replacementIndex) in masteredPool.current_replacements">
