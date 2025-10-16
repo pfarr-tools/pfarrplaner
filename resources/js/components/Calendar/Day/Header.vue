@@ -45,6 +45,9 @@
                 {{ today.format('dddd') }}
             </div>
             <div class="card-body">
+                <div class="kw">
+                    <span>{{ today.format('W') }}</span>
+                </div>
                 {{ today.format('D') }}
             </div>
             <div class="liturgy">
@@ -123,6 +126,20 @@ export default {
 .liturgy-color.purple {
     background-color: rebeccapurple;
 }
+
+th.day-header-cell .card-body {
+    line-height: .5em;
+    padding-bottom: .75em;
+}
+
+.kw {
+    font-size: .3em !important;
+    font-weight: normal;
+    text-align: left;
+    color: gray;
+    padding: 1px;
+}
+
 
 /deep/ .bible-reference, /deep/ .bible-reference div {
     display: inline;
