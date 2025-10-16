@@ -21,17 +21,6 @@
                             </div>
                             <table class="table serviceTable">
                                 <tbody>
-                                <tr>
-                                    <td valign="top"><span class="fa fa-praying-hands fa-2x"></span></td>
-                                    <td valign="top">
-                                        Gebetsanliegen und Nachrichten zu diesem Gottesdienst kannst du hier eingeben:
-                                        <input type="text" style="width:100%;" placeholder="Gib hier deinen Namen ein"/>
-                                        <textarea style="width: 100%;" rows="2"
-                                                  placeholder="Gib hier deine Nachricht ein"></textarea>
-                                        <input type="submit" class="btn btn-secondary btnSendLiveChatMsg"
-                                               value="Absenden"/>
-                                    </td>
-                                </tr>
                                 @if($nextService->songsheet)
                                     <tr>
                                         <td valign="top"><span class="fa fa-file fa-2x"></span></td>
@@ -186,24 +175,5 @@
         $('#serviceCollapsible li:first div.collapsible-body:first').show();
 
 
-        @if (null !== $nextService)
-        $('.btnSendLiveChatMsg').click(function () {
-            var author = $(this).parent().find('input').first().val();
-            var msg = $(this).parent().find('textarea').first().val();
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            });
-            $.post('{{ route('service.livechat.message.post', $nextService) }}', {
-                author: author,
-                message: msg,
-            }).done(function () {
-                console.log('Message submission successful.');
-            }).error(function () {
-                console.log('Message submission failed.');
-            });
-        });
-        @endif
     </script>
 @endif
