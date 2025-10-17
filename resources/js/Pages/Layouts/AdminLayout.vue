@@ -70,17 +70,25 @@
                 </template>
             </Topbar>
 
-            <transition name="fade">
-                <FlashMessage
-                    v-if="flash.message"
-                    :type="flash.type"
-                    :message="flash.message"
-                ></FlashMessage>
-            </transition>
+            <div class="px-2 pt-4">
+                <h1 v-if="title" class="m-0 mb-4 text-dark" :key="title">{{ title }}</h1>
+                <slot name="before-flash" />
+                <transition name="fade">
+                    <FlashMessage
+                        v-if="flash.message"
+                        :type="flash.type"
+                        :message="flash.message"
+                    ></FlashMessage>
+                </transition>
+                <slot name="after-flash" />
+                <div class="slot-tab-headers mt-3 mb-0 pb-0">
+                    <slot name="tab-headers" />
+                </div>
 
-            <main class="admin-content flex-grow-1 overflow-auto p-3">
-                <slot></slot>
-            </main>
+                <main class="admin-content flex-grow-1 overflow-auto p-3">
+                    <slot></slot>
+                </main>
+            </div>
         </div>
     </div>
 </template>
