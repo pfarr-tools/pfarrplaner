@@ -88,7 +88,7 @@ mix.js('resources/js/inertia-app.js', 'public/js')
         'moment': ['moment','window.moment'],
     })
     .sourceMaps()
-    .sass('resources/sass/app.scss', 'public/css')
+    .postCss('resources/css/prebuild.css', 'public/css/app.css', [])
     .webpackConfig({
         output: { chunkFilename: 'js/[name].js?id=[chunkhash]' },
         plugins: [

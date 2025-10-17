@@ -1,4 +1,4 @@
-/*!
+/*
  * Pfarrplaner
  *
  * @package Pfarrplaner
@@ -27,29 +27,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-// IMPORTANT: This file is prebuilt to resources/css/prebuild.css
-// If one of the dependencies or variables change, please run:
-// npx sass --load-path=node_modules resources/scss/app.scss resources/css/prebuild.css --style=compressed
-//
-
-// Fonts
-@import 'sarabun';
-
-// Variables
-@import '_variables';
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/6.5.95/css/materialdesignicons.min.css');
-
-
-// Bootstrap
-@import 'bootstrap/scss/bootstrap';
-
-@import url('https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.20.0/daterangepicker.min.css');
-@import '../../node_modules/selectize/dist/css/selectize.css';
-@import '../../node_modules/selectize/dist/css/selectize.bootstrap3.css';
-
-
-@import 'pfarrplaner';
-
+module.exports = {
+    plugins: {
+        autoprefixer: {}
+    }
+};

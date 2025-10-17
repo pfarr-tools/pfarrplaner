@@ -144,7 +144,7 @@ if (currentToken) {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
 
-import 'admin-lte/dist/js/adminlte';
+
 
 
 

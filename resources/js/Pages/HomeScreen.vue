@@ -86,11 +86,11 @@
                 <span class="d-none d-md-inline">Trauung anlegen...</span></a>&nbsp;
         </template>
         <template v-slot:navbar-right>
-            <li class="nav-item">
+            <div class="nav-item">
                 <inertia-link :href="route('user.profile')" class="nav-link" title="Anzeigeeinstellungen">
                     <span class="mdi mdi-cog"></span> <span class="d-none d-md-inline">Anzeige</span>
                 </inertia-link>
-            </li>
+            </div>
         </template>
 
         <template slot="before-flash">

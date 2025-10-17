@@ -28,172 +28,73 @@
   -->
 
 <template>
-    <!--begin::App Wrapper-->
-    <div class="admin-layout app-wrapper">
-        <!--begin::Header-->
-        <nav class="app-header navbar navbar-expand bg-body py-2">
-            <!--begin::Container-->
-            <div class="container-fluid">
-                <!--begin::Start Navbar Links-->
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button" @click.prevent.stop="toggleSideBar(!collapsed)">
-                            <i class="mdi mdi-menu"></i>
-                        </a>
-                    </li>
-                    <slot name="navbar-left" />
-                </ul>
-                <!--end::Start Navbar Links-->
+    <div
+        class="admin-layout"
+        :class="{ 'sidebar-pinned': sidebarPinned }"
+    >
+        <!-- Desktop Sidebar -->
+        <Sidebar
+            v-if="!mobileMenuOpen"
+            class="d-none d-lg-flex"
+            :pinned="sidebarPinned"
+            :hovered="sidebarHovered"
+            @hover="sidebarHovered = $event"
+            @pin="togglePin"
+        ></Sidebar>
 
-                <!--begin::End Navbar Links-->
-                <ul class="navbar-nav ms-auto">
-                    <slot name="navbar-right" />
+        <!-- Mobile Overlay Sidebar -->
+        <transition name="slide">
+            <Sidebar
+                v-if="mobileMenuOpen"
+                class="d-lg-none position-fixed top-0 start-0 w-100 h-100 z-0"
+                :mobile="true" :layout="layout" :package="package"
+                @close="mobileMenuOpen = false"
+                :appName="layout.appName"
+                :menu="layout.menu"
+            ></Sidebar>
+        </transition>
 
-                    <li class="nav-item dropdown" v-if="enableControlSidebar">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <span class="mdi mdi-cog"></span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                            <div class="p-2">
-                                <slot name="control-sidebar" />
-                            </div>
-                        </ul>
-                    </li>
+        <div class="admin-main d-flex flex-column">
+            <Topbar @toggleMobileMenu="toggleMobileMenu"
+                    :mobileMenuOpen = "mobileMenuOpen"
+                    :enableControlSidebar="enableControlSidebar"
+            >
+                <template v-slot:navbar-left>
+                    <slot name="navbar-left"></slot>
+                </template>
+                <template v-slot:navbar-right>
+                    <slot name="navbar-right"></slot>
+                </template>
+                <template v-slot:control-sidebar>
+                    <slot name="control-sidebar"></slot>
+                </template>
+            </Topbar>
 
-                    <li v-if="layout.adminUserSwitchBack" class="nav-item">
-                        <a class="btn btn-warning mr-1" :href="route('user.switchback')">
-                            <i class="mdi mdi-account-switch"></i>
-                        </a>
-                    </li>
+            <transition name="fade">
+                <FlashMessage
+                    v-if="flash.message"
+                    :type="flash.type"
+                    :message="flash.message"
+                ></FlashMessage>
+            </transition>
 
-                    <!--begin::User Menu Dropdown-->
-                    <li class="nav-item dropdown user-menu">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <i v-if="!user.image" class="nav-icon mdi mdi-account" ></i>
-                            <img v-else class="rounded-circle" :src="user.image.replace('attachments/', '/image/')" width="22" height="22" />
-                            <span class="d-none d-md-inline">{{ user.name }}</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                            <!--begin::User Image-->
-                            <li class="user-header text-bg-primary">
-                                <i v-if="!user.image" class="nav-icon mdi mdi-account" style="font-size: 4em;"></i>
-                                <img v-else class="rounded-circle" :src="user.image.replace('attachments/', '/image/')" width="22" height="22" />
-
-                                <p>
-                                    {{ user.name }}
-                                </p>
-                            </li>
-                            <!--end::User Image-->
-                            <!--begin::Menu Body-->
-                            <li class="user-body">
-                                <inertia-link :href="route('user.profile')" class="btn btn-default btn-flat">Einstellungen</inertia-link>
-                                <inertia-link :href="route('logout')" class="btn btn-default btn-flat float-end">Abmelden</inertia-link>
-                            </li>
-                            <!--end::Menu Body-->
-                            <!--begin::Menu Footer-->
-                            <!--end::Menu Footer-->
-                        </ul>
-                    </li>
-                    <!--end::User Menu Dropdown-->
-
-                </ul>
-                <!--end::End Navbar Links-->
-            </div>
-            <!--end::Container-->
-        </nav>
-        <!--end::Header-->
-        <!--begin::Sidebar-->
-        <aside class="app-sidebar shadow" :class="dev ? 'bg-info' : 'bg-primary'" data-bs-theme="dark">
-            <!--begin::Sidebar Brand-->
-            <div class="sidebar-brand">
-                <!--begin::Brand Link-->
-                <inertia-link href="/" class="brand-link">
-                    <!--begin::Brand Image-->
-                    <img src="/img/logo/pfarrplaner.svg" class="brand-image opacity-75 shadow" :title="'Startseite (Pfarrplaner '+package.info.version+'-'+package.env+', '+moment(package.date).locale('de').format('LLLL')+')'">
-                    <!--end::Brand Image-->
-                    <!--begin::Brand Text-->
-                    <span class="brand-text fw-light">{{ layout.appName }}</span>
-                    <!--end::Brand Text-->
-                </inertia-link>
-                <!--end::Brand Link-->
-                <a class="d-inline d-md-none ms-2" @click.prevent.stop="toggleSideBar(true)"><i class="mdi mdi-chevron-left-circle"></i></a>
-            </div>
-            <!--end::Sidebar Brand-->
-            <!--begin::Sidebar Wrapper-->
-            <div class="sidebar-wrapper" >
-                <nav class="mt-2" v-if="!noNavBar">
-                    <!--begin::Sidebar Menu-->
-                    <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
-
-                        <li v-for="item in layout.menu" :class="{
-                            'nav-header': (item.text == undefined) ,
-                            'nav-item': (item.text != undefined),
-                        }">
-                            {{ item.text == undefined ? item.toUpperCase() : '' }}
-                            <inertia-link v-if="item.text && item.inertia" class="nav-link" :class="{ active: item.active }" :href="item.url">
-                                <i v-if="item.icon && (!item.profile)" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
-                                <p v-if="item.text">
-                                    {{ item.text }}
-                                </p>
-                            </inertia-link>
-                            <a v-if="item.text && (!item.inertia)" class="nav-link" :class="{ active: item.active }" :href="item.url">
-                                <i v-if="item.icon && (!item.profile)" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
-                                <p v-if="item.text">
-                                    {{ item.text }}
-                                </p>
-                            </a>
-                        </li>
-
-
-                    </ul>
-                    <!--end::Sidebar Menu-->
-                </nav>
-            </div>
-            <!--end::Sidebar Wrapper-->
-        </aside>
-        <!--end::Sidebar-->
-        <!--begin::App Main-->
-        <main class="app-main">
-            <!--begin::App Content Header-->
-            <div class="app-content-header">
-                <!--begin::Container-->
-                <div class="container-fluid mb-0 pb-0">
-                    <h1 v-if="title" class="m-0 mb-4 text-dark" :key="title">{{ title }}</h1>
-                    <!-- flash messages here -->
-                    <slot name="before-flash" />
-                    <div v-if="(layout.errors.length > 0) || layout.flash.error" class="alert alert-danger">
-                        <span v-if="layout.flash.error">{{ layout.flash.error }}</span>
-                        <span v-else>Dein Formular enthält {{ layout.errors.length }} Fehler. Bitte überprüfe deine Eingaben.</span>
-                    </div>
-                    <div v-for="flashType in ['success','info']">
-                        <div v-if="layout.flash[flashType]" class="alert" :class="'alert-'+flashType">{{ layout.flash[flashType] }}</div>
-                    </div>
-                    <slot name="after-flash" />
-                    <div class="slot-tab-headers mb-0 pb-0">
-                        <slot name="tab-headers" />
-                    </div>
-                </div>
-                <!--end::Container-->
-            </div>
-            <!--end::App Content Header-->
-            <!--begin::App Content-->
-            <div class="app-content" :class="{'p-0': noPadding, 'pt-3': !noPadding}">
-                <div class="container-fluid" :class="{'p-0': noPadding}">
-                    <slot/>
-                </div>
-            </div>
-            <!--end::App Content-->
-        </main>
-        <!--end::App Main-->
-
+            <main class="admin-content flex-grow-1 overflow-auto p-3">
+                <slot></slot>
+            </main>
+        </div>
     </div>
-    <!--end::App Wrapper-->
 </template>
 
 <script>
+import Sidebar from './Parts/Sidebar.vue'
+import Topbar from './Parts/Topbar.vue'
+import FlashMessage from './Parts/FlashMessage.vue'
 
 export default {
+    name: 'AdminLayout',
+    components: { Sidebar, Topbar, FlashMessage },
     props: {
+        flash: { type: Object, default: () => ({}) },
         'enableControlSidebar': {
             default: false,
         },
@@ -206,50 +107,90 @@ export default {
         noContentHeader: Boolean,
         noPadding: Boolean,
     },
-    computed: {
-        layout() {
-            return this.$page.props;
-        }
-    },
     mounted() {
         if (this.title != '') document.title = this.title + ' :: ' + this.layout.appName;
         window.token();
     },
     data() {
         return {
+            sidebarPinned: false,
+            sidebarHovered: false,
+            mobileMenuOpen: false,
             dev: this.$page.props.dev,
             package: this.$page.props.package,
             user: this.$page.props.currentUser.data,
             collapsed: true,
-        };
+            layout: this.$page.props,
+        }
+    },
+    created() {
+        // Pin-Status beim Laden aus localStorage lesen
+        const saved = localStorage.getItem('pfarrplaner_sidebar_pinned')
+        if (saved === 'true') {
+            this.sidebarPinned = true
+        }
     },
     methods: {
-        clickUrl(url) {
-            if (url == '#') return;
-            window.location.href = url;
+        togglePin() {
+            this.sidebarPinned = !this.sidebarPinned
+            // Pin-Status speichern
+            localStorage.setItem('pfarrplaner_sidebar_pinned', this.sidebarPinned)
         },
-        toggleSideBar(state) {
-            this.collapsed = state;
-            let e = document.querySelector('body');
-            if (this.collapsed) {
-                e.classList.remove('sidebar-open');
-                e.classList.add('sidebar-collapse');
-            } else {
-                e.classList.remove('sidebar-collapse');
-                e.classList.add('sidebar-open');
-            }
-        },
+        toggleMobileMenu() {
+            this.mobileMenuOpen = !this.mobileMenuOpen
+        }
     }
 }
 </script>
 
 <style scoped>
-.nprogress-busy .admin-layout {
-    margin-top: 2px;
+:root {
+    --sidebar-collapsed: 70px;
+    --sidebar-expanded: 240px;
 }
 
-.sidebar-brand .brand-link {
-    align-items: left !important;
+.admin-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
 }
 
+.admin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease;
+    margin-left: var(--sidebar-collapsed);
+}
+
+.admin-layout.sidebar-pinned .admin-main {
+    margin-left: var(--sidebar-expanded);
+}
+
+.admin-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+/* Animationen */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+    transition: transform 0.3s ease;
+}
+.slide-enter {
+    transform: translateX(-100%);
+}
+.slide-leave-to {
+    transform: translateX(-100%);
+}
 </style>

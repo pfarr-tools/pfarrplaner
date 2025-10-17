@@ -12,7 +12,6 @@
     ],
     "require": {
         "php": "^8.4",
-        "almasaeed2010/adminlte": "~3.0",
         "barryvdh/laravel-ide-helper": "^3.0",
         "doctrine/dbal": "^3.0",
         "google/apiclient": "^2.0",

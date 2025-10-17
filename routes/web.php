@@ -100,3 +100,6 @@ Route::get('/panic', function () {
     throw new \Exception('Whoops');
 });
 
+Route::get('/dash', function () {
+    return \Inertia\Inertia::render('Dash');
+});
