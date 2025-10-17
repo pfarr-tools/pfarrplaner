@@ -104,6 +104,7 @@ export default {
     props: {
         flash: { type: Object, default: () => ({}) },
         'enableControlSidebar': {
+            type: Boolean,
             default: false,
         },
         'noNavBar': {
