@@ -64,7 +64,6 @@
     </style>
 </head>
 <body>
-<h1>Evangelisches Kirchenregisteramt {{ $funeral->service->city->name }}</h1>
 <form>
     <div class="row">
         <div class="label">Verstorbene/r</div>
