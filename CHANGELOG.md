@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.12.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.12.1...v2025.12.2) (2025-10-22)
+
+
+### Bug Fixes
+
+* Fehlende Scrollbalken im AdminLayout ([b471f9e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b471f9e864516b11ec29bd3a5d1ddd692069dae9))
+
 ### [2025.12.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.12.0...v2025.12.1) (2025-10-22)
 
 
