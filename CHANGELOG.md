@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2025.12.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.11.0...v2025.12.0) (2025-10-22)
+
+
+### Features
+
+* Themenplan der Gottesdienste ([d07920e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d07920e908f7fe505a81e90d3a6324c6b4df2240))
+* Wochennummer im Kalender zeigen ([34209ab](https://codeberg.org/pfarr.tools/pfarrplaner/commit/34209ab64e25abe703ba52a768b552dccd441e17))
+
+
+### Bug Fixes
+
+* Fehlende Namespaces in den Seedern ([41534ae](https://codeberg.org/pfarr.tools/pfarrplaner/commit/41534aef277758a9d7b403e86de424d5ca720e25))
+* Fehlende Slots hinzugefügt. ([96025e3](https://codeberg.org/pfarr.tools/pfarrplaner/commit/96025e3e3d311498eb56ac5574dbd0313e7e836d))
+* Fehler auf dem HomeScreen, wenn der/die Benutzer:in Poolmaster:in ist ([4fe35e8](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4fe35e89e6a05574c38f6203b223b7c779715543))
+* Kirchenregisteramt aus Formular entfernt ([9ede361](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9ede361ca348ab28423fb9a0dce50500e597fe54))
+* Template wird nicht kompiliert, weil ES2020-Syntax nicht unterstützt wird. ([03e042e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/03e042e9da3768053df06ed7ae6bfd768b0d048d))
+
 ## [2025.11.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.10.1...v2025.11.0) (2025-07-31)
 
 
