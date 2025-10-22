@@ -70,7 +70,7 @@
                 </template>
             </Topbar>
 
-            <div class="px-2 pt-4">
+            <div class="px-2 pt-4 overflow-scroll">
                 <h1 v-if="title" class="m-0 mb-4 text-dark" :key="title">{{ title }}</h1>
                 <slot name="before-flash" />
                 <transition name="fade">
