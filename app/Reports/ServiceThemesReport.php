@@ -106,6 +106,8 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
             ]
         );
 
+        Carbon::setLocale('de');
+
         $serviceList = Service::between(
             Carbon::createFromDate($data['year'], 1, 1),
             Carbon::createFromDate($data['year'], 12, 31)->setTime(23, 59, 59),
@@ -127,9 +129,9 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
             'C' => 15,
             'D' => 18,
             'E' => 6,
-            'F' => 12,
+            'F' => 14,
             'G' => 12,
-            'H' => 12,
+            'H' => 16,
             'I' => 12,
         ];
 
@@ -171,9 +173,9 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
 
         // page layout
         $sheet->getPageSetup()
-            ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE)
+            ->setOrientation(PageSetup::ORIENTATION_PORTRAIT)
             ->setPaperSize(PageSetup::PAPERSIZE_A4)
-            ->setRowsToRepeatAtTopByStartAndEnd(3, 4);
+            ->setRowsToRepeatAtTopByStartAndEnd(1, 1);
         $sheet->getPageMargins()
             ->setTop(Converter::cmToInch(1.5))
             ->setBottom(Converter::cmToInch(1))
@@ -229,15 +231,15 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
 
         $row = 2;
         foreach ($serviceList as $myKey => $services) {
-            dump ($myKey);
             foreach ($services as $service) {
+                if ($service->funerals()->count()) continue;
                 $row++;
 
                 foreach (array_keys($headers) as $index) {
                     $column = chr(65 + $index);
                     $style = $sheet->getStyle("{$column}{$row}");
                     $style->getFont()->setSize(8);
-                    $style->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setWrapText(true);
+                    $style->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setWrapText(true);
                     $style->getBorders()->getOutline()->setBorderStyle(Border::BORDER_THIN)->getColor()->setARGB(
                         'ff000000'
                     );
@@ -248,9 +250,8 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
 
 
                 $richtext = new RichText();
-                $textrun = $richtext->createTextRun(strftime('%A,', $service->date->getTimestamp()));
+                $textrun = $richtext->createTextRun($service->date->isoFormat('dddd, DD.MM.YYYY'));
                 $textrun->getFont()->setName('Arial')->setSize(8)->setBold(true);
-                $richtext->createText("\n" . $service->date->format('d.m.Y'));
                 $sheet->getCell($this->cellAddress('A', $row, $cities))->setValue($richtext);
                 $sheet->setCellValue("B{$row}", $service->city->name);
                 $sheet->setCellValue($this->cellAddress('C', $row, $cities), $service->liturgicalInfo['title'] ?? '');
