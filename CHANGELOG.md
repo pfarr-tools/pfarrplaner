@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.12.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.12.0...v2025.12.1) (2025-10-22)
+
+
+### Bug Fixes
+
+* Formatierungen im ServiceThemesReport ([30a7dc7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/30a7dc7430be8b9d5596706ce8e888db6b3d494a))
+
 ## [2025.12.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.11.0...v2025.12.0) (2025-10-22)
 
 
