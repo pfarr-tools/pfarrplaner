@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.12.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.12.3...v2025.12.4) (2025-10-27)
+
+
+### Bug Fixes
+
+* Dockerfile führt zu Fehler beim Docker-Build ([381e2cb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/381e2cb154aea9fb8a88dbc132b313622bc5cc6d))
+
 ### [2025.12.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.12.2...v2025.12.3) (2025-10-27)
 
 
