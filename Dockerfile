@@ -5,6 +5,8 @@ RUN apk add --no-cache \
     git \
     curl \
     bash \
+    build-base \
+    autoconf \
     libzip-dev \
     libxml2-dev \
     libpng-dev \
@@ -24,7 +26,8 @@ RUN apk add --no-cache \
     tzdata \
     gettext \
     musl-locales \
- && docker-php-ext-configure gd \
+ && docker-php-source extract \
+ && export CPPFLAGS="$CPPFLAGS -I/usr/src/php" \&& docker-php-ext-configure gd \
     --with-freetype \
     --with-jpeg \
     --with-webp \
@@ -57,13 +60,9 @@ WORKDIR /var/www
 COPY . .
 
 # Install Composer dependencies (no post-autoload scripts)
-RUN composer install --no-dev --optimize-autoloader --no-scripts
-
-# Install Node/Vite assets
-RUN yarn install && yarn run prod
-
-# Set permissions
-RUN chmod -R 775 storage bootstrap/cache || true
+RUN composer install --no-dev --optimize-autoloader --no-scripts \
+ && yarn install && yarn run prod \
+ && chmod -R 775 storage bootstrap/cache || true
 
 # Expose Octane port
 EXPOSE 9500
