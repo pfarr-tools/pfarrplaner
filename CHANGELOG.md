@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.12.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.12.2...v2025.12.3) (2025-10-27)
+
+
+### Bug Fixes
+
+* Layoutanpassungen für LiturgySheets (A4/A5) ([dc0b6c7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/dc0b6c78025d7ee7661c142d588b486855dfad20))
+
 ### [2025.12.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.12.1...v2025.12.2) (2025-10-22)
 
 
