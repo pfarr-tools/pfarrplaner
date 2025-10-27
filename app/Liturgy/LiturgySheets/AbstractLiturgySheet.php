@@ -34,6 +34,7 @@ namespace App\Liturgy\LiturgySheets;
 use App\Documents\PDF;
 use App\Models\Service;
 use App\Services\FileNameService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class AbstractLiturgySheet
@@ -68,9 +69,27 @@ class AbstractLiturgySheet
     public function render(Service $service)
     {
 
+        $footer = '<div style="font-size:8px; width:100%; text-align:left; padding: 0 15mm">'
+            .Carbon::now()->setTimezone('Europe/Berlin')->format('d.m.Y H:i:s')
+            .' – Seite <span class="pageNumber"></span> / <span class="totalPages"></span></div>';
+
         return PDF::fromView($this->getRenderViewName(),
                                             array_merge(compact('service'), $this->getData($service)))
+            ->format($this->layout['format'])
+            ->margins(15, 15, 15, 15)
+            ->showBrowserHeaderAndFooter()
+            ->hideHeader()
+            ->footerHtml($this->getFooter())
             ->download($this->getFileName($service));
+    }
+
+    protected function getFooter()
+    {
+        return '<div style="width: 100%; font-size: 8pt; font-family: \'Sarabun Light\', sans-serif; display: flex; justify-content: space-between; align-items: center; padding: 0 15mm;">'
+              .'<div style="text-align: left;">Stand: '.now()->setTimezone('Europe/Berlin')->format('d.m.Y, H:i').' Uhr</div>'
+              .'<div style="text-align: center;">'.(Auth::guest() ? '' : Auth::user()->name).'</div>'
+              .'<div style="text-align: right;">Seite <span class="pageNumber"></span> / <span class="totalPages"></span></div>'
+              .'</div>';
     }
 
     protected function getRenderViewName()

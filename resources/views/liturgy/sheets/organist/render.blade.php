@@ -69,11 +69,6 @@
         table.table td, th {
         }
 
-        table.table tr:last-child td, tr:last-child th {
-            border: 0;
-            margin-bottom: 0;
-        }
-
         table.table th {
             text-align: left;
         }
@@ -220,17 +215,6 @@
     </style>
 </head>
 <body>
-<htmlpagefooter name="PageFooter">
-    <table class="footer" style="">
-        <tr>
-            <td valign="top">Stand: {{ \Carbon\Carbon::now()->setTimezone('Europe/Berlin')->format('d.m.Y, H:i') }}
-                Uhr
-            </td>
-            <td style="text-align: center;">@auth{{ Auth::user()->fullName(false) }}@endauth</td>
-            <td valign="top" style="text-align: right">Seite {PAGENO} / {nbpg}</td>
-        </tr>
-    </table>
-</htmlpagefooter>
 <table class="head" cellpadding="0" cellspacing="0">
     <tr>
         <td valign="top">
