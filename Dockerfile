@@ -1,49 +1,33 @@
 FROM phpswoole/swoole:php8.4-alpine
 
-# Install system dependencies and PHP extensions
-RUN apk add --no-cache \
-    git \
-    curl \
-    bash \
-    build-base \
-    autoconf \
-    libzip-dev \
-    libxml2-dev \
-    libpng-dev \
-    oniguruma-dev \
-    yaml-dev \
-    freetype-dev \
-    libjpeg-turbo-dev \
-    libwebp-dev \
-    zlib-dev \
-    nodejs \
-    npm \
-    yarn \
-    icu-dev \
-    curl-dev \
-    pkgconfig \
-    gcompat \
-    tzdata \
-    gettext \
-    musl-locales \
- && docker-php-source extract \
- && export CPPFLAGS="$CPPFLAGS -I/usr/src/php" \&& docker-php-ext-configure gd \
-    --with-freetype \
-    --with-jpeg \
-    --with-webp \
- && docker-php-ext-install \
-    pdo \
-    pdo_mysql \
-    zip \
-    soap \
-    dom \
-    curl \
-    intl \
-    gd \
- && apk add --no-cache --virtual .build-deps g++ make autoconf \
- && pecl install yaml \
- && docker-php-ext-enable yaml \
- && apk del .build-deps
+# ---- RUNTIME deps (stay in final image)
+RUN set -eux; \
+  for i in 1 2 3; do \
+    apk add --no-cache \
+      bash curl git \
+      libzip libxml2 libpng freetype libjpeg-turbo libwebp zlib \
+      nodejs npm yarn \
+      icu-libs tzdata gettext musl-locales gcompat \
+    && break || (echo "apk retry $i" && sleep 2); \
+  done
+
+# ---- BUILD deps (removed later) + PHP extensions
+RUN set -eux; \
+  apk add --no-cache --virtual .build-deps \
+      build-base autoconf pkgconfig \
+      libzip-dev libxml2-dev libpng-dev freetype-dev libjpeg-turbo-dev libwebp-dev zlib-dev \
+      oniguruma-dev icu-dev curl-dev yaml-dev; \
+  docker-php-source extract; \
+  export CPPFLAGS="$CPPFLAGS -I/usr/src/php"; \
+  docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
+  docker-php-ext-install \
+      pdo pdo_mysql zip soap dom curl intl gd; \
+  pecl install yaml; \
+  docker-php-ext-enable yaml; \
+  docker-php-source delete; \
+  apk del .build-deps
+
+
 
 # Set locale to German (de_DE.UTF-8)
 ENV LANG=de_DE.UTF-8 \
