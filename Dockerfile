@@ -18,7 +18,7 @@ RUN set -eux; \
       libzip-dev libxml2-dev libpng-dev freetype-dev libjpeg-turbo-dev libwebp-dev zlib-dev \
       oniguruma-dev icu-dev curl-dev yaml-dev; \
   docker-php-source extract; \
-  export CPPFLAGS="$CPPFLAGS -I/usr/src/php"; \
+  export CPPFLAGS="${CPPFLAGS:-} -I/usr/src/php"; \
   docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
   docker-php-ext-install \
       pdo pdo_mysql zip soap dom curl intl gd; \
