@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2025.13.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.13.2...v2025.13.3) (2025-10-27)
+
+
+### Bug Fixes
+
+* Im Docker-Build fehlen Runtime libraries ([ffc0f9a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ffc0f9a30cff133be6dd08c9efe7a5eaf5c3e79f))
+
 ### [2025.13.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.13.1...v2025.13.2) (2025-10-27)
 
 
