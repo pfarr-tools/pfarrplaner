@@ -8,6 +8,7 @@ RUN set -eux; \
       libzip libxml2 libpng freetype libjpeg-turbo libwebp zlib \
       nodejs npm yarn \
       icu-libs tzdata gettext musl-locales gcompat \
+      liburing libyaml libstdc++ \
     && break || (echo "apk retry $i" && sleep 2); \
   done
 
@@ -20,13 +21,11 @@ RUN set -eux; \
   docker-php-source extract; \
   export CPPFLAGS="${CPPFLAGS:-} -I/usr/src/php"; \
   docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
-  docker-php-ext-install \
-      pdo pdo_mysql zip soap dom curl intl gd; \
+  docker-php-ext-install pdo pdo_mysql zip soap dom curl intl gd; \
   pecl install yaml; \
   docker-php-ext-enable yaml; \
   docker-php-source delete; \
   apk del .build-deps
-
 
 
 # Set locale to German (de_DE.UTF-8)
