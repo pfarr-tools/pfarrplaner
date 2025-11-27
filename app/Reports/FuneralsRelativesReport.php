@@ -75,16 +75,8 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
      */
     public function setup()
     {
-        // set default date to now()
-        $start = Carbon::now();
         $cities = Auth::user()->cities;
-        $year = Carbon::now()->year;
-        $liturgy = LiturgyService::getCompleteLiturgyInfoArray();
-        foreach ($liturgy as $date => $litInfo) {
-            if (($litInfo['calendarYear'] == $year) && ($litInfo['title'] == '1. Advent')) {
-                $start = Carbon::parse($litInfo['dateSql'])->setTime(0,0,0)->subDays(6);
-            }
-        }
+        $start = LiturgyService::getPropriumDateByCode(now()->year, '1ADV')->subDays(6);
         return Inertia::render('Report/FuneralsRelatives/Setup', compact('start', 'cities'));
     }
 

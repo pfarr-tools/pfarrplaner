@@ -63,8 +63,8 @@
             <div v-if="myService.isAlternateProprium"
                  title="Für diesen Gottesdienst wurde ein vom normalen Kalender abweichendes Proprium festgelegt.">
                 <div class="service-description">
-                    <div :style="'background-color: '+myService.liturgicalInfo.litColor" class="liturgy-color"></div>
-                    {{ myService.liturgicalInfo.title }}
+                    <div :style="'background-color: '+myService.liturgicalInfo['CSS-Farbe']" class="liturgy-color"></div>
+                    {{ myService.liturgicalInfo.Bezeichnung }}
                 </div>
             </div>
             <controlled-access v-if="myService.controlled_access" :service="service"/>

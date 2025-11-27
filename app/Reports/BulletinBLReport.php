@@ -388,7 +388,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
         $rowCtr = 0;
         foreach ($days as $day) {
             $rowCtr++;
-            $liturgy = LiturgyService::getDayInfo($day);
+            $liturgy = LiturgyService::getLiturgyInfoByDate($day);
 
             if ($rowCtr % 2 == 0) {
                 // even rows: render rectangles
@@ -413,7 +413,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                 $spreadCode,
                 $y,
                 0,
-                Carbon::parse($day)->format('d.m.Y') . $this->idml->BR() . ($liturgy['title'] ?? '')
+                Carbon::parse($day)->format('d.m.Y') . $this->idml->BR() . ($liturgy['Bezeichnung'] ?? '')
             );
 
 

@@ -125,6 +125,7 @@ class ServiceRequest extends FormRequest
             'end' => 'nullable|date',
             'rrule' => 'nullable|string',
             'is_allday' => 'nullable|int|in:0,1',
+            'alt_proprium' => 'nullable|string|max:6',
         ];
     }
 

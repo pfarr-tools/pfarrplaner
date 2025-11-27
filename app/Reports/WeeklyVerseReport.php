@@ -80,7 +80,7 @@ class WeeklyVerseReport extends AbstractCSVReport
         $records = [];
         $currentDate = $start->copy();
         do {
-            $dayData =  LiturgyService::getDayInfo($currentDate);
+            $dayData =  LiturgyService::getLiturgyInfoByDate($currentDate)[0] ?? [];
             if (count($dayData)) {
                 $records[$currentDate->format('Y-m-d')] = $dayData;
             }
@@ -100,7 +100,7 @@ class WeeklyVerseReport extends AbstractCSVReport
             [
             'Datum' => function($item, $key) { return $key; },
             'Titel des Tages' => function($item, $key) {
-                return strtr($item['title'], [
+                return strtr($item['Bezeichnung'], [
                     'So. n.' => 'Sonntag nach',
                     'So n.' => 'Sonntag nach',
                     'Drittl.S.d.Kj.' => 'Drittletzter Sonntag des Kirchenjahres',

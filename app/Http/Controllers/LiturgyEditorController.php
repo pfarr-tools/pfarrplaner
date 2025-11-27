@@ -40,6 +40,7 @@ use App\Models\LiturgyInfo;
 use App\Models\People\Participant;
 use App\Models\Sermon;
 use App\Models\Service;
+use App\Services\LiturgyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -60,11 +61,9 @@ class LiturgyEditorController extends Controller
         $autoFocusItem = $request->get('autoFocusItem', null);
         $ministries = $this->getAvailableMinistries();
         $markers = Replacement::getList();
-        $liturgyInfo = LiturgyInfo::select(['id', 'date', 'title', 'litColor'])->orderBy('date')->get();
-
         return Inertia::render(
             'liturgyEditor',
-            compact('service', 'liturgySheets', 'autoFocusBlock', 'autoFocusItem', 'ministries', 'markers', 'liturgyInfo')
+            compact('service', 'liturgySheets', 'autoFocusBlock', 'autoFocusItem', 'ministries', 'markers')
         );
     }
 

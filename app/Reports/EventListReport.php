@@ -206,7 +206,7 @@ class EventListReport extends AbstractWordDocumentReport
                     /* @var Service $event */
                     // only services this time
 
-                    $liturgy = LiturgyService::getDayInfo($event->day);
+                    $liturgy = LiturgyService::getLiturgyInfoByDate($event->day)[0] ?? [];
                     $pericope = (isset($liturgy['perikope']) ? $liturgy['litTextsPerikope' . $liturgy['perikope']] : '');
 
                     // remove optional verses
@@ -227,11 +227,11 @@ class EventListReport extends AbstractWordDocumentReport
                         0
                     );
 
-                    if (isset($liturgy['title'])) {
+                    if (isset($liturgy['Bezeichnung'])) {
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                [$liturgy['title'] . ' – ', []],
+                                [$liturgy['Bezeichnung'] . ' – ', []],
                             ],
                             0,
                             $run
@@ -281,11 +281,11 @@ class EventListReport extends AbstractWordDocumentReport
                             0,
                             $run
                         );
-                    } elseif (isset($liturgy['title'])) {
+                    } elseif (isset($liturgy['Bezeichnung'])) {
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                ["<w:br />\t\t" . $liturgy['title'], []],
+                                ["<w:br />\t\t" . $liturgy['Bezeichnung'], []],
                             ],
                             0,
                             $run

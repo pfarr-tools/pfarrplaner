@@ -364,7 +364,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
         $row = 3;
         foreach ($serviceList as $services) {
             foreach ($services as $service) {
-                $liturgy = LiturgyService::getDayInfo($service->date, true);
+                $liturgy = $service->liturgicalInfo;
 
                 $row += 2;
                 $row2 = $row + 1;
@@ -409,7 +409,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                 if (count($cities) > 1) {
                     $sheet->setCellValue("B{$row}", $service->city->name);
                 }
-                $sheet->setCellValue($this->cellAddress('B', $row, $cities), $liturgy['title'] ?: '');
+                $sheet->setCellValue($this->cellAddress('B', $row, $cities), $liturgy['Bezeichnung'] ?: '');
                 $sheet->setCellValue($this->cellAddress('C', $row, $cities), $service->descriptionText());
                 $sheet->setCellValue($this->cellAddress('D', $row, $cities), $service->timeText(false));
                 $sheet->setCellValue($this->cellAddress('E', $row, $cities), $service->locationText());

@@ -149,12 +149,10 @@ class CalendarService
 
     public static function addMissingDefaultDays($date, $days)
     {
-        $currentDate = $date->copy()->setDay(1)->setTime(0, 0, 0);
-        $month = $currentDate->month;
-        $litInfo = LiturgyService::getCompleteLiturgyInfoArray();
-
-        while ($month == $currentDate->month) {
-            if (isset($litInfo[$currentDate->format('d.m.Y')])) {
+        $currentDate = $date->copy()->firstOfMonth()->startOfDay();
+        $litInfo = LiturgyService::getYear($currentDate->year);
+        while ($currentDate <= $date->endOfMonth()) {
+            if (isset($litInfo[$currentDate->format('Y-m-d')])) {
                 $days->push($currentDate->format('Y-m-d'));
             }
             $currentDate->addDay(1);

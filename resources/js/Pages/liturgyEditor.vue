@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <admin-layout enable-control-sidebar="true" :title="title(service)">
+    <admin-layout :enable-control-sidebar="true" :title="title(service)">
         <template slot="navbar-left">
             <span v-if="!templateMode">
                 <inertia-link v-if="service.isEditable" class="btn btn-light" :href="route('service.edit', service.slug)"
@@ -51,7 +51,7 @@
                         help="Wörter pro Minute"/>
             <button class="btn btn-sm btn-primary" @click.prevent.stop="reloadPage">Anwenden</button>
         </template>
-        <info-pane v-if="!templateMode" :service="service" :liturgy-info="liturgyInfo" @info="infoWindow = true"/>
+        <info-pane v-if="!templateMode" :service="service" @info="infoWindow = true"/>
         <template-info-pane v-if="templateMode" v-model="service"/>
         <hr />
         <liturgy-tree v-if="service.isEditable" :service="service" :sheets="templateMode ? {} : liturgySheets" :agenda-mode="templateMode"

@@ -1,5 +1,5 @@
-@if(isset($liturgy['title']))
-<div class="day-description">{{ $liturgy['title'] }}</div>
+@if(isset($liturgy['Bezeichnung']))
+<div class="day-description">{{ $liturgy['Bezeichnung'] }}</div>
 @endif
 @if (isset($liturgy['perikope']))
     <div class="liturgy">

@@ -31,6 +31,7 @@
 namespace App\Reports;
 
 use App\Models\Places\City;
+use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Services\FileNameService;
 use App\Services\LiturgyService;
@@ -105,10 +106,13 @@ class BulletinReport extends AbstractWordDocumentReport
         );
 
 
+        $cities = City::whereIn('id', $data['includeCities'])->get();
+
         $start = Carbon::parse($data['start']);
-        $serviceList = Service::between($start, Carbon::parse($data['end']))
+        $serviceList = Service::withGlobalScope('servicesOnly', ServicesOnlyScope::class)
+            ->between($start, Carbon::parse($data['end']))
             ->displayable($start)
-            ->whereIn('city_id', $data['includeCities'])
+            ->inCities($cities)
             ->ordered()
             ->get()
             ->groupBy('key_date');
@@ -244,77 +248,76 @@ class BulletinReport extends AbstractWordDocumentReport
     public function renderGaufeldenFormat($serviceList)
     {
         $this->wordDocument->setDefaultFontSize(10);
-        $this->wordDocument->setDefaultFontName('Quicksand');
+        $this->wordDocument->setDefaultFontName('Lora');
         $section = $this->commonDocumentSetup();
         Carbon::setLocale(config('app.locale'));
 
+        /*
         $list = [];
         foreach ($serviceList as $date => $services) {
             foreach ($services as $service) {
                 $list[substr($date, 0, 7)][$service->city_id][$date] = $services;
             }
         }
+        */
 
-        foreach ($list as $month => $cities) {
-            $monthDate = Carbon::parse($month . '-01 0:00:00');
-            $section->addText(
-                $monthDate->getTranslatedMonthName() . ' ' . $monthDate->format('Y'),
-                ['name' => 'Quicksand', 'bold' => true, 'size' => 24]
-            );
-            $section->addTextBreak(1);
+        foreach ($serviceList as $date => $services) {
             $index = 0;
-            foreach ($this->cities as $cityId) {
-                $city = City::find($cityId);
-                $days = $cities[$cityId];
-                $run = $section->addTextRun();
-                $run->addText($city->name.'<w:br /><w:br />', ['name' => 'Quicksand', 'bold' => true, 'size' => 16]);
-                foreach ($days as $day => $services) {
-                    $dayDate = Carbon::parse($day . ' 0:00:00');
-                    if ($index == 0) {
-                        $liturgy = LiturgyService::getLiturgyInfoByDate($dayDate);
 
-                        $run->addText(
-                            substr($dayDate->getTranslatedDayName(), 0, 2)
-                            . '., '
-                            . $dayDate->format('d. ')
-                            . $dayDate->getTranslatedMonthName(),
-                            ['name' => 'Quicksand', 'bold' => true, 'size' => 10]
-                        );
-                        if (count($liturgy)) {
-                            $run->addText(' | '.$liturgy[0]->title, ['name' => 'Quicksand', 'bold' => true, 'size' => 8]);
-                        }
-                    }
-                    $run->addText('<w:br />');
-                    foreach ($services as $service) {
-                        /** @var Service $service */
-                        if ($service->city_id == $city->id) {
-                            $run->addText($service->timeText().'<w:br />', ['name' => 'Quicksand']);
+            $run = $section->addTextRun(['spaceAfter' => 0]);
+            $dayDate = Carbon::parse($date)->startOfDay();
+            if ($index == 0) {
+                $liturgy = LiturgyService::getLiturgyInfoByDate($dayDate);
 
-                            $location = $service->locationText();
-                            if (!Str::contains($location, $city->name)) $location .= ' '.$city->name;
-                            $run->addText($location.'<w:br />', ['name' => 'Quicksand']);
-
-                            if ($service->description && (substr($service->description,0,1)=='"')) {
-                                $run->addText($service->description.'<w:br />', ['name' => 'Quicksand']);
-                            }
-
-                            $run->addText(
-                                $service->titleText(false) . ' mit '
-                                . $service->participantsText('P', true).'<w:br />',
-                                ['name' => 'Quicksand']
-                            );
-
-                            if ($service->description && (substr($service->description,0,1)!='"')) {
-                                $run->addText($service->description.'<w:br />', ['name' => 'Quicksand']);
-                            }
-
-                            $run->addText('<w:br /><w:br />', ['name' => 'Quicksand']);
-                        }
-                    }
+                $run->addText(
+                    substr($dayDate->getTranslatedDayName(), 0, 2)
+                    . '., '
+                    . $dayDate->format('d. ')
+                    . $dayDate->getTranslatedMonthName(),
+                    ['name' => 'Lora', 'bold' => true, 'size' => 10]
+                );
+                if (count($liturgy)) {
+                    $run->addText(' | '.$liturgy[0]->title, ['name' => 'Lora', 'bold' => true, 'size' => 8]);
                 }
-                $run->addText('<w:br />');
-                $index++;
             }
+
+
+            $index = 0;
+            foreach ($services as $service) {
+                $run = $section->addTextRun(            [
+                                                            'tabs' => [
+                                                                new Tab('left', Converter::cmToTwip(2)),
+                                                                new Tab('left', Converter::cmToTwip(4.5)),
+                                                                new Tab('left', Converter::cmToTwip(8.5)),
+                                                            ],
+                                                            'indentation' => [
+                                                                'left' => Converter::cmToTwip(8.5),
+                                                                'hanging' => Converter::cmToTwip(8.5),
+                                                            ],
+                                                            'spaceAfter' => 0,
+                                                        ]
+                );
+                $run->addText($service->timeText()."\t", ['name' => 'Lora']);
+
+                $location = $service->locationText();
+                //if (!Str::contains($location, $service->city->name)) $location .= ' '.$service->city->name;
+                $run->addText($service->city->name."\t", ['name' => 'Lora', 'bold' => true, 'size' => 10, 'color' => 'a1a1a1']);
+                $run->addText($location."\t", ['name' => 'Lora', 'bold' => false, 'size' => 10]);
+
+                if ($service->description && (substr($service->description,0,1)=='"')) {
+                    $run->addText($service->description."\t", ['name' => 'Lora']);
+                }
+
+                $run->addText(
+                    $service->titleText(false) . ' mit '
+                    . $service->participantsText('P', true),
+                    ['name' => 'Lora']
+                );
+
+            }
+
+            $run->addText('<w:br/>');
+
         }
 
         return $this->sendToBrowser(

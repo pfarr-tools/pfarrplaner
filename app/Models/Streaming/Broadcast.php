@@ -163,8 +163,6 @@ class Broadcast
 
         $instance->authenticate($service->city);
 
-        $liturgy = LiturgyService::getDayInfo($service->day);
-
         $broadcast = null;
         $broadcastSnippet = $service->getBroadcastSnippet();
 

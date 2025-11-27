@@ -46,24 +46,8 @@ class LiturgyService
     /** @var Liturgy|null Instance */
     protected static $instance = null;
 
-    protected static $bibleReferences = [
-        'litTextsWeeklyPsalm',
-        'litTextsWeeklyQuote',
-        'litTextsEntryPsalm',
-        'litTextsOldTestament',
-        'litTextsEpistel',
-        'litTextsEvangelium',
-        'litTextsPreacher',
-        'litTextsHaleluja',
-        'litTextsPerikope1',
-        'litTextsPerikope2',
-        'litTextsPerikope3',
-        'litTextsPerikope4',
-        'litTextsPerikope5',
-        'litTextsPerikope6',
-        'litTextsSpecialty',
-        'currentPerikope',
-    ];
+    protected static $calendars = [];
+    protected static $lectionaryYears = [];
 
     /**
      * @return Liturgy|null
@@ -76,94 +60,78 @@ class LiturgyService
         return self::$instance;
     }
 
-    public static function getCompleteLiturgyInfoArray(): array
-    {
-        if (!Storage::exists('liturgy.json')) {
-            return [];
-        }
-        $tmpData = json_decode(Storage::get('liturgy.json'), true);
-        $overrides = config('liturgy')['overrides'];
-        foreach ($tmpData['content']['days'] as $key => $val) {
-            $dateComponents = explode('.', $val['date']);
-            if (isset($overrides[$dateComponents[1]][$dateComponents[0]])) {
-                $val = array_replace_recursive($val, $overrides[$dateComponents[1]][$dateComponents[0]]);
-            }
-            if (!isset($data[$val['date']])) {
-                $data[$val['date']] = $val;
-            }
-        }
-        return $data ?: [];
-    }
-
     /**
-     * @return \Illuminate\Support\Collection
+     * Get a specific liturgical item by code
+     * @param $year Year
+     * @param $code Code
+     * @return array|mixed
      */
-    public static function getCompleteLiturgyInfoCollection(): Collection
-    {
-        if (!Storage::exists('liturgy.json')) {
-            return collect();
-        }
-        $list = json_decode(Storage::get('liturgy.json'), true)['content']['days'];
-        $overrides = config('liturgy.overrides');
-        foreach ($list as $key => $val) {
-            $list[$key]['title'] = $overrides[$val['title']] ?? $val['title'];
-        }
-        return collect($list);
-    }
 
-    public static function getLiturgyInfoByDate($date)
-    {
-        if (!is_a(Carbon::class, $date)) {
-            $date = Carbon::parse($date);
-        }
-        return LiturgyInfo::whereDate('date', $date->format('Y-m-d'))->get();
-    }
-
-    public static function getLiturgyInfoByDayId($dayId = null)
-    {
-        $list = self::getCompleteLiturgyInfoCollection()->groupBy('dayId');
-        if ($dayId) return $list[$dayId] ?? null;
-        return $list;
-    }
-
-    /**
-     * Get all the liturgical info for a given day
-     * @param string|Carbon $day
-     * @param bool $fallback
-     * @return array
-     */
-    public static function getDayInfo($date, $fallback = false): array
-    {
-        // fallback for obsolete code that still uses Day objects
-        if (is_a($date, Day::class)) {
-            $date = $date->date;
-        }
-
-        if (is_string($date)) {
-            $date = Carbon::parse($date);
-        }
-        if (!$date) {
-            return [];
-        }
-        $data = self::getCompleteLiturgyInfoArray();
-
-        $result = null;
-        if (isset($data[$date->format('d.m.Y')])) {
-            $result = $data[$date->format('d.m.Y')];
-        } elseif ($fallback) {
-            $date = $date;
-            while (!isset($data[$date->format('d.m.Y')])) {
-                $date = $date->subDays(1);
+    public static function getLiturgyByCode($year, $code) {
+        $year = static::getYear($year);
+        foreach ($year['Tage'] as $date => $items) {
+            foreach ($items as $item) {
+                if ($item['Code'] == $code) {
+                    $item['Datum'] = $date;
+                    return $item;
+                }
             }
-            $result = isset($data[$date->format('d.m.Y')]) ? $data[$date->format('d.m.Y')] : [];
-        }
-        if (!is_null($result)) {
-            $result['currentPerikope'] = $result['litTextsPerikope' . $result['perikope']];
-            $result['currentPerikopeLink'] = $result['litTextsPerikope' . $result['perikope'] . 'Link'];
-            return $result;
         }
         return [];
     }
 
+    /**
+     * Get the date for a proprium by code
+     * @param $year Year
+     * @param $code Code
+     * @return Carbon|null
+     */
+    public static function getPropriumDateByCode($year, $code) {
+        $proprium = static::getLiturgyByCode($year, $code);
+        if (isset($proprium['Datum'])) return Carbon::parse($proprium['Datum']);
+        return null;
+    }
+
+    /**
+     * Get all the propria for a specific date
+     * @param $date
+     * @return array|mixed
+     */
+    public static function getLiturgyInfoByDate($date)
+    {
+        if (is_object($date)) $date = $date->format('Y-m-d');
+        return (static::getYear(substr($date, 0, 4))['Tage'] ?? [])[$date] ?? [];
+    }
+
+    /**
+     * Get the liturgical calendar for a specific year
+     * @param $year
+     * @return mixed
+     */
+    public static function getYear($year)
+    {
+        if (isset(static::$calendars[$year])) return static::$calendars[$year];
+        if (!Storage::exists('liturgy/'.$year.'.json')) {
+            Storage::put('liturgy/'.$year.'.json', file_get_contents('https://kirchenjahr.pfarr.tools/api/jahr/'.$year));
+        }
+        return static::$calendars[$year] = json_decode(Storage::get('liturgy/'.$year.'.json'), true);
+    }
+
+    public static function getLectionaryYear($year) {
+        if (isset(static::$lectionaryYears[$year])) return static::$lectionaryYears[$year];
+        if (!Storage::exists('liturgy/lesejahr-'.$year.'.json')) {
+            Storage::put('liturgy/lesejahr-'.$year.'.json', file_get_contents('https://kirchenjahr.pfarr.tools/api/lesejahr/'.$year));
+        }
+        return static::$lectionaryYears[$year] = json_decode(Storage::get('liturgy/lesejahr-'.$year.'.json'), true);
+    }
+
+    public static function getLiturgyByAltPropriumCode($code)
+    {
+        list($subCode,$year) = explode('-',$code);
+        if (!$year) return [];
+        if (!$subCode) return [];
+        if ($lectionaryYear = static::getLectionaryYear($year)) return $lectionaryYear[$subCode] ?? [];
+        return [];
+    }
 
 }

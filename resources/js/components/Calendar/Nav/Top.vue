@@ -161,7 +161,7 @@ export default {
         canCreate: Boolean,
         calendarMode: String,
         calendars: Array,
-        selectedCalendar: String,
+        selectedCalendar: Array,
     },
     methods: {
         monthLink: function (month) {

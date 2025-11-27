@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <admin-layout enable-control-sidebar="true" :title="pageTitle" no-padding no-content-header :key="calendarState">
+    <admin-layout :enable-control-sidebar="true" :title="pageTitle" no-padding no-content-header :key="calendarState">
         <template #navbar-left>
             <calendar-nav-top :date="new Date(myDate)" :years="years"
                               :orientation="orientation" :targetMode="targetMode" :target="target"

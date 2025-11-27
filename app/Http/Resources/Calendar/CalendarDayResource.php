@@ -63,8 +63,10 @@ class CalendarDayResource extends JsonResource
         return [
             'date' => $this->resource,
             'liturgy' => isset($liturgy[0]) ? [
-                'title' => $liturgy[0]['title'],
-                'litColor' => $liturgy[0]['litColor'],
+                'title' => $liturgy[0]['Bezeichnung'],
+                'litColor' => $liturgy[0]['CSS-Farbe'],
+                'feastCircleName' => $liturgy[0]['Festkreis'],
+                'perikope' => $liturgy[0]['Predigt'],
             ] : [],
             'absences' => CalendarAbsenceResource::collection($absences),
             'services' => new CalendarServiceIdCollectionResource($services),

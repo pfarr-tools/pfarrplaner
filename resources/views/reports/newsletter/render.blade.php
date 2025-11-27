@@ -7,7 +7,7 @@
         @foreach($events as $dateCode => $theseEvents)
                 <?php
                 $date = \Carbon\Carbon::createFromFormat('YmdHis', $dateCode)->setTime(0, 0, 0);
-                $liturgy = \App\Services\LiturgyService::getDayInfo($date->format('d.m.Y'));
+                $liturgy = \App\Services\LiturgyService::getLiturgyInfoByDate($date->format('d.m.Y'));
                 ?>
             <tr>
                 <td colspan="3"
@@ -74,7 +74,7 @@
         @foreach($events as $dateCode => $theseEvents)
                 <?php
                 $date = \Carbon\Carbon::createFromFormat('YmdHis', $dateCode)->setTime(0, 0, 0);
-                $liturgy = \App\Services\LiturgyService::getDayInfo($date->format('d.m.Y'));
+                $liturgy = \App\Services\LiturgyService::getLiturgyInfoByDate($date->format('d.m.Y'));
                 ?>
             <tr>
             <td colspan="3"

@@ -29,9 +29,9 @@
 
 <template xmlns="http://www.w3.org/1999/html">
     <div class="bible-reference" :class="{'bible-reference-inline' : inline}" :title="text">
-        <div v-if="liturgy[liturgyKey]" :key="liturgyKey+'Text__'+text">
-            <span v-if="title">{{ title }} </span><a v-if="liturgy[liturgyKey+'Link']" :href="liturgy[liturgyKey+'Link']"
-                   target="_blank">{{ liturgy[liturgyKey] }}</a><span v-else>{{ liturgy[liturgyKey]}} </span>
+        <div v-if="perikope.Bibelstelle" :key="perikope.Bibelstelle.replaceAll(' ', '_')+'Text__'+text">
+            <span v-if="title">{{ title }} </span><a v-if="perikope.URL" :href="perikope.URL"
+                   target="_blank">{{ perikope.Bibelstelle }}</a><span v-else>{{ perikope.Bibelstelle }} </span>
             <span v-if="loading" class="mdi mdi-spin mdi-loading"></span>
             <span v-if="!loading" class="mdi mdi-content-copy" @click.prevent.stop="copyToClipboard"
                   title="Klicken, um den Text in die Zwischenablage zu kopieren"></span>
@@ -42,16 +42,16 @@
 <script>
 export default {
     name: "BibleReference",
-    props: ['liturgy', 'liturgyKey', 'title', 'inline'],
+    props: ['perikope', 'title', 'inline'],
     methods: {
         copyToClipboard() {
             const cb = navigator.clipboard;
             cb.writeText(this.text+"\n("+this.reference.correctedReference+')').then(result => {});
         }
     },
-    created() {
-        if(this.liturgy[this.liturgyKey]) {
-            axios.get(route('bible.text', {reference: this.liturgy[this.liturgyKey]}))
+    mounted() {
+        if(this.perikope?.Bibelstelle) {
+            axios.get(route('bible.text', {reference: this.perikope.Bibelstelle}))
                 .then(result => {
                     this.text = result.data.text;
                     this.reference = result.data.reference;

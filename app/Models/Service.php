@@ -189,7 +189,8 @@ class Service extends Model implements HasDAVCalendarItems
         'event_class',
         'end',
         'rrule',
-        'is_allday'
+        'is_allday',
+        'alt_proprium',
     ];
 
     /**
@@ -287,7 +288,7 @@ class Service extends Model implements HasDAVCalendarItems
     {
         return (view(
             'services.youtube.snippet.description',
-            ['service' => $this, 'liturgy' => LiturgyService::getDayInfo($this->date->format('Y-m-d'))]
+            ['service' => $this, 'liturgy' => LiturgyService::getLiturgyInfoByDate($this->date->format('Y-m-d'))]
         )->render());
     }
 
@@ -296,8 +297,8 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function getBroadcastTitleAttribute()
     {
-        $liturgy = LiturgyService::getDayInfo($this->date->format('Y-m-d'));
-        return ($this->title ?: (isset($liturgy['title']) ? $liturgy['title']
+        $liturgy = LiturgyService::getLiturgyInfoByDate($this->date->format('Y-m-d'));
+        return ($this->title ?: (isset($liturgy['Bezeichnung']) ? $liturgy['Bezeichnung']
             . ' (' . $this->date->format('d.m.Y') . ')'
             : 'Gottesdienst mit ' . $this->participantsText('P', true)));
     }

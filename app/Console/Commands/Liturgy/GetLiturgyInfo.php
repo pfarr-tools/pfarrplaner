@@ -31,6 +31,7 @@
 namespace App\Console\Commands\Liturgy;
 
 use App\Models\LiturgyInfo;
+use App\Models\Service;
 use App\StudyHelpers\AbstractStudyHelper;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -52,7 +53,7 @@ class GetLiturgyInfo extends Command
      *
      * @var string
      */
-    protected $description = 'Get liturgical calendar from kirchenjahr-evangelisch.de';
+    protected $description = 'Get liturgical calendar from kirchenjahr.pfarr.tools';
 
     /**
      * Create a new command instance.
@@ -81,71 +82,39 @@ class GetLiturgyInfo extends Command
             }
         };
 
-
         $this->getOutput()->section('Verzeichnisse lesen');
-        /*
-        $this->processItem('Liturgische Informationen (kirchenjahr-evangelisch.de)', function() {
-            Storage::put(
-                'liturgy.json',
-                file_get_contents(
-                    'https://www.kirchenjahr-evangelisch.de/service.php?o=lcf&f=gaa&r=json&dl=user'
-                )
-            );
-        });
-        */
+
+        $maxYear = Service::select('date')->distinct()->orderBy('date', 'desc')->first()->date->year;
+        for ($year = 2018; $year <= $maxYear; $year++) {
+            $this->processItem('Kalender für '.$year, function () use ($year) {
+                Storage::put(
+                    'liturgy/'.$year.'.json',
+                    file_get_contents('https://kirchenjahr.pfarr.tools/api/jahr/'.$year)
+                );
+            });
+        }
+
         foreach ($studyHelperProviders as $studyHelperProvider) {
             $this->processItem($studyHelperProvider->title, function () use ($studyHelperProvider) {
-                $studyHelperProvider->read();
+                    $studyHelperProvider->read();
             });
         }
 
 
-        $this->getOutput()->section('Liturgiedatenbank aktualisieren');
-        $ctr = 0;
-        $list = json_decode(Storage::get('liturgy.json'), true)['content']['days'];
-        foreach ($list as $id => $data) {
-
-            $formattedDate = $data['date'];
-
-            $data['links'] = [];
-            /** @var AbstractStudyHelper $studyHelperProvider */
-            foreach ($studyHelperProviders as $studyHelperProvider) {
-                $data = $studyHelperProvider->getLinks($data);
-            }
-            ksort($data['links']);
-
-            $data['date'] = $data['dateSql'];
-            unset($data['dateSql']);
-            $data['id'] = $id;
-            $data['currentPerikope'] = $data['litTextsPerikope' . $data['perikope']];
-            $data['currentPerikopeLink'] = $data['litTextsPerikope' . $data['perikope'] . 'Link'];
-            if (!LiturgyInfo::where('id', $id)->where('date', $data['date'])->count()) {
-                $ctr++;
-                $this->processItem('Liturgie anlegen für '.$formattedDate, function() use ($data) {
-                    LiturgyInfo::create($data);
-                });
-            } else {
-                $this->processItem('Liturgie aktualisieren für '.$formattedDate, function() use ($data, $id) {
-                    $litInfo = LiturgyInfo::where('id', $id)->where('date', $data['date'])->first();
-                    $data['links'] = array_merge($litInfo->links ?? [], $data['links']);
-                    ksort($data['links']);
-                    $litInfo->update($data);
-                });
-            }
-        }
-
         $this->newLine(2);
         $this->line('Der liturgische Kalender wurde aktualisiert.');
-        if ($ctr) {
-            $this->line($ctr . ' neue Einträge wurden hinzugefügt.');
-        }
     }
 
 
     protected function processItem($title, $callback) {
         $this->getOutput()->write(Str::padRight($title, 75));
-        $result = $callback();
-        $this->getOutput()->writeln('[<info>OK</info>]');
-        return $result;
+        $success = true;
+        try {
+            $result = $callback();
+        } catch (\Exception $e) {
+            $success = false;
+        }
+        $this->getOutput()->writeln($success ? '[<info>OK</info>]' : '[<error>FAILED</error>]');
+        return $result ?? null;
     }
 }

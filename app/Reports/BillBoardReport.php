@@ -243,10 +243,10 @@ class BillBoardReport extends AbstractWordDocumentReport
 
     protected function renderBibleText($start)
     {
-        if($liturgy = LiturgyService::getDayInfo($start)) {
+        if($liturgy = LiturgyService::getLiturgyInfoByDate($start)) {
             $this->renderParagraph(static::HEADING1, [['Wochenspruch:', ['size' => 18, 'color' => '#0070c0']]]);
-            $this->renderParagraph(static::HEADING1, [[$liturgy['litTextsWeeklyQuoteText'], ['size' => 16, 'color' => '#0070c0']]]);
-            $this->renderParagraph(static::HEADING1, [[ReferenceParser::getInstance()->beautify($liturgy['litTextsWeeklyQuote']), ['size' => 12, 'color' => '#0070c0']]]);
+            $this->renderParagraph(static::HEADING1, [[$liturgy['Wochenspruch']['Text'], ['size' => 16, 'color' => '#0070c0']]]);
+            $this->renderParagraph(static::HEADING1, [[ReferenceParser::getInstance()->beautify($liturgy['Wochenspruch']['Bibelstelle']), ['size' => 12, 'color' => '#0070c0']]]);
         }
     }
 

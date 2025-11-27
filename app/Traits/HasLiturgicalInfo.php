@@ -37,7 +37,6 @@ trait HasLiturgicalInfo
 {
 
     protected $cachedLiturgicalInfo = null;
-    protected $cachedAlternateProprium = null;
 
     /**
      * Add liturgy attribute
@@ -46,26 +45,23 @@ trait HasLiturgicalInfo
     public function getLiturgicalInfoAttribute(): array
     {
         if (null !== $this->cachedLiturgicalInfo) return $this->cachedLiturgicalInfo;
-        if ($this->liturgy_info_id) return LiturgyInfo::find($this->liturgy_info_id)->toArray() ?? [];
-        $info = LiturgyService::getLiturgyInfoByDate($this->alt_liturgy_date ?: $this->date)->first();
-        if ($info) return $this->cachedLiturgicalInfo = $info->toArray();
-        return [];
+        if (!$this->isAlternateProprium) {
+            $litInfo = ((LiturgyService::getLiturgyInfoByDate($this->date) ?? [])[0] ?? []);
+        } else {
+            $litInfo = (LiturgyService::getLiturgyByAltPropriumCode($this->alt_proprium) ?? []);
+        }
+        if (($litInfo) && ($litInfo !== [])) $this->cachedLiturgicalInfo = $litInfo;
+        return $litInfo;
     }
 
     public function getLiturgicalInfoDateAttribute()
     {
-        return $this->liturgical_info['date'] ?? $this->date;
+        return $this->isAlternateProprium ? $this->liturgical_info['isoDate'] : $this->date;
     }
 
     public function getIsAlternatePropriumAttribute(): bool
     {
-        if (null !== $this->cachedAlternateProprium) return $this->cachedAlternateProprium;
-        if (!$this->liturgy_info_id) return $this->cachedAlternateProprium = false;
-        if ($this->liturgical_info['date'] != $this->date->format('d.m.Y')) return $this->cachedAlternateProprium = true;
-        $firstRecord = LiturgyService::getLiturgyInfoByDate($this->alt_liturgy_date ?: $this->date)->first();
-        if (!$firstRecord) return $this->cachedAlternateProprium = false;
-        if ($this->liturgy_info_id != ($firstRecord['id'] ?? -1)) return $this->cachedAlternateProprium = true;
-        return false;
+        return null !== $this->alt_proprium;
     }
 
 }

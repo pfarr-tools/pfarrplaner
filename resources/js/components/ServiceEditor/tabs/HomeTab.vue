@@ -85,7 +85,7 @@
                 </div>
                 <div class="col-md-4" v-if="myService.event_class == 'service'">
                     <proprium-select label="Zugehöriges Proprium" :liturgy-info="liturgyInfo"
-                                     v-model="myService.liturgy_info_id"/>
+                                     v-model="myService.alt_proprium"/>
                 </div>
             </div>
             <form-check v-if="(myService.event_class != 'service')" label="Ganztägige Veranstaltung"

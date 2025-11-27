@@ -33,11 +33,131 @@ import FormSelectize from "../Ui/forms/FormSelectize.vue";
 export default {
     name: "PropriumSelect",
     components: {FormSelectize},
-    props: ['liturgyInfo', 'value', 'label'],
+    props: ['value', 'label'],
     data() {
-        let myItems = this.liturgyInfo;
-        for (const myItemKey in myItems) {
-            myItems[myItemKey]['searchDate'] = moment(myItems[myItemKey]['date']).format('DD.MM.YYYY');
+        const codes = {
+            "1ADV": "1. Advent",
+            "1NCF": "1. So. n. Christfest",
+            "1TRI": "1. So. n. Trinitatis",
+            "1EPI": "1. So. nach Epiphanias",
+            "10TR": "10. So. n. Trinitatis (Israelsonntag)",
+            "11TR": "11. So. n. Trinitatis",
+            "12TR": "12. So. n. Trinitatis",
+            "13TR": "13. So. n. Trinitatis",
+            "14TR": "14. So. n. Trinitatis",
+            "15TR": "15. So. n. Trinitatis",
+            "16TR": "16. So. n. Trinitatis",
+            "17TR": "17. So. n. Trinitatis",
+            "18TR": "18. So n. Trinitatis",
+            "19TR": "19. So. n. Trinitatis",
+            "2ADV": "2. Advent",
+            "2TRI": "2. So. n. Trinitatis",
+            "2NCF": "2. So. nach Christfest",
+            "2EPI": "2. So. nach Epiphanias",
+            "20TR": "20. So. n. Trinitatis",
+            "21TR": "21. So. n. Trinitatis",
+            "22TR": "22. So. n. Trinitatis",
+            "23TR": "23. So. n. Trinitatis",
+            "3ADV": "3. Advent",
+            "3TRI": "3. So. n. Trinitatis",
+            "3EPI": "3. So. nach Epiphanias",
+            "4ADV": "4. Advent",
+            "4TRI": "4. So. n. Trinitatis",
+            "4VPA": "4. So. v. d. Passionszeit",
+            "5TRI": "5. So. n. Trinitatis",
+            "5VPA": "5. So. v. d. Passionszeit",
+            "6TRI": "6. So. n. Trinitatis",
+            "7TRI": "7. So. n. Trinitatis",
+            "8TRI": "8. So. n. Trinitatis",
+            "9TRI": "9. So. n. Trinitatis",
+            "ALTJ": "Altjahresabend",
+            "ASCH": "Aschermittwoch",
+            "BUBE": "Buß-und Bettag",
+            "CHF1": "Christfest I",
+            "CHF2": "Christfest II",
+            "CHHF": "Christi Himmelfahrt",
+            "CHRN": "Christnacht",
+            "CHRV": "Christvesper",
+            "DRTL": "Drittl.S.d.Kj.",
+            "EPIP": "Epiphanias (Erscheinungsfest)",
+            "ERNT": "Erntedank",
+            "ESTO": "Estomihi",
+            "EWIG": "Ewigkeitssonntag",
+            "EXAU": "Exaudi",
+            "PEPA": "Gedenktag der Apostel Petrus und Paulus",
+            "AUGU": "Gedenktag der Augsburgischen Konfession",
+            "ALLH": "Gedenktag der Heiligen",
+            "GRDO": "Gründonnerstag",
+            "INVO": "Invocavit",
+            "ISRA": "Israelsonntag: Gedenktag der Zerstörung Jerusalemns",
+            "JUBI": "Jubilate",
+            "JUDI": "Judika",
+            "KANT": "Kantate",
+            "KARF": "Karfreitag",
+            "KARA": "Karfreitag (Andacht zur Todesstunde Jesu)",
+            "KARV": "Karfreitag (Vesper)",
+            "KARS": "Karsamstag",
+            "KONF": "Konfirmation",
+            "LEPI": "Letzter So. nach Epiphanias",
+            "LAET": "Lätare",
+            "MART": "Martinstag (Bischof Martin von Tours)",
+            "MISD": "Misericordias Domini",
+            "NEUJ": "Neujahrstag",
+            "NIKO": "Nikolaustag",
+            "OKUL": "Okuli",
+            "OSTM": "Ostermontag",
+            "OSTN": "Osternacht",
+            "OSTS": "Ostersonntag",
+            "PALM": "Palmarum / Palmsonntag",
+            "PFIM": "Pfingstmontag",
+            "PFIS": "Pfingstsonntag",
+            "QUAS": "Quasimodogeniti",
+            "REFO": "Reformationsfest",
+            "REMI": "Reminiszere",
+            "ROGA": "Rogate",
+            "SEPT": "Septuagesimä",
+            "SEXA": "Sexagesimä",
+            "MAVE": "Tag der Ankündigung der Geburt Jesu (Mariä Verkündigung)",
+            "PHJA": "Tag der Apostel Philippus und Jakobus des Jüngeren",
+            "SIJU": "Tag der Apostel Simon und Judas",
+            "ARBE": "Tag der Arbeit (Bittag um gesegnete Arbeit)",
+            "BEAP": "Tag der Berufung des Apostels Paulus",
+            "BESJ": "Tag der Beschneidung und Namensgebung Jesu",
+            "LIME": "Tag der Darstellung Jesu im Tempel (Lichtmess)",
+            "JOHA": "Tag der Geburt Johannes des Täufers (Johannis)",
+            "MAMA": "Tag der Maria Magdalena",
+            "DEUT": "Tag der deutschen Einheit",
+            "UNSK": "Tag der unschuldigen Kinder",
+            "ANDR": "Tag des Apostels Andreas",
+            "BART": "Tag des Apostels Bartholomäus",
+            "JAKO": "Tag des Apostels Jakobus des Älteren",
+            "MATI": "Tag des Apostels Matthias",
+            "THOM": "Tag des Apostels Thomas",
+            "THO2": "Tag des Apostels Thomas",
+            "JOHN": "Tag des Apostels und Evangelisten Johannes",
+            "MATA": "Tag des Apostels und Evangelisten Matthäus",
+            "MAEL": "Tag des Besuchs Marias bei Elisabeth (Mariä Heimsuchung)",
+            "MICH": "Tag des Erzengels Michael und aller Engel",
+            "STEP": "Tag des Erzmärtyrers Stephanus",
+            "LUKA": "Tag des Evangelisten Lukas",
+            "MARK": "Tag des Evangelisten Markus",
+            "POGR": "Tag des Gedenkens an die Novemberprogrome",
+            "GONS": "Tag des Gedenkens an die Opfer des Nationalsozialismus",
+            "TOTE": "Totensonntag (Gedenktag der Entschlafenen)",
+            "TRIN": "Trinitatis",
+            "VALE": "Valentinstag",
+            "VORL": "Vorletzter Sonntag d. Kj."
+        };
+
+        let myItems = [];
+        for (const codeKey in codes) {
+            for (let i=1; i<=6; i++) {
+                myItems.push({
+                    id: codeKey+'-'+i,
+                    title: codes[codeKey],
+                    year: i,
+                });
+            }
         }
 
         return {
@@ -46,17 +166,19 @@ export default {
             settings: {
                 valueField: 'id',
                 labelField: 'title',
-                searchField: ['title', 'searchDate'],
+                searchField: ['title'],
+                allowEmptyOption: true,
+                showEmptyOptionInDropDown: true,
                 render: {
                     item(item, escape) {
-                        var t = '<div class="proprium-item"> <div style="background-color: '+item.litColor+'" class="liturgy-color"></div>'
-                        +' '+item.title+' <span class="text-muted">'+item.searchDate+'</span>'
+                        var t = '<div class="proprium-item">'
+                        +' '+item.title+' <span class="text-muted">(Lesejahr '+item.year+')</span>'
                         t += '</div>';
                         return t;
                     },
                     option(item, escape) {
-                        var t = '<div class="proprium-option">&nbsp;<div style="background-color: '+item.litColor+'" class="liturgy-color"></div>'
-                        +' '+item.title+' <span class="text-muted">'+item.searchDate+'</span>'
+                        var t = '<div class="proprium-option">'
+                        +' '+item.title+' <span class="text-muted">(Lesejahr '+item.year+')</span>'
                         t += '</div>';
                         return t;
                     }
@@ -75,27 +197,6 @@ export default {
 </template>
 
 <style scoped>
->>> .liturgy-color {
-    display: inline-block;
-    border: solid 1px gray;
-    min-width: 10px;
-    min-height: 10px;
-     border-radius: 0;
-     border-radius: 0;
-}
->>> .liturgy-color.white {
-    background-color: white;
-    border-color: darkgray;
-}
->>> .liturgy-color.black {
-    background-color:black;
-}
->>> .liturgy-color.green {
-    background-color: darkgreen;
-}
->>> .liturgy-color.purple {
-    background-color: rebeccapurple;
-}
 
 >>> .proprium-option .text-muted, >>> .proprium-item .text-muted {
     font-size: .8em;

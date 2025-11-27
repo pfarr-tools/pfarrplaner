@@ -72,7 +72,7 @@ class CalendarServiceResource extends JsonResource
             'liveDashboardUrl' => $this->liveDashboardUrl,
             'youtube_url' => $this->youtube_url,
             'isAlternateProprium' => $this->isAlternateProprium,
-            'liturgicalInfo' => new CalendarLiturgicalInfoResource($this->liturgicalInfo),
+            'liturgicalInfo' => $this->liturgical_info,
             'hidden' => $this->hidden,
             'ministriesByCategory' => new CalendarMinistriesResource($this),
             'pastors' => CalendarParticipantResource::collection($this->pastors),

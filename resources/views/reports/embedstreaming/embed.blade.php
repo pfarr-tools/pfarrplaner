@@ -3,7 +3,7 @@
 @else
     <ul class="collapsible" data-collapsible="accordion" id="serviceCollapsible">
         @if($nextService !== null)
-            <?php $liturgy = \App\Services\LiturgyService::getDayInfo($nextService->day) ?>
+            <?php $liturgy = \App\Services\LiturgyService::getLiturgyInfoByDate($nextService->day) ?>
             <li class="active">
                 <div class="collapsible-header">
                     <span>Gottesdienst am {{ $nextService->date->format('d.m.Y') }}</span></div>
@@ -99,7 +99,7 @@
             @if($ctr <= 10)
                 @if (($lastService->youtube_url != '') || ($lastService->recording_url != ''))
                     <?php $ctr++; ?>
-                    <?php $liturgy = \App\Services\LiturgyService::getDayInfo($lastService->day) ?>
+                    <?php $liturgy = \App\Services\LiturgyService::getLiturgyInfoByDate($lastService->day) ?>
                     <li @if(($loop->index == 1) && ($nextService === null))class="active" @endif>
                         <div class="collapsible-header">
                             <span>Gottesdienst vom {{ $lastService->date->format('d.m.Y') }} (Aufzeichnung)</span>

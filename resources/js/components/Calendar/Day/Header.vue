@@ -53,10 +53,10 @@
             <div class="liturgy">
                 <div class="liturgy-sermon" v-if="day.liturgy.perikope">
                     <div :class="day.liturgy.litColor" class="liturgy-color" :title="day.liturgy.feastCircleName"></div>
-                    <bible-reference :liturgy="day.liturgy" liturgy-key="currentPerikope" title=""/>
+                    <bible-reference :perikope="day.liturgy.perikope" title=""/>
                 </div>
             </div>
-            <div class="card-footer day-name" :title="day.liturgy.litProfileGist" v-if="day.liturgy.title">
+            <div class="card-footer day-name" :title="day.liturgy.title" v-if="day.liturgy.title">
                 {{ day.liturgy.title }}
             </div>
         </div>
