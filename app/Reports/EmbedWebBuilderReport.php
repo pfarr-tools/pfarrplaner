@@ -166,7 +166,10 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         $eventQuery = Occurence::with('event')
             ->between($start, $end)
             ->whereHas('service', function ($query) use ($data) {
-                $query->whereIn('city_id', $data['cities']);
+                $query
+                    ->notHidden()
+                    ->displayable()
+                    ->whereIn('city_id', $data['cities']);
                 switch($data['eventClass']) {
                     case 'service':
                     case 'event':
