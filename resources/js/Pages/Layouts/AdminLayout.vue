@@ -70,7 +70,7 @@
                 </template>
             </Topbar>
 
-            <div class="px-2 pt-4 overflow-scroll vh-100">
+            <div class="px-2 pt-4 d-flex flex-column flex-grow-1 min-vh-0">
                 <h1 v-if="title" class="m-0 mb-4 text-dark" :key="title">{{ title }}</h1>
                 <slot name="before-flash" />
                 <transition name="fade">
@@ -85,7 +85,7 @@
                     <slot name="tab-headers" />
                 </div>
 
-                <main class="admin-content flex-grow-1 overflow-auto p-3">
+                <main class="admin-content flex-grow-1 overflow-auto p-3 min-vh-0">
                     <slot></slot>
                 </main>
             </div>
@@ -201,5 +201,9 @@ export default {
 }
 .slide-leave-to {
     transform: translateX(-100%);
+}
+
+.min-vh-0 {
+    min-height: 0 !important;
 }
 </style>
