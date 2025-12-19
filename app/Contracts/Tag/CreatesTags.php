@@ -28,43 +28,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Actions\Pool;
+namespace App\Contracts\Tag;
 
-use App\Actions\AbstractDeleteAction;
-use App\Contracts\Pool\DeletesPools;
-use App\Events\Models\Pool\DeletedTag;
-use App\Models\Leave\Pool;
 use App\Models\People\User;
-use Illuminate\Support\Facades\Gate;
+use App\Models\Tag;
 
-class DeletePool extends AbstractDeleteAction implements DeletesPools
+/**
+ * @method Tag create(User $user, array $input)
+ */
+interface CreatesTags
 {
-
-    /**
-     * Get return route
-     * @return string
-     */
-    public function redirectTo(): string
-    {
-        return route('admin.pools.index');
-    }
-
-
-
-    /**
-     * Delete a pool
-     * @param User $user
-     * @param Pool $pool
-     * @return bool
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function delete(User $user, Pool $pool): bool
-    {
-        Gate::forUser($user)->authorize('delete', $pool);
-        DeletedTag::dispatch($user, $pool);
-        $this->messages = ['success' => 'Der Pool wurde gelöscht.'];
-        return $pool->delete();
-
-    }
 
 }

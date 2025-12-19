@@ -32,7 +32,7 @@ namespace App\Actions\Pool;
 
 use App\Actions\AbstractUpdateAction;
 use App\Contracts\Pool\UpdatesPools;
-use App\Events\Models\Pool\UpdatedPool;
+use App\Events\Models\Pool\UpdatedTag;
 use App\Models\Leave\Pool;
 use App\Models\People\User;
 use Google\Service\PeopleService\Resource\People;
@@ -58,7 +58,7 @@ class UpdatePool extends AbstractUpdateAction implements UpdatesPools
         $pool->cities()->sync($input['cities'] ?? '');
         $pool->users()->sync($input['users'] ?? '');
         $pool->refresh();
-        UpdatedPool::dispatch($user, $pool);
+        UpdatedTag::dispatch($user, $pool);
         $this->messages = ['success' => 'Der Pool wurde geändert.'];
         return $pool;
     }

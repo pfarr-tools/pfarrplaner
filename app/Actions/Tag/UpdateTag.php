@@ -28,16 +28,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Actions\Pool;
+namespace App\Actions\Tag;
 
-use App\Actions\AbstractDeleteAction;
-use App\Contracts\Pool\DeletesPools;
-use App\Events\Models\Pool\DeletedTag;
-use App\Models\Leave\Pool;
+use App\Actions\AbstractAction;
+use App\Actions\AbstractUpdateAction;
+use App\Contracts\Tag\UpdatesTags;
+use App\Events\Models\Tag\UpdatedTag;
 use App\Models\People\User;
+use App\Models\Tag;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
-class DeletePool extends AbstractDeleteAction implements DeletesPools
+class UpdateTag extends AbstractUpdateAction implements UpdatesTags
 {
 
     /**
@@ -46,25 +49,26 @@ class DeletePool extends AbstractDeleteAction implements DeletesPools
      */
     public function redirectTo(): string
     {
-        return route('admin.pools.index');
+        return route('admin.tags.index');
     }
-
-
 
     /**
-     * Delete a pool
+     * Update a tag
      * @param User $user
-     * @param Pool $pool
-     * @return bool
+     * @param Tag $tag
+     * @param array $input
+     * @return Tag
      * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function delete(User $user, Pool $pool): bool
+    public function update(User $user, Tag $tag, array $input)
     {
-        Gate::forUser($user)->authorize('delete', $pool);
-        DeletedTag::dispatch($user, $pool);
-        $this->messages = ['success' => 'Der Pool wurde gelöscht.'];
-        return $pool->delete();
-
+        Gate::forUser($user)->authorize('update', $tag);
+        $input = Validator::make($input, Tag::$validationRules)->validateWithBag('updateTag');
+        if (empty($input['code'] ?? '')) $input['code'] = Str::slug($input['name']);
+        $tag->update($input);
+        UpdatedTag::dispatch($user, $tag);
+        $this->messages = ['success' => 'Die Kennzeichnung wurde geändert.'];
+        return $tag;
     }
-
 }

@@ -120,16 +120,6 @@ class AdminModule extends AbstractModule
                 'inertia' => true,
             ];
         }
-        if ($user->can('index', Tag::class)) {
-            $adminMenu[] = [
-                'text' => 'Kennzeichnungen',
-                'group' => 'Veranstaltungen',
-                'icon' => 'mdi mdi-tag',
-                'url' => route('tags.index'),
-                'active' => $route == 'tags.index',
-                'inertia' => true,
-            ];
-        }
         if ($user->can('index', Parish::class)) {
             $adminMenu[] = [
                 'text' => 'Pfarrämter',

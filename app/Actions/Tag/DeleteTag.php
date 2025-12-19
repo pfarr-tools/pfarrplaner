@@ -28,14 +28,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+namespace App\Actions\Tag;
 
-use App\Http\Controllers\TagController;
+use App\Actions\AbstractDeleteAction;
+use App\Contracts\Tag\DeletesTags;
+use App\Events\Models\Tag\DeletedTag;
+use App\Models\People\User;
+use App\Models\Tag;
+use Illuminate\Support\Facades\Gate;
 
-Route::get('/kennzeichnungen', [TagController::class, 'index'])->name('tags.index');
-Route::get('/kennzeichnungen/neu', [TagController::class, 'create'])->name('tag.create');
-Route::post('/kennzeichnungen', [TagController::class, 'store'])->name('tag.store');
-Route::get('/kennzeichnung/{tag}', [TagController::class, 'edit'])->name('tag.edit');
-Route::patch('/kennzeichnung/{tag}', [TagController::class, 'update'])->name('tag.update');
-Route::delete('/kennzeichnung/{tag}', [TagController::class, 'destroy'])->name('tag.destroy');
+class DeleteTag extends AbstractDeleteAction implements DeletesTags
+{
 
+    /**
+     * Get return route
+     * @return string
+     */
+    public function redirectTo(): string
+    {
+        return route('admin.tags.index');
+    }
 
+    /**
+     * Delete a tag
+     * @param User $user
+     * @param Tag $tag
+     * @return Tag|bool|null
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function delete(User $user, Tag $tag)
+    {
+        Gate::forUser($user)->authorize('delete', $tag);
+        DeletedTag::dispatch($user, $tag);
+        $this->messages = ['success' => 'Die Kennzeichnung wurde gelöscht.'];
+        return $tag->delete();
+
+    }
+
+}

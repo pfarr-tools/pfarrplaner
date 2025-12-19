@@ -28,43 +28,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Actions\Pool;
+namespace App\Actions\Tag;
 
-use App\Actions\AbstractDeleteAction;
-use App\Contracts\Pool\DeletesPools;
-use App\Events\Models\Pool\DeletedTag;
-use App\Models\Leave\Pool;
+use App\Actions\AbstractCreateAction;
+use App\Contracts\Tag\CreatesTags;
+use App\Events\Models\Tag\CreatedTag;
 use App\Models\People\User;
+use App\Models\Tag;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
-class DeletePool extends AbstractDeleteAction implements DeletesPools
+class CreateTag extends AbstractCreateAction implements CreatesTags
 {
 
     /**
-     * Get return route
+     * Get the return route
      * @return string
      */
     public function redirectTo(): string
     {
-        return route('admin.pools.index');
+        return route('admin.tags.index');
     }
-
-
 
     /**
-     * Delete a pool
+     * Create a new tag
      * @param User $user
-     * @param Pool $pool
-     * @return bool
+     * @param array $input
+     * @return Tag
      * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function delete(User $user, Pool $pool): bool
+    public function create(User $user, array $input)
     {
-        Gate::forUser($user)->authorize('delete', $pool);
-        DeletedTag::dispatch($user, $pool);
-        $this->messages = ['success' => 'Der Pool wurde gelöscht.'];
-        return $pool->delete();
+        Gate::forUser($user)->authorize('create', Tag::class);
+        $input = Validator::make($input, Tag::$validationRules)->validateWithBag('createTag');
+        if (empty($input['code'] ?? '')) $input['code'] = Str::slug($input['name']);
+        $tag = Tag::create($input);
+        CreatedTag::dispatch($user, $tag);
+        $this->messages = ['success' => 'Die neue Kennzeichnung wurde gespeichert.'];
+        return $tag;
 
     }
-
 }

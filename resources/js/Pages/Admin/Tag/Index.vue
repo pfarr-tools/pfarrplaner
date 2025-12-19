@@ -28,103 +28,23 @@
   -->
 
 <template>
-    <admin-layout title="Kennzeichnungen">
-        <template v-slot:navbar-left>
-            <nav-button type="success" icon="mdi mdi-plus" title="Kennzeichnung hinzufügen"
-                        @click="addTag">Neue Kennzeichnung</nav-button>
-        </template>
-        <dataset v-slot="{ ds }"
-                 :ds-data="tags"
-                 ds-sort-by="name"
-                 :ds-search-in="['name']">
-            <div class="row mb-3" :data-page-count="ds.dsPagecount">
-                <div class="col-md-6 mb-2 mb-md-0">
-                    <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
-                </div>
-                <div class="col-md-5 text-end">
-                    <dataset-show class="float-right" />
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover d-md-table">
-                            <thead>
-                            <tr>
-                                <th>Kennzeichnung</th>
-                                <th>Code</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <dataset-item tag="tbody">
-                                <template #default="{ row, rowIndex }">
-                                    <tr>
-                                        <td>{{ row.name }}</td>
-                                        <td>{{ row.code }}</td>
-                                        <td class="text-end" style="min-width: 7em;">
-                                            <inertia-link class="btn btn-sm btn-primary" title="Rolle bearbeiten"
-                                                          :href="route('tag.edit', {tag: row.id})">
-                                                <span class="mdi mdi-pencil"></span>
-                                            </inertia-link>
-                                            <button class="btn  btn-sm btn-danger ms-1" title="Rolle löschen"
-                                                    @click="deleteTag(row)">
-                                                <span class="mdi mdi-delete"></span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </dataset-item>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
-            </div>
-        </dataset>
-    </admin-layout>
+    <model-index-page title="Kennzeichnungen" :records="tags" :can-create="canCreate"
+                      create-label="Neue Kennzeichnung" create-route-name="admin.tags.create"
+                      model-label="Kennzeichnung">
+
+    </model-index-page>
 </template>
 
 <script>
 
-import Card from "../../../components/Ui/cards/card";
-import CardBody from "../../../components/Ui/cards/cardBody";
-import FakeTable from "../../../components/Ui/FakeTable";
-import {
-    Dataset,
-    DatasetItem,
-    DatasetSearch,
-} from 'vue-dataset';
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
-import NavButton from "../../../components/Ui/buttons/NavButton";
+import ModelIndexPage from "../../../components/Admin/ModelIndexPage.vue";
 
 export default {
     name: "Index",
     components: {
-        NavButton, FakeTable, CardBody, Card,
-        Dataset,
-        DatasetItem,
-        DatasetInfo,
-        DatasetPager,
-        DatasetSearch,
-        DatasetShow
+        ModelIndexPage,
     },
-    props: ['tags'],
-    methods: {
-        addTag() {
-            this.$inertia.get(route('tag.create'));
-        },
-        editTag(tag) {
-            this.$inertia.get(route('tag.edit', tag.id));
-        },
-        deleteTag(tag) {
-            if (!confirm('Willst du diese Kennzeichnung wirklich komplett löschen?')) return;
-            this.$inertia.delete(route('tag.destroy', tag.id));
-        },
-    }
+    props: ['tags', 'canCreate'],
 }
 </script>
 

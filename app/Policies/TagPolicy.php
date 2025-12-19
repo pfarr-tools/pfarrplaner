@@ -64,10 +64,9 @@ class TagPolicy
 
     /**
      * @param User $user
-     * @param Tag $model
      * @return bool
      */
-    public function create(User $user, Tag $model)
+    public function create(User $user)
     {
         return true;
     }

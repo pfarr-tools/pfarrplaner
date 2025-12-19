@@ -38,7 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * Class Tag
  * @package App
  */
-class Tag extends Model
+class Tag extends AbstractModel
 {
     use HasFactory;
 
@@ -46,6 +46,19 @@ class Tag extends Model
      * @var string[]
      */
     protected $fillable = ['code', 'name'];
+
+    protected static string $prefix = 'kennzeichnung';
+    protected static string $prefixPlural = 'kennzeichnungen';
+    public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
+    public static array $validationRules = [
+        'name' => 'required|max:255',
+        'code' => 'nullable|max:255',
+    ];
+
+    public static $adminIcon = 'mdi mdi-tag';
+    public static $adminGroup = 'Veranstaltungen';
+    public static $adminTitle = 'Tags';
+
 
     /**
      * @return BelongsToMany

@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <admin-layout :title="tag.id ? tag.name+' bearbeiten' : 'Neue Kennzeichnung' ">
+    <admin-layout :title="myTag.name ? tag.name+' bearbeiten' : 'Neue Kennzeichnung' ">
         <template v-slot:navbar-left>
             <save-button @click="saveTag" />
             <nav-button class="ms-1" v-if="myTag.id"
@@ -44,25 +44,28 @@ import FormInput from "../../../components/Ui/forms/FormInput";
 import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import NavButton from "../../../components/Ui/buttons/NavButton";
 export default {
-    name: "TagEditor",
+    name: "Editor",
     components: {NavButton, SaveButton, FormInput},
     props: ['tag'],
     data() {
+        let myTag = this.tag;
+        if (undefined === myTag) myTag = {id: null, name: '', code: ''};
+
         return {
-            myTag: this.tag,
+            myTag,
         }
     },
     methods: {
         saveTag() {
             if (this.myTag.id) {
-                this.$inertia.patch(route('tag.update', this.myTag.id), this.myTag);
+                this.$inertia.patch(route('admin.tag.update', this.myTag.id), this.myTag);
             } else {
-                this.$inertia.post(route('tag.store'), this.myTag);
+                this.$inertia.post(route('admin.tags.store'), this.myTag);
             }
         },
         deleteTag() {
             if (!confirm('Willst du diese Kennzeichnung wirklich komplett löschen?')) return;
-            this.$inertia.delete(route('tag.destroy', this.myTag.id));
+            this.$inertia.delete(route('admin.tag.destroy', this.myTag.id));
         },
     }
 }
