@@ -102,7 +102,7 @@ class NewsletterReport extends AbstractWordDocumentReport
             ->between($start, $end)
             ->whereHas('service', function ($query) use ($data, $start, $end) {
                 $query->whereIn('city_id', $data['cities'])
-                    ->displayable(Carbon::now())
+                    ->displayable($start)
                     ->notHidden();
             })
             ->orderBy('start')
@@ -111,7 +111,20 @@ class NewsletterReport extends AbstractWordDocumentReport
                 return $item->start->format('Y-m-d');
             });
 
-        $html = View::make('reports.newsletter.html', compact('events', 'data', 'start', 'end'))->render();
+
+        $featuredEvents = Occurence::with('event')
+            ->adRunningAt('newsletter', $start)
+            ->whereHas('service', function ($query) use ($data, $start, $end) {
+                $query->whereIn('city_id', $data['cities'])
+                    ->displayable($start)
+                    ->notHidden();
+            })
+            ->orderBy('start')
+            ->get();
+
+        $html = View::make('reports.newsletter.html',
+                           compact('events', 'data', 'start', 'end', 'featuredEvents'))
+            ->render();
 
         return Inertia::render('Report/Newsletter/Render', compact('html'));
 

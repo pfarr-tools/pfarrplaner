@@ -30,10 +30,10 @@
 
 namespace App\Models;
 
-use App\Casts\RRule;
 use App\DAV\DAVCalendarItem;
 use App\DAV\HasDAVCalendarItems;
 use App\Helpers\YoutubeHelper;
+use App\Models\Ads\AdConfig;
 use App\Models\Calendar\Day;
 use App\Models\Calendar\Occurence;
 use App\Models\Liturgy\Block;
@@ -118,7 +118,6 @@ class Service extends Model implements HasDAVCalendarItems
         'date' => 'datetime',
         'registration_online_start' => 'datetime',
         'registration_online_end' => 'datetime',
-        'communiapp_listing_start' => 'datetime',
         'alt_liturgy_date' => 'datetime',
         'end' => 'datetime',
     ];
@@ -178,8 +177,6 @@ class Service extends Model implements HasDAVCalendarItems
         'sermon_id',
         'announcements',
         'offering_text',
-        'communiapp_id',
-        'communiapp_listing_start',
         'slug',
         'controlled_access',
         'alt_liturgy_date',
@@ -191,6 +188,7 @@ class Service extends Model implements HasDAVCalendarItems
         'rrule',
         'is_allday',
         'alt_proprium',
+        'ad_text',
     ];
 
     /**
@@ -525,6 +523,33 @@ class Service extends Model implements HasDAVCalendarItems
             return new RowBasedSeatFinder($this);
         }
         return new MaximumBasedSeatFinder($this);
+    }
+
+
+    /**
+     * Return the image url for a specific image cut (empty if this cut doesn't exist)
+     * @param string $cut
+     * @return string
+     */
+    public function getImageCutUrl(string $cut): string
+    {
+        if ($attachment = $this->attachments()->firstWhere('cut', Str::slug($cut))) {
+            return route('image', Str::replace('attachments/', '', $attachment->file));
+        }
+        return '';
+    }
+
+    /**
+     * Return the image path for a specific image cut (empty if this cut doesn't exist)
+     * @param string $cut
+     * @return string
+     */
+    public function getImageCutPath(string $cut): string
+    {
+        if ($attachment = $this->attachments()->firstWhere('cut', Str::slug($cut))) {
+            return storage_path('app/'.$attachment->file);
+        }
+        return '';
     }
 
     /**
@@ -1024,6 +1049,7 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
 
+
     // SETTERS
 // SETTERS
 // SETTERS
@@ -1088,10 +1114,19 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * Boot method
      * -> register creating/updating handlers to ensure slug is always up to date
+     * -> register global scope
      */
     protected static function boot()
     {
         parent::boot();
+
+        /*
+         * For backwards compatibility, we're adding a ServicesOnlyScope to all queries, so all existing code will only
+         * work on service events, not on other event_classes. Eventually, this scope won't be necessary any more, but
+         * for the moment, it's the easiest way to slowly introduce new event_classes.
+         */
+        static::addGlobalScope(new ServicesOnlyScope());
+
 
         static::creating(function ($service) {
             $service->slug = $service->createSlug();
@@ -1115,21 +1150,6 @@ class Service extends Model implements HasDAVCalendarItems
     public function isTemplate(): bool
     {
         return $this->date->format('Y-m-d') == '1978-03-05';
-    }
-
-    /**
-     * Booted lifecycle method
-     * -> register global scopes
-     * @return void
-     */
-    protected static function booted(): void
-    {
-        /*
-         * For backwards compatibility, we're adding a ServicesOnlyScope to all queries, so all existing code will only
-         * work on service events, not on other event_classes. Eventually, this scope won't be necessary any more, but
-         * for the moment, it's the easiest way to slowly introduce new event_classes.
-         */
-        static::addGlobalScope(new ServicesOnlyScope());
     }
 
     /**
@@ -1181,6 +1201,32 @@ class Service extends Model implements HasDAVCalendarItems
             }
         }
         return $participants;
+    }
+
+    /**
+     * @param Request $request
+     * @return void
+     */
+    public function setAdConfigFromRequest(Request $request)
+    {
+        if ($request->has('ad_configs')) {
+            AdConfig::where('service_id', $this->id)->delete();
+            $data = $request->validate([
+                'ad_configs.*.offset' => 'nullable|int|min:0',
+                'ad_configs.*.ad_text' => 'nullable|string',
+            ]);
+            $adConfigs = $data['ad_configs'];
+            foreach ($this->city->getActiveAdChannels() as $key => $channel) {
+                if (isset($adConfigs[$key]) && (($adConfigs[$key]['offset'] ?? 0) > 0)) {
+                    AdConfig::create([
+                        'service_id' => $this->id,
+                        'slug' => $key,
+                        'offset' => $adConfigs[$key]['offset'],
+                        'ad_text' => $adConfigs[$key]['ad_text'] ?? ''
+                     ]);
+                }
+            }
+        }
     }
 
     /**
@@ -1291,6 +1337,14 @@ class Service extends Model implements HasDAVCalendarItems
     public function day()
     {
         return $this->belongsTo(Day::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function AdConfigs()
+    {
+        return $this->hasMany(AdConfig::class);
     }
 
     /**

@@ -82,13 +82,14 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
     protected $validationRules = [
         'cities.*' => 'required|int|exists:cities,id',
         'locations.*' => 'nullable|int|exists:cities,id',
-        'tags.*' => 'nullable|string|exists:tags,code',
+        'tags.*' => 'nullable|int|exists:tags,id',
         'eventClass' => 'required|string',
         'maxDays' => 'nullable|int',
         'limit' => 'nullable|int',
         'cors-origin' => 'required|url',
         'template' => 'required|string',
         'maxBaptisms' => 'nullable|int',
+        'adChannelCode' => 'nullable|string',
     ];
 
     protected function getAvailableLayouts(): array {
@@ -199,12 +200,15 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
                 }
                 if (count($data['tags'] ??= []) > 0) {
                     $query->whereHas('tags', function ($query) use ($data) {
-                       $query->whereIn('tag_id', $data['tags']);
+                       $query->whereIn('id', $data['tags']);
                     });
                 }
             })->orderBy('start');
 
         if ($data['limit'] ?? null) $eventQuery->limit($data['limit']);
+        if ($data['adChannelCode']) {
+            $eventQuery->adRunningAt($data['adChannelCode'], $start);
+        }
 
         return view('embed.webbuilder.'.$data['template'], ['options' => $data, 'occurences' => $eventQuery->get(), 'randomId' => $randomId]);
     }

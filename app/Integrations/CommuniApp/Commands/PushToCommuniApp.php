@@ -31,6 +31,7 @@
 namespace App\Integrations\CommuniApp\Commands;
 
 use App\Integrations\CommuniApp\CommuniAppIntegration;
+use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
 use App\Models\Service;
 use Carbon\Carbon;
@@ -44,14 +45,14 @@ class PushToCommuniApp extends Command
      *
      * @var string
      */
-    protected $signature = 'communiapp:push';
+    protected $signature = 'communiapp:push {--dry-run : Only show which events would be pushed} {--force : Force push of all events, even if their publication date is already in the past }';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Push all existing services to communiapp';
+    protected $description = 'Push (all) events to CommuniApp ';
 
     /**
      * Create a new command instance.
@@ -71,31 +72,30 @@ class PushToCommuniApp extends Command
     public function handle()
     {
         foreach (City::all() as $city) {
+            $pushCtr = 0;
             if (CommuniAppIntegration::isActive($city)) {
-                $this->line('Updating future services for "'.$city->name.'"');
-                $communiApp = CommuniAppIntegration::get($city);
-                $services = Service::displayable()
-                    ->inCity($city)
-                    ->notHidden()
-                    ->whereDoesntHave('funerals')
-                    ->whereDoesntHave('weddings')
-                    ->where(function($query) {
-                        $query->where(function ($q) {
-                            $q->whereNull('communiapp_listing_start')
-                                ->startingFrom(Carbon::now())
-                                ->endingAt(Carbon::now()->addDays(8));
-                        })
-                        ->orWhere(function ($q) {
-                            $q->whereNotNull('communiapp_listing_start')
-                                ->startingFrom(Carbon::now())
-                                ->where('communiapp_listing_start', '<=', Carbon::now());
-                        });
-                    })
-                    ->ordered()
-                    ->get();
-                foreach ($services as $service) {
-                    $this->line('Updating service #'.$service->id.' ('.$service->dateTime->setTimeZone('Europe/Berlin')->format('d.m.Y H:i').')');
-                    $communiApp->handleServiceUpdated($service);
+
+                $this->line('Pushing events to CommuniApp for "'.$city->name.'"');
+
+                $events = Occurence::adRunningAt('communiapp', Carbon::now(), !$this->option('force'))
+                    ->whereHas('service', function ($q) use ($city) {
+                        $q->inCity($city)->notHidden()->displayable(Carbon::now());
+                    })->get();
+                if ($events->count()) {
+                    $communiApp = CommuniAppIntegration::get($city);
+                    foreach ($events as $event) {
+                        $this->line('Pushing event #'.$event->id.' ('
+                                    .$event->start->setTimeZone('Europe/Berlin')->format('d.m.Y, H:i')
+                                        .', '.$event->service->locationTextWithCity
+                                    .') '.$event->service->titleText(false, true));
+                        if (!$this->option('dry-run')) $communiApp->publish($event);
+                        $pushCtr++;
+                    }
+                }
+                if ($pushCtr == 0) {
+                    $this->line('No events to push');
+                } else {
+                    $this->line('Pushed '.$pushCtr.' events to CommuniApp');
                 }
             }
         }

@@ -32,6 +32,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attachment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 /**
  * Class AttachmentController
@@ -54,9 +55,15 @@ class AttachmentController extends Controller
     {
         if ($request->hasFile('attachments')) {
             $files = $request->file('attachments');
+            $cut = $request->get('cut', null);
             foreach ($files as $key => $file) {
-                $path = $file->store('attachments');
-                $attachment->update(['file' => $path]);
+                if ($cut) {
+                    //$extension = $file->getClientOriginalExtension() ?: pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+                    $path = $file->storeAs('attachments', 'zuschnitt-'.$attachment->attachable_id.'-'.$cut.'.'.$file->getClientOriginalExtension());
+                } else {
+                    $path = $file->storeAs('attachments', 'attachments', Str::random(32).'.'.$file->getClientOriginalExtension());
+                }
+                $attachment->update(['file' => $path, 'cut' => $cut]);
             }
         }
         $attachment->refresh();

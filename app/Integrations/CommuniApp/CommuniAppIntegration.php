@@ -32,10 +32,12 @@ namespace App\Integrations\CommuniApp;
 
 
 use App\Integrations\AbstractIntegration;
+use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
 use App\Models\Service;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use Illuminate\Console\Scheduling\Schedule;
 
 class CommuniAppIntegration extends AbstractIntegration
 {
@@ -49,6 +51,17 @@ class CommuniAppIntegration extends AbstractIntegration
 
     /** @var City */
     protected $city = null;
+
+    /**
+     * Schedule the push to CommuniApp to be run daily
+     * @param Schedule $schedule
+     * @return void
+     */
+    public static function schedule(Schedule $schedule)
+    {
+        $schedule->command('communiapp:push')->timezone('Europe/Berlin')->dailyAt('08:00');
+    }
+
 
     /**
      * Check if this integration is active for a particular city
@@ -93,36 +106,35 @@ class CommuniAppIntegration extends AbstractIntegration
      * @param Service $service
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function handleServiceCreated(Service $service)
-    {
-        if (!$this->mayPublish($service))  {
-            return;
-        }
+    public function handleServiceCreated(Service $service) {}
 
-        $response = $this->client->post(self::ROUTE_EVENT, ['body' => json_encode($this->getServiceArray($service))]);
-        if ($response->getStatusCode() == 200) {
-            $service->update(['communiapp_id' => json_decode($response->getBody())->id]);
-        }
+    /**
+     * Create a new service on CommuniApp (only here for reference)
+     * @param Service $service
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    private function createService(Service $service)
+    {
+        return $this->client->post(self::ROUTE_EVENT, ['body' => json_encode($this->getServiceArray($service))]);
     }
 
-    public function handleServiceUpdated(Service $service)
+    public function publish(Occurence $event)
     {
-        if (!$this->mayPublish($service))  {
-            return;
-        }
+        return $this->client->post(self::ROUTE_EVENT, ['body' => json_encode($this->getEventArray($event))]);
+    }
 
-        if (!$service->communiapp_id) {
-            return $this->handleServiceCreated($service);
-        };
-        $response = $this->client->put(sprintf('%s/%s', self::ROUTE_EVENT, $service->communiapp_id),
+    public function handleServiceUpdated(Service $service) {}
+
+    /**
+     * Update an existing service on CommuniApp (only here for reference)
+     * @param Service $service
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    private function updateService(Service $service) {
+        return $this->client->put(sprintf('%s/%s', self::ROUTE_EVENT, $service->communiapp_id),
                                        ['body' => json_encode($this->getServiceArray($service))]);
-    }
-
-    public function mayPublish(Service $service) {
-        if ($service->date <= Carbon::now()) return false;
-        if ((null === $service->communiapp_listing_start) && (Carbon::now() >= $service->date->subDay(8))) return true;
-        if ((null !== $service->communiapp_listing_start) && (Carbon::now() >= $service->communiapp_listing_start)) return true;
-        return false;
     }
 
     /**
@@ -142,14 +154,39 @@ class CommuniAppIntegration extends AbstractIntegration
     }
 
     /**
+     * Convert an event to a dataset array for CommuniApp
+     * @param Occurence $event
+     * @return array
+     */
+    protected function getEventArray(Occurence $event): array {
+        return [
+            'dateTime' => $event->start->setTimezone('Europe/Berlin')->format('Y-m-d H:i:s'),
+            'isOfficial' => true,
+            'group' => $this->city->communiapp_default_group_id,
+            'title' => $event->service->titleText(false, true),
+            'location' => $event->service->locationText(),
+            'picUrl' => $event->service->getImageCutUrl('CommuniApp'),
+            'description' => $event->getAdText('communiapp'),
+        ];
+    }
+
+
+
+    /**
      * Delete a service from CommuniApp
      * @param Service $service
      */
-    public function handleserviceDeleted(Service $service)
+    public function handleserviceDeleted(Service $service) {}
+
+    /**
+     * Delete a service from CommuniApp (only here for reference)
+     * @param Service $service
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function deleteService(Service $service)
     {
-        if (!$service->communiapp_id) return;
-        $response = $this->client->delete(sprintf('%s/%s', self::ROUTE_EVENT, $service->communiapp_id));
-        $service->update(['communiapp_id' => null]);
+        return $this->client->delete(sprintf('%s/%s', self::ROUTE_EVENT, $service->communiapp_id));
     }
 
 }

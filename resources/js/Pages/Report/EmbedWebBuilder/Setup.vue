@@ -46,11 +46,13 @@
             { id: 'funerals', name: 'Nur Beerdigungen' },
             { id: 'event', name: 'Nur andere Veranstaltungen' },
         ]" v-model="myForm.eventClass"/>
+        <form-input name="adChannelCode" label="Nur aktiv auf folgendem Werbekanal beworbene Veranstaltungen anzeigen"
+                    v-model="myForm.adChannelCode"/>
         <location-select name="locations" label="Auf folgende Veranstaltungsorte begrenzen"
                          placeholder="Leer lassen für alle Veranstaltungsorte"
                          :locations="locations" v-model="myForm.locations" multiple use-input />
-        <form-selectize name="tags" label="Auf folgende Stichworte begrenzen" required aria-required="true"
-                        v-model="myForm.tags" :options="tags" id-key="code" multiple/>
+        <tag-select name="tags" label="Auf folgende Stichworte begrenzen" return="id"
+                        v-model="myForm.tags" :tags="tags"  />
 
         <hr class="my-3"/>
         <h3>Weitere Filter</h3>
@@ -92,11 +94,14 @@ import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
 import LocationSelect from "../../../components/Ui/elements/LocationSelect.vue";
+import TagSelect from "../../../components/Ui/elements/TagSelect.vue";
 
 export default {
     name: "Setup",
     props: ['cities', 'locations', 'layouts', 'tags'],
-    components: {LocationSelect, FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {
+        TagSelect,
+        LocationSelect, FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         let myStart = moment();
         let myEnd = moment().add(7, 'days');
@@ -121,6 +126,7 @@ export default {
             myForm: {
                 cities: this.cities.length ? [this.cities[0].id] : [],
                 eventClass: '*',
+                adChannelCode: '',
                 locations: [],
                 tags: [],
                 maxDays: 8,

@@ -88,6 +88,7 @@ class ServiceController extends Controller
         $service->tags()->sync($request->get('tags') ?: []);
         $service->serviceGroups()->sync(ServiceGroup::createIfMissing($request->get('serviceGroups') ?: []));
         $service->updateRelatedCitiesFromRequest($request);
+        $service->setAdConfigFromRequest($request);
     }
 
     protected function presetDataForNewService($date = null, City $city = null): Array {
@@ -131,7 +132,7 @@ class ServiceController extends Controller
     {
         $tab = $request->get('tab', 'home');
         $service->load(
-            ['attachments', 'comments', 'bookings', 'liturgyBlocks', 'tags', 'serviceGroups', 'relatedCities']
+            ['attachments', 'comments', 'bookings', 'liturgyBlocks', 'tags', 'serviceGroups', 'relatedCities', 'adConfigs']
         );
         $service->setAppends(
             [
@@ -174,6 +175,10 @@ class ServiceController extends Controller
 
         $tags = Tag::all();
         $serviceGroups = ServiceGroup::all();
+
+        $adsConfig = config('ads');
+        $adChannels = $service->city->getActiveAdChannels();
+
         return Inertia::render(
             'serviceEditor',
             compact(
@@ -186,6 +191,8 @@ class ServiceController extends Controller
                 'backRoute',
                 'availableCities',
                 'liturgyInfo',
+                'adsConfig',
+                'adChannels',
             )
         );
     }

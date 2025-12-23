@@ -79,6 +79,18 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('liturgy:get')->daily();
         $schedule->command('cache:prune-stale-tags')->hourly();
+
+        // get schedules from integrations
+        foreach (glob(app_path('Integrations/*')) as $folder) {
+            if (is_dir($folder)) {
+                $integrationClassName = 'App\\Integrations\\'.basename($folder).'\\'.basename($folder).'Integration';
+                if (class_exists($integrationClassName)) {
+                    if (method_exists($integrationClassName, 'schedule')) {
+                        $integrationClassName::schedule($schedule);
+                    }
+                }
+            }
+        }
     }
 
     /**

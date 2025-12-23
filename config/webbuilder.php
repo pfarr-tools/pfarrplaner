@@ -38,13 +38,13 @@ return [
                 'events' => 'Alle Veranstaltungen',
                 'services' => 'Gottesdienste',
                 'baptisms' => 'Taufgottesdienste',
+                'triple-feature' => 'Features auf der Startseite',
             ],
         ],
         [
             'id' => 'jubi',
             'name' => 'Jubiläumslayout',
             'templates' => [
-                'teaser' => 'Teaserbox auf der Startseite',
             ],
         ],
     ],

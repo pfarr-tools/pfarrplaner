@@ -39,7 +39,9 @@
         "spiral/roadrunner-cli": "*",
         "spiral/roadrunner-http": "*",
         "staudenmeir/belongs-to-through": "^2.3",
-        "tightenco/ziggy": "^1.0"
+        "tightenco/ziggy": "^1.0",
+        "ext-dom": "*",
+        "ext-zip": "*"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^2.0",

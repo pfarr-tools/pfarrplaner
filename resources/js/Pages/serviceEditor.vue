@@ -96,6 +96,8 @@
                     <tab-header id="registrations" title="Anmeldungen" :active-tab="activeTab"
                                 :count="service.seating ? service.seating.count : 0"/>
                     <tab-header v-if="service.id"
+                                id="ads" title="Werbung" :active-tab="activeTab" />
+                    <tab-header v-if="service.id"
                                 id="attachments" title="Dateien" :active-tab="activeTab" :count="countAttachments()"/>
                     <tab-header v-if="service.id"
                                 id="comments" title="Kommentare" :active-tab="activeTab"
@@ -142,6 +144,9 @@
                     <tab id="registrations" :active-tab="activeTab">
                         <registrations-tab :service="service"/>
                     </tab>
+                    <tab id="ads" :active-tab="activeTab">
+                        <ads-tab :service="service" :config="adsConfig" :ad-channels="adChannels" />
+                    </tab>
                     <tab id="attachments" :active-tab="activeTab">
                         <attachments-tab :service="service" :liturgy-sheets="liturgySheets" :files="files"/>
                     </tab>
@@ -173,10 +178,12 @@ import CommentsTab from "../components/ServiceEditor/tabs/CommentsTab";
 import RegistrationsTab from "../components/ServiceEditor/tabs/RegistrationsTab";
 import NavButton from "../components/Ui/buttons/NavButton";
 import RecurrenceTab from "../components/ServiceEditor/tabs/RecurrenceTab.vue";
+import AdsTab from "../components/ServiceEditor/tabs/AdsTab.vue";
 
 export default {
     name: "serviceEditor",
     components: {
+        AdsTab,
         RecurrenceTab,
         NavButton,
         RegistrationsTab,
@@ -197,6 +204,8 @@ export default {
         backRoute: String,
         availableCities: Array,
         liturgyInfo: Array,
+        adsConfig: Object,
+        adChannels: Object,
     },
     computed: {
         hasAnnouncements() {

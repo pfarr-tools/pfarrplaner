@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="5000"
+   height="5000"
+   viewBox="0 0 5000 5000"
+   version="1.1"
+   id="svg831"
+   sodipodi:docname="note_white.svg"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:x="adobe:ns:meta/">
+  <sodipodi:namedview
+     id="namedview833"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="0.1758"
+     inkscape:cx="2500"
+     inkscape:cy="2500"
+     inkscape:window-width="1920"
+     inkscape:window-height="1129"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg831" />
+  <metadata
+     id="metadata824">
+<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>    <x:xmpmeta
+       x:xmptk="Adobe XMP Core 5.6-c138 79.159824, 2016/09/14-01:09:01        ">
+      <rdf:RDF>
+        <rdf:Description
+           rdf:about="" />
+      </rdf:RDF>
+    </x:xmpmeta>
+<?xpacket end="w"?>  </metadata>
+  <defs
+     id="defs828">
+    <style
+       id="style826">
+      .cls-1 {
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path
+     id="Form_1"
+     data-name="Form 1"
+     class="cls-1"
+     d="M4409.97,247.015L1695.37,734.16V3836.79c-72.43-68.39-193.11-88.49-333.93-88.49-160.92,0-354.03,80.47-506.922,205.17-152.868,120.67-265.531,285.61-265.531,450.54,0,104.6,44.269,193.12,120.682,253.46,72.424,60.33,177.028,96.54,289.69,96.54,177.031,0,378.191-72.41,531.051-193.09,156.9-120.7,265.53-285.64,265.53-466.64V1096.73L4310.41,645.5V3367.46c-72.43-68.39-193.14-88.49-333.93-88.49-160.95,0-354.05,80.47-506.92,205.17C3316.66,3604.81,3204,3769.75,3204,3934.68c0,104.6,44.26,193.12,120.71,253.46,72.43,60.33,177.04,96.54,289.66,96.54,177.03,0,378.19-72.41,531.09-193.09,156.89-120.7,265.53-285.64,265.53-466.64Z"
+     style="fill:#ffffff" />
+</svg>

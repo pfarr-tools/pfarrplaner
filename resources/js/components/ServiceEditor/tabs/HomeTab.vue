@@ -77,12 +77,6 @@
                                       @input="adjustAllDay"
                                       :config="myDatePickerConfig" iso-date/>
                 </div>
-                <div v-if="myService.city.communiapp_token" class="col-md-4">
-                    <form-group label="In der CommuniApp anzeigen ab"
-                                help="Leer lassen für den Standard (8 Tage vor Beginn)">
-                        <date-picker v-model="myService.communiapp_listing_start" :config="myDatePickerConfig"/>
-                    </form-group>
-                </div>
                 <div class="col-md-4" v-if="myService.event_class == 'service'">
                     <proprium-select label="Zugehöriges Proprium" :liturgy-info="liturgyInfo"
                                      v-model="myService.alt_proprium"/>
@@ -226,7 +220,6 @@ export default {
         this.cities.forEach(city => {
             if (city.id != this.service.city_id) relatableCities.push(city);
         });
-        myService.communiapp_listing_start = moment(this.service.communiapp_listing_start).format('DD.MM.YYYY');
         myService.event_class = myService.event_class || 'service';
         return {
             myService,
@@ -271,9 +264,6 @@ export default {
                 this.myService.location = null;
             }
             this.locationUpdating = false;
-        },
-        setCommuniappListingStart(e) {
-            this.service.communiapp_listing_start = e;
         },
         adjustEndTime(e) {
             if(this.myService.event_class === 'service') {

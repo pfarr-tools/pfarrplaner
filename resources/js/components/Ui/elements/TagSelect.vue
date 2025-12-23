@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <div class="tag-select">
+    <div class="tag-select"  :key="tagsUpdated">
         <form-selectize :name="name" :label="label" :help="help"
                         :options="tags" :value="myValue"
                         :item-renderer="renderOption" :option-renderer="renderOption"
@@ -42,7 +42,7 @@ import FormSelectize from "../forms/FormSelectize";
 export default {
     name: "TagSelect",
     components: {FormSelectize},
-    props: ['tags', 'name', 'label', 'help', 'value'],
+    props: ['tags', 'name', 'label', 'help', 'value', 'return'],
     data() {
         var myValue = [];
         if (this.value) {
@@ -50,6 +50,7 @@ export default {
         }
 
         let myTags = this.tags;
+        let myReturnProperty = this.return || '';
 
         return {
             myValue: myValue,
@@ -61,7 +62,9 @@ export default {
                         return '<div class="create">Neue Kennzeichnung anlegen: <strong>' + escape(data.input) + '</strong>&hellip;</div>';
                     },
                 },
-            }
+            },
+            myReturnProperty,
+            tagsUpdated: 0,
         }
     },
     methods: {
@@ -69,12 +72,23 @@ export default {
             return '<div class="item" style="padding-left: 3px;"><span class="mdi mdi-tag"></span> '+escape(item.name)+'</div>';
         },
         handleInput(e) {
+            this.myValue = e;
             var items = [];
-            this.tags.forEach(tag => { if (e.includes(tag.id.toString())) items.push(tag); });
+            if (!this.myReturnProperty) {
+                this.tags.forEach(tag => { if (e.includes(tag.id.toString())) items.push(tag); });
+            } else {
+                this.tags.forEach(tag => { if (e.includes(tag.id.toString())) items.push(tag[this.myReturnProperty]); });
+            }
             this.$emit('input', items);
         },
         addTag(e) {
-            console.log('add tag', e)
+            this.$api().post(route('api.tags.store'), {name: e}).then(response => {
+                this.mySelectizeSettings.options.push(response.data);
+                this.myValue.push(response.data.id);
+                this.tagsUpdated++;
+                this.$forceUpdate();
+                this.handleInput(this.myValue);
+            });
             return {name: e};
         }
     }

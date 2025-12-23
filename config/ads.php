@@ -28,51 +28,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Integrations\CommuniApp\Commands;
 
-use App\Integrations\CommuniApp\CommuniAppIntegration;
-use App\Models\Places\City;
-use App\Models\Service;
-use Illuminate\Console\Command;
-
-class KillCommuniApp extends Command
-{
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'communiapp:kill';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
-    {
-        $services = Service::whereNotNull('communiapp_id')->get();
-        $ca = CommuniAppIntegration::get(City::find(1));
-        foreach ($services as $service) {
-            $this->line('Trying to delete service #'.$service->id.' (CA #'.$service->communiapp_id.')');
-            $ca->handleserviceDeleted($service);
-        }
-    }
-}
+return [
+    'images' => [
+        'cuts' => [
+            'Bildschirm (4x3)' => [1024, 768],
+            'Bildschirm (16x9)' => [1920, 1080],
+            'CommuniApp' => [550,275],
+            'Quadratisch' => [1024, 1024],
+            'Story' => [1080, 1920],
+        ]
+    ],
+    'channels' => [
+        'bekanntgaben' => [
+            'name' => 'Bekanntgaben: extra Text',
+        ],
+        'communiapp' => [
+            'name' => 'CommuniApp: eigene Veranstaltung',
+            'depends_on' => 'communiapp_token',
+        ],
+        'newsletter' => [
+            'name' => 'Newsletter: Feature (Bild + Text)',
+        ],
+        'ppt' => [
+            'name' => 'Powerpoint: extra Folie',
+        ],
+    ],
+];

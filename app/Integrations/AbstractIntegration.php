@@ -32,6 +32,7 @@ namespace App\Integrations;
 
 
 use App\Models\Places\City;
+use Illuminate\Console\Scheduling\Schedule;
 
 /**
  * Class AbstractIntegration
@@ -49,5 +50,12 @@ class AbstractIntegration
     {
         return false;
     }
+
+    /**
+     * This is a hook to schedule tasks for this integration.
+     * @param Schedule $schedule
+     * @return void
+     */
+    public static function schedule(Schedule $schedule) {}
 
 }

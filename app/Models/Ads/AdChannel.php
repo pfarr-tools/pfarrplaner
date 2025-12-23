@@ -28,34 +28,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Integrations\CommuniApp;
+namespace App\Models\Ads;
 
+use App\Models\AbstractModel;
+use App\Models\Places\City;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-use App\Events\ServiceCreated;
-
-class ServiceCreatedListener
+class AdChannel extends AbstractModel
 {
+    /** @use HasFactory<\Database\Factories\AdChannelFactory> */
+    use HasFactory;
 
-    /**
-     * @param ServiceCreated $event
-     */
-    public function handle(ServiceCreated $event)
+    protected static string $prefix = 'werbekanal';
+    protected static string $prefixPlural = 'werbekanaele';
+    public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
+    public static array $validationRules = [
+        'name' => 'required|max:255',
+        'slug' => 'required|string|max:255',
+        'city_id' => 'required|int|exists:cities,id',
+        'depends_on_city' => 'nullable|string|max:255'
+    ];
+
+
+    protected $fillable = ['name', 'slug', 'city_id'];
+
+    public function city()
     {
-        if (!CommuniAppIntegration::isActive($event->service->city)) {
-            return;
-        }
-        if ($event->service->hidden) {
-            return;
-        }
-        if (count($event->service->funerals)) {
-            return;
-        }
-        if (count($event->service->weddings)) {
-            return;
-        }
-
-        CommuniAppIntegration::get($event->service->city)
-            ->handleServiceCreated($event->service);
+        return $this->belongsTo(City::class);
     }
-
 }

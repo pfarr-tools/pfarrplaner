@@ -1,4 +1,3 @@
-<?php
 /*
  * Pfarrplaner
  *
@@ -28,36 +27,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Integrations\CommuniApp;
+/**
+ * Slug generator compatible with Laravel Str::slug() for German text.
+ *
+ * - ä → ae, ö → oe, ü → ue
+ * - Ä → ae, Ö → oe, Ü → ue
+ * - ß → ss
+ * - Lowercase
+ * - Spaces and punctuation → "-"
+ * - Collapses duplicate "-"
+ * - Trims leading/trailing "-"
+ */
+export function slug(input) {
+    if (input == null) return '';
 
+    return String(input)
+        // German-specific replacements (must come first)
+        .replace(/Ä/g, 'Ae')
+        .replace(/Ö/g, 'Oe')
+        .replace(/Ü/g, 'Ue')
+        .replace(/ä/g, 'ae')
+        .replace(/ö/g, 'oe')
+        .replace(/ü/g, 'ue')
+        .replace(/ß/g, 'ss')
 
-use App\Events\ServiceUpdated;
+        // Normalize remaining accents (é → e, etc.)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
 
-class ServiceUpdatedListener
-{
+        // Lowercase (after transliteration)
+        .toLowerCase()
 
-    /**
-     * Handle the ServiceUpdated event
-     *
-     * @param ServiceUpdated $event
-     * @return void
-     */
-    public function handle(ServiceUpdated $event)
-    {
-        if (!CommuniAppIntegration::isActive($event->service->city)) {
-            return;
-        }
-        if ($event->service->hidden) {
-            return;
-        }
-        if (count($event->service->funerals)) {
-            return;
-        }
-        if (count($event->service->weddings)) {
-            return;
-        }
-        CommuniAppIntegration::get($event->service->city)
-            ->handleServiceUpdated($event->service);
-    }
+        // Replace non-alphanumeric characters with dashes
+        .replace(/[^a-z0-9]+/g, '-')
 
+        // Remove leading/trailing dashes
+        .replace(/^-+|-+$/g, '')
+
+        // Collapse multiple dashes
+        .replace(/-+/g, '-');
 }
+
+export default slug;

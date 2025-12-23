@@ -36,6 +36,7 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Laravel\Octane\Exceptions\DdException;
 use Spatie\LaravelIgnition\ContextProviders\LaravelContextProviderDetector;
 use Spatie\LaravelIgnition\Facades\Flare;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
@@ -125,6 +126,7 @@ class Handler extends ExceptionHandler
             ->setStage(app()->environment())
             ->setContextProviderDetector(new LaravelContextProviderDetector())
             ->setApiToken('')
+            ->filterExceptionsUsing(fn(Throwable $throwable) =>  !$throwable instanceof DdException)
             ->registerMiddleware(
                 collect(config('flare.flare_middleware'))
                     ->map(function ($value, $key) {
@@ -154,7 +156,7 @@ class Handler extends ExceptionHandler
                 return $kernel->terminate($request, $response);
             }
         }
-        return parent::render($request, $e); 
+        return parent::render($request, $e);
     }
 
 

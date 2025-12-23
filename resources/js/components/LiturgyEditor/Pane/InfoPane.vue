@@ -38,13 +38,10 @@
             <div v-if="liturgy['Bezeichnung']">
                 <hr />
                 <div class="row">
-                    <div class="col-12 col-md-10">
+                    <div class="col-12 col-md-10 fs-3">
                             <div v-if="liturgy['Bezeichnung']">
                                 <b class="fw-bold">{{ liturgy['Bezeichnung'] }}</b>
-                                <span v-if="liturgy['CSS-Farbe']" class="litColor"
-                                      :style="{ backgroundColor: liturgy['CSS-Farbe'] }"
-                                      :title="'Liturgische Farbe: '+liturgy['Farbe']"></span>
-                                <span v-if="liturgy['Festkreis']" class="badge bg-info">{{
+                                <span v-if="liturgy['Festkreis']" class="badge bg-info" :class="'bg-circle-'+liturgy['CSS-Farbe']">{{
                                         liturgy['Festkreis']
                                     }} ({{ romanize(liturgy['Lesejahr']) }}) </span>
                             </div>
@@ -221,13 +218,33 @@ export default {
     font-size: 0.8em;
 }
 
-.litColor {
-    border: solid 1px gray;
-    min-width: 10px;
-    min-height: 10px;
-    border-radius: 0;
-    display: inline-block;
+.bg-circle-white {
+    background-color: white !important;
+    color: black !important;
+    border: solid 1px lightgray;
 }
+
+.bg-circle-black {
+    background-color: black !important;
+    color: white !important;
+}
+
+.bg-circle-purple {
+    background-color: purple !important;
+    color: white !important;
+}
+
+.bg-circle-green {
+    background-color: green !important;
+    color: black !important;
+}
+
+.bg-circle-red {
+    background-color: red !important;
+    color: white !important;
+}
+
+
 
 .text-small {
     font-size: .8em;

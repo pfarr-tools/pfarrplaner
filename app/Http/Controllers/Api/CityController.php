@@ -37,6 +37,7 @@ use App\Models\Places\City;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * Class CityController
@@ -47,6 +48,12 @@ class CityController extends AbstractApiCRUDController
 
     protected string $modelClass = City::class;
 
+
+    public function index(Request $request)
+    {
+        Gate::authorize('viewAny', $this->modelClass);
+        return response()->json($request->user()->cities()->get());
+    }
 
     /**
      * @param City $city

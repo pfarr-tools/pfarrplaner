@@ -30,7 +30,7 @@
 <template>
     <div>
     <form-group :name="name" :label="label" :help="help" :key="tabUpdate">
-        <ul class="nav nav-pills mb-1">
+        <ul class="nav nav-pills mb-1" v-if="!noSourceTabs">
             <li class="nav-item">
                 <a class="nav-link" :class="{active: showTab == 0}" @click="showTab = 0">Lokale Dateien</a>
             </li>
@@ -48,7 +48,10 @@
             </li>
         </ul>
         <div class="upload-container" v-if="showTab == 0">
-            <div class="drop-target" :key="dragging" :class="{dragging: dragging}">
+            <div class="drop-target" :key="dragging" :class="{dragging: dragging}" @dragenter.prevent="dragEnter"
+                 @dragover.prevent
+                 @dragleave.prevent="dragLeave"
+                 @drop.prevent="drop">
                 <input class="form-control-file"
                        type="file" :name="name" @change="handleInput" :multiple="multi"
                        @dragenter="dragEnter" @dragleave="dragLeave" @drop="drop"/>
@@ -92,7 +95,7 @@ import __ from 'lodash';
 
 export default {
     name: "FormFileUpload",
-    props: ['name', 'label', 'help', 'multiple', 'helpText', 'noCamera', 'noUrl', 'noPixabay', 'noDescription', 'noInbox'],
+    props: ['name', 'label', 'help', 'multiple', 'helpText', 'noCamera', 'noUrl', 'noPixabay', 'noDescription', 'noInbox', 'noSourceTabs', 'cut'],
     components: {FormPixabayPicker, FormInput, NavButton, FormGroup},
     data() {
         return {
@@ -127,7 +130,30 @@ export default {
         dragLeave(e) {
             this.dragging = false;
         },
-        drop(e) {},
+        async drop(e) {
+            console.log('drop', e);
+            this.dragging = false;
+
+            // 1) Dropped file(s)
+            const files = e.dataTransfer?.files;
+            if (files && files.length) {
+                if (this.multi) {
+                    Array.from(files).forEach(file => this.$emit('input', file));
+                } else {
+                    this.$emit('input', files[0]);
+                }
+                return;
+            }
+
+            // 2) Dropped URL (e.g. dragging an <img> or link)
+            const uri = e.dataTransfer?.getData('text/uri-list') || e.dataTransfer?.getData('text/plain');
+            if (uri && /^https?:\/\//i.test(uri.trim())) {
+                this.uploadUrl = uri.trim();
+                this.uploadFromUrl();
+                return;
+            }
+
+        },
         /**
          * Get human-readable file size
          * @param size

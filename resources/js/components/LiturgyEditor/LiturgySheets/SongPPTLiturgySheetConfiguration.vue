@@ -33,6 +33,7 @@
             <tab-header id="colorscheme" active="1" title="Farbschema" />
             <tab-header id="layout" title="Layout" />
             <tab-header id="content" title="Inhalte" />
+            <tab-header id="ads" title="Werbung" />
         </tab-headers>
         <tabs>
             <tab id="colorscheme" active="1">
@@ -61,6 +62,19 @@
                 <form-check label="Hinweis auf Liederbuch vor jedem Lied" v-model="myConfig.includeSongbookReference" name="config[includeSongbookReference]"/>
                 <form-check label="Wo möglich, Noten statt Text verwenden" v-model="myConfig.renderMusic" name="config[renderMusic]" />
             </tab>
+            <tab id="ads">
+                <form-check label="Veranstaltungswerbung am Anfang einfügen" v-model="myConfig.includeAdLoopStart" name="config[includeAdLoopStart]"/>
+                <form-check label="Veranstaltungswerbung am End einfügen" v-model="myConfig.includeAdLoopEnd" name="config[includeAdLoopEnd]"/>
+                <form-selectize label="Veranstaltungswerbung bei folgenden Elementen einfügen" multiple :options="myItems"
+                                v-model="myConfig.includeAdLoopElements" name="config[includeAdLoopElements][]" />
+                <hr />
+                <form-selectize label="Veranstaltungen aus folgenden Kirchengemeinden einschließen" :key="this.myCities.length" multiple
+                                v-model="myConfig.showAdsFromCities" name="config[showAdsFromCities][]" :options="myCities" />
+                <hr />
+                <form-input label="Werbefolien nach ___ Sekunden weiterschalten" :v-model="myConfig.adLoopDelay"
+                            name="config[adLoopDelay]" type="number" min="0"
+                            help="Bei 0 erfolgt keine automatische Weiterschaltung" />
+            </tab>
         </tabs>
     </liturgy-sheet-configuration-form>
 </template>
@@ -78,9 +92,29 @@ export default {
     name: "SongPPTLiturgySheetConfiguration",
     components: {TabHeader, TabHeaders, Tab, Tabs, FormInput, FormSelectize, FormCheck, LiturgySheetConfigurationForm},
     props: ['service', 'sheet'],
+    created() {
+        this.$api().get(route('api.cities.index')).then(response => {
+            this.myCities = response.data;
+        });
+    },
     data() {
+        let myConfig = this.sheet.config;
+        if (!(myConfig.showAdsFromCities || []).length) myConfig.showAdsFromCities = [this.service.city_id];
+
+        let myItems = [];
+        if (!(myConfig.includeAdsLoopElements || []).length) myConfig.includeAdLoopElements = [];
+        this.service.liturgy_blocks.forEach(block => {
+            block.items.forEach(item => {
+                myItems.push({id: item.id, name: item.title });
+                if ((item.title == 'Bekanntgaben') && (!(myConfig.includeAdLoopElements || []).length))
+                    myConfig.includeAdLoopElements.push(item.id);
+            });
+        });
+
         return {
-            myConfig: this.sheet.config,
+            myCities: [],
+            myConfig,
+            myItems,
             myColorOptions: [
                 {id: 'FF043b04', name: 'Grün (für Greenscreen bei der Liveübertragung)'},
                 {id: 'FF000000', name: 'Schwarz'},

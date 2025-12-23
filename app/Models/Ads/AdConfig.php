@@ -21,45 +21,27 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the* GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Integrations\CommuniApp;
+namespace App\Models\Ads;
 
-use App\Events\ServiceBeforeDelete;
-use Illuminate\Support\Facades\Log;
+use App\Models\Service;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class ServiceBeforeDeleteListener
+class AdConfig extends Model
 {
+    /** @use HasFactory<\Database\Factories\AdConfigFactory> */
+    use HasFactory;
 
+    protected $fillable = ['service_id', 'slug', 'offset', 'ad_text'];
 
-    /**
-     * Handle the ServiceUpdated event
-     *
-     * @param ServiceBeforeDelete $event
-     * @return void
-     */
-    public function handle(ServiceBeforeDelete $event)
-    {
-        if (!CommuniAppIntegration::isActive($event->service->city)) {
-            return;
-        }
-        if ($event->service->hidden) {
-            return;
-        }
-        if (count($event->service->funerals)) {
-            return;
-        }
-        if (count($event->service->weddings)) {
-            return;
-        }
-        CommuniAppIntegration::get($event->service->city)
-        ->handleserviceDeleted($event->service);
+    public function service() {
+        return $this->belongsTo(Service::class);
     }
-
 
 }

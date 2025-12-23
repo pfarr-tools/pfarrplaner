@@ -31,6 +31,7 @@
 namespace App\Models\Places;
 
 use App\Models\AbstractModel;
+use App\Models\Ads\AdChannel;
 use App\Models\Leave\Pool;
 use App\Models\Location;
 use App\Models\Parish;
@@ -185,6 +186,15 @@ class City extends AbstractModel
     }
 
     /**
+     * @return HasMany
+     */
+    public function adChannels()
+    {
+        return $this->hasMany(AdChannel::class);
+    }
+
+
+    /**
      * Check if this city is administered by a particular use
      * @param User $user User
      * @return bool True if user has admin rights here
@@ -200,6 +210,36 @@ class City extends AbstractModel
         }
         return false;
     }
+
+    /**
+     * Get the default ad channels for this city
+     * @return \Illuminate\Support\Collection
+     */
+    public function getDefaultAdChannels()
+    {
+        $channels = [];
+        foreach (config('ads.channels') as $key => $channelConfig) {
+            if ($channelConfig['depends_on'] ?? false) {
+                /*
+                    some adChannels have a dependency on a specific property of the City model
+                    e.g. a CommuniApp AdChannel will only be shown if the city has a communiapp_token
+                */
+                if ($this->{$channelConfig['depends_on']}) $channels[$key] = $channelConfig;
+            } else {
+                $channels[$key] = $channelConfig;
+            }
+        }
+        return collect($channels);
+    }
+
+    public function getActiveAdChannels()
+    {
+        return $this->getDefaultAdChannels()
+            ->merge($this->adChannels->keyBy('slug'))
+            ->sortBy('name');
+
+    }
+
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany

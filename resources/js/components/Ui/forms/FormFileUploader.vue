@@ -30,7 +30,10 @@
 <template>
     <div class="form-file-uploader">
         <div v-if="uploading">Datei wird hochgeladen... <span class="mdi mdi-spin mdi-loading"></span></div>
-        <form-file-upload @input="upload" @upload-url="uploadUrl" @upload-inbox="uploadInbox" multiple="1" :key="updateUploader" />
+        <form-file-upload @input="upload" @upload-url="uploadUrl" @upload-inbox="uploadInbox" multiple="1" :key="updateUploader"
+                          :no-camera="noCamera" :no-description="noDescription" :no-pixabay="noPixabay" :no-url="noUrl" :no-inbox="noInbox"
+                          :no-source-tabs="noSourceTabs" :cut="cut" :help-text="helpText"
+        />
         <modal title="Bild zuschneiden" v-if="modalCropperOpen" min-height="50vh"
                @close="cropImage" @cancel="modalCropperOpen = false;"
                close-button-label="Zuschneiden" cancel-button-label="Original verwenden" max-width="800">
@@ -52,7 +55,8 @@ import 'vue-advanced-cropper/dist/style.css';
 export default {
     name: "FormFileUploader",
     components: {Modal, FormFileUpload, Cropper},
-    props: ['parent', 'uploadRoute', 'title', 'cropperCanvas', 'cropperStencil', 'width', 'height', 'noSource'],
+    props: ['parent', 'uploadRoute', 'title', 'cropperCanvas', 'cropperStencil', 'width', 'height', 'noSource',
+        'noCamera', 'noUrl', 'noPixabay', 'noDescription', 'noInbox', 'noSourceTabs', 'cut', 'helpText'],
     data() {
         let canvasSettings = this.cropperCanvas || {};
         let stencilSettings = this.cropperStencil || {};
@@ -80,14 +84,18 @@ export default {
         upload(file) {
             let title = this.title;
             let fileName = file.name;
-            if (!title) {
-                title = file.name;
-                title = title.substr(0, title.lastIndexOf('.'));
-                title = title.charAt(0).toUpperCase() + title.slice(1);
-                if (title == 'Brief ans Pfarramt') title = 'Datenblatt';
-                title = window.prompt('Bitte gib eine Beschreibung für die Datei "' + fileName + '" an.', title);
+            if (!this.noDescription) {
+                if (!title) {
+                    title = file.name;
+                    title = title.substr(0, title.lastIndexOf('.'));
+                    title = title.charAt(0).toUpperCase() + title.slice(1);
+                    if (title == 'Brief ans Pfarramt') title = 'Datenblatt';
+                    title = window.prompt('Bitte gib eine Beschreibung für die Datei "' + fileName + '" an.', title);
+                }
+                if (null == title) return;
+            } else {
+                title = fileName;
             }
-            if (null == title) return;
 
 
             let fd = new FormData();
@@ -110,7 +118,7 @@ export default {
         uploadUrl(data) {
             this.uploading = true;
             this.info = data.info;
-            axios.post(this.uploadRoute, {uploadFromUrl: data.url, attachment_text: data.description})
+            axios.post(this.uploadRoute, {uploadFromUrl: data.url, attachment_text: data.description }, {})
                 .then(response => {
                     let attachments = response.data;
                     this.$emit('input', attachments);
@@ -122,7 +130,7 @@ export default {
             let title = inboxFile.name
             title = window.prompt('Bitte gib eine Beschreibung für die Datei "' + inboxFile.name + '" an.', title);
             this.uploading = true;
-            axios.post(this.uploadRoute, {uploadFromInbox: inboxFile.name, attachment_text: title })
+            axios.post(this.uploadRoute, {uploadFromInbox: inboxFile.name, attachment_text: title }, {})
                 .then(response => {
                     let attachments = response.data;
                     this.$emit('input', attachments);
@@ -132,6 +140,7 @@ export default {
                 });
         },
         allowCropping(attachments) {
+            console.log('allowCropping()', attachments);
             if ((attachments.length > 0) && (attachments[attachments.length - 1].mimeType.substr(0, 6) == 'image/')) {
                 this.modalCropperOpen = true;
                 this.cropableImage = this.imageRoute(attachments[attachments.length - 1]);
@@ -158,8 +167,12 @@ export default {
                 this.modalCropperOpen = false;
                 const form = new FormData();
                 canvas.toBlob(blob => {
-                    form.append('attachments[0]', blob);
+                    const fileName = this.cropableAttachment.file.replace('attachments/', '');
+                    const file = new File([blob], fileName, { type: this.cropableAttachment.mimeType });
+
+                    form.append('attachments[0]', file);
                     form.append('attachment_text[0]', this.cropableAttachment.title);
+                    form.append('cut', this.cut);
                     form.append('legalInfo', JSON.stringify(this.info));
                     this.uploading = true;
                     axios.post(route('attachment.update', this.cropableAttachment.id), form)

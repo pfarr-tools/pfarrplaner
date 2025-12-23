@@ -43,7 +43,7 @@ class Attachment extends Model
     /**
      * @var string[]
      */
-    protected $fillable = ['title', 'file', 'attachable'];
+    protected $fillable = ['title', 'file', 'attachable', 'cut'];
 
     protected $appends = ['size', 'mimeType', 'icon', 'extension'];
 

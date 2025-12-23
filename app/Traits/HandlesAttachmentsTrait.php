@@ -52,7 +52,7 @@ trait HandlesAttachmentsTrait
         if ($request->hasFile('attachments')) {
             $files = $request->file('attachments');
             foreach ($files as $key => $file) {
-                $path = $file->store('attachments');
+                $path = $file->storeAs('attachments', Str::random(32).'.'.$file->getClientOriginalExtension());
                 $description = $request->get('attachment_text')[$key] ?: ucfirst(pathinfo(
                     $file->getClientOriginalName(),
                     PATHINFO_FILENAME
@@ -87,7 +87,9 @@ trait HandlesAttachmentsTrait
         if ($request->has('remove_attachment')) {
             foreach ($request->get('remove_attachment') as $attachmentId) {
                 $attachment = Attachment::findOrFail($attachmentId);
-                Storage::delete($attachment->file);
+                if (Attachment::where('file', $attachment->file)->count() == 1) {
+                    Storage::delete($attachment->file);
+                }
                 $object->attachments()->where('id', $attachmentId)->delete();
                 $attachment->delete();
             }

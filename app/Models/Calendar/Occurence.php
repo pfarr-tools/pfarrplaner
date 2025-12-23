@@ -30,6 +30,7 @@
 
 namespace App\Models\Calendar;
 
+use App\Models\Ads\AdConfig;
 use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Services\LiturgyService;
@@ -59,12 +60,55 @@ class Occurence extends Model
         return $this->belongsTo(Service::class, 'service_id')->withoutGlobalScope(ServicesOnlyScope::class);
     }
 
+    /**
+     * @param Builder $query
+     * @param Carbon $start
+     * @param Carbon $end
+     * @return Builder
+     */
     public function scopeBetween(Builder $query, Carbon $start, Carbon $end)
     {
         return $query->where('start', '<=', $end)
             ->where('end', '>=', $start);
     }
 
+    /**
+     * Find occurences which have a specific ad running at a specific date
+     *
+     * @param Builder $query
+     * @param string $adChannelSlug Slug of the ad channel to be used
+     * @param Carbon $adDate Date of the ad
+     * @param bool $exactDate If true, the ad date must match exactly, otherwise the ad date is used as lower bound
+     * @param bool $includeEnded If true, ended occurences are included
+     * @return Builder
+     */
+    public function scopeAdRunningAt(Builder $query, string $adChannelSlug, Carbon $adDate, bool $exactDate = false, bool $includeEnded = false)
+    {
+        if (!$includeEnded) $query->where('end', '>=', $adDate);
+        $query->whereHas('service', function ($query2) use ($adChannelSlug, $adDate, $exactDate) {
+            $query2->whereHas('adConfigs', function ($query3) use ($adChannelSlug, $adDate, $exactDate) {
+                $query3->where('ad_configs.slug', $adChannelSlug)
+                     ->whereRaw('DATE_SUB(DATE(services.date), INTERVAL ad_configs.offset DAY) '
+                                .($exactDate ? '=' : '<=').' ?',
+                                [$adDate->toDateString()]
+                        );
+                });
+        });
+        return $query;
+    }
+
+    public function hasAdRunningAt($adChannelSlug, Carbon $adDate, bool $exactDate = false)
+    {
+        $adConfig = $this->getAdConfig($adChannelSlug);
+        $adStart = $this->start->copy()->subDays($adConfig->offset);
+        return $exactDate ? $adStart->toDateString() == $adDate->toDateString() : $adStart <= $adDate;
+    }
+
+    /**
+     * @param Builder $query
+     * @param Carbon $start
+     * @return Builder
+     */
     public function scopeStartingFrom(Builder $query, Carbon $start)
     {
         return $query->where('end', '>=', $start);
@@ -78,4 +122,29 @@ class Occurence extends Model
         return $info[0] ?? [];
     }
 
+
+    /**
+     * Get the ad config for a specific ad channel
+     * @param string $adChannelKey
+     * @return AdConfig|null
+     */
+    public function getAdConfig(string $adChannelKey): AdConfig|null
+    {
+        return $this->event->adConfigs->firstWhere('slug', $adChannelKey);
+    }
+
+    /**
+     * Get the ad text for a specific ad channel
+     * @param string $adChannelKey
+     * @param string $defaultTo Default text to be used if no ad text is configured
+     * @return string
+     */
+    public function getAdText(string $adChannelKey, string $defaultTo = ''): string
+    {
+        $adConfig = $this->getAdConfig($adChannelKey);
+        if ($adConfig) {
+            $adText = $adConfig->ad_text ?? '';
+        }
+        return ($adText ?? '') ?: $defaultTo ?: $this->service->ad_text ?: $this->service->descriptionText();
+    }
 }

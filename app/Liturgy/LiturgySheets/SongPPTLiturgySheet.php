@@ -31,22 +31,30 @@
 namespace App\Liturgy\LiturgySheets;
 
 
+use App\FileFormats\PowerPoint;
 use App\Helpers\PPTUnitsHelper;
-use App\Services\LiturgyService;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Music\ABCMusic;
+use App\Models\Calendar\Occurence;
+use App\Models\Liturgy\Item;
 use App\Models\Service;
+use App\Services\ImageService;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use PhpOffice\Common\Drawing;
 use PhpOffice\PhpPresentation\DocumentLayout;
 use PhpOffice\PhpPresentation\IOFactory;
 use PhpOffice\PhpPresentation\PhpPresentation;
+use PhpOffice\PhpPresentation\Shape\AutoShape;
 use PhpOffice\PhpPresentation\Shape\RichText;
 use PhpOffice\PhpPresentation\Slide;
 use PhpOffice\PhpPresentation\Style\Alignment;
 use PhpOffice\PhpPresentation\Style\Border;
 use PhpOffice\PhpPresentation\Style\Color;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpPresentation\Style\Fill;
+use PhpOffice\PhpPresentation\Style\Font;
 
 class SongPPTLiturgySheet extends AbstractLiturgySheet
 {
@@ -69,6 +77,11 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         'verticalAlignment' => 'b',
         'fontSize' => 40,
         'renderMusic' => false,
+        'includeAdLoopStart' => false,
+        'includeAdLoopEnd' => false,
+        'includeAdLoopElements' => [],
+        'showAdsFromCities' => [],
+        'adLoopDelay' => 7,
     ];
 
     protected $counterColor = [
@@ -83,6 +96,23 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         'FF043b04' => ABCMusic::COLORS_GREENSCREEN,
     ];
 
+    /**
+     * Cache ad events to be listed to prevent multiple queries
+     * @var array
+     */
+    protected $adEventsToBeListed = [];
+    /**
+     * Cache ad events to be highlighted to prevent multiple queries
+     * @var array
+     */
+    protected $adEventsToBeHighlighted = [];
+
+    /**
+     * Slide names (for slide name fix)
+     * @var array
+     */
+    protected $slideNames = [];
+
 
     /** @var PhpPresentation */
     protected $ppt;
@@ -95,6 +125,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $textColor = new Color($this->config['textColor']);
         $highlightedTextColor = new Color('FFF79646');
         $this->ppt->removeSlideByIndex(0);
+
+        if ($this->config['includeAdLoopStart']) {
+            $this->renderAdLoop($service);
+        }
 
         if ($this->config['includeSongList']) {
             $this->renderSongListSlide($service);
@@ -113,6 +147,9 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
+                if (in_array($item->id, $this->config['includeAdLoopElements'])) {
+                    $this->renderAdLoop($service);
+                }
                 if ($item->data_type == 'song') {
                     $this->renderSongItem($item);
                 } elseif ($item->data_type == 'psalm') {
@@ -130,7 +167,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                     if (($item->data_type=='freetext') && ($item->title == 'Ehr sei dem Vater') && (isset($item->data['description']))) {
                         /** @var Liturgy\ItemHelpers\FreetextItemHelper $ftHelper */
                         $ftHelper = $item->getHelper();
-                        $this->slide($ftHelper->getText());
+                        $this->renderGloriaPatriSlide($ftHelper->getText());
                     }
                     if ($this->config['includeEmpty']) {
                         $this->slide();
@@ -145,6 +182,18 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
         if ($this->config['includeJingleAndIntro']) {
             $this->slide('Hier Jingle einfügen', 18);
+        }
+
+        if ($this->config['includeAdLoopEnd']) {
+            $this->renderAdLoop($service, true);
+        }
+
+
+        // we need to patch the PPTX to become a PPTM right here:
+        if (($this->config['includeAdLoopStart'])
+            || $this->config['includeAdLoopEnd']
+            || count($this->config['includeAdLoopElements']) && $this->config['adLoopDelay']) {
+            $this->extension = 'pptm';
         }
 
         return $this->sendToBrowser($this->getFileName($service, 'Texte und Lieder'));
@@ -165,7 +214,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setBold($bold)
             ->setSize($fontSize)
             ->setColor($color)
-            ->setName('Calibri');
+            ->setName('Sarabun');
         $paragraph->createTextRun($text);
     }
 
@@ -261,7 +310,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
     }
 
-    protected function renderSongItem(\App\Models\Liturgy\Item $item)
+    protected function renderSongItem(Item $item)
     {
         if ($this->config['includeSongbookReference']) {
             $this->songbookReferenceSlide($item);
@@ -310,7 +359,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
     }
 
-    protected function renderSongItemWithMusic(\App\Models\Liturgy\Item $item)
+    protected function renderSongItemWithMusic(Item $item)
     {
         $song = \App\Models\Liturgy\Song::find($item->data['song']['song_id']);
         $colorSet = $this->musicColorSet[$this->config['backgroundColor']];
@@ -329,6 +378,31 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         if ($this->config['includeEmpty']) {
             $this->slide();
         }
+    }
+
+    /**
+     * Render a special slide with the Gloria Patri ("Ehr sei dem Vater...")
+     * @param $text
+     * @return void
+     */
+    protected function renderGloriaPatriSlide($text) {
+        $slide = $this->createEmptySlide($this->config['backgroundColor']);
+        $shape = $this->createFullScreenRichTextShape($slide);
+        $shape->setOffsetY(100);
+        $shape->getActiveParagraph()->createTextRun($text)
+            ->getFont()
+            ->setItalic(true)
+            ->setSize($this->config['fontSize'])
+            ->setColor(new Color($this->config['textColor']))
+            ->setName('Sarabun');
+
+        $noteFile = $this->config['textColor'] == 'FFFFFFFF' ? base_path('assets/ppt/note_white.svg') : base_path('assets/ppt/note.svg');
+        $slide->createDrawingShape()
+            ->setPath($noteFile)
+            ->setOffsetX(10)
+            ->setOffsetY(10)
+            ->setHeight(80)
+            ->setWidth(80);
     }
 
     protected function slide($text = '', $size = -1, $rgb = -1, $bold = true, $copyrights = '', $backgroundColor = null)
@@ -363,7 +437,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                     $line = substr($line, 1);
                 }
                 $paragraph->getAlignment()->setVertical($this->config['verticalAlignment']);
-                $paragraph->getFont()->setBold($bold)->setSize($size)->setColor($color)->setName('Calibri');
+                $paragraph->getFont()->setBold($bold)->setSize($size)->setColor($color)->setName('Sarabun');
                 $paragraph->createTextRun(str_replace('&', '**', $line));
             }
         }
@@ -375,13 +449,13 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 ->setOffsetY(($text == '') ? 485 : 505);
             $paragraph = $shape->getActiveParagraph();
             $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-            $paragraph->getFont()->setBold(false)->setSize(10)->setColor($color)->setName('Calibri');
+            $paragraph->getFont()->setBold(false)->setSize(10)->setColor($color)->setName('Sarabun');
             $paragraph->createTextRun($copyrights);
         }
         return $slide;
     }
 
-    protected function songbookReferenceSlide(\App\Models\Liturgy\Item $item)
+    protected function songbookReferenceSlide(Item $item)
     {
         $data = $item->data;
         if ($item->data_type == 'song') {
@@ -428,7 +502,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 ->setBold(false)
                 ->setSize($this->config['fontSize'])
                 ->setColor($color)
-                ->setName('Calibri');
+                ->setName('Sarabun');
             $paragraph->createTextRun($data[$key]['songbook']['name']);
         } else {
             if (trim($data[$key]['songbook']['image'])) {
@@ -451,7 +525,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setBold(false)
             ->setSize($this->config['fontSize'] * 2)
             ->setColor($color)
-            ->setName('Calibri');
+            ->setName('Sarabun');
 
         if ($key == 'song') {
             $refText = ($data['verses'] ? ', ' . $data['verses'] : '');
@@ -504,19 +578,21 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      */
     protected function sendToBrowser($filename)
     {
-        header("Content-Description: File Transfer");
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation');
-        header('Content-Transfer-Encoding: binary');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Expires: 0');
-
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
-
-
         $objWriter = IOFactory::createWriter($this->ppt, 'PowerPoint2007');
         $objWriter->save($tempFile);
-        return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation'])
+
+        $contentType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+        $patchFile = PowerPoint::fromFile($tempFile);
+        $patchFile->applySVGFix();
+        $patchFile->applySlideNameFix($this->slideNames);
+        if ($this->extension == 'pptm') {
+            // needs patch
+            $patchFile->patchPPTM(base_path('assets/ppt/vbaProjectForAutoLoops.bin'));
+            $contentType = 'application/vnd.ms-powerpoint.presentation.macroEnabled.12';
+        }
+
+        return response()->download($tempFile, $filename, ['Content-Type' => $contentType])
             ->deleteFileAfterSend(true);
     }
 
@@ -533,6 +609,318 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setCategory('Gottesdienst')
             ->setKeywords('Gottesdienst, Lieder, Psalm, Mitwirkende')
             ->setCompany('Evangelische Kirchengemeinde ' . $service->city->name);
+    }
+
+    /**
+     * Render a complete loop of ad slides
+     * @param Service $service
+     * @param bool $isFinalLoop True if this loop is the very end of the presentation
+     * @return void
+     */
+    protected function renderAdLoop(Service $service, bool $isFinalLoop = false)
+    {
+        if (!count($this->config['showAdsFromCities'] ?? [])) return;
+
+        $start = $service->date->copy()->addHour(1);
+        $end = $service->date->copy()->addWeek(1)->startOfWeek();
+        if ($service->date->diffInDays($end) < 6) $end->addWeek(1);
+
+
+        // get the events to be listed (if not already cached)
+        if (!count($this->adEventsToBeListed)) {
+            $this->adEventsToBeListed = Occurence::between($start, $end)
+                ->whereHas('service', function ($query) use ($service) {
+                    $query->inCities($this->config['showAdsFromCities'])
+                        ->notHidden()
+                        ->displayable($service->date);
+                })->orderBy('start')
+                ->get()
+                ->groupBy(function ($occurence) {
+                    return $occurence->start->setTimeZone('Europe/Berlin')->format('Y-m-d');
+                });
+        }
+
+
+        // get the events to be highlighted (if not already cached)
+        if (!count($this->adEventsToBeHighlighted)) {
+            $this->adEventsToBeHighlighted = Occurence::adRunningAt('ppt', $service->date)
+                ->whereHas('service', function ($query) use ($service) {
+                    $query->inCities($this->config['showAdsFromCities'])
+                        ->notHidden()
+                        ->displayable($service->start);
+                })->orderBy('start')
+                ->get()
+                ->groupBy(function ($occurence) {
+                    return $occurence->start->setTimeZone('Europe/Berlin')->format('Y-m-d');
+                });
+        }
+
+
+        $currentSlideNumber = $this->ppt->getSlideCount();
+        $adSlidesCount = count($this->adEventsToBeListed) + count($this->adEventsToBeHighlighted);
+        $finalAdSlideNumber = $currentSlideNumber + $adSlidesCount;
+
+        $cursor = $start->copy();
+        while ($cursor->lte($end)) {
+            if (count($this->adEventsToBeListed[$cursor->format('Y-m-d')] ?? [])) {
+                $this->renderEventsListSlide($cursor,
+                                             $this->adEventsToBeListed[$cursor->format('Y-m-d')],
+                                             $currentSlideNumber+1,
+                                             $finalAdSlideNumber,
+                                             $isFinalLoop);
+            }
+            if (count($this->adEventsToBeHighlighted[$cursor->format('Y-m-d')] ?? [])) {
+                foreach ($this->adEventsToBeHighlighted[$cursor->format('Y-m-d')] as $event) {
+                    $this->renderEventHighlightSlide($cursor,
+                                                     $event,
+                                                     $currentSlideNumber+1,
+                                                     $finalAdSlideNumber,
+                                                     $isFinalLoop);
+                }
+            }
+            $cursor->addDay(1);
+        }
+
+        // add future highlights
+        foreach ($this->adEventsToBeHighlighted as $date => $events) {
+            $cursor = Carbon::parse($date);
+            if ($cursor->gt($end)) {
+                foreach ($this->adEventsToBeHighlighted[$date] as $event) {
+                    $this->renderEventHighlightSlide($cursor,
+                                                     $event,
+                                                     $currentSlideNumber+1,
+                                                     $finalAdSlideNumber);
+                }
+
+            }
+        }
+
+    }
+
+    /**
+     * Create an empty ad slide
+     * @param int $firstAdSlideNumber Number of the first slide in the loop
+     * @param int $finalAdSlideNumber Number of the last slide in the loop
+     * @param bool $isFinalLoop True, if this loop is at the very end of the presentation
+     * @return Slide
+     */
+    protected function createEmptyAdSlide(int $firstAdSlideNumber, int $finalAdSlideNumber, bool $isFinalLoop): Slide {
+        $slide = $this->createEmptySlide($this->config['backgroundColor']);
+        $note = $slide->getNote();
+        $layout = $this->ppt->getLayout();
+        $noteText = $note->createRichTextShape()
+            ->setHeight($layout->getCY(DocumentLayout::UNIT_PIXEL))
+            ->setWidth($layout->getCX(DocumentLayout::UNIT_PIXEL));
+        if (!$isFinalLoop) {
+            $noteText->createTextRun('Diese Folie gehört zu einer automatisch wiederholten Werbeschleife. Um diese zu beenden, springe zu Folie #'.($finalAdSlideNumber+1));
+        } else {
+            $noteText->createTextRun('Diese Folie gehört zu einer automatisch wiederholten Werbeschleife. Diese läuft weiter, bis du die Präsentation beendest.');
+        }
+        if ($this->config['adLoopDelay']) {
+            if ($this->ppt->getSlideCount() < $finalAdSlideNumber) {
+                $transition = new Slide\Transition();
+                $transition->setTimeTrigger(true, $this->config['adLoopDelay']*1000);
+                $slide->setTransition($transition);
+            } else {
+                $slide->setName('LOOP_'.$this->config['adLoopDelay'].'_'.$firstAdSlideNumber);
+                $this->slideNames[$this->ppt->getSlideCount()] = 'LOOP_'.$this->config['adLoopDelay'].'_'.$firstAdSlideNumber;
+            }
+        }
+        return $slide;
+    }
+
+    /**
+     * Create a slide for a highlighted event
+     * @param Carbon $date
+     * @param Occurence $event
+     * @param int $firstAdSlideNumber Number of the first slide in the loop
+     * @param int $finalAdSlideNumber Number of the last slide in the loop
+     * @param bool $isFinalLoop True, if this loop is at the very end of the presentation
+     * @return void
+     * @throws \PhpOffice\PhpPresentation\Exception\FileNotFoundException
+     */
+    protected function renderEventHighlightSlide(Carbon $date, Occurence $event, int $firstAdSlideNumber, int $finalAdSlideNumber, bool $isFinalLoop) {
+        $imageCutPath = $event->service->getImageCutPath('bildschirm-16x9');
+        if (empty($imageCutPath)) return;
+
+        $textColor = new Color($this->config['textColor']);
+        $gray = new Color('777777');
+        $inverseTextColor = new Color($this->config['backgroundColor']);
+        $shapeBackground = new Color('CCFFFFFF');
+
+        $averageImageColor = ImageService::sampleAverageRgb($imageCutPath, 20, 470, 150, 150);
+        $overlayARGB = ImageService::tintedOverlayArgb($averageImageColor,0.95);
+        $overlayColor = new Color($overlayARGB);
+        $overlayTextColor = new Color(ImageService::blackOrWhiteForArgb($overlayARGB));
+
+        $slideWidth = Drawing::emuToPixels($this->ppt->getLayout()->getCX());
+        $slideHeight = Drawing::emuToPixels($this->ppt->getLayout()->getCY());
+
+        $slide = $this->createEmptyAdSlide($firstAdSlideNumber, $finalAdSlideNumber, $isFinalLoop);
+        $shape = $slide->createDrawingShape()
+            ->setPath($imageCutPath)
+            ->setOffsetX(0)
+            ->setOffsetY(0)
+            ->setWidth($slideWidth)
+            ->setHeight($slideHeight);
+
+
+        $shape = $slide->createRichTextShape()
+            ->setWidth($slideWidth)
+            ->setHeight(130)
+            ->setOffsetX(0)
+            ->setOffsetY($slideHeight - 130);
+        $shape->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->setStartColor($shapeBackground);
+
+        $paragraph = $shape->getActiveParagraph();
+        $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)->setMarginLeft(150);
+        $run = $paragraph->createTextRun($date->setTimezone('Europe/Berlin')->format('H:i').' Uhr')->getFont()
+            ->setBold(false)
+            ->setSize((int)($this->config['fontSize']*0.5))
+            ->setColor($inverseTextColor)
+            ->setName('Sarabun Light');
+        $run = $paragraph->createTextRun(' | ')->getFont()
+            ->setBold(false)
+            ->setColor($gray)
+            ->setSize((int)($this->config['fontSize']*0.5))
+            ->setName('Sarabun Light');
+        $run = $paragraph->createTextRun($event->service->locationTextWithCity)
+            ->getFont()
+            ->setBold(false)
+            ->setSize((int)($this->config['fontSize']*0.5))
+            ->setColor($inverseTextColor)
+            ->setName('Sarabun Light');
+
+        $paragraph = $shape->createParagraph();
+        $run = $paragraph->createTextRun($event->getAdText('ppt', $event->service->titleText(false)))
+            ->getFont()
+            ->setName('Sarabun SemiBold')
+            ->setSize($this->config['fontSize'])
+            ->setColor($inverseTextColor);
+
+        $shape = $slide->createAutoShape()
+            ->setType(AutoShape::TYPE_OVAL)
+            ->setWidth(150)
+            ->setHeight(150)
+            ->setOffsetX(20)
+            ->setOffsetY($slideHeight - 250)
+            ->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->setStartColor($overlayColor);
+
+        $shape = $slide->createRichTextShape()
+            ->setWidth(150)
+            ->setHeight(150)
+            ->setOffsetX(20)
+            ->setOffsetY($slideHeight - 240);
+        $paragraph = $shape->getActiveParagraph();
+        $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $paragraph->createTextRun($event->start->isoFormat('dddd'))->getFont()
+            ->setBold(false)
+            ->setSize(12)
+            ->setColor($overlayTextColor)
+            ->setName('Sarabun Light');
+        $paragraph = $shape->createParagraph();
+        $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $paragraph->createTextRun($event->start->isoFormat('D'))->getFont()
+            ->setSize(50)
+            ->setColor($overlayTextColor)
+            ->setName('Sarabun ExtraBold');
+        $paragraph = $shape->createParagraph();
+        $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $paragraph->createTextRun($event->start->isoFormat('MMMM'))->getFont()
+            ->setBold(false)
+            ->setSize(12)
+            ->setColor($overlayTextColor)
+            ->setName('Sarabun Light');
+    }
+
+    /**
+     * Create a slide with an events list for a single day
+     * @param Carbon $date
+     * @param Collection<Occurence> $events
+     * @param int $firstAdSlideNumber Number of the first slide in the loop
+     * @param int $finalAdSlideNumber Number of the last slide in the loop
+     * @param bool $isFinalLoop True, if this loop is at the very end of the presentation
+     * @return void
+     * @throws \PhpOffice\PhpPresentation\Exception\OutOfBoundsException
+     */
+    protected function renderEventsListSlide(Carbon $date, Collection $events, int $firstAdSlideNumber, int $finalAdSlideNumber, bool $isFinalLoop)
+    {
+        $textColor = new Color($this->config['textColor']);
+        $gray = new Color('777777');
+
+        $slide = $this->createEmptyAdSlide($firstAdSlideNumber, $finalAdSlideNumber, $isFinalLoop);
+        $shape = $slide->createRichTextShape()
+            ->setWidth(950)
+            ->setHeight(50)
+            ->setOffsetX(10)
+            ->setOffsetY(0);
+
+
+        $paragraph = $shape->getActiveParagraph();
+        $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);;
+        $run = $paragraph->createTextRun($date->setTimezone('Europe/Berlin')->isoFormat('dddd'))->getFont()
+            ->setSize($this->config['fontSize'])
+            ->setColor($textColor)
+            ->setName('Sarabun SemiBold');
+        $run = $paragraph->createTextRun(' | ')->getFont()
+            ->setBold(false)
+            ->setSize($this->config['fontSize'])
+            ->setColor($gray)
+            ->setName('Sarabun Light');
+        $run = $paragraph->createTextRun($date->setTimezone('Europe/Berlin')->isoFormat('D. MMMM'))->getFont()
+            ->setBold(false)
+            ->setSize($this->config['fontSize'])
+            ->setColor($textColor)
+            ->setName('Sarabun SemiBold');
+
+        $table = $slide->createTableShape(2);
+        $table->setOffsetX(10)
+            ->setOffsetY(100)
+            ->setWidth(950)
+            ->setHeight(500);
+
+
+        $listFontSize = (int)($this->config['fontSize'] * 0.8);
+        $locationFontSize = (int)($listFontSize * 0.6);
+
+        foreach ($events as $event) {
+            $row = $table->createRow();
+            $cell = $row->nextCell();
+            $cell->setWidth(230);
+            $cell->getActiveParagraph()
+                ->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
+                ->setMarginRight(10);
+            $cell->createTextRun($event->service->timeText())
+                ->getFont()
+                ->setBold(false)
+                ->setSize($listFontSize)
+                ->setColor($textColor)
+                ->setName('Sarabun Light');
+            $cell = $row->nextCell();
+            $cell->setWidth(700);
+
+            $paragraph = $cell->getActiveParagraph();
+            $paragraph->getAlignment()
+                ->setMarginBottom(10);
+            $paragraph->createTextRun($event->getAdText('ppt', $event->service->titleText(false)))
+                ->getFont()
+                ->setSize($listFontSize)
+                ->setColor($textColor)
+                ->setName('Sarabun SemiBold');
+
+            $paragraph = $cell->createParagraph();
+            $paragraph->createTextRun($event->service->locationTextWithCity)
+                ->getFont()
+                ->setBold(false)
+                ->setSize($locationFontSize)
+                ->setColor($textColor)
+                ->setName('Sarabun Light');
+        }
     }
 
 }

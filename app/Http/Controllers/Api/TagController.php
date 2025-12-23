@@ -34,5 +34,5 @@ use App\Models\Tag;
 
 class TagController extends AbstractApiCRUDController
 {
-    protected string $model = Tag::class;
+    protected string $modelClass = Tag::class;
 }

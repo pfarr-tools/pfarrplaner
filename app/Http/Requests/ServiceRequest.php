@@ -114,8 +114,6 @@ class ServiceRequest extends FormRequest
             'sermon_id' => 'nullable|int|exists:sermons,id',
             'announcements' => 'nullable|string',
             'offering_text' => 'nullable|string',
-            'communiapp_id' => 'nullable|int',
-            'communiapp_listing_start' => 'nullable',
             'controlled_access' => 'nullable|int',
             'alt_liturgy_date' => 'nullable|date_format:d.m.Y',
             'date' => 'nullable|date',
@@ -126,6 +124,7 @@ class ServiceRequest extends FormRequest
             'rrule' => 'nullable|string',
             'is_allday' => 'nullable|int|in:0,1',
             'alt_proprium' => 'nullable|string|max:6',
+            'ad_text' => 'nullable|string',
         ];
     }
 
@@ -183,11 +182,6 @@ class ServiceRequest extends FormRequest
         }
         if (isset($data['registration_online_end'])) {
             $data['registration_online_end'] = $this->getDateTime($data['registration_online_end']);
-        }
-        if (isset($data['communiapp_listing_start']) && ($data['communiapp_listing_start'] != 'Invalid date')) {
-            $data['communiapp_listing_start'] = Carbon::createFromFormat('d.m.Y', $data['communiapp_listing_start']);
-        } else {
-            $data['communiapp_listing_start'] = null;
         }
 
         if (isset($data['date'])) {

@@ -274,6 +274,14 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             ->get();
         //dd($events);
 
+        $featuredEvents = Occurence::with('event')
+            ->whereHas('service', function ($query) use ($service) {
+                $query->inCity($service->city)->displayable($service->date);
+            })
+            ->adRunningAt('bekanntgaben', $service->date)
+            ->orderBy('start')
+            ->get();
+
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -360,6 +368,8 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $this->renderOfferings($service, $lastService, $offerings);
 
         $this->renderEvents($events);
+
+        $this->renderFeaturedEvents($featuredEvents);
 
         $textRun = $this->renderParagraph();
 
@@ -831,7 +841,7 @@ Amen.'
         }
         $this->renderParagraph(
             self::NO_INDENT,
-            [['Zu folgenden Veranstaltungen laden wir Sie ein:', ['italic' => true]]],
+            [[(count($events) == 1 ? 'Zu folgender Veranstaltung' : 'Zu folgenden Veranstaltungen').' laden wir Sie ein:', ['italic' => true]]],
             1
         );
         $days = [];
@@ -857,6 +867,33 @@ Amen.'
                     ]
                 ]);
             }
+        }
+    }
+
+    protected function renderFeaturedEvents($events)
+    {
+        if (!count($events)) {
+            return;
+        }
+        $this->renderParagraph();
+        $this->renderParagraph(
+            self::NO_INDENT,
+            [['Ganz besonders weisen wir auf folgende '.(count($events) == 1 ? 'Veranstaltung' : 'Veranstaltungen').' hin:', ['italic' => true]]],
+            1
+        );
+        $days = [];
+        foreach ($events as $event) {
+            $this->renderParagraph(
+                self::NO_INDENT,
+                [[$event->start->isoFormat('dddd, DD. MMMM').', '.$event->service->timeText().', '.$event->service->locationTextWithCity, self::BOLD]]
+            );
+            $this->renderParagraph(
+                self::NO_INDENT,
+                [[$event->service->titleText(false), self::BOLD]]
+            );
+            $this->renderParagraph(self::NO_INDENT, [
+                [$event->getAdText('newsletter'), []]
+            ]);
         }
     }
 
