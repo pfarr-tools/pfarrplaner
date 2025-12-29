@@ -42,6 +42,7 @@
                 <tab-header id="streaming" title="Streaming" :active-tab="activeTab"/>
                 <tab-header id="podcast" title="Podcast" :active-tab="activeTab"/>
                 <tab-header id="integrations" title="Weitere Integrationen" :active-tab="activeTab"/>
+                <tab-header id="ads" title="Werbung" :active-tab="activeTab"/>
             </tab-headers>
         </template>
         <tabs>
@@ -176,6 +177,12 @@
                     </accordion-element>
                 </accordion>
             </tab>
+            <tab id="ads" :active-tab="activeTab">
+                <model-index-list :records="city.ad_channels" :can-create="true" title="Werbekanäle"
+                                  create-label="Neuer Werbekanal" :create-route="route('admin.adchannels.create', {city: city.id})"
+                                  delete-route-name="api.adchannel.destroy" edit-route-name="admin.adchannel.edit"
+                    model-label="Werbekanal"/>
+            </tab>
         </tabs>
     </admin-layout>
 </template>
@@ -196,10 +203,14 @@ import FormTextarea from "../../../components/Ui/forms/FormTextarea";
 import KonfiAppEventTypeSelect from "../../../components/Ui/elements/KonfiAppEventTypeSelect";
 import Accordion from "../../../components/Ui/accordion/Accordion.vue";
 import AccordionElement from "../../../components/Ui/accordion/AccordionElement.vue";
+import ModelIndexList from "../../../components/Admin/ModelIndexList.vue";
+import ModelIndexPage from "../../../components/Admin/ModelIndexPage.vue";
 
 export default {
     name: "Editor",
     components: {
+        ModelIndexPage,
+        ModelIndexList,
         AccordionElement,
         Accordion,
         KonfiAppEventTypeSelect,
@@ -207,7 +218,7 @@ export default {
         FormImageAttacher,
         FormCheck, FormSelectize, FormInput, Tab, Tabs, TabHeader, TabHeaders, CardBody, CardHeader, Card
     },
-    props: ['city', 'streams', 'ministries'],
+    props: ['city', 'streams', 'ministries', 'tab'],
     created() {
         axios.get(route('api.ministries.list', {
             api_token: this.apiToken,
@@ -230,7 +241,7 @@ export default {
             myMinistries: [],
             ministriesLoaded: false,
             myCity: this.city,
-            activeTab: 'home',
+            activeTab: this.tab || 'home',
             streamOptions: streamOptions,
         }
     },

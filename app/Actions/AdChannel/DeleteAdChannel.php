@@ -28,30 +28,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Models\Ads;
+namespace App\Actions\AdChannel;
 
-use App\Models\AbstractModel;
+use App\Actions\AbstractDeleteAction;
+use App\Contracts\AdChannel\DeletesAdChannels;
+use App\Events\Models\AdChannel\DeletedAdChannel;
+use App\Models\Ads\AdChannel;
+use App\Models\People\User;
 use App\Models\Places\City;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Gate;
 
-class AdChannel extends AbstractModel
+class DeleteAdChannel extends AbstractDeleteAction implements DeletesAdChannels
 {
-    /** @use HasFactory<\Database\Factories\AdChannelFactory> */
-    use HasFactory;
 
-    protected static string $prefix = 'werbekanal';
-    protected static string $prefixPlural = 'werbekanaele';
-    public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
-    public static array $validationRules = [
-        'name' => 'required|max:255',
-        'city_id' => 'required|exists:cities,id',
-    ];
+    /** @var City $city */
+    protected $city;
 
-
-    protected $fillable = ['name', 'slug', 'city_id'];
-
-    public function city()
+    /**
+     * Get return route
+     * @return string
+     */
+    public function redirectTo(): string
     {
-        return $this->belongsTo(City::class);
+        return route('admin.city.edit', ['modelId' => $this->city->id, 'tab' => 'ads']);
     }
+
+    /**
+     * Delete a tag
+     * @param User $user
+     * @param AdChannel $adChannel
+     * @return AdChannel|bool|null
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function delete(User $user, AdChannel $adChannel)
+    {
+        $this->city = $adChannel->city;
+        Gate::forUser($user)->authorize('delete', $adChannel);
+        DeletedAdChannel::dispatch($user, $adChannel);
+        $this->messages = ['success' => 'Der Werbekanal wurde gelöscht.'];
+        return $adChannel->delete();
+
+    }
+
 }

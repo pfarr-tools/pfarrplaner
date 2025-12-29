@@ -28,30 +28,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Models\Ads;
+namespace App\Events\Models\AdChannel;
 
-use App\Models\AbstractModel;
-use App\Models\Places\City;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Ads\AdChannel;
+use App\Models\People\User;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
-class AdChannel extends AbstractModel
+class CreatedAdChannel
 {
-    /** @use HasFactory<\Database\Factories\AdChannelFactory> */
-    use HasFactory;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    protected static string $prefix = 'werbekanal';
-    protected static string $prefixPlural = 'werbekanaele';
-    public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
-    public static array $validationRules = [
-        'name' => 'required|max:255',
-        'city_id' => 'required|exists:cities,id',
-    ];
+    /** @var User $user */
+    protected $user;
+
+    /** @var AdChannel $adChannel */
+    protected $adChannel;
 
 
-    protected $fillable = ['name', 'slug', 'city_id'];
-
-    public function city()
+    public function __construct(User $user, AdChannel $adChannel)
     {
-        return $this->belongsTo(City::class);
+        $this->user = $user;
+        $this->adChannel = $adChannel;
     }
+
+
+
 }

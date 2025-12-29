@@ -32,6 +32,7 @@ namespace App\Http\Controllers;
 
 use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Integrations\Youtube\YoutubeIntegration;
+use App\Models\AbstractModel;
 use App\Services\MinistryService;
 use App\Models\Places\City;
 use App\Models\Service;
@@ -71,6 +72,13 @@ class CityController extends AbstractCRUDController
             return $user->cities()->get();
         }
     }
+
+
+    protected function getSingleModel(Request $request, $modelId = null, $relations = []): AbstractModel
+    {
+        return parent::getSingleModel($request, $modelId, $relations)->load('adChannels');
+    }
+
 
 
     /**

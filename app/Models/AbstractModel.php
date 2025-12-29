@@ -33,6 +33,7 @@ namespace App\Models;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Pluralizer;
@@ -92,8 +93,12 @@ class AbstractModel extends Model
      */
     public static function getAdminModuleConfig()
     {
-        if (!static::$adminIcon) false;
-        if (!Auth::user() || !Auth::user()->can('index', get_called_class())) false;
+        if (!static::$adminIcon) {
+            false;
+        }
+        if (!Auth::user() || !Auth::user()->can('index', get_called_class())) {
+            false;
+        }
         return [
             'text' => static::$adminTitle ?: ucfirst(static::$prefixPlural),
             'group' => static::$adminGroup,
@@ -107,12 +112,12 @@ class AbstractModel extends Model
 
     public static function getContractName(string $verb): string
     {
-        return static::relatedClass('App\\Contracts\\###\\'.ucfirst($verb).'s#p#');
+        return static::relatedClass('App\\Contracts\\###\\' . ucfirst($verb) . 's#p#');
     }
 
     public static function getActionName(string $verb): string
     {
-        return static::relatedClass('App\\Actions\\###\\'.ucfirst($verb).'###');
+        return static::relatedClass('App\\Actions\\###\\' . ucfirst($verb) . '###');
     }
 
     public function getContractedAction(string $verb)
@@ -142,42 +147,51 @@ class AbstractModel extends Model
 
     public static function getEventName(string $verb): string
     {
-        return static::relatedClass('App\\Events\\'.ucfirst($verb).'###');
+        return static::relatedClass('App\\Events\\' . ucfirst($verb) . '###');
     }
 
     public static function getVuePath(string $page)
     {
-        return (static::$path ? Str::ucfirst(static::$path).'/' : '')
-            .Str::ucfirst(static::relatedName('###/'.Str::ucfirst($page)));
+        return (static::$path ? Str::ucfirst(static::$path) . '/' : '')
+            . Str::ucfirst(static::relatedName('###/' . Str::ucfirst($page)));
     }
 
 
-    public static function getRoutes() {
+    public static function getRoutes()
+    {
         $routeClassPrefixes = ['web' => static::$path];
 
         $routeClasses = array_merge(array_keys(static::$routes ?? []), array_keys(static::$defaultRoutes ?? []));
         foreach (array_keys(static::$defaultRoutes ?? []) as $routeClass) {
             foreach ((static::$exceptRoutes ?? [])[$routeClass] ?? [] as $exception) {
-                if (isset((static::$defaultRoutes[$routeClass] ?? [])[$exception])) unset (static::$defaultRoutes[$routeClass][$exception]);
+                if (isset((static::$defaultRoutes[$routeClass] ?? [])[$exception])) {
+                    unset (static::$defaultRoutes[$routeClass][$exception]);
+                }
             }
         }
 
         $myRoutes = [];
         foreach ($routeClasses as $routeClass) {
             $myRoutes[$routeClass] = [];
-            $records = array_merge((static::$routes ?? [])[$routeClass] ?? [], (static::$defaultRoutes ?? [])[$routeClass] ?? [] );
+            $records = array_merge(
+                (static::$routes ?? [])[$routeClass] ?? [],
+                (static::$defaultRoutes ?? [])[$routeClass] ?? []
+            );
 
             // edit verb exception rule:
             // if "show" is not defined, remove the "edit verb" from the "edit" url
             if (isset($records['edit']) && (!isset($records['show']))) {
-                $records['edit'][1] = Str::replace('/'.static::$editVerb, '', $records['edit'][1]);
+                $records['edit'][1] = Str::replace('/' . static::$editVerb, '', $records['edit'][1]);
             }
 
             foreach ($records as $routeKey => $routeData) {
                 $routeClassPrefix = $routeClassPrefixes[$routeClass] ?? $routeClass;
-                $keyPrefix = $routeClassPrefix ? str_replace('/', '.', $routeClassPrefix).'.' : '';
-                $fullRouteName = $keyPrefix.(Str::contains($routeData[1], '#p#') ? static::pluralKey() : static::singularKey()).'.'.$routeKey;
-                $routeData[1] = '/'.($routeClassPrefix ? $routeClassPrefix.'/' : '').static::relatedUrl($routeData[1]);
+                $keyPrefix = $routeClassPrefix ? str_replace('/', '.', $routeClassPrefix) . '.' : '';
+                $fullRouteName = $keyPrefix . (Str::contains($routeData[1], '#p#') ? static::pluralKey(
+                    ) : static::singularKey()) . '.' . $routeKey;
+                $routeData[1] = '/' . ($routeClassPrefix ? $routeClassPrefix . '/' : '') . static::relatedUrl(
+                        $routeData[1]
+                    );
                 $myRoutes[$routeClass][$fullRouteName] = [
                     'verb' => $routeKey,
                     'httpVerbs' => $routeData[0],
@@ -197,7 +211,9 @@ class AbstractModel extends Model
     public static function getSingleRouteName(string $routeClass, string $verb): string
     {
         foreach (static::getRoutes()[$routeClass] ?? [] as $routeKey => $routeData) {
-            if ($routeData['verb'] == $verb) return $routeKey;
+            if ($routeData['verb'] == $verb) {
+                return $routeKey;
+            }
         }
         return '';
     }
@@ -222,7 +238,6 @@ class AbstractModel extends Model
                     ->name($routeKey);
             }
         }
-
     }
 
     /**
@@ -234,7 +249,7 @@ class AbstractModel extends Model
     {
         Route::middleware([
                               'auth',
-                          ])->group(function ()  {
+                          ])->group(function () {
             static::registerDefaultRoutes('web', static::controllerClass());
         });
     }
@@ -243,7 +258,7 @@ class AbstractModel extends Model
     {
         Route::middleware([
                               'auth:api',
-                          ])->group(function ()  {
+                          ])->group(function () {
             static::registerDefaultRoutes('api', static::apiControllerClass());
         });
     }
@@ -264,12 +279,12 @@ class AbstractModel extends Model
      */
     public static function controllerClass(): string
     {
-        return 'App\\Http\\Controllers\\'.static::modelName().'Controller';
+        return 'App\\Http\\Controllers\\' . static::modelName() . 'Controller';
     }
 
     public static function apiControllerClass(): string
     {
-        return 'App\\Http\\Controllers\\Api\\'.static::modelName().'Controller';
+        return 'App\\Http\\Controllers\\Api\\' . static::modelName() . 'Controller';
     }
 
     /**
@@ -292,6 +307,13 @@ class AbstractModel extends Model
         return strtolower(static::modelName());
     }
 
+    /**
+     * Get the prop name for the model
+     */
+    public static function propKey(): string
+    {
+        return Str::camel(static::modelName());
+    }
 
     /**
      * @return string

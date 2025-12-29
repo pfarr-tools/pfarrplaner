@@ -28,14 +28,14 @@
   -->
 
 <template>
-    <admin-layout :title="myTag.name ? tag.name+' bearbeiten' : 'Neue Kennzeichnung' ">
+    <admin-layout :title="myAdChannel.name ? myAdChannel.name+' bearbeiten' : 'Neuer Werbekanal' ">
         <template v-slot:navbar-left>
-            <save-button @click="saveTag" />
-            <nav-button class="ms-1" v-if="myTag.id"
-                        @click="deleteTag" type="danger" title="Kennzeichnung löschen"
+            <save-button @click="saveAdChannel" />
+            <nav-button class="ms-1" v-if="myAdChannel.id"
+                        @click="deleteAdChannel" type="danger" title="Werbekanal löschen"
                         icon="mdi mdi-delete">Löschen</nav-button>
         </template>
-        <form-input name="name" label="Bezeichnung" v-model="myTag.name" />
+        <form-input name="name" label="Bezeichnung" v-model="myAdChannel.name" />
     </admin-layout>
 </template>
 
@@ -46,26 +46,23 @@ import NavButton from "../../../components/Ui/buttons/NavButton";
 export default {
     name: "Editor",
     components: {NavButton, SaveButton, FormInput},
-    props: ['tag'],
+    props: ['adChannel', 'city'],
     data() {
-        let myTag = this.tag;
-        if (undefined === myTag) myTag = {id: null, name: '', code: ''};
-
         return {
-            myAdChannel: myTag,
+            myAdChannel: this.adChannel || { name: '', city_id: this.city ? this.city.id : null }
         }
     },
     methods: {
-        saveTag() {
+        saveAdChannel() {
             if (this.myAdChannel.id) {
-                this.$inertia.patch(route('admin.tag.update', this.myAdChannel.id), this.myAdChannel);
+                this.$inertia.patch(route('admin.adchannel.update', this.myAdChannel.id), this.myAdChannel);
             } else {
-                this.$inertia.post(route('admin.tags.store'), this.myAdChannel);
+                this.$inertia.post(route('admin.adchannels.store'), this.myAdChannel);
             }
         },
-        deleteTag() {
-            if (!confirm('Willst du diese Kennzeichnung wirklich komplett löschen?')) return;
-            this.$inertia.delete(route('admin.tag.destroy', this.myAdChannel.id));
+        deleteAdChannel() {
+            if (!confirm('Willst du diesen Werbekanal wirklich komplett löschen?')) return;
+            this.$inertia.delete(route('admin.adchannel.destroy', this.myAdChannel.id));
         },
     }
 }

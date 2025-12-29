@@ -128,7 +128,9 @@ class AbstractCRUDController extends Controller
     public function create(Request $request)
     {
         Gate::authorize('create', $this->modelClass);
-        return Inertia::render(($this->modelClass)::getVuePath('editor'), $this->getResourcesForEditor($request));
+        $data = $this->getResourcesForEditor($request);
+        if ($request->has('tab')) $data['tab'] = $request->get('tab');
+        return Inertia::render(($this->modelClass)::getVuePath('editor'), $data);
     }
 
     /**
@@ -152,8 +154,10 @@ class AbstractCRUDController extends Controller
     {
         $model = $this->getSingleModel($request, $modelId, ($this->modelClass)::$relationsForEditor);
         Gate::authorize('update', $model);
+        $data = $this->getResourcesForEditor($request, $model);
+        if ($request->has('tab')) $data['tab'] = $request->get('tab');
         return Inertia::render(($this->modelClass)::getVuePath('editor'),
-            array_merge([($this->modelClass)::singularKey() => $model], $this->getResourcesForEditor($request, $model))
+            array_merge([($this->modelClass)::propKey() => $model], $data)
         );
     }
 

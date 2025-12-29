@@ -28,30 +28,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Models\Ads;
+namespace App\Http\Controllers\Api;
 
-use App\Models\AbstractModel;
-use App\Models\Places\City;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Http\Controllers\AbstractCRUDController;
+use App\Models\Ads\AdChannel;
 
-class AdChannel extends AbstractModel
+class AdChannelController extends AbstractCRUDController
 {
-    /** @use HasFactory<\Database\Factories\AdChannelFactory> */
-    use HasFactory;
 
-    protected static string $prefix = 'werbekanal';
-    protected static string $prefixPlural = 'werbekanaele';
-    public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
-    public static array $validationRules = [
-        'name' => 'required|max:255',
-        'city_id' => 'required|exists:cities,id',
-    ];
+    protected string $modelClass = AdChannel::class;
 
-
-    protected $fillable = ['name', 'slug', 'city_id'];
-
-    public function city()
-    {
-        return $this->belongsTo(City::class);
-    }
 }
