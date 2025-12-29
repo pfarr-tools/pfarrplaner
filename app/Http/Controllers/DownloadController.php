@@ -150,8 +150,26 @@ class DownloadController extends Controller
      */
     public function qr($value, $prettyName = '') {
         $file = tempnam('/tmp', 'pfp-qr').'.png';
-        $command = 'qrencode -l H -m 0 -o '.escapeshellarg($file).' '.escapeshellarg($value);
-        exec($command);
+
+        // Wichtig: kein Leerraum am Ende, keine extra Leerzeile
+        $value = rtrim($value, "\r\n");
+
+        // temp file für payload
+        $tmp = tempnam(sys_get_temp_dir(), 'epc_');
+        file_put_contents($tmp, $value);
+
+        $command = 'qrencode -8 -l H -m 0 -o '
+            . escapeshellarg($file)
+            . ' -r '
+            . escapeshellarg($tmp);
+
+        exec($command, $out, $code);
+        @unlink($tmp);
+
+        if ($code !== 0) {
+            throw new RuntimeException("qrencode failed with exit code $code");
+        }
+
         $png = file_get_contents($file);
         unlink($file);
         return response($png)->header('Content-Type', 'image/png');

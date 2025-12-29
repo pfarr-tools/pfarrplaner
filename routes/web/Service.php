@@ -58,6 +58,7 @@ Route::patch('/veranstaltung-predigt/{service:slug}', [ServiceController::class,
 // additional service routes
 Route::get('/veranstaltung/{service:slug}/ical', [ServiceController::class, 'ical'])->name('service.ical');
 Route::get('/veranstaltung/{service:slug}/liedblatt', [ServiceController::class, 'songsheet'])->name('service.songsheet');
+Route::get('/veranstaltung/{service:slug}/spendencode', [ServiceController::class, 'epc'])->name('service.epc');
 Route::post('/veranstaltung/{service:slug}/dateien', [ServiceController::class, 'attach'])->name('service.attach');
 Route::delete('/veranstaltung/{service:slug}/datei/{attachment}', [ServiceController::class, 'detach'])->name('service.detach');
 

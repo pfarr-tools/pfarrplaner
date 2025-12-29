@@ -47,6 +47,7 @@ use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Models\ServiceGroup;
 use App\Models\Tag;
+use App\Services\GiroCodeService;
 use App\Services\RedirectorService;
 use App\Traits\HandlesAttachmentsTrait;
 use Carbon\Carbon;
@@ -463,6 +464,25 @@ class ServiceController extends Controller
         $service->save();
 
         return redirect()->route('qr', $service->city->name);
+    }
+
+    /**
+     * Return a EPC code for donations
+     * @return void
+     */
+    public function epc(Service $service)
+    {
+        if (!$service->city->iban) abort(404);
+
+        $purpose = $service->offering_goal ?: 'Allgemeine Gemeindearbeit';
+
+        return redirect()->route('qrcode', GiroCodeService::codeValue(
+             $service->city->official_name ?: 'Evang. Kirchengemeinde '.$service->city->name,
+            $service->city->iban,
+            null, // empty amount
+            'Spende: '.$purpose,
+            $service->city->bic ?? null,
+        ));
     }
 
 }

@@ -88,6 +88,8 @@ class City extends AbstractModel
         'konfiapp_default_type' => 'nullable|string',
         'official_name' => 'nullable|string',
         'default_ministries' => 'nullable',
+        'iban' => 'nullable|string',
+        'bic' => 'nullable|string',
     ];
 
     public static $adminIcon = 'mdi mdi-church';
@@ -136,6 +138,8 @@ class City extends AbstractModel
         'official_name',
         'logo',
         'default_ministries',
+        'iban',
+        'bic'
     ];
 
     /**

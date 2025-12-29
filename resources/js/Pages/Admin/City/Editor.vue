@@ -72,6 +72,10 @@
                             v-model="myCity.default_wedding_offering_description"/>
                 <form-input name="default_offering_url" label="Allgemeine Spendenseite"
                             v-model="myCity.default_offering_url"/>
+                <form-input name="iban" label="Bankkonto (IBAN)"
+                            v-model="myCity.iban"/>
+                <form-input name="bic" label="Bankkonto (BIC)"
+                            v-model="myCity.bic"/>
             </tab>
             <tab id="calendars" :active-tab="activeTab">
                 <form-input name="public_events_calendar_url" label="URL für einen öffentlichen Kalender auf elkw.de"
