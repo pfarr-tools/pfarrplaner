@@ -32,6 +32,7 @@ namespace App\Actions\AdChannel;
 
 use App\Actions\AbstractDeleteAction;
 use App\Contracts\AdChannel\DeletesAdChannels;
+use App\Contracts\AdChannel\DeletesLocations;
 use App\Events\Models\AdChannel\DeletedAdChannel;
 use App\Models\Ads\AdChannel;
 use App\Models\People\User;

@@ -32,6 +32,7 @@ namespace App\Actions\AdChannel;
 
 use App\Actions\AbstractUpdateAction;
 use App\Contracts\AdChannel\UpdatesAdChannels;
+use App\Contracts\AdChannel\UpdatesLocations;
 use App\Events\Models\AdChannel\UpdatedAdChannel;
 use App\Models\Ads\AdChannel;
 use App\Models\People\User;

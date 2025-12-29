@@ -45,13 +45,19 @@ export default {
         DatasetSearch,
         DatasetShow
     },
-    props: ['title', 'records', 'canCreate', 'createLabel', 'createRoute', 'modelLabel', 'editRouteName', 'deleteRouteName'],
+    props: ['title', 'records', 'canCreate', 'createLabel', 'createRoute', 'modelLabel', 'editRouteName', 'deleteRouteName', 'labelBy'],
     methods: {
         deleteRecord(row, rowKey) {
             if (!confirm('Willst du diesen Eintrag wirklich unwiderruflich löschen?')) return;
-            this.$api().delete(route(this.deleteRouteName, {modelId: row.id})).then(response => {
-                delete(this.records[rowKey]);
-            });
+            this.$inertia.delete(route(this.deleteRouteName, {modelId: row.id}));
+        },
+        rowLabel(row) {
+            console.log(row, this.labelBy)
+            if (undefined !== this.labelBy) {
+                return row[this.labelBy] || row.label || row.name;
+            } else {
+                return row.label || row.name;
+            }
         }
     }
 }
@@ -96,7 +102,7 @@ export default {
                                 <template #default="{ row, rowIndex }">
                                     <tr>
                                         <slot name="table-row-label-column" v-bind:row="row">
-                                            <td>{{ row.label }}</td>
+                                            <td>{{ rowLabel(row) }}</td>
                                         </slot>
                                         <slot name="table-row-additional-columns" v-bind:row="row"/>
                                         <td class="text-end">

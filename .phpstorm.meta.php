@@ -3225,12 +3225,12 @@ namespace PHPSTORM_META {
     override(\tap(0), type(0));
     override(\optional(0), type(0));
 
-            registerArgumentsSet('auth', 
+            registerArgumentsSet('auth',
 'calendar.month','calendar.print','calendar.printsetup','index','view',
 'create','update','delete','restore','forceDelete',
 'join','doJoin','editAbsences','denyWithStatus','denyAsNotFound',
 'viewAny','hasCityPermission','__construct','selfAdminister',);
-        registerArgumentsSet('configs', 
+        registerArgumentsSet('configs',
 'amazon.id','amazon.secret','app.name','app.env','app.debug',
 'app.url','app.frontend_url','app.asset_url','app.timezone','app.locale',
 'app.fallback_locale','app.faker_locale','app.cipher','app.key','app.previous_keys',
@@ -3378,11 +3378,11 @@ namespace PHPSTORM_META {
 'ignition.register_commands','ignition.solution_providers','ignition.ignored_solution_providers','ignition.enable_runnable_solutions','ignition.remote_sites_path',
 'ignition.local_sites_path','ignition.housekeeping_endpoint_prefix','ignition.settings_file_path','ignition.recorders','ignition.open_ai_key',
 'ignition.with_stack_frame_arguments','ignition.argument_reducers','tinker.commands','tinker.alias','tinker.dont_alias',);
-        registerArgumentsSet('middleware', 
+        registerArgumentsSet('middleware',
 'web','api','extranet','auth','auth.basic',
 'bindings','cache.headers','can','guest','signed',
 'throttle','verified','cors','csrf',);
-        registerArgumentsSet('routes', 
+        registerArgumentsSet('routes',
 'dusk.login','dusk.logout','dusk.user','sanctum.csrf-cookie','ignition.healthCheck',
 'ignition.executeSolution','ignition.updateConfig','extranet.sermons.lastest','extranet.sermons.headers','extranet.sermon.details',
 'extranet.services.next','extranet.services.past','extranet.services.lastWithSermon','api.pools.index','api.pools.store',
@@ -3443,7 +3443,7 @@ namespace PHPSTORM_META {
 'user.switchback','wedding.done','wedding.attach','wedding.detach','wedding.add',
 'wedding.destroy','weddings.wizard','weddings.wizard.save','admin.index','city.attach',
 'city.detach','admin.text.index','admin.text.import','admin.text.create','admin.text.store',
-'admin.text.edit','admin.text.update','admin.text.destroy','locations.index','location.create',
+'admin.text.edit','admin.text.update','admin.text.destroy','admin.locations.index','location.create',
 'location.store','location.edit','location.update','location.destroy','seatingSection.create',
 'seatingSection.edit','seatingSection.store','seatingSection.update','seatingSection.destroy','seatingRow.create',
 'seatingRow.edit','seatingRow.store','seatingRow.update','seatingRow.destroy','parishes.index',
@@ -3461,7 +3461,7 @@ namespace PHPSTORM_META {
 'users.add','user.store','user.create','user.edit','user.update',
 'user.destroy','user.attach','user.detach','user.password.reset','user.switch',
 'ping.update',);
-        registerArgumentsSet('views', 
+        registerArgumentsSet('views',
 'absences.mail.approved','absences.mail.checked','absences.mail.rejected','absences.mail.requested','app',
 'auth.passwords.change','auth.passwords.email','auth.passwords.reset','baptisms.appointment.ical','bookings.partials.place',
 'bookings.partials.service-bookings','bookings.pdf.list.maxBased','bookings.pdf.list.rowBased','calendarconnection.create','checkin.create',
@@ -3520,7 +3520,7 @@ namespace PHPSTORM_META {
 'laravel-exceptions::500','laravel-exceptions::503','laravel-exceptions::layout','laravel-exceptions::minimal','notifications::email',
 'pagination::bootstrap-4','pagination::bootstrap-5','pagination::default','pagination::semantic-ui','pagination::simple-bootstrap-4',
 'pagination::simple-bootstrap-5','pagination::simple-default','pagination::simple-tailwind','pagination::tailwind',);
-        registerArgumentsSet('translations', 
+        registerArgumentsSet('translations',
 'auth.failed','auth.password','auth.throttle','pagination.previous','pagination.next',
 'passwords.reset','passwords.sent','passwords.throttled','passwords.token','passwords.user',
 'validation.accepted','validation.accepted_if','validation.active_url','validation.after','validation.after_or_equal',
@@ -3875,7 +3875,7 @@ namespace PHPSTORM_META {
 'backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.unhealthy_backup_found_body','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.unhealthy_backup_found_not_reachable','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.unhealthy_backup_found_empty','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.unhealthy_backup_found_old','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.unhealthy_backup_found_unknown',
 'backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.unhealthy_backup_found_full','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.no_backups_info','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.application_name','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.backup_name','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.disk',
 'backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.newest_backup_size','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.number_of_backups','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.total_storage_used','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.newest_backup_date','backup::.mnt.6EA670EFA670B963.Dev.PHP.phpstorm.pfarr.tools.planer.vendor.spatie.laravel-backup.resources.lang.zh-TW.notifications.oldest_backup_date',);
-        registerArgumentsSet('env', 
+        registerArgumentsSet('env',
 'APP_NAME','APP_ENV','APP_KEY','APP_DEBUG','APP_URL',
 'TOKEN_SALT','APP_ADMINISTRATOR','LOG_CHANNEL','DB_CONNECTION','DB_HOST',
 'DB_PORT','DB_DATABASE','DB_USERNAME','DB_PASSWORD','BROADCAST_DRIVER',
@@ -3888,7 +3888,7 @@ namespace PHPSTORM_META {
 'YT_CHANNEL_FEED','REPO_COMMIT_FEED','PIXABAY_API_KEY','VACATION_STATE','AWS_ID',
 'AWS_SECRET','AMAZON_API_KEY','AMAZON_API_SECRET_KEY','AMAZON_ASSOCIATE_TAG','AMAZON_HOST',
 'AMAZON_REGION','RECAPTCHA_KEY','RECAPTCHA_SECRET','DATABASE_KEY',);
-        
+
                 expectedArguments(\Illuminate\Support\Facades\Gate::has(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::allows(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::denies(), 0, argumentsSet('auth'));
@@ -3952,5 +3952,5 @@ namespace PHPSTORM_META {
                 expectedArguments(\Illuminate\Contracts\Translation\Translator::get(), 0, argumentsSet('translations'));
                 expectedArguments(\env(), 0, argumentsSet('env'));
                 expectedArguments(\Illuminate\Support\Env::get(), 0, argumentsSet('env'));
-            
+
 }

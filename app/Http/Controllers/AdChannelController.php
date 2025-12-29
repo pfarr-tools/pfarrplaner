@@ -12,15 +12,10 @@ class AdChannelController extends AbstractCRUDController
 {
     protected string $modelClass = AdChannel::class;
 
-    protected function getResourcesForEditor(Request $request, $model = null): array
+    protected function preFillNewModel(Request $request): array
     {
-        $data = [];
-
-        if ($model) {
-            $data['city'] = $model->city;
-        } elseif ($request->has('city')) {
-            $data['city'] = City::findOrFail($request->get('city'));
-        }
+        $data = parent::preFillNewModel($request);
+        $data['city_id'] = $request->get('city') ?? null;
         return $data;
     }
 

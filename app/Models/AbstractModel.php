@@ -332,4 +332,23 @@ class AbstractModel extends Model
         return static::$modelKeyInRoute;
     }
 
+    /**
+     * fill defaults array
+     */
+    public function fillDefaults(): array
+    {
+        return ['default_ministries' => []];
+    }
+
+
+    /**
+     * Get an empty model instance
+     */
+    public static function getEmptyModel(): AbstractModel
+    {
+        $model = new static();
+        $data = array_merge(array_fill_keys($model->getFillable(), null), $model->fillDefaults(), ['name' => '']);
+        $model->fill($data);
+        return $model;
+    }
 }

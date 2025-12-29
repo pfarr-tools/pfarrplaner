@@ -31,6 +31,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Location;
+use App\Models\Places\City;
 use App\Models\Seating\SeatingRow;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -42,122 +43,42 @@ use Inertia\Inertia;
  * Class LocationController
  * @package App\Http\Controllers
  */
-class LocationController extends Controller
+class LocationController extends AbstractCRUDController
 {
+
+    /**
+     * @inheritDoc
+     */
+    protected string $modelClass = Location::class;
+
+    /**
+     * LocationController constructor.
+     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Inertia\Response
-     */
-    public function index()
+    protected function preFillNewModel(Request $request): array
     {
-        $locations = Location::whereIn('city_id', Auth::user()->writableCities->pluck('id'))->get();
-        return Inertia::render('Admin/Location/Index', compact('locations'));
+        $data = parent::preFillNewModel($request);
+        $data['city_id'] = $request->get('city') ?? null;
+        return $data;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        $cities = Auth::user()->writableCities;
-        $alternateLocations = Location::whereIn('city_id', $cities->pluck('id'))->get();
-        $location = new Location([
-                                     'name' => 'Neue Kirche',
-                                     'alternate_location_id' => '',
-                                 ]);
-        $seatingRows = [];
-        return Inertia::render(
-            'Admin/Location/LocationEditor',
-            compact('cities', 'location', 'alternateLocations', 'seatingRows')
-        );
-    }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
+     * @inheritDoc
      */
-    public function store()
+    protected function getResourcesForEditor(Request $request, $model = null): array
     {
-        Location::create($this->validateRequest());
-        return redirect()->route('locations.index')->with('success', 'Die Kirche wurde gespeichert');
+        $data = parent::getResourcesForEditor($request, $model);
+        $data['alternateLocations'] = $model ? $model->city->locations->where('id', '!=', $model->id) : [];
+        $data['seatingRows'] = $model ? SeatingRow::with('seatingSection')
+            ->whereHas('seatingSection', function ($q) use ($model) {
+                $q->where('location_id', $model->id);
+            })->get() : [];
+        return $data;
     }
 
-    /**
-     * @return array
-     * @throws ValidationException
-     */
-    protected function validateRequest(): array
-    {
-        return request()->validate(
-            [
-                'name' => 'required|max:255',
-                'city_id' => 'required|integer',
-                'default_time' => 'nullable|date_format:H:i',
-                'cc_default_location' => 'nullable|string',
-                'alternate_location_id' => 'nullable|int|exists:locations,id',
-                'general_location_name' => 'nullable|string',
-                'at_text' => 'nullable|string',
-                'instructions' => 'nullable|string'
-            ]
-        );
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param Location $location
-     * @return \Inertia\Response
-     */
-    public function edit(Location $location)
-    {
-        $location->load('seatingSections');
-        $cities = Auth::user()->writableCities;
-
-        $seatingRows = SeatingRow::with('seatingSection')
-            ->whereHas('seatingSection', function ($q) use ($location) {
-                $q->where('location_id', $location->id);
-            })->get();
-
-        $alternateLocations = Location::whereIn('city_id', $cities->pluck('id'))->where('id', '!=', $location->id)->get(
-        );
-        return Inertia::render(
-            'Admin/Location/LocationEditor',
-            compact('cities', 'location', 'alternateLocations', 'seatingRows')
-        );
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param Location $location
-     * @return Response
-     */
-    public function update(Location $location)
-    {
-        $location->update($this->validateRequest());
-        return redirect()->route('locations.index')->with('success', 'Die Kirche wurde geändert.');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        $location = Location::find($id);
-        $location->delete();
-        return redirect()->route('locations.index')->with('success', 'Die Kirche wurde gelöscht.');
-    }
 }

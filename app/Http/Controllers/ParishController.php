@@ -31,9 +31,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Parish;
+use App\Models\People\User;
+use App\Models\Places\City;
 use App\Models\Places\StreetRange;
+use App\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -41,72 +45,34 @@ use Inertia\Inertia;
  * Class ParishController
  * @package App\Http\Controllers
  */
-class ParishController extends Controller
+class ParishController extends AbstractCRUDController
 {
 
+    protected string $modelClass = Parish::class;
+
+    /**
+     * Class constructor.
+     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Inertia\Response
+     * @inheritDoc
      */
-    public function index()
+    protected function preFillNewModel(Request $request): array
     {
-        $parishes = Parish::with('owningCity')->whereIn('city_id', Auth::user()->adminCities->pluck('id'))->get();
-        return Inertia::render('Admin/Parish/Index', compact('parishes'));
+        $data = parent::preFillNewModel($request);
+        $city = City::findOrFail($request->get('city', -1));
+        $data['city_id'] = $city->id;
+        $data['name'] = 'Pfarramt '.$city->name;
+        return $data;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        $this->authorize('create', Parish::class);
-        $cities = Auth::user()->writableCities;
 
-        if (!count($cities)) {
-            abort(403);
-        }
 
-        $parish = new Parish(
-            [
-                'city_id' => $cities[0]->id,
-                'name' => 'Pfarramt ' . (Parish::where('city_id', $cities[0]->id)->count() + 1),
-                'code' => ''
-            ]
-        );
-        return Inertia::render('Admin/Parish/ParishEditor', compact('parish', 'cities'));
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-        Parish::create($this->validateRequest($request));
-        return redirect()->route('parishes.index')->with('success', 'Das Pfarramt wurde angelegt.');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param Parish $parish
-     * @return \Inertia\Response
-     */
-    public function edit(Parish $parish)
-    {
-        $cities = Auth::user()->writableCities;
-        return Inertia::render('Admin/Parish/ParishEditor', compact('parish', 'cities'));
-    }
 
     /**
      * Update the specified resource in storage.
@@ -115,7 +81,7 @@ class ParishController extends Controller
      * @param Parish $parish
      * @return Response
      */
-    public function update(Request $request, Parish $parish)
+    public function update_old(Request $request, Parish $parish)
     {
         $parish->update($this->validateRequest($request));
 
@@ -130,44 +96,4 @@ class ParishController extends Controller
         return redirect()->route('parishes.index')->with('success', 'Das Pfarramt wurde geändert. ' . $success);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param Parish $parish
-     * @return Response
-     */
-    public function destroy(Parish $parish)
-    {
-        /** @var StreetRange $streetRange */
-        foreach ($parish->streetRanges as $streetRange) {
-            $streetRange->delete();
-        }
-        $parish->delete();
-        return redirect()->route('parishes.index')->with('success', 'Das Pfarramt wurde gelöscht.');
-    }
-
-    /**
-     * Validate submitted data
-     * @param Request $request
-     * @return array
-     */
-    protected function validateRequest(Request $request)
-    {
-        return $request->validate(
-            [
-                'city_id' => 'required|int|exists:cities,id',
-                'name' => 'required|string',
-                'code' => 'required|string',
-                'congregation_name' => 'nullable|string',
-                'congregation_url' => 'nullable|string',
-                'address' => 'nullable|string',
-                'zip' => 'nullable|zip',
-                'city' => 'nullable|string',
-                'phone' => 'nullable|phone_number',
-                'email' => 'nullable|email',
-                'assistant' => 'nullable|string',
-                'opening_hours' => 'nullable|string',
-            ]
-        );
-    }
 }

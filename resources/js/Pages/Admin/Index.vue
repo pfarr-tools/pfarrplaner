@@ -31,7 +31,12 @@
     <admin-layout title="Administration">
         <div class="admin-index">
             <div v-for="(groupModules, groupName) in modules">
-                <h3 v-if="groupModules.length" class="mt-3">{{ groupName }}</h3>
+                <h3 v-if="groupModules.length" class="mt-3">{{ groupName }}
+                    <div v-if="(groupName == 'Orte') && canCreateCities" class="float-end">
+                        <inertia-link class="btn btn-success" :href="route('admin.cities.create')"
+                                      icon="mdi mdi-plus">Neuer Ort</inertia-link>
+                    </div>
+                </h3>
                 <div v-if="groupModules.length" class="row">
                     <div v-for="module in groupModules"
                          class="col-md-4 p-2 module"
@@ -60,7 +65,7 @@ import DatasetPager from "../../components/Ui/dataset/DatasetPager";
 
 export default {
     name: "Index",
-    props: ['modules'],
+    props: ['modules', 'canCreateCities'],
     components: {
         Dataset,
         DatasetItem,

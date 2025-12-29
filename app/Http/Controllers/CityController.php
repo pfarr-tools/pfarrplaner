@@ -46,8 +46,11 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 /**
- * Class CityController
- * @package App\Http\Controllers
+ * Controller for handling city-related functionality.
+ *
+ * Handles CRUD operations and additional functionality such as
+ * retrieving models, managing attachments, and generating QR codes
+ * for city-related events or services.
  */
 class CityController extends AbstractCRUDController
 {
@@ -58,12 +61,20 @@ class CityController extends AbstractCRUDController
     protected string $modelClass = City::class;
     protected $model = City::class;
 
+    /**
+     * Class constructor.
+     *
+     * Applies the 'auth' middleware to all routes, except for the 'qr' route.
+     */
     public function __construct()
     {
         $this->middleware('auth')->except('qr');
     }
 
 
+    /**
+     * @inheritDoc
+     */
     protected function getModelsForIndex(): Collection {
         $user = Auth::user();
         if ($user->isAdmin) {
@@ -74,11 +85,20 @@ class CityController extends AbstractCRUDController
     }
 
 
+    /**
+     * @inheritDoc
+     */
     protected function getSingleModel(Request $request, $modelId = null, $relations = []): AbstractModel
     {
-        return parent::getSingleModel($request, $modelId, $relations)->load('adChannels');
+        return parent::getSingleModel($request, $modelId, $relations)->load(['adChannels', 'locations', 'parishes']);
     }
 
+    protected function getResourcesForEditor(Request $request, $model = null): array
+    {
+        $data = parent::getResourcesForEditor($request, $model);
+        $data['canDelete'] = Auth::user()->can('delete', $model);
+        return $data;
+    }
 
 
     /**

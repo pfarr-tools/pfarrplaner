@@ -35,7 +35,6 @@
                         class="ms-1" type="danger" icon="mdi mdi-delete">Löschen</nav-button>
 
         </template>
-        <form-selectize :options="cities" name="city_id" v-model="myParish.city_id" label="Kirchengemeinde"/>
         <form-input name="name" label="Name" v-model="myParish.name" />
         <form-input name="code" label="Bezeichnung in DaviP" v-model="myParish.code" />
         <form-input name="congregation_name" label="Name der Teilkirchengemeinde" v-model="myParish.congregation_name"
@@ -79,14 +78,14 @@ export default {
         saveParish() {
             console.log(this.myParish);
             if (this.myParish.id) {
-                this.$inertia.patch(route('parish.update', this.myParish.id), this.myParish);
+                this.$inertia.patch(route('admin.parish.update', this.myParish.id), this.myParish);
             } else {
-                this.$inertia.post(route('parish.store'), this.myParish);
+                this.$inertia.post(route('admin.parishes.store'), this.myParish);
             }
         },
         deleteParish() {
             if (!confirm('Willst du dieses Pfarramt wirklich löschen?')) return;
-            this.$inertia.delete(route('parish.destroy', this.myParish.id));
+            this.$inertia.delete(route('admin.parish.destroy', this.myParish.id));
         }
     }
 }

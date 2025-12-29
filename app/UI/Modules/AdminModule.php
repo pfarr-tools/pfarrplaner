@@ -110,26 +110,6 @@ class AdminModule extends AbstractModule
                 'inertia' => true,
             ];
         }
-        if ($user->can('index', Location::class)) {
-            $adminMenu[] = [
-                'text' => 'Kirche / GD-Orte',
-                'group' => 'Orte',
-                'icon' => 'mdi mdi-map-marker',
-                'url' => route('locations.index'),
-                'active' => $route == 'locations.index',
-                'inertia' => true,
-            ];
-        }
-        if ($user->can('index', Parish::class)) {
-            $adminMenu[] = [
-                'text' => 'Pfarrämter',
-                'group' => 'Orte',
-                'icon' => 'mdi mdi-home-variant-outline',
-                'url' => route('parishes.index'),
-                'active' => $route == 'parishes.index',
-                'inertia' => true,
-            ];
-        }
         if ($user->can('viewAny', Psalm::class)) {
             $adminMenu[] = [
                 'text' => 'Psalmen',

@@ -45,9 +45,30 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * Class Parish
  * @package App
  */
-class Parish extends Model
+class Parish extends AbstractModel
 {
     use HasFactory;
+
+
+    protected static string $prefix = 'pfarramt';
+    protected static string $prefixPlural = 'pfarraemter';
+    public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
+    public static array $validationRules = [
+        'city_id' => 'required|int|exists:cities,id',
+        'name' => 'required|string',
+        'code' => 'required|string',
+        'congregation_name' => 'nullable|string',
+        'congregation_url' => 'nullable|string',
+        'address' => 'nullable|string',
+        'zip' => 'nullable|zip',
+        'city' => 'nullable|string',
+        'phone' => 'nullable|phone_number',
+        'email' => 'nullable|email',
+        'assistant' => 'nullable|string',
+        'opening_hours' => 'nullable|string',
+    ];
+
+
 
     /**
      * @var string[]

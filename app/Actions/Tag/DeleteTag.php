@@ -32,7 +32,7 @@ namespace App\Actions\Tag;
 
 use App\Actions\AbstractDeleteAction;
 use App\Contracts\Tag\DeletesTags;
-use App\Events\Models\Tag\DeletedTag;
+use App\Events\Models\Tag\DeletedLocation;
 use App\Models\People\User;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Gate;
@@ -59,7 +59,7 @@ class DeleteTag extends AbstractDeleteAction implements DeletesTags
     public function delete(User $user, Tag $tag)
     {
         Gate::forUser($user)->authorize('delete', $tag);
-        DeletedTag::dispatch($user, $tag);
+        DeletedLocation::dispatch($user, $tag);
         $this->messages = ['success' => 'Die Kennzeichnung wurde gelöscht.'];
         return $tag->delete();
 

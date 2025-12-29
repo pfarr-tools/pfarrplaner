@@ -30,17 +30,16 @@
 <template>
     <admin-layout :title="getTitle()">
         <template slot="navbar-left">
-            <button class="btn btn-primary" title="Speichern" @click="saveCity">
-                <span class="d-inline d-md-none mdi mdi-content-save"></span> <span class="d-none d-md-inline">Speichern</span>
-            </button>
+            <save-button @click="saveCity" />
+            <nav-button v-if="canDelete" class="ms-1" type="danger" icon="mdi mdi-delete" @click="deleteCity">Löschen</nav-button>
         </template>
         <template slot="tab-headers">
             <tab-headers>
                 <tab-header id="home" title="Allgemeines" :active-tab="activeTab"/>
                 <tab-header id="offerings" title="Opfer" :active-tab="activeTab"/>
-                <tab-header id="calendars" title="Externe Kalender" :active-tab="activeTab"/>
+                <tab-header id="parishes" title="Pfarrämter" :active-tab="activeTab"/>
                 <tab-header id="streaming" title="Streaming" :active-tab="activeTab"/>
-                <tab-header id="podcast" title="Podcast" :active-tab="activeTab"/>
+                <tab-header id="locations" title="Veranstaltungsorte" :active-tab="activeTab"/>
                 <tab-header id="integrations" title="Weitere Integrationen" :active-tab="activeTab"/>
                 <tab-header id="ads" title="Werbung" :active-tab="activeTab"/>
             </tab-headers>
@@ -50,9 +49,14 @@
                 <form-input name="name" label="Name der Kirchengemeinde" v-model="myCity.name" autofocus/>
                 <form-input name="offical_name" label="Offizielle Bezeichnung" v-model="myCity.official_name"/>
                 <form-input name="homepage" label="Homepage der Kirchengemeinde" v-model="myCity.homepage"/>
-                <form-image-attacher v-model="myCity.logo" label="Logo der Kirchengemeinde"
+                <form-image-attacher v-if="city.id"
+                                    v-model="myCity.logo" label="Logo der Kirchengemeinde"
                                      :attach-route="route('city.attach', {city: myCity.id, field: 'logo'})"
                                      :detach-route="route('city.detach', {city: myCity.id, field: 'logo'})"/>
+                <div v-else class="form-group">
+                    <label>Logo der Kirchengemeinde</label>
+                    Die Kirchengemeinde muss erst gespeichert werden, bevor ein Logo hochgeladen werden kann.
+                </div>
                 <form-selectize v-if="ministriesLoaded" multiple
                                 name="default_ministries" label="Diese Dienste immer mit anzeigen" v-model="myCity.default_ministries"
                                 :options="myMinistries" />
@@ -78,16 +82,6 @@
                 <form-input name="bic" label="Bankkonto (BIC)"
                             v-model="myCity.bic"/>
             </tab>
-            <tab id="calendars" :active-tab="activeTab">
-                <form-input name="public_events_calendar_url" label="URL für einen öffentlichen Kalender auf elkw.de"
-                            v-model="myCity.public_events_calendar_url"/>
-                <form-input name="op_domain" label="Domain für den Online-Planer"
-                            v-model="myCity.op_domain"/>
-                <form-input name="op_customer_key" label="Kundenschlüssel (customer key) für den Online-Planer"
-                            v-model="myCity.op_customer_key"/>
-                <form-input name="op_customer_token" label="Token (customer token) für den Online-Planer"
-                            v-model="myCity.op_customer_token"/>
-            </tab>
             <tab id="streaming" :active-tab="activeTab">
                 <form-input name="youtube_channel_url" label="URL für den YouTube-Kanal"
                             v-model="myCity.youtube_channel_url"/>
@@ -103,25 +97,17 @@
                 <form-input type="number" name="youtube_cutoff_days" v-model="myCity.youtube_cutoff_days"
                             label="Aufzeichnungen auf Youtube nach __ Tagen automatisch auf privat schalten"/>
             </tab>
-            <tab id="podcast" :active-tab="activeTab">
-                <form-input name="podcast_title" label="Titel des Podcasts" v-model="myCity.podcast_title"/>
-                <div class="row">
-                    <div class="col-md-6">
-                        <form-image-attacher v-model="myCity.podcast_logo" label="Logo des Podcasts"
-                                             :attach-route="route('city.attach', {city: myCity.id, field: 'podcast_logo'})"
-                                             :detach-route="route('city.detach', {city: myCity.id, field: 'podcast_logo'})"/>
-                    </div>
-                    <div class="col-md-6">
-                        <form-image-attacher v-model="myCity.sermon_default_image"
-                                             label="Standard-Titelbild zur Predigt"
-                                             :attach-route="route('city.attach', {city: myCity.id, field: 'sermon_default_image'})"
-                                             :detach-route="route('city.detach', {city: myCity.id, field: 'sermon_default_image'})"/>
-                    </div>
-                </div>
-                <form-input name="podcast_owner_name" label="Herausgeber des Podcasts"
-                            v-model="myCity.podcast_owner_name"/>
-                <form-input name="podcast_owner_email" label="E-Mailadresse für den Herausgeber des Podcasts"
-                            v-model="myCity.podcast_owner_email"/>
+            <tab id="locations" :active-tab="activeTab">
+                <model-index-list :records="city.locations" :can-create="true" title="Veranstaltungsorte" label-by="name"
+                                  create-label="Neuer Veranstaltungsort" :create-route="route('admin.locations.create', {city: city.id})"
+                                  delete-route-name="admin.location.destroy" edit-route-name="admin.location.edit"
+                                  model-label="Veranstaltungsort"/>
+            </tab>
+            <tab id="parishes" :active-tab="activeTab">
+                <model-index-list :records="city.parishes" :can-create="true" title="Pfarrämter" label-by="name"
+                                  create-label="Neues Pfarramt" :create-route="route('admin.parishes.create', {city: city.id})"
+                                  delete-route-name="admin.parish.destroy" edit-route-name="admin.parish.edit"
+                                  model-label="Pfarramt"/>
             </tab>
             <tab id="integrations" :active-tab="activeTab">
                 <accordion id="integrationsAccordion2">
@@ -180,7 +166,7 @@
             <tab id="ads" :active-tab="activeTab">
                 <model-index-list :records="city.ad_channels" :can-create="true" title="Werbekanäle"
                                   create-label="Neuer Werbekanal" :create-route="route('admin.adchannels.create', {city: city.id})"
-                                  delete-route-name="api.adchannel.destroy" edit-route-name="admin.adchannel.edit"
+                                  delete-route-name="admin.adchannel.destroy" edit-route-name="admin.adchannel.edit"
                     model-label="Werbekanal"/>
             </tab>
         </tabs>
@@ -205,10 +191,14 @@ import Accordion from "../../../components/Ui/accordion/Accordion.vue";
 import AccordionElement from "../../../components/Ui/accordion/AccordionElement.vue";
 import ModelIndexList from "../../../components/Admin/ModelIndexList.vue";
 import ModelIndexPage from "../../../components/Admin/ModelIndexPage.vue";
+import NavButton from "../../../components/Ui/buttons/NavButton.vue";
+import SaveButton from "../../../components/Ui/buttons/SaveButton.vue";
 
 export default {
     name: "Editor",
     components: {
+        SaveButton,
+        NavButton,
         ModelIndexPage,
         ModelIndexList,
         AccordionElement,
@@ -218,7 +208,7 @@ export default {
         FormImageAttacher,
         FormCheck, FormSelectize, FormInput, Tab, Tabs, TabHeader, TabHeaders, CardBody, CardHeader, Card
     },
-    props: ['city', 'streams', 'ministries', 'tab'],
+    props: ['city', 'streams', 'ministries', 'tab', 'canDelete'],
     created() {
         axios.get(route('api.ministries.list', {
             api_token: this.apiToken,
@@ -247,11 +237,21 @@ export default {
     },
     methods: {
         getTitle() {
-            return 'Kirchengemeinde "' + this.city.name + '" bearbeiten';
+            return this.city.id ? 'Kirchengemeinde "' + this.city.name + '" bearbeiten' : 'Neue Kirchengemeinde anlegen';
         },
         saveCity() {
             // new admin route
-            this.$inertia.patch(route('admin.city.update', {modelId: this.city.id}), this.myCity);
+            if (this.city.id) {
+                this.$inertia.patch(route('admin.city.update', {modelId: this.city.id}), this.myCity);
+            } else {
+                this.$inertia.post(route('admin.cities.store'), this.myCity);
+            }
+        },
+        deleteCity() {
+            if (!this.canDelete) return;
+            if (confirm('Willst du diese Kirchengemeinde wirklich unwiderruflich löschen?')) {
+                this.$inertia.delete(route('admin.city.destroy', this.city.id));
+            }
         }
     }
 }

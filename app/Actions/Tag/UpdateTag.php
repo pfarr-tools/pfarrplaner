@@ -33,7 +33,7 @@ namespace App\Actions\Tag;
 use App\Actions\AbstractAction;
 use App\Actions\AbstractUpdateAction;
 use App\Contracts\Tag\UpdatesTags;
-use App\Events\Models\Tag\UpdatedTag;
+use App\Events\Models\Tag\UpdatedLocation;
 use App\Models\People\User;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Gate;
@@ -67,7 +67,7 @@ class UpdateTag extends AbstractUpdateAction implements UpdatesTags
         $input = Validator::make($input, Tag::$validationRules)->validateWithBag('updateTag');
         if (empty($input['code'] ?? '')) $input['code'] = Str::slug($input['name']);
         $tag->update($input);
-        UpdatedTag::dispatch($user, $tag);
+        UpdatedLocation::dispatch($user, $tag);
         $this->messages = ['success' => 'Die Kennzeichnung wurde geändert.'];
         return $tag;
     }

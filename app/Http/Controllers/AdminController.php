@@ -30,7 +30,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Services\RoleService;
 use App\UI\Modules\AdminModule;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class AdminController extends Controller
@@ -46,7 +50,33 @@ class AdminController extends Controller
      */
     public function index()
     {
-        $modules = collect(AdminModule::modules())->sortBy(['group', 'text'])->groupBy('group');
-        return Inertia::render('Admin/Index', compact('modules'));
+        $modules = collect(AdminModule::modules())->sortBy(['group', 'text'])
+            ->reject(fn($module) => empty($module['group']))
+            ->groupBy('group');
+
+        if (Auth::user()->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
+            $cities = City::all();
+        } else {
+            $cities = collect(Auth::user()->writableCities())->merge(Auth::user()->adminCities())->unique('id');
+        }
+        if (count($cities) > 0) {
+            $modules['Orte'] = collect();
+            foreach ($cities->sortBy('name') as $city) {
+                $modules['Orte']->push([
+                                           'text' => $city->name,
+                                           'group' => 'Orte',
+                                           'icon' => 'mdi mdi-church',
+                                           'url' => route('admin.city.edit', $city),
+                                           'active' => false,
+                                           'inertia' => true,
+                                       ]);
+            }
+        } else {
+            unset($modules['Orte']);
+        }
+
+        $canCreateCities = Auth::user()->can('create', City::class);
+
+        return Inertia::render('Admin/Index', compact('modules', 'canCreateCities'));
     }
 }

@@ -32,6 +32,7 @@ namespace App\Actions\AdChannel;
 
 use App\Actions\AbstractCreateAction;
 use App\Contracts\AdChannel\CreatesAdChannels;
+use App\Contracts\AdChannel\CreatesLocations;
 use App\Events\Models\AdChannel\CreatedAdChannel;
 use App\Models\Ads\AdChannel;
 use App\Models\People\User;

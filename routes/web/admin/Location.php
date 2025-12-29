@@ -32,15 +32,6 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\SeatingRowController;
 use App\Http\Controllers\SeatingSectionController;
 
-Route::get('/orte', [LocationController::class, 'index'])->name('locations.index');
-
-Route::get('/orte/neu', [LocationController::class, 'create'])->name('location.create');
-Route::post('/orte/neu', [LocationController::class, 'store'])->name('location.store');
-
-Route::get('/ort/{location}', [LocationController::class, 'edit'])->name('location.edit');
-Route::patch('/ort/{location}', [LocationController::class, 'update'])->name('location.update');
-Route::delete('/ort/{location}', [LocationController::class, 'destroy'])->name('location.destroy');
-
 // seating sections
 Route::get('/ort/{location}/bereich',[SeatingSectionController::class, 'create'])->name('seatingSection.create');
 Route::get('/bereich/{seatingSection}',[SeatingSectionController::class, 'edit'])->name('seatingSection.edit');

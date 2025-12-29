@@ -28,13 +28,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+namespace App\Console\Commands\Skeleton;
 
-use App\Http\Controllers\ParishController;
+use Illuminate\Console\Concerns\CreatesMatchingTest;
+use Symfony\Component\Console\Attribute\AsCommand;
 
-Route::get('/pfarraemter', [ParishController::class, 'index'])->name('parishes.index');
+#[AsCommand(name: 'make:update-event')]
+class SkeletonUpdateEventCommand extends AbstractSkeletonBuilder
+{
 
-Route::get('/pfarraemter/neu', [ParishController::class, 'create'])->name('parish.create');
-Route::post('/pfarraemter', [ParishController::class, 'store'])->name('parish.store');
-Route::get('/pfarramt/{parish}', [ParishController::class, 'edit'])->name('parish.edit');
-Route::patch('/pfarramt/{parish}', [ParishController::class, 'update'])->name('parish.update');
-Route::delete('/pfarramt/{parish}', [ParishController::class, 'destroy'])->name('parish.destroy');
+    use CreatesMatchingTest;
+
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $name = 'make:update-event';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create a new update event skeleton';
+
+    protected $type = 'Event';
+
+    protected $verb = 'updated';
+
+    protected $namespaceAdditions = ['Models'];
+
+
+
+}

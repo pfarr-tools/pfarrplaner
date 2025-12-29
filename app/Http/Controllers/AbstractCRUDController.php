@@ -45,16 +45,29 @@ class AbstractCRUDController extends Controller
     /** @var string $modelClass */
     protected string $modelClass;
 
+    /**
+     * Get the model name derived from the controller name
+     * @return string
+     */
     protected function modelName(): string
     {
         return str_replace('Controller', '', Str::afterLast(get_class($this), '\\'));
     }
 
+    /**
+     * Prepare the collection of models for the index view
+     * @return Collection
+     */
     protected function getModelsForIndex(): Collection
     {
         return ($this->modelClass)::with(($this->modelClass)::$relationsForIndex)->get();
     }
 
+    /**
+     * Add rights and routes to a collection of models
+     * @param Collection $collection
+     * @return Collection
+     */
     protected function addRightsToModelCollection(Collection $collection): Collection
     {
         return $collection->map(function ($item) {
@@ -73,9 +86,10 @@ class AbstractCRUDController extends Controller
     }
 
     /**
+     * Get a single model instance, optionally with relations
      * @param Request $request
-     * @param $modelId
-     * @param $relations
+     * @param mixed $modelId
+     * @param array $relations
      * @return AbstractModel
      */
     protected function getSingleModel(Request $request, $modelId = null, $relations = []): AbstractModel
@@ -89,6 +103,12 @@ class AbstractCRUDController extends Controller
         return ($this->modelClass)::with($relations)->findOrFail($id);
     }
 
+    /**
+     * Redirect after an action and include status messages
+     * @param mixed $action
+     * @param mixed $result
+     * @return \Illuminate\Http\RedirectResponse
+     */
     protected function returnResult($action, $result = null)
     {
         return redirect($action->redirectTo())->with($action->messages);
@@ -129,6 +149,9 @@ class AbstractCRUDController extends Controller
     {
         Gate::authorize('create', $this->modelClass);
         $data = $this->getResourcesForEditor($request);
+        $newModel = ($this->modelClass)::getEmptyModel();
+        $newModel->fill($this->preFillNewModel($request));
+        $data[($this->modelClass)::propKey()] = $newModel;
         if ($request->has('tab')) $data['tab'] = $request->get('tab');
         return Inertia::render(($this->modelClass)::getVuePath('editor'), $data);
     }
@@ -187,5 +210,13 @@ class AbstractCRUDController extends Controller
         return $this->returnResult($deleter, $result);
     }
 
+    /**
+     * Get data to pre-fill a new model with
+     * @param Request $request
+     * @return array
+     */
+    protected function preFillNewModel(Request $request): array {
+       return [];
+    }
 
 }

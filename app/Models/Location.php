@@ -43,10 +43,25 @@ use Illuminate\Support\Str;
  * Class Location
  * @package App
  */
-class Location extends Model
+class Location extends AbstractModel
 {
 
     use HasFactory;
+
+    protected static string $prefix = 'ort';
+    protected static string $prefixPlural = 'orte';
+    public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
+    public static array $validationRules = [
+        'name' => 'required|max:255',
+        'city_id' => 'required|exists:cities,id',
+        'default_time' => 'nullable|date_format:H:i',
+        'cc_default_location' => 'nullable|string',
+        'alternate_location_id' => 'nullable|int|exists:locations,id',
+        'general_location_name' => 'nullable|string',
+        'at_text' => 'nullable|string',
+        'instructions' => 'nullable|string'
+    ];
+
 
     /**
      * @var string[]

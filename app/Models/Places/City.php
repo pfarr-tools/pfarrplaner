@@ -275,7 +275,12 @@ class City extends AbstractModel
      */
     public function setDefaultMinistriesAttribute(array $ministries)
     {
-        $this->attributes['default_ministries'] = join('||', $ministries);
+        $this->attributes['default_ministries'] = join('||', $ministries ?? []);
+    }
+
+    public function fillDefaults(): array
+    {
+        return ['default_ministries' => []];
     }
 
 }
