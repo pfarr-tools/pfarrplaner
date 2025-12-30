@@ -106,7 +106,7 @@ export default {
 <style scoped>
     .city-title {
         position: sticky;
-        top: 58px;
+        top: 0px;
         background-color: #f4f6f9;
     }
 
