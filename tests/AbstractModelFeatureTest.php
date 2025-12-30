@@ -47,7 +47,6 @@ abstract class AbstractModelFeatureTest extends TestCase
     /** @var User */
     protected $testUser = null;
 
-
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
@@ -113,10 +112,10 @@ abstract class AbstractModelFeatureTest extends TestCase
         $response = $this->actingAs($this->testUser, 'web')
             ->post(route($routeName), $data);
 
-        $response->assertStatus(302)
-            ->assertRedirectToRoute(($this->modelClass)::getSingleRouteName('web', 'index'));
+        $response->assertStatus(302);
         $this->assertEquals(1, ($this->modelClass)::count());
         $created = ($this->modelClass)::first();
+        $response->assertRedirect($this->getActionRedirectUrl($created));
         foreach ($data as $key => $value) {
             $this->assertEquals($value, $created->$key);
         }
@@ -138,11 +137,11 @@ abstract class AbstractModelFeatureTest extends TestCase
         $response = $this->actingAs($this->testUser, 'web')
             ->patchJson(route($routeName, $existing->id), $data);
 
-        $response->assertStatus(302)
-            ->assertRedirectToRoute(($this->modelClass)::getSingleRouteName('web', 'index'));
+        $response->assertStatus(302);
         $this->assertEquals(1, ($this->modelClass)::count());
 
         $updated = ($this->modelClass)::first();
+        $response->assertRedirect($this->getActionRedirectUrl($existing));
         foreach ($data as $key => $value) {
             $this->assertEquals($value, $updated->$key);
         }
@@ -157,6 +156,7 @@ abstract class AbstractModelFeatureTest extends TestCase
     public function testDeleteFrontend()
     {
         $existing = $this->factory()->create();
+        $existingClone = clone $existing;
         $this->assertTrue($this->testUser->can('delete', $existing));
 
         $routeName = ($this->modelClass)::getSingleRouteName('web', 'destroy');
@@ -164,8 +164,16 @@ abstract class AbstractModelFeatureTest extends TestCase
             ->delete(route($routeName, $existing->id));
 
         $response->assertStatus(302)
-            ->assertRedirectToRoute(($this->modelClass)::getSingleRouteName('web', 'index'));
+            ->assertRedirect($this->getActionRedirectUrl($existingClone));
         $this->assertEquals(0, ($this->modelClass)::count());
+    }
+
+    /**
+     * Get the expected redirect URL after an action
+     * @return string
+     */
+    protected function getActionRedirectUrl($model = null): string {
+        return route($this->getActionRedirectUrl());
     }
 
     /**

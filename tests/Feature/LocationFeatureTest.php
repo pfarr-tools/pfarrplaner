@@ -30,22 +30,33 @@
 
 namespace Tests\Feature;
 
+use App\Models\Location;
 use App\Models\Places\City;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\AbstractModelFeatureTest;
 
-class CityFeatureTest extends AbstractModelFeatureTest
+/**
+ * Class LocationFeatureTest
+ * @package Tests\Feature
+ */
+class LocationFeatureTest extends AbstractModelFeatureTest
 {
     use RefreshDatabase;
 
-    protected $modelClass = City::class;
+    protected $modelClass = Location::class;
+
+    protected function getActionRedirectUrl($model = null): string
+    {
+        return route('admin.city.edit', ['modelId' => $model->city_id, 'tab' => 'locations']);
+    }
+
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->testUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
-
 
 }
