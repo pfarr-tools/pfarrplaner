@@ -207,7 +207,7 @@ class WeddingController extends Controller
     public function wizard(Request $request)
     {
         $cities = Auth::user()->writableCities;
-        $locations = Location::whereIn('city_id', $cities->pluck('id'))->get();
+        $locations = Location::inCities($cities->pluck('id'))->get();
         $people = User::visibleFor(Auth::user())->get();
         $user = Auth::user();
         return Inertia::render('Rites/WeddingWizard', compact('cities', 'locations', 'people', 'user'));

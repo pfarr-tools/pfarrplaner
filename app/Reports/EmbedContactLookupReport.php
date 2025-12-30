@@ -151,7 +151,7 @@ class EmbedContactLookupReport extends AbstractEmbedReport
         if ($request->has('parish')) {
             $parish = Parish::findOrFail($request->get('parish'));
         } elseif (($street != '') && ($number != '')) {
-            $parish = Parish::byAddress($street, $number)->whereIn('city_id', $cities)->first();
+            $parish = Parish::byAddress($street, $number)->inCities($cities)->first();
         } elseif ($request->cookie('parish')) {
             $parish = Parish::findOrFail($request->cookie('parish'));
         }

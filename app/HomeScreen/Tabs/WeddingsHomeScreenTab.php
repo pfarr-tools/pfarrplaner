@@ -103,7 +103,7 @@ class WeddingsHomeScreenTab extends AbstractHomeScreenTab
                         }
                     );
                 } else {
-                    $service->whereIn('city_id', Auth::user()->writableCities->pluck('id'));
+                    $service->inCities(Auth::user()->writableCities->pluck('id'));
                 }
             })->orderBy('services.date', $order);
 

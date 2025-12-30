@@ -183,7 +183,7 @@ class EmbedRegistrationReport extends AbstractEmbedReport
         } else {
             $tmpServices = Service::where('needs_reservations', 1)
                 ->between($start, $end)
-                ->whereIn('city_id', $cities)
+                ->inCities($cities)
                 ->where('hidden', '!=', 1)
                 ->ordered()
                 ->get();

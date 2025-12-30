@@ -76,7 +76,7 @@ class MultipleServicesInput extends AbstractInput
             }
         }
 
-        $locations = Location::whereIn('city_id', Auth::user()->writableCities->pluck('id'))->get();
+        $locations = Location::inCities(Auth::user()->writableCities->pluck('id'))->get();
         return Inertia::render('Inputs/MultipleServices/Setup', compact('locations', 'eventTypes'));
     }
 

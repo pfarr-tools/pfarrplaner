@@ -109,7 +109,7 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
             ->between(Carbon::parse($data['start']), Carbon::parse($data['end']))
             ->whereDoesntHave('funerals')
             ->whereDoesntHave('weddings')
-            ->whereIn('city_id', $data['cities'])
+            ->inCities($data['cities'])
             ->ordered()
             ->get();
 

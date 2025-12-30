@@ -88,7 +88,10 @@ class CalController extends Controller
 
         $user = Auth::user();
         $writableCities = $user->writableCities;
-        $cities = array_values($user->getSortedCities()->all());
+        $cities = array_values($user->getSortedCities()->map(function ($city) {
+            $city->childIds = $city->is_org ? $city->children->pluck('id')->toArray() : [];
+            return $city;
+        })->all());
 
         $canCreate = $user->can('create', Service::class);
         $calendars = LocalEventCalendarFactory::list();

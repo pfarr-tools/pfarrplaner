@@ -48,7 +48,7 @@ class TeamController extends Controller
     {
         $writableCityIds = Auth::user()->writableCities->pluck('id');
         $teams = Team::with('city', 'users')
-            ->whereIn('city_id', Auth::user()->cities->pluck('id'))
+            ->inCities(Auth::user()->cities->pluck('id'))
             ->orderBy('name')
             ->get()
             ->map(function ($item) use ($writableCityIds) {
@@ -65,7 +65,7 @@ class TeamController extends Controller
      */
     public function create()
     {
-        $counter = Team::whereIn('city_id', Auth::user()->cities->pluck('id'))
+        $counter = Team::inCities(Auth::user()->cities->pluck('id'))
                 ->orderBy('name')
                 ->count() + 1;
         $team = Team::create([

@@ -90,6 +90,10 @@ class City extends AbstractModel
         'default_ministries' => 'nullable',
         'iban' => 'nullable|string',
         'bic' => 'nullable|string',
+        'is_org' => 'nullable|bool',
+        'parent_id' => 'nullable|int|exists:cities,id',
+        'childIds' => 'nullable|array',
+        'childIds.*' => 'nullable|int|exists:cities,id',
     ];
 
     public static $adminIcon = 'mdi mdi-church';
@@ -139,7 +143,9 @@ class City extends AbstractModel
         'logo',
         'default_ministries',
         'iban',
-        'bic'
+        'bic',
+        'parent_id',
+        'is_org',
     ];
 
     /**
@@ -195,6 +201,21 @@ class City extends AbstractModel
     public function adChannels()
     {
         return $this->hasMany(AdChannel::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function children() {
+        return $this->hasMany(self::class, 'parent_id');
     }
 
 
@@ -281,6 +302,21 @@ class City extends AbstractModel
     public function fillDefaults(): array
     {
         return ['default_ministries' => []];
+    }
+
+    /**
+     * Updates the children relationship for the current model based on the provided input.
+     *
+     * @param array $input An associative array containing child IDs in the 'childIds' key.
+     * @return void
+     */
+    public function setChildrenFromInput(array $input)
+    {
+        $this->children()->update(['parent_id' => null]);
+        if (count($input['childIds'] ?? [])) {
+            City::whereIn('id', $input['childIds'])->update(['parent_id' => $this->id]);
+        }
+
     }
 
 }

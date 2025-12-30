@@ -78,7 +78,7 @@ class EmbedServiceTableReport extends AbstractEmbedReport
     public function setup()
     {
         $cities = Auth::user()->cities;
-        $locations = Location::whereIn('city_id', $cities->pluck('id'))->get();
+        $locations = Location::inCities($cities->pluck('id'))->get();
         return Inertia::render('Report/EmbedServiceTable/Setup', compact('cities', 'locations'));
     }
 

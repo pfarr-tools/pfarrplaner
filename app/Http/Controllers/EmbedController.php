@@ -122,7 +122,7 @@ class EmbedController extends Controller
             ->notHidden()
             ->startingFrom(Carbon::now('Europe/Berlin')->setTime(0,0,0))
             ->where('cc', true)
-            ->whereIn('city_id', $ids)
+            ->inCities($ids)
             ->ordered()
             ->limit($limit)
             ->get();
@@ -164,7 +164,7 @@ class EmbedController extends Controller
         $services = Service::with('location', 'baptisms')
             ->startingFrom(Carbon::now('Europe/Berlin')->setTime(0,0,0))
             ->where('baptism', true)
-            ->whereIn('city_id', $ids)
+            ->inCities($ids)
             ->ordered()
             ->limit($limit)
             ->get();

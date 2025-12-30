@@ -84,7 +84,7 @@ class NextOfferingsHomeScreenTab extends AbstractHomeScreenTab
 
         $query = Service::with(['baptisms', 'weddings', 'funerals', 'location'])
             ->between($start, $end)
-            ->whereIn('city_id', Auth::user()->writableCities->pluck('id'))
+            ->inCities(Auth::user()->writableCities->pluck('id'))
             ->ordered();
         return $query;
     }

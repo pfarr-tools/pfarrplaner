@@ -112,7 +112,7 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
             Carbon::createFromDate($data['year'], 1, 1),
             Carbon::createFromDate($data['year'], 12, 31)->setTime(23, 59, 59),
         )->displayable()
-            ->whereIn('city_id', $data['cities'])
+            ->inCities($data['cities'])
             ->ordered()
             ->get()
             ->groupBy('key_date');

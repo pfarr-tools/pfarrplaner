@@ -62,7 +62,7 @@ class ChildrensChurchInput extends AbstractInput
     public function setup(Request $request)
     {
         $cities = Auth::user()->cities;
-        $locations = Location::whereIn('city_id', $cities->pluck('id'))->get();
+        $locations = Location::inCities($cities->pluck('id'))->get();
         return Inertia::render('Inputs/ChildrensChurch/Setup', compact('cities', 'locations'));
     }
 
@@ -81,7 +81,7 @@ class ChildrensChurchInput extends AbstractInput
             ]
         );
 
-        $locations = Location::whereIn('city_id', $setup['cities'])->get();
+        $locations = Location::inCities($setup['cities'])->get();
 
         $query = Service::with(['city'])
             ->select('services.slug')
@@ -89,7 +89,7 @@ class ChildrensChurchInput extends AbstractInput
                 Carbon::createFromFormat('d.m.Y', $setup['from']),
                 Carbon::createFromFormat('d.m.Y', $setup['to'])
             )
-            ->whereIn('city_id', $setup['cities'])
+            ->inCities($setup['cities'])
             ->ordered();
 
         if (count($setup['locations'] ?? [])) {

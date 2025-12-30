@@ -65,7 +65,7 @@ class AdminHomeScreen extends AbstractHomeScreen
 
         $services = Service::with(['baptisms', 'weddings', 'funerals', 'location'])
             ->between($start, $end)
-            ->whereIn('city_id', $user->writableCities->pluck('id'))
+            ->inCities($user->writableCities->pluck('id'))
             ->ordered()
             ->get();
 

@@ -94,7 +94,7 @@ class StreamingHomeScreenTab extends AbstractHomeScreenTab
 
         $query = Service::with(['baptisms', 'weddings', 'funerals', 'location'])
             ->between($start, $end)
-            ->whereIn('city_id', Auth::user()->cities->pluck('id'))
+            ->inCities(Auth::user()->cities->pluck('id'))
             ->where(function ($query) use ($includeNew) {
                 $query->where('youtube_url', '!=', '');
                 if ($includeNew) {

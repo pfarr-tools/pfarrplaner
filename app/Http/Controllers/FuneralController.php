@@ -112,7 +112,7 @@ class FuneralController extends Controller
         }
         $cities = $cities->unique();
 
-        $locations = Location::whereIn('city_id', $cities->pluck('id'))->get();
+        $locations = Location::inCities($cities->pluck('id'))->get();
         $people = User::visibleFor(Auth::user())->get();
 
 

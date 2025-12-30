@@ -35,6 +35,7 @@ use App\Http\Resources\OccurenceResource;
 use App\Models\Calendar\Occurence;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
 class EventController
@@ -46,6 +47,7 @@ class EventController
         $end = Carbon::parse(Str::beforeLast($end, '('));
 
         $calendars = explode(',', $calendar);
+        if (!count($calendars)) return new JsonResource([]);
 
         $occurences = Occurence::with('event')
             ->between($start, $end)

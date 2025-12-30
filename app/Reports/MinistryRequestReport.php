@@ -76,11 +76,11 @@ class MinistryRequestReport extends AbstractReport
     public function setup()
     {
         $cities = Auth::user()->writableCities;
-        $locations = Location::whereIn('city_id', Auth::user()->writableCities->pluck('id'))->get();
+        $locations = Location::inCities(Auth::user()->writableCities->pluck('id'))->get();
         $ministries = MinistryService::all(true);
         $users = User::visibleFor(Auth::user())->get();
 
-        $teams = Team::with('users')->whereIn('city_id', $cities->pluck('id'))->get()->groupBy('city_id');
+        $teams = Team::with('users')->inCities($cities->pluck('id'))->get()->groupBy('city_id');
         return Inertia::render('Report/MinistryRequest/Setup', compact('cities', 'locations', 'ministries', 'users', 'teams'));
     }
 

@@ -97,6 +97,12 @@ class CityController extends AbstractCRUDController
     {
         $data = parent::getResourcesForEditor($request, $model);
         $data['canDelete'] = Auth::user()->can('delete', $model);
+        $data['possibleChildren'] = City::where('is_org', '!=', 1)
+            ->whereNull('parent_id')
+            ->get()
+            ->merge($model->children)
+            ->unique()
+            ->sortBy('name');
         return $data;
     }
 

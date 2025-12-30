@@ -63,7 +63,7 @@ class ServicesByLocationCSVReport extends AbstractCSVReport
      */
     public function setup()
     {
-        $locations = Location::whereIn('city_id', Auth::user()->cities->pluck('id'))->get();
+        $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
         return Inertia::render('Report/ServicesByLocationCSV/Setup', compact('locations'));
     }
 

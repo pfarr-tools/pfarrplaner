@@ -222,11 +222,11 @@ class UserController extends Controller
 
         $roles = Role::all()->sortBy('name')->reject(function ($item) { return $item->name == 'Super-Administrator:in'; });
 
-        $parishes = Parish::whereIn('city_id', Auth::user()->adminCities->pluck('id'))->get();
+        $parishes = Parish::inCities(Auth::user()->adminCities->pluck('id'))->get();
         $homescreen = $user->getSetting('homeScreen', 'route:calendar');
         $users = User::all();
         $subscriptions = Subscription::where('user_id', $user->id)
-            ->whereIn('city_id', $adminCityIds)
+            ->inCities($adminCityIds)
             ->get();
 
         $homeScreenTabsConfig = $user->getSetting('homeScreenTabsConfig') ?? [];

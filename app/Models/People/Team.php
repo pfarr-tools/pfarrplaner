@@ -31,12 +31,13 @@
 namespace App\Models\People;
 
 use App\Models\Places\City;
+use App\Traits\HasCityScopes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Team extends Model
 {
-    use HasFactory;
+    use HasFactory, HasCityScopes;
 
     protected $fillable = ['name', 'city_id', 'fake_user'];
 

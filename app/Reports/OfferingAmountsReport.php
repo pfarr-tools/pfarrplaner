@@ -95,7 +95,7 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
 
         $cities = City::whereIn('id', $data['cities'])->get();
 
-        $services = Service::whereIn('city_id', $data['cities'])
+        $services = Service::inCities($data['cities'])
             ->between(Carbon::parse($data['start']), Carbon::parse($data['end']))
             ->ordered()
             ->get();

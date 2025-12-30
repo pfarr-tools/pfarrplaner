@@ -75,7 +75,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
      */
     public function setup()
     {
-        $locations = Location::whereIn('city_id', Auth::user()->cities->pluck('id'))->get();
+        $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
         return Inertia::render('Report/QuarterlyEvents/Setup', compact('locations'));
     }
 

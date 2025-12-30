@@ -73,7 +73,7 @@ class PlanningInput extends AbstractInput
     public function setup(Request $request)
     {
         $cities = Auth::user()->writableCities;
-        $locations = Location::whereIn('city_id', $cities->pluck('id'))->get();
+        $locations = Location::inCities($cities->pluck('id'))->get();
 
         $ministries = $this->getAvailableMinistries(
             Participant::all()
@@ -140,9 +140,9 @@ class PlanningInput extends AbstractInput
             ]
         );
 
-        $locations = Location::whereIn('city_id', $setup['cities'])->get();
+        $locations = Location::inCities($setup['cities'])->get();
 
-        $teams = Team::with('users')->whereIn('city_id', $setup['cities'])->get();
+        $teams = Team::with('users')->inCities($setup['cities'])->get();
 
         $query = Service::with(['city'])
             ->select('services.slug')
@@ -150,7 +150,7 @@ class PlanningInput extends AbstractInput
                 Carbon::createFromFormat('d.m.Y', $setup['from']),
                 Carbon::createFromFormat('d.m.Y', $setup['to'])
             )
-            ->whereIn('city_id', $setup['cities'])
+            ->inCities($setup['cities'])
             ->ordered();
 
         if (count($setup['locations'] ?? [])) {

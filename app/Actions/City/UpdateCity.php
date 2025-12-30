@@ -63,6 +63,7 @@ class UpdateCity extends AbstractUpdateAction implements UpdatesCities
         Gate::forUser($user)->authorize('update', $city);
         $input = Validator::make($input, City::$validationRules)->validateWithBag('updateCity');
         $city->update($input);
+        $city->setChildrenFromInput($input);
         $city->refresh();
         UpdatedCity::dispatch($user, $city);
         $this->messages = ['success' => 'Die Kirchengemeinde wurde geändert.'];

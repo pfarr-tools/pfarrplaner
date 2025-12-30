@@ -114,7 +114,7 @@ class CalendarController extends \App\Http\Controllers\Controller
         $date = Carbon::createFromFormat('d.m.Y', $date)->setTime(0,0,0);
         $services = Service::setEagerLoads([])->without(['city', 'location', 'participants'])
             ->select(['id', 'slug', 'title', 'date', 'location_id', 'city_id', 'special_location'])
-            ->whereIn('city_id', Auth::user()->writableCities->pluck('id'))
+            ->inCities(Auth::user()->writableCities->pluck('id'))
             ->startingFrom($date)->endingAt($date->copy()->endOfDay())->ordered()
             ->get();
         return response()->json($services ?? []);

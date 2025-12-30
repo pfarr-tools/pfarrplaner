@@ -119,7 +119,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
     public function setup()
     {
         $cities = Auth::user()->cities;
-        $locations = Location::whereIn('city_id', $cities->pluck('id'))->get();
+        $locations = Location::inCities($cities->pluck('id'))->get();
         $layouts = $this->getAvailableLayouts();
 
         $tags = Tag::all();
@@ -170,7 +170,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
                 $query
                     ->notHidden()
                     ->displayable()
-                    ->whereIn('city_id', $data['cities']);
+                    ->inCities($data['cities']);
                 switch($data['eventClass']) {
                     case 'service':
                     case 'event':

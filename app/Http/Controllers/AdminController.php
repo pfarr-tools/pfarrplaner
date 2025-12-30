@@ -57,7 +57,7 @@ class AdminController extends Controller
         if (Auth::user()->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
             $cities = City::all();
         } else {
-            $cities = collect(Auth::user()->writableCities())->merge(Auth::user()->adminCities())->unique('id');
+            $cities = collect(Auth::user()->writableCities)->merge(Auth::user()->adminCities)->unique('id');
         }
         if (count($cities) > 0) {
             $modules['Orte'] = collect();

@@ -159,14 +159,14 @@ class PublicController extends Controller
             abort(404);
         }
 
-        $service = Service::whereIn('city_id', $cityIds)
+        $service = Service::inCities($cityIds)
             ->startingFrom(Carbon::now()->setTime(0,0,0))
             ->where('youtube_url', '!=', '')
             ->ordered()
             ->first();
         if (!$service) {
             // get the last available service with a stream
-            $service = Service::whereIn('city_id', $cityIds)
+            $service = Service::inCities($cityIds)
                 ->where('youtube_url', '!=', '')
                 ->ordered('DESC')
                 ->first();

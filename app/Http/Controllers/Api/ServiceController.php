@@ -106,7 +106,7 @@ class ServiceController extends Controller
         $date = Carbon::parse($date);
         $start = $date->copy()->firstOfMonth()->setTime(0,0,0);
         $end = $start->copy()->addMonth(1)->subSecond(1);
-        $services = Service::whereIn('city_id', explode(',', $cities))->between($start, $end)->ordered()->get();
+        $services = Service::inCities(explode(',', $cities))->between($start, $end)->ordered()->get();
         return new CalendarServicesCollectionResource($services);
     }
 

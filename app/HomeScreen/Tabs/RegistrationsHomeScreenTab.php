@@ -101,7 +101,7 @@ class RegistrationsHomeScreenTab extends AbstractHomeScreenTab
 
         $query = Service::where('needs_reservations', 1)
             ->between($start, $end)
-            ->whereIn('city_id', $cities)
+            ->inCities($cities)
             ->whereHas('location')
             ->ordered();
         return $query;

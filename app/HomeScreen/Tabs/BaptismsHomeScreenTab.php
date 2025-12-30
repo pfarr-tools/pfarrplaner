@@ -113,14 +113,14 @@ class BaptismsHomeScreenTab extends AbstractHomeScreenTab
                         }
                     );
                 } else {
-                    $service->whereIn('city_id', Auth::user()->writableCities->pluck('id'));
+                    $service->inCities(Auth::user()->writableCities->pluck('id'));
                 }
             })->orderBy('services.date', $order);
 
         if ($this->config['excludeProcessed']) $this->baptismQuery->where('processed', '!=', 1);
 
         $this->baptismRequestQuery = Baptism::whereNull('service_id')
-            ->whereIn('city_id', Auth::user()->writableCities->pluck('id'));
+            ->inCities(Auth::user()->writableCities->pluck('id'));
 
     }
 

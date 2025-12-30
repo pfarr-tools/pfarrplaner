@@ -78,7 +78,9 @@ class RitesController extends Controller
             foreach (
                 $riteType::select($selectFields)->whereHas('service', function ($q) use ($cityIds) {
                     $q->userParticipates(Auth::user(), 'P')
-                        ->orWhereIn('city_id', $cityIds);
+                        ->orWhere(function ($q) use ($cityIds) {
+                            $q->inCities($cityIds);
+                        });
                 })->get() as $riteRecord
             ) {
                 foreach ($queryFields as $queryField) {

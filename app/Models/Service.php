@@ -383,6 +383,7 @@ class Service extends Model implements HasDAVCalendarItems
     {
         return $this->date->isoFormat($format);
     }
+
 //
 
     public function getDatetimeAttribute()
@@ -501,7 +502,9 @@ class Service extends Model implements HasDAVCalendarItems
 
     public function getDurationAttribute()
     {
-        if (!$this->end) return 60;
+        if (!$this->end) {
+            return 60;
+        }
         return abs((int)$this->end->diffInMinutes($this->date));
     }
 
@@ -547,7 +550,7 @@ class Service extends Model implements HasDAVCalendarItems
     public function getImageCutPath(string $cut): string
     {
         if ($attachment = $this->attachments()->firstWhere('cut', Str::slug($cut))) {
-            return storage_path('app/'.$attachment->file);
+            return storage_path('app/' . $attachment->file);
         }
         return '';
     }
@@ -863,10 +866,10 @@ class Service extends Model implements HasDAVCalendarItems
         $date = $date ?? Carbon::now();
         $query->notHidden()->where(function ($query) use ($date) {
             $query->doesntHave('funerals')
-            ->doesntHave('funerals', 'or', function ($query) use ($date) {
-                $query->whereNull('announcement')
-                    ->orWhereDate('announcement', '>', $date);
-            });
+                ->doesntHave('funerals', 'or', function ($query) use ($date) {
+                    $query->whereNull('announcement')
+                        ->orWhereDate('announcement', '>', $date);
+                });
         });
     }
 
@@ -905,27 +908,54 @@ class Service extends Model implements HasDAVCalendarItems
         return $query->where('hidden', 1);
     }
 
+    /**
+     * Scope a query to filter by given cities.
+     *
+     * If a city has is_org=true, child cities will be included
+     *
+     * @param Builder $query
+     * @param mixed $cities An array or collection of cities, each having an id property.
+     * @return Builder
+     */
     public function scopeInCities(Builder $query, $cities)
     {
-        if ((!is_array($cities)) && (is_object($cities->first()))) {
-            $cities = $cities->pluck('id');
+        if (is_string($cities)) $cities = [$cities];
+        $cityIds = collect();
+        // get model objects
+        foreach ($cities as $key => $city) {
+            $cities[$key] = $city = ($city instanceof City ? $city : City::query()->findOrFail($city));
+            $cityIds->push($city->id);
+            if ($city->is_org) {
+                $cityIds = $cityIds->merge($city->children->pluck('id'));
+            }
         }
-        return $query->where(function ($q) use ($cities) {
-            $q->whereIn('city_id', $cities);
-            $q->orWhereHas('relatedCities', function ($q2) use ($cities) {
-                $q2->whereIn('cities.id', $cities);
+        return $query->where(function ($q) use ($cityIds) {
+            $q->whereIn('city_id', $cityIds);
+            $q->orWhereHas('relatedCities', function ($q2) use ($cityIds) {
+                $q2->whereIn('cities.id', $cityIds);
             });
         });
     }
 
     /**
+     * Scope a query to filter by a given city
+     *
+     * If the city has is_org=true, child cities will be included
+     *
      * @param Builder $query
-     * @param $city
+     * @param $city A city object or id
      * @return Builder
      */
     public function scopeInCity(Builder $query, $city)
     {
-        return $query->where('city_id', $city->id);
+        $city = $city instanceof City ? $city : City::query()->findOrFail($city);
+        if ($city->is_org) {
+            return $this->scopeInCities($query, [$city->id]);
+        }
+        return $query->where('city_id', $city->id)
+                ->orWhereHas('relatedCities', function ($q2) use ($city) {
+                    $q2->whereIn('cities.id', $city);
+                });
     }
 
     /**
@@ -1197,7 +1227,9 @@ class Service extends Model implements HasDAVCalendarItems
         $this->participants()->sync([]);
         if (count($participants)) {
             foreach ($participants as $category => $participant) {
-                if ($category) $this->participants()->attach($participant);
+                if ($category) {
+                    $this->participants()->attach($participant);
+                }
             }
         }
         return $participants;
@@ -1212,18 +1244,18 @@ class Service extends Model implements HasDAVCalendarItems
         if ($request->has('ad_configs')) {
             AdConfig::where('service_id', $this->id)->delete();
             $data = $request->validate([
-                'ad_configs.*.offset' => 'nullable|int|min:0',
-                'ad_configs.*.ad_text' => 'nullable|string',
-            ]);
+                                           'ad_configs.*.offset' => 'nullable|int|min:0',
+                                           'ad_configs.*.ad_text' => 'nullable|string',
+                                       ]);
             $adConfigs = $data['ad_configs'];
             foreach ($this->city->getActiveAdChannels() as $key => $channel) {
                 if (isset($adConfigs[$key]) && (($adConfigs[$key]['offset'] ?? 0) > 0)) {
                     AdConfig::create([
-                        'service_id' => $this->id,
-                        'slug' => $key,
-                        'offset' => $adConfigs[$key]['offset'],
-                        'ad_text' => $adConfigs[$key]['ad_text'] ?? ''
-                     ]);
+                                         'service_id' => $this->id,
+                                         'slug' => $key,
+                                         'offset' => $adConfigs[$key]['offset'],
+                                         'ad_text' => $adConfigs[$key]['ad_text'] ?? ''
+                                     ]);
                 }
             }
         }

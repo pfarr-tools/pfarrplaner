@@ -159,7 +159,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
         $start = $request->get('start');
         $end = $request->get('end');
 
-        $locations = Location::with('alternateLocation')->whereIn('city_id', $includeCities)->get();
+        $locations = Location::with('alternateLocation')->inCities($includeCities)->get();
         $presets = explode(',', Auth::user()->getSetting('report.bulletinbl.locationpresets', '-1,-1,-1,-1'));
 
 
@@ -301,7 +301,7 @@ class BulletinBLReport extends AbstractPDFDocumentReport
                 Carbon::createFromFormat('d.m.Y', $data['start']),
                 Carbon::createFromFormat('d.m.Y', $data['end']),
             )
-                ->whereIn('city_id', $data['includeCities'])
+                ->inCities($data['includeCities'])
                 ->displayable()
                 ->whereDoesntHave('funerals')
                 ->whereHas('serviceGroups')

@@ -90,7 +90,7 @@ class AllServicesCalendarLink extends AbstractCalendarLink
     {
         $cityIds = explode('-', $request->get('cities', ''));
         $serviceQuery = Service::with(['location'])
-            ->whereIn('city_id', $cityIds)->startingFrom(Carbon::now()->subYears(1)->startOfYear());
+            ->inCities($cityIds)->startingFrom(Carbon::now()->subYears(1)->startOfYear());
         if (!$request->get('includeHidden', 0)) $serviceQuery->notHidden();
         return $serviceQuery->get();
     }

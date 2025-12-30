@@ -102,7 +102,7 @@ class ICalController extends Controller
     {
         $this->checkToken($token);
         $services = Service::with(['location'])
-            ->whereIn('city_id', explode(',', $locationIds))
+            ->inCities(explode(',', $locationIds))
             ->get();
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Expires: 0');

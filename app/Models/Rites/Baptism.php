@@ -36,6 +36,7 @@ use App\DAV\DAVCalendarItem;
 use App\DAV\HasDAVCalendarItems;
 use App\Models\Service;
 use App\Traits\HasAttachmentsTrait;
+use App\Traits\HasCityScopes;
 use App\Traits\HasCommentsTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -48,7 +49,7 @@ use Illuminate\Support\Facades\URL;
  */
 class Baptism extends Model implements HasDAVCalendarItems
 {
-    use HasCommentsTrait, HasAttachmentsTrait, HasFactory;
+    use HasCommentsTrait, HasAttachmentsTrait, HasFactory, HasCityScopes;
 
     /**
      * @var string[]

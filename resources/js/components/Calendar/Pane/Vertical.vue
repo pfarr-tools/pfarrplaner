@@ -97,8 +97,20 @@ export default {
         getServices(city, day) {
             if (this.data[day] == undefined) return [];
             if (this.data[day].services == undefined) return [];
-            if (this.data[day].services[city.id] == undefined) return [];
-            return this.data[day].services[city.id];
+            if (!city.is_org) return this.data[day].services[city.id] || [];
+
+            // org results: include all child ids
+            // "unpack" the lists by ids to avoid duplicates
+            let result = {};
+            (this.data[day].services[city.id] || []).forEach(item => {
+                result[item.id] = item;
+            });
+            city.childIds.forEach(childId => {
+                (this.data[day].services[childId] || []).forEach(item => {
+                    result[item.id] = item;
+                });
+            });
+            return result;
         },
     }
 }
@@ -116,7 +128,7 @@ export default {
 
     .month-loading {
         font-size: 3em;
-        font-width: bold;
+        font-weight: bold;
         color: lightgray;
         text-align: center;
         padding-top: 25vh;

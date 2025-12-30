@@ -36,21 +36,27 @@
         <template slot="tab-headers">
             <tab-headers>
                 <tab-header id="home" title="Allgemeines" :active-tab="activeTab"/>
-                <tab-header id="offerings" title="Opfer" :active-tab="activeTab"/>
-                <tab-header id="parishes" title="Pfarrämter" :active-tab="activeTab"/>
-                <tab-header id="streaming" title="Streaming" :active-tab="activeTab"/>
-                <tab-header id="locations" title="Veranstaltungsorte" :active-tab="activeTab"/>
-                <tab-header id="integrations" title="Weitere Integrationen" :active-tab="activeTab"/>
-                <tab-header id="ads" title="Werbung" :active-tab="activeTab"/>
+                <tab-header v-if="!myCity.is_org" id="offerings" title="Opfer" :active-tab="activeTab"/>
+                <tab-header v-if="!myCity.is_org" id="parishes" title="Pfarrämter" :active-tab="activeTab"/>
+                <tab-header v-if="!myCity.is_org" id="streaming" title="Streaming" :active-tab="activeTab"/>
+                <tab-header v-if="!myCity.is_org" id="locations" title="Veranstaltungsorte" :active-tab="activeTab"/>
+                <tab-header v-if="!myCity.is_org" id="integrations" title="Weitere Integrationen" :active-tab="activeTab"/>
+                <tab-header v-if="!myCity.is_org" id="ads" title="Werbung" :active-tab="activeTab"/>
             </tab-headers>
         </template>
         <tabs>
             <tab id="home" :active-tab="activeTab">
                 <form-input name="name" label="Name der Kirchengemeinde" v-model="myCity.name" autofocus/>
                 <form-input name="offical_name" label="Offizielle Bezeichnung" v-model="myCity.official_name"/>
-                <form-input name="homepage" label="Homepage der Kirchengemeinde" v-model="myCity.homepage"/>
+                <form-check class="mt-2" name="is_org" label="Diese Kirchengemeinde ist eine Sammelgemeinde für mehrere Einzelgemeinden"
+                            v-model="myCity.is_org"/>
+                <form-selectize name="childIds[]" label="Zugehörige Einzelgemeinden" v-model="myCity.childIds"
+                                :options="Object.values(possibleChildren)" multiple />
+
+
+                <form-input class="mt-2" name="homepage" label="Homepage der Kirchengemeinde" v-model="myCity.homepage"/>
                 <form-image-attacher v-if="city.id"
-                                    v-model="myCity.logo" label="Logo der Kirchengemeinde"
+                                     v-model="myCity.logo" label="Logo der Kirchengemeinde"
                                      :attach-route="route('city.attach', {city: myCity.id, field: 'logo'})"
                                      :detach-route="route('city.detach', {city: myCity.id, field: 'logo'})"/>
                 <div v-else class="form-group">
@@ -62,7 +68,7 @@
                                 :options="myMinistries" />
                 <div v-else><span class="mdi mdi-spin mdi-loading"></span> Diensteliste wird geladen...</div>
             </tab>
-            <tab id="offerings" :active-tab="activeTab">
+            <tab v-if="!myCity.is_org" id="offerings" :active-tab="activeTab">
                 <form-input name="default_offering_goal" label="Opferzweck, wenn nicht angegeben"
                             v-model="myCity.default_offering_goal"/>
                 <form-input name="default_offering_description" label="Opferbeschreibung bei leerem Opferzweck"
@@ -82,7 +88,7 @@
                 <form-input name="bic" label="Bankkonto (BIC)"
                             v-model="myCity.bic"/>
             </tab>
-            <tab id="streaming" :active-tab="activeTab">
+            <tab v-if="!myCity.is_org" id="streaming" :active-tab="activeTab">
                 <form-input name="youtube_channel_url" label="URL für den YouTube-Kanal"
                             v-model="myCity.youtube_channel_url"/>
                 <form-selectize name="youtube_active_stream_id" v-model="myCity.youtube_active_stream_id"
@@ -97,19 +103,19 @@
                 <form-input type="number" name="youtube_cutoff_days" v-model="myCity.youtube_cutoff_days"
                             label="Aufzeichnungen auf Youtube nach __ Tagen automatisch auf privat schalten"/>
             </tab>
-            <tab id="locations" :active-tab="activeTab">
+            <tab v-if="!myCity.is_org" id="locations" :active-tab="activeTab">
                 <model-index-list :records="city.locations" :can-create="true" title="Veranstaltungsorte" label-by="name"
                                   create-label="Neuer Veranstaltungsort" :create-route="route('admin.locations.create', {city: city.id})"
                                   delete-route-name="admin.location.destroy" edit-route-name="admin.location.edit"
                                   model-label="Veranstaltungsort"/>
             </tab>
-            <tab id="parishes" :active-tab="activeTab">
+            <tab v-if="!myCity.is_org" id="parishes" :active-tab="activeTab">
                 <model-index-list :records="city.parishes" :can-create="true" title="Pfarrämter" label-by="name"
                                   create-label="Neues Pfarramt" :create-route="route('admin.parishes.create', {city: city.id})"
                                   delete-route-name="admin.parish.destroy" edit-route-name="admin.parish.edit"
                                   model-label="Pfarramt"/>
             </tab>
-            <tab id="integrations" :active-tab="activeTab">
+            <tab v-if="!myCity.is_org" id="integrations" :active-tab="activeTab">
                 <accordion id="integrationsAccordion2">
                     <accordion-element title="KonfiApp" image="/img/external/konfiapp.png">
                         <p>Die <a href="https://konfiapp.de" target="_blank">KonfiApp</a> von Philipp Dormann bietet
@@ -163,7 +169,7 @@
                     </accordion-element>
                 </accordion>
             </tab>
-            <tab id="ads" :active-tab="activeTab">
+            <tab v-if="!myCity.is_org" id="ads" :active-tab="activeTab">
                 <model-index-list :records="city.ad_channels" :can-create="true" title="Werbekanäle"
                                   create-label="Neuer Werbekanal" :create-route="route('admin.adchannels.create', {city: city.id})"
                                   delete-route-name="admin.adchannel.destroy" edit-route-name="admin.adchannel.edit"
@@ -208,7 +214,7 @@ export default {
         FormImageAttacher,
         FormCheck, FormSelectize, FormInput, Tab, Tabs, TabHeader, TabHeaders, CardBody, CardHeader, Card
     },
-    props: ['city', 'streams', 'ministries', 'tab', 'canDelete'],
+    props: ['city', 'streams', 'ministries', 'tab', 'canDelete', 'possibleChildren'],
     created() {
         axios.get(route('api.ministries.list', {
             api_token: this.apiToken,
@@ -226,11 +232,15 @@ export default {
             streamOptions.push({id: streamKey, name: this.streams[streamKey]});
         }
 
+        let myCity = this.city;
+        myCity.childIds = [];
+        myCity.children.forEach(child => myCity.childIds.push(child.id));
+
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
             myMinistries: [],
             ministriesLoaded: false,
-            myCity: this.city,
+            myCity,
             activeTab: this.tab || 'home',
             streamOptions: streamOptions,
         }

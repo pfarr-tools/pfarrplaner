@@ -45,7 +45,7 @@ class LocationLocalEventCalendar extends AbstractLocalEventCalendar
     public static function list(): array
     {
         $calendars = [];
-        foreach (Location::whereIn('city_id', Auth::user()->cities->pluck('id'))->get() as $location) {
+        foreach (Location::inCities(Auth::user()->cities->pluck('id'))->get() as $location) {
             $calendars[] = static::getEntry($location->id, $location->name);
         }
         return $calendars;

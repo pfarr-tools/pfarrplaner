@@ -102,7 +102,7 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
                 $serviceIds = Service::select('services.id')
                     ->startingFrom($data['start'])
                     ->endingAt($data['end'])
-                    ->whereIn('city_id', $data['cities'])
+                    ->inCities($data['cities'])
                     ->userParticipates($user)
                     ->get()->pluck('id');
 

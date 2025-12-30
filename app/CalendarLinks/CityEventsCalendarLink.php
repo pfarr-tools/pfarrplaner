@@ -108,7 +108,7 @@ class CityEventsCalendarLink extends AbstractCalendarLink
         $events = Occurence::with('event')
             ->startingFrom(Carbon::now()->subYear(1))
             ->whereHas('event', function($query) use ($hidden) {
-                $query->whereIn('city_id', $this->data['cities']);
+                $query->inCities( $this->data['cities']);
                 if (!$hidden) $query->notHidden();
             })
             ->orderBy('start')

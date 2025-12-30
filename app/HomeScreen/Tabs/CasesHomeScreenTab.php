@@ -81,7 +81,7 @@ class CasesHomeScreenTab extends AbstractHomeScreenTab
             ->select(['funerals.*'])
             ->join('services', 'services.id', 'funerals.service_id')
             ->whereHas('service', function($service) use ($cities){
-                $service->whereIn('city_id', $cities);
+                $service->inCities($cities);
             })->orderBy('services.date', 'DESC')
             ->limit(10);
 
@@ -89,7 +89,7 @@ class CasesHomeScreenTab extends AbstractHomeScreenTab
             ->select(['weddings.*', 'services.*'])
             ->join('services', 'services.id', 'weddings.service_id')
             ->whereHas('service', function($service) use ($cities){
-                $service->whereIn('city_id', $cities);
+                $service->inCities($cities);
             })->orderBy('services.date', 'DESC')
             ->limit(10);
 
@@ -97,7 +97,7 @@ class CasesHomeScreenTab extends AbstractHomeScreenTab
             ->select(['baptisms.*', 'services.*'])
             ->join('services', 'services.id', 'baptisms.service_id')
             ->whereHas('service', function($service) use ($cities){
-                $service->whereIn('city_id', $cities);
+                $service->inCities($cities);
             })->orderBy('services.date', 'DESC')
             ->limit(10);
 

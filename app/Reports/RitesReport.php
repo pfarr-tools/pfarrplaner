@@ -115,7 +115,7 @@ class RitesReport extends AbstractWordDocumentReport
             $section,
             Service::with('baptisms')
                 ->whereHas('baptisms')
-                ->whereIn('city_id', $this->data['includeCities'])
+                ->inCities($this->data['includeCities'])
                 ->between($start, $end)
                 ->ordered()
                 ->get()
@@ -124,7 +124,7 @@ class RitesReport extends AbstractWordDocumentReport
         $this->renderBaptismDates(
             $section,
             Service::where('baptism', 1)
-                ->whereIn('city_id', $this->data['includeCities'])
+                ->inCities($this->data['includeCities'])
                 ->between($baptismDatesStart, $baptismDatesEnd)
                 ->ordered()
                 ->get()
@@ -134,7 +134,7 @@ class RitesReport extends AbstractWordDocumentReport
             $section,
             Service::with('weddings')
                 ->whereHas('weddings')
-                ->whereIn('city_id', $this->data['includeCities'])
+                ->inCities($this->data['includeCities'])
                 ->between($start, $end)
                 ->ordered()
                 ->get()
@@ -146,7 +146,7 @@ class RitesReport extends AbstractWordDocumentReport
                 ->whereHas('funerals', function ($q) {
                     $q->where('funerals.type', '!=', 'Urnenbeisetzung');
                 })
-                ->whereIn('city_id', $this->data['includeCities'])
+                ->inCities($this->data['includeCities'])
                 ->between($start, $end)
                 ->ordered()
                 ->get()

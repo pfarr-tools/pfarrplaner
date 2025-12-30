@@ -158,18 +158,12 @@ export default {
     computed: {
         foreign() {
             if (this.loading) return false;
-            return this.city ? (this.city.id != this.myService.city_id) : false;
+            if (!this.city) return false;
+            if (!this.city.is_org) return (this.city.id != this.myService.city_id);
+            return !this.city.childIds.includes(this.myService.city_id);
         }
     },
     data() {
-        /*
-        if (Array.isArray(myService.ministriesByCategory)) myService.ministriesByCategory = {};
-        if (!myService.ministriesByCategory) myService.ministriesByCategory = {};
-        this.service.city.default_ministries.forEach(ministry => {
-            if (!myService.ministriesByCategory[ministry]) myService.ministriesByCategory[ministry] = [];
-        });
-         */
-
         return {
             myService: null,
             loading: true,

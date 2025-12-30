@@ -61,6 +61,7 @@ class CreateCity extends AbstractCreateAction implements CreatesCities
         Gate::forUser($user)->authorize('create', City::class);
         $input = Validator::make($input, City::$validationRules)->validateWithBag('createCity');
         $city = City::create($input);
+        $city->setChildrenFromInput($input);
         CreatedCity::dispatch($user, $city);
         $this->messages = ['success' => 'Die neue Kirchengemeinde wurde gespeichert.'];
         return $city;

@@ -33,6 +33,7 @@ namespace App\Models;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Places\StreetRange;
+use App\Traits\HasCityScopes;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,7 +48,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Parish extends AbstractModel
 {
-    use HasFactory;
+    use HasFactory, HasCityScopes;
 
 
     protected static string $prefix = 'pfarramt';

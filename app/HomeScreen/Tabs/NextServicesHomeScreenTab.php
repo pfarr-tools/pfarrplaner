@@ -96,7 +96,7 @@ class NextServicesHomeScreenTab extends AbstractHomeScreenTab
                 }
             );
         } else {
-            $query->whereIn('city_id', Auth::user()->cities->pluck('id'));
+            $query->inCities(Auth::user()->cities->pluck('id'));
         }
         return $query;
     }

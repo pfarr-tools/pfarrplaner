@@ -107,7 +107,7 @@
         </div>
 
         <create-service-wizard-button v-if="canCreate" type="success"
-                                      :cities="writableCities" class="ms-2 me-2" :date="date"
+                                      :cities="creatableCities" class="ms-2 me-2" :date="date"
                                       :events="!(calendarMode == 'services')" :title="(calendarMode == 'services') ? 'Gottesdienst anlegen' : 'Veranstaltung anlegen'"
                                       :key="moment(date).toISOString()+calendarMode"/>
 
@@ -148,7 +148,8 @@ export default {
             slave: false,
             allColumnsOpen: false,
             numericDate: parseInt(moment(this.date).format('YYYYMM')),
-            mySelectedCalendar: this.selectedCalendar
+            mySelectedCalendar: this.selectedCalendar,
+            creatableCities: this.writableCities.filter(item => !item.is_org),
         }
     },
     props: {

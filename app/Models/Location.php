@@ -32,6 +32,7 @@ namespace App\Models;
 
 use App\Models\Places\City;
 use App\Models\Seating\SeatingSection;
+use App\Traits\HasCityScopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -47,6 +48,7 @@ class Location extends AbstractModel
 {
 
     use HasFactory;
+    use HasCityScopes;
 
     protected static string $prefix = 'ort';
     protected static string $prefixPlural = 'orte';
@@ -120,11 +122,6 @@ class Location extends AbstractModel
     public function atText()
     {
         return $this->at_text ?: '(' . $this->name . ')';
-    }
-
-    public function scopeInCities(Builder $query, $cities)
-    {
-        return $query->whereIn('city_id', $cities);
     }
 
     /**

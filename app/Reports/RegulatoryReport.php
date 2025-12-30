@@ -64,7 +64,7 @@ class RegulatoryReport extends AbstractReport
     public function setup()
     {
         $preselectedService = \request()->get('service', null);
-        $services = Service::whereIn('city_id', Auth::user()->writableCities->pluck('id'))
+        $services = Service::inCities(Auth::user()->writableCities->pluck('id'))
             ->startingFrom(Carbon::now())
             ->ordered()
             ->limit(20)

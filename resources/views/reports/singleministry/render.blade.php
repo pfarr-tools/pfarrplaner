@@ -34,7 +34,7 @@
             <td>{{ $service->date->format('d.m.Y') }}</td>
             <td>{{ $service->timeText() }}</td>
             @if(count($cities)>1)<td>{{ $service->city->name }}</td>@endif
-            <td>{{ $service->locationText() }}</td>
+            <td>{{ $service->locationTextWithCity }}</td>
             @foreach($ministries as $ministryKey => $ministry)<td valign="top"> {{ $service->participantsText($ministryKey) }} </td>@endforeach
 
         </tr>

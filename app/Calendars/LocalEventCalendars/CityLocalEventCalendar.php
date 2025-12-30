@@ -52,7 +52,7 @@ class CityLocalEventCalendar extends AbstractLocalEventCalendar
 
     public function adjustQuery(Builder $query): Builder
     {
-        return $query->where('city_id', $this->id);
+        return $query->inCity($this->id);
     }
 
     public function presetData(array $data): array

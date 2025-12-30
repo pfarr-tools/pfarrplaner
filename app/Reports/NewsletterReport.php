@@ -101,7 +101,7 @@ class NewsletterReport extends AbstractWordDocumentReport
         $events = Occurence::with('event')
             ->between($start, $end)
             ->whereHas('service', function ($query) use ($data, $start, $end) {
-                $query->whereIn('city_id', $data['cities'])
+                $query->inCities($data['cities'])
                     ->displayable($start)
                     ->notHidden();
             })
@@ -115,7 +115,7 @@ class NewsletterReport extends AbstractWordDocumentReport
         $featuredEvents = Occurence::with('event')
             ->adRunningAt('newsletter', $start)
             ->whereHas('service', function ($query) use ($data, $start, $end) {
-                $query->whereIn('city_id', $data['cities'])
+                $query->inCities($data['cities'])
                     ->displayable($start)
                     ->notHidden();
             })

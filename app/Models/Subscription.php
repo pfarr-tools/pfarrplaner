@@ -33,6 +33,7 @@ namespace App\Models;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Traits\HasCityScopes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,8 @@ use Illuminate\Support\Facades\Mail;
  */
 class Subscription extends Model
 {
+    use HasCityScopes;
+
     /**
      *
      */

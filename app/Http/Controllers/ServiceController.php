@@ -167,7 +167,7 @@ class ServiceController extends Controller
 
         $availableCities = Auth::user()->cities;
 
-        $locations = Location::whereIn('city_id', Auth::user()->cities->pluck('id'))->get();
+        $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
         $liturgySheets = LiturgySheets::all();
 
         $liturgyInfo = LiturgyInfo::select(['id', 'date', 'title', 'litColor'])->orderBy('date')->get();
@@ -325,10 +325,10 @@ class ServiceController extends Controller
     public function lastUpdate()
     {
         ServicesOnlyScope::activate();
-        $lastUpdated = Service::whereIn('city_id', Auth::user()->cities->pluck('id'))
+        $lastUpdated = Service::inCities(Auth::user()->cities->pluck('id'))
             ->orderBy('updated_at', 'DESC')
             ->first();
-        $lastCreated = Service::whereIn('city_id', Auth::user()->cities->pluck('id'))
+        $lastCreated = Service::inCities(Auth::user()->cities->pluck('id'))
             ->orderBy('created_at', 'DESC')
             ->first();
 

@@ -89,7 +89,7 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
         $data['start'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['start'] . ' 0:00:00');
         $data['end'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['end'] . ' 23:59:00');
         $data['services'] = Service::between($data['start'], $data['end'])
-            ->whereIn('city_id', $data['cities']->pluck('id'))->ordered()->get();
+            ->inCities($data['cities']->pluck('id'))->ordered()->get();
 
         return $this->sendToBrowser(
             FileNameService::make(
