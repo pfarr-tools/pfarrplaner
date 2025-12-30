@@ -11,7 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Doctrine unterstützt momentan keine Veränderungen bei ENUMs.
+        if (Schema::getConnection()->getDriverName() === 'sqlite') {
+            // SQLite does not support altering enum columns, which will cause this migration to fail all tests.
+            return;
+        }
         DB::statement("ALTER TABLE `services` CHANGE `event_class` `event_class` ENUM ('service', 'event', 'meeting')");
     }
 
@@ -20,7 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Doctrine unterstützt momentan keine Veränderungen bei ENUMs.
+        if (Schema::getConnection()->getDriverName() === 'sqlite') {
+            // SQLite does not support altering enum columns, which will cause this migration to fail all tests.
+            return;
+        }
         DB::statement("ALTER TABLE `services` CHANGE `event_class` `event_class` ENUM ('service', 'event')");
     }
 };
