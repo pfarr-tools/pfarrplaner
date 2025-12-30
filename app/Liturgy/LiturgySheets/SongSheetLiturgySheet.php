@@ -33,6 +33,7 @@ namespace App\Liturgy\LiturgySheets;
 
 use App\Documents\Word\DefaultWordDocument;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
+use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Music\ABCMusic;
 use App\Models\Liturgy\Item;
@@ -103,6 +104,14 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
     public function getFileTitle(): string
     {
         return 'Liedblatt';
+    }
+
+    protected function renderReadingItem(DefaultWordDocument $doc, Item $item)
+    {
+        if(!isset($item->data['reference'])) return;
+        if(!($item->data['showInHandouts'] ?? false)) return;
+        $helper = new ReadingItemHelper($item);
+        $helper->renderToWordDocument($doc, true);
     }
 
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)

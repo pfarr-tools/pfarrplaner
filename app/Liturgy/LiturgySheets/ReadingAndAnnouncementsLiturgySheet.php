@@ -35,6 +35,7 @@ use App\Documents\Word\DefaultWordDocument;
 use App\Liturgy\Bible\BibleText;
 use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
+use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Replacement\Replacement;
 use App\Models\Liturgy\Item;
@@ -243,28 +244,9 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
         if (!$item->data['reference']) {
             return;
         }
-        $ref = ReferenceParser::getInstance()->parse($item->data['reference']);
-        $doc->getSection()->addTitle($item->title, 2);
 
-        $doc->getSection()->addTitle($ref['correctedReference'], 3);
-        if (!$this->config['includeFullReadings']) {
-            return;
-        }
-        if ($ref['versionCopyrights']) {
-            $doc->renderNormalText($ref['versionCopyrights'], ['size' => 8]);
-        }
-
-        $bibleText = (new BibleText($ref['version']))->get($ref);
-
-        $run = [];
-        foreach ($bibleText as $range) {
-            foreach ($range['text'] as $verse) {
-                $run[] = [$verse['verse'] . ' ', ['superScript' => true]];
-                $run[] = [$verse['text'] . "\n", []];
-            }
-        }
-
-        $doc->renderParagraph($doc::NORMAL, $run);
+        $helper = new ReadingItemHelper($item);
+        $helper->renderToWordDocument($doc, true);
     }
 
 

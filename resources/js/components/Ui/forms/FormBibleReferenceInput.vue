@@ -48,12 +48,14 @@
                 </div>
             </div>
         </form-group>
-        <small class="form-text text-muted mt-0 p-0" :title="myBibleText">
-            <span v-if="myBibleTextLoading" class="mdi mdi-spin mdi-loading" title="Bibeltext wird geladen..."></span>
-            <span v-else>{{ myBibleText }}</span>
-            <span v-if="(!myBibleTextLoading) && (myBibleText) && (clipboard)" class="mdi mdi-content-copy" @click.prevent.stop="copyToClipboard"
-                                                       title="Klicken, um den Text in die Zwischenablage zu kopieren"></span>
-        </small>
+        <div :key="myVersion">
+            <small class="form-text text-muted mt-0 p-0" :title="myBibleText" v-if="myVersion != 'Eigener Text'">
+                <span v-if="myBibleTextLoading" class="mdi mdi-spin mdi-loading" title="Bibeltext wird geladen..."></span>
+                <span v-else>{{ myBibleText }}</span>
+                <span v-if="(!myBibleTextLoading) && (myBibleText) && (clipboard)" class="mdi mdi-content-copy" @click.prevent.stop="copyToClipboard"
+                                                           title="Klicken, um den Text in die Zwischenablage zu kopieren"></span>
+            </small>
+        </div>
     </div>
 </template>
 
@@ -65,10 +67,11 @@ import __ from 'lodash';
 import FormSelectize from "./FormSelectize";
 import FormInput from "./FormInput";
 import Selectize from 'vue2-selectize';
+import FormTextarea from "./FormTextarea.vue";
 
 export default {
     name: "FormBibleReferenceInput",
-    components: {FormInput, FormSelectize, BibleReference, ValueCheck, FormGroup, Selectize},
+    components: {FormTextarea, FormInput, FormSelectize, BibleReference, ValueCheck, FormGroup, Selectize},
     props: {
         label: String,
         id: String,
@@ -114,6 +117,10 @@ export default {
         noVersion: {
             type: Boolean,
             default: false,
+        },
+        allowOwnVersion: {
+            type: Boolean,
+            default: true,
         }
     },
     mounted() {
@@ -126,6 +133,11 @@ export default {
         let myOptions = [];
         for (const sourceKey in this.sources) {
             myOptions.push({ id: this.sources[sourceKey], name: sourceKey+': '+this.sources[sourceKey]});
+        }
+
+        let availableVersions = this.$page.props.bible.versions;
+        if (this.allowOwnVersion) {
+            availableVersions.push('Eigener Text');
         }
 
         let myValue = this.value || '';
@@ -144,7 +156,7 @@ export default {
             myBibleTextLoading: false,
             myReference,
             myVersion,
-            availableVersions: this.$page.props.bible.versions,
+            availableVersions,
             component: this,
             myOptions,
             mySettings: {
@@ -175,6 +187,11 @@ export default {
         bibleText: __.debounce((component) => {
             if (!component.myValue.includes(' ')) return;
             if (!component.myValue.includes(',')) return;
+            if (component.myVersion == 'Eigener Text') {
+                component.bibleDropDownVisible = false;
+                component.dropDownVisible = false;
+                return;
+            }
             component.myBibleText = '';
             component.myBibleTextLoading = true;
             axios.get(route('bible.text', {reference: component.myReference, version: component.myVersion}))

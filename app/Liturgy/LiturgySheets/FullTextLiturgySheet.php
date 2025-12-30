@@ -34,9 +34,8 @@ namespace App\Liturgy\LiturgySheets;
 use App\Documents\Word\DefaultA5WordDocument;
 use App\Documents\Word\DefaultWordDocument;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
-use App\Liturgy\Bible\BibleText;
-use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
+use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Replacement\Replacement;
 use App\Models\Liturgy\Item;
@@ -265,27 +264,8 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
             return;
         }
 
-        $ref = ReferenceParser::getInstance()->parse($item->data['reference']);
-
-        $doc->getSection()->addTitle($ref['correctedReference'], 3);
-        if (!$this->config['includeFullReadings']) {
-            return;
-        }
-        if ($ref['versionCopyrights']) {
-            $doc->renderNormalText($ref['versionCopyrights'], ['size' => 8]);
-        }
-
-        $bibleText = (new BibleText($ref['version']))->get($ref);
-
-        $run = [];
-        foreach ($bibleText as $range) {
-            foreach ($range['text'] as $verse) {
-                $run[] = [$verse['verse'] . ' ', ['superScript' => true]];
-                $run[] = [$verse['text'] . "\n", []];
-            }
-        }
-
-        $doc->renderParagraph($doc::NORMAL, $run);
+        $helper = new ReadingItemHelper($item);
+        $helper->renderToWordDocument($doc, $this->config['includeFullReadings'], true);
     }
 
 }

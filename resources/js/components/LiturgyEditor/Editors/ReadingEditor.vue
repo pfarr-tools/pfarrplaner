@@ -33,7 +33,13 @@
             <label for="title">Titel im Ablaufplan</label>
             <input class="form-control" v-model="editedElement.title" v-focus/>
         </div>
-        <form-bible-reference-input v-model="editedElement.data.reference" :sources="textSources"/>
+        <form-textarea v-model="editedElement.data.intro" label="Hinführung zur Lesung" class="mb-1" />
+        <form-bible-reference-input v-model="editedElement.data.reference" :sources="textSources" />
+        <div :key="editedElement.data.reference" v-if="editedElement.data.reference.includes('[Eigener Text]')">
+            <form-textarea v-model="editedElement.data.customText" label="Eigener Text" />
+            <form-input v-model="editedElement.data.customSource" label="Eigene Quellenangabe" />
+        </div>
+        <form-check v-model="editedElement.data.showInHandouts" label="Diese Lesung in Liedzetteln usw. mit ausgeben." />
     </div>
 </template>
 
@@ -41,10 +47,13 @@
 import TimeFields from "./Elements/TimeFields";
 import FormBibleReferenceInput from "../../Ui/forms/FormBibleReferenceInput";
 import {romanize} from "../../../libraries/Romanize";
+import FormTextarea from "../../Ui/forms/FormTextarea.vue";
+import FormCheck from "../../Ui/forms/FormCheck.vue";
+import FormInput from "../../Ui/forms/FormInput.vue";
 
 export default {
     name: "ReadingEditor",
-    components: {FormBibleReferenceInput, TimeFields},
+    components: {FormInput, FormCheck, FormTextarea, FormBibleReferenceInput, TimeFields},
     props: {
         element: Object,
         service: Object,
@@ -55,7 +64,17 @@ export default {
     },
     data() {
         var e = this.element;
-        if (undefined === e.data.reference) e.data.reference = '';
+
+        // initialize missing fields
+        e.data = {
+            intro: '',
+            reference: '',
+            customText: '',
+            customSource: '',
+            showInHandouts: false,
+            ...e.data,
+        };
+
 
         let textSources = {};
         if (undefined !== this.service.liturgicalInfo.title) {
