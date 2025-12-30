@@ -32,6 +32,7 @@ namespace Database\Factories;
 
 
 use App\Models\Location;
+use App\Models\Places\City;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class LocationFactory extends Factory
@@ -47,6 +48,7 @@ class LocationFactory extends Factory
             'name' => $name . (substr($name, -1) == 's' ? '' : 's') . 'kirche',
             'default_time' => '',
             'cc_default_location' => $name2 . (substr($name2, -1) == 's' ? '' : 's') . 'kirche',
+            'city_id' => City::factory(),
         ];
     }
 

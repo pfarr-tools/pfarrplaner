@@ -61,6 +61,8 @@ class ServiceFactory extends Factory {
             'cc_staff' => fake()->firstName() . ', ' . fake()->firstName(),
             'internal_remarks' => fake()->sentence(),
             'offering_amount' => fake()->randomFloat(2),
+            'meeting_url' => fake()->url,
+            'location_id' => Location::factory(),
         ];
     }
 
