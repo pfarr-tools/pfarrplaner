@@ -36,8 +36,16 @@ class PreventOrphans extends Migration
 {
 
     protected function getColumnType($table, $column) {
-        $dColumn = DB::connection()->getDoctrineColumn($table, $column);
-        return $dColumn->getType()->getName().($dColumn->getUnsigned() ? 'Unsigned' : 'Signed');
+        $columns = Schema::getColumns($table);
+
+        $col = collect($columns)->firstWhere('name', $column);
+
+        if (! $col) {
+            throw new \InvalidArgumentException("Column {$column} not found on table {$table}");
+        }
+
+        return $col['type_name']
+            . (!empty($col['unsigned']) ? 'Unsigned' : 'Signed');
     }
 
     public function createCascadingDelete($tableName, $foreignKey, $foreignTableName) {
@@ -68,11 +76,9 @@ class PreventOrphans extends Migration
 
     public function listTableForeignKeys($table)
     {
-        $conn = Schema::getConnection()->getDoctrineSchemaManager();
-
-        return array_map(function($key) {
-            return $key->getName();
-        }, $conn->listTableForeignKeys($table));
+        return collect(Schema::getForeignKeys($table))
+            ->pluck('name')
+            ->all();
     }
 
     /**
