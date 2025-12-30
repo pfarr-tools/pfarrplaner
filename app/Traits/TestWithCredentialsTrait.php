@@ -34,6 +34,7 @@ namespace App\Traits;
 use App\Http\Middleware\Authenticate;
 use App\Models\Places\City;
 use App\Models\People\User;
+use Illuminate\Contracts\Auth\Access\Gate;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -51,7 +52,8 @@ trait TestWithCredentialsTrait
     {
         parent::setUp();
         $this->withoutMiddleware(Authenticate::class);
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
+        $gate = $this->app->make(Gate::class);
+        $this->app->make(PermissionRegistrar::class)->registerPermissions($gate);
 
         Permission::create(['name' => 'gd-bearbeiten']);
 
