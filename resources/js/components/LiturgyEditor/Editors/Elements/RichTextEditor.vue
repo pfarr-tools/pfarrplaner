@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <div class="liturgy-text-editor form-group">
+    <div class="rich-text-editor form-group">
         <label>{{ myLabel }}</label>
         <quill-editor v-model="myValue" :options="quillOptions"
                       class="focused" ref="textEditor"
@@ -47,48 +47,9 @@
                                                     <button class="ql-indent" value="+1"></button>
                                                 </span>
                 <button v-if="mySettings.toolbar.clean"  class="ql-clean me-2"></button>
-                <button class="ql-importword quill-mdi-button  quill-text-button" :class="floatClass"
-                        @click="dialogs.insertWord = true"
-                        title="Aus Worddokument importieren"><span
-                    class="mdi mdi-file-word"></span> Word
-                </button>
-                <button class="ql-insertbible quill-mdi-button  quill-text-button" :class="floatClass"
-                        @click="dialogs.insertBible = true"
-                        title="Bibeltext hinzufügen"><span
-                    class="mdi mdi-book-open-variant"></span> Bibel
-                </button>
-                <button class="ql-inserttext quill-mdi-button  quill-text-button" :class="floatClass"
-                        @click="dialogs.insertLiturgic = true"
-                        title="Liturgischen Text hinzufügen"><span
-                    class="mdi mdi-text"></span> Lit. Texte
-                </button>
-
-                <quill-dropdown v-for="funeralDataset in funeralDataSets" :key="funeralDataset.funeral.id"
-                                :label="funeralDataset.funeral.buried_name"
-                                :title="'Textbausteine zur Beerdigung von '+funeralDataset.funeral.buried_name"
-                                icon="mdi mdi-grave-stone" :items="funeralDataset.data"
-                                :class="floatClass" @input="insertText($event)"/>
-
-                <quill-dropdown v-for="baptismDataset in baptismDataSets" :key="baptismDataset.baptism.id"
-                                :label="baptismDataset.baptism.candidate_name"
-                                :title="'Textbausteine zur Taufe von '+baptismDataset.baptism.candidate_name"
-                                icon="mdi mdi-water" :items="baptismDataset.data"
-                                :class="floatClass" @input="insertText($event)"/>
-
-                <quill-dropdown v-for="weddingDataset in weddingDataSets" :key="weddingDataset.wedding.id"
-                                :label="weddingDataset.wedding.spouse1_name+' &amp; '+weddingDataset.wedding.spouse2_name"
-                                :title="'Textbausteine zur Trauung von '+weddingDataset.wedding.spouse1_name+' und '+weddingDataset.wedding.spouse2_name"
-                                icon="mdi mdi-ring" :items="weddingDataset.data"
-                                :class="floatClass" @input="insertText($event)"/>
             </div>
         </quill-editor>
 
-        <insert-liturgic-text-dialog v-if="dialogs.insertLiturgic" class="dialog" :service="service"
-                                     @input="dialogs.insertLiturgic = false; insertText($event, true)"/>
-        <insert-bible-text-dialog v-if="dialogs.insertBible"  class="dialog" :service="service"
-                                  @input="dialogs.insertBible = false; insertText($event)" />
-        <insert-word-document-dialog v-if="dialogs.insertWord" class="dialog"
-                                     @input="dialogs.insertWord = false; insertText($event)" />
     </div>
 </template>
 
@@ -112,64 +73,13 @@ import {NameService} from "../../../../libraries/NameService";
 
 
 export default {
-    name: "LiturgyTextEditor",
+    name: "RichTextEditor",
     components: {
-        InsertWordDocumentDialog,
-        InsertBibleTextDialog,
-        InsertLiturgicTextDialog,
         QuillDropdownForm, QuillDropdown, quillEditor
     },
-    props: ['service', 'value', 'settings', 'label'],
+    props: ['value', 'settings', 'label'],
     inject: ['lists'],
     data() {
-        let funeralDataSets = [];
-        this.service.funerals.forEach(funeral => {
-            funeralDataSets.push({
-                funeral: funeral,
-                data: {
-                    'Geburtsdatum': moment(funeral.dob).locale('de').format('LL'),
-                    'Sterbedatum': moment(funeral.dod).locale('de').format('LL'),
-                    'Sterbedatum (relativ)': RelativeDate(moment(funeral.dod).format('DD.MM.YYYY'), moment(this.service.date).format('DD.MM.YYYY')),
-                    'Sterbealter': funeral.age,
-                    'Lebenszeit in Tagen': moment(funeral.dod).diff(moment(funeral.dob), 'days').toLocaleString('de-DE'),
-                    'Geburtsort': funeral.birth_place,
-                    'Sterbeort': funeral.death_place,
-                    'Geburtsname': funeral.birth_name,
-                    'Rufname': funeral.spoken_name,
-                }
-            })
-        });
-
-        let baptismDataSets = []
-        this.service.baptisms.forEach(baptism => {
-            let nameSet = new NameService(baptism.candidate_name);
-            console.log(nameSet);
-            baptismDataSets.push({
-                baptism: baptism,
-                data: {
-                    'Name': nameSet.name,
-                    'Vorname': nameSet.first,
-                    'Nachname': nameSet.last,
-                }
-            })
-        });
-
-        let weddingDataSets = []
-        this.service.weddings.forEach(wedding => {
-            let nameSet = [wedding.spouse1_name.split(','), wedding.spouse2_name.split(',')];
-            weddingDataSets.push({
-                wedding: wedding,
-                data: {
-                    'Name 1': nameSet[0][1].trim()+' '+nameSet[0][0].trim(),
-                    'Vorname 1': nameSet[0][1].trim(),
-                    'Nachname 1': nameSet[0][0].trim(),
-                    'Name 2': nameSet[1][1].trim()+' '+nameSet[1][0].trim(),
-                    'Vorname 2': nameSet[1][1].trim(),
-                    'Nachname 2': nameSet[1][0].trim(),
-                }
-            })
-        });
-
         Quill.register(SmartBreak);
 
         let quillDefaults = {
@@ -248,17 +158,9 @@ export default {
             myLabel: this.label || 'Inhalt',
             floatClass,
             mySettings,
-            dialogs: {
-                insertLiturgic: false,
-                insertBible: false,
-                insertWord: false,
-            },
             quill: null,
             t: false,
             selectedText: '',
-            funeralDataSets,
-            baptismDataSets,
-            weddingDataSets,
             textEditorActive: false,
             quillOptions: {
                 ...quillDefaults,

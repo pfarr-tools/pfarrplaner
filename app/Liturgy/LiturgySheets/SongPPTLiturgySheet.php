@@ -152,6 +152,21 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 }
                 if ($item->data_type == 'song') {
                     $this->renderSongItem($item);
+                } elseif($item->data_type == 'freetext') {
+                    if ($lastItem && ($lastItem->data_type=='psalm')) {
+                        if (($item->data_type=='freetext') && ($item->title == 'Ehr sei dem Vater') && (isset($item->data['description']))) {
+                            /** @var Liturgy\ItemHelpers\FreetextItemHelper $ftHelper */
+                            $ftHelper = $item->getHelper();
+                            $this->renderGloriaPatriSlide($ftHelper->getText());
+                        }
+                        if ($this->config['includeEmpty']) {
+                            $this->slide();
+                        }
+                    } else {
+                        $this->renderFreeTextSlides($item);
+                    }
+
+
                 } elseif ($item->data_type == 'psalm') {
                     if ($this->config['includeSongbookReference']) {
                         $this->songbookReferenceSlide($item);
@@ -160,17 +175,6 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                     $helper = $item->getHelper();
                     foreach ($helper->getVerses() as $verse) {
                         $this->slide($verse, $this->config['fontSize']);
-                    }
-                }
-
-                if ($lastItem && ($lastItem->data_type=='psalm')) {
-                    if (($item->data_type=='freetext') && ($item->title == 'Ehr sei dem Vater') && (isset($item->data['description']))) {
-                        /** @var Liturgy\ItemHelpers\FreetextItemHelper $ftHelper */
-                        $ftHelper = $item->getHelper();
-                        $this->renderGloriaPatriSlide($ftHelper->getText());
-                    }
-                    if ($this->config['includeEmpty']) {
-                        $this->slide();
                     }
                 }
 
@@ -216,6 +220,29 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setColor($color)
             ->setName('Sarabun');
         $paragraph->createTextRun($text);
+    }
+
+    protected function renderFreeTextSlides(Item $item)
+    {
+        if (!($item->data['slideText'] ?? false)) {
+            return;
+        }
+        $helper = $item->getHelper();
+
+        $slides = collect(explode("\n---", $item->data['slideText']))->map(fn($slideText) => trim($slideText));
+        foreach ($slides as $slideText) {
+            $this->slide(
+                $slideText,
+                $this->config['fontSize'],
+                $this->config['textColor'],
+                true,
+                ''
+            );
+        }
+
+        if ($this->config['includeEmpty']) {
+            $this->slide();
+        }
     }
 
     protected function renderSongListSlide(Service $service)

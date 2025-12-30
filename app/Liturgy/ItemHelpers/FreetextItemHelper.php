@@ -34,9 +34,21 @@ namespace App\Liturgy\ItemHelpers;
 class FreetextItemHelper extends AbstractItemHelper
 {
 
+    protected $field = 'description';
+
+    public function getField(): string
+    {
+        return $this->field;
+    }
+
+    public function setField(string $field): void
+    {
+        $this->field = $field;
+    }
+
     public function getText($shorten = false) {
-        if(!$this->item->data['description']) return '';
-        $s = strtr($this->item->data['description'], [
+        if(!$this->item->data[$this->field]) return '';
+        $s = strtr($this->item->data[$this->field], [
             '</p>' => "\r\n",
             '<br>' => "\n",
             '<br/>' => "\n",

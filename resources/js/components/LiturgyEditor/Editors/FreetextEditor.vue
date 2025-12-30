@@ -34,8 +34,16 @@
             <input class="form-control" v-model="editedElement.title" v-focus/>
         </div>
 
-        <liturgy-text-editor v-model="editedElement.data.description" settings="myEditorSettings" :service="service"/>
+        <liturgy-text-editor v-model="editedElement.data.description" settings="myEditorSettings"
+                             label="Notizen"
+                             :service="service"/>
         <text-stats :text="editedElement.data.description"/>
+
+        <rich-text-editor v-model="editedElement.data.handoutText" label="Text für Liedblätter ,usw."
+                             :settings="myEditorSettings" />
+        <form-check label="Titel in Liedblättern, usw. unterdrücken" v-model="editedElement.data.handoutSuppressTitle" class="mb-1" />
+        <form-textarea v-model="editedElement.data.slideText" label="Text für Folien" class="mb-1" help="--- als Trenner für neue Folie verwenden"/>
+
     </div>
 </template>
 
@@ -52,10 +60,16 @@ import ReplacementMenu from "./Elements/ReplacementMenu";
 import ReplacementMenuButton from "./Elements/ReplacementMenuButton";
 import RelativeDate from "../../../libraries/RelativeDate";
 import LiturgyTextEditor from "./Elements/LiturgyTextEditor.vue";
+import FormTextarea from "../../Ui/forms/FormTextarea.vue";
+import RichTextEditor from "./Elements/RichTextEditor.vue";
+import FormCheck from "../../Ui/forms/FormCheck.vue";
 
 export default {
     name: "FreetextEditor",
     components: {
+        FormCheck,
+        RichTextEditor,
+        FormTextarea,
         LiturgyTextEditor,
         ReplacementMenuButton,
         ReplacementMenu,
@@ -76,7 +90,14 @@ export default {
     },
     data() {
         var e = this.element;
-        if (undefined == e.data.description) e.data.description = '';
+
+        e.data = {
+            description: '',
+            handoutText: '',
+            handoutSuppressTitle: false,
+            slideText: '',
+            ...e.data,
+        }
 
         let replacementMenus = [];
 

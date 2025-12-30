@@ -36,6 +36,7 @@ use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Music\ABCMusic;
+use App\Liturgy\Replacement\Replacement;
 use App\Models\Liturgy\Item;
 use App\Models\Liturgy\Song;
 use App\Models\Service;
@@ -104,6 +105,19 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
     public function getFileTitle(): string
     {
         return 'Liedblatt';
+    }
+
+    protected function renderFreeTextItem(DefaultWordDocument $doc, Item $item)
+    {
+        if (!($item->data['handoutText'] ?? false)) {
+            return;
+        }
+        $helper = $item->getHelper();
+        $helper->setField('handoutText');
+        if (!($item->data['handoutSuppressTitle'] ?? false)) {
+            $doc->getSection()->addTitle($item->title,3);
+        }
+        $doc->renderNormalText(Replacement::replaceAll($helper->getText(), $this->service));
     }
 
     protected function renderReadingItem(DefaultWordDocument $doc, Item $item)
