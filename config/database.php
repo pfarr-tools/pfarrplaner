@@ -85,6 +85,10 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            'dump' => [
+                'use_single_transaction',
+                'add_extra_option' => '--max-allowed-packet=256m',
+            ]
         ],
 
         'pgsql' => [
