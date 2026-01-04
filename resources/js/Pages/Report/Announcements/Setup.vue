@@ -44,6 +44,8 @@
                 <form-selectize label="Bekanntgaben für den folgenden Gottesdienst erstellen"
                                 name="service" :options="services" v-model="myService"/>
             </div>
+            <form-check label="Wöchentlich wiederholte Veranstaltungen (nicht Gottesdienste) ausschließen"
+                        name="excludeRegularWeekly" v-model="excludeRegularWeekly" class="mb-1"/>
             <div v-if="(!lastServiceLoading) && (myLastServiceDays.length > 0)">
                 <form-selectize label="Herzlichen Dank für das Opfer der Gottesdienste vom..."
                                 :key="lastServiceDaysLoaded"
@@ -91,6 +93,11 @@ export default {
         await this.getLastServiceDays();
         await this.getAmount();
     },
+    computed: {
+        currentCity() {
+            if (this.myCity) return this.cities.filter(city => city.id == this.myCity)[0] || null;
+        },
+    },
     data() {
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
@@ -108,6 +115,7 @@ export default {
             amount: '',
             mixOutlook: false,
             mixOP: false,
+            excludeRegularWeekly: true,
         }
     },
     watch: {

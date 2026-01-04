@@ -34,6 +34,7 @@ use App\Documents\Word\DefaultWordDocument;
 use App\Liturgy\Bible\BibleText;
 use App\Liturgy\Bible\ReferenceParser;
 use App\Models\Liturgy\Item;
+use App\Reports\AbstractWordDocumentReport;
 use Illuminate\Support\Str;
 
 class ReadingItemHelper extends AbstractItemHelper
@@ -68,14 +69,15 @@ class ReadingItemHelper extends AbstractItemHelper
         return (new BibleText($this->reference['version']))->get($this->reference);
     }
 
-    public function renderToWordDocument(DefaultWordDocument $doc, $includeFullReadings = true, $includeIntro = false)
+
+    public function renderToWordDocument(DefaultWordDocument $doc, bool $includeFullReadings = true, bool $includeIntro = false, string $includeTitle = '', int $depth = 3)
     {
-        $doc->getSection()->addTitle($this->reference['correctedReference'], 3);
+        $doc->getSection()->addTitle($includeTitle ?: $this->reference['correctedReference'], $depth);
         if (!$includeFullReadings) {
             return;
         }
         if ($this->reference['versionCopyrights']) {
-            $doc->renderNormalText($this->reference['versionCopyrights'], ['size' => 8]);
+            $doc->renderNormalText($this->reference['versionCopyrights'], ['size' => 8], $doc->getConfig()['styles']['paragraphs']['default']['spaceAfter'] == 0);
         }
 
         // Include intro to reading?

@@ -900,6 +900,17 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
+     * Scope a query to include all event types by removing the ServicesOnlyScope.
+     *
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIncludeAllEventTypes(Builder $query)
+    {
+        return $query->withoutGlobalScope(ServicesOnlyScope::class);
+    }
+
+    /**
      * @param Builder $query
      * @return Builder
      */
@@ -1028,7 +1039,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function scopeRegularForCity(Builder $query, City $city)
     {
-        return $query->where('city_id', $city->id)
+        return $query->inCity($city->id)
             ->whereDoesntHave('funerals')
             ->whereDoesntHave('weddings');
     }

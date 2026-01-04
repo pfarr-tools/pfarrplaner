@@ -66,30 +66,17 @@ class DefaultWordDocument
 
     public function __construct($config = [])
     {
+        $this->config = array_replace_recursive(config('documents.word.default'), $this->config, $config);
         Settings::setOutputEscapingEnabled(true);
         $this->phpWord = new PhpWord();
         $this->phpWord->getSettings()->setThemeFontLang(new Language(Language::DE_DE));
         $this->configureLayout($config['layout'] ?? []);;
         $this->setDefaultDocumentStyles($config);
-        $this->config = $config;
     }
 
     protected function configureLayout($config)
     {
-        $this->section = $this->phpWord->addSection(
-            array_merge(
-                [
-                    'orientation' => 'portrait',
-                    'pageSizeH' => Converter::cmToTwip(29.7),
-                    'pageSizeW' => Converter::cmToTwip(21),
-                    'marginTop' => Converter::cmToTwip(1.5),
-                    'marginBottom' => Converter::cmToTwip(1.5),
-                    'marginLeft' => Converter::cmToTwip(1.5),
-                    'marginRight' => Converter::cmToTwip(1.5),
-                ],
-                $config
-            )
-        );
+        $this->section = $this->phpWord->addSection($config);
     }
 
     protected function setDefaultDocumentStyles($config = [])
@@ -98,109 +85,22 @@ class DefaultWordDocument
         $this->phpWord->setDefaultFontSize($config['defaultFontSize'] ?? 11);
 
         // Standard
-        $this->phpWord->setDefaultParagraphStyle(
-            [
-                'alignment' => Jc::START,
-                'indentation' => [
-                    'left' => 0,
-                    'right' => 0,
-                    'firstLine' => 0,
-                    'hanging' => 0,
-                ],
-                'lineHeight' => 1.08,
-                'spaceBefore' => 0,
-                'spaceAfter' => Converter::pointToTwip(8),
-            ]
-        );
+        $this->phpWord->setDefaultParagraphStyle($this->config['styles']['paragraphs']['default'] ?? []);
+        $this->phpWord->addFontStyle(self::NORMAL, $this->config['styles']['fonts'][self::NORMAL]);
 
-        $this->phpWord->addFontStyle(self::NORMAL, [
-            'name' => 'Sarabun Light',
-            'size' => 11,
-            'bold' => false,
-            'italic' => false,
-        ]);
+        // title styles
+        foreach ($this->config['styles']['paragraphs']['titles'] as $level => $pStyle) {
+            $this->phpWord->addTitleStyle($level, $this->config['styles']['fonts']['titles'][$level] ?? [], $pStyle);
+        }
 
-        // Überschrift 1
-        $this->phpWord->addTitleStyle(1, $this->getFontStyle('heading1'), $this->getParagraphStyle('heading1'));
+        foreach ($this->config['styles']['paragraphs']['custom'] as $pKey => $pStyle) {
+            $this->phpWord->addParagraphStyle($pKey, $pStyle);
+        }
 
-        // Überschrift 2
-        $this->phpWord->addTitleStyle(2, [
-            'name' => 'Sarabun Semibold',
-            'size' => 13,
-            'bold' => false,
-            'italic' => false,
-        ],                            [
-                                          'alignment' => Jc::START,
-                                          'indentation' => [
-                                              'left' => 0,
-                                              'right' => 0,
-                                              'firstLine' => 0,
-                                              'hanging' => 0,
-                                          ],
-                                          'keepNext' => true,
-                                          'lineHeight' => 1.08,
-                                          'spaceBefore' => Converter::pointToTwip(2),
-                                          'spaceAfter' => 0,
-                                      ]);
+        foreach ($this->config['styles']['fonts']['custom'] as $fKey => $fStyle) {
+            $this->phpWord->addFontStyle($fKey, $fStyle);
+        }
 
-        // Überschrift 3
-        $this->phpWord->addTitleStyle(3, [
-            'name' => 'Sarabun Semibold',
-            'size' => 12,
-            'bold' => false,
-            'italic' => false,
-        ],                            [
-                                          'alignment' => Jc::START,
-                                          'indentation' => [
-                                              'left' => 0,
-                                              'right' => 0,
-                                              'firstLine' => 0,
-                                              'hanging' => 0,
-                                          ],
-                                          'keepNext' => true,
-                                          'lineHeight' => 1.08,
-                                          'spaceBefore' => Converter::pointToTwip(2),
-                                          'spaceAfter' => 0,
-                                      ]);
-
-        // Zitat
-        $this->phpWord->addParagraphStyle(self::BLOCKQUOTE, [
-            'alignment' => Jc::BOTH,
-            'indentation' => [
-                'left' => Converter::cmToTwip(1),
-                'right' => Converter::cmToTwip(1),
-                'firstLine' => 0,
-                'hanging' => 0,
-            ],
-            'lineHeight' => 1.08,
-            'spaceBefore' => Converter::pointToTwip(10),
-            'spaceAfter' => Converter::pointToTwip(8),
-        ]);
-
-        $this->phpWord->addFontStyle(self::BLOCKQUOTE, [
-            'name' => 'Sarabun Light',
-            'size' => 10,
-            'bold' => false,
-            'italic' => false,
-        ]);
-
-        // indented paragraph with instructions
-        $this->phpWord->addParagraphStyle(self::INSTRUCTIONS, [
-                                                                'alignment' => Jc::START,
-                                                                'indentation' => [
-                                                                    'left' => Converter::cmToTwip(1.27),
-                                                                    'right' => 0,
-                                                                    'firstLine' => 0,
-                                                                    'hanging' => Converter::cmToTwip(1.27),
-                                                                ],
-                                                                'lineHeight' => 1.08,
-                                                                'spaceBefore' => 0,
-                                                                'spaceAfter' => Converter::pointToTwip(8),
-                                                                'tabs' => [
-                                                                    new Tab('left', Converter::cmToTwip(1.27)),
-                                                                ],
-                                                            ]
-        );
     }
 
 // SETTERS
@@ -254,11 +154,14 @@ class DefaultWordDocument
         $textRun = $existingTextRun ?: $this->section->addTextRun($template);
         foreach ($blocks as $block) {
             if (null !== $block[0]) {
+                $ct = 0;
                 foreach (explode("\n", $block[0]) as $item) {
-                    $textRun->addText($item, $block[1]);
-                    if (isset($block[2]) && $block[2]) {
-                        $textRun->addTextBreak();
-                    }
+                    if ($ct > 0) $textRun->addTextBreak();
+                    $textRun->addText($item, $block[1] ?? []);
+                    $ct++;
+                }
+                if (isset($block[2]) && $block[2]) {
+                    $textRun->addTextBreak();
                 }
             }
         }
@@ -359,6 +262,42 @@ class DefaultWordDocument
         }
     }
 
+
+    /**
+     * @param string $text
+     */
+    public function renderLiteral(string $text)
+    {
+        if (!is_array($text)) {
+            $text = [$text];
+        }
+        foreach ($text as $paragraph) {
+            switch (substr($paragraph, 0, 1)) {
+                case '*':
+                    $format = self::BOLD;
+                    $paragraph = substr($paragraph, 1);
+                    break;
+                case '_':
+                    $format = self::UNDERLINE;
+                    $paragraph = substr($paragraph, 1);
+                    break;
+                default:
+                    $format = [];
+            }
+            $paragraph = trim(
+                strtr(
+                    $paragraph,
+                    [
+                        "\r" => '',
+                        "\n" => '<w:br />'
+                    ]
+                )
+            );
+            $this->renderParagraph(self::NO_INDENT, [[$paragraph, $format]], 1);
+        }
+    }
+
+
     public function getParagraphStyle($style)
     {
         switch ($style) {
@@ -380,51 +319,6 @@ class DefaultWordDocument
     }
 
 
-    public function getFontStyle($style)
-    {
-        switch ($style) {
-            case 'heading1':
-                return [
-                    'name' => 'Sarabun Semibold',
-                    'size' => 16,
-                    'bold' => false,
-                    'italic' => false,
-                ];
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function getInstructionsFontStyle(): array
-    {
-        return $this->instructionsFontStyle;
-    }
-
-    /**
-     * @param array $instructionsFontStyle
-     */
-    public function setInstructionsFontStyle(array $instructionsFontStyle): void
-    {
-        $this->instructionsFontStyle = $instructionsFontStyle;
-    }
-
-    /**
-     * @return array
-     */
-    public function getInstructionsParagraphStyle(): array
-    {
-        return $this->instructionsParagraphStyle;
-    }
-
-    /**
-     * @param array $instructionsParagraphStyle
-     */
-    public function setInstructionsParagraphStyle(array $instructionsParagraphStyle): void
-    {
-        $this->instructionsParagraphStyle = $instructionsParagraphStyle;
-    }
-
     /**
      * @return null
      */
@@ -440,6 +334,18 @@ class DefaultWordDocument
     {
         $this->recipient = $recipient;
     }
+
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    public function setConfig(array $config): void
+    {
+        $this->config = $config;
+    }
+
+
 
 
 }

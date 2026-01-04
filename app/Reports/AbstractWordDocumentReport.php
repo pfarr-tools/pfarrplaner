@@ -30,6 +30,7 @@
 
 namespace App\Reports;
 
+use App\Documents\Word\DefaultWordDocument;
 use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
@@ -48,9 +49,27 @@ class AbstractWordDocumentReport extends AbstractReport
     /** @var PhpWord $wordDocument */
     protected $wordDocument = null;
 
+    // transition: use both PhpWord and DefaultWordDocument
+
+    /** @var DefaultWordDocument */
+    protected $doc;
+    protected $useDefaultDocument = false;
+
+    /** @var array  */
+    protected $config = [];
+
     public function __construct()
     {
         $this->wordDocument = new PhpWord();
+        $this->prepareWordDocument();
+    }
+
+    /**
+     * Prepare the DefaultWordDocument
+     */
+    protected function prepareWordDocument()
+    {
+        $this->doc = new DefaultWordDocument($this->config);
     }
 
     /**
@@ -60,7 +79,7 @@ class AbstractWordDocumentReport extends AbstractReport
     public function sendToBrowser($filename)
     {
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
-        $objWriter = IOFactory::createWriter($this->wordDocument, 'Word2007');
+        $objWriter = IOFactory::createWriter($this->useDefaultDocument ? $this->doc->getPhpWord() : $this->wordDocument, 'Word2007');
         $objWriter->save($tempFile);
         return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
             ->deleteFileAfterSend(true);

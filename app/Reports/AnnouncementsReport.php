@@ -32,15 +32,18 @@ namespace App\Reports;
 
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
+use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Liturgy\Bible\BibleText;
 use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
+use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
+use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Services\FileNameService;
 use App\Services\NameService;
@@ -87,6 +90,47 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
     public const FILE_TITLE = 'Bekanntgaben';
     public const FILE_SIGNATURE = '91.8';
+    protected $config = [
+        'layout' => [
+            'orientation' => 'landscape',
+            'marginTop' => 566.92913385827, // 1 cm
+            'marginBottom' => 566.92913385827,
+            'marginLeft' => 566.92913385827,
+            'marginRight' => 566.92913385827,
+            'pageSizeH' => 11906,
+            'pageSizeW' => 8419,
+        ],
+        'styles' => [
+            'paragraphs' => [
+                'default' => [
+                    'spaceAfter' => 0,
+                ],
+                'custom' => [
+                    'Bekanntgaben' => [
+                        'alignment' => 'start',
+                        'indentation' => [
+                            'left' => 1440, // 1.27cm
+                            'right' => 0,
+                            'firstLine' => 0,
+                            'hanging' => 1440, // 1.27cm
+                        ],
+                        'spaceBefore' => 0,
+                        'spaceAfter' => 0, // 8pt
+                    ],
+                ],
+            ],
+            'fonts' => [
+                'titles' => [
+                    1 => [
+                        'size' => 11,
+                        'underline' => 'single',
+                    ],
+                ],
+            ],
+        ],
+    ];
+
+    protected $useDefaultDocument = true;
 
     /**
      * @var string
@@ -111,7 +155,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
      */
     public function setup()
     {
-        $cities = Auth::user()->cities;
+        $cities = Auth::user()->cities->load('parent');
         return Inertia::render('Report/Announcements/Setup', compact('cities'));
     }
 
@@ -141,8 +185,6 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         return response()->json([
                                     'services' => $services,
-                                    'mixOutlook' => (bool)$city->public_events_calendar_url,
-                                    'mixOP' => (bool)$city->op_customer_token,
                                 ]);
     }
 
@@ -214,6 +256,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
                                 'offerings' => $lastService->offering_amount,
                                 'offering_text' => $service->offering_text,
                                 'service' => $service,
+                                'excludeRegularWeekly' => true,
                             ]);
     }
 
@@ -221,6 +264,12 @@ class AnnouncementsReport extends AbstractWordDocumentReport
     {
         $service = Service::findOrFail($data['service']);
         $city = City::findOrFail($data['city']);
+
+        // is this part of an org?
+        $localCity = $city;
+        if ($city->parent_id) {
+            $city = $city->parent;
+        }
 
         $lastService = $data['lastService'];
         $offerings = $data['offerings'];
@@ -235,8 +284,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $funerals = Funeral::where('announcement', $service->date->format('Y-m-d'))
             ->whereHas(
                 'service',
-                function ($query) use ($service) {
-                    $query->inCity($service->city);
+                function ($query) use ($service, $city) {
+                    $query->inCity($city)
+                        ->displayable($service->date);
                 }
             )
             ->get();
@@ -244,9 +294,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $weddings = Wedding::with('service')
             ->whereHas(
                 'service',
-                function ($query) use ($service, $nextWeek) {
+                function ($query) use ($service, $nextWeek, $city) {
                     $query->between($service->date, $nextWeek)
-                        ->inCity($service->city)
+                        ->inCity($city)
                         ->displayable($service->date)
                         ->ordered();
                 }
@@ -255,9 +305,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $baptisms = Baptism::with('service')
             ->whereHas(
                 'service',
-                function ($query) use ($service, $nextWeek) {
+                function ($query) use ($service, $nextWeek, $city) {
                     $query->between($service->date, $nextWeek)
-                        ->inCity($service->city)
+                        ->inCity($city)
                         ->displayable($service->date)
                         ->ordered();
                 }
@@ -266,17 +316,24 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $liturgicalInfo = $service->liturgicalInfo;
 
         $events = Occurence::with('event')
-            ->between($service->date, $nextWeek)
-            ->whereHas('service', function ($query) use ($service) {
-                $query->inCity($service->city)->displayable($service->date);
+            ->between($service->date->copy()->addHour(1), $nextWeek)
+            ->whereHas('service', function ($query) use ($service, $city, $data) {
+                $query->withoutGlobalScope(ServicesOnlyScope::class);
+                $query->inCity($city)->displayable($service->date);
+                if ($data['excludeRegularWeekly'] ?? false) {
+                    // do not include events that are (1) not services and (2) repeat every week
+                    $query->where(function ($q2) {
+                        $q2->where('event_class', 'service')
+                            ->orWhere('rrule', 'not like', '%FREQ=WEEKLY;INTERVAL=1%');
+                    });
+                }
             })
             ->orderBy('start')
             ->get();
-        //dd($events);
 
         $featuredEvents = Occurence::with('event')
-            ->whereHas('service', function ($query) use ($service) {
-                $query->inCity($service->city)->displayable($service->date);
+            ->whereHas('service', function ($query) use ($service, $city) {
+                $query->inCity($city)->displayable($service->date);
             })
             ->adRunningAt('bekanntgaben', $service->date)
             ->orderBy('start')
@@ -284,56 +341,19 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
+        $this->doc->getPhpWord()->getSettings()->setBookFoldPrinting(true);
 
-        $this->section = $this->wordDocument->addSection(
-            [
-                'orientation' => \PhpOffice\PhpWord\Style\Section::ORIENTATION_LANDSCAPE,
-                'pageSizeH' => 11906,
-                'pageSizeW' => 8419,
-                'marginTop' => Converter::cmToTwip(1),
-                'marginBottom' => Converter::cmToTwip(1),
-                'marginLeft' => Converter::cmToTwip(1),
-                'marginRight' => Converter::cmToTwip(1),
-            ]
-        );
-        $this->wordDocument->getSettings()->setBookFoldPrinting(true);
-        $this->wordDocument->setDefaultFontSize(12);
-
-        $this->wordDocument->addParagraphStyle(
-            self::INDENT,
-            array(
-                'indentation' => [
-                    'left' => Converter::cmToTwip(3),
-                    'hanging' => Converter::cmToTwip(3),
-                ],
-                'tabs' => [
-                    new Tab('left', Converter::cmToTwip(3)),
-                ],
-                'spaceAfter' => 0,
-            )
-        );
-
-        $this->wordDocument->addParagraphStyle(
-            self::NO_INDENT,
-            array(
-                'tabs' => [
-                    new Tab('left', Converter::cmToTwip(3)),
-                ],
-                'spaceAfter' => 0,
-            )
-        );
-
-        $textRun = $this->section->addTextRun('Bekanntgaben');
+        $textRun = $this->doc->getSection()->addTextRun('Bekanntgaben');
         $textRun->addText(
             $service->date->isoFormat('DD. MMMM YYYY')
             . (($service->liturgicalInfo['title'] ?? false) ? ' - ' . $service->liturgicalInfo['title'] : ''),
             ['bold' => true]
         );
 
-        $textRun = $this->section->addTextRun('Bekanntgaben');
+        $textRun = $this->doc->getSection()->addTextRun('Bekanntgaben');
         $textRun->addText($service->timeText() . ' ' . $service->locationText());
 
-        $this->section->addTextBreak();
+        $this->doc->getSection()->addTextBreak();
 
         foreach (
             [
@@ -349,7 +369,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         }
 
         if ($service->offering_goal) {
-            $this->renderParagraph(self::INDENT, [
+            $this->doc->renderParagraph(self::INDENT, [
                 ["Opfer:\t{$service->offering_goal}", []]
             ]);
         }
@@ -358,10 +378,10 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         $this->renderReadings($service);
 
-        $this->renderParagraph(self::NO_INDENT, [
+        $this->doc->renderParagraph(self::NO_INDENT, [
             ['Abkündigungen', self::BOLD_UNDERLINE],
         ]);
-        $this->section->addTextBreak();
+        $this->doc->getSection()->addTextBreak();
 
         $this->renderThanks($service);
 
@@ -371,11 +391,19 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         $this->renderFeaturedEvents($featuredEvents);
 
-        $textRun = $this->renderParagraph();
+        $this->doc->renderParagraph(self::NO_INDENT, [
+            [
+                'Alle weiteren Veranstaltungen finden Sie in den Aushängen'
+                . ($service->city->communiapp_token ? ', auf unserer Homepage oder in unserer App.' : ' oder auf unserer Homepage.'),
+                [], true
+            ]
+        ]);
+
+        $textRun = $this->doc->renderParagraph();
 
         // Baptisms
         if (count($baptisms)) {
-            $this->renderParagraph(self::NO_INDENT, [['Taufen', self::BOLD_UNDERLINE]]);
+            $this->doc->renderParagraph(self::NO_INDENT, [['Taufen', self::BOLD_UNDERLINE]]);
 
             $baptismArray = [];
             foreach ($baptisms as $baptism) {
@@ -386,9 +414,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             foreach ($baptismArray as $baptisms) {
                 $baptism = $baptisms[array_key_first($baptisms)];
                 if ($baptism->service->id != $service->id) {
-                    $textRun = $this->renderParagraph();
+                    $textRun = $this->doc->renderParagraph();
                     if ($baptism->service->trueDate() == $service->trueDate()) {
-                        $this->renderParagraph(
+                        $this->doc->renderParagraph(
                             self::NO_INDENT,
                             [
                                 [
@@ -400,7 +428,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
                             ]
                         );
                     } else {
-                        $this->renderParagraph(
+                        $this->doc->renderParagraph(
                             self::NO_INDENT,
                             [
                                 [
@@ -415,7 +443,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
                         );
                     }
                     foreach ($baptisms as $baptism) {
-                        $this->renderParagraph(
+                        $this->doc->renderParagraph(
                             self::NO_INDENT,
                             [
                                 [$this->renderName($baptism->candidate_name) . ', ' . $baptism->candidate_address, []]
@@ -424,8 +452,8 @@ class AnnouncementsReport extends AbstractWordDocumentReport
                     }
                 }
             }
-            $this->renderParagraph();
-            $this->renderLiteral(
+            $this->doc->renderParagraph();
+            $this->doc->renderNormalText(
                 '*Christus hat der Kirche den Auftrag gegeben:
 Gehet hin und machet zu Jüngern alle Völker
 und taufet sie auf den Namen des Vaters und
@@ -435,7 +463,7 @@ des Sohnes und des Heiligen Geistes.'
 
 
         if (count($weddings)) {
-            $this->renderParagraph(self::NO_INDENT, [['Trauungen', self::BOLD_UNDERLINE]]);
+            $this->doc->renderParagraph(self::NO_INDENT, [['Trauungen', self::BOLD_UNDERLINE]]);
 
             $weddingArray = [];
             foreach ($weddings as $wedding) {
@@ -446,9 +474,9 @@ des Sohnes und des Heiligen Geistes.'
             foreach ($weddingArray as $weddings) {
                 $wedding = $weddings[array_key_first($weddings)];
                 if ($wedding->service->id != $service->id) {
-                    $textRun = $this->renderParagraph();
+                    $textRun = $this->doc->renderParagraph();
                     if ($wedding->service->trueDate() == $service->trueDate()) {
-                        $this->renderParagraph(
+                        $this->doc->renderParagraph(
                             self::NO_INDENT,
                             [
                                 [
@@ -459,7 +487,7 @@ des Sohnes und des Heiligen Geistes.'
                             ]
                         );
                     } else {
-                        $this->renderParagraph(
+                        $this->doc->renderParagraph(
                             self::NO_INDENT,
                             [
                                 [
@@ -472,7 +500,7 @@ des Sohnes und des Heiligen Geistes.'
                         );
                     }
                     foreach ($weddings as $wedding) {
-                        $this->renderParagraph(
+                        $this->doc->renderParagraph(
                             self::NO_INDENT,
                             [
                                 [
@@ -486,7 +514,7 @@ des Sohnes und des Heiligen Geistes.'
                     }
                 }
             }
-            $this->renderParagraph();
+            $this->doc->renderParagraph();
             $textRun = $this->renderLiteral(
                 '*Vater im Himmel,
 wir bitten für dieses Hochzeitspaar.
@@ -498,7 +526,7 @@ in guten und in schweren Tagen.'
         }
 
         if (count($funerals)) {
-            $this->renderParagraph(self::NO_INDENT, [['Bestattungen', self::BOLD_UNDERLINE]]);
+            $this->doc->renderParagraph(self::NO_INDENT, [['Bestattungen', self::BOLD_UNDERLINE]]);
 
             $funeralArray = ['past' => [], 'future' => []];
             foreach ($funerals as $funeral) {
@@ -508,7 +536,7 @@ in guten und in schweren Tagen.'
 
             if (count($funeralArray['past'])) {
                 ksort($funeralArray['past']);
-                $this->renderParagraph(
+                $this->doc->renderParagraph(
                     self::NO_INDENT,
                     [
                         [
@@ -527,7 +555,7 @@ in guten und in schweren Tagen.'
                     ]
                 );
                 foreach ($funeralArray['past'] as $funeral) {
-                    $this->renderParagraph(
+                    $this->doc->renderParagraph(
                         self::NO_INDENT,
                         [
                             [
@@ -539,13 +567,13 @@ in guten und in schweren Tagen.'
                     );
                 }
                 if (count($funeralArray['future'])) {
-                    $this->renderParagraph();
+                    $this->doc->renderParagraph();
                 }
             }
 
             if (count($funeralArray['future'])) {
                 ksort($funeralArray['future']);
-                $this->renderParagraph(
+                $this->doc->renderParagraph(
                     self::NO_INDENT,
                     [
                         [
@@ -563,7 +591,7 @@ in guten und in schweren Tagen.'
                     if ($mode == 'Erdbestattung') {
                         $mode = 'Bestattung';
                     }
-                    $this->renderParagraph(
+                    $this->doc->renderParagraph(
                         self::NO_INDENT,
                         [
                             [
@@ -583,7 +611,7 @@ in guten und in schweren Tagen.'
             }
 
 
-            $this->renderParagraph();
+            $this->doc->renderParagraph();
             $textRun = $this->renderLiteral(
                 'Wir nehmen teil an der Trauer der Angehörigen und befehlen die Toten, die Trauernden und uns der Güte Gottes an.'
             );
@@ -600,18 +628,24 @@ Amen.'
         }
 
         if ($service->announcements) {
-            $this->renderParagraph();
+            $this->doc->renderParagraph();
             $textRun = $this->renderLiteral($service->announcements);
         }
 
         $this->renderFinalSong($service);
+
+        if (!empty($service->konfiapp_event_qr)) {
+            $this->renderKonfiAppQR($service);
+        }
+
 
         return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE,
                 '.docx',
                 static::FILE_SIGNATURE,
-                $service->date)
+                $service->date
+            )
         );
     }
 
@@ -629,35 +663,11 @@ Amen.'
                     'service' => 'required|int|exists:services,id',
                     'offerings' => 'required|string',
                     'lastService' => 'required|date',
-                    'mix_op' => 'nullable|bool',
-                    'mix_outlook' => 'nullable|bool',
                     'offering_text' => 'nullable|string',
+                    'excludeRegularWeekly' => 'nullable|bool',
                 ]
             )
         );
-    }
-
-    /**
-     * @param string $template
-     * @param array $blocks
-     * @param int $emptyParagraphsAfter
-     * @param null $existingTextRun
-     * @return TextRun|null
-     */
-    protected function renderParagraph(
-        $template = '',
-        array $blocks = [],
-        $emptyParagraphsAfter = 0,
-        $existingTextRun = null
-    ) {
-        $textRun = $existingTextRun ?: $this->section->addTextRun($template);
-        foreach ($blocks as $block) {
-            $textRun->addText($block[0], $block[1] ?? []);
-        }
-        for ($i = 0; $i < $emptyParagraphsAfter; $i++) {
-            $textRun = $this->section->addTextRun($template);
-        }
-        return $textRun;
     }
 
     /**
@@ -681,16 +691,7 @@ Amen.'
                 default:
                     $format = [];
             }
-            $paragraph = trim(
-                strtr(
-                    $paragraph,
-                    [
-                        "\r" => '',
-                        "\n" => '<w:br />'
-                    ]
-                )
-            );
-            $this->renderParagraph(self::NO_INDENT, [[$paragraph, $format]], 1);
+            $this->doc->renderParagraph(self::NO_INDENT, [[$paragraph, $format]], 1);
         }
     }
 
@@ -718,7 +719,7 @@ Amen.'
 
     protected function renderMinistryLine($ministry, $people)
     {
-        $this->renderParagraph(self::INDENT, [
+        $this->doc->renderParagraph(self::INDENT, [
             [$ministry . ":\t" . $this->getNameListLine($people), []]
         ]);
     }
@@ -728,9 +729,9 @@ Amen.'
         if (!count($service->liturgyBlocks)) {
             return;
         }
-        $this->section->addTextBreak(1);
+        $this->doc->getSection()->addTextBreak(1);
         foreach ($service->liturgyBlocks as $block) {
-            $this->renderParagraph(self::NO_INDENT, [
+            $this->doc->renderParagraph(self::NO_INDENT, [
                 [$block->title, ['bold' => true]],
             ]);
             foreach ($block->items as $item) {
@@ -748,7 +749,7 @@ Amen.'
                     $title = ': ' . $item->data['reference'] ?? '';
                 }
 
-                $this->renderParagraph(self::NO_INDENT, [
+                $this->doc->renderParagraph(self::NO_INDENT, [
                     [Str::replace('&', '&amp;', $item->title . trim($title)), []]
                 ]);
             }
@@ -760,27 +761,16 @@ Amen.'
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
                 if ($item->data_type == 'reading') {
-                    $this->renderParagraph(self::NO_INDENT, [
-                        ['Schriftlesung aus ' . ($item->data['reference'] ?? ''), self::BOLD_UNDERLINE],
-                    ]);
-                    $this->section->addTextBreak();
+                    $title = 'Schriftlesung aus ' . $item->data['reference'];
 
-                    if (!$item->data['reference']) continue;
-                    $ref = ReferenceParser::getInstance()->parse($item->data['reference']);
-                    $bibleText = (new BibleText())->get($ref);
+                    /** @var ReadingItemHelper $helper */
+                    $helper = $item->getHelper();
+                    $helper->renderToWordDocument($this->doc, true, true, $title, 1);
 
-                    $run = [];
-                    foreach ($bibleText as $range) {
-                        foreach ($range['text'] as $verse) {
-                            $run[] = [$verse['verse'] . ' ', ['superScript' => true]];
-                            $run[] = [$verse['text'] . "\n", []];
-                        }
-                    }
-
-                    $this->renderParagraph(self::NO_INDENT, $run, 1);
-                    $this->renderParagraph(self::NO_INDENT, [
+                    $this->doc->renderParagraph(self::NO_INDENT, [], 1);
+                    $this->doc->renderParagraph(self::NO_INDENT, [
                         ['Der Herr segne sein Wort an uns. Amen.', ['italic' => true]],
-                    ],                     1);
+                    ],                          1);
                 }
             }
         }
@@ -799,39 +789,46 @@ Amen.'
             $musicians->push(NameService::fromUser($musician)->format(NameService::FIRST_LAST));
         }
 
-        $this->renderParagraph(self::NO_INDENT, [
+        $this->doc->renderParagraph(self::NO_INDENT, [
             [
                 'Herzlichen Dank an ' . $musicians->join(
                     ', ',
                     ' und '
-                ) . ' für die schöne musikalische Begleitung des Gottesdiensts.'
+                ) . ' für die schöne musikalische Begleitung des Gottesdiensts.',
+                []
             ]
         ]);
-        $this->section->addTextBreak();
+        $this->doc->getSection()->addTextBreak();
     }
 
     protected function renderOfferings(Service $service, $lastService, $offerings)
     {
-        $lastService = Carbon::parse($lastService)->isoFormat('DDDD');
+        $lastService = Carbon::parse($lastService)->isoFormat('dddd');
         if ($offerings == "0,00\u{A0}€") {
             $offerings = '';
         }
-        $this->renderParagraph(self::NO_INDENT, [
+        $this->doc->renderParagraph(self::NO_INDENT, [
             ['Das Opfer vom letzten ' . $lastService . ' ergab ' . ($offerings ?: '______________') . '.', []]
         ],);
-        $this->renderParagraph(self::NO_INDENT, [
-            ['Das Opfer heute erbitten wir für: ' . $service->offering_goal, []]
-        ]);
+        if (!empty($service->offering_goal)) {
+            $this->doc->renderParagraph(self::NO_INDENT, [
+                ['Das Opfer heute erbitten wir für: ' . $service->offering_goal, []]
+            ]);
+        } else {
+            $this->doc->renderParagraph(self::NO_INDENT, [
+                ['Das Opfer heute erbitten wir für die vielfältigen Aufgaben in unserer Kirchengemeinde.', []]
+            ]);
+        }
 
         if ($service->offering_text) {
-            $this->renderParagraph();
-            $this->renderParagraph(self::NO_INDENT, [
+            $this->doc->renderParagraph();
+            $this->doc->renderParagraph(self::NO_INDENT, [
                 [$service->offering_text, []]
-            ],                     1);
+            ],                          1);
         }
-        $this->renderParagraph(self::NO_INDENT, [
+        $this->doc->renderParagraph(self::NO_INDENT, [
             ['Herzlichen Dank für alles, was Sie geben.', []]
-        ],                     1);
+        ],                          1);
     }
 
     protected function renderEvents($events)
@@ -839,9 +836,16 @@ Amen.'
         if (!count($events)) {
             return;
         }
-        $this->renderParagraph(
+        $this->doc->renderParagraph(
             self::NO_INDENT,
-            [[(count($events) == 1 ? 'Zu folgender Veranstaltung' : 'Zu folgenden Veranstaltungen').' laden wir Sie ein:', ['italic' => true]]],
+            [
+                [
+                    (count(
+                        $events
+                    ) == 1 ? 'Zu folgender Veranstaltung' : 'Zu folgenden Veranstaltungen') . ' laden wir Sie ein:',
+                    ['italic' => true]
+                ]
+            ],
             1
         );
         $days = [];
@@ -849,19 +853,23 @@ Amen.'
             $days[$event->start->format('Ymd')][$event->start->format('Hi')] = $event;
         }
         foreach ($days as $events) {
-            $this->renderParagraph(
+            $this->doc->renderParagraph(
                 self::NO_INDENT,
                 [[array_values($events)[0]->start->isoFormat('dddd, DD. MMMM'), self::BOLD]]
             );
             foreach ($events as $event) {
-                $this->renderParagraph(self::INDENT, [
+                $this->doc->renderParagraph(self::INDENT, [
                     [
-                        $event->event->timeText() . "\t" . Str::replace('&', '&amp;', $event->event->titleText(false, false))
+                        $event->event->timeText() . "\t" . Str::replace(
+                            '&',
+                            '&amp;',
+                            $event->event->titleText(false, false)
+                        )
                         . (count($event->event->pastors ?? []) ? ' mit ' . $this->getNameListLine(
                                 $event->event->pastors
                             ) : '')
-                        . ' (' . $event->event->locationText() . ')'
-                        .($event->event->description ? '<w:br />'.$event->event->description : '')
+                        . ' (' . $event->event->locationTextWithCity . ')'
+                        . ($event->event->description ? "\n" . $event->event->description : '')
                         ,
                         []
                     ]
@@ -875,23 +883,36 @@ Amen.'
         if (!count($events)) {
             return;
         }
-        $this->renderParagraph();
-        $this->renderParagraph(
+        $this->doc->renderParagraph();
+        $this->doc->renderParagraph(
             self::NO_INDENT,
-            [['Ganz besonders weisen wir auf folgende '.(count($events) == 1 ? 'Veranstaltung' : 'Veranstaltungen').' hin:', ['italic' => true]]],
+            [
+                [
+                    'Ganz besonders weisen wir auf folgende ' . (count(
+                        $events
+                    ) == 1 ? 'Veranstaltung' : 'Veranstaltungen') . ' hin:',
+                    ['italic' => true]
+                ]
+            ],
             1
         );
         $days = [];
         foreach ($events as $event) {
-            $this->renderParagraph(
+            $this->doc->renderParagraph(
                 self::NO_INDENT,
-                [[$event->start->isoFormat('dddd, DD. MMMM').', '.$event->service->timeText().', '.$event->service->locationTextWithCity, self::BOLD]]
+                [
+                    [
+                        $event->start->isoFormat('dddd, DD. MMMM') . ', ' . $event->service->timeText(
+                        ) . ', ' . $event->service->locationTextWithCity,
+                        self::BOLD
+                    ]
+                ]
             );
-            $this->renderParagraph(
+            $this->doc->renderParagraph(
                 self::NO_INDENT,
                 [[$event->service->titleText(false), self::BOLD]]
             );
-            $this->renderParagraph(self::NO_INDENT, [
+            $this->doc->renderParagraph(self::NO_INDENT, [
                 [$event->getAdText('newsletter'), []]
             ]);
         }
@@ -903,13 +924,13 @@ Amen.'
             return;
         }
         $announcements = false;
-        $this->section->addTextBreak(2);
+        $this->doc->getSection()->addTextBreak(2);
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
                 if ($announcements && ($item->data_type == 'song')) {
-                    $this->renderParagraph(self::NO_INDENT, [['Wir singen gemeinsam:', []]]);
+                    $this->doc->renderParagraph(self::NO_INDENT, [['Wir singen gemeinsam:', []]]);
                     $helper = new SongItemHelper($item);
-                    $this->renderParagraph(
+                    $this->doc->renderParagraph(
                         self::NO_INDENT,
                         [
                             [
@@ -926,6 +947,31 @@ Amen.'
                 );
             }
         }
+    }
+
+
+    public function renderKonfiAppQR(Service $service)
+    {
+        $this->doc->getSection()->addTextBreak(1);
+        $this->doc->getSection()->addTitle('QR-Code für die KonfiApp', 1);
+        $types = KonfiAppIntegration::get($service->city)->listEventTypes();
+        $text = '';
+        foreach ($types as $type) {
+            if ($type->id == $service->konfiapp_event_type) {
+                $text = $type->punktzahl . ' ' . ($type->punktzahl == 1 ? 'Punkt' : 'Punkte') . ' in der Kategorie "' . $type->name . '". ';
+            }
+        }
+        $this->doc->renderNormalText(
+            $text . 'Gültig nur am ' . $service->date->isoFormat('dddd, DD. MMMM YYYY')
+            . ' von ' . $service->date->setTimezone('Europe/Berlin')->format('H:i')
+            . ' bis ' . $service->date->setTimezone('Europe/Berlin')->copy()->addHours(3)->format('H:i') . ' Uhr.',
+            ['size' => 8],
+            true
+        );
+        $this->doc->getSection()->addImage(
+            route('qrcode', $service->konfiapp_event_qr),
+            ['width' => Converter::cmToPoint(4)]
+        );
     }
 
 }
