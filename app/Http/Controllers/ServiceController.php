@@ -485,4 +485,14 @@ class ServiceController extends Controller
         ));
     }
 
+
+    /**
+     *
+     */
+    public function publicLiturgy(Service $service)
+    {
+        return view('services.public.liturgy', compact('service'));
+    }
+
+
 }

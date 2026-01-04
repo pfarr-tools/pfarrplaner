@@ -43,6 +43,8 @@
 
 use App\Http\Controllers\ServiceController;
 
+Route::get('/mitfeiern/{service:slug}', [ServiceController::class, 'publicLiturgy'])->name('service.publicLiturgy');
+
 // multiple services
 Route::get('/veranstaltungen/neu/{city?}/{date?}', [ServiceController::class, 'create'])->name('service.create');
 Route::get('/veranstaltungen/neue-veranstaltung/{filter}/{date?}', [ServiceController::class, 'createEvent'])->name('event.create');

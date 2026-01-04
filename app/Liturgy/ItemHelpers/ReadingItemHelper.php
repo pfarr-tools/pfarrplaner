@@ -69,6 +69,18 @@ class ReadingItemHelper extends AbstractItemHelper
         return (new BibleText($this->reference['version']))->get($this->reference);
     }
 
+    public function getHtml() {
+        if ($this->reference['version'] == 'Eigener Text') return $item->data->customText();
+        $bibleText = (new BibleText($this->reference['version']))->get($this->reference);
+        $text = '';
+        foreach ($bibleText as $section) {
+            foreach ($section['text'] as $verse) {
+                $text .= '<sup>'.$verse['verse'].'</sup> '.$verse['text'];
+            }
+        }
+        return $text;
+    }
+
 
     public function renderToWordDocument(DefaultWordDocument $doc, bool $includeFullReadings = true, bool $includeIntro = false, string $includeTitle = '', int $depth = 3)
     {
