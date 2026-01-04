@@ -100,9 +100,11 @@ class CityController extends AbstractCRUDController
         $data['possibleChildren'] = City::where('is_org', '!=', 1)
             ->whereNull('parent_id')
             ->get()
-            ->merge($model->children)
+            ->merge($model ? $model->children : collect())
             ->unique()
             ->sortBy('name');
+        $data['streams'] = [];
+        $data['activeTab'] = 'home';
         return $data;
     }
 

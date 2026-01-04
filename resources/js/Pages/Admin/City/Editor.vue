@@ -50,7 +50,7 @@
                 <form-input name="offical_name" label="Offizielle Bezeichnung" v-model="myCity.official_name"/>
                 <form-check class="mt-2" name="is_org" label="Diese Kirchengemeinde ist eine Sammelgemeinde für mehrere Einzelgemeinden"
                             v-model="myCity.is_org"/>
-                <form-selectize name="childIds[]" label="Zugehörige Einzelgemeinden" v-model="myCity.childIds"
+                <form-selectize v-if="myCity.is_org" name="childIds[]" label="Zugehörige Einzelgemeinden" v-model="myCity.childIds"
                                 :options="Object.values(possibleChildren)" multiple />
 
 
@@ -232,9 +232,14 @@ export default {
             streamOptions.push({id: streamKey, name: this.streams[streamKey]});
         }
 
-        let myCity = this.city;
+        let myCity = {
+            is_org: false,
+            children: [],
+            ...this.city
+        };
         myCity.childIds = [];
         myCity.children.forEach(child => myCity.childIds.push(child.id));
+
 
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
