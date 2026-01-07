@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.0.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.0...v2026.0.1) (2026-01-07)
+
+
+### Bug Fixes
+
+* Konfiguration kann nicht serialisiert werden. ([3f8b287](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3f8b287048116ee77934b150b96b2992760b264f))
+* NPM-Buildfehler in der Produktion ([e3e26ea](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e3e26ea771e57858feebbaecbb68e79b7f118efc))
+
 ## [2026.0.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.13.3...v2026.0.0) (2026-01-07)
 
 
