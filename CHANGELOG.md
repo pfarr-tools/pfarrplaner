@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.0.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.13.3...v2026.0.0) (2026-01-07)
+
+
+### Features
+
+* Abkündigungen im digitalen Liedblatt ([6889035](https://codeberg.org/pfarr.tools/pfarrplaner/commit/68890356a5d465dc11bde5d2e09fc3d0a467109f))
+* Abkündigungen überarbeitet ([201f0b9](https://codeberg.org/pfarr.tools/pfarrplaner/commit/201f0b9a0e852fa3a7cc029b9caee1253c27fd2d))
+* Digitales Liedblatt zum Gottesdienst ([ea08a86](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ea08a86eec9acaed1205fce49cf5e42130ec5097))
+* Freitext-Elemente in der Liturgie können Text für Handouts und Folien enthalten. ([e3b5129](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e3b5129f0dff6e04fa3f56ac9adf23a5cd6a5922))
+* GiroCodes für Opfer ([aaea79d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/aaea79dbf7d1f9400d5d2bc916cfb7c92f861450))
+* Hinführung zur Schriftlesung und eigene Bibeltexte ([72143fd](https://codeberg.org/pfarr.tools/pfarrplaner/commit/72143fdc7721cfdeb197e41ebb59f14e232e4e12))
+* Neue Funktionen zur Veranstaltungswerbung ([0523043](https://codeberg.org/pfarr.tools/pfarrplaner/commit/0523043211b0777869b3797991e2051b8daf8aae))
+* Neue UI für die Bearbeitung von Veranstaltungsorten und Pfarrämtern. ([5db21eb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5db21ebd96e524520a4cefa870aba23a564b51a4))
+* Neuer liturgischer Kalender ([5043fd5](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5043fd528e2a245606e9b394d62eb2bfb938dd4f))
+* Sammelkirchengemeinden (orgs) fassen einzelne Gemeinde zusammen ([fe3c3a9](https://codeberg.org/pfarr.tools/pfarrplaner/commit/fe3c3a9d500f5a4eae732a6aa625d70244d81856))
+* UI zum Bearbeiten von Werbekanälen ([007a13f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/007a13fb35df37313bc65008455d06fa0e274347))
+
+
+### Bug Fixes
+
+* Backup bricht wegen zu kleiner packet_size ab. ([bad002a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/bad002ad965512ab275c5c6d8863fa37bcfa88d1))
+* Ersetze alte Doctrine-Funktionen durch neuen Code für Laravel 10+. ([638ef0c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/638ef0cdc18625b3b9f60fbbbe2586f467872ff0))
+* Fehler beim Anlegen von Kirchengemeinden ([f22bdf4](https://codeberg.org/pfarr.tools/pfarrplaner/commit/f22bdf404ccbdc595d3dffb74e94975f7e6bd29f))
+* Migration scheitert an fehlenden Casts. ([77d9ad8](https://codeberg.org/pfarr.tools/pfarrplaner/commit/77d9ad893d744f837f484cc295779162afb5f851))
+* Permissions werden bei Tests nicht korrekt registriert ([5ba327f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5ba327f9c5e1bbd1c88617458984b4a847d043b4))
+* Tabellenüberschrift im Kalender ist nach unten verrutscht ([a3e1ffd](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a3e1ffd0db7b56ea612e9c32e0b3814593663b85))
+* Überspringe Änderungen an ENUMs in SQLite (für Tests) ([71b2656](https://codeberg.org/pfarr.tools/pfarrplaner/commit/71b2656a375632cda49e8b02aabe6703c1af2d23))
+* Vertikale Höhe fehlt im Backend ([b2c1f04](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b2c1f04e53f777183bce3b27942d16eeb5456f9a))
+* Vertikale Höhe fehlt im Backend ([359521d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/359521d35118407a0deae1fc550456891506ac73))
+* WebBuilder zeigt versteckte Termine und nicht-öffentliche Beerdigungstermine an. ([b9d7ad7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b9d7ad7f5f29bc4466fa305bec05ceeb46a7c1cd))
+
 ### [2025.13.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2025.13.2...v2025.13.3) (2025-10-27)
 
 
