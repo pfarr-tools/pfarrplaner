@@ -66,12 +66,44 @@ class DefaultWordDocument
 
     public function __construct($config = [])
     {
-        $this->config = array_replace_recursive(config('documents.word.default'), $this->config, $config);
+
+        $this->config = array_replace_recursive($this->getBaseConfig(), $this->config, $config);
         Settings::setOutputEscapingEnabled(true);
         $this->phpWord = new PhpWord();
         $this->phpWord->getSettings()->setThemeFontLang(new Language(Language::DE_DE));
         $this->configureLayout($config['layout'] ?? []);;
         $this->setDefaultDocumentStyles($config);
+    }
+
+    /**
+     * Get the base config array.
+     *
+     * This will expand all ['tabs'] configs to PhpWord's Tab objects.
+     */
+    public function getBaseConfig(): array
+    {
+        $baseConfig = config('documents.word.default');
+        foreach ($baseConfig['styles']['paragraphs'] as $pKey => $pStyle) {
+            if (isset($pStyle['tabs'])) {
+                $tabs = [];
+                foreach ($pStyle['tabs'] as $tab) {
+                    $tabs[] = new Tab($tab['type'], $tab['position']);
+                }
+            }
+        }
+        $baseConfig['styles']['paragraphs'][$pKey]['tabs'] = $tabs;
+        foreach (['titles', 'custom'] as $sKey) {
+            foreach ($baseConfig['styles']['paragraphs'][$sKey] as $pKey => $pStyle) {
+                if (isset($pStyle['tabs'])) {
+                    $tabs = [];
+                    foreach ($pStyle['tabs'] as $tab) {
+                        $tabs[] = new Tab($tab['type'], $tab['position']);
+                    }
+                    $baseConfig['styles']['paragraphs'][$sKey][$pKey]['tabs'] = $tabs;
+                }
+            }
+        }
+        return $baseConfig;
     }
 
     protected function configureLayout($config)

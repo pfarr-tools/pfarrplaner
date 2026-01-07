@@ -124,7 +124,8 @@ return [
                             'spaceBefore' => 0,
                             'spaceAfter' => 160, // 8pt
                             'tabs' => [
-                                new Tab('left', 720), // 1.27cm
+                                ['position' => 720, 'type' => 'left'],
+                                //new Tab('left', 720), // 1.27cm
                             ],
                         ]
                     ],
