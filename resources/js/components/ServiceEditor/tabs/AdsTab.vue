@@ -70,7 +70,7 @@
                     <div
                         class="col-6 col-md-3 col-lg-2 mb-3"
                         v-for="attachment in myService.attachments"
-                        :key="attachment.id ?? attachment.file"
+                        :key="attachment.id || attachment.file"
                         v-if="!attachment.cut"
                     >
                         <div class="thumb-wrapper">
