@@ -89,9 +89,9 @@ class DefaultWordDocument
                 foreach ($pStyle['tabs'] as $tab) {
                     $tabs[] = new Tab($tab['type'], $tab['position']);
                 }
+                $baseConfig['styles']['paragraphs'][$pKey]['tabs'] = $tabs;
             }
         }
-        $baseConfig['styles']['paragraphs'][$pKey]['tabs'] = $tabs;
         foreach (['titles', 'custom'] as $sKey) {
             foreach ($baseConfig['styles']['paragraphs'][$sKey] as $pKey => $pStyle) {
                 if (isset($pStyle['tabs'])) {
