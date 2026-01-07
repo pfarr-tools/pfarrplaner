@@ -59,7 +59,7 @@
         @foreach ($service->liturgyBlocks as $blockIndex => $block)
             <div class="p-3"><h2>{{ $block->title }}</h2></div>
             @foreach($block->items as $itemIndex => $item)
-                @if (in_array($item->data_type, ['song', 'psalm']) || ($item->data['showInHandouts'] ?? false) || ($item->data['handoutText'] ?? false) || ($item->title == 'Ehr sei dem Vater'))
+                @if (in_array($item->data_type, ['song', 'psalm']) || ($item->data['showInHandouts'] ?? false) || ($item->data['handoutText'] ?? false) || ($item->title == 'Ehr sei dem Vater') || ($item->title == 'Bekanntgaben'))
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="heading_{{ $blockIndex }}_{{ $itemIndex }}">
                         <button class="accordion-button {{ $first ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $blockIndex }}_{{ $itemIndex }}" aria-expanded="{{ $blockIndex==0 && $itemIndex==0 ? 'true' : 'false' }})" aria-controls="collapse_{{ $blockIndex }}_{{ $itemIndex }}">
@@ -104,6 +104,10 @@
                                         wie es war im Anfang, jetzt und immerdar und von Ewigkeit zu Ewigkeit.
                                         Amen. Amen.
                                     </div>
+                                @elseif($item->title == 'Bekanntgaben')
+                                    <div>{!! (new \App\Models\Announcements($service, $service->city, false))->render('', '', function($key, $items) {
+                                        return '<div class="mb-2">'.join('</div><div>', $items).'</div>';
+                                    }, '</div><div class="mb-2">', ['last_offerings', 'final_song']) !!}</div>
                                 @else
                                     <div>{!! $item->data['handoutText'] ?: '' !!}</div>
                                 @endif

@@ -152,6 +152,10 @@ class AppServiceProvider extends ServiceProvider
         if (!is_dir($tmpPath)) {
             mkdir($tmpPath, 0755, true);
         }
+
+        Str::macro('choice', function (int $count, string $singular, string $plural) {
+            return $count === 1 ? $singular : $plural;
+        });
     }
 
     /**com

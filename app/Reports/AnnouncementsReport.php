@@ -38,6 +38,7 @@ use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
+use App\Models\Announcements;
 use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
 use App\Models\Rites\Baptism;
@@ -274,70 +275,12 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $lastService = $data['lastService'];
         $offerings = $data['offerings'];
 
-        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d') . ' 0:00:00 last Sunday');
-        $nextWeek = $lastWeek->copy()->addWeeks(2)->setTime(
-            23,
-            59,
-            59
-        );
-
-        $funerals = Funeral::where('announcement', $service->date->format('Y-m-d'))
-            ->whereHas(
-                'service',
-                function ($query) use ($service, $city) {
-                    $query->inCity($city)
-                        ->displayable($service->date);
-                }
-            )
-            ->get();
-
-        $weddings = Wedding::with('service')
-            ->whereHas(
-                'service',
-                function ($query) use ($service, $nextWeek, $city) {
-                    $query->between($service->date, $nextWeek)
-                        ->inCity($city)
-                        ->displayable($service->date)
-                        ->ordered();
-                }
-            )->get();
-
-        $baptisms = Baptism::with('service')
-            ->whereHas(
-                'service',
-                function ($query) use ($service, $nextWeek, $city) {
-                    $query->between($service->date, $nextWeek)
-                        ->inCity($city)
-                        ->displayable($service->date)
-                        ->ordered();
-                }
-            )->get();
-
-        $liturgicalInfo = $service->liturgicalInfo;
-
-        $events = Occurence::with('event')
-            ->between($service->date->copy()->addHour(1), $nextWeek)
-            ->whereHas('service', function ($query) use ($service, $city, $data) {
-                $query->withoutGlobalScope(ServicesOnlyScope::class);
-                $query->inCity($city)->displayable($service->date);
-                if ($data['excludeRegularWeekly'] ?? false) {
-                    // do not include events that are (1) not services and (2) repeat every week
-                    $query->where(function ($q2) {
-                        $q2->where('event_class', 'service')
-                            ->orWhere('rrule', 'not like', '%FREQ=WEEKLY;INTERVAL=1%');
-                    });
-                }
-            })
-            ->orderBy('start')
-            ->get();
-
-        $featuredEvents = Occurence::with('event')
-            ->whereHas('service', function ($query) use ($service, $city) {
-                $query->inCity($city)->displayable($service->date);
-            })
-            ->adRunningAt('bekanntgaben', $service->date)
-            ->orderBy('start')
-            ->get();
+        $announcements = new Announcements($service, $city, $data['excludeRegularWeekly'] ?? false);
+        $baptisms = $announcements->getBaptisms();
+        $funerals = $announcements->getFunerals();
+        $weddings = $announcements->getWeddings();
+        $events = $announcements->getEvents();
+        $featuredEvents = $announcements->getFeaturedEvents();
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -383,256 +326,24 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         ]);
         $this->doc->getSection()->addTextBreak();
 
-        $this->renderThanks($service);
+        // ANNOUNCEMENTS
 
-        $this->renderOfferings($service, $lastService, $offerings);
-
-        $this->renderEvents($events);
-
-        $this->renderFeaturedEvents($featuredEvents);
-
-        $this->doc->renderParagraph(self::NO_INDENT, [
-            [
-                'Alle weiteren Veranstaltungen finden Sie in den Aushängen'
-                . ($service->city->communiapp_token ? ', auf unserer Homepage oder in unserer App.' : ' oder auf unserer Homepage.'),
-                [], true
-            ]
-        ]);
-
-        $textRun = $this->doc->renderParagraph();
-
-        // Baptisms
-        if (count($baptisms)) {
-            $this->doc->renderParagraph(self::NO_INDENT, [['Taufen', self::BOLD_UNDERLINE]]);
-
-            $baptismArray = [];
-            foreach ($baptisms as $baptism) {
-                $baptismArray[$baptism->service->trueDate()->format('YmdHis')][] = $baptism;
-            }
-            ksort($baptismArray);
-
-            foreach ($baptismArray as $baptisms) {
-                $baptism = $baptisms[array_key_first($baptisms)];
-                if ($baptism->service->id != $service->id) {
-                    $textRun = $this->doc->renderParagraph();
-                    if ($baptism->service->trueDate() == $service->trueDate()) {
-                        $this->doc->renderParagraph(
-                            self::NO_INDENT,
-                            [
-                                [
-                                    'Im Gottesdienst heute ' . $baptism->service->atText() . ' ' . (count(
-                                        $baptisms
-                                    ) > 1 ? 'werden' : 'wird') . ' getauft:',
-                                    []
-                                ]
-                            ]
-                        );
+        $announcements->setUseTabs(true);
+        //dd($announcements->render($lastService, $offerings, null, "\n", ['last_offerings', 'final_song']));
+        $announcements->render($lastService, $offerings, function ($key, $items) {
+            if ($key == 'events') {
+                foreach ($items as $item) {
+                    if (Str::contains($item, "\t")) {
+                        $this->doc->renderParagraph(self::INDENT, [[ $item, [] ]]);
                     } else {
-                        $this->doc->renderParagraph(
-                            self::NO_INDENT,
-                            [
-                                [
-                                    'Im Gottesdienst am ' . $baptism->service->date->format(
-                                        'd.m.Y'
-                                    ) . ' ' . $baptism->service->atText() . ' ' . (count(
-                                        $baptisms
-                                    ) > 1 ? 'werden' : 'wird') . ' getauft:',
-                                    []
-                                ]
-                            ]
-                        );
-                    }
-                    foreach ($baptisms as $baptism) {
-                        $this->doc->renderParagraph(
-                            self::NO_INDENT,
-                            [
-                                [$this->renderName($baptism->candidate_name) . ', ' . $baptism->candidate_address, []]
-                            ]
-                        );
+                        $this->doc->renderParagraph(self::NO_INDENT, [[ $item, ['bold' => true] ]]);
                     }
                 }
+            } else {
+                $this->renderParagraphArray($items, self::NO_INDENT);
             }
-            $this->doc->renderParagraph();
-            $this->doc->renderNormalText(
-                '*Christus hat der Kirche den Auftrag gegeben:
-Gehet hin und machet zu Jüngern alle Völker
-und taufet sie auf den Namen des Vaters und
-des Sohnes und des Heiligen Geistes.'
-            );
-        }
-
-
-        if (count($weddings)) {
-            $this->doc->renderParagraph(self::NO_INDENT, [['Trauungen', self::BOLD_UNDERLINE]]);
-
-            $weddingArray = [];
-            foreach ($weddings as $wedding) {
-                $weddingArray[$wedding->service->trueDate()->format('YmdHis')][] = $wedding;
-            }
-            ksort($weddingArray);
-
-            foreach ($weddingArray as $weddings) {
-                $wedding = $weddings[array_key_first($weddings)];
-                if ($wedding->service->id != $service->id) {
-                    $textRun = $this->doc->renderParagraph();
-                    if ($wedding->service->trueDate() == $service->trueDate()) {
-                        $this->doc->renderParagraph(
-                            self::NO_INDENT,
-                            [
-                                [
-                                    'Im Gottesdienst heute ' . $wedding->service->atText(
-                                    ) . ' werden kirchlich getraut:',
-                                    []
-                                ]
-                            ]
-                        );
-                    } else {
-                        $this->doc->renderParagraph(
-                            self::NO_INDENT,
-                            [
-                                [
-                                    'Im Gottesdienst am ' . $wedding->service->date->format(
-                                        'd.m.Y'
-                                    ) . ' ' . $wedding->service->atText() . ' werden kirchlich getraut:',
-                                    []
-                                ]
-                            ]
-                        );
-                    }
-                    foreach ($weddings as $wedding) {
-                        $this->doc->renderParagraph(
-                            self::NO_INDENT,
-                            [
-                                [
-                                    $this->renderName($wedding->spouse1_name) . ' &amp; ' . $this->renderName(
-                                        $wedding->spouse2_name
-                                    ),
-                                    []
-                                ]
-                            ]
-                        );
-                    }
-                }
-            }
-            $this->doc->renderParagraph();
-            $textRun = $this->renderLiteral(
-                '*Vater im Himmel,
-wir bitten für dieses Hochzeitspaar.
-Begleite sie auf ihrem gemeinsamen Weg.
-Lass sie deine Liebe erfahren
-und stärke ihre Liebe zueinander
-in guten und in schweren Tagen.'
-            );
-        }
-
-        if (count($funerals)) {
-            $this->doc->renderParagraph(self::NO_INDENT, [['Bestattungen', self::BOLD_UNDERLINE]]);
-
-            $funeralArray = ['past' => [], 'future' => []];
-            foreach ($funerals as $funeral) {
-                $key = ($funeral->service->trueDate() < $service->trueDate()) ? 'past' : 'future';
-                $funeralArray[$key][] = $funeral;
-            }
-
-            if (count($funeralArray['past'])) {
-                ksort($funeralArray['past']);
-                $this->doc->renderParagraph(
-                    self::NO_INDENT,
-                    [
-                        [
-                            'Aus unserer Gemeinde ' . StringTool::pluralString(
-                                count($funeralArray['past']),
-                                'ist',
-                                'sind'
-                            ) . ' verstorben und '
-                            . StringTool::pluralString(
-                                count($funeralArray['past']),
-                                'wurde',
-                                'wurden'
-                            ) . ' kirchlich bestattet:',
-                            []
-                        ]
-                    ]
-                );
-                foreach ($funeralArray['past'] as $funeral) {
-                    $this->doc->renderParagraph(
-                        self::NO_INDENT,
-                        [
-                            [
-                                $this->renderName($funeral->buried_name) . ', ' . $funeral->buried_address
-                                . ($funeral->age() ? ', ' . $funeral->age() . ' Jahre' : '') . '.',
-                                []
-                            ]
-                        ]
-                    );
-                }
-                if (count($funeralArray['future'])) {
-                    $this->doc->renderParagraph();
-                }
-            }
-
-            if (count($funeralArray['future'])) {
-                ksort($funeralArray['future']);
-                $this->doc->renderParagraph(
-                    self::NO_INDENT,
-                    [
-                        [
-                            'Aus unserer Gemeinde ' . StringTool::pluralString(
-                                count($funeralArray['future']),
-                                'ist',
-                                'sind'
-                            ) . ' verstorben:',
-                            []
-                        ]
-                    ]
-                );
-                foreach ($funeralArray['future'] as $funeral) {
-                    $mode = $funeral->type;
-                    if ($mode == 'Erdbestattung') {
-                        $mode = 'Bestattung';
-                    }
-                    $this->doc->renderParagraph(
-                        self::NO_INDENT,
-                        [
-                            [
-                                $this->renderName($funeral->buried_name) . ', '
-                                . $funeral->buried_address
-                                . ($funeral->age() ? ', ' . $funeral->age() . ' Jahre' : '')
-                                . '. Die ' . $mode . ' findet am ' . $funeral->service->date->isoFormat(
-                                    'dddd, DD. MMMM'
-                                )
-                                . ' um ' . $funeral->service->timeText(true, '.')
-                                . ' ' . $funeral->service->atText() . ' statt.',
-                                []
-                            ]
-                        ]
-                    );
-                }
-            }
-
-
-            $this->doc->renderParagraph();
-            $textRun = $this->renderLiteral(
-                'Wir nehmen teil an der Trauer der Angehörigen und befehlen die Toten, die Trauernden und uns der Güte Gottes an.'
-            );
-            $textRun = $this->renderLiteral('Unser keiner lebt sich selber, und keiner stirbt sich selber.');
-            $textRun = $this->renderLiteral(
-                'Leben wir, so leben wir dem Herrn;
-sterben wir, so sterben wir dem Herrn.
-Darum: Wir leben oder sterben, so sind wir des Herrn.'
-            );
-            $textRun = $this->renderLiteral(
-                '*Denn dazu ist Christus gestorben und wieder lebendig geworden, dass er über Tote und Lebende Herr sei.
-Amen.'
-            );
-        }
-
-        if ($service->announcements) {
-            $this->doc->renderParagraph();
-            $textRun = $this->renderLiteral($service->announcements);
-        }
-
-        $this->renderFinalSong($service);
+            $this->doc->getSection()->addTextBreak();
+        });
 
         if (!empty($service->konfiapp_event_qr)) {
             $this->renderKonfiAppQR($service);
@@ -668,31 +379,6 @@ Amen.'
                 ]
             )
         );
-    }
-
-    /**
-     * @param $text
-     */
-    protected function renderLiteral($text)
-    {
-        if (!is_array($text)) {
-            $text = [$text];
-        }
-        foreach ($text as $paragraph) {
-            switch (substr($paragraph, 0, 1)) {
-                case '*':
-                    $format = self::BOLD;
-                    $paragraph = substr($paragraph, 1);
-                    break;
-                case '_':
-                    $format = self::UNDERLINE;
-                    $paragraph = substr($paragraph, 1);
-                    break;
-                default:
-                    $format = [];
-            }
-            $this->doc->renderParagraph(self::NO_INDENT, [[$paragraph, $format]], 1);
-        }
     }
 
     /**
@@ -776,178 +462,17 @@ Amen.'
         }
     }
 
-    protected function renderThanks(Service $service)
+    protected function renderParagraphArray($paragraphs, $pStyle = self::NO_INDENT)
     {
-        $music = $service->organists;
-        foreach (['Musik', 'Band', 'Klavier', 'Schlagzeug', 'Cajon', 'Bass'] as $instrument) {
-            if ($people = $service->participantsByCategory($instrument)) {
-                $music->merge($people);
-            }
-        }
-        $musicians = collect();
-        foreach ($music as $musician) {
-            $musicians->push(NameService::fromUser($musician)->format(NameService::FIRST_LAST));
-        }
-
-        $this->doc->renderParagraph(self::NO_INDENT, [
-            [
-                'Herzlichen Dank an ' . $musicians->join(
-                    ', ',
-                    ' und '
-                ) . ' für die schöne musikalische Begleitung des Gottesdiensts.',
-                []
-            ]
-        ]);
-        $this->doc->getSection()->addTextBreak();
-    }
-
-    protected function renderOfferings(Service $service, $lastService, $offerings)
-    {
-        $lastService = Carbon::parse($lastService)->isoFormat('dddd');
-        if ($offerings == "0,00\u{A0}€") {
-            $offerings = '';
-        }
-        $this->doc->renderParagraph(self::NO_INDENT, [
-            ['Das Opfer vom letzten ' . $lastService . ' ergab ' . ($offerings ?: '______________') . '.', []]
-        ],);
-        if (!empty($service->offering_goal)) {
-            $this->doc->renderParagraph(self::NO_INDENT, [
-                ['Das Opfer heute erbitten wir für: ' . $service->offering_goal, []]
-            ]);
-        } else {
-            $this->doc->renderParagraph(self::NO_INDENT, [
-                ['Das Opfer heute erbitten wir für die vielfältigen Aufgaben in unserer Kirchengemeinde.', []]
-            ]);
-        }
-
-        if ($service->offering_text) {
-            $this->doc->renderParagraph();
-            $this->doc->renderParagraph(self::NO_INDENT, [
-                [$service->offering_text, []]
-            ],                          1);
-        }
-        $this->doc->renderParagraph(self::NO_INDENT, [
-            ['Herzlichen Dank für alles, was Sie geben.', []]
-        ],                          1);
-    }
-
-    protected function renderEvents($events)
-    {
-        if (!count($events)) {
-            return;
-        }
-        $this->doc->renderParagraph(
-            self::NO_INDENT,
-            [
-                [
-                    (count(
-                        $events
-                    ) == 1 ? 'Zu folgender Veranstaltung' : 'Zu folgenden Veranstaltungen') . ' laden wir Sie ein:',
-                    ['italic' => true]
-                ]
-            ],
-            1
-        );
-        $days = [];
-        foreach ($events as $event) {
-            $days[$event->start->format('Ymd')][$event->start->format('Hi')] = $event;
-        }
-        foreach ($days as $events) {
-            $this->doc->renderParagraph(
-                self::NO_INDENT,
-                [[array_values($events)[0]->start->isoFormat('dddd, DD. MMMM'), self::BOLD]]
-            );
-            foreach ($events as $event) {
-                $this->doc->renderParagraph(self::INDENT, [
-                    [
-                        $event->event->timeText() . "\t" . Str::replace(
-                            '&',
-                            '&amp;',
-                            $event->event->titleText(false, false)
-                        )
-                        . (count($event->event->pastors ?? []) ? ' mit ' . $this->getNameListLine(
-                                $event->event->pastors
-                            ) : '')
-                        . ' (' . $event->event->locationTextWithCity . ')'
-                        . ($event->event->description ? "\n" . $event->event->description : '')
-                        ,
-                        []
-                    ]
-                ]);
+        foreach ($paragraphs as $paragraph) {
+            if ($paragraph == "") {
+                $this->doc->getSection()->addTextBreak();
+            } else {
+                $this->doc->renderParagraph($pStyle, [[$paragraph, [], true]]);
             }
         }
     }
 
-    protected function renderFeaturedEvents($events)
-    {
-        if (!count($events)) {
-            return;
-        }
-        $this->doc->renderParagraph();
-        $this->doc->renderParagraph(
-            self::NO_INDENT,
-            [
-                [
-                    'Ganz besonders weisen wir auf folgende ' . (count(
-                        $events
-                    ) == 1 ? 'Veranstaltung' : 'Veranstaltungen') . ' hin:',
-                    ['italic' => true]
-                ]
-            ],
-            1
-        );
-        $days = [];
-        foreach ($events as $event) {
-            $this->doc->renderParagraph(
-                self::NO_INDENT,
-                [
-                    [
-                        $event->start->isoFormat('dddd, DD. MMMM') . ', ' . $event->service->timeText(
-                        ) . ', ' . $event->service->locationTextWithCity,
-                        self::BOLD
-                    ]
-                ]
-            );
-            $this->doc->renderParagraph(
-                self::NO_INDENT,
-                [[$event->service->titleText(false), self::BOLD]]
-            );
-            $this->doc->renderParagraph(self::NO_INDENT, [
-                [$event->getAdText('newsletter'), []]
-            ]);
-        }
-    }
-
-    protected function renderFinalSong(Service $service)
-    {
-        if (!count($service->liturgyBlocks)) {
-            return;
-        }
-        $announcements = false;
-        $this->doc->getSection()->addTextBreak(2);
-        foreach ($service->liturgyBlocks as $block) {
-            foreach ($block->items as $item) {
-                if ($announcements && ($item->data_type == 'song')) {
-                    $this->doc->renderParagraph(self::NO_INDENT, [['Wir singen gemeinsam:', []]]);
-                    $helper = new SongItemHelper($item);
-                    $this->doc->renderParagraph(
-                        self::NO_INDENT,
-                        [
-                            [
-                                $helper->getTitleText(
-                                ) . (($item->data['verses'] ?? '') ? ', ' . $item->data['verses'] : ''),
-                                self::BOLD
-                            ]
-                        ]
-                    );
-                }
-                $announcements = in_array(
-                    $item->title,
-                    ['Abkündigungen', 'Ankündigungen', 'Bekanntgaben', 'Bekanntmachungen']
-                );
-            }
-        }
-    }
 
 
     public function renderKonfiAppQR(Service $service)
