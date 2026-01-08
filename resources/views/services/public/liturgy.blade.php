@@ -74,7 +74,7 @@
                             @case('psalm')
                                 <h3>{{ $helper->getTitleText() }}</h3>
                                 <div>
-                                    <pre>{{ $item->data['psalm']['text'] }}</pre>
+                                    <pre>{{ $item->data['psalm']['text'] ?? '' }}</pre>
                                 </div>
                             @break
                             @case('song')
