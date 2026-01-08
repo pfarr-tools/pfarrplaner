@@ -116,6 +116,7 @@ class InstallUpdates extends Command
         if (isset($actions['browserslist'])) {
             $this->getOutput()->section('Update browser list');
             passthru('npx --yes update-browserslist-db@latest');
+            passthru('npm i baseline-browser-mapping@latest -D');
             $this->line('');
         }
 
