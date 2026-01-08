@@ -64,10 +64,7 @@
                     @endif
                     <td>
                         @if($service->liturgicalInfo)
-                            <div class="liturgical-day">{{ $service->liturgicalInfo['title'] }}
-                                <span class="fas fa-info-circle" title="{{ $service->liturgicalInfo['title'] }}: {{ $service->liturgicalInfo['litProfileGist'] }}&#10;&#10;Klicken Sie, um weitere Information zu diesem Tag zu bekommen."
-                                      data-location="https://www.kirchenjahr-evangelisch.de/article.php#{{ $service->liturgicalInfo['dayId'] }}"></span>
-                            </div>
+                            <div class="liturgical-day">{{ $service->liturgicalInfo['Bezeichnung'] }}</div>
                         @endif
                         @if($service->titleText(true) != 'GD')
                             <div><b>{{ $service->titleText(false) }}</b></div>
