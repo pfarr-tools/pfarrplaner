@@ -21,6 +21,10 @@
                             <div class="media-title-wrapper"></div>
                         </div>
                         <div class="container-title">
+                            <div class="text-center" style="font-weight: bold; line-height: 1; margin: .5em 0;">
+                                {{ $event->start->isoFormat('dddd, D. MMMM') }}, {{ $event->event->timeText() }}<br />
+                                {{ $event->event->locationTextWithCity }}
+                            </div>
                             <h3 class="header-color-standard header-default header-icon-pos-center header-align-center">
                                 <span>
                                     {{ $event->service->titleText(false) }}
@@ -28,8 +32,8 @@
                             </h3>
                         </div>
                         <div class="container-1-col">
-                            <p class="text-center">
-                                {{ $event->getAdText('homepage') }}
+                            <p class="text-left">
+                                {{ $event->getAdText($options['adChannelCode'] ?? 'homepage') }}
                             </p>
                         </div>
                     </div>
