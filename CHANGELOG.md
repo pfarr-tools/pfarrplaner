@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.0.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.3...v2026.0.4) (2026-01-08)
+
+
+### Bug Fixes
+
+* NPM-Build-Fehler in Produktion ([b6102d7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b6102d73b1ccf6ed16a90aad0f2557c1546506f5))
+
 ### [2026.0.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.2...v2026.0.3) (2026-01-08)
 
 
