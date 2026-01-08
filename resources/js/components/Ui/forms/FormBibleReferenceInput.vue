@@ -43,7 +43,7 @@
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" @click="bibleDropDownVisible = !bibleDropDownVisible">
                         {{ myVersion }}</button>
                     <div class="dropdown-menu" :style="{display : bibleDropDownVisible ? 'block' : 'none'}">
-                        <a v-for="(option,optionIndex) in availableVersions" class="dropdown-item" @click.prevent.stop="setVersion(option); dropDownVisible = false;" :key="optionIndex">{{ option }}</a>
+                        <a v-for="(option,optionIndex) in availableVersions" class="dropdown-item" @click.prevent.stop="setVersion(option); bibleDropDownVisible = false;" :key="optionIndex">{{ option }}</a>
                     </div>
                 </div>
             </div>
@@ -215,6 +215,7 @@ export default {
             this.setNewValue();
         },
         setVersion(e) {
+            this.bibleDropDownVisible = false;
             this.myVersion = e;
             this.valueChanged++;
             this.setNewValue();
