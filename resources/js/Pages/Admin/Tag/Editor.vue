@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <admin-layout :title="myTag.name ? tag.name+' bearbeiten' : 'Neue Kennzeichnung' ">
+    <admin-layout :title="myTag.name ? myTag.name+' bearbeiten' : 'Neue Kennzeichnung' ">
         <template v-slot:navbar-left>
             <save-button @click="saveTag" />
             <nav-button class="ms-1" v-if="myTag.id"
@@ -52,20 +52,20 @@ export default {
         if (undefined === myTag) myTag = {id: null, name: '', code: ''};
 
         return {
-            myAdChannel: myTag,
+            myTag: myTag,
         }
     },
     methods: {
         saveTag() {
-            if (this.myAdChannel.id) {
-                this.$inertia.patch(route('admin.tag.update', this.myAdChannel.id), this.myAdChannel);
+            if (this.myTag.id) {
+                this.$inertia.patch(route('admin.tag.update', this.myTag.id), this.myTag);
             } else {
-                this.$inertia.post(route('admin.tags.store'), this.myAdChannel);
+                this.$inertia.post(route('admin.tags.store'), this.myTag);
             }
         },
         deleteTag() {
             if (!confirm('Willst du diese Kennzeichnung wirklich komplett löschen?')) return;
-            this.$inertia.delete(route('admin.tag.destroy', this.myAdChannel.id));
+            this.$inertia.delete(route('admin.tag.destroy', this.myTag.id));
         },
     }
 }

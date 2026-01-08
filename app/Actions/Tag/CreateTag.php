@@ -33,6 +33,7 @@ namespace App\Actions\Tag;
 use App\Actions\AbstractCreateAction;
 use App\Contracts\Tag\CreatesTags;
 use App\Events\Models\Tag\CreatedLocation;
+use App\Events\Models\Tag\CreatedTag;
 use App\Models\People\User;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Gate;
@@ -65,7 +66,7 @@ class CreateTag extends AbstractCreateAction implements CreatesTags
         $input = Validator::make($input, Tag::$validationRules)->validateWithBag('createTag');
         if (empty($input['code'] ?? '')) $input['code'] = Str::slug($input['name']);
         $tag = Tag::create($input);
-        CreatedLocation::dispatch($user, $tag);
+        CreatedTag::dispatch($user, $tag);
         $this->messages = ['success' => 'Die neue Kennzeichnung wurde gespeichert.'];
         return $tag;
 

@@ -8,14 +8,12 @@
                         <div class="is-image">
                             <div class="media-image media-type-jpg media-ctype-infobox">
                                 <span class="media-container has-mouseover ekd-copy-white">
-                                    <a href="https://gaeufelden.communiapp.de/" class="image-link">
                                         <span class="width-50">
                                             <picture>
                                                 <source media="(min-width:0px)" srcset="{{ $event->service->getImageCutUrl('bildschirm-16x9') }}">
-                                                <img src="{{ $event->service->getImageCutUrl('bildschirm-16x9') }}" alt="{{ $event->service->titleText(false) }}" />
+                                                <img class="ekd-mouseover" src="{{ $event->service->getImageCutUrl('bildschirm-16x9') }}" alt="{{ $event->service->titleText(false) }}" />
                                             </picture>
                                         </span>
-                                    </a>
                                 </span>
                             </div>
                             <div class="media-title-wrapper"></div>
