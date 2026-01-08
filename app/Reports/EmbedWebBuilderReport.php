@@ -40,6 +40,7 @@ namespace App\Reports;
 
 use App\Models\Calendar\Occurence;
 use App\Models\Location;
+use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Models\Tag;
 use Carbon\Carbon;
@@ -169,12 +170,17 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
             ->whereHas('service', function ($query) use ($data) {
                 $query
                     ->notHidden()
-                    ->displayable()
                     ->inCities($data['cities']);
                 switch($data['eventClass']) {
+                    case '*':
+                        $query->withoutGlobalScope(ServicesOnlyScope::class);
+                        break;
                     case 'service':
+                        break;
                     case 'event':
-                        $query->where('event_class', $data['eventClass']);
+                        $query
+                            ->withoutGlobalScope(ServicesOnlyScope::class)
+                            ->where('event_class', $data['eventClass']);
                         break;
                     case 'baptismalService':
                         $query->where('baptism', true);
@@ -200,7 +206,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
                 }
                 if (count($data['tags'] ??= []) > 0) {
                     $query->whereHas('tags', function ($query) use ($data) {
-                       $query->whereIn('id', $data['tags']);
+                       $query->whereIn('tags.id', $data['tags']);
                     });
                 }
             })->orderBy('start');
