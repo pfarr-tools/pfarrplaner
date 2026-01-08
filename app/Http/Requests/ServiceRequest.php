@@ -192,6 +192,10 @@ class ServiceRequest extends FormRequest
             $data['end'] = Carbon::parse($data['date'])->addHour(1);
         }
 
+        if ($data['location_id'] == 0) {
+            $data['location_id'] = null;
+        }
+
         return $data;
     }
 
