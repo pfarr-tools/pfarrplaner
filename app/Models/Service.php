@@ -965,7 +965,7 @@ class Service extends Model implements HasDAVCalendarItems
         }
         return $query->where('city_id', $city->id)
                 ->orWhereHas('relatedCities', function ($q2) use ($city) {
-                    $q2->whereIn('cities.id', $city);
+                    $q2->where('cities.id', $city->id);
                 });
     }
 
