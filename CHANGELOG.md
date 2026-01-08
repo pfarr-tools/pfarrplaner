@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.0.6](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.5...v2026.0.6) (2026-01-08)
+
+
+### Features
+
+* Weitere Verbesserungen beim Triple-Feature im WebBuilder ([99abaa3](https://codeberg.org/pfarr.tools/pfarrplaner/commit/99abaa33468950751fb140f14f342af9a35e555b))
+
+
+### Bug Fixes
+
+* Fehler beim Anlegen von Tags ([7d0a2c0](https://codeberg.org/pfarr.tools/pfarrplaner/commit/7d0a2c07db3e0268b13f521d2d6fa64982385a81))
+* Veranstaltung mit Freitext-Ort kann nicht gespeichert werden ([bfd5821](https://codeberg.org/pfarr.tools/pfarrplaner/commit/bfd5821f03f89481488419b8ea12577ba85dc0cf))
+
 ### [2026.0.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.4...v2026.0.5) (2026-01-08)
 
 
