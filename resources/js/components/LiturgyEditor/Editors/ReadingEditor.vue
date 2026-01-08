@@ -35,7 +35,7 @@
         </div>
         <form-textarea v-model="editedElement.data.intro" label="Hinführung zur Lesung" class="mb-1" />
         <form-bible-reference-input v-model="editedElement.data.reference" :sources="textSources" />
-        <div :key="editedElement.data.reference" v-if="editedElement.data.reference?.includes('[Eigener Text]')">
+        <div :key="editedElement.data.reference" v-if="editedElement.data.reference ? editedElement.data.reference.includes('[Eigener Text]') : false">
             <form-textarea v-model="editedElement.data.customText" label="Eigener Text" />
             <form-input v-model="editedElement.data.customSource" label="Eigene Quellenangabe" />
         </div>
