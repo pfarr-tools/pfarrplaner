@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.0.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.2...v2026.0.3) (2026-01-08)
+
+
+### Bug Fixes
+
+* Abkündigungen enthalten den Gottesdienst selbst ([1fb6c94](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1fb6c94d90e51e62d9d9452e1723087e4bc3b6af))
+* Digitales Liedblatt produziert Fehler, wenn kein Psalm gewählt wurde. ([4da555a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4da555af90faf88d8478729716d42fd3c405660d))
+* Dropdown-Menü für Bibelübersetzung bleibt offen ([3c250c3](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3c250c3ff88f1790b7deec79df9e93f9d2d01e99))
+* Kalender wird für manche Orte nicht angezeigt. ([58d282b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/58d282b05a47bf88c8cf095475d6df1879e7817c))
+* Migration schlägt unter MySQL fehl. ([09ee520](https://codeberg.org/pfarr.tools/pfarrplaner/commit/09ee520132574c275e5cac723644280e7795dd2a))
+* Schriftlesung kann nicht eingegeben werden ([c8afb53](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c8afb53e37bb8923b898b8b5ffacd6b36cdb6b71))
+* WebBuilder bringt Fehlermeldung, wenn kein adChannelCode gesetzt ist ([b77c67d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b77c67ddac086e283fbdf9518499ff419dbef3d3))
+
 ### [2026.0.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.1...v2026.0.2) (2026-01-07)
 
 
