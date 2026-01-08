@@ -90,6 +90,7 @@ class Announcements
             ->between($service->date->copy()->addHour(1), $nextWeek)
             ->whereHas('service', function ($query) use ($service, $city, $excludeRegularWeekly) {
                 $query->withoutGlobalScope(ServicesOnlyScope::class);
+                $query->where('id', '!=', $service->id);
                 $query->inCity($city)->displayable($service->date);
                 if ($excludeRegularWeekly ?? false) {
                     // do not include events that are (1) not services and (2) repeat every week
