@@ -206,7 +206,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
             })->orderBy('start');
 
         if ($data['limit'] ?? null) $eventQuery->limit($data['limit']);
-        if ($data['adChannelCode']) {
+        if ($data['adChannelCode'] ?? false) {
             $eventQuery->adRunningAt($data['adChannelCode'], $start);
         }
 
