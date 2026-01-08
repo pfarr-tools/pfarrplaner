@@ -22,7 +22,7 @@ return new class extends Migration
         });
 
         Schema::table('services', function ($table) {
-            $table->text('ad_text')->nullable()->default('');
+            $table->text('ad_text')->nullable();
         });
     }
 
