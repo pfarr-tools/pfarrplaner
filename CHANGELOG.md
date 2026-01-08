@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.0.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.4...v2026.0.5) (2026-01-08)
+
+
+### Bug Fixes
+
+* Fehlende Liturgieinformationen verursachen Fehlermeldung ([2d96834](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2d9683480562c919e2a68740c2b5332e5bb61d9f))
+
 ### [2026.0.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.3...v2026.0.4) (2026-01-08)
 
 
