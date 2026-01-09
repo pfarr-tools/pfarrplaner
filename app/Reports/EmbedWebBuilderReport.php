@@ -46,7 +46,9 @@ use App\Models\Tag;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View as ViewFacade;
@@ -89,7 +91,6 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         'limit' => 'nullable|int',
         'cors-origin' => 'required|url',
         'template' => 'required|string',
-        'maxBaptisms' => 'nullable|int',
         'adChannelCode' => 'nullable|string',
     ];
 
@@ -115,7 +116,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
     }
 
     /**
-     * @return \Inertia\Response
+     * @return JsonResponse
      */
     public function setup()
     {
@@ -133,20 +134,38 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
      */
     public function render(Request $request)
     {
-        $data = $request->validate($this->validationRules);
+        $data = $request->validate($this->getFullValidationRules($request, true));
 
         $data['report'] = 'WebBuilder';
         $corsOrigin = $data['cors-origin'];
         unset($data['cors-origin']);
+        if (isset($data['options'])) {
+            $data = array_merge($data, $data['options']);
+            unset($data['options']);
+        }
 
         $url = URL::signedRoute('embed.report', $data).'&cors-origin='.urlencode($corsOrigin);
         $randomId = uniqid();
 
         $html = ViewFacade::make('reports.embedservicetable.render', compact('url', 'randomId'))->render();
         $title= 'HTML-Code für Veranstaltungswerbung erstellen';
-        return Inertia::render('Report/EmbedServiceTable/Render', compact('html', 'title'));
+        //return Inertia::render('Report/EmbedServiceTable/Render', compact('html', 'title'));
+
+        return response()->json(['html' => $html, 'url' => $url, 'randomId' => $randomId]);
     }
 
+
+    protected function getFullValidationRules(Request $request, bool $addOptions = false): array {
+        $validationRules = $this->validationRules;
+        if ($request->has('template')) {
+            $layouts = collect($this->getAvailableLayouts())->keyBy('id')->toArray();
+            list($thisLayout, $thisTemplate) = explode('.', $request->get('template'));
+            foreach (Arr::get($layouts, $thisLayout.'.templates.'.$thisTemplate.'.fields', []) as $fieldKey => $field) {
+                if ($field['rules'] ?? false) $validationRules[($addOptions ? 'options.' : '').$fieldKey] = $field['rules'];
+            }
+        }
+        return $validationRules;
+    }
 
     public function embed(Request $request)
     {
@@ -154,7 +173,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
             abort(401);
         }
 
-        $validator = Validator::make($request->all(), $this->validationRules);
+        $validator = Validator::make($request->all(), $this->getFullValidationRules($request));
         if ($validator->fails()) abort(404);
         $data = $validator->validated();
 

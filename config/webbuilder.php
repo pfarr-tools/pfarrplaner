@@ -35,10 +35,45 @@ return [
             'id' => 'neo',
             'name' => 'Layout Neo',
             'templates' => [
-                'events' => 'Alle Veranstaltungen',
-                'services' => 'Gottesdienste',
-                'baptisms' => 'Taufgottesdienste',
-                'triple-feature' => 'Features auf der Startseite',
+                'events' => [
+                    'name' => 'Alle Veranstaltungen',
+                ],
+                'services' => [
+                    'name' => 'Gottesdienste',
+                ],
+                'baptisms' => [
+                    'name' => 'Taufgottesdienste',
+                    'fields' => [
+                        'suppressTitle' => [
+                            'label' => 'Maximale Anzahl Taufen pro Gottesdienst',
+                            'type' => 'number',
+                            'rules' => 'nullable|int|min:1',
+                        ],
+                    ]
+                ],
+                'triple-feature' => [
+                    'name' => 'Features auf der Startseite',
+                ],
+                'event-ul' => [
+                    'name' => 'Einfache Terminaufzählung',
+                    'fields' => [
+                        'suppressTitle' => [
+                            'label' => 'Veranstaltungstitel nicht anzeigen, wenn er so lautet:',
+                            'type' => 'text',
+                            'rules' => 'nullable|string',
+                        ],
+                        'suppressLocation' => [
+                            'label' => 'Veranstaltungsort nicht anzeigen, wenn er so lautet:',
+                            'type' => 'text',
+                            'rules' => 'nullable|string',
+                        ],
+                        'suppressTime' => [
+                            'label' => 'Uhrzeit der Veranstaltung nicht anzeigen, wenn sie so lautet:',
+                            'type' => 'text',
+                            'rules' => 'nullable|string',
+                        ],
+                    ],
+                ],
             ],
         ],
         [
