@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.0.7](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.6...v2026.0.7) (2026-01-09)
+
+
+### Bug Fixes
+
+* Volltext kann nicht heruntergeladen werden. ([2bde910](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2bde910b45469b631498392e2971a279ffec693b))
+* WebBuilder-Fehler, wenn nach Tags gefiltert wird ([08373dd](https://codeberg.org/pfarr.tools/pfarrplaner/commit/08373dd03baa71079a22b2d08f3049f80e2d61ca))
+
 ### [2026.0.6](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.5...v2026.0.6) (2026-01-08)
 
 
