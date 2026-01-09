@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.0.8](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.7...v2026.0.8) (2026-01-09)
+
+
+### Bug Fixes
+
+* Fehler beim Erstellen der kirchlichen Nachrichten ([aaf5e32](https://codeberg.org/pfarr.tools/pfarrplaner/commit/aaf5e3224f574d24325d7431c094b12b82b1d9b8))
+* Probleme beim Download von Word-Dokumenten ([b9ed1f5](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b9ed1f5a1989b9ea380b3a4f4dc2af71719c2e8c))
+
 ### [2026.0.7](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.6...v2026.0.7) (2026-01-09)
 
 
