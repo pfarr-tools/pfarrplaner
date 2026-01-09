@@ -243,7 +243,8 @@ class BillBoardReport extends AbstractWordDocumentReport
 
     protected function renderBibleText($start)
     {
-        if($liturgy = LiturgyService::getLiturgyInfoByDate($start)) {
+        if(($liturgy = LiturgyService::getLiturgyInfoByDate($start)) && (isset($liturgy[0]))) {
+            $liturgy = $liturgy[0];
             $this->renderParagraph(static::HEADING1, [['Wochenspruch:', ['size' => 18, 'color' => '#0070c0']]]);
             $this->renderParagraph(static::HEADING1, [[$liturgy['Wochenspruch']['Text'], ['size' => 16, 'color' => '#0070c0']]]);
             $this->renderParagraph(static::HEADING1, [[ReferenceParser::getInstance()->beautify($liturgy['Wochenspruch']['Bibelstelle']), ['size' => 12, 'color' => '#0070c0']]]);
@@ -340,7 +341,7 @@ class BillBoardReport extends AbstractWordDocumentReport
                 }
                 $this->renderParagraph(
                     static::INDENT,
-                    [[$event->event->timeText() . "\t" . join('<w:br />', $line), []]]
+                    [[$event->event->timeText() . "\t" . join("\n", $line), []]]
                 );
             }
             $this->section->addTextBreak();
@@ -423,7 +424,6 @@ class BillBoardReport extends AbstractWordDocumentReport
                     $paragraph,
                     [
                         "\r" => '',
-                        "\n" => '<w:br />'
                     ]
                 )
             );
