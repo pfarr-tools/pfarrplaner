@@ -76,7 +76,6 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
 
         $doc = new DefaultA5WordDocument();
         $this->setProperties($doc);
-        $doc->setInstructionsFontStyle(['size' => 8, 'italic' => true]);
 
         // page numbers
         if ($this->config['pageNumbers']) {
@@ -106,13 +105,13 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         }
 
         // heading
-        $run = new TextRun($doc->getParagraphStyle('heading1'));
-        $run->addText($service->titleText(false), $doc->getFontStyle('heading1'));
+        $run = new TextRun();
+        $run->addText($service->titleText(false), $doc->getConfig()['styles']['fonts']['titles'][1]);
         $run->addTextBreak();
         $run->addText(
             $service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr' . ', '
             . $service->locationText(),
-            $doc->getFontStyle('heading1')
+            $doc->getConfig()['styles']['fonts']['titles'][1]
         );
         $doc->getSection()->addTitle($run, 0);
 
