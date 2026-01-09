@@ -31,6 +31,7 @@
 namespace App\Documents\Word;
 
 
+use App\Models\Service;
 use Illuminate\Support\Facades\Response;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
@@ -348,6 +349,22 @@ class DefaultWordDocument
                     'spaceAfter' => 0,
                 ];
         }
+    }
+
+    /**
+     * Render the title for a service-related document in something resembling "Heading 1"
+     */
+    public function renderServiceTitleHeading(Service $service)
+    {
+        $run = new TextRun($this->config['styles']['paragraphs']['titles'][1]);
+        $run->addText($service->titleText(false), $this->config['styles']['fonts']['titles'][1]);
+        $run->addTextBreak();
+        $run->addText(
+            $service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr' . ', '
+            . $service->locationText(),
+            $this->config['styles']['fonts']['titles'][1]
+        );
+        $this->getSection()->addTitle($run, 0);
     }
 
 

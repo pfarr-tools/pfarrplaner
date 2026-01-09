@@ -70,7 +70,6 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
 
         $doc = new DefaultWordDocument();
         $this->setProperties($doc);
-        $doc->setInstructionsFontStyle(['size' => 8, 'italic' => true]);
         $doc->getPhpWord()->addTableStyle(
             'Ablauf',
             [
@@ -81,16 +80,7 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
             ]
         );
 
-        $run = new TextRun($doc->getParagraphStyle('heading1'));
-        $run->addText($this->service->titleText(false), $doc->getFontStyle('heading1'));
-        $run->addTextBreak();
-        $run->addText(
-            $this->service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr' . ', '
-            . $this->service->locationText(),
-            $doc->getFontStyle('heading1')
-        );
-        $doc->getSection()->addTitle($run, 0);
-
+        $doc->renderServiceTitleHeading($this->service);
 
         foreach (['P', 'O', 'M', 'Schriftlesung'] as $category) {
             if (count($this->service->participantsByCategory($category))) {

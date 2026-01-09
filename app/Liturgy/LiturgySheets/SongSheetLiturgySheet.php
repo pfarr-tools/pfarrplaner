@@ -72,12 +72,7 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
         $doc = new DefaultWordDocument();
         $this->setProperties($doc);
 
-        $run = new TextRun($doc->getParagraphStyle('heading1'));
-        $run->addText($service->titleText(false), $doc->getFontStyle('heading1'));
-        $run->addTextBreak();
-        $run->addText($service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr'.', '
-                      .$service->locationText(), $doc->getFontStyle('heading1'));
-        $doc->getSection()->addTitle($run, 0);
+        $doc->renderServiceTitleHeading($service);
 
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {

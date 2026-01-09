@@ -88,8 +88,8 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
 
     protected function title(FoldedFlyerWordDocument $doc, $text, $level = 0)
     {
-        $run = new TextRun($doc->getParagraphStyle('heading'.($level+1)));
-        $run->addText($text, $doc->getFontStyle('heading'.($level+1)));
+        $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][$level+1]);
+        $run->addText($text, $doc->getConfig()['styles']['fonts']['titles'][$level+1]);
         $doc->getSection()->addTitle($run, 0);
     }
 

@@ -105,15 +105,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         }
 
         // heading
-        $run = new TextRun();
-        $run->addText($service->titleText(false), $doc->getConfig()['styles']['fonts']['titles'][1]);
-        $run->addTextBreak();
-        $run->addText(
-            $service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr' . ', '
-            . $service->locationText(),
-            $doc->getConfig()['styles']['fonts']['titles'][1]
-        );
-        $doc->getSection()->addTitle($run, 0);
+        $doc->renderServiceTitleHeading($service);
 
         foreach ($service->liturgyBlocks as $block) {
             $doc->getSection()->addTitle($block->title, 1);

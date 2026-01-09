@@ -58,7 +58,6 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
 
         $doc = new DefaultWordDocument();
         $this->setProperties($doc);
-        $doc->setInstructionsFontStyle(['size' => 8, 'italic' => true]);
 
 
         // heading

@@ -92,7 +92,6 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
         $doc = new DefaultWordDocument();
         $this->setProperties($doc);
-        $doc->setInstructionsFontStyle(['size' => 8, 'italic' => true]);
         $doc->getPhpWord()->addTableStyle('Ablauf', ['borderSize' => 6, 'borderColor' => '444444', 'cellMargin' => 80, 'alignment' => JcTable::START]);
 
         if (count($this->config['recipients'])) {
@@ -144,11 +143,11 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
     }
 
     protected function renderLiturgyTable(DefaultWordDocument $doc, $recipient = '') {
-        $run = new TextRun($doc->getParagraphStyle('heading1'));
-        $run->addText($this->service->titleText(false), $doc->getFontStyle('heading1'));
+        $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][1]);
+        $run->addText($this->service->titleText(false), $doc->getConfig()['styles']['fonts']['titles'][1]);
         $run->addTextBreak();
         $run->addText($this->service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr'.', '
-                      .$this->service->locationText(), $doc->getFontStyle('heading1'));
+                      .$this->service->locationText(), $doc->getConfig()['styles']['fonts']['titles'][1]);
         $doc->getSection()->addTitle($run, 0);
 
         if (!$this->config['includeTable']) return;

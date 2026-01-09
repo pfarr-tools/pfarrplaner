@@ -65,7 +65,6 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
 
         $doc = new DefaultFoldedBooklet();
         $this->setProperties($doc);
-        $doc->setInstructionsFontStyle(['size' => 8, 'italic' => true]);
 
         $names = collect();
 
