@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.1.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.8...v2026.1.0) (2026-01-09)
+
+
+### Features
+
+* Erweiterungen im WebBuilder ([71dc390](https://codeberg.org/pfarr.tools/pfarrplaner/commit/71dc39043084370671da2f03253b7187e634073c))
+
 ### [2026.0.8](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.7...v2026.0.8) (2026-01-09)
 
 
