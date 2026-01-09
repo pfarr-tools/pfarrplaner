@@ -85,6 +85,9 @@ class BillBoardReport extends AbstractWordDocumentReport
     public const FILE_TITLE = 'Kirchliche Nachrichten';
 
 
+    protected $useDefaultDocument = true;
+
+
     /**
      * @var string
      */
@@ -214,13 +217,13 @@ class BillBoardReport extends AbstractWordDocumentReport
 
 
         $cityTitle = $data['altCity'] ?? $cities->pluck('name')->join(', ', ' und ');
-        $this->renderParagraph(static::HEADING1, [['Kirchliche Nachrichten '.$cityTitle, ['size' => 27]]]);
+        $this->doc->renderParagraph(static::HEADING1, [['Kirchliche Nachrichten '.$cityTitle, ['size' => 27]]]);
         $this->renderBibleText($start);
         $this->section->addTextBreak(2);
 
         if ($firstService->announcements) {
             foreach (explode("\n", str_replace("\r", '', $firstService->announcements)) as $announcement) {
-                $this->renderParagraph(static::DEFAULT, [[$announcement, []]]);
+                $this->doc->renderParagraph(static::DEFAULT, [[$announcement, []]]);
             }
             $this->section->addTextBreak(2);
         }
@@ -245,9 +248,9 @@ class BillBoardReport extends AbstractWordDocumentReport
     {
         if(($liturgy = LiturgyService::getLiturgyInfoByDate($start)) && (isset($liturgy[0]))) {
             $liturgy = $liturgy[0];
-            $this->renderParagraph(static::HEADING1, [['Wochenspruch:', ['size' => 18, 'color' => '#0070c0']]]);
-            $this->renderParagraph(static::HEADING1, [[$liturgy['Wochenspruch']['Text'], ['size' => 16, 'color' => '#0070c0']]]);
-            $this->renderParagraph(static::HEADING1, [[ReferenceParser::getInstance()->beautify($liturgy['Wochenspruch']['Bibelstelle']), ['size' => 12, 'color' => '#0070c0']]]);
+            $this->doc->renderParagraph(static::HEADING1, [['Wochenspruch:', ['size' => 18, 'color' => '#0070c0']]]);
+            $this->doc->renderParagraph(static::HEADING1, [[$liturgy['Wochenspruch']['Text'], ['size' => 16, 'color' => '#0070c0']]]);
+            $this->doc->renderParagraph(static::HEADING1, [[ReferenceParser::getInstance()->beautify($liturgy['Wochenspruch']['Bibelstelle']), ['size' => 12, 'color' => '#0070c0']]]);
         }
     }
 
@@ -269,7 +272,7 @@ class BillBoardReport extends AbstractWordDocumentReport
             if (in_array($title, $rendered)) continue;
             $rendered[] = $title;
 
-            $this->renderParagraph(static::DEFAULT, [[$title, ['size' => 22]]]);
+            $this->doc->renderParagraph(static::DEFAULT, [[$title, ['size' => 22]]]);
 
             $pastors = collect();
             foreach ($parishes as $parish) {
@@ -283,8 +286,8 @@ class BillBoardReport extends AbstractWordDocumentReport
                         'wrappingStyle' => 'tight',
                     ]);
                     $firstPastor = $parish->users->first();
-                    $this->renderParagraph(static::DEFAULT, [[trim(explode("\r\n", $firstPastor->address)[0]), []]]);
-                    $this->renderParagraph(static::DEFAULT, [['Telefon ' . $firstPastor->phone, []]]);
+                    $this->doc->renderParagraph(static::DEFAULT, [[trim(explode("\r\n", $firstPastor->address)[0]), []]]);
+                    $this->doc->renderParagraph(static::DEFAULT, [['Telefon ' . $firstPastor->phone, []]]);
                 }
 
                 $emails = [];
@@ -296,11 +299,11 @@ class BillBoardReport extends AbstractWordDocumentReport
                 if ($parish->email) {
                     $emails[] = $parish->email;
                 }
-                $this->renderParagraph(static::INDENT, [["E-Mail:\t" . join('<w:br/>', $emails), []]]);
-                $this->renderParagraph(static::INDENT, [["Homepage:\t" . parse_url($city->homepage, PHP_URL_HOST), []]]);
+                $this->doc->renderParagraph(static::INDENT, [["E-Mail:\t" . join('<w:br/>', $emails), []]]);
+                $this->doc->renderParagraph(static::INDENT, [["Homepage:\t" . parse_url($city->homepage, PHP_URL_HOST), []]]);
                 if ($parish->opening_hours) {
-                    $this->renderParagraph(static::DEFAULT, [['Sprechzeiten im Pfarrbüro'.($parish->assistant ? ', '.$parish->assistant : ''), []]]);
-                    $this->renderParagraph(static::DEFAULT, [[$parish->opening_hours, []]], 1);
+                    $this->doc->renderParagraph(static::DEFAULT, [['Sprechzeiten im Pfarrbüro'.($parish->assistant ? ', '.$parish->assistant : ''), []]]);
+                    $this->doc->renderParagraph(static::DEFAULT, [[$parish->opening_hours, []]], 1);
                 }
             }
 
@@ -313,13 +316,13 @@ class BillBoardReport extends AbstractWordDocumentReport
         if (!count($events)) {
             return;
         }
-        $this->renderParagraph(static::DEFAULT, [['Termine', static::BOLD]], 2);
+        $this->doc->renderParagraph(static::DEFAULT, [['Termine', static::BOLD]], 2);
         foreach ($events as $dayEvents) {
             $title = $dayEvents->first()->start->isoFormat('dddd, DD. MMMM') . ' ';
             if ($dayEvents->first()->event->liturgicalInfo['title'] ?? false) {
                 $title .= ' - ' . $dayEvents->first()->event->liturgicalInfo['title'] . ' - ';
             }
-            $this->renderParagraph(static::DEFAULT, [[trim($title), static::BOLD]]);
+            $this->doc->renderParagraph(static::DEFAULT, [[trim($title), static::BOLD]]);
             foreach ($dayEvents as $event) {
                 $line = [
                     htmlspecialchars($event->event->titleText(false, false)) . (count(
@@ -339,7 +342,7 @@ class BillBoardReport extends AbstractWordDocumentReport
                     if ($event->event->offering_goal) $line[] = 'Opfer: ' . $event->event->offering_goal;
                     $line[] = '';
                 }
-                $this->renderParagraph(
+                $this->doc->renderParagraph(
                     static::INDENT,
                     [[$event->event->timeText() . "\t" . join("\n", $line), []]]
                 );
@@ -355,7 +358,7 @@ class BillBoardReport extends AbstractWordDocumentReport
         }
         /** @var Absence $absence */
         foreach ($absences as $absence) {
-            $this->renderParagraph(static::DEFAULT, [[$absence->descriptiveText, []]], 1);
+            $this->doc->renderParagraph(static::DEFAULT, [[$absence->descriptiveText, []]], 1);
         }
     }
 
@@ -374,60 +377,4 @@ class BillBoardReport extends AbstractWordDocumentReport
     }
 
 
-    /**
-     * @param string $template
-     * @param array $blocks
-     * @param int $emptyParagraphsAfter
-     * @param null $existingTextRun
-     * @return TextRun|null
-     */
-    protected function renderParagraph(
-        $template = '',
-        array $blocks = [],
-        $emptyParagraphsAfter = 0,
-        $existingTextRun = null
-    ) {
-        $textRun = $existingTextRun ?: $this->section->addTextRun($template);
-        foreach ($blocks as $block) {
-            $textRun->addText($block[0], $block[1] ?? []);
-        }
-        for ($i = 0; $i < $emptyParagraphsAfter; $i++) {
-            $textRun = $this->section->addTextRun($template);
-        }
-        return $textRun;
-    }
-
-
-    /**
-     * @param $text
-     */
-    protected function renderLiteral($text)
-    {
-        if (!is_array($text)) {
-            $text = [$text];
-        }
-        foreach ($text as $paragraph) {
-            switch (substr($paragraph, 0, 1)) {
-                case '*':
-                    $format = static::BOLD;
-                    $paragraph = substr($paragraph, 1);
-                    break;
-                case '_':
-                    $format = static::UNDERLINE;
-                    $paragraph = substr($paragraph, 1);
-                    break;
-                default:
-                    $format = [];
-            }
-            $paragraph = trim(
-                strtr(
-                    $paragraph,
-                    [
-                        "\r" => '',
-                    ]
-                )
-            );
-            $this->renderParagraph(static::NO_INDENT, [[$paragraph, $format]], 1);
-        }
-    }
 }
