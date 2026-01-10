@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.2.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.1.0...v2026.2.0) (2026-01-10)
+
+
+### Features
+
+* Ausführende Personen im Volltext anzeigen ([c551111](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c5511119da89af04affaf7ec9ada4bc6893620d2))
+
 ## [2026.1.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.0.8...v2026.1.0) (2026-01-09)
 
 
