@@ -264,10 +264,10 @@ class DefaultWordDocument
                     // highlight for current recipient
                     $textRun->addText(
                         $keyWord . "\t",
-                        array_merge($this->getInstructionsFontStyle(), ['fgColor' => 'yellow'])
+                        array_merge(['size' => 8, 'italic' => true, 'bold' => false], ['fgColor' => 'yellow'])
                     );
                 } else {
-                    $textRun->addText($keyWord . "\t", $this->getInstructionsFontStyle());
+                    $textRun->addText($keyWord . "\t", ['size' => 8, 'italic' => true, 'bold' => false]);
                 }
                 if (trim($paragraph)) {
                     $this->renderWithLineBreaks($textRun, $paragraph, $fontOption);

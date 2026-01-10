@@ -45,6 +45,7 @@ use PhpOffice\PhpWord\Element\Footer;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Shared\Html;
+use PhpOffice\PhpWord\Style\Tab;
 
 class FullTextLiturgySheet extends AbstractLiturgySheet
 {
@@ -62,6 +63,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         'includeSongTexts' => 1,
         'includeFullReadings' => 1,
         'includeQR' => 1,
+        'includeRecipients' => 1,
         'pageNumbers' => 1,
     ];
 
@@ -74,7 +76,20 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
     {
         $this->service = $service;
 
-        $doc = new DefaultA5WordDocument();
+        $doc = new DefaultA5WordDocument([
+            'styles' => [
+                'paragraphs' => [
+                    'titles' => [
+                        2 => [
+                            'tabs' => [
+                                new Tab('right', Converter::cmToTwip(12)),
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+                                         ]);
+
         $this->setProperties($doc);
 
         // page numbers
@@ -110,7 +125,16 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         foreach ($service->liturgyBlocks as $block) {
             $doc->getSection()->addTitle($block->title, 1);
             foreach ($block->items as $item) {
-                $doc->getSection()->addTitle($item->title, 2);
+                $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][2]);
+                $run->addText($item->title, $doc->getConfig()['styles']['fonts']['titles'][2]);
+                if ($this->config['includeRecipients']) {
+                    $run->addText(
+                        "\t".join(', ', $item->recipients()),
+                        ['name' => 'Sarabun Light', 'size' => 8, 'bold' => false, 'italic' => true]
+                    );
+                }
+
+                $doc->getSection()->addTitle($run, 2);
                 if (method_exists($this, ($method = 'render' . ucfirst($item->data_type . 'Item')))) {
                     $this->$method($doc, $item);
                 }

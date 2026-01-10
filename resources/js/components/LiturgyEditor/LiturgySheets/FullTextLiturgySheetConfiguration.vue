@@ -33,6 +33,7 @@
             <legend>Folgende Inhalte mit einschließen:</legend>
             <form-check label="Komplette Liedtexte" v-model="myConfig.includeSongTexts" name="config[includeSongTexts]"/>
             <form-check label="Komplette Schriftlesungen" v-model="myConfig.includeFullReadings" name="config[includeFullReadings]"/>
+            <form-check label="Ausführende Personen" v-model="myConfig.includeRecipients" name="config[includeRecipients]"/>
             <form-check v-if="service.city.konfiapp_apikey"
                 label="QR-Code für KonfiApp" v-model="myConfig.includeFullReadings" name="config[includeQR]"/>
         </fieldset>
