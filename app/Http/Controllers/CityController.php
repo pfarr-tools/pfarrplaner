@@ -43,6 +43,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 /**
@@ -116,7 +117,7 @@ class CityController extends AbstractCRUDController
      * @return \Inertia\Response
      */
     public function qr(Request $request, $city) {
-        $city = City::where('name', 'like', '%' . str_replace('-', ' ', $city) . '%')->first();
+        $city = City::where('name', 'like', '%' . Str::replace(['-', 'ae', 'oe', 'ue'], [' ', 'ä', 'ö', 'ü'], $city) . '%')->first();
         $services = Service::where('city_id', $city->id)->whereDate('date', Carbon::now()->setTime(0,0,0))
             ->whereNotNull('konfiapp_event_qr')->get();
         $types = KonfiAppIntegration::get($city)->listEventTypes();
