@@ -33,13 +33,12 @@
         @for($i=0; $i<$copies; $i++)
             <div class="container" @if($loop->last) style="page-break-after: always;" @endif>
                 <p style="font-weight: bold">{{ $service->title ?: 'Gottesdienst' }}<br/>
-                    am {{ $service->date->format('d.m.Y') }} um {{ $service->timeText() }}
-                    <br/>{{ $service->locationText() }}</p>
+                    <span style="font-size: .8em;">am {{ $service->date->format('d.m.Y') }} um {{ $service->timeText() }}</span></p>
                 <p>
                     Alle Spenden zum heutigen Gottesdienst sind für:<br />
-                    <b>{{ $service->offering_goal }}</b>
+                    <b>{{ $service->offering_goal ?: 'Unsere Kirchengemeinde'}}</b>
                 </p>
-                <p>Scanne den folgenden Code mit deiner Online-Banking-App, um per Überweisung zu spenden:</p>
+                <p style="font-size: .8em;">Scanne den folgenden Code mit deiner Online-Banking-App, um per Überweisung zu spenden:</p>
                 <p>
                     <img src="{{ route('qrcode', \App\Services\GiroCodeService::codeValue(
                         $service->city->official_name ?: 'Evangelische Kirchengemeinde '.$service->city->name,
