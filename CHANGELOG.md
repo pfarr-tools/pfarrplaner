@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.3.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.2.0...v2026.3.0) (2026-01-12)
+
+
+### Features
+
+* Verbesserungen am GiroCodeReport ([69e23af](https://codeberg.org/pfarr.tools/pfarrplaner/commit/69e23afb91735b3645a24b66ca7ac660b858ffc5))
+
+
+### Bug Fixes
+
+* Dienstplan für einzelne Dienste berücksichtigt GlobalScope nicht ([290e5de](https://codeberg.org/pfarr.tools/pfarrplaner/commit/290e5deccde5b1ea0bfe8d740f281c5d68947ce8))
+* Mehrere Fehler bei ServiceTableReport ([c0c39ec](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c0c39ecd18362f0467cba0b9d48a0b1e4d10479d))
+* QR Code nicht gefunden für Ortsnamen mit Umlauten ([b011dba](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b011dba3fec924957a2f60c323eee762fd67e69e))
+* UserEditor speichert Einstellungen erst bei der 2. Bearbeitung ([e49cfb7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e49cfb7e414e31df54cebb5ad33bd938459be932))
+
 ## [2026.2.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.1.0...v2026.2.0) (2026-01-10)
 
 
