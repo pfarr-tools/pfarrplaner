@@ -124,10 +124,10 @@ export default {
     },
     props: ['availableTabs', 'homeScreenTabsConfig', 'cities', 'locations', 'ministries', 'settings', 'thirdParty', 'moduleGroups'],
     created() {
-        if (!this.settings.homeScreen) this.settings.homeScreen = 'homescreen:configurable';
-        if (!this.settings.homeScreenConfig) this.settings.homeScreenConfig = {};
-        if (!this.settings.homeScreenConfig.wizardButtons) this.settings.homeScreenConfig.wizardButtons = false;
-        if (!this.settings.homeScreenConfig.showReplacements) this.settings.homeScreenConfig.showReplacements = false;
+        if (undefined === this.settings.homeScreen) this.settings.homeScreen = 'homescreen:configurable';
+        if (undefined === this.settings.homeScreenConfig) this.settings.homeScreenConfig = {};
+        if (undefined === this.settings.homeScreenConfig.wizardButtons) this.settings.homeScreenConfig.wizardButtons = false;
+        if (undefined === this.settings.homeScreenConfig.showReplacements) this.settings.homeScreenConfig.showReplacements = false;
     },
     data() {
         if (!this.homeScreenTabsConfig.tabs) this.homeScreenTabsConfig.tabs = [];

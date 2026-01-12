@@ -167,7 +167,7 @@
                 <home-screen-configuration-tab :available-tabs="availableTabs" :cities="cities"
                                                :home-screen-tabs-config="mySettings.homeScreenTabsConfig"
                                                :locations="locations" :ministries="ministries"
-                                               :settings="settings" third-party="1" :module-groups="modules"/>
+                                               :settings="mySettings" third-party="1" :module-groups="modules"/>
             </tab>
             <tab v-if="myUser.isOfficialUser" id="settings" :active-tab="activeTab">
                 <div v-if="!riskTaker" class="alert alert-warning">
@@ -295,15 +295,38 @@ export default {
         myUser.vacation_admins = this.reduceToIds(myUser.vacation_admins);
         myUser.vacation_approvers = this.reduceToIds(myUser.vacation_approvers);
 
+
+        const raw = this.settings
+        // Normalize: treat null/undefined/[] as "no settings"
+        let mySettings =
+            raw && !Array.isArray(raw) && typeof raw === 'object'
+                ? { ...raw }
+                : {}
         // create empty settings for new users
-        this.settings.homeScreenTabsConfig = this.settings.homeScreenTabsConfig || {tabs: []}
+        mySettings = {
+            homeScreen: 'homescreen:configurable',
+            homeScreenConfig: {
+                wizardButtons: false,
+                showReplacements: false,
+            },
+            homeScreenTabsConfig: {
+                tabs: [],
+            },
+            ...mySettings,
+        }
+
+        mySettings.homeScreen = mySettings.homeScreen || 'homescreen:configurable';
+        mySettings.homeScreenConfig = mySettings.homeScreenConfig || {};
+        mySettings.homeScreenConfig.wizardButtons = mySettings.homeScreenConfig.wizardButtons || false;
+        mySettings.homeScreenConfig.showReplacements = mySettings.homeScreenConfig.wizardButtons || false;
+        mySettings.homeScreenTabsConfig = mySettings.homeScreenTabsConfig || {tabs: []}
 
         // create empty modules setting
-        if (!this.settings.modules) {
-            this.settings.modules = {};
+        if (undefined === mySettings.modules) {
+            mySettings.modules = {};
             for (const group in this.modules) {
                 this.modules[group].forEach(module => {
-                    this.settings.modules[module.key] = 1;
+                    mySettings.modules[module.key] = 1;
                 });
             }
         }
@@ -331,13 +354,14 @@ export default {
             mySubscriptions[city.id] = mySubscriptions[city.id] || {subscription_type: 0};
         })
 
+
         return {
             myUser,
             cityPermission,
             justCreated: false,
             mySubscriptions,
             riskTaker: false,
-            mySettings: this.settings,
+            mySettings,
             editSetting: null,
             emailChanged: 0,
         }

@@ -355,6 +355,7 @@ class UserController extends Controller
     public function update(UserRequest $request, User $user)
     {
         $data = $request->validated();
+
         $user->update($data);
         if (($user->email == '') && ($user->password != '')) {
             // this only works with a raw query!
