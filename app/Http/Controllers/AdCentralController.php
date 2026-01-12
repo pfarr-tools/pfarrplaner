@@ -28,33 +28,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+namespace App\Http\Controllers;
 
-return [
-    'images' => [
-        'cuts' => [
-            'Bildschirm (4x3)' => [1024, 768],
-            'Bildschirm (16x9)' => [1920, 1080],
-            'CommuniApp' => [550,275],
-            'Quadratisch' => [1024, 1024],
-            'Story' => [1080, 1920],
-        ]
-    ],
-    'channels' => [
-        'bekanntgaben' => [
-            'name' => 'Bekanntgaben: extra Text',
-        ],
-        'communiapp' => [
-            'name' => 'CommuniApp: eigene Veranstaltung',
-            'depends_on' => 'communiapp_token',
-        ],
-        'newsletter' => [
-            'name' => 'Newsletter: Feature (Bild + Text)',
-        ],
-        'ppt' => [
-            'name' => 'Powerpoint: extra Folie',
-        ],
-        'story' => [
-            'name' => 'Als Story posten',
-        ]
-    ],
-];
+use App\Http\Controllers\Controller;
+use App\Models\Calendar\Occurence;
+use App\Models\Scopes\ServicesOnlyScope;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+
+class AdCentralController extends Controller
+{
+
+    public function stories(Request $request)
+    {
+        $userId = null;
+        if (!$request->user()) {
+            if ($request->has('user')) $userId = $request->get('user');
+        } else {
+            $userId = $request->user()->id;
+        }
+
+        $events = Occurence::with('service')
+            ->withoutGlobalScope(ServicesOnlyScope::class)
+            ->adRunningAt('story', Carbon::now())
+            ->get();
+
+
+        $events->map(function($item) {
+            $item->service->adConfigs->filter(fn($item) => $item->slug == 'story');
+            $item->adStart = $item->start->copy()->subDays($item->service->adConfigs[0]->offset)->startOfDay();
+            return $item;
+        });
+
+        return view('adcentral.stories', compact('events'));
+    }
+
+}

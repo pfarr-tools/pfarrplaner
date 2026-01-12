@@ -29,32 +29,4 @@
  */
 
 
-return [
-    'images' => [
-        'cuts' => [
-            'Bildschirm (4x3)' => [1024, 768],
-            'Bildschirm (16x9)' => [1920, 1080],
-            'CommuniApp' => [550,275],
-            'Quadratisch' => [1024, 1024],
-            'Story' => [1080, 1920],
-        ]
-    ],
-    'channels' => [
-        'bekanntgaben' => [
-            'name' => 'Bekanntgaben: extra Text',
-        ],
-        'communiapp' => [
-            'name' => 'CommuniApp: eigene Veranstaltung',
-            'depends_on' => 'communiapp_token',
-        ],
-        'newsletter' => [
-            'name' => 'Newsletter: Feature (Bild + Text)',
-        ],
-        'ppt' => [
-            'name' => 'Powerpoint: extra Folie',
-        ],
-        'story' => [
-            'name' => 'Als Story posten',
-        ]
-    ],
-];
+Route::get('werbung/stories', [\App\Http\Controllers\AdCentralController::class, 'stories'])->name('adcentral.stories')->middleware([]);
