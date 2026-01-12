@@ -402,14 +402,14 @@ class ServiceTableReport extends AbstractExcelDocumentReport
 
 
                 $richtext = new RichText();
-                $textrun = $richtext->createTextRun(strftime('%A,', $service->date->getTimestamp()));
+                $textrun = $richtext->createTextRun($service->date->isoFormat('dddd, '));
                 $textrun->getFont()->setName('Arial')->setSize(8)->setBold(true);
                 $richtext->createText("\n" . $service->date->format('d.m.Y'));
                 $sheet->getCell($this->cellAddress('A', $row, $cities))->setValue($richtext);
                 if (count($cities) > 1) {
                     $sheet->setCellValue("B{$row}", $service->city->name);
                 }
-                $sheet->setCellValue($this->cellAddress('B', $row, $cities), $liturgy['Bezeichnung'] ?: '');
+                $sheet->setCellValue($this->cellAddress('B', $row, $cities), $liturgy['Bezeichnung'] ?? '');
                 $sheet->setCellValue($this->cellAddress('C', $row, $cities), $service->descriptionText());
                 $sheet->setCellValue($this->cellAddress('D', $row, $cities), $service->timeText(false));
                 $sheet->setCellValue($this->cellAddress('E', $row, $cities), $service->locationText());
@@ -446,11 +446,11 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                 // COLORS:
                 // red for "Konfirmation" / "Konfirmandenabendmahl"
                 if ($service->hasDescription('Konfirmation') || $service->hasDescription('Konfirmandenabendmahl')) {
-                    $liturgy['litColor'] = 'red';
+                    $liturgy['CSS-Farbe'] = 'red';
                 }
                 // liturgical color
                 $sheet->getStyle($this->cellAddress('B', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()->setARGB($colors[$liturgy['litColor']]);
+                    ->getStartColor()->setARGB($colors[$liturgy['CSS-Farbe'] ?? 'white'] ?? 'ffffffff');
 
                 // yellow for special location
                 if (!is_object($service->location)) {
