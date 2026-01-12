@@ -31,6 +31,7 @@
 namespace App\Reports;
 
 use App\Models\People\Participant;
+use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
@@ -106,6 +107,7 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         $data['ministries'] = $ministries;
 
         $services = Service::with(['location'])
+            ->where('event_class', 'service') // I wonder why the global scope doesn't work here?
             ->between(Carbon::parse($data['start']), Carbon::parse($data['end']))
             ->whereDoesntHave('funerals')
             ->whereDoesntHave('weddings')
