@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.4.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.3.0...v2026.4.0) (2026-01-13)
+
+
+### Features
+
+* Bekanntgaben-AutoAttachment ausblenden, wenn "Schriftlesung und Abkündigungen" verfügbar ist ([eee8617](https://codeberg.org/pfarr.tools/pfarrplaner/commit/eee8617fd78c00182a7c412107136007fdd99e03))
+
+
+### Bug Fixes
+
+* Bekanntgaben-AutoAttachment produziert Fehler 500 ([23265e8](https://codeberg.org/pfarr.tools/pfarrplaner/commit/23265e87201810345bdfdef76b7923fce97f47c5))
+* Falsche URL ([89c4e5a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/89c4e5abf07bf98e710e2ce8504e408930ded83a))
+* FormBibleReferenceInput sollte standardmässig keine "eigene Version" erlauben ([4683d09](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4683d091da3f64f94b2b764823560df8892970a1))
+* Taufspruch wird nicht angezeigt ([d05eabf](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d05eabfec15eba392c22483fe38cb9a9173bcd60))
+
 ## [2026.3.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.2.0...v2026.3.0) (2026-01-12)
 
 
