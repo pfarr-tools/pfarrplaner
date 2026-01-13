@@ -16,7 +16,7 @@
 @if($includeHeader)
 <h1>Dienstplan für {{ join(', ', $ministries) }}</h1>
 <b>Von {{ $start }} bis {{ $end }}</b>
-<p><small>Stand: {{ \Carbon\Carbon::now()->setTimezone('Europe/Berlin')->format('d.m.Y H:i') }} Uhr. Immer aktuell auf <a href="https://www.pfarrplaner.de">www.pfarrplaner.de</a></small></p>
+<p><small>Stand: {{ \Carbon\Carbon::now()->setTimezone('Europe/Berlin')->format('d.m.Y H:i') }} Uhr. Immer aktuell auf <a href="{{ config('app.url') }}">{{ parse_url(config('app.url'), PHP_URL_HOST) }}</a></small></p>
 <hr/>
 @endif
 <table style="width: 100%">
