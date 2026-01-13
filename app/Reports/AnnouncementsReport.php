@@ -252,12 +252,13 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             ->endingAt($service->dateTime)
             ->orderedDesc()
             ->first();
-        $this->renderReport([
+        return $this->renderReport([
                                 'lastService' => $lastService->date->format('d.m.Y'),
                                 'offerings' => $lastService->offering_amount,
                                 'offering_text' => $service->offering_text,
-                                'service' => $service,
+                                'service' => $service->id,
                                 'excludeRegularWeekly' => true,
+                                'city' => $service->city_id,
                             ]);
     }
 
