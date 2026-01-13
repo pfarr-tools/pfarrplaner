@@ -119,6 +119,9 @@ export default {
             this.service.attachments.forEach(attachment => {
                 found = found || (attachment.title == 'Bekanntgaben');
             });
+            for (const sheetKey in this.liturgySheets) {
+                found = found || (sheetKey == 'Schriftlesung und Abkündigungen');
+            }
             return found;
         },
     },
