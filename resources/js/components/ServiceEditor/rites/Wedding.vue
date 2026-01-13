@@ -58,7 +58,7 @@
             </div>
             <checked-process-item :check="wedding.text" positive="Trautext" negative="Trautext noch nicht eingetragen">
                 <template slot="positive">
-                    <bible-reference title="Trautext:" :liturgy="{ ref: wedding.text }" liturgy-key="ref" inline="1" />
+                    <bible-reference title="Trautext:" :perikope="{ Bibelstelle: wedding.text }" inline="1" />
                 </template>
             </checked-process-item>
             <div v-if="wedding.spouse1_needs_dimissorial">

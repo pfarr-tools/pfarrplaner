@@ -29,9 +29,9 @@
 
 <template xmlns="http://www.w3.org/1999/html">
     <div class="bible-reference" :class="{'bible-reference-inline' : inline}" :title="text">
-        <div v-if="perikope.Bibelstelle" :key="perikope.Bibelstelle.replaceAll(' ', '_')+'Text__'+text">
-            <span v-if="title">{{ title }} </span><a v-if="perikope.URL" :href="perikope.URL"
-                   target="_blank">{{ perikope.Bibelstelle }}</a><span v-else>{{ perikope.Bibelstelle }} </span>
+        <div v-if="myPerikope.Bibelstelle" :key="myPerikope.Bibelstelle.replaceAll(' ', '_')+'Text__'+text">
+            <span v-if="title">{{ title }} </span><a v-if="myPerikope.URL" :href="myPerikope.URL"
+                   target="_blank">{{ myPerikope.Bibelstelle }}</a><span v-else>{{ myPerikope.Bibelstelle }} </span>
             <span v-if="loading" class="mdi mdi-spin mdi-loading"></span>
             <span v-if="!loading" class="mdi mdi-content-copy" @click.prevent.stop="copyToClipboard"
                   title="Klicken, um den Text in die Zwischenablage zu kopieren"></span>
@@ -43,29 +43,38 @@
 export default {
     name: "BibleReference",
     props: ['perikope', 'title', 'inline'],
+    data() {
+        let myPerikope = this.perikope;
+        if (typeof myPerikope != 'object') myPerikope = {
+            Bibelstelle: myPerikope || '',
+            URL: null,
+        }
+        if (undefined === myPerikope.Bibelstelle) myPerikope.Bibelstelle = '';
+
+        return {
+            text: '',
+            reference: {},
+            myPerikope,
+            loading: true,
+        }
+    },
+    mounted() {
+        if((undefined !== this.myPerikope.Bibelstelle) && (!(this.myPerikope.Bibelstelle || false))) {
+            axios.get(route('bible.text', {reference: this.myPerikope.Bibelstelle}))
+                .then(result => {
+                    this.text = result.data.text;
+                    this.reference = result.data.reference;
+                    console.log('returned reference');
+                    this.loading = false;
+                });
+        }
+    },
     methods: {
         copyToClipboard() {
             const cb = navigator.clipboard;
             cb.writeText(this.text+"\n("+this.reference.correctedReference+')').then(result => {});
         }
     },
-    mounted() {
-        if(this.perikope?.Bibelstelle) {
-            axios.get(route('bible.text', {reference: this.perikope.Bibelstelle}))
-                .then(result => {
-                    this.text = result.data.text;
-                    this.reference = result.data.reference;
-                    this.loading = false;
-                });
-        }
-    },
-    data() {
-        return {
-            text: '',
-            reference: {},
-            loading: true,
-        }
-    }
 }
 </script>
 

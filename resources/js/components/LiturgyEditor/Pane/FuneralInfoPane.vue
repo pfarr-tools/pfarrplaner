@@ -40,7 +40,7 @@
                           title="Klicken, um den Text in die Zwischenablage zu kopieren"></span>
                 </div>
                 <div class="col-md-2">
-                    <bible-reference v-if="funeral.text" :liturgy="liturgy" liturgy-key="funeral" title="Text:"/>
+                    <bible-reference v-if="funeral.text" :perikope="funeral.text" title="Text:"/>
                 </div>
                 <div class="col-md-3 text-end">
                     <inertia-link class="btn btn-light btn-sm"

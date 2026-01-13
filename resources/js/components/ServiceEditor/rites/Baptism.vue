@@ -65,7 +65,7 @@
             <div>
                 <checked-process-item :check="baptism.text" positive="Taufspruch" negative="Taufspruch noch nicht eingetragen">
                     <template slot="positive">
-                        <bible-reference title="Taufspruch:" :liturgy="{ ref: myBaptism.text }" liturgy-key="ref" inline="1" />
+                        <bible-reference title="Taufspruch:" :perikope="{ Bibelstelle: myBaptism.text }" inline="1" />
                     </template>
                 </checked-process-item>
             </div>

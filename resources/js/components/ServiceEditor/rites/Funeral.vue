@@ -60,7 +60,7 @@
                 <dimissorial-check-item :parent="funeral" />
                 <checked-process-item :check="(funeral.text)" negative="Predigttext noch nicht eingetragen">
                     <template slot="positive">
-                        <bible-reference title="Predigttext:" :liturgy="{ ref: funeral.text }" liturgy-key="ref" inline="1" />
+                        <bible-reference title="Predigttext:" :perikope="{ Bibelstelle: funeral.text }" inline="1" />
                     </template>
                 </checked-process-item>
                 <checked-process-item :check="(funeral.announcement)"
