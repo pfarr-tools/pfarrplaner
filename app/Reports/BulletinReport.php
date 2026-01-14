@@ -277,7 +277,7 @@ class BulletinReport extends AbstractWordDocumentReport
                     ['name' => 'Lora', 'bold' => true, 'size' => 10]
                 );
                 if (count($liturgy)) {
-                    $run->addText(' | '.$liturgy[0]->title, ['name' => 'Lora', 'bold' => true, 'size' => 8]);
+                    $run->addText(' | '.$liturgy[0]['Bezeichnung'], ['name' => 'Lora', 'bold' => true, 'size' => 8]);
                 }
             }
 
@@ -316,7 +316,7 @@ class BulletinReport extends AbstractWordDocumentReport
 
             }
 
-            $run->addText('<w:br/>');
+            $run->addTextBreak();
 
         }
 
