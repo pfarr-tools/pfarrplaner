@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.4.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.4.0...v2026.4.1) (2026-01-14)
+
+
+### Bug Fixes
+
+* Fehlende Perikopenauswahl ([6c01a13](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6c01a137f7b691713a459dcdaa313a61dd57750f))
+
 ## [2026.4.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.3.0...v2026.4.0) (2026-01-13)
 
 
