@@ -148,7 +148,7 @@ class BulletinReport extends AbstractWordDocumentReport
                     $textRun->addText($service->date->format('d.m.Y'));
                 }
                 if ($ctr == 2) {
-                    $textRun->addText(htmlspecialchars(LiturgyService::getDayInfo($service->date)['title'] ?? ''));
+                    $textRun->addText(htmlspecialchars(LiturgyService::getLiturgyInfoByDate($service->date)['Bezeichnung'] ?? ''));
                 }
                 $textRun->addText("\t");
                 $textRun->addText($service->timeText() . "\t");
@@ -213,19 +213,19 @@ class BulletinReport extends AbstractWordDocumentReport
         $table = $section->addTable('table');
 
         foreach ($serviceList as $day => $dayList) {
-            $liturgy = LiturgyService::getDayInfo($day);
+            $liturgy = LiturgyService::getLiturgyInfoByDate($day);
             /** @var Service $service */
             $first = true;
             foreach ($dayList as $service) {
                 $table->addRow();
-                $table->addCell(Converter::cmToTwip(2.5))->addText($first ? ($liturgy['title'] ?? '') : '');
+                $table->addCell(Converter::cmToTwip(2.5))->addText($first ? ($liturgy['Bezeichnung'] ?? '') : '');
                 $table->addCell(Converter::cmToTwip(1.73))->addText($first ? $service->date->format('d.m.Y') : '');
                 $table->addCell(Converter::cmToTwip(1.58))->addText($service->timeText());
                 $table->addCell(Converter::cmToTwip(2.11))->addText($service->locationText());
                 $table->addCell(Converter::cmToTwip(2.32))->addText($service->descriptionText());
                 $table->addCell(Converter::cmToTwip(3.52))->addText($service->participantsText('P', false, false));
                 $table->addCell(Converter::cmToTwip(2.25))->addText(
-                    isset($liturgy['perikope']) ? $liturgy['litTextsPerikope' . $liturgy['perikope']] : ''
+                    isset($liturgy[0]['Predigt']) ? $liturgy[0]['Predigt']['Bibelstelle'] : ''
                 );
                 $table->addCell(Converter::cmToTwip(2.5))->addText(
                     $service->offering_goal ? 'Opfer für ' . $service->offering_goal : ''
