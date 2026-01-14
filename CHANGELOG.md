@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.4.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.4.1...v2026.4.2) (2026-01-14)
+
+
+### Bug Fixes
+
+* BulletinReport produziert Fehler 500. ([4366b51](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4366b518d737ee87bbecd8b500a491c155a4920d))
+
 ### [2026.4.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.4.0...v2026.4.1) (2026-01-14)
 
 
