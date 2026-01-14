@@ -46,10 +46,10 @@
 <script>
 import TimeFields from "./Elements/TimeFields";
 import FormBibleReferenceInput from "../../Ui/forms/FormBibleReferenceInput";
-import {romanize} from "../../../libraries/Romanize";
 import FormTextarea from "../../Ui/forms/FormTextarea.vue";
 import FormCheck from "../../Ui/forms/FormCheck.vue";
 import FormInput from "../../Ui/forms/FormInput.vue";
+import {getTextSources} from "../../../libraries/TextSources";
 
 export default {
     name: "ReadingEditor",
@@ -76,26 +76,7 @@ export default {
         };
 
 
-        let textSources = {};
-        if (undefined !== this.service.liturgicalInfo.title) {
-            textSources['Perikope für ' + this.service.liturgicalInfo.title] = this.service.liturgicalInfo.currentPerikope;
-            for (let i = 1; i <= 6; i++) {
-                textSources[this.service.liturgicalInfo.title + ' ' + romanize(i)] = this.service.liturgicalInfo['litTextsPerikope' + i];
-            }
-            textSources[this.service.liturgicalInfo.title + ' Psalm'] = this.service.liturgicalInfo['litTextsWeeklyPsalm'];
-            textSources[this.service.liturgicalInfo.title + ' Wochenspruch'] = this.service.liturgicalInfo['litTextsWeeklyQuote'];
-        }
-        this.service.baptisms.forEach(baptism => {
-            if (baptism.text) textSources['Taufspruch ' + baptism.candidate_name] = baptism.text;
-        });
-        this.service.funerals.forEach(funeral => {
-            if (funeral.text) textSources['Beerdigungstext ' + funeral.buried_name] = funeral.text;
-            if (funeral.confirmation_text) textSources['Denkspruch ' + funeral.buried_name] = funeral.confirmation_text;
-            if (funeral.wedding_text) textSources['Trauspruch ' + funeral.buried_name] = funeral.wedding_text;
-        });
-        this.service.weddings.forEach(wedding => {
-            if (wedding.text) textSources['Trauspruch ' + wedding.spouse1_name + ' & ' + wedding.spouse2_name] = wedding.text;
-        });
+        let textSources = getTextSources(this.service);
 
         return {
             editedElement: e,

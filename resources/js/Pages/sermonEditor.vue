@@ -210,7 +210,7 @@ import Card from "../components/Ui/cards/card";
 import CardBody from "../components/Ui/cards/cardBody";
 import FormBibleReferenceInput from "../components/Ui/forms/FormBibleReferenceInput";
 import NavButton from "../components/Ui/buttons/NavButton";
-import {romanize} from "../libraries/Romanize";
+import {getTextSources} from "../libraries/TextSources";
 
 export default {
     name: "sermonEditor",
@@ -270,25 +270,11 @@ export default {
         let allServices = this.services || [this.service];
         let textSources = {};
         allServices.forEach(thisService => {
-            if (undefined !== thisService.liturgicalInfo.title) {
-                textSources['Perikope für '+thisService.liturgicalInfo.title] = thisService.liturgicalInfo.currentPerikope;
-                for (let i=1; i<=6; i++) {
-                    textSources[thisService.liturgicalInfo.title+' '+romanize(i)] = thisService.liturgicalInfo['litTextsPerikope'+i];
-                }
-                textSources[thisService.liturgicalInfo.title+' Psalm'] = thisService.liturgicalInfo['litTextsWeeklyPsalm'];
-                textSources[thisService.liturgicalInfo.title+' Wochenspruch'] = thisService.liturgicalInfo['litTextsWeeklyQuote'];
+            const theseTextSources = getTextSources(thisService);
+            textSources = {
+                ...theseTextSources,
+                ...textSources,
             }
-            thisService.baptisms.forEach(baptism => {
-                if (baptism.text) textSources['Taufspruch '+baptism.candidate_name] = baptism.text;
-            });
-            thisService.funerals.forEach(funeral => {
-                if (funeral.text) textSources['Beerdigungstext '+funeral.buried_name] = funeral.text;
-                if (funeral.confirmation_text) textSources['Denkspruch '+funeral.buried_name] = funeral.confirmation_text;
-                if (funeral.wedding_text) textSources['Trauspruch '+funeral.buried_name] = funeral.wedding_text;
-            });
-            thisService.weddings.forEach(wedding => {
-                if (wedding.text) textSources['Trauspruch '+wedding.spouse1_name+' & '+wedding.spouse2_name] = wedding.text;
-            });
         });
 
 
