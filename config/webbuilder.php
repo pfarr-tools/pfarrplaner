@@ -44,7 +44,7 @@ return [
                 'baptisms' => [
                     'name' => 'Taufgottesdienste',
                     'fields' => [
-                        'suppressTitle' => [
+                        'maxBaptisms' => [
                             'label' => 'Maximale Anzahl Taufen pro Gottesdienst',
                             'type' => 'number',
                             'rules' => 'nullable|int|min:1',
