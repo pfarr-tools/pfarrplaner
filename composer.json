@@ -12,8 +12,11 @@
     ],
     "require": {
         "php": "^8.4",
+        "ext-dom": "*",
+        "ext-zip": "*",
         "barryvdh/laravel-ide-helper": "^3.0",
         "doctrine/dbal": "^3.0",
+        "firebase/php-jwt": "^6.11",
         "google/apiclient": "^2.0",
         "inertiajs/inertia-laravel": "^1.0",
         "laravel-lang/lang": "~9.0",
@@ -39,9 +42,7 @@
         "spiral/roadrunner-cli": "*",
         "spiral/roadrunner-http": "*",
         "staudenmeir/belongs-to-through": "^2.3",
-        "tightenco/ziggy": "^1.0",
-        "ext-dom": "*",
-        "ext-zip": "*"
+        "tightenco/ziggy": "^1.0"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^2.0",

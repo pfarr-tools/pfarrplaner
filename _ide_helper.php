@@ -20775,6 +20775,22 @@ namespace Illuminate\Support {
         }
 
             }
+    /**
+     */
+    class Str {
+        /**
+         * @see \App\Providers\AppServiceProvider::boot()
+         * @param int $count
+         * @param string $singular
+         * @param string $plural
+         * @static
+         */
+        public static function choice($count, $singular, $plural)
+        {
+            return \Illuminate\Support\Str::choice($count, $singular, $plural);
+        }
+
+            }
     }
 
 namespace Illuminate\Http {
