@@ -193,9 +193,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
-@import '../../../../../node_modules/bootstrap/scss/functions';
-@import '../../../../sass/_variables.scss';
+@use '../../../../sass/theme' as theme;
 
 
 
@@ -250,7 +248,7 @@ export default {
 }
 
 .inbox-row:hover {
-    background-color: map-get($theme-colors, "primary") !important;
+    background-color: theme.theme-color("primary") !important;
     color: white;
     cursor: pointer !important;
 }

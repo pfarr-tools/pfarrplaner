@@ -64,13 +64,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import '../../../sass/_variables';
+@use '../../../sass/theme' as theme;
 
     .indicator {
         color: lightgrey;
     }
 
     .indicator-active {
-        color: map-get($theme-colors, 'secondary');
+        color: theme.theme-color("secondary");
     }
 </style>

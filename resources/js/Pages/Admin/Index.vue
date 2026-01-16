@@ -78,7 +78,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import '../../../sass/_variables.scss';
+@use '../../../sass/theme' as theme;
 
 h3 {
     width: 100%;
@@ -90,7 +90,7 @@ h3 {
 }
 
 .module:hover {
-    background-color: map-get($theme-colors, "secondary");
+    background-color: theme.theme-color("secondary");
     color: white;
 }
 </style>

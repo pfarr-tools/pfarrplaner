@@ -28,7 +28,7 @@
  */
 
 @charset "UTF-8";
-
+@use 'theme' as theme;
 @import url(https://www.pfarrplaner.de/css/google-fonts.css);
 
 ul.nav-tabs {
@@ -199,14 +199,14 @@ body.calendar .content-header {
 .calendar-month .vacation {
     display: inline-block;
     font-weight: $font-weight-base;
-    background-color: map-get($elkw-colors, "orange");
+    background-color: theme.elkw-color("orange");
     font-size: 0.7em;
     padding: 3px;
     margin: 0 1px 1px 1px;
 }
 
 span.vacation-conflict {
-    background-color: map-get($elkw-colors, "orange");
+    background-color: theme.elkw-color("orange");
     text-decoration: underline;
     text-decoration-color: map-get($theme-colors, 'danger');
 }
@@ -235,7 +235,7 @@ span.vacation-conflict {
 
 .calendar-month .service-entry {
     background-color: white;
-    border: solid 1px map-get($elkw-colors, 'dunkelgrau');
+    border: solid 1px theme.elkw-color("dunkelgrau");
     padding: 5px;
     margin-bottom: 3px;
 }
@@ -267,12 +267,12 @@ span.vacation-conflict {
 }
 
 .calendar-month .service-entry.funeral {
-    background-color: map-get($elkw-colors, 'dunkelgrau');
+    background-color: theme.elkw-color("dunkelgrau");
     color: white !important;
 }
 
 .calendar-month .service-entry.funeral.mine {
-    background-color: map-get($elkw-colors, 'dunkelblau') !important;
+    background-color: theme.elkw-color("dunkelblau") !important;
     color: white !important;
 }
 
@@ -352,7 +352,7 @@ span.vacation-conflict {
 }
 
 pre {
-    border: solid 1px map-get($elkw-colors, 'dunkelgrau');
+    border: solid 1px theme.elkw-color("dunkelgrau");
     padding: 5px;
     border-radius: 0;
 }
@@ -366,11 +366,11 @@ ol.steps img {
 }
 
 .service-row.cc {
-    background-color: map-get($elkw-colors, 'hellgrün');
+    background-color: theme.elkw-color("hellgrün");
 }
 
 .service-row.no-cc {
-    color: map-get($elkw-colors, 'dunkelgrau');
+    color: theme.elkw-color("dunkelgrau");
 }
 
 .data-row.no-cc {
@@ -379,11 +379,11 @@ ol.steps img {
 
 
 table.table tr.past td {
-    background-color: map-get($elkw-colors, 'pastellviolett');
+    background-color: theme.elkw-color("pastellviolett");
 }
 
 table.table .fa-check-circle {
-    color: map-get($theme-colors, "success");
+    color: theme.theme-color("success");
 }
 
 table.table .fa-times-circle {
@@ -421,7 +421,7 @@ ul.sortable li:hover {
 
 ul.sortable li.placeholder {
     position: relative;
-    background-color: map-get($elkw-colors, "apricot");
+    background-color: theme.elkw-color("apricot");
     border: none;
     /** More li styles **/
 }
@@ -459,11 +459,11 @@ ul.sortable li.placeholder:before {
 }
 
 #absencesTab a {
-    background-color: map-get($elkw-colors, "orange");
+    background-color: theme.elkw-color("orange");
 }
 
 #absencesTab a.active {
-    background-color: map-get($elkw-colors, "orange");
+    background-color: theme.elkw-color("orange");
 }
 
 .card-counter {
@@ -483,22 +483,22 @@ ul.sortable li.placeholder:before {
 }
 
 .card-counter.primary {
-    background-color: map-get($theme-colors, "primary");
+    background-color: theme.theme-color("primary");
     color: #FFF;
 }
 
 .card-counter.danger {
-    background-color: map-get($theme-colors, "danger");
+    background-color: theme.theme-color("danger");
     color: #FFF;
 }
 
 .card-counter.success {
-    background-color: map-get($theme-colors, "success");
+    background-color: theme.theme-color("success");
     color: #FFF;
 }
 
 .card-counter.info {
-    background-color: map-get($theme-colors, "info");
+    background-color: theme.theme-color("info");
     color: black;
 }
 
@@ -578,15 +578,15 @@ input.form-control, textarea.form-control {
 }
 
 input.form-control:focus, textarea.form-control:focus {
-    background-color: tint-color(map-get($elkw-colors, "hellblau"), 70%);
+    background-color: tint-color(theme.elkw-color("hellblau"), 70%);
     font-weight: $font-weight-semibold;
     box-shadow: none;
-    border-color: map-get($elkw-colors, "dunkelblau");
+    border-color: theme.elkw-color("dunkelblau");
 }
 
 .form-check-input:checked {
-    background-color: map-get($theme-colors, "primary");
-    border-color: map-get($theme-colors, "primary");
+    background-color: theme.theme-color("primary");
+    border-color: theme.theme-color("primary");
 }
 
 .selectize-input {
@@ -596,22 +596,22 @@ input.form-control:focus, textarea.form-control:focus {
 
 .selectize-input:focus, .selectize-input.focus {
     border-radius: 0 !important;
-    border-color: map-get($elkw-colors, "dunkelblau");
+    border-color: theme.elkw-color("dunkelblau");
     box-shadow: none;
-    background-color: tint-color(map-get($elkw-colors, "hellblau"), 70%) !important;
+    background-color: tint-color(theme.elkw-color("hellblau"), 70%) !important;
     font-weight: $font-weight-semibold;
 }
 
 .badge-permission-a {
-    background-color: map-get($theme-colors, "primary") !important;
+    background-color: theme.theme-color("primary") !important;
 }
 
 .badge-permission-w {
-    background-color: map-get($theme-colors, "success") !important;
+    background-color: theme.theme-color("success") !important;
 }
 
 .badge-permission-r {
-    background-color: map-get($theme-colors, "warning") !important;
+    background-color: theme.theme-color("warning") !important;
 }
 
 .badge-permission-n {
@@ -623,17 +623,17 @@ input.form-control:focus, textarea.form-control:focus {
 }
 
 tr.changed, tr.changed td, tr.changed th {
-    background-color: map-get($elkw-colors, "hellgrün");
+    background-color: theme.elkw-color("hellgrün");
 }
 
 .content .footer {
     padding-left: 10px;
     font-size: .6em;
-    color: map-get($elkw-colors, 'dunkelgrau');
+    color: theme.elkw-color("dunkelgrau");
 }
 
 .content .footer a {
-    color: map-get($elkw-colors, 'dunkelgrau');
+    color: theme.elkw-color("dunkelgrau");
     font-weight: $font-weight-semibold;
 }
 
@@ -659,7 +659,7 @@ tr.changed, tr.changed td, tr.changed th {
 }
 
 .nav-tabs .nav-item.tabheader-absences a.nav-link {
-    background-color: map-get($elkw-colors, "orange") !important;
+    background-color: theme.elkw-color("orange") !important;
 }
 
 .calendar-vertical .day-header-cell {
@@ -695,27 +695,27 @@ tr.changed, tr.changed td, tr.changed th {
 }
 
 #nprogress .bar {
-    background: map-get($elkw-colors, "violett") !important;
+    background: theme.elkw-color("violett") !important;
 }
 
 #nprogress .peg {
-    box-shadow: 0 0 10px map-get($elkw-colors, "violett"), 0 0 5px map-get($elkw-colors, "violett");
+    box-shadow: 0 0 10px theme.elkw-color("violett"), 0 0 5px theme.elkw-color("violett");
 }
 
 #nprogress .spinner-icon {
-    border-top-color: map-get($elkw-colors, "violett");
-    border-left-color: map-get($elkw-colors, "violett");
+    border-top-color: theme.elkw-color("violett");
+    border-left-color: theme.elkw-color("violett");
 }
 
 
 
 .admin-layout .datepicker table tr td.today {
-    background-color: tint-color(map-get($theme-colors, "warning"), 50%) !important;
+    background-color: tint-color(theme.theme-color("warning"), 50%) !important;
 }
 
 .admin-layout .datepicker table tr td.today.active,
 .admin-layout .datepicker table tr td.active {
-    background-color: map-get($theme-colors, "primary") !important;
+    background-color: theme.theme-color("primary") !important;
 }
 
 
@@ -724,11 +724,11 @@ tr.changed, tr.changed td, tr.changed th {
 }
 
 .badge-primary {
-    background-color: map-get($theme-colors, "primary") !important;
+    background-color: theme.theme-color("primary") !important;
 }
 
 .mdi.mdi-youtube, span.mdi-youtube {
-    background-color: map-get($elkw-colors, "red") !important;
+    background-color: theme.elkw-color("red") !important;
 }
 
 .stripe-odd {

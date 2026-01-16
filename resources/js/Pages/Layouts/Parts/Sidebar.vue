@@ -146,7 +146,7 @@ export default {
 
 <style scoped lang="scss">
 
-@import '../../../../sass/variables.scss';
+@use '../../../../sass/theme' as theme;
 
 aside {
     z-index: 800;
@@ -175,7 +175,7 @@ aside {
     max-height: 58px;
     min-height: 58px;
     height: 58px;
-    background-color: map-get($elkw-colors, "violett");
+    background-color: theme.elkw-color("violett");
 }
 
 

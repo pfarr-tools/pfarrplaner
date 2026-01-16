@@ -6,6 +6,7 @@
  *   License: Open source - MIT <https://opensource.org/licenses/MIT>
  */
 
+@use 'theme' as theme;
 
 :root,
 [data-bs-theme=light] {
@@ -146,7 +147,7 @@
     white-space: nowrap;
     border-bottom: 3px solid white;
     transition: width 0.3s ease-in-out;
-    background-color: map-get($elkw-colors, "violett");
+    background-color: theme.elkw-color("violett");
 }
 @media (prefers-reduced-motion: reduce) {
     .sidebar-brand {
