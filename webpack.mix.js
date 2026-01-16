@@ -28,78 +28,59 @@
  */
 
 const mix = require('laravel-mix');
-
 const webpack = require('webpack');
-
-module.exports = {
-    module: {
-        rules: [
-            {
-                test: /\.css$/i,
-                use: ['style-loader', 'css-loader'],
-            },
-            {
-                test: /\.m?js$/,
-                exclude: /node_modules\/(?!admin-lte)/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env'],
-                        plugins: ['@babel/plugin-proposal-class-properties']
-                    }
-                }
-            }
-        ],
-    },
-    resolve: {
-        alias: {
-            // fix every jQuery to our direct jQuery dependency. Shariff 1.24.1 brings its own jQuery and it would be included twice without this alias.
-            'jquery': __dirname + '/node_modules/jquery/',
-        },
-    },
-    plugins:  [
-        new webpack.ProvidePlugin({
-            jQuery: 'jquery',
-            $: 'jquery',
-            jquery: 'jquery'
-        })
-    ],
-};
-
-/*
- |--------------------------------------------------------------------------
- | Mix Asset Management
- |--------------------------------------------------------------------------
- |
- | Mix provides a clean, fluent API for defining some Webpack build steps
- | for your Laravel application. By default, we are compiling the Sass
- | file for the application as well as bundling up all the JS files.
- |
- */
-
-// this plugin strips out unnecessary locales from moment.js
+const path = require('path');
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
 mix.js('resources/js/inertia-app.js', 'public/js')
-    .version()
+    .vue({ version: 2 })
     .autoload({
-        'jquery': ['$', 'window.jQuery', 'jQuery'],
-        'vue': ['Vue','window.Vue'],
-        'moment': ['moment','window.moment'],
+        jquery: ['$', 'window.jQuery', 'jQuery'],
+        vue: ['Vue', 'window.Vue'],
+        moment: ['moment', 'window.moment'],
     })
     .sourceMaps()
-    .postCss('resources/css/prebuild.css', 'public/css/app.css', [])
+    .postCss('resources/css/prebuild.css', 'public/css/app.css', [
+        require('autoprefixer'),
+    ])
     .webpackConfig({
-        output: { chunkFilename: 'js/[name].js?id=[chunkhash]' },
-        plugins: [
-            new MomentLocalesPlugin({ localesToKeep: ['de-de']}),
-        ],
+        output: {
+            chunkFilename: 'js/[name].js?id=[chunkhash]',
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.m?js$/,
+                    exclude: /node_modules\/(?!admin-lte)/,
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: ['@babel/preset-env'],
+                            plugins: ['@babel/plugin-proposal-class-properties'],
+                        },
+                    },
+                },
+            ],
+        },
         resolve: {
             alias: {
+                // force all jquery imports to one copy
+                jquery: path.resolve(__dirname, 'node_modules/jquery/'),
+
                 vue$: 'vue/dist/vue.esm.js',
-                '@': path.resolve('resources/js/components'),
+                '@': path.resolve(__dirname, 'resources/js/components'),
             },
-        }})
+        },
+        plugins: [
+            new webpack.ProvidePlugin({
+                jQuery: 'jquery',
+                $: 'jquery',
+                jquery: 'jquery',
+            }),
+            new MomentLocalesPlugin({ localesToKeep: ['de-de'] }),
+        ],
+    })
     .babelConfig({
         plugins: ['@babel/plugin-syntax-dynamic-import'],
-    });
+    })
+    .version();
