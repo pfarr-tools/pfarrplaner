@@ -8,7 +8,7 @@
     @endif
     <th>Pfarrer</th>
     @if ($options['maxBaptisms'] ?? 0 >0 )
-        <th colspan="2">Taufmöglichkeit</th>
+        <th>Taufmöglichkeit</th>
     @endif
     </thead>
     <tbody>
@@ -26,15 +26,10 @@
             @endif
             <td>{{ $occurence->event->participantsText('P') }}</td>
 @if ($options['maxBaptisms'] ?? 0 >0 )
-            <td style="padding: 0; font-size: 30pt; font-weight: bold;">
-                @if(count($occurence->event->baptisms) == 0) <span style="color: limegreen;">&bull;</span>
-                @elseif(count($occurence->event->baptisms) < $options['maxBaptisms'] ?? 0) <span style="color: orange;">&bull;</span>
-                @else <span style="color: red;">&bull;</span> @endif
-            </td>
-            <td>
-                @if(count($occurence->event->baptisms) == 0)Taufanmeldung möglich
-                @elseif(count($occurence->event->baptisms) < $options['maxBaptisms'] ?? 0)Taufanmeldung möglich <br /><small>(bereits {{ count ($occurence->event->baptisms) }} {{ count ($occurence->event->baptisms) == 1 ? 'Taufe' : 'Taufen' }})</small>
-                @else Taufanmeldung nicht mehr möglich @endif
+            <td style="padding: 0; vertical-align: middle;">
+                @if(count($occurence->event->baptisms) == 0) <div style="width: 10px; height: 10px; border-radius: 50%; background-color: limegreen; display: inline-block; margin: 0 5px;"></div> Taufanmeldung möglich
+                @elseif(count($occurence->event->baptisms) < $options['maxBaptisms'] ?? 0) <div style="width: 10px; height: 10px; border-radius: 50%; background-color: orange; display: inline-block; margin: 0 5px;"></div> Taufanmeldung möglich<div style="padding: 0 0 0 30px;margin: 0;font-size: .8em;">(bereits {{ count ($occurence->event->baptisms) }} {{ count ($occurence->event->baptisms) == 1 ? 'Taufe' : 'Taufen' }})</div>
+                @else <div style="width: 10px; height: 10px; border-radius: 50%; background-color: red; display: inline-block; margin: 0 5px;"></div> Taufanmeldung nicht mehr möglich @endif
             </td>
 @endif
         </tr>
