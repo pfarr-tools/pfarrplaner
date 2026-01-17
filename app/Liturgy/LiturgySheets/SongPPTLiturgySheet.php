@@ -931,7 +931,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         $table = $slide->createTableShape(2);
         $table->setOffsetX(10)
-            ->setOffsetY(100)
+            ->setOffsetY(80)
             ->setWidth(950)
             ->setHeight(500);
 
