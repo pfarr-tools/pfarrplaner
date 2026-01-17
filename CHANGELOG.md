@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.5.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.4.3...v2026.5.0) (2026-01-17)
+
+
+### Features
+
+* QR-Code für digitales Liedblatt in PowerPoint ([ccb556d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ccb556d61eb34eac1d03aafdf22e9935304b19f4))
+
+
+### Bug Fixes
+
+* Ampel bei Taufgottesdiensten fehlt ([e06c15e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e06c15e517553ae782047fbe013d4f4c6852f8f6))
+* Benutzer ohne E-Mailadresse können nicht gespeichert werden ([380fa60](https://codeberg.org/pfarr.tools/pfarrplaner/commit/380fa60fb027910f1c7f15bd683596f0f910f2b0))
+* Layoutverbesserungen in der Liste der Taufgottesdienste ([35492e9](https://codeberg.org/pfarr.tools/pfarrplaner/commit/35492e9f8da1eab67bc803b58019352361fcaf9d))
+
 ### [2026.4.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.4.2...v2026.4.3) (2026-01-14)
 
 
