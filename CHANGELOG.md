@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.5.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.5.0...v2026.5.1) (2026-01-17)
+
+
+### Bug Fixes
+
+* adLoopDelay wird nicht gespeichert ([ccddd9d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ccddd9d4c204c7851f6a114e2148dec767d4df5c))
+* Kleiner Layout-Fix für lange Eventlisten in PPT ([6171fb6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6171fb6fa4dafad9279260f417e96ceea14b545a))
+
 ## [2026.5.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.4.3...v2026.5.0) (2026-01-17)
 
 
