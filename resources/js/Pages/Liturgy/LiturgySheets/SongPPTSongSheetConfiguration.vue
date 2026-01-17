@@ -61,6 +61,7 @@
                 <form-check label="Liederliste am Anfang" v-model="myConfig.includeSongList" name="config[includeSongList]"/>
                 <form-check label="Hinweis auf Liederbuch vor jedem Lied" v-model="myConfig.includeSongbookReference" name="config[includeSongbookReference]"/>
                 <form-check label="Wo möglich, Noten statt Text verwenden" v-model="myConfig.renderMusic" name="config[renderMusic]" />
+                <form-check label="QR-Code für digitales Liedblatt anzeigen" v-model="myConfig.includeVirtualSongsheetQR" name="config[includeVirtualSongsheetQR]"/>
             </tab>
             <tab id="ads">
                 <form-check label="Veranstaltungswerbung am Anfang einfügen" v-model="myConfig.includeAdLoopStart" name="config[includeAdLoopStart]"/>

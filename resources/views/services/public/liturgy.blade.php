@@ -46,7 +46,7 @@
     </div>
     <hr />
 
-    @if($service->youtube_url || true)
+    @if($service->youtube_url)
         <div class="alert alert-warning p-3 m-2">
             Wir weisen darauf hin, dass dieser Gottesdienst live ins Internet übertragen wird. Die ersten Reihen werden dabei
             möglicherweise von der Kamera mit erfasst. Bitte wählen Sie Ihren Sitzplatz entsprechend, wenn Sie bei

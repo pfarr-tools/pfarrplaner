@@ -40,6 +40,7 @@ use App\Models\Calendar\Occurence;
 use App\Models\Liturgy\Item;
 use App\Models\Service;
 use App\Services\ImageService;
+use App\Services\QRService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -82,6 +83,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         'includeAdLoopElements' => [],
         'showAdsFromCities' => [],
         'adLoopDelay' => 7,
+        'includeVirtualSongsheetQR' => false,
     ];
 
     protected $counterColor = [
@@ -131,10 +133,19 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
 
         if ($this->config['includeSongList']) {
-            $this->renderSongListSlide($service);
+            if (!$this->config['includeAdLoopStart']) {
+                $slide = $this->createEmptySlide($this->config['backgroundColor']);
+                $this->renderSongListSlide($slide, $service);
+            }
         } elseif ($this->config['includeEmpty']) {
             $this->slide();
         }
+
+        if ($this->config['includeVirtualSongsheetQR'] && (!$this->config['includeAdLoopStart'])) {
+            $slide = $this->createEmptySlide($this->config['backgroundColor']);
+            $this->renderVirtualSongsheetQR($slide, $service);
+        }
+
         if ($this->config['includeJingleAndIntro']) {
             $this->slide('Hier Jingle einfügen');
             $this->slide('Hier Intro einfügen');
@@ -245,9 +256,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
     }
 
-    protected function renderSongListSlide(Service $service)
+    protected function renderSongListSlide(Slide $slide, Service $service)
     {
-        $slide = $this->createEmptySlide($this->config['backgroundColor']);
         $color = new Color($this->config['textColor']);
         $listItems = [];
         foreach ($service->liturgyBlocks as $block) {
@@ -659,6 +669,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 ->whereHas('service', function ($query) use ($service) {
                     $query->inCities($this->config['showAdsFromCities'])
                         ->notHidden()
+                        ->where('id', '!=', $service->id)
                         ->displayable($service->date);
                 })->orderBy('start')
                 ->get()
@@ -684,8 +695,22 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
 
         $currentSlideNumber = $this->ppt->getSlideCount();
+        $isFirstLoop = $currentSlideNumber == 0;
         $adSlidesCount = count($this->adEventsToBeListed) + count($this->adEventsToBeHighlighted);
         $finalAdSlideNumber = $currentSlideNumber + $adSlidesCount;
+
+        if ($isFirstLoop) {
+            $adSlidesCount += (int)$this->config['includeVirtualSongsheetQR'] + (int)$this->config['includeSongList'];
+            $finalAdSlideNumber += (int)$this->config['includeVirtualSongsheetQR'] + (int)$this->config['includeSongList'];
+            if ($this->config['includeSongList']) {
+                $slide = $this->createEmptyAdSlide(1, $finalAdSlideNumber, false);
+                $this->renderSongListSlide($slide, $service);
+            }
+            if ($this->config['includeVirtualSongsheetQR']) {
+                $slide = $this->createEmptyAdSlide(1, $finalAdSlideNumber, false);
+                $this->renderVirtualSongsheetQR($slide, $service);
+            }
+        }
 
         $cursor = $start->copy();
         while ($cursor->lte($end)) {
@@ -948,6 +973,37 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 ->setColor($textColor)
                 ->setName('Sarabun Light');
         }
+    }
+
+
+    public function renderVirtualSongsheetQR(Slide $slide, Service $service)
+    {
+        $shape = $slide->createRichTextShape()
+            ->setWidth(950)
+            ->setHeight(50)
+            ->setOffsetX(10)
+            ->setOffsetY(0);
+
+        $paragraph = $shape->getActiveParagraph();
+        $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);;
+        $run = $paragraph->createTextRun('Digitales Liedblatt zum Gottesdienst:')->getFont()
+            ->setSize((int)($this->config['fontSize']*0.8))
+            ->setColor(new Color($this->config['textColor']))
+            ->setName('Sarabun SemiBold');
+
+
+        $shape = $slide->createDrawingShape();
+        $shape->setName('')
+            ->setPath(QRService::generate(route('service.publicLiturgy', $service->slug)))
+            ->setResizeProportional(true)
+            ->setHeight(350)
+            ->setOffsetX(280)
+            ->setOffsetY(100)
+            ->getBorder()
+            ->setLineStyle(Border::LINE_SINGLE)
+            ->setLineWidth(20)
+            ->setColor(new Color('FFFFFF'));
+
     }
 
 }

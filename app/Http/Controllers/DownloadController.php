@@ -35,6 +35,7 @@ use App\Attachments\AttachmentFactory;
 use App\Helpers\FileHelper;
 use App\Models\Attachment;
 use App\Models\Service;
+use App\Services\QRService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -149,27 +150,7 @@ class DownloadController extends Controller
      * @param string $prettyName
      */
     public function qr($value, $prettyName = '') {
-        $file = tempnam('/tmp', 'pfp-qr').'.png';
-
-        // Wichtig: kein Leerraum am Ende, keine extra Leerzeile
-        $value = rtrim($value, "\r\n");
-
-        // temp file für payload
-        $tmp = tempnam(sys_get_temp_dir(), 'epc_');
-        file_put_contents($tmp, $value);
-
-        $command = 'qrencode -8 -l H -m 0 -o '
-            . escapeshellarg($file)
-            . ' -r '
-            . escapeshellarg($tmp);
-
-        exec($command, $out, $code);
-        @unlink($tmp);
-
-        if ($code !== 0) {
-            throw new RuntimeException("qrencode failed with exit code $code");
-        }
-
+        $file = QRService::generate($value);
         $png = file_get_contents($file);
         unlink($file);
         return response($png)->header('Content-Type', 'image/png');

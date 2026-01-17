@@ -73,7 +73,7 @@ class ServiceController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth')->except('createQR');
+        $this->middleware('auth')->except(['createQR', 'publicLiturgy']);
         ServicesOnlyScope::deactivate();
     }
 
