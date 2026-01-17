@@ -72,7 +72,7 @@
                 <form-selectize label="Veranstaltungen aus folgenden Kirchengemeinden einschließen" :key="this.myCities.length" multiple
                                 v-model="myConfig.showAdsFromCities" name="config[showAdsFromCities][]" :options="myCities" />
                 <hr />
-                <form-input label="Werbefolien nach ___ Sekunden weiterschalten" :v-model="myConfig.adLoopDelay"
+                <form-input label="Werbefolien nach ___ Sekunden weiterschalten" v-model="myConfig.adLoopDelay"
                             name="config[adLoopDelay]" type="number" min="0"
                             help="Bei 0 erfolgt keine automatische Weiterschaltung" />
             </tab>

@@ -72,7 +72,7 @@
                 <form-selectize label="Veranstaltungen aus folgenden Kirchengemeinden einschließen" :key="this.myCities.length" multiple
                                 v-model="myConfig.showAdsFromCities" name="config[showAdsFromCities][]" :options="myCities" />
                 <hr />
-                <form-input label="Werbefolien nach ___ Sekunden weiterschalten" :v-model="myConfig.adLoopDelay"
+                <form-input label="Werbefolien nach ___ Sekunden weiterschalten" v-model="myConfig.adLoopDelay"
                             name="config[adLoopDelay]" type="number" min="0"
                             help="Bei 0 erfolgt keine automatische Weiterschaltung" />
             </tab>
@@ -101,6 +101,7 @@ export default {
     data() {
         let myConfig = this.sheet.config;
         if (!(myConfig.showAdsFromCities || []).length) myConfig.showAdsFromCities = [this.service.city_id];
+        myConfig.adLoopDelay = parseInt(myConfig.adLoopDelay || "7");
 
         let myItems = [];
         if (!(myConfig.includeAdsLoopElements || []).length) myConfig.includeAdLoopElements = [];

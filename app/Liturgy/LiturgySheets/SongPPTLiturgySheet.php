@@ -364,7 +364,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 $copyrights = $item->data['song']['code'] . ' ' . $item->data['song']['reference'] . '. ' . $copyrights;
             }
         }
-        foreach ($helper->getActiveVerses() as $verse) {
+        $activeVerses = $helper->getActiveVerses();
+        foreach ($activeVerses as $verse) {
+            $showVerseNumber = !((count($activeVerses) == 1) && ($verse['number'] == 1));
+
             if ($verse['refrain_before']) {
                 $this->slide(
                     $item->data['song']['song']['refrain'],
@@ -375,7 +378,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 );
             }
             $this->slide(
-                $verse['number'] . '. ' . $verse['text'],
+                ($showVerseNumber ? $verse['number'] . '. ' : '') . $verse['text'],
                 $this->config['fontSize'],
                 $this->config['textColor'],
                 true,
