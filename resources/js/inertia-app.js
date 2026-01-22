@@ -170,7 +170,7 @@ Vue.mixin({
     methods: {
         route: route,
         moment: moment
-    }
+    },
 });
 Vue.mixin(require('./mixins/Asset.js'));
 Vue.mixin(require('./mixins/PfarrplanerAPI'));
@@ -194,6 +194,9 @@ Vue.directive('scrollTo', {
         el.scrollTo()
     }
 })
+
+// global event bus
+Vue.prototype.$bus = new Vue();
 
 const bindCustomEvent = {
     getName: function(binding) {
@@ -242,4 +245,5 @@ window.vm = new Vue({
         },
     }),
 }).$mount(app)
+
 

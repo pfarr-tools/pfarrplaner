@@ -150,7 +150,9 @@
             @cancel="selfEntryModalVisible = false" @close="doSelfEntry" min-height="50vh" :key="ministryListUpdated">
             <div v-if="myService.titleText != 'Gottesdienst'">{{ myService.titleText}}</div>
             <div class="mb-2">{{ moment(myService.date).format('DD.MM.YYYY')}}, {{ myService.timeText }}, {{ myService.locationTextWithCity }}</div>
-            <form-selectize :key="ministryListUpdated" :options="availableMinistries" label="Für folgenden Dienst eintragen" v-model="selfEntryMinistries"  multiple />
+            <form-selectize :key="ministryListUpdated" :options="availableMinistries" label="Für folgenden Dienst eintragen" v-model="selfEntryMinistries"
+                            @input="changeSelfEntryMinistries"
+                            multiple />
         </modal>
     </div>
 </template>
@@ -183,6 +185,12 @@ export default {
             return !this.city.childIds.includes(this.myService.city_id);
         }
     },
+    created() {
+        this.$bus.$on('selfentry-ministries-changed', this.onSelfEntryMinistriesChanged);
+    },
+    beforeDestroy() {
+        this.$bus.$off('selfentry-ministries-changed', this.onSelfEntryMinistriesChanged);
+    },
     data() {
         let availableMinistries = [
             {id: 'P', name: 'Pfarrer:in' },
@@ -194,7 +202,7 @@ export default {
             loading: true,
             availableMinistries,
             selfEntryModalVisible: false,
-            selfEntryMinistries: [],
+            selfEntryMinistries: this.$page.props.settings.selfentry_ministries || [],
             ministryListUpdated: 0,
         }
     },
@@ -209,7 +217,6 @@ export default {
                 (this.myService.city.default_ministries || []).forEach(ministry =>{
                     if (ministry.trim()) {
                         this.availableMinistries.push({id: ministry, name: ministry});
-                        console.log('add ministry: ',ministry, {id: ministry, name: ministry}, this.myService.city.name);
                     }
                 })
                 this.ministryListUpdated++;
@@ -295,6 +302,13 @@ export default {
             });
             this.$forceUpdate();
         },
+        changeSelfEntryMinistries() {
+            this.$bus.$emit('selfentry-ministries-changed', this.selfEntryMinistries);
+            this.setUserSetting('selfentry_ministries', this.selfEntryMinistries);
+        },
+        onSelfEntryMinistriesChanged(e) {
+            this.selfEntryMinistries = e;
+        }
     }
 }
 

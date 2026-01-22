@@ -68,7 +68,7 @@ mix.js('resources/js/inertia-app.js', 'public/js')
                 jquery: path.resolve(__dirname, 'node_modules/jquery/'),
 
                 vue$: 'vue/dist/vue.esm.js',
-                '@': path.resolve(__dirname, 'resources/js/components'),
+                '@': path.resolve(__dirname, 'resources/js'),
             },
         },
         plugins: [
