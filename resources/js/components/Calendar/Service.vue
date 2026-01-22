@@ -90,7 +90,7 @@
                                            :category="$page.props.labels.code_organist" :predicant="0"/>
             <calendar-service-participants :participants="myService.sacristans"
                                            :category="$page.props.labels.code_sacristan" :predicant="0"/>
-            <calendar-service-participants v-for="participants,ministry in myService.ministriesByCategory"
+            <calendar-service-participants v-for="(participants,ministry) in myService.ministriesByCategory"
                                            :key="ministry"
                                            :participants="participants" :category="ministry" :predicant="0"/>
             <div v-if="hasPermission('gd-kasualien-lesen') || hasPermission('gd-kasualien-nur-statistik')">
@@ -105,37 +105,53 @@
                 <img src="/img/cc.png" :title="ccTitle(myService)">
                 Kinderkirche: {{ myService.cc_lesson }} ({{ myService.cc_staff }})
             </div>
-            <div v-if="myService.isEditable" class="overlay">
-                <div class="buttons">
-                    <a href="#" class="btn btn-primary mb-1" role="button"
-                       title="Gottesdienst bearbeiten" @click.prevent.stop="editFromButton(myService, 'service.edit', $event)">
-                        <span class="mdi mdi-pencil"></span>
-                    </a>
-                    <a href="#" class="btn btn-light mb-1" role="button"
-                       title="Liturgie bearbeiten" @click.prevent.stop="editFromButton(myService, 'liturgy.editor', $event)">
-                        <span class="mdi mdi-view-list"></span>
-                    </a><br />
-                    <a href="#" class="btn btn-light mb-1" role="button"
-                       title="Predigt bearbeiten" @click.prevent.stop="editFromButton(myService, 'myService.sermon.editor', $event)">
-                        <span class="mdi mdi-microphone"></span>
-                    </a>
-                    <a href="#" class="btn btn-danger mb-1" role="button"
-                       title="Gottesdienst löschen" @click.prevent.stop="deleteService(myService, index)">
-                        <span class="mdi mdi-delete"></span>
-                    </a>
-
+            <div v-if="!targetMode">
+                <div v-if="myService.isEditable " class="overlay">
+                    <div class="buttons d-flex justify-content-center flex-wrap w-100">
+                        <a href="#" class="btn btn-primary mb-1 me-1" role="button"
+                           title="Gottesdienst bearbeiten" @click.prevent.stop="editFromButton(myService, 'service.edit', $event)">
+                            <span class="mdi mdi-pencil"></span>
+                        </a>
+                        <a href="#" class="btn btn-light mb-1 me-1" role="button"
+                           title="Liturgie bearbeiten" @click.prevent.stop="editFromButton(myService, 'liturgy.editor', $event)">
+                            <span class="mdi mdi-view-list"></span>
+                        </a>
+                        <a href="#" class="btn btn-light mb-1 me-1" role="button"
+                           title="Predigt bearbeiten" @click.prevent.stop="editFromButton(myService, 'myService.sermon.editor', $event)">
+                            <span class="mdi mdi-microphone"></span>
+                        </a>
+                        <a href="#" class="btn btn-danger mb-1 me-1" role="button"
+                           title="Gottesdienst löschen" @click.prevent.stop="deleteService(myService, index)">
+                            <span class="mdi mdi-delete"></span>
+                        </a>
+                        <a href="#" class="btn btn-info mb-1 me-1" role="button"
+                           title="Mich für diesen Gottesdienst eintragen"
+                           @click.prevent.stop="selfEntry">
+                            <span class="mdi mdi-target-account"></span>
+                        </a>
+                    </div>
+                </div>
+                <div v-if="!myService.isEditable" class="overlay">
+                    <div class="buttons d-flex justify-content-center flex-wrap w-100">
+                        <a href="#" class="btn btn-light mb-1 me-1" role="button"
+                           title="Liturgie ansehen" @click.prevent.stop="editFromButton(myService, 'liturgy.editor', $event)">
+                            <span class="mdi mdi-view-list"></span>
+                        </a>
+                        <a href="#" class="btn btn-info mb-1 me-1" role="button"
+                           title="Mich für diesen Gottesdienst eintragen"
+                           @click.prevent.stop="selfEntry">
+                            <span class="mdi mdi-target-account"></span>
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div v-if="!myService.isEditable" class="overlay">
-                <div class="buttons">
-                    <a href="#" class="btn btn-light mb-1" role="button"
-                       title="Liturgie ansehen" @click.prevent.stop="editFromButton(myService, 'liturgy.editor', $event)">
-                        <span class="mdi mdi-view-list"></span>
-                    </a><br />
-                </div>
-            </div>
-
         </div>
+        <modal v-if="selfEntryModalVisible" title="Mich für diesen Gottesdienst eintragen" close-button-label="Eintragen"
+            @cancel="selfEntryModalVisible = false" @close="doSelfEntry" min-height="50vh" :key="ministryListUpdated">
+            <div v-if="myService.titleText != 'Gottesdienst'">{{ myService.titleText}}</div>
+            <div class="mb-2">{{ moment(myService.date).format('DD.MM.YYYY')}}, {{ myService.timeText }}, {{ myService.locationTextWithCity }}</div>
+            <form-selectize :key="ministryListUpdated" :options="availableMinistries" label="Für folgenden Dienst eintragen" v-model="selfEntryMinistries"  multiple />
+        </modal>
     </div>
 </template>
 <script>
@@ -146,10 +162,14 @@ import CalendarServiceParticipants from "./Service/Participants.vue";
 import CalendarServiceBaptism from "./Service/Baptism.vue";
 import CalendarServiceFuneral from "./Service/Funeral.vue";
 import CalendarServiceWedding from "./Service/Wedding.vue";
+import Modal from "../Ui/modals/Modal.vue";
+import FormSelectize from "../Ui/forms/FormSelectize.vue";
 
 export default {
     name: 'CalendarService',
     components: {
+        FormSelectize,
+        Modal,
         CalendarServiceWedding,
         CalendarServiceFuneral, CalendarServiceBaptism, CalendarServiceParticipants, ControlledAccess
     },
@@ -164,9 +184,18 @@ export default {
         }
     },
     data() {
+        let availableMinistries = [
+            {id: 'P', name: 'Pfarrer:in' },
+            {id: 'O', name: 'Organist:in' },
+            {id: 'M', name: 'Mesner:in' },
+        ];
         return {
             myService: null,
             loading: true,
+            availableMinistries,
+            selfEntryModalVisible: false,
+            selfEntryMinistries: [],
+            ministryListUpdated: 0,
         }
     },
     mounted() {
@@ -177,6 +206,13 @@ export default {
             this.loading = true;
             this.$api().get(route('api.calendar.service', { service: this.serviceId })).then(response => {
                 this.myService = response.data.data;
+                (this.myService.city.default_ministries || []).forEach(ministry =>{
+                    if (ministry.trim()) {
+                        this.availableMinistries.push({id: ministry, name: ministry});
+                        console.log('add ministry: ',ministry, {id: ministry, name: ministry}, this.myService.city.name);
+                    }
+                })
+                this.ministryListUpdated++;
                 this.loading = false;
                 this.$updateComponentState();
                 this.$forceUpdate();
@@ -211,7 +247,7 @@ export default {
                 this.target.people.forEach(person => peopleIds.push(person.id));
                 this.loading = true;
 
-                this.$api().post(route('api.service.assign', service.id), {
+                this.$api().post(route('api.service.assign', this.myService.id), {
                     ministry: this.target.ministry,
                     users: peopleIds,
                     exclusive: this.target.exclusive,
@@ -240,8 +276,25 @@ export default {
                 });
             }
         },
-
-
+        selfEntry() {
+            this.selfEntryModalVisible = true;
+            this.$forceUpdate();
+        },
+        doSelfEntry() {
+            console.log('self-entry', this.selfEntryMinistries);
+            this.selfEntryModalVisible = false;
+            this.loading = true;
+            this.$api().post(route('api.service.assign', this.myService.id), {
+                ministry: this.selfEntryMinistries,
+                users: [this.$page.props.currentUser.data.id],
+                exclusive: false,
+            }).then(response => {
+                this.myService = response.data.service;
+                this.loading = false;
+                this.$forceUpdate();
+            });
+            this.$forceUpdate();
+        },
     }
 }
 

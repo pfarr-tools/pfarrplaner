@@ -177,28 +177,33 @@ class ServiceController extends Controller
     public function assign(Request $request, Service $service)
     {
         $data = $request->validate([
-                                       'ministry' => 'required|string',
+                                       'ministry' => 'required',
                                        'users.*' => 'required|int|exists:users,id',
                                        'exclusive' => 'required|bool',
                                        'no-toggle' => 'nullable|bool',
                                    ]);
         $participants = $service->getSyncableParticipantsArray();
-        if (!isset($participants[$data['ministry']])) {
-            $participants[$data['ministry']] = [];
+        if (!is_array($data['ministry'])) {
+            $data['ministry'] = [$data['ministry']];
         }
-        $existing = $participants[$data['ministry']];
-        if ($data['exclusive']) {
-            $participants[$data['ministry']] = [];
-        }
-        foreach ($data['users'] as $userId) {
-            if (!$data['no-toggle']) {
-                if (isset($existing[$userId])) {
-                    unset($participants[$data['ministry']][$userId]);
+        foreach ($data['ministry'] as $ministry) {
+            if (!isset($participants[$ministry])) {
+                $participants[$ministry] = [];
+            }
+            $existing = $participants[$ministry];
+            if ($data['exclusive']) {
+                $participants[$ministry] = [];
+            }
+            foreach ($data['users'] as $userId) {
+                if (!($data['no-toggle'] ?? false)) {
+                    if (isset($existing[$userId])) {
+                        unset($participants[$ministry][$userId]);
+                    } else {
+                        $participants[$ministry][$userId]['category'] = $ministry;
+                    }
                 } else {
-                    $participants[$data['ministry']][$userId]['category'] = $data['ministry'];
+                    $participants[$ministry][$userId]['category'] = $ministry;
                 }
-            } else {
-                $participants[$data['ministry']][$userId]['category'] = $data['ministry'];
             }
         }
         $service->syncParticipantsFromArray($participants);
