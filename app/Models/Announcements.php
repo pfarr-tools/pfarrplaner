@@ -107,21 +107,7 @@ class Announcements
             ->get();
 
         // expand multi-full-day events to each of the days
-        $extra = collect();
-        foreach ($this->events as $event) {
-            if (!$event->event->is_allday) continue;
-            if ($event->start->setTimezone('Europe/Berlin')->format('Ymd') == $event->end->setTimezone('Europe/Berlin')->format('Ymd')) continue;
-            $cursor = $event->start->copy()->addDay();
-            while ($cursor < $event->end) {
-                $newEvent = clone $event;
-                $newEvent->event = clone $event->event;
-                $newEvent->start = $cursor;
-                $newEvent->event->date = $cursor;
-                $extra->push($newEvent);
-                $cursor->addDay();
-            }
-        }
-        $this->events = $this->events->concat($extra)->sortBy('start')->groupBy(function ($event) {
+        $this->events = static::expandMultiDayEvents($this->events)->groupBy(function ($event) {
                 return $event->start->setTimezone('Europe/Berlin')->isoFormat($this->eventListKeyFormat);
             }, function ($event) {
                 return $event->start->format('Hi');
@@ -569,5 +555,23 @@ class Announcements
         $this->eventListKeyFormat = $eventListKeyFormat;
     }
 
+
+    public static function expandMultiDayEvents(Collection $events): Collection {
+        $extra = collect();
+        foreach ($events as $event) {
+            if (!$event->event->is_allday) continue;
+            if ($event->start->setTimezone('Europe/Berlin')->format('Ymd') == $event->end->setTimezone('Europe/Berlin')->format('Ymd')) continue;
+            $cursor = $event->start->copy()->addDay();
+            while ($cursor < $event->end) {
+                $newEvent = clone $event;
+                $newEvent->event = clone $event->event;
+                $newEvent->start = $cursor;
+                $newEvent->event->date = $cursor;
+                $extra->push($newEvent);
+                $cursor->addDay();
+            }
+        }
+        return $events->concat($extra)->sortBy('start');
+    }
 
 }

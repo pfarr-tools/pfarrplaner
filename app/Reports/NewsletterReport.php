@@ -32,6 +32,7 @@ namespace App\Reports;
 
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
+use App\Models\Announcements;
 use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
 use App\Models\Service;
@@ -106,7 +107,8 @@ class NewsletterReport extends AbstractWordDocumentReport
                     ->notHidden();
             })
             ->orderBy('start')
-            ->get()
+            ->get();
+        $events = Announcements::expandMultiDayEvents($events)
             ->groupBy(function ($item) {
                 return $item->start->format('Y-m-d');
             });
