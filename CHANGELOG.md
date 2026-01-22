@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.5.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.5.1...v2026.5.2) (2026-01-22)
+
+
+### Bug Fixes
+
+* Bekanntgaben brauchen Format für ganztägige Veranstaltungen ([eeedde5](https://codeberg.org/pfarr.tools/pfarrplaner/commit/eeedde5db6d4f88438fba2bec1578524c0465542))
+* Ganztägige Veranstaltungen werden am falschen Tag angezeigt. ([5b0d1d3](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5b0d1d3dacb3cf4b768a38f281ffcd1116145695))
+* Newsletter braucht Format für ganztägige Veranstaltungen ([860eb67](https://codeberg.org/pfarr.tools/pfarrplaner/commit/860eb6720a39287c34842b31bd97592a4cf92261))
+* Powerpoint braucht Format für ganztägige Veranstaltungen ([d35a953](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d35a953594515fd4b00d9650a3b023d2b5370df6))
+* WebBuilder braucht Format für ganztägige Veranstaltungen ([cd2f8b1](https://codeberg.org/pfarr.tools/pfarrplaner/commit/cd2f8b14d329f2a526b70178a7e9f5d907c6ce3a))
+
 ### [2026.5.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.5.0...v2026.5.1) (2026-01-17)
 
 
