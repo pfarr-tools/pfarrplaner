@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.7.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.6.0...v2026.7.0) (2026-01-22)
+
+
+### Features
+
+* Benutzereinstellung für schnelles Eintragen wird gespeichert ([d2f2ee1](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d2f2ee1ae1cc3f3189c80f11dc4fdfb3080186ee))
+
 ## [2026.6.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.5.2...v2026.6.0) (2026-01-22)
 
 
