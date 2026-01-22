@@ -9,7 +9,7 @@
             @php $firstLine = true; @endphp
             @foreach($theseEvents as $event)
                 <tr>
-                    <td valign="top" style="text-align: left;">@if($firstLine){!! str_replace(' ', '&nbsp;', $event->start->isoFormat('dd., DD. MMM')) !!}@php $firstLine = false;@endphp@endif</td>
+                    <td valign="top" style="text-align: left;">@if($firstLine){!! str_replace(' ', '&nbsp;', $event->start->setTimeZone('Europe/Berlin')->isoFormat('dd., DD. MMM')) !!}@php $firstLine = false;@endphp@endif</td>
                     <td valign="top" style="text-align: right;">{!!  $event->event->is_allday ? '' : str_replace(' ', '&nbsp;', $event->event->timeText() ) !!}</td>
                     <td valign="top" style="text-align: left; font-weight: bold;">{{ $event->event->titleText(false) }}</td>
                     <td valign="top" style="text-align: left;">{{ $event->event->locationTextWithCity }}</td>
@@ -62,7 +62,7 @@
 
                                     <table cellspacing="0" cellpadding="0" width="100%"><tbody><tr><td class="cr-text color-2" style="color: #000000; ;;;font-family: Helvetica, Arial, sans-serif; font-size: 14px; ;;;padding:10px 20px;" data-style="padding:inherit;color:inherit;" data-name="Text">
                                                 <!--#html#--><p align="left"><span style="font-size: 18px;"><strong>{{ $event->service->titleText(false) }}<br>
-                                                            <span style="font-size: 14px;">{{ $event->start->isoFormat('dddd, D. MMMM') }}{{ ($event->event->is_allday ? ($event->start->setTimeZone('Europe/Berlin')->format('Ymd') != $event->end->setTimeZone('Europe/Berlin')->format('Ymd') ? ' - '.$event->end->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM') : '') : ', ' . $event->service->timeText()) }}, {{ $event->service->locationTextWithCity }}</span></strong></span><br><br>{{ $event->getAdText('newsletter') }}</p><!--#/html#-->
+                                                            <span style="font-size: 14px;">{{ $event->start->setTimeZone('Europe/Berlin')->isoFormat('dddd, D. MMMM') }}{{ ($event->event->is_allday ? ($event->start->setTimeZone('Europe/Berlin')->format('Ymd') != $event->end->setTimeZone('Europe/Berlin')->format('Ymd') ? ' - '.$event->end->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM') : '') : ', ' . $event->service->timeText()) }}, {{ $event->service->locationTextWithCity }}</span></strong></span><br><br>{{ $event->getAdText('newsletter') }}</p><!--#/html#-->
                                             </td></tr></tbody></table>
 
                                     <!--[if mso | IE]></td></tr></table><![endif]-->

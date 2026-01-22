@@ -318,7 +318,7 @@ class BillBoardReport extends AbstractWordDocumentReport
         }
         $this->doc->renderParagraph(static::DEFAULT, [['Termine', static::BOLD]], 2);
         foreach ($events as $dayEvents) {
-            $title = $dayEvents->first()->start->isoFormat('dddd, DD. MMMM') . ' ';
+            $title = $dayEvents->first()->start->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM') . ' ';
             if ($dayEvents->first()->event->liturgicalInfo['title'] ?? false) {
                 $title .= ' - ' . $dayEvents->first()->event->liturgicalInfo['title'] . ' - ';
             }

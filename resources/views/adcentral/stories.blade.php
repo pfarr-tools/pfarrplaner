@@ -132,7 +132,7 @@
                     data-title="{{ $event->service->titleText(false) }}"
                     data-description="{{ $event->service->descriptionText() }}"
                     data-start="{{ $event->adStart->isoFormat('dddd, D. MMMM') }}"
-                    data-info="{{ $event->start->isoFormat('dddd, D. MMMM') }}, {{ $event->service->timeText() }}, {{ $event->service->locationTextWithCity }}"
+                    data-info="{{ $event->start->setTimeZone('Europe/Berlin')->isoFormat('dddd, D. MMMM') }}, {{ $event->service->timeText() }}, {{ $event->service->locationTextWithCity }}"
                     data-adtext="{{ $event->getAdText('story') }}"
                 >
             </section>

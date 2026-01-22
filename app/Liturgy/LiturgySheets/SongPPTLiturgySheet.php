@@ -868,20 +868,20 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setOffsetY($slideHeight - 240);
         $paragraph = $shape->getActiveParagraph();
         $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $paragraph->createTextRun(($multiDay ? 'Ab ' : '').$event->start->isoFormat('dddd'))->getFont()
+        $paragraph->createTextRun(($multiDay ? 'Ab ' : '').$event->start->setTimeZone('Europe/Berlin')->isoFormat('dddd'))->getFont()
             ->setBold(false)
             ->setSize(12)
             ->setColor($overlayTextColor)
             ->setName('Sarabun Light');
         $paragraph = $shape->createParagraph();
         $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $paragraph->createTextRun($event->start->isoFormat('D'))->getFont()
+        $paragraph->createTextRun($event->start->setTimeZone('Europe/Berlin')->isoFormat('D'))->getFont()
             ->setSize(50)
             ->setColor($overlayTextColor)
             ->setName('Sarabun ExtraBold');
         $paragraph = $shape->createParagraph();
         $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $paragraph->createTextRun($event->start->isoFormat('MMMM'))->getFont()
+        $paragraph->createTextRun($event->start->setTimeZone('Europe/Berlin')->isoFormat('MMMM'))->getFont()
             ->setBold(false)
             ->setSize(12)
             ->setColor($overlayTextColor)

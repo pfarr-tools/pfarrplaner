@@ -44,7 +44,7 @@
                 @foreach ($events as $theseEvents)@if(trim($theseEvents->first()->liturgicalInfo['title'] ?? '') && (substr($theseEvents->first()->liturgicalInfo['date'] ?? '',0,10) == $theseEvents->first()->event->date->format('Y-m-d')))
                     <tr style="background-color: #ccc !important;">
                         <td valign="top"
-                            style="vertical-align:top;">{!! $theseEvents->first()->start->isoFormat('dd.,\&\n\b\s\p;DD.MM.') !!}</td>
+                            style="vertical-align:top;">{!! $theseEvents->first()->start->setTimeZone('Europe/Berlin')->isoFormat('dd.,\&\n\b\s\p;DD.MM.') !!}</td>
                         <td></td>
                         <td valign="top" colspan="2"
                             style="vertical-align:top; font-weight: bold;">{{ str_replace('So.', 'Sonntag', $theseEvents->first()->liturgicalInfo['title'] ?? '') }}</td>
@@ -52,7 +52,7 @@
                     @endif @foreach($theseEvents as $occurence)
                             <tr>
                                 <td valign="top"
-                                    style="vertical-align:top;">{!! $occurence->start->isoFormat('dd.,\&\n\b\s\p;DD.MM.') !!}</td>
+                                    style="vertical-align:top;">{!! $occurence->start->setTimeZone('Europe/Berlin')->isoFormat('dd.,\&\n\b\s\p;DD.MM.') !!}</td>
                                 <td valign="top">{{ $occurence->event->timeText(true, '.') }}</td>
                                 <td valign="top">
                                     <b>{{ $occurence->event->titleText(false, false) }}</b> @if($occurence->event->participantsText('P') != '')
