@@ -20,7 +20,7 @@
                         </div>
                         <div class="container-title">
                             <div class="text-center" style="font-weight: bold; line-height: 1; margin: .5em 0;">
-                                {{ $event->start->isoFormat('dddd, D. MMMM') }}, {{ $event->event->timeText() }}<br />
+                                {{ $event->start->setTimeZone('Europe/Berlin')->isoFormat('dddd, D. MMMM') }}{{ ($event->event->is_allday ? ($event->start->setTimeZone('Europe/Berlin')->format('Ymd') != $event->end->setTimeZone('Europe/Berlin')->format('Ymd') ? ' - '.$event->end->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM') : '') : ', ' . $event->service->timeText()) }}<br />
                                 {{ $event->event->locationTextWithCity }}
                             </div>
                             <h3 class="header-color-standard header-default header-icon-pos-center header-align-center">
