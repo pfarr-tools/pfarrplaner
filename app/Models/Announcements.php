@@ -74,10 +74,13 @@ class Announcements
     /** @var bool Use tabs \t in output? */
     protected bool $useTabs = false;
 
-    public function __construct(Service $service, City $city, $excludeRegularWeekly = false)
+    protected $eventListKeyFormat = 'dddd, D. MMMM';
+
+    public function __construct(Service $service, City $city, $excludeRegularWeekly = false, $eventListKeyFormat = 'dddd, D. MMMM')
     {
         $this->service = $service;
         $this->city = $city;
+        $this->eventListKeyFormat = $eventListKeyFormat;
 
         $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d') . ' 0:00:00 last Sunday');
         $nextWeek = $lastWeek->copy()->addWeeks(2)->setTime(
@@ -119,7 +122,7 @@ class Announcements
             }
         }
         $this->events = $this->events->concat($extra)->sortBy('start')->groupBy(function ($event) {
-                return $event->start->setTimezone('Europe/Berlin')->isoFormat('dddd, DD. MMMM');
+                return $event->start->setTimezone('Europe/Berlin')->isoFormat($this->eventListKeyFormat);
             }, function ($event) {
                 return $event->start->format('Hi');
             });
@@ -554,6 +557,16 @@ class Announcements
     public function setUseTabs(bool $useTabs): void
     {
         $this->useTabs = $useTabs;
+    }
+
+    public function getEventListKeyFormat(): string
+    {
+        return $this->eventListKeyFormat;
+    }
+
+    public function setEventListKeyFormat(string $eventListKeyFormat): void
+    {
+        $this->eventListKeyFormat = $eventListKeyFormat;
     }
 
 

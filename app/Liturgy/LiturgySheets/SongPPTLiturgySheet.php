@@ -36,6 +36,7 @@ use App\Helpers\PPTUnitsHelper;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Music\ABCMusic;
+use App\Models\Announcements;
 use App\Models\Calendar\Occurence;
 use App\Models\Liturgy\Item;
 use App\Models\Service;
@@ -666,21 +667,12 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         if ($service->date->diffInDays($end) < 6) $end->addWeek(1);
 
 
+        $announcements = new Announcements($service, $service->city, false, 'YYYY-MM-DD');
+
         // get the events to be listed (if not already cached)
         if (!count($this->adEventsToBeListed)) {
-            $this->adEventsToBeListed = Occurence::between($start, $end)
-                ->whereHas('service', function ($query) use ($service) {
-                    $query->inCities($this->config['showAdsFromCities'])
-                        ->notHidden()
-                        ->where('id', '!=', $service->id)
-                        ->displayable($service->date);
-                })->orderBy('start')
-                ->get()
-                ->groupBy(function ($occurence) {
-                    return $occurence->start->setTimeZone('Europe/Berlin')->format('Y-m-d');
-                });
+            $this->adEventsToBeListed = $announcements->getEvents();
         }
-
 
         // get the events to be highlighted (if not already cached)
         if (!count($this->adEventsToBeHighlighted)) {
@@ -831,16 +823,18 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         $paragraph = $shape->getActiveParagraph();
         $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)->setMarginLeft(150);
-        $run = $paragraph->createTextRun($date->setTimezone('Europe/Berlin')->format('H:i').' Uhr')->getFont()
-            ->setBold(false)
-            ->setSize((int)($this->config['fontSize']*0.5))
-            ->setColor($inverseTextColor)
-            ->setName('Sarabun Light');
-        $run = $paragraph->createTextRun(' | ')->getFont()
-            ->setBold(false)
-            ->setColor($gray)
-            ->setSize((int)($this->config['fontSize']*0.5))
-            ->setName('Sarabun Light');
+        if (!$event->event->is_allday) {
+            $run = $paragraph->createTextRun($date->setTimezone('Europe/Berlin')->format('H:i').' Uhr')->getFont()
+                ->setBold(false)
+                ->setSize((int)($this->config['fontSize']*0.5))
+                ->setColor($inverseTextColor)
+                ->setName('Sarabun Light');
+            $run = $paragraph->createTextRun(' | ')->getFont()
+                ->setBold(false)
+                ->setColor($gray)
+                ->setSize((int)($this->config['fontSize']*0.5))
+                ->setName('Sarabun Light');
+        }
         $run = $paragraph->createTextRun($event->service->locationTextWithCity)
             ->getFont()
             ->setBold(false)
@@ -854,6 +848,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setName('Sarabun SemiBold')
             ->setSize($this->config['fontSize'])
             ->setColor($inverseTextColor);
+
+        $multiDay = $event->event->is_allday && ($event->start->setTimeZone('Europe/Berlin')->format('Ymd') != $event->end->setTimeZone('Europe/Berlin')->format('Ymd'));
 
         $shape = $slide->createAutoShape()
             ->setType(AutoShape::TYPE_OVAL)
@@ -872,7 +868,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setOffsetY($slideHeight - 240);
         $paragraph = $shape->getActiveParagraph();
         $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $paragraph->createTextRun($event->start->isoFormat('dddd'))->getFont()
+        $paragraph->createTextRun(($multiDay ? 'Ab ' : '').$event->start->isoFormat('dddd'))->getFont()
             ->setBold(false)
             ->setSize(12)
             ->setColor($overlayTextColor)
@@ -950,12 +946,14 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 ->getAlignment()
                 ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
                 ->setMarginRight(10);
-            $cell->createTextRun($event->service->timeText())
-                ->getFont()
-                ->setBold(false)
-                ->setSize($listFontSize)
-                ->setColor($textColor)
-                ->setName('Sarabun Light');
+            if (!$event->event->is_allday) {
+                $cell->createTextRun($event->service->timeText())
+                    ->getFont()
+                    ->setBold(false)
+                    ->setSize($listFontSize)
+                    ->setColor($textColor)
+                    ->setName('Sarabun Light');
+            }
             $cell = $row->nextCell();
             $cell->setWidth(700);
 
