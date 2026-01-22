@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.6.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.5.2...v2026.6.0) (2026-01-22)
+
+
+### Features
+
+* Benutzer können sich im Kalender schnell selbst eintragen ([69a24e3](https://codeberg.org/pfarr.tools/pfarrplaner/commit/69a24e3e62d0810c4b212fa5e3d272bd92e76eb1))
+
 ### [2026.5.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.5.1...v2026.5.2) (2026-01-22)
 
 
