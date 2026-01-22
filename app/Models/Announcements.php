@@ -101,9 +101,25 @@ class Announcements
                 }
             })
             ->orderBy('start')
-            ->get()
-            ->groupBy(function ($event) {
-                return $event->start->isoFormat('dddd, DD. MMMM');
+            ->get();
+
+        // expand multi-full-day events to each of the days
+        $extra = collect();
+        foreach ($this->events as $event) {
+            if (!$event->event->is_allday) continue;
+            if ($event->start->setTimezone('Europe/Berlin')->format('Ymd') == $event->end->setTimezone('Europe/Berlin')->format('Ymd')) continue;
+            $cursor = $event->start->copy()->addDay();
+            while ($cursor < $event->end) {
+                $newEvent = clone $event;
+                $newEvent->event = clone $event->event;
+                $newEvent->start = $cursor;
+                $newEvent->event->date = $cursor;
+                $extra->push($newEvent);
+                $cursor->addDay();
+            }
+        }
+        $this->events = $this->events->concat($extra)->sortBy('start')->groupBy(function ($event) {
+                return $event->start->setTimezone('Europe/Berlin')->isoFormat('dddd, DD. MMMM');
             }, function ($event) {
                 return $event->start->format('Hi');
             });
@@ -378,7 +394,7 @@ class Announcements
             $paragraphs[] = '';
             $paragraphs[] = $day;
             foreach ($events as $event) {
-                $paragraphs[] = $event->event->timeText() . $this->tab()
+                $paragraphs[] = ($event->event->is_allday ? '' : $event->event->timeText() . $this->tab())
                     . Str::replace('&', '&amp;', $event->event->titleText(false, false))
                     . (count($event->event->pastors ?? []) ?
                         ' mit ' . $event->event->pastors->map(function ($pastor) {
@@ -405,7 +421,8 @@ class Announcements
         $paragraphs = [];
         foreach ($this->featuredEvents as $event) {
             $paragraphs[] = '';
-            $paragraphs[] = $event->start->isoFormat('dddd, DD. MMMM') . ', ' . $event->service->timeText()
+            $paragraphs[] = $event->start->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM')
+                . ($event->event->is_allday ? ($event->start->setTimeZone('Europe/Berlin')->format('Ymd') != $event->end->setTimeZone('Europe/Berlin')->format('Ymd') ? ' - '.$event->end->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM') : '') : ', ' . $event->service->timeText())
                 . ', ' . $event->service->locationTextWithCity;
             $paragraphs[] = $event->service->titleText(false);
             $paragraphs[] = $event->getAdText('newsletter');

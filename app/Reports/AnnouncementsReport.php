@@ -448,16 +448,18 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
                 if ($item->data_type == 'reading') {
-                    $title = 'Schriftlesung aus ' . $item->data['reference'];
+                    if ($item->data['reference']) {
+                        $title = 'Schriftlesung aus ' . $item->data['reference'];
 
-                    /** @var ReadingItemHelper $helper */
-                    $helper = $item->getHelper();
-                    $helper->renderToWordDocument($this->doc, true, true, $title, 1);
+                        /** @var ReadingItemHelper $helper */
+                        $helper = $item->getHelper();
+                        $helper->renderToWordDocument($this->doc, true, true, $title, 1);
 
-                    $this->doc->renderParagraph(self::NO_INDENT, [], 1);
-                    $this->doc->renderParagraph(self::NO_INDENT, [
-                        ['Der Herr segne sein Wort an uns. Amen.', ['italic' => true]],
-                    ],                          1);
+                        $this->doc->renderParagraph(self::NO_INDENT, [], 1);
+                        $this->doc->renderParagraph(self::NO_INDENT, [
+                            ['Der Herr segne sein Wort an uns. Amen.', ['italic' => true]],
+                        ],                          1);
+                    }
                 }
             }
         }
