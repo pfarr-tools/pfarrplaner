@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.8.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.7.0...v2026.8.0) (2026-01-24)
+
+
+### Features
+
+* KI-Prompt für Gottesdienste ([30bbbd4](https://codeberg.org/pfarr.tools/pfarrplaner/commit/30bbbd494ce5fca63f11fb0abebe1802e558c79c))
+
 ## [2026.7.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.6.0...v2026.7.0) (2026-01-22)
 
 
