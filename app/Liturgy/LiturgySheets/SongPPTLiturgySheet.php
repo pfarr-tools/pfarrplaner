@@ -736,7 +736,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                     $this->renderEventHighlightSlide($cursor,
                                                      $event,
                                                      $currentSlideNumber+1,
-                                                     $finalAdSlideNumber);
+                                                     $finalAdSlideNumber,
+                                                     $isFinalLoop);
                 }
 
             }
