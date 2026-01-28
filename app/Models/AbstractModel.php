@@ -337,7 +337,7 @@ class AbstractModel extends Model
      */
     public function fillDefaults(): array
     {
-        return ['default_ministries' => []];
+        return [];
     }
 
 

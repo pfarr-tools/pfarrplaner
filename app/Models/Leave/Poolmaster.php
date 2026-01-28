@@ -39,7 +39,7 @@ class Poolmaster extends AbstractModel
 {
 
     protected $fillable = ['id',  'pool_id', 'user_id', 'start', 'end'];
-    protected $casts = ['from' => 'date', 'to' => 'date'];
+    protected $casts = ['start' => 'date', 'end' => 'date'];
 
 
     protected static string $prefix = 'poolmaster';
@@ -78,8 +78,41 @@ class Poolmaster extends AbstractModel
 
     public function getLabelAttribute(): string
     {
-        return $this->pool->name.', '.$this->start.'-'.$this->end;
+        return ($this->pool ? $this->pool->name.', ' : '').$this->start.'-'.$this->end;
     }
 
+    /**
+     * Get an empty model instance
+     *
+     * @override AbstractModel::getEmptyModel() because Poolmaster has no name field
+     */
+    public static function getEmptyModel(): AbstractModel
+    {
+        $model = new static();
+        $data = array_merge(array_fill_keys($model->getFillable(), null), $model->fillDefaults());
+        $model->fill($data);
+        return $model;
+    }
+
+
+    /**
+     * Mutator for start date, needed to deal with ISO date strings
+     * @param $value
+     * @return void
+     */
+    public function setStartAttribute($value): void
+    {
+        $this->attributes['start'] = $value ? Carbon::parse($value)->toDateString() : null;
+    }
+
+    /**
+     * Mutator for end date, needed to deal with ISO date strings
+     * @param $value
+     * @return void
+     */
+    public function setEndAttribute($value): void
+    {
+        $this->attributes['end'] = $value ? Carbon::parse($value)->toDateString() : null;
+    }
 
 }

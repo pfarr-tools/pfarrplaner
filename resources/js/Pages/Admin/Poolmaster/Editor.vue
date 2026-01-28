@@ -55,10 +55,10 @@ export default {
     props: ['poolmaster', 'pools', 'date', 'user'],
     data() {
         return {
-            myPoolmaster: this.poolmaster ? {
-                ...this.poolmaster,
+            myPoolmaster: this.poolmaster.id ? {
                 start: moment(this.poolmaster.start).startOf('day'),
                 end: moment(this.poolmaster.end).endOf('day'),
+                ...this.poolmaster,
             } : {
                 id: null,
                 user_id: this.user.id,
