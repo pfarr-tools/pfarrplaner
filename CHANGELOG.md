@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.8.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.8.0...v2026.8.1) (2026-01-28)
+
+
+### Bug Fixes
+
+* Fehler beim Erstellen von PPT ([084f846](https://codeberg.org/pfarr.tools/pfarrplaner/commit/084f846540093f9e4a7b786b3e857a9df66c9536))
+* Fehler beim Erstellen von PPT ([8e027ae](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8e027aef180b0a3f64b9f942a769dde231228ee9))
+* Poolmaster können nicht angelegt werden ([277c807](https://codeberg.org/pfarr.tools/pfarrplaner/commit/277c80736fe29ac44c09d30801771e33d0d8d4a1))
+* SingleMinistryReport sendet Exceldatei direkt binär in den Browser ([dae87a4](https://codeberg.org/pfarr.tools/pfarrplaner/commit/dae87a43085a7ba50b920b29da64297c57fcc5cf))
+
 ## [2026.8.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.7.0...v2026.8.0) (2026-01-24)
 
 
