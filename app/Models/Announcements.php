@@ -76,10 +76,12 @@ class Announcements
 
     protected $eventListKeyFormat = 'dddd, D. MMMM';
 
-    public function __construct(Service $service, City $city, $excludeRegularWeekly = false, $eventListKeyFormat = 'dddd, D. MMMM')
+    public function __construct(Service $service, $city, $excludeRegularWeekly = false, $eventListKeyFormat = 'dddd, D. MMMM')
     {
         $this->service = $service;
-        $this->city = $city;
+        if (is_a($city, City::class)) $city = [$city->id];
+        elseif (!is_array($city)) $city = [$city];
+        $city = City::whereIn('id', $city)->get();
         $this->eventListKeyFormat = $eventListKeyFormat;
 
         $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d') . ' 0:00:00 last Sunday');
@@ -90,11 +92,11 @@ class Announcements
         );
 
         $this->events = Occurence::with('event')
-            ->between($service->date->copy()->addHour(1), $nextWeek)
+            ->between($service->date->copy()->addHour(2), $nextWeek)
             ->whereHas('service', function ($query) use ($service, $city, $excludeRegularWeekly) {
                 $query->withoutGlobalScope(ServicesOnlyScope::class);
                 $query->where('id', '!=', $service->id);
-                $query->inCity($city)->displayable($service->date);
+                $query->inCities($city)->displayable($service->date);
                 if ($excludeRegularWeekly ?? false) {
                     // do not include events that are (1) not services and (2) repeat every week
                     $query->where(function ($q2) {
@@ -115,7 +117,7 @@ class Announcements
 
         $this->featuredEvents = Occurence::with('event')
             ->whereHas('service', function ($query) use ($service, $city) {
-                $query->inCity($city)->displayable($service->date);
+                $query->inCities($city)->displayable($service->date);
             })
             ->adRunningAt('bekanntgaben', $service->date)
             ->orderBy('start')
@@ -125,7 +127,7 @@ class Announcements
             ->whereHas(
                 'service',
                 function ($query) use ($service, $city) {
-                    $query->inCity($city)
+                    $query->inCities($city)
                         ->displayable($service->date);
                 }
             )
@@ -136,7 +138,7 @@ class Announcements
                 'service',
                 function ($query) use ($service, $nextWeek, $city) {
                     $query->between($service->date, $nextWeek)
-                        ->inCity($city)
+                        ->inCities($city)
                         ->displayable($service->date)
                         ->ordered();
                 }
@@ -154,7 +156,7 @@ class Announcements
                 'service',
                 function ($query) use ($service, $nextWeek, $city) {
                     $query->between($service->date, $nextWeek)
-                        ->inCity($city)
+                        ->inCities($city)
                         ->displayable($service->date)
                         ->ordered();
                 }

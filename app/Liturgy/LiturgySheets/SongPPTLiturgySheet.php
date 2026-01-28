@@ -667,7 +667,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         if ($service->date->diffInDays($end) < 6) $end->addWeek(1);
 
 
-        $announcements = new Announcements($service, $service->city, false, 'YYYY-MM-DD');
+        $announcements = new Announcements($service, $this->config['showAdsFromCities'], false, 'YYYY-MM-DD');
 
         // get the events to be listed (if not already cached)
         if (!count($this->adEventsToBeListed)) {
