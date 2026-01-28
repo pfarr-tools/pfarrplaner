@@ -236,26 +236,13 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
             $row++;
         }
 
-
-        $fileName = FileNameService::make(
+        return $this->sendXlsxToBrowser($fileName = FileNameService::make(
             static::FILE_TITLE . ' ' . join(',', $data['ministries']),
             'xlsx',
             static::FILE_SIGNATURE,
             [$data['start'], $data['end']]
-        );
+        ), $spreadsheet);
 
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $fileName . '"');
-        header('Cache-Control: max-age=0');
-        header('Cache-Control: max-age=1');
-        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT'); // always modified
-        header('Cache-Control: cache, must-revalidate'); // HTTP/1.1
-        header('Pragma: public'); // HTTP/1.0
-
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save('php://output');
-        exit;
     }
 
     protected function getAvailableMinistries()
@@ -296,4 +283,16 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
 
         return $ministries;
     }
+
+
+
+    public function sendXlsxToBrowser($filename, $spreadsheet)
+    {
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($tempFile);
+        return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+            ->deleteFileAfterSend(true);
+    }
+
 }
