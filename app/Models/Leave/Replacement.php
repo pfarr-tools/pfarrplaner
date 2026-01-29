@@ -108,8 +108,8 @@ class Replacement extends Model
                     ->where('end', '>=', $this->from)
                     ->get();
                 foreach ($poolmasters as $poolmaster) {
-                    $from = max(Carbon::parse($poolmaster->start . ' 0:00:00'), $this->from);
-                    $to = min(Carbon::parse($poolmaster->end . ' 23:59:59'), $this->to);
+                    $from = max(Carbon::parse($poolmaster->start)->startOfDay(), $this->from);
+                    $to = min(Carbon::parse($poolmaster->end)->endOfDay(), $this->to);
 
                     $texts[] = $poolmaster->user->name . ' [Poolmaster:in "' . $poolmaster->pool->name . '"]'
                         . ' (' . StringTool::durationText($from, $to) . ')';
@@ -153,8 +153,8 @@ class Replacement extends Model
                 ->where('end', '>=', $this->from)
                 ->get();
             foreach ($poolmasters as $poolmaster) {
-                $from = max(Carbon::parse($poolmaster->start . ' 0:00:00'), $this->from);
-                $to = min(Carbon::parse($poolmaster->end . ' 23:59:59'), $this->to);
+                $from = max(Carbon::parse($poolmaster->start)->startOfDay(), $this->from);
+                $to = min(Carbon::parse($poolmaster->end)->endOfDay(), $this->to);
 
                 $users[$from->format('Ymd') . $to->format(
                     'Ymd'
