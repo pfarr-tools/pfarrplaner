@@ -46,7 +46,7 @@ class GetLiturgyInfo extends Command
      *
      * @var string
      */
-    protected $signature = 'liturgy:get';
+    protected $signature = 'liturgy:get {--only=}';
 
     /**
      * The console command description.
@@ -77,29 +77,44 @@ class GetLiturgyInfo extends Command
         foreach (\File::allFiles(app_path('StudyHelpers')) as $file) {
             if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract'))) {
                 $className = substr('App\\StudyHelpers\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+                /** @var AbstractStudyHelper $studyHelperProvider */
                 $studyHelperProvider = new $className($this);
-                $studyHelperProviders[$studyHelperProvider->title] = $studyHelperProvider;
+                $studyHelperProviders[$studyHelperProvider->getKey()] = $studyHelperProvider;
             }
         };
 
+        $only = $this->option('only') ? explode(',', $this->option('only')) : [];
+
         $this->getOutput()->section('Verzeichnisse lesen');
+
+        $data = [];
 
         $maxYear = Service::select('date')->distinct()->orderBy('date', 'desc')->first()->date->year;
         for ($year = 2018; $year <= $maxYear; $year++) {
-            $this->processItem('Kalender für '.$year, function () use ($year) {
-                Storage::put(
-                    'liturgy/'.$year.'.json',
-                    file_get_contents('https://kirchenjahr.pfarr.tools/api/jahr/'.$year)
-                );
-            });
+            if (empty($only) || in_array($year, $only)) {
+                $this->processItem('Kalender für '.$year, function () use ($year, &$data) {
+                    $data[$year] = json_decode(file_get_contents('https://kirchenjahr.pfarr.tools/api/jahr/'.$year), true);
+                    /**
+                    Storage::put(
+                        'liturgy/'.$year.'.json',
+                        file_get_contents('https://kirchenjahr.pfarr.tools/api/jahr/'.$year)
+                    );
+                     */
+                });
+            }
         }
 
-        foreach ($studyHelperProviders as $studyHelperProvider) {
-            $this->processItem($studyHelperProvider->title, function () use ($studyHelperProvider) {
-                    $studyHelperProvider->read();
-            });
+        foreach ($studyHelperProviders as $key => $studyHelperProvider) {
+            if (empty($only) || in_array($key, $only)) {
+                $this->processItem($studyHelperProvider->title, function () use ($studyHelperProvider, &$data) {
+                   $data = $studyHelperProvider->assign($data);
+                });
+            }
         }
 
+        foreach ($data ?? [] as $year => $calendar) {
+            Storage::put('liturgy/'.$year.'.json', json_encode($calendar));
+        }
 
         $this->newLine(2);
         $this->line('Der liturgische Kalender wurde aktualisiert.');

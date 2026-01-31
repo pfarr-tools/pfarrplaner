@@ -42,11 +42,12 @@ class DasKirchenjahrStudyHelper extends AbstractStudyHelper
 
 
 
-    function read(): void {
+    function read(array $data): array
+    {
         if ('' == ($content = $this->getContent(
                 'https://www.daskirchenjahr.de/'
             ))) {
-            return;
+            return [];
         }
         preg_match_all('/<A href="tag.php\?name=&zeit=(.*?)&typ=Einfuehrung/', $content, $matches);
         $pages = collect($matches[1])->reject(function ($item) {
@@ -57,6 +58,7 @@ class DasKirchenjahrStudyHelper extends AbstractStudyHelper
         }
 
         $this->records['Ewigkeitssonntag'] = ['[Das Kirchenjahr] Letzter Sonntag im Kirchenjahr' => 'https://www.daskirchenjahr.de/tag.php?name=letzter&zeit=Kirchenjahresende'];
+        return $this->records;
     }
     function readPage(string $page): array
     {

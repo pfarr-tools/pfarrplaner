@@ -39,13 +39,17 @@ class VELKDStudyHelper extends AbstractStudyHelper
     public $title = 'VELKD Lesepredigt';
     protected $records = [];
 
-    function read(): void
+    function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('https://www.velkd.de/schwerpunkte/liturgie/lesepredigt'))) return;
+        if ('' == ($content = $this->getContent('https://www.velkd.de/schwerpunkte/liturgie/lesepredigt'))) return [];
         $content = Str::replace("\n", '', $content);
-        preg_match('/<li><a href="(.*?)"(?:.*?)Lesepredigt für(?:.*)(\d\d\.\d\d\.\d\d\d\d)/', $content, $matches);
 
-        $this->records[$matches[2]] = ['[VELKD] Lesepredigt für den '.$matches[2] => 'https://www.velkd.de'.$matches[1]];
+        //https://www.velkd.de/fileadmin/user_upload/VELKD/PDF/Lesepredigt/Lesepredigt-01-02-2026.pdf
+        preg_match('/Lesepredigt-(\d\d\-\d\d\-\d\d\d\d)/', $content, $matches);
+
+        $myDate = Str::replace('-', '.', $matches[1]);
+        $this->records[$myDate] = ['[VELKD] Lesepredigt für den '.$myDate => 'https://www.velkd.de/fileadmin/user_upload/VELKD/PDF/Lesepredigt/Lesepredigt-'.$matches[1].'.pdf'];
+        return $this->records;
     }
 
     function getLinks(array $data): array

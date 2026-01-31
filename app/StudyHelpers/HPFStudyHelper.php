@@ -39,9 +39,9 @@ class HPFStudyHelper extends AbstractStudyHelper
     public $title = 'Heidelberger Predigtforum';
     protected $records = [];
 
-    function read(): void
+    function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('https://predigtforum.de/'))) return;
+        if ('' == ($content = $this->getContent('https://predigtforum.de/'))) return [];
         $content = Str::replace("\n", '', $content);
         preg_match_all('/<h3>(.*?)<\/h3>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<a(?:.*?)href="(.*?)"/', $content, $matches);
 
@@ -50,6 +50,7 @@ class HPFStudyHelper extends AbstractStudyHelper
             if (!isset($this->records[$date])) $this->records[$date] = [];
             $this->records[$date]['[Heidelberger Predigtforum] '.$date.': '.$matches[2][$index].' ('.$matches[6][$index].')'] = $matches[7][$index];
         }
+        return $this->records;
     }
 
     function getLinks(array $data): array

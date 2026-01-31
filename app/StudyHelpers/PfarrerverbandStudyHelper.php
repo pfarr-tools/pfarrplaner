@@ -41,55 +41,27 @@ class PfarrerverbandStudyHelper extends AbstractStudyHelper
 
     protected $records = [];
 
-    function read(): void
+    function read(array $data): array
     {
-        $pages = $this->getPageIndexFrom('https://www.pfarrerverband.de/pfarrerverand-predigtimpulse');
-        if (!count($pages)) return;
-        $pages = array_unique(array_merge($pages, $this->getPageIndexFrom($pages[0])));
-        sort($pages);
-        foreach ($pages as $url) {
-            $this->records = array_merge($this->records ?? [], $this->getPageLinks($url));
+        if ('' == ($content = $this->getContent('https://www.pfarrerverband.de/pfarrerverand-predigtimpulse'))) return [];
+
+        try {
+
+            $content = Str::between($content, '<main>', '</main>');
+            $find = preg_match_all(
+                '~<strong>(\d{2}\.\d{2}\.\d{4})*</strong>[\s\S]*?href="([^"]+)"~i',
+                $content,
+                $matches
+            );
+        } catch (\Exception $e) {
+            dd($e);
         }
-    }
 
-    protected function getPageIndexFrom($url): array
-    {
-        $pages = [];
-        if ('' == ($content = Str::between($this->getContent($url), '<ul class="f3-widget-paginator pagination">', '</ul>'))) return [];
-        $doc = new \DOMDocument();
-        $doc->loadHTML($content);
-
-        foreach ($doc->getElementsByTagName('a') as $a) $pages[] = 'https://www.pfarrerverband.de'.$a->getAttribute('href');
-        return array_unique($pages);
-    }
-
-    protected function getPageLinks($url): array {
-        if ('' == ($content = $this->getContent($url))) return [];
-        $content = Str::replace("\n", '', $content);
-        //dd($url, $content);
-        preg_match_all('/Item.html(?:.*?)<h2(?:.*?)<b>(.*?)<\/b>(?:.*?)<br>\s+(.*?)\s+<\/h2>(?:.*?)<p>(.*?), (.*?)<\/p>(?:.*?)<strong>(.*?)<\/strong>(?:.*?)von (.*?)<\/p>(?:.*?)href="(.*?)"/', $content, $matches);
-        $records = [];
-        foreach ($matches[0] as $index => $match) {
-            $recordTitle = '[Pfarrerverband] "'.$matches[2][$index].'"'
-                .(Str::contains($matches[4][$index], '-->') ? '' : ', '.$matches[4][$index])
-                .' ('.trim($matches[6][$index]).')';
-            $records[$this->translateDate($matches[3][$index])] = [
-                $recordTitle => 'https://www.pfarrerverband.de'.$matches[7][$index],
-            ];
+        foreach ($matches[1] as $index => $date) {
+            $this->records[$date] = ['[Pfarrerverband] '.$date => 'https://www.pfarrerverband.de'.$matches[2][$index]];
         }
-        return $records;
+        return $this->records;
     }
-
-    protected function translateDate($date) {
-        $months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-
-        if (Str::contains($date, '<strong>')) return Str::betweenFirst($date, '<strong>', '</strong>');
-        foreach ($months as $index => $month) {
-            $date = Str::replace(' '.$month.' ', Str::padLeft($index+1, 2, '0').'.', $date);
-        }
-        return Str::padLeft($date, 10, '0');
-    }
-
 
     function getLinks(array $data): array
     {

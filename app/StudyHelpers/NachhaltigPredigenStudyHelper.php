@@ -40,9 +40,9 @@ class NachhaltigPredigenStudyHelper extends AbstractStudyHelper
 
     protected $records = [];
 
-    function read(): void
+    function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('http://www.nachhaltig-predigen.de/index.php/predigtanregungen/2023-24'))) return;
+        if ('' == ($content = $this->getContent('http://www.nachhaltig-predigen.de/index.php/predigtanregungen/2023-24'))) return [];
         $content = Str::replace("\n", '', $content);
         $content = Str::replace("\r", '', $content);
         preg_match_all('/<li><h4>(?:.*?)href="(.*?)">(?:<span class="mod-articles-category-title "(?: style="font-size: medium;")?>)?(.*?)(?:<\/span>)?<\/a>(?:.*?)<\/h4>/', $content, $matches);
@@ -54,6 +54,7 @@ class NachhaltigPredigenStudyHelper extends AbstractStudyHelper
                 $this->records[$date]['[Nachhaltig predigen] '.$parts[1].', '.$date] = 'http://www.nachhaltig-predigen.de'.$matches[1][$index];
             }
         }
+        return $this->records;
     }
 
     function getLinks(array $data): array

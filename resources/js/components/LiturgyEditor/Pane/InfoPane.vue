@@ -47,7 +47,7 @@
                             </div>
                     </div>
                     <div class="col-12 col-md-2 text-md-end">
-                        <div v-if="service.isEditable && false" class="dropdown">
+                        <div v-if="Object.keys(myService.liturgicalInfo.Links).length > 0" class="dropdown">
                             <button type="button" id="dropdownLinksMenuButton" data-bs-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="false" title="Links zu Predigthilfen"
                                     class="btn btn-light btn-sm mt-1 dropdown-toggle"><span data-v-5d98b2c4=""
@@ -55,13 +55,12 @@
                                 Materialsammlung
                             </button>
                             <div aria-labelledby="dropdownLinksMenuButton" class="dropdown-menu">
-                                <a :href="'https://www.kirchenjahr-evangelisch.de/article.php#'+liturgy['dayId']"
-                                   class="dropdown-item"
-                                   target="_blank">
-                                    <div class="fw-bold">Kirchenjahr Evangelisch</div>
-                                    <div>{{ liturgy['title'] }}</div>
+                                <a v-if="myService.liturgicalInfo.DKJ" target="_blank"
+                                   :href="myService.liturgicalInfo.DKJ.URL" class="dropdown-item">
+                                    <div class="fw-bold">Das Kirchenjahr</div>
+                                    <div>{{ myService.liturgicalInfo.Bezeichnung }}</div>
                                 </a>
-                                <a v-for="(link,linkTitle) in liturgy.links" target="_blank"
+                                <a v-for="(link,linkTitle) in myService.liturgicalInfo.Links" target="_blank"
                                    :href="link" class="dropdown-item">
                                     <div class="fw-bold">{{ linkTitle.substring(1, linkTitle.indexOf(']')) }}</div>
                                     <div v-if="getLinkAuthor(linkTitle)" class="text-small fst-italic">
@@ -142,8 +141,11 @@ export default {
             if (isNaN(key) && (!(['Altes Testament', 'Evangelium', 'Epistel'].includes(key)))) pKeys.push(key);
         }
 
+        let myService = this.service;
+        if (undefined === myService.liturgicalInfo.Links) myService.liturgicalInfo.Links = [];
+
         return {
-            myService: this.service,
+            myService,
             liturgy: this.service.liturgicalInfo,
             morePericopes: pKeys,
             originalAltDate: this.service.alt_liturgy_date,

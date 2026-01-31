@@ -30,8 +30,10 @@
 
 namespace App\StudyHelpers;
 
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 abstract class AbstractStudyHelper
 {
@@ -64,8 +66,27 @@ abstract class AbstractStudyHelper
         return $result->getBody()->getContents();
     }
 
+    public function getKey()
+    {
+        return Str::replace('StudyHelper', '', Str::afterLast(static::class, '\\'));
+    }
 
-    abstract function read(): void;
+    public function assign(array $data): array
+    {
+        $studyData = $this->read($data);
+        foreach ($studyData as $date => $record) {
+            $date = Carbon::createFromFormat('d.m.Y', $date);
+            if (isset($data[$date->year]['Tage'][$date->format('Y-m-d')])) {
+                foreach ($data[$date->year]['Tage'][$date->format('Y-m-d')] as $key => $tmp) {
+                    $data[$date->year]['Tage'][$date->format('Y-m-d')][$key]['Links'] = array_merge($data[$date->year]['Tage'][$date->format('Y-m-d')][$key]['Links'] ?? [], $record);
+                }
+            }
+        }
+        return $data;
+    }
+
+
+    abstract function read(array $data): array;
 
     abstract function getLinks(array $data): array;
 }

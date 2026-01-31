@@ -40,9 +40,9 @@ class PMWueStudyHelper extends AbstractStudyHelper
 
     public $title = 'Predigtmeditation aus Württemberg';
 
-    function read(): void
+    function read(array $data): array
     {
-        return;
+        return [];
     }
 
     function getLinks(array $data): array

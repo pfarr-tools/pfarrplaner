@@ -41,13 +41,13 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
 
     protected $records = [];
 
-    function read(): void
+    function read(array $data): array
     {
         // "Weitere Sonntage in der Trinitatiszeit
         if ('' == ($content = $this->getContent(
                 'https://www.liturgischer-wegweiser.de/gebete-und-lieder/trinitatiszeit/weitere-sonntage-in-der-trinitatiszeit/'
             ))) {
-            return;
+            return [];
         }
         $content = Str::replace("\n", '', $content);
         preg_match_all('/<li><a href="([^"<]+?)" class="c-mega-menu__sub-link">(.*?)<\/a><\/li>/', $content, $matches);
@@ -73,6 +73,7 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
             }
             $this->records[$title] = ['[Liturgischer Wegweiser] ' . $matches[2][$index] => 'https://www.liturgischer-wegweiser.de' . $matches[1][$index]];
         }
+        return $this->records;
     }
 
     protected function translateTitle($title)

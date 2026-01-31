@@ -40,11 +40,12 @@ class CalwerPredigtenStudyHelper extends AbstractStudyHelper
 
     protected $records = [];
 
-    function read(): void
+    function read(array $data): array
     {
         for ($i=0; $i<=90; $i+=10) {
             $this->records = array_merge($this->records ?? [], $this->readSinglePage('https://www.calwer-stiftung.com/calwer-predigten-online.365730.202264.htm?id=365730&md=202264&skip='.$i));
         }
+        return $this->records;
     }
 
     protected function readSinglePage($url) {

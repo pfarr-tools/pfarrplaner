@@ -39,13 +39,26 @@ class EFPStudyHelper extends AbstractStudyHelper
     protected $records = [];
 
 
-    function read(): void
+    function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('https://www.bibelwissenschaft.de/efp'))) return;
+        if ('' == ($content = $this->getContent('https://www.die-bibel.de/efp'))) return [];
 
-        $table = preg_match('/<table>(.*)<\/table>/m', $content, $matches);
-        $doc = new \DOMDocument();
-        $doc->loadHTML(utf8_decode($matches[0]));
+        $content = preg_replace(
+            '~</?\s*ibep-[a-z0-9-]+(?:\s+[^<>]*?)?\s*/?>~i',
+            '',
+            $content
+        );
+        $content = preg_replace(
+            '~<svg\b[^>]*>.*?</svg>~is',
+            '',
+            $content
+        );
+
+        $table = preg_match('/<table(.*)<\/table>/m', $content, $matches);
+        try {
+            $doc = new \DOMDocument();
+            $doc->loadHTML('$matches[0]', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        } catch (\Throwable $th) {}
 
         $records = [];
         foreach ($doc->getElementsByTagName('tr') as $tr) {
@@ -54,7 +67,7 @@ class EFPStudyHelper extends AbstractStudyHelper
             foreach ($tr->getElementsByTagName('td') as $td) {
                 switch ($colIdx) {
                     case 0:
-                        $record['url'] = 'https://www.bibelwissenschaft.de' . $td->childNodes[0]->getAttribute('href');
+                        $record['url'] = 'https://www.die-bibel.de' . $td->childNodes[0]->getAttribute('href');
                         break;
                     case 1:
                         $record['date'] = $td->nodeValue;
@@ -70,6 +83,7 @@ class EFPStudyHelper extends AbstractStudyHelper
             }
         }
         $this->records = $records;
+        return $records;
     }
 
     function getLinks(array $data): array

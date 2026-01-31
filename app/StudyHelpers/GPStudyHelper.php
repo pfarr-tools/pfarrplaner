@@ -40,9 +40,9 @@ class GPStudyHelper extends AbstractStudyHelper
 
     protected $records = [];
 
-    function read(): void
+    function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('https://www.theologie.uzh.ch/predigten/category/aktuelle/'))) return;
+        if ('' == ($content = $this->getContent('https://www.theologie.uzh.ch/predigten/category/aktuelle/'))) return [];
         $content = Str::replace("\n", '', $content);
         preg_match_all('/<h3 class="entry-title no-date"><a href="(.*?)">(.*?)<\/a>(?:.*?)<p>(?:.*?)(\d\d.\d\d.\d\d)/', $content, $matches);
 
@@ -51,6 +51,7 @@ class GPStudyHelper extends AbstractStudyHelper
             if (!isset($this->records[$date])) $this->records[$date] = [];
             $this->records[$date]['[Göttinger Predigten] '.$date.': '.$matches[2][$index]] = $matches[1][$index];
         }
+        return $this->records;
     }
 
     protected function translateDate($date) {
