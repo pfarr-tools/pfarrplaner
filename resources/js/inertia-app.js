@@ -78,48 +78,26 @@ window.moment = require('moment');
 
 window.axios = require('axios');
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios.defaults.withCredentials = true;
 
-window.api = require('axios');
-window.api.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.api.defaults.withCredentials = true;
+// Laravel defaults:
+window.axios.defaults.xsrfCookieName = 'XSRF-TOKEN';
+window.axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
+window.api = window.axios.create({
+    withCredentials: true,
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN',
+});
 
-
-/**
-* Next we will register the CSRF Token as a common header with Axios so that
-* all outgoing HTTP requests automatically have it attached. This is just
-* a simple convenience so we don't have to attach every token manually.
-*/
-
-window.token = async function() {
-    console.log('Checking CSRF token...');
-    currentToken = document.head.querySelector('meta[name="csrf-token"]');
-
-    if (currentToken) {
-        console.log('CSRF token is present.');
-        window.axios.defaults.headers.common['X-CSRF-TOKEN'] = currentToken.content;
-        window.api.defaults.headers.common['X-CSRF-TOKEN'] = currentToken.content;
-        return currentToken.content;
-    } else {
-        try {
-            console.log('Retrieving new CSRF token...');
-            const response = await window.axios.get(route('csrf.keepalive'));
-            currentToken = response.data.token;
-            window.axios.defaults.headers.common['X-CSRF-TOKEN'] = currentToken;
-            window.api.defaults.headers.common['X-CSRF-TOKEN'] = currentToken;
-            document.querySelector('meta[name="description"]').setAttribute("content", currentToken);
-            console.log('CSRF token is present.');
-            return currentToken;
-        } catch(error) {
-            console.error('Error retrieving token: '+error);
-            return null;
-        }
+// Warm up cookies early (don’t block app boot if it fails)
+(async () => {
+    try {
+        await window.axios.get('/csrf-cookie');
+    } catch (e) {
+        // optional: console.warn('csrf-cookie warmup failed', e);
     }
-
-}
-window.csrf_token = window.token();
-
-
-
+})();
 
 /**
  * Bootstrap plugins etc.

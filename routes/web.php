@@ -42,6 +42,14 @@
 
 use Illuminate\Support\Str;
 
+Route::match(['GET','POST'],'/csrf-cookie', fn () => response()->noContent());
+Route::post('/_debug/needs-csrf', function () {
+    return response()->json(['ok' => true]);
+});
+Route::get('/_debug/form', function () {
+    return '<form method="POST" action="/_debug/needs-csrf"><button>Send</button></form>';
+});
+
 Route::get('/test-node', function () {
     return shell_exec('node -v') ?: 'node not found';
 });

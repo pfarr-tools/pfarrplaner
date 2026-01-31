@@ -118,7 +118,6 @@ export default {
     },
     mounted() {
         if (this.title != '') document.title = this.title + ' :: ' + this.layout.appName;
-        window.token();
     },
     data() {
         return {

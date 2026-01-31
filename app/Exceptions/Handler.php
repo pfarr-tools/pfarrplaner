@@ -42,6 +42,8 @@ use Spatie\LaravelIgnition\Facades\Flare;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Session\TokenMismatchException;
 
 class Handler extends ExceptionHandler
 {
@@ -72,15 +74,10 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
-        $this->reportable(
-            function (Throwable $e) {
-                //
-            }
-        );
-    }
 
+    }
 
     /**
      * Converts the Exception in a PHP Exception to be able to serialize it.
@@ -120,13 +117,12 @@ class Handler extends ExceptionHandler
         }
 
 
-
         $flat = $this->getFlattenedException($e);
         $flare = Flare::make()
             ->setStage(app()->environment())
             ->setContextProviderDetector(new LaravelContextProviderDetector())
             ->setApiToken('')
-            ->filterExceptionsUsing(fn(Throwable $throwable) =>  !$throwable instanceof DdException)
+            ->filterExceptionsUsing(fn(Throwable $throwable) => !$throwable instanceof DdException)
             ->registerMiddleware(
                 collect(config('flare.flare_middleware'))
                     ->map(function ($value, $key) {
@@ -149,6 +145,7 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
+        // Dein Spezialfall bleibt unverändert
         if ($e instanceof \ErrorException) {
             if (Str::contains($e->getMessage(), 'Increment on type bool has no effect')) {
                 $kernel = app(Kernel::class);
@@ -156,8 +153,64 @@ class Handler extends ExceptionHandler
                 return $kernel->terminate($request, $response);
             }
         }
-        return parent::render($request, $e);
-    }
 
+        // Laravel rendert ganz normal
+        $response = parent::render($request, $e);
+
+        // Danach: 419 zuverlässig loggen (egal wie es entstanden ist)
+        try {
+            if ((int) $response->getStatusCode() === 419) {
+                $route = $request->route();
+
+                Log::channel('csrf419')->warning('HTTP 419 rendered', [
+                    'time' => now()->toIso8601String(),
+
+                    // Request basics
+                    'method' => $request->method(),
+                    'full_url' => $request->fullUrl(),
+                    'path' => $request->path(),
+
+                    // Route info (falls vorhanden)
+                    'route_name' => optional($route)->getName(),
+                    'route_uri' => optional($route)->uri(),
+
+                    // Exception context
+                    'exception' => get_class($e),
+                    'message' => $e->getMessage(),
+                    'is_token_mismatch' => $e instanceof TokenMismatchException,
+
+                    // Client context
+                    'user_id' => optional($request->user())->id,
+                    'ip' => $request->ip(),
+                    'user_agent' => (string) $request->userAgent(),
+                    'referer' => $request->headers->get('referer'),
+                    'origin' => $request->headers->get('origin'),
+
+                    // Cookie/Header presence (keine Werte!)
+                    'cookie_session_present' => $request->cookies->has(config('session.cookie')),
+                    'cookie_xsrf_present' => $request->cookies->has('XSRF-TOKEN'),
+                    'xsrf_header_present' =>
+                        $request->headers->has('X-XSRF-TOKEN') || $request->headers->has('X-CSRF-TOKEN'),
+
+                    // HTTPS/Proxy hints
+                    'is_secure' => $request->isSecure(),
+                    'scheme' => $request->getScheme(),
+                    'forwarded_proto' => $request->headers->get('x-forwarded-proto'),
+                    'forwarded_for' => $request->headers->get('x-forwarded-for'),
+
+                    // Inertia/JSON hints
+                    'expects_json' => $request->expectsJson(),
+                    'is_inertia' => $request->headers->has('X-Inertia'),
+                ]);
+            }
+        } catch (Throwable $logError) {
+            // Logging darf nie das Rendern kaputtmachen
+            Log::error('Failed to write csrf419 log in Handler::render', [
+                'logger_error' => get_class($logError) . ': ' . $logError->getMessage(),
+            ]);
+        }
+
+        return $response;
+    }
 
 }

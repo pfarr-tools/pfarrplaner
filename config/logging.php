@@ -118,6 +118,12 @@ return [
             'driver' => 'errorlog',
             'level' => 'debug',
         ],
+        'csrf419' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/419.log'),
+            'level' => 'info',
+            'replace_placeholders' => true,
+        ],
     ],
 
 ];
