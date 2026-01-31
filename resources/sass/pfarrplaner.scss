@@ -254,6 +254,10 @@ span.vacation-conflict {
     border-color: gray;
 }
 
+.calendar-month .service-entry.hidden.funeral {
+    background-color: #888888 !important;
+}
+
 .calendar-month .service-entry.mine.hidden {
     background-color: white !important;
     color: map-get($theme-colors, 'info');
@@ -267,7 +271,7 @@ span.vacation-conflict {
 }
 
 .calendar-month .service-entry.funeral {
-    background-color: theme.elkw-color("dunkelgrau");
+    background-color: theme.elkw-color("dunkelgrau") !important;
     color: white !important;
 }
 
