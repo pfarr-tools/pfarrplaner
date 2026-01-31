@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.8.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.8.1...v2026.8.2) (2026-01-31)
+
+
+### Bug Fixes
+
+* Häufiger Fehler 419. ([8989cfd](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8989cfdc46b556e2880cd372a7e28cbb4d5619d7))
+* Kalenderansicht scheitert, wenn Urlaube mit Vertretungen angezeigt werden sollen. ([74422c6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/74422c6c6c13c6d6b2c81a3143b1bb5aee676b27))
+* Materialsammlung ist nicht mehr verfügbar ([498fe83](https://codeberg.org/pfarr.tools/pfarrplaner/commit/498fe838a8df2afaef611836bd2da4ac0db7a456))
+
 ### [2026.8.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.8.0...v2026.8.1) (2026-01-28)
 
 
