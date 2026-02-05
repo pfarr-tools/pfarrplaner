@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.9.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.8.2...v2026.9.0) (2026-02-05)
+
+
+### Features
+
+* Bericht mit Zahlen zur EKD-Statistik ([8382049](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8382049b91d0a2599d13fee24429e988aa04bc6b))
+
+
+### Bug Fixes
+
+* Einige Formulare führen zu Fehler 419 ([85c52a7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/85c52a7750489425e905544277673bebc15c24e8))
+* Fehlerhafte Kalenderanzeige, wenn kein Bestattungstyp ausgewählt ist. ([695c7ac](https://codeberg.org/pfarr.tools/pfarrplaner/commit/695c7ac60e1cb1a68ff0922c8d5b223f562e6ea9))
+* ServiceTableReport enthält nicht-gottesdienstliche Veranstaltungen ([5f34917](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5f34917b06a44f86455983f5ef13d96c5596fc68))
+* Versteckte Beerdigungen sind im Kalender unlesbar. ([decb48d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/decb48da3b1d3b7e4e090852acab3cdbf890909c))
+* Weitere Fehler 419 ([e616f30](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e616f30d97f6e76653e21276c7c8b1270f83aab2))
+
 ### [2026.8.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.8.1...v2026.8.2) (2026-01-31)
 
 
