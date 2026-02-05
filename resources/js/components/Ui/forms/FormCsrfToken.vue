@@ -36,11 +36,21 @@ export default {
     name: "FormCsrfToken",
     data() {
         return {
-            token: document.querySelector('meta[name="csrf-token"]').content,
+            token: decodeURIComponent(
+                document.cookie
+                    .split('; ')
+                    .find(c => c.startsWith('XSRF-TOKEN='))
+                    ?.split('=')[1]
+            )
         }
     },
     mounted() {
-        this.token = document.querySelector('meta[name="csrf-token"]').content;
+        this.token = decodeURIComponent(
+            document.cookie
+                .split('; ')
+                .find(c => c.startsWith('XSRF-TOKEN='))
+                ?.split('=')[1]
+        );
     },
 }
 </script>
