@@ -44,7 +44,7 @@
                         <input type="radio" name="format" :value="format" v-model="myFormat" />
                         Format: <b>{{ format }}</b><br/>
                     </label><br />
-                    <img class="img-fluid" :src="'/img/bulletin/'+format+'.jpg'"/>
+                    <img class="img-fluid" :src="'/img/bulletin/'+slug(format)+'.jpg'"/>
                 </div>
             </div>
         </form>
@@ -57,6 +57,7 @@ import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import {kebabCase} from "lodash";
 export default {
     name: "Setup",
     props: ['cities', 'formats'],
@@ -73,6 +74,9 @@ export default {
         renderReport() {
             this.$refs.myForm.submit();
         },
+        slug(s) {
+            return kebabCase(s);
+        }
     }
 }
 </script>
