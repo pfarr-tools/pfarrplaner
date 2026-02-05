@@ -121,6 +121,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             Carbon::createFromDate($data['year'], 1, 1),
             Carbon::createFromDate($data['year'], 12, 31)->setTime(23, 59, 59),
         )->displayable()
+            ->where('event_class', 'service')
             ->inCities($data['cities'])
             ->ordered()
             ->get()
