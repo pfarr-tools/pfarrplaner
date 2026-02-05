@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.9.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.9.0...v2026.9.1) (2026-02-05)
+
+
+### Bug Fixes
+
+* Inertia sendet falsches Token bei Form POSTs. ([cf6238c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/cf6238cf572bc4c876a6e913bafbcc0ba0b67a83))
+
 ## [2026.9.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.8.2...v2026.9.0) (2026-02-05)
 
 
