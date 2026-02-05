@@ -29,20 +29,18 @@
 
 <template>
     <form :id="'frm'+sheet.key" method="post" :action="route('liturgy.download', {service: service.slug, key: sheet.key})">
-        <input type="hidden" name="_token" :value="token" />
+        <form-csrf-token />
         <slot />
     </form>
 </template>
 
 <script>
+import FormCsrfToken from "../../Ui/forms/FormCsrfToken.vue";
+
 export default {
     name: "LiturgySheetConfigurationForm",
+    components: {FormCsrfToken},
     props: ['service', 'sheet'],
-    data() {
-        return {
-            token: window.Laravel.csrfToken,
-        }
-    },
 }
 </script>
 

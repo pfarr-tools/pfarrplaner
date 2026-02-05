@@ -49,7 +49,7 @@
                     service: this.service.slug,
                     key: this.sheetConfig.key,
                 })">
-                    <input type="hidden" name="_token" :value="token"/>
+                    <form-csrf-token />
                     <slot/>
                 </form>
             </card-body>
@@ -61,16 +61,12 @@
 import Card from "../../../components/Ui/cards/card";
 import CardHeader from "../../../components/Ui/cards/cardHeader";
 import CardBody from "../../../components/Ui/cards/cardBody";
+import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken.vue";
 
 export default {
     name: "LiturgySheetConfigurationLayout",
-    components: {CardBody, CardHeader, Card},
+    components: {FormCsrfToken, CardBody, CardHeader, Card},
     props: ['title', 'service', 'sheetConfig'],
-    data() {
-        return {
-            token: window.Laravel.csrfToken,
-        }
-    },
     methods: {
         submit() {
             document.getElementById('configForm').submit();

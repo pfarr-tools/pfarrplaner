@@ -38,7 +38,7 @@
                     <h1 class="ps-0 pl-0 ms-0 ms-0 mb-4">{{ layout.appName }}</h1>
                     <h2 v-if="layout.appProvider" class="ps-0 pl-0 ms-0 ms-0 mb-4">&mdash; {{ layout.appProvider }} &mdash;</h2>
                     <form method="POST" id="loginForm" @submit.prevent.stop="submit">
-                        <input type="hidden" name="_token" :value="csrf" :key="csrf">
+                        <form-csrf-token />
                         <!-- Email input -->
                         <div v-if="!demo">
                             <form-input v-if="!demo"
@@ -99,10 +99,11 @@
 <script>
 import FormInput from "../../components/Ui/forms/FormInput.vue";
 import FormCheck from "../../components/Ui/forms/FormCheck.vue";
+import FormCsrfToken from "../../components/Ui/forms/FormCsrfToken.vue";
 
 export default {
     name: "Login",
-    components: {FormCheck, FormInput},
+    components: {FormCsrfToken, FormCheck, FormInput},
     computed: {
         layout() {
             return this.$page.props;
@@ -118,7 +119,6 @@ export default {
                 email: '',
                 password: '',
                 remember: false,
-                '_token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             }
         };
     },

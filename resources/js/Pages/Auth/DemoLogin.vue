@@ -41,7 +41,7 @@
                         Ein Passwort ist nicht erforderlich. Bitte wähle den gewünschten Benutzer einfach unten aus.
                     </p>
                     <form method="POST" id="loginForm" @submit.prevent.stop="submit">
-                        <input type="hidden" name="_token" :value="csrf" :key="csrf">
+                        <form-csrf-token />
                         <!-- Email input -->
                         <form-group label="E-Mailadresse">
                             <select name="email" class="form-control" v-model="form.email">
@@ -87,10 +87,11 @@
 <script>
 import FormInput from "../../components/Ui/forms/FormInput.vue";
 import FormCheck from "../../components/Ui/forms/FormCheck.vue";
+import FormCsrfToken from "../../components/Ui/forms/FormCsrfToken.vue";
 
 export default {
     name: "Login",
-    components: {FormCheck, FormInput},
+    components: {FormCsrfToken, FormCheck, FormInput},
     props: ['users'],
     computed: {
         layout() {
@@ -107,7 +108,6 @@ export default {
                 email: '',
                 password: 'test',
                 remember: false,
-                '_token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             }
         };
     },
