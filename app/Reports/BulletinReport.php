@@ -109,7 +109,7 @@ class BulletinReport extends AbstractWordDocumentReport
         $cities = City::whereIn('id', $data['includeCities'])->get();
 
         $start = Carbon::parse($data['start']);
-        $serviceList = Service::withGlobalScope('servicesOnly', ServicesOnlyScope::class)
+        $serviceList = Service::where('event_class', 'service')
             ->between($start, Carbon::parse($data['end']))
             ->displayable($start)
             ->inCities($cities)
@@ -251,15 +251,6 @@ class BulletinReport extends AbstractWordDocumentReport
         $this->wordDocument->setDefaultFontName('Lora');
         $section = $this->commonDocumentSetup();
         Carbon::setLocale(config('app.locale'));
-
-        /*
-        $list = [];
-        foreach ($serviceList as $date => $services) {
-            foreach ($services as $service) {
-                $list[substr($date, 0, 7)][$service->city_id][$date] = $services;
-            }
-        }
-        */
 
         foreach ($serviceList as $date => $services) {
             $index = 0;
