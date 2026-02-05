@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.9.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.9.1...v2026.9.2) (2026-02-05)
+
+
+### Bug Fixes
+
+* Fehlendes Vorschaubild für Format "Gäufelden" ([1ff1cfa](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1ff1cfa2edeb6d35b8702fd0ba92369fb1a80b77))
+* Gemeindebrief enthält nicht-gottesdienstliche Veranstaltungen ([426f75f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/426f75f84f67dac6511cc02544b4625386cdb8c5))
+
 ### [2026.9.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.9.0...v2026.9.1) (2026-02-05)
 
 
