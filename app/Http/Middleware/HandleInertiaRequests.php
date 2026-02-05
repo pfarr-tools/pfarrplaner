@@ -78,6 +78,7 @@ class HandleInertiaRequests extends Middleware
         $data = array_merge(parent::share($request), [
             'appName' => config('app.name'),
             'appProvider' => config('app.provider'),
+            'csrfToken' => csrf_token(),
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),

@@ -28,30 +28,11 @@
   -->
 
 <template>
-    <input type="hidden" name="_token" :value="token" />
+    <input type="hidden" name="_token" :value="$page.props.csrfToken" />
 </template>
-
 <script>
 export default {
     name: "FormCsrfToken",
-    data() {
-        return {
-            token: decodeURIComponent(
-                document.cookie
-                    .split('; ')
-                    .find(c => c.startsWith('XSRF-TOKEN='))
-                    ?.split('=')[1]
-            )
-        }
-    },
-    mounted() {
-        this.token = decodeURIComponent(
-            document.cookie
-                .split('; ')
-                .find(c => c.startsWith('XSRF-TOKEN='))
-                ?.split('=')[1]
-        );
-    },
 }
 </script>
 
