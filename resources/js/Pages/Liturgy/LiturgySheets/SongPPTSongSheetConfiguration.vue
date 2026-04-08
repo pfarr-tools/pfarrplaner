@@ -34,6 +34,7 @@
             <tab-header id="layout" title="Layout" />
             <tab-header id="content" title="Inhalte" />
             <tab-header id="ads" title="Werbung" />
+            <tab-header id="format" title="Ausgabeformat" />
         </tab-headers>
         <tabs>
             <tab id="colorscheme" active="1">
@@ -76,6 +77,13 @@
                             name="config[adLoopDelay]" type="number" min="0"
                             help="Bei 0 erfolgt keine automatische Weiterschaltung" />
             </tab>
+            <tab id="format">
+                <form-selectize label="Dateiformat" v-model="myConfig.outputFormat"
+                                :options="[
+                                    {id: 'ppt', name: 'Microsoft PowerPoint (.pptx, .pptm)'},
+                                    {id: 'odp', name: 'OpenDocument Presentation (.odp)'},
+                                ]" />
+            </tab>
         </tabs>
     </liturgy-sheet-configuration-form>
 </template>
@@ -86,10 +94,11 @@ import FormCheck from "../../../components/Ui/forms/FormCheck";
 import Tab from "../../../components/Ui/tabs/tab.vue";
 import FormInput from "../../../components/Ui/forms/FormInput.vue";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize.vue";
+import TabHeader from "../../../components/Ui/tabs/tabHeader.vue";
 
 export default {
     name: "SongPPTSongSheetConfiguration",
-    components: {FormSelectize, FormInput, Tab, FormCheck, LiturgySheetConfigurationLayout},
+    components: {TabHeader, FormSelectize, FormInput, Tab, FormCheck, LiturgySheetConfigurationLayout},
     props: ['service', 'sheetConfig', 'config'],
     created() {
         this.$api().get(route('api.cities.index')).then(response => {
@@ -99,14 +108,14 @@ export default {
     data() {
         let myConfig = this.sheet.config;
         if (!(myConfig.showAdsFromCities || []).length) myConfig.showAdsFromCities = [this.service.city_id];
+        if (!myConfig.outputFormat) myConfig.outputFormat = 'ppt';
+
 
         let myItems = [];
         if (!(myConfig.includeAdsLoopElements || []).length) myConfig.includeAdLoopElements = [];
         this.service.liturgy_blocks.forEach(block => {
             block.items.forEach(item => {
                 myItems.push({id: item.id, name: item.title });
-                if ((item.title == 'Bekanntgaben') && (!(myConfig.includeAdLoopElements || []).length))
-                    myConfig.includeAdLoopElements.push(item.id);
             });
         });
 

@@ -31,6 +31,7 @@
 namespace App\Liturgy\LiturgySheets;
 
 
+use App\FileFormats\ODP;
 use App\FileFormats\PowerPoint;
 use App\Helpers\PPTUnitsHelper;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
@@ -85,6 +86,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         'showAdsFromCities' => [],
         'adLoopDelay' => 7,
         'includeVirtualSongsheetQR' => false,
+        'outputFormat' => 'ppt',
     ];
 
     protected $counterColor = [
@@ -155,6 +157,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             $this->slide();
         }
 
+        if ($this->config['outputFormat'] == 'odp') {
+            $this->setExtension('odp');
+        }
+
         $lastItem = null;
 
         foreach ($service->liturgyBlocks as $block) {
@@ -209,7 +215,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         if (($this->config['includeAdLoopStart'])
             || $this->config['includeAdLoopEnd']
             || count($this->config['includeAdLoopElements']) && $this->config['adLoopDelay']) {
-            $this->extension = 'pptm';
+            if ($this->config['outputFormat'] == 'ppt') $this->setExtension('pptm');
         }
 
         return $this->sendToBrowser($this->getFileName($service, 'Texte und Lieder'));
@@ -454,46 +460,183 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         if ($rgb == -1) {
             $rgb = $this->config['textColor'];
         }
+
         $color = new Color($rgb);
-        $slide = $this->createEmptySlide(
-            $backgroundColor ?: ($text ? $this->config['backgroundColor'] : $this->config['backgroundColorEmpty'])
-        );
-        if ($text) {
-            if (!is_array($text)) {
-                $text = [$text];
+
+        $isOdp = ($this->config['outputFormat'] === 'odp');
+
+        // Normalize $text into an array of "paragraph lines"
+        // - honor line breaks inside strings
+        // - allow manual slide breaks with a line containing only "---"
+        $lines = [];
+
+        if (is_array($text)) {
+            foreach ($text as $chunk) {
+                if ($chunk === null) {
+                    continue;
+                }
+                $chunk = (string)$chunk;
+
+                // Normalize Windows/Mac newlines
+                $chunk = str_replace(["\r\n", "\r"], "\n", $chunk);
+
+                // Split into lines
+                foreach (explode("\n", $chunk) as $line) {
+                    $lines[] = $line;
+                }
             }
-            $text = str_replace("\n\t", "\r\t", $text);
-            $shape = $this->createFullScreenRichTextShape($slide);
-            $shape->setParagraphs([]);
-            $ct = 0;
-            foreach ($text as $line) {
-                if ($ct = 0) {
-                    $paragraph = $shape->getActiveParagraph();
-                } else {
-                    $paragraph = $shape->createParagraph();
+        } else {
+            $text = (string)$text;
+            $text = str_replace(["\r\n", "\r"], "\n", $text);
+            $lines = explode("\n", $text);
+        }
+
+        // Keep your special-case handling for indented lines that come from "\n\t"
+        // (this turns into "\n" + "\t" after the normalization above)
+        // Also keep legacy replacement if someone passed "\n\t" literally somewhere
+        // (doesn't hurt, but no longer required)
+        $lines = array_map(static function ($line) {
+            return str_replace("\n\t", "\r\t", $line);
+        }, $lines);
+
+        // If there's no text at all, just create one empty slide (and still show copyrights if given)
+        if (count($lines) === 0 || (count($lines) === 1 && trim($lines[0]) === '')) {
+            $slide = $this->createEmptySlide(
+                $backgroundColor ?: $this->config['backgroundColorEmpty']
+            );
+
+            if ($copyrights) {
+                $copyrightShape = $slide->createRichTextShape()
+                    ->setWidth(950)
+                    ->setHeight(30)
+                    ->setOffsetX(10)
+                    ->setOffsetY(485);
+
+                $copyrightParagraph = $copyrightShape->getActiveParagraph();
+                $copyrightParagraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                $copyrightParagraph->getFont()->setBold(false)->setSize(10)->setColor($color)->setName('Sarabun');
+                $copyrightParagraph->createTextRun($copyrights);
+            }
+
+            return $slide;
+        }
+
+        // Split by manual slide breaks ("---" on a line by itself)
+        $manualSlideChunks = [];
+        $currentChunk = [];
+
+        foreach ($lines as $line) {
+            if (trim($line) === '---') {
+                // finalize current chunk (even if empty; we still want a slide)
+                $manualSlideChunks[] = $currentChunk;
+                $currentChunk = [];
+                continue;
+            }
+            $currentChunk[] = $line;
+        }
+        // add last chunk
+        $manualSlideChunks[] = $currentChunk;
+
+        // Prepare font metrics
+        $ttfPath = resource_path($bold ? 'fonts/Sarabun-SemiBold.ttf' : 'fonts/Sarabun-Regular.ttf');
+        if (!file_exists($ttfPath)) {
+            $ttfPath = resource_path('fonts/Sarabun-SemiBold.ttf');
+        }
+
+        // These must match createFullScreenRichTextShape()
+        $textAreaWidthPx  = 950;
+        $textAreaHeightPx = 500;
+
+        // Small safety margin so we don't touch the bottom edge
+        $maxHeightPx = $textAreaHeightPx - 10;
+
+        // Render each manual chunk, auto-splitting into additional slides if it overflows
+        $lastCreatedSlide = null;
+
+        foreach ($manualSlideChunks as $chunkLines) {
+            // Ensure we at least create a slide for empty chunks
+            if (count($chunkLines) === 0) {
+                $chunkLines = [''];
+            }
+
+            // Repeatedly split until it fits (supports 2+ slides)
+            $pendingLines = $chunkLines;
+
+            while (true) {
+                [$part1Lines, $part2Lines] = PPTUnitsHelper::splitTextToFitSlide(
+                    $pendingLines,
+                    (int)$size,
+                    (int)$textAreaWidthPx,
+                    (int)$maxHeightPx,
+                    $ttfPath
+                );
+
+                // Create the slide for part1
+                $slide = $this->createEmptySlide(
+                    $backgroundColor ?: ($part1Lines && trim(implode('', $part1Lines)) !== ''
+                        ? $this->config['backgroundColor']
+                        : $this->config['backgroundColorEmpty'])
+                );
+
+                // Add the main text if any
+                if ($part1Lines && !(count($part1Lines) === 1 && trim($part1Lines[0]) === '')) {
+                    $shape = $this->createFullScreenRichTextShape($slide);
+                    // If your createFullScreenRichTextShape() does not clear paragraphs,
+                    // we handle paragraph creation explicitly below.
+
+                    $paragraphIndex = 0;
+                    foreach ($part1Lines as $line) {
+                        $paragraph = ($paragraphIndex === 0) ? $shape->getActiveParagraph() : $shape->createParagraph();
+                        $paragraphIndex++;
+
+                        $line = (string)$line;
+
+                        if (mb_substr($line, 0, 1) === "\t") {
+                            $paragraph->getAlignment()->setMarginLeft(35);
+                            $line = mb_substr($line, 1);
+                        }
+
+                        $paragraph->getAlignment()->setVertical($this->config['verticalAlignment']);
+                        $paragraph->getFont()
+                            ->setBold($bold)
+                            ->setSize($size)
+                            ->setColor($color)
+                            ->setName('Sarabun');
+
+                        $paragraph->createTextRun(str_replace('&', '**', $line));
+                        if ($isOdp) {
+                            $paragraph->setLineSpacing(95);
+                        }
+                    }
                 }
-                $ct++;
-                if (substr($line, 0, 1) == "\t") {
-                    $paragraph->getAlignment()->setMarginLeft(35);
-                    $line = substr($line, 1);
+
+                // Copyrights must appear on every slide
+                if ($copyrights) {
+                    $copyrightShape = $slide->createRichTextShape()
+                        ->setWidth(950)
+                        ->setHeight(30)
+                        ->setOffsetX(10)
+                        ->setOffsetY(($part1Lines && trim(implode('', $part1Lines)) !== '') ? 505 : 485);
+
+                    $copyrightParagraph = $copyrightShape->getActiveParagraph();
+                    $copyrightParagraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                    $copyrightParagraph->getFont()->setBold(false)->setSize(10)->setColor($color)->setName('Sarabun');
+                    $copyrightParagraph->createTextRun($copyrights);
                 }
-                $paragraph->getAlignment()->setVertical($this->config['verticalAlignment']);
-                $paragraph->getFont()->setBold($bold)->setSize($size)->setColor($color)->setName('Sarabun');
-                $paragraph->createTextRun(str_replace('&', '**', $line));
+
+                $lastCreatedSlide = $slide;
+
+                // If there's no overflow, we're done with this manual chunk
+                if (!$part2Lines || trim(implode('', $part2Lines)) === '') {
+                    break;
+                }
+
+                // Continue with remainder
+                $pendingLines = $part2Lines;
             }
         }
-        if ($copyrights) {
-            $shape = $slide->createRichTextShape()
-                ->setWidth(950)
-                ->setHeight(30)
-                ->setOffsetX(10)
-                ->setOffsetY(($text == '') ? 485 : 505);
-            $paragraph = $shape->getActiveParagraph();
-            $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-            $paragraph->getFont()->setBold(false)->setSize(10)->setColor($color)->setName('Sarabun');
-            $paragraph->createTextRun($copyrights);
-        }
-        return $slide;
+
+        return $lastCreatedSlide;
     }
 
     protected function songbookReferenceSlide(Item $item)
@@ -610,6 +753,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setHeight(500)
             ->setOffsetX(10)
             ->setOffsetY(0);
+
+
+        $shape->getFill()->setFillType(Fill::FILL_NONE);
+        $shape->getBorder()->setLineStyle(Border::LINE_NONE);
         return $shape;
     }
 
@@ -620,10 +767,30 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     protected function sendToBrowser($filename)
     {
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        if ($this->config['outputFormat'] == 'ppt') {
+            $contentType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+            $this->createPPTFile($tempFile);
+        } else {
+            $contentType = 'application/vnd.oasis.opendocument.presentation';
+            $this->extension = 'odp';
+            $this->createODPFile($tempFile);
+        }
+
+        return response()->download($tempFile, $filename, ['Content-Type' => $contentType])
+            ->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Output to PPTX/PPTM file
+     * @param $tempFile
+     * @return void
+     * @throws \DOMException
+     */
+    protected function createPPTFile($tempFile)
+    {
         $objWriter = IOFactory::createWriter($this->ppt, 'PowerPoint2007');
         $objWriter->save($tempFile);
 
-        $contentType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
         $patchFile = PowerPoint::fromFile($tempFile);
         $patchFile->applySVGFix();
         $patchFile->applySlideNameFix($this->slideNames);
@@ -633,8 +800,25 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             $contentType = 'application/vnd.ms-powerpoint.presentation.macroEnabled.12';
         }
 
-        return response()->download($tempFile, $filename, ['Content-Type' => $contentType])
-            ->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Output to ODP file
+     * @param $tempFile
+     * @return void
+     * @throws \DOMException
+     */
+    protected function createODPFile($tempFile)
+    {
+        $objWriter = IOFactory::createWriter($this->ppt, 'ODPresentation');
+        $objWriter->save($tempFile);
+
+        $patchFile = ODP::fromFile($tempFile);
+        $patchFile->applySlideNameFix($this->slideNames);
+        $patchFile->injectBasicMacroFromBas(
+                         resource_path('macros/LO/ODF/LoopListener.bas')
+        );
+
     }
 
     protected function setDocumentProperties(Service $service)
@@ -754,15 +938,17 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      */
     protected function createEmptyAdSlide(int $firstAdSlideNumber, int $finalAdSlideNumber, bool $isFinalLoop): Slide {
         $slide = $this->createEmptySlide($this->config['backgroundColor']);
-        $note = $slide->getNote();
-        $layout = $this->ppt->getLayout();
-        $noteText = $note->createRichTextShape()
-            ->setHeight($layout->getCY(DocumentLayout::UNIT_PIXEL))
-            ->setWidth($layout->getCX(DocumentLayout::UNIT_PIXEL));
-        if (!$isFinalLoop) {
-            $noteText->createTextRun('Diese Folie gehört zu einer automatisch wiederholten Werbeschleife. Um diese zu beenden, springe zu Folie #'.($finalAdSlideNumber+1));
-        } else {
-            $noteText->createTextRun('Diese Folie gehört zu einer automatisch wiederholten Werbeschleife. Diese läuft weiter, bis du die Präsentation beendest.');
+        if ($this->config['outputFormat'] == 'ppt') {
+            $note = $slide->getNote();
+            $layout = $this->ppt->getLayout();
+            $noteText = $note->createRichTextShape()
+                ->setHeight($layout->getCY(DocumentLayout::UNIT_PIXEL))
+                ->setWidth($layout->getCX(DocumentLayout::UNIT_PIXEL));
+            if (!$isFinalLoop) {
+                $noteText->createTextRun('Diese Folie gehört zu einer automatisch wiederholten Werbeschleife. Um diese zu beenden, springe zu Folie #'.($finalAdSlideNumber+1));
+            } else {
+                $noteText->createTextRun('Diese Folie gehört zu einer automatisch wiederholten Werbeschleife. Diese läuft weiter, bis du die Präsentation beendest.');
+            }
         }
         if ($this->config['adLoopDelay']) {
             if ($this->ppt->getSlideCount() < $finalAdSlideNumber) {
@@ -825,7 +1011,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $paragraph = $shape->getActiveParagraph();
         $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)->setMarginLeft(150);
         if (!$event->event->is_allday) {
-            $run = $paragraph->createTextRun($date->setTimezone('Europe/Berlin')->format('H:i').' Uhr')->getFont()
+            $run = $paragraph->createTextRun($event->start->copy()->setTimezone('Europe/Berlin')->format('H:i').' Uhr')->getFont()
                 ->setBold(false)
                 ->setSize((int)($this->config['fontSize']*0.5))
                 ->setColor($inverseTextColor)
@@ -850,7 +1036,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setSize($this->config['fontSize'])
             ->setColor($inverseTextColor);
 
-        $multiDay = $event->event->is_allday && ($event->start->setTimeZone('Europe/Berlin')->format('Ymd') != $event->end->setTimeZone('Europe/Berlin')->format('Ymd'));
+        $multiDay = $event->event->is_allday && ($event->start->copy()->setTimeZone('Europe/Berlin')->format('Ymd') != $event->end->copy()->setTimeZone('Europe/Berlin')->format('Ymd'));
 
         $shape = $slide->createAutoShape()
             ->setType(AutoShape::TYPE_OVAL)
@@ -869,20 +1055,20 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setOffsetY($slideHeight - 240);
         $paragraph = $shape->getActiveParagraph();
         $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $paragraph->createTextRun(($multiDay ? 'Ab ' : '').$event->start->setTimeZone('Europe/Berlin')->isoFormat('dddd'))->getFont()
+        $paragraph->createTextRun(($multiDay ? 'Ab ' : '').$event->start->copy()->setTimeZone('Europe/Berlin')->isoFormat('dddd'))->getFont()
             ->setBold(false)
             ->setSize(12)
             ->setColor($overlayTextColor)
             ->setName('Sarabun Light');
         $paragraph = $shape->createParagraph();
         $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $paragraph->createTextRun($event->start->setTimeZone('Europe/Berlin')->isoFormat('D'))->getFont()
+        $paragraph->createTextRun($event->start->copy()->setTimeZone('Europe/Berlin')->isoFormat('D'))->getFont()
             ->setSize(50)
             ->setColor($overlayTextColor)
             ->setName('Sarabun ExtraBold');
         $paragraph = $shape->createParagraph();
         $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $paragraph->createTextRun($event->start->setTimeZone('Europe/Berlin')->isoFormat('MMMM'))->getFont()
+        $paragraph->createTextRun($event->start->copy()->setTimeZone('Europe/Berlin')->isoFormat('MMMM'))->getFont()
             ->setBold(false)
             ->setSize(12)
             ->setColor($overlayTextColor)
@@ -899,76 +1085,161 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      * @return void
      * @throws \PhpOffice\PhpPresentation\Exception\OutOfBoundsException
      */
-    protected function renderEventsListSlide(Carbon $date, Collection $events, int $firstAdSlideNumber, int $finalAdSlideNumber, bool $isFinalLoop)
-    {
+    protected function renderEventsListSlide(
+        Carbon $date,
+        Collection $events,
+        int $firstAdSlideNumber,
+        int $finalAdSlideNumber,
+        bool $isFinalLoop
+    ) {
         $textColor = new Color($this->config['textColor']);
-        $gray = new Color('777777');
+        $gray      = new Color('777777');
 
         $slide = $this->createEmptyAdSlide($firstAdSlideNumber, $finalAdSlideNumber, $isFinalLoop);
-        $shape = $slide->createRichTextShape()
+
+        // Header
+        $headerShape = $slide->createRichTextShape()
             ->setWidth(950)
             ->setHeight(50)
             ->setOffsetX(10)
             ->setOffsetY(0);
 
+        $headerShape->getFill()->setFillType(Fill::FILL_NONE);
+        $headerShape->getBorder()->setLineStyle(Border::LINE_NONE);
 
-        $paragraph = $shape->getActiveParagraph();
-        $paragraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);;
-        $run = $paragraph->createTextRun($date->setTimezone('Europe/Berlin')->isoFormat('dddd'))->getFont()
-            ->setSize($this->config['fontSize'])
-            ->setColor($textColor)
-            ->setName('Sarabun SemiBold');
-        $run = $paragraph->createTextRun(' | ')->getFont()
-            ->setBold(false)
-            ->setSize($this->config['fontSize'])
-            ->setColor($gray)
-            ->setName('Sarabun Light');
-        $run = $paragraph->createTextRun($date->setTimezone('Europe/Berlin')->isoFormat('D. MMMM'))->getFont()
-            ->setBold(false)
-            ->setSize($this->config['fontSize'])
-            ->setColor($textColor)
-            ->setName('Sarabun SemiBold');
+        $headerParagraph = $headerShape->getActiveParagraph();
+        $headerParagraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
-        $table = $slide->createTableShape(2);
-        $table->setOffsetX(10)
-            ->setOffsetY(80)
-            ->setWidth(950)
-            ->setHeight(500);
+        $headerParagraph->createTextRun($date->copy()->setTimezone('Europe/Berlin')->isoFormat('dddd'))
+            ->getFont()->setSize($this->config['fontSize'])->setColor($textColor)->setName('Sarabun SemiBold');
 
+        $headerParagraph->createTextRun(' | ')
+            ->getFont()->setBold(false)->setSize($this->config['fontSize'])->setColor($gray)->setName('Sarabun Light');
 
-        $listFontSize = (int)($this->config['fontSize'] * 0.8);
+        $headerParagraph->createTextRun($date->copy()->setTimezone('Europe/Berlin')->isoFormat('D. MMMM'))
+            ->getFont()->setBold(false)->setSize($this->config['fontSize'])->setColor($textColor)->setName('Sarabun SemiBold');
+
+        // List layout
+        $listFontSize     = (int)($this->config['fontSize'] * 0.8);
         $locationFontSize = (int)($listFontSize * 0.6);
 
+        $listOffsetX = 10;
+        $listOffsetY = 80;
+        $listWidth   = 950;
+        $listHeight  = 500;
+
+        // Indent at 5.5cm
+        $leftColumnWidthPixels = (int) PPTUnitsHelper::convert(5.5, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL);
+        $rightColumnOffsetX    = $listOffsetX + $leftColumnWidthPixels;
+        $rightColumnWidth      = $listWidth - $leftColumnWidthPixels;
+
+        // Shapes
+        $timeColumnShape = $slide->createRichTextShape()
+            ->setOffsetX($listOffsetX)
+            ->setOffsetY($listOffsetY)
+            ->setWidth($leftColumnWidthPixels)
+            ->setHeight($listHeight);
+
+        $timeColumnShape->getFill()->setFillType(Fill::FILL_NONE);
+        $timeColumnShape->getBorder()->setLineStyle(Border::LINE_NONE);
+
+        $detailsColumnShape = $slide->createRichTextShape()
+            ->setOffsetX($rightColumnOffsetX)
+            ->setOffsetY($listOffsetY)
+            ->setWidth($rightColumnWidth)
+            ->setHeight($listHeight);
+
+        $detailsColumnShape->getFill()->setFillType(Fill::FILL_NONE);
+        $detailsColumnShape->getBorder()->setLineStyle(Border::LINE_NONE);
+
+        // Font file for measuring wrapping of the title
+        $titleFontTtfPath = resource_path('fonts/Sarabun-SemiBold.ttf');
+
+        // Conservative horizontal padding inside the details column, to match what PPT/LO will effectively do
+        $detailsInnerPaddingPx = 10;
+        $maxTitleWidthPx = max(50, $rightColumnWidth - $detailsInnerPaddingPx);
+
+        $isFirstTimeParagraph    = true;
+        $isFirstDetailsParagraph = true;
+
         foreach ($events as $event) {
-            $row = $table->createRow();
-            $cell = $row->nextCell();
-            $cell->setWidth(230);
-            $cell->getActiveParagraph()
-                ->getAlignment()
+            $timeText = (!$event->event->is_allday) ? $event->service->timeText() : '';
+
+            $titleText = $event->getAdText('ppt', $event->service->titleText(false));
+            $titleLines = PPTUnitsHelper::wrapTextByPixelWidth($titleText, $titleFontTtfPath, $listFontSize, $maxTitleWidthPx);
+
+            // --- LEFT COLUMN: time on first line, then spacer lines to match wrapped title, then spacer for location
+            $timeParagraph = $isFirstTimeParagraph
+                ? $timeColumnShape->getActiveParagraph()
+                : $timeColumnShape->createParagraph();
+            $isFirstTimeParagraph = false;
+
+            $timeParagraph->getAlignment()
                 ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
-                ->setMarginRight(10);
-            if (!$event->event->is_allday) {
-                $cell->createTextRun($event->service->timeText())
+                ->setMarginRight(10)
+                ->setMarginBottom(4);
+
+            $timeParagraph->createTextRun($timeText)
+                ->getFont()
+                ->setBold(false)
+                ->setSize($listFontSize)
+                ->setColor($textColor)
+                ->setName('Sarabun Light');
+
+            // If title wraps into N lines, add N-1 blank lines in the time column
+            for ($i = 1; $i < count($titleLines); $i++) {
+                $timeWrappedSpacerParagraph = $timeColumnShape->createParagraph();
+                $timeWrappedSpacerParagraph->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
+                    ->setMarginRight(10)
+                    ->setMarginBottom(4);
+
+                $timeWrappedSpacerParagraph->createTextRun("\u{00A0}")
                     ->getFont()
                     ->setBold(false)
                     ->setSize($listFontSize)
                     ->setColor($textColor)
                     ->setName('Sarabun Light');
             }
-            $cell = $row->nextCell();
-            $cell->setWidth(700);
 
-            $paragraph = $cell->getActiveParagraph();
-            $paragraph->getAlignment()
-                ->setMarginBottom(10);
-            $paragraph->createTextRun($event->getAdText('ppt', $event->service->titleText(false)))
+            // Spacer line for the location line (keeps left/right aligned)
+            $timeLocationSpacerParagraph = $timeColumnShape->createParagraph();
+            $timeLocationSpacerParagraph->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
+                ->setMarginRight(10)
+                ->setMarginBottom(14);
+
+            $timeLocationSpacerParagraph->createTextRun("\u{00A0}")
                 ->getFont()
-                ->setSize($listFontSize)
+                ->setBold(false)
+                ->setSize($locationFontSize)
                 ->setColor($textColor)
-                ->setName('Sarabun SemiBold');
+                ->setName('Sarabun Light');
 
-            $paragraph = $cell->createParagraph();
-            $paragraph->createTextRun($event->service->locationTextWithCity)
+            // --- RIGHT COLUMN: title as multiple paragraphs (so wrapping is deterministic), then location paragraph
+            foreach ($titleLines as $index => $titleLine) {
+                $titleParagraph = $isFirstDetailsParagraph
+                    ? $detailsColumnShape->getActiveParagraph()
+                    : $detailsColumnShape->createParagraph();
+                $isFirstDetailsParagraph = false;
+
+                $titleParagraph->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_LEFT)
+                    ->setMarginBottom(4);
+
+                $titleParagraph->createTextRun($titleLine)
+                    ->getFont()
+                    ->setSize($listFontSize)
+                    ->setColor($textColor)
+                    ->setName('Sarabun SemiBold');
+            }
+
+            $locationParagraph = $detailsColumnShape->createParagraph();
+            $locationParagraph->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_LEFT)
+                ->setMarginBottom(14);
+
+            $locationParagraph->createTextRun($event->service->locationTextWithCity)
                 ->getFont()
                 ->setBold(false)
                 ->setSize($locationFontSize)
@@ -976,7 +1247,6 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 ->setName('Sarabun Light');
         }
     }
-
 
     public function renderVirtualSongsheetQR(Slide $slide, Service $service)
     {

@@ -36,7 +36,7 @@ use DOMElement;
 use PhpOffice\PhpPresentation\Shape\Drawing\ZipFile;
 use \ZipArchive;
 
-class PowerPoint
+class PowerPoint extends AbstractZIPBasedFileFormat
 {
 
     protected const VBA_REL_TYPE = 'http://schemas.microsoft.com/office/2006/relationships/vbaProject';
@@ -44,37 +44,6 @@ class PowerPoint
     protected const CT_PPTM_MAIN = 'application/vnd.ms-powerpoint.presentation.macroEnabled.main+xml';
     protected const CUSTOM_UI = '<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="StartLoopListener"><ribbon /></customUI>';
 
-
-    protected $pptxPath = '';
-
-    /** @var ZipArchive $zip Output file stream  */
-    protected $zip = null;
-
-
-    public function __construct()
-    {
-        $this->zip = new ZipArchive();
-    }
-
-    /**
-     * @param $pptxPath
-     * @return static
-     */
-    public static function fromFile($pptxPath) {
-        $instance = new static();
-        $instance->setPptxPath($pptxPath);
-        return $instance;
-    }
-
-    /**
-     * Set the path to the PPTX file
-     * @param string $pptxPath
-     * @return void
-     */
-    public function setPptxPath(string $pptxPath): void
-    {
-        $this->pptxPath = $pptxPath;
-    }
 
     /**
      * Patch the PPTM file to enable VBA macros and custom UI
@@ -84,7 +53,7 @@ class PowerPoint
      * @throws \DOMException
      */
     public function patchPPTM($vbaProjectPath, $customUI = true) {
-        $this->zip->open($this->pptxPath);
+        $this->zip->open($this->documentFilePath);
         $this->addVBAProject($vbaProjectPath);
         if ($customUI) $this->addCustomUI();
         $this->zip->close();
@@ -226,7 +195,7 @@ class PowerPoint
      */
     public function applySVGFix()
     {
-        $this->zip->open($this->pptxPath);
+        $this->zip->open($this->documentFilePath);
         $this->patchXMLFile('[Content_Types].xml', function(DOMDocument $doc) {
             $types = $doc->documentElement;
             foreach ($types->getElementsByTagName('Default') as $type) {
@@ -240,26 +209,6 @@ class PowerPoint
         $this->zip->close();
     }
 
-    /**
-     * Patch an XML file in the ZIP archive
-     * @param string $path Path to the XML file relative to the root of the ZIP archive
-     * @param Closure $callback This will be called with the DOMDocument object of the XML file
-     * @return void
-     */
-    protected function patchXMLFile(string $path, Closure $callback) {
-        $xml = $this->zip->getFromName($path);
-        if (empty($xml)) dd($path, $this->zip);
-        $doc = new DOMDocument();
-        $doc->preserveWhiteSpace = false;
-        $doc->formatOutput = true;
-        $doc->loadXML($xml);
-        $callback($doc);
-        if ($this->zip->locateName($path) !== false) {
-            $this->zip->deleteName($path);
-        }
-        $this->zip->addFromString($path, $doc->saveXML());
-    }
-
 
     /**
      * Apply a workaround for slide names in PowerPoint
@@ -271,7 +220,7 @@ class PowerPoint
      */
     public function applySlideNameFix(array $slideNames)
     {
-        $this->zip->open($this->pptxPath);
+        $this->zip->open($this->documentFilePath);
         foreach ($slideNames as $slideIndex => $name) {
             $this->patchXMLFile('ppt/slides/slide' . $slideIndex . '.xml', function(DOMDocument $doc) use ($name) {
                 $slide = $doc->documentElement;

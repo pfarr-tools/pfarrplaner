@@ -43,6 +43,7 @@ use App\Services\NameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
@@ -257,7 +258,7 @@ class BillBoardReport extends AbstractWordDocumentReport
     protected function renderParagraphWithImage($text, $textFormat, $image, $imageOptions = []) {
         $run = $this->section->addTextRun(static::DEFAULT);
         $run->addText($text."\t", $textFormat);
-        if ($image) {
+        if ($image && Storage::exists('app/'.$image)) {
             $run->addImage(storage_path('app/'.$image), $imageOptions);
         }
     }
@@ -316,6 +317,10 @@ class BillBoardReport extends AbstractWordDocumentReport
         if (!count($events)) {
             return;
         }
+
+        $cityCount = count($cities);
+        $cityCount = max($cityCount == 1 ? (null !== $cities[0]->parent_id ? 2 : 1) : $cityCount, $cities[0]->children->count());
+
         $this->doc->renderParagraph(static::DEFAULT, [['Termine', static::BOLD]], 2);
         foreach ($events as $dayEvents) {
             $title = $dayEvents->first()->start->setTimeZone('Europe/Berlin')->isoFormat('dddd, DD. MMMM') . ' ';
@@ -332,11 +337,14 @@ class BillBoardReport extends AbstractWordDocumentReport
                 if ($event->event->description) {
                     $line[] = $event->event->description;
                 }
-                if ((count($cities) == 1) && ((null === $event->location) || ($event->location->city_id == $cities[0]->id))) {
+
+                // figure out whether city name must be added to location string
+                if (($cityCount == 1) && ((null === $event->location) || ($event->location->city_id == $cities[0]->id))) {
                     $line[] = $event->event->locationText;
                 } else {
                     $line[] = $event->event->locationTextWithCity;
                 }
+
                 if ($event->event->event_class == 'service') {
                     if ($s = $this->getNameListLine($event->event->organists))$line[] = 'Musik: ' . $s;
                     if ($event->event->offering_goal) $line[] = 'Opfer: ' . $event->event->offering_goal;
