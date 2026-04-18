@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.10.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.9.2...v2026.10.0) (2026-04-18)
+
+
+### Features
+
+* Werbeschleifen funktionieren in Powerpoint und LibreOffice ([1b514d6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1b514d6a605df369a25788f07e7eee525be8a281))
+
+
+### Bug Fixes
+
+* Zeitspalte zu schmal auf Folien mit Veranstaltungslisten ([dffaa78](https://codeberg.org/pfarr.tools/pfarrplaner/commit/dffaa7845a0d6629ece8441ee6aa4ec82a335f3e))
+
 ### [2026.9.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.9.1...v2026.9.2) (2026-02-05)
 
 
