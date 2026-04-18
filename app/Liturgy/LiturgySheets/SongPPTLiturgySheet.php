@@ -1123,7 +1123,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $listHeight  = 500;
 
         // Indent at 5.5cm
-        $leftColumnWidthPixels = (int) PPTUnitsHelper::convert(5.5, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL);
+        $leftColumnWidthPixels = (int) PPTUnitsHelper::convert(5.75, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL);
         $rightColumnOffsetX    = $listOffsetX + $leftColumnWidthPixels;
         $rightColumnWidth      = $listWidth - $leftColumnWidthPixels;
 
