@@ -211,6 +211,9 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
 
 
+        // ODP needs an additional slide
+        if ($this->config['outputFormat'] == 'odp') $this->slide();
+
         // we need to patch the PPTX to become a PPTM right here:
         if (($this->config['includeAdLoopStart'])
             || $this->config['includeAdLoopEnd']
@@ -926,7 +929,6 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
             }
         }
-
     }
 
     /**
@@ -938,26 +940,18 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      */
     protected function createEmptyAdSlide(int $firstAdSlideNumber, int $finalAdSlideNumber, bool $isFinalLoop): Slide {
         $slide = $this->createEmptySlide($this->config['backgroundColor']);
-        if ($this->config['outputFormat'] == 'ppt') {
-            $note = $slide->getNote();
-            $layout = $this->ppt->getLayout();
-            $noteText = $note->createRichTextShape()
-                ->setHeight($layout->getCY(DocumentLayout::UNIT_PIXEL))
-                ->setWidth($layout->getCX(DocumentLayout::UNIT_PIXEL));
-            if (!$isFinalLoop) {
-                $noteText->createTextRun('Diese Folie gehört zu einer automatisch wiederholten Werbeschleife. Um diese zu beenden, springe zu Folie #'.($finalAdSlideNumber+1));
-            } else {
-                $noteText->createTextRun('Diese Folie gehört zu einer automatisch wiederholten Werbeschleife. Diese läuft weiter, bis du die Präsentation beendest.');
-            }
-        }
         if ($this->config['adLoopDelay']) {
-            if ($this->ppt->getSlideCount() < $finalAdSlideNumber) {
-                $transition = new Slide\Transition();
-                $transition->setTimeTrigger(true, $this->config['adLoopDelay']*1000);
-                $slide->setTransition($transition);
-            } else {
-                $slide->setName('LOOP_'.$this->config['adLoopDelay'].'_'.$firstAdSlideNumber);
-                $this->slideNames[$this->ppt->getSlideCount()] = 'LOOP_'.$this->config['adLoopDelay'].'_'.$firstAdSlideNumber;
+            $transition = new Slide\Transition();
+            $transition->setTimeTrigger(true, $this->config['adLoopDelay']*1000);
+            $slide->setTransition($transition);
+            if ($this->ppt->getSlideCount() == $firstAdSlideNumber) {
+                $slideName = 'LOOP_START_'.uniqid();
+                $slide->setName($slideName);
+                $this->slideNames[$this->ppt->getSlideCount()] = $slideName;
+            } elseif($this->ppt->getSlideCount() == $finalAdSlideNumber) {
+                $slideName = 'LOOP_END_'.uniqid();
+                $slide->setName($slideName);
+                $this->slideNames[$this->ppt->getSlideCount()] = $slideName;
             }
         }
         return $slide;
