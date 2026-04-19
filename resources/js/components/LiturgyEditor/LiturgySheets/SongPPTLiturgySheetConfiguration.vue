@@ -66,7 +66,7 @@
             </tab>
             <tab id="ads">
                 <form-check label="Veranstaltungswerbung am Anfang einfügen" v-model="myConfig.includeAdLoopStart" name="config[includeAdLoopStart]"/>
-                <form-check label="Veranstaltungswerbung am End einfügen" v-model="myConfig.includeAdLoopEnd" name="config[includeAdLoopEnd]"/>
+                <form-check label="Veranstaltungswerbung am Ende einfügen" v-model="myConfig.includeAdLoopEnd" name="config[includeAdLoopEnd]"/>
                 <form-selectize label="Veranstaltungswerbung bei folgenden Elementen einfügen" multiple :options="myItems"
                                 v-model="myConfig.includeAdLoopElements" name="config[includeAdLoopElements][]" />
                 <hr />
