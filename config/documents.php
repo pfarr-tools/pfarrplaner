@@ -103,8 +103,8 @@ return [
                         'Zitat' => [
                             'alignment' => 'both',
                             'indentation' => [
-                                'left' => 4535.4330708661, // 1cm
-                                'right' => 4535.4330708661, // 1cm
+                                'left' => 566.893, // 1cm
+                                'right' => 566.893, // 1cm
                                 'firstLine' => 0,
                                 'hanging' => 0,
                             ],
