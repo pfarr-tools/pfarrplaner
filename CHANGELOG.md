@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.10.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.10.1...v2026.10.2) (2026-04-19)
+
+
+### Bug Fixes
+
+* Falsche Einrückungen beim Zitaten in Word-Dokumenten. ([d74c18e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d74c18e7e70e8a616f48ad5a88a91ef3f5e35087))
+* Tippfehler ([319fe56](https://codeberg.org/pfarr.tools/pfarrplaner/commit/319fe56fa9148498c29405c6b791a86da595c9d4))
+
 ### [2026.10.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.10.0...v2026.10.1) (2026-04-18)
 
 
