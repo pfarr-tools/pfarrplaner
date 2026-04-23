@@ -445,8 +445,8 @@ class UserController extends Controller
      */
     public function doJoin(Request $request, User $user1, User $user2)
     {
-        $this->authorize('delete', $user1);
-        $this->authorize('update', $user2);
+        $this->authorize('merge', $user1);
+        $this->authorize('merge', $user2);
 
         if (null === $user1 || null === $user2) {
             return redirect()->route('home')->with('error', 'Ein Fehler ist aufgetreten.');

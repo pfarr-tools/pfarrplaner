@@ -855,17 +855,32 @@ class User extends Authenticatable
     public function mergeInto(User $user)
     {
         if ((!$user->isOfficialUser) && $this->isOfficialUser) {
-            $user->password = $this->password;
-            $user->cities()->sync($this->cities->pluck('id'));
-            $user->writableCities()->sync($this->writableCities->pluck('id'));
-            $user->adminCities()->sync($this->adminCities->pluck('id'));
             $user->roles()->sync($this->roles->pluck('id'));
             $user->permissions()->sync($this->permissions->pluck('id'));
             $user->update([
-                              'manage_absences' => $this->manage_absences,
-                              'preference_cities' => $this->preference_cities,
-                          ]);
+                'manage_absences' => $this->manage_absences,
+                'preference_cities' => $this->preference_cities,
+            ]);
         }
+
+        // Additive city merge: all cities from both users, keep the better permission for shared cities
+        $permissionRank = ['n' => 0, 'r' => 1, 'w' => 2, 'a' => 3];
+        foreach ($this->cities as $city) {
+            $sourcePermission = $city->pivot->permission;
+            $targetCity = $user->cities()->where('cities.id', $city->id)->first();
+            if ($targetCity === null) {
+                $user->cities()->attach($city->id, ['permission' => $sourcePermission]);
+            } elseif (($permissionRank[$sourcePermission] ?? 0) > ($permissionRank[$targetCity->pivot->permission] ?? 0)) {
+                $user->cities()->updateExistingPivot($city->id, ['permission' => $sourcePermission]);
+            }
+        }
+
+        // Merge pivot memberships additively
+        $user->cityScopes()->syncWithoutDetaching($this->cityScopes->pluck('id')->toArray());
+        $user->homeCities()->syncWithoutDetaching($this->homeCities->pluck('id')->toArray());
+        $user->pools()->syncWithoutDetaching($this->pools->pluck('id')->toArray());
+
+        // Transfer direct FK associations
         Absence::where('user_id', $this->id)->update(['user_id' => $user->id]);
         CalendarConnection::where('user_id', $this->id)->update(['user_id' => $user->id]);
         Comment::where('user_id', $this->id)->update(['user_id' => $user->id]);
@@ -873,26 +888,28 @@ class User extends Authenticatable
         Subscription::where('user_id', $this->id)->update(['user_id' => $user->id]);
         UserSetting::where('user_id', $this->id)->update(['user_id' => $user->id]);
 
+        // Merge parishes — syncWithoutDetaching avoids duplicate pivot rows
         foreach ($this->parishes as $parish) {
             /** @var Parish $parish */
             $parish->users()->detach($this->id);
-            $parish->users()->attach($user->id);
+            $parish->users()->syncWithoutDetaching([$user->id]);
         }
 
+        // Merge teams — syncWithoutDetaching avoids duplicate pivot rows
         foreach ($this->teams as $team) {
             /** @var Team $team */
             $team->users()->detach($this->id);
-            $team->users()->attach($user->id);
+            $team->users()->syncWithoutDetaching([$user->id]);
         }
 
+        // Transfer replacement assignments (BelongsToMany pivot, no user_id FK on replacements)
         $srcUser = $this;
-        foreach (
-            Replacement::whereHas('users', function ($query) use ($srcUser) {
-                $query->where('user_id', $srcUser);
-            }) as $replacement
-        ) {
-            $replacement->update(['user_id' => $user->id]);
-        }
+        Replacement::whereHas('users', function ($query) use ($srcUser) {
+            $query->where('user_id', $srcUser->id);
+        })->get()->each(function (Replacement $replacement) use ($user, $srcUser) {
+            $replacement->users()->detach($srcUser->id);
+            $replacement->users()->syncWithoutDetaching([$user->id]);
+        });
     }
 
     /**

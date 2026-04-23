@@ -2,6 +2,7 @@
 
 namespace Database\Factories\Leave;
 
+use App\Models\Leave\Pool;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,6 +10,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PoolFactory extends Factory
 {
+    protected $model = Pool::class;
+
     /**
      * Define the model's default state.
      *
@@ -17,7 +20,8 @@ class PoolFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->words(2, true),
+            'slug' => fake()->slug(2),
         ];
     }
 }

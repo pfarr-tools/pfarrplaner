@@ -182,6 +182,26 @@ class UserPolicy
     }
 
     /**
+     * Determine whether the user can merge another user into a third one.
+     * Requires (super)admin or local admin of at least one city the subject user belongs to.
+     *
+     * @param User $user
+     * @param User $model
+     * @return bool
+     */
+    public function merge(User $user, User $model): bool
+    {
+        if ($model->hasRole(AuthServiceProvider::SUPER)) {
+            return false;
+        }
+        if ($user->hasRole(AuthServiceProvider::ADMIN)) {
+            return true;
+        }
+        return $user->adminCities->intersect($model->cities)->isNotEmpty()
+            || $user->adminCities->intersect($model->homeCities)->isNotEmpty();
+    }
+
+    /**
      * Determine whether the user can merge this user into another one
      *
      * @param User $user

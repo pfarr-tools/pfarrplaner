@@ -39,8 +39,11 @@ class ParishFactory extends Factory
 
     public function definition()
     {
-        // TODO: Implement definition() method.
-        return [];
+        return [
+            'name' => fake()->words(2, true),
+            'code' => fake()->lexify('???'),
+            'city_id' => \App\Models\Places\City::factory(),
+        ];
     }
 
 }

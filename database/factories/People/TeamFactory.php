@@ -50,7 +50,8 @@ class TeamFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => fake()->words(2, true),
+            'city_id' => \App\Models\Places\City::factory(),
         ];
     }
 }
