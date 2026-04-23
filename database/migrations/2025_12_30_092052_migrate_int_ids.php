@@ -53,6 +53,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // SQLite does not distinguish int/bigint and has no information_schema — nothing to do
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         // special case: locations: location_id could be 0 so far -> must be set to null for the constraint to work
         Service::withoutGlobalScopes()->where('location_id', 0)->update(['location_id' => null]);
 
@@ -67,6 +72,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            return;
+        }
+
         foreach ($this->concernsTables as $table) {
             $this->migrateIdFieldWithAllConstraints($table, 'unsignedInteger');
         }

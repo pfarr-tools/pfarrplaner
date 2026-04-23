@@ -30,7 +30,7 @@
 
 namespace Tests\Feature;
 
-use App\Http\Middleware\Authenticate;
+use App\Models\People\User;
 use App\Models\Tag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -45,6 +45,9 @@ class TagFeatureTest extends TestCase
 
     use RefreshDatabase;
 
+    /** @var User */
+    protected $testUser = null;
+
     /**
      * Test if a tag can be created
      *
@@ -52,9 +55,9 @@ class TagFeatureTest extends TestCase
      */
     public function testTagCanBeCreated()
     {
-        $response = $this->post(route('tag.store'), Tag::factory()->raw());
+        $response = $this->actingAs($this->testUser)->post(route('admin.tags.store'), Tag::factory()->raw());
         $response->assertStatus(302);
-        $response->assertRedirect(route('tags.index'));
+        $response->assertRedirect(route('admin.tags.index'));
         $this->assertCount(1, Tag::all());
     }
 
@@ -65,8 +68,8 @@ class TagFeatureTest extends TestCase
      */
     public function testTagCannotBeCreatedWithoutName()
     {
-        $response = $this->post(route('tag.store'), Tag::factory()->raw(['name' => null]));
-        $response->assertSessionHasErrors('name');
+        $response = $this->actingAs($this->testUser)->post(route('admin.tags.store'), Tag::factory()->raw(['name' => null]));
+        $response->assertSessionHasErrors(['name'], null, 'createTag');
         $this->assertCount(0, Tag::all());
     }
 
@@ -78,9 +81,9 @@ class TagFeatureTest extends TestCase
     public function testTagCanBeUpdated()
     {
         $tag = Tag::factory()->create();
-        $response = $this->patch(route('tag.update', $tag->id), ['name' => 'cool name']);
+        $response = $this->actingAs($this->testUser)->patch(route('admin.tag.update', $tag->id), ['name' => 'cool name']);
         $response->assertStatus(302);
-        $response->assertRedirect(route('tags.index'));
+        $response->assertRedirect(route('admin.tags.index'));
         $this->assertEquals('cool name', Tag::first()->name);
     }
 
@@ -92,8 +95,8 @@ class TagFeatureTest extends TestCase
     public function testTagCannotBeUpdatedWithoutName()
     {
         $tag = Tag::factory()->create(['name' => 'cool name']);
-        $response = $this->patch(route('tag.update', $tag->id), ['name' => null]);
-        $response->assertSessionHasErrors('name');
+        $response = $this->actingAs($this->testUser)->patch(route('admin.tag.update', $tag->id), ['name' => null]);
+        $response->assertSessionHasErrors(['name'], null, 'updateTag');
         $this->assertEquals('cool name', Tag::first()->name);
     }
 
@@ -104,7 +107,7 @@ class TagFeatureTest extends TestCase
      */
     public function testTagCodeIsSlug()
     {
-        $this->post(route('tag.store'), Tag::factory()->raw(['code' => null]));
+        $this->actingAs($this->testUser)->post(route('admin.tags.store'), Tag::factory()->raw(['code' => null]));
         $tag = Tag::first();
         $this->assertEquals(Str::slug($tag->name), $tag->code);
     }
@@ -118,15 +121,15 @@ class TagFeatureTest extends TestCase
     {
         $tag = Tag::factory()->create();
         $this->assertCount(1, Tag::all());
-        $response = $this->delete(route('tag.destroy', $tag->id));
+        $response = $this->actingAs($this->testUser)->delete(route('admin.tag.destroy', $tag->id));
         $response->assertStatus(302);
-        $response->assertRedirect(route('tags.index'));
+        $response->assertRedirect(route('admin.tags.index'));
         $this->assertCount(0, Tag::all());
     }
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->withoutMiddleware(Authenticate::class);
+        $this->testUser = User::factory()->create();
     }
 }
