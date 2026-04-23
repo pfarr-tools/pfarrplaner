@@ -45,7 +45,7 @@ class DeleteCity extends AbstractDeleteAction implements DeletesCities
      */
     public function redirectTo(): string
     {
-        return route('admin.index');
+        return City::getSingleRoute('web', 'index');
     }
 
 

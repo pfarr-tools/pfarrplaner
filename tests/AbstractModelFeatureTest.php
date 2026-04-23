@@ -173,7 +173,7 @@ abstract class AbstractModelFeatureTest extends TestCase
      * @return string
      */
     protected function getActionRedirectUrl($model = null): string {
-        return route($this->getActionRedirectUrl());
+        return ($this->modelClass)::getSingleRoute('web', 'index');
     }
 
     /**

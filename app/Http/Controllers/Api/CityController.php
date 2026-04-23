@@ -52,7 +52,11 @@ class CityController extends AbstractApiCRUDController
     public function index(Request $request)
     {
         Gate::authorize('viewAny', $this->modelClass);
-        return response()->json($request->user()->cities()->get());
+        $user = $request->user();
+        if ($user->isAdmin) {
+            return response()->json(City::all());
+        }
+        return response()->json($user->cities()->get());
     }
 
     /**

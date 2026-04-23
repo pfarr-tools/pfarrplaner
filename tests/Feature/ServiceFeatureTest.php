@@ -118,7 +118,7 @@ class ServiceFeatureTest extends TestCase
         Storage::fake('fake');
 
         $this->withoutMiddleware(Authenticate::class);
-        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();
+        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
         Permission::create(['name' => 'gd-bearbeiten']);
         Permission::create(['name' => 'gd-allgemein-bearbeiten']);

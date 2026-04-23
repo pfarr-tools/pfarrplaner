@@ -46,7 +46,7 @@ class CreateCity extends AbstractCreateAction implements CreatesCities
      */
     public function redirectTo(): string
     {
-        return route('admin.index');
+        return City::getSingleRoute('web', 'index');
     }
 
     /**

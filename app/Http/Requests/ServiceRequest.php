@@ -188,11 +188,11 @@ class ServiceRequest extends FormRequest
             $data['time'] = Carbon::parse($data['date'])->setTimezone('Europe/Berlin')->format('H:i:s');
         }
 
-        if ($data['event_class'] == 'service') {
+        if (($data['event_class'] ?? null) == 'service') {
             $data['end'] = Carbon::parse($data['date'])->addHour(1);
         }
 
-        if ($data['location_id'] == 0) {
+        if (($data['location_id'] ?? null) === 0) {
             $data['location_id'] = null;
         }
 

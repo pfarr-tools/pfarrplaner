@@ -46,7 +46,7 @@ class UpdateCity extends AbstractUpdateAction implements UpdatesCities
      */
     public function redirectTo(): string
     {
-        return route('admin.index');
+        return City::getSingleRoute('web', 'index');
     }
 
 
