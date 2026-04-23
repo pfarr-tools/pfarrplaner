@@ -343,17 +343,18 @@ export default {
                     city: this.city.id,
                 }));
             }
-            person.type='mdi mdi-account';
+            person.type = 'mdi mdi-account';
             person.category = 'Personen';
+            person.userString = '';
             this.myPeople.push(person);
-            component.personCreatedData = person;
+            this.personCreatedData = person;
             this.myPeopleReference[person.id] = person;
             this.createCallback(person);
-            component.myValue.push(data.id);
-            component.personCreatedCounter++;
-            component.$forceUpdate();
-            component.changed(component.myValue);
-            component.personCreated = true;
+            this.myValue.push(person.id);
+            this.personCreatedCounter++;
+            this.$forceUpdate();
+            this.changed(this.myValue);
+            this.personCreated = true;
             EventBus.publish(new NewPersonAddedEvent(this.uuid, person));
         },
         newPersonModalShown(ref) {
