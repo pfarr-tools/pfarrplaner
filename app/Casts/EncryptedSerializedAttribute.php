@@ -38,9 +38,13 @@ class EncryptedSerializedAttribute extends EncryptedAttribute
     public function get($model, $key, $value, $attributes)
     {
         $decrypted = parent::get($model, $key, $value, $attributes);
-        if (Str::startsWith($decrypted, '_____')) $decrypted = substr($decrypted, 5);
-        while (is_string($decrypted) && ($x = @unserialize($decrypted))) {
-            $decrypted = $x;
+        if (is_string($decrypted) && Str::startsWith($decrypted, '_____')) $decrypted = substr($decrypted, 5);
+        while (is_string($decrypted)) {
+            $unserialized = @unserialize($decrypted);
+            // unserialize() returns false both on failure and for a serialized false value;
+            // only stop if it actually failed (i.e. input wasn't the serialization of false)
+            if ($unserialized === false && $decrypted !== 'b:0;') break;
+            $decrypted = $unserialized;
             if (is_string($decrypted) && Str::startsWith($decrypted, '_____')) $decrypted = substr($decrypted, 5);
         }
         return $decrypted;

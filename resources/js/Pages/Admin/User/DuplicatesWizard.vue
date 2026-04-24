@@ -32,118 +32,163 @@
         <template slot="navbar-left">
             <save-button @click="fixDuplicates" />
         </template>
-        <draggable :list="people" group="users" handle=".handle" @end="dragged">
-            <div v-for="user in people" class="row user-item my-3 p-2 border rounded rounded-lg">
-                <div class="col-md-3">
-                    <span class="handle" :class="user.isOfficialUser ? 'mdi mdi-account-check' : 'mdi mdi-account-question-outline'"></span>
-                    <span class="text-bold">{{ user.fullNameText || user.name }}</span>
-                    <span class="badge bg-info">{{ user.duplicates.length }}</span><br />
-                    <small>
-                        <div v-if="user.email">{{ user.email }}</div>
-                        <div v-if="user.home_cities">
-                            <span v-for="city in user.home_cities" class="badge bg-dark me-1 mb-1">{{ city.name }}</span>
+
+        <div v-for="person in people" :key="person.id" class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <!-- Keeper: editable name fields + info -->
+                    <div class="col-md-4 border-end">
+                        <div class="mb-2 text-muted small fw-semibold">
+                            <span :class="person.isOfficialUser ? 'mdi mdi-account-check text-primary' : 'mdi mdi-account-question-outline text-secondary'" class="me-1"></span>
+                            Behalten
                         </div>
-                    </small>
-                </div>
-                <div class="col-md-7">
-                    <draggable :list="user.duplicates" group="users" handle=".handle" @end="dragged" class="duplicates-drop"
-                        :class="user.duplicates.length ? 'has-duplicates' : 'no-duplicates'" :emptyInsertThreshold="100">
-                        <div v-for="duplicateUser in user.duplicates" class="user-item my-3 p-2 border rounded rounded-lg">
-                            <span class="handle" :class="duplicateUser.isOfficialUser ? 'mdi mdi-account-check' : 'mdi mdi-account-question-outline'"></span>
-                            <span class="text-bold">{{ duplicateUser.fullNameText || duplicateUser.name }}</span>
-                            <div v-if="user.email">{{ user.email }}</div>
-                            <div v-if="duplicateUser.home_cities">
-                                <span v-for="city in user.home_cities" class="badge bg-dark me-1 mb-1">{{ city.name }}</span>
+                        <div class="mb-2">
+                            <input class="form-control form-control-sm mb-1"
+                                   v-model="person.editTitle"
+                                   placeholder="Titel (z.B. Pfarrer, Dr.)" />
+                            <div class="input-group input-group-sm mb-1">
+                                <input class="form-control"
+                                       v-model="person.editFirstName"
+                                       placeholder="Vorname" />
+                                <input class="form-control"
+                                       v-model="person.editLastName"
+                                       placeholder="Nachname" />
                             </div>
                         </div>
-                    </draggable>
+                        <small class="text-muted">
+                            <div v-if="person.email" class="mb-1">{{ person.email }}</div>
+                            <div v-if="person.home_cities && person.home_cities.length">
+                                <span v-for="city in person.home_cities" :key="city.id" class="badge bg-dark me-1 mb-1">{{ city.name }}</span>
+                            </div>
+                            <div v-if="person.city_scopes && person.city_scopes.length">
+                                <span v-for="city in person.city_scopes" :key="city.id" class="badge bg-secondary me-1 mb-1">{{ city.name }}</span>
+                            </div>
+                        </small>
+                    </div>
+
+                    <!-- Duplicates with checkboxes -->
+                    <div class="col-md-8">
+                        <div class="mb-2 text-muted small fw-semibold">Zusammenführen mit</div>
+                        <div v-for="dup in person.duplicates" :key="dup.id"
+                             class="d-flex align-items-start mb-2 p-2 rounded"
+                             :class="dup.selected ? 'bg-light border' : 'border border-dashed text-muted'">
+                            <div class="me-2 mt-1">
+                                <input type="checkbox" :id="'dup-'+dup.id" v-model="dup.selected" />
+                            </div>
+                            <label :for="'dup-'+dup.id" class="mb-0 flex-grow-1" style="cursor:pointer">
+                                <span :class="dup.isOfficialUser ? 'mdi mdi-account-check text-primary' : 'mdi mdi-account-question-outline text-secondary'" class="me-1"></span>
+                                <strong>{{ dup.fullNameText || dup.name }}</strong>
+                                <small class="d-block">
+                                    <span v-if="dup.email" class="me-2">{{ dup.email }}</span>
+                                    <span v-for="city in dup.home_cities" :key="city.id" class="badge bg-dark me-1">{{ city.name }}</span>
+                                    <span v-for="city in dup.city_scopes" :key="city.id" class="badge bg-secondary me-1">{{ city.name }}</span>
+                                </small>
+                            </label>
+                        </div>
+                        <form-selectize
+                            :key="'add-dup-'+person.id+'-'+person.duplicates.length"
+                            :options="availableFor(person)"
+                            placeholder="Weiteres Duplikat hinzufügen..."
+                            @input="addDuplicateToPerson(person, $event)"
+                        />
+                    </div>
                 </div>
-                <div class="col-md-2"></div>
             </div>
-        </draggable>
+        </div>
+
         <hr />
-        <form-selectize label="Zur Liste hinzufügen" :options="withoutDuplicates" @input="addUserToList" />
+        <form-selectize
+            :key="'add-to-list-'+people.length"
+            label="Zur Liste hinzufügen"
+            :options="availableUsers"
+            @input="addUserToList"
+        />
     </admin-layout>
 </template>
 
 <script>
 
-import draggable from 'vuedraggable'
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import SaveButton from "../../../components/Ui/buttons/SaveButton";
 
 export default {
     name: "DuplicatesWizard",
     props: { possibleDuplicates: Array, withoutDuplicates: Array },
-    components: {SaveButton, FormSelectize, draggable },
+    components: { SaveButton, FormSelectize },
     data() {
-        var people = this.possibleDuplicates;
-        for (const personIndex in people) {
-            people[personIndex].duplicates = Object.values(people[personIndex].duplicates);
-        }
-
-        return {
-            people: people,
-        }
+        const people = this.possibleDuplicates.map(person => ({
+            ...person,
+            editTitle: person.title || '',
+            editFirstName: person.first_name || '',
+            editLastName: person.last_name || '',
+            duplicates: Object.values(person.duplicates).map(d => ({ ...d, selected: true })),
+        }));
+        return { people };
+    },
+    computed: {
+        usedIds() {
+            const ids = new Set(this.people.map(p => p.id));
+            this.people.forEach(p => p.duplicates.forEach(d => ids.add(d.id)));
+            return ids;
+        },
+        availableUsers() {
+            return this.withoutDuplicates.filter(u => !this.usedIds.has(u.id));
+        },
     },
     methods: {
-        dragged(event) {
-            for (const personIndex in this.people) {
-                for (const dupIndex in this.people[personIndex].duplicates) {
-                    if (this.people[personIndex].duplicates[dupIndex].duplicates.length > 0) {
-                        this.people[personIndex].duplicates[dupIndex].duplicates.forEach(duplicate => {
-                            this.people[personIndex].duplicates.push(duplicate);
-                        });
-                        this.people[personIndex].duplicates[dupIndex].duplicates = [];
-                    }
-                }
+        availableFor() {
+            return this.availableUsers;
+        },
+        addDuplicateToPerson(person, id) {
+            const user = this.withoutDuplicates.find(u => u.id == id);
+            if (user && !this.usedIds.has(user.id)) {
+                person.duplicates.push({
+                    ...user,
+                    selected: true,
+                    fullNameText: user.fullNameText || user.name,
+                    duplicates: [],
+                });
             }
         },
         addUserToList(id) {
-            this.withoutDuplicates.forEach(user => {
-                if (id == user.id) this.possibleDuplicates.push(user);
-            });
+            const user = this.withoutDuplicates.find(u => u.id == id);
+            if (user && !this.usedIds.has(user.id)) {
+                this.people.push({
+                    ...user,
+                    editTitle: user.title || '',
+                    editFirstName: user.first_name || '',
+                    editLastName: user.last_name || '',
+                    duplicates: [],
+                });
+            }
         },
         fixDuplicates() {
-            let record = {};
+            const groups = [];
             this.people.forEach(person => {
-               if (person.duplicates.length > 0) {
-                   record[person.id] = [];
-                   person.duplicates.forEach(duplicate => {
-                        record[person.id].push(duplicate.id);
-                   });
-               }
+                const selectedSources = person.duplicates
+                    .filter(d => d.selected)
+                    .map(d => d.id);
+                if (selectedSources.length > 0) {
+                    groups.push({
+                        target_id: person.id,
+                        source_ids: selectedSources,
+                        name_update: {
+                            title: person.editTitle,
+                            first_name: person.editFirstName,
+                            last_name: person.editLastName,
+                        },
+                    });
+                }
             });
 
-            this.$inertia.post(route('users.duplicates.fix'), record, { preserveState: false});
-        }
-    }
+            this.$inertia.post(route('users.duplicates.fix'), { groups }, { preserveState: false });
+        },
+    },
 }
 </script>
 
 <style scoped>
-    .user-item {
-        background-color: white;
-    }
-
-    .mdi-account-check {
-        color: blue;
-    }
-
-    .handle {
-        cursor: move;
-    }
-
-    .duplicates-drop {
-        min-height: 3em;
-    }
-
-    .duplicates-drop.no-duplicates {
-        background-color: lightyellow;
-    }
-
-    .sortable-chosen {
-        background-color: yellow;
-    }
-
+.border-dashed {
+    border-style: dashed !important;
+}
 </style>

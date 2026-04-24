@@ -32,6 +32,8 @@
         <template slot="navbar-left">
             <nav-button v-if="canCreate" type="success" icon="mdi mdi-account-plus" title="Neue Person anlegen"
                         @click="createUser">Person hinzufügen</nav-button>
+            <nav-button v-if="isSuperAdmin" type="warning" icon="mdi mdi-account-multiple-check" title="Doppelte Personeneinträge finden"
+                        class="ms-1" @click="findDuplicates">Duplikate finden</nav-button>
         </template>
         <dataset v-slot="{ ds }"
                  :ds-data="users"
@@ -72,7 +74,9 @@
                                             <div>
                                                 <span  :class="row.isOfficialUser ? 'mdi mdi-account-check' : 'mdi mdi-account-question-outline'"></span>
                                                 <span v-if="row.last_name && row.first_name">
-                                                    <b>{{ row.last_name }}</b>, {{ row.first_name }}
+                                                    <b>{{ row.last_name }}</b>, {{ row.first_name }}<span
+                                                        v-if="row.name && row.name.trim() !== (row.first_name + ' ' + row.last_name).trim()"
+                                                        class="text-muted ms-1">({{ row.name }})</span>
                                                 </span>
                                                 <span v-else>{{ row.name }}</span>
                                             </div>
@@ -156,14 +160,15 @@ export default {
         return {
             filter: '',
             isAdmin: this.$page.props.currentUser.data.isAdmin,
+            isSuperAdmin: this.$page.props.currentUser.data.isSuperAdmin,
             currentUser: this.$page.props.currentUser.data,
             checkboxes: [
                 {
                     name: 'isOfficialUser',
-                    title: 'Nur Personen mit Benutzerkonto anzeigen',
+                    title: 'Nur Benutzerkonten anzeigen (Personen ohne Login-Konto ausblenden)',
                     icon: 'mdi mdi-account-check',
-                    label: '',
-                    value: true,
+                    label: 'nur Benutzerkonten',
+                    value: !!(this.$page.props.settings.userIndexFilterOfficialOnly ?? 1),
                     condition: this.$page.props.currentUser.data.isLocalAdmin
                         || this.$page.props.currentUser.data.isAdmin
                         || this.hasPermission('benutzer-beabeiten')
@@ -180,6 +185,17 @@ export default {
                 return { ...acc, ...{ [curr.name]: curr.value === false ? '' : curr.value } }
             }, {})
         }
+    },
+    watch: {
+        'checkboxes': {
+            deep: true,
+            handler(checkboxes) {
+                const cb = checkboxes.find(c => c.name === 'isOfficialUser');
+                if (cb) {
+                    axios.post(route('setting.set', { user: this.currentUser.id, key: 'userIndexFilterOfficialOnly' }), { value: cb.value ? 1 : 0 });
+                }
+            },
+        },
     },
     methods: {
         canEdit(user) {
@@ -207,6 +223,9 @@ export default {
         },
         mergeUser(user) {
             window.location.href = route('user.join', user.id);
+        },
+        findDuplicates() {
+            this.$inertia.get(route('users.duplicates'));
         },
         resetPassword(user) {
             if (confirm('Willst du das Passwort für '+user.name+' wirklich zurücksetzen? '

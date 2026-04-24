@@ -138,6 +138,7 @@ class User extends Authenticatable
     protected $appends = [
         'isOfficialUser',
         'isAdmin',
+        'isSuperAdmin',
         'isLocalAdmin',
         'isPastor',
         'sortName',
@@ -195,6 +196,14 @@ class User extends Authenticatable
     public function getIsAdminAttribute()
     {
         return $this->hasRole(RoleService::ROLE_ADMIN) || $this->hasRole(RoleService::ROLE_SUPER_ADMIN);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsSuperAdminAttribute(): bool
+    {
+        return $this->hasRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
     /**

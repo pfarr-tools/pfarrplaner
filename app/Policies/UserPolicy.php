@@ -182,6 +182,28 @@ class UserPolicy
     }
 
     /**
+     * Determine whether the user can search for duplicate person entries.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function findDuplicates(User $user): bool
+    {
+        return $user->hasRole(AuthServiceProvider::SUPER);
+    }
+
+    /**
+     * Determine whether the user can batch-merge duplicate person entries.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function fixDuplicates(User $user): bool
+    {
+        return $user->hasRole(AuthServiceProvider::SUPER);
+    }
+
+    /**
      * Determine whether the user can merge another user into a third one.
      * Requires (super)admin or local admin of at least one city the subject user belongs to.
      *

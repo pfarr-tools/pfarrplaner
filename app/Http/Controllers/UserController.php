@@ -51,6 +51,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -593,69 +594,127 @@ class UserController extends Controller
 
     public function findDuplicates()
     {
-        $allUsers = User::all();
+        Gate::authorize('findDuplicates', User::class);
+
+        $allUsers = User::with(['homeCities', 'cityScopes'])->get();
+        $userById = $allUsers->keyBy('id');
+
+        // Build inverted index: name key → [user_ids]
+        // Two keys are used: the stored name field, and the (first_name, last_name) pair when both are present.
+        // This catches cases where the name field was auto-generated differently (e.g. title included).
+        $keyIndex = [];
+        foreach ($allUsers as $user) {
+            if ($user->name) {
+                $keyIndex['n:' . mb_strtolower(trim($user->name))][] = $user->id;
+            }
+            if ($user->first_name && $user->last_name) {
+                $keyIndex['fl:' . mb_strtolower(trim($user->first_name)) . '|' . mb_strtolower(trim($user->last_name))][] = $user->id;
+            }
+        }
+
+        // Union-Find: path-halving find
+        $parent = $allUsers->pluck('id', 'id')->toArray();
+        $find = function (int $x) use (&$parent): int {
+            while ($parent[$x] !== $x) {
+                $parent[$x] = $parent[$parent[$x]];
+                $x = $parent[$x];
+            }
+            return $x;
+        };
+
+        foreach ($keyIndex as $userIds) {
+            for ($i = 0; $i < count($userIds) - 1; $i++) {
+                for ($j = $i + 1; $j < count($userIds); $j++) {
+                    $a = $userById[$userIds[$i]];
+                    $b = $userById[$userIds[$j]];
+                    // Different non-empty emails are a strong indicator these are distinct people
+                    if ($a->email && $b->email && $a->email !== $b->email) {
+                        continue;
+                    }
+                    $px = $find($userIds[$i]);
+                    $py = $find($userIds[$j]);
+                    if ($px !== $py) {
+                        $parent[$px] = $py;
+                    }
+                }
+            }
+        }
+
+        // Group users by union-find root
+        $grouped = [];
+        foreach ($allUsers as $user) {
+            $grouped[$find($user->id)][] = $user;
+        }
+
         $possibleDuplicates = [];
         $withoutDuplicates = [];
 
-        foreach ($allUsers as $user) {
-            $usersWithSameName = User::with('homeCities')
-                ->where('name', $user->name)
-                ->where('id', '!=', $user->id)
-                ->get();
-            if (count($usersWithSameName) > 0) {
-                $alreadyListed = false;
-                foreach ($usersWithSameName as $thisUser) {
-                    if (isset($possibleDuplicates[$thisUser->name])) {
-                        $alreadyListed = true;
-                        if ($thisUser->isOfficialUser && (!$possibleDuplicates[$thisUser->name]->isOfficialUser)) {
-                            $thisUser->duplicates = $possibleDuplicates[$thisUser->name]->duplicates->reject(
-                                function ($item) use ($thisUser) {
-                                    return $item->id == $thisUser->id;
-                                }
-                            );
-                            $possibleDuplicates[$thisUser->name]->duplicates = collect();
-                            $thisUser->duplicates->push($possibleDuplicates[$thisUser->name]);
-                            $possibleDuplicates[$thisUser->name] = $thisUser;
-                        }
-                    }
-                }
-                if (!$alreadyListed) {
-                    $user->load('homeCities');
-                    $usersWithSameName = $usersWithSameName->map(function ($item) {
-                        $item->duplicates = collect();
-                        $item->fullNameText = $item->fullName(true);
-                        return $item;
-                    });
-                    $user->duplicates = $usersWithSameName;
-                    $user->fullNameText = $user->fullName(true);
-                    $possibleDuplicates[$user->name] = $user;
-                }
-            } else {
+        foreach ($grouped as $group) {
+            $group = collect($group);
+            if ($group->count() <= 1) {
+                $user = $group->first();
                 $user->duplicates = collect();
                 $user->fullNameText = $user->fullName(true);
                 $withoutDuplicates[] = $user;
+                continue;
             }
+
+            // Official users (with accounts) are preferred as the keeper
+            $sorted = $group->sortByDesc(fn($u) => (int) $u->isOfficialUser)->values();
+            $keeper = $sorted[0];
+            $keeper->fullNameText = $keeper->fullName(true);
+            $keeper->duplicates = $sorted->slice(1)->map(function ($u) {
+                $u->fullNameText = $u->fullName(true);
+                $u->duplicates = collect();
+                return $u;
+            })->values();
+            $possibleDuplicates[] = $keeper;
         }
-        $possibleDuplicates = array_values($possibleDuplicates);
 
         return Inertia::render('Admin/User/DuplicatesWizard', compact('possibleDuplicates', 'withoutDuplicates'));
     }
 
     public function fixDuplicates(Request $request)
     {
-        foreach ($request->all() as $target => $duplicates) {
-            $target = User::find($target);
-            if ($target) {
-                foreach ($duplicates as $duplicate) {
-                    $duplicate = User::find($duplicate);
-                    if ($duplicate) {
-                        $duplicate->mergeInto($target);
-                        $duplicate->delete();
-                    }
+        Gate::authorize('fixDuplicates', User::class);
+
+        $request->validate([
+            'groups' => 'array',
+            'groups.*.target_id' => 'required|integer',
+            'groups.*.source_ids' => 'required|array',
+            'groups.*.source_ids.*' => 'integer',
+            'groups.*.name_update' => 'sometimes|array',
+            'groups.*.name_update.title' => 'sometimes|nullable|string|max:255',
+            'groups.*.name_update.first_name' => 'sometimes|nullable|string|max:255',
+            'groups.*.name_update.last_name' => 'sometimes|nullable|string|max:255',
+            'groups.*.name_update.name' => 'sometimes|nullable|string|max:255',
+        ]);
+
+        foreach ($request->input('groups', []) as $group) {
+            $target = User::find($group['target_id']);
+            if (!$target) continue;
+
+            if (!empty($group['name_update'])) {
+                $update = array_filter($group['name_update'], fn($v) => $v !== null);
+                // Keep the stored name field in sync when first or last name is edited
+                if (array_key_exists('first_name', $update) || array_key_exists('last_name', $update)) {
+                    $firstName = $update['first_name'] ?? $target->first_name ?? '';
+                    $lastName  = $update['last_name']  ?? $target->last_name  ?? '';
+                    $update['name'] = trim(implode(' ', array_filter([$firstName, $lastName], fn($v) => $v !== '')));
+                }
+                $target->fill($update)->save();
+            }
+
+            foreach ($group['source_ids'] as $sourceId) {
+                $source = User::find($sourceId);
+                if ($source && $source->id !== $target->id) {
+                    $source->mergeInto($target);
+                    $source->delete();
                 }
             }
         }
-        return redirect()->route('users.duplicates');
+
+        return redirect()->route('users.index')->with('success', 'Die doppelten Personeneinträge wurden zusammengeführt.');
     }
 
     public function resetPassword(Request $request, User $user)
