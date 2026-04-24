@@ -87,7 +87,7 @@ class AbstractLiturgySheet
     {
         return '<div style="width: 100%; font-size: 8pt; font-family: \'Sarabun Light\', sans-serif; display: flex; justify-content: space-between; align-items: center; padding: 0 15mm;">'
               .'<div style="text-align: left;">Stand: '.now()->setTimezone('Europe/Berlin')->format('d.m.Y, H:i').' Uhr</div>'
-              .'<div style="text-align: center;">'.(Auth::guest() ? '' : Auth::user()->name).'</div>'
+              .'<div style="text-align: center;">'.(Auth::guest() ? '' : Auth::user()->fullName()).'</div>'
               .'<div style="text-align: right;">Seite <span class="pageNumber"></span> / <span class="totalPages"></span></div>'
               .'</div>';
     }

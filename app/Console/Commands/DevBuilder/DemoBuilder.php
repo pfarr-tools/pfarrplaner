@@ -373,7 +373,7 @@ class DemoBuilder extends Command
 
     protected function handleUsers(User $user)
     {
-        if ($user->name != 'Admin') {
+        if ($user->last_name != 'Admin') {
             $data = [
                 'first_name' => $this->faker->firstName,
                 'last_name' => $this->faker->lastName,

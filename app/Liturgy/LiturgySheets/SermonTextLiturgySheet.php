@@ -83,12 +83,12 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
     protected function setProperties(DefaultWordDocument $doc)
     {
         $properties = $doc->getPhpWord()->getDocInfo();
-        $properties->setCreator(Auth::user()->name);
+        $properties->setCreator(Auth::user()->fullName());
         $properties->setCompany(Auth::user()->office ?? '');
         $properties->setTitle($this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi') . ' ' . $this->getFileTitle());
         $properties->setDescription($this->getFileTitle() . ' (' . $this->title . ')');
         $properties->setCategory('Gottesdienste');
-        $properties->setLastModifiedBy(Auth::user()->name);
+        $properties->setLastModifiedBy(Auth::user()->fullName());
         $properties->setSubject('Komplette Liturgie');
     }
 

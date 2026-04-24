@@ -2,7 +2,7 @@
 Abwesenheitsantrag: Bitte überprüfen
 ====================================
 
-{{ $absence->user->name }} bittet um Überprüfung eines Abwesenheitsantrags:
+{{ $absence->user->fullName() }} bittet um Überprüfung eines Abwesenheitsantrags:
 
 @component('mail::panel')
 **{{ $absence->reason }}**

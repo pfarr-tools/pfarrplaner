@@ -59,7 +59,7 @@ class InstallAdmin extends Command
      */
     public function handle()
     {
-        if (User::where('name', 'Admin')->count()) {
+        if (User::where('last_name', 'Admin')->whereNull('first_name')->count()) {
             $this->line('<error>ERROR</error> Admin user already exists.');
             return Command::FAILURE;
         }
@@ -68,7 +68,7 @@ class InstallAdmin extends Command
         $domain = parse_url(url('/'), PHP_URL_HOST);
 
         $password = PasswordService::randomPassword();
-        $user = User::create(['name' => 'Admin', 'email' => 'admin@'.$domain, 'password' => $password, 'must_change_password' => 1]);
+        $user = User::create(['last_name' => 'Admin', 'email' => 'admin@'.$domain, 'password' => $password, 'must_change_password' => 1]);
         $user->assignRole($role);
 
         $this->line('<info>SUCCESS</info> Admin user admin@'.$domain.' with password"'.$password.'" created.');

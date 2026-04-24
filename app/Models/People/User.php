@@ -92,7 +92,6 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name',
         'first_name',
         'last_name',
         'title',
@@ -146,7 +145,7 @@ class User extends Authenticatable
     /**
      * @var string
      */
-    protected $orderBy = 'name';
+    protected $orderBy = 'last_name';
     /**
      * @var string
      */
@@ -241,16 +240,12 @@ class User extends Authenticatable
      */
     public function lastName($withTitle = false)
     {
-        if ($this->last_name) {
-            return ($withTitle ? ($this->title ? $this->title . ' ' : '') : '') . $this->last_name;
-        }
-        $name = explode(' ', $this->name);
-        return ($withTitle ? ($this->title ? $this->title . ' ' : '') : '') . end($name);
+        return ($withTitle ? ($this->title ? $this->title . ' ' : '') : '') . $this->last_name;
     }
 
     public function getSortNameAttribute()
     {
-        return ($this->last_name && $this->first_name) ? $this->last_name . ', ' . $this->first_name : $this->name;
+        return $this->last_name . ($this->first_name ? ', ' . $this->first_name : '');
     }
 
     /**
@@ -405,7 +400,6 @@ class User extends Authenticatable
             }
             $user = new User(
                 [
-                    'name' => $name,
                     'office' => '',
                     'phone' => '',
                     'address' => '',
@@ -426,7 +420,7 @@ class User extends Authenticatable
         parent::boot();
 
         static::addGlobalScope('order', function (Builder $builder) {
-            $builder->orderBy('name', 'asc');
+            $builder->orderBy('last_name', 'asc')->orderBy('first_name', 'asc');
         });
     }
 
@@ -626,7 +620,9 @@ class User extends Authenticatable
      */
     public function fullName($withTitle = false)
     {
-        return ($withTitle ? ($this->title ? $this->title . ' ' : '') : '') . $this->name;
+        return $this->nameService()->format(
+            $withTitle ? \App\Services\NameService::TITLE_FIRST_LAST : \App\Services\NameService::FIRST_LAST
+        );
     }
 
     /**

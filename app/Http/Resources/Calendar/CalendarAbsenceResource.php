@@ -46,8 +46,8 @@ class CalendarAbsenceResource extends JsonResource
         /** @var Absence $this */
         return [
             'id' => $this->id,
-            'name' => $this->user->last_name ?? $this->user->name,
-            'label' => $this->user->name.': '.$this->reason.$this->replacementText(', V: '),
+            'name' => $this->user->last_name,
+            'label' => $this->user->fullName().': '.$this->reason.$this->replacementText(', V: '),
         ];
     }
 }

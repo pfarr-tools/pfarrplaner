@@ -8,7 +8,7 @@
                     @else
                         @if(isset($value) && $value->contains($user))  selected="selected" @endif
                     @endif
-            >{{ $user->name }}</option>
+            >{{ $user->fullName() }}</option>
         @endforeach
     </select>
     @include('partials.form.validation')

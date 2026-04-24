@@ -591,7 +591,7 @@
                 options: [
                         @foreach ($users as $user)
                     {
-                        name: '{{ $user->name }}',
+                        name: '{{ $user->fullName() }}',
                         email: '{{ $user->email }}',
                         roles: [@foreach ($user->roles as $role) '{{ $role->name }}', @endforeach ],
                         cities: [@foreach ($user->homeCities as $city) '{{ $city->name }}', @endforeach ],

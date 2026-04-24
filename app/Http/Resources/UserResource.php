@@ -45,7 +45,7 @@ class UserResource extends JsonResource
         $sortedCities = $this->getSortedCities()->pluck('id');
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => $this->fullName(),
             'image' => $this->image,
             'email' => $this->email,
             'first_name' => $this->first_name,

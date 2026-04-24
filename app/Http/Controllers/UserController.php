@@ -433,7 +433,7 @@ class UserController extends Controller
      */
     public function join(User $user)
     {
-        $people = User::where('id', '!=', $user->id)->orderBy('name')->get();
+        $people = User::where('id', '!=', $user->id)->orderBy('last_name')->orderBy('first_name')->get();
         return Inertia::render('Admin/User/Join', compact('user', 'people'));
     }
 
@@ -524,9 +524,8 @@ class UserController extends Controller
     protected function validateRequest(Request $request, $user = null, $withCity = false)
     {
         $rules = [
-            'name' => 'required|string|max:255',
             'first_name' => 'nullable|string',
-            'last_name' => 'nullable|string',
+            'last_name' => 'required|string|max:255',
             'title' => 'nullable|string',
             'email' => 'nullable|string|email|max:255|unique:users,email' . ($user ? ',' . $user->id : ''),
             'password' => 'nullable|string',
@@ -604,9 +603,6 @@ class UserController extends Controller
         // This catches cases where the name field was auto-generated differently (e.g. title included).
         $keyIndex = [];
         foreach ($allUsers as $user) {
-            if ($user->name) {
-                $keyIndex['n:' . mb_strtolower(trim($user->name))][] = $user->id;
-            }
             if ($user->first_name && $user->last_name) {
                 $keyIndex['fl:' . mb_strtolower(trim($user->first_name)) . '|' . mb_strtolower(trim($user->last_name))][] = $user->id;
             }
@@ -687,7 +683,6 @@ class UserController extends Controller
             'groups.*.name_update.title' => 'sometimes|nullable|string|max:255',
             'groups.*.name_update.first_name' => 'sometimes|nullable|string|max:255',
             'groups.*.name_update.last_name' => 'sometimes|nullable|string|max:255',
-            'groups.*.name_update.name' => 'sometimes|nullable|string|max:255',
         ]);
 
         foreach ($request->input('groups', []) as $group) {
@@ -695,14 +690,7 @@ class UserController extends Controller
             if (!$target) continue;
 
             if (!empty($group['name_update'])) {
-                $update = array_filter($group['name_update'], fn($v) => $v !== null);
-                // Keep the stored name field in sync when first or last name is edited
-                if (array_key_exists('first_name', $update) || array_key_exists('last_name', $update)) {
-                    $firstName = $update['first_name'] ?? $target->first_name ?? '';
-                    $lastName  = $update['last_name']  ?? $target->last_name  ?? '';
-                    $update['name'] = trim(implode(' ', array_filter([$firstName, $lastName], fn($v) => $v !== '')));
-                }
-                $target->fill($update)->save();
+                $target->fill(array_filter($group['name_update'], fn($v) => $v !== null))->save();
             }
 
             foreach ($group['source_ids'] as $sourceId) {
@@ -721,6 +709,6 @@ class UserController extends Controller
     {
         if (!$request->user()->can('update', $user)) abort(403);
         $user->resetAccount();
-        return redirect()->route('users.index')->with('success', 'Das Benutzerpasswort für '.$user->name.' wurde zurückgesetzt. Eine E-Mail mit neuen Zugangsdaten wurde an '.$user->email.' versandt.');
+        return redirect()->route('users.index')->with('success', 'Das Benutzerpasswort für '.$user->fullName().' wurde zurückgesetzt. Eine E-Mail mit neuen Zugangsdaten wurde an '.$user->email.' versandt.');
     }
 }

@@ -109,7 +109,7 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
             . route('liturgy.download', ['service' => $service->slug, 'key' => 'A4']) . PHP_EOL . PHP_EOL
             . 'Außerdem gibt es den Ablauf in einem druckbaren, für Organist:innen optimierten Format hier:' . PHP_EOL
             . route('liturgy.download', ['service' => $service->slug, 'key' => 'Organist']) . PHP_EOL
-            . PHP_EOL . 'Freundliche Grüße, ' . PHP_EOL . Auth::user()->name;
+            . PHP_EOL . 'Freundliche Grüße, ' . PHP_EOL . Auth::user()->fullName();
 
         $recipients = [];
         foreach ($service->organists as $organist) {

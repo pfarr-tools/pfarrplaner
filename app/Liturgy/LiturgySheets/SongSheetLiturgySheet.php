@@ -86,12 +86,12 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
 
     protected function setProperties (DefaultWordDocument $doc) {
         $properties = $doc->getPhpWord()->getDocInfo();
-        $properties->setCreator(Auth::user()->name);
+        $properties->setCreator(Auth::user()->fullName());
         $properties->setCompany(Auth::user()->office ?? '');
         $properties->setTitle($this->getFileTitle());
         $properties->setDescription($this->getFileTitle());
         $properties->setCategory('Gottesdienste');
-        $properties->setLastModifiedBy(Auth::user()->name);
+        $properties->setLastModifiedBy(Auth::user()->fullName());
         $properties->setSubject('Liedblatt');
     }
 

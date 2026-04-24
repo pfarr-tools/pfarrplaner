@@ -74,9 +74,7 @@
                                             <div>
                                                 <span  :class="row.isOfficialUser ? 'mdi mdi-account-check' : 'mdi mdi-account-question-outline'"></span>
                                                 <span v-if="row.last_name && row.first_name">
-                                                    <b>{{ row.last_name }}</b>, {{ row.first_name }}<span
-                                                        v-if="row.name && row.name.trim() !== (row.first_name + ' ' + row.last_name).trim()"
-                                                        class="text-muted ms-1">({{ row.name }})</span>
+                                                    <b>{{ row.last_name }}</b>, {{ row.first_name }}
                                                 </span>
                                                 <span v-else>{{ row.name }}</span>
                                             </div>

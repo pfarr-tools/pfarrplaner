@@ -10,7 +10,7 @@
                 Dienstanfrage für "{{ $ministryTitle }}"
             @endslot
 
-            <p>Herzlichen Dank, {{ $user->name }}!</p>
+            <p>Herzlichen Dank, {{ $user->fullName() }}!</p>
             <p>Deine Zusagen wurden eingetragen. Danke für deine Bereitschaft zur Mitarbeit.</p>
 
 

@@ -250,7 +250,7 @@ class VersionInfo
                             'user.profile'
                         ) . '">'
                         . '<span class="fa fa-user"></span>&nbsp;'
-                        . Auth::user()->name . ' > Mein Profil</a> an- und abbestellt werden.',
+                        . Auth::user()->fullName() . ' > Mein Profil</a> an- und abbestellt werden.',
                 ],
                 [
                     'date' => Carbon::createFromFormat('d.m.Y', '14.05.2019'),

@@ -2,7 +2,7 @@
 Abwesenheitsantrag: Bitte um Genehmigung
 ========================================
 
-{{ $absence->user->name }} bittet um Genehmigung eines Abwesenheitsantrags:
+{{ $absence->user->fullName() }} bittet um Genehmigung eines Abwesenheitsantrags:
 
 @component('mail::panel')
 **{{ $absence->reason }}**
@@ -11,7 +11,7 @@ Abwesenheitsantrag: Bitte um Genehmigung
 @endcomponent
 
 Der Antrag wurde am {{ \Carbon\Carbon::now()->isoFormat('dddd, DD.MM.YYYY, \u\m HH:mm \U\h\r') }} von
-{{ $absence->checkedBy->name }} überprüft und zur Genehmigung weitergeleitet.
+{{ $absence->checkedBy->fullName() }} überprüft und zur Genehmigung weitergeleitet.
 
 @component('mail::button', ['url' => route('absence.edit', $absence->id)])
     Antrag im Pfarrplaner öffnen

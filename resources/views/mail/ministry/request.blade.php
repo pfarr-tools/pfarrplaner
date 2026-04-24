@@ -4,9 +4,9 @@ Anfrage
 =======
 
 
-Hallo {{ $user->name }},
+Hallo {{ $user->fullName() }},
 
-{{ $sender->name }} fragt an, ob du dir vorstellen könntest, in einem oder mehreren der folgenden Gottesdienste den Dienst
+{{ $sender->fullName() }} fragt an, ob du dir vorstellen könntest, in einem oder mehreren der folgenden Gottesdienste den Dienst
 "{{ $ministry }}" zu übernehmen.
 
 @foreach($services as $service)
@@ -15,7 +15,7 @@ Hallo {{ $user->name }},
 
 @if($text)
 
-    Dazu hat {{ $sender->name }} noch Folgendes geschrieben:
+    Dazu hat {{ $sender->fullName() }} noch Folgendes geschrieben:
 
 
     {{ $text }}
@@ -31,7 +31,7 @@ Bist du dabei? Dann kannst du hier mit nur ein paar Klicks die entsprechenden Go
 
 
 
-Du hast noch Fragen? Dann wende dich am Besten direkt an {{ $sender->name }} ({{ $sender->email }}).
+Du hast noch Fragen? Dann wende dich am Besten direkt an {{ $sender->fullName() }} ({{ $sender->email }}).
 
 Herzlichen Dank für deine Bereitschaft zur Mithilfe!
 Das Team deiner Kirchengemeinde

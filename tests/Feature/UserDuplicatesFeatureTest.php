@@ -71,8 +71,8 @@ class UserDuplicatesFeatureTest extends TestCase
 
     public function testFixDuplicatesMergesUsersAndDeletesSource()
     {
-        $source = User::factory()->create(['name' => 'Max Mustermann']);
-        $target = User::factory()->create(['name' => 'Max Mustermann']);
+        $source = User::factory()->create(['first_name' => 'Max', 'last_name' => 'Mustermann']);
+        $target = User::factory()->create(['first_name' => 'Max', 'last_name' => 'Mustermann']);
 
         $response = $this->actingAs($this->superAdmin)
             ->post(route('users.duplicates.fix'), ['groups' => [['target_id' => $target->id, 'source_ids' => [$source->id]]]]);
@@ -164,10 +164,9 @@ class UserDuplicatesFeatureTest extends TestCase
 
     public function testFindDuplicatesGroupsUsersWithSameName()
     {
-        $nameA = 'Erika Musterfrau';
-        User::factory()->create(['name' => $nameA]);
-        User::factory()->create(['name' => $nameA]);
-        User::factory()->create(['name' => 'Unique Person']);
+        User::factory()->create(['first_name' => 'Erika', 'last_name' => 'Musterfrau']);
+        User::factory()->create(['first_name' => 'Erika', 'last_name' => 'Musterfrau']);
+        User::factory()->create(['first_name' => 'Unique', 'last_name' => 'Person']);
 
         $response = $this->actingAs($this->superAdmin)->get(route('users.duplicates'));
 

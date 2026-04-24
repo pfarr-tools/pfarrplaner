@@ -829,8 +829,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $titleLine = $service->titleText(false) . ' am ' . $service->dateText() . ', ' . $service->timeText(
             ) . ', ' . $service->locationText();
         $this->ppt->getDocumentProperties()
-            ->setCreator(Auth::user()->name)
-            ->setLastModifiedBy(Auth::user()->name)
+            ->setCreator(Auth::user()->fullName())
+            ->setLastModifiedBy(Auth::user()->fullName())
             ->setTitle('Lieder und Texte')
             ->setSubject($titleLine)
             ->setDescription($titleLine)

@@ -64,7 +64,7 @@ class NameService
     }
 
     public static function fromUser(User $user): NameService {
-        return self::fromName($user->name, $user->title);
+        return new self($user->first_name ?? '', $user->last_name ?? '', $user->title ?? '');
     }
 
     public function format($format = self::LAST_COMMA_FIRST)
@@ -73,7 +73,7 @@ class NameService
             case self::LAST_COMMA_FIRST:
                 return $this->lastName.', '.$this->firstName;
             case self::FIRST_LAST:
-                return $this->firstName.' '.$this->lastName;
+                return trim($this->firstName.' '.$this->lastName);
             case self::LAST_FIRST:
                 return strtoupper($this->lastName).' '.$this->firstName;
             case self::LAST_FIRST_ARRAY:

@@ -42,7 +42,7 @@ class ProfileModule extends AbstractModule
     public function addItems(array $items): array
     {
         $items[] = [
-            'text' => Auth::user()->name,
+            'text' => Auth::user()->fullName(),
             'icon' => 'mdi mdi-account-settings',
             'url' => route('user.profile'),
             'active' => request()->is(['user.profile']),

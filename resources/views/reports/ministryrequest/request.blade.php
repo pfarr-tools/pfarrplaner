@@ -13,7 +13,7 @@
                 <button type="submit" class="btn btn-primary">Absenden</button>
             @endslot
 
-            <p>Guten Tag, {{ $user->name }}!</p>
+            <p>Guten Tag, {{ $user->fullName() }}!</p>
             <p>Bei welchem der folgenden Gottesdienste könnten Sie den Dienst "{{ $ministryTitle }}" übernehmen? Bitte kreuzen Sie einfach an:</p>
 
             <table class="table table-striped">

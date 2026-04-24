@@ -57,7 +57,6 @@
         </template>
         <tabs>
             <tab id="home" :active-tab="activeTab">
-                <form-input name="name" label="Name" v-model="myUser.name"/>
                 <div class="row">
                     <div class="col-md-2">
                         <form-input name="title" label="Titel" v-model="myUser.title"/>

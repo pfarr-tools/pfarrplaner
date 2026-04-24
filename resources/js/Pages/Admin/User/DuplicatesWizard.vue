@@ -77,7 +77,7 @@
                             </div>
                             <label :for="'dup-'+dup.id" class="mb-0 flex-grow-1" style="cursor:pointer">
                                 <span :class="dup.isOfficialUser ? 'mdi mdi-account-check text-primary' : 'mdi mdi-account-question-outline text-secondary'" class="me-1"></span>
-                                <strong>{{ dup.fullNameText || dup.name }}</strong>
+                                <strong>{{ dup.fullNameText }}</strong>
                                 <small class="d-block">
                                     <span v-if="dup.email" class="me-2">{{ dup.email }}</span>
                                     <span v-for="city in dup.home_cities" :key="city.id" class="badge bg-dark me-1">{{ city.name }}</span>
@@ -145,7 +145,7 @@ export default {
                 person.duplicates.push({
                     ...user,
                     selected: true,
-                    fullNameText: user.fullNameText || user.name,
+                    fullNameText: user.fullNameText,
                     duplicates: [],
                 });
             }

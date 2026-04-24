@@ -111,7 +111,7 @@ class Replacement extends Model
                     $from = max(Carbon::parse($poolmaster->start)->startOfDay(), $this->from);
                     $to = min(Carbon::parse($poolmaster->end)->endOfDay(), $this->to);
 
-                    $texts[] = $poolmaster->user->name . ' [Poolmaster:in "' . $poolmaster->pool->name . '"]'
+                    $texts[] = $poolmaster->user->fullName() . ' [Poolmaster:in "' . $poolmaster->pool->name . '"]'
                         . ' (' . StringTool::durationText($from, $to) . ')';
                 }
             }

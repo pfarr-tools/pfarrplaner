@@ -105,7 +105,7 @@ class Subscription extends Model
                     Log::debug('Sending ServiceUpdated to ' . $subscriber->email);
                     Mail::to($subscriber)->queue(new $mailClass($subscriber, $service, Auth::user(), $data));
                 } else {
-                    Log::debug('User ' . $subscriber->name . ' has no valid email to send ServiceUpdated.');
+                    Log::debug('User ' . $subscriber->fullName() . ' has no valid email to send ServiceUpdated.');
                 }
             } else {
                 Log::debug('Sending ServiceUpdated to dev@toph.de instead of ' . $subscriber->email);

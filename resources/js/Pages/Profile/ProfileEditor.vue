@@ -109,7 +109,6 @@ export default {
     methods: {
         saveProfile() {
             var result = {
-                name: this.user.name,
                 email: this.user.email,
                 office: this.user.office,
                 address: this.user.address,

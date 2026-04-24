@@ -28,7 +28,7 @@
                                             @foreach($service->commentsForUser($user)->get() as $comment)
                                                 <tr>
                                                     <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;" align="left" valign="top">
-                                                        <b>{{ $comment->user->name }}</b> @if($comment->private)(private Notiz)@endif<br />
+                                                        <b>{{ $comment->user->fullName() }}</b> @if($comment->private)(private Notiz)@endif<br />
                                                         <small>
                                                             {{ $comment->created_at->format('d.m.Y, H:i') }} Uhr
                                                             @if ($comment->created_at != $comment->updated_at)

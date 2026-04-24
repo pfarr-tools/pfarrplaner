@@ -195,7 +195,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
             if ($x = Auth::user()->office) {
                 $data[] = $x;
             }
-            $data[] = Auth::user()->name;
+            $data[] = Auth::user()->fullName();
             if ($x = Auth::user()->phone) {
                 $data[] = 'Tel. ' . $x;
             }

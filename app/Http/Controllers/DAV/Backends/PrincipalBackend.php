@@ -52,7 +52,7 @@ class PrincipalBackend implements BackendInterface
         foreach (User::whereHas('calendarConnections')->get() as $user) {
             $principals[] = [
                 'uri'               => static::PRINCIPAL_PREFIX.$user->email,
-                '{DAV:}displayname' => $user->name,
+                '{DAV:}displayname' => $user->fullName(),
                 '{'.Server::NS_SABREDAV.'}email-address' => $user->email,
                 'read-only' => true,
             ];
