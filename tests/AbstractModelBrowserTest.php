@@ -47,7 +47,6 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
 
     /**
      * Test, if an Admin module is present
-     * @test
      * @return void
      */
     public function testHasAdminModule()
@@ -62,7 +61,6 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
     }
 
     /**
-     * @test
      * @return void
      */
     public function testNewRecordIsVisibleInIndex()

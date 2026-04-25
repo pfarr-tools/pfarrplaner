@@ -39,7 +39,6 @@ class TestCoverageTest extends TestCase
 
     /**
      * Tests whether there is a test for every route
-     * @test
      */
     public function testAllRoutesHaveTests()
     {

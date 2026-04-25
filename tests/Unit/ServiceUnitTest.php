@@ -45,7 +45,6 @@ class ServiceUnitTest extends TestCase
      * Test that a service can be created
      *
      * @return void
-     * @test
      */
     public function testServiceCanBeCreated()
     {
@@ -57,7 +56,6 @@ class ServiceUnitTest extends TestCase
      * Test that a service can be updated
      *
      * @return void
-     * @test
      */
     public function testServiceCanBeUpdated()
     {
@@ -71,7 +69,6 @@ class ServiceUnitTest extends TestCase
      * Test that a service can be deleted
      *
      * @return void
-     * @test
      */
     public function testServiceCanBeDeleted()
     {
@@ -85,7 +82,6 @@ class ServiceUnitTest extends TestCase
      * Test that checkbox fields can be set and unset
      *
      * @return void
-     * @test
      */
     public function testCheckBoxesCanBeSetAndUnset()
     {
@@ -106,7 +102,6 @@ class ServiceUnitTest extends TestCase
      * Test that a service can have a title
      *
      * @return void
-     * @test
      */
     public function testServiceCanHaveTitle()
     {

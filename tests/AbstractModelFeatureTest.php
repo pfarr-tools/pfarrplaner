@@ -102,7 +102,6 @@ abstract class AbstractModelFeatureTest extends TestCase
     /**
      * Test if model can be created via the frontend
      * @return void
-     * @test
      */
     public function testCreateViaFrontend()
     {
@@ -124,7 +123,6 @@ abstract class AbstractModelFeatureTest extends TestCase
     /**
      * Test if model can be updated via the frontend
      * @return void
-     * @test
      */
     public function testUpdateViaFrontend()
     {
@@ -151,7 +149,6 @@ abstract class AbstractModelFeatureTest extends TestCase
     /**
      * Test if model can be deleted via the frontend
      * @return void
-     * @test
      */
     public function testDeleteFrontend()
     {

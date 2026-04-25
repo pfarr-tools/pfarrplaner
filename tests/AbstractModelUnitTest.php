@@ -82,7 +82,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if model class exists and is a descendant of AbstractModel
      * @return void
-     * @test
      */
     public function testModelClassExistsAndIsDescendant()
     {
@@ -110,7 +109,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if columns from fillable are present
      * @return void
-     * @test
      */
     public function testColumnsFromFillableArePresent()
     {
@@ -132,7 +130,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * test if controller is present and descendent of AbstractCRUDController
      * @return void
-     * @test
      */
     public function testControllerClassIsPresentAndDescendant()
     {
@@ -146,7 +143,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * test if API controller is present and descendent of AbstractCRUDController
      * @return void
-     * @test
      */
     public function testApiControllerClassIsPresentAndDescendant()
     {
@@ -161,7 +157,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if controller methods are present
      * @return void
-     * @test
      */
     public function testControllerMethodsArePresent()
     {
@@ -180,7 +175,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if all the defined routes for the model are present
      * @return void
-     * @test
      */
     public function testRoutesArePresent()
     {
@@ -195,7 +189,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if the contract interfaces exist
      * @return void
-     * @test
      */
     public function testContractsExists()
     {
@@ -207,7 +200,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if the contract resolve to a concrete action
      * @return void
-     * @test
      */
     public function testContractsResolve()
     {
@@ -240,7 +232,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if model can be created via action
      * @return void
-     * @test
      */
     public function testCreateViaAction()
     {
@@ -266,7 +257,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if model can be updated via action
      * @return void
-     * @test
      */
     public function testUpdateViaAction()
     {
@@ -294,7 +284,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if model can be deleted via action
      * @return void
-     * @test
      */
     public function testDeleteViaAction()
     {
@@ -315,7 +304,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if model index can be retrieved via API call
      * @return void
-     * @test
      */
     public function testIndexViaApi()
     {
@@ -337,7 +325,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if model can be retrieved via API call
      * @return void
-     * @test
      */
     public function testShowViaApi()
     {
@@ -361,7 +348,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if model can be created via API call
      * @return void
-     * @test
      */
     public function testCreateViaApi()
     {
@@ -380,7 +366,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if model can be updated via API call
      * @return void
-     * @test
      */
     public function testUpdateViaApi()
     {
@@ -405,7 +390,6 @@ abstract class AbstractModelUnitTest extends TestCase
     /**
      * Test if model can be deleted via API call
      * @return void
-     * @test
      */
     public function testDeleteViaApi()
     {
