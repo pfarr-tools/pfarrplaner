@@ -32,7 +32,7 @@ namespace App\Actions\Pool;
 
 use App\Actions\AbstractDeleteAction;
 use App\Contracts\Pool\DeletesPools;
-use App\Events\Models\Pool\DeletedTag;
+use App\Events\Models\Pool\DeletedPool;
 use App\Models\Leave\Pool;
 use App\Models\People\User;
 use Illuminate\Support\Facades\Gate;
@@ -61,7 +61,7 @@ class DeletePool extends AbstractDeleteAction implements DeletesPools
     public function delete(User $user, Pool $pool): bool
     {
         Gate::forUser($user)->authorize('delete', $pool);
-        DeletedTag::dispatch($user, $pool);
+        DeletedPool::dispatch($user, $pool);
         $this->messages = ['success' => 'Der Pool wurde gelöscht.'];
         return $pool->delete();
 

@@ -21,7 +21,6 @@ class PoolFactory extends Factory
     {
         return [
             'name' => fake()->words(2, true),
-            'slug' => fake()->slug(2),
         ];
     }
 }

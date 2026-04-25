@@ -32,10 +32,9 @@ namespace App\Actions\Pool;
 
 use App\Actions\AbstractUpdateAction;
 use App\Contracts\Pool\UpdatesPools;
-use App\Events\Models\Pool\UpdatedTag;
+use App\Events\Models\Pool\UpdatedPool;
 use App\Models\Leave\Pool;
 use App\Models\People\User;
-use Google\Service\PeopleService\Resource\People;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
@@ -55,10 +54,10 @@ class UpdatePool extends AbstractUpdateAction implements UpdatesPools
         Gate::forUser($user)->authorize('update', $pool);
         $input = Validator::make($input, Pool::$validationRules)->validateWithBag('updatePool');
         $pool->update($input);
-        $pool->cities()->sync($input['cities'] ?? '');
-        $pool->users()->sync($input['users'] ?? '');
+        $pool->cities()->sync($input['cities'] ?? []);
+        $pool->users()->sync($input['users'] ?? []);
         $pool->refresh();
-        UpdatedTag::dispatch($user, $pool);
+        UpdatedPool::dispatch($user, $pool);
         $this->messages = ['success' => 'Der Pool wurde geändert.'];
         return $pool;
     }

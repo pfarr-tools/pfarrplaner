@@ -30,10 +30,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\AbstractCRUDController;
 use App\Models\Ads\AdChannel;
 
-class AdChannelController extends AbstractCRUDController
+class AdChannelController extends AbstractApiCRUDController
 {
 
     protected string $modelClass = AdChannel::class;

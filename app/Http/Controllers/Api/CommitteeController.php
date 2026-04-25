@@ -44,7 +44,7 @@ class CommitteeController extends AbstractApiCRUDController
     {
         return Committee::with(Committee::$relationsForIndex)
             ->whereHas('cities', function ($query) {
-                $query->whereIn('city_id', Auth::user()->cities()->pluck('id'));
+                $query->whereIn('cities.id', Auth::user()->cities()->pluck('cities.id'));
             })
             ->get();
     }

@@ -32,8 +32,7 @@ namespace App\Actions\Pool;
 
 use App\Actions\AbstractCreateAction;
 use App\Contracts\Pool\CreatesPools;
-use App\Events\Models\City\CreatedCity;
-use App\Events\Models\Pool\CreatedTag;
+use App\Events\Models\Pool\CreatedPool;
 use App\Models\Leave\Pool;
 use App\Models\People\User;
 use App\Models\Places\City;
@@ -65,7 +64,7 @@ class CreatePool extends AbstractCreateAction implements CreatesPools
         $pool = Pool::create($input);
         $pool->cities()->sync($input['cities'] ?? []);
         $pool->users()->sync($input['users'] ?? []);
-        CreatedTag::dispatch($user, $pool);
+        CreatedPool::dispatch($user, $pool);
         $this->messages = ['success' => 'Der neue Pool wurde gespeichert.'];
         return $pool;
     }

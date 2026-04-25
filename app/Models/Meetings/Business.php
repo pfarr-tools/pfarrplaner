@@ -31,4 +31,9 @@ class Business extends AbstractModel
     public function service() {
         return $this->belongsTo(Service::class);
     }
+
+    public function getLabelAttribute(): string
+    {
+        return $this->title ?? '';
+    }
 }

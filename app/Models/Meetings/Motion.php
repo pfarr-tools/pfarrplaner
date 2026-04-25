@@ -13,6 +13,7 @@ class Motion extends AbstractModel
     protected static string $prefixPlural = 'antraege';
     public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
     public static array $validationRules = [
+        'business_id' => 'required|integer|exists:businesses,id',
         'title' => 'required|string|max:255',
         'body' => 'nullable|string',
         'minutes' => 'nullable|string',
@@ -25,4 +26,9 @@ class Motion extends AbstractModel
 
 
     protected $fillable = ['id', 'title', 'body', 'minutes', 'business_id', 'voted', 'aye', 'nay', 'abstention'];
+
+    public function getLabelAttribute(): string
+    {
+        return $this->title ?? '';
+    }
 }

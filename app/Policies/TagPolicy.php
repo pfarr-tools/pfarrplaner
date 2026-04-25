@@ -57,6 +57,15 @@ class TagPolicy
      * @param User $user
      * @return bool
      */
+    public function viewAny(User $user): bool
+    {
+        return true;
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
     public function index(User $user)
     {
         return true;

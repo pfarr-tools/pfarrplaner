@@ -12,7 +12,7 @@ class AdChannelPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isAdmin || count($user->cities) > 0;
     }
 
     /**
