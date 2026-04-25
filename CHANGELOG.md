@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.11.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.10.2...v2026.11.0) (2026-04-25)
+
+
+### Features
+
+* Duplikate-Assistent überarbeitet und Benutzerverwaltung verbessert ([d5c099b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d5c099b9f55369ce8259d88078781587c70f1f72))
+
+
+### Bug Fixes
+
+* Fehler beim Übernehmen einer Person aus anderer Kirchengemeinde im PeopleSelect behoben ([1ba2eee](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1ba2eee45bb360d7b52e8b712d7270d1cf80605f))
+* Fehlerhafte mergeInto()-Methode beim Zusammenführen von Personen korrigiert ([22fb4ab](https://codeberg.org/pfarr.tools/pfarrplaner/commit/22fb4abb2f8a73cd22a27cad89439d1a76875f0b))
+* Fehlgeschlagene Unit-Tests für AbstractModel-Subklassen korrigiert. ([b0e1887](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b0e188759723654c41c9e764b7300c705bbc0af8))
+* PHPUnit-Deprecation für [@test](https://codeberg.org/test)-Annotationen in Docblocks behoben. ([4f6dbd2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4f6dbd202b792af4fb3f83910a6bfc13f9091b65))
+
 ### [2026.10.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.10.1...v2026.10.2) (2026-04-19)
 
 
