@@ -141,6 +141,7 @@ class User extends Authenticatable
         'isLocalAdmin',
         'isPastor',
         'sortName',
+        'name',
     ];
     /**
      * @var string
@@ -1184,5 +1185,10 @@ class User extends Authenticatable
                     $query2->where('city_id', $city->id);
                 });
             })->where('start', '<=', now()->endOfDay())->where('end', '>=', now()->startOfDay())->count() > 0;
+    }
+
+    public function getNameAttribute()
+    {
+        return NameService::fromUser($this)->format(NameService::FIRST_LAST);
     }
 }
