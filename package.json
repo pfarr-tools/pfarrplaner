@@ -42,7 +42,7 @@
         "vue": "^2.5.17",
         "vue-loader": "^15.11.1",
         "vue-template-compiler": "^2.6.10",
-        "webpack": "^5.104.1",
+        "webpack": "5.105.4",
         "webpack-cli": "^6.0.1"
     },
     "dependencies": {
