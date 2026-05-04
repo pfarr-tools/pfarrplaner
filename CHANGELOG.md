@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.11.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.0...v2026.11.1) (2026-05-04)
+
+
+### Bug Fixes
+
+* AdminHomeScreenTab lädt nicht ([f572acb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/f572acbfcc795058ad80de31cdf0a796874be48e))
+* Benutzer werden als "undefined" angezeigt. ([68780d4](https://codeberg.org/pfarr.tools/pfarrplaner/commit/68780d4ccf045b22db61e65cf4d563c5be1dfbef))
+* Fehler beim Speichern von Personeneinträgen ([70f1315](https://codeberg.org/pfarr.tools/pfarrplaner/commit/70f131545bc389af7273a54112ded2d3de7f519e))
+* Fehler im PeopleSelect ([e170ee1](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e170ee15797fe2d8a2a391d3a313a394426c7c53))
+* Pinne webpack v5.105.4 ([94ae847](https://codeberg.org/pfarr.tools/pfarrplaner/commit/94ae847ba00264782d08eeddbe5b71d3d59203e9))
+
 ## [2026.11.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.10.2...v2026.11.0) (2026-04-25)
 
 
