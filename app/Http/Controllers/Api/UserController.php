@@ -50,8 +50,10 @@ class UserController extends \App\Http\Controllers\Controller
      */
     public function select()
     {
-        $users = ListedPerson::select(['id', 'name'])
+        $users = ListedPerson::select(['id', 'first_name', 'last_name', 'title'])
             ->visibleFor(Auth::user())
+            ->orderBy('last_name')
+            ->orderBy('first_name')
             ->get();
         $teams = Team::with('users')->get();
         return response()->json(compact('users', 'teams'));
@@ -67,11 +69,14 @@ class UserController extends \App\Http\Controllers\Controller
     {
         if (empty($searchString)) return response()->json([]);
         $users = User::with('cityScopes')
-            ->where('name', 'LIKE', '%'.$searchString.'%')
-            ->whereDoesntHave('cityScopes', function($q) {
+            ->whereRaw(
+                "TRIM(CONCAT(first_name, ' ', last_name)) LIKE ?",
+                ['%' . $searchString . '%']
+            )->whereDoesntHave('cityScopes', function($q) {
                 return $q->whereIn('city_id', Auth::user()->cities->pluck('id'));
             })
-            ->orderBy('name')
+            ->orderBy('last_name')
+            ->orderBy('first_name')
             ->get();
 
         return response()->json($users);
