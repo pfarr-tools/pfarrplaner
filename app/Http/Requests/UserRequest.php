@@ -72,9 +72,8 @@ class UserRequest extends FormRequest
         }
 
         $rules = [
-            'name' => 'required|string|max:255',
             'first_name' => 'nullable|string',
-            'last_name' => 'nullable|string',
+            'last_name' => 'required|string',
             'title' => 'nullable|string',
             // add an exception to "unique" when an existing user account is updated
             'email' => 'nullable|string|email|max:255|unique:users,email' . (($user && $user->id) ? ',' . $user->id : ''),
