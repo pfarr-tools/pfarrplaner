@@ -39,7 +39,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @package App
  */
 class Participant extends Pivot
-{
+{planer.
     /**
      * @var bool
      */
