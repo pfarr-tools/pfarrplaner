@@ -91,7 +91,7 @@
                 <div class="col-md-4">
                     <location-select name="location_id" label="Ort" :value="myLocation" v-if="!locationUpdating"
                                      :locations="locations" @set-location="setLocation" return-object
-                                     :key="typeof myLocation == 'object' ? myLocation.id : myLocation   "
+                                     :key="myLocation && typeof myLocation === 'object' ? myLocation.id : myLocation"
                     />
                 </div>
                 <div class="col-md-4">
@@ -252,7 +252,12 @@ export default {
     methods: {
         setLocation(location) {
             this.locationUpdating = true;
-            if (typeof location == 'object') {
+            if (location === null || location === undefined) {
+                this.myLocation = null;
+                this.myService.location_id = null;
+                this.myService.location = null;
+                this.myService.special_location = null;
+            } else if (typeof location === 'object') {
                 this.myLocation = location;
                 this.myService.location_id = location.id;
                 this.myService.location = location;

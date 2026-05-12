@@ -41,18 +41,19 @@ import FormTextarea from "../../Ui/forms/FormTextarea.vue";
 
 export default {
     name: "InfoPane",
+    emits: ['update:modelValue'],
     components: {FormTextarea, FormInput},
     data() {
         return {
-            myTemplate: this.value,
+            myTemplate: this.modelValue,
         };
     },
-    props: ['value'],
+    props: ['modelValue'],
     watch: {
-        template: {
+        myTemplate: {
             deep: true,
-            handler(newValue, oldValue ) {
-                this.$emit('input', newValue);
+            handler(newValue) {
+                this.$emit('update:modelValue', newValue);
             },
         }
     },

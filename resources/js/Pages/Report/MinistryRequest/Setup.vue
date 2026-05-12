@@ -45,14 +45,7 @@
                                  v-model="myLocations" multiple @set-location="setLocation"/>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6">
-                <form-date-picker v-model="from" name="start" label="Gottesdienste von"/>
-            </div>
-            <div class="col-md-6">
-                <form-date-picker v-model="to" name="end" label="Bis"/>
-            </div>
-        </div>
+        <form-date-range-picker label="Gottesdienste von" v-model:from="from" v-model:to="to" />
         <form-selectize label="Anfrage für folgenden Dienst senden"
                         v-model="myMinistry" name="ministry"
                         :options="myMinistries"/>
@@ -88,7 +81,7 @@
 
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import LocationSelect from "../../../components/Ui/elements/LocationSelect";
 import FakeTable from "../../../components/Ui/FakeTable";
 import PeopleSelect from "../../../components/Ui/elements/PeopleSelect";
@@ -108,7 +101,7 @@ export default {
         Tab,
         Tabs,
         TabHeader,
-        TabHeaders, PeopleSelect, FakeTable, LocationSelect, FormDatePicker, FormSelectize, FormInput
+        TabHeaders, PeopleSelect, FakeTable, LocationSelect, FormDateRangePicker, FormSelectize, FormInput
     },
     computed: {
         selectedServices() {

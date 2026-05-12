@@ -109,7 +109,7 @@
                             <div v-html="booking.contact.replace('\n', '<br />')"/>
                             {{ booking.email }}
                         </td>
-                        <td>{{ moment(booking.created_at).locale('de-DE').format('LLL') }}</td>
+                        <td>{{ moment(booking.created_at).locale('de').format('LLL') }}</td>
                         <td>
                             <div v-if="service.seating.list">
                             <seat :seat="service.seating.grid[service.seating.list[booking.code]]" :booking="booking"/>

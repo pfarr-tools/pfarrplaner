@@ -29,7 +29,7 @@
 
 <template>
     <card>
-        <card-header :id="'heading'+uid" @click="open = !open">
+        <card-header :id="'heading'+uid">
             <h2 class="mb-0">
                 <button class="btn btn-block text-left pl-0 accordion-button" :class="{ collapsed : !open}" type="button" data-bs-toggle="collapse" :data-target="'#collapse'+uid" aria-expanded="false" :aria-controls="'collapse'+uid"
                 @click="open = !open">
@@ -50,6 +50,7 @@
 import Card from "../cards/card";
 import CardHeader from "../cards/cardHeader";
 import CardBody from "../cards/cardBody";
+import { uid } from '../../../libraries/uid';
 export default {
     name: "AccordionElement",
     props: ['title', 'icon', 'image'],
@@ -57,9 +58,8 @@ export default {
     inject: ['accordionId'],
     data() {
         return {
-            accordionId: this.accordionId,
             open: false,
-            uid: this._uid,
+            uid: uid(),
         }
     }
 }

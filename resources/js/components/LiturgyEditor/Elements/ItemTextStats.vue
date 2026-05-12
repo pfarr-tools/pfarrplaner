@@ -36,6 +36,71 @@
 <script>
 import TextStats from "./TextStats";
 
+export function speechTimeInSeconds(item, service, rounded, wpm) {
+    function getVersesToDisplay(song) {
+        const range = song.data.verses;
+        var verses = [];
+        if (undefined == song.data.song) return [];
+        if (undefined == song.data.song.song) return [];
+        if ((null === range) || (undefined === range) || (range == '')) {
+            song.data.song.song.verses.forEach(v => verses.push(v.number));
+            return verses;
+        }
+        range.split('+').forEach(function (subRange) {
+            if (subRange.indexOf('-') >= 0) {
+                var tmp = subRange.split('-');
+                if ((tmp[0] != '') && (tmp[1] != '')) {
+                    if ((!isNaN(tmp[0])) && (!isNaN(tmp[1]))) {
+                        for (var i = parseInt(tmp[0]); i <= parseInt(tmp[1]); i++) verses.push(i.toString());
+                    }
+                } else if (tmp[0] != '') {
+                    verses.push(tmp[0]);
+                }
+            } else {
+                if (subRange != '') verses.push(subRange);
+            }
+        });
+        return verses;
+    }
+    function quotableSongText(song) {
+        var text = '';
+        getVersesToDisplay(song).forEach(function (verseNumber) {
+            song.data.song.song.verses.forEach(function (verse) {
+                if (verse.number == verseNumber) {
+                    if (verse.refrain_before) text += "<p>" + song.data.song.song.refrain + "</p>";
+                    text += "<p>" + (verse.number != '' ? verse.number + '. ' : '') + verse.text + "</p>";
+                    if (verse.refrain_after) text += "<p>" + song.data.song.song.refrain + "</p>";
+                }
+            });
+        });
+        return text;
+    }
+    function getItemText() {
+        switch (item.data_type) {
+            case 'freetext':
+                if (!item.data || !item.data.description) return '';
+                return item.data.description.replaceAll('<p>', '').replaceAll('</p>', "\r\n").replaceAll('<br>', "\n").replaceAll('<br />', "\n").replaceAll('<br/>', "\n");
+            case 'psalm':
+                return item.data.psalm ? (item.data.psalm.text || '') : '';
+            case 'sermon':
+                return service.sermon ? (service.sermon.text || '') : '';
+            case 'song':
+                return quotableSongText(item);
+            case 'reading':
+                return item.data ? (item.data.fullText || item.data.customText || item.data.text || '') : '';
+        }
+        return '';
+    }
+    const typeWpm = item.data_type === 'song' ? 40
+        : (['psalm', 'reading'].includes(item.data_type) ? 90
+        : ((item.data_type === 'freetext' && item.title === 'Ehr sei dem Vater') ? 40
+        : (wpm || 140)));
+    const effectiveWpm = item.data.wpm || typeWpm;
+    const words = getItemText().trim().split(/\s+/).length;
+    const seconds = parseInt(words / effectiveWpm * 60, 10);
+    return rounded ? Math.ceil(seconds / 30) * 30 : seconds;
+}
+
 export default {
     name: "ItemTextStats",
     components: {TextStats},
@@ -69,12 +134,16 @@ export default {
                 case 'song':
                     return this.quotableSongText(this.item);
                 case 'reading':
-                    return this.item.data ? (this.item.data.text || '') : '';
+                    return this.item.data ? (this.item.data.fullText || this.item.data.customText || this.item.data.text || '') : '';
             }
             return '';
         },
         getItemWPM() {
-            return this.item.data.wpm || this.wpm || (this.item.data_type == 'song' ? 40 : 110);
+            const typeWpm = this.item.data_type === 'song' ? 40
+                : (['psalm', 'reading'].includes(this.item.data_type) ? 90
+                : ((this.item.data_type === 'freetext' && this.item.title === 'Ehr sei dem Vater') ? 40
+                : (this.wpm || 140)));
+            return this.item.data.wpm || typeWpm;
         },
         getVersesToDisplay(song) {
             const range = song.data.verses;

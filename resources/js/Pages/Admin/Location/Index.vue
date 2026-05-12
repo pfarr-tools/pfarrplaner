@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Kirchen und Gottesdienstorte">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <a class="btn btn-success" :href="route('location.create')">
                 <span class="d-inline d-md-none mdi mdi-plus"></span>
                 <span class="d-none d-md-inline">Neuen Ort hinzufügen</span>

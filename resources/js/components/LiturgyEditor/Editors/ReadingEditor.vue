@@ -71,6 +71,7 @@ export default {
             reference: '',
             customText: '',
             customSource: '',
+            fullText: '',
             showInHandouts: false,
             ...e.data,
         };
@@ -83,7 +84,31 @@ export default {
             textSources,
         };
     },
+    mounted() {
+        if (this.editedElement.data.reference) this.updateFullText();
+    },
+    watch: {
+        'editedElement.data.reference'() { this.updateFullText(); },
+        'editedElement.data.customText'(val) {
+            if (this.editedElement.data.reference && this.editedElement.data.reference.includes('[Eigener Text]')) {
+                this.editedElement.data.fullText = val || '';
+            }
+        },
+    },
     methods: {
+        updateFullText() {
+            const ref = this.editedElement.data.reference;
+            if (!ref) return;
+            if (ref.includes('[Eigener Text]')) {
+                this.editedElement.data.fullText = this.editedElement.data.customText || '';
+                return;
+            }
+            const parts = ref.split('[');
+            const myReference = parts[0].trim();
+            const myVersion = parts.length > 1 ? parts[1].replace(']', '').trim() : '';
+            axios.get(route('bible.text', {reference: myReference, version: myVersion}))
+                .then(result => { this.editedElement.data.fullText = result.data.text; });
+        },
         save: function () {
             this.$inertia.patch(route('liturgy.item.update', {
                 service: this.service.id,

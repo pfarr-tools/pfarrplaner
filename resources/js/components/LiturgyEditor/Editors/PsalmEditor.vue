@@ -100,8 +100,7 @@
 </template>
 
 <script>
-import Nl2br from 'vue-nl2br';
-import Selectize from 'vue2-selectize';
+import Nl2br from '../../Ui/Nl2br.vue';
 import FormSelectize from "../../Ui/forms/FormSelectize";
 import TextStats from "../Elements/TextStats";
 import TimeFields from "./Elements/TimeFields";
@@ -112,7 +111,6 @@ export default {
         TimeFields,
         TextStats,
         Nl2br,
-        Selectize,
         FormSelectize,
     },
     props: {

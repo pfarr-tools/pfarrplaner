@@ -46,7 +46,7 @@
             <time-fields v-if="element.data_type != 'block'"
                          :service="service" :element="editedElement" :agenda-mode="agendaMode"/>
             <div class="form-group">
-                <button class="btn btn-primary" @click.prevent.stop="save">Speichern</button>
+                <button class="btn btn-primary me-1" @click.prevent.stop="save">Speichern</button>
                 <button class="btn btn-secondary" @click.prevent.stop="cancel">Abbrechen</button>
             </div>
         </div>

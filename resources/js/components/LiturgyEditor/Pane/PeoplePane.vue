@@ -31,17 +31,27 @@
     <div class="liturgy-editor-people-pane">
         <form @submit.prevent="save">
             <label>Verantwortlich</label>
-            <selectize name="data[responsible][]" class="form-control" v-model="editedElement.data.responsible" multiple
-                       :options="options"
-                       :settings="selectizeSettings"/>
-
+            <Multiselect
+                name="data[responsible][]"
+                v-model="editedElement.data.responsible"
+                mode="tags"
+                :groups="true"
+                :options="groupedOptions"
+                value-prop="id"
+                label="name"
+                :searchable="true"
+                :create-option="createFreeOption"
+                locale="de"
+                :no-results-text="{ de: 'Keine Ergebnisse gefunden', en: 'No results found' }"
+                :no-options-text="{ de: 'Die Liste ist leer', en: 'The list is empty' }"
+            />
         </form>
     </div>
 </template>
 
 <script>
-
-import Selectize from 'vue2-selectize';
+import Multiselect from '@vueform/multiselect';
+import '@vueform/multiselect/themes/default.css';
 
 export default {
     name: "PeoplePane",
@@ -50,96 +60,65 @@ export default {
         service: Object,
         ministries: {
             type: Object,
-            default() {
-                return {};
-            },
-        }
+            default() { return {}; },
+        },
     },
-    components: {
-        Selectize,
-    },
+    components: { Multiselect },
     data() {
         var e = this.element;
-        var emptyOption = {
-            name: '',
-            type: '',
-        };
+        var emptyOption = { name: '', type: '' };
         if (undefined == e.data.responsible) e.data.responsible = [emptyOption];
         if (e.data.responsible.length == 0) e.data.responsible = [emptyOption];
 
         var options = [];
-        var optGroups = [];
-
-        const basicMinistries = {pastors: this.$page.props.labels.pastor, organists: this.$page.props.labels.organist, sacristans: this.$page.props.labels.sacristan};
+        const basicMinistries = {
+            pastors: this.$page.props.labels.pastor,
+            organists: this.$page.props.labels.organist,
+            sacristans: this.$page.props.labels.sacristan,
+        };
         for (var ministryIndex in basicMinistries) {
-            optGroups.push({groupName: basicMinistries[ministryIndex]});
-            options.push({
-                id: 'ministry:' + ministryIndex,
-                name: basicMinistries[ministryIndex],
-                category: basicMinistries[ministryIndex],
-                type: 'users'
-            });
+            options.push({ id: 'ministry:' + ministryIndex, name: basicMinistries[ministryIndex], category: basicMinistries[ministryIndex], type: 'users' });
             this.service[ministryIndex].forEach(person => {
-                options.push({
-                    id: 'user:' + person.id,
-                    name: person.name,
-                    category: basicMinistries[ministryIndex],
-                    type: 'user-check'
-                });
+                options.push({ id: 'user:' + person.id, name: person.name, category: basicMinistries[ministryIndex], type: 'user-check' });
             });
         }
         var knownMinistries = this.service.ministriesByCategory;
         Object.keys(this.ministries).forEach(ministry => {
             if (knownMinistries[ministry]) {
-                optGroups.push({groupName: ministry});
-                options.push({id: 'ministry:' + ministry, name: ministry, category: ministry, type: 'users'});
+                options.push({ id: 'ministry:' + ministry, name: ministry, category: ministry, type: 'users' });
                 knownMinistries[ministry].forEach(person => {
-                    options.push({id: 'user:' + person.id, name: person.name, category: ministry, type: 'user-check'});
+                    options.push({ id: 'user:' + person.id, name: person.name, category: ministry, type: 'user-check' });
                 });
             }
         }, this);
-        optGroups.push({groupName: 'Eigene Eingaben'});
         e.data.responsible.forEach(item => {
-            if ((item) && (typeof item == 'string')) {
-                if (item.substr(0, 5) == 'free:') {
-                    options.push({id: item, name: item.substr(5), category: 'Eigene Eingaben', type: 'user-times'});
-                }
+            if (item && typeof item == 'string' && item.substr(0, 5) == 'free:') {
+                options.push({ id: item, name: item.substr(5), category: 'Eigene Eingaben', type: 'user-times' });
             }
         });
 
-
         return {
-            emptyOption: emptyOption,
             editedElement: e,
             options: options,
-            selectizeSettings: {
-                options: options,
-                searchField: ['name', 'category'],
-                valueField: 'id',
-                labelField: 'name',
-                optgroupField: 'category',
-                optgroupLabelField: 'groupName',
-                optgroupValueField: 'groupName',
-                optgroups: optGroups,
-                create: function (input) {
-                    return {id: 'free:' + input, name: input, category: 'Eigene Eingaben', type: 'user-times'}
-                },
-                render: {
-                    option_create: function (data, escape) {
-                        return '<div class="create">Freie Texteingabe: <strong>' + escape(data.input) + '</strong>&hellip;</div>';
-                    },
-                    item: function (item, escape) {
-                        return '<div><span class="' + item.type + '"></span> ' + item.name + '</div>';
-                    }
-                }
-            },
-        }
+        };
     },
-}
+    computed: {
+        groupedOptions() {
+            const groups = {};
+            this.options.forEach(opt => {
+                const cat = opt.category || 'Sonstige';
+                if (!groups[cat]) groups[cat] = [];
+                groups[cat].push(opt);
+            });
+            return Object.entries(groups).map(([label, opts]) => ({ label, options: opts }));
+        },
+    },
+    methods: {
+        createFreeOption(query) {
+            const newOpt = { id: 'free:' + query, name: query, category: 'Eigene Eingaben', type: 'user-times' };
+            this.options.push(newOpt);
+            return newOpt;
+        },
+    },
+};
 </script>
-
-<style scoped>
-.liturgy-editor-people-pane {
-    padding: 5px;
-}
-</style>

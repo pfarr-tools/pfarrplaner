@@ -47,8 +47,8 @@
         <div class="col-md-4">
             <div>
                 <checked-process-item :check="(wedding.appointment)" negative="Traugespräch noch nicht vereinbart">
-                    <template slot="positive">
-                        Traugespräch am {{ moment(wedding.appointment).locale('de-DE').format('LLLL') }} Uhr
+                    <template #positive>
+                        Traugespräch am {{ moment(wedding.appointment).locale('de').format('LLLL') }} Uhr
                     </template>
                 </checked-process-item>
             </div>
@@ -57,14 +57,14 @@
                 <checked-process-item :check="wedding.signed" positive="Anmeldung unterschrieben" negative="Anmeldung noch nicht unterschrieben" />
             </div>
             <checked-process-item :check="wedding.text" positive="Trautext" negative="Trautext noch nicht eingetragen">
-                <template slot="positive">
+                <template #positive>
                     <bible-reference title="Trautext:" :perikope="{ Bibelstelle: wedding.text }" inline="1" />
                 </template>
             </checked-process-item>
             <div v-if="wedding.spouse1_needs_dimissorial">
                 <checked-process-item v-if="wedding.spouse1_dimissorial_requested" :check="wedding.spouse1_dimissorial_received"
                                       :positive="'Dimissoriale für '+spouseName(1)+' erhalten'">
-                    <template slot="negative">
+                    <template #negative>
                         Dimissoriale für {{ spouseName(1)}} steht noch aus (beantragt am {{ moment(wedding.spouse1_dimissorial_requested).format('DD.MM.YYYY') }})
                     </template>
                 </checked-process-item>
@@ -74,7 +74,7 @@
             <div v-if="wedding.spouse2_needs_dimissorial">
                 <checked-process-item v-if="wedding.spouse2_dimissorial_requested" :check="wedding.spouse2_dimissorial_received"
                                       :positive="'Dimissoriale für '+spouseName(2)+' erhalten'">
-                    <template slot="negative">
+                    <template #negative>
                         Dimissoriale für {{ spouseName(2)}} steht noch aus (beantragt am {{ moment(wedding.spouse2_dimissorial_requested).format('DD.MM.YYYY') }})
                     </template>
                 </checked-process-item>
@@ -84,7 +84,7 @@
             <div v-if="wedding.needs_permission != 0">
                 <checked-process-item v-if="wedding.permission_requested" :check="wedding.permission_received"
                                       positive="Genehmigung vom Dekanatamt erhalten">
-                    <template slot="negative">
+                    <template #negative>
                         Genehmigung vom Dekanatamt steht noch aus (beantragt am {{ moment(wedding.permission_requested).format('DD.MM.YYYY') }})
                     </template>
                 </checked-process-item>
@@ -93,7 +93,7 @@
             </div>
             <div>
                 <checked-process-item :check="wedding.docs_ready" positive="Urkunden erstellt" negative="Urkunden noch nicht erstellt">
-                    <template slot="positive">
+                    <template #positive>
                         Urkunden erstellt<small v-if="wedding.docs_where"><br />Hinterlegt: {{ wedding.docs_where }}</small>
                     </template>
                 </checked-process-item>

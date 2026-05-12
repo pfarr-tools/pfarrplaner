@@ -28,56 +28,88 @@
   -->
 
 <template>
-    <form-group :label="label" :help="help" :is-checked-item="isCheckedItem" :pre-label="preLabel">
-        <div class="row">
-            <div class="col-md-6">
-                <date-picker v-model="myFrom" :config="myDatePickerConfig1" @input="setFrom" :disabled="disabled"/>
-            </div>
-            <div class="col-md-6">
-                <date-picker v-model="myTo" :config="myDatePickerConfig2" @input="setTo" :disabled="disabled"/>
-            </div>
-        </div>
+    <form-group
+        :label="label"
+        :help="help"
+        :is-checked-item="isCheckedItem"
+        :pre-label="preLabel"
+    >
+        <VueDatePicker
+            :model-value="internalRange"
+            range
+            multi-calendars
+            :locale="dpLocale"
+            :formats="{ input: 'dd.MM.yyyy' }"
+            :enable-time-picker="false"
+            text-input
+            :text-input-options="{ format: 'dd.MM.yyyy' }"
+            auto-apply
+            :disabled="disabled"
+            @update:model-value="onRangeChange"
+        />
     </form-group>
 </template>
 
 <script>
+import { VueDatePicker } from '@vuepic/vue-datepicker';
 import FormGroup from "../forms/FormGroup";
+import * as dateFnsLocales from 'date-fns/locale';
+
 export default {
     name: "DateRangeInput",
-    components: {FormGroup},
-    props: ['from', 'to', 'label', 'preLabel', 'help', 'isCheckedItem', 'disabled'],
-    data() {
-        this.from = this.from || moment().format('DD.MM.YYYY');
-        this.to = this.to || moment().addYears(5).format('DD.MM.YYYY');
-        return {
-            myDatePickerConfig1: {
-                locale: 'de',
-                format: 'DD.MM.YYYY',
-            },
-            myDatePickerConfig2: {
-                locale: 'de',
-                format: 'DD.MM.YYYY',
-                useCurrent: false,
-            },
-            myFrom: this.from.length > 10 ? moment(this.from).format('DD.MM.YYYY') : this.from,
-            myTo: this.to.length > 10 ? moment(this.to).format('DD.MM.YYYY') : this.to,
-        }
+    components: { FormGroup, VueDatePicker },
+
+    props: {
+        modelValue: { type: Array, default: null },
+        from: { type: null, default: null },
+        to: { type: null, default: null },
+        label: String,
+        preLabel: String,
+        help: String,
+        isCheckedItem: Boolean,
+        disabled: Boolean,
     },
-    methods: {
-        setFrom(e) {
-            this.myFrom = e;
-//            this.myDatePickerConfig2.minDate = e ? moment(e, 'DD.MM.YYYY') : moment().format('DD.MM.YYYY');
-            this.$emit('input', [moment(this.myFrom, 'DD.MM.YYYY').startOf('day'), moment(this.myTo, 'DD.MM.YYYY').endOf('day')]);
+
+    emits: ["update:modelValue", "input"],
+
+    computed: {
+        dpLocale() {
+            return dateFnsLocales.de;
         },
-        setTo(e) {
-            this.myTo = e;
-//            this.myDatePickerConfig1.maxDate = e ? moment(e, 'DD.MM.YYYY') : moment().addYears(5).format('DD.MM.YYYY');
-            this.$emit('input', [moment(this.myFrom, 'DD.MM.YYYY').startOf('day'), moment(this.myTo, 'DD.MM.YYYY').endOf('day')]);
-        }
-    }
-}
+
+        internalRange() {
+            if (this.modelValue && this.modelValue.length === 2) {
+                return [this.toDate(this.modelValue[0]), this.toDate(this.modelValue[1])];
+            }
+            if (this.from && this.to) {
+                return [this.toDate(this.from), this.toDate(this.to)];
+            }
+            return null;
+        },
+    },
+
+    methods: {
+        toDate(val) {
+            if (!val) return null;
+            const m = window.moment(val);
+            if (!m.isValid()) return null;
+            return new Date(Date.UTC(m.year(), m.month(), m.date()));
+        },
+
+        formatDisplay(dates) {
+            if (!dates || !dates[0]) return '';
+            const from = window.moment(dates[0]).format('DD.MM.YYYY');
+            if (!dates[1]) return from;
+            return `${from} – ${window.moment(dates[1]).format('DD.MM.YYYY')}`;
+        },
+
+        onRangeChange(range) {
+            if (!range || range.length < 2 || !range[1]) return;
+            const start = window.moment(range[0]).startOf('day');
+            const end = window.moment(range[1]).endOf('day');
+            this.$emit('update:modelValue', [start, end]);
+            this.$emit('input', [start, end]);
+        },
+    },
+};
 </script>
-
-<style scoped>
-
-</style>

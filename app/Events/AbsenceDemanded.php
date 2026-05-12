@@ -1,3 +1,4 @@
+<?php
 /*
  * Pfarrplaner
  *
@@ -27,45 +28,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Slug generator compatible with Laravel Str::slug() for German text.
- *
- * - ä → ae, ö → oe, ü → ue
- * - Ä → ae, Ö → oe, Ü → ue
- * - ß → ss
- * - Lowercase
- * - Spaces and punctuation → "-"
- * - Collapses duplicate "-"
- * - Trims leading/trailing "-"
- */
-export function slug(input) {
-    if (input == null) return '';
+namespace App\Events;
 
-    return String(input)
-        // German-specific replacements (must come first)
-        .replace(/Ä/g, 'Ae')
-        .replace(/Ö/g, 'Oe')
-        .replace(/Ü/g, 'Ue')
-        .replace(/ä/g, 'ae')
-        .replace(/ö/g, 'oe')
-        .replace(/ü/g, 'ue')
-        .replace(/ß/g, 'ss')
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
-        // Normalize remaining accents (é → e, etc.)
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
+class AbsenceDemanded
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
-        // Lowercase (after transliteration)
-        .toLowerCase()
+    /**
+     * Create a new event instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
 
-        // Replace non-alphanumeric characters with dashes
-        .replace(/[^a-z0-9]+/g, '-')
-
-        // Remove leading/trailing dashes
-        .replace(/^-+|-+$/g, '')
-
-        // Collapse multiple dashes
-        .replace(/-+/g, '-');
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return \Illuminate\Broadcasting\Channel|array
+     */
+    public function broadcastOn()
+    {
+        return new PrivateChannel('channel-name');
+    }
 }
-
-export default slug;

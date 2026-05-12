@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Passwort ändern">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <save-button @click="savePassword" />
         </template>
         <div v-if="mustChange" class="alert alert-warning">Dein Benutzerpasswort muss geändert werden. Vielleicht verwendest du noch das Originalpasswort, das du von deinem Administrator bekommen hast?

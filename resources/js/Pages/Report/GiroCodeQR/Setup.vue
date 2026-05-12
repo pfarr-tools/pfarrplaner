@@ -36,8 +36,7 @@
             <form-csrf-token />
             <form-selectize name="city" label="GiroCodes für folgende Kirchengemeinde erstellen" v-model="myCity" :options="cities" />
             <input type="hidden" name="city" v-model="myCity" />
-            <form-date-picker name="start" label="Gottesdienste von" v-model="myStart" iso-date />
-            <form-date-picker name="end" label="Bis" v-model="myEnd" iso-date />
+            <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
             <form-input name="copies" label="Anzahl Kopien pro QR-Code" type="number" v-model="myCopies" />
         </form>
     </admin-layout>
@@ -48,11 +47,11 @@ import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 export default {
     name: "Setup",
     props: ['cities', 'start'],
-    components: {FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         let myStart = moment();
         let myEnd = moment().add(3, 'months');

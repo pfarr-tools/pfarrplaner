@@ -45,12 +45,15 @@
 </template>
 
 <script>
+import { uid } from '../../../libraries/uid';
 export default {
     name: "FormRadioGroup",
+    emits: ['input', 'update:modelValue'],
     props: {
         id: String,
         label: String,
         name: String,
+        modelValue: { type: null },
         value: String,
         help: String,
         items: Object,
@@ -65,20 +68,27 @@ export default {
         }
     },
     mounted() {
-        if (this.myId == '') this.myId = this._uid;
+        if (this.myId == '') this.myId = uid();
     },
     data() {
         return {
             myId: this.id || '',
-            myValue: this.value || '',
+            myValue: (this.modelValue !== undefined ? this.modelValue : this.value) || '',
             error: this.$page.props.errors[this.name],
         }
+    },
+    watch: {
+        modelValue(v) { this.myValue = v; },
+        value(v) { if (this.modelValue === undefined) this.myValue = v; },
     },
     methods: {
         changed(event) {
             var result = typeof event.target.value == Array ? event.target.value[0] : event.target.value;
             if (!isNaN(result)) result=parseInt(result);
-            if (event.target.checked) this.$emit('input', result);
+            if (event.target.checked) {
+                this.$emit('input', result);
+                this.$emit('update:modelValue', result);
+            }
             this.$forceUpdate();
         },
     }

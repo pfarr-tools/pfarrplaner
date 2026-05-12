@@ -29,14 +29,9 @@
 
 <script>
 
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
-import '../../../components/SermonEditor/quill.css'
-import {quillEditor} from 'vue-quill-editor';
-import {Quill} from "vue-quill-editor/src";
-import {lineBreakMatcher, SmartBreak} from '../../../components/LiturgyEditor/Editors/Quill/QuillSmartBreak';
-
+import { Editor, EditorContent } from '@tiptap/vue-3';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
 
 import FormInput from "../../../components/Ui/forms/FormInput.vue";
 import FormTextarea from "../../../components/Ui/forms/FormTextarea.vue";
@@ -47,10 +42,9 @@ import FormGroup from "../../../components/Ui/forms/FormGroup.vue";
 
 export default {
     name: "LiturgicalTextEditor",
-    components: {FormGroup, quillEditor, SaveButton, NavButton, FormSelectize, FormTextarea, FormInput},
+    components: {FormGroup, EditorContent, SaveButton, NavButton, FormSelectize, FormTextarea, FormInput},
     props: {text: Object, codes: Array},
     data() {
-        Quill.register(SmartBreak);
         return {
             myText: this.text,
             replacementOptions: [
@@ -68,41 +62,17 @@ export default {
                     }
                 },
             },
-            quillOptions: {
-                formats: ['break'],
-                placeholder: 'Hier Text eingeben...',
-                modules: {
-                    toolbar: {
-                        container: '#toolbar',
-                    },
-                    clipboard: {
-                        matchers: [["BR", lineBreakMatcher]],
-                        matchVisual: false,
-                    },
-                    keyboard: {
-                        bindings: {
-                            linebreak: {
-                                key: 13,
-                                shiftKey: true,
-                                handler: function (range) {
-                                    const currentLeaf = this.quill.getLeaf(range.index)[0];
-                                    const nextLeaf = this.quill.getLeaf(range.index + 1)[0];
-                                    this.quill.insertEmbed(range.index, "break", true, "user");
-                                    // Insert a second break if:
-                                    // At the end of the editor, OR next leaf has a different parent (<p>)
-                                    if (nextLeaf === null || currentLeaf.parent !== nextLeaf.parent) {
-                                        this.quill.insertEmbed(range.index, "break", true, "user");
-                                    }
-                                    // Now that we've inserted a line break, move the cursor forward
-                                    this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            textEditorActive: false,
+            editor: new Editor({
+                content: this.text.text || '',
+                extensions: [StarterKit, Underline],
+                onUpdate: ({ editor }) => {
+                    this.myText.text = editor.getHTML();
+                },
+            }),
         }
+    },
+    beforeUnmount() {
+        this.editor.destroy();
     },
     methods: {
         saveText() {
@@ -128,12 +98,7 @@ export default {
         </template>
         <form-input label="Titel" v-model="myText.title"/>
         <form-group label="Text">
-            <quill-editor v-model="myText.text" :options="quillOptions"
-                          class="focused" ref="textEditor"
-                          @focus="textEditorActive = true"
-                          @blur="textEditorActive = false">
-                <div id="toolbar" slot="toolbar"></div>
-            </quill-editor>
+            <editor-content :editor="editor" class="form-control tiptap-editor" />
         </form-group>
         <form-textarea label="Quellenangaben" v-model="myText.source"/>
         <form-textarea label="Anmerkungen" v-model="myText.notice"/>
@@ -144,7 +109,8 @@ export default {
 </template>
 
 <style scoped>
-    #toolbar {
-        display: none;
-    }
+.tiptap-editor :deep(.ProseMirror) {
+    min-height: 120px;
+    outline: none;
+}
 </style>

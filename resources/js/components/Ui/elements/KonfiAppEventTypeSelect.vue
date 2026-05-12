@@ -39,9 +39,11 @@ import FormSelectize from "../forms/FormSelectize";
 
 export default {
     name: "KonfiAppEventTypeSelect",
+    emits: ['input', 'update:modelValue'],
     props: {
         city: Object,
         name: String,
+        modelValue: { type: null },
         value: Number,
         label: String,
         help: String,
@@ -52,18 +54,19 @@ export default {
         .then(response => {
             return response.data
         }).then(data => {
-            this.items = data;
+            this.items = Array.isArray(data) ? data : [];
         })
     },
     data() {
         return {
             items: [],
-            myValue: this.value,
+            myValue: this.modelValue !== undefined ? this.modelValue : this.value,
         };
     },
     methods: {
         handleInput(e) {
             this.$emit('input', e.id);
+            this.$emit('update:modelValue', e.id);
         },
     }
 }

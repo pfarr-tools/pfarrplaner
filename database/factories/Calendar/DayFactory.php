@@ -31,6 +31,7 @@
 namespace Database\Factories\Calendar;
 
 use App\Models\Calendar\Day;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DayFactory extends Factory
@@ -41,7 +42,7 @@ class DayFactory extends Factory
     public function definition()
     {
         return [
-            'date' => (new Carbon\Carbon(fake()->date()))->format('d.m.Y'),
+            'date' => (new Carbon(fake()->date()))->format('d.m.Y'),
             'day_type' => fake()->randomElement(
                 [\App\Models\Calendar\Day::DAY_TYPE_DEFAULT, \App\Models\Calendar\Day::DAY_TYPE_LIMITED]
             ),

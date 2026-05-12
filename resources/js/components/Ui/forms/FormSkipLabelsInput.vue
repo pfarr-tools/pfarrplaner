@@ -32,19 +32,24 @@ import FormGroup from "./FormGroup.vue";
 
 export default {
     name: "FormSkipLabelsInput",
-    props: ['label', 'labels', 'length', 'value'],
+    props: ['label', 'labels', 'length', 'modelValue'],
+    emits: ['update:modelValue', 'input'],
     components: {FormGroup},
     data() {
         let states = [];
         for (let i=0; i<this.labels; i++) states.push(false);
         return {
             states,
-            myValue: this.value,
+            myValue: this.modelValue,
         }
+    },
+    watch: {
+        modelValue(v) { this.myValue = v; },
     },
     methods: {
         setValue(value) {
             this.myValue = value;
+            this.$emit('update:modelValue', value);
             this.$emit('input', value);
             this.$forceUpdate();
         }

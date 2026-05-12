@@ -33,7 +33,7 @@
         <div v-if="hasAutoAttachments || (service.attachments.length > 0)">
             <div v-if="myService.liturgy_blocks.length > 0">
                 <div class="liturgy-sheet btn btn-light" v-for="(sheet,key,index) in liturgySheets" :key="key"
-                     @click.prevent="(sheet.configurationComponent) ? dialogs[sheet.key] = true : downloadSheet(sheet)"
+                     @click.prevent="(sheet.configurationComponent) ? dialogs[sheet?.key] = true : downloadSheet(sheet)"
                      v-if="!sheet.isNotAFile">
                     <b><span :class="sheet.icon"></span> {{ sheet.title }}</b><br/>
                     <small>.{{ sheet.extension }}, Größe unbekannt</small>
@@ -65,7 +65,7 @@
                             :upload-route="route('service.attach', this.myService.slug)"
                             v-model="myService.attachments"/>
 
-        <modal v-for="(sheet,sheetKey) in liturgySheets" v-if="dialogs[sheet.key]" :title="sheet.title + ' herunterladen'"
+        <modal v-for="(sheet,sheetKey) in liturgySheets" v-if="dialogs[sheet?.key]" :title="sheet.title + ' herunterladen'"
                :key="'dlg'+sheet.key"
                @close="downloadConfiguredSheet(sheet)"
                @cancel="dialogs[sheet.key] = false"

@@ -30,7 +30,7 @@
 <template>
     <div class="sermon-editor">
         <admin-layout title="Predigt bearbeiten">
-            <template slot="navbar-left">
+            <template #navbar-left>
                 <button class="btn btn-primary" @click.prevent="saveSermon">Speichern</button>&nbsp;
                 <a class="btn btn-light" v-if="editedSermon.id"
                               :href="route('sermon.reader', {sermon: editedSermon.id})" target="_blank"
@@ -104,29 +104,18 @@
                 </div>
                 <div class="form-group">
                     <label>Text der Predigt</label>
-                    <!-- HERE --->
-
-                    <quill-editor :class="{focused: textEditorActive}" ref="textEditor"
-                                  v-model="editedSermon.text" :key="textUpdated"
-                                  :options="editorOption" @focus="textEditorActive = true"
-                                  @blur="textEditorActive = false">
-                        <div id="toolbar" slot="toolbar">
-                            <button class="ql-bold"></button>
-                            <button class="ql-italic"></button>
-                            <button class="ql-underline me-2"></button>
-                            <button class="ql-header" value="1"></button>
-                            <button class="ql-blockquote me-2"></button>
-                            <span class="ql-formats me-2">
-                                                    <button class="ql-list" value="ordered"></button>
-                                                    <button class="ql-list" value="bullet"></button>
-                                                    <button class="ql-indent" value="-1"></button>
-                                                    <button class="ql-indent" value="+1"></button>
-                                                </span>
-                            <button class="ql-clean me-2"></button>
-                            <button class="ql-insertbible quill-mdi-button" title="Bibeltext hinzufügen"><span
-                                class="mdi mdi-book-open-variant"></span></button>
-                        </div>
-                    </quill-editor>
+                    <div class="tiptap-toolbar btn-toolbar mb-1" v-if="editorText">
+                        <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleBold().run()" :class="{active: editorText.isActive('bold')}" title="Fett"><b>B</b></button>
+                        <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleItalic().run()" :class="{active: editorText.isActive('italic')}" title="Kursiv"><i>I</i></button>
+                        <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleUnderline().run()" :class="{active: editorText.isActive('underline')}" title="Unterstrichen"><u>U</u></button>
+                        <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleHeading({level:1}).run()" :class="{active: editorText.isActive('heading',{level:1})}" title="Überschrift">H1</button>
+                        <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleBlockquote().run()" :class="{active: editorText.isActive('blockquote')}" title="Zitat">&ldquo;</button>
+                        <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleOrderedList().run()" :class="{active: editorText.isActive('orderedList')}" title="Nummerierte Liste">1.</button>
+                        <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleBulletList().run()" :class="{active: editorText.isActive('bulletList')}" title="Aufzählung">&bull;</button>
+                        <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().unsetAllMarks().clearNodes().run()" title="Formatierung entfernen">&#10005;</button>
+                        <button class="btn btn-sm btn-outline-secondary" @click.prevent="insertBible()" title="Bibeltext hinzufügen"><span class="mdi mdi-book-open-variant"></span></button>
+                    </div>
+                    <editor-content :editor="editorText" class="form-control tiptap-editor" />
 
                     <text-stats :text="editedSermon.text"  :key="textUpdated"/>
                     <div v-if="funerals.length > 0" class="mt-1 mb-3">
@@ -159,13 +148,13 @@
                             <small id="helpQuestions" class="form-text text-muted">Eine Frage pro Zeile</small>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="inputCCLicense"
+                            <input class="form-check-input" type="checkbox" id="inputCCLicense"
                                    v-model="editedSermon.cc_license" value="1"/>
                             <label class="form-check-label" for="inputCCLicense">Predigt und Materialien unter
                                 der CC-BY-SA 4.0 Lizenz freigeben</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="inputPermitHandouts"
+                            <input class="form-check-input" type="checkbox" id="inputPermitHandouts"
                                    v-model="editedSermon.permit_handouts" value="1"/>
                             <label class="form-check-label" for="inputPermitHandouts">Handouts freigeben</label>
                         </div>
@@ -186,10 +175,13 @@
                 </div>
                 <div class="form-group" style="height: 100%;">
                     <label>Literaturhinweise</label>
-                    <quill-editor :class="{focused: literatureEditorActive}" ref="literatureEditor"
-                                  v-model="editedSermon.literature" scrolling-container="html"
-                                  :options="editorOptionListOnly" @focus="literatureEditorActive = true"
-                                  @blur="literatureEditorActive = false"/>
+                    <div class="tiptap-toolbar btn-toolbar mb-1" v-if="editorLiterature">
+                        <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorLiterature.chain().focus().toggleItalic().run()" :class="{active: editorLiterature.isActive('italic')}" title="Kursiv"><i>I</i></button>
+                        <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorLiterature.chain().focus().toggleOrderedList().run()" :class="{active: editorLiterature.isActive('orderedList')}" title="Nummerierte Liste">1.</button>
+                        <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorLiterature.chain().focus().toggleBulletList().run()" :class="{active: editorLiterature.isActive('bulletList')}" title="Aufzählung">&bull;</button>
+                        <button class="btn btn-sm btn-outline-secondary" @click.prevent="editorLiterature.chain().focus().unsetAllMarks().clearNodes().run()" title="Formatierung entfernen">&#10005;</button>
+                    </div>
+                    <editor-content :editor="editorLiterature" class="form-control tiptap-editor" />
                 </div>
             </form>
         </admin-layout>
@@ -197,12 +189,11 @@
 </template>
 
 <script>
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
-import '../components/SermonEditor/quill.css';
+import { Editor, EditorContent } from '@tiptap/vue-3';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import Placeholder from '@tiptap/extension-placeholder';
 
-import {quillEditor} from 'vue-quill-editor';
 import FormFileUploader from "../components/Ui/forms/FormFileUploader";
 import FormImageAttacher from "../components/Ui/forms/FormImageAttacher";
 import TextStats from "../components/LiturgyEditor/Elements/TextStats";
@@ -222,7 +213,7 @@ export default {
         TextStats,
         FormImageAttacher,
         FormFileUploader,
-        quillEditor,
+        EditorContent,
     },
     props: {
         sermon: Object,
@@ -277,45 +268,34 @@ export default {
             }
         });
 
-
         return {
             referenceCopied: 0,
-            textEditorActive: false,
-            literatureEditorActive: false,
             editedSermon: editedSermon,
-            editorOption: {
-                placeholder: 'Schreibe hier den Text deiner Predigt hin...',
-                modules: {
-                    toolbar: {
-                        container: '#toolbar',
-                        handlers: {
-                            custom: this.quillInsertText,
-                            insertbible: this.quillInsertBible,
-                        }
-                    },
-                    clipboard: {
-                        matchVisual: false,
-                    },
-                }
-            },
-            editorOptionListOnly: {
-                placeholder: 'Hier gibt es Platz z.B. für eine Literaturliste...',
-                modules: {
-                    toolbar: [
-                        ['italic'],        // toggled buttons
-                        [{'list': 'ordered'}, {'list': 'bullet'}],
-                        ['clean']                                         // remove formatting button
-                    ],
-                    clipboard: {
-                        matchVisual: false,
-                    },
-                }
-            },
             fileUpload: null,
             removeImage: false,
             textSources,
-            textUpdated: 0,
+            editorText: new Editor({
+                content: editedSermon.text,
+                extensions: [
+                    StarterKit,
+                    Underline,
+                    Placeholder.configure({ placeholder: 'Schreibe hier den Text deiner Predigt hin...' }),
+                ],
+                onUpdate: ({ editor }) => { editedSermon.text = editor.getHTML(); },
+            }),
+            editorLiterature: new Editor({
+                content: editedSermon.literature,
+                extensions: [
+                    StarterKit,
+                    Placeholder.configure({ placeholder: 'Hier gibt es Platz z.B. für eine Literaturliste...' }),
+                ],
+                onUpdate: ({ editor }) => { editedSermon.literature = editor.getHTML(); },
+            }),
         }
+    },
+    beforeUnmount() {
+        this.editorText.destroy();
+        this.editorLiterature.destroy();
     },
     methods: {
         saveSermon() {
@@ -331,17 +311,13 @@ export default {
             }
             if (undefined === this.editedSermon.id) {
                 this.$inertia.post(route('sermon.store', {service: this.service.slug}), formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
+                    headers: { 'Content-Type': 'multipart/form-data' },
                     preserveState: false,
                 });
             } else {
                 formData.append('_method', 'PATCH');
                 this.$inertia.post(route('sermon.update', {sermon: this.editedSermon.id}), formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
+                    headers: { 'Content-Type': 'multipart/form-data' },
                     preserveState: false,
                 });
             }
@@ -354,21 +330,10 @@ export default {
         setImage(event) {
             this.fileUpload = event.target.files[0];
         },
-        quillInsertText(e) {
-            var quill = this.$refs.textEditor.quill;
-            var text = null;
-
-            switch (e) {
-                default:
-                    text = e;
-            }
-
-            if (text) {
-                quill.insertText(quill.getSelection(true).index, text);
-                quill.scrollSelectionIntoView();
-            }
+        insertText(editor, text) {
+            if (text) editor.chain().focus().insertContent(text).run();
         },
-        quillInsertBible() {
+        insertBible() {
             var reference = window.prompt('Welche Bibelstelle möchtest du einfügen?');
             axios.get(route('bible.text', {
                 reference: reference,
@@ -376,7 +341,7 @@ export default {
                 showVerseNumbers: 0
             })).then(result => {
                 if (result.data.text) {
-                    this.quillInsertText(result.data.text);
+                    this.insertText(this.editorText, result.data.text);
                 } else {
                     alert('Zu dieser Stellenangabe konnte kein Text gefunden werden.');
                 }
@@ -387,31 +352,25 @@ export default {
             this.referenceCopied++;
         },
         insertFuneralStory(funeral) {
-            if (this.editedSermon.text.trim() != '') this.editedSermon.text += "\n\n";
-            this.editedSermon.text += funeral.life;
-            this.textUpdated++;
+            this.editorText.chain().focus().insertContent(funeral.life || '').run();
         }
     }
 }
 </script>
 
 <style scoped>
->>> .quill {
-    height: 100%;
-}
-
-.ql-clipboard, >>> .ql-clipboard {
-    position: fixed;
-}
-
-.ql-toolbar .quill-mdi-button {
-    padding-top: 1px;
-}
->>> .ql-container.ql-snow,
->>> .ql-container.ql-snow .ql-editor {
-    font-family: inherit !important;
+:deep(.ProseMirror) {
+    font-family: inherit;
     font-weight: normal;
+    min-height: 120px;
+    outline: none;
+    padding: 0.375rem 0.75rem;
 }
-
-
+:deep(.ProseMirror p.is-editor-empty:first-child::before) {
+    content: attr(data-placeholder);
+    float: left;
+    color: #adb5bd;
+    pointer-events: none;
+    height: 0;
+}
 </style>

@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Planungstabelle konfigurieren">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <nav-button type="primary" title="Planungstabelle anzeigen" icon="mdi mdi-table"
                         :disabled="setup.ministries.length == 0"
                         :title="setup.ministries.length ? 'Planungstabelle erstellen und anzeigen' : 'Du musst mindestens einen Dienst auswählen, um eine Planungstabelle erstellen zu können.'"
@@ -39,12 +39,7 @@
                         v-model="setup.cities" name="cities" multiple />
         <form-selectize label="Auf folgende Orte beschränken" placeholder="Leer lassen für alle Orte"
                         v-model="setup.locations" :options="locations" multiple />
-        <form-group name="from" label="Gottesdienste anzeigen ab">
-            <date-picker v-model="setup.from" :config="myDatePickerConfig"/>
-        </form-group>
-        <form-group name="to" label="Gottesdienste anzeigen bis">
-            <date-picker v-model="setup.to" :config="myDatePickerConfig" />
-        </form-group>
+        <date-range-input label="Zeitraum" :model-value="dateRange" @update:modelValue="onDateRangeChange" />
         <form-selectize name="ministries" label="Folgende Dienste anzeigen"
                         :help="setup.ministries.length ? '' : 'Bitte wähle mindestens einen Dienst aus.'"
                         :options="myMinistries" v-model="setup.ministries" multiple/>
@@ -52,13 +47,13 @@
 </template>
 
 <script>
-import FormGroup from "../../../components/Ui/forms/FormGroup";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import NavButton from "../../../components/Ui/buttons/NavButton";
 import LocationSelect from "../../../components/Ui/elements/LocationSelect";
+import DateRangeInput from "../../../components/Ui/elements/DateRangeInput";
 export default {
     name: "PlanningInputSetup",
-    components: {LocationSelect, NavButton, FormSelectize, FormGroup},
+    components: {DateRangeInput, LocationSelect, NavButton, FormSelectize},
     props: ['cities', 'ministries', 'locations'],
     data() {
         var myMinistries = [];
@@ -66,11 +61,6 @@ export default {
             myMinistries.push({ id: ministryKey, name: this.ministries[ministryKey]});
         }
         return {
-            myDatePickerConfig: {
-                locale: 'de',
-                format: 'DD.MM.YYYY',
-                showClear: true,
-            },
             myMinistries: myMinistries,
             setup: {
                 from: moment().format('DD.MM.YYYY'),
@@ -81,7 +71,21 @@ export default {
             }
         }
     },
+    computed: {
+        dateRange() {
+            return [
+                this.setup.from ? moment(this.setup.from, 'DD.MM.YYYY') : null,
+                this.setup.to ? moment(this.setup.to, 'DD.MM.YYYY') : null,
+            ];
+        },
+    },
     methods: {
+        onDateRangeChange(val) {
+            if (val && val.length === 2 && val[1]) {
+                this.setup.from = moment(val[0]).format('DD.MM.YYYY');
+                this.setup.to = moment(val[1]).format('DD.MM.YYYY');
+            }
+        },
         showTable() {
             this.$inertia.post(route('inputs.input', 'planning'), this.setup);
         }

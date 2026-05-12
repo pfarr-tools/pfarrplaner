@@ -56,6 +56,7 @@ import FormInput from "./FormInput";
 import __ from "lodash";
 export default {
     name: "FormPixabayPicker",
+    emits: ['input'],
     components: {FormInput, FormGroup},
     data() {
         return {

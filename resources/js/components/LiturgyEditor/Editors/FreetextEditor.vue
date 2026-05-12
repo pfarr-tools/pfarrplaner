@@ -48,17 +48,16 @@
 </template>
 
 <script>
-import Nl2br from 'vue-nl2br';
 import TextStats from "../Elements/TextStats";
 import FormInput from "../../Ui/forms/FormInput";
 import FormSelectize from "../../Ui/forms/FormSelectize";
 import NavButton from "../../Ui/buttons/NavButton";
 import FormFileUpload from "../../Ui/forms/FormFileUpload";
-import {romanize} from "../../../libraries/Romanize";
+import {romanize} from "@pfarr.tools/romanize";
 import FormBibleReferenceInput from "../../Ui/forms/FormBibleReferenceInput";
 import ReplacementMenu from "./Elements/ReplacementMenu";
 import ReplacementMenuButton from "./Elements/ReplacementMenuButton";
-import RelativeDate from "../../../libraries/RelativeDate";
+import RelativeDate from "@pfarr.tools/relative-date";
 import LiturgyTextEditor from "./Elements/LiturgyTextEditor.vue";
 import FormTextarea from "../../Ui/forms/FormTextarea.vue";
 import RichTextEditor from "./Elements/RichTextEditor.vue";
@@ -73,7 +72,7 @@ export default {
         LiturgyTextEditor,
         ReplacementMenuButton,
         ReplacementMenu,
-        FormBibleReferenceInput, FormFileUpload, NavButton, FormSelectize, FormInput, TextStats, Nl2br
+        FormBibleReferenceInput, FormFileUpload, NavButton, FormSelectize, FormInput, TextStats
     },
     inject: ['lists'],
     props: {

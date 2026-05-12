@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Benutzerverwaltung">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <nav-button v-if="canCreate" type="success" icon="mdi mdi-account-plus" title="Neue Person anlegen"
                         @click="createUser">Person hinzufügen</nav-button>
             <nav-button v-if="isSuperAdmin" type="warning" icon="mdi mdi-account-multiple-check" title="Doppelte Personeneinträge finden"
@@ -45,11 +45,13 @@
                     <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
                 </div>
                 <div class="col-md-1 mb-2 mb-md-0">
-                    <label v-for="checkbox in checkboxes" class="mt-1" :title="checkbox.title" v-if="checkbox.condition">
-                        <input type="checkbox" v-model="checkbox.value" :title="checkbox.title" />
-                        <span v-if="checkbox.icon" :class="checkbox.icon"></span>
-                        <span v-if="checkbox.label">{{ checkbox.label }}</span>
-                    </label>
+                    <template v-for="checkbox in checkboxes" :key="checkbox.name">
+                        <label v-if="checkbox.condition" class="mt-1" :title="checkbox.title">
+                            <input type="checkbox" v-model="checkbox.value" :title="checkbox.title" />
+                            <span v-if="checkbox.icon" :class="checkbox.icon"></span>
+                            <span v-if="checkbox.label">{{ checkbox.label }}</span>
+                        </label>
+                    </template>
                 </div>
                 <div class="col-md-5 text-end">
                     <dataset-show class="float-right" />

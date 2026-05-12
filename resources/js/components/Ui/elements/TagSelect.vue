@@ -41,12 +41,13 @@
 import FormSelectize from "../forms/FormSelectize";
 export default {
     name: "TagSelect",
+    emits: ['update:modelValue'],
     components: {FormSelectize},
-    props: ['tags', 'name', 'label', 'help', 'value', 'return'],
+    props: ['tags', 'name', 'label', 'help', 'modelValue', 'return'],
     data() {
         var myValue = [];
-        if (this.value) {
-            this.value.forEach(item => { myValue.push(item.id)});
+        if (this.modelValue) {
+            this.modelValue.forEach(item => { myValue.push(item.id)});
         }
 
         let myTags = this.tags;
@@ -79,7 +80,7 @@ export default {
             } else {
                 this.tags.forEach(tag => { if (e.includes(tag.id.toString())) items.push(tag[this.myReturnProperty]); });
             }
-            this.$emit('input', items);
+            this.$emit('update:modelValue', items);
         },
         addTag(e) {
             this.$api().post(route('api.tags.store'), {name: e}).then(response => {

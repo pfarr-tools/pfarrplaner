@@ -33,11 +33,9 @@
             <span class="mdi mdi-spin mdi-loading"></span>
         </div>
         <div v-else>
-            <template slot="toolbar">
-            </template>
             <div class="row py-2 border-bottom mb-2">
                 <div class="col-md-6">
-                    <button class="btn btn-success" @click="addBlock"><span class="mdi mdi-format-section"></span>
+                    <button class="btn btn-success me-1" @click="addBlock"><span class="mdi mdi-format-section"></span>
                         Abschnitt
                         hinzufügen...
                     </button>
@@ -54,16 +52,17 @@
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <div v-for="sheet in sheets">
                                 <liturgy-sheet-link :service="service" :sheet="sheet"
-                                                    @open="dialogs[sheet.key] = true"/>
+                                                    @open="dialogs[sheet?.key] = true"/>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <draggable :list="blocks" group="blocks" v-bind:class="{ghostClass: 'ghost-block'}"
+            <draggable :list="blocks" item-key="id" group="blocks" v-bind:class="{ghostClass: 'ghost-block'}"
                        class="liturgy-blocks-list" :key="treeState+blocks.length"
                        @start="focusOff" @end="saveState" :disabled="!editable" handle=".handle">
-                <div v-for="(block,blockIndex) in blocks" class="liturgy-block"
+              <template #item="{ element: block, index: blockIndex }">
+                <div class="liturgy-block"
                      :class="{focused: (focusedBlock == blockIndex) && (focusedItem == null)}"
                      @click="focusBlock(blockIndex)">
                     <div class="row" :ref="'block'+blockIndex" :key="'block'+blockIndex">
@@ -101,10 +100,11 @@
                                   @unfocus="cancelEditing($event, blockIndex)"
                                   :agenda-mode="agendaMode" :markers="markers"/>
 
-                    <draggable :list="block.items" group="items" class="liturgy-items-list" handle=".handle"
+                    <draggable :list="block.items" item-key="id" group="items" class="liturgy-items-list" handle=".handle"
                                v-bind:class="{ghostClass: 'ghost-item'}" @start="focusOff" @end="saveState"
                                :disabled="!editable">
-                        <div v-for="(item,itemIndex) in block.items" class="liturgy-item"
+                      <template #item="{ element: item, index: itemIndex }">
+                        <div class="liturgy-item"
                              @click.stop="focusItem(blockIndex, itemIndex)"
                              :class="{focused: (focusedBlock == blockIndex) && (focusedItem == itemIndex)}"
                              :data-block-index="blockIndex" :data-item-index="itemIndex">
@@ -171,8 +171,10 @@
                                           @unfocus="cancelEditing($event, blockIndex, itemIndex)"
                                           :agenda-mode="agendaMode" :markers="markers"/>
                         </div>
+                      </template>
                     </draggable>
                 </div>
+              </template>
             </draggable>
             <div class="row" v-if="blocks.length > 0">
                 <div class="col-sm-7"></div>
@@ -198,7 +200,7 @@
                     Importmöglichquellen werden geladen... <span class="mdi mdi-spin mdi-loading"></span>
                 </div>
             </modal>
-            <modal v-for="(sheet,sheetKey) in sheets" v-if="dialogs[sheet.key]" :title="sheet.title + ' herunterladen'"
+            <modal v-for="(sheet,sheetKey) in sheets" v-if="dialogs[sheet?.key]" :title="sheet.title + ' herunterladen'"
                    :key="'dlg'+sheet.key"
                    @close="downloadConfiguredSheet(sheet)"
                    @cancel="dialogs[sheet.key] = false"
@@ -213,7 +215,6 @@
 import draggable from 'vuedraggable'
 import LiturgyBlock from "../Elements/LiturgyBlock";
 import DetailsPane from "./DetailsPane";
-import Selectize from "vue2-selectize";
 import Modal from "../../Ui/modals/Modal";
 import LiturgySheetLink from "../Elements/LiturgySheetLink";
 import FormSelectize from "../../Ui/forms/FormSelectize";
@@ -238,7 +239,6 @@ export default {
         LiturgyBlock,
         DetailsPane,
         draggable,
-        Selectize,
         FullTextLiturgySheetConfiguration,
         SongPPTLiturgySheetConfiguration,
         A4WordSpecificLiturgySheetConfiguration,
@@ -683,7 +683,7 @@ export default {
             });
         },
         cancelEditing(item, blockIndex, itemIndex = null) {
-            if (undefined == item.data.responsible) item.data.responsible = [];
+            if (item.data && undefined == item.data.responsible) item.data.responsible = [];
             if (null !== itemIndex) {
                 this.blocks[blockIndex].items[itemIndex] = item;
                 this.blocks[blockIndex].items[itemIndex].editing = false;

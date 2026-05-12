@@ -32,6 +32,7 @@ namespace App\Models\People;
 
 use App\Models\Places\City;
 use App\Models\People\User;
+use App\Services\NameService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Shetabit\Visitor\Traits\Visitable;
@@ -46,6 +47,17 @@ use Shetabit\Visitor\Traits\Visitor;
 class ListedPerson extends Model
 {
     protected $table = 'users';
+
+    protected $appends = ['name'];
+
+    /**
+     * @return string
+     */
+    public function getNameAttribute(): string
+    {
+        return (new NameService($this->first_name ?? '', $this->last_name ?? '', $this->title ?? ''))
+            ->format(NameService::FIRST_LAST);
+    }
 
     public function cityScopes()
     {

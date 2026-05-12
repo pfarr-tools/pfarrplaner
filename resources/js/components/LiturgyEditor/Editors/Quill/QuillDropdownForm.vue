@@ -46,6 +46,7 @@
 <script>
 export default {
     name: "QuillDropdownForm",
+    emits: ['input'],
     props: ['title', 'label', 'icon', 'items', 'remember'],
     data() {
         return {

@@ -31,16 +31,33 @@
 namespace Database\Factories\Rites;
 
 use App\Models\Rites\Baptism;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BaptismFactory extends Factory
 {
     protected $model = Baptism::class;
 
-    public function definition()
+    /**
+     * @return array<string, mixed>
+     */
+    public function definition(): array
     {
-        // TODO: Implement definition() method.
-        return [];
+        return [
+            'service_id' => Service::factory(),
+            'candidate_name' => fake()->name(),
+            'candidate_address' => fake()->streetAddress(),
+            'candidate_zip' => fake()->postcode(),
+            'candidate_city' => fake()->city(),
+            'candidate_email' => fake()->safeEmail(),
+            'candidate_phone' => fake()->phoneNumber(),
+            'first_contact_with' => fake()->name(),
+            'registered' => 0,
+            'appointment' => fake()->dateTimeBetween('+1 week', '+3 months'),
+            'signed' => 0,
+            'docs_ready' => 0,
+            'docs_where' => '',
+        ];
     }
 
 

@@ -37,6 +37,7 @@
 <script>
 export default {
     name: "NavButton",
+    emits: ['click'],
     props: {
         type: {
             type: String,

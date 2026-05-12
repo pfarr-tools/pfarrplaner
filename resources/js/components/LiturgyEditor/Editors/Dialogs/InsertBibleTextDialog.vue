@@ -39,11 +39,12 @@
 <script>
 import Modal from "../../../Ui/modals/Modal.vue";
 import FormBibleReferenceInput from "../../../Ui/forms/FormBibleReferenceInput.vue";
-import {romanize} from "../../../../libraries/Romanize";
-import RelativeDate from "../../../../libraries/RelativeDate";
+import {romanize} from "@pfarr.tools/romanize";
+import RelativeDate from "@pfarr.tools/relative-date";
 
 export default {
     name: "InsertBibleTextDialog",
+    emits: ['input'],
     props: ['service'],
     components: {FormBibleReferenceInput, Modal},
     data() {

@@ -29,12 +29,12 @@
 
 <template>
     <admin-layout title="Mein Profil">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <button class="btn btn-primary" title="Profil speichern" @click="saveProfile">
                 <span class="d-inline d-md-none mdi mdi-content-save"></span> <span class="d-none d-md-inline">Speichern</span>
             </button>
         </template>
-        <template slot="tab-headers">
+        <template #tab-headers>
             <tab-headers>
                 <tab-header title="Profil" id="profile" :active-tab="activeTab"/>
                 <tab-header title="Sicherheit" id="security" :active-tab="activeTab"/>

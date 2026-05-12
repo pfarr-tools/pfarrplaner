@@ -29,11 +29,11 @@
 
 <template>
     <admin-layout :title="getTitle()">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <save-button @click="saveCity" />
             <nav-button v-if="canDelete" class="ms-1" type="danger" icon="mdi mdi-delete" @click="deleteCity">Löschen</nav-button>
         </template>
-        <template slot="tab-headers">
+        <template #tab-headers>
             <tab-headers>
                 <tab-header id="home" title="Allgemeines" :active-tab="activeTab"/>
                 <tab-header v-if="!myCity.is_org" id="offerings" title="Opfer" :active-tab="activeTab"/>

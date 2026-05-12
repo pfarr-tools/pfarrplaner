@@ -30,36 +30,41 @@
 /**
  * @source https://yavuztas.dev/javascript/vuejs/2019/11/10/type-based-global-events-in-vuejs.html
  */
+import mitt from 'mitt'
+
+const emitter = mitt()
+
 export default {
-
-    $eventBus: null,
-
-    install (Vue, options) {
-        this.$eventBus = new Vue()
+    install(app) {
+        app.config.globalProperties.$bus = emitter
     },
 
-    listen (eventClass, handler) {
-        this.$eventBus.$on(eventClass.name, handler)
+    /** @param {Function} eventClass  @param {Function} handler */
+    listen(eventClass, handler) {
+        emitter.on(eventClass.name, handler)
     },
 
-    listenOnce (eventClass, handler) {
-        this.$eventBus.$once(eventClass.name, handler)
+    /** @param {Function} eventClass  @param {Function} handler */
+    listenOnce(eventClass, handler) {
+        const wrapper = e => { handler(e); emitter.off(eventClass.name, wrapper) }
+        emitter.on(eventClass.name, wrapper)
     },
 
-    remove (eventClass, handler) {
+    /** @param {Function} eventClass  @param {Function} [handler] */
+    remove(eventClass, handler) {
         if (handler) {
-            this.$eventBus.$off(eventClass.name, handler)
+            emitter.off(eventClass.name, handler)
         } else {
-            this.$eventBus.$off(eventClass.name)
+            emitter.off(eventClass.name)
         }
     },
 
-    removeAll () {
-        this.$eventBus.$off()
+    removeAll() {
+        emitter.all.clear()
     },
 
-    publish (event) {
-        this.$eventBus.$emit(event.constructor.name, event)
-    }
-
+    /** @param {Object} event */
+    publish(event) {
+        emitter.emit(event.constructor.name, event)
+    },
 }

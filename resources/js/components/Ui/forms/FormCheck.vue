@@ -41,16 +41,17 @@
 
 <script>
 import FormGroup from "./FormGroup";
+import { uid } from '../../../libraries/uid';
 export default {
     name: "FormCheck",
     components: {FormGroup},
+    emits: ['input', 'update:modelValue'],
     props: {
         label: String,
         id: String,
         name: String,
-        value: {
-            type: null,
-        },
+        modelValue: { type: null },
+        value: { type: null },
         help: String,
         preLabel: String,
         disabled: {
@@ -65,19 +66,24 @@ export default {
         }
     },
     mounted() {
-        if (this.myId == '') this.myId = this._uid;
+        if (this.myId == '') this.myId = uid();
     },
     data() {
         return {
             myId: this.id || '',
-            myValue: this.value,
+            myValue: this.modelValue !== undefined ? this.modelValue : this.value,
             error: this.$page.props.errors[this.name],
         }
+    },
+    watch: {
+        modelValue(v) { this.myValue = v; },
+        value(v) { if (this.modelValue === undefined) this.myValue = v; },
     },
     methods: {
         handleInput(event) {
             this.myValue = event.target.checked ? 1: 0;
             this.$emit('input', this.myValue);
+            this.$emit('update:modelValue', this.myValue);
         }
     }
 }

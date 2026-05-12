@@ -79,18 +79,18 @@
 </template>
 
 <script>
-import Nl2br from "vue-nl2br";
 import Modal from "../../../Ui/modals/Modal.vue";
 import NavButton from "../../../Ui/buttons/NavButton.vue";
 import FormSelectize from "../../../Ui/forms/FormSelectize.vue";
 import {PronounSetFactory} from "../../../../libraries/PronounSets/PronounSetFactory";
-import RelativeDate from "../../../../libraries/RelativeDate";
+import RelativeDate from "@pfarr.tools/relative-date";
 import {NameService} from "../../../../libraries/NameService";
 
 export default {
     name: "InsertLiturgicTextDialog",
+    emits: ['input'],
     props: ['service'],
-    components: {FormSelectize, NavButton, Modal, Nl2br},
+    components: {FormSelectize, NavButton, Modal},
     inject: ['lists'],
     computed: {
         myUnfilteredText() {

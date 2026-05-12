@@ -15,9 +15,6 @@
     <link href="/landing/assets/img/favicon.png" rel="icon">
     <link href="/landing/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-    <!-- Google Fonts -->
-    <link rel="stylesheet" href="/css/google-fonts.css">
-
     <!-- Vendor CSS Files -->
     <link href="/landing/assets/vendor/aos/aos.css" rel="stylesheet">
     <link href="/landing/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">

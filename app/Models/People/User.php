@@ -158,6 +158,14 @@ class User extends Authenticatable
 // ACCESSORS
 
     /**
+     * @return string
+     */
+    public function getNameAttribute(): string
+    {
+        return $this->nameService()->format(NameService::FIRST_LAST);
+    }
+
+    /**
      * @return City[]|\Illuminate\Database\Eloquent\Collection
      */
     public function getAdminCitiesAttribute()
@@ -1187,8 +1195,4 @@ class User extends Authenticatable
             })->where('start', '<=', now()->endOfDay())->where('end', '>=', now()->startOfDay())->count() > 0;
     }
 
-    public function getNameAttribute()
-    {
-        return NameService::fromUser($this)->format(NameService::FIRST_LAST);
-    }
 }

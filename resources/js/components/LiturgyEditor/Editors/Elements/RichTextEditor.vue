@@ -30,99 +30,52 @@
 <template>
     <div class="rich-text-editor form-group">
         <label>{{ myLabel }}</label>
-        <quill-editor v-model="myValue" :options="quillOptions"
-                      class="focused" ref="textEditor"
-                      @focus="textEditorActive = true"
-                      @blur="textEditorActive = false">
-            <div id="toolbar" slot="toolbar">
-                <button v-if="mySettings.toolbar.bold" class="ql-bold"></button>
-                <button v-if="mySettings.toolbar.italic"  class="ql-italic"></button>
-                <button v-if="mySettings.toolbar.underline"  class="ql-underline me-2"></button>
-                <button v-if="mySettings.toolbar.header"  class="ql-header" value="1"></button>
-                <button v-if="mySettings.toolbar.blockquote"  class="ql-blockquote me-2"></button>
-                <span v-if="mySettings.toolbar.formats.length > 0"  class="ql-formats me-2">
-                                                    <button class="ql-list" value="ordered"></button>
-                                                    <button class="ql-list" value="bullet"></button>
-                                                    <button class="ql-indent" value="-1"></button>
-                                                    <button class="ql-indent" value="+1"></button>
-                                                </span>
-                <button v-if="mySettings.toolbar.clean"  class="ql-clean me-2"></button>
-            </div>
-        </quill-editor>
-
+        <div class="tiptap-toolbar btn-toolbar mb-1" v-if="editor">
+            <button v-if="mySettings.toolbar.bold" class="btn btn-sm btn-outline-secondary me-1"
+                    @click.prevent="editor.chain().focus().toggleBold().run()"
+                    :class="{active: editor.isActive('bold')}" title="Fett"><b>B</b></button>
+            <button v-if="mySettings.toolbar.italic" class="btn btn-sm btn-outline-secondary me-1"
+                    @click.prevent="editor.chain().focus().toggleItalic().run()"
+                    :class="{active: editor.isActive('italic')}" title="Kursiv"><i>I</i></button>
+            <button v-if="mySettings.toolbar.underline" class="btn btn-sm btn-outline-secondary me-2"
+                    @click.prevent="editor.chain().focus().toggleUnderline().run()"
+                    :class="{active: editor.isActive('underline')}" title="Unterstrichen"><u>U</u></button>
+            <button v-if="mySettings.toolbar.header" class="btn btn-sm btn-outline-secondary me-1"
+                    @click.prevent="editor.chain().focus().toggleHeading({level:1}).run()"
+                    :class="{active: editor.isActive('heading',{level:1})}" title="Überschrift">H1</button>
+            <button v-if="mySettings.toolbar.blockquote" class="btn btn-sm btn-outline-secondary me-2"
+                    @click.prevent="editor.chain().focus().toggleBlockquote().run()"
+                    :class="{active: editor.isActive('blockquote')}" title="Zitat">&ldquo;</button>
+            <template v-if="mySettings.toolbar.formats && mySettings.toolbar.formats.length > 0">
+                <button class="btn btn-sm btn-outline-secondary me-1"
+                        @click.prevent="editor.chain().focus().toggleOrderedList().run()"
+                        :class="{active: editor.isActive('orderedList')}" title="Nummerierte Liste">1.</button>
+                <button class="btn btn-sm btn-outline-secondary me-2"
+                        @click.prevent="editor.chain().focus().toggleBulletList().run()"
+                        :class="{active: editor.isActive('bulletList')}" title="Aufzählung">&bull;</button>
+            </template>
+            <button v-if="mySettings.toolbar.clean" class="btn btn-sm btn-outline-secondary"
+                    @click.prevent="editor.chain().focus().unsetAllMarks().clearNodes().run()"
+                    title="Formatierung entfernen">&#10005;</button>
+        </div>
+        <editor-content :editor="editor" class="form-control tiptap-editor" />
     </div>
 </template>
 
 
 <script>
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
-import '../../../SermonEditor/quill.css'
-
-import {quillEditor} from 'vue-quill-editor';
-import {Quill} from "vue-quill-editor/src";
-import RelativeDate from "../../../../libraries/RelativeDate";
-import QuillDropdown from "../Quill/QuillDropdown.vue";
-import QuillDropdownForm from "../Quill/QuillDropdownForm.vue";
-import {lineBreakMatcher, SmartBreak} from '../Quill/QuillSmartBreak';
-import InsertLiturgicTextDialog from "../Dialogs/InsertLiturgicTextDialog.vue";
-import InsertBibleTextDialog from "../Dialogs/InsertBibleTextDialog.vue";
-import InsertWordDocumentDialog from "../Dialogs/InsertWordDocumentDialog.vue";
-import {NameService} from "../../../../libraries/NameService";
-
+import { Editor, EditorContent } from '@tiptap/vue-3';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import Placeholder from '@tiptap/extension-placeholder';
 
 export default {
     name: "RichTextEditor",
-    components: {
-        QuillDropdownForm, QuillDropdown, quillEditor
-    },
-    props: ['value', 'settings', 'label'],
+    emits: ['update:modelValue'],
+    components: { EditorContent },
+    props: ['modelValue', 'settings', 'label'],
     inject: ['lists'],
     data() {
-        Quill.register(SmartBreak);
-
-        let quillDefaults = {
-            formats: ['break'],
-            placeholder: 'Hier Text eingeben...',
-            modules: {
-                toolbar: {
-                    container: '#toolbar',
-                    handlers: {
-                        inserttext: this.dummy,
-                        insertbible: this.dummy,
-                        importword: this.dummy,
-                        insertfuneraltext: this.quillShowInsertFuneralTextDialog,
-                        custom: this.clickHandler,
-                    }
-                },
-                clipboard: {
-                    matchers: [["BR", lineBreakMatcher]],
-                    matchVisual: false,
-                },
-                keyboard: {
-                    bindings: {
-                        linebreak: {
-                            key: 13,
-                            shiftKey: true,
-                            handler: function (range) {
-                                const currentLeaf = this.quill.getLeaf(range.index)[0];
-                                const nextLeaf = this.quill.getLeaf(range.index + 1)[0];
-                                this.quill.insertEmbed(range.index, "break", true, "user");
-                                // Insert a second break if:
-                                // At the end of the editor, OR next leaf has a different parent (<p>)
-                                if (nextLeaf === null || currentLeaf.parent !== nextLeaf.parent) {
-                                    this.quill.insertEmbed(range.index, "break", true, "user");
-                                }
-                                // Now that we've inserted a line break, move the cursor forward
-                                this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
-                            }
-                        }
-                    }
-                }
-            }
-        };
-
         let defaultSettings = {
             toolbar: {
                 bold: false,
@@ -132,99 +85,59 @@ export default {
                 blockquote: false,
                 formats: {},
             },
-            quill: {},
-        }
-
-        let mySettings = {
-            ...defaultSettings,
-            ...this.settings,
         };
-
-        delete mySettings.quill;
-
-        let floatClass = '';
-        if (mySettings.toolbar.bold
-            || mySettings.toolbar.italic
-            || mySettings.toolbar.underline
-            || mySettings.toolbar.header
-            || mySettings.toolbar.blockquote
-            || mySettings.toolbar.formats.length) {
-            floatClass = 'float-right';
-        }
-
+        let mySettings = { ...defaultSettings, ...this.settings };
+        const initContent = this.modelValue || '';
 
         return {
-            myValue: this.value,
             myLabel: this.label || 'Inhalt',
-            floatClass,
             mySettings,
-            quill: null,
-            t: false,
-            selectedText: '',
-            textEditorActive: false,
-            quillOptions: {
-                ...quillDefaults,
-                ...this.settings.quill || {},
-            },
-
+            editor: new Editor({
+                content: initContent,
+                extensions: [
+                    StarterKit,
+                    Underline,
+                    Placeholder.configure({ placeholder: 'Hier Text eingeben...' }),
+                ],
+                onUpdate: ({ editor }) => {
+                    this.$emit('update:modelValue', editor.getHTML());
+                },
+            }),
         }
     },
     watch: {
-        myValue: {
-            handler(newVal) { this.$emit('input', newVal); },
-        }
+        modelValue(v) {
+            if (v !== this.editor.getHTML()) this.editor.commands.setContent(v || '');
+        },
+    },
+    beforeUnmount() {
+        this.editor.destroy();
     },
     methods: {
-        dummy() {},
         insertText(value, withHtml = false) {
-            const quill = this.$refs.textEditor.quill;
-            const {index, length} = quill.selection.savedRange;
-            value = String(value);
-            if (value != '') {
-                quill.deleteText(index, length);
-                if (withHtml) {
-                    quill.clipboard.dangerouslyPasteHTML(value);
-                } else {
-                    quill.insertText(index, value);
-                }
+            if (!value) return;
+            if (withHtml) {
+                this.editor.chain().focus().insertContent(String(value)).run();
+            } else {
+                this.editor.chain().focus().insertContent(String(value)).run();
             }
-            quill.setSelection(index + value.length);
         },
     }
 }
 </script>
 
 <style scoped>
-.ql-toolbar .quill-mdi-button {
-    padding-top: 1px;
-}
-
-.ql-toolbar .quill-text-button {
-    width: auto !important;
-}
-
-.ql-toolbar button {
-    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-}
-
->>> .ql-container.ql-snow,
->>> .ql-container.ql-snow .ql-editor {
-    font-family: inherit !important;
+.tiptap-editor :deep(.ProseMirror) {
+    min-height: 80px;
+    outline: none;
+    font-family: inherit;
     font-weight: normal;
 }
-
->>> .quill-dropdown-form .ql-picker-options {
-    min-width: 500px;
+:deep(.ProseMirror p.is-editor-empty:first-child::before) {
+    content: attr(data-placeholder);
+    float: left;
+    color: #adb5bd;
+    pointer-events: none;
+    height: 0;
 }
-
->>> .quill-dropdown-form.float-right .ql-picker-options {
-    right: 0;
-}
-
-.dialog {
-    min-height: 70vh;
-}
-
 </style>

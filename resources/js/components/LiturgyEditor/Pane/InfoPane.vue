@@ -114,7 +114,7 @@
                 </div>
                 <div class="col-md-4 text-end">
                     <div class="text-start">
-                        <proprium-select label="Proprium auswählen" @input="setAlternativeProprium"
+                        <proprium-select label="Proprium auswählen" @update:modelValue="setAlternativeProprium"
                                          v-model="myService.alt_proprium" />
                     </div>
                 </div>

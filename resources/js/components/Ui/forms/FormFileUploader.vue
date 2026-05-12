@@ -55,6 +55,7 @@ import 'vue-advanced-cropper/dist/style.css';
 export default {
     name: "FormFileUploader",
     components: {Modal, FormFileUpload, Cropper},
+    emits: ['input'],
     props: ['parent', 'uploadRoute', 'title', 'cropperCanvas', 'cropperStencil', 'width', 'height', 'noSource',
         'noCamera', 'noUrl', 'noPixabay', 'noDescription', 'noInbox', 'noSourceTabs', 'cut', 'helpText'],
     data() {

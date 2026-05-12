@@ -35,6 +35,18 @@
                 </a>
             </div>
 
+            <!-- Help button -->
+            <div class="nav-item">
+                <a class="btn btn-sm btn-outline-secondary"
+                   :href="helpUrl"
+                   target="_blank"
+                   rel="noopener"
+                   title="Hilfe öffnen">
+                    <i class="mdi mdi-help-circle-outline"></i>
+                    <span class="d-none d-lg-inline ms-1">Hilfe</span>
+                </a>
+            </div>
+
             <!--begin::User Menu Dropdown-->
             <div class="nav-item dropdown user-menu">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
@@ -76,7 +88,16 @@ export default {
         },
         adminUserSwitchBack() {
             return this.$page.props.adminUserSwitchBack;
-        }
+        },
+        helpPage() {
+            return this.$page.props.helpPage ?? 'index';
+        },
+        helpUrl() {
+            const baseUrl = (this.$page.props.manualBaseUrl ?? 'https://handbuch.pfarrplaner.de').replace(/\/+$/, '');
+            const helpPage = this.helpPage === 'index' ? '' : `${this.helpPage}/`;
+
+            return `${baseUrl}/${helpPage}`;
+        },
     },
     props: {
         enableControlSidebar: Boolean,

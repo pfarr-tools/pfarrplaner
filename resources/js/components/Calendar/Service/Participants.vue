@@ -44,8 +44,8 @@ export default {
     props: ['participants', 'category', 'predicant'],
     data() {
         return {
-            nameFormat: vm.$children[0].page.props.settings.calendar_name_format,
-            user: vm.$children[0].page.props.currentUser.data,
+            nameFormat: this.$page.props.settings.calendar_name_format,
+            user: this.$page.props.currentUser.data,
         }
     },
     methods: {

@@ -34,9 +34,8 @@ use App\Console\Kernel;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -58,25 +57,10 @@ abstract class TestCase extends BaseTestCase
     }
     */
 
-    protected function refreshTestDatabase()
-    {
-        if (!RefreshDatabaseState::$migrated) {
-            $files = scandir(base_path('/tests/database/'), SCANDIR_SORT_DESCENDING);
-            DB::unprepared(file_get_contents(base_path('/tests/database/' . $files[0])));
-
-            $this->artisan('migrate');
-
-            $this->app[Kernel::class]->setArtisan(null);
-
-            RefreshDatabaseState::$migrated = true;
-        }
-
-        $this->beginDatabaseTransaction();
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
+        Storage::fake();
 
         Factory::guessFactoryNamesUsing(function (string $modelName) {
             return Str::replace('App\\Models\\', '\\Database\\Factories\\', $modelName) . 'Factory';

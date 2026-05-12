@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Geburtstagsbesuche eintragen">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <nav-button type="primary" title="Eintragen" icon="mdi mdi-calendar"
                         @click="execute" :disabled="file && mySetup.calendar">Eintragen
             </nav-button>

@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Opferplan bearbeiten">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <nav-button type="primary" title="Opferplan anzeigen" icon="mdi mdi-table"
                         @click="showTable">Plan anzeigen</nav-button>
         </template>
@@ -37,31 +37,21 @@
                         v-model="setup.cities" name="cities" multiple />
         <form-selectize label="Auf folgende Orte beschränken" placeholder="Leer lassen für alle Orte"
                         v-model="setup.locations" :options="locations" multiple />
-        <form-group name="from" label="Gottesdienste anzeigen ab">
-            <date-picker v-model="setup.from" :config="myDatePickerConfig"/>
-        </form-group>
-        <form-group name="to" label="Gottesdienste anzeigen bis">
-            <date-picker v-model="setup.to" :config="myDatePickerConfig" />
-        </form-group>
+        <date-range-input label="Zeitraum" :model-value="dateRange" @update:modelValue="onDateRangeChange" />
     </admin-layout>
 </template>
 
 <script>
-import FormGroup from "../../../components/Ui/forms/FormGroup";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import NavButton from "../../../components/Ui/buttons/NavButton";
 import LocationSelect from "../../../components/Ui/elements/LocationSelect";
+import DateRangeInput from "../../../components/Ui/elements/DateRangeInput";
 export default {
     name: "Setup",
-    components: {LocationSelect, NavButton, FormSelectize, FormGroup},
+    components: {DateRangeInput, LocationSelect, NavButton, FormSelectize},
     props: ['cities', 'locations'],
     data() {
         return {
-            myDatePickerConfig: {
-                locale: 'de',
-                format: 'DD.MM.YYYY',
-                showClear: true,
-            },
             setup: {
                 from: moment().startOf('year').format('DD.MM.YYYY'),
                 to: moment().endOf('year').format('DD.MM.YYYY'),
@@ -70,7 +60,21 @@ export default {
             }
         }
     },
+    computed: {
+        dateRange() {
+            return [
+                this.setup.from ? moment(this.setup.from, 'DD.MM.YYYY') : null,
+                this.setup.to ? moment(this.setup.to, 'DD.MM.YYYY') : null,
+            ];
+        },
+    },
     methods: {
+        onDateRangeChange(val) {
+            if (val && val.length === 2 && val[1]) {
+                this.setup.from = moment(val[0]).format('DD.MM.YYYY');
+                this.setup.to = moment(val[1]).format('DD.MM.YYYY');
+            }
+        },
         showTable() {
             this.$inertia.post(route('inputs.input', 'offerings'), this.setup);
         }

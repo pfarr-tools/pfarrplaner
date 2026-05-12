@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Kasualien">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <a class="btn btn-primary" :href="route('calendar')"><span class="mdi mdi-calendar"></span> <span
                 class="d-none d-md-inline">Zum Kalender</span></a>&nbsp;
             <inertia-link v-if="config.wizardButtons == '1'" class="btn btn-light" :href="route('baptisms.create')">
@@ -43,7 +43,7 @@
                 <span class="d-none d-md-inline">Trauung anlegen...</span></a>&nbsp;
         </template>
         <div class="mb-3" v-if="!searching">
-            <form-input label="Nach Namen suchen" placeholder="Name" v-model="query" autofocus v-on:keyup.native.enter="doSearch(query)"/>
+            <form-input label="Nach Namen suchen" placeholder="Name" v-model="query" autofocus @keyup.enter="doSearch(query)"/>
             <nav-button  icon="mdi mdi-magnify" title="Suchen" type="primary" @click="doSearch(query)"
                         :force-icon="true">Suchen
             </nav-button>

@@ -37,6 +37,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use OpenApi\Attributes as OA;
 
 class AbsenceController extends \App\Http\Controllers\Controller
 {
@@ -52,6 +53,18 @@ class AbsenceController extends \App\Http\Controllers\Controller
      * @param Absence $absence Absence
      * @return JsonResponse
      */
+    #[OA\Post(
+        path: '/absence/{absence}/set-checked',
+        operationId: 'setAbsenceChecked',
+        summary: 'Mark an absence as checked',
+        tags: ['Absence'],
+        security: [['apiToken' => []]],
+        parameters: [new OA\Parameter(name: 'absence', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))],
+        responses: [
+            new OA\Response(response: 200, description: 'Updated absence'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+        ]
+    )]
     public function setChecked(Absence $absence)
     {
         $absence->update([

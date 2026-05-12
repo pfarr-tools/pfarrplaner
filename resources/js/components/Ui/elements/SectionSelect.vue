@@ -40,7 +40,8 @@
 import FormSelectize from "../forms/FormSelectize";
 export default {
     name: "SectionSelect",
-    props: ['location', 'value', 'label', 'help', 'name', 'multiple', 'valueKey'],
+    emits: ['update:modelValue', 'input'],
+    props: ['location', 'modelValue', 'label', 'help', 'name', 'multiple', 'valueKey'],
     components: {FormSelectize},
     computed: {
         myItems() {
@@ -53,16 +54,18 @@ export default {
             myLocation: this.location,
             mySelectizeSettings: {
                 labelField: 'title',
-                valueField: 'title',
+                valueField: this.valueKey || 'title',
                 searchField: ['title'],
             },
-            myValue: this.multiple ? (this.value ? this.value.split(',') : []) : this.value,
+            myValue: this.multiple ? (this.modelValue ? this.modelValue.split(',') : []) : this.modelValue,
             myValueKey: this.valueKey || 'title',
         }
     },
     methods: {
         handleInput(e) {
-            this.$emit('input', this.multiple ? e.join(',') : e);
+            const val = this.multiple ? e.join(',') : e;
+            this.$emit('update:modelValue', val);
+            this.$emit('input', val);
         }
     }
 }

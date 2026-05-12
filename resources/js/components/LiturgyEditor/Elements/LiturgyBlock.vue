@@ -48,13 +48,15 @@
                 </button>
             </div>
         </div>
-        <draggable :list="items" class="liturgy-items-list" group="items" @change="updateBlock">
-            <div v-for="item in items" class="liturgy-item">
-                <div class="row">
-                    <div class="col-8">{{ item.title }}</div>
-                    <div class="col-4"><input type="text" class="form-control" /></div>
+        <draggable :list="items" item-key="title" class="liturgy-items-list" group="items" @change="updateBlock">
+            <template #item="{ element: item }">
+                <div class="liturgy-item">
+                    <div class="row">
+                        <div class="col-8">{{ item.title }}</div>
+                        <div class="col-4"><input type="text" class="form-control" /></div>
+                    </div>
                 </div>
-            </div>
+            </template>
         </draggable>
     </div>
 </template>

@@ -31,6 +31,8 @@
 namespace Database\Factories;
 
 use App\Models\Comment;
+use App\Models\People\User;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CommentFactory extends Factory
@@ -39,8 +41,14 @@ class CommentFactory extends Factory
 
     public function definition()
     {
-        // TODO: Implement definition() method.
-        return [];
+        $commentable = Service::factory()->create();
+        return [
+            'user_id' => User::factory(),
+            'body' => fake()->sentence(),
+            'private' => false,
+            'commentable_id' => $commentable->id,
+            'commentable_type' => Service::class,
+        ];
     }
 
 }

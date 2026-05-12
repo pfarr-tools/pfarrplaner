@@ -32,18 +32,18 @@
         <form-group :name="name" :id="myId" :label="label" :help="help" pre-label="book-bible" :required="required" :is-checked-item="isCheckedItem" :value="myValue">
             <div class="input-group mb-3">
                 <div v-if="Object.keys(myOptions).length > 0" class="input-group-prepend">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" @click="dropDownVisible = !dropDownVisible">
+                    <button ref="sourceToggle" class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="mdi mdi-book-open-variant"></span></button>
-                    <div class="dropdown-menu" :style="{display : dropDownVisible ? 'block' : 'none'}">
-                        <a v-for="(option,optionIndex) in myOptions" class="dropdown-item" @click.prevent.stop="setTextFromList(option.id); dropDownVisible = false;" :key="optionIndex">{{ option.name }}</a>
+                    <div class="dropdown-menu">
+                        <a v-for="(option,optionIndex) in myOptions" class="dropdown-item" @click.prevent="setTextFromList(option.id, $event)" :key="optionIndex" href="#">{{ option.name }}</a>
                     </div>
                 </div>
                 <input type="text" class="form-control" :aria-label="label" :name="name" :value="myReference" @input="handleInput" :key="valueChanged">
                 <div class="input-group-append">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" @click="bibleDropDownVisible = !bibleDropDownVisible">
+                    <button ref="versionToggle" class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {{ myVersion }}</button>
-                    <div class="dropdown-menu" :style="{display : bibleDropDownVisible ? 'block' : 'none'}">
-                        <a v-for="(option,optionIndex) in availableVersions" class="dropdown-item" @click.prevent.stop="setVersion(option); bibleDropDownVisible = false;" :key="optionIndex">{{ option }}</a>
+                    <div class="dropdown-menu">
+                        <a v-for="(option,optionIndex) in availableVersions" class="dropdown-item"  @click.prevent="setVersion(option, $event)" :key="optionIndex">{{ option }}</a>
                     </div>
                 </div>
             </div>
@@ -66,12 +66,13 @@ import BibleReference from "../../LiturgyEditor/Elements/BibleReference";
 import __ from 'lodash';
 import FormSelectize from "./FormSelectize";
 import FormInput from "./FormInput";
-import Selectize from 'vue2-selectize';
 import FormTextarea from "./FormTextarea.vue";
+import { uid } from '../../../libraries/uid';
 
 export default {
     name: "FormBibleReferenceInput",
-    components: {FormTextarea, FormInput, FormSelectize, BibleReference, ValueCheck, FormGroup, Selectize},
+    components: {FormTextarea, FormInput, FormSelectize, BibleReference, ValueCheck, FormGroup},
+    emits: ['input', 'update:modelValue'],
     props: {
         label: String,
         id: String,
@@ -84,9 +85,8 @@ export default {
             default: false,
         },
         name: String,
-        value: {
-            type: null,
-        },
+        modelValue: { type: null },
+        value: { type: null },
         help: String,
         placeholder: String,
         autofocus: Boolean,
@@ -124,15 +124,16 @@ export default {
         }
     },
     mounted() {
-        if (this.myId == '') this.myId = this._uid;
-        if (this.value) this.bibleText(this);
+        if (this.myId == '') this.myId = uid();
+        const initVal = this.modelValue !== undefined ? this.modelValue : this.value;
+        if (initVal) this.bibleText(this);
     },
     data() {
-        this.sources = this.sources || {};
+        const sources = this.sources || {};
 
         let myOptions = [];
-        for (const sourceKey in this.sources) {
-            myOptions.push({ id: this.sources[sourceKey], name: sourceKey+': '+this.sources[sourceKey]});
+        for (const sourceKey in sources) {
+            myOptions.push({ id: sources[sourceKey], name: sourceKey+': '+sources[sourceKey]});
         }
 
         let availableVersions = this.$page.props.bible.versions;
@@ -140,7 +141,7 @@ export default {
             availableVersions.push('Eigener Text');
         }
 
-        let myValue = this.value || '';
+        let myValue = (this.modelValue !== undefined ? this.modelValue : this.value) || '';
         if (!myValue.includes('[')) myValue += ' ['+(this.version || this.$page.props.bible.versions[0] || '')+']';
         let parts = myValue.split('[');
         let myVersion = parts[1].replace(']', '').trim();
@@ -169,27 +170,27 @@ export default {
                 searchFields: ['name', 'id'],
             },
             valueChanged: 0,
-            dropDownVisible: false,
-            bibleDropDownVisible: false,
         }
     },
     watch: {
-        value: {
-            handler: function (newVal) {
-                if (this.required) {
-                    this.error = this.$page.props.errors[this.name] = newVal ? '' : 'Dieses Feld darf nicht leer bleiben.';
-                    this.$forceUpdate();
-                }
+        modelValue(newVal) {
+            if (this.required) {
+                this.error = this.$page.props.errors[this.name] = newVal ? '' : 'Dieses Feld darf nicht leer bleiben.';
+                this.$forceUpdate();
             }
-        }
+        },
+        value(newVal) {
+            if (this.modelValue === undefined && this.required) {
+                this.error = this.$page.props.errors[this.name] = newVal ? '' : 'Dieses Feld darf nicht leer bleiben.';
+                this.$forceUpdate();
+            }
+        },
     },
     methods: {
         bibleText: __.debounce((component) => {
             if (!component.myValue.includes(' ')) return;
             if (!component.myValue.includes(',')) return;
             if (component.myVersion == 'Eigener Text') {
-                component.bibleDropDownVisible = false;
-                component.dropDownVisible = false;
                 return;
             }
             component.myBibleText = '';
@@ -209,16 +210,17 @@ export default {
             const cb = navigator.clipboard;
             cb.writeText(this.myBibleText+" ("+this.myReference+')').then(result => {});
         },
-        setTextFromList(e) {
-            this.myReference = e;
+        setTextFromList(id, event) {
+            this.myReference = id;
             this.valueChanged++;
             this.setNewValue();
+            this.$refs.sourceToggle?.click()
         },
-        setVersion(e) {
-            this.bibleDropDownVisible = false;
-            this.myVersion = e;
+        setVersion(option, event) {
+            this.myVersion = option;
             this.valueChanged++;
             this.setNewValue();
+            this.$refs.versionToggle?.click();
         },
         setNewValue(fetchBibleText = true) {
             this.myValue = this.myReference+' ['+this.myVersion+']';
@@ -230,7 +232,9 @@ export default {
             this.setNewValue();
         },
         returnInput() {
-            this.$emit('input', this.fullText ? this.myBibleText+" \n("+this.myReference+')' : this.myValue);
+            const val = this.fullText ? this.myBibleText+" \n("+this.myReference+')' : this.myValue;
+            this.$emit('input', val);
+            this.$emit('update:modelValue', val);
         }
     },
 }

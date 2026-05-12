@@ -44,7 +44,7 @@
             <div class="btn-group" role="group">
                 <button id="btnGroupDrop1" type="button" class="btn btn-default dropdown-toggle"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{ moment(date).locale('de-DE').format('MMMM') }}
+                    {{ moment(date).format('MMMM') }}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                     <a class="dropdown-item" href="#"
@@ -95,13 +95,13 @@
 
         <div class="btn-group" role="group" aria-label="Ansicht umschalten">
             <input type="radio" class="btn-check" name="calendarMode" id="calendarModeServices" autocomplete="off"
-                   v-model="calendarMode"
+                   :checked="calendarMode === 'services'"
                    value="services" @input="$emit('toggle-calendar-mode', 'services')"
                    title="Nur Gottesdienste anzeigen"/>
             <label class="btn btn-light" for="calendarModeServices"><span class="mdi mdi-church"></span></label>
 
             <input type="radio" class="btn-check" name="calendarMode" id="calendarModeEvents" autocomplete="off"
-                   v-model="calendarMode"
+                   :checked="calendarMode === 'events'"
                    value="events" @input="$emit('toggle-calendar-mode', 'events')"/>
             <label class="btn btn-light" for="calendarModeEvents"><span class="mdi mdi-calendar"></span></label>
         </div>
@@ -126,7 +126,7 @@
            :href="route('reports.setup', {report: 'ministryRequest'})"
            title="Dienstanfrage per E-Mail senden"><span class="mdi mdi-email"></span> <span class="d-none d-md-inline">Anfrage senden...</span></a>
         <calendar-select v-if="(calendarMode == 'events')" :calendars="calendars" v-model="mySelectedCalendar"
-                         @input="$emit('calendar-select', $event)"/>
+                         @update:modelValue="$emit('calendar-select', $event)"/>
 
 
     </div>

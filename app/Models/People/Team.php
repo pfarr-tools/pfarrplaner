@@ -39,7 +39,7 @@ class Team extends Model
 {
     use HasFactory, HasCityScopes;
 
-    protected $fillable = ['name', 'city_id', 'fake_user'];
+    protected $fillable = ['name', 'city_id'];
 
     public function city()
     {

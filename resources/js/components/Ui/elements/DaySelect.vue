@@ -39,9 +39,11 @@
 
 <script>
 import FormGroup from "../forms/FormGroup";
+import { uid } from '../../../libraries/uid';
 
 export default {
     name: "DaySelect",
+    emits: ['input', 'update:modelValue'],
     components: {FormGroup},
     props: {
         label: String,
@@ -51,6 +53,7 @@ export default {
             default: 'text',
         },
         name: String,
+        modelValue: { type: null },
         value: Object,
         help: String,
         placeholder: String,
@@ -59,12 +62,13 @@ export default {
         days: Array,
     },
     mounted() {
-        if (this.myId == '') this.myId = this._uid;
+        if (this.myId == '') this.myId = uid();
     },
     data() {
+        const initVal = this.modelValue !== undefined ? this.modelValue : this.value;
         return {
             myId: this.id || '',
-            myValue: this.value.id,
+            myValue: initVal ? initVal.id : null,
         }
     },
     methods: {
@@ -77,6 +81,7 @@ export default {
             if (found) {
                 this.myValue = found.id;
                 this.$emit('input', found);
+                this.$emit('update:modelValue', found);
             }
         }
     },

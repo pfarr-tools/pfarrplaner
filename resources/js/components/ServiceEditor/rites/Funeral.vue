@@ -50,7 +50,7 @@
         <div class="col-md-4">
             <div>
                 <checked-process-item :check="(funeral.appointment)" negative="Trauergespräch noch nicht vereinbart">
-                    <template slot="positive">
+                    <template #positive>
                         <a :href="route('funeral.appointment.ical', funeral)" title="In den Kalender übernehmen">
                             <span class="mdi mdi-calendar"></span> Trauergespräch am
                             {{ DateTime.fromISO(funeral.appointment).setZone('Europe/Berlin' , {keepLocalTime: true}).setLocale('de').toLocaleString(DateTime.DATETIME_SHORT) }} Uhr
@@ -59,14 +59,14 @@
                 </checked-process-item>
                 <dimissorial-check-item :parent="funeral" />
                 <checked-process-item :check="(funeral.text)" negative="Predigttext noch nicht eingetragen">
-                    <template slot="positive">
+                    <template #positive>
                         <bible-reference title="Predigttext:" :perikope="{ Bibelstelle: funeral.text }" inline="1" />
                     </template>
                 </checked-process-item>
                 <checked-process-item :check="(funeral.announcement)"
                                       negative="Abkündigungstermin noch nicht festgelegt">
-                    <template slot="positive">
-                        Abkündigung im GD am {{ moment(funeral.announcement).locale('de-DE').format('LL') }}
+                    <template #positive>
+                        Abkündigung im GD am {{ moment(funeral.announcement).locale('de').format('LL') }}
                     </template>
                 </checked-process-item>
             </div>

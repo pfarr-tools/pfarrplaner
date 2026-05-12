@@ -27,201 +27,121 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {InertiaApp} from '@inertiajs/inertia-vue'
-import EventBus from './plugins/EventBus.js';
-import Vue from 'vue'
-import {InertiaProgress} from '@inertiajs/progress'
+// CSS
+import '../css/prebuild.css'
+import '@vuepic/vue-datepicker/dist/main.css'
+import '@mdi/font/css/materialdesignicons.min.css'
 
-import AdminLayout from "./Pages/Layouts/AdminLayout";
+// Libraries
+import $ from 'jquery'
+import * as Popper from '@popperjs/core'
+import 'bootstrap/dist/js/bootstrap.bundle.min'
+import dayjs from 'dayjs'
+import 'dayjs/locale/de'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import isoWeek from 'dayjs/plugin/isoWeek'
+import utc from 'dayjs/plugin/utc'
+import axios from 'axios'
 
-import LaravelPermission from "./plugins/LaravelPermission";
-import CalendarNavTop from './components/Calendar/Nav/Top.vue';
-import CalendarNavControlSidebar from './components/Calendar/Nav/ControlSidebar';
-import CalendarDayHeader from './components/Calendar/Day/Header';
-import CalendarCell from './components/Calendar/Cell';
-import CalendarService from './components/Calendar/Service.vue';
-import CalendarServiceParticipants from './components/Calendar/Service/Participants.vue';
-import CalendarServiceWedding from './components/Calendar/Service/Wedding.vue';
-import CalendarServiceFuneral from './components/Calendar/Service/Funeral.vue';
-import CalendarServiceBaptism from './components/Calendar/Service/Baptism.vue';
-import CalendarControlCitySort from './components/Calendar/Control/CitySort';
+window.$ = window.jQuery = $
+window.Popper = Popper
 
-import datePicker from 'vue-bootstrap-datetimepicker';
-//import 'bootswatch/dist/pulse/bootstrap.min.css'
-import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.min.css';
-import "@mdi/font/css/materialdesignicons.min.css"
+dayjs.extend(customParseFormat)
+dayjs.extend(localizedFormat)
+dayjs.extend(relativeTime)
+dayjs.extend(isoWeek)
+dayjs.extend(utc)
+dayjs.locale('de')
+dayjs.isMoment = dayjs.isDayjs  // backward-compat shim for legacy moment.isMoment() calls
+window.moment = dayjs
+window.dayjs = dayjs
 
-
-window._ = require('lodash');
-
-
-/**
- * We'll load jQuery and the Bootstrap jQuery plugin which provides support
- * for JavaScript based Bootstrap features such as modals and tabs. This
- * code may be modified to fit the specific needs of your application.
- */
-
-window.$ = window.jQuery = require('jquery');
-try {
-    window.Popper = require('@popperjs/core');
-    require('bootstrap/dist/js/bootstrap.bundle.min');
-} catch (e) {}
-
-window.$ = $.noConflict();
-window.moment = require('moment');
-
-/**
- * We'll load the axios HTTP library which allows us to easily issue requests
- * to our Laravel back-end. This library automatically handles sending the
- * CSRF token as a header based on the value of the "XSRF" token cookie.
- */
-
-window.axios = require('axios');
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.axios.defaults.withCredentials = true;
-
-// Laravel defaults:
-window.axios.defaults.xsrfCookieName = 'XSRF-TOKEN';
-window.axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN';
+window.axios = axios
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+window.axios.defaults.withCredentials = true
+window.axios.defaults.xsrfCookieName = 'XSRF-TOKEN'
+window.axios.defaults.xsrfHeaderName = 'X-XSRF-TOKEN'
 window.api = window.axios.create({
     withCredentials: true,
     headers: { 'X-Requested-With': 'XMLHttpRequest' },
     xsrfCookieName: 'XSRF-TOKEN',
     xsrfHeaderName: 'X-XSRF-TOKEN',
-});
+})
 
-// Warm up cookies early (don’t block app boot if it fails)
-(async () => {
-    try {
-        await window.axios.get('/csrf-cookie');
-    } catch (e) {
-        // optional: console.warn('csrf-cookie warmup failed', e);
-    }
-})();
-
-/**
- * Bootstrap plugins etc.
- */
-
-//require('admin-lte');
-window.moment = require('moment');
-
-
-
-
-/**
- * Next we will register the CSRF Token as a common header with Axios so that
- * all outgoing HTTP requests automatically have it attached. This is just
- * a simple convenience so we don't have to attach every token manually.
- */
-let currentToken = document.head.querySelector('meta[name="csrf-token"]');
+const currentToken = document.head.querySelector('meta[name="csrf-token"]')
 if (currentToken) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = currentToken.content;
-    window.api.defaults.headers.common['X-CSRF-TOKEN'] = currentToken.content;
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = currentToken.content
+    window.api.defaults.headers.common['X-CSRF-TOKEN'] = currentToken.content
 } else {
-    console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+    console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token')
 }
 
+// Warm up cookies early (don't block app boot if it fails)
+;(async () => { try { await window.axios.get('/csrf-cookie') } catch (e) {} })()
 
+// Inertia / Vue 3
+import { createApp, h, reactive } from 'vue'
+import { createInertiaApp, Link, router } from '@inertiajs/vue3'
 
+// Plugins
+import LaravelPermission from './plugins/LaravelPermission.js'
+import EventBus from './plugins/EventBus.js'
 
+// Globally registered components
+import AdminLayout from './Pages/Layouts/AdminLayout.vue'
+import DatePickerShim from './components/Ui/forms/DatePickerShim.vue'
 
-/**
- * VUE app configuration
- */
+// Mixins
+import AssetMixin from './mixins/Asset.js'
+import PfarrplanerAPIMixin from './mixins/PfarrplanerAPI.js'
 
+const pages = import.meta.glob('./Pages/**/*.vue')
 
-Vue.use(datePicker);
-Vue.component('admin-layout', AdminLayout)
-InertiaProgress.init({
-    delay: 100,
-    color: '#29d',
-    includeCSS: true,
-    showSpinner: true,
-});
-Vue.use(InertiaProgress);
-Vue.use(LaravelPermission);
-Vue.use(EventBus);
-Vue.config.productionTip = false
+createInertiaApp({
+    resolve: name => pages[`./Pages/${name}.vue`](),
+    setup({ el, App, props, plugin }) {
+        const app = createApp({ render: () => h(App, props) })
+        const settings = reactive(props.initialPage.props.settings ?? {})
+        app.config.globalProperties.$settings = settings
 
-Vue.mixin({
-    methods: {
-        route: route,
-        moment: moment
+        app.use(plugin)
+        app.use(LaravelPermission)
+        app.use(EventBus)
+
+        app.config.globalProperties.route = window.route
+        app.config.globalProperties.moment = dayjs
+
+        app.mixin({ methods: { route: window.route, moment: dayjs } })
+        app.mixin(AssetMixin)
+        app.mixin(PfarrplanerAPIMixin)
+
+        app.component('admin-layout', AdminLayout)
+        app.component('inertia-link', Link)   // backward-compat alias
+        app.component('Link', Link)
+        app.component('date-picker', DatePickerShim)
+
+        app.directive('focus', {
+            mounted(el) { el.focus(); el.select() },
+        })
+        app.directive('scrollTo', {
+            mounted(el) { el.scrollIntoView() },
+        })
+        app.directive('bindCustomEvent', {
+            mounted(el, binding) {
+                const name = binding.arg + '.' + Object.keys(binding.modifiers).join('.')
+                el._cevHandler = binding.value
+                el._cevName = name
+                document.addEventListener(name, binding.value)
+            },
+            beforeUnmount(el) {
+                document.removeEventListener(el._cevName, el._cevHandler)
+            },
+        })
+
+        app.mount(el)
+        window.vm = app
     },
-});
-Vue.mixin(require('./mixins/Asset.js'));
-Vue.mixin(require('./mixins/PfarrplanerAPI'));
-
-
-// Register a global custom directive called `v-focus`
-Vue.directive('focus', {
-    // When the bound element is inserted into the DOM...
-    inserted: function (el) {
-        // Focus the element
-        el.focus()
-        el.select();
-    }
+    progress: { color: '#29d', delay: 100, showSpinner: true },
 })
-
-// Register a global custom directive called `v-scrollTo`
-Vue.directive('scrollTo', {
-    // When the bound element is inserted into the DOM...
-    inserted: function (el) {
-        // Focus the element
-        el.scrollTo()
-    }
-})
-
-// global event bus
-Vue.prototype.$bus = new Vue();
-
-const bindCustomEvent = {
-    getName: function(binding) {
-        return binding.arg + '.' +
-            Object.keys(binding.modifiers).map(key => key).join('.');
-    },
-    bind: function(el, binding, vnode) {
-        const eventName = bindCustomEvent.getName(binding);
-        document.addEventListener(eventName, binding.value);
-    },
-    unbind: function(el, binding) {
-        const eventName = bindCustomEvent.getName(binding);
-        document.removeEventListener(eventName, binding.value);
-    }
-};
-
-// register a global custom directive called v-bind-custom-event
-Vue.directive('bindCustomEvent', bindCustomEvent);
-
-
-
-Vue.use(InertiaApp)
-
-jQuery.extend(true, jQuery.fn.datetimepicker.defaults, {
-    icons: {
-        time: 'mdi mdi-clock',
-        date: 'mdi mdi-calendar',
-        up: 'mdi mdi-arrow-up',
-        down: 'mdi mdi-arrow-down',
-        previous: 'mdi mdi-chevron-left',
-        next: 'mdi mdi-chevron-right',
-        today: 'mdi mdi-calendar-check',
-        clear: 'mdi mdi-delete',
-        close: 'mdi mdi-close'
-    }
-});
-
-
-const app = document.getElementById('app')
-
-window.vm = new Vue({
-    render: h => h(InertiaApp, {
-        props: {
-            initialPage: JSON.parse(app.dataset.page),
-            resolveComponent: name => import(`./Pages/${name}`).then(module => module.default),
-        },
-    }),
-}).$mount(app)
-
-

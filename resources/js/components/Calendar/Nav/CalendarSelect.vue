@@ -28,43 +28,57 @@
   -->
 
 <script>
-
-import Selectize from "vue2-selectize";
+import Multiselect from '@vueform/multiselect';
+import '@vueform/multiselect/themes/default.css';
 
 export default {
-    name: "CalendarSelect",
-    props: ['value', 'calendars'],
-    components: {Selectize},
+    name: 'CalendarSelect',
+    props: ['modelValue', 'calendars'],
+    components: { Multiselect },
+    emits: ['update:modelValue'],
     data() {
-        let myGroups = [];
-        let setGroups = [];
-        this.calendars.forEach(item => {
-            if (undefined == setGroups[item.group]) {
-                setGroups[item.group] = true;
-                myGroups.push({groupName: item.group});
-            }
-        });
-
         return {
-            myValue: this.value,
-            mySettings: {
-                valueField: 'id',
-                labelField: 'name',
-                searchField: ['name', 'group'],
-                optgroupField: 'group',
-                optgroupLabelField: 'groupName',
-                optgroupValueField: 'groupName',
-                optgroups: myGroups,
-                options: this.calendars,
-            }
-        }
-    }
-}
+            myValue: this.modelValue,
+        };
+    },
+    watch: {
+        modelValue(v) { this.myValue = v; },
+    },
+    computed: {
+        groupedCalendars() {
+            const groups = {};
+            (this.calendars || []).forEach(item => {
+                const g = item.group || 'Kalender';
+                if (!groups[g]) groups[g] = [];
+                groups[g].push(item);
+            });
+            return Object.entries(groups).map(([label, options]) => ({ label, options }));
+        },
+    },
+    methods: {
+        changed(val) {
+            this.$emit('update:modelValue', val);
+        },
+    },
+};
 </script>
 
 <template>
     <div class="calendar-select">
-        <selectize class="form-control ms-1 mt-1" v-model="myValue" :options="calendars" :settings="mySettings" @input="$emit('input', $event)" multiple/>
+        <Multiselect
+            class="form-control ms-1 mt-1"
+            :model-value="myValue"
+            mode="tags"
+            :groups="true"
+            :options="groupedCalendars"
+            value-prop="id"
+            label="name"
+            :searchable="true"
+            locale="de"
+            :no-results-text="{ de: 'Keine Ergebnisse gefunden', en: 'No results found' }"
+            :no-options-text="{ de: 'Die Liste ist leer', en: 'The list is empty' }"
+            @change="changed"
+        />
     </div>
 </template>
 

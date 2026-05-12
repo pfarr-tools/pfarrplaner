@@ -62,7 +62,7 @@
                     <nav-button icon="mdi mdi-check" v-if="editing == songbookIndex"
                                 class="btn-sm"
                                 type="success" title="Bestätigen"
-                                force-no-text force-icon @click="editing = -1" />
+                                force-no-text force-icon @click="confirmEdit" />
                 </td>
             </tr>
             </tbody>
@@ -80,8 +80,9 @@ import SongbookSelect from "./SongbookSelect";
 import FormSelectize from "../../../Ui/forms/FormSelectize.vue";
 export default {
     name: "SongbookList",
+    emits: ['update:modelValue'],
     components: {FormSelectize, SongbookSelect, FormInput, NavButton},
-    props: ['value', 'allowSplit'],
+    props: ['modelValue', 'allowSplit'],
     created() {
         axios.get(route('api.songbooks.index', { api_token: this.apiToken }))
         .then(result => {
@@ -95,19 +96,29 @@ export default {
     data() {
         return {
             editing: -1,
-            mySongbooks: this.value,
+            mySongbooks: [...(this.modelValue || [])],
             allSongbooks: [],
             colors: [],
             apiToken: this.$page.props.currentUser.data.api_token,
         };
     },
+    watch: {
+        modelValue: {
+            deep: true,
+            handler(val) { this.mySongbooks = [...val]; },
+        },
+    },
     methods: {
         editEntry(songbookIndex) {
             this.editing = songbookIndex;
         },
+        confirmEdit() {
+            this.editing = -1;
+            this.$emit('update:modelValue', [...this.mySongbooks]);
+        },
         deleteEntry(songbookIndex) {
-            this.mySongbooks.splice(songbookIndex, 1)
-            this.$forceUpdate();
+            this.mySongbooks.splice(songbookIndex, 1);
+            this.$emit('update:modelValue', [...this.mySongbooks]);
         },
         addEntry() {
             this.mySongbooks.push({
@@ -125,6 +136,7 @@ export default {
                 }
             });
             this.editing = this.mySongbooks.length - 1;
+            this.$emit('update:modelValue', [...this.mySongbooks]);
         },
         splitOffEntry(songbook) {
             if (!confirm('Willst du wirklich ein separates Lied aus diesem Eintrag erstellen?')) return;

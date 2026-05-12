@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Planungstabelle">
-        <template slot="after-flash">
+        <template #after-flash>
             <div v-if="(serviceSlugs.length - serviceLoaded) > 0" class="alert alert-info">
                 Daten für {{ serviceSlugs.length - serviceLoaded }} Gottesdienste werden geladen...
             </div>

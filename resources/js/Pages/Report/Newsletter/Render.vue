@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Gottesdienstliste für den Newsletter">
-        <form-textarea label="HTML-Code zum Kopieren" v-model="html" rows="20"/>
+        <form-textarea label="HTML-Code zum Kopieren" v-model="myHtml" rows="20"/>
         <nav-button type="light" icon="mdi mdi-content-copy" force-icon
                     @click="copyToClipboard"
                     title="In die Zwischenablage kopieren">Kopieren</nav-button>
@@ -43,10 +43,13 @@ export default {
     name: "Render",
     components: {NavButton, FormTextarea},
     props: ['html'],
+    data() {
+        return { myHtml: this.html }
+    },
     methods: {
         copyToClipboard() {
             const cb = navigator.clipboard;
-            cb.writeText(this.html).then(result => {});
+            cb.writeText(this.myHtml).then(result => {});
         }
     },
 }

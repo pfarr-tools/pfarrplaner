@@ -35,8 +35,7 @@
         <form method="post" :action="route('reports.render', {report: 'predicants'})" ref="myForm">
             <form-csrf-token />
             <form-selectize name="cities[]" :label="$page.props.labels.predicant+'nen für folgende Kirchengemeinden anfordern'" v-model="myCities" :options="cities" multiple />
-            <form-date-picker name="start" label="Gottesdienste von" v-model="from" iso-date />
-            <form-date-picker name="end" label="Bis" v-model="to" iso-date />
+            <form-date-range-picker label="Gottesdienste von" v-model:from="from" v-model:to="to" iso-date />
         </form>
     </admin-layout>
 </template>
@@ -46,11 +45,11 @@ import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 export default {
     name: "Setup",
     props: ['cities'],
-    components: {FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         let from = moment().date(1).month(7);
         if (parseInt(moment().format('MMDD')) <= 1101) from = moment().date(1).month(2).add(1, 'years');

@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout :title="song.title + ' :: Noteneditor '">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <save-button @click="saveSong" />
         </template>
         <div class="row">

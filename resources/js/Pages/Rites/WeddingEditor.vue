@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout :title="'Trauung von '+spouseName(1)+' &amp; '+spouseName(2)">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <button class="btn btn-primary" @click.prevent="saveWedding" title="Speichern">
                 <span class="d-inline d-md-none mdi mdi-content-save"></span> <span class="d-none d-md-inline">Speichern</span>
             </button>&nbsp;
@@ -37,7 +37,7 @@
                 <span class="d-inline d-md-none mdi mdi-delete"></span> <span class="d-none d-md-inline">Löschen</span>
             </button>
         </template>
-        <template slot="tab-headers">
+        <template #tab-headers>
             <tab-headers>
                 <tab-header title="Brautpaar" id="home" :active-tab="activeTab" :is-checked-item="true"
                             :check-value="permissionChecks()"/>

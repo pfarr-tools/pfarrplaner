@@ -33,10 +33,30 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use OpenApi\Attributes as OA;
 
 class HealthController extends Controller
 {
 
+    #[OA\Get(
+        path: '/health',
+        operationId: 'getHealth',
+        summary: 'Application health check',
+        tags: ['Health'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Health status',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'status', type: 'string', example: 'ok'),
+                        new OA\Property(property: 'app', type: 'string'),
+                        new OA\Property(property: 'db', type: 'string', example: 'connected'),
+                    ]
+                )
+            ),
+        ]
+    )]
     public function __invoke(): JsonResponse
     {
         try {

@@ -46,7 +46,7 @@
             <div class="btn-group" role="group">
                 <button id="btnGroupDrop1" type="button" class="btn btn-default dropdown-toggle"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{ moment(date).locale('de-DE').format('MMMM') }}
+                    {{ moment(date).locale('de').format('MMMM') }}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                     <inertia-link class="dropdown-item" :href="monthLink(1)">Januar</inertia-link>

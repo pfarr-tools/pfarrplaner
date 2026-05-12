@@ -39,7 +39,7 @@
             <tr v-for="(broadcast,key,index) in broadcasts" title="Klicken, um auszuwählen" v-if="!broadcast.service"
                 @click="activateBroadcast(broadcast)">
                 <td>
-                    {{ moment (broadcast.snippet.scheduledStartTime).locale('de-DE').format('LLL') }}<br />
+                    {{ moment (broadcast.snippet.scheduledStartTime).locale('de').format('LLL') }}<br />
                     {{ broadcast.snippet.title }}
                 </td>
                 <td>

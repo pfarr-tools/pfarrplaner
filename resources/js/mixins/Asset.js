@@ -31,7 +31,7 @@
  * @source https://stackoverflow.com/questions/52576512/how-can-use-laravel-assets-in-vue-component
  * @type {{methods: {asset(*): *}}}
  */
-module.exports = {
+export default {
     methods: {
         asset(path) {
             var base_path = window.Laravel.assetUrl || '';

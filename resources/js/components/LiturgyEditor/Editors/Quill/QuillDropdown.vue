@@ -28,26 +28,24 @@
   -->
 
 <template>
-        <span class="">
-            <span class="ql-picker" :class="{'ql-expanded': t}">
-                <span class="ql-picker-label" :data-label="title" :title="title" @click.prevent.stop="toggle($event)">
-                    <span v-if="icon" :class="icon"></span>
-                    <span style="margin-right: 15px;" :key="myLabel">{{ myLabel }}</span>
-                    <svg viewBox="0 0 18 18">
-                        <polygon class="ql-stroke" points="7 11 9 13 11 11 7 11"></polygon> <polygon class="ql-stroke" points="7 7 9 5 11 7 7 7"></polygon> </svg>
-                </span>
-                <span class="ql-picker-options">
-                    <span v-for="(item,itemKey) in items" v-if="items[itemKey]"
-                          class="ql-picker-item" :data-value="items[itemKey]"
-                          @click.prevent.stop="set(items[itemKey])">{{ itemKey }}</span>
-                </span>
-            </span>
-        </span>
+    <div class="dropdown d-inline-block">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                :title="title" @click.prevent.stop="toggle">
+            <span v-if="icon" :class="icon"></span>
+            {{ myLabel }}
+        </button>
+        <div class="dropdown-menu" :class="{'show': t}">
+            <button v-for="(item, itemKey) in items" :key="itemKey" v-if="items[itemKey]"
+                    class="dropdown-item" type="button"
+                    @click.prevent.stop="set(items[itemKey])">{{ itemKey }}</button>
+        </div>
+    </div>
 </template>
 
 <script>
 export default {
     name: "QuillDropdown",
+    emits: ['input'],
     props: ['title', 'label', 'icon', 'items', 'remember'],
     data() {
         return {
@@ -56,9 +54,7 @@ export default {
         }
     },
     methods: {
-        toggle(e) {
-            e.preventDefault();
-            e.stopPropagation();
+        toggle() {
             this.t = !this.t;
         },
         set(e) {
@@ -69,9 +65,3 @@ export default {
     },
 }
 </script>
-
-<style scoped>
-    .ql-picker-label {
-        padding-left: 0 !important;
-    }
-</style>

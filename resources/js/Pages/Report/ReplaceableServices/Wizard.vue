@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout :title="'Vertretungen für '+user.name+' bearbeiten'">
-        <template slot="after-flash">
+        <template #after-flash>
             <div v-if="saving" class="alert alert-warning">Änderungen werden gespeichert ... <span
                 class="mdi mdi-spin mdi-loading"></span></div>
             <div v-if="saved" class="alert alert-success"><span class="mdi mdi-check"></span> Änderungen wurden

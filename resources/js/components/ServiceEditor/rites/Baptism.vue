@@ -44,7 +44,7 @@
         <div class="col-md-4">
             <checked-process-item :check="(baptism.first_contact_on) && (baptism.first_contact_with)"
                                   negative="Erstkontakt nicht dokumentiert">
-                <template slot="positive">
+                <template #positive>
                     Erstkontakt dokumentiert:
                     <span v-if="baptism.first_contact_on">{{ moment(baptism.first_contact_on).format('DD.MM.YYYY') }}, </span>
                     {{ baptism.first_contact_with }}
@@ -52,8 +52,8 @@
             </checked-process-item>
             <div>
                 <checked-process-item :check="(baptism.appointment)" negative="Taufgespräch noch nicht vereinbart">
-                    <template slot="positive">
-                        Taufgespräch am {{ moment(baptism.appointment).locale('de-DE').format('LLLL') }} Uhr
+                    <template #positive>
+                        Taufgespräch am {{ moment(baptism.appointment).locale('de').format('LLLL') }} Uhr
                     </template>
                 </checked-process-item>
             </div>
@@ -64,14 +64,14 @@
             </div>
             <div>
                 <checked-process-item :check="baptism.text" positive="Taufspruch" negative="Taufspruch noch nicht eingetragen">
-                    <template slot="positive">
+                    <template #positive>
                         <bible-reference title="Taufspruch:" :perikope="{ Bibelstelle: myBaptism.text }" inline="1" />
                     </template>
                 </checked-process-item>
             </div>
             <div>
                 <checked-process-item :check="baptism.docs_ready" positive="Urkunden erstellt" negative="Urkunden noch nicht erstellt">
-                    <template slot="positive">
+                    <template #positive>
                         Urkunden erstellt<small v-if="baptism.docs_where"><br />Hinterlegt: {{ baptism.docs_where }}</small>
                     </template>
                 </checked-process-item>

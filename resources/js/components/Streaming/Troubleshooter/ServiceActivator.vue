@@ -38,7 +38,7 @@
             <tbody>
             <tr v-for="(service,key,index) in services" title="Klicken, um auszuwählen"
                 @click="activateServiceStream(service)">
-                <td>{{ moment(service.date).locale('de-DE').format('LL') }}, {{ service.timeText}}<br />
+                <td>{{ moment(service.date).locale('de').format('LL') }}, {{ service.timeText}}<br />
                     {{ service.locationText }}</td>
                 <td>
                     <button class="btn btn-success" @click="activateServiceStream(service)" title="Diesen Gottesdienst aktivieren">

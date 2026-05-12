@@ -27,7 +27,6 @@ RUN set -eux; \
   docker-php-source delete; \
   apk del .build-deps
 
-
 # Set locale to German (de_DE.UTF-8)
 ENV LANG=de_DE.UTF-8 \
     LANGUAGE=de_DE:de \
@@ -44,7 +43,7 @@ COPY . .
 
 # Install Composer dependencies (no post-autoload scripts)
 RUN composer install --no-dev --optimize-autoloader --no-scripts \
- && yarn install && yarn run prod \
+ && npm install && npm run build \
  && chmod -R 775 storage bootstrap/cache || true
 
 # Expose Octane port

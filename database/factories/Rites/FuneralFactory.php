@@ -31,6 +31,7 @@
 namespace Database\Factories\Rites;
 
 use App\Models\Rites\Funeral;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class FuneralFactory extends Factory
@@ -40,6 +41,7 @@ class FuneralFactory extends Factory
     public function definition()
     {
         return [
+            'service_id' => Service::factory(),
             'buried_name' => fake()->name,
             'buried_address' => fake()->streetAddress,
             'buried_zip' => fake()->postcode,

@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout :enable-control-sidebar="true" :title="title(service)">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <span v-if="!templateMode">
                 <inertia-link v-if="service.isEditable" class="btn btn-light" :href="route('service.edit', service.slug)"
                               title="Gottesdienst bearbeiten"><span class="mdi mdi-pencil"></span> Gottesdienst
@@ -44,15 +44,15 @@
             </span>
             <slot name="toolbar"/>
         </template>
-        <template slot="control-sidebar" v-if="service.isEditable" >
-            <form-check label="Zeitangaben runden" v-model="$page.props.settings.liturgy_times_rounded"
+        <template #control-sidebar v-if="service.isEditable" >
+            <form-check label="Zeitangaben runden" v-model="$settings.liturgy_times_rounded"
                         @input="setLiturgyTimesRounded"/>
-            <form-input class="mt-2" label="Sprechgeschwindigkeit" v-model="$page.props.settings.wpm" @input="setWPM"
+            <form-input class="mt-2" label="Sprechgeschwindigkeit" v-model="$settings.wpm" @input="setWPM"
                         help="Wörter pro Minute"/>
             <button class="btn btn-sm btn-primary" @click.prevent.stop="reloadPage">Anwenden</button>
         </template>
         <info-pane v-if="!templateMode" :service="service" @info="infoWindow = true"/>
-        <template-info-pane v-if="templateMode" v-model="service"/>
+        <template-info-pane v-if="templateMode" v-model="myService"/>
         <hr />
         <liturgy-tree v-if="service.isEditable" :service="service" :sheets="templateMode ? {} : liturgySheets" :agenda-mode="templateMode"
                       :auto-focus-block="autoFocusBlock" :auto-focus-item="autoFocusItem"
@@ -63,15 +63,14 @@
 </template>
 
 <script>
-import moment from 'moment';
+import dayjs from 'dayjs';
 import FormCheck from "../components/Ui/forms/FormCheck";
 import FormInput from "../components/Ui/forms/FormInput";
 import SaveButton from "../components/Ui/buttons/SaveButton.vue";
-
-const InfoPane = () => import('../components/LiturgyEditor/Pane/InfoPane');
-const TemplateInfoPane = () => import('../components/TemplateEditor/Pane/InfoPane');
-const LiturgyTree = () => import('../components/LiturgyEditor/Pane/LiturgyTree');
-const LiturgyViewer = () => import('../components/LiturgyEditor/Pane/LiturgyViewer');
+import InfoPane from '../components/LiturgyEditor/Pane/InfoPane';
+import TemplateInfoPane from '../components/TemplateEditor/Pane/InfoPane';
+import LiturgyTree from '../components/LiturgyEditor/Pane/LiturgyTree';
+import LiturgyViewer from '../components/LiturgyEditor/Pane/LiturgyViewer';
 
 export default {
     props: {
@@ -105,21 +104,22 @@ export default {
         LiturgyViewer,
     },
     data() {
-        if (undefined == this.$page.props.settings.liturgy_times_rounded) this.$page.props.settings.liturgy_times_rounded = false;
-        if (undefined == this.$page.props.settings.liturgy_times_rounded) this.$page.props.settings.liturgy_times_rounded = 110;
+        if (undefined == this.$settings.liturgy_times_rounded) this.$settings.liturgy_times_rounded = false;
+        if (undefined == this.$settings.wpm) this.$settings.wpm = 110;
 
         return {
             blockIndex: null,
             itemIndex: null,
             element: null,
             infoWindow: false,
-            templateMode: moment(this.service.date).format('YYYYMMDD') == 19780305,
+            templateMode: dayjs(this.service.date).format('YYYYMMDD') == 19780305,
+            myService: this.service,
         }
     },
     methods: {
         title(service) {
             if (this.templateMode) return 'Vorlage bearbeiten';
-            return 'Liturgie für ' + moment(service.date).locale('de-DE').format('DD.MM.YYYY') + ', ' + service.timeText;
+            return 'Liturgie für ' + dayjs(service.date).locale('de').format('DD.MM.YYYY') + ', ' + service.timeText;
         },
         updateFocus(blockIndex, itemIndex, element) {
             this.blockIndex = blockIndex;
@@ -128,26 +128,24 @@ export default {
             this.showModal = true;
         },
         setLiturgyTimesRounded() {
-            this.$forceUpdate();
             this.$inertia.post(route('setting.set', {
                 user: this.$page.props.currentUser.data.id,
                 key: 'liturgy_times_rounded'
             }), {
-                value: this.$page.props.settings.liturgy_times_rounded,
+                value: this.$settings.liturgy_times_rounded,
             });
             window.location.reload();
         },
         setWPM() {
-            this.$forceUpdate();
             this.$inertia.post(route('setting.set', {user: this.$page.props.currentUser.data.id, key: 'wpm'}), {
-                value: this.$page.props.settings.wpm,
+                value: this.$settings.wpm,
             });
         },
         reloadPage() {
             window.location.reload();
         },
         saveTemplate() {
-            this.$inertia.patch(route('template.update', this.service.id), this.service);
+            this.$inertia.patch(route('template.update', this.myService.id), this.myService);
         },
         deleteTemplate() {},
     }

@@ -56,8 +56,7 @@
                                 <label class="form-label" for="form3Example3">E-Mailadresse</label>
 
                                 <select id="users" name="email" class="form-control">
-                                    <select id="users" name="email" class="form-control" :value="users[0].email"
-                                    <option v-for="user in users" :value="user.email">
+                                    <option v-for="user in users" :key="user.email" :value="user.email">
                                         {{ user.title ? user.title+' ' : ''}}{{ user.name }} ({{ user.email }})
                                     </option>
                                 </select>

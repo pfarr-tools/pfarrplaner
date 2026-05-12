@@ -51,11 +51,12 @@ import FormTextarea from "../../../Ui/forms/FormTextarea";
 
 export default {
     name: "SongbookSelect",
+    emits: ['update:modelValue'],
     components: {FormTextarea, FormInput, Modal, FormSelectize},
-    props: ['value', 'songbooks', 'pivot'],
+    props: ['modelValue', 'songbooks', 'pivot'],
     data() {
         return {
-            myValue: this.value.id || this.value,
+            myValue: this.modelValue ? (this.modelValue.id || this.modelValue) : null,
             settings: {
                 searchField: ['name', 'code'],
                 create: this.addSongbook,
@@ -111,7 +112,7 @@ export default {
                 filtered = filtered[0];
                 filtered.pivot = this.pivot;
                 filtered.pivot.songbook_id = this.myValue;
-                this.$emit('input', filtered);
+                this.$emit('update:modelValue', filtered);
             }
         }
     }

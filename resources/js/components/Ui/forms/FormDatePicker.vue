@@ -39,12 +39,10 @@
 import FormGroup from "./FormGroup";
 import ValueCheck from "../elements/ValueCheck";
 
-//import 'bootswatch/dist/pulse/_variables.scss'
-import 'pc-bootstrap4-datetimepicker/src/sass/bootstrap-datetimepicker-build.scss'
-
 export default {
     name: "FormDatePicker",
     components: {FormGroup},
+    emits: ['input', 'update:modelValue', 'dp-update'],
     props: {
         label: String,
         id: String,
@@ -57,9 +55,8 @@ export default {
             default: false,
         },
         name: String,
-        value: {
-            type: null,
-        },
+        modelValue: { type: null },
+        value: { type: null },
         help: String,
         placeholder: String,
         preLabel: String,
@@ -76,27 +73,41 @@ export default {
         config: Object,
         isoDate: Boolean,
     },
+    computed: {
+        currentValue() {
+            return this.modelValue !== undefined ? this.modelValue : this.value;
+        }
+    },
     data() {
+        const v = this.modelValue !== undefined ? this.modelValue : this.value;
         return {
-            myValue: (typeof this.value == 'string') ? new Date(this.value) : this.value,
-            myDatePickerConfig: this.config ||  {
+            myValue: v,
+            myDatePickerConfig: this.config || {
                 locale: 'de',
                 format: 'DD.MM.YYYY',
                 showClear: true,
             },
         }
     },
+    watch: {
+        currentValue(v) {
+            this.myValue = v;
+        }
+    },
     methods: {
         handleInputEvent(e) {
+            let out;
             if (this.isoDate) {
                 if (this.myDatePickerConfig.format == 'DD.MM.YYYY') {
-                    this.$emit('input', moment.utc(e, this.myDatePickerConfig.format).toISOString());
+                    out = moment.utc(e, this.myDatePickerConfig.format).toISOString();
                 } else {
-                    this.$emit('input', moment(e, this.myDatePickerConfig.format).toISOString());
+                    out = moment(e, this.myDatePickerConfig.format).toISOString();
                 }
             } else {
-                this.$emit('input', e);
+                out = e;
             }
+            this.$emit('input', out);
+            this.$emit('update:modelValue', out);
         },
     }
 };

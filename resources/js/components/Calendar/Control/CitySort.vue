@@ -30,16 +30,20 @@
 <template>
     <div class="mb-1">
         <h6>Reihenfolge</h6>
-        <draggable :list="list1" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities" @change="handleChange">
-            <div v-for="city in list1" :key="city.id" class="sortable-city"><span class="mdi mdi-church"></span>
-                {{ city.name }}
-            </div>
+        <draggable :list="list1" item-key="id" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities" @change="handleChange">
+            <template #item="{ element: city }">
+                <div class="sortable-city"><span class="mdi mdi-church"></span>
+                    {{ city.name }}
+                </div>
+            </template>
         </draggable>
         Nicht anzeigen:<br/>
-        <draggable :list="list2" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities">
-            <div v-for="city in list2" :key="city.id" class="sortable-city"><span class="mdi mdi-church"></span>
-                {{ city.name }}
-            </div>
+        <draggable :list="list2" item-key="id" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities">
+            <template #item="{ element: city }">
+                <div class="sortable-city"><span class="mdi mdi-church"></span>
+                    {{ city.name }}
+                </div>
+            </template>
         </draggable>
     </div>
 </template>
@@ -58,8 +62,8 @@ export default {
     data() {
         return {
             list1: Object.values(this.cities),
-            list2: Object.values(window.vm.$children[0].$page.props.currentUser.data.hiddenCities),
-            user: window.vm.$children[0].$page.props.currentUser.data,
+            list2: Object.values(this.$page.props.currentUser.data.hiddenCities),
+            user: this.$page.props.currentUser.data,
         }
     },
     beforeMount() {

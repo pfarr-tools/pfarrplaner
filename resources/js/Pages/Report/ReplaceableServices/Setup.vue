@@ -36,8 +36,7 @@
         <form method="post" :action="myAction" ref="myForm" :key="myAction">
             <form-csrf-token />
             <form-selectize name="person" label="Nach folgender Person suchen" :options="users" v-model="myUser" />
-            <form-date-picker name="start" label="Dienste von" v-model="myStart" iso-date />
-            <form-date-picker name="end" label="Bis" v-model="myEnd" iso-date />
+            <form-date-range-picker label="Dienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
         </form>
     </admin-layout>
 </template>
@@ -47,12 +46,12 @@ import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import NavButton from "../../../components/Ui/buttons/NavButton.vue";
 export default {
     name: "Setup",
     props: ['users'],
-    components: {NavButton, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {NavButton, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         return {
             myUser: this.$page.props.currentUser.data.id,

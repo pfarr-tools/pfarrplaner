@@ -33,7 +33,19 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\AbstractCRUDController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use OpenApi\Attributes as OA;
 
+#[OA\Info(
+    version: '1.0.0',
+    title: 'Pfarrplaner API',
+    description: 'REST API for collaborative church service planning.',
+)]
+#[OA\SecurityScheme(
+    securityScheme: 'apiToken',
+    type: 'apiKey',
+    in: 'query',
+    name: 'api_token',
+)]
 class AbstractApiCRUDController extends AbstractCRUDController
 {
     protected function returnResult($action, $result = null)

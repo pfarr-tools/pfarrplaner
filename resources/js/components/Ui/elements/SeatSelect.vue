@@ -42,8 +42,9 @@
 import FormSelectize from "../forms/FormSelectize";
 export default {
     name: "SeatSelect",
+    emits: ['update:modelValue'],
     components: {FormSelectize},
-    props: ['location', 'label', 'help', 'multiple', 'name', 'excludeSections', 'value'],
+    props: ['location', 'label', 'help', 'multiple', 'name', 'excludeSections', 'modelValue'],
     computed: {
         myItems() {
             var items = [];
@@ -71,7 +72,7 @@ export default {
         }
     },
     data() {
-        var myValue = this.value ? this.value.split(',') : [];
+        var myValue = this.modelValue ? this.modelValue.split(',') : [];
         myValue.forEach((value,key) => {
             if ((isNaN(value) && (value.length==2))  || ((!isNaN(value)) && (value.length == 1))) {
                 myValue[key] = '0' + value;
@@ -104,7 +105,7 @@ export default {
                 +(item.seats >1 ? ' Plätze' : ' Platz')+'</span></div>';
         },
         handleInput(e) {
-            this.$emit('input', e.join(','));
+            this.$emit('update:modelValue', e.join(','));
         }
     }
 }

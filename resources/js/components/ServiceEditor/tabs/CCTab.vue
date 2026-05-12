@@ -43,7 +43,7 @@
             </div>
             <div class="col-md-6">
                 <form-input name="cc_location" label="Ort der Kinderkirche"
-                            :help="service.location.cc_default_location ? 'Leer lassen für: '+ service.location.cc_default_location : ''"
+                            :help="service.location?.cc_default_location ? 'Leer lassen für: '+ service.location?.cc_default_location : ''"
                             v-model="myService.cc_location" :disabled="disabled"/>
             </div>
         </div>

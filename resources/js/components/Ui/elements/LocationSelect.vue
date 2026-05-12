@@ -28,31 +28,41 @@
   -->
 
 <template>
-    <form-selectize :id="myId" :name="name" :label="label" :help="help"
-                    :value="myValue"
-                    :options="myOptions" id-key="id" title-key="name" :multiple="multiple"
-                    :settings="settings" @input="locationChanged" />
+    <form-group :id="myId" :label="label" :help="help" :name="name">
+        <Multiselect
+            :id="myId + 'Input'"
+            v-model="myValue"
+            :options="groupedOptions"
+            value-prop="id"
+            label="name"
+            track-by="name"
+            :groups="true"
+            group-label="label"
+            group-options="options"
+            :searchable="true"
+            :create-option="true"
+            :placeholder="placeholder || ''"
+            @change="locationChanged"
+        />
+    </form-group>
 </template>
 
 <script>
 import FormGroup from "../forms/FormGroup";
-import Selectize from "vue2-selectize";
-import FormSelectize from "../forms/FormSelectize";
+import Multiselect from '@vueform/multiselect';
+import '@vueform/multiselect/themes/default.css';
+import { uid } from '../../../libraries/uid';
 
 export default {
     name: "LocationSelect",
-    components: {FormSelectize, FormGroup, Selectize},
+    emits: ['input', 'update:modelValue', 'set-location'],
+    components: { FormGroup, Multiselect },
     props: {
         label: String,
         id: String,
-        type: {
-            type: String,
-            default: 'text',
-        },
         name: String,
-        value: {
-            type: null,
-        },
+        modelValue: { type: null },
+        value: { type: null },
         help: String,
         placeholder: String,
         locations: Array,
@@ -62,84 +72,85 @@ export default {
         multiple: Boolean,
     },
     mounted() {
-        if (this.myId == '') this.myId = this._uid;
+        if (this.myId === '') this.myId = uid();
     },
     data() {
-        var myValue;
-        var myOptions = [];
-        var myCities = {};
-        var myCityOptions = [];
+        const initVal = this.modelValue !== undefined ? this.modelValue : this.value;
 
-        this.locations.forEach(item => {
-            item['cityName'] = item.city.name;
-            if (undefined == myCities[item.city.name]) myCities[item.city.name] = item.city.name;
-            myOptions.push(item);
+        // Build city-grouped options
+        const cityGroups = {};
+        (this.locations || []).forEach(item => {
+            const cityName = item.city.name;
+            if (!cityGroups[cityName]) cityGroups[cityName] = [];
+            cityGroups[cityName].push(item);
         });
 
-        Object.keys(myCities).forEach(cityItem => {
-            myCityOptions.push({groupName: cityItem});
-        });
-        myCityOptions.push('Freie Ortsangabe');
+        const groupedOptions = Object.keys(cityGroups).map(cityName => ({
+            label: cityName,
+            options: cityGroups[cityName],
+        }));
 
-        if (this.value) {
-            if (typeof this.value == 'object') {
-                myValue = this.value.id
+        const freiOptions = [];
+        let myValue = null;
+
+        if (initVal !== null && initVal !== undefined) {
+            if (typeof initVal === 'object') {
+                myValue = initVal.id;
             } else {
-                myValue = this.value;
-                if (isNaN(myValue)) {
-                    myOptions.push({id: myValue, name: myValue, cityName: 'Freie Ortsangabe'});
+                myValue = initVal;
+                if (isNaN(initVal) || String(initVal).trim() === '') {
+                    // freetext — add to the Freie Ortsangabe group so it displays
+                    if (initVal !== '') freiOptions.push({ id: initVal, name: initVal });
                 }
             }
         }
+
+        groupedOptions.push({ label: 'Freie Ortsangabe', options: freiOptions });
+
         return {
             myId: this.id || '',
-            myValue: myValue,
-            myOptions: myOptions,
-            settings: {
-                labelField: 'name',
-                searchField: ['name', 'cityName'],
-                optgroupField: 'cityName',
-                optgroupLabelField: 'groupName',
-                optgroupValueField: 'groupName',
-                optgroups: myCityOptions,
-                create: function(input, callback){
-                    return callback({id: input, name: input, cityName: 'Freie Ortsangabe'});
-                },
-                render: {
-                    option_create: function (data, escape) {
-                        return '<div class="create">Freie Ortsangabe: <strong>' + escape(data.input) + '</strong>&hellip;</div>';
-                    },
-                    optgroup_header: function (data, escape) {
-                        return '<div class="optgroup-header">' + escape(data.groupName) +'</div>';
-                    }
-                },
-            },
-        }
+            myValue,
+            groupedOptions,
+        };
     },
     methods: {
+        /**
+         * Called by Multiselect @change. newVal is the value-prop value ('id').
+         * @param {string|number|null} newVal
+         */
         locationChanged(newVal) {
-            if (this.returnObject) {
-                if (!isNaN(newVal)) {
-                    var found = false;
-                    this.locations.forEach((thisLocation) => {
-                        if (thisLocation.id == newVal) found = thisLocation;
-                    })
-                    if (found) newVal = found;
-                }
+            if (newVal === null || newVal === undefined) {
+                this.sendEvent(null);
+                return;
             }
-            this.sendEvent(newVal);
+
+            if (this.returnObject) {
+                if (!isNaN(newVal) && newVal !== '') {
+                    const found = (this.locations || []).find(loc => loc.id == newVal);
+                    this.sendEvent(found || newVal);
+                } else {
+                    // freetext string
+                    this.sendEvent(String(newVal));
+                }
+            } else {
+                this.sendEvent(newVal);
+            }
         },
+
+        /**
+         * @param {Object|string|null} found
+         */
         sendEvent(found) {
             if (this.useInput) {
-                this.$emit('input', found)
+                this.$emit('input', found);
+                this.$emit('update:modelValue', found);
             } else {
                 this.$emit('set-location', found);
             }
-        }
-    }
+        },
+    },
 }
 </script>
 
 <style scoped>
-
 </style>

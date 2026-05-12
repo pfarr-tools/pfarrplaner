@@ -31,7 +31,7 @@
     <div v-if="parent.needs_dimissorial">
         <checked-process-item v-if="parent.dimissorial_requested || parent.dimissorial_received" :check="parent.dimissorial_received"
                               :positive="'Dimissoriale  erhalten'">
-            <template slot="negative">
+            <template #negative>
                 Dimissoriale steht noch aus (beantragt am {{ moment(parent.dimissorial_requested).format('DD.MM.YYYY') }})
             </template>
         </checked-process-item>

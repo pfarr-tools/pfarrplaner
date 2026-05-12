@@ -122,10 +122,8 @@
 </template>
 
 <script>
-import draggable from 'vuedraggable'
 import LiturgyBlock from "../Elements/LiturgyBlock";
 import DetailsPane from "./DetailsPane";
-import Selectize from "vue2-selectize";
 import Modal from "../../Ui/modals/Modal";
 import LiturgySheetLink from "../Elements/LiturgySheetLink";
 import FormSelectize from "../../Ui/forms/FormSelectize";
@@ -149,8 +147,6 @@ export default {
         Modal,
         LiturgyBlock,
         DetailsPane,
-        draggable,
-        Selectize,
         FullTextLiturgySheetConfiguration,
         SongPPTLiturgySheetConfiguration,
         A4WordSpecificLiturgySheetConfiguration,

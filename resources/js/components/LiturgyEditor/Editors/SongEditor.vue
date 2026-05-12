@@ -83,8 +83,6 @@
 </template>
 
 <script>
-import Nl2br from 'vue-nl2br';
-import Selectize from 'vue2-selectize';
 import Modal from "../../Ui/modals/Modal";
 import TextStats from "../Elements/TextStats";
 import TimeFields from "./Elements/TimeFields";
@@ -98,8 +96,6 @@ export default {
         SongEditPane,
         TimeFields,
         TextStats,
-        Nl2br,
-        Selectize,
         Modal,
     },
     props: {

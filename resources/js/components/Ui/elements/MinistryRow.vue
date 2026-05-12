@@ -30,7 +30,7 @@
 <template>
     <div class="row">
         <div class="col-md-6">
-            <selectize class="form-group" :name="'ministries['+index+']'+'[description]'" v-model="myDescription" :settings="settings" :required="myMembers"/>
+            <Multiselect v-model="myDescription" :options="ministryOptions" :create-option="true" :searchable="true" :allow-absent="true" mode="single" locale="de" :no-results-text="{ de: 'Keine Ergebnisse gefunden', en: 'No results found' }" :no-options-text="{ de: 'Die Liste ist leer', en: 'The list is empty' }" />
         </div>
         <div class="col-md-5">
             <people-select :name="'ministries['+index+']'+'[people][]'" v-model="myMembers" :teams="teams"
@@ -45,17 +45,20 @@
 </template>
 
 <script>
-import Selectize from "vue2-selectize";
+import Multiselect from '@vueform/multiselect';
+import '@vueform/multiselect/themes/default.css';
 import PeopleSelect from "./PeopleSelect";
 export default {
     name: "MinistryRow",
-    components: {PeopleSelect, Selectize},
+    emits: ['input', 'update:modelValue', 'count', 'delete'],
+    components: {PeopleSelect, Multiselect},
     props: {
         title: String,
         members: Array,
         people: Array,
         index: Number,
         ministries: Array,
+        modelValue: { type: null },
         value: Object,
         includeTeamsFromCity: Object,
         teams: Array,
@@ -73,22 +76,13 @@ export default {
             myDescription: this.title != 'test' ? this.title : '',
             myMinistries: myMinistries,
             myMembers: this.members,
-            store: this.value,
-            settings: {
-                searchField: ['category'],
-                labelField: 'category',
-                valueField: 'category',
-                options: myMinistries,
-                create: function(input) {
-                    return {category: input};
-                },
-                render: {
-                    option_create: function (data, escape) {
-                        return '<div class="create">Neuen Dienst anlegen: <strong>' + escape(data.input) + '</strong>&hellip;</div>';
-                    }
-                },
-            }
-        }
+            store: this.modelValue !== undefined ? this.modelValue : this.value,
+        };
+    },
+    computed: {
+        ministryOptions() {
+            return this.myMinistries.map(m => m.category);
+        },
     },
     watch: {
         myDescription: {
@@ -101,6 +95,7 @@ export default {
                 this.store[newVal] = this.store[oldVal];
                 delete this.store[oldVal];
                 this.$emit('input', this.store);
+                this.$emit('update:modelValue', this.store);
             }
         }
     },
@@ -112,6 +107,7 @@ export default {
         changed(newVal) {
             this.store[this.myDescription] = newVal;
             this.$emit('input', this.store);
+            this.$emit('update:modelValue', this.store);
         },
         deleteRow() {
             this.$emit('delete', this.myDescription);

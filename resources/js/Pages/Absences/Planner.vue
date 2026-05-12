@@ -43,7 +43,7 @@
                 <thead>
                 <tr>
                     <th></th>
-                    <th v-for="(day,index,key) in myDays" :key="key" :index="index"
+                    <th v-for="day in myDays.filter(d => d)" :key="key" :index="index"
                         class="cal-cell text-center" :class="dayClass(day, false)">
                         <div>{{ moment(day.date).locale('de').format('dd') }}</div>
                         <div>{{ moment(day.date).locale('de').format('DD') }}</div>
@@ -58,46 +58,49 @@
                         {{ category }}
                     </th>
                 </tr>
-                <tr v-for="(user,userIndex) in users[category]" v-if="openSections[category] && userDays[user.id]"
-                    :key="category+userIndex+'_'+(openSections['category'] ? 'show' : 'hide')">
-                    <th class="user-name pl-2"><span v-if="user.first_name && user.last_name"><span
-                        class="text-bold">{{ user.last_name }}</span>, {{ user.first_name }}</span>
-                        <span v-else>{{ user.name }}</span>
-                        <span v-if="(category == 'Mitarbeitende' || category == 'Ausgeblendete Mitarbeitende') && (!user.show_vacations_with_services) && isPastor"
-                              class="eye-toggle" :class="user.pinned ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
-                              :title="user.pinned ? 'Klicken, wenn diese Person ausgeblendet werden soll' : 'Klicken, wenn diese Person immer angezeigt werden soll'"
-                              @click="togglePinned(user)"
-                        />
-                        <inertia-link v-if="user.canEdit" class="btn btn-sm btn-success me-1"
-                           title="Neuen Urlaubseintrag hinzufügen"
-                           :href="route('absence.create', {year: year, month: month, user: user.id})"><span
-                            class="mdi mdi-briefcase-plus"></span></inertia-link>
-                        <inertia-link v-if="(user.canEdit) && (pools.length > 0)"
-                           title="Poolmaster:in werden"
-                           class="btn btn-sm btn-primary"
-                           :href="route('admin.poolmasters.create', {user: user.id, year, month})">
-                            <span class="mdi mdi-account-tie"></span></inertia-link>
-                    </th>
-                    <td v-for="(day,index,key) in myDays" :key="key" :index="index"
-                        class="cal-cell"
-                        :class="userDays[user.id][day.day].duration ? absenceClass(user, day) : dayClass(user, day)"
-                        v-if="userDays[user.id][day.day].show"
-                        :title="userDays[user.id][day.day].duration ? absenceTitle(user, userDays[user.id][day.day].absence) : (user.canEdit   ? 'Klicken, um neuen Eintrag anzulegen' : '')"
-                        :colspan="colspan(user,day)"
-                        @click="edit(user,day,userDays[user.id][day.day].absence)">
-                        <div v-if="userDays[user.id][day.day].duration"
-                             class="absence" :class="{editable: user.canEdit}">
-                            <b>{{ userDays[user.id][day.day].absence.user.name }}</b>
-                            <span
-                                v-if="user.canEdit || userDays[user.id][day.day].absence.canEdit || userDays[user.id][day.day].absence.replacing">
-                                ({{ userDays[user.id][day.day].absence.reason }})
-                            </span>
-                            <br/>
-                            <small v-if="userDays[user.id][day.day].absence.replacementText">
-                                V: {{ userDays[user.id][day.day].absence.replacementText }}</small>
-                        </div>
-                    </td>
-                </tr>
+                <template v-for="(user,userIndex) in users[category]" :key="user.id">
+                    <tr v-if="openSections[category] && userDays[user.id]" :key="category+userIndex+'_'+(openSections['category'] ? 'show' : 'hide')">
+                        <th class="user-name pl-2"><span v-if="user.first_name && user.last_name"><span
+                            class="text-bold">{{ user.last_name }}</span>, {{ user.first_name }}</span>
+                            <span v-else>{{ user.name }}</span>
+                            <span v-if="(category == 'Mitarbeitende' || category == 'Ausgeblendete Mitarbeitende') && (!user.show_vacations_with_services) && isPastor"
+                                  class="eye-toggle" :class="user.pinned ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
+                                  :title="user.pinned ? 'Klicken, wenn diese Person ausgeblendet werden soll' : 'Klicken, wenn diese Person immer angezeigt werden soll'"
+                                  @click="togglePinned(user)"
+                            />
+                            <inertia-link v-if="user.canEdit" class="btn btn-sm btn-success me-1"
+                               title="Neuen Urlaubseintrag hinzufügen"
+                               :href="route('absence.create', {year: year, month: month, user: user.id})"><span
+                                class="mdi mdi-briefcase-plus"></span></inertia-link>
+                            <inertia-link v-if="(user.canEdit) && (pools.length > 0)"
+                               title="Poolmaster:in werden"
+                               class="btn btn-sm btn-primary"
+                               :href="route('admin.poolmasters.create', {user: user.id, year, month})">
+                                <span class="mdi mdi-account-tie"></span></inertia-link>
+                        </th>
+                        <template v-for="(day,index,key) in myDays">
+                            <td v-if="getUserDay(user, day)?.show"  :key="key" :index="index"
+                                class="cal-cell"
+                                :class="getUserDay(user, day)?.duration ? absenceClass(user, day) : dayClass(user, day)"
+                                :title="getUserDay(user, day)?.duration ? absenceTitle(user, userDays[user.id][day.day].absence) : (user.canEdit   ? 'Klicken, um neuen Eintrag anzulegen' : '')"
+                                :colspan="colspan(user,day)"
+                                @click="edit(user,day,getUserDay(user, day)?.absence)">
+
+                                <div v-if="getUserDay(user, day)?.duration"
+                                     class="absence" :class="{editable: user.canEdit}">
+                                    <b>{{ userDays[user.id][day.day].absence.user.name }}</b>
+                                    <span
+                                        v-if="user.canEdit || userDays[user.id][day.day].absence.canEdit || userDays[user.id][day.day].absence.replacing">
+                                        ({{ userDays[user.id][day.day].absence.reason }})
+                                    </span>
+                                    <br/>
+                                    <small v-if="userDays[user.id][day.day].absence.replacementText">
+                                        V: {{ userDays[user.id][day.day].absence.replacementText }}</small>
+                                </div>
+                            </td>
+                        </template>
+                    </tr>
+                </template>
                 </tbody>
             </table>
         </div>
@@ -122,6 +125,7 @@ export default {
                     this.loadingDates++;
                     axios.get(route('planner.days', {user: user.id, date: moment(this.start).format('YYYY-MM')}))
                         .then(response => {
+                            console.log('received data for user '+user.id, response.data);
                             this.userDays[user.id] = response.data;
                             this.loadingDates--;
                         });
@@ -131,7 +135,8 @@ export default {
         });
     },
     data() {
-        var myDays = [];
+        var myDays = Object.values(this.days || {})
+            .filter(day => day && typeof day === 'object');
         Object.entries(this.days).forEach(day => myDays.push(day[1]));
 
         let mask = {
@@ -144,7 +149,7 @@ export default {
         return {
             myDays,
             users: {},
-            userDays: [],
+            userDays: {},
             loadingUsers: true,
             loadingDates: 0,
             sections: [],
@@ -297,6 +302,10 @@ export default {
                 key: 'planner_pinned_users',
                 value: this.pinnedUsers,
             }));
+        },
+        getUserDay(user, day) {
+            if (!user || !day) return null;
+            return this.userDays?.[user.id]?.[day.day];
         }
     }
 }

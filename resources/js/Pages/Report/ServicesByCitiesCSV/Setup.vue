@@ -36,8 +36,7 @@
             <form-csrf-token />
             <form-selectize name="cities[]" label="Kirchengemeinden" v-model="myCities" :options="cities" multiple />
             <form-check name="full_location" label="Komplette Ortsangabe bei der Bezeichung des Gottesdienstortes" v-model="myFullLocation" />
-            <form-date-picker name="start" label="Von" v-model="myStart" iso-date />
-            <form-date-picker name="end" label="Bis" v-model="myEnd" iso-date />
+            <form-date-range-picker label="Von" v-model:from="myStart" v-model:to="myEnd" iso-date />
         </form>
     </admin-layout>
 </template>
@@ -47,12 +46,12 @@ import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
 export default {
     name: "Setup",
     props: ['cities'],
-    components: {FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {FormCheck, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         let myStart = moment().startOf('month').add(1, 'month');
         let myEnd = moment().endOf('year');

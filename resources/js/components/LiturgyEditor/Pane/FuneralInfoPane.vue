@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import RelativeDate from "../../../libraries/RelativeDate";
+import RelativeDate from "@pfarr.tools/relative-date";
 import BibleReference from "../Elements/BibleReference";
 
 export default {

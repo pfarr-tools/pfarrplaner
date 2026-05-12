@@ -35,8 +35,7 @@
         <form method="post" :action="route('reports.render', {report: 'eventList'})" ref="myForm">
             <form-csrf-token />
             <form-selectize name="city" label="Liste für folgende Kirchengemeinde erstellen" v-model="myCity" :options="cities" />
-            <form-date-picker name="start" label="Von" v-model="myStart" iso-date />
-            <form-date-picker name="end" label="Bis" v-model="myEnd" iso-date />
+            <form-date-range-picker label="Von" v-model:from="myStart" v-model:to="myEnd" iso-date />
             <form-check name="mixOutlook" label="Veranstaltungen aus dem Outlook-Kalender mit aufnehmen." />
             <form-check name="mixOP" label="Veranstaltungen aus dem Online Planer mit aufnehmen." />
         </form>
@@ -48,12 +47,12 @@ import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
 export default {
     name: "Setup",
     props: ['cities'],
-    components: {FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {FormCheck, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         let myStart = moment().startOf('month').add(1, 'month');
         let myEnd = moment().startOf('month').add(2, 'months').subtract(1, 'day');

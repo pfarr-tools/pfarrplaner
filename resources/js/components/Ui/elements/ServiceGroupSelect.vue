@@ -40,12 +40,13 @@
 import FormSelectize from "../forms/FormSelectize";
 export default {
     name: "ServiceGroupSelect",
+    emits: ['update:modelValue'],
     components: {FormSelectize},
-    props: ['serviceGroups', 'name', 'label', 'help', 'value'],
+    props: ['serviceGroups', 'name', 'label', 'help', 'modelValue'],
     data() {
         var myValue = [];
-        if (this.value) {
-            this.value.forEach(item => { myValue.push(item.id)});
+        if (this.modelValue) {
+            this.modelValue.forEach(item => { myValue.push(item.id)});
         }
 
         return {
@@ -56,7 +57,7 @@ export default {
         handleInput(e) {
             var items = [];
             this.serviceGroups.forEach(group => { if (e.includes(group.id.toString())) items.push(group); });
-            this.$emit('input', items);
+            this.$emit('update:modelValue', items);
         },
     }
 }

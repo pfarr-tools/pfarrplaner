@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout :title="'Willkommen, '+(user.first_name ? user.first_name : user.name)+'!'">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <div class="btn-group me-1">
                 <a class="btn btn-primary" :href="route('calendar')"><span class="mdi mdi-calendar"></span> <span
                     class="d-none d-md-inline">Zum Kalender</span></a>
@@ -93,7 +93,7 @@
             </div>
         </template>
 
-        <template slot="before-flash">
+        <template #before-flash>
             <div v-if="settings.homeScreenConfig.showReplacements && (replacements.length > 0)"
                  class="alert alert-info">
                 <div class="text-bold">Du vertrittst aktuell:</div>
@@ -131,7 +131,7 @@
                 </ul>
             </div>
         </template>
-        <template slot="tab-headers">
+        <template #tab-headers>
             <tab-headers>
                 <li v-for="tab in myTabs"
                     :id="tab.key+'Tab'" class="nav-item" @click.prevent.stop="loadTab(tab)">

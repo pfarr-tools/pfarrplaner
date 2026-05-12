@@ -88,12 +88,11 @@ class HandleInertiaRequests extends Middleware
             ],
             'dev' => config('app.dev') ? true:  false,
             'demo' => config('demo_mode') ? true:  false,
-            'errors' => fn() => Session::get('errors')
-                ? Session::get('errors')->getBag('default')->getMessages()
-                : (object)[],
             'package' =>  fn() => PackageService::info(),
             'route' => fn() => Route::currentRouteName(),
             'currentRoute' => fn() => Route::currentRouteName(),
+            'helpPage'     => fn() => $this->resolveHelpPage(Route::currentRouteName()),
+            'manualBaseUrl' => config('app.manual_url'),
             'version' => $version,
             'activeTab' => request()->get('tab', 'home'),
             'labels' => fn() => config('labels'),
@@ -115,5 +114,24 @@ class HandleInertiaRequests extends Middleware
         }
 
         return $data;
+    }
+
+    /**
+     * @param string|null $routeName Current Laravel route name
+     * @return string Chapter slug for the manual help page
+     */
+    private function resolveHelpPage(?string $routeName): string
+    {
+        if (!$routeName) {
+            return 'index';
+        }
+        foreach (config('manual', []) as $chapter => $prefixes) {
+            foreach ($prefixes as $prefix) {
+                if (str_starts_with($routeName, $prefix) || $routeName === $prefix) {
+                    return $chapter;
+                }
+            }
+        }
+        return 'index';
     }
 }

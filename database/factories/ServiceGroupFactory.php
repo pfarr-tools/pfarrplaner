@@ -39,8 +39,9 @@ class ServiceGroupFactory extends Factory
 
     public function definition()
     {
-        // TODO: Implement definition() method.
-        return [];
+        return [
+            'name' => fake()->words(3, true),
+        ];
     }
 
 }

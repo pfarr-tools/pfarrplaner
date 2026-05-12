@@ -32,8 +32,9 @@ import FormSelectize from "../Ui/forms/FormSelectize.vue";
 
 export default {
     name: "PropriumSelect",
+    emits: ['update:modelValue'],
     components: {FormSelectize},
-    props: ['value', 'label'],
+    props: ['modelValue', 'label'],
     data() {
         const codes = {
             "1ADV": "1. Advent",
@@ -161,29 +162,12 @@ export default {
         }
 
         return {
-            myValue: this.value,
+            myValue: this.modelValue,
             myItems,
             settings: {
                 valueField: 'id',
                 labelField: 'title',
                 searchField: ['title'],
-                allowEmptyOption: true,
-                showEmptyOptionInDropDown: true,
-                render: {
-                    item(item, escape) {
-                        var t = '<div class="proprium-item">'
-                        +' '+item.title+' <span class="text-muted">(Lesejahr '+item.year+')</span>'
-                        t += '</div>';
-                        return t;
-                    },
-                    option(item, escape) {
-                        var t = '<div class="proprium-option">'
-                        +' '+item.title+' <span class="text-muted">(Lesejahr '+item.year+')</span>'
-                        t += '</div>';
-                        return t;
-                    }
-
-                }
             },
 
         }
@@ -193,12 +177,23 @@ export default {
 
 <template>
     <form-selectize :label="label" :options="myItems" :settings="settings"
-                    v-model="myValue" @input="myValue=$event; $emit('input', $event)" />
+                    v-model="myValue" @update:modelValue="$emit('update:modelValue', $event)">
+        <template #option="{ option }">
+            <div class="proprium-option">
+                {{ option.title }} <span class="text-muted"> (Lesejahr {{ option.year }})</span>
+            </div>
+        </template>
+        <template #singlelabel="{ value }">
+            <div class="multiselect-single-label proprium-item">
+                {{ value.title }} <span class="text-muted"> (Lesejahr {{ value.year }})</span>
+            </div>
+        </template>
+    </form-selectize>
 </template>
 
 <style scoped>
 
->>> .proprium-option .text-muted, >>> .proprium-item .text-muted {
+:deep(.proprium-option .text-muted), :deep(.proprium-item .text-muted) {
     font-size: .8em;
 }
 

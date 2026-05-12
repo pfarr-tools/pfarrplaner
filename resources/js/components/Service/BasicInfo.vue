@@ -29,8 +29,8 @@
 
 <template>
     <div class="basic-info">
-        <div>{{ moment(service.date).locale('de-DE').format('LL') }}</div>
-        <div>{{ moment(service.date).locale('de-DE').format('HH:mm') }} Uhr</div>
+        <div>{{ moment(service.date).locale('de').format('LL') }}</div>
+        <div>{{ moment(service.date).locale('de').format('HH:mm') }} Uhr</div>
         <div>{{ service.locationText }}</div>
     </div>
 </template>

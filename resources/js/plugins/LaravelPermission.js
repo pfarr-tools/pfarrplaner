@@ -28,14 +28,8 @@
  */
 
 export default {
-
-    install (Vue, options) {
-        Vue.prototype.hasPermission = function(p) {
-            return window.Laravel.permissions.includes(p);
-        };
-        Vue.prototype.$can = function(p) {
-            return window.Laravel.permissions.includes(p);
-        };
+    install(app) {
+        app.config.globalProperties.hasPermission = p => window.Laravel.permissions.includes(p)
+        app.config.globalProperties.$can = p => window.Laravel.permissions.includes(p)
     },
-
 }

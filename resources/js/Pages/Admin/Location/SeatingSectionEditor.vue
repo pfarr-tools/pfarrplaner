@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout :title="'Bereich'+(mySection.title ? ' '+mySection.title : '')+' bearbeiten'">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <save-button @click="saveRow"/>
             <nav-button @click="deleteRow" title="Bereich löschen"
                         class="ms-1" type="danger" icon="mdi mdi-delete">Löschen</nav-button>
@@ -37,15 +37,13 @@
         <form-input name="title" label="Bezeichnung" v-model="mySection.title" />
         <form-input name="priority" label="Prioriät" type="number" v-model="mySection.priority" />
         <form-group name="color" label="Farbe">
-            <verte v-model="mySection.color" :rgbSliders="true" model="rgb" style="justify-content: left"/>
+            <input type="color" v-model="mySection.color" class="form-control form-control-color" />
         </form-group>
     </admin-layout>
 </template>
 
 <script>
 import FormInput from "../../../components/Ui/forms/FormInput";
-import verte from 'verte';
-import 'verte/dist/verte.css';
 import { fromString } from 'css-color-converter';
 import FormGroup from "../../../components/Ui/forms/FormGroup";
 import NavButton from "../../../components/Ui/buttons/NavButton";
@@ -56,11 +54,11 @@ import SectionSelect from "../../../components/Ui/elements/SectionSelect";
 
 export default {
     name: "SeatingRowEditor",
-    components: {SectionSelect, SeatingSplit, SeatingLabel, SaveButton, NavButton, FormGroup, FormInput, verte},
+    components: {SectionSelect, SeatingSplit, SeatingLabel, SaveButton, NavButton, FormGroup, FormInput},
     props: ['seatingSection'],
     data() {
         let mySection = this.seatingSection;
-        mySection.color = mySection.color ? fromString(mySection.color).toRgbString() : '';
+        mySection.color = mySection.color ? fromString(mySection.color).toHexString() : '#000000';
         if (mySection.modelClass) mySection.seating_model = mySection.modelClass;
 
         return {

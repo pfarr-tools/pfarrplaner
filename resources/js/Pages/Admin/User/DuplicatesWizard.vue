@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Doppelte Personeneinträge finden">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <save-button @click="fixDuplicates" />
         </template>
 

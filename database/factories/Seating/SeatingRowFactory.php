@@ -31,6 +31,7 @@
 namespace Database\Factories\Seating;
 
 use App\Models\Seating\SeatingRow;
+use App\Models\Seating\SeatingSection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SeatingRowFactory extends Factory
@@ -39,8 +40,11 @@ class SeatingRowFactory extends Factory
 
     public function definition()
     {
-        // TODO: Implement definition() method.
-        return [];
+        return [
+            'seating_section_id' => SeatingSection::factory(),
+            'title' => fake()->words(2, true),
+            'seats' => fake()->numberBetween(10, 50),
+        ];
     }
 
 }

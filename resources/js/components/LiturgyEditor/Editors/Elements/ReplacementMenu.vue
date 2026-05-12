@@ -41,6 +41,7 @@
 <script>
 export default {
     name: "ReplacementMenu",
+    emits: ['input'],
     props: ['menu'],
     data() {
         let myItems = {};

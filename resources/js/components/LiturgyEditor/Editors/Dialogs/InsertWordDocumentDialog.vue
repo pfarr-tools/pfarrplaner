@@ -39,11 +39,12 @@
 
 <script>
 import Modal from "../../../Ui/modals/Modal.vue";
-import {romanize} from "../../../../libraries/Romanize";
+import {romanize} from "@pfarr.tools/romanize";
 import FormFileUpload from "../../../Ui/forms/FormFileUpload.vue";
 
 export default {
     name: "InsertWordDocumentDialog",
+    emits: ['input'],
     components: {FormFileUpload, Modal},
     data() {
         return {

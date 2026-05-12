@@ -31,7 +31,10 @@
 namespace Tests\Unit;
 
 use App\Http\Requests\ServiceRequest;
+use App\Models\Places\City;
 use App\Models\Service;
+use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
@@ -40,6 +43,8 @@ use Tests\TestCase;
  */
 class ServiceUnitTest extends TestCase
 {
+    use RefreshDatabase;
+
 
     /**
      * Test that a service can be created
@@ -110,6 +115,48 @@ class ServiceUnitTest extends TestCase
         $service = Service::create($data);
         $service->update(['slug' => $service->createSlug()]);
         $this->assertEquals('Cool title', Service::first()->title);
+    }
+
+    /**
+     * @return void
+     */
+    public function testServiceHasCityRelationship(): void
+    {
+        $city = City::factory()->create();
+        $service = Service::factory()->create(['city_id' => $city->id]);
+        $this->assertNotNull($service->city);
+        $this->assertEquals($city->id, $service->city->id);
+    }
+
+    /**
+     * @return void
+     */
+    public function testServiceHasParticipantsRelationship(): void
+    {
+        $service = Service::factory()->create();
+        $this->assertNotNull($service->participants());
+    }
+
+    /**
+     * @return void
+     */
+    public function testServiceHasCommentsRelationship(): void
+    {
+        $service = Service::factory()->create();
+        $this->assertNotNull($service->comments());
+    }
+
+    /**
+     * @return void
+     */
+    public function testScopeAtDateFiltersCorrectly(): void
+    {
+        $date = Carbon::today();
+        $service = Service::factory()->create(['date' => $date]);
+        Service::factory()->create(['date' => $date->copy()->addDay()]);
+        $results = Service::atDate($date)->get();
+        $this->assertCount(1, $results);
+        $this->assertEquals($service->id, $results->first()->id);
     }
 
 

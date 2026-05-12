@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Trauung hinzufügen">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <button class="btn btn-primary" @click.prevent="createWedding"
                     :disabled="!(wedding.city && wedding.location && wedding.date && wedding.spouse1_name && wedding.spouse2_name)">Erstellen
             </button>

@@ -44,7 +44,7 @@ class BookingController extends Controller
 
     public function destroy(Booking $booking) {
         $booking->delete();
-        return response();
+        return response()->noContent();
     }
 
 }

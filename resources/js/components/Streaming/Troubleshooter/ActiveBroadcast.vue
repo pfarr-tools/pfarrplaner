@@ -33,7 +33,7 @@
             <b>Aktiver Stream:</b>
             <div v-if="broadcast.service">
                 {{ broadcast.service.titleText }}<br/>
-                {{ moment(broadcast.service.date).locale('de-DE').format('LL') }}, {{
+                {{ moment(broadcast.service.date).locale('de').format('LL') }}, {{
                     broadcast.service.timeText
                 }}<br/>
                 {{ broadcast.service.locationText }}
@@ -41,7 +41,7 @@
             <div v-else>
                 <i>Kein Gottesdienststream</i><br/>
                 {{ broadcast.snippet.title }}<br/>
-                {{ moment(broadcast.snippet.scheduledStartTime).locale('de-DE').format('LLL') }}
+                {{ moment(broadcast.snippet.scheduledStartTime).locale('de').format('LLL') }}
             </div>
         </div>
         <button class="btn btn-danger" @click="$emit('wrong')">Ist das der falsche Stream?</button>
@@ -49,20 +49,20 @@
         <checked-process-item :check="true" positive="Korrekter Streamingschlüssel"/>
         <checked-process-item :check="Math.abs(moment().diff(moment(broadcast.snippet.scheduledStartTime), 'minutes')) <=15"
                               positive="Startzeit weicht um 15 Minuten oder weniger ab">
-            <template slot="negative">
+            <template #negative>
                 <span v-if="moment().diff(moment(broadcast.snippet.scheduledStartTime), 'minutes') < 0">
-                    Dieser Stream soll laut den hinterlegten Angaben erst {{ moment(broadcast.snippet.scheduledStartTime).locale('de-DE').fromNow() }} starten.
+                    Dieser Stream soll laut den hinterlegten Angaben erst {{ moment(broadcast.snippet.scheduledStartTime).locale('de').fromNow() }} starten.
                 </span>
                 <span v-else>
-                    Dieser Stream sollte laut den hinterlegten Angaben bereits {{ moment(broadcast.snippet.scheduledStartTime).locale('de-DE').fromNow() }} starten.
+                    Dieser Stream sollte laut den hinterlegten Angaben bereits {{ moment(broadcast.snippet.scheduledStartTime).locale('de').fromNow() }} starten.
                 </span>
                 <button class="btn btn-danger" @click="$emit('wrong')">Ist das vielleicht der falsche Stream?</button>
             </template>
         </checked-process-item>
         <div v-if="broadcast.service">
-            <checked-process-item :check="moment(broadcast.snippet.scheduledStartTime).locale('de-DE').format('LL') == moment(broadcast.service.date).locale('de_DE').format('LL')"
+            <checked-process-item :check="moment(broadcast.snippet.scheduledStartTime).locale('de').format('LL') == moment(broadcast.service.date).locale('de').format('LL')"
                                   positive="Datum in Pfarrplaner und YouTube stimmt überein">
-                <template slot="negative">
+                <template #negative>
                     Pfarrplaner und YouTube scheinen unterschiedliche Daten für diesen Gottesdienst zu haben.
                     <button class="btn btn-danger" @click="$emit('wrong')">Ist das vielleicht der falsche Stream?</button>
                     <br />
@@ -74,7 +74,7 @@
                 v-if="broadcast.service.city.youtube_auto_startstop"
                 :check="broadcast.contentDetails.enableAutoStart"
                 positive="Auto-Start aktiviert">
-                <template slot="negative">
+                <template #negative>
                     Auto-Start ist nicht aktiviert!<br/>
                     <button class="btn btn-success" @click="reactivateService">Problem beheben</button>
                 </template>
@@ -83,7 +83,7 @@
                 v-if="broadcast.service.city.youtube_auto_startstop"
                 :check="broadcast.contentDetails.enableAutoStop"
                 positive="Auto-Stop aktiviert">
-                <template slot="negative">
+                <template #negative>
                     Auto-Stop ist nicht aktiviert!<br/>
                     <button class="btn btn-success" @click="reactivateService">Problem beheben</button>
                 </template>
@@ -91,7 +91,7 @@
         </div>
         <div v-else>
             <checked-process-item :check="false" color-negative="#f5d403" icon-negative="mdi mdi-alert">
-                <template slot="negative">
+                <template #negative>
                     Dieser Stream wurde nicht über den Pfarrplaner angelegt und ist auch keinem Gottesdienst zugeordnet.
                     Eventuell handelt es sich um eine besondere Veranstaltung. Wenn nicht, solltest du überprüfen, ob
                     es sich um den korrekten Stream für deine Veranstaltung handelt.

@@ -186,10 +186,10 @@ export default {
         }
     },
     created() {
-        this.$bus.$on('selfentry-ministries-changed', this.onSelfEntryMinistriesChanged);
+        this.$bus.on('selfentry-ministries-changed', this.onSelfEntryMinistriesChanged);
     },
-    beforeDestroy() {
-        this.$bus.$off('selfentry-ministries-changed', this.onSelfEntryMinistriesChanged);
+    beforeUnmount() {
+        this.$bus.off('selfentry-ministries-changed', this.onSelfEntryMinistriesChanged);
     },
     data() {
         let availableMinistries = [
@@ -303,7 +303,7 @@ export default {
             this.$forceUpdate();
         },
         changeSelfEntryMinistries() {
-            this.$bus.$emit('selfentry-ministries-changed', this.selfEntryMinistries);
+            this.$bus.emit('selfentry-ministries-changed', this.selfEntryMinistries);
             this.setUserSetting('selfentry_ministries', this.selfEntryMinistries);
         },
         onSelfEntryMinistriesChanged(e) {

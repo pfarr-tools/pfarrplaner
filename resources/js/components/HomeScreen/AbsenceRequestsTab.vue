@@ -83,7 +83,7 @@
                         </div>
                         <div class="col-md-3">
                             <checked-process-item check="1">
-                                <template slot="positive">
+                                <template #positive>
                                     Überprüft <span v-if="absence.checked_at">
                                         am {{ moment(absence.checked_at).locale('de').format('DD.MM.YYYY') }}
                                         um {{ moment(absence.checked_at).locale('de').format('HH:MM') }} Uhr

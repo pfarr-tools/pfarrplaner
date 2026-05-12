@@ -41,8 +41,8 @@
                 <span class="mdi mdi-chevron-left"></span>
             </a>
         </li>
-        <template v-for="(item, index) in dsPages">
-            <li :key="index" :class="['page-item', item === dsPage && 'active', item === morePages && 'disabled']">
+        <template v-for="(item, index) in dsPages" :key="index">
+            <li :class="['page-item', item === dsPage && 'active', item === morePages && 'disabled']">
                 <a v-if="item !== morePages" class="page-link" href="#" @click.prevent="setActive(item)">
                     {{ item }}
                 </a>
@@ -67,31 +67,26 @@
 </template>
 
 <script>
+import { ref, inject, computed } from 'vue'
 
 export default {
-    inject: ['datasetI18n', 'setActive', 'rdsPages', 'rdsPagecount', 'rdsPage'],
-    data: function () {
+    setup() {
+        const morePages = ref('...')
+        const dsPage = inject('dsPage')
+        const dsPagecount = inject('dsPagecount')
+
+        const disabledPrevious = computed(() => dsPage.value === 1)
+        const disabledNext = computed(() => dsPage.value === dsPagecount.value || dsPagecount.value === 0)
+
         return {
-            morePages: '...'
-        }
-    },
-    computed: {
-        /* Setup reactive injects */
-        dsPages() {
-            return this.rdsPages()
-        },
-        dsPagecount() {
-            return this.rdsPagecount()
-        },
-        dsPage() {
-            return this.rdsPage()
-        },
-        /* Normal computeds */
-        disabledPrevious() {
-            return this.dsPage === 1
-        },
-        disabledNext() {
-            return this.dsPage === this.dsPagecount || this.dsPagecount === 0
+            datasetI18n: inject('datasetI18n'),
+            setActive: inject('setActive'),
+            dsPages: inject('dsPages'),
+            dsPagecount,
+            dsPage,
+            morePages,
+            disabledPrevious,
+            disabledNext
         }
     }
 }

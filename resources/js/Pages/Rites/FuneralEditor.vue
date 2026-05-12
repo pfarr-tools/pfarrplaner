@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout :title="'Beerdigung von '+funeral.buried_name" :key="formKey">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <button class="btn btn-primary" @click.prevent="saveFuneral" title="Speichern">
                 <span class="d-inline d-md-none mdi mdi-content-save"></span> <span
                 class="d-none d-md-inline">Speichern</span>
@@ -49,7 +49,7 @@
                 </div>
             </div>
         </template>
-        <template slot="after-flash">
+        <template #after-flash>
             <div v-if="inLocalStorage" class="alert alert-info">
                 <div>Eine Kopie dieses Datensatzes wurde im Browser zwischengespeichert. Willst du diese Kopie wiederherstellen?</div>
                 <div class="pull-right">
@@ -58,7 +58,7 @@
                 </div>
             </div>
         </template>
-        <template slot="tab-headers">
+        <template #tab-headers>
             <tab-headers>
                 <tab-header title="Allgemeines" id="home" :active-tab="activeTab" :is-checked-item="true"
                             :check-value="(!myFuneral.needs_dimissorial) || (myFuneral.dimissorial_received)"/>
@@ -337,30 +337,22 @@
                     <div v-if="showStoryEditor" class="col-lg-4">
                         <div class="form-group">
                             <label>Lebenslauf</label>
-                            <quill-editor class="focused" ref="textEditor"
-                                          v-model="funeral.life"
-                                          :options="editorOption" @focus="textEditorActive = true"
-                                          @blur="textEditorActive = false">
-                                <div id="toolbar" slot="toolbar">
-                                    <button class="ql-bold"></button>
-                                    <button class="ql-italic"></button>
-                                    <button class="ql-underline me-2"></button>
-                                    <button class="ql-header" value="1"></button>
-                                    <button class="ql-blockquote me-2"></button>
-                                    <span class="ql-formats me-2">
-                                                <button class="ql-list" value="ordered"></button>
-                                                <button class="ql-list" value="bullet"></button>
-                                                <button class="ql-indent" value="-1"></button>
-                                                <button class="ql-indent" value="+1"></button>
-                                            </span>
-                                    <button class="ql-clean me-2"></button>
-                                    <quill-dropdown :key="funeral.id"
-                                                    label="Texte"
-                                                    :title="'Textbausteine zur Beerdigung von '+funeral.buried_name"
-                                                    icon="mdi mdi-grave-stone" :items="funeralDataset"
-                                                    class="float-right" @input="quillInsertText($event)"/>
-                                </div>
-                            </quill-editor>
+                            <div class="tiptap-toolbar btn-toolbar mb-1" v-if="editorText">
+                                <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleBold().run()" :class="{active: editorText.isActive('bold')}" title="Fett"><b>B</b></button>
+                                <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleItalic().run()" :class="{active: editorText.isActive('italic')}" title="Kursiv"><i>I</i></button>
+                                <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleUnderline().run()" :class="{active: editorText.isActive('underline')}" title="Unterstrichen"><u>U</u></button>
+                                <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleHeading({level:1}).run()" :class="{active: editorText.isActive('heading',{level:1})}" title="Überschrift">H1</button>
+                                <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleBlockquote().run()" :class="{active: editorText.isActive('blockquote')}" title="Zitat">&ldquo;</button>
+                                <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleOrderedList().run()" :class="{active: editorText.isActive('orderedList')}" title="Nummerierte Liste">1.</button>
+                                <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleBulletList().run()" :class="{active: editorText.isActive('bulletList')}" title="Aufzählung">&bull;</button>
+                                <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().unsetAllMarks().clearNodes().run()" title="Formatierung entfernen">&#10005;</button>
+                                <quill-dropdown :key="funeral.id"
+                                                label="Texte"
+                                                :title="'Textbausteine zur Beerdigung von '+funeral.buried_name"
+                                                icon="mdi mdi-grave-stone" :items="funeralDataset"
+                                                @input="insertText($event)"/>
+                            </div>
+                            <editor-content :editor="editorText" class="form-control tiptap-editor" />
                             <text-stats :text="funeral.life"/>
                         </div>
 
@@ -387,11 +379,10 @@
 </template>
 
 <script>
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
-import '../../components/SermonEditor/quill.css';
-import {quillEditor} from 'vue-quill-editor';
+import { Editor, EditorContent } from '@tiptap/vue-3';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import Placeholder from '@tiptap/extension-placeholder';
 import TabHeaders from "../../components/Ui/tabs/tabHeaders";
 import TabHeader from "../../components/Ui/tabs/tabHeader";
 import Tabs from "../../components/Ui/tabs/tabs";
@@ -407,7 +398,7 @@ import AttachmentList from "../../components/Ui/elements/AttachmentList";
 import ValueCheck from "../../components/Ui/elements/ValueCheck";
 import Participants from "../../components/Calendar/Service/Participants";
 import FakeAttachment from "../../components/Ui/elements/FakeAttachment";
-import RelativeDate from "../../libraries/RelativeDate";
+import RelativeDate from "@pfarr.tools/relative-date";
 import FormCheck from "../../components/Ui/forms/FormCheck";
 import DimissorialFormPart from "../../components/RiteEditors/DimissorialFormPart";
 import TextStats from "../../components/LiturgyEditor/Elements/TextStats";
@@ -433,7 +424,7 @@ export default {
         FormCheck,
         FakeAttachment,
         Participants,
-        quillEditor,
+        EditorContent,
         ValueCheck,
         AttachmentList,
         Attachment,
@@ -519,23 +510,20 @@ export default {
             myFuneral: myFuneral,
             copied: 0,
             appointmentPlaceCopied: 0,
-            textEditorActive: false,
-            editorOption: {
-                placeholder: 'Hier kannst du einen Textentwurf für den Lebenslauf schreiben...',
-                modules: {
-                    toolbar: {
-                        container: '#toolbar',
-                        handlers: {
-                            custom: this.quillInsertText,
-                        }
-                    },
-                    clipboard: {
-                        matchVisual: false,
-                    },
-                }
-            },
+            editorText: new Editor({
+                content: myFuneral.life || '',
+                extensions: [
+                    StarterKit,
+                    Underline,
+                    Placeholder.configure({ placeholder: 'Hier kannst du einen Textentwurf für den Lebenslauf schreiben...' }),
+                ],
+                onUpdate: ({ editor }) => { myFuneral.life = editor.getHTML(); },
+            }),
             inLocalStorage,
         }
+    },
+    beforeUnmount() {
+        this.editorText.destroy();
     },
     methods: {
         copyAddress() {
@@ -574,10 +562,8 @@ export default {
             window.location.href = route('funeral.form', {funeral: this.myFuneral.id});
         },
         relativeDate: RelativeDate,
-        quillInsertText(e) {
-            var quill = this.$refs.textEditor.quill;
+        insertText(e) {
             var text = null;
-
             switch (e) {
                 case 'dob':
                     text = moment(this.myFuneral.dob, 'DD.MM.YYYY').locale('de').format('LL');
@@ -591,8 +577,7 @@ export default {
                 default:
                     if (this.myFuneral[e]) text = this.myFuneral[e];
             }
-
-            if (text) quill.insertText(quill.getSelection(true).index, text+' ');
+            if (text) this.editorText.chain().focus().insertContent(text + ' ').run();
         },
         setFuneralText(t) {
             this.myFuneral.text = t;
@@ -667,8 +652,8 @@ export default {
     color: gray !important;
 }
 
->>> .ql-container.ql-snow,
->>> .ql-container.ql-snow .ql-editor {
+:deep(.ql-container.ql-snow),
+:deep(.ql-container.ql-snow .ql-editor) {
     font-family: inherit !important;
     font-weight: normal;
 }

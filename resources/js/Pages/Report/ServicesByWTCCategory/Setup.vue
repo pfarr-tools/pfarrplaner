@@ -37,8 +37,7 @@
             <form-selectize name="cities[]" label="Bericht für folgende Kirchengemeinden erstellen" v-model="myCities"
                             :options="cities" multiple />
             <people-select name="people[]" label="Bericht für folgende Personen erstellen" :people="people" v-model="myPeople" />
-            <form-date-picker name="start" label="Gottesdienste von" v-model="myStart" iso-date />
-            <form-date-picker name="end" label="Bis" v-model="myEnd" iso-date />
+            <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
         </form>
     </admin-layout>
 </template>

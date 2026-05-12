@@ -38,8 +38,7 @@
                             :options="cities" v-model="myCities" multiple />
             <form-selectize name="ministries[]" label="Dienste" :options="myMinistries"
                             v-model="mySelectedMinistries" multiple />
-            <form-date-picker name="start" label="Gottesdienste von" v-model="myStart" iso-date />
-            <form-date-picker name="end" label="Bis" v-model="myEnd" iso-date />
+            <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
             <form-radio-group name="file_format" label="Dateiformat" v-model="myFileFormat" :items="{
                             'pdf': 'PDF-Datei',
                             'xlsx': 'Microsoft Excel-Tabelle',
@@ -54,13 +53,13 @@ import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import FormRadioGroup from "../../../components/Ui/forms/FormRadioGroup.vue";
 import FormCheck from "../../../components/Ui/forms/FormCheck.vue";
 export default {
     name: "Setup",
     props: ['cities', 'ministries'],
-    components: {FormCheck, FormRadioGroup, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {FormCheck, FormRadioGroup, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         let myMinistries = [];
         for (let key in this.ministries) {

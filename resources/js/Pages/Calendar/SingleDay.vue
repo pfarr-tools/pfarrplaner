@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout :title="today.format('ddd, DD. MMMM YYYY')+' ('+city.name+')'" no-content-header>
-        <template slot="navbar-left">
+        <template #navbar-left>
             <a class="btn btn-light" :href="route('calendar', {date: today.format('YYYY-MM')})">
                 <span class="mdi mdi-calendar"></span> {{ today.format('MMMM YYYY') }}
             </a>

@@ -45,11 +45,12 @@ import Attachment from "./Attachment";
 
 export default {
     name: "AttachmentList",
+    emits: ['update:modelValue'],
     components: {Attachment},
-    props: ['value', 'deleteRouteName', 'emptyMessage', 'parentType', 'parentObject', 'preventEmptyListMessage'],
+    props: ['modelValue', 'deleteRouteName', 'emptyMessage', 'parentType', 'parentObject', 'preventEmptyListMessage'],
     data() {
         return {
-            attachments: this.value || [],
+            attachments: this.modelValue || [],
         }
     },
     methods: {
@@ -58,7 +59,7 @@ export default {
             config[this.parentType] = this.parentObject.id;
             axios.delete(route(this.deleteRouteName, config))
                 .then(response => {
-                    this.$emit('input', response.data);
+                    this.$emit('update:modelValue', response.data);
                 });
         }
     }

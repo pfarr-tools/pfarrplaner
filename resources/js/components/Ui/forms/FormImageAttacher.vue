@@ -72,12 +72,13 @@ import 'vue-advanced-cropper/dist/style.css';
 export default {
     name: "FormImageAttacher",
     components: {FormGroup, Modal, FormFileUpload, Cropper},
-    props: ['attachRoute', 'detachRoute', 'value', 'label', 'help', 'isCheckedItem', 'handlePaste', 'cropperCanvas', 'cropperStencil', 'width', 'height',
+    emits: ['update:modelValue'],
+    props: ['attachRoute', 'detachRoute', 'modelValue', 'label', 'help', 'isCheckedItem', 'handlePaste', 'cropperCanvas', 'cropperStencil', 'width', 'height',
         'noSource', 'allowUncropped', 'noCamera', 'noUrl', 'noPixabay', 'noDescription'],
     created() {
         if (this.handlePaste) window.addEventListener('paste', this.attachFromClipboard);
     },
-    destroyed() {
+    unmounted() {
         if (this.handlePaste) window.removeEventListener('paste', this.attachFromClipboard);
     },
     data() {
@@ -94,7 +95,7 @@ export default {
         }
         return {
             uploading: false,
-            myValue: this.value,
+            myValue: this.modelValue,
             modalCropperOpen: false,
             cropableImage: '',
             cropableAttachment: null,
@@ -116,7 +117,7 @@ export default {
                 }
             }).then(response => {
                 this.myValue = response.data.image;
-                this.$emit('input', response.data.image.toString());
+                this.$emit('update:modelValue', response.data.image.toString());
                 this.uploading = false;
                 this.allowCropping(response.data);
             });
@@ -129,6 +130,7 @@ export default {
                 .then(response => {
                     this.myValue = response.data.image;
                     this.$emit('input', response.data.image.toString());
+                    this.$emit('update:modelValue', response.data.image.toString());
                     this.uploading = false;
                     this.allowCropping(response.data);
                 });
@@ -144,7 +146,7 @@ export default {
         detachImage() {
             axios.delete(this.detachRoute).then(response => {
                 this.myValue = '';
-                this.$emit('input', '');
+                this.$emit('update:modelValue', '');
             })
         },
         attachFromClipboard(event) {
@@ -186,6 +188,7 @@ export default {
                         .then(response => {
                             this.myValue = response.data.image;
                             this.$emit('input', response.data.image.toString());
+                            this.$emit('update:modelValue', response.data.image.toString());
                             this.uploading = false;
                             this.info = null;
                         });

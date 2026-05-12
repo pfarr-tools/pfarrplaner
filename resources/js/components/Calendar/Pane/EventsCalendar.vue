@@ -28,15 +28,8 @@
   -->
 
 <template>
-    <div class="px-3 height: 90vh;">
-        <ToastUICalendar ref="calendar"
-                         style="height: 90vh;"
-                         :usage-statistics="false"
-                         view="month"
-                         :month="monthOptions"
-                         :template="myTemplate"
-                         @clickEvent="onClickEvent"
-        />
+    <div class="px-3" style="height: 90vh;">
+        <div ref="calendarContainer" style="height: 90vh;"></div>
         <modal :title="selectedEvent.title" v-if="showModal"
                @cancel="closeModal"
                :allow-close="false">
@@ -49,7 +42,7 @@
             <div>
                 <span class="mdi mdi-map-marker"></span> {{ selectedEvent.location }}
             </div>
-            <template v-slot:additional-buttons>
+            <template #additional-buttons>
                 <button v-if="!selectedEvent.raw.isRecurring"
                         type="button" class="btn btn-secondary"
                         title="Veranstaltung bearbeiten"
@@ -85,7 +78,7 @@
 
 
 <script>
-import ToastUICalendar from '@toast-ui/vue-calendar';
+import Calendar from '@toast-ui/calendar';
 import '@toast-ui/calendar/dist/toastui-calendar.css';
 import Modal from "../../Ui/modals/Modal.vue";
 import NavButton from "../../Ui/buttons/NavButton.vue";
@@ -93,38 +86,38 @@ import NavButton from "../../Ui/buttons/NavButton.vue";
 export default {
     name: "EventsCalendar",
     props: ['date', 'calendar'],
-    computed: {
-        calendarInstance() {
-            return this.$refs.calendar.getInstance();
-        },
-    },
     components: {
         NavButton,
         Modal,
-        ToastUICalendar,
     },
     data() {
         return {
-            monthOptions: {
-                dayNames: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
-                startDayOfWeek: 1,
-            },
-            myTemplate: {
-                time(event) {
-                    return '<span class="' + (event.isReadOnly ? 'readonly' : '') + '">' +
-                        moment(event.start.toDate()).format('HH:mm') + ' ' + event.title + '</span>';
-                }
-            },
+            calendarInstance: null,
             showModal: false,
             selectedEvent: null,
         }
     },
     mounted() {
-        this.calendarInstance.setDate(new Date(this.date));
-        this.calendarInstance.setOptions({
+        this.calendarInstance = new Calendar(this.$refs.calendarContainer, {
+            defaultView: 'month',
             usageStatistics: false,
             useDetailPopup: false,
-        })
+            month: {
+                dayNames: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
+                startDayOfWeek: 1,
+            },
+            template: {
+                time(event) {
+                    return '<span class="' + (event.isReadOnly ? 'readonly' : '') + '">' +
+                        moment(event.start.toDate()).format('HH:mm') + ' ' + event.title + '</span>';
+                }
+            },
+        });
+
+        this.calendarInstance.setDate(new Date(this.date));
+
+        this.calendarInstance.on('clickEvent', this.onClickEvent);
+
         this.$api().get(route('api.events.range', {
             calendar: this.calendar,
             start: this.calendarInstance.getDateRangeStart().toString(),
@@ -133,20 +126,21 @@ export default {
             for (let index in response.data.data) {
                 if (response.data.data[index].isReadOnly) response.data.data[index].customStyle = {cursor: 'not-allowed'}
             }
-
             this.calendarInstance.createEvents(response.data.data);
-        })
+        });
+    },
+    beforeUnmount() {
+        if (this.calendarInstance) {
+            this.calendarInstance.off('clickEvent', this.onClickEvent);
+            this.calendarInstance.destroy();
+        }
     },
     methods: {
-        loadEvents() {
-
-        },
         closeModal() {
             this.selectedEvent = null;
             this.showModal = false;
         },
         onClickEvent(e) {
-            console.log(e.event);
             this.selectedEvent = e.event;
             this.showModal = true;
         },
@@ -179,9 +173,9 @@ export default {
 
             dt += ' - ';
             if (!sameDate) {
-                dt = myEnd.format('LL')+', ';
+                dt = myEnd.format('LL') + ', ';
             }
-            if (!event.isAllday) dt += myEnd.format('HH:mm')+' Uhr';
+            if (!event.isAllday) dt += myEnd.format('HH:mm') + ' Uhr';
             return dt.trim();
         }
     }
@@ -189,11 +183,11 @@ export default {
 </script>
 
 <style scoped>
->>> .toastui-calendar-weekday-event-dot {
+:deep(.toastui-calendar-weekday-event-dot) {
     display: none;
 }
 
->>> .readonly {
+:deep(.readonly) {
     cursor: not-allowed !important;
 }
 </style>

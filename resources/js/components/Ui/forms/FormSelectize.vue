@@ -29,123 +29,136 @@
 
 <template>
     <form-group :id="myId" :label="label" :help="help" :name="name" :pre-label="preLabel" :is-checked-item="isCheckedItem">
-        <selectize class="form-control" :class="{'is-invalid': $page.props.errors[name]}" v-model="myValue" :id="myId+'Input'"
-               :placeholder="placeholder" :aria-placeholder="placeholder" :disabled="disabled" :name="name"
-               @input="changed" :settings="mySettings" :multiple="multiple" v-if="options.length == 0">
-            <option v-for="item in items" :value="item[idKey]">{{ titleKey ? item[titleKey] : item }}</option>
-        </selectize>
-        <selectize class="form-control" :class="{'is-invalid': $page.props.errors[name]}" v-model="myValue" :id="myId+'Input'"
-               :placeholder="placeholder" :aria-placeholder="placeholder" :disabled="disabled" :name="name"
-               @input="changed" :settings="mySettings" :multiple="multiple" v-else>
-        </selectize>
+        <Multiselect
+            :id="myId + 'Input'"
+            :class="{'is-invalid': $page.props.errors && $page.props.errors[name]}"
+            v-model="myValue"
+            :options="resolvedOptions"
+            :value-prop="resolvedIdKey"
+            :label="resolvedTitleKey"
+            :track-by="resolvedTitleKey"
+            :mode="multiple ? 'tags' : 'single'"
+            :placeholder="placeholder"
+            :disabled="disabled"
+            :searchable="true"
+            :name="name"
+            locale="de"
+            :no-results-text="{ de: 'Keine Ergebnisse gefunden', en: 'No results found' }"
+            :no-options-text="{ de: 'Die Liste ist leer', en: 'The list is empty' }"
+            :groups="isGrouped"
+            :group-label="isGrouped ? '_groupLabel' : undefined"
+            :group-options="isGrouped ? '_groupOptions' : undefined"
+            @change="changed"
+        >
+            <template v-if="$slots.option" #option="slotProps">
+                <slot name="option" v-bind="slotProps" />
+            </template>
+            <template v-if="$slots.singlelabel" #singlelabel="slotProps">
+                <slot name="singlelabel" v-bind="slotProps" />
+            </template>
+            <template v-if="$slots.tag" #tag="slotProps">
+                <slot name="tag" v-bind="slotProps" />
+            </template>
+        </Multiselect>
     </form-group>
 </template>
 
 <script>
-import FormGroup from "./FormGroup";
-import Selectize from 'vue2-selectize';
+import FormGroup from './FormGroup';
+import Multiselect from '@vueform/multiselect';
+import '@vueform/multiselect/themes/default.css';
+import { uid } from '../../../libraries/uid';
+
 export default {
-    name: "FormSelectize",
-    components: {FormGroup, Selectize},
+    name: 'FormSelectize',
+    components: { FormGroup, Multiselect },
     props: {
         label: String,
-        id: {
-            type: null,
-        },
-        type: {
-            type: String,
-            default: 'text',
-        },
+        id: { type: null },
+        type: { type: String, default: 'text' },
         name: String,
-        value: {
-            type: null,
-        },
+        value: { type: null },
+        modelValue: { type: null },
         items: Array,
-        idKey: {
-            type: String,
-            default: 'id',
-        },
-        titleKey: {
-            type: String,
-            default: 'name',
-        },
+        idKey: { type: String, default: 'id' },
+        titleKey: { type: String, default: 'name' },
         help: String,
         placeholder: String,
         error: String,
         settings: {},
         preLabel: String,
-        multiple: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        options: {
-            type: Array,
-            default() { return []; }
-        },
-        itemRenderer: {
-            type: null,
-        },
-        optionRenderer: {
-            type: null,
-        },
-        isCheckedItem: {
-            type: Boolean,
-        }
+        multiple: { type: Boolean, default: false },
+        disabled: { type: Boolean, default: false },
+        options: { type: Array, default: () => [] },
+        itemRenderer: { type: null },
+        optionRenderer: { type: null },
+        isCheckedItem: { type: Boolean },
     },
+    emits: ['input', 'update:modelValue'],
     mounted() {
-        if (this.myId == '') this.myId = this._uid;
+        if (this.myId === '') this.myId = uid();
     },
     data() {
-        var mySettings = (this.settings == undefined ? {} : this.settings);
-        if (this.options.length > 0) {
-            mySettings['options'] = this.options;
-            if (this.idKey) mySettings['valueField'] = this.idKey;
-            if (this.titleKey) mySettings['labelField'] = this.titleKey;
-            if (undefined != this.itemRenderer) {
-                if (undefined == mySettings['render']) mySettings['render'] = {};
-                mySettings['render']['item'] = this.itemRenderer;
-            }
-            if (undefined != this.optionRenderer) {
-                if (undefined == mySettings['render']) mySettings['render'] = {};
-                mySettings['render']['option'] = this.optionRenderer;
-            }
-        }
-        if (!mySettings['searchField']) mySettings['searchField'] = [mySettings['labelField'] || 'name'];
-
         return {
             myId: this.id || '',
-            myValue: this.value,
-            mySettings: mySettings,
-        }
+            myValue: this.modelValue !== undefined ? this.modelValue : this.value,
+        };
+    },
+    computed: {
+        resolvedIdKey() {
+            if (this.settings && this.settings.valueField) return this.settings.valueField;
+            return this.idKey || 'id';
+        },
+        resolvedTitleKey() {
+            if (this.settings && this.settings.labelField) return this.settings.labelField;
+            return this.titleKey || 'name';
+        },
+        isGrouped() {
+            return !!(this.settings && this.settings.optgroupField);
+        },
+        resolvedOptions() {
+            let opts = [];
+            if (this.options && this.options.length > 0) opts = this.options;
+            else if (this.items && this.items.length > 0) opts = this.items;
+            else if (this.settings && this.settings.options) opts = this.settings.options;
+
+            if (!this.isGrouped) {
+                if (this.settings && this.settings.allowEmptyOption) {
+                    const emptyLabel = this.settings.emptyOptionLabel || '';
+                    opts = [{ [this.resolvedIdKey]: null, [this.resolvedTitleKey]: emptyLabel }, ...opts];
+                }
+                return opts;
+            }
+
+            const { optgroupField, optgroupLabelField, optgroupValueField, optgroups = [] } = this.settings;
+            const groups = optgroups.map(group => ({
+                _groupLabel: group[optgroupLabelField],
+                _groupOptions: opts.filter(item => item[optgroupField] === group[optgroupValueField]),
+            }));
+
+            if (this.settings.allowEmptyOption) {
+                const emptyLabel = this.settings.emptyOptionLabel || '';
+                groups.unshift({
+                    _groupLabel: '',
+                    _groupOptions: [{ [this.resolvedIdKey]: null, [this.resolvedTitleKey]: emptyLabel }],
+                });
+            }
+
+            return groups;
+        },
+    },
+    watch: {
+        value(v) { this.myValue = v; },
+        modelValue(v) { this.myValue = v; },
     },
     methods: {
         changed(newVal) {
-            var allFound = [];
-            if (this.items) {
-                this.items.forEach(item => {
-                    if (newVal.includes(item[this.idKey].toString())) allFound.push(item);
-                });
-                if (this.multiple) {
-                    this.$emit('input', allFound);
-                } else {
-                    this.$emit('input', allFound[0]);
-                }
-            } else {
-                if (this.multiple) {
-                    this.$emit('input', newVal);
-                } else {
-                    this.$emit('input', typeof newVal == 'Array' ? newVal[0] : newVal);
-                }
-            }
-        }
-    }
-}
+            this.$emit('input', newVal);
+            this.$emit('update:modelValue', newVal);
+        },
+    },
+};
 </script>
 
 <style scoped>
-
 </style>

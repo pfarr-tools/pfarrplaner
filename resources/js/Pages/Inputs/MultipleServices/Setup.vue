@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Mehrere Gottesdienste anlegen">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <nav-button type="primary" title="Gottesdienste anlegen" icon="mdi mdi-table"
                         @click="createServices">Anlegen
             </nav-button>
@@ -49,20 +49,15 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-3">
-                <form-date-picker v-model="setup.from" name="from" label="Von" iso-date @input="serviceList" />
-            </div>
-            <div class="col-md-3">
-                <form-date-picker v-model="setup.to" name="to" label="Bis" iso-date @input="serviceList" />
+            <div class="col-md-6">
+                <date-range-input label="Zeitraum" :model-value="dateRange" @update:modelValue="onDateRangeChange" />
             </div>
             <div class="col-md-3">
                 <form-selectize label="Wochentag" :options="weekDays" v-model="setup.weekDay"  @input="serviceList"/>
             </div>
             <div class="col-md-3 ">
-                <form-group label="Rhythmus">
-                    <div class="form-inline">Jede <input class="mx-1 form-control" type="number" v-model="setup.rhythm"
-                                                         size="4"  @input="serviceList"/>. Woche
-                    </div>
+                <form-group label="Rhythmus (jede ... Woche)">
+                    <input class="mx-1 form-control" type="number" v-model="setup.rhythm" size="4"  @input="serviceList"/>
                 </form-group>
             </div>
         </div>
@@ -131,12 +126,12 @@ import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
 import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
 import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
 import FormBibleReferenceInput from "../../../components/Ui/forms/FormBibleReferenceInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import DateRangeInput from "../../../components/Ui/elements/DateRangeInput";
 
 export default {
     name: "Setup",
     components: {
-        FormDatePicker,
+        DateRangeInput,
         FormBibleReferenceInput,
         FormInput, LocationSelect, NavButton, FormSelectize, FormGroup,
         Dataset,
@@ -161,6 +156,12 @@ export default {
         },
         endDate() {
             return typeof this.setup.to == 'Object' ? this.setup.to : moment(this.setup.to);
+        },
+        dateRange() {
+            return [
+                this.setup.from ? moment(this.setup.from).toDate() : null,
+                this.setup.to ? moment(this.setup.to).toDate() : null,
+            ];
         },
     },
     data() {
@@ -214,6 +215,13 @@ export default {
         }
     },
     methods: {
+        onDateRangeChange(val) {
+            if (val && val.length === 2 && val[1]) {
+                this.setup.from = moment(val[0]).toISOString();
+                this.setup.to = moment(val[1]).toISOString();
+                this.serviceList();
+            }
+        },
         serviceList() {
             if (!this.setup.from) return;
             if (!this.setup.to) return;
@@ -226,7 +234,7 @@ export default {
             this.services = [];
             // find first instance
             let current = moment(this.startDate);
-            while (current.format('d') != this.setup.weekDay) current.add(1, 'day');
+            while (current.format('d') != this.setup.weekDay) current = current.add(1, 'day');
 
             while (current <= this.endDate) {
                 this.services.push(

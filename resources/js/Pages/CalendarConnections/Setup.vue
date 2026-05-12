@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Kalenderverbindung einrichten">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <button class="btn btn-primary" @click="saveConnection">
                 <span class="d-inline d-md-none mdi mdi-content-save"></span><span
                 class="d-none d-md-inline">Speichern</span>

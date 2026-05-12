@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import moment from "moment";
+import dayjs from 'dayjs';
 import EventBus from "../../../plugins/EventBus";
 import {CalendarToggleDayColumnEvent} from "../../../events/CalendarToggleDayColumnEvent";
 import BibleReference from "../../LiturgyEditor/Elements/BibleReference";
@@ -82,13 +82,13 @@ export default {
     props: ['day', 'index', 'scrollToDate'],
     computed: {
         today() {
-            return moment(this.day.date).locale('de-DE');
+            return dayjs(this.day.date).locale('de');
         },
     },
     data: function () {
         var scrollToMe = false;
         if (this.scrollToDate) {
-            if (moment(this.scrollToDate).format('YYYYMMDD') == moment(this.date).format('YYYYMMDD')) {
+            if (dayjs(this.scrollToDate).format('YYYYMMDD') == dayjs(this.date).format('YYYYMMDD')) {
                 scrollToMe = true;
             }
         }
@@ -141,7 +141,7 @@ th.day-header-cell .card-body {
 }
 
 
-/deep/ .bible-reference, /deep/ .bible-reference div {
+:deep(.bible-reference), :deep(.bible-reference div) {
     display: inline;
 }
 

@@ -68,7 +68,7 @@ export default {
     props: ['date', 'days', 'cities', 'services', 'years', 'canCreate', 'loading'],
     methods: {
         title: function (d) {
-            return moment(d).locale('de-DE').format('MMMM YYYY');
+            return moment(d).locale('de').format('MMMM YYYY');
         },
         getServices(city, day) {
             if (this.services[city.id] == undefined) return [];

@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Teams">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <a class="btn btn-success" :href="route('teams.create')">
                 <span class="d-inline d-md-none mdi mdi-account-multiple-plus"></span>
                 <span class="d-none d-md-inline">Team hinzufügen</span>

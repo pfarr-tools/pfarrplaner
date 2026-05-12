@@ -37,12 +37,10 @@
             <form-selectize name="includeCities[]" label="Folgende Kirchengemeinden mit einbeziehen"
                             v-model="myCities" :options="cities" multiple/>
             <h4>Kausalien</h4>
-            <form-date-picker name="start" label="Auflisten von" v-model="myStart" iso-date />
-            <form-date-picker name="end" label="Bis" v-model="myEnd" iso-date />
+            <form-date-range-picker label="Auflisten von" v-model:from="myStart" v-model:to="myEnd" iso-date />
             <hr />
             <h4>Nächste Tauftermine</h4>
-            <form-date-picker name="baptismDatesStart" label="Auflisten von" v-model="myBaptismDatesStart" iso-date />
-            <form-date-picker name="baptismDatesEnd" label="Bis" v-model="myBaptismDatesEnd" iso-date />
+            <form-date-range-picker label="Auflisten von" v-model:from="myBaptismDatesStart" v-model:to="myBaptismDatesEnd" name-from="baptismDatesStart" name-to="baptismDatesEnd" iso-date />
         </form>
     </admin-layout>
 </template>
@@ -52,11 +50,11 @@ import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 export default {
     name: "Setup",
     props: ['cities'],
-    components: {FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         return {
             myCities: this.cities.length ? [this.cities[0].id] : null,

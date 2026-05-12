@@ -43,7 +43,7 @@
                     <tbody>
                     <tr v-for="(token,key,index) in tokens" :key="key">
                         <td>{{ token.name }}</td>
-                        <td>{{ moment(token.created_at).locale('de-DE').format('LLLL')}}</td>
+                        <td>{{ moment(token.created_at).locale('de').format('LLLL')}}</td>
                         <td class="text-end">
                             <button class="btn btn-sm btn-danger" title="Token löschen" @click.prevent="deleteToken(token)">
                                 <span class="mdi mdi-delete"></span>

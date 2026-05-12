@@ -7,6 +7,8 @@ package-lock.json
 .husky
 *.sql
 .env
+.env.*
+!.env.example
 public/js/*.js
 public/js/*.map
 bootstrap/cache
@@ -17,3 +19,18 @@ public/user-images
 storage.old
 .phpstorm.meta.php
 _ide_helper*
+build
+build/*
+.npm-licenses
+.composer-licenses
+deploy_key
+dev.cfg
+.phpunit.result.cache
+*.old
+*.bak
+.claude
+.phpunit*
+test-results
+playwright-report
+*.map
+*.log

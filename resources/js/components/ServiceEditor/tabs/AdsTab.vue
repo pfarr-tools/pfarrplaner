@@ -48,8 +48,8 @@
                             <th valign="top" width="30%">
                                 <checked-process-item :check="myService.ad_configs[adChannelKey].offset > 0"
                                                       :key="myService.ad_configs[adChannelKey].offset">
-                                    <template slot="negative">{{ adChannel.name }}</template>
-                                    <template slot="positive">{{ adChannel.name }}</template>
+                                    <template #negative>{{ adChannel.name }}</template>
+                                    <template #positive>{{ adChannel.name }}</template>
                                 </checked-process-item>
                             </th>
                             <td valign="top" width="10%">
@@ -71,7 +71,7 @@
                         class="col-6 col-md-3 col-lg-2 mb-3"
                         v-for="attachment in myService.attachments"
                         :key="attachment.id || attachment.file"
-                        v-if="!attachment.cut"
+                        v-if="!attachment?.cut"
                     >
                         <div class="thumb-wrapper">
                             <div class="thumb border border-light-subtle p-1">
@@ -128,7 +128,7 @@
 <script>
 
 
-import slug from '../../../libraries/Slug';
+import slug from '@pfarr.tools/slug';
 import FormFileUploader from "../../Ui/forms/FormFileUploader.vue";
 import NavButton from "../../Ui/buttons/NavButton.vue";
 import FormTextarea from "../../Ui/forms/FormTextarea.vue";

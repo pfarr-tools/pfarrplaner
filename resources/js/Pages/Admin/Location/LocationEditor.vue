@@ -29,14 +29,14 @@
 
 <template>
     <admin-layout :title="myLocation ? myLocation.name+' bearbeiten' : 'Kirche / Gottesdienstort bearbeiten'">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <save-button @click="saveLocation"/>
             <nav-button title="Bereich hinzufügen" v-if="myLocation.id"
                         class="ms-1" type="success" icon="mdi mdi-plus">Bereich hinzufügen</nav-button>
             <nav-button @click="addRow" title="Reihe hinzufügen" v-if="myLocation.id"
                         class="ms-1" type="success" icon="mdi mdi-plus">Reihe hinzufügen</nav-button>
         </template>
-        <template slot="tab-headers">
+        <template #tab-headers>
             <tab-headers>
                 <tab-header id="home" :active-tab="activeTab" title="Allgemeines"/>
                 <tab-header id="seating" :active-tab="activeTab" title="Sitzplätze"/>

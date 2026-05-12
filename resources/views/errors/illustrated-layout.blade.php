@@ -6,10 +6,6 @@
 
         <title>@yield('title')</title>
 
-        <!-- Fonts -->
-        <link rel="stylesheet" href="/css/google-fonts.css">
-
-
         <!-- Styles -->
         <style>
             html {

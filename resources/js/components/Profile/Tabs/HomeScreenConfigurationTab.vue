@@ -53,33 +53,35 @@
         <div class="row" v-if="settings.homeScreen == 'homescreen:configurable'">
             <div class="col-md-9 pl-3">
                 <h3>Angezeigte Reiter</h3>
-                <draggable :list="myTabs" group="tabs">
-                    <div v-for="(tab,tabIndex) in myTabs" class="tab-block p-1 m-1 rounded-sm">
-                        <div class="row">
-                            <div class="col-1">
-                                <span class="mdi mdi-drag-horizontal"></span>
-                            </div>
-                            <div class="col-9">
-                                <div class="text-bold">{{ tab.config.title || availableTabs[tab.type].title }}</div>
-                                <div>{{ availableTabs[tab.type].description }}</div>
-                                <div v-if="tab.configVisible">
-                                    <hr />
-                                    <div :is="configurationComponent(tab)" :tab="tab" :cities="cities"
-                                         :locations="locations" :ministries="ministries" />
+                <draggable :list="myTabs" item-key="type" group="tabs">
+                    <template #item="{ element: tab, index: tabIndex }">
+                        <div class="tab-block p-1 m-1 rounded-sm">
+                            <div class="row">
+                                <div class="col-1">
+                                    <span class="mdi mdi-drag-horizontal"></span>
+                                </div>
+                                <div class="col-9">
+                                    <div class="text-bold">{{ tab.config.title || availableTabs[tab.type].title }}</div>
+                                    <div>{{ availableTabs[tab.type].description }}</div>
+                                    <div v-if="tab.configVisible">
+                                        <hr />
+                                        <div :is="configurationComponent(tab)" :tab="tab" :cities="cities"
+                                             :locations="locations" :ministries="ministries" />
+                                    </div>
+                                </div>
+                                <div class="col-2 text-end">
+                                    <button v-if="Object.entries(tab.config).length" class="btn btn-light btn-sm"
+                                            @click="toggleConfig(tabIndex)"
+                                        :title="tab.configVisible ? 'Konfiguration einklappen' : 'Dieser Reiter kann weiter konfiguriert werden'">
+                                        <span :class="tab.configVisible ? 'mdi mdi-chevron-down' : 'mdi mdi-chevron-right'"></span>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" @click="deleteTab(tabIndex)" title="Reiter entfernen">
+                                        <span class="mdi mdi-delete"></span>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="col-2 text-end">
-                                <button v-if="Object.entries(tab.config).length" class="btn btn-light btn-sm"
-                                        @click="toggleConfig(tabIndex)"
-                                    :title="tab.configVisible ? 'Konfiguration einklappen' : 'Dieser Reiter kann weiter konfiguriert werden'">
-                                    <span :class="tab.configVisible ? 'mdi mdi-chevron-down' : 'mdi mdi-chevron-right'"></span>
-                                </button>
-                                <button class="btn btn-sm btn-danger" @click="deleteTab(tabIndex)" title="Reiter entfernen">
-                                    <span class="mdi mdi-delete"></span>
-                                </button>
-                            </div>
                         </div>
-                    </div>
+                    </template>
                 </draggable>
             </div>
             <div class="col-md-3">

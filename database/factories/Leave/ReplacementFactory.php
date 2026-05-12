@@ -30,7 +30,9 @@
 
 namespace Database\Factories\Leave;
 
+use App\Models\Leave\Absence;
 use App\Models\Leave\Replacement;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ReplacementFactory extends Factory
@@ -39,8 +41,12 @@ class ReplacementFactory extends Factory
 
     public function definition()
     {
-        // TODO: Implement definition() method.
-        return [];
+        $from = Carbon::now()->addDays(fake()->numberBetween(1, 10));
+        return [
+            'absence_id' => Absence::factory(),
+            'from' => $from,
+            'to' => (clone $from)->addDays(fake()->numberBetween(1, 5)),
+        ];
     }
 
 

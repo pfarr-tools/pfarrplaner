@@ -37,7 +37,6 @@
 
 <script>
 import EventBus from "../../../plugins/EventBus";
-import draggable from 'vuedraggable'
 import {CalendarNewOrientationEvent} from "../../../events/CalendarNewOrientationEvent";
 import {CalendarNewNameFormatEvent} from "../../../events/CalendarNewNameFormatEvent";
 import FormCheck from "../../Ui/forms/FormCheck";
@@ -48,15 +47,14 @@ export default {
     components: {
         CalendarControlCitySort,
         FormCheck,
-        draggable,
     },
     props: ['date', 'cities'],
     inject: ['settings'],
     data() {
         return {
-            orientation: window.vm.$children[0].$page.props.settings.calendar_view,
-            nameFormat: window.vm.$children[0].$page.props.settings.calendar_name_format,
-            user: window.vm.$children[0].$page.props.currentUser.data,
+            orientation: this.$page.props.settings.calendar_view,
+            nameFormat: this.$page.props.settings.calendar_name_format,
+            user: this.$page.props.currentUser.data,
             mySettings: this.settings,
         }
     },

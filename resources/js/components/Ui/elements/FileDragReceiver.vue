@@ -39,6 +39,7 @@
 <script>
 export default {
     name: "FileDragReceiver",
+    emits: ['input'],
     props: ['list', 'uploadRoute', 'title', 'multi'],
     data() {
         return {

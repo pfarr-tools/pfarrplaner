@@ -37,8 +37,7 @@
 
 <script>
 
-import ItemTextStats from "./ItemTextStats";
-import Vue from "vue";
+import { speechTimeInSeconds } from "./ItemTextStats";
 
 export default {
     name: "ItemStartingTime",
@@ -65,14 +64,9 @@ export default {
         itemTime(item) {
             if (item.data.time) return this.parseTimeString(item.data.time);
 
-            let itemTextStatsClass = Vue.extend(ItemTextStats);
-            let itemTextStatsInstance = new itemTextStatsClass({
-                propsData: {
-                    item: item,
-                    service: this.service,
-                }
-            });
-            return itemTextStatsInstance.speechTimeInSeconds();
+            const rounded = this.$page.props.settings.liturgy_times_rounded ? true : false;
+            const wpm = this.$page.props.settings.wpm || 110;
+            return speechTimeInSeconds(item, this.service, rounded, wpm);
         },
         parseTimeString(s) {
             let t = s.split(':');

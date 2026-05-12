@@ -35,7 +35,7 @@
                     <p class="comment-header pull-left">
                         <span class="comment-author"><span class="mdi mdi-account"></span> {{ comment.user.name }}</span>
                         <span v-if="comment.private" class="mdi mdi-lock" title="Dieser Kommentar ist nur für mich sichtbar."></span><br />
-                        {{ moment(comment.created_at).locale('de-DE').format('LLLL') }}</p>
+                        {{ moment(comment.created_at).locale('de').format('LLLL') }}</p>
                 </div>
                 <div class="col-1 text-end">
                     <button class="btn btn-sm btn-danger" title="Kommentar löschen" @click.prevent="deleteComment(comment.id, key, index)">

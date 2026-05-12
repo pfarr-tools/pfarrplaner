@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout :title="title + ' einrichten'">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <button class="btn btn-primary" @click="submit">
                 <span class="d-inline d-md-none mdi mdi-download"></span>
                 <span class="d-none d-md-inline">Herunterladen</span>

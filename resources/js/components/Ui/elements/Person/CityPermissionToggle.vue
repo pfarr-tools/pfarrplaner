@@ -47,14 +47,16 @@
 <script>
 export default {
     name: "CityPermissionToggle",
-    props: ['value'],
+    emits: ['update:modelValue', 'input'],
+    props: ['modelValue'],
     data() {
         return {
-            rights: this.value,
+            rights: this.modelValue,
         }
     },
     methods: {
         changed(e) {
+            this.$emit('update:modelValue', e.target.value);
             this.$emit('input', e.target.value);
         }
     }

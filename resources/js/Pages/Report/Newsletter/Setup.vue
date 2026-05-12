@@ -36,8 +36,7 @@
             <form-csrf-token />
             <form-selectize name="cities[]" label="Newsletter für folgende Kirchengemeinden erstellen" v-model="myForm.cities" :options="cities" multiple />
             <form-check name="includeWeeklyVerse" label="Wochenspruch mit aufnehmen." v-model="myForm.includeWeeklyVerse"/>
-            <form-date-picker name="start" label="Gottesdienste von" v-model="myForm.start" iso-date />
-            <form-date-picker name="end" label="Bis" v-model="myForm.end" iso-date />
+            <form-date-range-picker label="Gottesdienste von" v-model:from="myForm.start" v-model:to="myForm.end" iso-date />
         </form>
     </admin-layout>
 </template>
@@ -47,12 +46,12 @@ import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
 export default {
     name: "Setup",
     props: ['cities'],
-    components: {FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {FormCheck, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         let myStart = moment();
         let myEnd = moment().add(7, 'days');

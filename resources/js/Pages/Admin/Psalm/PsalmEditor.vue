@@ -74,7 +74,7 @@ import Tabs from "../../../components/Ui/tabs/tabs";
 import Tab from "../../../components/Ui/tabs/tab";
 import SongbookList from "../../../components/LiturgyEditor/Editors/Elements/SongbookList";
 import TextStats from "../../../components/LiturgyEditor/Elements/TextStats";
-import Nl2br from 'vue-nl2br';
+import Nl2br from '../../../components/Ui/Nl2br.vue';
 import NavButton from "../../../components/Ui/buttons/NavButton";
 
 export default {

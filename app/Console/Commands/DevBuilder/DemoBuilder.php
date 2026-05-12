@@ -31,16 +31,18 @@
 namespace App\Console\Commands\DevBuilder;
 
 use App\Models\Attachment;
-use App\Models\Places\City;
 use App\Models\Comment;
 use App\Models\Leave\Absence;
+use App\Models\Leave\Pool;
 use App\Models\Location;
 use App\Models\Parish;
 use App\Models\People\User;
+use App\Models\Places\City;
 use App\Models\Places\StreetRange;
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
+use App\Models\Seating\Booking;
 use App\Models\Service;
 use App\Services\PackageService;
 use Carbon\Carbon;
@@ -104,9 +106,11 @@ class DemoBuilder extends Command
                 'absences' => Absence::class,
                 'attachments' => Attachment::class,
                 'baptisms' => Baptism::class,
+                'bookings' => Booking::class,
                 'comments' => Comment::class,
                 'funerals' => Funeral::class,
                 'parishes' => Parish::class,
+                'pools' => Pool::class,
                 'streetRanges' => StreetRange::class,
                 'weddings' => Wedding::class,
             ] as $unit => $model
@@ -179,6 +183,7 @@ class DemoBuilder extends Command
     protected function handleAbsences(Absence $absence)
     {
         $absence->update([
+                             'reason' => $this->faker->sentence,
                              'admin_notes' => $this->faker->text(),
                              'approver_notes' => $this->faker->text(),
                              'replacement_notes' => $this->faker->text(),
@@ -206,8 +211,8 @@ class DemoBuilder extends Command
         } else {
             $attachment->update(['file' => 'demo/demo.pdf']);
         }
-        if (('demo' != substr($oldFile, 0, 4)) && (file_exists(storage_path($oldFile)))) {
-            unlink(storage_path($oldFile));
+        if (('demo' != substr($oldFile, 0, 4)) && Storage::exists($oldFile)) {
+            Storage::delete($oldFile);
         }
     }
 
@@ -221,10 +226,21 @@ class DemoBuilder extends Command
                              'candidate_phone' => $this->faker->phoneNumber,
                              'candidate_email' => $this->faker->email,
                              'first_contact_with' => $this->faker->name,
+                             'text' => $this->faker->text(),
                              'notes' => $this->faker->text(),
                              'dimissorial_issuer' => 'Pfarramt ' . $this->faker->city,
-                             'dimissorial_requested',
-                             'dimissorial_received',
+                             'birth_place' => $this->faker->city,
+                         ]);
+    }
+
+    protected function handleBookings(Booking $booking)
+    {
+        $booking->update([
+                             'code' => Booking::createCode(),
+                             'name' => $this->faker->lastName,
+                             'first_name' => $this->faker->firstName,
+                             'contact' => $this->faker->phoneNumber,
+                             'email' => 'demo-booking-' . $booking->id . '@demo.pfarrplaner.de',
                          ]);
     }
 
@@ -252,12 +268,21 @@ class DemoBuilder extends Command
                           'konfiapp_apikey' => '',
                           'youtube_active_stream_id' => '',
                           'youtube_passive_stream_id' => '',
+                          'youtube_auto_startstop' => null,
+                          'youtube_cutoff_days' => null,
                           'default_offering_url' => '',
+                          'youtube_self_declared_for_children' => null,
                           'communiapp_url' => '',
                           'communiapp_token' => '',
+                          'communiapp_default_group_id' => null,
+                          'communiapp_use_outlook' => null,
+                          'communiapp_use_op' => null,
                           'konfiapp_default_type' => '',
                           'official_name' => 'Evangelische Kirchengemeinde ' . $newName,
                           'logo' => '',
+                          'default_ministries' => '',
+                          'iban' => '',
+                          'bic' => '',
                       ]);
 
         $locations = Location::where('city_id', $city->id)->get();
@@ -284,9 +309,13 @@ class DemoBuilder extends Command
                              'relative_zip' => $this->faker->postcode,
                              'relative_city' => $this->faker->city,
                              'relative_contact_data' => $this->faker->phoneNumber,
-                             'appointment',
-                             'dob',
-                             'dod',
+                             'appointment' => $funeral->appointment
+                                 ? $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y H:i')
+                                 : null,
+                             'dob' => $this->faker->dateTimeBetween('-95 years', '-70 years')->format('d.m.Y'),
+                             'dod' => $funeral->dod
+                                 ? $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y')
+                                 : null,
                              'spouse' => $this->faker->name,
                              'parents' => $this->faker->name('male') . ' / ' . $this->faker->name('female'),
                              'children' => join(', ', [$this->faker->name, $this->faker->name, $this->faker->name]),
@@ -295,6 +324,7 @@ class DemoBuilder extends Command
                              'confirmation' => '',
                              'undertaker' => $this->faker->name . ' (' . $this->faker->phoneNumber . ')',
                              'eulogies' => '',
+                             'text' => $this->faker->text(),
                              'notes' => $this->faker->text(),
                              'announcements' => $this->faker->text(),
                              'childhood' => $this->faker->text(),
@@ -316,6 +346,8 @@ class DemoBuilder extends Command
                              'dimissorial_issuer' => 'Pfarramt ' . $this->faker->city,
                              'birth_name' => $this->faker->lastName,
                              'appointment_address' => $this->faker->address,
+                             'confirmation_text' => $this->faker->sentence,
+                             'wedding_text' => $this->faker->sentence,
                          ]);
     }
 
@@ -333,10 +365,21 @@ class DemoBuilder extends Command
                         ]);
     }
 
+    protected function handlePools(Pool $pool)
+    {
+        $pool->update([
+                          'contact' => $this->faker->name,
+                          'office' => '',
+                          'phone' => $this->faker->phoneNumber,
+                          'email' => 'demo-pool-' . $pool->id . '@demo.pfarrplaner.de',
+                      ]);
+    }
+
     protected function handleServices(Service $service)
     {
         $data = [
-            'internal_remarks' => ''
+            'internal_remarks' => '',
+            'registration_phone' => '',
         ];
         if ($service->special_location) {
             if (str_contains($service->special_location, 'kirche')) {
@@ -357,13 +400,12 @@ class DemoBuilder extends Command
     {
         // allow non-unique api_token
         try {
-            Schema::table('users', function (Blueprint $table) {
-                $indexesFound = Schema::getConnection()->getDoctrineSchemaManager()->listTableIndexes('users');
-                if (array_key_exists('users_api_token_unique', $indexesFound)) {
+            if ($this->hasIndex('users', 'users_api_token_unique')) {
+                Schema::table('users', function (Blueprint $table) {
                     $table->string('api_token')->change();
                     $table->dropUnique('users_api_token_unique');
-                }
-            });
+                });
+            }
         } catch (\Exception $e) {
             return false;
         }
@@ -373,24 +415,22 @@ class DemoBuilder extends Command
 
     protected function handleUsers(User $user)
     {
-        if ($user->last_name != 'Admin') {
-            $data = [
-                'first_name' => $this->faker->firstName,
-                'last_name' => $this->faker->lastName,
-                'address' => $this->faker->address,
-                'phone' => $this->faker->phoneNumber,
-                'office' => '',
-                'own_website' => $this->faker->url,
-                'own_podcast_title' => $this->faker->sentence,
-                'own_podcast_url' => $this->faker->url,
-                'api_token' => Str::random(20),
-            ];
-            $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
-            $data['email'] = strtolower($data['first_name'] . '.' . $data['last_name']) . '@demo.pfarrplaner.de';
-            if ($user->password != '') {
-                $data['password'] = 'test';
-            }
-        } else {
+        $data = [
+            'first_name' => $user->last_name == 'Admin' ? 'Demo' : $this->faker->firstName,
+            'last_name' => $user->last_name == 'Admin' ? 'Admin' : $this->faker->lastName,
+            'address' => $this->faker->address,
+            'phone' => $this->faker->phoneNumber,
+            'office' => '',
+            'own_website' => '',
+            'own_podcast_title' => '',
+            'own_podcast_url' => '',
+            'own_podcast_spotify' => '',
+            'own_podcast_itunes' => '',
+            'api_token' => Str::random(60),
+            'email' => 'demo-user-' . $user->id . '@demo.pfarrplaner.de',
+            'image' => '',
+        ];
+        if ($user->password != '') {
             $data['password'] = 'test';
         }
         $user->update($data);
@@ -419,9 +459,22 @@ class DemoBuilder extends Command
                              'spouse2_city' => $this->faker->city,
                              'spouse2_dimissorial_issuer' => 'Pfarramt ' . $this->faker->city,
                              'notes' => $this->faker->text(),
+                             'text' => $this->faker->text(),
                              'music' => $this->faker->text(),
                              'gift' => $this->faker->text(),
                              'flowers' => $this->faker->text(),
                          ]);
+    }
+
+    protected function hasIndex(string $table, string $index): bool
+    {
+        if (method_exists(Schema::getConnection()->getSchemaBuilder(), 'getIndexes')) {
+            return collect(Schema::getIndexes($table))->contains('name', $index);
+        }
+
+        return array_key_exists(
+            $index,
+            Schema::getConnection()->getDoctrineSchemaManager()->listTableIndexes($table)
+        );
     }
 }

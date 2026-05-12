@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Person bearbeiten">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <save-button @click="saveUser"/>
             <nav-button v-if="myUser.isOfficialUser && (!justCreated)"
                         title="Passwort zurücksetzen und Nachricht versenden"
@@ -40,7 +40,7 @@
                         @click="deleteUser">Löschen
             </nav-button>
         </template>
-        <template slot="tab-headers">
+        <template #tab-headers>
             <tab-headers>
                 <tab-header id="home" :active-tab="activeTab" title="Person"/>
                 <tab-header id="account" :active-tab="activeTab" title="Benutzerkonto"/>
@@ -182,8 +182,9 @@
                             <div class="col-md-3"><code class="text-bold">{{ settingKey }}</code></div>
                             <div class="col-md-7">
                                 <div v-if="editSetting == settingKey">
-                                    <json-editor :data-input="mySettings[settingKey]"
-                                                 @data-output="(data) => (mySettings[settingKey] = data)"/>
+                                    <textarea class="form-control font-monospace" rows="5"
+                                              :value="JSON.stringify(mySettings[settingKey], null, 2)"
+                                              @change="(e) => updateJsonSetting(settingKey, e.target.value)"></textarea>
                                 </div>
                                 <vue-json-pretty v-else @click="editSetting = settingKey"
                                                  :data="mySettings[settingKey]"/>
@@ -210,7 +211,7 @@
                     <legend>Genehmigungsprozess</legend>
                     <p>Wenn die folgenden Felder ausgefüllt sind, durchläuft ein Abwesenheitsantrag dieser
                         Person
-                        zuerst <a href="/media/manual/media/documents/Urlaubsanträge im Pfarrplaner.pdf"
+                        zuerst <a :href="`${($page.props.manualBaseUrl ?? 'https://handbuch.pfarrplaner.de').replace(/\/+$/, '')}/urlaubsplan/`"
                                   target="_blank">einen Genehmigungsprozess</a>.</p>
                     <people-select label="Urlaub muss durch eine der folgenden Personen geprüft werden"
                                    :people="users" v-model="myUser.vacation_admins"/>
@@ -242,9 +243,6 @@ import CityPermissionToggle from "../../../components/Ui/elements/Person/CityPer
 import FormGroup from "../../../components/Ui/forms/FormGroup";
 import PeopleSelect from "../../../components/Ui/elements/PeopleSelect";
 import HomeScreenConfigurationTab from "../../../components/Profile/Tabs/HomeScreenConfigurationTab";
-import JsonEditor from "@kassaila/vue-json-editor";
-import "@kassaila/vue-json-editor/src/styles/main.scss";
-
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 
@@ -278,7 +276,6 @@ export default {
         FormCheck,
         FormImageAttacher,
         FormTextarea, FormInput, Tab, Tabs, TabHeader, TabHeaders,
-        JsonEditor,
         VueJsonPretty,
     },
     data() {
@@ -366,6 +363,9 @@ export default {
         }
     },
     methods: {
+        updateJsonSetting(key, jsonText) {
+            try { this.mySettings[key] = JSON.parse(jsonText); } catch (_) {}
+        },
         createUserAccount(e) {
             if (e) {
                 this.myUser.password = 'testtest';

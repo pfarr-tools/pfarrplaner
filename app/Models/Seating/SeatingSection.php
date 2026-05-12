@@ -39,7 +39,7 @@ class SeatingSection extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['location_id', 'title', 'seating_model', 'sorting', 'priority', 'color'];
+    protected $fillable = ['location_id', 'title', 'seating_model', 'priority', 'color'];
 
     protected $with = ['seatingRows'];
 

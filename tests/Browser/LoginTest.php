@@ -24,8 +24,8 @@ class LoginTest extends DuskTestCase
     public function testLoginScreenVisible(): void
     {
         $this->browse(function (Browser $browser) {
-            $browser->visit('/')
-                    ->assertSee(config('app.name'))
+            $browser->visit('/login')
+                    ->assertSeeIn('h1', config('app.name'))
                     ->assertSee('E-Mailadresse')
                     ->assertSee('Passwort')
                     ->assertSee('Anmelden');

@@ -95,6 +95,7 @@ import __ from 'lodash';
 
 export default {
     name: "FormFileUpload",
+    emits: ['input', 'upload-url', 'upload-inbox'],
     props: ['name', 'label', 'help', 'multiple', 'helpText', 'noCamera', 'noUrl', 'noPixabay', 'noDescription', 'noInbox', 'noSourceTabs', 'cut'],
     components: {FormPixabayPicker, FormInput, NavButton, FormGroup},
     data() {

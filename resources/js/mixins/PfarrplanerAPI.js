@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-module.exports = {
+export default {
     data() {
         return {
             '$componentState': Math.random().toString(36).substr(2, 9),
@@ -45,7 +45,7 @@ module.exports = {
                 user: this.$page.props.currentUser.data.id,
                 key: key,
             }), {value: value});
-            this.$page.props.settings[key] = value;
+            this.$settings[key] = value;
         },
         $updateComponentState() {
             this.$componentState = Math.random().toString(36).substr(2, 9);

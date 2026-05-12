@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import moment from 'moment';
+import dayjs from 'dayjs';
 import {Dataset, DatasetItem, DatasetSearch} from "vue-dataset";
 import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo.vue";
 import DatasetPager from "../../../components/Ui/dataset/DatasetPager.vue";

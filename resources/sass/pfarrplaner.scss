@@ -29,7 +29,10 @@
 
 @charset "UTF-8";
 @use 'theme' as theme;
-@import url(https://www.pfarrplaner.de/css/google-fonts.css);
+
+:root {
+    --dp-font-family: "Sarabun", "Nunito", sans-serif !important;
+}
 
 ul.nav-tabs {
     margin-bottom: 15px;
@@ -606,6 +609,68 @@ input.form-control:focus, textarea.form-control:focus {
     font-weight: $font-weight-semibold;
 }
 
+// @vueform/multiselect — match FormInput styling
+.multiselect {
+    background-color: white;
+    border-width: 0 0 1px 1px !important;
+    border-radius: 0;
+}
+
+.multiselect.is-active {
+    border-width: 0 0 1px 1px !important;
+    border-color: theme.elkw-color("dunkelblau") !important;
+    box-shadow: none !important;
+    font-weight: $font-weight-semibold !important;
+}
+
+.multiselect.is-active .multiselect-search,
+.multiselect.is-active .multiselect-tags-search {
+    background-color: tint-color(theme.elkw-color("hellblau"), 70%);
+}
+
+.multiselect.is-open,
+.multiselect.is-open-top {
+    border-radius: 0;
+}
+
+.multiselect-dropdown {
+    border-radius: 0;
+    border-width: 0 0 1px 1px;
+}
+
+.multiselect-option.is-selected {
+    background: tint-color(theme.elkw-color("hellblau"), 70%) !important;
+    color: #212529 !important;
+}
+
+.multiselect-option.is-selected.is-pointed {
+    background: tint-color(theme.elkw-color("hellblau"), 55%)  !important;
+    color: #212529 !important;
+}
+
+// @vuepic/vue-datepicker — match FormInput styling
+.dp__input {
+    border-width: 0 0 1px 1px !important;
+    border-radius: 0 !important;
+    background-color: white !important;
+    font-weight: 300 !important;
+}
+
+.dp__input, .dp__input_wrap {
+    font-family: inherit !important;
+}
+
+.dp__input_focus {
+    background-color: tint-color(theme.elkw-color("hellblau"), 70%) !important;
+    border-color: theme.elkw-color("dunkelblau") !important;
+    font-weight: $font-weight-semibold !important;
+    box-shadow: none !important;
+}
+
+.dp__menu {
+    border-radius: 0 !important;
+}
+
 .badge-permission-a {
     background-color: theme.theme-color("primary") !important;
 }
@@ -737,6 +802,12 @@ tr.changed, tr.changed td, tr.changed th {
 
 .stripe-odd {
     background-color: #f2f2f2;
+}
+
+.multiselect-tag {
+    background-color: #efefef !important;
+    color: black !important;
+    font-weight: normal !important;
 }
 
 

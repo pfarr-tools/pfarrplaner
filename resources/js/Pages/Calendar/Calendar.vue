@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import moment from 'moment';
+import dayjs from 'dayjs';
 import EventBus from "../../plugins/EventBus";
 import {CalendarNewSortOrderEvent} from "../../events/CalendarNewSortOrderEvent";
 import {CalendarNewOrientationEvent} from "../../events/CalendarNewOrientationEvent";
@@ -143,7 +143,7 @@ export default {
     },
     created() {
         if (undefined === this.settings.show_cc_details) this.settings.show_cc_details = 0;
-        this.navigateTo(moment(this.myDate).format('YYYY-MM'));
+        this.navigateTo(dayjs(this.myDate).format('YYYY-MM'));
 
         this.$api().get(route('api.people.select')).then(response => {
             this.myPeople = response.data.users;
@@ -191,7 +191,7 @@ export default {
             this.calendarMode = e || 'services';
             this.setUserSetting('calendar_mode', this.calendarMode);
             if (this.calendarMode == 'services') {
-                if (this.dataDate != this.myDate) this.navigateTo(moment(this.myDate).format('YYYY-MM'));
+                if (this.dataDate != this.myDate) this.navigateTo(dayjs(this.myDate).format('YYYY-MM'));
             }
             this.dataDate = this.myDate;
         },
@@ -213,7 +213,7 @@ export default {
     },
     computed: {
         pageTitle() {
-            return moment(this.myDate).locale('de-DE').format('MMMM YYYY');
+            return dayjs(this.myDate).format('MMMM YYYY');
         },
     }
 }

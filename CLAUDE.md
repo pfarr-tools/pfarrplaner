@@ -137,6 +137,8 @@ build: Mix toolchain auf v6 aktualisiert
 
 ## Dev Instructions
 - Never commit or push unless I specifically ask you to.
+- When changing models, migrations, fillable/cast fields, personal data fields, attachments, calendar integrations, seating bookings, rites, user/profile data, or demo-login behavior, check whether `app/Console/Commands/DevBuilder/DemoBuilder.php` must be updated so the online demo remains buildable and safely anonymized.
+- If a change introduces new user-facing or personally identifying data, either extend the DemoBuilder anonymization/deletion logic in the same change or explicitly document why no DemoBuilder update is needed.
 
 ## Releases
 - None of Claude Code will be done in the main branch. Usually in claude-testing, occasionally in a dedicated feature branch.
@@ -145,4 +147,18 @@ build: Mix toolchain auf v6 aktualisiert
 - After the release is done, push the main branch to origin.
 - Go back to the claude-testing branch and continue working there.
 
-
+## End-user documentation
+- Every change to the code must be reflected in the full end-user manual for Pfarrplaner, covering everything. 
+- The manual should exist in a series of .md files in a suitable folder. 
+- The app layout needs to include a help button on every page (somewhere  
+  on the right side of the Top Nav), opening the appropriate manual page in a separate tab. 
+- There need to be links to an index and a table of contents. 
+- There needs to be a build step compiling the manual into a downloadable PDF  
+  with TOC and index.
+- Documentation needs to explain each screen to the fullest, covering every UI element relevant to the user.
+- The documentation also needs to be structured into chapters arranged by useful topic, guiding a novice user into the app. 
+- Installation, maintenance, technical docs are not part of this documentation at this point.
+- Where it seems useful to include screenshots in the documentation, provide a separate set of dusk tests setting   
+  up the desired situation and saving a screenshot to the docs folder.
+- Documentation must be entirely in German, using simple, non-technical language an average user in a church office
+  can understand.                     

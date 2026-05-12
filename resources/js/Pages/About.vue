@@ -31,7 +31,7 @@
     <admin-layout :title="'Über '+appName">
         <div>
             <h2>{{ appName }}</h2><br/>
-            <span v-if="appName != 'Pfarrplaner'">Pfarrplaner </span>v.{{ version }}-{{ env }} vom {{ moment(date).locale('DE').format('LLLL') }}<br/>
+            <span v-if="appName != 'Pfarrplaner'">Pfarrplaner </span>v.{{ version }}-{{ env }} vom {{ moment(date).locale('de').format('LLLL') }}<br/>
             Laravel {{ laravelVersion }} auf PHP {{ phpVersion }}
         </div>
         <p v-if="officialServer">Gehostet auf einem Server des <a href="https://wwww.kirchenbezirk-balingen.de/" target="_blank">Evangelischen
@@ -50,7 +50,7 @@
 import CardHeader from "../components/Ui/cards/cardHeader";
 import CardBody from "../components/Ui/cards/cardBody";
 import Card from "../components/Ui/cards/card";
-import VueMarkdown from 'vue-markdown';
+import VueMarkdown from 'vue-markdown-render';
 
 export default {
     name: "About",
@@ -66,11 +66,11 @@ export default {
 </script>
 
 <style scoped>
-.changelog /deep/ h1 {
+.changelog :deep(h1) {
     font-size: 2rem;
 }
 
-.changelog /deep/ h2, .changelog /deep/ h3 {
+.changelog :deep(h2), .changelog :deep(h3) {
     font-size: 1em;
     font-weight: bold;
 }

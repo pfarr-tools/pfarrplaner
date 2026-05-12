@@ -29,7 +29,7 @@
 
 <template>
     <admin-layout title="Bestattung hinzufügen">
-        <template slot="navbar-left">
+        <template #navbar-left>
             <button class="btn btn-primary" @click.prevent="createFuneral"
                     :disabled="!(funeral.city && funeral.location && funeral.date && funeral.name)">Erstellen
             </button>

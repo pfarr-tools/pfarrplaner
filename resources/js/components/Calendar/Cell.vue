@@ -46,15 +46,13 @@
 <script>
 import EventBus from "../../plugins/EventBus";
 import {CalendarToggleDayColumnEvent} from "../../events/CalendarToggleDayColumnEvent";
-import Popper from 'vue-popperjs';
-import 'vue-popperjs/dist/vue-popper.css';
 import NavButton from "../Ui/buttons/NavButton";
 import CalendarService from "./Service.vue";
 
 export default {
     name: 'CalendarCell',
     props: ['city', 'day', 'services', 'targetMode', 'target'],
-    components: {CalendarService, NavButton, Popper},
+    components: {CalendarService, NavButton},
 }
 </script>
 <style scoped>
