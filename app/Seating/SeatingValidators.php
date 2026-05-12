@@ -33,18 +33,10 @@ namespace App\Seating;
 
 use App\Models\Seating\Booking;
 use App\Models\Service;
-use Illuminate\Support\Facades\Validator;
 
 class SeatingValidators
 {
-    public static function register() {
-        Validator::extend('seatable', function($attribute, $value, $parameters, $validator){
-            return SeatingValidators::seatable($attribute, $value, $parameters, $validator);
-        });
-        Validator::extend('seatable_fixed', function($attribute, $value, $parameters, $validator){
-            return SeatingValidators::seatable($attribute, $value, $parameters, $validator);
-        });
-    }
+    public static function register(): void {}
 
     public static function seatable($attribute, $value, $parameters, $validator) {
         /** @var \Illuminate\Validation\Validator $data */

@@ -33,6 +33,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Seating\Booking;
 use App\Models\Service;
+use App\Rules\Seatable;
+use App\Rules\SeatableFixed;
 use App\Services\FileNameService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -152,7 +154,7 @@ class BookingController extends Controller
      */
     protected function pin(Request $request, Booking $booking)
     {
-        $data = $request->validate(['fixed_seat' => 'required|string|seatable_fixed:booking_id']);
+        $data = $request->validate(['fixed_seat' => ['required', 'string', new SeatableFixed('booking_id')]]);
         $booking->update($data);
         return response()->json($booking);
     }
@@ -170,8 +172,8 @@ class BookingController extends Controller
                 'name' => 'required',
                 'first_name' => 'nullable',
                 'contact' => 'required|string',
-                'number' => 'required|int|min:1|seatable:booking_id',
-                'fixed_seat' => 'nullable|string|seatable_fixed:booking_id',
+                'number' => ['required', 'int', 'min:1', new Seatable('booking_id')],
+                'fixed_seat' => ['nullable', 'string', new SeatableFixed('booking_id')],
                 'override_seats' => 'nullable|int',
                 'override_split' => 'nullable|string',
                 'email' => 'nullable|email',

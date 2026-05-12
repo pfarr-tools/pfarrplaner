@@ -28,6 +28,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use Spatie\Backup\Notifications\Notifiable;
+use Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification;
+use Spatie\Backup\Notifications\Notifications\BackupWasSuccessfulNotification;
+use Spatie\Backup\Notifications\Notifications\CleanupHasFailedNotification;
+use Spatie\Backup\Notifications\Notifications\CleanupWasSuccessfulNotification;
+use Spatie\Backup\Notifications\Notifications\HealthyBackupWasFoundNotification;
+use Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFoundNotification;
+use Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy;
+use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays;
+use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
+
 return [
 
     'backup' => [
@@ -57,33 +68,28 @@ return [
                 'exclude' => [
                     base_path('vendor'),
                     base_path('node_modules'),
+                    storage_path('framework'),
                 ],
 
                 /*
                  * Determines if symlinks should be followed.
                  */
                 'follow_links' => true,
+
+                /*
+                 * Determines if it should avoid unreadable folders.
+                 */
                 'ignore_unreadable_directories' => true,
+
+                /*
+                 * This path is used to make directories in resulting zip-file relative.
+                 * Set to `null` to include complete absolute path.
+                 */
+                'relative_path' => null,
             ],
 
             /*
-             * The names of the connections to the databases that should be backed up
-             * MySQL, PostgreSQL, SQLite and Mongo databases are supported.
-             *
-             * The content of the database dump may be customized for each connection
-             * by adding a 'dump' key to the connection settings in config/database.php.
-             * E.g.
-             * 'mysql' => [
-             *       ...
-             *      'dump' => [
-             *           'excludeTables' => [
-             *                'table_to_exclude_from_backup',
-             *                'another_table_to_exclude'
-             *            ]
-             *       ]
-             * ],
-             *
-             * For a complete list of available customization options, see https://github.com/spatie/db-dumper
+             * The names of the connections to the databases that should be backed up.
              */
             'databases' => [
                 'mysql',
@@ -91,19 +97,41 @@ return [
         ],
 
         /*
-         * The database dump can be compressed to decrease diskspace usage.
+         * The database dump can be compressed to decrease disk space usage.
          *
          * Out of the box Laravel-backup supplies
          * Spatie\DbDumper\Compressors\GzipCompressor::class.
-         *
-         * You can also create custom compressor. More info on that here:
-         * https://github.com/spatie/db-dumper#using-compression
          *
          * If you do not want any compressor at all, set it to null.
          */
         'database_dump_compressor' => null,
 
+        /*
+         * If specified, the database dumped file name will contain a timestamp (e.g.: 'Y-m-d-H-i-s').
+         */
+        'database_dump_file_timestamp_format' => null,
+
+        /*
+         * The base of the dump filename, either 'database' or 'connection'.
+         */
+        'database_dump_filename_base' => 'database',
+
+        /*
+         * The file extension used for the database dump files.
+         */
+        'database_dump_file_extension' => '',
+
         'destination' => [
+
+            /*
+             * The compression algorithm to be used for creating the zip archive.
+             */
+            'compression_method' => ZipArchive::CM_DEFAULT,
+
+            /*
+             * The compression level corresponding to the used algorithm; an integer between 0 and 9.
+             */
+            'compression_level' => 9,
 
             /*
              * The filename prefix used for the backup zip file.
@@ -116,72 +144,118 @@ return [
             'disks' => [
                 'backup',
                 'local-backup',
-                's3'
+                's3',
             ],
+
+            /*
+             * Determines whether to allow backups to continue when some targets fail.
+             */
+            'continue_on_failure' => false,
         ],
 
         /*
          * The directory where the temporary files will be stored.
          */
         'temporary_directory' => storage_path('app/backup-temp'),
+
+        /*
+         * The password to be used for archive encryption.
+         * Set to `null` to disable encryption.
+         */
+        'password' => env('BACKUP_ARCHIVE_PASSWORD'),
+
+        /*
+         * The encryption algorithm to be used for archive encryption.
+         * Supported: 'none', 'default', 'aes128', 'aes192', 'aes256'
+         */
+        'encryption' => 'default',
+
+        /*
+         * After creating the zip, verify it can be opened and contains files.
+         */
+        'verify_backup' => false,
+
+        /*
+         * The number of attempts, in case the backup command encounters an exception.
+         */
+        'tries' => 1,
+
+        /*
+         * The number of seconds to wait before attempting a new backup if the previous try failed.
+         */
+        'retry_delay' => 0,
     ],
 
     /*
-     * You can get notified when specific events occur. Out of the box you can use 'mail'.
-     *
-     * You can also use your own notification classes, just make sure the class is named after one of
-     * the `Spatie\Backup\Events` classes.
+     * You can get notified when specific events occur. Out of the box you can use 'mail' and 'slack'.
      */
     'notifications' => [
 
         'notifications' => [
-            \Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFoundNotification::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\CleanupHasFailedNotification::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\BackupWasSuccessfulNotification::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\HealthyBackupWasFoundNotification::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\CleanupWasSuccessfulNotification::class => ['mail'],
+            BackupHasFailedNotification::class => ['mail'],
+            UnhealthyBackupWasFoundNotification::class => ['mail'],
+            CleanupHasFailedNotification::class => ['mail'],
+            BackupWasSuccessfulNotification::class => ['mail'],
+            HealthyBackupWasFoundNotification::class => ['mail'],
+            CleanupWasSuccessfulNotification::class => ['mail'],
         ],
 
         /*
-         * Here you can specify the notifiable to which the notifications should be sent. The default
-         * notifiable will use the variables specified in this config file.
+         * Here you can specify the notifiable to which the notifications should be sent.
          */
-        'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
+        'notifiable' => Notifiable::class,
 
         'mail' => [
-            'to' => env('BACKUP_EMAIL_RECIPIENT'),
+            'to' => env('BACKUP_EMAIL_RECIPIENT') ?: 'dev@toph.de',
+
+            'from' => [
+                'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+                'name' => env('MAIL_FROM_NAME', 'Example'),
+            ],
         ],
 
+        'slack' => [
+            'webhook_url' => '',
+            'channel' => null,
+            'username' => null,
+            'icon' => null,
+        ],
+
+        'discord' => [
+            'webhook_url' => '',
+            'username' => '',
+            'avatar_url' => '',
+        ],
+
+        'webhook' => [
+            'url' => '',
+        ],
     ],
 
     /*
+     * The log channel used for backup activity messages.
+     */
+    'log_channel' => null,
+
+    /*
      * Here you can specify which backups should be monitored.
-     * If a backup does not meet the specified requirements the
-     * UnHealthyBackupWasFound event will be fired.
      */
     'monitor_backups' => [
         [
             'name' => config('app.name'),
             'disks' => ['backup', 'local-backup', 's3'],
             'health_checks' => [
-                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
-                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 100000,
+                MaximumAgeInDays::class => 1,
+                MaximumStorageInMegabytes::class => 100000,
             ],
         ],
     ],
 
     'cleanup' => [
         /*
-         * The strategy that will be used to cleanup old backups. The default strategy
-         * will keep all backups for a certain amount of days. After that period only
-         * a daily backup will be kept. After that period only weekly backups will
-         * be kept and so on.
-         *
-         * No matter how you configure it the default strategy will never
-         * delete the newest backup.
+         * The strategy that will be used to cleanup old backups.
          */
-        'strategy' => \Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy::class,
+        'strategy' => DefaultStrategy::class,
 
         'default_strategy' => [
 
@@ -216,5 +290,15 @@ return [
              */
             'delete_oldest_backups_when_using_more_megabytes_than' => 100000,
         ],
+
+        /*
+         * The number of attempts, in case the cleanup command encounters an exception.
+         */
+        'tries' => 1,
+
+        /*
+         * The number of seconds to wait before attempting a new cleanup if the previous try failed.
+         */
+        'retry_delay' => 0,
     ],
 ];

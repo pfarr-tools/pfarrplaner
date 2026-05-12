@@ -42,3 +42,15 @@ use Illuminate\Support\Facades\Schedule;
 */
 
 Schedule::command('telescope:prune --hours=48')->daily();
+Schedule::command('liturgy:get')->daily();
+Schedule::command('cache:prune-stale-tags')->hourly();
+
+// Integration schedules
+foreach (glob(app_path('Integrations/*')) as $folder) {
+    if (is_dir($folder)) {
+        $cls = 'App\\Integrations\\' . basename($folder) . '\\' . basename($folder) . 'Integration';
+        if (class_exists($cls) && method_exists($cls, 'schedule')) {
+            $cls::schedule(app(\Illuminate\Console\Scheduling\Schedule::class));
+        }
+    }
+}

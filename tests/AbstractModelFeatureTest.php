@@ -47,16 +47,6 @@ abstract class AbstractModelFeatureTest extends TestCase
     /** @var User */
     protected $testUser = null;
 
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-        $this->assertNotEmpty($this->modelClass);
-        $this->assertEquals(1, preg_match('/Tests\\\\Feature\\\\(.*)FeatureTest/', get_called_class(), $matches));
-        $this->assertGreaterThan(1, count($matches));
-        $this->modelName = $matches[1];
-    }
-
-
     // test via web
 
     public function testIndexViewWorks()
@@ -184,8 +174,11 @@ abstract class AbstractModelFeatureTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp(); //
-
+        parent::setUp();
+        $this->assertNotEmpty($this->modelClass);
+        $this->assertEquals(1, preg_match('/Tests\\\\Feature\\\\(.*)FeatureTest/', get_called_class(), $matches));
+        $this->assertGreaterThan(1, count($matches));
+        $this->modelName = $matches[1];
         $this->testUser = User::factory()->create();
     }
 

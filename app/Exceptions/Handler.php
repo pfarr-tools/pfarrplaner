@@ -30,11 +30,9 @@
 
 namespace App\Exceptions;
 
-use App\Http\Kernel;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Laravel\Octane\Exceptions\DdException;
 use Spatie\LaravelIgnition\ContextProviders\LaravelContextProviderDetector;
@@ -145,16 +143,6 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
-        // Dein Spezialfall bleibt unverändert
-        if ($e instanceof \ErrorException) {
-            if (Str::contains($e->getMessage(), 'Increment on type bool has no effect')) {
-                $kernel = app(Kernel::class);
-                $response = $kernel->handle($request)->send();
-                return $kernel->terminate($request, $response);
-            }
-        }
-
-        // Laravel rendert ganz normal
         $response = parent::render($request, $e);
 
         // Danach: 419 zuverlässig loggen (egal wie es entstanden ist)

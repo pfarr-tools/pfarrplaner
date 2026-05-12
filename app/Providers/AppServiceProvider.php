@@ -30,8 +30,8 @@
 
 namespace App\Providers;
 
-use App\Services\QueryLogService;
 use App\Seating\SeatingValidators;
+use App\Services\QueryLogService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
@@ -89,41 +89,12 @@ class AppServiceProvider extends ServiceProvider
 
 
 
-        Validator::extend(
-            'phone_number',
-            function ($attribute, $value, $parameters) {
-                return preg_match('/^([0-9s(+][0-9\.-\/ ()]{7,})$/i', $value);
-            }
-        );
+        Validator::extend('phone_number', fn ($a, $v) => (bool) preg_match('/^([0-9s(+][0-9\.-\/ ()]{7,})$/i', $v));
+        Validator::extend('zip', fn ($a, $v) => (bool) preg_match('/^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$/i', $v));
+        Validator::extend('hash', fn ($a, $v, $p) => Hash::check($v, $p[0]));
+        Validator::extend('not_hash', fn ($a, $v, $p) => !Hash::check($v, $p[0]));
+        Validator::extend('not_current_password', fn ($a, $v) => !Hash::check($v, Auth::user()->password));
 
-        Validator::extend(
-            'zip',
-            function ($attribute, $value, $parameters) {
-                return preg_match('/^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$/i', $value);
-            }
-        );
-        Validator::extend(
-            'hash',
-            function ($attribute, $value, $parameters) {
-                return Hash::check($value, $parameters[0]);
-            }
-        );
-
-        Validator::extend(
-            'not_hash',
-            function ($attribute, $value, $parameters) {
-                return !Hash::check($value, $parameters[0]);
-            }
-        );
-
-        Validator::extend(
-            'not_current_password',
-            function ($attribute, $value, $parameters) {
-                return !Hash::check($value, Auth::user()->password);
-            }
-        );
-
-        // seating Validators
         SeatingValidators::register();
 
         QueryLogService::register();
@@ -158,19 +129,24 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    /**com
+    /**
      * Register any application services.
      *
      * @return void
      */
     public function register()
     {
+        $this->app->singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \App\Exceptions\Handler::class
+        );
+
+        $this->app->alias('mail.manager', \Illuminate\Mail\MailManager::class);
 
         // DEV dependencies:
         if ($this->app->environment('local')) {
             if (class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
                 $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
-                //$this->app->register(TelescopeServiceProvider::class);
             }
         }
     }

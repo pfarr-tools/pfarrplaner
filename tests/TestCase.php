@@ -30,7 +30,6 @@
 
 namespace Tests;
 
-use App\Console\Kernel;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;

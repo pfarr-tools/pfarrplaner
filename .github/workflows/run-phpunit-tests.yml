@@ -4,21 +4,29 @@ on: [pull_request, push]
 
 jobs:
   run-tests:
-    runs-on: ubuntu-20.04
-
-    container:
-      image:  prooph/composer:7.4
+    runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, zip, pdo, pdo_sqlite
+          coverage: none
+
       - name: Install dependencies
-        run: composer install --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-      - name: Generate application key
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Create .env
         run: |
-          echo "APP_KEY=base64:M/vh3SEfI2RufB1yAOd45sIyWm4+pVfcnyzd28t+cuE=" > .env
-      - name: Create folders
-        run: |
-          mkdir -p bootstrap/cache
-      - name: Run tests
-        run: vendor/bin/phpunit
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Create required directories
+        run: mkdir -p bootstrap/cache storage/logs storage/app/tmp
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --no-coverage
 

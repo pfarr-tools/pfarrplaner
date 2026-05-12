@@ -39,18 +39,9 @@
 |
 */
 
-// auto-register model routes
-use Illuminate\Support\Str;
-
-Route::namespace('Api')->group(
-    function () {
-        Route::name('api.')->group(
-            function() {
-                foreach(glob(base_path('routes/api/*.php')) as $file) {
-                    Route::group([], $file);
-                }
-            }
-        );
+Route::name('api.')->group(function () {
+    foreach (glob(base_path('routes/api/*.php')) as $file) {
+        Route::group([], $file);
     }
-);
+});
 

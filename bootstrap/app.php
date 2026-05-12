@@ -28,61 +28,83 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-|--------------------------------------------------------------------------
-| Create The Application
-|--------------------------------------------------------------------------
-|
-| The first thing we will do is create a new Laravel application instance
-| which serves as the "glue" for all the components of Laravel, and is
-| the IoC container for the system binding all of the various parts.
-|
-*/
+use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\Cors;
+use App\Http\Middleware\ForceDomain;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\RedirectIfAuthenticated;
+use App\Http\Middleware\TrustProxies;
+use App\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Auth\Middleware\Authorize;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Validation\ValidationException;
 
 setlocale(LC_ALL, 'de_DE.utf8');
 
-$app = new Illuminate\Foundation\Application(
-    $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
-);
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(commands: __DIR__.'/../routes/console.php')
+    ->withMiddleware(function (Middleware $middleware) {
+        // Global middleware appended to every request
+        $middleware->append([
+            ForceDomain::class,
+            TrustProxies::class,
+        ]);
 
-/*
-|--------------------------------------------------------------------------
-| Bind Important Interfaces
-|--------------------------------------------------------------------------
-|
-| Next, we need to bind some important interfaces into the container so
-| we will be able to resolve them when needed. The kernels serve the
-| incoming requests to this application from both the web and CLI.
-|
-*/
+        // CSRF exceptions (replaces App\Http\Middleware\VerifyCsrfToken::$except)
+        $middleware->validateCsrfTokens(except: [
+            '/livechat/message/*',
+        ]);
 
-$app->singleton(
-    Illuminate\Contracts\Http\Kernel::class,
-    App\Http\Kernel::class
-);
+        // Add Inertia to the web group
+        $middleware->web(append: [HandleInertiaRequests::class]);
 
-$app->singleton(
-    Illuminate\Contracts\Console\Kernel::class,
-    App\Console\Kernel::class
-);
+        // Add Sanctum stateful handling to api group
+        $middleware->api(prepend: [EnsureFrontendRequestsAreStateful::class]);
 
-$app->alias('mail.manager', Illuminate\Mail\MailManager::class);
+        // Custom extranet middleware group (Sanctum-authenticated API)
+        $middleware->group('extranet', [
+            EnsureFrontendRequestsAreStateful::class,
+            'throttle:600,1',
+            SubstituteBindings::class,
+            'auth:sanctum',
+        ]);
 
-$app->singleton(
-    Illuminate\Contracts\Debug\ExceptionHandler::class,
-    App\Exceptions\Handler::class
-);
+        // Middleware aliases
+        $middleware->alias([
+            'auth'     => Authenticate::class,
+            'can'      => Authorize::class,
+            'guest'    => RedirectIfAuthenticated::class,
+            'verified' => EnsureEmailIsVerified::class,
+            'cors'     => Cors::class,
+            'csrf'     => VerifyCsrfToken::class,
+        ]);
 
-
-/*
-|--------------------------------------------------------------------------
-| Return The Application
-|--------------------------------------------------------------------------
-|
-| This script returns the application instance. The instance is given to
-| the calling script so we can separate the building of the instances
-| from the actual running of the application and sending responses.
-|
-*/
-
-return $app;
+        // Middleware execution priority
+        $middleware->priority([
+            StartSession::class,
+            ShareErrorsFromSession::class,
+            Authenticate::class,
+            AuthenticateSession::class,
+            SubstituteBindings::class,
+            Authorize::class,
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->dontReport([
+            NotFoundHttpException::class,
+            AuthenticationException::class,
+            ValidationException::class,
+        ]);
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation']);
+    })
+    ->create();
