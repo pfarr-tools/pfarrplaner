@@ -67,7 +67,10 @@ export default {
     },
     methods: {
         download() {
-            window.location.href = route('attachment', {attachment: this.attachment.id});
+            this.redirectTo(route('attachment', {attachment: this.attachment.id}));
+        },
+        redirectTo(url) {
+            window.location.href = url;
         },
         /**
          * Get human-readable file size

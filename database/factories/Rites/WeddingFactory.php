@@ -31,16 +31,35 @@
 namespace Database\Factories\Rites;
 
 use App\Models\Rites\Wedding;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class WeddingFactory extends Factory
 {
     protected $model = Wedding::class;
 
-    public function definition()
+    /**
+     * @return array<string, mixed>
+     */
+    public function definition(): array
     {
-        // TODO: Implement definition() method.
-        return [];
+        return [
+            'service_id' => Service::factory(),
+            'spouse1_name' => fake()->name(),
+            'spouse1_birth_name' => fake()->lastName(),
+            'spouse1_email' => fake()->safeEmail(),
+            'spouse1_phone' => fake()->phoneNumber(),
+            'spouse2_name' => fake()->name(),
+            'spouse2_birth_name' => fake()->lastName(),
+            'spouse2_email' => fake()->safeEmail(),
+            'spouse2_phone' => fake()->phoneNumber(),
+            'text' => fake()->sentence(),
+            'registered' => 0,
+            'registration_document' => '',
+            'signed' => 0,
+            'docs_ready' => 0,
+            'docs_where' => '',
+        ];
     }
 
 }

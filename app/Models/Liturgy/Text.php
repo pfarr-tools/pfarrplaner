@@ -30,9 +30,12 @@
 
 namespace App\Models\Liturgy;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Text extends \Illuminate\Database\Eloquent\Model
 {
+    use HasFactory;
+
     protected $table = 'liturgical_texts';
 
     protected $fillable = ['title', 'text', 'agenda_code', 'needs_replacement', 'source', 'notice'];

@@ -32,9 +32,12 @@ namespace App\Models\Liturgy;
 
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Psalm extends \Illuminate\Database\Eloquent\Model
 {
+    use HasFactory;
+
     protected $fillable = ['title', 'intro', 'text', 'copyrights', 'songbook', 'songbook_abbreviation', 'reference'];
 
     protected static function boot()

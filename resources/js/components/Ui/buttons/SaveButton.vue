@@ -35,6 +35,7 @@
 import NavButton from "./NavButton";
 export default {
     name: "SaveButton",
+    emits: ['click'],
     props: ['label'],
     components: {NavButton}
 }

@@ -30,9 +30,12 @@
 
 namespace App\Models\Liturgy;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Song extends \Illuminate\Database\Eloquent\Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'title',
         'refrain',

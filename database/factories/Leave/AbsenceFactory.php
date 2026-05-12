@@ -37,9 +37,14 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class AbsenceFactory extends Factory {
 
     protected $model = Absence::class;
-    public function definition()
+    public function definition(): array
     {
-        return [];
+        return [
+            'from' => fake()->dateTimeBetween('now', '+1 month')->format('Y-m-d'),
+            'to' => fake()->dateTimeBetween('+1 month', '+2 months')->format('Y-m-d'),
+            'user_id' => \App\Models\People\User::factory(),
+            'reason' => fake()->sentence(),
+        ];
     }
 
 }
