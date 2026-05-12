@@ -30,9 +30,8 @@
 
 namespace App\Console\Commands\DevBuilder;
 
+use App\Services\PackageService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Route;
-
 class BuildManualPages extends Command
 {
     /**
@@ -66,25 +65,9 @@ class BuildManualPages extends Command
      */
     public function handle()
     {
-        $toc = $this->getTOC();
-
-        $this->line('Scanning for missing manual pages...');
-        // create empty pages for every get route not yet covered
-        $empty = base_path('manual/notfound.md');
-        $routes = Route::getRoutes()->getRoutesByMethod();
-        $routeKeys = [];
-        ksort($routes);
-        /** @var \Illuminate\Routing\Route $route */
-        foreach ($routes['GET'] as $route) {
-            $routeKey = $route->getAction('as');
-            if ($routeKey) {
-                $targetFile = base_path('manual/'.$routeKey.'.md');
-                if (!file_exists(base_path('manual/'.$routeKey.'.md'))) {
-                    $this->line('Creating new manual page '.$targetFile);
-                    copy($empty, $targetFile);
-                }
-            }
-        }
+        $this->line('Writing generated front matter...');
+        $this->writeGeneratedFrontMatter();
+        $this->writeLicensePage();
 
         $this->line('Moving image files...');
         foreach (glob(base_path('manual/img*.png')) as $file) {
@@ -96,11 +79,162 @@ class BuildManualPages extends Command
             file_put_contents($file, str_replace('(img', '(media/images/img', file_get_contents($file)));
         }
 
-        $this->line('Building table of contents...');
-        file_put_contents(base_path('manual/index.md'), 'Inhaltsverzeichnis'.PHP_EOL.'=================='.PHP_EOL.PHP_EOL.$this->outputTOCLevel($toc));
-        $this->line('Writing table of contents to file '.base_path('manual/index.md'));
-
         $this->line('Done');
+    }
+
+    protected function writeGeneratedFrontMatter()
+    {
+        $package = PackageService::info();
+        $manualDateTime = now('Europe/Berlin')->isoFormat('DD.MM.YYYY HH:mm');
+        $gitCommit = trim((string) shell_exec('git rev-parse --short HEAD 2>/dev/null')) ?: 'unbekannt';
+        $gitBranch = trim((string) shell_exec('git branch --show-current 2>/dev/null')) ?: 'unbekannt';
+
+        file_put_contents(base_path('manual/versionsangaben.md'), implode(PHP_EOL, [
+            '[//]: # (TOC: 16. Versionsangaben)',
+            '',
+            '# Versionsangaben',
+            '',
+            '| Angabe | Wert |',
+            '|---|---|',
+            '| Handbuch | Pfarrplaner Benutzerhandbuch |',
+            '| Programmversion | '.$package['info']['version'].' |',
+            '| Umgebung | '.$package['env'].' |',
+            '| Build-Datum der Anwendung | '.$package['buildDateString'].' |',
+            '| Handbuch erstellt am | '.$manualDateTime.' |',
+            '| Git-Branch | '.$gitBranch.' |',
+            '| Git-Stand | '.$gitCommit.' |',
+            '| Lizenz | GNU General Public License, Version 3.0 oder später |',
+            '| Projekt | Pfarrplaner |',
+            '| Autor und Copyright | Christoph Fischer, https://christoph-fischer.org |',
+            '',
+            '## Was ist neu?',
+            '',
+            'Die wichtigsten Änderungen der letzten Versionen stehen im Änderungsprotokoll. Für die tägliche Arbeit sind vor allem neue oder geänderte Schaltflächen, neue Berichte, neue Eingabefelder und geänderte Abläufe wichtig.',
+            '',
+            $this->getRecentChanges(),
+            '',
+            'Pfarrplaner ist freie Software. Sie dürfen das Programm unter den Bedingungen der GNU General Public License Version 3 oder später weitergeben und verändern.',
+            '',
+            'Dieses Handbuch beschreibt die Bedienung für Benutzerinnen und Benutzer. Installation, Betrieb und technische Wartung sind nicht Teil dieses Handbuchs.',
+            '',
+        ]));
+    }
+
+    /**
+     * Write the license chapter with project license text and dependency licenses.
+     *
+     * @return void
+     */
+    protected function writeLicensePage(): void
+    {
+        $licenseFile = base_path('manual/media/licenses/gpl-3.0.de.txt');
+        $licenseText = file_exists($licenseFile) ? trim(file_get_contents($licenseFile)) : '';
+
+        file_put_contents(base_path('manual/lizenzen.md'), implode(PHP_EOL, [
+            '[//]: # (TOC: 17. Lizenzen)',
+            '',
+            '# Lizenzen',
+            '',
+            'Pfarrplaner ist freie Software. Sie dürfen Pfarrplaner weitergeben und verändern, wenn Sie die Bedingungen der GNU General Public License Version 3 oder später einhalten.',
+            '',
+            'Dieses Kapitel nennt zuerst die Lizenz von Pfarrplaner selbst. Danach folgt eine Übersicht der verwendeten Programmpakete und ihrer Lizenzen.',
+            '',
+            '## Lizenz von Pfarrplaner',
+            '',
+            'Pfarrplaner steht unter der GNU General Public License, Version 3 oder später.',
+            '',
+            'Der folgende Text ist eine inoffizielle deutsche Übersetzung der GNU General Public License, Version 3. Rechtlich verbindlich ist der englische Originaltext.',
+            '',
+            '```text',
+            $licenseText,
+            '```',
+            '',
+            '## Verwendete Programmpakete',
+            '',
+            $this->getDependencyLicenseMarkdown(),
+            '',
+        ]));
+    }
+
+    /**
+     * @return string Markdown table with dependency license data
+     */
+    protected function getDependencyLicenseMarkdown(): string
+    {
+        $rows = [];
+
+        $composerFile = base_path('.composer-licenses');
+        if (file_exists($composerFile)) {
+            $composer = json_decode(file_get_contents($composerFile), true);
+            foreach (($composer['dependencies'] ?? []) as $package => $info) {
+                $rows[] = [
+                    'Composer',
+                    $package,
+                    $info['version'] ?? '',
+                    implode(', ', $info['license'] ?? []),
+                ];
+            }
+        }
+
+        $npmFile = base_path('.npm-licenses');
+        if (file_exists($npmFile)) {
+            $npm = json_decode(file_get_contents($npmFile), true);
+            foreach (($npm ?? []) as $package => $info) {
+                $rows[] = [
+                    'npm',
+                    $package,
+                    '',
+                    is_array($info['licenses'] ?? null) ? implode(', ', $info['licenses']) : ($info['licenses'] ?? ''),
+                ];
+            }
+        }
+
+        if (!count($rows)) {
+            return 'Die Paketliste konnte nicht automatisch aus den Lizenzdateien gelesen werden. Erzeugen Sie sie mit `npm run licenses:update` neu.';
+        }
+
+        usort($rows, fn($left, $right) => [$left[0], $left[1]] <=> [$right[0], $right[1]]);
+
+        $markdown = [
+            '| Bereich | Paket | Version | Lizenz |',
+            '|---|---|---|---|',
+        ];
+
+        foreach ($rows as $row) {
+            $markdown[] = '| '.implode(' | ', array_map(fn($value) => str_replace('|', '\\|', $value), $row)).' |';
+        }
+
+        return implode(PHP_EOL, $markdown);
+    }
+
+    /**
+     * @return string Markdown excerpt with recent changelog entries
+     */
+    protected function getRecentChanges(): string
+    {
+        $file = base_path('CHANGELOG.md');
+        if (!file_exists($file)) {
+            return 'Für diese Version liegt kein Änderungsprotokoll vor.';
+        }
+
+        $lines = preg_split('/\R/', file_get_contents($file));
+        $output = [];
+        $versionCount = 0;
+
+        foreach ($lines as $line) {
+            if (preg_match('/^##\s+/', $line)) {
+                $versionCount++;
+                if ($versionCount > 3) {
+                    break;
+                }
+            }
+
+            if ($versionCount > 0) {
+                $output[] = $line;
+            }
+        }
+
+        return trim(implode(PHP_EOL, $output)) ?: 'Für diese Version liegen keine zusammengefassten Änderungen vor.';
     }
 
     protected function getTOC() {
@@ -110,34 +244,31 @@ class BuildManualPages extends Command
             preg_match_all('/\[\/\/\]: \# \(TOC: (.*?)\)/', $page, $matches);
             if (count($matches[1])) {
                 foreach ($matches[1] as $match) {
-                    preg_match('/((?:\d+.)+)(.*)/', $match, $matches2);
+                    preg_match('/^((?:\d+\.)*)\s*(.*)$/', trim($match), $matches2);
                     if (count($matches2)) {
-                        $levels = explode('.', trim($matches2[1]));
-                        $jsonObject = '{ ## }';
-                        foreach ($levels as $level) {
-                            $jsonObject = str_replace('##', '"_'.$level.'": { "items": { ## }}', $jsonObject);
-                        }
-                        $jsonObject = str_replace('{ ## }', '{}, "title": "'.$matches2[2].'", "file": "'.basename($file).'"', $jsonObject);
-                        $toc = array_merge_recursive(json_decode($jsonObject, true), $toc);
+                        $toc[] = [
+                            'number' => trim($matches2[1], '.'),
+                            'title' => trim($matches2[2]),
+                            'file' => basename($file),
+                        ];
                     }
                 }
             }
         }
+        usort($toc, function ($a, $b) {
+            return version_compare($a['number'], $b['number']);
+        });
         return $toc;
     }
 
     protected function outputTOCLevel($data, $level = 0, $prefix='')
     {
         $o = '';
-        $data2 = [];
-        foreach ($data as $key => $item) {
-            $data2[substr($key, 1)] = $item;
-        }
-        ksort($data2);
-        foreach ($data2 as $key => $item) {
-            $o .= str_pad('', $level*4, ' ', STR_PAD_LEFT)
-                .'* ['.$prefix.$key.'. '.$item['title'].']('.$item['file'].')'.PHP_EOL;
-            if (isset($item['items'])) $o .= $this->outputTOCLevel($item['items'], ($level+1), $prefix.$key.'.');
+        foreach ($data as $item) {
+            $label = str_starts_with($item['number'], '0')
+                ? $item['title']
+                : $item['number'].'. '.$item['title'];
+            $o .= '* ['.$label.']('.$item['file'].')'.PHP_EOL;
         }
         return $o;
     }

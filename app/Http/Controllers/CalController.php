@@ -80,7 +80,10 @@ class CalController extends Controller
         if ($date->format('Ym') < 201801) abort(404);
         $monthEnd = $date->copy()->addMonth(1)->subSecond(1);
 
-        $years = Service::select(DB::raw('DISTINCT YEAR(DATE(services.date)) as year'))
+        $yearExpression = DB::connection()->getDriverName() == 'sqlite'
+            ? "strftime('%Y', services.date)"
+            : 'YEAR(DATE(services.date))';
+        $years = Service::select(DB::raw('DISTINCT '.$yearExpression.' as year'))
             ->inCities(Auth::user()->visibleCities)
             ->orderBy('year', 'ASC')
             ->get()->pluck('year');

@@ -94,6 +94,7 @@ class BaptismController extends Controller
                 'candidate_email' => '',
                 'candidate_phone' => '',
                 'first_contact_with' => '',
+                'appointment' => now(),
                 'registered' => false,
                 'signed' => false,
                 'docs_ready' => false,

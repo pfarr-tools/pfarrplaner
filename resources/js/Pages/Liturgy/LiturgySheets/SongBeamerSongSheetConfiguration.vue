@@ -28,12 +28,13 @@
   -->
 
 <template>
-    <liturgy-sheet-configuration-form :service="service" :sheet="sheet">
+    <liturgy-sheet-configuration-layout :title="sheetConfig.title" :service="service"
+                                        :sheet-config="sheetConfig">
         <form-check label="Platzhalter für Jingle, Intro, ..." v-model="myConfig.includeJingleAndIntro"
                     name="config[includeJingleAndIntro]"/>
         <form-check label="Mitwirkende anzeigen" v-model="myConfig.includeCredits" name="config[includeCredits]"/>
         <form-check label="Liederliste am Anfang" v-model="myConfig.includeSongList" name="config[includeSongList]"/>
-    </liturgy-sheet-configuration-form>
+    </liturgy-sheet-configuration-layout>
 </template>
 
 <script>

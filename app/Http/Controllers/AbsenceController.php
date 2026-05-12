@@ -78,7 +78,10 @@ class AbsenceController extends Controller
 
         $start = CalendarService::getStartOfPeriod($year, $month);
         $days = Absence::getDaysForPlanner($start->copy());
-        $years = Absence::select(DB::raw('YEAR(absences.from) as year'))->distinct()->get()->pluck('year')->sort();
+        $yearExpression = DB::connection()->getDriverName() == 'sqlite'
+            ? "strftime('%Y', \"absences\".\"from\")"
+            : 'YEAR(absences.from)';
+        $years = Absence::select(DB::raw($yearExpression.' as year'))->distinct()->get()->pluck('year')->sort();
         $pinList = $request->user()->getSetting('planner_pinned_users', []);
         $sectionConfig = $request->user()->getSetting('planner_open_sections', null);
 

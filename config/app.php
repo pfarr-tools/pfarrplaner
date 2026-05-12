@@ -91,6 +91,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'manual_url' => env('MANUAL_URL', 'https://handbuch.pfarrplaner.de'),
+
     'asset_url' => env('ASSET_URL', null),
 
     /*

@@ -37,10 +37,13 @@
             findest du eine Anleitung zum Einrichten der Verbindung in Outlook.
         </div>
         <div class="mb-2">
-            <inertia-link class="btn btn-light" title="Neuen Kalender verbinden"
-                          :href="route('calendarConnection.create')">
+            <inertia-link v-if="createRoute" class="btn btn-light" title="Neuen Kalender verbinden"
+                          :href="createRoute">
                 <span class="d-inline d-md-none mdi mdi-calendar-plus"></span><span class="d-none d-md-inline">Neue Verbindung anlegen</span>
             </inertia-link>
+            <button v-else class="btn btn-light" title="Neue Kalenderverbindungen sind in dieser Installation nicht freigeschaltet" disabled>
+                <span class="d-inline d-md-none mdi mdi-calendar-plus"></span><span class="d-none d-md-inline">Neue Verbindung anlegen</span>
+            </button>
         </div>
         <fake-table v-if="calendarConnections.length >0"
                     :columns="[5,5,2]" collapsed-header="Kalender"
@@ -70,6 +73,11 @@ export default {
     name: "CalendarConnectionsTab",
     components: {CopyableCode, FakeTable},
     props: ['user', 'calendarConnections'],
+    computed: {
+        createRoute() {
+            return route().has('calendarConnection.create') ? route('calendarConnection.create') : null;
+        },
+    },
     methods: {
         editConnection(calendarConnection) {
             this.$inertia.get(route('calendarConnection.edit', calendarConnection.id));

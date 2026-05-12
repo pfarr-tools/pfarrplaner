@@ -28,7 +28,8 @@
   -->
 
 <template>
-    <liturgy-sheet-configuration-form :service="service" :sheet="sheet">
+    <liturgy-sheet-configuration-layout :title="sheetConfig.title" :service="service"
+                                        :sheet-config="sheetConfig">
         <tab-headers>
             <tab-header id="colorscheme" active="1" title="Farbschema" />
             <tab-header id="layout" title="Layout" />
@@ -85,20 +86,22 @@
                                 ]" />
             </tab>
         </tabs>
-    </liturgy-sheet-configuration-form>
+    </liturgy-sheet-configuration-layout>
 </template>
 
 <script>
 import LiturgySheetConfigurationLayout from "./LiturgySheetConfigurationLayout";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
 import Tab from "../../../components/Ui/tabs/tab.vue";
+import Tabs from "../../../components/Ui/tabs/tabs.vue";
 import FormInput from "../../../components/Ui/forms/FormInput.vue";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize.vue";
 import TabHeader from "../../../components/Ui/tabs/tabHeader.vue";
+import TabHeaders from "../../../components/Ui/tabs/tabHeaders.vue";
 
 export default {
     name: "SongPPTSongSheetConfiguration",
-    components: {TabHeader, FormSelectize, FormInput, Tab, FormCheck, LiturgySheetConfigurationLayout},
+    components: {TabHeaders, TabHeader, FormSelectize, FormInput, Tabs, Tab, FormCheck, LiturgySheetConfigurationLayout},
     props: ['service', 'sheetConfig', 'config'],
     created() {
         this.$api().get(route('api.cities.index')).then(response => {
@@ -106,14 +109,14 @@ export default {
         });
     },
     data() {
-        let myConfig = this.sheet.config;
+        let myConfig = this.config || {};
         if (!(myConfig.showAdsFromCities || []).length) myConfig.showAdsFromCities = [this.service.city_id];
         if (!myConfig.outputFormat) myConfig.outputFormat = 'ppt';
 
 
         let myItems = [];
-        if (!(myConfig.includeAdsLoopElements || []).length) myConfig.includeAdLoopElements = [];
-        this.service.liturgy_blocks.forEach(block => {
+        if (!(myConfig.includeAdLoopElements || []).length) myConfig.includeAdLoopElements = [];
+        (this.service.liturgy || this.service.liturgy_blocks || []).forEach(block => {
             block.items.forEach(item => {
                 myItems.push({id: item.id, name: item.title });
             });

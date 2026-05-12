@@ -121,7 +121,10 @@ class CalendarController extends Controller
         );
         $user->setSetting('calendar_name_format', $nameFormat);
 
-        $years = Day::select(DB::raw('YEAR(days.date) as year'))->orderBy('date')->get()->pluck('year')->unique()->sort();
+        $yearExpression = DB::connection()->getDriverName() == 'sqlite'
+            ? "strftime('%Y', days.date)"
+            : 'YEAR(days.date)';
+        $years = Day::select(DB::raw($yearExpression.' as year'))->orderBy('date')->get()->pluck('year')->unique()->sort();
         for ($i = 1; $i <= 12; $i++) {
             $months[$i] = strftime('%B', mktime(0, 0, 0, $i, 1, date('Y')));
         }
