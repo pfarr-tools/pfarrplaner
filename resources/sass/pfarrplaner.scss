@@ -810,4 +810,9 @@ tr.changed, tr.changed td, tr.changed th {
     font-weight: normal !important;
 }
 
-
+.tiptap blockquote {
+    padding-left: 1em;
+    padding-right: 2em;
+    text-align: justify;
+    font-size: .9em;
+}
