@@ -354,6 +354,8 @@ Beim Volltext-Liedblatt können diese Optionen erscheinen:
 - **QR-Code für KonfiApp**: Fügt einen QR-Code ein, wenn der Gottesdienst mit KonfiApp verbunden ist. Diese Option ist nur sinnvoll, wenn die Gemeinde entsprechend eingerichtet ist.
 - **Seitenzahlen**: Fügt Seitenzahlen in die Ausgabe ein.
 
+Typografische Zeichen wie Gedankenstrich, Auslassungspunkte oder Anführungszeichen werden in Word-Ausgaben mit übernommen, wenn sie im Predigt- oder Liturgietext enthalten sind.
+
 ---
 
 ## Konfiguration: Liedblatt mit Noten

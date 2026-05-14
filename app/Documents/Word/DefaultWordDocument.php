@@ -33,6 +33,7 @@ namespace App\Documents\Word;
 
 use App\Models\Service;
 use Illuminate\Support\Facades\Response;
+use DOMDocument;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Exception\Exception;
@@ -219,6 +220,23 @@ class DefaultWordDocument
     }
 
     /**
+     * Create a DOM document from HTML while preserving UTF-8 characters for Word exports.
+     *
+     * @param string $html
+     * @return DOMDocument
+     */
+    public static function createDomDocumentFromHtml(string $html): DOMDocument
+    {
+        $dom = new DOMDocument();
+        $dom->loadHTML(
+            mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'),
+            LIBXML_NOERROR | LIBXML_NOWARNING
+        );
+
+        return $dom;
+    }
+
+    /**
      * Render some text with default formatting
      * @param $text Text
      * @param array $fontOption Font options
@@ -398,6 +416,5 @@ class DefaultWordDocument
 
 
 }
-
 
 

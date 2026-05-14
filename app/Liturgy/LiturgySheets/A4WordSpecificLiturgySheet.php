@@ -256,15 +256,18 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
             $doc->renderNormalText('Für diesen Gottesdienst wurde noch keine Predigt angelegt.', ['italic' => true]);
         } else {
             if (!$this->service->sermon->text) return;
-            $text = utf8_decode(strtr($this->service->sermon->text, [
+            $text = strtr($this->service->sermon->text, [
                 '<h1>' => '<h3>', '</h1>' => '</h3>',
                 '<h2>' => '<h4>', '</h2>' => '</h4>',
-            ]));
-            $dom = new \DOMDocument();
-            $dom->loadHTML($text, LIBXML_NOWARNING);
+            ]);
+            $dom = DefaultWordDocument::createDomDocumentFromHtml($text);
+            $body = $dom->getElementsByTagName('body')->item(0);
+            if (!$body) {
+                return;
+            }
             $nodes = [];
             /** @var \DOMNode $node */
-            foreach ($dom->documentElement->firstChild->childNodes as $node) {
+            foreach ($body->childNodes as $node) {
                 if ($node->nodeName == 'blockquote') {
                     $doc->renderText($node->nodeValue, $doc::BLOCKQUOTE, ['size' => 10]);
                 } else {
