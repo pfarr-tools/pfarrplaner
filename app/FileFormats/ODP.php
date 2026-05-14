@@ -383,4 +383,28 @@ class ODP extends AbstractZIPBasedFileFormat
         $this->zip->close();
     }
 
+    /**
+     * Decode HTML entities in ODP body text so LibreOffice shows Unicode characters instead of entity strings.
+     *
+     * @return void
+     */
+    public function applyTextEntityDecodingFix(): void
+    {
+        $this->zip->open($this->documentFilePath);
+
+        $this->patchXMLFile('content.xml', function (DOMDocument $doc) {
+            $xpath = new DOMXPath($doc);
+            $xpath->registerNamespace('office', 'urn:oasis:names:tc:opendocument:xmlns:office:1.0');
+
+            foreach ($xpath->query('/office:document-content/office:body//text()') as $textNode) {
+                $decodedText = html_entity_decode($textNode->textContent, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                if ($decodedText !== $textNode->textContent) {
+                    $textNode->nodeValue = $decodedText;
+                }
+            }
+        });
+
+        $this->zip->close();
+    }
+
 }

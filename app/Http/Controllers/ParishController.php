@@ -69,31 +69,4 @@ class ParishController extends AbstractCRUDController
         $data['name'] = 'Pfarramt '.$city->name;
         return $data;
     }
-
-
-
-
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param Parish $parish
-     * @return Response
-     */
-    public function update_old(Request $request, Parish $parish)
-    {
-        $parish->update($this->validateRequest($request));
-
-        // import street ranges from csv
-        $csv = $request->get('csv', '');
-        if ($csv) {
-            $ctr = $parish->importStreetsFromCSV($csv);
-        }
-
-        $success = isset($ctr) ? $ctr . ' Straßendatensätze wurden importiert.' : '';
-
-        return redirect()->route('parishes.index')->with('success', 'Das Pfarramt wurde geändert. ' . $success);
-    }
-
 }

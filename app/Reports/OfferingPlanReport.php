@@ -94,7 +94,8 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
 
         $data['occurences'] = Occurence::with('event')->whereHas('event', function ($query) use ($data) {
             $query->servicesOnly()
-                ->inCities($data['cities'])
+                ->whereIn('city_id', $data['cities'])
+		        ->whereDoesntHave('funerals')
                 ->between(Carbon::parse('01-01-'.$data['year'])->startOfYear(), Carbon::parse('01-01-'.$data['year'])->endOfYear())
                 ->ordered();
         })->orderBy('start')->get();

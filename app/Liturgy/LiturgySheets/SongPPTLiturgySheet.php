@@ -44,7 +44,7 @@ use App\Models\Service;
 use App\Services\ImageService;
 use App\Services\QRService;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\Common\Drawing;
 use PhpOffice\PhpPresentation\DocumentLayout;
@@ -797,6 +797,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $patchFile = PowerPoint::fromFile($tempFile);
         $patchFile->applySVGFix();
         $patchFile->applySlideNameFix($this->slideNames);
+        $patchFile->applyTextEntityDecodingFix();
         if ($this->extension == 'pptm') {
             // needs patch
             $patchFile->patchPPTM(base_path('assets/ppt/vbaProjectForAutoLoops.bin'));
@@ -817,6 +818,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $objWriter->save($tempFile);
 
         $patchFile = ODP::fromFile($tempFile);
+        $patchFile->applyTextEntityDecodingFix();
         $patchFile->applySlideNameFix($this->slideNames);
         $patchFile->injectBasicMacroFromBas(
                          resource_path('macros/LO/ODF/LoopListener.bas')
@@ -875,10 +877,17 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 });
         }
 
+        $eventListSlideChunks = $this->paginateEventListSlidesByDate($this->adEventsToBeListed);
+        $listedSlidesCount = collect($eventListSlideChunks)->sum(function (array $pages) {
+            return count($pages);
+        });
+        $highlightedSlidesCount = collect($this->adEventsToBeHighlighted)->sum(function ($events) {
+            return count($events);
+        });
 
         $currentSlideNumber = $this->ppt->getSlideCount();
         $isFirstLoop = $currentSlideNumber == 0;
-        $adSlidesCount = count($this->adEventsToBeListed) + count($this->adEventsToBeHighlighted);
+        $adSlidesCount = $listedSlidesCount + $highlightedSlidesCount;
         $finalAdSlideNumber = $currentSlideNumber + $adSlidesCount;
 
         if ($isFirstLoop) {
@@ -896,9 +905,9 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         $cursor = $start->copy();
         while ($cursor->lte($end)) {
-            if (count($this->adEventsToBeListed[$cursor->format('Y-m-d')] ?? [])) {
+            foreach (($eventListSlideChunks[$cursor->format('Y-m-d')] ?? []) as $eventListChunk) {
                 $this->renderEventsListSlide($cursor,
-                                             $this->adEventsToBeListed[$cursor->format('Y-m-d')],
+                                             $eventListChunk,
                                              $currentSlideNumber+1,
                                              $finalAdSlideNumber,
                                              $isFinalLoop);
@@ -929,6 +938,121 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
             }
         }
+    }
+
+    /**
+     * Split event lists into slide-sized chunks per day.
+     *
+     * @param iterable $eventsByDate
+     * @return array<string, array<int, Collection>>
+     */
+    protected function paginateEventListSlidesByDate(iterable $eventsByDate): array
+    {
+        $pagesByDate = [];
+
+        foreach ($eventsByDate as $date => $events) {
+            $pagesByDate[$date] = $this->paginateEventListSlides(collect($events));
+        }
+
+        return $pagesByDate;
+    }
+
+    /**
+     * Split a single day's event list into multiple slide-sized chunks.
+     *
+     * @param Collection $events
+     * @return array<int, Collection>
+     */
+    protected function paginateEventListSlides(Collection $events): array
+    {
+        if ($events->isEmpty()) {
+            return [];
+        }
+
+        $layout = $this->getEventsListLayout();
+        $titleLineHeight = PPTUnitsHelper::estimateLineHeightPx($layout['titleFontTtfPath'], $layout['listFontSize']);
+        $locationLineHeight = PPTUnitsHelper::estimateLineHeightPx($layout['locationFontTtfPath'], $layout['locationFontSize']);
+
+        $pages = [];
+        $currentPageEvents = collect();
+        $currentHeight = 0;
+
+        foreach ($events as $event) {
+            $eventHeight = $this->estimateEventListEntryHeight($event, $layout, $titleLineHeight, $locationLineHeight);
+
+            if ($currentPageEvents->isNotEmpty() && (($currentHeight + $eventHeight) > $layout['listHeight'])) {
+                $pages[] = $currentPageEvents;
+                $currentPageEvents = collect();
+                $currentHeight = 0;
+            }
+
+            $currentPageEvents->push($event);
+            $currentHeight += $eventHeight;
+        }
+
+        if ($currentPageEvents->isNotEmpty()) {
+            $pages[] = $currentPageEvents;
+        }
+
+        return $pages;
+    }
+
+    /**
+     * Get the layout configuration for event list slides.
+     *
+     * @return array<string, int|string>
+     */
+    protected function getEventsListLayout(): array
+    {
+        $listFontSize     = (int)($this->config['fontSize'] * 0.8);
+        $locationFontSize = (int)($listFontSize * 0.6);
+        $listWidth        = 950;
+        $listHeight       = 500;
+        $leftColumnWidthPixels = (int)PPTUnitsHelper::convert(5.75, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL);
+        $rightColumnWidth = $listWidth - $leftColumnWidthPixels;
+        $detailsInnerPaddingPx = 10;
+
+        return [
+            'listFontSize' => $listFontSize,
+            'locationFontSize' => $locationFontSize,
+            'listWidth' => $listWidth,
+            'listHeight' => $listHeight,
+            'listOffsetX' => 10,
+            'listOffsetY' => 80,
+            'leftColumnWidthPixels' => $leftColumnWidthPixels,
+            'rightColumnOffsetX' => 10 + $leftColumnWidthPixels,
+            'rightColumnWidth' => $rightColumnWidth,
+            'detailsInnerPaddingPx' => $detailsInnerPaddingPx,
+            'maxTitleWidthPx' => max(50, $rightColumnWidth - $detailsInnerPaddingPx),
+            'titleFontTtfPath' => resource_path('fonts/Sarabun-SemiBold.ttf'),
+            'locationFontTtfPath' => resource_path('fonts/Sarabun-Light.ttf'),
+            'titleMarginBottom' => 4,
+            'locationMarginBottom' => 14,
+        ];
+    }
+
+    /**
+     * Estimate the vertical space needed for one event in the list slide layout.
+     *
+     * @param mixed $event
+     * @param array<string, int|string> $layout
+     * @param int $titleLineHeight
+     * @param int $locationLineHeight
+     * @return int
+     */
+    protected function estimateEventListEntryHeight($event, array $layout, int $titleLineHeight, int $locationLineHeight): int
+    {
+        $titleText = $event->getAdText('ppt', $event->service->titleText(false));
+        $titleLines = PPTUnitsHelper::wrapTextByPixelWidth(
+            $titleText,
+            $layout['titleFontTtfPath'],
+            $layout['listFontSize'],
+            $layout['maxTitleWidthPx']
+        );
+
+        return (count($titleLines) * ($titleLineHeight + $layout['titleMarginBottom']))
+            + $locationLineHeight
+            + $layout['locationMarginBottom'];
     }
 
     /**
@@ -1091,7 +1215,128 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         $slide = $this->createEmptyAdSlide($firstAdSlideNumber, $finalAdSlideNumber, $isFinalLoop);
 
-        // Header
+        $this->renderEventsListSlideHeader($slide, $date, $textColor, $gray);
+        $layout = $this->getEventsListLayout();
+
+        // Shapes
+        $timeColumnShape = $slide->createRichTextShape()
+            ->setOffsetX($layout['listOffsetX'])
+            ->setOffsetY($layout['listOffsetY'])
+            ->setWidth($layout['leftColumnWidthPixels'])
+            ->setHeight($layout['listHeight']);
+
+        $timeColumnShape->getFill()->setFillType(Fill::FILL_NONE);
+        $timeColumnShape->getBorder()->setLineStyle(Border::LINE_NONE);
+
+        $detailsColumnShape = $slide->createRichTextShape()
+            ->setOffsetX($layout['rightColumnOffsetX'])
+            ->setOffsetY($layout['listOffsetY'])
+            ->setWidth($layout['rightColumnWidth'])
+            ->setHeight($layout['listHeight']);
+
+        $detailsColumnShape->getFill()->setFillType(Fill::FILL_NONE);
+        $detailsColumnShape->getBorder()->setLineStyle(Border::LINE_NONE);
+
+        $isFirstTimeParagraph    = true;
+        $isFirstDetailsParagraph = true;
+
+        foreach ($events as $event) {
+            $timeText = (!$event->event->is_allday) ? $event->service->timeText() : '';
+
+            $titleText = $event->getAdText('ppt', $event->service->titleText(false));
+            $titleLines = PPTUnitsHelper::wrapTextByPixelWidth($titleText, $layout['titleFontTtfPath'], $layout['listFontSize'], $layout['maxTitleWidthPx']);
+
+            // --- LEFT COLUMN: time on first line, then spacer lines to match wrapped title, then spacer for location
+            $timeParagraph = $isFirstTimeParagraph
+                ? $timeColumnShape->getActiveParagraph()
+                : $timeColumnShape->createParagraph();
+            $isFirstTimeParagraph = false;
+
+            $timeParagraph->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
+                ->setMarginRight(10)
+                ->setMarginBottom(4);
+
+            $timeParagraph->createTextRun($timeText)
+                ->getFont()
+                ->setBold(false)
+                ->setSize($layout['listFontSize'])
+                ->setColor($textColor)
+                ->setName('Sarabun Light');
+
+            // If title wraps into N lines, add N-1 blank lines in the time column
+            for ($i = 1; $i < count($titleLines); $i++) {
+                $timeWrappedSpacerParagraph = $timeColumnShape->createParagraph();
+                $timeWrappedSpacerParagraph->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
+                    ->setMarginRight(10)
+                    ->setMarginBottom(4);
+
+                $timeWrappedSpacerParagraph->createTextRun("\u{00A0}")
+                    ->getFont()
+                    ->setBold(false)
+                    ->setSize($layout['listFontSize'])
+                    ->setColor($textColor)
+                    ->setName('Sarabun Light');
+            }
+
+            // Spacer line for the location line (keeps left/right aligned)
+            $timeLocationSpacerParagraph = $timeColumnShape->createParagraph();
+            $timeLocationSpacerParagraph->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
+                ->setMarginRight(10)
+                ->setMarginBottom(14);
+
+            $timeLocationSpacerParagraph->createTextRun("\u{00A0}")
+                ->getFont()
+                ->setBold(false)
+                ->setSize($layout['locationFontSize'])
+                ->setColor($textColor)
+                ->setName('Sarabun Light');
+
+            // --- RIGHT COLUMN: title as multiple paragraphs (so wrapping is deterministic), then location paragraph
+            foreach ($titleLines as $index => $titleLine) {
+                $titleParagraph = $isFirstDetailsParagraph
+                    ? $detailsColumnShape->getActiveParagraph()
+                    : $detailsColumnShape->createParagraph();
+                $isFirstDetailsParagraph = false;
+
+                $titleParagraph->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_LEFT)
+                    ->setMarginBottom(4);
+
+                $titleParagraph->createTextRun($titleLine)
+                    ->getFont()
+                    ->setSize($layout['listFontSize'])
+                    ->setColor($textColor)
+                    ->setName('Sarabun SemiBold');
+            }
+
+            $locationParagraph = $detailsColumnShape->createParagraph();
+            $locationParagraph->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_LEFT)
+                ->setMarginBottom(14);
+
+            $locationParagraph->createTextRun($event->service->locationTextWithCity)
+                ->getFont()
+                ->setBold(false)
+                ->setSize($layout['locationFontSize'])
+                ->setColor($textColor)
+                ->setName('Sarabun Light');
+        }
+    }
+
+    /**
+     * Render the repeated day header for event list slides.
+     *
+     * @param Slide $slide
+     * @param Carbon $date
+     * @param Color $textColor
+     * @param Color $gray
+     * @return void
+     */
+    protected function renderEventsListSlideHeader(Slide $slide, Carbon $date, Color $textColor, Color $gray): void
+    {
         $headerShape = $slide->createRichTextShape()
             ->setWidth(950)
             ->setHeight(50)
@@ -1112,134 +1357,6 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         $headerParagraph->createTextRun($date->copy()->setTimezone('Europe/Berlin')->isoFormat('D. MMMM'))
             ->getFont()->setBold(false)->setSize($this->config['fontSize'])->setColor($textColor)->setName('Sarabun SemiBold');
-
-        // List layout
-        $listFontSize     = (int)($this->config['fontSize'] * 0.8);
-        $locationFontSize = (int)($listFontSize * 0.6);
-
-        $listOffsetX = 10;
-        $listOffsetY = 80;
-        $listWidth   = 950;
-        $listHeight  = 500;
-
-        // Indent at 5.5cm
-        $leftColumnWidthPixels = (int) PPTUnitsHelper::convert(5.75, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL);
-        $rightColumnOffsetX    = $listOffsetX + $leftColumnWidthPixels;
-        $rightColumnWidth      = $listWidth - $leftColumnWidthPixels;
-
-        // Shapes
-        $timeColumnShape = $slide->createRichTextShape()
-            ->setOffsetX($listOffsetX)
-            ->setOffsetY($listOffsetY)
-            ->setWidth($leftColumnWidthPixels)
-            ->setHeight($listHeight);
-
-        $timeColumnShape->getFill()->setFillType(Fill::FILL_NONE);
-        $timeColumnShape->getBorder()->setLineStyle(Border::LINE_NONE);
-
-        $detailsColumnShape = $slide->createRichTextShape()
-            ->setOffsetX($rightColumnOffsetX)
-            ->setOffsetY($listOffsetY)
-            ->setWidth($rightColumnWidth)
-            ->setHeight($listHeight);
-
-        $detailsColumnShape->getFill()->setFillType(Fill::FILL_NONE);
-        $detailsColumnShape->getBorder()->setLineStyle(Border::LINE_NONE);
-
-        // Font file for measuring wrapping of the title
-        $titleFontTtfPath = resource_path('fonts/Sarabun-SemiBold.ttf');
-
-        // Conservative horizontal padding inside the details column, to match what PPT/LO will effectively do
-        $detailsInnerPaddingPx = 10;
-        $maxTitleWidthPx = max(50, $rightColumnWidth - $detailsInnerPaddingPx);
-
-        $isFirstTimeParagraph    = true;
-        $isFirstDetailsParagraph = true;
-
-        foreach ($events as $event) {
-            $timeText = (!$event->event->is_allday) ? $event->service->timeText() : '';
-
-            $titleText = $event->getAdText('ppt', $event->service->titleText(false));
-            $titleLines = PPTUnitsHelper::wrapTextByPixelWidth($titleText, $titleFontTtfPath, $listFontSize, $maxTitleWidthPx);
-
-            // --- LEFT COLUMN: time on first line, then spacer lines to match wrapped title, then spacer for location
-            $timeParagraph = $isFirstTimeParagraph
-                ? $timeColumnShape->getActiveParagraph()
-                : $timeColumnShape->createParagraph();
-            $isFirstTimeParagraph = false;
-
-            $timeParagraph->getAlignment()
-                ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
-                ->setMarginRight(10)
-                ->setMarginBottom(4);
-
-            $timeParagraph->createTextRun($timeText)
-                ->getFont()
-                ->setBold(false)
-                ->setSize($listFontSize)
-                ->setColor($textColor)
-                ->setName('Sarabun Light');
-
-            // If title wraps into N lines, add N-1 blank lines in the time column
-            for ($i = 1; $i < count($titleLines); $i++) {
-                $timeWrappedSpacerParagraph = $timeColumnShape->createParagraph();
-                $timeWrappedSpacerParagraph->getAlignment()
-                    ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
-                    ->setMarginRight(10)
-                    ->setMarginBottom(4);
-
-                $timeWrappedSpacerParagraph->createTextRun("\u{00A0}")
-                    ->getFont()
-                    ->setBold(false)
-                    ->setSize($listFontSize)
-                    ->setColor($textColor)
-                    ->setName('Sarabun Light');
-            }
-
-            // Spacer line for the location line (keeps left/right aligned)
-            $timeLocationSpacerParagraph = $timeColumnShape->createParagraph();
-            $timeLocationSpacerParagraph->getAlignment()
-                ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
-                ->setMarginRight(10)
-                ->setMarginBottom(14);
-
-            $timeLocationSpacerParagraph->createTextRun("\u{00A0}")
-                ->getFont()
-                ->setBold(false)
-                ->setSize($locationFontSize)
-                ->setColor($textColor)
-                ->setName('Sarabun Light');
-
-            // --- RIGHT COLUMN: title as multiple paragraphs (so wrapping is deterministic), then location paragraph
-            foreach ($titleLines as $index => $titleLine) {
-                $titleParagraph = $isFirstDetailsParagraph
-                    ? $detailsColumnShape->getActiveParagraph()
-                    : $detailsColumnShape->createParagraph();
-                $isFirstDetailsParagraph = false;
-
-                $titleParagraph->getAlignment()
-                    ->setHorizontal(Alignment::HORIZONTAL_LEFT)
-                    ->setMarginBottom(4);
-
-                $titleParagraph->createTextRun($titleLine)
-                    ->getFont()
-                    ->setSize($listFontSize)
-                    ->setColor($textColor)
-                    ->setName('Sarabun SemiBold');
-            }
-
-            $locationParagraph = $detailsColumnShape->createParagraph();
-            $locationParagraph->getAlignment()
-                ->setHorizontal(Alignment::HORIZONTAL_LEFT)
-                ->setMarginBottom(14);
-
-            $locationParagraph->createTextRun($event->service->locationTextWithCity)
-                ->getFont()
-                ->setBold(false)
-                ->setSize($locationFontSize)
-                ->setColor($textColor)
-                ->setName('Sarabun Light');
-        }
     }
 
     public function renderVirtualSongsheetQR(Slide $slide, Service $service)

@@ -14,6 +14,7 @@ namespace Tests\Unit;
 
 use App\Models\Liturgy\Block;
 use App\Models\Liturgy\Item;
+use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -90,5 +91,29 @@ class ItemUnitTest extends TestCase
         $fresh = Item::find($item->id);
         $this->assertIsArray($fresh->data);
         $this->assertEmpty($fresh->data);
+    }
+
+    public function testRecipientsResolveCustomMinistryContainingColon(): void
+    {
+        $user = User::factory()->create([
+            'first_name' => 'Alex',
+            'last_name' => 'Muster',
+        ]);
+
+        $service = $this->block->service;
+        $service->participants()->attach($user->id, ['category' => 'Lektor:innen']);
+        $service->refresh();
+
+        $item = Item::create([
+            'liturgy_block_id' => $this->block->id,
+            'title' => 'Test-Element',
+            'data_type' => 'text',
+            'serialized_data' => serialize([
+                'responsible' => ['ministry:Lektor:innen'],
+            ]),
+            'sortable' => 1,
+        ]);
+
+        $this->assertSame(['Alex Muster'], $item->recipients());
     }
 }
