@@ -31,7 +31,8 @@
     <div class="profile-tab">
         <div class="row">
             <div class="col-md-8">
-                <form-input name="name" label="Name" v-model="user.name" />
+                <form-input name="first_name" label="Vorname" v-model="user.first_name" />
+                <form-input name="last_name" label="Nachname" v-model="user.last_name" />
                 <form-input name="email" label="E-Mailadresse" v-model="user.email" />
                 <form-input name="office" label="Pfarramt/Büro" v-model="user.office" />
                 <form-textarea name="address" label="Adresse" v-model="user.address" />
