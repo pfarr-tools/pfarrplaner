@@ -193,7 +193,7 @@ class AbstractCalendarLink
         $data = $this->getRenderData($request, $user);
         $calendarLink = $this;
         $raw = View::make('ical.export.' . $this->viewName, compact('calendarLink', 'data'));
-        return $this->normalizeLineEndings(str_replace(' ,', ',', $raw));
+        return $this->normalizeLineEndings($raw);
     }
 
     /**
