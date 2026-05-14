@@ -797,6 +797,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $patchFile = PowerPoint::fromFile($tempFile);
         $patchFile->applySVGFix();
         $patchFile->applySlideNameFix($this->slideNames);
+        $patchFile->applyTextEntityDecodingFix();
         if ($this->extension == 'pptm') {
             // needs patch
             $patchFile->patchPPTM(base_path('assets/ppt/vbaProjectForAutoLoops.bin'));
@@ -817,6 +818,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $objWriter->save($tempFile);
 
         $patchFile = ODP::fromFile($tempFile);
+        $patchFile->applyTextEntityDecodingFix();
         $patchFile->applySlideNameFix($this->slideNames);
         $patchFile->injectBasicMacroFromBas(
                          resource_path('macros/LO/ODF/LoopListener.bas')

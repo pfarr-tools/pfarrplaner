@@ -33,6 +33,7 @@ namespace App\FileFormats;
 use Closure;
 use DOMDocument;
 use DOMElement;
+use DOMXPath;
 use PhpOffice\PhpPresentation\Shape\Drawing\ZipFile;
 use \ZipArchive;
 
@@ -225,6 +226,41 @@ class PowerPoint extends AbstractZIPBasedFileFormat
             $this->patchXMLFile('ppt/slides/slide' . $slideIndex . '.xml', function(DOMDocument $doc) use ($name) {
                 $slide = $doc->documentElement;
                 $slide->getElementsByTagName('cSld')->item(0)->setAttribute('name', $name);
+                return $doc;
+            });
+        }
+        $this->zip->close();
+    }
+
+    /**
+     * Decode HTML entities in slide text runs so PowerPoint shows Unicode characters instead of entity strings.
+     *
+     * @return void
+     * @throws \DOMException
+     */
+    public function applyTextEntityDecodingFix(): void
+    {
+        $this->zip->open($this->documentFilePath);
+        $slidePaths = [];
+        for ($index = 0; $index < $this->zip->numFiles; $index++) {
+            $path = $this->zip->getNameIndex($index);
+            if (preg_match('#^ppt/slides/slide\d+\.xml$#', $path)) {
+                $slidePaths[] = $path;
+            }
+        }
+
+        foreach ($slidePaths as $path) {
+            $this->patchXMLFile($path, function (DOMDocument $doc) {
+                $xpath = new DOMXPath($doc);
+                $xpath->registerNamespace('a', 'http://schemas.openxmlformats.org/drawingml/2006/main');
+
+                foreach ($xpath->query('//a:t') as $textNode) {
+                    $decodedText = html_entity_decode($textNode->textContent, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    if ($decodedText !== $textNode->textContent) {
+                        $textNode->nodeValue = $decodedText;
+                    }
+                }
+
                 return $doc;
             });
         }
