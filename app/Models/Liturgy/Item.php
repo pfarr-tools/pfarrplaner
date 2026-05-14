@@ -79,6 +79,11 @@ class Item extends Model
         return $this->attributes['serialized_data'] = serialize($data);
     }
 
+    /**
+     * Resolve all recipients configured for this liturgy item.
+     *
+     * @return array
+     */
     public function recipients() {
         $list = (isset($this->data['responsible']) ? $this->data['responsible'] : []);
         $p = [];
@@ -87,7 +92,7 @@ class Item extends Model
                 $type = $participant['type'];
                 $id = $participant['name'];
             } else {
-                list($type, $id) = explode(':', $participant);
+                [$type, $id] = explode(':', $participant, 2);
             }
             if ((!$type) || (!$id)) continue;
             if ($type == 'ministry') {
