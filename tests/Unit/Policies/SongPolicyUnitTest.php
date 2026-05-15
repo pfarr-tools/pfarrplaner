@@ -36,6 +36,12 @@ class SongPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->viewAny($user));
     }
 
+    public function testIndexAlwaysReturnsTrue(): void
+    {
+        $user = User::factory()->create();
+        $this->assertTrue($this->policy->index($user));
+    }
+
     public function testViewAlwaysReturnsTrue(): void
     {
         $user = User::factory()->create();

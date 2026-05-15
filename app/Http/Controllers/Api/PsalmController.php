@@ -31,12 +31,12 @@
 namespace App\Http\Controllers\Api;
 
 
-use App\Http\Controllers\Controller;
 use App\Models\Liturgy\Psalm;
 use Illuminate\Http\Request;
 
-class PsalmController extends Controller
+class PsalmController extends AbstractApiCRUDController
 {
+    protected string $modelClass = Psalm::class;
 
     /**
      * PsalmController constructor.
@@ -46,57 +46,26 @@ class PsalmController extends Controller
         $this->middleware('auth:api');
     }
 
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Psalm::all());
+        return response()->json(parent::index($request));
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function store(Request $request)
     {
-        $data = $this->validateRequest($request);
-        $psalm = Psalm::create($data);
+        $creator = app(($this->modelClass)::getContractName('create'));
+        $psalm = $creator->create($request->user(), $request->all());
         $psalms = Psalm::all();
         return response()->json(compact('psalm', 'psalms'));
     }
 
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function update(Request $request, Psalm $psalm)
+    public function update(Request $request, $modelId)
     {
-        $data = $this->validateRequest($request);
-
-        $psalm->update($data);
+        $psalm = $this->getSingleModel($request, $modelId);
+        $updater = $psalm->getContractedAction('update');
+        $psalm = $updater->update($request->user(), $psalm, $request->all());
         $psalm->refresh();
         $psalms = Psalm::all();
         return response()->json(compact('psalm', 'psalms'));
     }
-
-    /**
-     * @param Request $request
-     * @return array
-     */
-    protected function validateRequest(Request $request)
-    {
-        return $request->validate(
-            [
-                'title' => 'required|string',
-                'intro' => 'nullable|string',
-                'text' => 'nullable|string',
-                'copyrights' => 'nullable|string',
-                'songbook' => 'nullable|string',
-                'songbook_abbreviation' => 'nullable|string',
-                'reference' => 'nullable|string',
-            ]
-        );
-    }
-
 }

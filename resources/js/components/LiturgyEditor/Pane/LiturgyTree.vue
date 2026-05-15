@@ -154,7 +154,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
-                                    <div class="row">
+                                    <div class="row" v-if="!agendaMode">
                                         <item-starting-time class="col-6" :item="item" :service="service"/>
                                         <item-text-stats class="col-6" :item="item" :service="service"/>
                                     </div>
@@ -176,7 +176,7 @@
                 </div>
               </template>
             </draggable>
-            <div class="row" v-if="blocks.length > 0">
+            <div class="row" v-if="blocks.length > 0 && !agendaMode">
                 <div class="col-sm-7"></div>
                 <div class="col-sm-2" style="border-top: solid 1px lightgray;">
                     <small>Berechnetes Ende:</small>

@@ -30,13 +30,4 @@
 
 use App\Http\Controllers\PsalmController;
 
-Route::get('/psalmen', [PsalmController::class, 'index'])->name('psalms.index');
-Route::post('/psalmen', [PsalmController::class, 'store'])->name('psalm.store');
-Route::get('/psalmen/neu', [PsalmController::class, 'create'])->name('psalm.create');
-
-Route::get('/psalm/{psalm}', [PsalmController::class, 'edit'])->name('psalm.edit');
-Route::patch('/psalm/{psalm}', [PsalmController::class, 'update'])->name('psalm.update');
-Route::delete('/psalm/{psalm}', [PsalmController::class, 'destroy'])->name('psalm.destroy');
-
 Route::post('/psalm/{psalm}/split/{reference}',[PsalmController::class, 'split'])->name('psalm.psalmbook.split');
-

@@ -327,30 +327,22 @@ class Absence extends Model implements HasDAVCalendarItems
     /**
      * @param $data
      */
-    public function setupReplacements($data)
+    public function setupReplacements(User $user, $data)
     {
         $this->load('replacements');
         if (count($this->replacements)) {
             foreach ($this->replacements as $replacement) {
-                $replacement->delete();
+                app(Replacement::getContractName('delete'))->delete($user, $replacement);
             }
         }
         foreach ($data as $replacementData) {
-            $replacement = new Replacement(
-                [
-                    'absence_id' => $this->id,
-                    'from' => max(Carbon::createFromFormat('d.m.Y', $replacementData['from']), $this->from),
-                    'to' => min(Carbon::createFromFormat('d.m.Y', $replacementData['to']), $this->to),
-                    'pool_id' => $replacementData['pool_id'] ?? null,
-                ]
-            );
-            $replacement->save();
-            if (isset($replacementData['users'])) {
-                foreach ($replacementData['users'] as $id => $userData) {
-                    $replacementData['users'][$id] = $userData['id'] ?? $userData;
-                }
-                $replacement->users()->sync($replacementData['users']);
-            }
+            $replacement = app(Replacement::getContractName('create'))->create($user, $this, [
+                'absence_id' => $this->id,
+                'from' => max(Carbon::createFromFormat('d.m.Y', $replacementData['from']), $this->from),
+                'to' => min(Carbon::createFromFormat('d.m.Y', $replacementData['to']), $this->to),
+                'pool_id' => $replacementData['pool_id'] ?? null,
+                'users' => $replacementData['users'] ?? [],
+            ]);
             $replacementIds[] = $replacement->id;
         }
     }

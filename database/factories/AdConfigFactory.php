@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Ads\AdConfig;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,6 +11,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class AdConfigFactory extends Factory
 {
+    protected $model = AdConfig::class;
+
     /**
      * Define the model's default state.
      *
@@ -17,7 +21,10 @@ class AdConfigFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'service_id' => Service::factory(),
+            'slug' => $this->faker->slug(),
+            'offset' => $this->faker->numberBetween(1, 14),
+            'ad_text' => $this->faker->sentence(),
         ];
     }
 }

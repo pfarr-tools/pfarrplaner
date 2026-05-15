@@ -32,10 +32,10 @@
         <template v-slot:navbar-left>
             <save-button @click="saveSongbook" />
         </template>
-        <form-input label="Titel" v-model="mySongbook.name"/>
-        <form-input label="Kürzel" v-model="mySongbook.code"/>
-        <form-input label="ISBN" v-model="mySongbook.isbn"/>
-        <form-textarea label="Beschreibung" v-model="mySongbook.description"/>
+        <form-input label="Titel" name="name" v-model="mySongbook.name"/>
+        <form-input label="Kürzel" name="code" v-model="mySongbook.code"/>
+        <form-input label="ISBN" name="isbn" v-model="mySongbook.isbn"/>
+        <form-textarea label="Beschreibung" name="description" v-model="mySongbook.description"/>
         <div v-if="!(mySongbook.id)" class="alert alert-info">
             Du musst das Liederbuch erst einmal speichern, um ein Bild hinzufügen zu können.
         </div>
@@ -67,9 +67,9 @@ export default {
     methods: {
         saveSongbook() {
             if (this.mySongbook.id) {
-                this.$inertia.patch(route('songbook.update', this.mySongbook.id), this.mySongbook);
+                this.$inertia.patch(route('admin.songbook.update', this.mySongbook.id), this.mySongbook);
             } else {
-                this.$inertia.post(route('songbook.store'), this.mySongbook);
+                this.$inertia.post(route('admin.songbooks.store'), this.mySongbook);
             }
         }
     }

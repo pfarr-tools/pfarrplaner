@@ -39,6 +39,13 @@ class SongbookPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->viewAny($user));
     }
 
+    public function testIndexDelegatesToViewAny(): void
+    {
+        $user = User::factory()->create();
+        $user->givePermissionTo('liederbuecher-bearbeiten');
+        $this->assertTrue($this->policy->index($user));
+    }
+
     public function testAdminCanViewAny(): void
     {
         $user = User::factory()->create();

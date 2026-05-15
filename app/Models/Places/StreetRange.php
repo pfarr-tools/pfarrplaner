@@ -30,18 +30,34 @@
 
 namespace App\Models\Places;
 
+use App\Models\AbstractModel;
 use App\Models\Parish;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class StreetRange
  * @package App
  */
-class StreetRange extends Model
+class StreetRange extends AbstractModel
 {
     use HasFactory;
+
+    protected static string $prefix = 'streetrange';
+    protected static string $prefixPlural = 'streetranges';
+    protected static string $path = '';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
+        'api' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
+    ];
+    public static array $validationRules = [
+        'parish_id' => 'required|integer|exists:parishes,id',
+        'name' => 'required|string|max:255',
+        'odd_start' => 'nullable|integer|min:0',
+        'odd_end' => 'nullable|integer|min:0',
+        'even_start' => 'nullable|integer|min:0',
+        'even_end' => 'nullable|integer|min:0',
+    ];
 
     /**
      * @var string[]
@@ -58,7 +74,7 @@ class StreetRange extends Model
     /**
      * @return BelongsTo
      */
-    public function parish()
+    public function parish(): BelongsTo
     {
         return $this->belongsTo(Parish::class);
     }

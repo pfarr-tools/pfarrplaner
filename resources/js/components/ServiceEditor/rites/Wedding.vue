@@ -111,7 +111,7 @@
         </div>
         <div class="col-md-1 text-end">
             <a class="btn btn-sm btn-light" title="Trauung bearbeiten"
-               :href="route('weddings.edit', {wedding: wedding.id})"><span class="mdi mdi-pencil"></span></a>
+               :href="route('weddings.edit', {modelId: wedding.id})"><span class="mdi mdi-pencil"></span></a>
             <button class="btn btn-sm btn-danger" title="Trauung löschen"
                     @click.prevent="deleteWedding"><span class="mdi mdi-delete"></span></button>
         </div>
@@ -155,7 +155,7 @@ export default {
     methods: {
         deleteWedding() {
             if (!confirm('Willst du diese Trauung wirklich unwiderruflich löschen?')) return;
-            this.$inertia.delete(route('weddings.destroy', {wedding: this.wedding.id}), {preserveState: false});
+            this.$inertia.delete(route('weddings.destroy', {modelId: this.wedding.id}), {preserveState: false});
         },
         spouseName(index) {
             var name = this.myWedding['spouse' + index + '_name'].split(', ');

@@ -31,11 +31,27 @@
 namespace Tests\Browser;
 
 use App\Models\Places\City;
+use Laravel\Dusk\Browser;
 use Tests\AbstractModelBrowserTest;
 
 class CityBrowserTest extends AbstractModelBrowserTest
 {
 
     protected $modelClass = City::class;
+
+    public function testHasAdminModule()
+    {
+        $city = City::factory()->create(['name' => 'Testkirchengemeinde']);
+
+        $this->browse(function (Browser $browser) {
+            $browser->loginAs($this->testUser, 'web')
+                ->visit(route('admin.index'))
+                ->waitFor('#app', 10)
+                ->assertDontSee('500')
+                ->assertDontSee('Whoops')
+                ->assertDontSee('404')
+                ->assertSee('Testkirchengemeinde');
+        });
+    }
 
 }

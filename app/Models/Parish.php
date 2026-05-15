@@ -118,11 +118,11 @@ class Parish extends AbstractModel
      * @return int
      * @throws Exception
      */
-    public function importStreetsFromCSV($csv)
+    public function importStreetsFromCSV(User $user, $csv)
     {
         /** @var StreetRange $streetRange */
         foreach ($this->streetRanges as $streetRange) {
-            $streetRange->delete();
+            app(StreetRange::getContractName('delete'))->delete($user, $streetRange);
         }
 
         $ctr = 0;
@@ -138,17 +138,14 @@ class Parish extends AbstractModel
                 if ($record[4] == $this->code) {
                     $record[5] = explode(' bis ', $record[5]);
                     $record[6] = explode(' bis ', $record[6]);
-                    $streetRange = new StreetRange(
-                        [
-                            'parish_id' => $this->id,
-                            'name' => $record[0],
-                            'odd_start' => $record[5][0],
-                            'odd_end' => $record[5][1],
-                            'even_start' => $record[6][0],
-                            'even_end' => $record[6][1],
-                        ]
-                    );
-                    $streetRange->save();
+                    app(StreetRange::getContractName('create'))->create($user, $this, [
+                        'parish_id' => $this->id,
+                        'name' => $record[0],
+                        'odd_start' => $record[5][0],
+                        'odd_end' => $record[5][1],
+                        'even_start' => $record[6][0],
+                        'even_end' => $record[6][1],
+                    ]);
                     $ctr++;
                 }
             }

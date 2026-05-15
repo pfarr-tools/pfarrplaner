@@ -35,7 +35,7 @@ class SongbookFeatureTest extends TestCase
     public function testIndexLoads(): void
     {
         $this->actingAs($this->user)
-            ->get(route('songbooks.index'))
+            ->get(route('admin.songbooks.index'))
             ->assertStatus(200)
             ->assertInertia(fn(Assert $page) => $page->component('Admin/Songbook/Index'));
     }
@@ -44,7 +44,7 @@ class SongbookFeatureTest extends TestCase
     {
         $songbook = Songbook::factory()->create();
         $this->actingAs($this->user)
-            ->get(route('songbook.edit', $songbook->id))
+            ->get(route('admin.songbook.edit', $songbook->id))
             ->assertStatus(200)
             ->assertInertia(fn(Assert $page) => $page->component('Admin/Songbook/SongbookEditor'));
     }
@@ -52,8 +52,8 @@ class SongbookFeatureTest extends TestCase
     public function testCreateSongbook(): void
     {
         $this->actingAs($this->user)
-            ->post(route('songbook.store'), ['name' => 'Testgesangbuch', 'code' => 'TG'])
-            ->assertStatus(302);
+            ->post(route('admin.songbooks.store'), ['name' => 'Testgesangbuch', 'code' => 'TG'])
+            ->assertRedirect(route('admin.songbooks.index'));
         $this->assertTrue(Songbook::where('code', 'TG')->exists());
     }
 }

@@ -30,7 +30,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
 
@@ -38,21 +38,41 @@ use Illuminate\Support\Facades\Storage;
  * Class Attachment
  * @package App
  */
-class Attachment extends Model
+class Attachment extends AbstractModel
 {
+    use HasFactory;
+
+    protected static string $prefix = 'attachment';
+    protected static string $prefixPlural = 'attachments';
+    protected static string $path = '';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
+        'api' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
+    ];
+    protected static $routes = [
+        'web' => [
+            'update' => [['POST', 'PATCH'], '###/{modelId}'],
+        ],
+    ];
+
     /**
      * @var string[]
      */
-    protected $fillable = ['title', 'file', 'attachable', 'cut'];
+    protected $fillable = ['title', 'file', 'attachable_id', 'attachable_type', 'cut'];
 
     protected $appends = ['size', 'mimeType', 'icon', 'extension'];
 
     /**
      * @return MorphTo
      */
-    public function attachable()
+    public function attachable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function getLabelAttribute(): string
+    {
+        return (string) ($this->title ?? basename((string) $this->file));
     }
 
     public function getSizeAttribute()

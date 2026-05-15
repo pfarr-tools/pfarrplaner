@@ -46,8 +46,7 @@ use App\Http\Controllers\WeddingController;
 Route::post('/wedding/done/{wedding}', [WeddingController::class, 'done'])->name('wedding.done');
 Route::post('weddings/{wedding}/attachment', [WeddingController::class, 'attach'])->name('wedding.attach');
 Route::delete('weddings/{wedding}/attachment/{attachment}', [WeddingController::class, 'detach'])->name('wedding.detach');
-Route::get('/wedding/add/{service}', [WeddingController::class, 'create'])->name('wedding.add')->middleware('auth');
-Route::get('/wedding/destroy/{wedding}', [WeddingController::class, 'destroy'])->name('wedding.destroy');
+Route::get('/wedding/add/{service}', [WeddingController::class, 'add'])->name('wedding.add')->middleware('auth');
 
 
 // Wizard

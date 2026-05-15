@@ -33,7 +33,7 @@
             <button class="btn btn-primary" @click.prevent="saveBaptism" title="Speichern">
                 <span class="d-inline d-md-none mdi mdi-content-save"></span> <span class="d-none d-md-inline">Speichern</span>
             </button>&nbsp;
-            <button class="btn btn-danger" @click.prevent="deleteBaptism" title="Löschen">
+            <button v-if="myBaptism.id" class="btn btn-danger" @click.prevent="deleteBaptism" title="Löschen">
                 <span class="d-inline d-md-none mdi mdi-delete"></span> <span class="d-none d-md-inline">Löschen</span>
             </button>
         </template>
@@ -285,11 +285,11 @@ export default {
                 && (this.myBaptism.processed);
         },
         saveBaptism() {
-            this.$inertia.patch(route('baptisms.update', {baptism: this.myBaptism.id}), this.myBaptism);
+            this.$inertia.patch(route('baptisms.update', {modelId: this.myBaptism.id}), this.myBaptism);
         },
         deleteBaptism() {
             if (!confirm('Willst du diese Taufe wirklich unwiderruflich löschen?')) return;
-            this.$inertia.delete(route('baptisms.destroy', {baptism: this.myBaptism.id}));
+            this.$inertia.delete(route('baptisms.destroy', {modelId: this.myBaptism.id}));
         },
     }
 }

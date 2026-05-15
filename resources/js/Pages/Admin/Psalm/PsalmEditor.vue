@@ -93,13 +93,13 @@ export default {
     methods: {
         savePsalm() {
             if (this.myPsalm.id) {
-                this.$inertia.patch(route('psalm.update', this.myPsalm.id), this.myPsalm);
+                this.$inertia.patch(route('admin.psalm.update', this.myPsalm.id), this.myPsalm);
             } else {
                 this.saveAsCopy();
             }
         },
         saveAsCopy() {
-            this.$inertia.post(route('psalm.store'), {
+            this.$inertia.post(route('admin.psalms.store'), {
                 title: this.myPsalm.title,
                 copyrights: this.myPsalm.copyrights,
                 intro: this.myPsalm.intro,

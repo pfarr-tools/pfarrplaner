@@ -59,7 +59,7 @@ export default {
         }
     },
     mounted() {
-        if((undefined !== this.myPerikope.Bibelstelle) && (!(this.myPerikope.Bibelstelle || false))) {
+        if(this.myPerikope.Bibelstelle) {
             axios.get(route('bible.text', {reference: this.myPerikope.Bibelstelle}))
                 .then(result => {
                     this.text = result.data.text;

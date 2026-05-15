@@ -126,9 +126,9 @@ export default {
     methods: {
         saveSong() {
             if (this.mySong.id) {
-                this.$inertia.patch(route('song.update', this.mySong.id), this.mySong);
+                this.$inertia.patch(route('admin.song.update', this.mySong.id), this.mySong);
             } else {
-                this.$inertia.post(route('song.store'), this.mySong);
+                this.$inertia.post(route('admin.songs.store'), this.mySong);
             }
         },
         addVerse() {

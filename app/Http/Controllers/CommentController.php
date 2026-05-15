@@ -30,11 +30,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\Comment\CreatesComments;
+use App\Contracts\Comment\DeletesComments;
 use App\Models\Comment;
-use App\Models\Service;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Class CommentController
@@ -55,54 +56,26 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        if (!$request->has('body')) {
-            abort(403);
-        }
-        $commentableType = $request->get('commentable_type');
-        $commentableId = $request->get('commentable_id');
-        $owner = app($commentableType)->find($commentableId);
-        if ($this->canCommentOnThisObject($owner)) {
-            $comment = $owner->comments()->create(
-                [
-                    'body' => $request->get('body'),
-                    'private' => $request->get('private'),
-                    'user_id' => Auth::user()->id
-                ]
-            );
-            $comment->load('user');
+        try {
+            $creator = app(CreatesComments::class);
+            $comment = $creator->create($request->user(), $request->all());
             return response()->json($comment);
-        } else {
-            return response()->json(
-                ['message' => 'Leider hast du keine Berechtigung zum Kommentieren dieses Objekts.'],
-                401
-            );
+        } catch (AuthorizationException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 401);
         }
-    }
-
-    /**
-     * Check if current user may comment on a specific object
-     * @param $owner Object to be commented on
-     * @return bool true if commenting is allowed
-     */
-    protected function canCommentOnThisObject($owner)
-    {
-        $owningService = is_a($owner, Service::class) ? $owner : $owner->service;
-        if (null === $owningService) {
-            return Auth::user()->writableCities->pluck('id')->contains($owner->city_id);
-        }
-        return Auth::user()->can('update', $owningService);
     }
 
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Comment $comment
+     * @param int $modelId
      * @return Response
      */
-    public function destroy(Comment $comment)
+    public function destroy(int $modelId)
     {
-        $comment->delete();
+        $comment = Comment::findOrFail($modelId);
+        app(DeletesComments::class)->delete(request()->user(), $comment);
         return '<div class="alert alert-success alert-dismissible alertCommentDeleted"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Der Kommentar wurde gelöscht.</div>';
     }
 }

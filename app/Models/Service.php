@@ -219,6 +219,7 @@ class Service extends Model implements HasDAVCalendarItems
         'liturgicalInfo',
         'keyDate',
         'isAlternateProprium',
+        'isTemplate',
     ];
 
     /**
@@ -1194,6 +1195,14 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
+     * @return bool
+     */
+    public function getIsTemplateAttribute(): bool
+    {
+        return $this->isTemplate();
+    }
+
+    /**
      * @param $request
      * @param Service $service
      * @return array
@@ -1253,7 +1262,9 @@ class Service extends Model implements HasDAVCalendarItems
     public function setAdConfigFromRequest(Request $request)
     {
         if ($request->has('ad_configs')) {
-            AdConfig::where('service_id', $this->id)->delete();
+            foreach ($this->AdConfigs as $adConfig) {
+                app(AdConfig::getContractName('delete'))->delete($request->user(), $adConfig);
+            }
             $data = $request->validate([
                                            'ad_configs.*.offset' => 'nullable|int|min:0',
                                            'ad_configs.*.ad_text' => 'nullable|string',
@@ -1261,12 +1272,12 @@ class Service extends Model implements HasDAVCalendarItems
             $adConfigs = $data['ad_configs'];
             foreach ($this->city->getActiveAdChannels() as $key => $channel) {
                 if (isset($adConfigs[$key]) && (($adConfigs[$key]['offset'] ?? 0) > 0)) {
-                    AdConfig::create([
-                                         'service_id' => $this->id,
-                                         'slug' => $key,
-                                         'offset' => $adConfigs[$key]['offset'],
-                                         'ad_text' => $adConfigs[$key]['ad_text'] ?? ''
-                                     ]);
+                    app(AdConfig::getContractName('create'))->create($request->user(), $this, [
+                        'service_id' => $this->id,
+                        'slug' => $key,
+                        'offset' => $adConfigs[$key]['offset'],
+                        'ad_text' => $adConfigs[$key]['ad_text'] ?? '',
+                    ]);
                 }
             }
         }

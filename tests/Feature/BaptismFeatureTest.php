@@ -40,4 +40,13 @@ class BaptismFeatureTest extends TestCase
             ->assertStatus(200)
             ->assertInertia(fn(Assert $page) => $page->component('Rites/BaptismEditor'));
     }
+
+    public function testCreateRedirectsToEditor(): void
+    {
+        $this->actingAs($this->user)
+            ->get(route('baptisms.create'))
+            ->assertRedirectContains('/baptisms/');
+
+        $this->assertCount(1, Baptism::all());
+    }
 }

@@ -38,9 +38,11 @@
                               title="Predigt zu diesem Gottesdienst bearbeiten"><span class="mdi mdi-microphone"></span>
                     Predigt
                 </inertia-link>&nbsp;
+                <a v-if="service.isEditable" class="btn btn-secondary" title="Als Vorlage speichern" @click.prevent.stop="saveAsTemplate"><span class="mdi mdi-file-plus"></span> Als Vorlage speichern</a>&nbsp;
             </span>
             <span v-else>
-                <save-button v-if="service.isEditable" @click="saveTemplate">Vorlage speichern</save-button>
+                <save-button v-if="service.isEditable" @click="saveTemplate">Vorlage speichern</save-button>&nbsp;
+                <a class="btn btn-danger" title="Vorlage löschen" @click.prevent.stop="deleteTemplate"><span class="mdi mdi-delete"></span> Löschen</a>
             </span>
             <slot name="toolbar"/>
         </template>
@@ -112,7 +114,7 @@ export default {
             itemIndex: null,
             element: null,
             infoWindow: false,
-            templateMode: dayjs(this.service.date).format('YYYYMMDD') == 19780305,
+            templateMode: this.service.isTemplate,
             myService: this.service,
         }
     },
@@ -147,7 +149,13 @@ export default {
         saveTemplate() {
             this.$inertia.patch(route('template.update', this.myService.id), this.myService);
         },
-        deleteTemplate() {},
+        saveAsTemplate() {
+            this.$inertia.post(route('template.saveAsTemplate', this.service.id), {}, { preserveState: false });
+        },
+        deleteTemplate() {
+            if (!confirm('Willst du diese Vorlage wirklich unwiderruflich löschen?')) return;
+            this.$inertia.delete(route('template.destroy', this.service.id));
+        },
     }
 }
 </script>

@@ -27,9 +27,3 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
-use App\Http\Controllers\CommentController;
-
-Route::post('/kommentar', [CommentController::class, 'store'])->name('comment.store');
-Route::delete('/kommentar', [CommentController::class, 'destroy'])->name('comment.destroy');

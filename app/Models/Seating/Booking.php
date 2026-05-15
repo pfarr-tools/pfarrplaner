@@ -31,14 +31,48 @@
 namespace App\Models\Seating;
 
 use App\Casts\EncryptedAttribute;
+use App\Models\AbstractModel;
 use App\Models\Service;
-use AustinHeap\Database\Encryption\Traits\HasEncryptedAttributes;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Booking extends Model
+class Booking extends AbstractModel
 {
+    use HasFactory;
 
+    protected static string $path = '';
+    protected static string $prefix = 'booking';
+    protected static string $prefixPlural = 'bookings';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'create', 'show', 'store', 'edit', 'update', 'destroy'],
+        'api' => ['index', 'show', 'store', 'update', 'destroy'],
+    ];
+    protected static $routes = [
+        'web' => [
+            'store' => [['POST'], 'anmeldung'],
+            'edit' => [['GET', 'HEAD'], 'anmeldung/{modelId}'],
+            'update' => [['PATCH', 'PUT'], 'anmeldung/{modelId}'],
+            'destroy' => [['DELETE'], 'anmeldung/{modelId}'],
+        ],
+        'api' => [
+            'destroy' => [['DELETE'], 'booking/{modelId}'],
+        ],
+    ];
+    public static array $validationRules = [
+        'service_id' => 'required|int|exists:services,id',
+        'code' => 'nullable|string',
+        'name' => 'required|string',
+        'first_name' => 'nullable|string',
+        'contact' => 'required|string',
+        'number' => ['required', 'int', 'min:1'],
+        'fixed_seat' => ['nullable', 'string'],
+        'override_seats' => 'nullable|int',
+        'override_split' => 'nullable|string',
+        'email' => 'nullable|email',
+    ];
+
+    protected $guarded = [];
     protected $fillable = [
         'service_id',
         'code',
@@ -75,11 +109,40 @@ class Booking extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function service() {
+    public function getLabelAttribute(): string
+    {
+        return trim(($this->name ?? '') . (($this->first_name ?? '') ? ', ' . $this->first_name : ''));
+    }
+
+    public function fillDefaults(): array
+    {
+        return [
+            'name' => '',
+            'first_name' => '',
+            'contact' => '',
+            'email' => '',
+            'number' => 1,
+            'fixed_seat' => '',
+            'override_seats' => '',
+            'override_split' => '',
+        ];
+    }
+
+    public static function getVuePath(string $page)
+    {
+        return match ($page) {
+            'editor' => 'Service/Registrations/BookingEditor',
+            default => parent::getVuePath($page),
+        };
+    }
+
+    public function service(): BelongsTo
+    {
         return $this->belongsTo(Service::class);
     }
 
-    public static function createCode() {
+    public static function createCode(): string
+    {
         return str_pad(dechex(rand(0x100000, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
     }
 

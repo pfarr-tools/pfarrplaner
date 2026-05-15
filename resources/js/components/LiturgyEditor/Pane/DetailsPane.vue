@@ -38,6 +38,7 @@
             </div>
             <div class="col-sm-3">
                 <people-pane :service="service" :element="editedElement"
+                             :agenda-mode="agendaMode"
                              @close="doneEditingResponsibles(item)"
                              :ministries="lists.ministries"/>
             </div>

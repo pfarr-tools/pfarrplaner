@@ -80,6 +80,71 @@ class TemplateController extends Controller
         return redirect()->route('template.index');
     }
 
+    public function saveAsTemplate(Service $service)
+    {
+        $this->authorize('create', Service::class);
+        $template = Service::create([
+            'date'             => Carbon::parse('1978-03-05 0:00:00'),
+            'title'            => $service->title ?: 'Neue Vorlage',
+            'description'      => '',
+            'special_location' => '',
+        ]);
+        $template->update(['slug' => $template->createSlug()]);
+
+        $service->load('liturgyBlocks.items');
+        $ct = 0;
+        foreach ($service->liturgyBlocks as $sourceBlock) {
+            $ct++;
+            $newBlock = $sourceBlock->replicate();
+            $newBlock->sortable = $ct;
+            $newBlock->service_id = $template->id;
+            $newBlock->save();
+            $itemCtr = 0;
+            foreach ($sourceBlock->items as $sourceItem) {
+                $itemCtr++;
+                $newItem = $sourceItem->replicate();
+                $newItem->liturgy_block_id = $newBlock->id;
+                $newItem->sortable = $itemCtr;
+                $newItem->save();
+            }
+        }
+
+        return redirect()->route('liturgy.editor', $template->slug);
+    }
+
+    public function duplicate(Service $template)
+    {
+        $this->authorize('create', Service::class);
+        $newTemplate = Service::create([
+            'date'             => Carbon::parse('1978-03-05 0:00:00'),
+            'title'            => $template->title . ' (Kopie)',
+            'description'      => $template->description,
+            'special_location' => $template->special_location,
+            'internal_remarks' => $template->internal_remarks,
+        ]);
+        $newTemplate->update(['slug' => $newTemplate->createSlug()]);
+
+        $template->load('liturgyBlocks.items');
+        $ct = 0;
+        foreach ($template->liturgyBlocks as $sourceBlock) {
+            $ct++;
+            $newBlock = $sourceBlock->replicate();
+            $newBlock->sortable = $ct;
+            $newBlock->service_id = $newTemplate->id;
+            $newBlock->save();
+            $itemCtr = 0;
+            foreach ($sourceBlock->items as $sourceItem) {
+                $itemCtr++;
+                $newItem = $sourceItem->replicate();
+                $newItem->liturgy_block_id = $newBlock->id;
+                $newItem->sortable = $itemCtr;
+                $newItem->save();
+            }
+        }
+
+        return redirect()->route('liturgy.editor', $newTemplate->slug);
+    }
+
     public function delete(Service $template)
     {
         $template->delete();

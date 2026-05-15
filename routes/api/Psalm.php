@@ -42,7 +42,3 @@
 
 
 use App\Http\Controllers\Api\PsalmController;
-
-Route::get('/liturgy/psalms', [PsalmController::class, 'index'])->name('liturgy.psalm.index');
-Route::post('/liturgy/psalms', [PsalmController::class, 'store'])->name('liturgy.psalm.store');
-Route::patch('/liturgy/psalms/{psalm}', [PsalmController::class, 'update'])->name('liturgy.psalm.update');

@@ -28,13 +28,13 @@
   -->
 
 <template>
-    <admin-layout :title="team.name">
+    <admin-layout :title="myTeam.name || 'Neues Team'">
         <template #navbar-left>
             <button class="btn btn-primary" @click="saveTeam">
                 <span class="d-inline d-md-none mdi mdi-content-save"></span>
                 <span class="d-none d-md-inline">Speichern</span>
             </button>
-            <button class="btn btn-danger ms-1" @click="deleteTeam">
+            <button v-if="myTeam.id" class="btn btn-danger ms-1" @click="deleteTeam">
                 <span class="d-inline d-md-none mdi mdi-account-multiple-minus"></span>
                 <span class="d-none d-md-inline">Löschen</span>
             </button>
@@ -67,11 +67,15 @@ export default {
     },
     methods: {
         saveTeam() {
-            this.$inertia.patch(route('team.update', this.myTeam.id), this.myTeam);
+            if (this.myTeam.id) {
+                this.$inertia.patch(route('admin.team.update', this.myTeam.id), this.myTeam);
+            } else {
+                this.$inertia.post(route('admin.teams.store'), this.myTeam);
+            }
         },
         deleteTeam() {
             if (confirm('Willst du dieses Team wirklich löschen?'))
-                this.$inertia.delete(route('team.destroy', this.team.id));
+                this.$inertia.delete(route('admin.team.destroy', this.team.id));
         },
     }
 }

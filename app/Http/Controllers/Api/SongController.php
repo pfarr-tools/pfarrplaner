@@ -31,16 +31,15 @@
 namespace App\Http\Controllers\Api;
 
 
-use App\Http\Controllers\Controller;
 use App\Liturgy\Music\ABCMusic;
 use App\Models\Liturgy\Psalm;
 use App\Models\Liturgy\Song;
 use App\Models\Liturgy\SongReference;
-use App\Models\Liturgy\SongVerse;
 use Illuminate\Http\Request;
 
-class SongController extends Controller
+class SongController extends AbstractApiCRUDController
 {
+    protected string $modelClass = Song::class;
 
     /**
      * SongController constructor.
@@ -53,7 +52,7 @@ class SongController extends Controller
     /**
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         $listed = SongReference::orderBy('code')->orderBy('reference')->get();
         $songsWithoutSongBook = Song::whereDoesntHave('songbooks')->orderBy('title')->get();
@@ -157,7 +156,8 @@ class SongController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateRequest($request)['song'];
-        $song = Song::create($data);
+        $creator = app(Song::getContractName('create'));
+        $song = $creator->create($request->user(), $data);
         return response()->json($song);
     }
 
@@ -165,20 +165,15 @@ class SongController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, Song $song)
+    public function update(Request $request, $modelId)
     {
+        /** @var Song $song */
+        $song = $this->getSingleModel($request, $modelId);
         $data = $this->validateRequest($request)['song'];
-
-        $song->update($data);
-        $song->verses()->delete();
-        foreach ($data['verses'] as $verse) {
-            $verse['song_id'] = $song->id;
-            SongVerse::create($verse);
-        }
-
-        $song->syncSongbooksFromRequest($data);
+        $updater = $song->getContractedAction('update');
+        $song = $updater->update($request->user(), $song, $data);
         $song->refresh();
-        $song->load('verses');
+        $song->load(Song::$relationsForEditor);
 
         $id = $request->get('ref');
         if ($id < 1000000) {

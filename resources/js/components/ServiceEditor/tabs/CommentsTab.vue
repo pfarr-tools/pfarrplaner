@@ -67,7 +67,7 @@ export default {
                 private: false,
                 body: '',
                 commentable_id: this.service.id,
-                commentable_type: 'App\\Service',
+                commentable_type: 'App\\Models\\Service',
             }
         }
     },

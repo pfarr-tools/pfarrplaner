@@ -34,12 +34,12 @@ use App\Calendars\SyncEngines\AbstractSyncEngine;
 use App\Casts\EncryptedAttribute;
 use App\DAV\DAVCalendarItem;
 use App\DAV\HasDAVCalendarItems;
+use App\Models\AbstractModel;
 use App\Models\Service;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCityScopes;
 use App\Traits\HasCommentsTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\URL;
 
@@ -47,9 +47,54 @@ use Illuminate\Support\Facades\URL;
  * Class Baptism
  * @package App
  */
-class Baptism extends Model implements HasDAVCalendarItems
+class Baptism extends AbstractModel implements HasDAVCalendarItems
 {
     use HasCommentsTrait, HasAttachmentsTrait, HasFactory, HasCityScopes;
+
+    protected static string $prefix = 'baptism';
+    protected static string $prefixPlural = 'baptisms';
+    protected static string $path = '';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'show', 'store', 'create', 'edit', 'update', 'destroy'],
+        'api' => ['index', 'show', 'store', 'update', 'destroy'],
+    ];
+    protected static $routes = [
+        'web' => [
+            'create' => [['GET', 'HEAD'], '#p#/create'],
+            'edit' => [['GET', 'HEAD'], '#p#/{modelId}'],
+            'update' => [['PATCH', 'PUT'], '#p#/{modelId}'],
+            'destroy' => [['DELETE'], '#p#/{modelId}'],
+        ],
+    ];
+    public static array $validationRules = [
+        'service' => 'nullable|exists:services,id',
+        'service_id' => 'nullable|exists:services,id',
+        'candidate_name' => 'required|string',
+        'candidate_email' => 'nullable|email',
+        'candidate_address' => 'nullable|string',
+        'candidate_zip' => 'nullable|string',
+        'candidate_city' => 'nullable|string',
+        'candidate_phone' => 'nullable|string',
+        'pronoun_set' => 'nullable|string',
+        'city_id' => 'required|integer|exists:cities,id',
+        'first_contact_on' => 'nullable|date',
+        'first_contact_with' => 'nullable|string',
+        'appointment' => 'nullable|date',
+        'registered' => 'nullable|integer|between:0,1',
+        'signed' => 'nullable|integer|between:0,1',
+        'docs_ready' => 'nullable|integer|between:0,1',
+        'docs_where' => 'nullable|string',
+        'text' => 'nullable|string',
+        'notes' => 'nullable|string',
+        'processed' => 'nullable|integer|between:0,1',
+        'needs_dimissorial' => 'nullable|integer|between:0,1',
+        'dimissorial_issuer' => 'nullable|string',
+        'dimissorial_requested' => 'nullable|date',
+        'dimissorial_received' => 'nullable|date',
+        'dob' => 'nullable|date',
+        'birth_place' => 'nullable|string',
+    ];
+    public static $relationsForEditor = ['attachments'];
 
     /**
      * @var string[]
@@ -102,9 +147,52 @@ class Baptism extends Model implements HasDAVCalendarItems
     protected $appends = ['hasRegistrationForm', 'dimissorialUrl'];
 
     /**
+     * @param string $page
+     * @return string
+     */
+    public static function getVuePath(string $page)
+    {
+        return match ($page) {
+            'editor' => 'Rites/BaptismEditor',
+            default => parent::getVuePath($page),
+        };
+    }
+
+    /**
+     * @return array
+     */
+    public function fillDefaults(): array
+    {
+        return [
+            'candidate_name' => '',
+            'candidate_address' => '',
+            'candidate_zip' => '',
+            'candidate_city' => '',
+            'candidate_email' => '',
+            'candidate_phone' => '',
+            'first_contact_with' => '',
+            'registered' => 0,
+            'signed' => 0,
+            'docs_ready' => 0,
+            'docs_where' => '',
+            'text' => '',
+            'notes' => '',
+            'processed' => 0,
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabelAttribute(): string
+    {
+        return $this->candidate_name ?: '';
+    }
+
+    /**
      * @return BelongsTo
      */
-    public function service()
+    public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
     }

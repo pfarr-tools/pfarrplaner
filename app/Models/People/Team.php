@@ -30,25 +30,58 @@
 
 namespace App\Models\People;
 
+use App\Models\AbstractModel;
 use App\Models\Places\City;
 use App\Traits\HasCityScopes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Team extends Model
+class Team extends AbstractModel
 {
     use HasFactory, HasCityScopes;
 
+    protected static string $prefix = 'team';
+    protected static string $prefixPlural = 'teams';
+    public static array $exceptRoutes = [
+        'web' => ['show'],
+        'api' => ['show'],
+    ];
+    public static array $validationRules = [
+        'name' => 'required|string',
+        'city_id' => 'required|int|exists:cities,id',
+        'users' => 'nullable|array',
+        'users.*' => 'nullable|int|exists:users,id',
+    ];
+    public static $relationsForIndex = ['city', 'users'];
+    public static $relationsForEditor = ['city', 'users'];
+
     protected $fillable = ['name', 'city_id'];
 
-    public function city()
+    public static function getVuePath($page)
+    {
+        return match ($page) {
+            'index' => 'Teams/Index',
+            'editor' => 'Teams/TeamEditor',
+            default => parent::getVuePath($page),
+        };
+    }
+
+    public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
     }
 
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
+    }
+
+    public function fillDefaults(): array
+    {
+        return [
+            'users' => collect(),
+        ];
     }
 
 }

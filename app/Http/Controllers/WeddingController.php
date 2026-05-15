@@ -30,7 +30,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\ServiceUpdated;
 use App\Liturgy\PronounSets\PronounSets;
 use App\Models\Attachment;
 use App\Models\Calendar\Day;
@@ -42,167 +41,69 @@ use App\Models\Service;
 use App\Traits\HandlesAttachmentsTrait;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 /**
  * Class WeddingController
  * @package App\Http\Controllers
  */
-class WeddingController extends Controller
+class WeddingController extends AbstractCRUDController
 {
 
     use HandlesAttachmentsTrait;
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        //
-    }
+    protected string $modelClass = Wedding::class;
 
     /**
      * Show the form for creating a new resource.
      *
-     * @param int $serviceId Service Id
-     * @return Response
+     * @param Request $request
+     * @return RedirectResponse
      */
-    public function create(Service $service)
+    public function create(Request $request): RedirectResponse
     {
-        $wedding = Wedding::create([
-                                       'service_id' => $service->id,
-                                       'spouse1_name' => '',
-                                       'spouse1_birth_name' => '',
-                                       'spouse1_email' => '',
-                                       'spouse1_phone' => '',
-                                       'spouse2_name' => '',
-                                       'spouse2_birth_name' => '',
-                                       'spouse2_email' => '',
-                                       'spouse2_phone' => '',
-                                       'text' => '',
-                                        'registered' => false,
-                                        'registration_document' => '',
-            'signed' => false,
-            'docs_ready' => false,
-            'docs_where' => '',
-                                   ]);
+        $service = Service::findOrFail($request->get('service') ?: $request->get('service_id'));
+        Gate::authorize('create', [Wedding::class, $service]);
+        $creator = app(Wedding::getContractName('create'));
+        $wedding = $creator->create($request->user(), $request->all());
+
         return redirect()->route('weddings.edit', $wedding->id);
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     * @return Response
+     * @param Service $service
+     * @return RedirectResponse
      */
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     * @return Response
-     */
-    public function store(Request $request)
+    public function add(Service $service): RedirectResponse
     {
-        $data = $this->validateRequest($request);
-        $serviceId = $data['service_id'] = $data['service'];
-        $wedding = new Wedding($data);
-        if ($request->get('appointment')) {
-            $wedding->appointment = Carbon::createFromFormat('d.m.Y', $request->get('appointment'));
-        }
-
-        if ($request->hasFile('registration_document')) {
-            $wedding->registration_document = $request->file('registration_document')->store('wedding', 'public');
-        }
-
-        $wedding->save();
-
-        $wedding->service->setDefaultOfferingValues();
-        $wedding->service->save();
-        $this->handleAttachments($request, $wedding);
-
-
-        // delayed notification after wizard completion:
-        if ($request->get('wizard') == 1) {
-            Subscription::send(Service::find($serviceId), ServiceCreated::class);
-            Session::remove('wizard');
-        }
-
-
-        return redirect(route('service.edit', ['service' => $wedding->service->slug, 'tab' => 'rites']));
+        return redirect()->route('weddings.create', ['service' => $service->id]);
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param Wedding $wedding
-     * @return Response
+     * @param Request $request
+     * @param Wedding|null $wedding
+     * @return array
      */
-    public function show(Wedding $wedding)
+    protected function getResourcesForEditor(Request $request, $wedding = null): array
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param Wedding $wedding
-     * @return \Inertia\Response
-     */
-    public function edit(Wedding $wedding)
-    {
-        $wedding->load('service');
+        if ($wedding?->service) {
+            $wedding->service->setAppends(['pastors', 'locationText', 'timeText']);
+        }
         $pronounSets = PronounSets::toArray();
-        return Inertia::render('Rites/WeddingEditor', compact('wedding', 'pronounSets'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param Wedding $wedding
-     * @return Response
-     */
-    public function update(Request $request, Wedding $wedding)
-    {
-        $data = $this->validateRequest($request);
-        if (isset($data['service'])) {
-            $serviceId = $data['service_id'] = $data['service'];
-        }
-        $wedding->update($data);
-
-        $wedding->service->setDefaultOfferingValues();
-        $wedding->service->save();
-        ServiceUpdated::dispatch($wedding->service, $wedding->service->participants);
-
-        return redirect(route('service.edit', ['service' => $wedding->service->slug, 'tab' => 'rites']));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param Wedding $wedding
-     * @return Response
-     */
-    public function destroy(Wedding $wedding)
-    {
-        $serviceSlug = $wedding->service->slug;
-        $wedding->delete();
-        return redirect(route('service.edit', ['service' => $serviceSlug, 'tab' => 'rites']));
+        return compact('pronounSets');
     }
 
 
     /**
      * Wedding wizard, step 1: select city and date
      * @param Request $request
-     * @return Factory|View
+     * @return \Inertia\Response
      */
     public function wizard(Request $request)
     {
@@ -353,117 +254,5 @@ class WeddingController extends Controller
         $attachment->delete();
         $wedding->refresh();
         return response()->json($wedding->attachments);
-    }
-
-
-    protected function validateRequest(Request $request)
-    {
-        $data = $request->validate(
-            [
-                'service' => 'int|exists:services,id',
-                'spouse1_name' => 'required|string',
-                'spouse1_birth_name' => 'nullable|string',
-                'pronoun_set1' => 'nullable|string',
-                'spouse1_phone' => 'nullable|phone_number',
-                'spouse1_email' => 'nullable|email',
-                'spouse2_name' => 'required|string',
-                'spouse2_birth_name' => 'nullable|string',
-                'spouse2_phone' => 'nullable|phone_number',
-                'spouse2_email' => 'nullable|email',
-                'pronoun_set2' => 'nullable|string',
-                'text' => 'nullable|string',
-                'registered' => 'nullable|bool',
-                'signed' => 'nullable|bool',
-                'docs_ready' => 'nullable|bool',
-                'docs_where' => 'nullable|string',
-                'appointment' => 'nullable|date',
-                'spouse1_dob' => 'nullable|date_format:"d.m.Y"',
-                'spouse1_address' => 'nullable|string',
-                'spouse1_zip' => 'nullable|string',
-                'spouse1_city' => 'nullable|string',
-                'spouse1_needs_dimissorial' => 'nullable|int',
-                'spouse1_dimissorial_issuer' => 'nullable|string',
-                'spouse1_dimissorial_requested' => 'nullable|date_format:"d.m.Y"',
-                'spouse1_dimissorial_received' => 'nullable|date_format:"d.m.Y"',
-                'spouse2_dob' => 'nullable|date_format:"d.m.Y"',
-                'spouse2_address' => 'nullable|string',
-                'spouse2_zip' => 'nullable|string',
-                'spouse2_city' => 'nullable|string',
-                'spouse2_needs_dimissorial' => 'nullable|int',
-                'spouse2_dimissorial_issuer' => 'nullable|string',
-                'spouse2_dimissorial_requested' => 'nullable|date_format:"d.m.Y"',
-                'spouse2_dimissorial_received' => 'nullable|date_format:"d.m.Y"',
-                'needs_permission' => 'nullable|int',
-                'permission_requested' => 'nullable|date_format:"d.m.Y"',
-                'permission_received' => 'nullable|date_format:"d.m.Y"',
-                'music' => 'nullable|string',
-                'gift' => 'nullable|string',
-                'flowers' => 'nullable|string',
-                'docs_format' => 'nullable|int',
-                'notes' => 'nullable|string',
-                'processed' => 'nullable|integer|between:0,1'
-            ]
-        );
-        if (!isset($data['text'])) {
-            $data['text'] = '';
-        }
-        if (!isset($data['docs_where'])) {
-            $data['docs_where'] = '';
-        }
-        if (!isset($data['registration_document'])) {
-            $data['registration_document'] = '';
-        }
-        if (!isset($data['registered'])) {
-            $data['registered'] = 0;
-        }
-        if (!isset($data['signed'])) {
-            $data['signed'] = 0;
-        }
-        if (!isset($data['docs_ready'])) {
-            $data['docs_ready'] = 0;
-        }
-
-        // dates
-        if (isset($data['appointment'])) {
-            $data['appointment'] = Carbon::parse($data['appointment'], 'Europe/Berlin')->setTimezone('UTC');
-        }
-
-        if (isset($data['spouse1_dob'])) {
-            $data['spouse1_dob'] = Carbon::createFromFormat('d.m.Y', $data['spouse1_dob']);
-        }
-        if (isset($data['spouse1_dimissorial_requested'])) {
-            $data['spouse1_dimissorial_requested'] = Carbon::createFromFormat(
-                'd.m.Y',
-                $data['spouse1_dimissorial_requested']
-            );
-        }
-        if (isset($data['spouse1_dimissorial_received'])) {
-            $data['spouse1_dimissorial_received'] = Carbon::createFromFormat(
-                'd.m.Y',
-                $data['spouse1_dimissorial_received']
-            );
-        }
-        if (isset($data['spouse2_dob'])) {
-            $data['spouse2_dob'] = Carbon::createFromFormat('d.m.Y', $data['spouse2_dob']);
-        }
-        if (isset($data['spouse2_dimissorial_requested'])) {
-            $data['spouse2_dimissorial_requested'] = Carbon::createFromFormat(
-                'd.m.Y',
-                $data['spouse2_dimissorial_requested']
-            );
-        }
-        if (isset($data['spouse2_dimissorial_received'])) {
-            $data['spouse2_dimissorial_received'] = Carbon::createFromFormat(
-                'd.m.Y',
-                $data['spouse2_dimissorial_received']
-            );
-        }
-        if (isset($data['permission_requested'])) {
-            $data['permission_requested'] = Carbon::createFromFormat('d.m.Y', $data['permission_requested']);
-        }
-        if (isset($data['permission_received'])) {
-            $data['permission_received'] = Carbon::createFromFormat('d.m.Y', $data['permission_received']);
-        }
-        return $data;
     }
 }

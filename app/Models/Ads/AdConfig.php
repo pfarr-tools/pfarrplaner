@@ -29,19 +29,40 @@
 
 namespace App\Models\Ads;
 
+use App\Models\AbstractModel;
 use App\Models\Service;
+use Database\Factories\AdConfigFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class AdConfig extends Model
+class AdConfig extends AbstractModel
 {
     /** @use HasFactory<\Database\Factories\AdConfigFactory> */
     use HasFactory;
 
+    protected static string $prefix = 'adconfig';
+    protected static string $prefixPlural = 'adconfigs';
+    protected static string $path = '';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
+        'api' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
+    ];
+    public static array $validationRules = [
+        'service_id' => 'required|integer|exists:services,id',
+        'slug' => 'required|string|max:255',
+        'offset' => 'nullable|integer|min:0',
+        'ad_text' => 'nullable|string',
+    ];
+
     protected $fillable = ['service_id', 'slug', 'offset', 'ad_text'];
 
-    public function service() {
-        return $this->belongsTo(Service::class);
+    protected static function newFactory(): AdConfigFactory
+    {
+        return AdConfigFactory::new();
     }
 
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class);
+    }
 }

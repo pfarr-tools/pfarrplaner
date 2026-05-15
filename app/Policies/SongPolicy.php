@@ -38,6 +38,11 @@ class SongPolicy
 {
     use HandlesAuthorization;
 
+    public function index(User $user): bool
+    {
+        return $this->viewAny($user);
+    }
+
     /**
      * Create a new policy instance.
      *
@@ -54,7 +59,7 @@ class SongPolicy
      * @param User $user
      * @return mixed
      */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
         return true;
     }
@@ -67,7 +72,7 @@ class SongPolicy
      * @param Song $song
      * @return mixed
      */
-    public function view(User $user, Song $song)
+    public function view(User $user, Song $song): bool
     {
         return true;
     }
@@ -78,7 +83,7 @@ class SongPolicy
      * @param User $user
      * @return mixed
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
         return true;
     }
@@ -90,7 +95,7 @@ class SongPolicy
      * @param Song $song
      * @return mixed
      */
-    public function update(User $user, Song $song)
+    public function update(User $user, Song $song): bool
     {
         return true;
     }
@@ -102,7 +107,7 @@ class SongPolicy
      * @param Song $song
      * @return mixed
      */
-    public function delete(User $user, Song $song)
+    public function delete(User $user, Song $song): bool
     {
         return true;
     }
@@ -114,7 +119,7 @@ class SongPolicy
      * @param Song $song
      * @return mixed
      */
-    public function restore(User $user, Song $song)
+    public function restore(User $user, Song $song): bool
     {
         return true;
     }
@@ -126,7 +131,7 @@ class SongPolicy
      * @param Song $song
      * @return mixed
      */
-    public function forceDelete(User $user, Song $song)
+    public function forceDelete(User $user, Song $song): bool
     {
         return true;
     }

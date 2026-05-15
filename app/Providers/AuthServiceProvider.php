@@ -31,22 +31,48 @@
 namespace App\Providers;
 
 use App\Models\Calendar\Day;
+use App\Models\Ads\AdConfig;
+use App\Models\Attachment;
+use App\Models\Comment;
 use App\Models\Leave\Absence;
+use App\Models\Leave\Replacement;
+use App\Models\Liturgy\Psalm;
+use App\Models\Liturgy\Song;
+use App\Models\Liturgy\Songbook;
 use App\Models\Location;
 use App\Models\People\Team;
 use App\Models\People\User;
+use App\Models\Places\StreetRange;
 use App\Models\Places\City;
+use App\Models\Rites\Baptism;
+use App\Models\Rites\Funeral;
+use App\Models\Rites\Wedding;
+use App\Models\ServiceGroup;
+use App\Models\Seating\Booking;
 use App\Models\Tag;
 use App\Policies\AbsencePolicy;
 use App\Policies\CityPolicy;
+use App\Policies\CommentPolicy;
 use App\Policies\DayPolicy;
+use App\Policies\FuneralPolicy;
+use App\Policies\AttachmentPolicy;
+use App\Policies\AdConfigPolicy;
+use App\Policies\BaptismPolicy;
+use App\Policies\BookingPolicy;
 use App\Policies\LocationPolicy;
 use App\Policies\ParishPolicy;
+use App\Policies\PsalmPolicy;
+use App\Policies\SongPolicy;
+use App\Policies\SongbookPolicy;
 use App\Policies\RolePolicy;
+use App\Policies\ReplacementPolicy;
 use App\Policies\ServicePolicy;
+use App\Policies\ServiceGroupPolicy;
+use App\Policies\StreetRangePolicy;
 use App\Policies\TagPolicy;
 use App\Policies\TeamPolicy;
 use App\Policies\UserPolicy;
+use App\Policies\WeddingPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
@@ -74,6 +100,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         User::class => UserPolicy::class,
+        Booking::class => BookingPolicy::class,
         Location::class => LocationPolicy::class,
         City::class => CityPolicy::class,
         //Service::class => ServicePolicy::class,
@@ -82,9 +109,21 @@ class AuthServiceProvider extends ServiceProvider
         Day::class => DayPolicy::class,
         Role::class => RolePolicy::class,
         Absence::class => AbsencePolicy::class,
+        Replacement::class => ReplacementPolicy::class,
+        AdConfig::class => AdConfigPolicy::class,
+        Attachment::class => AttachmentPolicy::class,
+        Baptism::class => BaptismPolicy::class,
+        Comment::class => CommentPolicy::class,
+        Funeral::class => FuneralPolicy::class,
         Parish::class => ParishPolicy::class,
+        Psalm::class => PsalmPolicy::class,
+        Song::class => SongPolicy::class,
+        Songbook::class => SongbookPolicy::class,
+        ServiceGroup::class => ServiceGroupPolicy::class,
+        StreetRange::class => StreetRangePolicy::class,
         Tag::class => TagPolicy::class,
         Team::class => TeamPolicy::class,
+        Wedding::class => WeddingPolicy::class,
     ];
 
     /**

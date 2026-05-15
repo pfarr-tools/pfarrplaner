@@ -35,11 +35,11 @@ use App\Calendars\SyncEngines\AbstractSyncEngine;
 use App\Casts\EncryptedAttribute;
 use App\DAV\DAVCalendarItem;
 use App\DAV\HasDAVCalendarItems;
+use App\Models\AbstractModel;
 use App\Models\Service;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCommentsTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\URL;
 
@@ -47,9 +47,71 @@ use Illuminate\Support\Facades\URL;
  * Class Wedding
  * @package App
  */
-class Wedding extends Model implements HasDAVCalendarItems
+class Wedding extends AbstractModel implements HasDAVCalendarItems
 {
     use HasCommentsTrait, HasAttachmentsTrait, HasFactory;
+
+    protected static string $prefix = 'wedding';
+    protected static string $prefixPlural = 'weddings';
+    protected static string $path = '';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'show', 'store', 'create', 'edit', 'update', 'destroy'],
+        'api' => ['index', 'show', 'store', 'update', 'destroy'],
+    ];
+    protected static $routes = [
+        'web' => [
+            'create' => [['GET', 'HEAD'], '#p#/create'],
+            'edit' => [['GET', 'HEAD'], '#p#/{modelId}'],
+            'update' => [['PATCH', 'PUT'], '#p#/{modelId}'],
+            'destroy' => [['DELETE'], '#p#/{modelId}'],
+        ],
+    ];
+    public static array $validationRules = [
+        'service' => 'nullable|exists:services,id',
+        'service_id' => 'nullable|exists:services,id',
+        'spouse1_name' => 'required|string',
+        'spouse1_birth_name' => 'nullable|string',
+        'pronoun_set1' => 'nullable|string',
+        'spouse1_phone' => 'nullable|phone_number',
+        'spouse1_email' => 'nullable|email',
+        'spouse2_name' => 'required|string',
+        'spouse2_birth_name' => 'nullable|string',
+        'spouse2_phone' => 'nullable|phone_number',
+        'spouse2_email' => 'nullable|email',
+        'pronoun_set2' => 'nullable|string',
+        'text' => 'nullable|string',
+        'registered' => 'nullable|bool',
+        'signed' => 'nullable|bool',
+        'docs_ready' => 'nullable|bool',
+        'docs_where' => 'nullable|string',
+        'appointment' => 'nullable|date',
+        'spouse1_dob' => 'nullable|date_format:d.m.Y',
+        'spouse1_address' => 'nullable|string',
+        'spouse1_zip' => 'nullable|string',
+        'spouse1_city' => 'nullable|string',
+        'spouse1_needs_dimissorial' => 'nullable|int',
+        'spouse1_dimissorial_issuer' => 'nullable|string',
+        'spouse1_dimissorial_requested' => 'nullable|date_format:d.m.Y',
+        'spouse1_dimissorial_received' => 'nullable|date_format:d.m.Y',
+        'spouse2_dob' => 'nullable|date_format:d.m.Y',
+        'spouse2_address' => 'nullable|string',
+        'spouse2_zip' => 'nullable|string',
+        'spouse2_city' => 'nullable|string',
+        'spouse2_needs_dimissorial' => 'nullable|int',
+        'spouse2_dimissorial_issuer' => 'nullable|string',
+        'spouse2_dimissorial_requested' => 'nullable|date_format:d.m.Y',
+        'spouse2_dimissorial_received' => 'nullable|date_format:d.m.Y',
+        'needs_permission' => 'nullable|int',
+        'permission_requested' => 'nullable|date_format:d.m.Y',
+        'permission_received' => 'nullable|date_format:d.m.Y',
+        'music' => 'nullable|string',
+        'gift' => 'nullable|string',
+        'flowers' => 'nullable|string',
+        'docs_format' => 'nullable|int',
+        'notes' => 'nullable|string',
+        'processed' => 'nullable|integer|between:0,1',
+    ];
+    public static $relationsForEditor = ['attachments', 'service.pastors'];
 
     /**
      * @var string[]
@@ -134,9 +196,59 @@ class Wedding extends Model implements HasDAVCalendarItems
     protected $appends = ['spouse1DimissorialUrl', 'spouse2DimissorialUrl'];
 
     /**
+     * @param string $page
+     * @return string
+     */
+    public static function getVuePath(string $page)
+    {
+        return match ($page) {
+            'editor' => 'Rites/WeddingEditor',
+            default => parent::getVuePath($page),
+        };
+    }
+
+    /**
+     * @return array
+     */
+    public function fillDefaults(): array
+    {
+        return [
+            'spouse1_name' => '',
+            'spouse1_birth_name' => '',
+            'spouse1_email' => '',
+            'spouse1_phone' => '',
+            'spouse2_name' => '',
+            'spouse2_birth_name' => '',
+            'spouse2_email' => '',
+            'spouse2_phone' => '',
+            'text' => '',
+            'registered' => 0,
+            'registration_document' => '',
+            'signed' => 0,
+            'docs_ready' => 0,
+            'docs_where' => '',
+            'notes' => '',
+            'music' => '',
+            'gift' => '',
+            'flowers' => '',
+            'docs_format' => 0,
+            'needs_permission' => 0,
+            'processed' => 0,
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabelAttribute(): string
+    {
+        return trim($this->spouse1_name . ' / ' . $this->spouse2_name, ' /');
+    }
+
+    /**
      * @return BelongsTo
      */
-    public function service()
+    public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
     }

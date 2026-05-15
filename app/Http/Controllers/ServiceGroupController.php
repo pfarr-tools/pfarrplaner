@@ -30,89 +30,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ServiceGroup;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-
 /**
  * Class ServiceGroupController
  * @package App\Http\Controllers
  */
-class ServiceGroupController extends Controller
+class ServiceGroupController extends AbstractCRUDController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param ServiceGroup $serviceGroup
-     * @return Response
-     */
-    public function show(ServiceGroup $serviceGroup)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param ServiceGroup $serviceGroup
-     * @return Response
-     */
-    public function edit(ServiceGroup $serviceGroup)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param ServiceGroup $serviceGroup
-     * @return Response
-     */
-    public function update(Request $request, ServiceGroup $serviceGroup)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param ServiceGroup $serviceGroup
-     * @return Response
-     */
-    public function destroy(ServiceGroup $serviceGroup)
-    {
-        //
-    }
+    protected string $modelClass = \App\Models\ServiceGroup::class;
 }

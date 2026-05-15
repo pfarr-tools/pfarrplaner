@@ -75,7 +75,7 @@ class UpdateParish extends AbstractUpdateAction implements UpdatesParishes
         // import street ranges from csv
         $csv = request()->get('csv', '');
         if ($csv) {
-            $ctr = $parish->importStreetsFromCSV($csv);
+            $ctr = $parish->importStreetsFromCSV($user, $csv);
         }
 
 

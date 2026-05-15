@@ -30,17 +30,62 @@
 
 namespace App\Models\Seating;
 
+use App\Models\AbstractModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class SeatingRow extends Model
+class SeatingRow extends AbstractModel
 {
     use HasFactory;
+
+    protected static string $path = '';
+    protected static string $prefix = 'reihe';
+    protected static string $prefixPlural = 'reihen';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'show', 'create', 'edit', 'store', 'update', 'destroy'],
+        'api' => ['show'],
+    ];
+    protected static $routes = [
+        'web' => [
+            'create' => [['GET', 'HEAD'], 'admin/ort/{location}/reihe'],
+            'edit' => [['GET', 'HEAD'], 'admin/reihe/{modelId}'],
+            'store' => [['POST'], 'admin/reihe'],
+            'update' => [['PATCH', 'PUT'], 'admin/reihe/{modelId}'],
+            'destroy' => [['DELETE'], 'admin/reihe/{modelId}'],
+        ],
+    ];
+    public static array $validationRules = [
+        'seating_section_id' => 'required|int|exists:seating_sections,id',
+        'title' => 'required|regex:/[0-9]+/i',
+        'divides_into' => 'nullable|int',
+        'seats' => 'nullable|int',
+        'spacing' => 'nullable|int',
+        'split' => 'nullable|string|regex:/^((\\d+)(,\\s*\\d+)+)$/i',
+        'color' => 'nullable|string',
+    ];
 
     protected $fillable = ['seating_section_id', 'title', 'seats', 'divides_into', 'spacing', 'split', 'color'];
 
     public $bookings = [];
+
+    public static function singularKey(): string
+    {
+        return 'seatingRow';
+    }
+
+    public static function pluralKey(): string
+    {
+        return 'seatingRows';
+    }
+
+    public static function getVuePath(string $page)
+    {
+        return match ($page) {
+            'editor' => 'Admin/Location/SeatingRowEditor',
+            default => parent::getVuePath($page),
+        };
+    }
 
     protected static function boot()
     {
@@ -50,9 +95,25 @@ class SeatingRow extends Model
         });
     }
 
+    public function getLabelAttribute(): string
+    {
+        return $this->title;
+    }
+
+    public function fillDefaults(): array
+    {
+        return [
+            'seats' => 1,
+            'divides_into' => 1,
+            'spacing' => 0,
+            'split' => '',
+            'color' => '',
+        ];
+    }
+
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function seatingSection()
     {

@@ -160,12 +160,14 @@ class AbstractModel extends Model
     public static function getRoutes()
     {
         $routeClassPrefixes = ['web' => static::$path];
+        $defaultRoutes = static::$defaultRoutes ?? [];
+        $customRoutes = static::$routes ?? [];
 
-        $routeClasses = array_merge(array_keys(static::$routes ?? []), array_keys(static::$defaultRoutes ?? []));
-        foreach (array_keys(static::$defaultRoutes ?? []) as $routeClass) {
+        $routeClasses = array_merge(array_keys($customRoutes), array_keys($defaultRoutes));
+        foreach (array_keys($defaultRoutes) as $routeClass) {
             foreach ((static::$exceptRoutes ?? [])[$routeClass] ?? [] as $exception) {
-                if (isset((static::$defaultRoutes[$routeClass] ?? [])[$exception])) {
-                    unset (static::$defaultRoutes[$routeClass][$exception]);
+                if (isset(($defaultRoutes[$routeClass] ?? [])[$exception])) {
+                    unset ($defaultRoutes[$routeClass][$exception]);
                 }
             }
         }
@@ -174,8 +176,8 @@ class AbstractModel extends Model
         foreach ($routeClasses as $routeClass) {
             $myRoutes[$routeClass] = [];
             $records = array_merge(
-                (static::$routes ?? [])[$routeClass] ?? [],
-                (static::$defaultRoutes ?? [])[$routeClass] ?? []
+                $customRoutes[$routeClass] ?? [],
+                $defaultRoutes[$routeClass] ?? []
             );
 
             // edit verb exception rule:

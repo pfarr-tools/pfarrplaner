@@ -30,14 +30,6 @@
 
 use App\Http\Controllers\SongController;
 
-Route::get('/lieder', [SongController::class, 'index'])->name('songs.index');
-Route::post('/lieder', [SongController::class, 'store'])->name('song.store');
-Route::get('/lieder/neu', [SongController::class, 'create'])->name('song.create');
-
-Route::get('/lied/{song}', [SongController::class, 'edit'])->name('song.edit');
-Route::patch('/lied/{song}', [SongController::class, 'update'])->name('song.update');
-Route::delete('/lied/{song}', [SongController::class, 'destroy'])->name('song.destroy');
-
 Route::post('/lied/{song}/split/{reference}',[SongController::class, 'split'])->name('song.songbook.split');
 
 Route::get('/lied/{song}/noten-editor', [SongController::class, 'musicEditor'])->name('liturgy.song.musiceditor');

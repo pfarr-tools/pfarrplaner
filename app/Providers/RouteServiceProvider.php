@@ -33,6 +33,7 @@ namespace App\Providers;
 use App\Models\People\User;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 /**
  * Class RouteServiceProvider
@@ -77,8 +78,17 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
-        Route::middleware('api')
-            ->group(base_path('routes/api_auto.php'));
+        Route::middleware('api')->group(function () {
+            foreach (\File::allFiles(app_path('Models')) as $file) {
+                if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract'))) {
+                    $className = substr('App\\Models\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+                    if (method_exists($className, 'registerApiRoutes')) {
+                        $className::registerApiRoutes();
+                    }
+                }
+            }
+        });
+
         Route::prefix('api')
             ->middleware('api')
             ->group(base_path('routes/api.php'));

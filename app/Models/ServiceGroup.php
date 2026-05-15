@@ -31,16 +31,26 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Class ServiceGroup
  * @package App
  */
-class ServiceGroup extends Model
+class ServiceGroup extends AbstractModel
 {
     use HasFactory;
+
+    protected static string $prefix = 'servicegroup';
+    protected static string $prefixPlural = 'servicegroups';
+    protected static string $path = '';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
+        'api' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
+    ];
+    public static array $validationRules = [
+        'name' => 'required|string|max:255',
+    ];
 
     /**
      * @var string[]
@@ -58,8 +68,7 @@ class ServiceGroup extends Model
             if (is_numeric($element)) {
                 $result[] = $element;
             } else {
-                $sg = new ServiceGroup(['name' => $element]);
-                $sg->save();
+                $sg = static::firstOrCreate(['name' => $element]);
                 $result[] = $sg->id;
             }
         }
@@ -69,7 +78,7 @@ class ServiceGroup extends Model
     /**
      * @return BelongsToMany
      */
-    public function services()
+    public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class);
     }

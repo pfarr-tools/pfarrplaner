@@ -30,8 +30,6 @@
 
 use App\Http\Controllers\Api\CityController;
 
-//Route::resource('cities', 'CityController');
 Route::get('city/{city}/konfiapp-types', [CityController::class, 'konfiAppTypes'])->name('city.konfiAppTypes');
-
 
 

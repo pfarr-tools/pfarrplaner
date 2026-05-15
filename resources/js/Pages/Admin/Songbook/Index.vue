@@ -30,7 +30,7 @@
 <template>
     <admin-layout title="Liederbücher">
         <template v-slot:navbar-left>
-            <nav-button type="success" icon="mdi mdi-plus" title="Neues Liederbuch anlegen" :href="route('songbook.create')">
+            <nav-button type="success" icon="mdi mdi-plus" title="Neues Liederbuch anlegen" :href="route('admin.songbooks.create')">
                 Neues Liederbuch
             </nav-button>
         </template>
@@ -71,10 +71,10 @@
                                             <div class="text-small">{{ row.description }}</div>
                                         </td>
                                         <td class="text-end">
-                                            <nav-button v-if="row.can.update" class="btn-sm"
+                                            <nav-button v-if="row.canEdit" class="btn-sm"
                                                         type="primary" icon="mdi mdi-pencil" title="Liederbuch bearbeiten"
-                                                        force-icon force-no-text :href="route('songbook.edit', row.id)" />
-                                            <nav-button v-if="row.can.delete" class="btn-sm"
+                                                        force-icon force-no-text :href="route('admin.songbook.edit', row.id)" />
+                                            <nav-button v-if="row.canDelete" class="btn-sm"
                                                         type="danger" icon="mdi mdi-delete" title="Liederbuch löschen"
                                                         force-icon force-no-text @click="deleteSongbook(row)" />
                                         </td>
@@ -117,7 +117,7 @@ export default {
     methods: {
         deleteSongbook(songbook) {
             if (!confirm('Willst du wirklich das komplette Liederbuch löschen?')) return;
-            this.$inertia.delete(route('songbook.destroy', songbook.id));
+            this.$inertia.delete(route('admin.songbook.destroy', songbook.id));
         }
     }
 }

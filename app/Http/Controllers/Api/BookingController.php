@@ -31,19 +31,23 @@
 namespace App\Http\Controllers\Api;
 
 
-use App\Http\Controllers\Controller;
 use App\Models\Seating\Booking;
+use Illuminate\Http\Request;
 
-class BookingController extends Controller
+class BookingController extends AbstractApiCRUDController
 {
+    protected string $modelClass = Booking::class;
 
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    public function destroy(Booking $booking) {
-        $booking->delete();
+    public function destroy(Request $request, $modelId)
+    {
+        $model = $this->getSingleModel($request, $modelId);
+        $deleter = $model->getContractedAction('delete');
+        $deleter->delete($request->user(), $model);
         return response()->noContent();
     }
 

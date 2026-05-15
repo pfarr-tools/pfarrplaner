@@ -31,17 +31,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Liturgy\Songbook;
-use App\Services\ResourcePolicyService;
 use App\Traits\HandlesAttachedImageTrait;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 
-class SongbookController extends Controller
+class SongbookController extends AbstractCRUDController
 {
 
     use HandlesAttachedImageTrait;
 
-    protected $model = Songbook::class;
+    protected string $modelClass = Songbook::class;
 
     /**
      * Initialize controller
@@ -49,99 +46,5 @@ class SongbookController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->authorizeResource(Songbook::class, 'songbook');
-    }
-
-    /**
-     * Show all records
-     *
-     * @return \Inertia\Response
-     */
-    public function index()
-    {
-        $songbooks = ResourcePolicyService::attachPermissions(Songbook::orderBy('code')->get());
-        return Inertia::render('Admin/Songbook/Index', compact('songbooks'));
-    }
-
-    /**
-     * Create a new record
-     *
-     * @return \Inertia\Response
-     */
-    public function create()
-    {
-        $songbook = new Songbook([
-            'name' => '',
-            'code' => '',
-            'isbn' => '',
-            'description' => '',
-                                 ]);
-        return Inertia::render('Admin/Songbook/SongbookEditor', compact('songbook'));
-    }
-
-    /**
-     * Store a new record
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function store(Request $request)
-    {
-        Songbook::create($this->validateRequest($request));
-        return redirect()->route('songbooks.index')->with('success', 'Das neue Liederbuch wurde angelegt.');
-    }
-
-    /**
-     * Edit a record
-     *
-     * @param Songbook $songbook
-     * @return \Inertia\Response
-     */
-    public function edit(Songbook $songbook)
-    {
-        return Inertia::render('Admin/Songbook/SongbookEditor', compact('songbook'));
-    }
-
-
-    /**
-     * Update a record
-     *
-     * @param Request $request
-     * @param Songbook $songbook
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function update(Request $request, Songbook $songbook)
-    {
-        $songbook->update($this->validateRequest($request));
-        return redirect()->route('songbooks.index')->with('success', 'Die Änderungen wurden gespeichert.');
-    }
-
-
-    /**
-     * Delete a record
-     *
-     * @param Songbook $songbook
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function delete(Songbook $songbook)
-    {
-        $songbook->delete();
-        return redirect()->route('songbooks.index')->with('success', 'Das Liederbuch wurde gelöscht.');
-    }
-
-    /**
-     * Validate the submitted data
-     *
-     * @param Request $request Request
-     * @return array Data
-     */
-    protected function validateRequest(Request $request) {
-        return $request->validate([
-                                      'name' => 'required|string',
-                                      'code' => 'required|string',
-                                      'isbn' => 'nullable|string',
-                                      'description' => 'nullable|string',
-                                      'image' => 'nullable|string',
-                                  ]);
     }
 }

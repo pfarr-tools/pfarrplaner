@@ -43,5 +43,10 @@
 
 use App\Http\Controllers\TemplateController;
 
-// agenda
-TemplateController::defaultRoutes();
+Route::get('/vorlagen', [TemplateController::class, 'index'])->name('template.index');
+Route::get('/vorlage/neu', [TemplateController::class, 'create'])->name('template.create');
+Route::post('/vorlagen', [TemplateController::class, 'store'])->name('template.store');
+Route::patch('/vorlage/{template}', [TemplateController::class, 'update'])->name('template.update');
+Route::delete('/vorlage/{template}', [TemplateController::class, 'delete'])->name('template.destroy');
+Route::post('/vorlage/aus-gottesdienst/{service}', [TemplateController::class, 'saveAsTemplate'])->name('template.saveAsTemplate');
+Route::post('/vorlage/{template}/duplizieren', [TemplateController::class, 'duplicate'])->name('template.duplicate');

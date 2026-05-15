@@ -34,13 +34,13 @@ namespace App\Http\Controllers;
 use App\Liturgy\Music\ABCMusic;
 use App\Models\Liturgy\Psalm;
 use App\Models\Liturgy\Song;
-use App\Models\Liturgy\SongVerse;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class SongController extends Controller
+class SongController extends AbstractCRUDController
 {
+    protected string $modelClass = Song::class;
 
     /**
      * SongController constructor.
@@ -48,40 +48,14 @@ class SongController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->authorizeResource(Song::class, 'song');
     }
 
     /**
-     * @return \Inertia\Response
+     * @return Collection
      */
-    public function index()
+    protected function getModelsForIndex(): Collection
     {
-        $songs = Song::without(['verses'])->select(['id', 'title', 'alt_eg'])->get();
-        return Inertia::render('Admin/Song/Index', compact('songs'));
-    }
-
-    /**
-     * Create a new record
-     *
-     * @return \Inertia\Response
-     */
-    public function create()
-    {
-        $song = new Song([
-                             'title' => '',
-                             'refrain' => '',
-                             'copyrights' => '',
-                             'key' => '',
-                             'measure' => '',
-                             'note_length' => '',
-                             'prolog' => '',
-                             'notation' => '',
-                             'refrain_notation' => '',
-                             'refrain_text_notation' => '',
-                         ]);
-        $song->songbooks = [];
-        $song->verses = [];
-        return Inertia::render('Admin/Song/SongEditor', compact('song'));
+        return Song::without(['verses'])->select(['id', 'title', 'alt_eg'])->get();
     }
 
     /**
@@ -103,62 +77,6 @@ class SongController extends Controller
             ];
         }
         return response()->json($songbooks);
-    }
-
-    /**
-     * Edit a record
-     *
-     * @param Song $song
-     * @return \Inertia\Response
-     */
-    public function edit(Song $song)
-    {
-        return Inertia::render('Admin/Song/SongEditor', compact('song'));
-    }
-
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(Request $request)
-    {
-        $data = $this->validateRequest($request);
-        $song = Song::create($data);
-        foreach ($data['verses'] as $verse) {
-            $verse['song_id'] = $song->id;
-            SongVerse::create($verse);
-        }
-        $song->syncSongbooksFromRequest($data);
-        return redirect()->route('songs.index')->with('success', 'Das neue Lied wurde gespeichert.');
-    }
-
-    /**
-     * @param Request $request
-     * @return RedirectResponse
-     */
-    public function update(Request $request, Song $song)
-    {
-        $data = $this->validateRequest($request);
-        $song->update($data);
-        $song->verses()->delete();
-        foreach ($data['verses'] as $verse) {
-            $verse['song_id'] = $song->id;
-            SongVerse::create($verse);
-        }
-
-        $song->syncSongbooksFromRequest($data);
-        return redirect()->route('songs.index')->with('success', 'Die Änderungen wurden gespeichert.');
-    }
-
-    /**
-     * @param Song $song
-     * @return RedirectResponse
-     */
-    public function destroy(Song $song)
-    {
-        $song->delete();
-        return redirect()->route('songs.index')->with('success', 'Das Lied wurde gelöscht.');
     }
 
     /**
@@ -214,38 +132,7 @@ class SongController extends Controller
         }
         $newSong->refresh();
 
-        return redirect()->route('song.edit', $newSong->id);
-    }
-
-    /**
-     * @param Request $request
-     * @return array
-     */
-    protected function validateRequest(Request $request)
-    {
-        return $request->validate(
-            [
-                'title' => 'required|string',
-                'refrain' => 'nullable|string',
-                'copyrights' => 'nullable|string',
-                'key' => 'nullable|string',
-                'measure' => 'nullable|string',
-                'note_length' => 'nullable|string',
-                'notation' => 'nullable|string',
-                'refrain_notation' => 'nullable|string',
-                'refrain_text_notation' => 'nullable|string',
-                'verses.*.number' => 'nullable',
-                'verses.*.text' => 'nullable|string',
-                'verses.*.refrain_before' => 'nullable|bool',
-                'verses.*.refrain_after' => 'nullable|bool',
-                'verses.*.notation' => 'nullable|string',
-                'songbooks.*.code' => 'nullable|string',
-                'songbooks.*.pivot.songbook_id' => 'nullable|int|exists:songbooks,id',
-                'songbooks.*.pivot.reference' => 'nullable|string',
-                'songbooks.*.pivot.color' => 'nullable|string',
-                'alt_eg' => 'nullable|string',
-            ]
-        );
+        return redirect()->route('admin.song.edit', $newSong->id);
     }
 
     public function musicEditor(Song $song)

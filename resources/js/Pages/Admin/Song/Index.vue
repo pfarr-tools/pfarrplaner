@@ -31,7 +31,7 @@
     <admin-layout title="Lieder">
         <template v-slot:navbar-left>
             <nav-button type="success" icon="mdi mdi-plus" title="Lied hinzufügen"
-                        :href="route('song.create')">Neues Lied</nav-button>
+                        :href="route('admin.songs.create')">Neues Lied</nav-button>
         </template>
             <dataset
                  v-slot="{ ds }"
@@ -78,7 +78,7 @@
                                                         force-icon force-no-text :href="route('liturgy.song.musiceditor', row.id)" />
                                             <nav-button class="btn-sm"
                                                         type="primary" icon="mdi mdi-pencil" title="Lied bearbeiten"
-                                                        force-icon force-no-text :href="route('song.edit', row.id)" />
+                                                        force-icon force-no-text :href="route('admin.song.edit', row.id)" />
                                             <nav-button class="btn-sm"
                                                         type="danger" icon="mdi mdi-delete" title="Lied löschen"
                                                         force-icon force-no-text @click="deleteSong(row)" />
@@ -127,7 +127,7 @@ export default {
     methods: {
         deleteSong(song) {
             if (!confirm('Willst du wirklich das komplette Lied löschen?')) return;
-            this.$inertia.delete(route('song.destroy', song.id));
+            this.$inertia.delete(route('admin.song.destroy', song.id));
         },
         searchFullTitle(value, searchString, rowData) {
             let found = false;

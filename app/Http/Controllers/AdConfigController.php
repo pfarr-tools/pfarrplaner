@@ -1,66 +1,36 @@
 <?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreAdConfigRequest;
-use App\Http\Requests\UpdateAdConfigRequest;
-use App\Models\Ads\AdConfig;
-
-class AdConfigController extends Controller
+class AdConfigController extends AbstractCRUDController
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreAdConfigRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(AdConfig $adConfig)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(AdConfig $adConfig)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAdConfigRequest $request, AdConfig $adConfig)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(AdConfig $adConfig)
-    {
-        //
-    }
+    protected string $modelClass = \App\Models\Ads\AdConfig::class;
 }

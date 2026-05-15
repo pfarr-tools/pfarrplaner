@@ -263,7 +263,7 @@ class AbsenceController extends Controller
     public function update(AbsenceRequest $request, Absence $absence)
     {
         $absence->update($request->validated());
-        $absence->setupReplacements($request->get('replacements') ?: []);
+        $absence->setupReplacements($request->user(), $request->get('replacements') ?: []);
 
 
 

@@ -33,15 +33,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Seating\Booking;
 use App\Models\Service;
-use App\Rules\Seatable;
 use App\Rules\SeatableFixed;
 use App\Services\FileNameService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use App\Documents\PDF;
 
-class BookingController extends Controller
+class BookingController extends AbstractCRUDController
 {
+    protected string $modelClass = Booking::class;
 
     /**
      * BookingController constructor.
@@ -51,6 +52,27 @@ class BookingController extends Controller
         $this->middleware('auth');
     }
 
+    protected function getResourcesForEditor(Request $request, $model = null): array
+    {
+        /** @var Booking|null $model */
+        $service = $model?->service;
+        if (!$service && $request->has('service_id')) {
+            $service = Service::findOrFail($request->integer('service_id'));
+        }
+        if ($service) {
+            $service->setAppends([]);
+        }
+
+        return ['service' => $service];
+    }
+
+    public function index(Request $request, ?Service $service = null)
+    {
+        abort_if(!$service, 404);
+        Gate::authorize('update', $service);
+        return response()->json($service->bookings()->get());
+    }
+
     /**
      * @param Request $request
      * @param Service $service
@@ -58,68 +80,11 @@ class BookingController extends Controller
      */
     public function findSeat(Request $request, Service $service)
     {
-        $booking = new Booking([
-                                   'service_id' => $service->id,
-                                   'name' => '',
-                                   'first_name' => '',
-                                   'contact' => '',
-                                   'email' => '',
-                                   'number' => 1,
-                                   'fixed_seat' => '',
-                                   'override_seats' => '',
-                                   'override_split' => '',
-                               ]);
+        Gate::authorize('create', [Booking::class, $service]);
+        $service->setAppends([]);
+        $booking = Booking::getEmptyModel();
+        $booking->service_id = $service->id;
         return Inertia::render('Service/Registrations/BookingEditor', compact('service', 'booking'));
-    }
-
-    /**
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function store(Request $request)
-    {
-        $data = $this->validateRequest($request);
-        $data['code'] = Booking::createCode();
-        $booking = Booking::create($data);
-        $message = ($data['number'] == 1 ? 'Der Platz wurde reserviert.' : $data['number'] . ' zusammenhängende Plätze wurden reserviert.');
-        return redirect()->route('service.edit', ['service' => $booking->service->slug, 'tab' => 'registrations']
-        )->with('success', $message);
-    }
-
-    /**
-     * @param Booking $booking
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function edit(Booking $booking)
-    {
-        $service = $booking->service;
-        return Inertia::render('Service/Registrations/BookingEditor', compact('service', 'booking'));
-    }
-
-    /**
-     * Update an existing booking
-     * @param Request $request
-     * @param Booking $booking
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function update(Request $request, Booking $booking)
-    {
-        $data = $this->validateRequest($request);
-        $booking->update($data);
-        return redirect()->route('service.edit', ['service' => $booking->service->slug, 'tab' => 'registrations'])
-            ->with('success', 'Die Buchung wurde erfolgreich geändert.');
-    }
-
-    /**
-     * @param Booking $booking
-     * @return \Illuminate\Http\RedirectResponse
-     * @throws \Exception
-     */
-    public function destroy(Booking $booking)
-    {
-        $serviceId = $booking->service_id;
-        $booking->delete();
-        return response()->json();
     }
 
     /**
@@ -154,38 +119,18 @@ class BookingController extends Controller
      */
     protected function pin(Request $request, Booking $booking)
     {
+        Gate::authorize('update', $booking);
         $data = $request->validate(['fixed_seat' => ['required', 'string', new SeatableFixed('booking_id')]]);
         $booking->update($data);
         return response()->json($booking);
     }
 
-    /**
-     * @param Request $request
-     * @return array
-     */
-    protected function validateRequest(Request $request)
+    public function destroy(Request $request, $modelId)
     {
-        $data = $request->validate(
-            [
-                'service_id' => 'required|int|exists:services,id',
-                'code' => 'nullable|string',
-                'name' => 'required',
-                'first_name' => 'nullable',
-                'contact' => 'required|string',
-                'number' => ['required', 'int', 'min:1', new Seatable('booking_id')],
-                'fixed_seat' => ['nullable', 'string', new SeatableFixed('booking_id')],
-                'override_seats' => 'nullable|int',
-                'override_split' => 'nullable|string',
-                'email' => 'nullable|email',
-            ]
-        );
-
-        $data['fixed_seat'] = strtoupper($data['fixed_seat'] ?? '');
-        $data['override_seats'] = strtoupper($data['override_seats'] ?? '');
-        $data['override_split'] = strtoupper($data['override_split'] ?? '');
-
-
-        return $data;
+        $model = $this->getSingleModel($request, $modelId);
+        $deleter = $model->getContractedAction('delete');
+        $deleter->delete($request->user(), $model);
+        return response()->json();
     }
 
 }

@@ -35,12 +35,12 @@ use App\Calendars\SyncEngines\AbstractSyncEngine;
 use App\Casts\EncryptedAttribute;
 use App\DAV\DAVCalendarItem;
 use App\DAV\HasDAVCalendarItems;
+use App\Models\AbstractModel;
 use App\Models\Service;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCommentsTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\URL;
 
@@ -48,9 +48,85 @@ use Illuminate\Support\Facades\URL;
  * Class Funeral
  * @package App
  */
-class Funeral extends Model implements HasDAVCalendarItems
+class Funeral extends AbstractModel implements HasDAVCalendarItems
 {
     use HasCommentsTrait, HasAttachmentsTrait, HasFactory;
+
+    protected static string $prefix = 'funeral';
+    protected static string $prefixPlural = 'funerals';
+    protected static string $path = '';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'show', 'store', 'create', 'edit', 'update', 'destroy'],
+        'api' => ['index', 'show', 'store', 'update', 'destroy'],
+    ];
+    protected static $routes = [
+        'web' => [
+            'create' => [['GET', 'HEAD'], '#p#/create'],
+            'edit' => [['GET', 'HEAD'], '#p#/{modelId}'],
+            'update' => [['PATCH', 'PUT'], '#p#/{modelId}'],
+            'destroy' => [['DELETE'], '#p#/{modelId}'],
+        ],
+    ];
+    public static array $validationRules = [
+        'service_id' => 'required|int|exists:services,id',
+        'buried_name' => 'required|string',
+        'buried_address' => 'nullable|string',
+        'buried_zip' => 'nullable|zip',
+        'buried_city' => 'nullable|string',
+        'pronoun_set' => 'nullable|string',
+        'text' => 'nullable|string',
+        'type' => 'nullable|string',
+        'relative_name' => 'nullable|string',
+        'relative_address' => 'nullable|string',
+        'relative_zip' => 'nullable|zip',
+        'relative_city' => 'nullable|string',
+        'relative_contact_data' => 'nullable|string',
+        'wake_location' => 'nullable|string',
+        'wake' => 'nullable|date_format:d.m.Y',
+        'dob' => 'nullable|date_format:d.m.Y',
+        'dod' => 'nullable|date_format:d.m.Y',
+        'announcement' => 'nullable|date_format:d.m.Y',
+        'appointment' => 'nullable|date_format:d.m.Y H:i',
+        'spouse' => 'nullable|string',
+        'parents' => 'nullable|string',
+        'children' => 'nullable|string',
+        'further_family' => 'nullable|string',
+        'baptism' => 'nullable|string',
+        'confirmation' => 'nullable|string',
+        'undertaker' => 'nullable|string',
+        'eulogies' => 'nullable|string',
+        'notes' => 'nullable|string',
+        'announcements' => 'nullable|string',
+        'childhood' => 'nullable|string',
+        'profession' => 'nullable|string',
+        'family' => 'nullable|string',
+        'further_life' => 'nullable|string',
+        'faith' => 'nullable|string',
+        'events' => 'nullable|string',
+        'character' => 'nullable|string',
+        'death' => 'nullable|string',
+        'life' => 'nullable|string',
+        'attending' => 'nullable|string',
+        'quotes' => 'nullable|string',
+        'spoken_name' => 'nullable|string',
+        'professional_life' => 'nullable|string',
+        'birth_place' => 'nullable|string',
+        'death_place' => 'nullable|string',
+        'processed' => 'nullable|integer|between:0,1',
+        'needs_dimissorial' => 'nullable|integer|between:0,1',
+        'dimissorial_issuer' => 'nullable|string',
+        'dimissorial_requested' => 'nullable|date_format:d.m.Y',
+        'dimissorial_received' => 'nullable|date_format:d.m.Y',
+        'birth_name' => 'nullable|string',
+        'appointment_address' => 'nullable|string',
+        'baptism_date' => 'nullable|date_format:d.m.Y',
+        'confirmation_date' => 'nullable|date_format:d.m.Y',
+        'confirmation_text' => 'nullable|string',
+        'wedding_date' => 'nullable|date_format:d.m.Y',
+        'wedding_text' => 'nullable|string',
+        'dod_spouse' => 'nullable|date_format:d.m.Y',
+    ];
+    public static $relationsForEditor = ['attachments', 'service.pastors', 'service.sermon'];
 
     /**
      * @var string[]
@@ -170,9 +246,83 @@ class Funeral extends Model implements HasDAVCalendarItems
     protected $with = ['attachments'];
 
     /**
+     * @param string $page
+     * @return string
+     */
+    public static function getVuePath(string $page)
+    {
+        return match ($page) {
+            'editor' => 'Rites/FuneralEditor',
+            default => parent::getVuePath($page),
+        };
+    }
+
+    /**
+     * @return array
+     */
+    public function fillDefaults(): array
+    {
+        return [
+            'buried_name' => '',
+            'buried_address' => '',
+            'buried_zip' => '',
+            'buried_city' => '',
+            'pronoun_set' => '',
+            'text' => '',
+            'type' => 'Erdbestattung',
+            'relative_name' => '',
+            'relative_address' => '',
+            'relative_zip' => '',
+            'relative_city' => '',
+            'relative_contact_data' => '',
+            'wake_location' => '',
+            'spouse' => '',
+            'parents' => '',
+            'children' => '',
+            'further_family' => '',
+            'baptism' => '',
+            'confirmation' => '',
+            'undertaker' => '',
+            'eulogies' => '',
+            'notes' => '',
+            'announcements' => '',
+            'childhood' => '',
+            'profession' => '',
+            'family' => '',
+            'further_life' => '',
+            'faith' => '',
+            'events' => '',
+            'character' => '',
+            'death' => '',
+            'life' => '',
+            'attending' => '',
+            'quotes' => '',
+            'spoken_name' => '',
+            'professional_life' => '',
+            'birth_place' => '',
+            'death_place' => '',
+            'processed' => 0,
+            'needs_dimissorial' => 0,
+            'dimissorial_issuer' => '',
+            'birth_name' => '',
+            'appointment_address' => '',
+            'confirmation_text' => '',
+            'wedding_text' => '',
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabelAttribute(): string
+    {
+        return $this->buried_name ?: '';
+    }
+
+    /**
      * @return BelongsTo
      */
-    public function service()
+    public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
     }

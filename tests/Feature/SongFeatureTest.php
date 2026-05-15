@@ -35,7 +35,7 @@ class SongFeatureTest extends TestCase
     public function testIndexLoads(): void
     {
         $this->actingAs($this->user)
-            ->get(route('songs.index'))
+            ->get(route('admin.songs.index'))
             ->assertStatus(200)
             ->assertInertia(fn(Assert $page) => $page->component('Admin/Song/Index'));
     }
@@ -44,7 +44,7 @@ class SongFeatureTest extends TestCase
     {
         $song = Song::factory()->create();
         $this->actingAs($this->user)
-            ->get(route('song.edit', $song->id))
+            ->get(route('admin.song.edit', $song->id))
             ->assertStatus(200)
             ->assertInertia(fn(Assert $page) => $page->component('Admin/Song/SongEditor'));
     }
@@ -52,12 +52,12 @@ class SongFeatureTest extends TestCase
     public function testCreateSong(): void
     {
         $this->actingAs($this->user)
-            ->post(route('song.store'), [
+            ->post(route('admin.songs.store'), [
                 'title' => 'Testlied',
                 'verses' => [['number' => '1', 'text' => 'Testtext', 'refrain_before' => false, 'refrain_after' => false]],
                 'songbooks' => [],
             ])
-            ->assertStatus(302);
+            ->assertRedirect(route('admin.songs.index'));
         $this->assertTrue(Song::where('title', 'Testlied')->exists());
     }
 }

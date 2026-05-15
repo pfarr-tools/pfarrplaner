@@ -32,7 +32,6 @@ namespace App\UI\Modules;
 
 use App\Models\Liturgy\Psalm;
 use App\Models\Liturgy\Song;
-use App\Models\Liturgy\Songbook;
 use App\Models\Liturgy\Text;
 use App\Models\Location;
 use App\Models\Parish;
@@ -95,8 +94,8 @@ class AdminModule extends AbstractModule
                 'text' => 'Teams',
                 'group' => 'Personen',
                 'icon' => 'mdi mdi-account-multiple',
-                'url' => route('teams.index'),
-                'active' => $route == 'teams.index',
+                'url' => route('admin.teams.index'),
+                'active' => $route == 'admin.teams.index',
                 'inertia' => true,
             ];
         }
@@ -115,18 +114,8 @@ class AdminModule extends AbstractModule
                 'text' => 'Psalmen',
                 'group' => 'Liturgie',
                 'icon' => 'mdi mdi-hands-pray',
-                'url' => route('psalms.index'),
-                'active' => $route == 'psalms.index',
-                'inertia' => true,
-            ];
-        }
-        if ($user->can('viewAny', Songbook::class)) {
-            $adminMenu[] = [
-                'text' => 'Liederbücher',
-                'group' => 'Liturgie',
-                'icon' => 'mdi mdi-book-music-outline',
-                'url' => route('songbooks.index'),
-                'active' => $route == 'songbooks.index',
+                'url' => route('admin.psalms.index'),
+                'active' => $route == 'admin.psalms.index',
                 'inertia' => true,
             ];
         }
@@ -135,8 +124,8 @@ class AdminModule extends AbstractModule
                 'text' => 'Lieder',
                 'group' => 'Liturgie',
                 'icon' => 'mdi mdi-music',
-                'url' => route('songs.index'),
-                'active' => $route == 'songs.index',
+                'url' => route('admin.songs.index'),
+                'active' => $route == 'admin.songs.index',
                 'inertia' => true,
             ];
         }

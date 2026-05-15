@@ -59,6 +59,11 @@ class PsalmPolicy
         return true;
     }
 
+    public function index(User $user)
+    {
+        return $this->viewAny($user);
+    }
+
 
     /**
      * Determine whether the user can view the psalm.

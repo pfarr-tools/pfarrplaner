@@ -39,6 +39,17 @@ class SongbookPolicy
     use HandlesAuthorization;
 
     /**
+     * Determine whether the user can view the songbook index.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function index(User $user): bool
+    {
+        return $this->viewAny($user);
+    }
+
+    /**
      * Create a new policy instance.
      *
      * @return void
@@ -54,7 +65,7 @@ class SongbookPolicy
      * @param User $user
      * @return mixed
      */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
         return $user->isAdmin || $user->isLocalAdmin || $user->hasPermissionTo('liederbuecher-bearbeiten');
     }
@@ -67,7 +78,7 @@ class SongbookPolicy
      * @param Songbook $songbook
      * @return mixed
      */
-    public function view(User $user, Songbook $songbook)
+    public function view(User $user, Songbook $songbook): bool
     {
         return $user->isAdmin || $user->isLocalAdmin || $user->hasPermissionTo('liederbuecher-bearbeiten');
     }
@@ -78,7 +89,7 @@ class SongbookPolicy
      * @param User $user
      * @return mixed
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
         return $user->isAdmin || $user->isLocalAdmin || $user->hasPermissionTo('liederbuecher-bearbeiten');
     }
@@ -90,7 +101,7 @@ class SongbookPolicy
      * @param Songbook $songbook
      * @return mixed
      */
-    public function update(User $user, Songbook $songbook)
+    public function update(User $user, Songbook $songbook): bool
     {
         return $user->isAdmin || $user->isLocalAdmin || $user->hasPermissionTo('liederbuecher-bearbeiten');
     }
@@ -102,7 +113,7 @@ class SongbookPolicy
      * @param Songbook $songbook
      * @return mixed
      */
-    public function delete(User $user, Songbook $songbook)
+    public function delete(User $user, Songbook $songbook): bool
     {
         return $user->isAdmin || $user->isLocalAdmin || $user->hasPermissionTo('liederbuecher-bearbeiten');
     }
@@ -114,7 +125,7 @@ class SongbookPolicy
      * @param Songbook $songbook
      * @return mixed
      */
-    public function restore(User $user, Songbook $songbook)
+    public function restore(User $user, Songbook $songbook): bool
     {
         return $user->isAdmin || $user->isLocalAdmin || $user->hasPermissionTo('liederbuecher-bearbeiten');
     }
@@ -126,7 +137,7 @@ class SongbookPolicy
      * @param Songbook $songbook
      * @return mixed
      */
-    public function forceDelete(User $user, Songbook $songbook)
+    public function forceDelete(User $user, Songbook $songbook): bool
     {
         return $user->isAdmin || $user->isLocalAdmin || $user->hasPermissionTo('liederbuecher-bearbeiten');
     }

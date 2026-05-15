@@ -548,13 +548,13 @@ export default {
             ['baptism_date', 'confirmation_date', 'wedding_date', 'dod_spouse'].forEach(key => {
                 if (record[key] && (record[key].length != 10)) record[key] = moment(record[key]).format('DD.MM.YYYY');
             });
-            this.$inertia.patch(route('funerals.update', this.myFuneral.id), record, {
+            this.$inertia.patch(route('funerals.update', {modelId: this.myFuneral.id}), record, {
                 preserveState: false,
             });
         },
         deleteFuneral() {
             if (!confirm('Willst du diese Beerdigung wirklich unwiderruflich löschen?')) return;
-            this.$inertia.delete(route('funerals.destroy', this.myFuneral.id), {
+            this.$inertia.delete(route('funerals.destroy', {modelId: this.myFuneral.id}), {
                 preserveState: false,
             })
         },

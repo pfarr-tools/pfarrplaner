@@ -31,6 +31,4 @@
 
 use App\Http\Controllers\Api\SongbookController;
 
-Route::get('/songbooks/index', [SongbookController::class, 'index'])->name('songbooks.index');
 Route::get('/songbooks/colors', [SongbookController::class, 'colors'])->name('songbooks.colors');
-Route::post('/songbooks', [SongbookController::class, 'store'])->name('songbook.store');

@@ -89,7 +89,7 @@
         </div>
         <div class="col-md-1 text-end">
             <inertia-link class="btn btn-sm btn-light" title="Taufe bearbeiten"
-               :href="route('baptisms.edit', {baptism: baptism.id})"><span class="mdi mdi-pencil"></span></inertia-link>
+               :href="route('baptisms.edit', {modelId: baptism.id})"><span class="mdi mdi-pencil"></span></inertia-link>
             <button class="btn btn-sm btn-danger" title="Taufe löschen"
                     @click.prevent="deleteBaptism"><span class="mdi mdi-delete"></span></button>
         </div>
@@ -136,7 +136,7 @@ export default {
     methods: {
         deleteBaptism() {
             if (!confirm('Willst du diese Taufe wirklich unwiderruflich löschen?')) return;
-            this.$inertia.delete(route('baptisms.destroy', {baptism: this.baptism.id}), {preserveState: false});
+            this.$inertia.delete(route('baptisms.destroy', {modelId: this.baptism.id}), {preserveState: false});
         }
     }
 

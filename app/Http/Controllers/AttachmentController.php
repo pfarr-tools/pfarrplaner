@@ -30,9 +30,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\Attachment\UpdatesAttachments;
 use App\Models\Attachment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 /**
  * Class AttachmentController
@@ -49,24 +49,12 @@ class AttachmentController extends Controller
 
     /**
      * @param Request $request
-     * @param Attachment $attachment
+     * @param int $modelId
      */
-    public function update(Request $request, Attachment $attachment)
+    public function update(Request $request, int $modelId)
     {
-        if ($request->hasFile('attachments')) {
-            $files = $request->file('attachments');
-            $cut = $request->get('cut', null);
-            foreach ($files as $key => $file) {
-                if ($cut) {
-                    //$extension = $file->getClientOriginalExtension() ?: pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
-                    $path = $file->storeAs('attachments', 'zuschnitt-'.$attachment->attachable_id.'-'.$cut.'.'.$file->getClientOriginalExtension());
-                } else {
-                    $path = $file->storeAs('attachments', 'attachments', Str::random(32).'.'.$file->getClientOriginalExtension());
-                }
-                $attachment->update(['file' => $path, 'cut' => $cut]);
-            }
-        }
-        $attachment->refresh();
+        $attachment = Attachment::findOrFail($modelId);
+        $attachment = app(UpdatesAttachments::class)->update($request->user(), $attachment, $request->all());
         return response()->json($attachment->attachable->attachments);
     }
 

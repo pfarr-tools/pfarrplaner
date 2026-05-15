@@ -30,11 +30,11 @@
 
 namespace App\Models\Leave;
 
+use App\Models\AbstractModel;
 use App\Models\People\User;
 use App\Tools\StringTool;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -42,10 +42,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * Class Replacement
  * @package App
  */
-class Replacement extends Model
+class Replacement extends AbstractModel
 {
 
     use HasFactory;
+
+    protected static string $prefix = 'replacement';
+    protected static string $prefixPlural = 'replacements';
+    protected static string $path = '';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
+        'api' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
+    ];
+    public static array $validationRules = [
+        'absence_id' => 'required|integer|exists:absences,id',
+        'from' => 'required|date',
+        'to' => 'required|date|after_or_equal:from',
+        'pool_id' => 'nullable|integer|exists:pools,id',
+    ];
 
     /**
      * @var string[]
@@ -61,7 +75,7 @@ class Replacement extends Model
     /**
      * @return BelongsTo
      */
-    public function absence()
+    public function absence(): BelongsTo
     {
         return $this->belongsTo(Absence::class);
     }
@@ -69,7 +83,7 @@ class Replacement extends Model
     /**
      * @return BelongsToMany
      */
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withTimestamps();
     }
@@ -77,7 +91,7 @@ class Replacement extends Model
     /**
      * @return BelongsTo
      */
-    public function pool()
+    public function pool(): BelongsTo
     {
         return $this->belongsTo(Pool::class);
     }

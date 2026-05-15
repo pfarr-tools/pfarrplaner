@@ -107,6 +107,10 @@ class Handler extends ExceptionHandler
 
         parent::report($e);
 
+        if (app()->runningInConsole() || app()->runningUnitTests()) {
+            return;
+        }
+
         // abort here, if 'mail.manager' is not available
         try {
             $mailManager = app('mail.manager');

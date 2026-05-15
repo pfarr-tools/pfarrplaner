@@ -47,7 +47,3 @@ Route::post('booking/{booking}/pin', [BookingController::class, 'pin'])->name('b
 Route::get('services/{service}/bookings', [BookingController::class, 'index'])->name('service.bookings');
 Route::get('anmelden/{service:slug}', [BookingController::class, 'findSeat'])->name('seatfinder');
 Route::get('services/{service}/bookingList', [BookingController::class, 'finalize'])->name('booking.finalize');
-
-Route::get('anmeldung/{booking}', [BookingController::class, 'edit'])->name('booking.edit');
-Route::patch('anmeldung/{booking}', [BookingController::class, 'update'])->name('booking.update');
-Route::delete('anmeldung/{booking}', [BookingController::class, 'destroy'])->name('booking.destroy');

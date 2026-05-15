@@ -31,19 +31,31 @@
 namespace Tests\Unit;
 
 use App\Models\Attachment;
+use App\Models\Location;
+use App\Models\Places\City;
 use App\Models\Rites\Funeral;
 use App\Models\Service;
+use App\Models\People\User;
+use App\Contracts\Attachment\UpdatesAttachments;
+use App\Events\Models\Attachment\UpdatedAttachment;
+use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use Tests\AbstractSimpleModelUnitTest;
 
 /**
  * Class AttachmentUnitTest
  * @package Tests\Unit
  */
-class AttachmentUnitTest extends TestCase
+class AttachmentUnitTest extends AbstractSimpleModelUnitTest
 {
 
     use RefreshDatabase;
+
+    protected string $modelClass = Attachment::class;
 
     /**
      * Test that an attachment can be created
@@ -52,7 +64,6 @@ class AttachmentUnitTest extends TestCase
      */
     public function testAttachmentCanBeCreated()
     {
-        $this->withoutExceptionHandling();
         $attachment = Attachment::create(['title' => 'cool title', 'file' => 'file.txt']);
         $this->assertCount(1, Attachment::all());
     }
@@ -64,10 +75,34 @@ class AttachmentUnitTest extends TestCase
      */
     public function testAttachmentCanBeCreatedForFuneral()
     {
-        $this->withoutExceptionHandling();
         $funeral = Funeral::factory()->for(Service::factory(), 'service')->create();
         $this->assertCount(1, Funeral::all());
         $funeral->attachments()->create(['title' => 'cool title', 'file' => 'file.txt']);
         $this->assertCount(1, Funeral::first()->attachments);
+    }
+
+    public function testAttachmentUpdateRouteExists(): void
+    {
+        $this->assertTrue(Route::has('attachment.update'));
+    }
+
+    public function testAttachmentCanBeUpdatedViaAction(): void
+    {
+        Storage::fake();
+        Event::fake();
+
+        $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
+        $attachment = Attachment::factory()->create();
+
+        $updated = app(UpdatesAttachments::class)->update($user, $attachment, [
+            'attachments' => [UploadedFile::fake()->image('updated.jpg')],
+            'cut' => 'header',
+        ]);
+
+        $this->assertInstanceOf(Attachment::class, $updated);
+        $this->assertSame('header', $updated->cut);
+        Storage::assertExists($updated->file);
+        Event::assertDispatched(UpdatedAttachment::class);
     }
 }

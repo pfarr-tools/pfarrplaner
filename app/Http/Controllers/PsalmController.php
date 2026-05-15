@@ -32,12 +32,10 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Liturgy\Psalm;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 
-class PsalmController extends Controller
+class PsalmController extends AbstractCRUDController
 {
+    protected string $modelClass = Psalm::class;
 
     /**
      * PsalmController constructor.
@@ -45,88 +43,6 @@ class PsalmController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-    }
-
-    /**
-     * @return \Inertia\Response
-     */
-    public function index()
-    {
-        $psalms = Psalm::all();
-        return Inertia::render('Admin/Psalm/Index', compact('psalms'));
-    }
-
-    /**
-     * @return \Inertia\Response
-     */
-    public function create()
-    {
-        $psalm = new Psalm();
-        return Inertia::render('Admin/Psalm/PsalmEditor', compact('psalm'));
-    }
-
-    /**
-     * @param Psalm $psalm
-     * @return \Inertia\Response
-     */
-    public function edit(Psalm $psalm)
-    {
-        return Inertia::render('Admin/Psalm/PsalmEditor', compact('psalm'));
-    }
-
-    /**
-     * @param Request $request
-     * @return RedirectResponse
-     */
-    public function store(Request $request)
-    {
-        $data = $this->validateRequest($request);
-        $psalm = Psalm::create($data);
-        $psalms = Psalm::all();
-        return redirect()->route('psalms.index')->with('success', 'Der Psalm wurde gespeichert.');
-    }
-
-    /**
-     * @param Request $request
-     * @return RedirectResponse
-     */
-    public function update(Request $request, Psalm $psalm)
-    {
-        $data = $this->validateRequest($request);
-
-        $psalm->update($data);
-        $psalm->refresh();
-        $psalms = Psalm::all();
-        return redirect()->route('psalms.index')->with('success', 'Der Psalm wurde gespeichert.');
-    }
-
-    /**
-     * @param Psalm $psalm
-     * @return RedirectResponse
-     */
-    public function destroy(Psalm $psalm)
-    {
-        $psalm->delete();
-        return redirect()->route('psalms.index')->with('success', 'Der Psalm wurde gelöscht.');
-    }
-
-    /**
-     * @param Request $request
-     * @return array
-     */
-    protected function validateRequest(Request $request)
-    {
-        return $request->validate(
-            [
-                'title' => 'required|string',
-                'intro' => 'nullable|string',
-                'text' => 'nullable|string',
-                'copyrights' => 'nullable|string',
-                'songbook' => 'nullable|string',
-                'songbook_abbreviation' => 'nullable|string',
-                'reference' => 'nullable|string',
-            ]
-        );
     }
 
 }

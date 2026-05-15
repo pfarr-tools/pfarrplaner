@@ -13,17 +13,16 @@
 namespace Tests\Unit;
 
 use App\Models\Seating\SeatingSection;
-use Tests\AbstractSimpleModelUnitTest;
+use App\Services\RoleService;
+use Tests\AbstractModelUnitTest;
 
-class SeatingSectionUnitTest extends AbstractSimpleModelUnitTest
+class SeatingSectionUnitTest extends AbstractModelUnitTest
 {
-    protected string $modelClass = SeatingSection::class;
-    protected bool $hasPolicy = false;
-    protected bool $hasFactory = true;
+    protected $modelClass = SeatingSection::class;
 
-    public function testSeatingSectionCanBeCreatedViaFactory(): void
+    protected function setUp(): void
     {
-        $section = SeatingSection::factory()->create();
-        $this->assertCount(1, SeatingSection::all());
+        parent::setUp();
+        $this->testUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 }

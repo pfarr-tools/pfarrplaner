@@ -14,7 +14,7 @@ namespace Tests\Feature;
 
 use App\Models\People\User;
 use App\Models\Seating\Booking;
-use App\Models\Service;
+use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -28,18 +28,11 @@ class BookingApiFeatureTest extends TestCase
     public function testDestroyDeletesBooking()
     {
         $user = User::factory()->create();
-        $service = Service::factory()->create();
-        $booking = Booking::create([
-            'service_id' => $service->id,
-            'code' => 'TEST001',
-            'name' => 'Mustermann',
-            'first_name' => 'Max',
-            'contact' => 'max@example.de',
-            'number' => 2,
-        ]);
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
+        $booking = Booking::factory()->create();
         $id = $booking->id;
 
-        $response = $this->actingAs($user)
+        $response = $this->actingAs($user, 'api')
             ->deleteJson(route('api.booking.destroy', $booking));
 
         $response->assertNoContent();
@@ -51,15 +44,7 @@ class BookingApiFeatureTest extends TestCase
      */
     public function testDestroyRequiresAuth()
     {
-        $service = Service::factory()->create();
-        $booking = Booking::create([
-            'service_id' => $service->id,
-            'code' => 'TEST002',
-            'name' => 'Musterfrau',
-            'first_name' => 'Anna',
-            'contact' => 'anna@example.de',
-            'number' => 1,
-        ]);
+        $booking = Booking::factory()->create();
 
         $response = $this->deleteJson(route('api.booking.destroy', $booking));
         $response->assertUnauthorized();
@@ -71,8 +56,9 @@ class BookingApiFeatureTest extends TestCase
     public function testDestroyReturns404ForMissingBooking()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
 
-        $response = $this->actingAs($user)
+        $response = $this->actingAs($user, 'api')
             ->deleteJson(route('api.booking.destroy', 999999));
 
         $response->assertNotFound();

@@ -35,19 +35,18 @@ use App\Models\People\Team;
 use App\Models\People\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
 
-class TeamController extends Controller
+class TeamController extends AbstractCRUDController
 {
+    protected string $modelClass = Team::class;
+
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Inertia\Response
+     * Prepare the collection of models for the index view.
      */
-    public function index()
+    protected function getModelsForIndex(): \Illuminate\Support\Collection
     {
         $writableCityIds = Auth::user()->writableCities->pluck('id');
-        $teams = Team::with('city', 'users')
+        return Team::with(Team::$relationsForIndex)
             ->inCities(Auth::user()->cities->pluck('id'))
             ->orderBy('name')
             ->get()
@@ -55,74 +54,30 @@ class TeamController extends Controller
                 $item->writable = $writableCityIds->contains($item->city_id);
                 return $item;
             });
-        return Inertia::render('Teams/Index', compact('teams'));
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Get additional resources needed to display the editor component.
      */
-    public function create()
+    protected function getResourcesForEditor(Request $request, $model = null): array
     {
-        $counter = Team::inCities(Auth::user()->cities->pluck('id'))
-                ->orderBy('name')
-                ->count() + 1;
-        $team = Team::create([
-                                 'name' => 'Neues Team #' . $counter,
-                                 'city_id' => Auth::user()->cities->pluck('id')->first(),
-                             ]);
-        return redirect()->route('team.edit', $team->id);
+        return [
+            'cities' => Auth::user()->writableCities,
+            'users' => User::visibleFor(Auth::user())->get(),
+        ];
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param Team $team
-     * @return \Inertia\Response
+     * Get data to pre-fill a new model with.
      */
-    public function edit(Team $team)
+    protected function preFillNewModel(Request $request): array
     {
-        $team->load(['city', 'users']);
-        $cities = Auth::user()->writableCities;
-        $users = User::visibleFor(Auth::user())->get();
-        return Inertia::render('Teams/TeamEditor', compact('team', 'cities', 'users'));
-    }
+        $counter = Team::inCities(Auth::user()->cities->pluck('id'))->count() + 1;
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param Team $team;
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function update(Request $request, Team $team)
-    {
-        $data = $this->validateRequest($request);
-        $team->update($data);
-        if (isset($data['users'])) $team->users()->sync(collect($data['users'])->pluck('id'));
-        return redirect()->route('teams.index');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param Team $team
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function destroy(Team $team)
-    {
-        $team->delete();
-        return redirect()->route('teams.index');
-    }
-
-    protected function validateRequest(Request $request)
-    {
-        return $request->validate([
-            'name' => 'required|string',
-            'city_id' => 'required|int|exists:cities,id',
-            'users' => 'nullable',
-                                  ]);
+        return [
+            'name' => 'Neues Team #' . $counter,
+            'city_id' => Auth::user()->cities->pluck('id')->first(),
+        ];
     }
 
     /**

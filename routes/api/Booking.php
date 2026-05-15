@@ -30,5 +30,3 @@
 
 
 use App\Http\Controllers\Api\BookingController;
-
-Route::delete('booking/{booking}', [BookingController::class, 'destroy'])->name('booking.destroy');

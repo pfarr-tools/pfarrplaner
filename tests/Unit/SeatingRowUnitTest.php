@@ -13,17 +13,16 @@
 namespace Tests\Unit;
 
 use App\Models\Seating\SeatingRow;
-use Tests\AbstractSimpleModelUnitTest;
+use App\Services\RoleService;
+use Tests\AbstractModelUnitTest;
 
-class SeatingRowUnitTest extends AbstractSimpleModelUnitTest
+class SeatingRowUnitTest extends AbstractModelUnitTest
 {
-    protected string $modelClass = SeatingRow::class;
-    protected bool $hasPolicy = false;
-    protected bool $hasFactory = true;
+    protected $modelClass = SeatingRow::class;
 
-    public function testSeatingRowCanBeCreatedViaFactory(): void
+    protected function setUp(): void
     {
-        $row = SeatingRow::factory()->create();
-        $this->assertCount(1, SeatingRow::all());
+        parent::setUp();
+        $this->testUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 }

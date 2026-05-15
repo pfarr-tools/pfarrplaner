@@ -13,15 +13,28 @@
 namespace Tests\Unit;
 
 use App\Models\People\Team;
+use App\Models\Places\City;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Tests\AbstractSimpleModelUnitTest;
+use Tests\AbstractModelUnitTest;
 
-class TeamUnitTest extends AbstractSimpleModelUnitTest
+class TeamUnitTest extends AbstractModelUnitTest
 {
-    protected string $modelClass = Team::class;
-    protected bool $hasPolicy = true;
-    protected bool $hasFactory = true;
+    protected $modelClass = Team::class;
+    private City $city;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->city = City::factory()->create();
+        $this->testUser->cities()->attach($this->city->id, ['permission' => 'w']);
+    }
+
+    protected function factory(): Factory
+    {
+        return Team::factory()->state(['city_id' => $this->city->id]);
+    }
 
     public function testTeamHasCityRelationship(): void
     {

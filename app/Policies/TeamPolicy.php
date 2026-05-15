@@ -53,6 +53,11 @@ class TeamPolicy
         return count($user->writableCities) > 0;
     }
 
+    public function viewAny(User $user)
+    {
+        return $this->index($user);
+    }
+
     public function create(User $user)
     {
         return count($user->writableCities) > 0;

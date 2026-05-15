@@ -30,14 +30,6 @@
 
 use App\Http\Controllers\SongbookController;
 
-Route::get('/liederbuecher', [SongbookController::class, 'index'])->name('songbooks.index');
-Route::get('/liederbuecher/neu', [SongbookController::class, 'create'])->name('songbook.create');
-Route::post('/liederbuecher', [SongbookController::class, 'store'])->name('songbook.store');
-Route::get('/liederbuch/{songbook}', [SongbookController::class, 'edit'])->name('songbook.edit');
-Route::patch('/liederbuch/{songbook}', [SongbookController::class, 'update'])->name('songbook.update');
-Route::delete('/liederbuch/{songbook}', [SongbookController::class, 'destroy'])->name('songbook.destroy');
-
 // Cover image
 Route::post('/liederbuch/{model}/cover', [SongbookController::class, 'attachImage'])->name('songbook.cover.attach');
 Route::delete('/liederbuch/{model}/cover', [SongbookController::class, 'detachImage'])->name('songbook.cover.detach');
-

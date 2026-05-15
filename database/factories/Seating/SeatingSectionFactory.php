@@ -32,6 +32,7 @@ namespace Database\Factories\Seating;
 
 use App\Models\Location;
 use App\Models\Seating\SeatingSection;
+use App\Seating\RowBasedSeatingModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SeatingSectionFactory extends Factory
@@ -43,7 +44,7 @@ class SeatingSectionFactory extends Factory
         return [
             'location_id' => Location::factory(),
             'title' => fake()->words(2, true),
-            'seating_model' => 'default',
+            'seating_model' => RowBasedSeatingModel::class,
             'priority' => fake()->numberBetween(1, 10),
             'color' => fake()->hexColor(),
         ];

@@ -39,6 +39,13 @@ class BaptismPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->create($user));
     }
 
+    public function testIndexUsesCreatePermission(): void
+    {
+        $user = User::factory()->create();
+        $user->givePermissionTo('gd-bearbeiten');
+        $this->assertTrue($this->policy->index($user));
+    }
+
     public function testUserWithPermissionCanCreate(): void
     {
         $user = User::factory()->create();

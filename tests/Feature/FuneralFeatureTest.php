@@ -30,11 +30,13 @@
 
 namespace Tests\Feature;
 
-use App\Models\Places\City;
+use App\Models\People\User;
 use App\Models\Rites\Funeral;
 use App\Models\Service;
-use App\Traits\TestWithCredentialsTrait;
+use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 /**
@@ -44,40 +46,59 @@ use Tests\TestCase;
 class FuneralFeatureTest extends TestCase
 {
     use RefreshDatabase;
-    use TestWithCredentialsTrait;
 
-    /**
-     * Test that a funeral can be created
-     *
-     * @return void
-     */
-    public function testFuneralCanBeCreated()
+    private User $user;
+
+    protected function setUp(): void
     {
-        $service = Service::factory()->create();
-        $this->actingAs($this->user)
-            ->get(route('funerals.create', $service->id))
-            ->assertStatus(302);
-        $this->assertCount(1, Funeral::all());
+        parent::setUp();
+        Storage::fake();
+        foreach (range((int)date('Y') - 2, (int)date('Y') + 2) as $year) {
+            Storage::put("liturgy/{$year}.json", '{}');
+        }
+        Storage::put('liturgy/.json', '{}');
+        $this->user = User::factory()->create();
+        $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
     /**
-     * Test that a funeral can be updated
-     *
      * @return void
      */
-    public function testFuneralCanBeUpdated()
+    public function testEditorLoads(): void
     {
-        $this->withoutExceptionHandling();
-        $raw = Funeral::factory()
-            ->for(Service::factory()->for(City::factory(), 'city'), 'service')
-            ->raw();
-        $funeral = Funeral::create($raw);
-        $this->assertCount(1, Funeral::all());
-        $raw['buried_name'] = 'Karl Otto';
+        $funeral = Funeral::factory()->create();
         $this->actingAs($this->user)
-            ->patch(route('funerals.update', $funeral->id), $raw)
-            ->assertStatus(302);
+            ->get(route('funerals.edit', $funeral->id))
+            ->assertStatus(200)
+            ->assertInertia(fn(Assert $page) => $page->component('Rites/FuneralEditor'));
+    }
+
+    /**
+     * @return void
+     */
+    public function testCreateRedirectsToEditor(): void
+    {
+        $service = Service::factory()->create();
+
+        $this->actingAs($this->user)
+            ->get(route('funerals.create', ['service' => $service->id]))
+            ->assertRedirectContains('/funerals/');
+
         $this->assertCount(1, Funeral::all());
-        $this->assertEquals('Karl Otto', Funeral::first()->buried_name);
+    }
+
+    public function testFuneralCanBeUpdated(): void
+    {
+        $funeral = Funeral::factory()->create();
+        $raw = [
+            'buried_name' => 'Karl Otto',
+            'service_id' => $funeral->service_id,
+        ];
+
+        $this->actingAs($this->user)
+            ->patch(route('funerals.update', ['modelId' => $funeral->id]), $raw)
+            ->assertStatus(302);
+
+        $this->assertSame('Karl Otto', Funeral::first()->buried_name);
     }
 }

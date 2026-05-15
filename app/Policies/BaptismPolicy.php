@@ -40,6 +40,15 @@ class BaptismPolicy
 
     /**
      * @param User $user
+     * @return bool
+     */
+    public function index(User $user): bool
+    {
+        return $this->create($user);
+    }
+
+    /**
+     * @param User $user
      * @param Baptism $baptism
      * @return bool
      */
@@ -80,7 +89,7 @@ class BaptismPolicy
      */
     public function update(User $user, Baptism $baptism = null): bool
     {
-        return $this->mayChange($user, $baptism);
+        return $this->mayChange($user, $baptism) || (null !== $baptism && null === $baptism->city_id && $this->create($user));
     }
 
     /**
@@ -93,4 +102,3 @@ class BaptismPolicy
         return $this->mayChange($user, $baptism);
     }
 }
-

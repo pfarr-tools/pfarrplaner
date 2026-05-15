@@ -126,7 +126,7 @@ export default {
      * @returns {Promise<void>}
      */
     async created() {
-        const psalms = await axios.get(route('api.liturgy.psalm.index', {api_token: this.apiToken}))
+        const psalms = await axios.get(route('api.psalms.index', {api_token: this.apiToken}))
         if (psalms.data) {
             psalms.data.forEach(psalm => {
                 psalm['name'] = this.displayTitle(psalm);
@@ -171,7 +171,7 @@ export default {
             }), this.editedElement, {preserveState: false});
         },
         saveText() {
-            axios.post(route('api.liturgy.psalm.store', {api_token: this.apiToken}), this.editedElement.data.psalm).then(response => {
+            axios.post(route('api.psalms.store', {api_token: this.apiToken}), this.editedElement.data.psalm).then(response => {
                 return response.data;
             }).then(data => {
                 this.editPsalm = false;
@@ -182,10 +182,10 @@ export default {
             this.psalmIsDirty = false;
         },
         updateText() {
-            axios.patch(route('api.liturgy.psalm.update', {
+            axios.patch(route('api.psalm.update', {
                 psalm: this.editedElement.data.psalm.id,
                 api_token: this.apiToken
-            }), this.editedElement.data.psalms).then(response => {
+            }), this.editedElement.data.psalm).then(response => {
                 return response.data;
             }).then(data => {
                 this.editPsalm = false;

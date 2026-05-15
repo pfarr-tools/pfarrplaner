@@ -50,12 +50,12 @@
                         <small>Strophen: {{ getVersesToDisplay(editedElement.data.verses) }}</small>
                     </div>
                     <div class="form-group">
-                        <inertia-link class="btn btn-sm btn-light" title="Neues Lied anlegen" :href="route('song.create')">
+                        <inertia-link class="btn btn-sm btn-light" title="Neues Lied anlegen" :href="route('admin.songs.create')">
                             Neues Lied
                         </inertia-link>
                         <inertia-link v-if="(undefined != editedElement.data.song) && (undefined != editedElement.data.song.song) && (editedElement.data.song.song.id > 0)"
                                       class="btn btn-sm btn-light"
-                                title="Lied bearbeiten" :href="route('song.edit', editedElement.data.song.song.id)">Lied bearbeiten
+                                title="Lied bearbeiten" :href="route('admin.song.edit', editedElement.data.song.song.id)">Lied bearbeiten
                         </inertia-link>
                         <button v-if="(undefined != editedElement.data.song) && (undefined != editedElement.data.song.song) && (editedElement.data.song.song.id != -1)"
                                 class="btn btn-sm btn-light"

@@ -31,7 +31,6 @@
 namespace App\Http\Controllers;
 
 use App\Events\ServiceUpdated;
-use App\Http\Requests\FuneralStoreRequest;
 use App\Liturgy\PronounSets\PronounSets;
 use App\Models\Attachment;
 use App\Models\Leave\Poolmaster;
@@ -44,9 +43,10 @@ use App\Traits\HandlesAttachmentsTrait;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
@@ -56,10 +56,12 @@ use App\Documents\PDF;
  * Class FuneralController
  * @package App\Http\Controllers
  */
-class FuneralController extends Controller
+class FuneralController extends AbstractCRUDController
 {
 
     use HandlesAttachmentsTrait;
+
+    protected string $modelClass = Funeral::class;
 
     public function __construct()
     {
@@ -67,28 +69,28 @@ class FuneralController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Show the form for creating a new resource.
      *
-     * @return Response
+     * @param Request $request
+     * @return RedirectResponse
      */
-    public function index()
+    public function create(Request $request): RedirectResponse
     {
+        $service = Service::findOrFail($request->get('service') ?: $request->get('service_id'));
+        Gate::authorize('create', [Funeral::class, $service]);
+        $creator = app(Funeral::getContractName('create'));
+        $funeral = $creator->create($request->user(), $request->all());
+
+        return redirect()->route('funerals.edit', $funeral->id);
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
+     * @param Service $service
+     * @return RedirectResponse
      */
-    public function create(Service $service)
+    public function add(Service $service): RedirectResponse
     {
-        $funeral = Funeral::create(
-            [
-                'service_id' => $service->id,
-                'buried_name' => '',
-            ]
-        );
-        return redirect()->route('funerals.edit', $funeral->id);
+        return redirect()->route('funerals.create', ['service' => $service->id]);
     }
 
 
@@ -207,59 +209,17 @@ class FuneralController extends Controller
 
 
     /**
-     * Display the specified resource.
-     *
-     * @param Funeral $funeral
-     * @return Response
+     * @param Request $request
+     * @param Funeral|null $funeral
+     * @return array
      */
-    public function show(Funeral $funeral)
+    protected function getResourcesForEditor(Request $request, $funeral = null): array
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param Funeral $funeral
-     * @return Response
-     */
-    public function edit(Funeral $funeral)
-    {
-        $funeral->load('service');
-        $funeral->service->load('sermon');
+        if ($funeral?->service) {
+            $funeral->service->setAppends(['pastors', 'locationText', 'timeText']);
+        }
         $pronounSets = PronounSets::toArray();
-        return Inertia::render('Rites/FuneralEditor', compact('funeral', 'pronounSets'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param FuneralStoreRequest $request
-     * @param Funeral $funeral
-     * @return Response
-     */
-    public function update(FuneralStoreRequest $request, Funeral $funeral)
-    {
-        $funeral->update($request->validated());
-        $funeral->service->setDefaultOfferingValues();
-        $funeral->service->save();
-        $this->handleAttachments($request, $funeral);
-        ServiceUpdated::dispatch($funeral->service, $funeral->service->participants);
-
-        return redirect(route('service.edit', ['service' => $funeral->service->slug, 'tab' => 'rites']));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param Funeral $funeral
-     * @return Response
-     */
-    public function destroy(Funeral $funeral)
-    {
-        $serviceSlug = $funeral->service->slug;
-        $funeral->delete();
-        return redirect(route('service.edit', ['service' => $serviceSlug, 'tab' => 'rites']));
+        return compact('pronounSets');
     }
 
     /**

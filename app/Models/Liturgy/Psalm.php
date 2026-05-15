@@ -31,14 +31,51 @@
 namespace App\Models\Liturgy;
 
 
+use App\Models\AbstractModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Psalm extends \Illuminate\Database\Eloquent\Model
+class Psalm extends AbstractModel
 {
     use HasFactory;
 
+    protected static string $prefix = 'psalm';
+    protected static string $prefixPlural = 'psalms';
+    public static array $exceptRoutes = [
+        'web' => ['show'],
+        'api' => ['show', 'destroy'],
+    ];
+    protected static $routes = [
+        'api' => [
+            'index' => [['GET', 'HEAD'], 'liturgy/#p#'],
+            'store' => [['POST'], 'liturgy/#p#'],
+            'update' => [['PATCH', 'PUT'], 'liturgy/#p#/{modelId}'],
+        ],
+    ];
+    public static array $validationRules = [
+        'title' => 'required|string',
+        'intro' => 'nullable|string',
+        'text' => 'nullable|string',
+        'copyrights' => 'nullable|string',
+        'songbook' => 'nullable|string',
+        'songbook_abbreviation' => 'nullable|string',
+        'reference' => 'nullable|string',
+    ];
+
     protected $fillable = ['title', 'intro', 'text', 'copyrights', 'songbook', 'songbook_abbreviation', 'reference'];
+
+    public static function getVuePath(string $page)
+    {
+        return match ($page) {
+            'editor' => 'Admin/Psalm/PsalmEditor',
+            default => parent::getVuePath($page),
+        };
+    }
+
+    public function getLabelAttribute(): string
+    {
+        return trim((($this->songbook_abbreviation ?: $this->songbook ?: '') . ' ' . ($this->reference ?: '') . ' ' . $this->title));
+    }
 
     protected static function boot()
     {

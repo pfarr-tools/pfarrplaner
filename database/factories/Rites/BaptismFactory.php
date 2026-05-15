@@ -30,6 +30,7 @@
 
 namespace Database\Factories\Rites;
 
+use App\Models\Places\City;
 use App\Models\Rites\Baptism;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -44,7 +45,10 @@ class BaptismFactory extends Factory
     public function definition(): array
     {
         return [
-            'service_id' => Service::factory(),
+            'city_id' => City::factory(),
+            'service_id' => fn (array $attributes) => Service::factory()->create([
+                'city_id' => $attributes['city_id'],
+            ])->id,
             'candidate_name' => fake()->name(),
             'candidate_address' => fake()->streetAddress(),
             'candidate_zip' => fake()->postcode(),

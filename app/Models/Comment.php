@@ -33,17 +33,30 @@ namespace App\Models;
 use App\Casts\EncryptedAttribute;
 use App\Models\People\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Comment
  * @package App
  */
-class Comment extends Model
+class Comment extends AbstractModel
 {
 
     use HasFactory;
+
+    protected static string $prefix = 'kommentar';
+    protected static string $prefixPlural = 'kommentare';
+    protected static string $path = '';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'create', 'show', 'edit', 'update', 'destroy', 'store'],
+        'api' => ['index', 'create', 'show', 'edit', 'update', 'destroy', 'store'],
+    ];
+    protected static $routes = [
+        'web' => [
+            'store' => [['POST'], '###'],
+            'destroy' => [['DELETE'], '###/{modelId}'],
+        ],
+    ];
 
     /**
      * @var string[]
@@ -76,9 +89,14 @@ class Comment extends Model
     /**
      * @return BelongsTo
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getLabelAttribute(): string
+    {
+        return (string) ($this->body ?? '');
     }
 
 }

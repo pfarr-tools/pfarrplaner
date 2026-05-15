@@ -816,3 +816,56 @@ tr.changed, tr.changed td, tr.changed th {
     text-align: justify;
     font-size: .9em;
 }
+
+.tiptap-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    background-color: #e9ecef;
+    padding: 4px 6px;
+    margin-bottom: 0 !important;
+    width: 100%;
+    border: 1px solid #ced4da;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+
+    .btn-group {
+        display: inline-flex;
+
+        .btn {
+            border-radius: 0;
+
+            &:first-child { border-radius: 3px 0 0 3px; }
+            &:last-child  { border-radius: 0 3px 3px 0; }
+            &:only-child  { border-radius: 3px; }
+        }
+    }
+
+    // Standalone buttons outside a btn-group
+    > .btn {
+        border-radius: 3px;
+    }
+
+    // Override outline-secondary → solid light-gray within toolbar
+    .btn-outline-secondary {
+        background-color: #f8f9fa;
+        color: #495057;
+        border-color: #ced4da;
+
+        &:hover, &:focus {
+            background-color: #dee2e6;
+            color: #212529;
+            border-color: #adb5bd;
+        }
+
+        &.active, &:active {
+            background-color: #6c757d;
+            color: #fff;
+            border-color: #6c757d;
+        }
+    }
+
+    // Remove Bootstrap spacing helpers that push margin back
+    .me-1, .me-2 { margin-right: 0 !important; }
+}

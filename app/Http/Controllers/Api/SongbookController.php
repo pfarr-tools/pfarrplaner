@@ -33,8 +33,9 @@ namespace App\Http\Controllers\Api;
 use App\Models\Liturgy\Songbook;
 use Illuminate\Http\Request;
 
-class SongbookController extends \App\Http\Controllers\Controller
+class SongbookController extends AbstractApiCRUDController
 {
+    protected string $modelClass = Songbook::class;
 
     public function __construct()
     {
@@ -46,20 +47,9 @@ class SongbookController extends \App\Http\Controllers\Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Songbook::orderBy('code')->get());
-    }
-
-    /**
-     * Store a new songbook
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(Request $request) {
-        $data = $this->validateRequest($request);
-        $songbook = Songbook::create($data);
-        return response()->json($songbook);
+        return response()->json(parent::index($request));
     }
 
     /**
@@ -75,19 +65,4 @@ class SongbookController extends \App\Http\Controllers\Controller
         return response()->json($data);
     }
 
-    /**
-     * Validate submitted data
-     *
-     * @param Request $request
-     * @return array
-     */
-    protected function validateRequest(Request $request) {
-        return $request->validate([
-            'name' => 'required|string',
-            'code' => 'required|string',
-            'isbn' => 'nullable|string',
-            'description' => 'nullable|string',
-            'image' => 'nullable|string',
-                                  ]);
-    }
 }

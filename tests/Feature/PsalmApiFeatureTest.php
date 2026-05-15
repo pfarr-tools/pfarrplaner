@@ -30,7 +30,7 @@ class PsalmApiFeatureTest extends TestCase
         Psalm::factory()->count(3)->create();
 
         $response = $this->actingAs($user, 'api')
-            ->getJson(route('api.liturgy.psalm.index'));
+            ->getJson(route('api.psalms.index'));
 
         $response->assertOk();
         $this->assertCount(3, $response->json());
@@ -41,7 +41,7 @@ class PsalmApiFeatureTest extends TestCase
      */
     public function testIndexRequiresAuth()
     {
-        $response = $this->getJson(route('api.liturgy.psalm.index'));
+        $response = $this->getJson(route('api.psalms.index'));
         $response->assertUnauthorized();
     }
 
@@ -53,7 +53,7 @@ class PsalmApiFeatureTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user, 'api')
-            ->postJson(route('api.liturgy.psalm.store'), [
+            ->postJson(route('api.psalms.store'), [
                 'title' => 'Psalm 23',
                 'text' => 'Der Herr ist mein Hirte',
             ]);
@@ -71,7 +71,7 @@ class PsalmApiFeatureTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user, 'api')
-            ->postJson(route('api.liturgy.psalm.store'), []);
+            ->postJson(route('api.psalms.store'), []);
 
         $response->assertUnprocessable();
     }
@@ -85,7 +85,7 @@ class PsalmApiFeatureTest extends TestCase
         $psalm = Psalm::factory()->create(['title' => 'Alter Titel']);
 
         $response = $this->actingAs($user, 'api')
-            ->patchJson(route('api.liturgy.psalm.update', $psalm), [
+            ->patchJson(route('api.psalm.update', $psalm), [
                 'title' => 'Neuer Titel',
             ]);
 
@@ -101,7 +101,7 @@ class PsalmApiFeatureTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user, 'api')
-            ->patchJson(route('api.liturgy.psalm.update', 999999), ['title' => 'Test']);
+            ->patchJson(route('api.psalm.update', 999999), ['title' => 'Test']);
 
         $response->assertNotFound();
     }

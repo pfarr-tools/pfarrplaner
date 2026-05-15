@@ -40,8 +40,6 @@
 |
 */
 
-use App\Http\Controllers\BaptismController;
-use App\Http\Controllers\WeddingController;
 use Illuminate\Support\Str;
 
 Route::match(['GET','POST'],'/csrf-cookie', fn () => response()->noContent());
@@ -56,8 +54,6 @@ Route::get('/test-node', function () {
     return shell_exec('node -v') ?: 'node not found';
 });
 
-Route::resource('baptisms', BaptismController::class)->middleware('auth');
-Route::resource('weddings', WeddingController::class)->middleware('auth');
 
 if (!function_exists('routeNames')) {
     function routeNames($model)

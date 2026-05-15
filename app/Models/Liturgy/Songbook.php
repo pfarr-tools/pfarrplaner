@@ -30,23 +30,56 @@
 
 namespace App\Models\Liturgy;
 
+use App\Models\AbstractModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Songbook extends Model
+class Songbook extends AbstractModel
 {
     use HasFactory;
+
+    protected static string $prefix = 'liederbuch';
+    protected static string $prefixPlural = 'liederbuecher';
+    public static array $exceptRoutes = [
+        'web' => ['show'],
+        'api' => ['show', 'update', 'destroy'],
+    ];
+    public static array $validationRules = [
+        'name' => 'required|string',
+        'code' => 'required|string',
+        'isbn' => 'nullable|string',
+        'description' => 'nullable|string',
+        'image' => 'nullable|string',
+    ];
+    public static $adminTitle = 'Liederbücher';
+    public static $adminIcon = 'mdi mdi-book-music-outline';
+    public static $adminGroup = 'Liturgie';
 
     protected $fillable = ['name', 'code', 'description', 'isbn', 'image'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @param string $page
+     * @return string
      */
-    public function songs()
+    public static function getVuePath(string $page)
+    {
+        return match ($page) {
+            'editor' => 'Admin/Songbook/SongbookEditor',
+            default => parent::getVuePath($page),
+        };
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function songs(): BelongsToMany
     {
         return $this->belongsToMany(Song::class)->withPivot(['id', 'reference']);
     }
 
+    /**
+     * @return string
+     */
     public function getImageField()
     {
         return 'image';

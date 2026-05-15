@@ -92,6 +92,25 @@ class SongApiFeatureTest extends TestCase
         $this->assertDatabaseHas('songs', ['title' => 'Ein feste Burg']);
     }
 
+    public function testUpdateModifiesSong(): void
+    {
+        $user = User::factory()->create();
+        $song = Song::factory()->create(['title' => 'Alt']);
+
+        $response = $this->actingAs($user, 'api')
+            ->patchJson(route('api.liturgy.song.update', $song), [
+                'song' => [
+                    'title' => 'Neu',
+                    'verses' => [],
+                    'songbooks' => [],
+                ],
+                'ref' => 1000000 + $song->id,
+            ]);
+
+        $response->assertOk();
+        $this->assertSame('Neu', $song->fresh()->title);
+    }
+
     /**
      * @return void
      */

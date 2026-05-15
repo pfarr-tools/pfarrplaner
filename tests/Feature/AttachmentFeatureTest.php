@@ -30,86 +30,42 @@
 
 namespace Tests\Feature;
 
-use App\Models\Rites\Funeral;
-use App\Models\Service;
-use App\Traits\TestWithCredentialsTrait;
+use App\Models\Attachment;
+use App\Models\People\User;
+use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Shetabit\Visitor\Middlewares\LogVisits;
 use Tests\TestCase;
 
-/**
- * Class AttachmentFeatureTest
- * @package Tests\Feature
- */
 class AttachmentFeatureTest extends TestCase
 {
-
     use RefreshDatabase;
-    use TestWithCredentialsTrait {
-        setUp as traitSetUp;
-    }
 
-    /**
-     * Test that a funeral can be created with an attachment
-     *
-     * @return void
-     */
-    public function testFuneralAttachmentCanBeCreated()
-    {
-        $funeral = Funeral::factory()->for(Service::factory(), 'service')->create();
-        $this->actingAs($this->user)
-            ->post(route('funeral.attach', $funeral->id), $this->fakeFuneralAttachmentData())
-            ->assertStatus(200)
-            ->assertJson([]);
+    private User $user;
 
-        $this->assertCount(1, Funeral::all());
-        $this->assertCount(1, Funeral::first()->attachments);
-    }
-
-    /**
-     * Test that an attachment can be removed from a funeral
-     *
-     * @return void
-     */
-    public function testFuneralAttachmentCanBeRemoved()
-    {
-        $funeral = Funeral::factory()->for(Service::factory(), 'service')->create();
-        $this->actingAs($this->user)
-            ->post(route('funeral.attach', $funeral->id), $this->fakeFuneralAttachmentData())
-            ->assertStatus(200)
-            ->assertJson([]);
-
-        $this->assertCount(1, Funeral::all());
-        $funeral = Funeral::first();
-        $this->assertCount(1, $funeral->attachments);
-        $this->actingAs($this->user)
-            ->delete(route('funeral.detach', ['funeral' => $funeral->id, 'attachment' => $funeral->attachments[0]->id]))
-            ->assertStatus(200)
-            ->assertJson([]);
-        $this->assertCount(0, Funeral::first()->attachments);
-    }
-
-    /**
-     * Prepare data for fake attachment
-     * @return array
-     */
-    protected function fakeFuneralAttachmentData(): array
-    {
-        Storage::fake('fake');
-        $raw['attachments'][1] = UploadedFile::fake()->image('test.jpg');
-        $raw['attachment_text'][1] = 'Testing';
-        return $raw;
-    }
-
-
-    /**
-     * Setup test
-     */
     protected function setUp(): void
     {
-        $this->traitSetUp();
-        $this->withoutMiddleware([LogVisits::class]);
+        parent::setUp();
+        Storage::fake();
+        $this->user = User::factory()->create();
+        $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
+    }
+
+    public function testAttachmentCanBeUpdatedViaWebRoute(): void
+    {
+        $attachment = Attachment::factory()->create();
+
+        $response = $this->actingAs($this->user)
+            ->post(route('attachment.update', $attachment->id), [
+                'attachments' => [UploadedFile::fake()->image('crop.jpg')],
+                'attachment_text' => ['Testing'],
+                'cut' => 'teaser',
+            ]);
+
+        $response->assertOk();
+        $attachment->refresh();
+        $this->assertSame('teaser', $attachment->cut);
+        $this->assertCount(1, $response->json());
     }
 }

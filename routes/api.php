@@ -44,4 +44,3 @@ Route::name('api.')->group(function () {
         Route::group([], $file);
     }
 });
-

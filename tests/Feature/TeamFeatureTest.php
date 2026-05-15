@@ -13,39 +13,26 @@
 namespace Tests\Feature;
 
 use App\Models\People\Team;
-use App\Models\People\User;
+use App\Models\Places\City;
 use App\Services\RoleService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia as Assert;
-use Tests\TestCase;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Tests\AbstractModelFeatureTest;
 
-class TeamFeatureTest extends TestCase
+class TeamFeatureTest extends AbstractModelFeatureTest
 {
-    use RefreshDatabase;
-
-    private User $user;
+    protected $modelClass = Team::class;
+    private City $city;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->user = User::factory()->create();
-        $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
+        $this->testUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
+        $this->city = City::factory()->create();
+        $this->testUser->cities()->attach($this->city->id, ['permission' => 'w']);
     }
 
-    public function testIndexLoads(): void
+    protected function factory(): Factory
     {
-        $this->actingAs($this->user)
-            ->get(route('teams.index'))
-            ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Teams/Index'));
-    }
-
-    public function testEditorLoads(): void
-    {
-        $team = Team::factory()->create();
-        $this->actingAs($this->user)
-            ->get(route('team.edit', $team->id))
-            ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Teams/TeamEditor'));
+        return Team::factory()->state(['city_id' => $this->city->id]);
     }
 }

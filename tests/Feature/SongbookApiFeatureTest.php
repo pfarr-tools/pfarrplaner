@@ -14,6 +14,7 @@ namespace Tests\Feature;
 
 use App\Models\Liturgy\Songbook;
 use App\Models\People\User;
+use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -27,6 +28,7 @@ class SongbookApiFeatureTest extends TestCase
     public function testIndexReturnsSongbooks()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         Songbook::factory()->count(2)->create();
 
         $response = $this->actingAs($user, 'api')
@@ -51,6 +53,7 @@ class SongbookApiFeatureTest extends TestCase
     public function testColorsReturnsColorList()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
 
         $response = $this->actingAs($user, 'api')
             ->getJson(route('api.songbooks.colors'));
@@ -65,9 +68,10 @@ class SongbookApiFeatureTest extends TestCase
     public function testStoreCreatesSongbook()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
 
         $response = $this->actingAs($user, 'api')
-            ->postJson(route('api.songbook.store'), [
+            ->postJson(route('api.songbooks.store'), [
                 'name' => 'Evangelisches Gesangbuch',
                 'code' => 'EG',
             ]);
@@ -83,9 +87,10 @@ class SongbookApiFeatureTest extends TestCase
     public function testStoreRequiresNameAndCode()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
 
         $response = $this->actingAs($user, 'api')
-            ->postJson(route('api.songbook.store'), []);
+            ->postJson(route('api.songbooks.store'), []);
 
         $response->assertUnprocessable();
     }

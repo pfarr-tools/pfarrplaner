@@ -63,7 +63,8 @@ abstract class AbstractPageLoadTest extends DuskTestCase
                 ->visit($url)
                 ->waitFor('#app', 10)
                 ->assertDontSee('500')
-                ->assertDontSee('Whoops');
+                ->assertDontSee('Whoops')
+                ->assertDontSee('404');
 
         if ($expectedHeading !== null) {
             $browser->assertSee($expectedHeading);

@@ -30,18 +30,64 @@
 
 namespace App\Models\Seating;
 
+use App\Models\AbstractModel;
 use App\Models\Location;
+use App\Seating\RowBasedSeatingModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class SeatingSection extends Model
+class SeatingSection extends AbstractModel
 {
     use HasFactory;
+
+    protected static string $path = '';
+    protected static string $prefix = 'bereich';
+    protected static string $prefixPlural = 'bereiche';
+    public static array $exceptRoutes = [
+        'web' => ['index', 'show', 'create', 'edit', 'store', 'update', 'destroy'],
+        'api' => ['show'],
+    ];
+    protected static $routes = [
+        'web' => [
+            'create' => [['GET', 'HEAD'], 'admin/ort/{location}/bereich'],
+            'edit' => [['GET', 'HEAD'], 'admin/bereich/{modelId}'],
+            'store' => [['POST'], 'admin/bereich'],
+            'update' => [['PATCH', 'PUT'], 'admin/bereich/{modelId}'],
+            'destroy' => [['DELETE'], 'admin/bereich/{modelId}'],
+        ],
+    ];
+    public static array $validationRules = [
+        'location_id' => 'required|int|exists:locations,id',
+        'title' => 'required|string',
+        'seating_model' => 'nullable|string',
+        'priority' => 'nullable|int',
+        'color' => 'nullable|string',
+    ];
 
     protected $fillable = ['location_id', 'title', 'seating_model', 'priority', 'color'];
 
     protected $with = ['seatingRows'];
+    protected $appends = ['modelClass'];
+
+    public static function singularKey(): string
+    {
+        return 'seatingSection';
+    }
+
+    public static function pluralKey(): string
+    {
+        return 'seatingSections';
+    }
+
+    public static function getVuePath(string $page)
+    {
+        return match ($page) {
+            'editor' => 'Admin/Location/SeatingSectionEditor',
+            default => parent::getVuePath($page),
+        };
+    }
 
     protected static function boot()
     {
@@ -51,8 +97,27 @@ class SeatingSection extends Model
         });
     }
 
+    public function getLabelAttribute(): string
+    {
+        return $this->title;
+    }
+
+    public function getModelClassAttribute(): string
+    {
+        return $this->attributes['seating_model'] ?? RowBasedSeatingModel::class;
+    }
+
+    public function fillDefaults(): array
+    {
+        return [
+            'seating_model' => RowBasedSeatingModel::class,
+            'priority' => 1,
+            'color' => '',
+        ];
+    }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function location()
     {
@@ -60,17 +125,11 @@ class SeatingSection extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function seatingRows()
     {
         return $this->hasMany(SeatingRow::class);
-    }
-
-    public function getSeatingModelAttribute()
-    {
-        $class = $this->attributes['seating_model'];
-        return new $class();
     }
 
     public function setSeatingModelAttribute($seatingModel)

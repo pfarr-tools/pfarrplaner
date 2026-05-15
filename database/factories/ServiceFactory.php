@@ -45,6 +45,7 @@ class ServiceFactory extends Factory {
         return [
             'date' => fake()->dateTime(),
             'time' => fake()->time('H:i'),
+            'city_id' => City::factory(),
             'description' => fake()->sentence(),
             'need_predicant' => fake()->numberBetween(0, 1),
             'baptism' => fake()->numberBetween(0, 1),

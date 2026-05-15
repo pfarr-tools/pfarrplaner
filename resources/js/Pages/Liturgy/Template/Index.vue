@@ -58,6 +58,8 @@
                                         <td style="width: 20%" class="text-end">
                                             <nav-button type="light" icon="mdi mdi-pencil" title="Vorlage bearbeiten"
                                                         @click="editTemplate(row)" force-icon force-no-text/>
+                                            <nav-button type="light" icon="mdi mdi-content-copy" title="Vorlage duplizieren"
+                                                        @click="duplicateTemplate(row)" force-icon force-no-text/>
                                             <nav-button type="danger" icon="mdi mdi-delete"
                                                         title="Vorlage löschen"
                                                         @click="deleteTemplate(row)" force-icon force-no-text/>
@@ -109,6 +111,9 @@ export default {
         },
         editTemplate(template) {
             this.$inertia.get(route('liturgy.editor', template.slug));
+        },
+        duplicateTemplate(template) {
+            this.$inertia.post(route('template.duplicate', template.id));
         },
         deleteTemplate(template) {
             if (!confirm('Willst du diese Vorlage wirklich unwiderruflich löschen?')) return;

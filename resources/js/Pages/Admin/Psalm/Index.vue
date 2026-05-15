@@ -31,7 +31,7 @@
     <admin-layout title="Psalmen">
         <template v-slot:navbar-left>
             <nav-button type="success" icon="mdi mdi-plus" title="Psalm hinzufügen"
-                        :href="route('psalm.create')">Neuer Psalm</nav-button>
+                        :href="route('admin.psalms.create')">Neuer Psalm</nav-button>
         </template>
             <dataset
                  v-slot="{ ds }"
@@ -68,7 +68,7 @@
                                         <td class="text-end">
                                             <nav-button class="btn-sm"
                                                         type="primary" icon="mdi mdi-pencil" title="Psalm bearbeiten"
-                                                        force-icon force-no-text :href="route('psalm.edit', row.id)" />
+                                                        force-icon force-no-text :href="route('admin.psalm.edit', row.id)" />
                                             <nav-button class="btn-sm"
                                                         type="danger" icon="mdi mdi-delete" title="Psalm löschen"
                                                         force-icon force-no-text @click="deletePsalm(row)" />
@@ -117,7 +117,7 @@ export default {
     methods: {
         deletePsalm(psalm) {
             if (!confirm('Willst du wirklich den kompletten Psalm löschen?')) return;
-            this.$inertia.delete(route('psalm.destroy', psalm.id));
+            this.$inertia.delete(route('admin.psalm.destroy', psalm.id));
         },
         searchFullTitle(value, searchString, rowData) {
             return String((rowData.songbook_abbreviation || rowData.songbook || '')+' '+(rowData.reference || '')+' '+(rowData.title || ''))

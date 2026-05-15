@@ -42,8 +42,12 @@ class SeatingRowFactory extends Factory
     {
         return [
             'seating_section_id' => SeatingSection::factory(),
-            'title' => fake()->words(2, true),
+            'title' => str_pad((string) fake()->numberBetween(1, 50), 2, '0', STR_PAD_LEFT),
             'seats' => fake()->numberBetween(10, 50),
+            'divides_into' => 1,
+            'spacing' => 0,
+            'split' => '1,2',
+            'color' => fake()->hexColor(),
         ];
     }
 

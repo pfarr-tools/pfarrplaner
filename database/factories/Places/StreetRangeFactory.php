@@ -30,6 +30,7 @@
 
 namespace Database\Factories\Places;
 
+use App\Models\Parish;
 use App\Models\Places\StreetRange;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -37,11 +38,15 @@ class StreetRangeFactory extends Factory
 {
     protected $model = StreetRange::class;
 
-    public function definition()
+    public function definition(): array
     {
-        // TODO: Implement definition() method.
-        return [];
+        return [
+            'parish_id' => Parish::factory(),
+            'name' => $this->faker->streetName(),
+            'odd_start' => 1,
+            'odd_end' => 19,
+            'even_start' => 2,
+            'even_end' => 20,
+        ];
     }
-
-
 }

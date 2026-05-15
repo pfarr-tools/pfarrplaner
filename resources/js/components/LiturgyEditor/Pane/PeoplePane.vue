@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <div class="liturgy-editor-people-pane">
+    <div class="liturgy-editor-people-pane pe-2">
         <form @submit.prevent="save">
             <label>Verantwortlich</label>
             <Multiselect
@@ -45,6 +45,31 @@
                 :no-results-text="{ de: 'Keine Ergebnisse gefunden', en: 'No results found' }"
                 :no-options-text="{ de: 'Die Liste ist leer', en: 'The list is empty' }"
             />
+            <div class="mt-2" v-if="agendaMode">
+                <label>Beschreibung (Vorlage)</label>
+                <div class="tiptap-toolbar btn-group btn-group-sm mb-1">
+                    <button type="button" class="btn btn-outline-secondary" :class="{active: editor.isActive('bold')}"
+                            @click.prevent="editor.chain().focus().toggleBold().run()" title="Fett">
+                        <span class="mdi mdi-format-bold"/>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" :class="{active: editor.isActive('italic')}"
+                            @click.prevent="editor.chain().focus().toggleItalic().run()" title="Kursiv">
+                        <span class="mdi mdi-format-italic"/>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" :class="{active: editor.isActive('underline')}"
+                            @click.prevent="editor.chain().focus().toggleUnderline().run()" title="Unterstrichen">
+                        <span class="mdi mdi-format-underline"/>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" :class="{active: editor.isActive('heading', {level: 1})}"
+                            @click.prevent="editor.chain().focus().toggleHeading({level: 1}).run()" title="Überschrift">
+                        <span class="mdi mdi-format-header-1"/>
+                    </button>
+                </div>
+                <editor-content :editor="editor" class="form-control tiptap-editor" />
+            </div>
+            <div class="mt-1" v-else-if="editedElement.data.agenda_description">
+                <small class="text-muted" v-html="editedElement.data.agenda_description"/>
+            </div>
         </form>
     </div>
 </template>
@@ -52,23 +77,31 @@
 <script>
 import Multiselect from '@vueform/multiselect';
 import '@vueform/multiselect/themes/default.css';
+import { Editor, EditorContent } from '@tiptap/vue-3';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
 
 export default {
     name: "PeoplePane",
     props: {
         element: Object,
         service: Object,
+        agendaMode: {
+            type: Boolean,
+            default: false,
+        },
         ministries: {
             type: Object,
             default() { return {}; },
         },
     },
-    components: { Multiselect },
+    components: { Multiselect, EditorContent },
     data() {
         var e = this.element;
         var emptyOption = { name: '', type: '' };
         if (undefined == e.data.responsible) e.data.responsible = [emptyOption];
         if (e.data.responsible.length == 0) e.data.responsible = [emptyOption];
+        if (undefined == e.data.agenda_description) e.data.agenda_description = '';
 
         var options = [];
         const basicMinistries = {
@@ -100,6 +133,13 @@ export default {
         return {
             editedElement: e,
             options: options,
+            editor: new Editor({
+                content: e.data.agenda_description || '',
+                extensions: [StarterKit, Underline],
+                onUpdate: ({ editor }) => {
+                    this.editedElement.data.agenda_description = editor.getHTML();
+                },
+            }),
         };
     },
     computed: {
@@ -113,6 +153,9 @@ export default {
             return Object.entries(groups).map(([label, opts]) => ({ label, options: opts }));
         },
     },
+    beforeUnmount() {
+        this.editor.destroy();
+    },
     methods: {
         createFreeOption(query) {
             const newOpt = { id: 'free:' + query, name: query, category: 'Eigene Eingaben', type: 'user-times' };
@@ -122,3 +165,10 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.tiptap-editor :deep(.ProseMirror) {
+    min-height: 80px;
+    outline: none;
+}
+</style>

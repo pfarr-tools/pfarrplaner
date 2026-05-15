@@ -87,7 +87,7 @@
         </div>
         <div class="col-md-1 text-end">
             <a class="btn btn-sm btn-light" title="Bestattung bearbeiten"
-               :href="route('funerals.edit', {funeral: funeral.id})"><span class="mdi mdi-pencil"></span></a>
+               :href="route('funerals.edit', {modelId: funeral.id})"><span class="mdi mdi-pencil"></span></a>
             <button class="btn btn-sm btn-danger" title="Bestattung löschen"
                     @click.prevent="deleteFuneral"><span class="mdi mdi-delete"></span></button>
         </div>
@@ -131,8 +131,8 @@ export default {
     methods: {
         deleteFuneral() {
             if (!confirm('Willst du diese Beerdigung wirklich unwiderruflich löschen?')) return;
-            this.$inertia.delete(route('funerals.destroy', {funeral: this.funeral.id}), {preserveState: false});
-        },
+            this.$inertia.delete(route('funerals.destroy', {modelId: this.funeral.id}), {preserveState: false});
+            },
         downloadForm() {
             window.location.href = route('funeral.form', {funeral: this.funeral.id});
         }

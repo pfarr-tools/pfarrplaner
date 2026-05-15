@@ -30,7 +30,7 @@
 <template>
     <admin-layout title="Teams">
         <template #navbar-left>
-            <a class="btn btn-success" :href="route('teams.create')">
+            <a class="btn btn-success" :href="route('admin.teams.create')">
                 <span class="d-inline d-md-none mdi mdi-account-multiple-plus"></span>
                 <span class="d-none d-md-inline">Team hinzufügen</span>
             </a>
@@ -109,11 +109,11 @@ export default {
     props: ['teams'],
     methods: {
         editTeam(team) {
-            this.$inertia.get(route('team.edit', team.id));
+            this.$inertia.get(route('admin.team.edit', team.id));
         },
         deleteTeam(team) {
             if (confirm('Willst du dieses Team wirklich löschen?'))
-                this.$inertia.delete(route('team.destroy', team.id));
+                this.$inertia.delete(route('admin.team.destroy', team.id));
         },
         searchAsCity(value, searchString, rowData) {
             return rowData.city.name.toLowerCase().includes(searchString);

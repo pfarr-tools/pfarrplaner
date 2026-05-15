@@ -31,8 +31,6 @@
 namespace App\Http\Controllers;
 
 use App\Attachments\AttachmentFactory;
-use App\Events\ServiceUpdated;
-use App\Http\Requests\StoreBaptismRequest;
 use App\Liturgy\PronounSets\PronounSets;
 use App\Models\Attachment;
 use App\Models\Rites\Baptism;
@@ -45,6 +43,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 
@@ -52,10 +51,12 @@ use Inertia\Inertia;
  * Class BaptismController
  * @package App\Http\Controllers
  */
-class BaptismController extends Controller
+class BaptismController extends AbstractCRUDController
 {
 
     use HandlesAttachmentsTrait;
+
+    protected string $modelClass = Baptism::class;
 
     public function __construct()
     {
@@ -64,46 +65,26 @@ class BaptismController extends Controller
 
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
      * Show the form for creating a new resource.
      *
      * @param int $serviceId Service Id
      * @return Response
      */
-    public function create($serviceId = null)
+    public function create(Request $request)
     {
-        $service = null;
-        if ($serviceId) {
-            $service = Service::findOrFail($serviceId);
-        }
-        $baptism = Baptism::create(
-            [
-                'candidate_name' => '',
-                'candidate_address' => '',
-                'candidate_zip' => '',
-                'candidate_city' => '',
-                'candidate_email' => '',
-                'candidate_phone' => '',
-                'first_contact_with' => '',
-                'appointment' => now(),
-                'registered' => false,
-                'signed' => false,
-                'docs_ready' => false,
-                'docs_where' => '',
-                'service_id' => $serviceId,
-                'city_id' => ($service ? $service->city_id : null),
-            ]
-        );
+        Gate::authorize('create', Baptism::class);
+        $creator = app(Baptism::getContractName('create'));
+        $baptism = $creator->create($request->user(), $request->all());
         return redirect()->route('baptisms.edit', $baptism->id);
+    }
+
+    /**
+     * @param Service $service
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function add(Service $service)
+    {
+        return redirect()->route('baptisms.create', ['service_id' => $service->id]);
     }
 
     /**
@@ -128,7 +109,7 @@ class BaptismController extends Controller
      * @param Baptism $baptism
      * @return Response
      */
-    public function edit(Baptism $baptism)
+    protected function getResourcesForEditor(Request $request, $baptism = null): array
     {
         $baptismalServicesQuery = Service::setEagerLoads([])
             ->with(['baptisms', 'participants'])
@@ -136,7 +117,7 @@ class BaptismController extends Controller
             ->inCities(Auth::user()->cities)
             ->startingFrom(Carbon::now())
             ->ordered();
-        if ($baptism->service_id) {
+        if ($baptism?->service_id) {
             $baptismalServicesQuery->orWhere('services.id', (int)$baptism->service_id);
         }
         $baptismalServices = $baptismalServicesQuery->get();
@@ -169,48 +150,7 @@ class BaptismController extends Controller
             }
         }
 
-        return Inertia::render('Rites/BaptismEditor', compact('baptism', 'services', 'cities', 'pronounSets', 'attachments'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param StoreBaptismRequest $request
-     * @param Baptism $baptism
-     * @return Response
-     */
-    public function update(StoreBaptismRequest $request, Baptism $baptism)
-    {
-        $data = $request->validated();
-        $baptism->update($data);
-        if ($baptism->service) {
-            ServiceUpdated::dispatch($baptism->service, $baptism->service->participants);
-        }
-
-        if ($baptism->service_id) {
-            return redirect(route('service.edit', ['service' => $baptism->service->slug, 'tab' => 'rites']));
-        } else {
-            return redirect(route('home'));
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param Baptism $baptism
-     * @return Response
-     */
-    public
-    function destroy(
-        Baptism $baptism
-    ) {
-        $serviceSlug = $baptism->service ? $baptism->service->slug : null;
-        $baptism->delete();
-        if ($serviceSlug) {
-            return redirect(route('service.edit', ['service' => $serviceSlug, 'tab' => 'rites']));
-        } else {
-            return redirect(route('home'));
-        }
+        return compact('services', 'cities', 'pronounSets', 'attachments');
     }
 
     /**

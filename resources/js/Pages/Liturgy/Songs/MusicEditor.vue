@@ -231,7 +231,7 @@ export default {
             this.renderer.renderAbc('refrain', this.refrain);
         },
         saveSong() {
-            this.$inertia.patch(route('song.update', {song: this.mySong.id}), this.mySong);
+            this.$inertia.patch(route('admin.song.update', {song: this.mySong.id}), this.mySong);
         }
     }
 }

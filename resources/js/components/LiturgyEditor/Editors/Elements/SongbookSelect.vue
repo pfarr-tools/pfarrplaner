@@ -91,7 +91,7 @@ export default {
         },
         closeModal() {
             this.createCallback({});
-            axios.post(route('api.songbook.store', {api_token: this.$page.props.currentUser.data.api_token}), this.modalSongbook)
+            axios.post(route('api.songbooks.store', {api_token: this.$page.props.currentUser.data.api_token}), this.modalSongbook)
                 .then(response => {
                     this.modalSongbook = response.data;
                     this.songbooks.push(this.modalSongbook);
