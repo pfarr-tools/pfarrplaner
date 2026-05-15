@@ -221,7 +221,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
                 ->writable()
                 ->get(),
             Service::setEagerLoads([])->with([])
-                ->select(['id', 'title', 'date'])
+                ->select(['id', 'title', 'date', 'description', 'special_location'])
                 ->isTemplate()
                 ->get(),
         ];
@@ -233,7 +233,9 @@ class LiturgyController extends \App\Http\Controllers\Controller
                     $sources[] = [
                         'id' => $service->id,
                         'date' => 0,
-                        'name' => $service->title . ($service->source ? ' (' . $service->source . ')' : ''),
+                        'name' => $service->title,
+                        'description' => $service->description,
+                        'source' => $service->special_location,
                         'group' => 'Vorlagen',
                     ];
                 } else {

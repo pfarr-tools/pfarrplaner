@@ -195,6 +195,10 @@
                    close-button-label="Importieren" cancel-button-label="Abbrechen" max-width="800">
                 <div v-if="importFrom != null">
                     <form-selectize :options="sources" v-model="importFrom" :settings="sourceSelectizeSettings"/>
+                    <div v-if="selectedSource && selectedSource.group === 'Vorlagen'" class="mt-2">
+                        <div v-if="selectedSource.description">{{ selectedSource.description }}</div>
+                        <small v-if="selectedSource.source" class="text-muted">{{ selectedSource.source }}</small>
+                    </div>
                 </div>
                 <div v-else class="text-align: right; width: 100%; color: darkgray;">
                     Importmöglichquellen werden geladen... <span class="mdi mdi-spin mdi-loading"></span>
@@ -319,6 +323,12 @@ export default {
     },
     beforeUnmount() {
         // here we need to do some dirty checking and saving!
+    },
+    computed: {
+        selectedSource() {
+            if (!this.importFrom || !this.sources.length) return null;
+            return this.sources.find(s => s.id == this.importFrom) || null;
+        }
     },
     data() {
         let myService = this.service;
