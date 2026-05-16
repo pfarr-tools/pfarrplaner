@@ -125,8 +125,6 @@
         <a v-if="(calendarMode == 'services')" class="btn btn-default"
            :href="route('reports.setup', {report: 'ministryRequest'})"
            title="Dienstanfrage per E-Mail senden"><span class="mdi mdi-email"></span> <span class="d-none d-md-inline">Anfrage senden...</span></a>
-        <calendar-select v-if="(calendarMode == 'events')" :calendars="calendars" v-model="mySelectedCalendar"
-                         @update:modelValue="$emit('calendar-select', $event)"/>
 
 
     </div>
@@ -138,17 +136,16 @@ import EventBus from "../../../plugins/EventBus";
 import {CalendarToggleDayColumnEvent} from "../../../events/CalendarToggleDayColumnEvent";
 import NavButton from "../../Ui/buttons/NavButton";
 import CreateServiceWizardButton from "../../Ui/wizards/CreateServiceWizardButton.vue";
-import CalendarSelect from "./CalendarSelect.vue";
 
 export default {
     name: 'CalendarNavTop',
-    components: {CalendarSelect, CreateServiceWizardButton, NavButton},
+    components: {CreateServiceWizardButton, NavButton},
     data() {
         return {
             slave: false,
             allColumnsOpen: false,
             numericDate: parseInt(moment(this.date).format('YYYYMM')),
-            mySelectedCalendar: this.selectedCalendar,
+            mySelectedCalendar: this.normalizeSelectedCalendar(this.selectedCalendar),
             creatableCities: this.writableCities.filter(item => !item.is_org),
         }
     },
@@ -162,9 +159,19 @@ export default {
         canCreate: Boolean,
         calendarMode: String,
         calendars: Array,
-        selectedCalendar: Array,
+        selectedCalendar: [Array, String, Number, null],
+    },
+    watch: {
+        selectedCalendar(newValue) {
+            this.mySelectedCalendar = this.normalizeSelectedCalendar(newValue);
+        },
     },
     methods: {
+        normalizeSelectedCalendar(value) {
+            if (Array.isArray(value)) return value;
+            if (value === null || value === undefined || value === '') return [];
+            return [value];
+        },
         monthLink: function (month) {
             return route('calendar', {
                 date: this.date.getFullYear() + '-' + month

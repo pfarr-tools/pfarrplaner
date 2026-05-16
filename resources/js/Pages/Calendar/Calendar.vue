@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <admin-layout :enable-control-sidebar="true" :title="pageTitle" no-padding no-content-header :key="calendarState">
+    <admin-layout :enable-control-sidebar="calendarMode == 'services'" :title="pageTitle" no-padding no-content-header :key="calendarState">
         <template #navbar-left>
             <calendar-nav-top :date="new Date(myDate)" :years="years"
                               :orientation="orientation" :targetMode="targetMode" :target="target"
@@ -40,10 +40,13 @@
                               @navigate="navigateTo"
             />
         </template>
+        <template #navbar-right>
+            <calendar-select v-if="calendarMode == 'events'" :calendars="calendars" v-model="selectedCalendar"/>
+        </template>
         <template #control-sidebar>
             <calendar-nav-control-sidebar :date="new Date(date)" :cities="cities" @set-setting="setSetting"/>
         </template>
-        <div v-if="calendarMode == 'services'">
+        <div v-if="calendarMode == 'services'" class="calendar-mode-container">
             <div class="calendar-full-container">
                 <calendar-pane-vertical :date="myDate" :cities="cityList"
                                         :initial-data="calendarData"
@@ -52,8 +55,10 @@
                                         :can-create="canCreate "/>
             </div>
         </div>
-        <div v-if="calendarMode == 'events'">
-            <events-calendar :date="myDate" :calendar="selectedCalendar" :key="selectedCalendar+myDate"/>
+        <div v-if="calendarMode == 'events'" class="calendar-mode-container">
+            <div class="calendar-full-container">
+                <events-calendar :date="myDate" :calendar="selectedCalendar" :writable-cities="writableCities" :key="selectedCalendar.join(',')+myDate"/>
+            </div>
         </div>
         <modal v-if="showTargetModeModal" title="Person(en) schnell eintragen"
                @close="setTarget" :key="peopleLoaded"
@@ -91,11 +96,13 @@ import PeopleSelect from "../../components/Ui/elements/PeopleSelect";
 import FormSelectize from "../../components/Ui/forms/FormSelectize";
 import FormCheck from "../../components/Ui/forms/FormCheck";
 import CalendarNavTop from "../../components/Calendar/Nav/Top.vue";
+import CalendarSelect from "../../components/Calendar/Nav/CalendarSelect.vue";
 import CalendarNavControlSidebar from "../../components/Calendar/Nav/ControlSidebar.vue";
 import EventsCalendar from "../../components/Calendar/Pane/EventsCalendar.vue";
 
 export default {
     components: {
+        CalendarSelect,
         EventsCalendar,
         CalendarNavControlSidebar,
         CalendarNavTop,
@@ -137,7 +144,7 @@ export default {
                 exclusive: false,
             },
             calendarData: this.initialCalendarData,
-            selectedCalendar: this.$page.props.settings.calendar_select || this.calendars[0].id || null,
+            selectedCalendar: this.normalizeSelectedCalendar(this.$page.props.settings.calendar_select || this.calendars[0]?.id || null),
         }
     },
     created() {
@@ -175,11 +182,16 @@ export default {
             this.loading = true;
             this.myDate = targetDate;
         },
+        normalizeSelectedCalendar(value) {
+            if (Array.isArray(value)) return value;
+            if (value === null || value === undefined || value === '') return [];
+            return [value];
+        },
         changeState() {
             this.calendarState = Math.random().toString(36).substr(2, 9);
         },
         selectCalendar(e) {
-            this.selectedCalendar = e;
+            this.selectedCalendar = this.normalizeSelectedCalendar(e);
             this.setUserSetting('calendar_select', this.selectedCalendar);
         },
         ensureTargetModeDataLoaded() {
@@ -223,9 +235,21 @@ th, td {
 }
 
 .calendar-full-container {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
     width: 100%;
     padding: 0.5rem;
     font-size: 0.875rem;
+}
+
+.calendar-mode-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
 }
 
 @media (max-width: 991.98px) {

@@ -192,15 +192,14 @@ Danach öffnen Sie den Eintrag im [Editor für Veranstaltungen und Gottesdienste
 
 Wenn Sie in der Bedienleiste auf das **Kalendersymbol** wechseln, sehen Sie den Veranstaltungskalender. Diese Ansicht zeigt Termine in einer klassischen Monatsansicht.
 
-Oben bleibt die Monatsnavigation erhalten. Zusätzlich erscheint eine Auswahl für den Kalender, wenn mehrere Veranstaltungskalender verfügbar sind.
+Oben bleibt die Monatsnavigation erhalten. Zusätzlich erscheint rechts oben die Schaltfläche **Kalender**. Eine Zahl zeigt an, wie viele Kalender gerade eingeschaltet sind. Über diese Schaltfläche öffnen Sie einen Filter mit Überschriften für die verschiedenen Kalendergruppen. Dort schalten Sie einzelne Kalender direkt ein oder aus.
 
-Ein Termin im Veranstaltungskalender zeigt Uhrzeit und Titel. Klicken Sie auf einen Termin, um ein Fenster mit Details zu öffnen:
+Jeder Kalendertag erscheint als Feld im Monatsraster. Tage aus dem vorherigen oder nächsten Monat sind blasser dargestellt. Der heutige Tag ist besonders hervorgehoben. Links sehen Sie zusätzlich eine schmale Spalte mit der Kalenderwoche.
 
-![Dialog mit Veranstaltungsdetails](media/images/kalender-veranstaltung-dialog.png)
+Die Wochentage bleiben beim Blättern nach unten am oberen Rand sichtbar. Ein Termin im Veranstaltungskalender zeigt Uhrzeit, Titel und die Ortszeile direkt im Kalendertag. Alle Termine eines Tages werden direkt im Tagesfeld angezeigt.
 
-- **Beschreibung**
-- **Datum und Uhrzeit**
-- **Ort**
+Bewegen Sie die Maus auf einen Termin. Dann erscheinen direkt auf dem Termin die passenden Schaltflächen:
+
 - **Bearbeiten**, wenn es ein bearbeitbarer Einzeltermin ist
 - **Liturgie** und **Predigt**, wenn der Termin ein Gottesdienst ist
 - **Serie bearbeiten**, wenn der Termin zu einer wiederholten Veranstaltungsserie gehört
@@ -208,6 +207,8 @@ Ein Termin im Veranstaltungskalender zeigt Uhrzeit und Titel. Klicken Sie auf ei
 - **Einzeltermin löschen**, wenn nur dieser Termin aus der Serie entfernt werden soll
 
 Wiederkehrende Termine behandeln Sie besonders vorsichtig: **Serie bearbeiten** wirkt auf die ganze Reihe, **Einzeltermin bearbeiten** nur auf den ausgewählten Termin.
+
+Leere Kalendertage zeigen einen dezenten Hinweis zum Anlegen. Wenn Sie auf freien Platz in einem Kalendertag klicken, öffnet Pfarrplaner ein kleines Fenster mit einer Schaltfläche pro Kirchengemeinde. Nach dem Klick auf die passende Gemeinde wird sofort eine neue Veranstaltung für diesen Tag angelegt und im Editor geöffnet.
 
 ---
 
