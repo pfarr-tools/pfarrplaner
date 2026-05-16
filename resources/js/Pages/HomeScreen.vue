@@ -86,11 +86,9 @@
                 <span class="d-none d-md-inline">Trauung anlegen...</span></a>&nbsp;
         </template>
         <template v-slot:navbar-right>
-            <div class="nav-item">
-                <inertia-link :href="route('user.profile')" class="nav-link" title="Anzeigeeinstellungen">
-                    <span class="mdi mdi-cog"></span> <span class="d-none d-md-inline">Anzeige</span>
-                </inertia-link>
-            </div>
+            <button class="btn btn-outline-secondary" title="Anzeigeeinstellung" @click="$inertia.get(route('user.profile'))">
+                <span class="mdi mdi-cog"></span> <span class="d-none d-md-inline">Anzeige</span>
+            </button>
         </template>
 
         <template #before-flash>

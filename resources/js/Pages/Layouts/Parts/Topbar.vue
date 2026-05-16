@@ -51,7 +51,7 @@
             </div>
 
             <!--begin::User Menu Dropdown-->
-            <div class="nav-item dropdown user-menu">
+            <div class="nav-item dropdown user-menu mx-0">
                 <button type="button"
                         class="btn btn-sm btn-outline-secondary topbar-action-button topbar-dropdown-toggle topbar-user-button"
                         data-bs-toggle="dropdown"
