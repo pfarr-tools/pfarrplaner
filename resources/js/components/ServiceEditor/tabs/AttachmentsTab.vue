@@ -32,6 +32,7 @@
         <h3>Angehängte Dateien</h3>
         <div v-if="hasAutoAttachments || (service.attachments.length > 0)">
             <div v-if="myService.liturgy_blocks.length > 0">
+                <template v-if="sheet">
                 <div class="liturgy-sheet btn btn-light" v-for="(sheet,key,index) in liturgySheets" :key="key"
                      @click.prevent="(sheet.configurationComponent) ? dialogs[sheet?.key] = true : downloadSheet(sheet)"
                      v-if="!sheet.isNotAFile">
@@ -39,6 +40,7 @@
                     <small>.{{ sheet.extension }}, Größe unbekannt</small>
                     <span class="float-right mdi mdi-download"></span>
                 </div>
+                </template>
             </div>
             <div v-if="myService.konfiapp_event_qr">
                 <div class="liturgy-sheet btn btn-light" @click.prevent="downloadQR">
