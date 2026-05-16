@@ -38,8 +38,9 @@
                     <span class="sr-only">Weitere Optionen aufklappen</span>
                 </button>
                 <div class="dropdown-menu p-1">
-                    <form-date-picker :config="myDatePickerSettings" v-model="myQuickPickerDate"
-                                      @input="quickPickDate($event)" @dp-update="updateViewDate"/>
+                    <date-picker v-model="myQuickPickerDate" inline auto-apply
+                                 :time-config="{ enableTimePicker: false }"
+                                 @update:modelValue="quickPickDate($event); updateViewDate();"/>
                     <hr/>
                     <div class="px-2 mb-2 text-sm">
                         <nav-button type="secondary btn-sm" icon="mdi mdi-calendar" force-icon
@@ -240,7 +241,6 @@ export default {
             myTabs: {},
             myActiveTab: this.activeTab || (this.settings.homeScreenTabsConfig.tabs[0] ? this.settings.homeScreenTabsConfig.tabs[0].type + '0' : null),
             myDatePickerSettings: {
-                inline: true,
                 format: 'L',
                 locale: 'de',
             },
@@ -355,6 +355,10 @@ ul.nav.nav-tabs {
     font-size: 8em;
     text-align: center;
     color: lightgray;
+}
+
+>>> .dp__menu {
+    border: none !important;
 }
 
 </style>
