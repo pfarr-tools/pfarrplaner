@@ -35,6 +35,7 @@ use App\Models\Calendar\Day;
 use App\Models\Leave\Absence;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\CalendarService;
 use App\Services\RedirectorService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -98,10 +99,11 @@ class CalController extends Controller
 
         $canCreate = $user->can('create', Service::class);
         $calendars = LocalEventCalendarFactory::list();
+        $initialCalendarData = CalendarService::buildMonthPayload($date->copy(), $user);
 
         return Inertia::render(
             'Calendar/Calendar',
-            compact('date', 'cities', 'years', 'canCreate', 'writableCities', 'calendars')
+            compact('date', 'cities', 'years', 'canCreate', 'writableCities', 'calendars', 'initialCalendarData')
         );
     }
 

@@ -35,22 +35,22 @@
         'service-entry': 1,
         'editable': myService.isEditable && (!foreign),
         'mine': myService.isMine,
-        'bg-info': myService.isMine && (myService.funerals.length == 0),
+        'bg-info': myService.isMine && (!isFuneral),
         'highlighted': 0,
         'possible-target': targetMode,
-        'funeral': myService.funerals.length > 0,
-        'bg-dark': myService.funerals.length > 0,
-        'reloading': loading,
-        'foreign': foreign,
-        'hidden': myService.hidden}"
+        'funeral': isFuneral,
+        'bg-dark': isFuneral,
+             'reloading': loading,
+             'foreign': foreign,
+             'hidden': myService.hidden}"
              :title="myService.isEditable ? clickTitle(myService) : null"
-             @click="myService.isEditable ? edit(service, $event) : null"
+             @click="myService.isEditable ? edit(myService, $event) : null"
         >
-            <div :class="{'service-time': 1,  'service-special-time text-danger': isSpecialTime(myService)}">
+            <div :class="{'service-time': 1,  'service-special-time text-danger': myService.isSpecialTime}">
                 {{ myService.timeText }}
             </div>
             <span class="separator">|</span>
-            <div :class="{'service-location': 1, 'service-special-location text-danger': isSpecialLocation(myService)}">
+            <div :class="{'service-location': 1, 'service-special-location text-danger': myService.isSpecialLocation}">
                 {{ foreign ? myService.locationTextWithCity : myService.locationText }}
             </div>
             <img v-if="(!settings.show_cc_details) && (myService.cc)" src="/img/cc.png" :title="ccTitle(myService)">
@@ -63,20 +63,19 @@
             <div v-if="myService.isAlternateProprium"
                  title="Für diesen Gottesdienst wurde ein vom normalen Kalender abweichendes Proprium festgelegt.">
                 <div class="service-description">
-                    <div :style="'background-color: '+myService.liturgicalInfo['CSS-Farbe']" class="liturgy-color"></div>
-                    {{ myService.liturgicalInfo.Bezeichnung }}
+                    <div :style="'background-color: '+(myService.liturgicalInfo.litColor || myService.liturgicalInfo['CSS-Farbe'])" class="liturgy-color"></div>
+                    {{ myService.liturgicalInfo.title || myService.liturgicalInfo.Bezeichnung }}
                 </div>
             </div>
-            <controlled-access v-if="myService.controlled_access" :service="service"/>
+            <controlled-access v-if="myService.controlled_access" :service="myService"/>
             <div
-                v-if="(myService.titleText != 'Gottesdienst') && (myService.titleText != 'GD') && (myService.funerals.length == 0)"
+                v-if="(myService.titleText != 'Gottesdienst') && (myService.titleText != 'GD') && (!isFuneral)"
                 class="service-description">{{ myService.titleText }}
             </div>
 
-            <div class="service-description" v-if="myService.funerals.length > 0">
+            <div class="service-description" v-if="isFuneral">
                 <span class="mdi mdi-grave-stone"></span>
-                <calendar-service-funeral v-for="(funeral, index) in myService.funerals" :key="funeral.id"
-                                          :funeral="funeral" trailer=", " :trail="index > 0"/>
+                {{ myService.funeralSummary }}
             </div>
             <div class="service-description" v-html="myService.descriptionText"></div>
             <div class="service-description" v-if="myService.internal_remarks">
@@ -84,20 +83,20 @@
                 {{ myService.internal_remarks }}
             </div>
 
-            <calendar-service-participants :participants="myService.pastors" :category="$page.props.labels.code_pastor"
+            <calendar-service-participants :participants="myService.pastors" :text="participantText('P')" :category="$page.props.labels.code_pastor"
                                            :predicant="myService.need_predicant"/>
-            <calendar-service-participants :participants="myService.organists"
+            <calendar-service-participants :participants="myService.organists" :text="participantText('O')"
                                            :category="$page.props.labels.code_organist" :predicant="0"/>
-            <calendar-service-participants :participants="myService.sacristans"
+            <calendar-service-participants :participants="myService.sacristans" :text="participantText('M')"
                                            :category="$page.props.labels.code_sacristan" :predicant="0"/>
-            <calendar-service-participants v-for="(participants,ministry) in myService.ministriesByCategory"
+            <calendar-service-participants v-for="(participants,ministry) in otherParticipantText"
                                            :key="ministry"
-                                           :participants="participants" :category="ministry" :predicant="0"/>
+                                           :participants="[]" :text="participants" :category="ministry" :predicant="0"/>
             <div v-if="hasPermission('gd-kasualien-lesen') || hasPermission('gd-kasualien-nur-statistik')">
-                <div class="service-description" v-if="myService.baptisms.length > 0">
+                <div class="service-description" v-if="baptismCount > 0">
                     <span class="mdi mdi-water"
-                          :title="hasPermission('gd-kasualien-lesen') ? myService.baptismsText : ''"></span>
-                    {{ myService.baptisms.length }}
+                          :title="hasPermission('gd-kasualien-lesen') ? myService.baptismSummary : ''"></span>
+                    {{ baptismCount }}
                 </div>
             </div>
             <div v-if="settings.show_cc_details && (myService.cc)">
@@ -175,15 +174,32 @@ export default {
         CalendarServiceWedding,
         CalendarServiceFuneral, CalendarServiceBaptism, CalendarServiceParticipants, ControlledAccess
     },
-    props: ['serviceId', 'targetMode', 'target', 'city'],
-    inject: ['settings'],
+    props: ['serviceId', 'service', 'targetMode', 'target', 'city'],
+    inject: {
+        settings: {
+            default: () => ({}),
+        },
+    },
     computed: {
         foreign() {
             if (this.loading) return false;
             if (!this.city) return false;
             if (!this.city.is_org) return (this.city.id != this.myService.city_id);
             return !this.city.childIds.includes(this.myService.city_id);
-        }
+        },
+        isFuneral() {
+            return !!(this.myService?.funeral || (this.myService?.funerals || []).length > 0);
+        },
+        baptismCount() {
+            return this.myService?.baptismCount ?? (this.myService?.baptisms || []).length ?? 0;
+        },
+        otherParticipantText() {
+            const result = { ...(this.myService?.participantText || {}) };
+            delete result.P;
+            delete result.O;
+            delete result.M;
+            return result;
+        },
     },
     created() {
         this.$bus.on('selfentry-ministries-changed', this.onSelfEntryMinistriesChanged);
@@ -198,8 +214,8 @@ export default {
             {id: 'M', name: 'Mesner:in' },
         ];
         return {
-            myService: null,
-            loading: true,
+            myService: this.service ? this.normalizeService(this.service) : null,
+            loading: !this.service,
             availableMinistries,
             selfEntryModalVisible: false,
             selfEntryMinistries: this.$page.props.settings.selfentry_ministries || [],
@@ -207,32 +223,33 @@ export default {
         }
     },
     mounted() {
-        this.loadData();
+        if (!this.service && this.serviceId) {
+            this.loadData();
+        } else {
+            this.refreshAvailableMinistries();
+        }
+    },
+    watch: {
+        service: {
+            deep: true,
+            handler(newValue) {
+                if (!newValue) return;
+                this.myService = this.normalizeService(newValue);
+                this.loading = false;
+                this.refreshAvailableMinistries();
+            },
+        },
     },
     methods: {
         loadData() {
             this.loading = true;
             this.$api().get(route('api.calendar.service', { service: this.serviceId })).then(response => {
-                this.myService = response.data.data;
-                (this.myService.city.default_ministries || []).forEach(ministry =>{
-                    if (ministry.trim()) {
-                        this.availableMinistries.push({id: ministry, name: ministry});
-                    }
-                })
-                this.ministryListUpdated++;
+                this.myService = this.normalizeService(response.data.data);
+                this.refreshAvailableMinistries();
                 this.loading = false;
                 this.$updateComponentState();
                 this.$forceUpdate();
             })
-        },
-        isSpecialTime(service) {
-            if (null == service.location) return true;
-            if (null == service.location.default_time) return true;
-            if ('' == service.location.default_time) return true;
-            return service.time != service.location.default_time.substr(0, 5);
-        },
-        isSpecialLocation(service) {
-            return service.location == null;
         },
         ccTitle(service) {
             return 'Parallel Kinderkirche (' + service.cc_location + ') zum Thema "' + service.cc_lesson + '": ' + service.cc_staff;
@@ -259,7 +276,8 @@ export default {
                     users: peopleIds,
                     exclusive: this.target.exclusive,
                 }).then(response => {
-                    this.myService = response.data.service;
+                    this.myService = this.normalizeService(response.data.service);
+                    this.refreshAvailableMinistries();
                     this.loading = false;
                 });
                 return;
@@ -296,7 +314,8 @@ export default {
                 users: [this.$page.props.currentUser.data.id],
                 exclusive: false,
             }).then(response => {
-                this.myService = response.data.service;
+                this.myService = this.normalizeService(response.data.service);
+                this.refreshAvailableMinistries();
                 this.loading = false;
                 this.$forceUpdate();
             });
@@ -308,6 +327,65 @@ export default {
         },
         onSelfEntryMinistriesChanged(e) {
             this.selfEntryMinistries = e;
+        },
+        participantText(category) {
+            return this.myService?.participantText?.[category] || '';
+        },
+        normalizeService(service) {
+            return {
+                ...service,
+                participantText: service.participantText || this.buildParticipantTextFromCollections(service),
+                funeral: service.funeral ?? ((service.funerals || []).length > 0),
+                funeralSummary: service.funeralSummary || '',
+                baptismCount: service.baptismCount ?? ((service.baptisms || []).length || 0),
+                baptismSummary: service.baptismSummary || service.baptismsText || '',
+                isSpecialTime: service.isSpecialTime ?? this.detectSpecialTime(service),
+                isSpecialLocation: service.isSpecialLocation ?? (service.location == null),
+                liturgicalInfo: service.liturgicalInfo || {},
+            };
+        },
+        buildParticipantTextFromCollections(service) {
+            const lines = {};
+            const knownCategories = {
+                P: service.pastors || [],
+                O: service.organists || [],
+                M: service.sacristans || [],
+            };
+
+            Object.keys(knownCategories).forEach(category => {
+                const text = knownCategories[category]
+                    .map(person => [person.title, person.first_name, person.last_name].filter(Boolean).join(' ').trim() || person.name)
+                    .join(' | ');
+                if (text) lines[category] = text;
+            });
+
+            Object.entries(service.ministriesByCategory || {}).forEach(([category, participants]) => {
+                const text = (participants || [])
+                    .map(person => [person.title, person.first_name, person.last_name].filter(Boolean).join(' ').trim() || person.name)
+                    .join(' | ');
+                if (text) lines[category] = text;
+            });
+
+            return lines;
+        },
+        detectSpecialTime(service) {
+            if (service.location == null) return true;
+            if (service.location.default_time == null) return true;
+            if (service.location.default_time === '') return true;
+            return service.time != service.location.default_time.substr(0, 5);
+        },
+        refreshAvailableMinistries() {
+            this.availableMinistries = [
+                {id: 'P', name: 'Pfarrer:in' },
+                {id: 'O', name: 'Organist:in' },
+                {id: 'M', name: 'Mesner:in' },
+            ];
+            (this.myService?.city?.default_ministries || []).forEach(ministry => {
+                if (ministry && ministry.trim()) {
+                    this.availableMinistries.push({ id: ministry, name: ministry });
+                }
+            });
+            this.ministryListUpdated++;
         }
     }
 }

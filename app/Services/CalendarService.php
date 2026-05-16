@@ -31,10 +31,16 @@
 namespace App\Services;
 
 
+use App\Http\Resources\Calendar\CalendarAbsenceResource;
+use App\Http\Resources\Calendar\CalendarMonthServiceResource;
+use App\Models\Leave\Absence;
 use App\Models\Calendar\Day;
+use App\Models\People\User;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class CalendarService
 {
@@ -158,6 +164,201 @@ class CalendarService
             $currentDate->addDay(1);
         }
         return $days->unique()->sort();
+    }
+
+    /**
+     * Build the compact month payload for the calendar view.
+     *
+     * @param Carbon $date
+     * @param User $user
+     * @return array<string, mixed>
+     */
+    public static function buildMonthPayload(Carbon $date, User $user): array
+    {
+        $monthStart = $date->copy()->firstOfMonth()->startOfDay();
+        $monthEnd = $date->copy()->endOfMonth()->endOfDay();
+
+        $dates = Service::setEagerLoads([])->with([])
+            ->select(DB::raw('DISTINCT DATE(services.date) as day'))
+            ->inCities($user->visibleCities)
+            ->inMonthByDate($date)
+            ->orderBy('day', 'ASC')
+            ->get()->pluck('day');
+
+        $dates = self::addMissingDefaultDays($date->copy(), $dates);
+        $days = self::initializeMonthDayMap($dates, $date);
+
+        $services = self::loadMonthServices($date, $user);
+        self::addServicesToDays($days, $services);
+
+        $absences = self::loadMonthAbsences($monthStart, $monthEnd, $user);
+        self::addAbsencesToDays($days, $absences, $monthStart, $monthEnd);
+
+        return [
+            'data' => $days,
+            'loadedDate' => $date->format('Y-m'),
+            'returnRoute' => RedirectorService::backRoute(),
+        ];
+    }
+
+    /**
+     * Initialize the day map for a calendar month.
+     *
+     * @param Collection $dates
+     * @param Carbon $date
+     * @return array<string, array<string, mixed>>
+     */
+    protected static function initializeMonthDayMap(Collection $dates, Carbon $date): array
+    {
+        $days = [];
+        $liturgyYear = LiturgyService::getYear($date->year);
+
+        foreach ($dates as $rawDate) {
+            $dayDate = Carbon::parse($rawDate)->startOfDay();
+            $liturgy = $liturgyYear[$dayDate->format('Y-m-d')] ?? [];
+            $days[$dayDate->format('Y-m-d')] = [
+                'date' => $dayDate->format('Y-m-d'),
+                'liturgy' => isset($liturgy['Bezeichnung']) ? [
+                    'title' => $liturgy['Bezeichnung'],
+                    'litColor' => $liturgy['CSS-Farbe'],
+                    'feastCircleName' => $liturgy['Festkreis'],
+                    'perikope' => $liturgy['Predigt'],
+                ] : [],
+                'absences' => [],
+                'services' => [],
+            ];
+        }
+
+        ksort($days);
+
+        return $days;
+    }
+
+    /**
+     * Load the services needed for the month view in one batch.
+     *
+     * @param Carbon $date
+     * @param User $user
+     * @return Collection<int, Service>
+     */
+    protected static function loadMonthServices(Carbon $date, User $user): Collection
+    {
+        $services = Service::setEagerLoads([])->with([
+            'location:id,name,default_time,city_id',
+            'city:id,name,youtube_channel_url,default_ministries',
+            'participants:id,first_name,last_name,title',
+            'baptisms:id,service_id,candidate_name',
+            'funerals:id,service_id,buried_name,type',
+            'weddings:id,service_id,spouse1_name,spouse1_birth_name,spouse2_name,spouse2_birth_name',
+            'relatedCities:id',
+        ])->inMonthByDate($date)
+            ->inCities($user->visibleCities)
+            ->ordered()
+            ->get();
+
+        $services->each(function (Service $service) {
+            $service->participantText = self::buildParticipantText($service);
+        });
+
+        return $services;
+    }
+
+    /**
+     * Load the absences shown in the month header.
+     *
+     * @param Carbon $start
+     * @param Carbon $end
+     * @param User $user
+     * @return Collection<int, Absence>
+     */
+    protected static function loadMonthAbsences(Carbon $start, Carbon $end, User $user): Collection
+    {
+        return Absence::setEagerLoads([])->with('user', function ($query) {
+            $query->setEagerLoads([])->with([]);
+        })->byPeriod($start, $end)
+            ->visibleForUser($user)
+            ->showInCalendar()
+            ->get();
+    }
+
+    /**
+     * Attach service data to the day map keyed by visible city.
+     *
+     * @param array<string, array<string, mixed>> $days
+     * @param Collection<int, Service> $services
+     * @return void
+     */
+    protected static function addServicesToDays(array &$days, Collection $services): void
+    {
+        foreach ($services as $service) {
+            $dayKey = $service->date->format('Y-m-d');
+            if (!isset($days[$dayKey])) {
+                continue;
+            }
+
+            $cityIds = collect([$service->city_id])
+                ->merge($service->relatedCities->pluck('id'))
+                ->unique()
+                ->values();
+
+            $resource = (new CalendarMonthServiceResource($service))->resolve();
+
+            foreach ($cityIds as $cityId) {
+                if (!isset($days[$dayKey]['services'][$cityId])) {
+                    $days[$dayKey]['services'][$cityId] = [];
+                }
+                $days[$dayKey]['services'][$cityId][] = $resource;
+            }
+        }
+    }
+
+    /**
+     * Attach absences to all affected days inside the month.
+     *
+     * @param array<string, array<string, mixed>> $days
+     * @param Collection<int, Absence> $absences
+     * @param Carbon $monthStart
+     * @param Carbon $monthEnd
+     * @return void
+     */
+    protected static function addAbsencesToDays(array &$days, Collection $absences, Carbon $monthStart, Carbon $monthEnd): void
+    {
+        foreach ($absences as $absence) {
+            $currentDate = $absence->from->copy()->startOfDay()->max($monthStart->copy());
+            $lastDate = $absence->to->copy()->endOfDay()->min($monthEnd->copy());
+            $absenceResource = (new CalendarAbsenceResource($absence))->resolve();
+
+            while ($currentDate <= $lastDate) {
+                $dayKey = $currentDate->format('Y-m-d');
+                if (isset($days[$dayKey])) {
+                    $days[$dayKey]['absences'][] = $absenceResource;
+                }
+                $currentDate->addDay();
+            }
+        }
+    }
+
+    /**
+     * Build compact participant strings for a month service card.
+     *
+     * @param Service $service
+     * @return array<string, string>
+     */
+    protected static function buildParticipantText(Service $service): array
+    {
+        $result = [];
+
+        foreach ($service->participants->groupBy('pivot.category') as $category => $participants) {
+            $result[$category] = $participants->map(function ($participant) {
+                return trim(join(' ', array_filter([
+                    $participant->title,
+                    $participant->first_name,
+                    $participant->last_name,
+                ]))) ?: $participant->name;
+            })->join(' | ');
+        }
+
+        return $result;
     }
 
 }

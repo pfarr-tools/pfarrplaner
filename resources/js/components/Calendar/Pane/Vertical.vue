@@ -29,7 +29,7 @@
 
 <template>
     <div class="calendar-month calendar-vertical">
-        <div v-if="!loading">
+        <div v-if="hasData">
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -47,15 +47,42 @@
                         :key="dayDate"
                     />
                     <calendar-cell v-for="(city,index) in cities" :day="day" :key="city.id" :targetMode="targetMode" :target="target"
-                                   :services="getServices(city,dayDate)" :city="city" :can-create="canCreate"
+                                   :services="getServices(city,dayDate)" :city="city" :can-create="canCreate" :loading="loading"
                     />
                 </tr>
                 </tbody>
             </table>
         </div>
         <div v-else class="month-loading">
-            <div><span class="mdi mdi-spin mdi-loading"></span></div>
-            <div>Kalender wird geladen</div>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th class="no-print text-start city-title"></th>
+                    <th v-for="city in cities" class="city-title">
+                        <span class="mdi mdi-arrow-down-circle pr-2"></span>
+                        {{ city.name }}
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="day in skeletonDays" :key="day.date">
+                    <th class="day-header-cell skeleton-day-cell">
+                        <div class="skeleton-day-badge"></div>
+                        <div class="skeleton-day-line"></div>
+                    </th>
+                    <calendar-cell
+                        v-for="city in cities"
+                        :key="'skeleton_'+city.id+'_'+day.date"
+                        :day="day"
+                        :city="city"
+                        :services="[]"
+                        :targetMode="targetMode"
+                        :target="target"
+                        :loading="true"
+                    />
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </template>
@@ -68,28 +95,35 @@ import CalendarCell from "../Cell.vue";
 export default {
     name: 'CalendarPaneVertical',
     components: {CalendarCell, CalendarDayHeader, NavButton},
-    props: ['date', 'cities', 'canCreate', 'collapseState', 'targetMode', 'target'],
+    props: ['date', 'cities', 'canCreate', 'collapseState', 'targetMode', 'target', 'initialData'],
     data() {
         return {
             loading: false,
-            data: null,
+            data: this.initialData?.data || null,
+            loadedDate: this.initialData?.loadedDate || null,
         }
     },
     mounted() {
-        this.loadServices();
+        if (this.loadedDate !== this.date) {
+            this.loadServices();
+        }
     },
     watch: {
-        date(newVal, oldVal) {
-            this.loadServices();
+        date(newVal) {
+            if (this.loadedDate !== newVal) {
+                this.loadServices();
+            }
         },
     },
     methods: {
         loadServices() {
             this.loading = true;
+            this.data = null;
             this.$api().get(route('api.calendar.month', {
                 date: this.date,
             })).then(response => {
                 this.data = response.data.data;
+                this.loadedDate = response.data.loadedDate;
                 this.loading = false;
                 this.$forceUpdate();
             });
@@ -110,6 +144,20 @@ export default {
                     result[item.id] = item;
                 });
             });
+            return Object.values(result);
+        },
+    },
+    computed: {
+        hasData() {
+            return !!this.data && Object.keys(this.data).length > 0;
+        },
+        skeletonDays() {
+            const firstDay = moment(this.date + '-01');
+            const result = [];
+            const dayCount = firstDay.daysInMonth();
+            for (let day = 1; day <= dayCount; day++) {
+                result.push({ date: firstDay.date(day).format('YYYY-MM-DD') });
+            }
             return result;
         },
     }
@@ -127,11 +175,40 @@ export default {
     }
 
     .month-loading {
-        font-size: 3em;
-        font-weight: bold;
-        color: lightgray;
-        text-align: center;
-        padding-top: 25vh;
+        min-height: 50vh;
+    }
+
+    .skeleton-day-cell {
+        min-width: 100px;
+        background-color: #f8fafc;
+    }
+
+    .skeleton-day-badge,
+    .skeleton-day-line {
+        border-radius: 4px;
+        background: linear-gradient(90deg, #f3f5f7 25%, #e7ebef 37%, #f3f5f7 63%);
+        background-size: 400% 100%;
+        animation: skeleton-shimmer 1.4s ease infinite;
+    }
+
+    .skeleton-day-badge {
+        height: 1.2rem;
+        width: 55%;
+        margin-bottom: 0.6rem;
+    }
+
+    .skeleton-day-line {
+        height: 0.8rem;
+        width: 75%;
+    }
+
+    @keyframes skeleton-shimmer {
+        0% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0 50%;
+        }
     }
 
 

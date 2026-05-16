@@ -30,7 +30,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Resources\Calendar\CalendarDayCollectionResource;
 use App\Http\Resources\Calendar\CalendarServiceResource;
 use App\Models\Places\City;
 use App\Models\Service;
@@ -39,7 +38,6 @@ use App\Services\RedirectorService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class CalendarController extends \App\Http\Controllers\Controller
 {
@@ -57,21 +55,9 @@ class CalendarController extends \App\Http\Controllers\Controller
     public function month($date)
     {
         $date = Carbon::parse($date . '-01 0:00:00');
-
-        $returnRoute = route('calendar', $date->format('Y-m'));
         RedirectorService::setReturnRoute(route('calendar', $date->format('Y-m')));
-        $returnRoute = RedirectorService::backRoute();
 
-        $dates = Service::setEagerLoads([])->with([])
-            ->select(DB::raw('DISTINCT DATE(services.date) as day'))
-            ->inCities(Auth::user()->visibleCities)
-            ->inMonthByDate($date)
-            ->orderBy('day', 'ASC')
-            ->get()->pluck('day');
-
-        $dates = CalendarService::addMissingDefaultDays($date, $dates);
-
-        return new CalendarDayCollectionResource($dates);
+        return response()->json(CalendarService::buildMonthPayload($date, Auth::user()));
     }
 
     public function service(Service $service)

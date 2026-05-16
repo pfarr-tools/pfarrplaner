@@ -35,9 +35,11 @@
         }"
     >
         <div class="celldata">
-            <div v-if="city.loading" class="city-loading"><span class="mdi mdi-spin mdi-loading"></span></div>
+            <template v-if="loading">
+                <calendar-service-skeleton v-for="index in skeletonCount" :key="'skeleton_'+index" />
+            </template>
             <div v-for="(service,index) in services" :key="service.id">
-                <calendar-service :service-id="service.id" :key="service.id" :index="index" :city="city"
+                <calendar-service :service="service" :key="service.id" :index="index" :city="city"
                                   :targetMode="targetMode" :target="target"/>
             </div>
         </div>
@@ -48,11 +50,17 @@ import EventBus from "../../plugins/EventBus";
 import {CalendarToggleDayColumnEvent} from "../../events/CalendarToggleDayColumnEvent";
 import NavButton from "../Ui/buttons/NavButton";
 import CalendarService from "./Service.vue";
+import CalendarServiceSkeleton from "./Service/Skeleton.vue";
 
 export default {
     name: 'CalendarCell',
-    props: ['city', 'day', 'services', 'targetMode', 'target'],
-    components: {CalendarService, NavButton},
+    props: ['city', 'day', 'services', 'targetMode', 'target', 'loading'],
+    components: {CalendarServiceSkeleton, CalendarService, NavButton},
+    computed: {
+        skeletonCount() {
+            return this.city?.is_org ? 3 : 2;
+        }
+    }
 }
 </script>
 <style scoped>

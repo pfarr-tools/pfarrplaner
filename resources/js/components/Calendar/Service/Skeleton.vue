@@ -28,46 +28,53 @@
   -->
 
 <template>
-    <div class="service-team">
-        <span v-if="category" class="designation">{{ category }}: </span>
-        <span v-if="predicant" class="need-predicant">{{ $page.props.labels.predicant }} benötigt</span>
-        <template v-if="text">
-            <span>{{ text }}</span>
-        </template>
-        <template v-else>
-            <span v-for="person,index in participants"><span :class="{me: person.id == user.id}">{{ formatName(person) }}</span><span v-if="index<participants.length-1"> | </span></span>
-        </template>
+    <div class="service-entry service-skeleton" aria-hidden="true">
+        <div class="skeleton-line skeleton-line-short"></div>
+        <div class="skeleton-line skeleton-line-medium"></div>
+        <div class="skeleton-line skeleton-line-long"></div>
+        <div class="skeleton-line skeleton-line-medium"></div>
     </div>
 </template>
 
 <script>
-import EventBus from "../../../plugins/EventBus";
-import {CalendarNewNameFormatEvent} from "../../../events/CalendarNewNameFormatEvent";
-
 export default {
-    name: 'CalendarServiceParticipants',
-    props: ['participants', 'category', 'predicant', 'text'],
-    data() {
-        return {
-            nameFormat: this.$page.props.settings.calendar_name_format,
-            user: this.$page.props.currentUser.data,
-        }
-    },
-    methods: {
-        formatName(person) {
-            if (!person.last_name) return person.name;
-            if (!person.first_name) return person.name;
-            return [person.title, person.first_name, person.last_name].join(' ').trim();
-        },
-        handeNameFormatChange(e) {
-            this.nameFormat = e.format;
-        }
-    }
+    name: 'CalendarServiceSkeleton',
 }
 </script>
 
 <style scoped>
-    .me {
-        font-weight: bold;
+.service-skeleton {
+    border-color: #d9dee5;
+    background: linear-gradient(90deg, #f3f5f7 25%, #e7ebef 37%, #f3f5f7 63%);
+    background-size: 400% 100%;
+    animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+.skeleton-line {
+    height: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.2rem;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.skeleton-line-short {
+    width: 38%;
+}
+
+.skeleton-line-medium {
+    width: 64%;
+}
+
+.skeleton-line-long {
+    width: 82%;
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 100% 50%;
     }
+    100% {
+        background-position: 0 50%;
+    }
+}
 </style>

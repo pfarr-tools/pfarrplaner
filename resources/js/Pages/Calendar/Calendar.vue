@@ -46,7 +46,7 @@
         <div v-if="calendarMode == 'services'">
             <div class="calendar-full-container">
                 <calendar-pane-vertical :date="myDate" :cities="cityList"
-                                        :data="data"
+                                        :initial-data="calendarData"
                                         :key="calendarState"
                                         :targetMode="targetMode" :target="target"
                                         :can-create="canCreate "/>
@@ -107,7 +107,7 @@ export default {
         CalendarPaneHorizontal,
         CalendarPaneVertical
     },
-    props: ['date', 'cities', 'years', 'canCreate', 'ministries', 'writableCities', 'calendars'],
+    props: ['date', 'cities', 'years', 'canCreate', 'ministries', 'writableCities', 'calendars', 'initialCalendarData'],
     provide() {
         return {
             settings: this.$page.props.settings || {},
@@ -136,38 +136,13 @@ export default {
                 ministry: this.$page.props.currentUser.data.isPastor ? 'P' : null,
                 exclusive: false,
             },
-            data: null,
-            dataDate: null,
+            calendarData: this.initialCalendarData,
             selectedCalendar: this.$page.props.settings.calendar_select || this.calendars[0].id || null,
         }
     },
     created() {
         if (undefined === this.settings.show_cc_details) this.settings.show_cc_details = 0;
         this.navigateTo(dayjs(this.myDate).format('YYYY-MM'));
-
-        this.$api().get(route('api.people.select')).then(response => {
-            this.myPeople = response.data.users;
-            this.myTeams = response.data.teams;
-            this.target.people = this.myPeople.filter(person => person.id == this.$page.props.currentUser.data.id)
-            this.peopleLoaded = 1;
-        });
-
-        this.$api().get(route('api.ministries.list')).then(response => {
-            this.myMinistries = [
-                {id: 'P', 'name': this.$page.props.labels.pastor},
-                {id: 'O', 'name': this.$page.props.labels.organist},
-                {id: 'M', 'name': this.$page.props.labels.sacristan},
-            ];
-            for (const ministryKey in response.data) {
-                this.myMinistries.push({
-                    id: response.data[ministryKey].category,
-                    name: response.data[ministryKey].category
-                });
-            }
-            this.ministriesLoaded = true;
-        });
-
-
     },
     mounted() {
         EventBus.listen(CalendarNewSortOrderEvent, this.sortHandler);
@@ -186,14 +161,11 @@ export default {
                 return;
             }
             this.showTargetModeModal = true;
+            this.ensureTargetModeDataLoaded();
         },
         toggleCalendarMode(e) {
             this.calendarMode = e || 'services';
             this.setUserSetting('calendar_mode', this.calendarMode);
-            if (this.calendarMode == 'services') {
-                if (this.dataDate != this.myDate) this.navigateTo(dayjs(this.myDate).format('YYYY-MM'));
-            }
-            this.dataDate = this.myDate;
         },
         setTarget() {
             this.showTargetModeModal = false;
@@ -209,6 +181,33 @@ export default {
         selectCalendar(e) {
             this.selectedCalendar = e;
             this.setUserSetting('calendar_select', this.selectedCalendar);
+        },
+        ensureTargetModeDataLoaded() {
+            if (!this.peopleLoaded) {
+                this.$api().get(route('api.people.select')).then(response => {
+                    this.myPeople = response.data.users;
+                    this.myTeams = response.data.teams;
+                    this.target.people = this.myPeople.filter(person => person.id == this.$page.props.currentUser.data.id)
+                    this.peopleLoaded = 1;
+                });
+            }
+
+            if (!this.ministriesLoaded) {
+                this.$api().get(route('api.ministries.list')).then(response => {
+                    this.myMinistries = [
+                        {id: 'P', 'name': this.$page.props.labels.pastor},
+                        {id: 'O', 'name': this.$page.props.labels.organist},
+                        {id: 'M', 'name': this.$page.props.labels.sacristan},
+                    ];
+                    for (const ministryKey in response.data) {
+                        this.myMinistries.push({
+                            id: response.data[ministryKey].category,
+                            name: response.data[ministryKey].category
+                        });
+                    }
+                    this.ministriesLoaded = true;
+                });
+            }
         }
     },
     computed: {
