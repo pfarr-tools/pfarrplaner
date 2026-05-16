@@ -31,13 +31,6 @@
     <admin-layout :enable-control-sidebar="true" :title="title(service)">
         <template #navbar-left>
             <span v-if="!templateMode">
-                <inertia-link v-if="service.isEditable" class="btn btn-light" :href="route('service.edit', service.slug)"
-                              title="Gottesdienst bearbeiten"><span class="mdi mdi-pencil"></span> Gottesdienst
-                </inertia-link>&nbsp;
-                <inertia-link v-if="service.isEditable" class="btn btn-light" :href="route('service.sermon.editor', service.slug)"
-                              title="Predigt zu diesem Gottesdienst bearbeiten"><span class="mdi mdi-microphone"></span>
-                    Predigt
-                </inertia-link>&nbsp;
                 <a v-if="service.isEditable" class="btn btn-secondary" title="Als Vorlage speichern" @click.prevent.stop="saveAsTemplate"><span class="mdi mdi-file-plus"></span> Als Vorlage speichern</a>&nbsp;
             </span>
             <span v-else>
@@ -45,6 +38,22 @@
                 <a class="btn btn-danger" title="Vorlage löschen" @click.prevent.stop="deleteTemplate"><span class="mdi mdi-delete"></span> Löschen</a>
             </span>
             <slot name="toolbar"/>
+        </template>
+        <template #navbar-right>
+            <div class="btn-group calendar-mode-toggle" role="group" aria-label="Ansicht umschalten" v-if="service.isEditable">
+                <inertia-link class="btn btn-outline-secondary" :href="route('service.edit', service.slug)" title="Gottesdienst bearbeiten">
+                    <span class="mdi mdi-pencil me-1"></span>
+                    <span class="d-none d-xl-inline">Bearbeiten</span>
+                </inertia-link>
+                <button class="btn btn-secondary" href="#">
+                    <span class="mdi mdi-view-list me-1"></span>
+                    <span class="d-none d-xl-inline">Liturgie</span>
+                </button>
+                <inertia-link class="btn btn-outline-secondary" :href="route('service.sermon.editor', service.slug)" title="Liturgie anzeigen">
+                    <span class="mdi mdi-microphone me-1"></span>
+                    <span class="d-none d-xl-inline">Predigt</span>
+                </inertia-link>
+            </div>
         </template>
         <template #control-sidebar v-if="service.isEditable" >
             <form-check label="Zeitangaben runden" v-model="$settings.liturgy_times_rounded"

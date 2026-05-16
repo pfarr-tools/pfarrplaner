@@ -30,7 +30,7 @@
 <template>
     <div class="service-editor">
         <admin-layout title="Veranstaltung bearbeiten">
-            <template v-slot:navbar-left>
+            <template #navbar-left>
                 <div class="btn-group me-1">
                     <button type="button" class="btn btn-primary" @click.prevent="saveService(true)"
                             title="Speichern und schließen">
@@ -51,8 +51,25 @@
                 </div>
                 <button class="btn btn-danger" @click.prevent="deleteService"><span
                     class="mdi mdi-delete d-md-none"></span><span class="d-none d-md-inline"> Löschen</span></button>&nbsp;
-                <div class="dropdown show">
-                    <a class="btn btn-light dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+            </template>
+            <template #navbar-right>
+                <div class="btn-group calendar-mode-toggle" role="group" aria-label="Ansicht umschalten" v-if="editedService.event_class == 'service'">
+                    <button class="btn btn-secondary" href="#">
+                        <span class="mdi mdi-pencil me-1"></span>
+                        <span class="d-none d-xl-inline">Bearbeiten</span>
+                    </button>
+                    <inertia-link class="btn btn-outline-secondary" :href="route('liturgy.editor', service.slug)" title="Liturgie anzeigen">
+                        <span class="mdi mdi-view-list me-1"></span>
+                        <span class="d-none d-xl-inline">Liturgie</span>
+                    </inertia-link>
+                    <inertia-link class="btn btn-outline-secondary" :href="route('service.sermon.editor', service.slug)" title="Liturgie anzeigen">
+                        <span class="mdi mdi-microphone me-1"></span>
+                        <span class="d-none d-xl-inline">Predigt</span>
+                    </inertia-link>
+                </div>
+
+                <div class="ms-1 dropdown show">
+                    <a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Weitere Aktionen
                     </a>
@@ -68,16 +85,9 @@
                             -->
                     </div>
                 </div>
-                <nav-button v-if="(editedService.event_class == 'service') && service.slug"
-                            :href="route('liturgy.editor', service.slug)"
-                            icon="mdi mdi-view-list" force-icon type="light"
-                            title="Liturgie zu diesem Gottesdienst bearbeiten">Liturgie</nav-button>
-                <nav-button v-if="(editedService.event_class == 'service') && service.slug"
-                            :href="route('service.sermon.editor', service.slug)"
-                            icon="mdi mdi-microphone" force-icon type="light"
-                            title="Predigt zu diesem Gottesdienst bearbeiten">Predigt</nav-button>
+
             </template>
-            <template v-slot:tab-headers>
+            <template #tab-headers>
                 <tab-headers>
                     <tab-header id="home" title="Allgemeines" :active-tab="activeTab"/>
                     <tab-header v-if="editedService.event_class == 'service'"
@@ -179,10 +189,12 @@ import RegistrationsTab from "../components/ServiceEditor/tabs/RegistrationsTab"
 import NavButton from "../components/Ui/buttons/NavButton";
 import RecurrenceTab from "../components/ServiceEditor/tabs/RecurrenceTab.vue";
 import AdsTab from "../components/ServiceEditor/tabs/AdsTab.vue";
+import {Link as InertiaLink} from "@inertiajs/vue3";
 
 export default {
     name: "serviceEditor",
     components: {
+        InertiaLink,
         AdsTab,
         RecurrenceTab,
         NavButton,

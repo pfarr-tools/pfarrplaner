@@ -38,6 +38,24 @@
                     <span class="mdi mdi-text-box-outline"></span> Zur Leseansicht
                 </a>
             </template>
+            <template #navbar-right>
+                <div class="btn-group calendar-mode-toggle" role="group" aria-label="Ansicht umschalten" v-if="service.isEditable">
+                    <inertia-link class="btn btn-outline-secondary" :href="route('service.edit', service.slug)" title="Gottesdienst bearbeiten">
+                        <span class="mdi mdi-pencil me-1"></span>
+                        <span class="d-none d-xl-inline">Bearbeiten</span>
+                        <span class="ms-1 badge badge-primary" v-if="services.length">{{ services.length }}</span>
+                    </inertia-link>
+                    <inertia-link class="btn btn-outline-secondary" :href="route('liturgy.editor', service.slug)" title="Liturgie bearbeiten">
+                        <span class="mdi mdi-view-list me-1"></span>
+                        <span class="d-none d-xl-inline">Liturgie</span>
+                        <span class="ms-1 badge badge-primary" v-if="services.length">{{ services.length }}</span>
+                    </inertia-link>
+                    <button class="btn btn-secondary" href="#">
+                        <span class="mdi mdi-microphone me-1"></span>
+                        <span class="d-none d-xl-inline">Predigt</span>
+                    </button>
+                </div>
+            </template>
             <form @submit.prevent="saveSermon" id="formSermon">
                 <div v-if="services.length >0" class="mb-3">
                     <div class="row py-1 border-bottom mb-1" v-for="service in services">
