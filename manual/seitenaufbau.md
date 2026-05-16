@@ -56,6 +56,10 @@ Diese Schaltflächen sind deshalb nicht auf jeder Seite gleich. Sie beziehen sic
 
 Manche Seiten haben rechts oben ein Zahnrad :material-cog:. Es öffnet zusätzliche Einstellungen für genau diese Seite.
 
+Das Zahnrad erscheint als eigene Schaltfläche in derselben Form wie die Hilfe und das Benutzer-Menü. So erkennen Sie diese drei Funktionen als zusammengehörige Bedienleiste.
+
+Auf der Kalenderseite finden Sie in diesem Bereich zusätzlich den Umschalter zwischen Gottesdiensten und Veranstaltungen. In der Gottesdienstansicht erscheint dort die Schaltfläche **Kirchengemeinden**, in der Veranstaltungsansicht die Schaltfläche **Kalender** für die Auswahl der eingeblendeten Kalender.
+
 Beispiele:
 
 - Im [Kalender](kalender.md) können dort Gemeinden angezeigt, ausgeblendet und sortiert werden.
@@ -77,14 +81,14 @@ Im Online-Handbuch sehen Sie links die Kapitelübersicht. Unten auf einer Seite 
 
 ## Benutzerfeld rechts oben
 
-Ganz rechts in der oberen Leiste sehen Sie Ihren Namen oder Ihr Profilbild. Wenn Sie darauf klicken, öffnet sich ein Menü.
+Ganz rechts in der oberen Leiste sehen Sie eine Schaltfläche mit Ihrem Profilbild oder einem Benutzersymbol. Wenn Sie darauf klicken, öffnet sich ein Menü.
 
 Dieses Menü enthält:
 
 - **Einstellungen**: Öffnet Ihre [persönlichen Einstellungen](einstellungen.md).
 - **Abmelden**: Beendet Ihre Sitzung.
 
-Wenn Sie kein Profilbild hinterlegt haben, zeigt Pfarrplaner ein Benutzersymbol. Wenn ein Profilbild hinterlegt ist, wird dieses Bild klein angezeigt.
+Im geöffneten Menü sehen Sie oben noch einmal Ihren Namen und, falls vorhanden, Ihre E-Mail-Adresse. Wenn Sie kein Profilbild hinterlegt haben, zeigt Pfarrplaner stattdessen ein Benutzersymbol.
 
 Administratorinnen und Administratoren können sich unter bestimmten Umständen als ein anderer Benutzer anmelden. Dann kann zusätzlich ein gelber Button mit einem Benutzerwechsel-Symbol erscheinen. Damit kehren sie zum eigenen Administrationskonto zurück.
 

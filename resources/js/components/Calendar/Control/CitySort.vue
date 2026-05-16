@@ -28,23 +28,28 @@
   -->
 
 <template>
-    <div class="mb-1">
-        <h6>Reihenfolge</h6>
-        <draggable :list="list1" item-key="id" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities" @change="handleChange">
-            <template #item="{ element: city }">
-                <div class="sortable-city"><span class="mdi mdi-church"></span>
-                    {{ city.name }}
-                </div>
-            </template>
-        </draggable>
-        Nicht anzeigen:<br/>
-        <draggable :list="list2" item-key="id" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities">
-            <template #item="{ element: city }">
-                <div class="sortable-city"><span class="mdi mdi-church"></span>
-                    {{ city.name }}
-                </div>
-            </template>
-        </draggable>
+    <div class="calendar-city-sort">
+        <div class="calendar-city-sort-section">
+            <div class="calendar-city-sort-title">Im Kalender sichtbar</div>
+            <draggable :list="list1" item-key="id" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities" @change="handleChange">
+                <template #item="{ element: city }">
+                    <div class="sortable-city"><span class="mdi mdi-church"></span>
+                        {{ city.name }}
+                    </div>
+                </template>
+            </draggable>
+        </div>
+
+        <div class="calendar-city-sort-section">
+            <div class="calendar-city-sort-title">Ausgeblendet</div>
+            <draggable :list="list2" item-key="id" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities" @change="handleChange">
+                <template #item="{ element: city }">
+                    <div class="sortable-city sortable-city-muted"><span class="mdi mdi-church-outline"></span>
+                        {{ city.name }}
+                    </div>
+                </template>
+            </draggable>
+        </div>
     </div>
 </template>
 
@@ -66,8 +71,6 @@ export default {
             user: this.$page.props.currentUser.data,
         }
     },
-    beforeMount() {
-    },
     methods: {
         handleChange() {
             EventBus.publish(new CalendarNewSortOrderEvent(this.list1));
@@ -85,17 +88,52 @@ export default {
 </script>
 
 <style scoped>
+.calendar-city-sort {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.calendar-city-sort-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.calendar-city-sort-title {
+    color: #495057;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
 .sortable-cities {
-    min-height: 50px;
+    min-height: 3rem;
+    padding: 0.35rem;
+    border: 1px solid #dee2e6;
+    background: #f8f9fa;
 }
 
 .sortable-city {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
     width: 100%;
-    border: solid 1px gray;
+    border: 1px solid #dee2e6;
     list-style: none;
-    padding: 5px;
-    margin: 1px;
-     border-radius: 0;
+    padding: 0.55rem 0.7rem;
+    margin: 0 0 0.35rem;
+    border-radius: 0;
+    background: #fff;
+    color: #212529;
     cursor: move !important;
+}
+
+.sortable-city:last-child {
+    margin-bottom: 0;
+}
+
+.sortable-city-muted {
+    background: #f1f3f5;
+    color: #495057;
 }
 </style>

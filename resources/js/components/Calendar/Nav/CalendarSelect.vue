@@ -85,7 +85,7 @@ export default {
 <template>
     <div class="calendar-select dropdown" data-bs-auto-close="outside">
         <button
-            class="btn btn-outline-secondary dropdown-toggle calendar-select-trigger"
+            class="btn btn-sm btn-outline-secondary dropdown-toggle calendar-select-trigger"
             type="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
@@ -121,6 +121,7 @@ export default {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    min-height: calc(2.25rem + 2px);
 }
 
 .calendar-select-menu {
@@ -129,7 +130,7 @@ export default {
 }
 
 .calendar-select-panel {
-    max-height: min(28rem, calc(100vh - 8rem));
+    max-height: min(34rem, calc(100vh - 5rem));
     overflow: auto;
     padding: 0.5rem;
 }
@@ -157,7 +158,7 @@ export default {
     margin-bottom: 0.35rem;
     padding: 0.55rem 0.7rem;
     border: 1px solid transparent;
-    border-radius: 0.5rem;
+    border-radius: 0;
     text-align: left;
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
@@ -167,8 +168,8 @@ export default {
 }
 
 .calendar-toggle-active {
-    border-color: #0d6efd;
-    background: #0d6efd;
+    border-color: var(--bs-primary);
+    background: var(--bs-primary);
     color: #fff;
 }
 

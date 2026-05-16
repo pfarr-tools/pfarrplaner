@@ -14,18 +14,18 @@ Viele Benutzerinnen und Benutzer öffnen den Kalender von der [Startseite](start
 
 ![Kalenderübersicht](media/images/kalender-uebersicht.png)
 
-Oben im Kalender befindet sich die Bedienleiste. Darunter sehen Sie entweder die Gottesdienst-Ansicht oder den Veranstaltungskalender.
+Oben im Kalender befindet sich die Bedienleiste. Rechts oben in derselben Leiste wählen Sie außerdem, ob Sie die Gottesdienst-Ansicht oder den Veranstaltungskalender sehen möchten. Darunter erscheint dann die passende Kalenderansicht.
 
 ---
 
 ## Zwischen Gottesdiensten und Veranstaltungen umschalten
 
-In der Bedienleiste gibt es zwei Umschalter:
+Rechts oben in der oberen Leiste gibt es zwei Umschalter:
 
 - **Kirchensymbol**: Zeigt die Gottesdienst-Ansicht. Diese Ansicht ist für die eigentliche Gottesdienstplanung gedacht.
 - **Kalendersymbol**: Zeigt den Veranstaltungskalender. Diese Ansicht ist für andere Veranstaltungen und für eine klassische Monatsdarstellung gedacht.
 
-Pfarrplaner merkt sich, welche Ansicht Sie zuletzt verwendet haben.
+Pfarrplaner merkt sich, welche Ansicht Sie zuletzt verwendet haben. Wenn Sie den Veranstaltungskalender öffnen, erscheint daneben zusätzlich die Schaltfläche **Kalender**. Dort wählen Sie aus, welche verbundenen Kalender eingeblendet werden sollen.
 
 ---
 
@@ -50,11 +50,11 @@ Die Spalten zeigen die Gemeinden, die für Ihr Konto eingeblendet sind. Wenn ein
 
 ![Seiteneinstellungen des Kalenders](media/images/kalender-seiteneinstellungen.png)
 
-Die sichtbaren Gemeinden stellen Sie in den Seiteneinstellungen des Kalenders ein. Öffnen Sie diese Einstellungen über das Zahnrad rechts oben in der oberen Leiste.
+Die sichtbaren Gemeinden stellen Sie über die Schaltfläche **Kirchengemeinden** rechts oben in der oberen Leiste ein.
 
-Im Bereich **Reihenfolge** sehen Sie die Gemeinden, die im Kalender angezeigt werden. Ziehen Sie eine Gemeinde mit der Maus an eine andere Stelle, um die Spaltenreihenfolge zu ändern.
+In der Schaltfläche **Kirchengemeinden** sehen Sie eine geordnete Liste aller verfügbaren Gemeinden. Ziehen Sie eine Gemeinde mit der Maus an eine andere Stelle, um die Reihenfolge der sichtbaren Spalten zu ändern.
 
-Unter **Nicht anzeigen** stehen Gemeinden, die für Sie grundsätzlich verfügbar sind, aber im Kalender ausgeblendet werden. Ziehen Sie eine Gemeinde in diesen Bereich, um sie auszublenden. Ziehen Sie sie zurück in die Liste **Reihenfolge**, um sie wieder einzublenden.
+Jeder Eintrag kann direkt ein- oder ausgeschaltet werden. Eingeschaltete Gemeinden erscheinen im Kalender. Ausgeschaltete Gemeinden bleiben in der Liste sichtbar, werden aber im Kalender nicht angezeigt.
 
 Die Einstellung gilt für Ihr eigenes Konto. Andere Benutzerinnen und Benutzer behalten ihre eigene Ansicht.
 
@@ -227,7 +227,7 @@ Veranstaltungen sind für Termine gedacht, die keine normalen Gottesdienste sind
 
 ## Details zur Kinderkirche anzeigen
 
-In den Seiteneinstellungen gibt es die Option **Details zur Kinderkirche anzeigen**.
+In der Schaltfläche **Kirchengemeinden** gibt es außerdem die Option **Details zur Kinderkirche anzeigen**.
 
 - Wenn die Option ausgeschaltet ist, sehen Sie nur das Kinderkirche-Symbol.
 - Wenn die Option eingeschaltet ist, zeigt der Kalender zusätzliche Angaben wie Thema, Ort und Mitarbeitende direkt in der Gottesdienst-Kachel.

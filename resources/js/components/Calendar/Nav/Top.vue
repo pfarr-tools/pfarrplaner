@@ -30,19 +30,19 @@
 <template>
     <div class="button-row no-print btn-toolbar" role="toolbar">
         <div class="btn-group me-2" role="group">
-            <button class="btn btn-default"
+            <button class="btn btn-sm btn-outline-secondary"
                     v-if="numericDate > 201801"
                     @click.prevent.stop="navigate(moment(date).subtract(1, 'months').format('YYYY-MM'))"
                     title="Einen Monat zurück">
                 <span class="mdi mdi-chevron-left"></span>
             </button>
-            <button class="btn btn-default" @click.prevent.stop="today">
+            <button class="btn btn-sm btn-outline-secondary" @click.prevent.stop="today">
                 <span class="mdi mdi-calendar-today"></span><span class="d-none d-md-inline"> Gehe zu Heute </span>
             </button>
 
             <!-- TODO month / year dropdown -->
             <div class="btn-group" role="group">
-                <button id="btnGroupDrop1" type="button" class="btn btn-default dropdown-toggle"
+                <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {{ moment(date).format('MMMM') }}
                 </button>
@@ -74,7 +74,7 @@
                 </div>
             </div>
             <div class="btn-group" role="group">
-                <button id="btnGroupDrop2" type="button" class="btn btn-default dropdown-toggle"
+                <button id="btnGroupDrop2" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {{ moment(date).format('YYYY') }}
                 </button>
@@ -85,25 +85,12 @@
                     </a>
                 </div>
             </div>
-            <button class="btn btn-default"
+            <button class="btn btn-sm btn-outline-secondary"
                     v-if="numericDate > 201801"
                     @click.prevent.stop="navigate(moment(date).add(1, 'months').format('YYYY-MM'))"
                     title="Einen Monat weiter">
                 <span class="mdi mdi-chevron-right"></span>
             </button>
-        </div>
-
-        <div class="btn-group" role="group" aria-label="Ansicht umschalten">
-            <input type="radio" class="btn-check" name="calendarMode" id="calendarModeServices" autocomplete="off"
-                   :checked="calendarMode === 'services'"
-                   value="services" @input="$emit('toggle-calendar-mode', 'services')"
-                   title="Nur Gottesdienste anzeigen"/>
-            <label class="btn btn-light" for="calendarModeServices"><span class="mdi mdi-church"></span></label>
-
-            <input type="radio" class="btn-check" name="calendarMode" id="calendarModeEvents" autocomplete="off"
-                   :checked="calendarMode === 'events'"
-                   value="events" @input="$emit('toggle-calendar-mode', 'events')"/>
-            <label class="btn btn-light" for="calendarModeEvents"><span class="mdi mdi-calendar"></span></label>
         </div>
 
         <create-service-wizard-button v-if="canCreate" type="success"
@@ -113,7 +100,7 @@
 
         <nav-button v-if="(calendarMode == 'services')"
                     class="me-2"
-                    :type="targetMode ? 'warning' : 'default'"
+                    :type="targetMode ? 'warning' : 'outline-secondary'"
                     :icon="targetMode ? (target.exclusive ? 'mdi mdi-account-convert-outline': 'mdi mdi-account-arrow-down-outline') : 'mdi mdi-target-account'"
                     :force-no-text="!targetMode"
                     force-icon
@@ -122,7 +109,7 @@
             {{ targetTitle() }}
         </nav-button>
 
-        <a v-if="(calendarMode == 'services')" class="btn btn-default"
+        <a v-if="(calendarMode == 'services')" class="btn btn-sm btn-outline-secondary"
            :href="route('reports.setup', {report: 'ministryRequest'})"
            title="Dienstanfrage per E-Mail senden"><span class="mdi mdi-email"></span> <span class="d-none d-md-inline">Anfrage senden...</span></a>
 
@@ -132,8 +119,6 @@
 </template>
 
 <script>
-import EventBus from "../../../plugins/EventBus";
-import {CalendarToggleDayColumnEvent} from "../../../events/CalendarToggleDayColumnEvent";
 import NavButton from "../../Ui/buttons/NavButton";
 import CreateServiceWizardButton from "../../Ui/wizards/CreateServiceWizardButton.vue";
 
@@ -142,10 +127,7 @@ export default {
     components: {CreateServiceWizardButton, NavButton},
     data() {
         return {
-            slave: false,
-            allColumnsOpen: false,
             numericDate: parseInt(moment(this.date).format('YYYYMM')),
-            mySelectedCalendar: this.normalizeSelectedCalendar(this.selectedCalendar),
             creatableCities: this.writableCities.filter(item => !item.is_org),
         }
     },
@@ -153,25 +135,13 @@ export default {
         date: Date,
         writableCities: Array,
         years: Array,
-        orientation: String,
         targetMode: Boolean,
         target: Object,
         canCreate: Boolean,
         calendarMode: String,
         calendars: Array,
-        selectedCalendar: [Array, String, Number, null],
-    },
-    watch: {
-        selectedCalendar(newValue) {
-            this.mySelectedCalendar = this.normalizeSelectedCalendar(newValue);
-        },
     },
     methods: {
-        normalizeSelectedCalendar(value) {
-            if (Array.isArray(value)) return value;
-            if (value === null || value === undefined || value === '') return [];
-            return [value];
-        },
         monthLink: function (month) {
             return route('calendar', {
                 date: this.date.getFullYear() + '-' + month
@@ -198,12 +168,6 @@ export default {
             let people = [];
             this.target.people.forEach(person => people.push(person.name));
             return this.target.ministry + ': ' + people.join(', ');
-        },
-        createNewEvent() {
-            this.$inertia.get(route('event.create', {
-                filter: this.mySelectedCalendar,
-                date: moment(this.date).format('YYYY-MM'),
-            }))
         },
         navigate(targetDate) {
             this.$inertia.get(route('calendar', {date: targetDate}));
