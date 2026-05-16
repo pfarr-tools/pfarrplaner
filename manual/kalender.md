@@ -33,8 +33,6 @@ Pfarrplaner merkt sich, welche Ansicht Sie zuletzt verwendet haben.
 
 Die Gottesdienst-Ansicht zeigt einen Monat als Tabelle. Links stehen die Tage, oben stehen die sichtbaren Gemeinden. Jede Zelle zeigt die Gottesdienste dieser Gemeinde an diesem Tag.
 
-Beim Öffnen eines Monats baut sich die Ansicht stufenweise auf. Zuerst erscheinen Tabellenstruktur und Platzhalter-Kacheln. Kurz danach werden die eigentlichen Gottesdienste geladen. So sehen Sie schneller, dass der richtige Monat geöffnet wird, auch wenn viele Gemeinden oder viele Einträge angezeigt werden.
-
 Ein Tageskopf enthält:
 
 - **Wochentag und Datum**

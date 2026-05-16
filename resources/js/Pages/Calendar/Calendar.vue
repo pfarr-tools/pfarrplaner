@@ -223,7 +223,16 @@ th, td {
 }
 
 .calendar-full-container {
-    font-size: .9em;
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+}
+
+@media (max-width: 991.98px) {
+    .calendar-full-container {
+        padding: 0.25rem;
+        font-size: 0.8125rem;
+    }
 }
 
 </style>

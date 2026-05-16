@@ -29,14 +29,20 @@
 
 <template>
     <div class="calendar-month calendar-vertical">
-        <div v-if="hasData">
-            <table class="table table-bordered">
+        <div v-if="hasData" class="calendar-grid-wrapper">
+            <table class="table table-bordered table-sm mb-0 calendar-grid">
+                <colgroup>
+                    <col class="day-column">
+                    <col v-for="city in cities" :key="'col_'+city.id" class="city-column">
+                </colgroup>
                 <thead>
                 <tr>
-                    <th class="no-print text-start city-title"><!-- // TODO: slave mode --></th>
-                    <th v-for="city in cities" class="city-title">
-                        <span class="mdi mdi-arrow-down-circle pr-2"></span>
-                        {{ city.name }}
+                    <th class="no-print text-start city-title day-column-header"><!-- // TODO: slave mode --></th>
+                    <th v-for="city in cities" :key="city.id" class="city-title">
+                        <div class="city-title-content">
+                            <span class="mdi mdi-map-marker-outline city-title-icon"></span>
+                            <span class="city-title-text">{{ city.name }}</span>
+                        </div>
                     </th>
                 </tr>
                 </thead>
@@ -53,14 +59,20 @@
                 </tbody>
             </table>
         </div>
-        <div v-else class="month-loading">
-            <table class="table table-bordered">
+        <div v-else class="month-loading calendar-grid-wrapper">
+            <table class="table table-bordered table-sm mb-0 calendar-grid">
+                <colgroup>
+                    <col class="day-column">
+                    <col v-for="city in cities" :key="'skeleton_col_'+city.id" class="city-column">
+                </colgroup>
                 <thead>
                 <tr>
-                    <th class="no-print text-start city-title"></th>
-                    <th v-for="city in cities" class="city-title">
-                        <span class="mdi mdi-arrow-down-circle pr-2"></span>
-                        {{ city.name }}
+                    <th class="no-print text-start city-title day-column-header"></th>
+                    <th v-for="city in cities" :key="'skeleton_header_'+city.id" class="city-title">
+                        <div class="city-title-content">
+                            <span class="mdi mdi-map-marker-outline city-title-icon"></span>
+                            <span class="city-title-text">{{ city.name }}</span>
+                        </div>
                     </th>
                 </tr>
                 </thead>
@@ -164,52 +176,136 @@ export default {
 }
 </script>
 <style scoped>
+.calendar-vertical {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.calendar-grid-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    overflow: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    background: #fff;
+}
+
+.calendar-grid {
+    width: 100%;
+    table-layout: fixed;
+    margin-bottom: 0;
+}
+
+.day-column {
+    width: 12rem;
+}
+
+.city-column {
+    width: auto;
+}
+
+.city-title {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 0.55rem 0.65rem;
+    background-color: #f8f9fa;
+    border-bottom-width: 1px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.day-column-header {
+    left: 0;
+    z-index: 25;
+}
+
+.city-title-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 2rem;
+}
+
+.city-title-icon {
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+.city-title-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.month-loading {
+    min-height: 50vh;
+}
+
+.skeleton-day-cell {
+    min-width: 100px;
+    background-color: #f8fafc;
+}
+
+.skeleton-day-badge,
+.skeleton-day-line {
+    border-radius: 4px;
+    background: linear-gradient(90deg, #f3f5f7 25%, #e7ebef 37%, #f3f5f7 63%);
+    background-size: 400% 100%;
+    animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+.skeleton-day-badge {
+    height: 1.2rem;
+    width: 55%;
+    margin-bottom: 0.6rem;
+}
+
+.skeleton-day-line {
+    height: 0.8rem;
+    width: 75%;
+}
+
+:deep(th.day-header-cell) {
+    position: sticky;
+    left: 0;
+    z-index: 15;
+    background: #fff;
+}
+
+:deep(td.calendar-cell) {
+    min-width: 0;
+}
+
+@media (max-width: 991.98px) {
+    .day-column {
+        width: 9.75rem;
+    }
+
     .city-title {
-        position: sticky;
-        top: 0px;
-        background-color: #f4f6f9;
+        font-size: 0.72rem;
+        padding: 0.45rem 0.35rem;
     }
 
-    .btn-xs {
-        padding: 0.75em 1em;
+    .city-title-content {
+        flex-direction: column;
+        gap: 0.15rem;
     }
+}
 
-    .month-loading {
-        min-height: 50vh;
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 100% 50%;
     }
-
-    .skeleton-day-cell {
-        min-width: 100px;
-        background-color: #f8fafc;
+    100% {
+        background-position: 0 50%;
     }
-
-    .skeleton-day-badge,
-    .skeleton-day-line {
-        border-radius: 4px;
-        background: linear-gradient(90deg, #f3f5f7 25%, #e7ebef 37%, #f3f5f7 63%);
-        background-size: 400% 100%;
-        animation: skeleton-shimmer 1.4s ease infinite;
-    }
-
-    .skeleton-day-badge {
-        height: 1.2rem;
-        width: 55%;
-        margin-bottom: 0.6rem;
-    }
-
-    .skeleton-day-line {
-        height: 0.8rem;
-        width: 75%;
-    }
-
-    @keyframes skeleton-shimmer {
-        0% {
-            background-position: 100% 50%;
-        }
-        100% {
-            background-position: 0 50%;
-        }
-    }
+}
 
 
 </style>

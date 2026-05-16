@@ -70,8 +70,11 @@
                 </template>
             </Topbar>
 
-            <div class="px-2 pt-4 d-flex flex-column flex-grow-1 min-vh-0">
-                <h1 v-if="title" class="m-0 mb-4 text-dark" :key="title">{{ title }}</h1>
+            <div
+                class="px-2 d-flex flex-column flex-grow-1 min-vh-0"
+                :class="noContentHeader ? 'pt-2' : 'pt-4'"
+            >
+                <h1 v-if="title && !noContentHeader" class="m-0 mb-4 text-dark" :key="title">{{ title }}</h1>
                 <slot name="before-flash" />
                 <transition name="fade">
                     <FlashMessage
@@ -81,11 +84,14 @@
                     ></FlashMessage>
                 </transition>
                 <slot name="after-flash" />
-                <div class="slot-tab-headers mt-3 mb-0 pb-0">
+                <div v-if="$slots['tab-headers']" class="slot-tab-headers mt-3 mb-0 pb-0">
                     <slot name="tab-headers" />
                 </div>
 
-                <main class="admin-content flex-grow-1 overflow-auto p-3 min-vh-0">
+                <main
+                    class="admin-content flex-grow-1 overflow-auto min-vh-0"
+                    :class="noPadding ? 'p-0' : 'p-3'"
+                >
                     <slot></slot>
                 </main>
             </div>

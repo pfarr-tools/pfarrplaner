@@ -212,17 +212,19 @@ class CalendarService
     {
         $days = [];
         $liturgyYear = LiturgyService::getYear($date->year);
+        $liturgyDays = $liturgyYear['Tage'] ?? [];
 
         foreach ($dates as $rawDate) {
             $dayDate = Carbon::parse($rawDate)->startOfDay();
-            $liturgy = $liturgyYear[$dayDate->format('Y-m-d')] ?? [];
+            $liturgy = $liturgyDays[$dayDate->format('Y-m-d')] ?? [];
+            $primaryLiturgy = $liturgy[0] ?? [];
             $days[$dayDate->format('Y-m-d')] = [
                 'date' => $dayDate->format('Y-m-d'),
-                'liturgy' => isset($liturgy['Bezeichnung']) ? [
-                    'title' => $liturgy['Bezeichnung'],
-                    'litColor' => $liturgy['CSS-Farbe'],
-                    'feastCircleName' => $liturgy['Festkreis'],
-                    'perikope' => $liturgy['Predigt'],
+                'liturgy' => isset($primaryLiturgy['Bezeichnung']) ? [
+                    'title' => $primaryLiturgy['Bezeichnung'],
+                    'litColor' => $primaryLiturgy['CSS-Farbe'],
+                    'feastCircleName' => $primaryLiturgy['Festkreis'],
+                    'perikope' => $primaryLiturgy['Predigt'],
                 ] : [],
                 'absences' => [],
                 'services' => [],
