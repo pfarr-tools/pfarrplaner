@@ -30,13 +30,13 @@
 <template>
     <div class="button-row no-print btn-toolbar" role="toolbar">
         <div class="btn-group me-2" role="group">
-            <inertia-link class="btn btn-default"
+            <inertia-link class="btn btn-outline-secondary"
                           v-if="numericDate > 201801"
                           :href="route('absences.index', { year: moment(date).subtract(1, 'months').format('YYYY'), month: moment(date).subtract(1, 'months').format('MM') })"
                           title="Einen Monat zurück">
                 <span class="mdi mdi-chevron-left"></span>
             </inertia-link>
-            <inertia-link class="btn btn-default"
+            <inertia-link class="btn btn-outline-secondary"
                           :href="route('absences.index', { year: new Date().getFullYear(), month: new Date().getMonth()+1 })"
                           title="Gehe zum aktuellen Monat">
                 <span class="mdi mdi-calendar-today"></span><span class="d-none d-md-inline"> Gehe zu Heute </span>
@@ -44,7 +44,7 @@
 
             <!-- TODO month / year dropdown -->
             <div class="btn-group" role="group">
-                <button id="btnGroupDrop1" type="button" class="btn btn-default dropdown-toggle"
+                <button id="btnGroupDrop1" type="button" class="btn btn-outline-secondary dropdown-toggle"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {{ moment(date).locale('de').format('MMMM') }}
                 </button>
@@ -64,7 +64,7 @@
                 </div>
             </div>
             <div class="btn-group" role="group">
-                <button id="btnGroupDrop2" type="button" class="btn btn-default dropdown-toggle"
+                <button id="btnGroupDrop2" type="button" class="btn btn-outline-secondary dropdown-toggle"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {{ moment(date).format('YYYY') }}
                 </button>
@@ -76,7 +76,7 @@
             </div>
 
 
-            <inertia-link class="btn btn-default"
+            <inertia-link class="btn btn-outline-secondary"
                           :href="route('absences.index', { year: moment(date).add(1, 'months').format('YYYY'), month: moment(date).add(1, 'months').format('MM') })"
                           title="Einen Monat weiter">
                 <span class="mdi mdi-chevron-right"></span>

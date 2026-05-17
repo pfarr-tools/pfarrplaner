@@ -33,14 +33,14 @@
                 text.length.toLocaleString('de-DE')
             }} Zeichen &middot;
             {{ wordCount().toLocaleString('de-DE') }} Wörter &middot;
-            Voraussichtliche Redezeit: </span>{{ calculatedSpeechTime() }}</small>
+            {{ speechTimeLabel || 'Voraussichtliche Redezeit: ' }}</span>{{ calculatedSpeechTime() }}</small>
     </div>
 </template>
 
 <script>
 export default {
     name: "TextStats",
-    props: ['text', 'timeOnly', 'hideHours', 'wpm'],
+    props: ['text', 'timeOnly', 'hideHours', 'wpm', 'speechTimeLabel'],
     methods: {
         wordCount() {
             return this.text.trim().split(/\s+/).length;

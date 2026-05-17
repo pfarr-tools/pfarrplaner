@@ -89,8 +89,8 @@
                 </div>
 
                 <main
-                    class="admin-content flex-grow-1 overflow-auto min-vh-0"
-                    :class="noPadding ? 'p-0' : 'p-3'"
+                    class="admin-content flex-grow-1 min-vh-0"
+                    :class="[noPadding ? 'p-0' : 'p-3', noContentScroll ? 'overflow-hidden' : 'overflow-auto']"
                 >
                     <slot></slot>
                 </main>
@@ -121,6 +121,7 @@ export default {
         },
         noContentHeader: Boolean,
         noPadding: Boolean,
+        noContentScroll: Boolean,
     },
     mounted() {
         if (this.title != '') document.title = this.title + ' :: ' + this.layout.appName;

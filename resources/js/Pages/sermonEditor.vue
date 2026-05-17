@@ -79,80 +79,82 @@
             <form @submit.prevent="saveSermon" id="formSermon" class="sermon-editor__form">
                 <div class="row g-3 sermon-editor__layout">
                     <div class="col-md-4 d-flex flex-column min-h-0 sermon-editor__column">
-                        <card class="h-100 shadow-sm sermon-editor__card">
-                            <div class="card-header bg-white border-bottom">
-                                Predigtinformationen
-                            </div>
-                            <card-body class="overflow-auto min-h-0 sermon-editor__sidebar">
-                                <div class="form-group">
-                                    <label>Titel</label>
-                                    <input class="form-control" type="text" v-model="editedSermon.title" v-focus/>
+                        <div class="overflow-auto min-h-0 h-100 ">
+                            <card class="shadow-sm sermon-editor__card">
+                                <div class="card-header bg-white border-bottom">
+                                    Predigtinformationen
                                 </div>
-                                <div class="form-group">
-                                    <label>Untertitel</label>
-                                    <input class="form-control" type="text" v-model="editedSermon.subtitle"/>
-                                </div>
-                                <div class="form-group">
-                                    <label>Reihe</label>
-                                    <input class="form-control" type="text" v-model="editedSermon.series"/>
-                                </div>
-                                <div class="form-group mb-2">
-                                    <label>Zusammenfassung</label>
-                                    <textarea class="form-control" v-model="editedSermon.summary"/>
-                                </div>
-                                <form-bible-reference-input name="reference" :key="referenceCopied"
-                                                            label="Predigttext"
-                                                            v-model="editedSermon.reference" :sources="textSources" />
-                                <div v-if="!(editedSermon.id)" class="alert alert-info">
-                                    Du musst die Predigt erst einmal speichern, um ein Bild hinzufügen zu können.
-                                </div>
-                                <div v-else>
-                                    <form-image-attacher
-                                        :attach-route="route('sermon.image.attach', {model: editedSermon.id})"
-                                        :detach-route="route('sermon.image.detach', {model: editedSermon.id})"
-                                        label="Bild zur Predigt" :handle-paste="true"
-                                        v-model="editedSermon.image" width="1024" height="768"
-                                    />
-                                </div>
-                                <div class="form-check my-2">
-                                    <input class="form-check-input" type="checkbox" id="inputCCLicense"
-                                           v-model="editedSermon.cc_license" value="1"/>
-                                    <label class="form-check-label" for="inputCCLicense">Predigt und Materialien unter
-                                        der CC-BY-SA 4.0 Lizenz freigeben</label>
-                                </div>
-                            </card-body>
-                        </card>
+                                <card-body class="sermon-editor__sidebar">
+                                    <div class="form-group">
+                                        <label>Titel</label>
+                                        <input class="form-control" type="text" v-model="editedSermon.title" v-focus/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Untertitel</label>
+                                        <input class="form-control" type="text" v-model="editedSermon.subtitle"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Reihe</label>
+                                        <input class="form-control" type="text" v-model="editedSermon.series"/>
+                                    </div>
+                                    <div class="form-group mb-2">
+                                        <label>Zusammenfassung</label>
+                                        <textarea class="form-control" v-model="editedSermon.summary"/>
+                                    </div>
+                                    <form-bible-reference-input name="reference" :key="referenceCopied"
+                                                                label="Predigttext"
+                                                                v-model="editedSermon.reference" :sources="textSources" />
+                                    <div v-if="!(editedSermon.id)" class="alert alert-info">
+                                        Du musst die Predigt erst einmal speichern, um ein Bild hinzufügen zu können.
+                                    </div>
+                                    <div v-else>
+                                        <form-image-attacher
+                                            :attach-route="route('sermon.image.attach', {model: editedSermon.id})"
+                                            :detach-route="route('sermon.image.detach', {model: editedSermon.id})"
+                                            label="Bild zur Predigt" :handle-paste="true"
+                                            v-model="editedSermon.image" width="1024" height="768"
+                                        />
+                                    </div>
+                                    <div class="form-check my-2">
+                                        <input class="form-check-input" type="checkbox" id="inputCCLicense"
+                                               v-model="editedSermon.cc_license" value="1"/>
+                                        <label class="form-check-label" for="inputCCLicense">Predigt und Materialien unter
+                                            der CC-BY-SA 4.0 Lizenz freigeben</label>
+                                    </div>
+                                </card-body>
+                            </card>
+
+                        </div>
                     </div>
                     <div class="col-md-8 d-flex flex-column min-h-0 overflow-hidden sermon-editor__column">
                         <card class="h-100 shadow-sm sermon-editor__card overflow-hidden">
                             <div class="card-header bg-white border-bottom">
                                 <div class="d-flex flex-wrap align-items-center gap-2" v-if="editorText">
                                     <strong class="me-2">Predigttext</strong>
-                                    <div class="tiptap-toolbar btn-toolbar flex-wrap" v-if="editorText">
-                                <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleBold().run()" :class="{active: editorText.isActive('bold')}" title="Fett"><b>B</b></button>
-                                <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleItalic().run()" :class="{active: editorText.isActive('italic')}" title="Kursiv"><i>I</i></button>
-                                <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleUnderline().run()" :class="{active: editorText.isActive('underline')}" title="Unterstrichen"><u>U</u></button>
-                                <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleHeading({level:1}).run()" :class="{active: editorText.isActive('heading',{level:1})}" title="Überschrift">H1</button>
-                                <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleBlockquote().run()" :class="{active: editorText.isActive('blockquote')}" title="Zitat">&ldquo;</button>
-                                <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleOrderedList().run()" :class="{active: editorText.isActive('orderedList')}" title="Nummerierte Liste">1.</button>
-                                <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleBulletList().run()" :class="{active: editorText.isActive('bulletList')}" title="Aufzählung">&bull;</button>
-                                <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().unsetAllMarks().clearNodes().run()" title="Formatierung entfernen">&#10005;</button>
-                                <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="insertBible()" title="Bibeltext hinzufügen"><span class="mdi mdi-book-open-variant"></span></button>
-                                <template v-if="funerals.length">
-
-                                </template>
-                                <button v-for="(funeral, funeralIndex, funeralKey) in funerals" type="light" class="btn btn-sm btn-outline-secondary me-2"
-                                        :key="funeralKey" :title="'Lebenslauf von '+funeral.buried_name+' einfügen'"
-                                        @click="insertFuneralStory(funeral)">
-                                    <span class="mdi mdi-text me-1"></span> {{ funeral.buried_name }}
-                                </button>
-                                    </div>
+                                </div>
+                            </div>
+                            <card-body class="d-flex flex-column min-h-0 p-0">
+                                <div class="tiptap-toolbar btn-toolbar flex-wrap" v-if="editorText">
+                                    <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleBold().run()" :class="{active: editorText.isActive('bold')}" title="Fett"><b>B</b></button>
+                                    <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleItalic().run()" :class="{active: editorText.isActive('italic')}" title="Kursiv"><i>I</i></button>
+                                    <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleUnderline().run()" :class="{active: editorText.isActive('underline')}" title="Unterstrichen"><u>U</u></button>
+                                    <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleHeading({level:1}).run()" :class="{active: editorText.isActive('heading',{level:1})}" title="Überschrift">H1</button>
+                                    <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleBlockquote().run()" :class="{active: editorText.isActive('blockquote')}" title="Zitat">&ldquo;</button>
+                                    <button class="btn btn-sm btn-outline-secondary me-1" @click.prevent="editorText.chain().focus().toggleOrderedList().run()" :class="{active: editorText.isActive('orderedList')}" title="Nummerierte Liste">1.</button>
+                                    <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().toggleBulletList().run()" :class="{active: editorText.isActive('bulletList')}" title="Aufzählung">&bull;</button>
+                                    <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="editorText.chain().focus().unsetAllMarks().clearNodes().run()" title="Formatierung entfernen">&#10005;</button>
+                                    <button class="btn btn-sm btn-outline-secondary me-2" @click.prevent="insertBible()" title="Bibeltext hinzufügen"><span class="mdi mdi-book-open-variant"></span></button>
+                                    <template v-if="funerals.length">
+                                        <button v-for="(funeral, funeralIndex, funeralKey) in funerals" type="light" class="btn btn-sm btn-outline-secondary me-2"
+                                                :key="funeralKey" :title="'Lebenslauf von '+funeral.buried_name+' einfügen'"
+                                                @click="insertFuneralStory(funeral)">
+                                            <span class="mdi mdi-text me-1"></span> {{ funeral.buried_name }}
+                                        </button>
+                                    </template>
                                     <div class="ms-auto d-flex align-items-center">
                                         <text-stats :text="editedSermon.text" :key="textUpdated" speech-time-label="ca. "/>
                                     </div>
                                 </div>
-                            </div>
-                            <card-body class="d-flex flex-column min-h-0 p-0">
                                 <div class="editor-scroll-area">
                                     <editor-content :editor="editorText" class="form-control tiptap-editor border-0 rounded-0" />
                                 </div>
