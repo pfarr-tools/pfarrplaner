@@ -119,13 +119,14 @@ export default {
                         <button
                             type="button"
                             class="calendar-city-toggle"
-                            :class="city.visible ? 'calendar-city-toggle-active' : 'calendar-city-toggle-inactive'"
                             @click="toggleCity(city.id)"
                         >
                             <span class="calendar-city-drag-handle mdi mdi-drag-vertical"></span>
-                            <span class="calendar-city-toggle-icon mdi"
-                                  :class="city.visible ? 'mdi-check-circle' : 'mdi-checkbox-blank-circle-outline'"></span>
                             <span class="calendar-city-toggle-label">{{ city.name }}</span>
+                            <span class="badge rounded-pill"
+                                  :class="city.visible ? 'bg-success text-dark' : 'bg-secondary'">
+                                {{ city.visible ? 'An' : 'Aus' }}
+                            </span>
                         </button>
                     </template>
                 </draggable>
@@ -135,13 +136,14 @@ export default {
                     <button
                         type="button"
                         class="calendar-city-toggle"
-                        :class="settings.show_cc_details ? 'calendar-city-toggle-active' : 'calendar-city-toggle-inactive'"
                         @click="toggleChildChurchDetails"
                     >
-                        <span class="calendar-city-toggle-icon mdi"
-                              :class="settings.show_cc_details ? 'mdi-check-circle' : 'mdi-checkbox-blank-circle-outline'"></span>
                         <span class="calendar-city-toggle-label">
                             Details zur Kinderkirche anzeigen
+                        </span>
+                        <span class="badge rounded-pill"
+                              :class="settings.show_cc_details ? 'bg-success text-dark' : 'bg-secondary'">
+                            {{ settings.show_cc_details ? 'An' : 'Aus' }}
                         </span>
                     </button>
                 </div>
@@ -207,37 +209,31 @@ export default {
     width: 100%;
     margin-bottom: 0.35rem;
     padding: 0.55rem 0.7rem;
-    border: 1px solid transparent;
+    border: 1px solid #dee2e6;
     border-radius: 0;
     text-align: left;
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    background: #fff;
+    color: #212529;
 }
 
 .calendar-city-toggle:last-child {
     margin-bottom: 0;
 }
 
-.calendar-city-toggle-active {
-    border-color: var(--bs-primary);
-    background: var(--bs-primary);
-    color: #fff;
+.calendar-city-toggle:hover {
+    background: #f8f9fa;
 }
 
-.calendar-city-toggle-inactive {
-    border-color: #dee2e6;
-    background: #f8f9fa;
-    color: #212529;
+.calendar-city-toggle .badge.bg-success,
+.calendar-city-toggle .badge.bg-success.text-dark {
+    color: var(--bs-dark) !important;
 }
 
 .calendar-city-drag-handle {
     flex: 0 0 auto;
     cursor: move;
     opacity: 0.75;
-}
-
-.calendar-city-toggle-icon {
-    flex: 0 0 auto;
-    font-size: 1rem;
 }
 
 .calendar-city-toggle-label {

@@ -104,11 +104,13 @@ export default {
                         :key="calendar.id"
                         type="button"
                         class="calendar-toggle"
-                        :class="isSelected(calendar.id) ? 'calendar-toggle-active' : 'calendar-toggle-inactive'"
                         @click="toggleCalendar(calendar.id)"
                     >
-                        <span class="calendar-toggle-icon mdi" :class="isSelected(calendar.id) ? 'mdi-check-circle' : 'mdi-checkbox-blank-circle-outline'"></span>
                         <span class="calendar-toggle-label">{{ calendar.name }}</span>
+                        <span class="badge rounded-pill"
+                              :class="isSelected(calendar.id) ? 'bg-success text-dark' : 'bg-secondary'">
+                            {{ isSelected(calendar.id) ? 'An' : 'Aus' }}
+                        </span>
                     </button>
                 </div>
             </div>
@@ -157,31 +159,25 @@ export default {
     width: 100%;
     margin-bottom: 0.35rem;
     padding: 0.55rem 0.7rem;
-    border: 1px solid transparent;
+    border: 1px solid #dee2e6;
     border-radius: 0;
     text-align: left;
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    background: #fff;
+    color: #212529;
 }
 
 .calendar-toggle:last-child {
     margin-bottom: 0;
 }
 
-.calendar-toggle-active {
-    border-color: var(--bs-primary);
-    background: var(--bs-primary);
-    color: #fff;
-}
-
-.calendar-toggle-inactive {
-    border-color: #dee2e6;
+.calendar-toggle:hover {
     background: #f8f9fa;
-    color: #212529;
 }
 
-.calendar-toggle-icon {
-    flex: 0 0 auto;
-    font-size: 1rem;
+.calendar-toggle .badge.bg-success,
+.calendar-toggle .badge.bg-success.text-dark {
+    color: var(--bs-dark) !important;
 }
 
 .calendar-toggle-label {
