@@ -96,13 +96,13 @@
                 <div v-if="expanded && (item.text === undefined)" class="px-4 p-2 text-start text-uppercase">{{  item }}</div>
                 <inertia-link v-if="item.text && item.inertia" class="px-4 p-2 text-start w-100 nav-link" :class="{ active: item.active }" :href="item.url">
                     <i v-if="item.icon && (!item.profile)" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
-                    <span v-if="expanded && item.text">
+                    <span v-if="expanded && item.text" class="ms-1">
                         {{ item.text }}
                     </span>
                 </inertia-link>
                 <a v-if="item.text && (!item.inertia)" class="px-4 p-2 text-start w-100 nav-link" :class="{ active: item.active }" :href="item.url">
                     <i v-if="item.icon && (!item.profile)" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
-                    <span v-if="expanded && item.text">
+                    <span v-if="expanded && item.text" class="ms-1">
                         {{ item.text }}
                     </span>
                 </a>
