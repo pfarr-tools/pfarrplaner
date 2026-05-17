@@ -63,21 +63,20 @@ Beim Öffnen lädt Pfarrplaner zuerst die Benutzer:innen und danach die Einträg
 
 Der Urlaubsplan ist eine Tabelle. Links stehen die Personen, oben die Tage des Monats. Jede Zelle steht für einen Tag.
 
+Die Monatsübersicht bleibt auch bei langen Listen gut lesbar:
+
+- Die Kopfzeile mit den Tagen bleibt beim Scrollen nach unten sichtbar.
+- Die linke Spalte mit den Namen bleibt beim seitlichen Scrollen sichtbar.
+- Oberhalb der Tabelle sehen Sie zusätzlich eine kleine Zusammenfassung mit Anzahl der Tage und aktuell sichtbaren Personen.
+- Rechts oben finden Pfarrpersonen eine aufklappbare Liste **Mitarbeitende**. Dort können Mitarbeitende mit einem Schalter **An** oder **Aus** in der Tabelle ein- oder ausgeblendet werden. Die Liste ist scrollbar, wenn viele Personen zur Auswahl stehen.
+
 Die Benutzer:innen sind in Bereiche gegliedert:
 
 - **Eigenes Konto**: Ihr eigener Eintrag.
 - **Pfarrer:innen**: Pfarrpersonen, falls Ihre Installation diese Bezeichnung verwendet und Sie diese Personen sehen dürfen.
 - **Mitarbeitende**: Weitere Personen, deren Abwesenheiten sichtbar sind.
-- **Ausgeblendete Mitarbeitende**: Personen, die nicht dauerhaft im Hauptbereich angezeigt werden.
 
 Klicken Sie auf die Überschrift eines Bereichs, um ihn ein- oder auszuklappen. Pfarrplaner merkt sich diese Einstellung für Ihr Konto.
-
-Bei Mitarbeitenden können Augensymbole erscheinen:
-
-- **Auge**: Die Person wird dauerhaft im Bereich **Mitarbeitende** angezeigt. Klicken Sie darauf, um sie auszublenden.
-- **Durchgestrichenes Auge**: Die Person steht unter **Ausgeblendete Mitarbeitende**. Klicken Sie darauf, um sie wieder dauerhaft einzublenden.
-
-Diese Augensymbole erscheinen für Pfarrpersonen bei Mitarbeitenden, deren Urlaub nicht ohnehin im Gottesdienstplaner angezeigt wird.
 
 ---
 
