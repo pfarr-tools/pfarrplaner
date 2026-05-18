@@ -1,7 +1,6 @@
 vendor
 node_modules
 storage
-package-lock.json
 .idea
 .github
 .husky
