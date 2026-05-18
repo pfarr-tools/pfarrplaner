@@ -11,6 +11,7 @@
         "release:major": "node scripts/release.js major",
         "release:minor": "node scripts/release.js minor",
         "release:patch": "node scripts/release.js patch",
+        "install:updates": "node scripts/install-updates.js",
         "licenses:update": "license-checker --json > .npm-licenses && composer licenses --format=json > .composer-licenses && php artisan licenses:markdown && git add CREDITS.md && git commit -m \"chore: Lizenzinformationen aktualisiert\"",
         "test:js": "vitest --config vitest.config.mjs",
         "test:js:run": "vitest run --config vitest.config.mjs",
