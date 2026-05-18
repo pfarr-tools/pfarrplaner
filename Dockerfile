@@ -1,52 +1,40 @@
-FROM phpswoole/swoole:php8.4-alpine
+FROM debian:bookworm-slim
 
-# ---- RUNTIME deps (stay in final image)
-RUN set -eux; \
-  for i in 1 2 3; do \
-    apk add --no-cache \
-      bash curl git \
-      libzip libxml2 libpng freetype libjpeg-turbo libwebp zlib \
-      nodejs npm yarn \
-      icu-libs tzdata gettext musl-locales gcompat \
-      liburing libyaml libstdc++ \
-    && break || (echo "apk retry $i" && sleep 2); \
-  done
+ENV DEBIAN_FRONTEND=noninteractive
 
-# ---- BUILD deps (removed later) + PHP extensions
-RUN set -eux; \
-  apk add --no-cache --virtual .build-deps \
-      build-base autoconf pkgconfig \
-      libzip-dev libxml2-dev libpng-dev freetype-dev libjpeg-turbo-dev libwebp-dev zlib-dev \
-      oniguruma-dev icu-dev curl-dev yaml-dev; \
-  docker-php-source extract; \
-  export CPPFLAGS="${CPPFLAGS:-} -I/usr/src/php"; \
-  docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
-  docker-php-ext-install pdo pdo_mysql zip soap dom curl intl gd; \
-  pecl install yaml; \
-  docker-php-ext-enable yaml; \
-  docker-php-source delete; \
-  apk del .build-deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl gnupg lsb-release git \
+    && curl -sSLo /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg \
+    && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list \
+    && apt-get update && apt-get install -y --no-install-recommends \
+      php8.4-cli php8.4-swoole php8.4-mbstring \
+      php8.4-gd php8.4-intl php8.4-zip php8.4-xml php8.4-curl php8.4-mysql php8.4-yaml \
+      locales tzdata \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && sed -i '/^path-exclude=\/usr\/share\/locale/d' /etc/dpkg/dpkg.cfg.d/docker 2>/dev/null || true \
+    && echo "de_DE.UTF-8 UTF-8" > /etc/locale.gen \
+    && locale-gen \
+    && update-locale LANG=de_DE.UTF-8 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set locale to German (de_DE.UTF-8)
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 ENV LANG=de_DE.UTF-8 \
     LANGUAGE=de_DE:de \
-    LC_ALL=de_DE.UTF-8
+    LC_ALL=de_DE.UTF-8 \
+    TZ=Europe/Berlin
 
-# Set timezone to Europe/Berlin
-ENV TZ=Europe/Berlin
-
-# Set working directory
 WORKDIR /var/www
 
-# Copy application code
 COPY . .
 
-# Install Composer dependencies (no post-autoload scripts)
 RUN composer install --no-dev --optimize-autoloader --no-scripts \
  && npm install && npm run build \
- && chmod -R 775 storage bootstrap/cache || true
+ && mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
+ && chmod -R 775 storage bootstrap/cache \
+ && rm -f app/Console/Commands/DuskRunCommand.php
 
-# Expose Octane port
 EXPOSE 9500
 
 # No CMD/ENTRYPOINT – handled by pfarrplaner-dockerized
