@@ -86,7 +86,16 @@ export default {
         },
         pageError() {
             if (!this.name) return null;
-            return this.$page.props.errors?.[this.name] || null;
+            const errors = this.$page.props.errors || {};
+            if (errors[this.name]) return errors[this.name];
+
+            for (const bag of Object.values(errors)) {
+                if (bag && typeof bag === 'object' && bag[this.name]) {
+                    return bag[this.name];
+                }
+            }
+
+            return null;
         },
         errorMessage() {
             const message = this.error ?? this.pageError;

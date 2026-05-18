@@ -343,9 +343,7 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
      */
     public function setDobAttribute($date)
     {
-        if (!is_null($date)) {
-            $this->attributes['dob'] = Carbon::createFromFormat('d.m.Y', $date);
-        }
+        $this->attributes['dob'] = $this->normalizeDateAttribute($date);
     }
 
     /**
@@ -353,9 +351,7 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
      */
     public function setDodAttribute($date)
     {
-        if (!is_null($date)) {
-            $this->attributes['dod'] = Carbon::createFromFormat('d.m.Y', $date);
-        }
+        $this->attributes['dod'] = $this->normalizeDateAttribute($date);
     }
 
     /**
@@ -363,9 +359,7 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
      */
     public function setAnnouncementAttribute($date)
     {
-        if (!is_null($date)) {
-            $this->attributes['announcement'] = Carbon::createFromFormat('d.m.Y', $date);
-        }
+        $this->attributes['announcement'] = $this->normalizeDateAttribute($date);
     }
 
     /**
@@ -373,9 +367,7 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
      */
     public function setWakeAttribute($date)
     {
-        if (!is_null($date)) {
-            $this->attributes['wake'] = Carbon::createFromFormat('d.m.Y', $date);
-        }
+        $this->attributes['wake'] = $this->normalizeDateAttribute($date);
     }
 
     /**
@@ -383,9 +375,41 @@ class Funeral extends AbstractModel implements HasDAVCalendarItems
      */
     public function setAppointmentAttribute($date)
     {
-        if (!is_null($date)) {
-            $this->attributes['appointment'] = Carbon::createFromFormat('d.m.Y H:i', $date);
+        $this->attributes['appointment'] = $this->normalizeDateTimeAttribute($date);
+    }
+
+    /**
+     * @param mixed $date
+     * @return Carbon|string|null
+     */
+    protected function normalizeDateAttribute($date)
+    {
+        if (($date === null) || ($date === '')) {
+            return null;
         }
+
+        if ($date instanceof Carbon) {
+            return $date;
+        }
+
+        return Carbon::createFromFormat('d.m.Y', $date);
+    }
+
+    /**
+     * @param mixed $date
+     * @return Carbon|string|null
+     */
+    protected function normalizeDateTimeAttribute($date)
+    {
+        if (($date === null) || ($date === '')) {
+            return null;
+        }
+
+        if ($date instanceof Carbon) {
+            return $date;
+        }
+
+        return Carbon::createFromFormat('d.m.Y H:i', $date);
     }
 
     public function getAgeAttribute()

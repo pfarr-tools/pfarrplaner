@@ -69,8 +69,21 @@ export default {
         }
     },
     computed: {
+        pageError() {
+            if (!this.name) return null;
+            const errors = this.$page.props.errors || {};
+            if (errors[this.name]) return errors[this.name];
+
+            for (const bag of Object.values(errors)) {
+                if (bag && typeof bag === 'object' && bag[this.name]) {
+                    return bag[this.name];
+                }
+            }
+
+            return null;
+        },
         errorMessage() {
-            const message = this.name ? this.$page.props.errors?.[this.name] : null;
+            const message = this.pageError;
             if (!message) return '';
             return Array.isArray(message) ? message.join(' ') : message;
         },

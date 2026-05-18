@@ -103,15 +103,13 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <form-group name="dob" label="Geburtsdatum">
-                            <date-picker :config="myDatePickerConfig" v-model="myFuneral.dob"/>
-                        </form-group>
+                        <form-date-picker name="dob" label="Geburtsdatum"
+                                          :config="myDatePickerConfig" v-model="myFuneral.dob"/>
                     </div>
                     <div class="col-md-6">
-                        <form-group name="dod" label="Sterbedatum"
-                                    :help="relativeDate(myFuneral.dod, moment())+(age ? ' im Alter von '+age+' Jahren' : '')">
-                            <date-picker :config="myDatePickerConfig" v-model="myFuneral.dod"/>
-                        </form-group>
+                        <form-date-picker name="dod" label="Sterbedatum"
+                                          :help="relativeDate(myFuneral.dod, moment())+(age ? ' im Alter von '+age+' Jahren' : '')"
+                                          :config="myDatePickerConfig" v-model="myFuneral.dod"/>
                     </div>
                 </div>
                 <div class="row">
@@ -186,16 +184,14 @@
                                   :items="funeralTypeOptions"
                                   :inline="false" />
                 <div v-if="myFuneral.type == 'Urnenbeisetzung'">
-                    <form-group label="Datum der vorhergehenden Trauerfeier" name="wake">
-                        <date-picker :config="myDatePickerConfig" v-model="myFuneral.wake"/>
-                    </form-group>
+                    <form-date-picker label="Datum der vorhergehenden Trauerfeier" name="wake"
+                                      :config="myDatePickerConfig" v-model="myFuneral.wake"/>
                     <form-input label="Ort der vorhergehenden Trauerfeier"
                                 v-model="myFuneral.wake_location" name="wake_location"/>
                 </div>
-                <form-group label="Abkündigen am" :is-checked-item="true" :value="myFuneral.announcement"
-                            name="announcement">
-                    <date-picker :config="myDatePickerConfig" v-model="myFuneral.announcement"/>
-                </form-group>
+                <form-date-picker label="Abkündigen am" :is-checked-item="true"
+                                  name="announcement" :config="myDatePickerConfig"
+                                  v-model="myFuneral.announcement"/>
                 <hr/>
                 <form-textarea label="Bestatter" v-model="myFuneral.undertaker" name="undertaker"/>
                 <form-textarea label="Nachrufe" v-model="myFuneral.eulogies" name="eulogies"/>
@@ -229,10 +225,9 @@
             <tab id="interview" :active-tab="activeTab">
                 <div class="row">
                     <div class="col-md-6">
-                        <form-group label="Trauergespräch" :is-checked-item="true" :value="myFuneral.appointment"
-                                    name="appointment">
-                            <date-picker v-model="myFuneral.appointment" :config="myDateTimePickerConfig"/>
-                        </form-group>
+                        <form-date-picker label="Trauergespräch" :is-checked-item="true"
+                                          name="appointment" :config="myDateTimePickerConfig"
+                                          v-model="myFuneral.appointment"/>
                     </div>
                     <div class="col-md-6">
                         <form-input label="Ort des Trauergesprächs" name="appointment_address"
@@ -267,36 +262,36 @@
                 </div>
                 <div class="row">
                     <div :class="showStoryEditor ? 'col-lg-4': 'col-md-6'">
-                        <form-textarea label="Eltern, Herkunftsfamilie" v-model="funeral.parents"
+                        <form-textarea label="Eltern, Herkunftsfamilie" v-model="myFuneral.parents"
                                        name="parents"/>
                         <accordion id="casesAccordion">
                             <accordion-element title="Taufe" icon="mdi mdi-water">
-                                <form-textarea label="Taufe" v-model="funeral.baptism" name="baptism"/>
+                                <form-textarea label="Taufe" v-model="myFuneral.baptism" name="baptism"/>
                                 <form-date-picker label="Taufdatum" v-model="myFuneral.baptism_date" name="baptism_date"
                                                   :help="ageText(myFuneral.baptism_date, myFuneral.dob, 'mit ', 'n')"/>
                             </accordion-element>
                             <accordion-element title="Konfirmation" icon="mdi mdi-cross-outline">
-                                <form-textarea label="Konfirmation" v-model="funeral.confirmation" name="confirmation"/>
-                                <form-date-picker label="Datum der Konfirmation" v-model="funeral.confirmation_date"
+                                <form-textarea label="Konfirmation" v-model="myFuneral.confirmation" name="confirmation"/>
+                                <form-date-picker label="Datum der Konfirmation" v-model="myFuneral.confirmation_date"
                                                   name="confirmation_date"
                                                   :help="ageText(myFuneral.confirmation_date, myFuneral.dob, 'mit ', 'n')"/>
                                 <form-bible-reference-input label="Denkspruch" v-model="myFuneral.confirmation_text"
                                                             name="confirmation_text"/>
                             </accordion-element>
                             <accordion-element title="Heirat" icon="mdi mdi-ring">
-                                <form-textarea label="Ehepartner:in" v-model="funeral.spouse" name="spouse"/>
-                                <form-date-picker label="Heiratsdatum" v-model="funeral.wedding_date"
+                                <form-textarea label="Ehepartner:in" v-model="myFuneral.spouse" name="spouse"/>
+                                <form-date-picker label="Heiratsdatum" v-model="myFuneral.wedding_date"
                                                   name="wedding_date"
                                                   :help="myFuneral.wedding_date ? ageText(myFuneral.dod_spouse || myFuneral.dod, myFuneral.wedding_date, '', ' verheiratet') : ''"/>
                                 <form-bible-reference-input label="Trauspruch" v-model="myFuneral.wedding_text"
                                                             name="wedding_text"/>
-                                <form-date-picker label="Sterbedatum Ehepartner:in" v-model="funeral.dod_spouse"
+                                <form-date-picker label="Sterbedatum Ehepartner:in" v-model="myFuneral.dod_spouse"
                                                   name="dod_spouse"
                                                   :help="myFuneral.dod_spouse ? ageText(moment().format('DD.MM.YYYY'), myFuneral.dod_spouse, 'vor ', 'n') : ''"/>
                             </accordion-element>
                             <accordion-element title="Familie" icon="mdi mdi-human-male-female-child">
-                                <form-textarea label="Kinder" v-model="funeral.children" name="children"/>
-                                <form-textarea label="Weitere Hinterbliebene" v-model="funeral.further_family"
+                                <form-textarea label="Kinder" v-model="myFuneral.children" name="children"/>
+                                <form-textarea label="Weitere Hinterbliebene" v-model="myFuneral.further_family"
                                                name="further_family"/>
                             </accordion-element>
                         </accordion>
@@ -305,22 +300,22 @@
                         <hr/>
                     </div>
                     <div :class="showStoryEditor ? 'col-lg-4': 'col-md-6'">
-                        <form-textarea label="Kindheit, Jugend" v-model="funeral.childhood" name="childhood"/>
+                        <form-textarea label="Kindheit, Jugend" v-model="myFuneral.childhood" name="childhood"/>
                         <form-input label="Beruf" v-model="myFuneral.profession" name="profession"/>
-                        <form-textarea label="Ausbildung, Beruf" v-model="funeral.professional_life"
+                        <form-textarea label="Ausbildung, Beruf" v-model="myFuneral.professional_life"
                                        name="professional_life"/>
-                        <form-textarea label="Heirat, Familie" v-model="funeral.family" name="family"/>
-                        <form-textarea label="Weiterer Lebenslauf" v-model="funeral.further_life"
+                        <form-textarea label="Heirat, Familie" v-model="myFuneral.family" name="family"/>
+                        <form-textarea label="Weiterer Lebenslauf" v-model="myFuneral.further_life"
                                        name="further_life"/>
-                        <form-textarea label="Lebensende" v-model="funeral.death" name="death" :help="endOfLifeText"/>
+                        <form-textarea label="Lebensende" v-model="myFuneral.death" name="death" :help="endOfLifeText"/>
                         <hr/>
                         <form-textarea label="Prägende Erlebnisse, Hobbies, Interessen"
-                                       v-model="funeral.events" name="events"/>
-                        <form-textarea label="Charakter" v-model="funeral.character" name="character"/>
-                        <form-textarea label="Glaube, Frömmigkeit, Kirche" v-model="funeral.faith"
+                                       v-model="myFuneral.events" name="events"/>
+                        <form-textarea label="Charakter" v-model="myFuneral.character" name="character"/>
+                        <form-textarea label="Glaube, Frömmigkeit, Kirche" v-model="myFuneral.faith"
                                        name="faith"/>
                         <hr/>
-                        <form-textarea label="Zitate" v-model="funeral.quotes" name="quotes"/>
+                        <form-textarea label="Zitate" v-model="myFuneral.quotes" name="quotes"/>
                     </div>
                     <div v-if="showStoryEditor" class="col-lg-4">
                         <div class="form-group">
@@ -341,7 +336,7 @@
                                                 @input="insertText($event)"/>
                             </div>
                             <editor-content :editor="editorText" class="form-control tiptap-editor" />
-                            <text-stats :text="funeral.life"/>
+                            <text-stats :text="myFuneral.life"/>
                         </div>
 
                     </div>
@@ -367,6 +362,7 @@
 </template>
 
 <script>
+import { useForm } from '@inertiajs/vue3';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -399,6 +395,44 @@ import Accordion from "../../components/Ui/accordion/Accordion";
 import AccordionElement from "../../components/Ui/accordion/AccordionElement";
 import QuillDropdown from "../../components/LiturgyEditor/Editors/Quill/QuillDropdown.vue";
 
+
+function formatDateValue(value) {
+    if (!value) return value;
+    if ((typeof value === 'string') && moment(value, 'DD.MM.YYYY', true).isValid()) return value;
+    return moment(value).format('DD.MM.YYYY');
+}
+
+function formatDateTimeValue(value) {
+    if (!value) return value;
+    if ((typeof value === 'string') && moment(value, 'DD.MM.YYYY HH:mm', true).isValid()) return value;
+    return moment(value).format('DD.MM.YYYY HH:mm');
+}
+
+function formatFuneralForForm(funeral) {
+    const formData = __.cloneDeep(funeral);
+
+    formData.life = formData.life || '';
+    formData.attachments = formData.attachments || [];
+
+    [
+        'dob',
+        'dod',
+        'announcement',
+        'wake',
+        'dimissorial_requested',
+        'dimissorial_received',
+        'baptism_date',
+        'confirmation_date',
+        'wedding_date',
+        'dod_spouse',
+    ].forEach((key) => {
+        formData[key] = formatDateValue(formData[key]);
+    });
+
+    formData.appointment = formatDateTimeValue(formData.appointment);
+
+    return formData;
+}
 
 export default {
     name: "FuneralEditor",
@@ -470,20 +504,12 @@ export default {
             return sources;
         },
     },
-    created() {
-        if (this.myFuneral.dob) this.myFuneral.dob = moment(this.myFuneral.dob).format('DD.MM.YYYY');
-        if (this.myFuneral.dod) this.myFuneral.dod = moment(this.myFuneral.dod).format('DD.MM.YYYY');
-        if (this.myFuneral.announcement) this.myFuneral.announcement = moment(this.myFuneral.announcement).format('DD.MM.YYYY');
-        if (this.myFuneral.wake) this.myFuneral.wake = moment(this.myFuneral.wake).format('DD.MM.YYYY');
-        if (this.myFuneral.appointment) this.myFuneral.appointment = moment(this.myFuneral.appointment).format('DD.MM.YYYY HH:mm');
-    },
     mounted() {
         this.refreshKey++;
         this.$forceUpdate();
     },
     data() {
-        var myFuneral = this.funeral;
-        myFuneral.life = myFuneral.life || '';
+        const myFuneral = useForm(formatFuneralForForm(this.funeral));
 
         let ls = this.getLocalStorage();
         let inLocalStorage = (undefined !== ls.funerals[this.funeral.id]);
@@ -547,18 +573,35 @@ export default {
             this.appointmentPlaceCopied++;
             this.$forceUpdate();
         },
-        saveFuneral() {
-            let record = __.clone(this.myFuneral);
-            ['baptism_date', 'confirmation_date', 'wedding_date', 'dod_spouse'].forEach(key => {
-                if (record[key] && (record[key].length != 10)) record[key] = moment(record[key]).format('DD.MM.YYYY');
+        prepareFuneralForm() {
+            const record = __.cloneDeep(this.myFuneral.data());
+
+            [
+                'dob',
+                'dod',
+                'announcement',
+                'wake',
+                'dimissorial_requested',
+                'dimissorial_received',
+                'baptism_date',
+                'confirmation_date',
+                'wedding_date',
+                'dod_spouse',
+            ].forEach((key) => {
+                record[key] = formatDateValue(record[key]);
             });
-            this.$inertia.patch(route('funerals.update', {modelId: this.myFuneral.id}), record, {
-                preserveState: false,
+            record.appointment = formatDateTimeValue(record.appointment);
+
+            return record;
+        },
+        saveFuneral() {
+            this.myFuneral.transform(() => this.prepareFuneralForm()).patch(route('funerals.update', {modelId: this.myFuneral.id}), {
+                errorBag: 'updateFuneral',
             });
         },
         deleteFuneral() {
             if (!confirm('Willst du diese Beerdigung wirklich unwiderruflich löschen?')) return;
-            this.$inertia.delete(route('funerals.destroy', {modelId: this.myFuneral.id}), {
+            this.myFuneral.delete(route('funerals.destroy', {modelId: this.myFuneral.id}), {
                 preserveState: false,
             })
         },
@@ -604,7 +647,7 @@ export default {
             return prefix + String(date.diff(startDate, 'years')) + ' Jahre' + suffix;
         },
         downloadAsJson(exportObj, exportName) {
-            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.myFuneral));
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.myFuneral.data()));
             var downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
             downloadAnchorNode.setAttribute("download", exportName + ".json");
@@ -614,14 +657,22 @@ export default {
         },
         saveInLocalStorage() {
             let ls = this.getLocalStorage();
-            ls.funerals[this.myFuneral.id] = this.myFuneral;
+            ls.funerals[this.myFuneral.id] = this.myFuneral.data();
             localStorage.pfarrplaner = JSON.stringify(ls);
             this.inLocalStorage = true;
+        },
+        applyFormData(source) {
+            const restored = formatFuneralForForm(source);
+            Object.keys(restored).forEach((key) => {
+                this.myFuneral[key] = restored[key];
+            });
+            this.myFuneral.clearErrors();
+            this.editorText.commands.setContent(this.myFuneral.life || '', false);
         },
         loadFromLocalStorage() {
             let ls = this.getLocalStorage();
             if (ls.funerals[this.myFuneral.id]) {
-                this.myFuneral = ls.funerals[this.myFuneral.id];
+                this.applyFormData(ls.funerals[this.myFuneral.id]);
                 this.formKey++;
                 this.$forceUpdate();
                 this.deleteFromLocalStorage();

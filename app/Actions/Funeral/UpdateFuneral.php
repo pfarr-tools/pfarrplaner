@@ -46,13 +46,14 @@ class UpdateFuneral extends AbstractUpdateAction implements UpdatesFunerals
     {
         Gate::forUser($user)->authorize('update', $funeral);
 
-        $normalized = $this->normalizeInput($user, array_merge([
+        $input = $this->prepareInputForValidation(array_merge([
             'service_id' => $funeral->service_id,
             'buried_name' => $funeral->buried_name,
         ], $input));
-        $validated = Validator::make($normalized, Funeral::$validationRules)->validateWithBag('updateFuneral');
+        $this->authorizeServiceWriteAccess($user, $input['service_id'] ?? null);
+        $validated = Validator::make($input, Funeral::$validationRules)->validateWithBag('updateFuneral');
 
-        $funeral->update($validated);
+        $funeral->update($this->normalizeValidatedInput($validated));
         if ($funeral->service) {
             $funeral->service->setDefaultOfferingValues();
             $funeral->service->save();

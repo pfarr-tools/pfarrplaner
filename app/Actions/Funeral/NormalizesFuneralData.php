@@ -21,12 +21,10 @@ use Illuminate\Validation\ValidationException;
 trait NormalizesFuneralData
 {
     /**
-     * @param User $user
      * @param array $input
      * @return array
-     * @throws ValidationException
      */
-    protected function normalizeInput(User $user, array $input): array
+    protected function prepareInputForValidation(array $input): array
     {
         foreach ([
             'buried_address',
@@ -78,6 +76,32 @@ trait NormalizesFuneralData
         $input['needs_dimissorial'] ??= 0;
         $input['type'] = $input['type'] ?: 'Erdbestattung';
 
+        return $input;
+    }
+
+    /**
+     * @param User $user
+     * @param int|string|null $serviceId
+     * @return void
+     * @throws ValidationException
+     */
+    protected function authorizeServiceWriteAccess(User $user, int|string|null $serviceId): void
+    {
+        if (!empty($serviceId) && !$user->isAdmin) {
+            $service = Service::find($serviceId);
+            $allowed = $service && $user->writableCities->pluck('id')->contains((int)$service->city_id);
+            if (!$allowed) {
+                throw ValidationException::withMessages(['service_id' => 'Für diesen Gottesdienst fehlen Schreibrechte.']);
+            }
+        }
+    }
+
+    /**
+     * @param array $input
+     * @return array
+     */
+    protected function normalizeValidatedInput(array $input): array
+    {
         $input['wake'] = $this->parseDate($input['wake'] ?? null);
         $input['dob'] = $this->parseDate($input['dob'] ?? null);
         $input['dod'] = $this->parseDate($input['dod'] ?? null);
@@ -89,14 +113,6 @@ trait NormalizesFuneralData
         $input['confirmation_date'] = $this->parseDate($input['confirmation_date'] ?? null);
         $input['wedding_date'] = $this->parseDate($input['wedding_date'] ?? null);
         $input['dod_spouse'] = $this->parseDate($input['dod_spouse'] ?? null);
-
-        if (!empty($input['service_id']) && !$user->isAdmin) {
-            $service = Service::find($input['service_id']);
-            $allowed = $service && $user->writableCities->pluck('id')->contains((int)$service->city_id);
-            if (!$allowed) {
-                throw ValidationException::withMessages(['service_id' => 'Für diesen Gottesdienst fehlen Schreibrechte.']);
-            }
-        }
 
         return $input;
     }
