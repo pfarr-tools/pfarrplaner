@@ -19,6 +19,8 @@ const path = require('path');
 
 const packagePath = path.resolve(__dirname, '..', 'package.json');
 const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+const standardVersionConfig = pkg['standard-version'] || {};
+const tagPrefix = standardVersionConfig.tagPrefix || 'v';
 
 // Parse CLI args: positional "major|minor|patch" or --release-as <type>
 const args = process.argv.slice(2);
@@ -36,12 +38,24 @@ for (let i = 0; i < args.length; i++) {
 
 const currentYear = new Date().getFullYear();
 const versionMajor = parseInt(pkg.version.split('.')[0], 10);
-const releaseEnv = {
-    ...process.env,
-    PFARRPLANER_RELEASE_TYPE: '',
-};
 
 let releaseType;
+
+/**
+ * Stage the given paths if they exist in the working tree.
+ *
+ * @param {string[]} paths Paths to stage
+ * @return {void}
+ */
+function gitAddExisting(paths) {
+    const existingPaths = paths.filter((target) => fs.existsSync(path.resolve(__dirname, '..', target)));
+
+    if (existingPaths.length === 0) {
+        return;
+    }
+
+    execSync(`git add ${existingPaths.join(' ')}`, { stdio: 'inherit' });
+}
 
 if (forcedType) {
     releaseType = forcedType;
@@ -71,15 +85,45 @@ if (forcedType) {
     console.log(`Determined release type: ${releaseType}`);
 }
 
-releaseEnv.PFARRPLANER_RELEASE_TYPE = releaseType;
-
 try {
-    execSync(`npx standard-version --release-as ${releaseType} --commit-all`, { stdio: 'inherit', env: releaseEnv });
+    execSync(`npx standard-version --release-as ${releaseType} --skip.commit --skip.tag`, { stdio: 'inherit' });
 } catch (err) {
     process.exit(err.status ?? 1);
 }
 
 const newPkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+const releaseMessage = `chore(release): ${newPkg.version}`;
+
+if (releaseType === 'major' || releaseType === 'minor') {
+    console.log('Rebuilding and deploying manual...');
+    try {
+        execSync('npm run manual:all:server', { stdio: 'inherit' });
+        execSync('npm run manual:deploy', { stdio: 'inherit' });
+        gitAddExisting([
+            'manual/versionsangaben.md',
+            'manual/lizenzen.md',
+            'manual/media/images',
+            'manual/media/site',
+        ]);
+    } catch (err) {
+        console.error('Manual build/deploy failed.');
+        process.exit(err.status ?? 1);
+    }
+}
+
+try {
+    gitAddExisting([
+        'CHANGELOG.md',
+        'package.json',
+        'package-lock.json',
+        'npm-shrinkwrap.json',
+    ]);
+    execSync(`git commit -m "${releaseMessage}"`, { stdio: 'inherit' });
+    execSync(`git tag -a ${tagPrefix}${newPkg.version} -m "${releaseMessage}"`, { stdio: 'inherit' });
+} catch (err) {
+    process.exit(err.status ?? 1);
+}
+
 const dockerRepo = 'pfarrtools/pfarrplaner';
 const versionTag = `${dockerRepo}:${newPkg.version}`;
 console.log(`Building Docker image ${versionTag}...`);
