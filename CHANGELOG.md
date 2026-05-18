@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.11.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.0...v2026.11.2) (2026-05-18)
+
+
+### Bug Fixes
+
+* Backup speichert unnötige Dateien ([9294f21](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9294f216c0851ca9c8174cbd18b20bab92cdbc73))
+* Datumsvalidierung bei Taufen und Trauungen repariert. ([88b3984](https://codeberg.org/pfarr.tools/pfarrplaner/commit/88b3984dd0cd6f6ce0b37d50c4d199d7b631622b))
+* Datumsvalidierung im Beerdigungseditor repariert. ([9edea86](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9edea86dc40320a3301b2b49b0a6a2af96bdb4e5))
+* Formularwerte aus Multiselect-Feldern korrekt übermitteln. ([5f04ef7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5f04ef7a9e390181d39c8a2f6a1a1dbea120a47e))
+
 ### [2026.11.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.0...v2026.11.1) (2026-05-18)
 
 
