@@ -182,9 +182,13 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
 
     public function getFileTitle(): string
     {
+        if (!$this->service) {
+            return 'Volltext';
+        }
+
         return $this->service->titleText(
                 false
-            ) . (($this->service) && ($this->service->sermon) ? ' - ' . $this->service->sermon->title : '');
+            ) . ($this->service->sermon ? ' - ' . $this->service->sermon->title : '');
     }
 
     protected function renderFreetextItem(DefaultWordDocument $doc, Item $item)

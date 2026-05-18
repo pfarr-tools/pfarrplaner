@@ -90,7 +90,7 @@ class RitesScreenshotTest extends ManualScreenshotTestCase
                 800
             );
             $browser->type('input[placeholder="Name"]', 'Muster')
-                ->press('Suchen')
+                ->click('a[title="Suchen"]')
                 ->waitForText('Suchergebnisse', self::APP_RENDER_TIMEOUT_SECONDS);
             $this->captureCurrentManualScreenshot($browser, 'kasualien-uebersicht', 800);
         });

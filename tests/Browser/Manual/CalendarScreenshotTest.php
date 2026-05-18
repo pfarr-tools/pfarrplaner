@@ -132,7 +132,7 @@ class CalendarScreenshotTest extends ManualScreenshotTestCase
             $browser->script("document.querySelector('.modal-dialog .btn-secondary')?.click();");
 
             $browser->pause(300)
-                ->click('.nav-item.dropdown > .nav-link.dropdown-toggle');
+                ->click('#btnGroupDrop1');
             $browser->waitFor('.dropdown-menu.show', self::APP_RENDER_TIMEOUT_SECONDS);
             $this->captureCurrentManualElementScreenshot(
                 $browser,
@@ -155,7 +155,7 @@ class CalendarScreenshotTest extends ManualScreenshotTestCase
                 1500
             );
 
-            $browser->waitFor('.toastui-calendar-weekday-event', self::APP_RENDER_TIMEOUT_SECONDS);
+            $browser->waitFor('.event-card', self::APP_RENDER_TIMEOUT_SECONDS);
             $browser->script(<<<'JS'
                 document.body.classList.add('modal-open');
                 const modal = document.createElement('form');
