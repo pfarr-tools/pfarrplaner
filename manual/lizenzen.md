@@ -937,106 +937,96 @@ http://www.gnu.org/philosophy/why-not-lgpl.html.
 
 | Bereich | Paket | Version | Lizenz |
 |---|---|---|---|
-| Composer | almasaeed2010/adminlte | v3.2.0 | MIT |
 | Composer | aws/aws-crt-php | v1.2.7 | Apache-2.0 |
-| Composer | aws/aws-sdk-php | 3.351.7 | Apache-2.0 |
-| Composer | bacon/bacon-qr-code | 2.0.8 | BSD-2-Clause |
-| Composer | barryvdh/laravel-debugbar | v3.16.0 | MIT |
-| Composer | barryvdh/laravel-ide-helper | v3.6.0 | MIT |
-| Composer | barryvdh/reflection-docblock | v2.4.0 | MIT |
-| Composer | beyondcode/laravel-dump-server | 2.1.0 | MIT |
-| Composer | brick/math | 0.12.3 | MIT |
-| Composer | carbonphp/carbon-doctrine-types | 2.1.0 | MIT |
-| Composer | composer/class-map-generator | 1.6.1 | MIT |
+| Composer | aws/aws-sdk-php | 3.380.3 | Apache-2.0 |
+| Composer | barryvdh/laravel-ide-helper | v3.7.0 | MIT |
+| Composer | barryvdh/reflection-docblock | v2.4.1 | MIT |
+| Composer | brick/math | 0.14.8 | MIT |
+| Composer | carbonphp/carbon-doctrine-types | 3.2.0 | MIT |
+| Composer | composer/class-map-generator | 1.7.3 | MIT |
 | Composer | composer/pcre | 3.3.2 | MIT |
-| Composer | composer/semver | 3.4.3 | MIT |
-| Composer | dasprid/enum | 1.0.6 | BSD-2-Clause |
+| Composer | composer/semver | 3.4.4 | MIT |
 | Composer | dflydev/dot-access-data | v3.0.3 | MIT |
-| Composer | doctrine/collections | 2.3.0 | MIT |
-| Composer | doctrine/dbal | 3.10.0 | MIT |
-| Composer | doctrine/deprecations | 1.1.5 | MIT |
-| Composer | doctrine/event-manager | 2.0.1 | MIT |
-| Composer | doctrine/inflector | 2.0.10 | MIT |
+| Composer | doctrine/collections | 2.6.0 | MIT |
+| Composer | doctrine/deprecations | 1.1.6 | MIT |
+| Composer | doctrine/inflector | 2.1.0 | MIT |
 | Composer | doctrine/lexer | 3.0.1 | MIT |
-| Composer | dragonmantank/cron-expression | v3.4.0 | MIT |
+| Composer | dragonmantank/cron-expression | v3.6.0 | MIT |
 | Composer | egulias/email-validator | 4.0.4 | MIT |
-| Composer | ezyang/htmlpurifier | v4.18.0 | LGPL-2.1-or-later |
-| Composer | filp/whoops | 2.18.3 | MIT |
-| Composer | firebase/php-jwt | v6.11.1 | BSD-3-Clause |
-| Composer | fruitcake/php-cors | v1.3.0 | MIT |
-| Composer | fzaninotto/faker | dev-master 5ffe7db | MIT |
-| Composer | google/apiclient | v2.18.3 | Apache-2.0 |
-| Composer | google/apiclient-services | v0.404.0 | Apache-2.0 |
-| Composer | google/auth | v1.44.0 | Apache-2.0 |
-| Composer | google/protobuf | v4.31.1 | BSD-3-Clause |
-| Composer | graham-campbell/result-type | v1.1.3 | MIT |
-| Composer | guzzlehttp/guzzle | 7.9.3 | MIT |
-| Composer | guzzlehttp/promises | 2.2.0 | MIT |
-| Composer | guzzlehttp/psr7 | 2.7.1 | MIT |
-| Composer | guzzlehttp/uri-template | v1.0.4 | MIT |
+| Composer | fakerphp/faker | v1.24.1 | MIT |
+| Composer | filp/whoops | 2.18.4 | MIT |
+| Composer | firebase/php-jwt | v7.0.5 | BSD-3-Clause |
+| Composer | fruitcake/php-cors | v1.4.0 | MIT |
+| Composer | google/apiclient | v2.19.3 | Apache-2.0 |
+| Composer | google/apiclient-services | v0.441.0 | Apache-2.0 |
+| Composer | google/auth | v1.50.1 | Apache-2.0 |
+| Composer | google/protobuf | v5.34.1 | BSD-3-Clause |
+| Composer | graham-campbell/result-type | v1.1.4 | MIT |
+| Composer | guzzlehttp/guzzle | 7.10.0 | MIT |
+| Composer | guzzlehttp/promises | 2.3.0 | MIT |
+| Composer | guzzlehttp/psr7 | 2.9.0 | MIT |
+| Composer | guzzlehttp/uri-template | v1.0.5 | MIT |
 | Composer | hamcrest/hamcrest-php | v2.1.1 | BSD-3-Clause |
-| Composer | inertiajs/inertia-laravel | v1.3.3 | MIT |
-| Composer | jamesiarmes/php-ntlm | 1.0.0 | MIT |
-| Composer | laminas/laminas-diactoros | 3.6.0 | BSD-3-Clause |
-| Composer | laravel-lang/lang | 9.1.2 | MIT |
-| Composer | laravel/dusk | v8.3.3 | MIT |
-| Composer | laravel/framework | v11.45.1 | MIT |
-| Composer | laravel/legacy-factories | v1.4.1 | MIT |
-| Composer | laravel/octane | v2.12.0 | MIT |
-| Composer | laravel/prompts | v0.3.6 | MIT |
-| Composer | laravel/sanctum | v4.2.0 | MIT |
-| Composer | laravel/serializable-closure | v2.0.4 | MIT |
-| Composer | laravel/tinker | v2.10.1 | MIT |
-| Composer | laravel/ui | v4.6.1 | MIT |
-| Composer | league/commonmark | 2.7.1 | BSD-3-Clause |
+| Composer | inertiajs/inertia-laravel | v3.1.0 | MIT |
+| Composer | laminas/laminas-diactoros | 3.8.0 | BSD-3-Clause |
+| Composer | laravel/boost | v2.4.6 | MIT |
+| Composer | laravel/dusk | v8.6.0 | MIT |
+| Composer | laravel/framework | v13.8.0 | MIT |
+| Composer | laravel/legacy-factories | v1.4.2 | MIT |
+| Composer | laravel/mcp | v0.7.0 | MIT |
+| Composer | laravel/octane | v2.17.3 | MIT |
+| Composer | laravel/prompts | v0.3.17 | MIT |
+| Composer | laravel/roster | v0.5.1 | MIT |
+| Composer | laravel/sanctum | v4.3.2 | MIT |
+| Composer | laravel/sentinel | v1.1.0 | MIT |
+| Composer | laravel/serializable-closure | v2.0.13 | MIT |
+| Composer | laravel/telescope | v5.20.0 | MIT |
+| Composer | laravel/tinker | v3.0.2 | MIT |
+| Composer | laravel/ui | v4.6.3 | MIT |
+| Composer | league/commonmark | 2.8.2 | BSD-3-Clause |
 | Composer | league/config | v1.2.0 | BSD-3-Clause |
-| Composer | league/flysystem | 3.30.0 | MIT |
-| Composer | league/flysystem-aws-s3-v3 | 3.29.0 | MIT |
-| Composer | league/flysystem-local | 3.30.0 | MIT |
-| Composer | league/flysystem-sftp-v3 | 3.30.0 | MIT |
+| Composer | league/flysystem | 3.33.0 | MIT |
+| Composer | league/flysystem-aws-s3-v3 | 3.32.0 | MIT |
+| Composer | league/flysystem-local | 3.31.0 | MIT |
+| Composer | league/flysystem-sftp-v3 | 3.33.0 | MIT |
 | Composer | league/mime-type-detection | 1.16.0 | MIT |
-| Composer | league/uri | 7.5.1 | MIT |
-| Composer | league/uri-interfaces | 7.5.0 | MIT |
-| Composer | maennchen/zipstream-php | 3.2.0 | MIT |
+| Composer | league/uri | 7.8.1 | MIT |
+| Composer | league/uri-interfaces | 7.8.1 | MIT |
+| Composer | maennchen/zipstream-php | 3.2.2 | MIT |
 | Composer | markbaker/complex | 3.0.2 | MIT |
 | Composer | markbaker/matrix | 3.0.1 | MIT |
 | Composer | mockery/mockery | 1.6.12 | BSD-3-Clause |
-| Composer | monolog/monolog | 3.9.0 | MIT |
-| Composer | mpdf/mpdf | v8.2.5 | GPL-2.0-only |
-| Composer | mpdf/psr-http-message-shim | v2.0.1 | MIT |
-| Composer | mpdf/psr-log-aware-trait | v2.0.0 | MIT |
-| Composer | mpdf/qrcode | v1.2.1 | LGPL-2.1-or-later |
+| Composer | monolog/monolog | 3.10.0 | MIT |
 | Composer | mtdowling/jmespath.php | 2.8.0 | MIT |
-| Composer | myclabs/deep-copy | 1.13.3 | MIT |
-| Composer | nesbot/carbon | 3.10.1 | MIT |
-| Composer | nette/schema | v1.3.2 | BSD-3-Clause, GPL-2.0-only, GPL-3.0-only |
-| Composer | nette/utils | v4.0.7 | BSD-3-Clause, GPL-2.0-only, GPL-3.0-only |
-| Composer | nikic/php-parser | v5.5.0 | BSD-3-Clause |
-| Composer | niklasravnsborg/laravel-pdf | v4.1.0 | MIT |
-| Composer | nunomaduro/collision | v8.8.2 | MIT |
-| Composer | nunomaduro/termwind | v2.3.1 | MIT |
-| Composer | paragonie/constant_time_encoding | v3.0.0 | MIT |
+| Composer | myclabs/deep-copy | 1.13.4 | MIT |
+| Composer | nesbot/carbon | 3.11.4 | MIT |
+| Composer | nette/schema | v1.3.5 | BSD-3-Clause, GPL-2.0-only, GPL-3.0-only |
+| Composer | nette/utils | v4.1.4 | BSD-3-Clause, GPL-2.0-only, GPL-3.0-only |
+| Composer | nikic/php-parser | v5.7.0 | BSD-3-Clause |
+| Composer | nunomaduro/collision | v8.9.4 | MIT |
+| Composer | nunomaduro/termwind | v2.4.0 | MIT |
+| Composer | paragonie/constant_time_encoding | v3.1.3 | MIT |
 | Composer | paragonie/random_compat | v9.99.100 | MIT |
 | Composer | pclzip/pclzip | 2.8.2 | LGPL-2.1 |
+| Composer | peregrinus/bible-reference-parser | 1.0.2 | GPL-3.0-or-later |
 | Composer | phar-io/manifest | 2.0.4 | BSD-3-Clause |
 | Composer | phar-io/version | 3.2.1 | BSD-3-Clause |
-| Composer | php-debugbar/php-debugbar | v2.2.4 | MIT |
-| Composer | php-ews/php-ews | 1.0.0 | MIT |
-| Composer | php-webdriver/webdriver | 1.15.2 | MIT |
+| Composer | php-webdriver/webdriver | 1.16.0 | MIT |
 | Composer | phpoffice/common | 1.0.5 | LGPL-3.0-only |
 | Composer | phpoffice/math | 0.3.0 | MIT |
 | Composer | phpoffice/phppresentation | 1.2.0 | LGPL-3.0-only |
-| Composer | phpoffice/phpspreadsheet | 1.29.12 | MIT |
+| Composer | phpoffice/phpspreadsheet | 2.4.5 | MIT |
 | Composer | phpoffice/phpword | 1.4.0 | LGPL-3.0-only |
-| Composer | phpoption/phpoption | 1.9.3 | Apache-2.0 |
-| Composer | phpseclib/phpseclib | 3.0.46 | MIT |
-| Composer | phpunit/php-code-coverage | 11.0.10 | BSD-3-Clause |
-| Composer | phpunit/php-file-iterator | 5.1.0 | BSD-3-Clause |
-| Composer | phpunit/php-invoker | 5.0.1 | BSD-3-Clause |
-| Composer | phpunit/php-text-template | 4.0.1 | BSD-3-Clause |
-| Composer | phpunit/php-timer | 7.0.1 | BSD-3-Clause |
-| Composer | phpunit/phpunit | 11.5.27 | BSD-3-Clause |
-| Composer | predis/predis | v1.1.10 | MIT |
+| Composer | phpoption/phpoption | 1.9.5 | Apache-2.0 |
+| Composer | phpseclib/phpseclib | 3.0.52 | MIT |
+| Composer | phpstan/phpdoc-parser | 2.3.2 | MIT |
+| Composer | phpunit/php-code-coverage | 12.5.6 | BSD-3-Clause |
+| Composer | phpunit/php-file-iterator | 6.0.1 | BSD-3-Clause |
+| Composer | phpunit/php-invoker | 6.0.0 | BSD-3-Clause |
+| Composer | phpunit/php-text-template | 5.0.0 | BSD-3-Clause |
+| Composer | phpunit/php-timer | 8.0.0 | BSD-3-Clause |
+| Composer | phpunit/phpunit | 12.5.24 | BSD-3-Clause |
+| Composer | predis/predis | v2.4.1 | MIT |
 | Composer | psr/cache | 3.0.0 | MIT |
 | Composer | psr/clock | 1.0.0 | MIT |
 | Composer | psr/container | 2.0.2 | MIT |
@@ -1044,446 +1034,305 @@ http://www.gnu.org/philosophy/why-not-lgpl.html.
 | Composer | psr/http-client | 1.0.3 | MIT |
 | Composer | psr/http-factory | 1.1.0 | MIT |
 | Composer | psr/http-message | 2.0 | MIT |
-| Composer | psr/log | 2.0.0 | MIT |
+| Composer | psr/log | 3.0.2 | MIT |
 | Composer | psr/simple-cache | 3.0.0 | MIT |
-| Composer | psy/psysh | v0.12.9 | MIT |
+| Composer | psy/psysh | v0.12.22 | MIT |
+| Composer | radebatz/type-info-extras | 1.0.7 | MIT |
 | Composer | ralouphie/getallheaders | 3.0.3 | MIT |
 | Composer | ramsey/collection | 2.1.1 | MIT |
-| Composer | ramsey/uuid | 4.9.0 | MIT |
-| Composer | revolution/laravel-amazon-product-api | 4.9.1 | MIT |
-| Composer | roadrunner-php/roadrunner-api-dto | v1.12.0 | MIT |
+| Composer | ramsey/uuid | 4.9.2 | MIT |
+| Composer | roadrunner-php/roadrunner-api-dto | v1.14.1 | MIT |
 | Composer | sabre/dav | 4.7.0 | BSD-3-Clause |
-| Composer | sabre/event | 5.1.7 | BSD-3-Clause |
-| Composer | sabre/http | 5.1.12 | BSD-3-Clause |
+| Composer | sabre/event | 5.1.8 | BSD-3-Clause |
+| Composer | sabre/http | 5.1.13 | BSD-3-Clause |
 | Composer | sabre/uri | 2.3.4 | BSD-3-Clause |
-| Composer | sabre/vobject | 4.5.7 | BSD-3-Clause |
+| Composer | sabre/vobject | 4.5.8 | BSD-3-Clause |
 | Composer | sabre/xml | 2.2.11 | BSD-3-Clause |
-| Composer | sebastian/cli-parser | 3.0.2 | BSD-3-Clause |
-| Composer | sebastian/code-unit | 3.0.3 | BSD-3-Clause |
-| Composer | sebastian/code-unit-reverse-lookup | 4.0.1 | BSD-3-Clause |
-| Composer | sebastian/comparator | 6.3.1 | BSD-3-Clause |
-| Composer | sebastian/complexity | 4.0.1 | BSD-3-Clause |
-| Composer | sebastian/diff | 6.0.2 | BSD-3-Clause |
-| Composer | sebastian/environment | 7.2.1 | BSD-3-Clause |
-| Composer | sebastian/exporter | 6.3.0 | BSD-3-Clause |
-| Composer | sebastian/global-state | 7.0.2 | BSD-3-Clause |
-| Composer | sebastian/lines-of-code | 3.0.1 | BSD-3-Clause |
-| Composer | sebastian/object-enumerator | 6.0.1 | BSD-3-Clause |
-| Composer | sebastian/object-reflector | 4.0.1 | BSD-3-Clause |
-| Composer | sebastian/recursion-context | 6.0.2 | BSD-3-Clause |
-| Composer | sebastian/type | 5.1.2 | BSD-3-Clause |
-| Composer | sebastian/version | 5.0.2 | BSD-3-Clause |
-| Composer | setasign/fpdi | v2.6.3 | MIT |
-| Composer | simplesoftwareio/simple-qrcode | 4.2.0 | MIT |
+| Composer | sebastian/cli-parser | 4.2.0 | BSD-3-Clause |
+| Composer | sebastian/comparator | 7.1.6 | BSD-3-Clause |
+| Composer | sebastian/complexity | 5.0.0 | BSD-3-Clause |
+| Composer | sebastian/diff | 7.0.0 | BSD-3-Clause |
+| Composer | sebastian/environment | 8.1.0 | BSD-3-Clause |
+| Composer | sebastian/exporter | 7.0.2 | BSD-3-Clause |
+| Composer | sebastian/global-state | 8.0.2 | BSD-3-Clause |
+| Composer | sebastian/lines-of-code | 4.0.0 | BSD-3-Clause |
+| Composer | sebastian/object-enumerator | 7.0.0 | BSD-3-Clause |
+| Composer | sebastian/object-reflector | 5.0.0 | BSD-3-Clause |
+| Composer | sebastian/recursion-context | 7.0.1 | BSD-3-Clause |
+| Composer | sebastian/type | 6.0.3 | BSD-3-Clause |
+| Composer | sebastian/version | 6.0.0 | BSD-3-Clause |
 | Composer | simshaun/recurr | v5.0.3 | MIT |
-| Composer | spatie/backtrace | 1.7.4 | MIT |
-| Composer | spatie/db-dumper | 3.8.0 | MIT |
+| Composer | spatie/backtrace | 1.8.2 | MIT |
+| Composer | spatie/browsershot | 5.3.0 | MIT |
+| Composer | spatie/db-dumper | 4.1.1 | MIT |
 | Composer | spatie/error-solutions | 1.1.3 | MIT |
-| Composer | spatie/flare-client-php | 1.10.1 | MIT |
-| Composer | spatie/ignition | 1.15.1 | MIT |
-| Composer | spatie/laravel-backup | 8.8.2 | MIT |
-| Composer | spatie/laravel-ignition | 2.9.1 | MIT |
-| Composer | spatie/laravel-package-tools | 1.92.7 | MIT |
-| Composer | spatie/laravel-permission | 6.21.0 | MIT |
-| Composer | spatie/laravel-signal-aware-command | 2.1.0 | MIT |
-| Composer | spatie/temporary-directory | 2.3.0 | MIT |
-| Composer | spiral/core | 3.15.8 | MIT |
+| Composer | spatie/flare-client-php | 1.11.0 | MIT |
+| Composer | spatie/ignition | 1.16.0 | MIT |
+| Composer | spatie/laravel-backup | 10.2.1 | MIT |
+| Composer | spatie/laravel-ignition | 2.12.0 | MIT |
+| Composer | spatie/laravel-package-tools | 1.93.0 | MIT |
+| Composer | spatie/laravel-permission | 6.25.0 | MIT |
+| Composer | spatie/laravel-signal-aware-command | 2.1.2 | MIT |
+| Composer | spatie/temporary-directory | 2.3.1 | MIT |
+| Composer | spiral/core | 3.16.2 | MIT |
 | Composer | spiral/goridge | 4.2.1 | MIT |
-| Composer | spiral/hmvc | 3.15.8 | MIT |
-| Composer | spiral/interceptors | 3.15.8 | MIT |
-| Composer | spiral/logger | 3.15.8 | MIT |
-| Composer | spiral/roadrunner | v2025.1.2 | MIT |
-| Composer | spiral/roadrunner-cli | v2.7.1 | MIT |
-| Composer | spiral/roadrunner-http | v3.5.2 | MIT |
+| Composer | spiral/hmvc | 3.16.2 | MIT |
+| Composer | spiral/interceptors | 3.16.2 | MIT |
+| Composer | spiral/logger | 3.16.2 | MIT |
+| Composer | spiral/roadrunner | v2025.1.13 | MIT |
+| Composer | spiral/roadrunner-cli | v2.7.2 | MIT |
+| Composer | spiral/roadrunner-http | v4.1.0 | MIT |
 | Composer | spiral/roadrunner-worker | v3.6.2 | MIT |
-| Composer | spiral/security | 3.15.8 | MIT |
-| Composer | spiral/tokenizer | 3.15.8 | MIT |
+| Composer | spiral/security | 3.16.2 | MIT |
+| Composer | spiral/tokenizer | 3.16.2 | MIT |
 | Composer | staabm/side-effects-detector | 1.0.5 | MIT |
-| Composer | staudenmeir/belongs-to-through | v2.16.4 | MIT |
-| Composer | symfony/clock | v7.3.0 | MIT |
-| Composer | symfony/console | v7.3.1 | MIT |
-| Composer | symfony/css-selector | v7.3.0 | MIT |
-| Composer | symfony/debug | v4.4.44 | MIT |
-| Composer | symfony/deprecation-contracts | v3.6.0 | MIT |
-| Composer | symfony/error-handler | v7.3.1 | MIT |
-| Composer | symfony/event-dispatcher | v7.3.0 | MIT |
-| Composer | symfony/event-dispatcher-contracts | v3.6.0 | MIT |
-| Composer | symfony/finder | v7.3.0 | MIT |
-| Composer | symfony/http-client | v7.3.1 | MIT |
-| Composer | symfony/http-client-contracts | v3.6.0 | MIT |
-| Composer | symfony/http-foundation | v7.3.1 | MIT |
-| Composer | symfony/http-kernel | v7.3.1 | MIT |
-| Composer | symfony/mailer | v7.3.1 | MIT |
-| Composer | symfony/mime | v7.3.0 | MIT |
-| Composer | symfony/polyfill-ctype | v1.32.0 | MIT |
-| Composer | symfony/polyfill-intl-grapheme | v1.32.0 | MIT |
-| Composer | symfony/polyfill-intl-idn | v1.32.0 | MIT |
-| Composer | symfony/polyfill-intl-normalizer | v1.32.0 | MIT |
-| Composer | symfony/polyfill-mbstring | v1.32.0 | MIT |
-| Composer | symfony/polyfill-php80 | v1.32.0 | MIT |
-| Composer | symfony/polyfill-php83 | v1.32.0 | MIT |
-| Composer | symfony/polyfill-php84 | v1.32.0 | MIT |
-| Composer | symfony/polyfill-uuid | v1.32.0 | MIT |
-| Composer | symfony/process | v7.3.0 | MIT |
-| Composer | symfony/psr-http-message-bridge | v7.3.0 | MIT |
-| Composer | symfony/routing | v7.3.0 | MIT |
-| Composer | symfony/service-contracts | v3.6.0 | MIT |
-| Composer | symfony/string | v7.3.0 | MIT |
-| Composer | symfony/translation | v7.3.1 | MIT |
-| Composer | symfony/translation-contracts | v3.6.0 | MIT |
-| Composer | symfony/uid | v7.3.1 | MIT |
-| Composer | symfony/var-dumper | v7.3.1 | MIT |
-| Composer | symfony/yaml | v7.3.1 | MIT |
-| Composer | theseer/tokenizer | 1.2.3 | BSD-3-Clause |
-| Composer | thewirecutter/paapi5-php-sdk | v1.2.2 | Apache-2.0 |
-| Composer | thybag/php-sharepoint-lists-api | dev-master cb3479d | MIT |
+| Composer | staudenmeir/belongs-to-through | v2.18 | MIT |
+| Composer | symfony/clock | v8.0.8 | MIT |
+| Composer | symfony/console | v8.0.9 | MIT |
+| Composer | symfony/css-selector | v8.0.9 | MIT |
+| Composer | symfony/deprecation-contracts | v3.7.0 | MIT |
+| Composer | symfony/error-handler | v8.0.8 | MIT |
+| Composer | symfony/event-dispatcher | v8.0.9 | MIT |
+| Composer | symfony/event-dispatcher-contracts | v3.7.0 | MIT |
+| Composer | symfony/filesystem | v8.0.9 | MIT |
+| Composer | symfony/finder | v7.4.8 | MIT |
+| Composer | symfony/http-client | v8.0.9 | MIT |
+| Composer | symfony/http-client-contracts | v3.7.0 | MIT |
+| Composer | symfony/http-foundation | v8.0.8 | MIT |
+| Composer | symfony/http-kernel | v8.0.10 | MIT |
+| Composer | symfony/mailer | v8.0.8 | MIT |
+| Composer | symfony/mime | v8.0.9 | MIT |
+| Composer | symfony/polyfill-ctype | v1.37.0 | MIT |
+| Composer | symfony/polyfill-intl-grapheme | v1.37.0 | MIT |
+| Composer | symfony/polyfill-intl-idn | v1.37.0 | MIT |
+| Composer | symfony/polyfill-intl-normalizer | v1.37.0 | MIT |
+| Composer | symfony/polyfill-mbstring | v1.37.0 | MIT |
+| Composer | symfony/polyfill-php80 | v1.37.0 | MIT |
+| Composer | symfony/polyfill-php83 | v1.37.0 | MIT |
+| Composer | symfony/polyfill-php84 | v1.37.0 | MIT |
+| Composer | symfony/polyfill-php85 | v1.37.0 | MIT |
+| Composer | symfony/polyfill-php86 | v1.37.0 | MIT |
+| Composer | symfony/polyfill-uuid | v1.37.0 | MIT |
+| Composer | symfony/process | v8.0.8 | MIT |
+| Composer | symfony/psr-http-message-bridge | v8.0.8 | MIT |
+| Composer | symfony/routing | v8.0.9 | MIT |
+| Composer | symfony/service-contracts | v3.7.0 | MIT |
+| Composer | symfony/string | v8.0.8 | MIT |
+| Composer | symfony/translation | v8.0.10 | MIT |
+| Composer | symfony/translation-contracts | v3.7.0 | MIT |
+| Composer | symfony/type-info | v8.0.9 | MIT |
+| Composer | symfony/uid | v8.0.9 | MIT |
+| Composer | symfony/var-dumper | v8.0.8 | MIT |
+| Composer | symfony/yaml | v8.0.10 | MIT |
+| Composer | theseer/tokenizer | 2.0.1 | BSD-3-Clause |
 | Composer | tightenco/ziggy | v1.8.2 | MIT |
-| Composer | tijsverkoyen/css-to-inline-styles | v2.3.0 | BSD-3-Clause |
-| Composer | venturecraft/revisionable | 1.42.0 | MIT |
-| Composer | vlucas/phpdotenv | v5.6.2 | BSD-3-Clause |
-| Composer | voku/portable-ascii | 2.0.3 | MIT |
-| Composer | webmozart/assert | 1.11.0 | MIT |
+| Composer | tijsverkoyen/css-to-inline-styles | v2.4.0 | BSD-3-Clause |
+| Composer | vlucas/phpdotenv | v5.6.3 | BSD-3-Clause |
+| Composer | voku/portable-ascii | 2.1.1 | MIT |
+| Composer | zircote/swagger-php | 6.1.2 | Apache-2.0 |
 | npm | @ampproject/remapping@2.3.0 |  | Apache-2.0 |
-| npm | @babel/code-frame@7.27.1 |  | MIT |
-| npm | @babel/compat-data@7.28.0 |  | MIT |
-| npm | @babel/core@7.28.0 |  | MIT |
-| npm | @babel/generator@7.28.0 |  | MIT |
-| npm | @babel/helper-annotate-as-pure@7.27.3 |  | MIT |
-| npm | @babel/helper-compilation-targets@7.27.2 |  | MIT |
-| npm | @babel/helper-create-class-features-plugin@7.27.1 |  | MIT |
-| npm | @babel/helper-create-regexp-features-plugin@7.27.1 |  | MIT |
-| npm | @babel/helper-define-polyfill-provider@0.6.5 |  | MIT |
-| npm | @babel/helper-globals@7.28.0 |  | MIT |
-| npm | @babel/helper-member-expression-to-functions@7.27.1 |  | MIT |
-| npm | @babel/helper-module-imports@7.27.1 |  | MIT |
-| npm | @babel/helper-module-transforms@7.27.3 |  | MIT |
-| npm | @babel/helper-optimise-call-expression@7.27.1 |  | MIT |
-| npm | @babel/helper-plugin-utils@7.27.1 |  | MIT |
-| npm | @babel/helper-remap-async-to-generator@7.27.1 |  | MIT |
-| npm | @babel/helper-replace-supers@7.27.1 |  | MIT |
-| npm | @babel/helper-skip-transparent-expression-wrappers@7.27.1 |  | MIT |
+| npm | @asamuzakjp/css-color@3.2.0 |  | MIT |
+| npm | @babel/code-frame@7.29.0 |  | MIT |
 | npm | @babel/helper-string-parser@7.27.1 |  | MIT |
-| npm | @babel/helper-validator-identifier@7.27.1 |  | MIT |
-| npm | @babel/helper-validator-option@7.27.1 |  | MIT |
-| npm | @babel/helper-wrap-function@7.27.1 |  | MIT |
-| npm | @babel/helpers@7.28.2 |  | MIT |
-| npm | @babel/parser@7.28.0 |  | MIT |
-| npm | @babel/plugin-bugfix-firefox-class-in-computed-class-key@7.27.1 |  | MIT |
-| npm | @babel/plugin-bugfix-safari-class-field-initializer-scope@7.27.1 |  | MIT |
-| npm | @babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@7.27.1 |  | MIT |
-| npm | @babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining@7.27.1 |  | MIT |
-| npm | @babel/plugin-bugfix-v8-static-class-fields-redefine-readonly@7.27.1 |  | MIT |
-| npm | @babel/plugin-proposal-object-rest-spread@7.20.7 |  | MIT |
-| npm | @babel/plugin-proposal-private-property-in-object@7.21.0-placeholder-for-preset-env.2 |  | MIT |
-| npm | @babel/plugin-syntax-dynamic-import@7.8.3 |  | MIT |
-| npm | @babel/plugin-syntax-import-assertions@7.27.1 |  | MIT |
-| npm | @babel/plugin-syntax-import-attributes@7.27.1 |  | MIT |
-| npm | @babel/plugin-syntax-object-rest-spread@7.8.3 |  | MIT |
-| npm | @babel/plugin-syntax-unicode-sets-regex@7.18.6 |  | MIT |
-| npm | @babel/plugin-transform-arrow-functions@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-async-generator-functions@7.28.0 |  | MIT |
-| npm | @babel/plugin-transform-async-to-generator@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-block-scoped-functions@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-block-scoping@7.28.0 |  | MIT |
-| npm | @babel/plugin-transform-class-properties@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-class-static-block@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-classes@7.28.0 |  | MIT |
-| npm | @babel/plugin-transform-computed-properties@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-destructuring@7.28.0 |  | MIT |
-| npm | @babel/plugin-transform-dotall-regex@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-duplicate-keys@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-duplicate-named-capturing-groups-regex@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-dynamic-import@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-explicit-resource-management@7.28.0 |  | MIT |
-| npm | @babel/plugin-transform-exponentiation-operator@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-export-namespace-from@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-for-of@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-function-name@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-json-strings@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-literals@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-logical-assignment-operators@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-member-expression-literals@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-modules-amd@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-modules-commonjs@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-modules-systemjs@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-modules-umd@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-named-capturing-groups-regex@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-new-target@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-nullish-coalescing-operator@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-numeric-separator@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-object-rest-spread@7.28.0 |  | MIT |
-| npm | @babel/plugin-transform-object-super@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-optional-catch-binding@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-optional-chaining@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-parameters@7.27.7 |  | MIT |
-| npm | @babel/plugin-transform-private-methods@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-private-property-in-object@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-property-literals@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-regenerator@7.28.1 |  | MIT |
-| npm | @babel/plugin-transform-regexp-modifiers@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-reserved-words@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-runtime@7.28.0 |  | MIT |
-| npm | @babel/plugin-transform-shorthand-properties@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-spread@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-sticky-regex@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-template-literals@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-typeof-symbol@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-unicode-escapes@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-unicode-property-regex@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-unicode-regex@7.27.1 |  | MIT |
-| npm | @babel/plugin-transform-unicode-sets-regex@7.27.1 |  | MIT |
-| npm | @babel/preset-env@7.28.0 |  | MIT |
-| npm | @babel/preset-modules@0.1.6-no-external-plugins |  | MIT |
-| npm | @babel/runtime@7.28.2 |  | MIT |
-| npm | @babel/template@7.27.2 |  | MIT |
-| npm | @babel/traverse@7.28.0 |  | MIT |
-| npm | @babel/types@7.28.2 |  | MIT |
-| npm | @commitlint/cli@12.1.4 |  | MIT |
-| npm | @commitlint/config-conventional@12.1.4 |  | MIT |
-| npm | @commitlint/ensure@12.1.4 |  | MIT |
-| npm | @commitlint/execute-rule@12.1.4 |  | MIT |
-| npm | @commitlint/format@12.1.4 |  | MIT |
-| npm | @commitlint/is-ignored@12.1.4 |  | MIT |
-| npm | @commitlint/lint@12.1.4 |  | MIT |
-| npm | @commitlint/load@12.1.4 |  | MIT |
-| npm | @commitlint/message@12.1.4 |  | MIT |
-| npm | @commitlint/parse@12.1.4 |  | MIT |
-| npm | @commitlint/read@12.1.4 |  | MIT |
-| npm | @commitlint/resolve-extends@12.1.4 |  | MIT |
-| npm | @commitlint/rules@12.1.4 |  | MIT |
-| npm | @commitlint/to-lines@12.1.4 |  | MIT |
-| npm | @commitlint/top-level@12.1.4 |  | MIT |
-| npm | @commitlint/types@12.1.4 |  | MIT |
+| npm | @babel/helper-validator-identifier@7.28.5 |  | MIT |
+| npm | @babel/parser@7.29.2 |  | MIT |
+| npm | @babel/types@7.29.0 |  | MIT |
+| npm | @bcoe/v8-coverage@1.0.2 |  | MIT |
+| npm | @commitlint/cli@18.6.1 |  | MIT |
+| npm | @commitlint/config-conventional@18.6.3 |  | MIT |
+| npm | @commitlint/config-validator@18.6.1 |  | MIT |
+| npm | @commitlint/ensure@18.6.1 |  | MIT |
+| npm | @commitlint/execute-rule@18.6.1 |  | MIT |
+| npm | @commitlint/format@18.6.1 |  | MIT |
+| npm | @commitlint/is-ignored@18.6.1 |  | MIT |
+| npm | @commitlint/lint@18.6.1 |  | MIT |
+| npm | @commitlint/load@18.6.1 |  | MIT |
+| npm | @commitlint/message@18.6.1 |  | MIT |
+| npm | @commitlint/parse@18.6.1 |  | MIT |
+| npm | @commitlint/read@18.6.1 |  | MIT |
+| npm | @commitlint/resolve-extends@18.6.1 |  | MIT |
+| npm | @commitlint/rules@18.6.1 |  | MIT |
+| npm | @commitlint/to-lines@18.6.1 |  | MIT |
+| npm | @commitlint/top-level@18.6.1 |  | MIT |
+| npm | @commitlint/types@18.6.1 |  | MIT |
+| npm | @csstools/color-helpers@5.1.0 |  | MIT-0 |
+| npm | @csstools/css-calc@2.1.4 |  | MIT |
+| npm | @csstools/css-color-parser@3.1.0 |  | MIT |
+| npm | @csstools/css-parser-algorithms@3.0.5 |  | MIT |
+| npm | @csstools/css-tokenizer@3.0.4 |  | MIT |
+| npm | @date-fns/tz@1.4.1 |  | MIT |
+| npm | @esbuild/linux-x64@0.27.7 |  | MIT |
+| npm | @floating-ui/core@1.7.5 |  | MIT |
+| npm | @floating-ui/dom@1.7.6 |  | MIT |
+| npm | @floating-ui/utils@0.2.11 |  | MIT |
+| npm | @floating-ui/vue@1.1.11 |  | MIT |
 | npm | @hutson/parse-repository-url@3.0.2 |  | Apache-2.0 |
-| npm | @inertiajs/inertia-vue@0.4.3 |  | MIT |
-| npm | @inertiajs/inertia@0.7.0 |  | MIT |
-| npm | @inertiajs/progress@0.2.7 |  | MIT |
-| npm | @isneezy/vue-selectize@0.6.1 |  | MIT |
-| npm | @jamescoyle/vue-icon@0.1.2 |  | MIT |
-| npm | @jridgewell/gen-mapping@0.3.12 |  | MIT |
+| npm | @inertiajs/core@3.0.3 |  | MIT |
+| npm | @inertiajs/vite@3.0.3 |  | MIT |
+| npm | @inertiajs/vue3@3.0.3 |  | MIT |
+| npm | @isaacs/cliui@8.0.2 |  | ISC |
+| npm | @istanbuljs/schema@0.1.6 |  | MIT |
+| npm | @jridgewell/gen-mapping@0.3.13 |  | MIT |
 | npm | @jridgewell/resolve-uri@3.1.2 |  | MIT |
-| npm | @jridgewell/sourcemap-codec@1.5.4 |  | MIT |
-| npm | @jridgewell/trace-mapping@0.3.29 |  | MIT |
-| npm | @kassaila/vue-json-editor@0.4.0 |  | Apache-2.0 |
+| npm | @jridgewell/sourcemap-codec@1.5.5 |  | MIT |
+| npm | @jridgewell/trace-mapping@0.3.31 |  | MIT |
 | npm | @mdi/font@6.9.96 |  | Apache-2.0 |
 | npm | @mdi/js@7.4.47 |  | Apache-2.0 |
-| npm | @mrmlnc/readdir-enhanced@2.2.1 |  | MIT |
-| npm | @nodelib/fs.stat@1.1.3 |  | MIT |
-| npm | @parcel/watcher-linux-x64-glibc@2.5.1 |  | MIT |
-| npm | @parcel/watcher-linux-x64-musl@2.5.1 |  | MIT |
-| npm | @parcel/watcher@2.5.1 |  | MIT |
+| npm | @one-ini/wasm@0.1.1 |  | MIT |
+| npm | @oxc-project/types@0.127.0 |  | MIT |
+| npm | @parcel/watcher-linux-x64-glibc@2.5.6 |  | MIT |
+| npm | @parcel/watcher-linux-x64-musl@2.5.6 |  | MIT |
+| npm | @parcel/watcher@2.5.6 |  | MIT |
+| npm | @pfarr.tools/relative-date@1.0.0 |  | GPL-3.0-or-later |
+| npm | @pfarr.tools/romanize@1.0.0 |  | GPL-3.0-or-later |
+| npm | @pfarr.tools/slug@1.0.0 |  | GPL-3.0-or-later |
+| npm | @pkgjs/parseargs@0.11.0 |  | MIT |
 | npm | @popperjs/core@2.11.8 |  | MIT |
-| npm | @toast-ui/calendar@2.1.3 |  | MIT |
-| npm | @toast-ui/vue-calendar@2.1.3 |  | MIT |
-| npm | @tootallnate/once@2.0.0 |  | MIT |
-| npm | @types/dompurify@2.4.0 |  | MIT |
-| npm | @types/glob@7.2.0 |  | MIT |
-| npm | @types/json-schema@7.0.15 |  | MIT |
-| npm | @types/minimatch@5.1.2 |  | MIT |
+| npm | @puppeteer/browsers@2.13.0 |  | Apache-2.0 |
+| npm | @rolldown/binding-linux-x64-gnu@1.0.0-rc.17 |  | MIT |
+| npm | @rolldown/binding-linux-x64-musl@1.0.0-rc.17 |  | MIT |
+| npm | @rolldown/pluginutils@1.0.0-rc.13 |  | MIT |
+| npm | @rolldown/pluginutils@1.0.0-rc.17 |  | MIT |
+| npm | @rollup/rollup-linux-x64-gnu@4.60.2 |  | MIT |
+| npm | @rollup/rollup-linux-x64-musl@4.60.2 |  | MIT |
+| npm | @tiptap/core@3.22.4 |  | MIT |
+| npm | @tiptap/extension-blockquote@3.22.4 |  | MIT |
+| npm | @tiptap/extension-bold@3.22.4 |  | MIT |
+| npm | @tiptap/extension-bubble-menu@3.22.4 |  | MIT |
+| npm | @tiptap/extension-bullet-list@3.22.4 |  | MIT |
+| npm | @tiptap/extension-code-block@3.22.4 |  | MIT |
+| npm | @tiptap/extension-code@3.22.4 |  | MIT |
+| npm | @tiptap/extension-document@3.22.4 |  | MIT |
+| npm | @tiptap/extension-dropcursor@3.22.4 |  | MIT |
+| npm | @tiptap/extension-floating-menu@3.22.4 |  | MIT |
+| npm | @tiptap/extension-gapcursor@3.22.4 |  | MIT |
+| npm | @tiptap/extension-hard-break@3.22.4 |  | MIT |
+| npm | @tiptap/extension-heading@3.22.4 |  | MIT |
+| npm | @tiptap/extension-horizontal-rule@3.22.4 |  | MIT |
+| npm | @tiptap/extension-italic@3.22.4 |  | MIT |
+| npm | @tiptap/extension-link@3.22.4 |  | MIT |
+| npm | @tiptap/extension-list-item@3.22.4 |  | MIT |
+| npm | @tiptap/extension-list-keymap@3.22.4 |  | MIT |
+| npm | @tiptap/extension-list@3.22.4 |  | MIT |
+| npm | @tiptap/extension-ordered-list@3.22.4 |  | MIT |
+| npm | @tiptap/extension-paragraph@3.22.4 |  | MIT |
+| npm | @tiptap/extension-placeholder@3.22.4 |  | MIT |
+| npm | @tiptap/extension-strike@3.22.4 |  | MIT |
+| npm | @tiptap/extension-text@3.22.4 |  | MIT |
+| npm | @tiptap/extension-underline@3.22.4 |  | MIT |
+| npm | @tiptap/extensions@3.22.4 |  | MIT |
+| npm | @tiptap/pm@3.22.4 |  | MIT |
+| npm | @tiptap/starter-kit@3.22.4 |  | MIT |
+| npm | @tiptap/vue-3@3.22.4 |  | MIT |
+| npm | @tootallnate/quickjs-emscripten@0.23.0 |  | MIT |
+| npm | @types/chai@5.2.3 |  | MIT |
+| npm | @types/deep-eql@4.0.2 |  | MIT |
+| npm | @types/estree@1.0.8 |  | MIT |
 | npm | @types/minimist@1.2.5 |  | MIT |
-| npm | @types/node@24.1.0 |  | MIT |
+| npm | @types/node@25.6.0 |  | MIT |
 | npm | @types/normalize-package-data@2.4.4 |  | MIT |
-| npm | @types/parse-json@4.0.2 |  | MIT |
-| npm | @types/q@1.5.8 |  | MIT |
-| npm | @types/trusted-types@2.0.7 |  | MIT |
-| npm | @vue/compiler-sfc@2.7.16 |  | MIT* |
-| npm | @vue/component-compiler-utils@3.3.0 |  | MIT |
-| npm | @webassemblyjs/ast@1.9.0 |  | MIT |
-| npm | @webassemblyjs/floating-point-hex-parser@1.9.0 |  | MIT |
-| npm | @webassemblyjs/helper-api-error@1.9.0 |  | MIT |
-| npm | @webassemblyjs/helper-buffer@1.9.0 |  | MIT |
-| npm | @webassemblyjs/helper-code-frame@1.9.0 |  | MIT |
-| npm | @webassemblyjs/helper-fsm@1.9.0 |  | ISC |
-| npm | @webassemblyjs/helper-module-context@1.9.0 |  | MIT |
-| npm | @webassemblyjs/helper-wasm-bytecode@1.9.0 |  | MIT |
-| npm | @webassemblyjs/helper-wasm-section@1.9.0 |  | MIT |
-| npm | @webassemblyjs/ieee754@1.9.0 |  | MIT |
-| npm | @webassemblyjs/leb128@1.9.0 |  | MIT |
-| npm | @webassemblyjs/utf8@1.9.0 |  | MIT |
-| npm | @webassemblyjs/wasm-edit@1.9.0 |  | MIT |
-| npm | @webassemblyjs/wasm-gen@1.9.0 |  | MIT |
-| npm | @webassemblyjs/wasm-opt@1.9.0 |  | MIT |
-| npm | @webassemblyjs/wasm-parser@1.9.0 |  | MIT |
-| npm | @webassemblyjs/wast-parser@1.9.0 |  | MIT |
-| npm | @webassemblyjs/wast-printer@1.9.0 |  | MIT |
-| npm | @xtuc/ieee754@1.2.0 |  | BSD-3-Clause |
-| npm | @xtuc/long@4.2.2 |  | Apache-2.0 |
+| npm | @types/web-bluetooth@0.0.21 |  | MIT |
+| npm | @types/yauzl@2.10.3 |  | MIT |
+| npm | @vitejs/plugin-vue@6.0.6 |  | MIT |
+| npm | @vitest/coverage-v8@3.2.4 |  | MIT |
+| npm | @vitest/expect@3.2.4 |  | MIT |
+| npm | @vitest/mocker@3.2.4 |  | MIT |
+| npm | @vitest/pretty-format@3.2.4 |  | MIT |
+| npm | @vitest/runner@3.2.4 |  | MIT |
+| npm | @vitest/snapshot@3.2.4 |  | MIT |
+| npm | @vitest/spy@3.2.4 |  | MIT |
+| npm | @vitest/utils@3.2.4 |  | MIT |
+| npm | @vue/compiler-core@3.5.33 |  | MIT |
+| npm | @vue/compiler-dom@3.5.33 |  | MIT |
+| npm | @vue/compiler-sfc@3.5.33 |  | MIT |
+| npm | @vue/compiler-ssr@3.5.33 |  | MIT |
+| npm | @vue/reactivity@3.5.33 |  | MIT |
+| npm | @vue/runtime-core@3.5.33 |  | MIT |
+| npm | @vue/runtime-dom@3.5.33 |  | MIT |
+| npm | @vue/server-renderer@3.5.33 |  | MIT |
+| npm | @vue/shared@3.5.33 |  | MIT |
+| npm | @vue/test-utils@2.4.8 |  | MIT |
+| npm | @vueform/multiselect@2.6.11 |  | MIT |
+| npm | @vuepic/vue-datepicker@12.1.0 |  | MIT |
+| npm | @vueuse/core@14.2.1 |  | MIT |
+| npm | @vueuse/metadata@14.2.1 |  | MIT |
+| npm | @vueuse/shared@14.2.1 |  | MIT |
 | npm | JSONStream@1.3.5 |  | (MIT OR Apache-2.0) |
-| npm | abab@2.0.6 |  | BSD-3-Clause |
 | npm | abbrev@1.1.1 |  | ISC |
-| npm | abcjs@6.5.1 |  | MIT |
-| npm | accepts@1.3.8 |  | MIT |
-| npm | acorn-globals@7.0.1 |  | MIT |
-| npm | acorn-walk@8.3.4 |  | MIT |
-| npm | acorn@6.4.2 |  | MIT |
-| npm | acorn@8.15.0 |  | MIT |
+| npm | abbrev@2.0.0 |  | ISC |
+| npm | abcjs@6.6.3 |  | MIT |
 | npm | add-stream@1.0.0 |  | MIT |
-| npm | adjust-sourcemap-loader@1.2.0 |  | MIT |
-| npm | admin-lte@4.0.0-rc3 |  | MIT |
-| npm | agent-base@6.0.2 |  | MIT |
-| npm | ajv-errors@1.0.1 |  | MIT |
-| npm | ajv-keywords@3.5.2 |  | MIT |
-| npm | ajv@6.12.6 |  | MIT |
-| npm | alphanum-sort@1.0.2 |  | MIT |
-| npm | ansi-colors@3.2.4 |  | MIT |
-| npm | ansi-html-community@0.0.8 |  | Apache-2.0 |
-| npm | ansi-regex@2.1.1 |  | MIT |
-| npm | ansi-regex@3.0.1 |  | MIT |
-| npm | ansi-regex@4.1.1 |  | MIT |
+| npm | agent-base@7.1.4 |  | MIT |
+| npm | ajv@8.20.0 |  | MIT |
 | npm | ansi-regex@5.0.1 |  | MIT |
-| npm | ansi-styles@2.2.1 |  | MIT |
+| npm | ansi-regex@6.2.2 |  | MIT |
 | npm | ansi-styles@3.2.1 |  | MIT |
 | npm | ansi-styles@4.3.0 |  | MIT |
-| npm | ansicolors@0.2.1 |  | MIT |
-| npm | anymatch@2.0.0 |  | ISC |
-| npm | anymatch@3.1.3 |  | ISC |
-| npm | aproba@1.2.0 |  | ISC |
-| npm | argparse@1.0.10 |  | MIT |
-| npm | arr-diff@4.0.0 |  | MIT |
-| npm | arr-flatten@1.1.0 |  | MIT |
-| npm | arr-union@3.1.0 |  | MIT |
-| npm | array-buffer-byte-length@1.0.2 |  | MIT |
+| npm | ansi-styles@6.2.3 |  | MIT |
+| npm | argparse@2.0.1 |  | Python-2.0 |
 | npm | array-find-index@1.0.2 |  | MIT |
-| npm | array-flatten@1.1.1 |  | MIT |
-| npm | array-flatten@2.1.2 |  | MIT |
 | npm | array-ify@1.0.0 |  | MIT |
 | npm | array-slice@0.2.3 |  | MIT |
-| npm | array-union@1.0.2 |  | MIT |
-| npm | array-uniq@1.0.3 |  | MIT |
-| npm | array-unique@0.3.2 |  | MIT |
-| npm | array.prototype.reduce@1.0.8 |  | MIT |
-| npm | arraybuffer.prototype.slice@1.0.4 |  | MIT |
 | npm | arrify@1.0.1 |  | MIT |
 | npm | asap@2.0.6 |  | MIT |
-| npm | asn1.js@4.10.1 |  | MIT |
-| npm | assert@1.5.1 |  | MIT |
-| npm | assign-symbols@1.0.0 |  | MIT |
-| npm | ast-types@0.9.6 |  | MIT |
-| npm | async-each@1.0.6 |  | MIT |
-| npm | async-function@1.0.0 |  | MIT |
-| npm | async-limiter@1.0.1 |  | MIT |
-| npm | async@2.6.4 |  | MIT |
-| npm | async@3.2.6 |  | MIT |
+| npm | assertion-error@2.0.1 |  | MIT |
+| npm | ast-types@0.13.4 |  | MIT |
+| npm | ast-v8-to-istanbul@0.3.12 |  | MIT |
 | npm | asynckit@0.4.0 |  | MIT |
-| npm | at-least-node@1.0.0 |  | ISC |
-| npm | atob@2.1.2 |  | (MIT OR Apache-2.0) |
-| npm | autoprefixer@9.8.8 |  | MIT |
-| npm | available-typed-arrays@1.0.7 |  | MIT |
-| npm | axios@0.20.0 |  | MIT |
-| npm | axios@0.21.4 |  | MIT |
-| npm | babel-code-frame@6.26.0 |  | MIT |
-| npm | babel-loader@8.4.1 |  | MIT |
-| npm | babel-merge@2.0.1 |  | MIT |
-| npm | babel-plugin-polyfill-corejs2@0.4.14 |  | MIT |
-| npm | babel-plugin-polyfill-corejs3@0.13.0 |  | MIT |
-| npm | babel-plugin-polyfill-regenerator@0.6.5 |  | MIT |
-| npm | babel-runtime@6.26.0 |  | MIT |
+| npm | autoprefixer@10.5.0 |  | MIT |
+| npm | axios@1.15.2 |  | MIT |
+| npm | b4a@1.8.0 |  | Apache-2.0 |
 | npm | balanced-match@1.0.2 |  | MIT |
-| npm | base64-js@1.5.1 |  | MIT |
-| npm | base@0.11.2 |  | MIT |
-| npm | batch@0.6.1 |  | MIT |
-| npm | big.js@5.2.2 |  | MIT |
-| npm | binary-extensions@1.13.1 |  | MIT |
-| npm | binary-extensions@2.3.0 |  | MIT |
-| npm | bluebird@3.7.2 |  | MIT |
-| npm | bn.js@4.12.2 |  | MIT |
-| npm | bn.js@5.2.2 |  | MIT |
-| npm | body-parser@1.20.3 |  | MIT |
-| npm | bonjour@3.5.0 |  | MIT |
-| npm | boolbase@1.0.0 |  | ISC |
-| npm | bootstrap-datepicker@1.10.0 |  | Apache-2.0 |
-| npm | bootstrap@4.6.2 |  | MIT |
-| npm | bootstrap@5.3.7 |  | MIT |
-| npm | bootswatch@5.3.7 |  | MIT |
-| npm | brace-expansion@1.1.12 |  | MIT |
-| npm | braces@2.3.2 |  | MIT |
-| npm | braces@3.0.3 |  | MIT |
-| npm | brorand@1.1.0 |  | MIT |
-| npm | browserify-aes@1.2.0 |  | MIT |
-| npm | browserify-cipher@1.0.1 |  | MIT |
-| npm | browserify-des@1.0.2 |  | MIT |
-| npm | browserify-rsa@4.1.1 |  | MIT |
-| npm | browserify-sign@4.2.3 |  | ISC |
-| npm | browserify-zlib@0.2.0 |  | MIT |
-| npm | browserslist@4.25.1 |  | MIT |
+| npm | balanced-match@4.0.4 |  | MIT |
+| npm | bare-events@2.8.2 |  | Apache-2.0 |
+| npm | bare-fs@4.7.1 |  | Apache-2.0 |
+| npm | bare-os@3.9.0 |  | Apache-2.0 |
+| npm | bare-path@3.0.0 |  | Apache-2.0 |
+| npm | bare-stream@2.13.0 |  | Apache-2.0 |
+| npm | bare-url@2.4.2 |  | Apache-2.0 |
+| npm | baseline-browser-mapping@2.10.23 |  | Apache-2.0 |
+| npm | basic-ftp@5.3.1 |  | MIT |
+| npm | bootstrap@5.3.8 |  | MIT |
+| npm | bootswatch@5.3.8 |  | MIT |
+| npm | brace-expansion@1.1.14 |  | MIT |
+| npm | brace-expansion@2.1.0 |  | MIT |
+| npm | brace-expansion@5.0.5 |  | MIT |
+| npm | browserslist@4.28.2 |  | MIT |
+| npm | buffer-crc32@0.2.13 |  | MIT |
 | npm | buffer-from@1.1.2 |  | MIT |
-| npm | buffer-indexof@1.1.1 |  | MIT |
-| npm | buffer-xor@1.0.3 |  | MIT |
-| npm | buffer@4.9.2 |  | MIT |
-| npm | builtin-status-codes@3.0.0 |  | MIT |
-| npm | bytes@3.1.2 |  | MIT |
-| npm | cacache@12.0.4 |  | ISC |
-| npm | cache-base@1.0.1 |  | MIT |
+| npm | cac@6.7.14 |  | MIT |
 | npm | call-bind-apply-helpers@1.0.2 |  | MIT |
-| npm | call-bind@1.0.8 |  | MIT |
-| npm | call-bound@1.0.4 |  | MIT |
-| npm | call-me-maybe@1.0.2 |  | MIT |
-| npm | caller-callsite@2.0.0 |  | MIT |
-| npm | caller-path@2.0.0 |  | MIT |
-| npm | callsites@2.0.0 |  | MIT |
 | npm | callsites@3.1.0 |  | MIT |
-| npm | camel-case@3.0.0 |  | MIT |
 | npm | camelcase-keys@6.2.2 |  | MIT |
-| npm | camelcase@1.2.1 |  | MIT |
-| npm | camelcase@4.1.0 |  | MIT |
 | npm | camelcase@5.3.1 |  | MIT |
-| npm | caniuse-api@3.0.0 |  | MIT |
-| npm | caniuse-lite@1.0.30001727 |  | CC-BY-4.0 |
-| npm | cardinal@1.0.0 |  | MIT |
-| npm | chalk@1.1.3 |  | MIT |
+| npm | caniuse-lite@1.0.30001791 |  | CC-BY-4.0 |
+| npm | chai@5.3.3 |  | MIT |
 | npm | chalk@2.4.2 |  | MIT |
 | npm | chalk@4.1.2 |  | MIT |
-| npm | charenc@0.0.2 |  | BSD-3-Clause |
-| npm | chokidar@2.1.8 |  | MIT |
-| npm | chokidar@3.6.0 |  | MIT |
+| npm | check-error@2.1.3 |  | MIT |
 | npm | chokidar@4.0.3 |  | MIT |
-| npm | chownr@1.1.4 |  | ISC |
-| npm | chrome-trace-event@1.0.4 |  | MIT |
-| npm | cipher-base@1.0.6 |  | MIT |
-| npm | class-utils@0.3.6 |  | MIT |
+| npm | chromium-bidi@14.0.0 |  | Apache-2.0 |
 | npm | classnames@2.5.1 |  | MIT |
-| npm | clean-css@4.2.4 |  | MIT |
-| npm | cliui@4.1.0 |  | ISC |
-| npm | cliui@5.0.0 |  | ISC |
 | npm | cliui@7.0.4 |  | ISC |
-| npm | clone-deep@4.0.1 |  | MIT |
-| npm | clone@2.1.2 |  | MIT |
-| npm | coa@2.0.2 |  | MIT |
-| npm | code-point-at@1.1.0 |  | MIT |
-| npm | collect.js@4.36.1 |  | MIT |
-| npm | collection-visit@1.0.0 |  | MIT |
+| npm | cliui@8.0.1 |  | ISC |
 | npm | color-convert@0.5.3 |  | MIT* |
 | npm | color-convert@1.9.3 |  | MIT |
 | npm | color-convert@2.0.1 |  | MIT |
-| npm | color-fns@0.0.10 |  | MIT |
 | npm | color-name@1.1.3 |  | MIT |
 | npm | color-name@1.1.4 |  | MIT |
-| npm | color-string@1.9.1 |  | MIT |
-| npm | color@3.2.1 |  | MIT |
 | npm | combined-stream@1.0.8 |  | MIT |
-| npm | commander@2.17.1 |  | MIT |
-| npm | commander@2.19.0 |  | MIT |
-| npm | commander@2.20.3 |  | MIT |
-| npm | commondir@1.0.1 |  | MIT |
+| npm | commander@10.0.1 |  | MIT |
 | npm | compare-func@2.0.0 |  | MIT |
-| npm | component-emitter@1.3.1 |  | MIT |
-| npm | compressible@2.0.18 |  | MIT |
-| npm | compression@1.8.1 |  | MIT |
 | npm | concat-map@0.0.1 |  | MIT |
-| npm | concat-stream@1.6.2 |  | MIT |
 | npm | concat-stream@2.0.0 |  | MIT |
-| npm | concatenate@0.0.2 |  | MIT* |
-| npm | connect-history-api-fallback@1.6.0 |  | MIT |
-| npm | console-browserify@1.2.0 |  | MIT |
-| npm | consolidate@0.15.1 |  | MIT |
-| npm | constants-browserify@1.0.0 |  | MIT |
-| npm | content-disposition@0.5.4 |  | MIT |
-| npm | content-type@1.0.5 |  | MIT |
+| npm | config-chain@1.1.13 |  | MIT |
 | npm | conventional-changelog-angular@5.0.13 |  | ISC |
+| npm | conventional-changelog-angular@7.0.0 |  | ISC |
 | npm | conventional-changelog-atom@2.0.8 |  | ISC |
 | npm | conventional-changelog-codemirror@2.0.8 |  | ISC |
 | npm | conventional-changelog-config-spec@2.1.0 |  | MIT |
 | npm | conventional-changelog-conventionalcommits@4.6.3 |  | ISC |
+| npm | conventional-changelog-conventionalcommits@7.0.2 |  | ISC |
 | npm | conventional-changelog-core@4.2.4 |  | MIT |
 | npm | conventional-changelog-ember@2.0.9 |  | ISC |
 | npm | conventional-changelog-eslint@3.0.9 |  | ISC |
@@ -1495,573 +1344,268 @@ http://www.gnu.org/philosophy/why-not-lgpl.html.
 | npm | conventional-changelog@3.1.25 |  | MIT |
 | npm | conventional-commits-filter@2.0.7 |  | MIT |
 | npm | conventional-commits-parser@3.2.4 |  | MIT |
+| npm | conventional-commits-parser@5.0.0 |  | MIT |
 | npm | conventional-recommended-bump@6.1.0 |  | MIT |
-| npm | convert-source-map@0.3.5 |  | MIT |
-| npm | convert-source-map@1.9.0 |  | MIT |
-| npm | convert-source-map@2.0.0 |  | MIT |
-| npm | cookie-signature@1.0.6 |  | MIT |
-| npm | cookie@0.7.1 |  | MIT |
-| npm | copy-concurrently@1.0.5 |  | ISC |
 | npm | copy-descriptor@0.1.1 |  | MIT |
-| npm | core-js-compat@3.44.0 |  | MIT |
-| npm | core-js@2.6.12 |  | MIT |
-| npm | core-js@3.44.0 |  | MIT |
 | npm | core-util-is@1.0.3 |  | MIT |
-| npm | cosmiconfig@5.2.1 |  | MIT |
-| npm | cosmiconfig@7.1.0 |  | MIT |
-| npm | create-ecdh@4.0.4 |  | MIT |
-| npm | create-hash@1.1.3 |  | MIT |
-| npm | create-hash@1.2.0 |  | MIT |
-| npm | create-hmac@1.1.7 |  | MIT |
-| npm | cross-env@5.2.1 |  | MIT |
-| npm | cross-spawn@6.0.6 |  | MIT |
-| npm | crypt@0.0.2 |  | BSD-3-Clause |
-| npm | crypto-browserify@3.12.1 |  | MIT |
+| npm | cosmiconfig-typescript-loader@5.1.0 |  | MIT |
+| npm | cosmiconfig@8.3.6 |  | MIT |
+| npm | cosmiconfig@9.0.1 |  | MIT |
+| npm | cross-spawn@7.0.6 |  | MIT |
 | npm | css-color-converter@2.0.0 |  | MIT |
-| npm | css-color-names@0.0.4 |  | MIT |
-| npm | css-declaration-sorter@4.0.1 |  | MIT |
-| npm | css-loader@1.0.1 |  | MIT |
-| npm | css-select-base-adapter@0.1.1 |  | MIT |
-| npm | css-select@2.1.0 |  | BSD-2-Clause |
-| npm | css-selector-tokenizer@0.7.3 |  | MIT |
-| npm | css-tree@1.0.0-alpha.37 |  | MIT |
-| npm | css-tree@1.1.3 |  | MIT |
 | npm | css-unit-converter@1.1.2 |  | MIT |
-| npm | css-what@3.4.2 |  | BSD-2-Clause |
-| npm | css@2.2.4 |  | MIT |
-| npm | cssesc@3.0.0 |  | MIT |
-| npm | cssnano-preset-default@4.0.8 |  | MIT |
-| npm | cssnano-util-get-arguments@4.0.0 |  | MIT |
-| npm | cssnano-util-get-match@4.0.0 |  | MIT |
-| npm | cssnano-util-raw-cache@4.0.1 |  | MIT |
-| npm | cssnano-util-same-parent@4.0.1 |  | MIT |
-| npm | cssnano@4.1.11 |  | MIT |
-| npm | csso@4.2.0 |  | MIT |
-| npm | cssom@0.3.8 |  | MIT |
-| npm | cssom@0.5.0 |  | MIT |
-| npm | cssstyle@2.3.0 |  | MIT |
-| npm | csstype@3.1.3 |  | MIT |
-| npm | csv-parse@4.16.3 |  | MIT |
-| npm | cyclist@1.0.2 |  | MIT |
+| npm | cssstyle@4.6.0 |  | MIT |
+| npm | csstype@3.2.3 |  | MIT |
 | npm | dargs@7.0.0 |  | MIT |
-| npm | data-urls@3.0.2 |  | MIT |
-| npm | data-view-buffer@1.0.2 |  | MIT |
-| npm | data-view-byte-length@1.0.2 |  | MIT |
-| npm | data-view-byte-offset@1.0.1 |  | MIT |
+| npm | data-uri-to-buffer@6.0.2 |  | MIT |
+| npm | data-urls@5.0.0 |  | MIT |
+| npm | date-fns@4.1.0 |  | MIT |
 | npm | dateformat@3.0.3 |  | MIT |
-| npm | de-indent@1.0.2 |  | MIT |
+| npm | dayjs@1.11.20 |  | MIT |
 | npm | debounce@1.2.1 |  | MIT |
-| npm | debug@2.6.9 |  | MIT |
 | npm | debug@3.2.7 |  | MIT |
-| npm | debug@4.4.1 |  | MIT |
+| npm | debug@4.4.3 |  | MIT |
 | npm | debuglog@1.0.1 |  | MIT |
 | npm | decamelize-keys@1.1.1 |  | MIT |
 | npm | decamelize@1.2.0 |  | MIT |
 | npm | decimal.js@10.6.0 |  | MIT |
-| npm | decode-uri-component@0.2.2 |  | MIT |
 | npm | decompress-response@3.3.0 |  | MIT |
-| npm | deep-equal@1.1.2 |  | MIT |
-| npm | deepmerge@2.2.1 |  | MIT |
-| npm | deepmerge@4.3.1 |  | MIT |
-| npm | default-gateway@4.2.0 |  | BSD-2-Clause |
-| npm | define-data-property@1.1.4 |  | MIT |
-| npm | define-properties@1.2.1 |  | MIT |
+| npm | deep-eql@5.0.2 |  | MIT |
 | npm | define-property@0.2.5 |  | MIT |
-| npm | define-property@1.0.0 |  | MIT |
-| npm | define-property@2.0.2 |  | MIT |
-| npm | del@4.1.1 |  | MIT |
+| npm | degenerator@5.0.1 |  | MIT |
 | npm | delayed-stream@1.0.0 |  | MIT |
-| npm | depd@1.1.2 |  | MIT |
-| npm | depd@2.0.0 |  | MIT |
-| npm | des.js@1.1.0 |  | MIT |
-| npm | destroy@1.2.0 |  | MIT |
-| npm | detect-file@1.0.0 |  | MIT |
 | npm | detect-indent@6.1.0 |  | MIT |
-| npm | detect-libc@1.0.3 |  | Apache-2.0 |
+| npm | detect-libc@2.1.2 |  | Apache-2.0 |
 | npm | detect-newline@3.1.0 |  | MIT |
-| npm | detect-node@2.1.0 |  | MIT |
+| npm | devtools-protocol@0.0.1595872 |  | BSD-3-Clause |
 | npm | dezalgo@1.0.4 |  | ISC |
-| npm | diffie-hellman@5.0.3 |  | MIT |
-| npm | dir-glob@2.0.0 |  | MIT |
-| npm | dns-equal@1.0.0 |  | MIT |
-| npm | dns-packet@1.3.4 |  | MIT |
-| npm | dns-txt@2.0.2 |  | MIT |
-| npm | dom-serializer@0.2.2 |  | MIT |
-| npm | domain-browser@1.2.0 |  | MIT |
-| npm | domelementtype@1.3.1 |  | BSD-2-Clause |
-| npm | domelementtype@2.3.0 |  | BSD-2-Clause |
-| npm | domexception@4.0.0 |  | MIT |
-| npm | dompurify@2.5.8 |  | (MPL-2.0 OR Apache-2.0) |
-| npm | domutils@1.7.0 |  | BSD-2-Clause |
 | npm | dot-prop@5.3.0 |  | MIT |
-| npm | dotenv-expand@4.2.0 |  | BSD-2-Clause |
-| npm | dotenv@6.2.0 |  | BSD-2-Clause |
 | npm | dotgitignore@2.1.0 |  | ISC |
 | npm | dunder-proto@1.0.1 |  | MIT |
-| npm | duplexify@3.7.1 |  | MIT |
+| npm | eastasianwidth@0.2.0 |  | MIT |
 | npm | easy-bem@1.1.1 |  | MIT |
-| npm | ee-first@1.1.1 |  | MIT |
-| npm | electron-to-chromium@1.5.191 |  | ISC |
+| npm | editorconfig@1.0.7 |  | MIT |
+| npm | electron-to-chromium@1.5.344 |  | ISC |
 | npm | elkw-colors@1.0.0 |  | GPL-3.0-or-later |
-| npm | elliptic@6.6.1 |  | MIT |
-| npm | emoji-regex@7.0.3 |  | MIT |
 | npm | emoji-regex@8.0.0 |  | MIT |
-| npm | emojis-list@3.0.0 |  | MIT |
-| npm | encodeurl@1.0.2 |  | MIT |
-| npm | encodeurl@2.0.0 |  | MIT |
+| npm | emoji-regex@9.2.2 |  | MIT |
 | npm | end-of-stream@1.4.5 |  | MIT |
-| npm | enhanced-resolve@4.5.0 |  | MIT |
-| npm | entities@1.1.2 |  | BSD-2-Clause |
-| npm | entities@2.2.0 |  | BSD-2-Clause |
+| npm | entities@4.5.0 |  | BSD-2-Clause |
 | npm | entities@6.0.1 |  | BSD-2-Clause |
-| npm | errno@0.1.8 |  | MIT |
-| npm | error-ex@1.3.2 |  | MIT |
-| npm | error-stack-parser@2.1.4 |  | MIT |
-| npm | es-abstract@1.24.0 |  | MIT |
-| npm | es-array-method-boxes-properly@1.0.0 |  | MIT |
+| npm | entities@7.0.1 |  | BSD-2-Clause |
+| npm | env-paths@2.2.1 |  | MIT |
+| npm | error-ex@1.3.4 |  | MIT |
 | npm | es-define-property@1.0.1 |  | MIT |
 | npm | es-errors@1.3.0 |  | MIT |
+| npm | es-module-lexer@1.7.0 |  | MIT |
 | npm | es-object-atoms@1.1.1 |  | MIT |
 | npm | es-set-tostringtag@2.1.0 |  | MIT |
-| npm | es-to-primitive@1.3.0 |  | MIT |
-| npm | es6-templates@0.2.3 |  | Apache* |
+| npm | es-toolkit@1.46.0 |  | MIT |
+| npm | esbuild@0.27.7 |  | MIT |
 | npm | escalade@3.2.0 |  | MIT |
-| npm | escape-html@1.0.3 |  | MIT |
 | npm | escape-string-regexp@1.0.5 |  | MIT |
 | npm | escodegen@2.1.0 |  | BSD-2-Clause |
-| npm | eslint-scope@4.0.3 |  | BSD-2-Clause |
-| npm | esprima@3.0.0 |  | BSD-2-Clause |
-| npm | esprima@3.1.3 |  | BSD-2-Clause |
 | npm | esprima@4.0.1 |  | BSD-2-Clause |
-| npm | esrecurse@4.3.0 |  | BSD-2-Clause |
-| npm | estraverse@4.3.0 |  | BSD-2-Clause |
 | npm | estraverse@5.3.0 |  | BSD-2-Clause |
+| npm | estree-walker@2.0.2 |  | MIT |
+| npm | estree-walker@3.0.3 |  | MIT |
 | npm | esutils@2.0.3 |  | BSD-2-Clause |
-| npm | etag@1.8.1 |  | MIT |
-| npm | eventemitter3@2.0.3 |  | MIT |
-| npm | eventemitter3@4.0.7 |  | MIT |
-| npm | events@3.3.0 |  | MIT |
-| npm | eventsource@2.0.2 |  | MIT |
-| npm | evp_bytestokey@1.0.3 |  | MIT |
-| npm | execa@1.0.0 |  | MIT |
-| npm | expand-brackets@2.1.4 |  | MIT |
+| npm | events-universal@1.0.1 |  | Apache-2.0 |
+| npm | execa@5.1.1 |  | MIT |
 | npm | expand-range@1.8.2 |  | MIT |
-| npm | expand-tilde@2.0.2 |  | MIT |
-| npm | express@4.21.2 |  | MIT |
+| npm | expect-type@1.3.0 |  | Apache-2.0 |
 | npm | extend-shallow@2.0.1 |  | MIT |
-| npm | extend-shallow@3.0.2 |  | MIT |
-| npm | extend@3.0.2 |  | MIT |
-| npm | extglob@2.0.4 |  | MIT |
-| npm | extract-text-webpack-plugin@4.0.0-beta.0 |  | MIT |
+| npm | extract-zip@2.0.1 |  | BSD-2-Clause |
 | npm | fast-deep-equal@3.1.3 |  | MIT |
-| npm | fast-diff@1.1.2 |  | Apache-2.0 |
-| npm | fast-glob@2.2.7 |  | MIT |
-| npm | fast-json-stable-stringify@2.1.0 |  | MIT |
-| npm | fastparse@1.1.2 |  | MIT |
-| npm | faye-websocket@0.11.4 |  | Apache-2.0 |
-| npm | figgy-pudding@3.5.2 |  | ISC |
+| npm | fast-fifo@1.3.2 |  | MIT |
+| npm | fast-uri@3.1.2 |  | BSD-3-Clause |
+| npm | fd-slicer@1.1.0 |  | MIT |
+| npm | fdir@6.5.0 |  | MIT |
 | npm | figures@3.2.0 |  | MIT |
-| npm | file-loader@2.0.0 |  | MIT |
-| npm | file-type@10.11.0 |  | MIT |
 | npm | fill-range@2.2.4 |  | MIT |
-| npm | fill-range@4.0.0 |  | MIT |
-| npm | fill-range@7.1.1 |  | MIT |
-| npm | finalhandler@1.3.1 |  | MIT |
-| npm | find-cache-dir@2.1.0 |  | MIT |
-| npm | find-cache-dir@3.3.2 |  | MIT |
 | npm | find-up@2.1.0 |  | MIT |
 | npm | find-up@3.0.0 |  | MIT |
 | npm | find-up@4.1.0 |  | MIT |
 | npm | find-up@5.0.0 |  | MIT |
-| npm | findup-sync@3.0.0 |  | MIT |
-| npm | flush-write-stream@1.1.1 |  | MIT |
-| npm | follow-redirects@1.15.9 |  | MIT |
-| npm | for-each@0.3.5 |  | MIT |
+| npm | follow-redirects@1.16.0 |  | MIT |
 | npm | for-in@1.0.2 |  | MIT |
 | npm | for-own@0.1.5 |  | MIT |
-| npm | form-data@4.0.4 |  | MIT |
+| npm | foreground-child@3.3.1 |  | ISC |
+| npm | form-data@4.0.5 |  | MIT |
 | npm | format-people@0.1.4 |  | MIT |
-| npm | forwarded@0.2.0 |  | MIT |
-| npm | fragment-cache@0.2.1 |  | MIT |
-| npm | fresh@0.5.2 |  | MIT |
-| npm | friendly-errors-webpack-plugin@1.7.0 |  | MIT |
-| npm | from2@2.3.0 |  | MIT |
-| npm | fs-extra@7.0.1 |  | MIT |
-| npm | fs-extra@9.1.0 |  | MIT |
-| npm | fs-write-stream-atomic@1.0.10 |  | ISC |
+| npm | fraction.js@5.3.4 |  | MIT |
 | npm | fs.realpath@1.0.0 |  | ISC |
 | npm | function-bind@1.1.2 |  | MIT |
-| npm | function.prototype.name@1.1.8 |  | MIT |
-| npm | functions-have-names@1.2.3 |  | MIT |
-| npm | fuse.js@6.6.2 |  | Apache-2.0 |
-| npm | gensync@1.0.0-beta.2 |  | MIT |
-| npm | get-caller-file@1.0.3 |  | ISC |
 | npm | get-caller-file@2.0.5 |  | ISC |
 | npm | get-intrinsic@1.3.0 |  | MIT |
 | npm | get-pkg-repo@4.2.1 |  | MIT |
 | npm | get-proto@1.0.1 |  | MIT |
-| npm | get-stream@4.1.0 |  | MIT |
-| npm | get-symbol-description@1.1.0 |  | MIT |
-| npm | get-value@2.0.6 |  | MIT |
+| npm | get-stream@5.2.0 |  | MIT |
+| npm | get-stream@6.0.1 |  | MIT |
+| npm | get-uri@6.0.5 |  | MIT |
 | npm | git-raw-commits@2.0.11 |  | MIT |
 | npm | git-remote-origin-url@2.0.0 |  | MIT |
 | npm | git-semver-tags@4.1.1 |  | MIT |
 | npm | gitconfiglocal@1.0.0 |  | BSD* |
 | npm | github-base@0.5.4 |  | MIT |
 | npm | github-contributors@0.4.1 |  | MIT |
-| npm | glob-parent@3.1.0 |  | ISC |
-| npm | glob-parent@5.1.2 |  | ISC |
-| npm | glob-to-regexp@0.3.0 |  | BSD* |
+| npm | glob@10.5.0 |  | ISC |
 | npm | glob@7.2.3 |  | ISC |
 | npm | global-dirs@0.1.1 |  | MIT |
-| npm | global-modules@1.0.0 |  | MIT |
-| npm | global-modules@2.0.0 |  | MIT |
-| npm | global-prefix@1.0.2 |  | MIT |
-| npm | global-prefix@3.0.0 |  | MIT |
-| npm | globalthis@1.0.4 |  | MIT |
-| npm | globby@6.1.0 |  | MIT |
-| npm | globby@8.0.2 |  | MIT |
-| npm | globs@0.1.4 |  | MIT |
 | npm | gopd@1.2.0 |  | MIT |
 | npm | graceful-fs@4.2.11 |  | ISC |
-| npm | growly@1.3.0 |  | MIT |
-| npm | handle-thing@2.0.1 |  | MIT |
-| npm | handlebars@4.7.8 |  | MIT |
+| npm | handlebars@4.7.9 |  | MIT |
 | npm | hard-rejection@2.1.0 |  | MIT |
-| npm | has-ansi@2.0.0 |  | MIT |
-| npm | has-bigints@1.1.0 |  | MIT |
 | npm | has-flag@3.0.0 |  | MIT |
 | npm | has-flag@4.0.0 |  | MIT |
-| npm | has-property-descriptors@1.0.2 |  | MIT |
-| npm | has-proto@1.2.0 |  | MIT |
 | npm | has-symbols@1.1.0 |  | MIT |
 | npm | has-tostringtag@1.0.2 |  | MIT |
-| npm | has-value@0.3.1 |  | MIT |
-| npm | has-value@1.0.0 |  | MIT |
-| npm | has-values@0.1.4 |  | MIT |
-| npm | has-values@1.0.0 |  | MIT |
-| npm | has@1.0.4 |  | MIT |
-| npm | hash-base@2.0.2 |  | MIT |
-| npm | hash-base@3.0.5 |  | MIT |
-| npm | hash-sum@1.0.2 |  | MIT |
-| npm | hash.js@1.1.7 |  | MIT |
-| npm | hasown@2.0.2 |  | MIT |
-| npm | he@1.2.0 |  | MIT |
-| npm | hex-color-regex@1.1.0 |  | MIT |
-| npm | highlight.js@9.18.5 |  | BSD-3-Clause |
-| npm | hmac-drbg@1.0.1 |  | MIT |
-| npm | homedir-polyfill@1.0.3 |  | MIT |
+| npm | hasown@2.0.3 |  | MIT |
 | npm | hosted-git-info@2.8.9 |  | ISC |
 | npm | hosted-git-info@4.1.0 |  | ISC |
-| npm | hpack.js@2.1.6 |  | MIT |
-| npm | hsl-regex@1.0.0 |  | MIT |
-| npm | hsla-regex@1.0.0 |  | MIT |
-| npm | html-encoding-sniffer@3.0.0 |  | MIT |
-| npm | html-entities@1.4.0 |  | MIT |
-| npm | html-loader@0.5.5 |  | MIT |
-| npm | html-minifier@3.5.21 |  | MIT |
-| npm | http-deceiver@1.2.7 |  | MIT |
-| npm | http-errors@1.6.3 |  | MIT |
-| npm | http-errors@2.0.0 |  | MIT |
-| npm | http-parser-js@0.5.10 |  | MIT |
-| npm | http-proxy-agent@5.0.0 |  | MIT |
-| npm | http-proxy-middleware@0.19.1 |  | MIT |
-| npm | http-proxy@1.18.1 |  | MIT |
-| npm | https-browserify@1.0.0 |  | MIT |
-| npm | https-proxy-agent@5.0.1 |  | MIT |
-| npm | humanize@0.0.9 |  | MIT* |
+| npm | html-encoding-sniffer@4.0.0 |  | MIT |
+| npm | html-escaper@2.0.2 |  | MIT |
+| npm | http-proxy-agent@7.0.2 |  | MIT |
+| npm | https-proxy-agent@7.0.6 |  | MIT |
+| npm | human-signals@2.1.0 |  | Apache-2.0 |
 | npm | husky@6.0.0 |  | MIT |
-| npm | iconv-lite@0.4.24 |  | MIT |
 | npm | iconv-lite@0.6.3 |  | MIT |
-| npm | icss-replace-symbols@1.1.0 |  | ISC |
-| npm | icss-utils@2.1.0 |  | ISC |
-| npm | ieee754@1.2.1 |  | BSD-3-Clause |
-| npm | iferr@0.1.5 |  | MIT |
-| npm | ignore@3.3.10 |  | MIT |
-| npm | imagemin@6.1.0 |  | MIT |
-| npm | img-loader@3.0.2 |  | MIT |
-| npm | immer@9.0.21 |  | MIT |
-| npm | immutable@5.1.3 |  | MIT |
-| npm | import-cwd@2.1.0 |  | MIT |
-| npm | import-fresh@2.0.0 |  | MIT |
+| npm | immutable@5.1.5 |  | MIT |
 | npm | import-fresh@3.3.1 |  | MIT |
-| npm | import-from@2.1.0 |  | MIT |
-| npm | import-local@2.0.0 |  | MIT |
-| npm | imurmurhash@0.1.4 |  | MIT |
 | npm | indent-string@4.0.0 |  | MIT |
-| npm | indexes-of@1.0.1 |  | MIT |
-| npm | infer-owner@1.0.4 |  | ISC |
 | npm | inflight@1.0.6 |  | ISC |
-| npm | inherits@2.0.3 |  | ISC |
 | npm | inherits@2.0.4 |  | ISC |
 | npm | ini@1.3.8 |  | ISC |
-| npm | internal-ip@4.3.0 |  | MIT |
-| npm | internal-slot@1.1.0 |  | MIT |
-| npm | interpret@1.4.0 |  | MIT |
-| npm | invert-kv@2.0.0 |  | MIT |
-| npm | ip-regex@2.1.0 |  | MIT |
-| npm | ip@1.1.9 |  | MIT |
-| npm | ipaddr.js@1.9.1 |  | MIT |
-| npm | is-absolute-url@2.1.0 |  | MIT |
-| npm | is-absolute-url@3.0.3 |  | MIT |
+| npm | ip-address@10.2.0 |  | MIT |
 | npm | is-accessor-descriptor@1.0.1 |  | MIT |
-| npm | is-arguments@1.2.0 |  | MIT |
-| npm | is-array-buffer@3.0.5 |  | MIT |
 | npm | is-arrayish@0.2.1 |  | MIT |
-| npm | is-arrayish@0.3.2 |  | MIT |
-| npm | is-async-function@2.1.1 |  | MIT |
-| npm | is-bigint@1.1.0 |  | MIT |
-| npm | is-binary-path@1.0.1 |  | MIT |
-| npm | is-binary-path@2.1.0 |  | MIT |
-| npm | is-boolean-object@1.2.2 |  | MIT |
 | npm | is-buffer@1.1.6 |  | MIT |
-| npm | is-callable@1.2.7 |  | MIT |
-| npm | is-color-stop@1.1.0 |  | MIT |
 | npm | is-core-module@2.16.1 |  | MIT |
 | npm | is-data-descriptor@1.0.1 |  | MIT |
-| npm | is-data-view@1.0.2 |  | MIT |
-| npm | is-date-object@1.1.0 |  | MIT |
 | npm | is-descriptor@0.1.7 |  | MIT |
-| npm | is-descriptor@1.0.3 |  | MIT |
-| npm | is-directory@0.3.1 |  | MIT |
-| npm | is-docker@2.2.1 |  | MIT |
 | npm | is-extendable@0.1.1 |  | MIT |
 | npm | is-extendable@1.0.1 |  | MIT |
 | npm | is-extglob@2.1.1 |  | MIT |
-| npm | is-finalizationregistry@1.1.1 |  | MIT |
-| npm | is-fullwidth-code-point@1.0.0 |  | MIT |
-| npm | is-fullwidth-code-point@2.0.0 |  | MIT |
 | npm | is-fullwidth-code-point@3.0.0 |  | MIT |
-| npm | is-generator-function@1.1.0 |  | MIT |
-| npm | is-glob@3.1.0 |  | MIT |
 | npm | is-glob@4.0.3 |  | MIT |
-| npm | is-map@2.0.3 |  | MIT |
-| npm | is-negative-zero@2.0.3 |  | MIT |
-| npm | is-number-object@1.1.1 |  | MIT |
 | npm | is-number@2.1.0 |  | MIT |
-| npm | is-number@3.0.0 |  | MIT |
 | npm | is-number@4.0.0 |  | MIT |
-| npm | is-number@7.0.0 |  | MIT |
 | npm | is-obj@2.0.0 |  | MIT |
-| npm | is-path-cwd@2.2.0 |  | MIT |
-| npm | is-path-in-cwd@2.1.0 |  | MIT |
-| npm | is-path-inside@2.1.0 |  | MIT |
 | npm | is-plain-obj@1.1.0 |  | MIT |
 | npm | is-plain-object@2.0.4 |  | MIT |
 | npm | is-potential-custom-element-name@1.0.1 |  | MIT |
-| npm | is-regex@1.2.1 |  | MIT |
-| npm | is-resolvable@1.1.0 |  | ISC |
-| npm | is-set@2.0.3 |  | MIT |
-| npm | is-shared-array-buffer@1.0.4 |  | MIT |
-| npm | is-stream@1.1.0 |  | MIT |
-| npm | is-string@1.1.1 |  | MIT |
-| npm | is-symbol@1.1.1 |  | MIT |
+| npm | is-stream@2.0.1 |  | MIT |
 | npm | is-text-path@1.0.1 |  | MIT |
-| npm | is-typed-array@1.1.15 |  | MIT |
-| npm | is-weakmap@2.0.2 |  | MIT |
-| npm | is-weakref@1.1.1 |  | MIT |
-| npm | is-weakset@2.0.4 |  | MIT |
-| npm | is-windows@1.0.2 |  | MIT |
-| npm | is-wsl@1.1.0 |  | MIT |
-| npm | is-wsl@2.2.0 |  | MIT |
+| npm | is-text-path@2.0.0 |  | MIT |
 | npm | isarray@1.0.0 |  | MIT |
-| npm | isarray@2.0.5 |  | MIT |
 | npm | isexe@2.0.0 |  | ISC |
 | npm | isobject@2.1.0 |  | MIT |
 | npm | isobject@3.0.1 |  | MIT |
-| npm | isomorphic-dompurify@0.20.0 |  | MIT |
-| npm | jquery-ui@1.14.1 |  | MIT |
+| npm | istanbul-lib-coverage@3.2.2 |  | BSD-3-Clause |
+| npm | istanbul-lib-report@3.0.1 |  | BSD-3-Clause |
+| npm | istanbul-lib-source-maps@5.0.6 |  | BSD-3-Clause |
+| npm | istanbul-reports@3.2.0 |  | BSD-3-Clause |
+| npm | jackspeak@3.4.3 |  | BlueOak-1.0.0 |
+| npm | jiti@1.21.7 |  | MIT |
+| npm | jquery-ui@1.14.2 |  | MIT |
 | npm | jquery@3.5.0 |  | MIT |
-| npm | jquery@3.7.1 |  | MIT |
-| npm | js-tokens@3.0.2 |  | MIT |
+| npm | js-beautify@1.15.4 |  | MIT |
+| npm | js-cookie@3.0.5 |  | MIT |
+| npm | js-tokens@10.0.0 |  | MIT |
 | npm | js-tokens@4.0.0 |  | MIT |
-| npm | js-yaml@3.14.1 |  | MIT |
-| npm | jsdom@20.0.3 |  | MIT |
-| npm | jsesc@3.0.2 |  | MIT |
-| npm | jsesc@3.1.0 |  | MIT |
+| npm | js-tokens@9.0.1 |  | MIT |
+| npm | js-yaml@4.1.1 |  | MIT |
+| npm | jsdom@25.0.1 |  | MIT |
 | npm | json-parse-better-errors@1.0.2 |  | MIT |
 | npm | json-parse-even-better-errors@2.3.1 |  | MIT |
-| npm | json-schema-traverse@0.4.1 |  | MIT |
+| npm | json-schema-traverse@1.0.0 |  | MIT |
 | npm | json-stringify-safe@5.0.1 |  | ISC |
-| npm | json5@1.0.2 |  | MIT |
-| npm | json5@2.2.3 |  | MIT |
-| npm | jsonfile@4.0.0 |  | MIT |
-| npm | jsonfile@6.1.0 |  | MIT |
 | npm | jsonparse@1.3.1 |  | MIT |
-| npm | katex@0.6.0 |  | MIT |
-| npm | killable@1.0.1 |  | ISC |
 | npm | kind-of@3.2.2 |  | MIT |
-| npm | kind-of@4.0.0 |  | MIT |
 | npm | kind-of@6.0.3 |  | MIT |
-| npm | laravel-mix@4.1.4 |  | MIT |
-| npm | last-call-webpack-plugin@3.0.0 |  | MIT |
-| npm | lcid@2.0.0 |  | MIT |
+| npm | laravel-precognition@2.0.0 |  | MIT |
+| npm | laravel-vite-plugin@3.0.1 |  | MIT |
 | npm | license-checker@25.0.1 |  | BSD-3-Clause |
+| npm | lightningcss-linux-x64-gnu@1.32.0 |  | MPL-2.0 |
+| npm | lightningcss-linux-x64-musl@1.32.0 |  | MPL-2.0 |
+| npm | lightningcss@1.32.0 |  | MPL-2.0 |
 | npm | lines-and-columns@1.2.4 |  | MIT |
-| npm | linkify-it@1.2.4 |  | MIT |
+| npm | linkify-it@5.0.0 |  | MIT |
+| npm | linkifyjs@4.3.2 |  | MIT |
 | npm | list-item@1.1.1 |  | MIT |
 | npm | load-json-file@4.0.0 |  | MIT |
-| npm | loader-runner@2.4.0 |  | MIT |
-| npm | loader-utils@1.4.2 |  | MIT |
-| npm | loader-utils@2.0.4 |  | MIT |
 | npm | locate-path@2.0.0 |  | MIT |
 | npm | locate-path@3.0.0 |  | MIT |
 | npm | locate-path@5.0.0 |  | MIT |
 | npm | locate-path@6.0.0 |  | MIT |
-| npm | lodash._baseassign@3.2.0 |  | MIT |
-| npm | lodash._basecopy@3.0.1 |  | MIT |
-| npm | lodash._bindcallback@3.0.1 |  | MIT |
-| npm | lodash._createassigner@3.1.1 |  | MIT |
-| npm | lodash._getnative@3.9.1 |  | MIT |
-| npm | lodash._isiterateecall@3.0.9 |  | MIT |
-| npm | lodash.assign@3.2.0 |  | MIT |
-| npm | lodash.assign@4.2.0 |  | MIT |
-| npm | lodash.debounce@4.0.8 |  | MIT |
-| npm | lodash.defaults@3.1.2 |  | MIT |
-| npm | lodash.defaults@4.2.0 |  | MIT |
-| npm | lodash.difference@4.5.0 |  | MIT |
-| npm | lodash.isarguments@3.1.0 |  | MIT |
-| npm | lodash.isarray@3.0.4 |  | MIT |
+| npm | lodash.camelcase@4.3.0 |  | MIT |
+| npm | lodash.isfunction@3.0.9 |  | MIT |
 | npm | lodash.ismatch@4.4.0 |  | MIT |
-| npm | lodash.keys@3.1.2 |  | MIT |
-| npm | lodash.memoize@4.1.2 |  | MIT |
-| npm | lodash.restparam@3.6.1 |  | MIT |
+| npm | lodash.isplainobject@4.0.6 |  | MIT |
+| npm | lodash.kebabcase@4.1.1 |  | MIT |
+| npm | lodash.merge@4.6.2 |  | MIT |
+| npm | lodash.mergewith@4.6.2 |  | MIT |
+| npm | lodash.snakecase@4.1.1 |  | MIT |
+| npm | lodash.startcase@4.4.0 |  | MIT |
 | npm | lodash.uniq@4.5.0 |  | MIT |
-| npm | lodash@4.17.21 |  | MIT |
-| npm | loglevel@1.9.2 |  | MIT |
+| npm | lodash.upperfirst@4.3.1 |  | MIT |
+| npm | lodash@4.18.1 |  | MIT |
 | npm | longest-value@0.2.0 |  | MIT |
 | npm | longest@1.0.1 |  | MIT |
-| npm | lower-case@1.1.4 |  | MIT |
-| npm | lru-cache@4.1.5 |  | ISC |
-| npm | lru-cache@5.1.1 |  | ISC |
+| npm | loupe@3.2.1 |  | MIT |
+| npm | lru-cache@10.4.3 |  | ISC |
 | npm | lru-cache@6.0.0 |  | ISC |
+| npm | lru-cache@7.18.3 |  | ISC |
 | npm | luxon@2.5.2 |  | MIT |
-| npm | make-dir@1.3.0 |  | MIT |
-| npm | make-dir@2.1.0 |  | MIT |
-| npm | make-dir@3.1.0 |  | MIT |
-| npm | map-age-cleaner@0.1.3 |  | MIT |
-| npm | map-cache@0.2.2 |  | MIT |
+| npm | magic-string@0.30.21 |  | MIT |
+| npm | magicast@0.3.5 |  | MIT |
+| npm | make-dir@4.0.0 |  | MIT |
 | npm | map-obj@1.0.1 |  | MIT |
 | npm | map-obj@4.3.0 |  | MIT |
-| npm | map-visit@1.0.0 |  | MIT |
-| npm | markdown-it-abbr@1.0.4 |  | MIT |
-| npm | markdown-it-deflist@2.1.0 |  | MIT |
-| npm | markdown-it-emoji@1.4.0 |  | MIT |
-| npm | markdown-it-footnote@2.0.0 |  | MIT |
-| npm | markdown-it-ins@2.0.0 |  | MIT |
-| npm | markdown-it-katex@2.0.3 |  | MIT |
-| npm | markdown-it-mark@2.0.0 |  | MIT |
-| npm | markdown-it-sub@1.0.0 |  | MIT |
-| npm | markdown-it-sup@1.0.0 |  | MIT |
-| npm | markdown-it-task-lists@2.1.1 |  | ISC |
-| npm | markdown-it-toc-and-anchor@4.2.0 |  | MIT |
-| npm | markdown-it@6.1.1 |  | MIT |
+| npm | markdown-it@14.1.1 |  | MIT |
 | npm | markdown-utils@0.7.3 |  | MIT |
-| npm | match-at@0.1.1 |  | MIT* |
 | npm | math-intrinsics@1.1.0 |  | MIT |
 | npm | math-random@1.0.4 |  | MIT |
-| npm | md5.js@1.3.5 |  | MIT |
-| npm | md5@2.3.0 |  | BSD-3-Clause |
-| npm | mdn-data@2.0.14 |  | CC0-1.0 |
-| npm | mdn-data@2.0.4 |  | CC0-1.0 |
-| npm | mdurl@1.0.1 |  | MIT |
-| npm | media-typer@0.3.0 |  | MIT |
-| npm | mem@4.3.0 |  | MIT |
-| npm | memory-fs@0.4.1 |  | MIT |
-| npm | memory-fs@0.5.0 |  | MIT |
+| npm | mdurl@2.0.0 |  | MIT |
+| npm | meow@12.1.1 |  | MIT |
 | npm | meow@8.1.2 |  | MIT |
-| npm | merge-descriptors@1.0.3 |  | MIT |
-| npm | merge-source-map@1.1.0 |  | MIT |
-| npm | merge2@1.4.1 |  | MIT |
-| npm | methods@1.1.2 |  | MIT |
-| npm | micromatch@3.1.10 |  | MIT |
-| npm | micromatch@4.0.8 |  | MIT |
-| npm | microplugin@0.0.3 |  | Apache* |
-| npm | miller-rabin@4.0.1 |  | MIT |
+| npm | merge-stream@2.0.0 |  | MIT |
 | npm | mime-db@1.52.0 |  | MIT |
 | npm | mime-types@2.1.35 |  | MIT |
-| npm | mime@1.6.0 |  | MIT |
-| npm | mime@2.6.0 |  | MIT |
 | npm | mimic-fn@2.1.0 |  | MIT |
 | npm | mimic-response@1.0.1 |  | MIT |
 | npm | min-indent@1.0.1 |  | MIT |
-| npm | minimalistic-assert@1.0.1 |  | ISC |
-| npm | minimalistic-crypto-utils@1.0.1 |  | MIT |
-| npm | minimatch@3.1.2 |  | ISC |
+| npm | minimatch@10.2.5 |  | BlueOak-1.0.0 |
+| npm | minimatch@3.1.5 |  | ISC |
+| npm | minimatch@9.0.9 |  | ISC |
 | npm | minimist-options@4.1.0 |  | MIT |
-| npm | minimist@0.0.10 |  | MIT |
 | npm | minimist@1.2.8 |  | MIT |
-| npm | mississippi@3.0.0 |  | BSD-2-Clause |
+| npm | minipass@7.1.3 |  | BlueOak-1.0.0 |
+| npm | mitt@3.0.1 |  | MIT |
 | npm | mixin-deep@1.3.2 |  | MIT |
 | npm | mkdirp@0.5.6 |  | MIT |
 | npm | modify-values@1.0.1 |  | MIT |
-| npm | moment-locales-webpack-plugin@1.2.0 |  | MIT |
-| npm | moment-timezone@0.4.1 |  | MIT |
-| npm | moment-timezone@0.5.48 |  | MIT |
-| npm | moment@2.29.4 |  | MIT |
-| npm | moment@2.30.1 |  | MIT |
-| npm | momentjs@2.0.0 |  | UNKNOWN |
-| npm | move-concurrently@1.0.1 |  | ISC |
-| npm | ms@2.0.0 |  | MIT |
 | npm | ms@2.1.3 |  | MIT |
-| npm | multicast-dns-service-types@1.1.0 |  | MIT |
-| npm | multicast-dns@6.2.3 |  | MIT |
 | npm | nanoid@3.3.11 |  | MIT |
-| npm | nanomatch@1.2.13 |  | MIT |
-| npm | negotiator@0.6.3 |  | MIT |
-| npm | negotiator@0.6.4 |  | MIT |
 | npm | neo-async@2.6.2 |  | MIT |
-| npm | nice-try@1.0.5 |  | MIT |
-| npm | no-case@2.3.2 |  | MIT |
+| npm | netmask@2.1.1 |  | MIT |
 | npm | node-addon-api@7.1.1 |  | MIT |
-| npm | node-forge@0.10.0 |  | (BSD-3-Clause OR GPL-2.0) |
-| npm | node-libs-browser@2.2.1 |  | MIT |
-| npm | node-notifier@9.0.1 |  | MIT |
-| npm | node-releases@2.0.19 |  | MIT |
+| npm | node-releases@2.0.38 |  | MIT |
 | npm | nopt@4.0.3 |  | ISC |
+| npm | nopt@7.2.1 |  | ISC |
 | npm | normalize-package-data@2.5.0 |  | BSD-2-Clause |
 | npm | normalize-package-data@3.0.3 |  | BSD-2-Clause |
-| npm | normalize-path@2.1.1 |  | MIT |
-| npm | normalize-path@3.0.0 |  | MIT |
-| npm | normalize-range@0.1.2 |  | MIT |
-| npm | normalize-url@3.3.0 |  | MIT |
 | npm | npm-normalize-package-bin@1.0.1 |  | ISC |
-| npm | npm-run-path@2.0.2 |  | MIT |
-| npm | nprogress@0.2.0 |  | MIT |
-| npm | nth-check@1.0.2 |  | BSD-2-Clause |
-| npm | num2fraction@1.2.2 |  | MIT |
-| npm | number-is-nan@1.0.1 |  | MIT |
-| npm | nwsapi@2.2.21 |  | MIT |
-| npm | object-assign@4.1.1 |  | MIT |
+| npm | npm-run-path@4.0.1 |  | MIT |
+| npm | nwsapi@2.2.23 |  | MIT |
 | npm | object-copy@0.1.0 |  | MIT |
-| npm | object-inspect@1.13.4 |  | MIT |
-| npm | object-is@1.1.6 |  | MIT |
-| npm | object-keys@1.1.1 |  | MIT |
-| npm | object-path@0.9.2 |  | MIT |
-| npm | object-visit@1.0.1 |  | MIT |
-| npm | object.assign@4.1.7 |  | MIT |
-| npm | object.getownpropertydescriptors@2.1.8 |  | MIT |
 | npm | object.omit@2.0.1 |  | MIT |
-| npm | object.omit@3.0.0 |  | MIT |
-| npm | object.pick@1.3.0 |  | MIT |
-| npm | object.values@1.2.1 |  | MIT |
-| npm | obuf@1.1.2 |  | MIT |
-| npm | on-finished@2.4.1 |  | MIT |
-| npm | on-headers@1.1.0 |  | MIT |
 | npm | once@1.4.0 |  | ISC |
-| npm | opencollective-postinstall@2.0.3 |  | MIT |
-| npm | opn@5.5.0 |  | MIT |
-| npm | optimist@0.6.1 |  | MIT* |
-| npm | optimize-css-assets-webpack-plugin@5.0.8 |  | MIT |
-| npm | os-browserify@0.3.0 |  | MIT |
+| npm | onetime@5.1.2 |  | MIT |
+| npm | orderedmap@2.1.1 |  | MIT |
 | npm | os-homedir@1.0.2 |  | MIT |
-| npm | os-locale@3.1.0 |  | MIT |
 | npm | os-tmpdir@1.0.2 |  | MIT |
 | npm | osenv@0.1.5 |  | ISC |
-| npm | own-keys@1.0.1 |  | MIT |
-| npm | p-defer@1.0.0 |  | MIT |
-| npm | p-finally@1.0.0 |  | MIT |
-| npm | p-is-promise@2.1.0 |  | MIT |
 | npm | p-limit@1.3.0 |  | MIT |
 | npm | p-limit@2.3.0 |  | MIT |
 | npm | p-limit@3.1.0 |  | MIT |
@@ -2069,123 +1613,61 @@ http://www.gnu.org/philosophy/why-not-lgpl.html.
 | npm | p-locate@3.0.0 |  | MIT |
 | npm | p-locate@4.1.0 |  | MIT |
 | npm | p-locate@5.0.0 |  | MIT |
-| npm | p-map@2.1.0 |  | MIT |
-| npm | p-pipe@1.2.0 |  | MIT |
-| npm | p-retry@3.0.1 |  | MIT |
 | npm | p-try@1.0.0 |  | MIT |
 | npm | p-try@2.2.0 |  | MIT |
+| npm | pac-proxy-agent@7.2.0 |  | MIT |
+| npm | pac-resolver@7.0.1 |  | MIT |
+| npm | package-json-from-dist@1.0.1 |  | BlueOak-1.0.0 |
 | npm | pad-right@0.2.2 |  | MIT |
-| npm | pako@1.0.11 |  | (MIT AND Zlib) |
-| npm | parallel-transform@1.2.0 |  | MIT |
-| npm | param-case@2.1.1 |  | MIT |
-| npm | parchment@1.1.4 |  | BSD-3-Clause |
 | npm | parent-module@1.0.1 |  | MIT |
-| npm | parse-asn1@5.1.7 |  | ISC |
 | npm | parse-json@4.0.0 |  | MIT |
 | npm | parse-json@5.2.0 |  | MIT |
-| npm | parse-link-header@0.4.1 |  | MIT |
-| npm | parse-passwd@1.0.0 |  | MIT |
+| npm | parse-link-header@2.0.0 |  | MIT |
 | npm | parse5@7.3.0 |  | MIT |
-| npm | parseurl@1.3.3 |  | MIT |
-| npm | pascalcase@0.1.1 |  | MIT |
-| npm | path-browserify@0.0.1 |  | MIT |
-| npm | path-dirname@1.0.2 |  | MIT |
 | npm | path-exists@3.0.0 |  | MIT |
 | npm | path-exists@4.0.0 |  | MIT |
 | npm | path-is-absolute@1.0.1 |  | MIT |
-| npm | path-is-inside@1.0.2 |  | (WTFPL OR MIT) |
-| npm | path-key@2.0.1 |  | MIT |
+| npm | path-key@3.1.1 |  | MIT |
 | npm | path-parse@1.0.7 |  | MIT |
-| npm | path-to-regexp@0.1.12 |  | MIT |
+| npm | path-scurry@1.11.1 |  | BlueOak-1.0.0 |
 | npm | path-type@3.0.0 |  | MIT |
 | npm | path-type@4.0.0 |  | MIT |
-| npm | pbkdf2@3.1.3 |  | MIT |
-| npm | pc-bootstrap4-datetimepicker@4.17.51 |  | MIT |
-| npm | picocolors@0.2.1 |  | ISC |
+| npm | pathe@2.0.3 |  | MIT |
+| npm | pathval@2.0.1 |  | MIT |
+| npm | pend@1.2.0 |  | MIT |
 | npm | picocolors@1.1.1 |  | ISC |
-| npm | picomatch@2.3.1 |  | MIT |
+| npm | picomatch@2.3.2 |  | MIT |
+| npm | picomatch@4.0.4 |  | MIT |
 | npm | pify@2.3.0 |  | MIT |
 | npm | pify@3.0.0 |  | MIT |
-| npm | pify@4.0.1 |  | MIT |
-| npm | pinkie-promise@2.0.1 |  | MIT |
-| npm | pinkie@2.0.4 |  | MIT |
-| npm | pkg-dir@3.0.0 |  | MIT |
-| npm | pkg-dir@4.2.0 |  | MIT |
-| npm | popper.js@1.16.1 |  | MIT |
-| npm | portfinder@1.0.37 |  | MIT |
-| npm | posix-character-classes@0.1.1 |  | MIT |
-| npm | possible-typed-array-names@1.1.0 |  | MIT |
-| npm | postcss-calc@7.0.5 |  | MIT |
-| npm | postcss-colormin@4.0.3 |  | MIT |
-| npm | postcss-convert-values@4.0.1 |  | MIT |
-| npm | postcss-discard-comments@4.0.2 |  | MIT |
-| npm | postcss-discard-duplicates@4.0.2 |  | MIT |
-| npm | postcss-discard-empty@4.0.1 |  | MIT |
-| npm | postcss-discard-overridden@4.0.1 |  | MIT |
-| npm | postcss-load-config@2.1.2 |  | MIT |
-| npm | postcss-loader@3.0.0 |  | MIT |
-| npm | postcss-merge-longhand@4.0.11 |  | MIT |
-| npm | postcss-merge-rules@4.0.3 |  | MIT |
-| npm | postcss-minify-font-values@4.0.2 |  | MIT |
-| npm | postcss-minify-gradients@4.0.2 |  | MIT |
-| npm | postcss-minify-params@4.0.2 |  | MIT |
-| npm | postcss-minify-selectors@4.0.2 |  | MIT |
-| npm | postcss-modules-extract-imports@1.2.1 |  | ISC |
-| npm | postcss-modules-local-by-default@1.2.0 |  | MIT |
-| npm | postcss-modules-scope@1.1.0 |  | ISC |
-| npm | postcss-modules-values@1.3.0 |  | ISC |
-| npm | postcss-normalize-charset@4.0.1 |  | MIT |
-| npm | postcss-normalize-display-values@4.0.2 |  | MIT |
-| npm | postcss-normalize-positions@4.0.2 |  | MIT |
-| npm | postcss-normalize-repeat-style@4.0.2 |  | MIT |
-| npm | postcss-normalize-string@4.0.2 |  | MIT |
-| npm | postcss-normalize-timing-functions@4.0.2 |  | MIT |
-| npm | postcss-normalize-unicode@4.0.1 |  | MIT |
-| npm | postcss-normalize-url@4.0.1 |  | MIT |
-| npm | postcss-normalize-whitespace@4.0.2 |  | MIT |
-| npm | postcss-ordered-values@4.1.2 |  | MIT |
-| npm | postcss-reduce-initial@4.0.3 |  | MIT |
-| npm | postcss-reduce-transforms@4.0.2 |  | MIT |
-| npm | postcss-selector-parser@3.1.2 |  | MIT |
-| npm | postcss-selector-parser@6.1.2 |  | MIT |
-| npm | postcss-svgo@4.0.3 |  | MIT |
-| npm | postcss-unique-selectors@4.0.1 |  | MIT |
-| npm | postcss-value-parser@3.3.1 |  | MIT |
 | npm | postcss-value-parser@4.2.0 |  | MIT |
-| npm | postcss@6.0.23 |  | MIT |
-| npm | postcss@7.0.39 |  | MIT |
-| npm | postcss@8.5.6 |  | MIT |
-| npm | preact-render-to-string@5.2.6 |  | MIT |
-| npm | preact@10.26.9 |  | MIT |
-| npm | prettier@2.8.8 |  | MIT |
-| npm | pretty-format@3.8.0 |  | MIT |
-| npm | private@0.1.8 |  | MIT |
+| npm | postcss@8.5.12 |  | MIT |
 | npm | process-nextick-args@2.0.1 |  | MIT |
-| npm | process@0.11.10 |  | MIT |
-| npm | promise-inflight@1.0.1 |  | ISC |
-| npm | proxy-addr@2.0.7 |  | MIT |
-| npm | prr@1.0.1 |  | MIT |
-| npm | pseudomap@1.0.2 |  | ISC |
-| npm | psl@1.15.0 |  | MIT |
-| npm | public-encrypt@4.0.3 |  | MIT |
-| npm | pump@2.0.1 |  | MIT |
-| npm | pump@3.0.3 |  | MIT |
-| npm | pumpify@1.5.1 |  | MIT |
-| npm | punycode@1.4.1 |  | MIT |
+| npm | progress@2.0.3 |  | MIT |
+| npm | prosemirror-changeset@2.4.1 |  | MIT |
+| npm | prosemirror-commands@1.7.1 |  | MIT |
+| npm | prosemirror-dropcursor@1.8.2 |  | MIT |
+| npm | prosemirror-gapcursor@1.4.1 |  | MIT |
+| npm | prosemirror-history@1.5.0 |  | MIT |
+| npm | prosemirror-keymap@1.2.3 |  | MIT |
+| npm | prosemirror-model@1.25.4 |  | MIT |
+| npm | prosemirror-schema-list@1.5.1 |  | MIT |
+| npm | prosemirror-state@1.4.4 |  | MIT |
+| npm | prosemirror-tables@1.8.5 |  | MIT |
+| npm | prosemirror-transform@1.12.0 |  | MIT |
+| npm | prosemirror-view@1.41.8 |  | MIT |
+| npm | proto-list@1.2.4 |  | ISC |
+| npm | proxy-agent@6.5.0 |  | MIT |
+| npm | proxy-from-env@1.1.0 |  | MIT |
+| npm | proxy-from-env@2.1.0 |  | MIT |
+| npm | pump@3.0.4 |  | MIT |
+| npm | punycode.js@2.3.1 |  | MIT |
 | npm | punycode@2.3.1 |  | MIT |
+| npm | puppeteer-core@24.42.0 |  | Apache-2.0 |
+| npm | puppeteer@24.42.0 |  | Apache-2.0 |
 | npm | q@1.5.1 |  | MIT |
-| npm | qs@6.13.0 |  | BSD-3-Clause |
-| npm | qs@6.14.0 |  | BSD-3-Clause |
-| npm | querystring-es3@0.2.1 |  | MIT |
-| npm | querystringify@2.2.0 |  | MIT |
 | npm | quick-lru@4.0.1 |  | MIT |
-| npm | quill-delta@3.6.3 |  | MIT |
-| npm | quill@1.3.7 |  | BSD-3-Clause |
 | npm | randomatic@3.1.1 |  | MIT |
-| npm | randombytes@2.1.0 |  | MIT |
-| npm | randomfill@1.0.4 |  | MIT |
-| npm | range-parser@1.2.1 |  | MIT |
-| npm | raw-body@2.5.2 |  | MIT |
 | npm | read-installed@4.0.3 |  | ISC |
 | npm | read-package-json@2.1.2 |  | ISC |
 | npm | read-pkg-up@3.0.0 |  | MIT |
@@ -2195,311 +1677,152 @@ http://www.gnu.org/philosophy/why-not-lgpl.html.
 | npm | readable-stream@2.3.8 |  | MIT |
 | npm | readable-stream@3.6.2 |  | MIT |
 | npm | readdir-scoped-modules@1.1.0 |  | ISC |
-| npm | readdirp@2.2.1 |  | MIT |
-| npm | readdirp@3.6.0 |  | MIT |
 | npm | readdirp@4.1.2 |  | MIT |
-| npm | recast@0.11.23 |  | MIT |
 | npm | redent@3.0.0 |  | MIT |
-| npm | redeyed@1.0.1 |  | MIT |
-| npm | reflect.getprototypeof@1.0.10 |  | MIT |
-| npm | regenerate-unicode-properties@10.2.0 |  | MIT |
-| npm | regenerate@1.4.2 |  | MIT |
-| npm | regenerator-runtime@0.11.1 |  | MIT |
-| npm | regex-not@1.0.2 |  | MIT |
-| npm | regex-parser@2.3.1 |  | MIT |
-| npm | regexp.prototype.flags@1.5.4 |  | MIT |
-| npm | regexpu-core@6.2.0 |  | MIT |
-| npm | regjsgen@0.8.0 |  | MIT |
-| npm | regjsparser@0.12.0 |  | BSD-2-Clause |
-| npm | relateurl@0.2.7 |  | MIT |
-| npm | remove-trailing-separator@1.1.0 |  | ISC |
 | npm | repeat-element@1.1.4 |  | MIT |
 | npm | repeat-string@1.6.1 |  | MIT |
-| npm | replace-ext@1.0.1 |  | MIT |
 | npm | require-directory@2.1.1 |  | MIT |
-| npm | require-main-filename@1.0.1 |  | ISC |
-| npm | require-main-filename@2.0.0 |  | ISC |
-| npm | requires-port@1.0.0 |  | MIT |
-| npm | resolve-cwd@2.0.0 |  | MIT |
-| npm | resolve-dir@1.0.1 |  | MIT |
-| npm | resolve-from@3.0.0 |  | MIT |
+| npm | require-from-string@2.0.2 |  | MIT |
 | npm | resolve-from@4.0.0 |  | MIT |
 | npm | resolve-from@5.0.0 |  | MIT |
 | npm | resolve-global@1.0.0 |  | MIT |
-| npm | resolve-url-loader@2.3.2 |  | MIT |
-| npm | resolve-url@0.2.1 |  | MIT |
-| npm | resolve@1.22.10 |  | MIT |
-| npm | ret@0.1.15 |  | MIT |
-| npm | retry@0.12.0 |  | MIT |
-| npm | rework-visit@1.0.0 |  | MIT |
-| npm | rework@1.0.1 |  | MIT* |
-| npm | rgb-regex@1.0.1 |  | MIT |
-| npm | rgba-regex@1.0.0 |  | MIT |
+| npm | resolve@1.22.12 |  | MIT |
 | npm | right-pad-values@0.3.1 |  | MIT |
-| npm | rimraf@2.7.1 |  | ISC |
-| npm | ripemd160@2.0.1 |  | MIT |
-| npm | ripemd160@2.0.2 |  | MIT |
+| npm | rolldown@1.0.0-rc.17 |  | MIT |
+| npm | rollup@4.60.2 |  | MIT |
+| npm | rope-sequence@1.3.4 |  | MIT |
 | npm | rrule@2.8.1 |  | BSD-3-Clause |
-| npm | run-queue@1.0.3 |  | ISC |
-| npm | safe-array-concat@1.1.3 |  | MIT |
+| npm | rrweb-cssom@0.7.1 |  | MIT |
+| npm | rrweb-cssom@0.8.0 |  | MIT |
 | npm | safe-buffer@5.1.2 |  | MIT |
 | npm | safe-buffer@5.2.1 |  | MIT |
-| npm | safe-push-apply@1.0.0 |  | MIT |
-| npm | safe-regex-test@1.1.0 |  | MIT |
-| npm | safe-regex@1.1.0 |  | MIT |
 | npm | safer-buffer@2.1.2 |  | MIT |
-| npm | sass-loader@7.3.1 |  | MIT |
-| npm | sass@1.89.2 |  | MIT |
-| npm | sax@1.2.4 |  | ISC |
+| npm | sass@1.99.0 |  | MIT |
 | npm | saxes@6.0.0 |  | ISC |
-| npm | schema-utils@0.4.7 |  | MIT |
-| npm | schema-utils@1.0.0 |  | MIT |
-| npm | schema-utils@2.7.1 |  | MIT |
-| npm | select-hose@2.0.0 |  | MIT |
-| npm | selectize@0.12.6 |  | Apache-2.0 |
-| npm | selfsigned@1.10.14 |  | MIT |
 | npm | semver@5.7.2 |  | ISC |
 | npm | semver@6.3.1 |  | ISC |
-| npm | semver@7.3.5 |  | ISC |
-| npm | semver@7.7.2 |  | ISC |
-| npm | send@0.19.0 |  | MIT |
-| npm | serialize-javascript@4.0.0 |  | BSD-3-Clause |
-| npm | serve-index@1.9.1 |  | MIT |
-| npm | serve-static@1.16.2 |  | MIT |
-| npm | set-blocking@2.0.0 |  | ISC |
-| npm | set-function-length@1.2.2 |  | MIT |
-| npm | set-function-name@2.0.2 |  | MIT |
-| npm | set-proto@1.0.0 |  | MIT |
-| npm | set-value@2.0.1 |  | MIT |
-| npm | setimmediate@1.0.5 |  | MIT |
-| npm | setprototypeof@1.1.0 |  | ISC |
-| npm | setprototypeof@1.2.0 |  | ISC |
-| npm | sha.js@2.4.12 |  | (MIT AND BSD-3-Clause) |
-| npm | shallow-clone@3.0.1 |  | MIT |
-| npm | shebang-command@1.2.0 |  | MIT |
-| npm | shebang-regex@1.0.0 |  | MIT |
-| npm | shellwords@0.1.1 |  | MIT |
-| npm | side-channel-list@1.0.0 |  | MIT |
-| npm | side-channel-map@1.0.1 |  | MIT |
-| npm | side-channel-weakmap@1.0.2 |  | MIT |
-| npm | side-channel@1.1.0 |  | MIT |
-| npm | sifter@0.5.4 |  | Apache-2.0 |
+| npm | semver@7.6.0 |  | ISC |
+| npm | semver@7.7.4 |  | ISC |
+| npm | shebang-command@2.0.0 |  | MIT |
+| npm | shebang-regex@3.0.0 |  | MIT |
+| npm | siginfo@2.0.0 |  | ISC |
 | npm | signal-exit@3.0.7 |  | ISC |
+| npm | signal-exit@4.1.0 |  | ISC |
 | npm | simple-concat@1.0.1 |  | MIT |
 | npm | simple-get@2.8.2 |  | MIT |
-| npm | simple-swizzle@0.2.2 |  | MIT |
-| npm | slash@1.0.0 |  | MIT |
 | npm | slide@1.1.6 |  | ISC |
-| npm | snapdragon-node@2.1.1 |  | MIT |
-| npm | snapdragon-util@3.0.1 |  | MIT |
-| npm | snapdragon@0.8.2 |  | MIT |
-| npm | sockjs-client@1.6.1 |  | MIT |
-| npm | sockjs@0.3.24 |  | MIT |
-| npm | sortablejs@1.10.2 |  | MIT |
-| npm | source-list-map@2.0.1 |  | MIT |
+| npm | smart-buffer@4.2.0 |  | MIT |
+| npm | socks-proxy-agent@8.0.5 |  | MIT |
+| npm | socks@2.8.7 |  | MIT |
+| npm | sortablejs@1.14.0 |  | MIT |
 | npm | source-map-js@1.2.1 |  | BSD-3-Clause |
-| npm | source-map-resolve@0.5.3 |  | MIT |
-| npm | source-map-support@0.5.21 |  | MIT |
-| npm | source-map-url@0.4.1 |  | MIT |
-| npm | source-map@0.5.7 |  | BSD-3-Clause |
 | npm | source-map@0.6.1 |  | BSD-3-Clause |
 | npm | spdx-compare@1.0.0 |  | MIT |
 | npm | spdx-correct@3.2.0 |  | Apache-2.0 |
 | npm | spdx-exceptions@2.5.0 |  | CC-BY-3.0 |
 | npm | spdx-expression-parse@3.0.1 |  | MIT |
-| npm | spdx-license-ids@3.0.21 |  | CC0-1.0 |
+| npm | spdx-license-ids@3.0.23 |  | CC0-1.0 |
 | npm | spdx-ranges@2.1.1 |  | (MIT AND CC-BY-3.0) |
 | npm | spdx-satisfies@4.0.1 |  | MIT |
-| npm | spdy-transport@3.0.0 |  | MIT |
-| npm | spdy@4.0.2 |  | MIT |
-| npm | split-string@3.1.0 |  | MIT |
 | npm | split2@3.2.2 |  | ISC |
+| npm | split2@4.2.0 |  | ISC |
 | npm | split@1.0.1 |  | MIT |
-| npm | sprintf-js@1.0.3 |  | BSD-3-Clause |
-| npm | ssri@6.0.2 |  | ISC |
-| npm | stable@0.1.8 |  | MIT |
-| npm | stackframe@1.3.4 |  | MIT |
+| npm | stackback@0.0.2 |  | MIT |
 | npm | standard-version@9.5.0 |  | ISC |
 | npm | static-extend@0.1.2 |  | MIT |
-| npm | statuses@1.5.0 |  | MIT |
-| npm | statuses@2.0.1 |  | MIT |
-| npm | stop-iteration-iterator@1.1.0 |  | MIT |
-| npm | stream-browserify@2.0.2 |  | MIT |
-| npm | stream-each@1.2.3 |  | MIT |
-| npm | stream-http@2.8.3 |  | MIT |
-| npm | stream-shift@1.0.3 |  | MIT |
-| npm | string-width@1.0.2 |  | MIT |
-| npm | string-width@2.1.1 |  | MIT |
-| npm | string-width@3.1.0 |  | MIT |
+| npm | std-env@3.10.0 |  | MIT |
+| npm | streamx@2.25.0 |  | MIT |
 | npm | string-width@4.2.3 |  | MIT |
-| npm | string.prototype.trim@1.2.10 |  | MIT |
-| npm | string.prototype.trimend@1.0.9 |  | MIT |
-| npm | string.prototype.trimstart@1.0.8 |  | MIT |
+| npm | string-width@5.1.2 |  | MIT |
 | npm | string_decoder@1.1.1 |  | MIT |
+| npm | string_decoder@1.3.0 |  | MIT |
 | npm | stringify-package@1.0.1 |  | ISC |
-| npm | strip-ansi@3.0.1 |  | MIT |
-| npm | strip-ansi@4.0.0 |  | MIT |
-| npm | strip-ansi@5.2.0 |  | MIT |
 | npm | strip-ansi@6.0.1 |  | MIT |
+| npm | strip-ansi@7.2.0 |  | MIT |
 | npm | strip-bom@3.0.0 |  | MIT |
-| npm | strip-eof@1.0.0 |  | MIT |
+| npm | strip-final-newline@2.0.0 |  | MIT |
 | npm | strip-indent@3.0.0 |  | MIT |
-| npm | style-loader@0.23.1 |  | MIT |
-| npm | stylehacks@4.0.3 |  | MIT |
-| npm | supports-color@2.0.0 |  | MIT |
+| npm | strip-literal@3.1.0 |  | MIT |
 | npm | supports-color@5.5.0 |  | MIT |
-| npm | supports-color@6.1.0 |  | MIT |
 | npm | supports-color@7.2.0 |  | MIT |
 | npm | supports-preserve-symlinks-flag@1.0.0 |  | MIT |
-| npm | svgo@1.3.2 |  | MIT |
 | npm | symbol-tree@3.2.4 |  | MIT |
-| npm | tapable@1.1.3 |  | MIT |
-| npm | tempusdominus-bootstrap-4@5.39.2 |  | MIT |
-| npm | tempusdominus-core@5.19.3 |  | MIT |
-| npm | terser-webpack-plugin@1.4.6 |  | MIT |
-| npm | terser@3.17.0 |  | BSD-2-Clause |
-| npm | terser@4.8.1 |  | BSD-2-Clause |
+| npm | tar-fs@3.1.2 |  | MIT |
+| npm | tar-stream@3.1.8 |  | MIT |
+| npm | teex@1.0.1 |  | MIT |
+| npm | test-exclude@7.0.2 |  | ISC |
+| npm | text-decoder@1.2.7 |  | Apache-2.0 |
 | npm | text-extensions@1.9.0 |  | MIT |
+| npm | text-extensions@2.4.0 |  | MIT |
 | npm | through2@2.0.5 |  | MIT |
 | npm | through2@4.0.2 |  | MIT |
 | npm | through@2.3.8 |  | MIT |
-| npm | thunky@1.1.0 |  | MIT |
-| npm | timers-browserify@2.0.12 |  | MIT |
-| npm | timsort@0.3.0 |  | MIT |
-| npm | to-arraybuffer@1.0.1 |  | MIT |
-| npm | to-buffer@1.2.1 |  | MIT |
+| npm | tinybench@2.9.0 |  | MIT |
+| npm | tinyexec@0.3.2 |  | MIT |
+| npm | tinyglobby@0.2.16 |  | MIT |
+| npm | tinypool@1.1.1 |  | MIT |
+| npm | tinyrainbow@2.0.0 |  | MIT |
+| npm | tinyspy@4.0.4 |  | MIT |
+| npm | tldts-core@6.1.86 |  | MIT |
+| npm | tldts@6.1.86 |  | MIT |
 | npm | to-gfm-code-block@0.1.1 |  | MIT |
-| npm | to-object-path@0.3.0 |  | MIT |
-| npm | to-regex-range@2.1.1 |  | MIT |
-| npm | to-regex-range@5.0.1 |  | MIT |
-| npm | to-regex@3.0.2 |  | MIT |
-| npm | toidentifier@1.0.1 |  | MIT |
-| npm | tough-cookie@4.1.4 |  | BSD-3-Clause |
-| npm | tr46@3.0.0 |  | MIT |
+| npm | tough-cookie@5.1.2 |  | BSD-3-Clause |
+| npm | tr46@5.1.1 |  | MIT |
 | npm | treeify@1.1.0 |  | MIT |
 | npm | trim-newlines@3.0.1 |  | MIT |
 | npm | tslib@2.8.1 |  | 0BSD |
-| npm | tty-browserify@0.0.0 |  | MIT |
-| npm | tui-date-picker@4.3.3 |  | MIT |
-| npm | tui-time-picker@2.1.6 |  | MIT |
 | npm | type-fest@0.18.1 |  | (MIT OR CC0-1.0) |
 | npm | type-fest@0.6.0 |  | (MIT OR CC0-1.0) |
 | npm | type-fest@0.8.1 |  | (MIT OR CC0-1.0) |
-| npm | type-is@1.6.18 |  | MIT |
-| npm | typed-array-buffer@1.0.3 |  | MIT |
-| npm | typed-array-byte-length@1.0.3 |  | MIT |
-| npm | typed-array-byte-offset@1.0.4 |  | MIT |
-| npm | typed-array-length@1.0.7 |  | MIT |
+| npm | typed-query-selector@2.12.2 |  | MIT |
 | npm | typedarray@0.0.6 |  | MIT |
-| npm | uc.micro@1.0.6 |  | MIT |
-| npm | uglify-js@3.4.10 |  | BSD-2-Clause |
-| npm | unbox-primitive@1.1.0 |  | MIT |
-| npm | undici-types@7.8.0 |  | MIT |
-| npm | unicode-canonical-property-names-ecmascript@2.0.1 |  | MIT |
-| npm | unicode-match-property-ecmascript@2.0.0 |  | MIT |
-| npm | unicode-match-property-value-ecmascript@2.2.0 |  | MIT |
-| npm | unicode-property-aliases-ecmascript@2.1.0 |  | MIT |
-| npm | union-value@1.0.1 |  | MIT |
-| npm | uniq@1.0.1 |  | MIT |
-| npm | uniqs@2.0.0 |  | MIT |
-| npm | unique-filename@1.1.1 |  | ISC |
-| npm | unique-slug@2.0.2 |  | ISC |
-| npm | universalify@0.1.2 |  | MIT |
-| npm | universalify@0.2.0 |  | MIT |
-| npm | universalify@2.0.1 |  | MIT |
-| npm | unorm@1.6.0 |  | MIT* |
-| npm | unpipe@1.0.0 |  | MIT |
-| npm | unquote@1.1.1 |  | MIT |
-| npm | unset-value@1.0.0 |  | MIT |
-| npm | upath@1.2.0 |  | MIT |
-| npm | update-browserslist-db@1.1.3 |  | MIT |
-| npm | upper-case@1.1.3 |  | MIT |
-| npm | uri-js@4.4.1 |  | BSD-2-Clause |
-| npm | urix@0.1.0 |  | MIT |
-| npm | url-parse@1.5.10 |  | MIT |
-| npm | url@0.11.4 |  | MIT |
+| npm | typescript@6.0.3 |  | Apache-2.0 |
+| npm | uc.micro@2.1.0 |  | MIT |
+| npm | uglify-js@3.19.3 |  | BSD-2-Clause |
+| npm | undici-types@7.19.2 |  | MIT |
+| npm | update-browserslist-db@1.2.3 |  | MIT |
 | npm | use@3.1.1 |  | MIT |
-| npm | uslug@1.0.4 |  | MIT |
 | npm | util-deprecate@1.0.2 |  | MIT |
 | npm | util-extend@1.0.3 |  | MIT |
-| npm | util.promisify@1.0.1 |  | MIT |
-| npm | util@0.10.4 |  | MIT |
-| npm | util@0.11.1 |  | MIT |
-| npm | utils-merge@1.0.1 |  | MIT |
-| npm | uuid@3.4.0 |  | MIT |
-| npm | uuid@8.3.2 |  | MIT |
-| npm | v8-compile-cache@2.4.0 |  | MIT |
 | npm | validate-npm-package-license@3.0.4 |  | Apache-2.0 |
-| npm | vary@1.1.2 |  | MIT |
-| npm | vendors@1.0.4 |  | MIT |
-| npm | verte@0.0.12 |  | MIT |
-| npm | vm-browserify@1.1.2 |  | MIT |
-| npm | vue-advanced-cropper@1.11.7 |  | MIT |
-| npm | vue-async-computed@3.9.0 |  | MIT |
-| npm | vue-avatar@2.3.3 |  | MIT |
-| npm | vue-bootstrap-datetimepicker@5.0.1 |  | MIT |
-| npm | vue-click-outside@1.1.0 |  | MIT |
-| npm | vue-dataset@1.1.18 |  | MIT |
-| npm | vue-hot-reload-api@2.3.4 |  | MIT |
-| npm | vue-json-pretty@1.9.5 |  | MIT |
-| npm | vue-loader@15.11.1 |  | MIT |
-| npm | vue-markdown@2.2.4 |  | MIT |
-| npm | vue-nl2br@0.1.2 |  | MIT |
-| npm | vue-popperjs@2.3.0 |  | MIT |
-| npm | vue-quill-editor@3.0.6 |  | MIT |
-| npm | vue-style-loader@4.1.3 |  | MIT |
-| npm | vue-template-compiler@2.7.16 |  | MIT |
-| npm | vue-template-es2015-compiler@1.9.1 |  | MIT |
-| npm | vue2-selectize@1.1.7 |  | ISC |
-| npm | vue@2.7.16 |  | MIT |
-| npm | vuedraggable@2.24.3 |  | MIT |
-| npm | w3c-xmlserializer@4.0.0 |  | MIT |
-| npm | watchpack-chokidar2@2.0.1 |  | MIT |
-| npm | watchpack@1.7.5 |  | MIT |
-| npm | wbuf@1.7.3 |  | MIT |
+| npm | vite-node@3.2.4 |  | MIT |
+| npm | vite-plugin-full-reload@1.2.0 |  | MIT |
+| npm | vite@7.3.2 |  | MIT |
+| npm | vite@8.0.10 |  | MIT |
+| npm | vitest@3.2.4 |  | MIT |
+| npm | vue-advanced-cropper@2.8.9 |  | MIT |
+| npm | vue-component-type-helpers@3.2.7 |  | MIT |
+| npm | vue-dataset@2.1.0 |  | MIT |
+| npm | vue-demi@0.14.10 |  | MIT |
+| npm | vue-json-pretty@2.6.0 |  | MIT |
+| npm | vue-markdown-render@2.3.0 |  | MIT |
+| npm | vue3-avatar@4.1.1 |  | MIT |
+| npm | vue@3.5.33 |  | MIT |
+| npm | vuedraggable@4.1.0 |  | MIT |
+| npm | w3c-keyname@2.2.8 |  | MIT |
+| npm | w3c-xmlserializer@5.0.0 |  | MIT |
+| npm | webdriver-bidi-protocol@0.4.1 |  | Apache-2.0 |
 | npm | webidl-conversions@7.0.0 |  | BSD-2-Clause |
-| npm | webpack-cli@3.3.12 |  | MIT |
-| npm | webpack-dev-middleware@3.7.3 |  | MIT |
-| npm | webpack-dev-server@3.11.3 |  | MIT |
-| npm | webpack-log@2.0.0 |  | MIT |
-| npm | webpack-merge@4.2.2 |  | MIT |
-| npm | webpack-notifier@1.15.0 |  | ISC |
-| npm | webpack-sources@1.4.3 |  | MIT |
-| npm | webpack@4.47.0 |  | MIT |
-| npm | websocket-driver@0.7.4 |  | Apache-2.0 |
-| npm | websocket-extensions@0.1.4 |  | Apache-2.0 |
-| npm | whatwg-encoding@2.0.0 |  | MIT |
-| npm | whatwg-mimetype@3.0.0 |  | MIT |
-| npm | whatwg-url@11.0.0 |  | MIT |
-| npm | which-boxed-primitive@1.1.1 |  | MIT |
-| npm | which-builtin-type@1.2.1 |  | MIT |
-| npm | which-collection@1.0.2 |  | MIT |
-| npm | which-module@2.0.1 |  | ISC |
-| npm | which-typed-array@1.1.19 |  | MIT |
-| npm | which@1.3.1 |  | ISC |
+| npm | whatwg-encoding@3.1.1 |  | MIT |
+| npm | whatwg-mimetype@4.0.0 |  | MIT |
+| npm | whatwg-url@14.2.0 |  | MIT |
 | npm | which@2.0.2 |  | ISC |
-| npm | wordwrap@0.0.3 |  | MIT |
+| npm | why-is-node-running@2.3.0 |  | MIT |
 | npm | wordwrap@1.0.0 |  | MIT |
-| npm | worker-farm@1.7.0 |  | MIT |
-| npm | wrap-ansi@2.1.0 |  | MIT |
-| npm | wrap-ansi@5.1.0 |  | MIT |
 | npm | wrap-ansi@7.0.0 |  | MIT |
+| npm | wrap-ansi@8.1.0 |  | MIT |
 | npm | wrappy@1.0.2 |  | ISC |
-| npm | ws@6.2.3 |  | MIT |
-| npm | ws@8.18.3 |  | MIT |
-| npm | xml-name-validator@4.0.0 |  | Apache-2.0 |
+| npm | ws@8.20.0 |  | MIT |
+| npm | xml-name-validator@5.0.0 |  | Apache-2.0 |
 | npm | xmlchars@2.2.0 |  | MIT |
 | npm | xtend@4.0.2 |  | MIT |
-| npm | y18n@4.0.3 |  | ISC |
 | npm | y18n@5.0.8 |  | ISC |
-| npm | yallist@2.1.2 |  | ISC |
-| npm | yallist@3.1.1 |  | ISC |
 | npm | yallist@4.0.0 |  | ISC |
-| npm | yaml@1.10.2 |  | ISC |
-| npm | yargs-parser@11.1.1 |  | ISC |
-| npm | yargs-parser@13.1.2 |  | ISC |
+| npm | yaml@2.8.3 |  | ISC |
 | npm | yargs-parser@20.2.9 |  | ISC |
-| npm | yargs@12.0.5 |  | MIT |
-| npm | yargs@13.3.2 |  | MIT |
+| npm | yargs-parser@21.1.1 |  | ISC |
 | npm | yargs@16.2.0 |  | MIT |
+| npm | yargs@17.7.2 |  | MIT |
+| npm | yauzl@2.10.0 |  | MIT |
 | npm | yocto-queue@0.1.0 |  | MIT |
+| npm | zod@3.25.76 |  | MIT |

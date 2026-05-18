@@ -5,12 +5,12 @@
 | Angabe | Wert |
 |---|---|
 | Handbuch | Pfarrplaner Benutzerhandbuch |
-| Programmversion | 2026.10.2 |
+| Programmversion | 2026.11.0 |
 | Umgebung | local |
-| Build-Datum der Anwendung | Samstag, 16. Mai 2026 16:22 |
-| Handbuch erstellt am | 18.05.2026 11:09 |
-| Git-Branch | codex/form-styling |
-| Git-Stand | da873f73 |
+| Build-Datum der Anwendung | Montag, 18. Mai 2026 13:35 |
+| Handbuch erstellt am | 18.05.2026 13:39 |
+| Git-Branch | main |
+| Git-Stand | 04fa8f96 |
 | Lizenz | GNU General Public License, Version 3.0 oder später |
 | Projekt | Pfarrplaner |
 | Autor und Copyright | Christoph Fischer, https://christoph-fischer.org |
@@ -18,6 +18,49 @@
 ## Was ist neu?
 
 Die wichtigsten Änderungen der letzten Versionen stehen im Änderungsprotokoll. Für die tägliche Arbeit sind vor allem neue oder geänderte Schaltflächen, neue Berichte, neue Eingabefelder und geänderte Abläufe wichtig.
+
+## [2026.11.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.10.2...v2026.11.0) (2026-05-18)
+
+
+### Features
+
+* Beschreibung und Quelle für Vorlagen im Import-Dialog anzeigen ([0b5beb3](https://codeberg.org/pfarr.tools/pfarrplaner/commit/0b5beb391b028fcbe2ecefecfa87e2606c9d575e))
+* Duplikate-Assistent überarbeitet und Benutzerverwaltung verbessert ([d5c099b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d5c099b9f55369ce8259d88078781587c70f1f72))
+* **ui:** Formularstil und Kalenderoberflaechen ueberarbeitet ([5e902bd](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5e902bdb39fe83831c2734d74165938286facee7))
+* Vue3-Migration abgeschlossen ([ee24242](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ee2424281f39be7e18d8bd42ef255049a147c1a4))
+
+
+### Bug Fixes
+
+* AdminHomeScreenTab lädt nicht ([f572acb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/f572acbfcc795058ad80de31cdf0a796874be48e))
+* Benutzer werden als "undefined" angezeigt. ([68780d4](https://codeberg.org/pfarr.tools/pfarrplaner/commit/68780d4ccf045b22db61e65cf4d563c5be1dfbef))
+* Dienste mit Doppelpunkt in Liturgieausgaben berücksichtigen. ([408427e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/408427e731368dcff145042de4e0650cb1207300)), closes [#442](https://codeberg.org/pfarr.tools/pfarrplaner/issues/442)
+* Editor hat kein Styling für Zitate. ([9de2d20](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9de2d2093edb20b71f8bbd5514917402fa43db44))
+* Ereignislisten im Präsentationsexport auf mehrere Folien verteilt. ([9cbab2a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9cbab2a386ac193efca0303dcedaac9443ec71d6))
+* Fehler beim Speichern von Personeneinträgen ([70f1315](https://codeberg.org/pfarr.tools/pfarrplaner/commit/70f131545bc389af7273a54112ded2d3de7f519e))
+* Fehler beim Übernehmen einer Person aus anderer Kirchengemeinde im PeopleSelect behoben ([1ba2eee](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1ba2eee45bb360d7b52e8b712d7270d1cf80605f))
+* Fehler im PeopleSelect ([e170ee1](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e170ee15797fe2d8a2a391d3a313a394426c7c53))
+* Fehlerhafte mergeInto()-Methode beim Zusammenführen von Personen korrigiert ([22fb4ab](https://codeberg.org/pfarr.tools/pfarrplaner/commit/22fb4abb2f8a73cd22a27cad89439d1a76875f0b))
+* Fehlgeschlagene Unit-Tests für AbstractModel-Subklassen korrigiert. ([b0e1887](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b0e188759723654c41c9e764b7300c705bbc0af8))
+* Opferplan enthält falsche Gottesdienste ([fb57a4d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/fb57a4d92cb7e9ed03723e6ff58a6ea0f2b0a98a))
+* PHPUnit-Deprecation für [@test](https://codeberg.org/test)-Annotationen in Docblocks behoben. ([4f6dbd2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4f6dbd202b792af4fb3f83910a6bfc13f9091b65))
+* Pinne webpack v5.105.4 ([94ae847](https://codeberg.org/pfarr.tools/pfarrplaner/commit/94ae847ba00264782d08eeddbe5b71d3d59203e9))
+* Profil kann nicht gespeichert werden. ([5943aaa](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5943aaab533ea86286078ca105e258e53d2b5ceb))
+* RFC-konformes Leerzeichen in ICAL-Fortsetzungszeilen erhalten. ([f6464d3](https://codeberg.org/pfarr.tools/pfarrplaner/commit/f6464d3223a08d793445eba3b99793fd91229885)), closes [#427](https://codeberg.org/pfarr.tools/pfarrplaner/issues/427)
+* ServiceEditor lässt sich nicht öffnen ([3726cd1](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3726cd1ea9c71aa9baf8a3bfcca41ec5aecb9580))
+* Sonderzeichen im Präsentationsexport korrigiert. ([c881164](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c8811648ac0dd4f797a88188c291206e9acfa418))
+* Sonderzeichen in Word-Exporten erhalten. ([b782fc9](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b782fc9340750807da3b00f0607d6eb3772ac638))
+
+### [2026.11.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.0...v2026.11.1) (2026-05-04)
+
+
+### Bug Fixes
+
+* AdminHomeScreenTab lädt nicht ([f572acb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/f572acbfcc795058ad80de31cdf0a796874be48e))
+* Benutzer werden als "undefined" angezeigt. ([68780d4](https://codeberg.org/pfarr.tools/pfarrplaner/commit/68780d4ccf045b22db61e65cf4d563c5be1dfbef))
+* Fehler beim Speichern von Personeneinträgen ([70f1315](https://codeberg.org/pfarr.tools/pfarrplaner/commit/70f131545bc389af7273a54112ded2d3de7f519e))
+* Fehler im PeopleSelect ([e170ee1](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e170ee15797fe2d8a2a391d3a313a394426c7c53))
+* Pinne webpack v5.105.4 ([94ae847](https://codeberg.org/pfarr.tools/pfarrplaner/commit/94ae847ba00264782d08eeddbe5b71d3d59203e9))
 
 ## [2026.11.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.10.2...v2026.11.0) (2026-04-25)
 
@@ -75,41 +118,6 @@ Die wichtigsten Änderungen der letzten Versionen stehen im Änderungsprotokoll.
 ### Bug Fixes
 
 * Inertia sendet falsches Token bei Form POSTs. ([cf6238c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/cf6238cf572bc4c876a6e913bafbcc0ba0b67a83))
-
-## [2026.9.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.8.2...v2026.9.0) (2026-02-05)
-
-
-### Features
-
-* Bericht mit Zahlen zur EKD-Statistik ([8382049](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8382049b91d0a2599d13fee24429e988aa04bc6b))
-
-
-### Bug Fixes
-
-* Einige Formulare führen zu Fehler 419 ([85c52a7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/85c52a7750489425e905544277673bebc15c24e8))
-* Fehlerhafte Kalenderanzeige, wenn kein Bestattungstyp ausgewählt ist. ([695c7ac](https://codeberg.org/pfarr.tools/pfarrplaner/commit/695c7ac60e1cb1a68ff0922c8d5b223f562e6ea9))
-* ServiceTableReport enthält nicht-gottesdienstliche Veranstaltungen ([5f34917](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5f34917b06a44f86455983f5ef13d96c5596fc68))
-* Versteckte Beerdigungen sind im Kalender unlesbar. ([decb48d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/decb48da3b1d3b7e4e090852acab3cdbf890909c))
-* Weitere Fehler 419 ([e616f30](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e616f30d97f6e76653e21276c7c8b1270f83aab2))
-
-### [2026.8.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.8.1...v2026.8.2) (2026-01-31)
-
-
-### Bug Fixes
-
-* Häufiger Fehler 419. ([8989cfd](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8989cfdc46b556e2880cd372a7e28cbb4d5619d7))
-* Kalenderansicht scheitert, wenn Urlaube mit Vertretungen angezeigt werden sollen. ([74422c6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/74422c6c6c13c6d6b2c81a3143b1bb5aee676b27))
-* Materialsammlung ist nicht mehr verfügbar ([498fe83](https://codeberg.org/pfarr.tools/pfarrplaner/commit/498fe838a8df2afaef611836bd2da4ac0db7a456))
-
-### [2026.8.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.8.0...v2026.8.1) (2026-01-28)
-
-
-### Bug Fixes
-
-* Fehler beim Erstellen von PPT ([084f846](https://codeberg.org/pfarr.tools/pfarrplaner/commit/084f846540093f9e4a7b786b3e857a9df66c9536))
-* Fehler beim Erstellen von PPT ([8e027ae](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8e027aef180b0a3f64b9f942a769dde231228ee9))
-* Poolmaster können nicht angelegt werden ([277c807](https://codeberg.org/pfarr.tools/pfarrplaner/commit/277c80736fe29ac44c09d30801771e33d0d8d4a1))
-* SingleMinistryReport sendet Exceldatei direkt binär in den Browser ([dae87a4](https://codeberg.org/pfarr.tools/pfarrplaner/commit/dae87a43085a7ba50b920b29da64297c57fcc5cf))
 
 Pfarrplaner ist freie Software. Sie dürfen das Programm unter den Bedingungen der GNU General Public License Version 3 oder später weitergeben und verändern.
 
