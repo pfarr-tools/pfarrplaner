@@ -43,6 +43,7 @@
             :disabled="disabled"
             :searchable="true"
             :name="name"
+            :native-support="hasNativeSupport"
             :aria-invalid="field.error ? 'true' : 'false'"
             :aria-describedby="field.describedBy || undefined"
             locale="de"
@@ -116,6 +117,9 @@ export default {
         },
         isGrouped() {
             return !!(this.settings && this.settings.optgroupField);
+        },
+        hasNativeSupport() {
+            return !!this.name;
         },
         resolvedOptions() {
             let opts = [];
