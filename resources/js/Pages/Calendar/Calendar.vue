@@ -28,10 +28,10 @@
   -->
 
 <template>
-    <admin-layout :enable-control-sidebar="false" :title="pageTitle" no-padding no-content-header :key="calendarState">
+    <admin-layout :enable-control-sidebar="false" :title="pageTitle" no-padding no-content-header no-outer-padding :key="calendarState">
         <template #navbar-left>
             <calendar-nav-top :date="new Date(myDate)" :years="years"
-                              :targetMode="targetMode" :target="target"
+                              :targetMode="targetMode" :target="target" :calendar-mode="calendarMode"
                               :writable-cities="writableCities" :can-create="canCreate"
                               @toggle-target-mode="toggleTargetMode"
                               @navigate="navigateTo"
@@ -245,7 +245,7 @@ th, td {
     min-height: 0;
     height: 100%;
     width: 100%;
-    padding: 0.5rem;
+    padding: 0;
     font-size: 0.875rem;
 }
 
@@ -283,7 +283,6 @@ th, td {
 
 @media (max-width: 991.98px) {
     .calendar-full-container {
-        padding: 0.25rem;
         font-size: 0.8125rem;
     }
 

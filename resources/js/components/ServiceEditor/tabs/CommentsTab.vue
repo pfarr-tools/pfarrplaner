@@ -43,7 +43,7 @@
                     </button>
                 </div>
             </div>
-            <p class="comment-body" v-html="comment.body.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '<br />')" />
+            <p class="comment-body">{{ comment.body }}</p>
         </div>
         <hr />
         <h3>Neuen Kommentar hinzufügen</h3>
@@ -73,6 +73,7 @@ export default {
     },
     methods: {
         saveComment() {
+            if (!this.newComment.body.trim()) return;
             axios.post(route('comment.store'), this.newComment, {
                 headers: { Accept: 'application/json' }
             })
@@ -84,7 +85,9 @@ export default {
         },
         deleteComment(id, key, index) {
             axios.delete(route('comment.destroy', id))
-                .then(this.myService.comments.splice(key, 1));
+                .then(() => {
+                    this.myService.comments.splice(key, 1);
+                });
         }
     }
 }
@@ -96,5 +99,9 @@ export default {
     }
     .comment-author {
         font-weight: bold;
+    }
+    .comment-body {
+        margin-bottom: 0;
+        white-space: pre-line;
     }
 </style>

@@ -28,15 +28,18 @@
   -->
 
 <template>
-    <div class="form-check">
-        <input type="hidden" :name="name" value="0" />
-        <input type="checkbox" class="form-check-input" :class="{'is-invalid': $page.props.errors[name]}" :id="myId+'Input'" :name="name"
-               :checked="isChecked" @input="handleInput" value="1" :disabled="disabled"/>
-        <label class="form-check-label" v-if="label" :for="id+'Input'">{{ label }}</label>
-        <span v-if="isCheckedItem"  :class="myValue ? 'mdi mdi-check-circle' : 'mdi mdi-close-circle'" :key="myValue"></span>
-        <div v-if="$page.props.errors[name]" class="invalid-feedback">{{ $page.props.errors[name] }}</div>
-        <div v-if="help" class="form-text text-muted">{{ help }}</div>
-    </div>
+    <form-group :id="myId" :input-id="`${myId}Input`" :help="help" :name="name" :value="currentValue"
+                :is-checked-item="isCheckedItem" v-slot="field">
+        <div class="form-check">
+            <input v-if="name" type="hidden" :name="name" value="0" />
+            <input :id="field.fieldId" type="checkbox" class="form-check-input"
+                   :class="{'is-invalid': field.error}" :name="name" :checked="isChecked" value="1"
+                   :disabled="disabled" :aria-invalid="field.error ? 'true' : 'false'"
+                   :aria-describedby="field.describedBy || undefined" @input="handleInput"/>
+            <label class="form-check-label" v-if="label" :for="field.fieldId">{{ label }}</label>
+            <span v-if="isCheckedItem" :class="myValue ? 'mdi mdi-check-circle' : 'mdi mdi-close-circle'" :key="myValue"></span>
+        </div>
+    </form-group>
 </template>
 
 <script>
@@ -61,18 +64,17 @@ export default {
         isCheckedItem: Boolean,
     },
     computed: {
+        currentValue() {
+            return this.modelValue !== undefined ? this.modelValue : this.value;
+        },
         isChecked() {
             return (this.myValue) && (this.myValue != 0) && (this.myValue != '0');
         }
     },
-    mounted() {
-        if (this.myId == '') this.myId = uid();
-    },
     data() {
         return {
-            myId: this.id || '',
+            myId: this.id || uid(),
             myValue: this.modelValue !== undefined ? this.modelValue : this.value,
-            error: this.$page.props.errors[this.name],
         }
     },
     watch: {

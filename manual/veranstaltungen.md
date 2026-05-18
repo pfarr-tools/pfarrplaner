@@ -71,12 +71,11 @@ Der erste Reiter enthält die wichtigsten Angaben zum Gottesdienst oder zur Vera
 
 ### Datum und Uhrzeit
 
-- **Datum und Uhrzeit**: Wählen Sie Beginn des Gottesdienstes aus. Bei anderen Veranstaltungen gibt es zusätzlich **Ende** und **Ganztägige Veranstaltung**.
+- **Datum und Uhrzeit**: Wählen Sie Beginn des Gottesdienstes aus. Bei anderen Veranstaltungen gibt es stattdessen den **Zeitraum** und die Auswahl **Ganztägige Veranstaltung**.
 - **Zugehöriges Proprium**: Bei Gottesdiensten können Sie ein abweichendes Proprium auswählen.
 - **Dauer** oder **Ende**: Falls sichtbar, geben Sie an, wann der Termin ungefähr endet. Das hilft bei Raum- und Kalenderplanung.
-- **Beginn**: Bei anderen Veranstaltungen die Startzeit.
-- **Ende**: Bei anderen Veranstaltungen die Endzeit. Wenn das Ende leer ist oder vor dem Beginn liegt, setzt Pfarrplaner beim Ändern des Beginns automatisch eine sinnvolle Endzeit.
-- **Ganztägige Veranstaltung**: Erscheint nur bei anderen Veranstaltungen. Dann werden Beginn und Ende als Datum ohne Uhrzeit verwendet.
+- **Zeitraum**: Bei anderen Veranstaltungen wählen Sie Beginn und Ende in einem gemeinsamen Feld. Wenn die Veranstaltung nicht ganztägig ist, gehören Datum und Uhrzeit zusammen in diesen Zeitraum. Ein Klick auf das Feld öffnet einen Kalender; dort wählen Sie zuerst den Beginn und dann das Ende.
+- **Ganztägige Veranstaltung**: Erscheint nur bei anderen Veranstaltungen. Dann werden nur Start- und Enddatum ohne Uhrzeit verwendet.
 - **Zugehöriges Proprium**: Erscheint nur bei Gottesdiensten. Damit wählen Sie einen anderen Sonn- oder Feiertag mit Lesejahr aus, wenn der Gottesdienst liturgisch nicht zum Kalendertag gehört.
 
 ### Ort und Sichtbarkeit
@@ -259,6 +258,8 @@ Hier können Sie Dateien an den Gottesdienst anhängen (z. B. PDFs, Bilder, Word
 - **Löschen**: Entfernt eine Datei aus dem Gottesdienst.
 
 Typische Dateien sind Ablaufpläne, Lesungen, Bilder, Plakate, Formulare oder Absprachen mit Mitwirkenden.
+
+Wenn eine früher gespeicherte Datei auf dem Server nicht mehr vorhanden ist, bleibt der Eintrag trotzdem sichtbar. Pfarrplaner zeigt dann direkt an der Datei einen Hinweis, dass die gespeicherte Datei nicht gefunden wurde.
 
 ---
 

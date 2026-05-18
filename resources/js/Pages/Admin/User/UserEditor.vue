@@ -130,14 +130,15 @@
                             <city-permission-toggle v-model="cityPermission[city.id].permission"/>
                         </div>
                         <div class="col-md-4">
-                            <div class="form-group">
-                                <select v-model="mySubscriptions[city.id].subscription_type"
-                                        class="form-control">
+                            <form-group :id="`subscriptionType${city.id}`" :input-id="`subscriptionType${city.id}Input`"
+                                        :label="`Benachrichtigungen für ${city.name}`" class="mb-0" v-slot="field">
+                                <select :id="field.fieldId" v-model="mySubscriptions[city.id].subscription_type"
+                                        class="form-control" :aria-describedby="field.describedBy || undefined">
                                     <option value="0">keine Benachrichtigungen</option>
                                     <option value="1">bei Änderungen an eigenen Gottesdiensten</option>
                                     <option value="2">bei Änderungen an allen Gottesdiensten</option>
                                 </select>
-                            </div>
+                            </form-group>
                         </div>
                     </div>
                 </fake-table>

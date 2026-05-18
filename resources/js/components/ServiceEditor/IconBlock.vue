@@ -35,19 +35,25 @@ export default {
 </script>
 
 <template>
-    <div>
-        <div class="row">
-            <div class="d-none d-md-block col-md-1" style="font-size: 3em; color: darkgray;">
+    <section class="icon-block card shadow-sm border-0 mb-3">
+        <div class="card-body">
+            <div class="row align-items-start">
+                <div class="d-none d-md-block col-md-1 icon-block-symbol">
                 <span :class="icon"></span>
             </div>
             <div class="col-12 col-md-11">
                 <slot/>
             </div>
         </div>
-        <hr/>
-    </div>
+        </div>
+    </section>
 </template>
 
 <style scoped>
-
+.icon-block-symbol {
+    color: darkgray;
+    font-size: 2.5rem;
+    line-height: 1;
+    text-align: center;
+}
 </style>

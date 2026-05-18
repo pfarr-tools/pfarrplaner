@@ -576,15 +576,29 @@ body.login .main-sidebar:hover .login-form.hidden-collapsed {
     color: map-get($theme-colors, 'danger');
 }
 
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group .form-label,
+.form-group legend.form-label {
+    font-weight: $font-weight-medium;
+    margin-bottom: .35rem;
+}
+
+.form-group .invalid-feedback {
+    display: block;
+}
+
 .form-control, input.form-check-input {
     background-color: white;
 }
 
-input.form-control, textarea.form-control {
+input.form-control, textarea.form-control, select.form-control, select.form-select {
     border-width: 0 0 1px 1px;
 }
 
-input.form-control:focus, textarea.form-control:focus {
+input.form-control:focus, textarea.form-control:focus, select.form-control:focus, select.form-select:focus {
     background-color: tint-color(theme.elkw-color("hellblau"), 70%);
     font-weight: $font-weight-semibold;
     box-shadow: none;
@@ -648,6 +662,10 @@ input.form-control:focus, textarea.form-control:focus {
     color: #212529 !important;
 }
 
+.multiselect.is-invalid {
+    border-color: map-get($theme-colors, 'danger') !important;
+}
+
 // @vuepic/vue-datepicker — match FormInput styling
 .dp__input {
     border-width: 0 0 1px 1px !important;
@@ -665,6 +683,10 @@ input.form-control:focus, textarea.form-control:focus {
     border-color: theme.elkw-color("dunkelblau") !important;
     font-weight: $font-weight-semibold !important;
     box-shadow: none !important;
+}
+
+.dp__input[aria-invalid="true"] {
+    border-color: map-get($theme-colors, 'danger') !important;
 }
 
 .dp__menu {

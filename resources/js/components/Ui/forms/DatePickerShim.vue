@@ -34,6 +34,7 @@
 -->
 <template>
     <VueDatePicker
+        v-bind="$attrs"
         :model-value="internalDate"
         :formats="{ input: dpFormat }"
         :enable-time-picker="hasTime"
@@ -53,6 +54,7 @@ import * as dateFnsLocales from 'date-fns/locale';
 
 export default {
     name: 'DatePickerShim',
+    inheritAttrs: false,
     components: { VueDatePicker },
     props: {
         modelValue: { type: null, default: null },

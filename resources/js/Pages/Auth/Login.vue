@@ -37,7 +37,7 @@
                 <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                     <h1 class="ps-0 pl-0 ms-0 ms-0 mb-4">{{ layout.appName }}</h1>
                     <h2 v-if="layout.appProvider" class="ps-0 pl-0 ms-0 ms-0 mb-4">&mdash; {{ layout.appProvider }} &mdash;</h2>
-                    <form method="POST" id="loginForm" @submit.prevent.stop="submit">
+                    <form method="POST" id="loginForm" @submit.prevent.stop="submit" novalidate>
                         <form-csrf-token />
                         <!-- Email input -->
                         <div v-if="!demo">
@@ -53,18 +53,18 @@
 
                         <div v-else>
                             <div class="form-outline mb-4">
-                                <label class="form-label" for="form3Example3">E-Mailadresse</label>
-
-                                <select id="users" name="email" class="form-control">
+                                <label class="form-label" for="users">E-Mailadresse</label>
+                                <select id="users" name="email" class="form-control" v-model="form.email" aria-describedby="usersHelp">
                                     <option v-for="user in users" :key="user.email" :value="user.email">
                                         {{ user.title ? user.title+' ' : ''}}{{ user.name }} ({{ user.email }})
                                     </option>
                                 </select>
+                                <small id="usersHelp" class="form-text text-muted">Wählen Sie einen Demo-Benutzer aus.</small>
                             </div>
                         </div>
                         <div class="text-end text-lg-start mt-4 pt-2" :key="attempts">
-                            <button  class="btn btn-primary btn-lg"
-                                     @click="submit"
+                            <button type="submit" class="btn btn-primary btn-lg"
+                                     :disabled="loggingIn"
                                      style="padding-left: 2.5rem; padding-right: 2.5rem;">Anmelden</button>
                         </div>
 
@@ -112,10 +112,12 @@ export default {
         return {
             csrf: null,
             dev: this.$page.props.dev,
+            demo: this.$page.props.demo,
+            users: this.$page.props.users || [],
             attempts: 0,
             loggingIn: false,
             form: {
-                email: '',
+                email: this.$page.props.users?.[0]?.email || '',
                 password: '',
                 remember: false,
             }

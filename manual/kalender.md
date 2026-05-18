@@ -33,6 +33,8 @@ Pfarrplaner merkt sich, welche Ansicht Sie zuletzt verwendet haben. Wenn Sie den
 
 Die Gottesdienst-Ansicht zeigt einen Monat als Tabelle. Links stehen die Tage, oben stehen die sichtbaren Gemeinden. Jede Zelle zeigt die Gottesdienste dieser Gemeinde an diesem Tag.
 
+Beim Wechsel in einen anderen Monat baut Pfarrplaner zuerst das Monatsraster auf. Einzelne Gottesdienst-Kacheln können einen kurzen Augenblick später nachgeladen werden. Währenddessen sehen Sie Platzhalter in den betroffenen Zellen.
+
 Ein Tageskopf enthält:
 
 - **Wochentag und Datum**
@@ -121,7 +123,7 @@ Wenn Sie einen Gottesdienst bearbeiten dürfen, können Sie die Kachel anklicken
 - **:material-pencil: Stift**: Gottesdienst im [Editor für Veranstaltungen und Gottesdienste](veranstaltungen.md) bearbeiten.
 - **:material-view-list: Listen-Symbol**: [Liturgie-Editor](liturgie.md) öffnen.
 - **:material-microphone: Mikrofon**: [Predigteditor](predigt.md) öffnen.
-- **:material-delete: Papierkorb**: Gottesdienst löschen. Nutzen Sie diese Funktion nur, wenn der Eintrag wirklich entfernt werden soll.
+- **:material-delete: Papierkorb**: Gottesdienst löschen. Nach dem Klick fragt Pfarrplaner noch einmal nach. Erst nach Ihrer Bestätigung wird der Eintrag entfernt und verschwindet sofort aus dem Kalender.
 - **:material-target-account: Zielscheibe mit Person**: Sich selbst für einen Dienst in diesem Gottesdienst eintragen.
 
 Wenn Sie den Gottesdienst nicht bearbeiten dürfen, können trotzdem Schaltflächen sichtbar sein:
@@ -184,6 +186,8 @@ Mehr zu Berichten und Ausgaben steht im Kapitel [Berichte und Ausgaben](berichte
 
 Danach öffnen Sie den Eintrag im [Editor für Veranstaltungen und Gottesdienste](veranstaltungen.md), um Ort, Mitwirkende, Beschreibung, Dateien, Kasualien und weitere Angaben zu ergänzen.
 
+Wenn Sie für mehrere Gemeinden schreiben dürfen, öffnet die Schaltfläche ein Auswahlmenü. Dort sehen Sie zuerst die Gemeindeliste. Unter einem Trenner finden Sie zusätzlich den Link **Mehrere Gottesdienste auf einmal anlegen...**. Darüber öffnen Sie direkt den Assistenten aus dem Kapitel [Eingabe-Assistenten](eingaben.md#mehrere-gottesdienste-anlegen).
+
 ---
 
 ## Veranstaltungskalender
@@ -198,6 +202,8 @@ Jeder Kalendertag erscheint als Feld im Monatsraster. Tage aus dem vorherigen od
 
 Die Wochentage bleiben beim Blättern nach unten am oberen Rand sichtbar. Ein Termin im Veranstaltungskalender zeigt Uhrzeit, Titel und die Ortszeile direkt im Kalendertag. Alle Termine eines Tages werden direkt im Tagesfeld angezeigt.
 
+Mehrtägige Veranstaltungen erscheinen an jedem betroffenen Kalendertag. So sehen Sie bei ganztägigen und bei zeitgebundenen Terminen sofort, über welche Tage sich der Termin erstreckt. Am ersten Tag sehen Sie den Beginn, an Zwischentagen einen Hinweis auf die laufende Veranstaltung und am letzten Tag das Ende.
+
 Bewegen Sie die Maus auf einen Termin. Dann erscheinen direkt auf dem Termin die passenden Schaltflächen:
 
 - **Bearbeiten**, wenn es ein bearbeitbarer Einzeltermin ist
@@ -205,6 +211,9 @@ Bewegen Sie die Maus auf einen Termin. Dann erscheinen direkt auf dem Termin die
 - **Serie bearbeiten**, wenn der Termin zu einer wiederholten Veranstaltungsserie gehört
 - **Einzeltermin bearbeiten**, wenn nur dieser eine Termin aus einer Serie geändert werden soll
 - **Einzeltermin löschen**, wenn nur dieser Termin aus der Serie entfernt werden soll
+- **Löschen**, wenn ein einzelner Termin vollständig entfernt werden soll
+
+Beim Löschen fragt Pfarrplaner immer noch einmal nach. Nach Ihrer Bestätigung verschwindet der gelöschte Termin sofort aus der Monatsansicht.
 
 Wiederkehrende Termine behandeln Sie besonders vorsichtig: **Serie bearbeiten** wirkt auf die ganze Reihe, **Einzeltermin bearbeiten** nur auf den ausgewählten Termin.
 

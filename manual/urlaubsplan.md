@@ -191,6 +191,8 @@ Der Reiter **Dateien** enthält:
 - **Angehängte Dateien**: Liste bereits gespeicherter Dateien.
 - **Dateien hinzufügen**: Uploadfeld für weitere Dateien.
 
+Wenn eine gespeicherte Datei im System nicht mehr gefunden wird, bleibt sie in der Liste sichtbar. Statt Größenangabe oder Vorschau sehen Sie dann einen deutlichen Hinweis direkt an dieser Datei.
+
 Dateien können zum Beispiel ein unterschriebener Urlaubsantrag oder ein Formular sein. Achten Sie bei sensiblen Dokumenten darauf, ob sie wirklich im Pfarrplaner gespeichert werden sollen.
 
 ---

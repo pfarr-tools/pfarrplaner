@@ -29,10 +29,7 @@
 
 <template>
     <div class="liturgy-item-reading-editor">
-        <div class="form-group">
-            <label for="title">Titel im Ablaufplan</label>
-            <input class="form-control" v-model="editedElement.title" v-focus/>
-        </div>
+        <form-input id="readingEditorTitle" v-model="editedElement.title" label="Titel im Ablaufplan" />
         <form-textarea v-model="editedElement.data.intro" label="Hinführung zur Lesung" class="mb-1" />
         <form-bible-reference-input v-model="editedElement.data.reference" :sources="textSources" :allow-own-version="true" />
         <div :key="editedElement.data.reference" v-if="editedElement.data.reference ? editedElement.data.reference.includes('[Eigener Text]') : false">

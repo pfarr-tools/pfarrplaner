@@ -7,10 +7,10 @@
 | Handbuch | Pfarrplaner Benutzerhandbuch |
 | Programmversion | 2026.10.2 |
 | Umgebung | local |
-| Build-Datum der Anwendung | Freitag, 08. Mai 2026 19:26 |
-| Handbuch erstellt am | 08.05.2026 19:27 |
-| Git-Branch | vue3-migration |
-| Git-Stand | ab867d6e |
+| Build-Datum der Anwendung | Samstag, 16. Mai 2026 16:22 |
+| Handbuch erstellt am | 18.05.2026 11:09 |
+| Git-Branch | codex/form-styling |
+| Git-Stand | da873f73 |
 | Lizenz | GNU General Public License, Version 3.0 oder später |
 | Projekt | Pfarrplaner |
 | Autor und Copyright | Christoph Fischer, https://christoph-fischer.org |

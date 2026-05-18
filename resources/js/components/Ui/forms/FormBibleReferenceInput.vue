@@ -29,21 +29,32 @@
 
 <template>
     <div class="form-bible-reference-input">
-        <form-group :name="name" :id="myId" :label="label" :help="help" pre-label="book-bible" :required="required" :is-checked-item="isCheckedItem" :value="myValue">
-            <div class="input-group mb-3">
-                <div v-if="Object.keys(myOptions).length > 0" class="input-group-prepend">
-                    <button ref="sourceToggle" class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="mdi mdi-book-open-variant"></span></button>
+        <form-group :name="name" :id="myId" :input-id="`${myId}Input`" :label="label" :help="help" pre-label="book-bible"
+                    :required="required" :is-checked-item="isCheckedItem" :value="currentValue" v-slot="field">
+            <div class="input-group">
+                <div v-if="myOptions.length > 0" class="dropdown">
+                    <button ref="sourceToggle" class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false" title="Vorschlag übernehmen">
+                        <span class="mdi mdi-book-open-variant" aria-hidden="true"></span>
+                        <span class="visually-hidden">Vorschlag übernehmen</span>
+                    </button>
                     <div class="dropdown-menu">
-                        <a v-for="(option,optionIndex) in myOptions" class="dropdown-item" @click.prevent="setTextFromList(option.id, $event)" :key="optionIndex" href="#">{{ option.name }}</a>
+                        <button v-for="(option, optionIndex) in myOptions" :key="optionIndex" type="button" class="dropdown-item"
+                                @click="setTextFromList(option.id)">{{ option.name }}</button>
                     </div>
                 </div>
-                <input type="text" class="form-control" :aria-label="label" :name="name" :value="myReference" @input="handleInput" :key="valueChanged">
-                <div class="input-group-append">
-                    <button ref="versionToggle" class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{ myVersion }}</button>
+                <input :id="field.fieldId" type="text" class="form-control" :class="{'is-invalid': field.error}"
+                       :aria-label="label" :aria-invalid="field.error ? 'true' : 'false'"
+                       :aria-describedby="field.describedBy || undefined" :name="name" :value="myReference"
+                       :disabled="disabled" :required="required" @input="handleInput">
+                <div v-if="!noVersion" class="dropdown">
+                    <button ref="versionToggle" class="btn btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ myVersion }}
+                    </button>
                     <div class="dropdown-menu">
-                        <a v-for="(option,optionIndex) in availableVersions" class="dropdown-item"  @click.prevent="setVersion(option, $event)" :key="optionIndex">{{ option }}</a>
+                        <button v-for="(option, optionIndex) in availableVersions" :key="optionIndex" type="button" class="dropdown-item"
+                                @click="setVersion(option)">{{ option }}</button>
                     </div>
                 </div>
             </div>
@@ -52,8 +63,12 @@
             <small class="form-text text-muted mt-0 p-0" :title="myBibleText" v-if="myVersion != 'Eigener Text'">
                 <span v-if="myBibleTextLoading" class="mdi mdi-spin mdi-loading" title="Bibeltext wird geladen..."></span>
                 <span v-else>{{ myBibleText }}</span>
-                <span v-if="(!myBibleTextLoading) && (myBibleText) && (clipboard)" class="mdi mdi-content-copy" @click.prevent.stop="copyToClipboard"
-                                                           title="Klicken, um den Text in die Zwischenablage zu kopieren"></span>
+                <button v-if="(!myBibleTextLoading) && myBibleText && clipboard" type="button"
+                        class="btn btn-link btn-sm p-0 ms-2 align-baseline" @click.prevent.stop="copyToClipboard"
+                        title="Klicken, um den Text in die Zwischenablage zu kopieren">
+                    <span class="mdi mdi-content-copy" aria-hidden="true"></span>
+                    <span class="visually-hidden">Text in die Zwischenablage kopieren</span>
+                </button>
             </small>
         </div>
     </div>
@@ -61,17 +76,12 @@
 
 <script>
 import FormGroup from "./FormGroup";
-import ValueCheck from "../elements/ValueCheck";
-import BibleReference from "../../LiturgyEditor/Elements/BibleReference";
 import __ from 'lodash';
-import FormSelectize from "./FormSelectize";
-import FormInput from "./FormInput";
-import FormTextarea from "./FormTextarea.vue";
 import { uid } from '../../../libraries/uid';
 
 export default {
     name: "FormBibleReferenceInput",
-    components: {FormTextarea, FormInput, FormSelectize, BibleReference, ValueCheck, FormGroup},
+    components: {FormGroup},
     emits: ['input', 'update:modelValue'],
     props: {
         label: String,
@@ -123,10 +133,10 @@ export default {
             default: false,
         }
     },
-    mounted() {
-        if (this.myId == '') this.myId = uid();
-        const initVal = this.modelValue !== undefined ? this.modelValue : this.value;
-        if (initVal) this.bibleText(this);
+    computed: {
+        currentValue() {
+            return this.modelValue !== undefined ? this.modelValue : this.value;
+        },
     },
     data() {
         const sources = this.sources || {};
@@ -136,7 +146,7 @@ export default {
             myOptions.push({ id: sources[sourceKey], name: sourceKey+': '+sources[sourceKey]});
         }
 
-        let availableVersions = this.$page.props.bible.versions;
+        let availableVersions = [...this.$page.props.bible.versions];
         if (this.allowOwnVersion) {
             availableVersions.push('Eigener Text');
         }
@@ -149,41 +159,34 @@ export default {
 
 
         return {
-            errors: this.$page.props.errors,
-            error: this.$page.props.errors[this.name] || false,
-            myId: this.id || '',
+            myId: this.id || uid(),
             myValue,
             myBibleText: '',
             myBibleTextLoading: false,
             myReference,
             myVersion,
             availableVersions,
-            component: this,
             myOptions,
-            mySettings: {
-                create: function(input) {
-                    return {id: input, name: input};
-                },
-                options: myOptions,
-                labelField: 'name',
-                valueField: 'id',
-                searchFields: ['name', 'id'],
-            },
-            valueChanged: 0,
         }
     },
+    mounted() {
+        if (this.currentValue) this.bibleText(this);
+    },
     watch: {
-        modelValue(newVal) {
-            if (this.required) {
-                this.error = this.$page.props.errors[this.name] = newVal ? '' : 'Dieses Feld darf nicht leer bleiben.';
-                this.$forceUpdate();
+        currentValue(newVal) {
+            if (!newVal) {
+                this.myValue = '';
+                this.myReference = '';
+                return;
             }
-        },
-        value(newVal) {
-            if (this.modelValue === undefined && this.required) {
-                this.error = this.$page.props.errors[this.name] = newVal ? '' : 'Dieses Feld darf nicht leer bleiben.';
-                this.$forceUpdate();
+            this.myValue = newVal;
+            if (!newVal.includes('[')) {
+                this.myReference = newVal.trim();
+                return;
             }
+            let parts = newVal.split('[');
+            this.myVersion = parts[1].replace(']', '').trim();
+            this.myReference = parts[0].trim();
         },
     },
     methods: {
@@ -207,18 +210,15 @@ export default {
                 });
         }, 1000),
         copyToClipboard() {
-            const cb = navigator.clipboard;
-            cb.writeText(this.myBibleText+" ("+this.myReference+')').then(result => {});
+            navigator.clipboard?.writeText(this.myBibleText+" ("+this.myReference+')').then(() => {});
         },
-        setTextFromList(id, event) {
+        setTextFromList(id) {
             this.myReference = id;
-            this.valueChanged++;
             this.setNewValue();
             this.$refs.sourceToggle?.click()
         },
-        setVersion(option, event) {
+        setVersion(option) {
             this.myVersion = option;
-            this.valueChanged++;
             this.setNewValue();
             this.$refs.versionToggle?.click();
         },

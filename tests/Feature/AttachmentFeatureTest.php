@@ -68,4 +68,21 @@ class AttachmentFeatureTest extends TestCase
         $this->assertSame('teaser', $attachment->cut);
         $this->assertCount(1, $response->json());
     }
+
+    public function testMissingAttachmentFileStillSerializes(): void
+    {
+        $attachment = Attachment::factory()->create([
+            'title' => 'Fehlende Datei',
+            'file' => 'attachments/does-not-exist.pdf',
+        ]);
+
+        $data = $attachment->fresh()->toArray();
+
+        $this->assertFalse($data['hasFile']);
+        $this->assertNull($data['size']);
+        $this->assertSame('', $data['mimeType']);
+        $this->assertSame('fa-exclamation-triangle', $data['icon']);
+        $this->assertSame('pdf', $data['extension']);
+        $this->assertSame('Die gespeicherte Datei wurde nicht gefunden.', $data['errorMessage']);
+    }
 }

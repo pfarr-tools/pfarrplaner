@@ -28,9 +28,9 @@
   -->
 
 <template>
-    <div class="form-inline">
-        <label>Zeige</label>
-        <select :value="dsShowEntries" class="form-control me-1 ms-1" @change="change">
+    <div class="form-inline align-items-center">
+        <label :for="selectId">Zeige</label>
+        <select :id="selectId" :value="dsShowEntries" class="form-control me-1 ms-1" @change="change" aria-label="Anzahl der angezeigten Datensätze">
             <option v-for="option in dsShowEntriesLovs" :key="option.value" :value="option.value">
                 {{ option.text }}
             </option>
@@ -57,6 +57,11 @@ export default {
                 { value: 100, text: 100 }
             ]
         }
+    },
+    computed: {
+        selectId() {
+            return 'dataset-show-entries';
+        },
     },
     created() {
         this.showEntries(Number(this.dsShowEntries))

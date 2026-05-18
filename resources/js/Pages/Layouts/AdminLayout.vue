@@ -71,8 +71,8 @@
             </Topbar>
 
             <div
-                class="px-2 d-flex flex-column flex-grow-1 min-vh-0"
-                :class="noContentHeader ? 'pt-2' : 'pt-4'"
+                class="d-flex flex-column flex-grow-1 min-vh-0"
+                :class="contentShellClasses"
             >
                 <h1 v-if="title && !noContentHeader" class="m-0 mb-4 text-dark" :key="title">{{ title }}</h1>
                 <slot name="before-flash" />
@@ -122,6 +122,15 @@ export default {
         noContentHeader: Boolean,
         noPadding: Boolean,
         noContentScroll: Boolean,
+        noOuterPadding: Boolean,
+    },
+    computed: {
+        contentShellClasses() {
+            return [
+                this.noOuterPadding ? 'px-0 pt-0' : 'px-2',
+                !this.noOuterPadding ? (this.noContentHeader ? 'pt-2' : 'pt-4') : '',
+            ];
+        },
     },
     mounted() {
         if (this.title != '') document.title = this.title + ' :: ' + this.layout.appName;

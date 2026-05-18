@@ -38,14 +38,14 @@
                 <span class="d-inline d-md-none mdi mdi-delete"></span> <span class="d-none d-md-inline">Löschen</span>
             </button>
             <div class="dropdown show">
-                <a class="btn btn-light dropdown-toggle ms-1" href="#" role="button" id="dropdownMenuLink"
+                <button type="button" class="btn btn-light dropdown-toggle ms-1" id="dropdownMenuLink"
                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Weitere Aktionen
-                </a>
+                </button>
 
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                    <a class="dropdown-item" @click.prevent.stop="saveInLocalStorage">Datenpaket im Browser sichern</a>
-                    <a class="dropdown-item" @click.prevent.stop="downloadAsJson">Datenpaket auf Festplatte sichern</a>
+                    <button type="button" class="dropdown-item" @click.prevent.stop="saveInLocalStorage">Datenpaket im Browser sichern</button>
+                    <button type="button" class="dropdown-item" @click.prevent.stop="downloadAsJson">Datenpaket auf Festplatte sichern</button>
                 </div>
             </div>
         </template>
@@ -80,19 +80,10 @@
                                     label="Name" placeholder="Nachname, Vorname"/>
                     </div>
                     <div class="col-md-6">
-                        <form-group label="Zu verwendendes Pronomen">
-                            <div>
-                                <div class="form-check-inline"
-                                     v-for="(pronounSet, pronounSetIndex) in pronounSets"
-                                     :key="'pronouns_'+pronounSet.key">
-                                    <label class="form-check-label">
-                                        <input type="radio" class="form-check-input"
-                                               v-model="myFuneral.pronoun_set"
-                                               :value="pronounSet.key">{{ pronounSet.label }}
-                                    </label>
-                                </div>
-                            </div>
-                        </form-group>
+                        <form-radio-group label="Zu verwendendes Pronomen"
+                                          name="pronoun_set"
+                                          v-model="myFuneral.pronoun_set"
+                                          :items="pronounSetOptions" />
                     </div>
                 </div>
                 <div class="row">
@@ -189,14 +180,11 @@
                         :title="'Von Predigt übernehmen ('+funeral.service.sermon.reference+')'"
                         @click="setFuneralText(funeral.service.sermon.reference)">Von Predigt übernehmen
                 </button>
-                <form-group label="Bestattungsart">
-                    <select v-model="myFuneral.type" class="form-control" name="type">
-                        <option>Erdbestattung</option>
-                        <option>Trauerfeier</option>
-                        <option>Trauerfeier mit Urnenbeisetzung</option>
-                        <option>Urnenbeisetzung</option>
-                    </select>
-                </form-group>
+                <form-radio-group label="Bestattungsart"
+                                  name="type"
+                                  v-model="myFuneral.type"
+                                  :items="funeralTypeOptions"
+                                  :inline="false" />
                 <div v-if="myFuneral.type == 'Urnenbeisetzung'">
                     <form-group label="Datum der vorhergehenden Trauerfeier" name="wake">
                         <date-picker :config="myDatePickerConfig" v-model="myFuneral.wake"/>
@@ -405,6 +393,7 @@ import TextStats from "../../components/LiturgyEditor/Elements/TextStats";
 import FormDatePicker from "../../components/Ui/forms/FormDatePicker";
 import NavButton from "../../components/Ui/buttons/NavButton";
 import FormBibleReferenceInput from "../../components/Ui/forms/FormBibleReferenceInput";
+import FormRadioGroup from "../../components/Ui/forms/FormRadioGroup.vue";
 import __ from 'lodash';
 import Accordion from "../../components/Ui/accordion/Accordion";
 import AccordionElement from "../../components/Ui/accordion/AccordionElement";
@@ -417,6 +406,7 @@ export default {
         AccordionElement,
         Accordion,
         FormBibleReferenceInput,
+        FormRadioGroup,
         NavButton,
         FormDatePicker,
         TextStats,
@@ -436,6 +426,20 @@ export default {
     },
     props: ['funeral', 'pronounSets', 'activeTab'],
     computed: {
+        pronounSetOptions() {
+            return this.pronounSets.reduce((result, pronounSet) => {
+                result[pronounSet.key] = pronounSet.label;
+                return result;
+            }, {});
+        },
+        funeralTypeOptions() {
+            return {
+                'Erdbestattung': 'Erdbestattung',
+                'Trauerfeier': 'Trauerfeier',
+                'Trauerfeier mit Urnenbeisetzung': 'Trauerfeier mit Urnenbeisetzung',
+                'Urnenbeisetzung': 'Urnenbeisetzung',
+            };
+        },
         age() {
             if ((!this.myFuneral.dod) || (!this.myFuneral.dob)) return null;
             return moment(this.myFuneral.dod, 'DD.MM.YYYY').diff(moment(this.myFuneral.dob, 'DD.MM.YYYY'), 'years');

@@ -29,8 +29,9 @@
 -->
 
 <template>
-    <form-group :label="label">
+    <form-group :id="myId" :input-id="`${myId}Input`" :label="label" v-slot="field">
         <VueDatePicker
+            :id="field.fieldId"
             :model-value="internalRange"
             range
             multi-calendars
@@ -41,6 +42,7 @@
             :text-input-options="{ format: 'dd.MM.yyyy' }"
             auto-apply
             :disabled="disabled"
+            :aria-describedby="field.describedBy || undefined"
             @update:model-value="onRangeChange"
         />
         <input type="hidden" :name="nameFrom" :value="hiddenFrom" />
@@ -52,6 +54,7 @@
 import { VueDatePicker } from '@vuepic/vue-datepicker';
 import FormGroup from './FormGroup';
 import * as dateFnsLocales from 'date-fns/locale';
+import { uid } from '../../../libraries/uid';
 
 export default {
     name: 'FormDateRangePicker',
@@ -68,6 +71,12 @@ export default {
     },
 
     emits: ['update:from', 'update:to'],
+
+    data() {
+        return {
+            myId: uid(),
+        };
+    },
 
     computed: {
         dpLocale() {
@@ -105,7 +114,12 @@ export default {
         },
 
         onRangeChange(range) {
-            if (!range || range.length < 2 || !range[1]) return;
+            if (!range || !range[0]) {
+                this.$emit('update:from', null);
+                this.$emit('update:to', null);
+                return;
+            }
+            if (range.length < 2 || !range[1]) return;
             const start = window.moment(range[0]).startOf('day');
             const end = window.moment(range[1]).endOf('day');
             if (this.isoDate) {

@@ -36,7 +36,24 @@ class PoolmasterPolicy
      */
     public function update(User $user, Poolmaster $poolmaster): bool
     {
-        return true;
+        if ($user->id === $poolmaster->user_id) {
+            return true;
+        }
+
+        if ($user->hasPermissionTo('fremden-urlaub-bearbeiten')) {
+            $cityIds = $poolmaster->user->homeCities->pluck('id');
+            foreach ($user->writableCities as $city) {
+                if ($cityIds->contains($city->id) && (!$poolmaster->user->hasRole('Pfarrer:in'))) {
+                    return true;
+                }
+            }
+        }
+
+        if ($poolmaster->user->vacationAdmins->pluck('id')->contains($user->id)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -44,7 +61,7 @@ class PoolmasterPolicy
      */
     public function delete(User $user, Poolmaster $poolmaster): bool
     {
-        return true;
+        return $this->update($user, $poolmaster);
     }
 
     /**

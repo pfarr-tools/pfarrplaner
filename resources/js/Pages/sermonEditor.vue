@@ -80,27 +80,15 @@
                 <div class="row g-3 sermon-editor__layout">
                     <div class="col-md-4 d-flex flex-column min-h-0 sermon-editor__column">
                         <div class="overflow-auto min-h-0 h-100 ">
-                            <card class="shadow-sm sermon-editor__card">
+                                <card class="shadow-sm sermon-editor__card">
                                 <div class="card-header bg-white border-bottom">
                                     Predigtinformationen
                                 </div>
                                 <card-body class="sermon-editor__sidebar">
-                                    <div class="form-group">
-                                        <label>Titel</label>
-                                        <input class="form-control" type="text" v-model="editedSermon.title" v-focus/>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Untertitel</label>
-                                        <input class="form-control" type="text" v-model="editedSermon.subtitle"/>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Reihe</label>
-                                        <input class="form-control" type="text" v-model="editedSermon.series"/>
-                                    </div>
-                                    <div class="form-group mb-2">
-                                        <label>Zusammenfassung</label>
-                                        <textarea class="form-control" v-model="editedSermon.summary"/>
-                                    </div>
+                                    <form-input id="sermonTitle" label="Titel" v-model="editedSermon.title" />
+                                    <form-input id="sermonSubtitle" label="Untertitel" v-model="editedSermon.subtitle"/>
+                                    <form-input id="sermonSeries" label="Reihe" v-model="editedSermon.series"/>
+                                    <form-textarea id="sermonSummary" label="Zusammenfassung" v-model="editedSermon.summary" class="mb-2"/>
                                     <form-bible-reference-input name="reference" :key="referenceCopied"
                                                                 label="Predigttext"
                                                                 v-model="editedSermon.reference" :sources="textSources" />
@@ -181,10 +169,14 @@ import CardBody from "../components/Ui/cards/cardBody";
 import FormBibleReferenceInput from "../components/Ui/forms/FormBibleReferenceInput";
 import NavButton from "../components/Ui/buttons/NavButton";
 import {getTextSources} from "../libraries/TextSources";
+import FormTextarea from "../components/Ui/forms/FormTextarea.vue";
+import FormInput from "../components/Ui/forms/FormInput.vue";
 
 export default {
     name: "sermonEditor",
     components: {
+        FormInput,
+        FormTextarea,
         NavButton,
         FormBibleReferenceInput,
         CardBody,
@@ -249,6 +241,7 @@ export default {
 
         return {
             referenceCopied: 0,
+            textUpdated: 0,
             editedSermon: editedSermon,
             fileUpload: null,
             removeImage: false,
@@ -260,7 +253,7 @@ export default {
                     Underline,
                     Placeholder.configure({ placeholder: 'Schreibe hier den Text deiner Predigt hin...' }),
                 ],
-                onUpdate: ({ editor }) => { editedSermon.text = editor.getHTML(); },
+                onUpdate: ({ editor }) => { editedSermon.text = editor.getHTML(); this.textUpdated++; },
             }),
             editorLiterature: new Editor({
                 content: editedSermon.literature,

@@ -28,7 +28,7 @@
   -->
 
 <template>
-    <admin-layout :title="pageTitle" no-content-header>
+    <admin-layout :title="pageTitle" no-content-header no-padding no-outer-padding>
         <template #navbar-left>
             <absence-nav :year="year" :month="month" :years="years" />
         </template>
@@ -67,17 +67,9 @@
             </div>
         </template>
 
-        <div v-if="loadingUsers" class="alert alert-info">
-            <span class="mdi mdi-spin mdi-loading"></span>
-            Lade anzuzeigende Benutzer...
-        </div>
-        <div v-if="loadingDates" class="alert alert-info">
-            <span class="mdi mdi-spin mdi-loading"></span>
-            Lade Einträge für {{ loadingDates }} Benutzer...
-        </div>
-
+        <div class="planner-page">
         <card class="planner-card">
-            <card-body class="p-0">
+            <card-body class="p-0 planner-card-body">
                 <div class="table-responsive tbl-absences">
                     <table class="table table-bordered table-hover table-sm mb-0 absence-planner-table">
                         <thead>
@@ -94,6 +86,16 @@
                             </th>
                         </tr>
                         </thead>
+                        <tbody v-if="loadingUsers && !sections.length">
+                        <tr v-for="index in skeletonRowCount" :key="'planner-skeleton-' + index" class="planner-skeleton-row">
+                            <th class="user-name planner-sticky-column">
+                                <div class="planner-skeleton planner-skeleton-name"></div>
+                            </th>
+                            <td v-for="day in calendarDays" :key="'planner-skeleton-cell-' + index + '-' + day.key" class="cal-cell">
+                                <div class="planner-skeleton planner-skeleton-cell"></div>
+                            </td>
+                        </tr>
+                        </tbody>
                         <tbody v-for="(category, categoryIndex) in sections" :key="category">
                         <tr
                             v-if="categoryIndex > 0"
@@ -114,7 +116,7 @@
                             </th>
                         </tr>
                         <template v-for="user in users[category]" :key="user.id">
-                            <tr v-if="openSections[category] && userDays[user.id]" :key="userRowKey(category, user)">
+                            <tr v-if="openSections[category] && userDays[user.id]" :key="userRowKey(category, user)" class="planner-row-compact">
                                 <th class="user-name planner-sticky-column">
                                     <div class="d-flex justify-content-between align-items-start gap-2">
                                         <div>
@@ -159,10 +161,6 @@
                                             <span v-if="showAbsenceReason(user, day)">
                                                 ({{ getUserDay(user, day)?.absence?.reason }})
                                             </span>
-                                            <br />
-                                            <small v-if="getUserDay(user, day)?.absence?.replacementText">
-                                                V: {{ getUserDay(user, day)?.absence?.replacementText }}
-                                            </small>
                                         </div>
                                         <div
                                             v-else
@@ -173,12 +171,29 @@
                                     </td>
                                 </template>
                             </tr>
+                            <tr v-else-if="openSections[category] && isUserDaysLoading(user)" :key="userRowKey(category, user) + '-loading'" class="planner-skeleton-row">
+                                <th class="user-name planner-sticky-column">
+                                    <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <div>
+                                            <div class="planner-user-label">{{ formatUserName(user) }}</div>
+                                        </div>
+                                        <div v-if="user.canEdit" class="btn-group btn-group-sm planner-user-actions" role="group">
+                                            <span class="planner-skeleton planner-skeleton-button"></span>
+                                            <span v-if="pools.length > 0" class="planner-skeleton planner-skeleton-button"></span>
+                                        </div>
+                                    </div>
+                                </th>
+                                <td v-for="day in calendarDays" :key="user.id + '-loading-' + day.key" class="cal-cell">
+                                    <div class="planner-skeleton planner-skeleton-cell"></div>
+                                </td>
+                            </tr>
                         </template>
                         </tbody>
                     </table>
                 </div>
             </card-body>
         </card>
+        </div>
     </admin-layout>
 </template>
 
@@ -205,7 +220,7 @@ export default {
             users: {},
             userDays: {},
             loadingUsers: true,
-            loadingDates: 0,
+            loadingUserDays: {},
             sections: [],
             openSections: this.normalizeOpenSections(this.sectionConfig, mask),
             pinnedUsers: this.pinList || [],
@@ -234,6 +249,9 @@ export default {
         sectionColumnCount() {
             return this.calendarDays.length + 1;
         },
+        skeletonRowCount() {
+            return 6;
+        },
         plannerVisibilityUsers() {
             return this.toggleableUsers.filter(Boolean);
         },
@@ -251,17 +269,17 @@ export default {
         async loadPlanner() {
             const response = await axios.get(route('planner.users'));
             const users = this.sortUsers(response.data);
-            this.loadingUsers = false;
             this.users = users;
+            this.loadingUsers = false;
 
             response.data.forEach(user => {
-                this.loadingDates++;
+                this.loadingUserDays[user.id] = true;
                 axios.get(route('planner.days', {user: user.id, date: moment(this.start).format('YYYY-MM')}))
                     .then(userResponse => {
                         this.userDays[user.id] = userResponse.data;
                     })
                     .finally(() => {
-                        this.loadingDates--;
+                        delete this.loadingUserDays[user.id];
                     });
             });
         },
@@ -494,6 +512,9 @@ export default {
         getUserDay(user, day) {
             if (!user || !day) return null;
             return this.userDays?.[user.id]?.[day.day] || null;
+        },
+        isUserDaysLoading(user) {
+            return !!this.loadingUserDays[user.id];
         }
     }
 }
@@ -503,8 +524,54 @@ export default {
 @use '../../../sass/theme' as theme;
 
 .planner-card {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
     border: 0;
     box-shadow: var(--bs-box-shadow-sm);
+}
+
+.planner-page {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.planner-card-body {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.planner-skeleton-row .planner-sticky-column {
+    background: var(--bs-white);
+}
+
+.planner-skeleton {
+    background: linear-gradient(90deg, #edf1f4 25%, #f8f9fa 37%, #edf1f4 63%);
+    background-size: 400% 100%;
+    animation: planner-skeleton-shimmer 1.4s ease infinite;
+    border-radius: 0.25rem;
+}
+
+.planner-skeleton-name {
+    height: 1rem;
+    width: 75%;
+    margin: 0.15rem 0;
+}
+
+.planner-skeleton-cell {
+    height: 1.1rem;
+    width: 100%;
+}
+
+.planner-skeleton-button {
+    display: inline-block;
+    height: 1.45rem;
+    width: 1.75rem;
+    margin-left: 0.25rem;
 }
 
 .planner-topbar-actions {
@@ -535,8 +602,19 @@ export default {
     color: var(--bs-dark) !important;
 }
 
+@keyframes planner-skeleton-shimmer {
+    0% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0 50%;
+    }
+}
+
 .tbl-absences {
-    max-height: calc(100vh - 14rem);
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
 }
 
 .tbl-absences .table {
@@ -598,6 +676,24 @@ export default {
     min-width: 2.5rem;
     max-width: 2.5rem;
     overflow: hidden;
+}
+
+.planner-row-compact .cal-cell {
+    height: 2.6rem;
+    max-height: 2.6rem;
+}
+
+.planner-row-compact .absence {
+    display: block;
+    max-height: 2.2rem;
+    overflow: hidden;
+    line-height: 1.05;
+}
+
+.planner-row-compact .absence strong,
+.planner-row-compact .absence span,
+.planner-row-compact .absence small {
+    display: inline;
 }
 
 .planner-day-header {

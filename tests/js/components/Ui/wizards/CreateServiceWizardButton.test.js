@@ -23,9 +23,23 @@ describe('CreateServiceWizardButton', () => {
             props: { cities: multiCities, date: '2024-06-09' },
         })
         const items = w.findAll('.dropdown-item')
-        expect(items).toHaveLength(2)
+        expect(items).toHaveLength(3)
         expect(items[0].text()).toBe('Albstadt')
         expect(items[1].text()).toBe('Balingen')
+        expect(items[2].text()).toBe('Mehrere Gottesdienste auf einmal anlegen...')
+    })
+    it('renders a separator before the multiple services link', () => {
+        const w = mount(CreateServiceWizardButton, {
+            props: { cities: multiCities, date: '2024-06-09' },
+        })
+        expect(w.find('.dropdown-divider').exists()).toBe(true)
+    })
+    it('links to the multiple services input from the dropdown', () => {
+        const w = mount(CreateServiceWizardButton, {
+            props: { cities: multiCities, date: '2024-06-09' },
+        })
+        const items = w.findAll('.dropdown-item')
+        expect(items[2].attributes('href')).toBe('/inputs.setup')
     })
     it('uses custom title when title prop is set', () => {
         const w = mount(CreateServiceWizardButton, {

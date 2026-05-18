@@ -37,15 +37,17 @@
         <card>
             <card-header>Passwort ändern</card-header>
             <card-body>
-                <form-input name="current_password" v-if="!originalPassword"
-                            label="Aktuelles Passwort" type="password"
-                            v-model="auth.current_password" />
-                <form-input name="new_password"
-                            label="Neues Passwort" type="password"
-                            v-model="auth.new_password" />
-                <form-input name="new_password_confirmation"
-                            label="Neues Passwort (wiederholen)" type="password"
-                            v-model="auth.new_password_confirmation" />
+                <form class="password-change-form" @submit.prevent="savePassword">
+                    <form-input name="current_password" v-if="!originalPassword"
+                                label="Aktuelles Passwort" type="password" autocomplete="current-password"
+                                v-model="auth.current_password" />
+                    <form-input name="new_password"
+                                label="Neues Passwort" type="password" autocomplete="new-password"
+                                v-model="auth.new_password" />
+                    <form-input name="new_password_confirmation"
+                                label="Neues Passwort (wiederholen)" type="password" autocomplete="new-password"
+                                v-model="auth.new_password_confirmation" />
+                </form>
             </card-body>
         </card>
     </admin-layout>
@@ -73,7 +75,7 @@ export default {
     },
     methods: {
         savePassword() {
-            let data = this.auth;
+            const data = {...this.auth};
             if (this.originalPassword) delete(data.current_password);
             this.$inertia.post(route('password.change'), data);
         },
@@ -82,5 +84,7 @@ export default {
 </script>
 
 <style scoped>
-
+.password-change-form {
+    max-width: 40rem;
+}
 </style>

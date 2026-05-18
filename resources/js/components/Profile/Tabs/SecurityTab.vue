@@ -31,11 +31,11 @@
     <div class="security-tab">
         <form-input name="current_password" label="Aktuelles Passwort"
                     help="Um dein Passwort zu ändern, musst du dein aktuelles Passwort mit angeben."
-                    type="password" v-model="password.current" />
+                    type="password" autocomplete="current-password" v-model="password.current" />
         <form-input name="new_password" label="Neues Passwort"
-                    type="password" v-model="password.new" />
+                    type="password" autocomplete="new-password" v-model="password.new" />
         <form-input name="new_password_confirm" label="Neues Passwort wiederholen"
-                    type="password" v-model="password.confirm" />
+                    type="password" autocomplete="new-password" v-model="password.confirm" />
     </div>
 </template>
 

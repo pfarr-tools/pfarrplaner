@@ -116,7 +116,7 @@
                             <span class="mdi mdi-view-list"></span>
                         </a>
                         <a href="#" class="btn btn-light mb-1 me-1" role="button"
-                           title="Predigt bearbeiten" @click.prevent.stop="editFromButton(myService, 'myService.sermon.editor', $event)">
+                           title="Predigt bearbeiten" @click.prevent.stop="editFromButton(myService, 'service.sermon.editor', $event)">
                             <span class="mdi mdi-microphone"></span>
                         </a>
                         <a href="#" class="btn btn-danger mb-1 me-1" role="button"
@@ -168,6 +168,7 @@ import FormSelectize from "../Ui/forms/FormSelectize.vue";
 
 export default {
     name: 'CalendarService',
+    emits: ['deleted'],
     components: {
         FormSelectize,
         Modal,
@@ -292,12 +293,17 @@ export default {
                 this.$inertia.visit(route(myRoute, service.slug));
             }
         },
-        deleteService(service, index) {
+        deleteService(service) {
             if (confirm('Willst du diesen Gottesdienst wirklich komplett löschen?')) {
                 this.$api().delete(route('api.service.destroy', {
                     service: service.slug,
-                })).then(response => {
-                    this.services = this.services.splice(index, 1);
+                })).then(() => {
+                    this.$emit('deleted', {
+                        id: service.id,
+                        slug: service.slug,
+                        cityId: service.city_id,
+                        date: moment(service.date).format('YYYY-MM-DD'),
+                    });
                 });
             }
         },

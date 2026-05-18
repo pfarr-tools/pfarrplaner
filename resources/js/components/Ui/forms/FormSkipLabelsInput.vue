@@ -36,12 +36,14 @@ export default {
     emits: ['update:modelValue', 'input'],
     components: {FormGroup},
     data() {
-        let states = [];
-        for (let i=0; i<this.labels; i++) states.push(false);
         return {
-            states,
             myValue: this.modelValue,
         }
+    },
+    computed: {
+        states() {
+            return Array.from({ length: this.labels }, (_, index) => index);
+        },
     },
     watch: {
         modelValue(v) { this.myValue = v; },
@@ -51,7 +53,6 @@ export default {
             this.myValue = value;
             this.$emit('update:modelValue', value);
             this.$emit('input', value);
-            this.$forceUpdate();
         }
     }
 }
@@ -61,14 +62,16 @@ export default {
     <form-group :label="label">
         <div class="row">
             <div class="col-12 col-md-4">
-                <div class="row page m-3">
-                    <div v-for="(state,labelIndex) in states"
+                <div class="row page m-3" role="listbox" aria-label="Druckbeginn für Etiketten">
+                    <button v-for="labelIndex in states" :key="labelIndex" type="button"
                          class="col-4 label p-3"
                          :class="labelIndex < myValue ? 'skipped' : (labelIndex < myValue+length ? 'active' : 'empty')"
+                         :aria-selected="labelIndex === myValue ? 'true' : 'false'"
                          @click="setValue(labelIndex)"
                     >
                         <span v-if="(labelIndex >= myValue) && (labelIndex < myValue+length)">Dieses Etikett wird bedruckt.</span>
-                    </div>
+                        <span v-else class="visually-hidden">Druck beginnt ab diesem Etikett.</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -85,6 +88,7 @@ export default {
         border: solid 1px black;
         min-height: 7em !important;
         font-size: .6em;
+        text-align: left;
     }
 
     .label.active, .label.empty {

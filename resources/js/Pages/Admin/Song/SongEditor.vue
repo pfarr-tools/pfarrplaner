@@ -60,13 +60,11 @@
                 </div>
                 <div v-for="(verse,verseKey,verseIndex) in song.verses">
                     <div class="row">
-                        <div class="col-1 form-group">
-                            <input type="text" class="form-control" v-model="verse.number"/>
+                        <div class="col-1">
+                            <form-input :id="`verseNumber${verseIndex}`" label="" v-model="verse.number"/>
                         </div>
                         <div class="col-10">
-                            <div class="form-group">
-                                <textarea class="form-control" v-model="verse.text"></textarea>
-                            </div>
+                            <form-textarea :id="`verseText${verseIndex}`" label="" v-model="verse.text" />
                             <div class="form-check-inline">
                                 <input type="checkbox" v-model="verse.refrain_before"/> &nbsp;
                                 Kehrvers vor dieser Strophe

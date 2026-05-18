@@ -95,7 +95,7 @@
 
         <create-service-wizard-button v-if="canCreate" type="success"
                                       :cities="creatableCities" class="ms-2 me-2" :date="date"
-                                      :events="!(calendarMode == 'services')" :title="(calendarMode == 'services') ? 'Gottesdienst anlegen' : 'Veranstaltung anlegen'"
+                                      :events="!(calendarMode == 'services')"
                                       :key="moment(date).toISOString()+calendarMode"/>
 
         <nav-button v-if="(calendarMode == 'services')"
@@ -109,11 +109,9 @@
             {{ targetTitle() }}
         </nav-button>
 
-        <a v-if="(calendarMode == 'services')" class="btn btn-sm btn-outline-secondary"
-           :href="route('reports.setup', {report: 'ministryRequest'})"
-           title="Dienstanfrage per E-Mail senden"><span class="mdi mdi-email"></span> <span class="d-none d-md-inline">Anfrage senden...</span></a>
-
-
+        <nav-button type="outline-secondary" icon="mdi mdi-email" force-icon :href="route('reports.setup', {report: 'ministryRequest'})">
+            Anfrage senden
+        </nav-button>
     </div>
 
 </template>

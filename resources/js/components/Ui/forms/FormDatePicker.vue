@@ -28,16 +28,19 @@
   -->
 
 <template>
-    <form-group :id="id" :label="label" :help="help" :name="name" :pre-label="preLabel" :required="required"
-                :value="myValue" :is-checked-item="isCheckedItem">
-        <date-picker :name="name" v-model="myValue" :config="myDatePickerConfig" :disabled="disabled" :required="required"
-                     :aria-required="required" @input="handleInputEvent" @dp-update="$emit('dp-update', $event)"/>
+    <form-group :id="myId" :input-id="`${myId}Input`" :label="label" :help="help" :name="name"
+                :pre-label="preLabel" :required="required" :value="currentValue" :is-checked-item="isCheckedItem"
+                v-slot="field">
+        <date-picker :id="field.fieldId" :name="name" :model-value="currentValue" :config="myDatePickerConfig"
+                     :disabled="disabled" :required="required" :aria-required="required ? 'true' : 'false'"
+                     :aria-invalid="field.error ? 'true' : 'false'" :aria-describedby="field.describedBy || undefined"
+                     @update:modelValue="handleModelUpdate" @input="handleInputEvent" @dp-update="$emit('dp-update', $event)"/>
     </form-group>
 </template>
 
 <script>
 import FormGroup from "./FormGroup";
-import ValueCheck from "../elements/ValueCheck";
+import { uid } from '../../../libraries/uid';
 
 export default {
     name: "FormDatePicker",
@@ -79,9 +82,8 @@ export default {
         }
     },
     data() {
-        const v = this.modelValue !== undefined ? this.modelValue : this.value;
         return {
-            myValue: v,
+            myId: this.id || uid(),
             myDatePickerConfig: this.config || {
                 locale: 'de',
                 format: 'DD.MM.YYYY',
@@ -89,12 +91,10 @@ export default {
             },
         }
     },
-    watch: {
-        currentValue(v) {
-            this.myValue = v;
-        }
-    },
     methods: {
+        handleModelUpdate(value) {
+            this.$emit('update:modelValue', value);
+        },
         handleInputEvent(e) {
             let out;
             if (this.isoDate) {
@@ -107,7 +107,6 @@ export default {
                 out = e;
             }
             this.$emit('input', out);
-            this.$emit('update:modelValue', out);
         },
     }
 };

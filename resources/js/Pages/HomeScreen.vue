@@ -31,11 +31,11 @@
     <admin-layout :title="'Willkommen, '+(user.first_name ? user.first_name : user.name)+'!'">
         <template #navbar-left>
             <div class="btn-group me-1">
-                <a class="btn btn-primary" :href="route('calendar')"><span class="mdi mdi-calendar"></span> <span
-                    class="d-none d-md-inline">Zum Kalender</span></a>
+                <inertia-link class="btn btn-primary" :href="route('calendar')"><span class="mdi mdi-calendar"></span> <span
+                    class="d-none d-md-inline">Zum Kalender</span></inertia-link>
                 <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="sr-only">Weitere Optionen aufklappen</span>
+                    <span class="visually-hidden">Weitere Optionen aufklappen</span>
                 </button>
                 <div class="dropdown-menu p-1">
                     <date-picker v-model="myQuickPickerDate" inline auto-apply
@@ -74,7 +74,7 @@
                 </div>
             </div>
 
-            <create-service-wizard-button :cities="cities" />
+            <create-service-wizard-button type="success" :cities="cities" />
 
             <inertia-link v-if="config.wizardButtons == '1'" class="btn btn-light" :href="route('baptisms.create')">
                 <span class="mdi mdi-water"></span>
@@ -101,8 +101,8 @@
                         {{ replacement.absence.user.name }} ({{ replacement.absence.reason }},
                         {{ moment(replacement.from).format('DD.MM.YYYY') }} -
                         {{ moment(replacement.to).format('DD.MM.YYYY') }})
-                        <div v-if="replacement.absence.replacement_notes"><small><span
-                            class="fw-bold">Hinweis: </span><span v-html="replacement.absence.replacement_notes.replaceAll(/(\r)*\n/g, '<br />')"></span></small></div>
+                        <div v-if="replacement.absence.replacement_notes" class="replacement-note"><small><span
+                            class="fw-bold">Hinweis: </span><span>{{ replacement.absence.replacement_notes }}</span></small></div>
                     </li>
                 </ul>
             </div>
@@ -120,8 +120,8 @@
                                 {{ replacement.absence.user.name }} ({{ replacement.absence.reason }},
                                 {{ moment(replacement.from).format('DD.MM.YYYY') }} -
                                 {{ moment(replacement.to).format('DD.MM.YYYY') }})
-                                <div v-if="replacement.absence.replacement_notes"><small><span
-                                    class="fw-bold">Hinweis: </span><span v-html="replacement.absence.replacement_notes.replaceAll(/(\r)*\n/g, '<br />')"></span></small></div>
+                                <div v-if="replacement.absence.replacement_notes" class="replacement-note"><small><span
+                                    class="fw-bold">Hinweis: </span><span>{{ replacement.absence.replacement_notes }}</span></small></div>
                             </li>
                         </ul>
                         </template>
@@ -296,7 +296,7 @@ export default {
             this.myQuickPickerLoading = true;
             axios.get(route('api.calendar.quick-pick', {
                 api_token: this.apiToken,
-                date: this.myQuickPickerDate,
+                date: moment(this.myQuickPickerDate).format('DD.MM.YYYY'),
             })).then(response => {
                 this.myQuickPickerServices = response.data;
                 this.myQuickPickerLoading = false;
@@ -349,6 +349,10 @@ ul.nav.nav-tabs {
     text-decoration: none;
 }
 
+.replacement-note {
+    white-space: pre-line;
+}
+
 .tab-loader {
     width: 100%;
     margin-top: 30vh;
@@ -357,7 +361,7 @@ ul.nav.nav-tabs {
     color: lightgray;
 }
 
->>> .dp__menu {
+:deep(.dp__menu) {
     border: none !important;
 }
 

@@ -28,60 +28,94 @@
   -->
 
 <template>
-    <div class="form-group" :class="{'form-group-required' : required}" :title="required ? 'Dieses Feld muss ausgefüllt werden.' : ''">
+    <div class="form-group form-field" :class="groupClasses">
         <value-check v-if="isCheckedItem" :value="value" />
-        <label v-if="label" :for="id+'Input'" class="control-label"><span v-if="preLabel" :class="preLabel"></span> {{ label }}</label>
-        <slot />
-        <small v-if="error" :key="String(error)" class="message invalid-feedback">{{ Array.isArray(error) ? error.join(' ') : error }}</small>
-        <div v-else><small v-if="help" class="message form-text text-muted">{{ help }}</small></div>
+        <label v-if="label" :for="fieldId" class="control-label form-label">
+            <span v-if="preLabel" :class="preLabel" aria-hidden="true"></span>
+            {{ label }}
+            <span v-if="required" class="text-danger ms-1" aria-hidden="true">*</span>
+            <span v-if="required" class="visually-hidden">(Pflichtfeld)</span>
+        </label>
+        <slot :described-by="describedBy" :error="hasError" :error-id="errorId" :error-message="errorMessage"
+              :field-id="fieldId" :help-id="helpId" />
+        <small v-if="help" :id="helpId" class="message form-text text-muted">{{ help }}</small>
+        <div v-if="hasError" :id="errorId" :key="errorId + String(errorMessage)" class="message invalid-feedback d-block">
+            {{ errorMessage }}
+        </div>
     </div>
 </template>
 
 <script>
 import ValueCheck from "../elements/ValueCheck";
+
 export default {
     name: "FormGroup",
     components: {ValueCheck},
-    props: ['id', 'name', 'label', 'help', 'preLabel', 'required', 'value', 'isCheckedItem'],
-    updated() {
-        this.errors = this.$page.props.errors;
-        this.error = this.errors[this.name] || false;
-    },
-    data() {
-        const errors = this.$page.props.errors;
-        return {
-            errors: errors,
-            error: errors[this.name] || false,
-        }
-    },
-    watch: {
-        value: {
-            handler: function(newVal) {
-                if (this.required) {
-                    this.error = this.$page.props.errors[this.name] = newVal ? '' : 'Dieses Feld darf nicht leer bleiben.';
-                    this.$forceUpdate();
-                }
-            }
+    props: {
+        id: String,
+        name: String,
+        label: String,
+        help: String,
+        preLabel: String,
+        required: {
+            type: Boolean,
+            default: false,
         },
-        '$page.props.errors': function(newVal) {
-            this.errors = this.$page.props.errors;
-            this.error = this.errors[this.name] || false;
-            this.$forceUpdate();
-        }
-    }
+        value: { type: null },
+        isCheckedItem: {
+            type: Boolean,
+            default: false,
+        },
+        inputId: String,
+        error: {
+            type: [String, Array],
+            default: null,
+        },
+    },
+    computed: {
+        fieldId() {
+            if (this.inputId) return this.inputId;
+            if (this.id) return `${this.id}Input`;
+            return '';
+        },
+        helpId() {
+            return this.id ? `${this.id}Help` : '';
+        },
+        errorId() {
+            return this.id ? `${this.id}Error` : '';
+        },
+        pageError() {
+            if (!this.name) return null;
+            return this.$page.props.errors?.[this.name] || null;
+        },
+        errorMessage() {
+            const message = this.error ?? this.pageError;
+            if (!message) return '';
+            return Array.isArray(message) ? message.join(' ') : message;
+        },
+        hasError() {
+            return this.errorMessage !== '';
+        },
+        describedBy() {
+            return [this.help ? this.helpId : null, this.hasError ? this.errorId : null].filter(Boolean).join(' ');
+        },
+        groupClasses() {
+            return {
+                'form-group-required': this.required,
+                'form-field-invalid': this.hasError,
+            };
+        },
+    },
 }
 </script>
 
 <style scoped>
-.form-group.form-group-required .control-label:after {
-    color: #d00;
-    content: "*";
-    position: absolute;
-    margin-left: 3px;
-}
-
 .message {
     font-size: .8em;
+}
+
+.form-label {
+    font-weight: 500;
 }
 
 </style>

@@ -210,7 +210,8 @@ export default {
         var myPeople = this.people.filter(person => person.id != this.$page.props.currentUser.data.id);
         myPeople.unshift(this.$page.props.currentUser.data);
 
-        const initVal = this.modelValue !== undefined ? this.modelValue : (this.value || []);
+        const initValRaw = this.modelValue !== undefined ? this.modelValue : this.value;
+        const initVal = Array.isArray(initValRaw) ? initValRaw : [];
         initVal.forEach(function (person) {
             myValue.push(isNaN(person) ? person.id : person);
         });

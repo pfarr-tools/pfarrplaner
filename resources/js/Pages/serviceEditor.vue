@@ -38,15 +38,15 @@
                     </button>
                     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="sr-only">Weitere Optionen aufklappen</span>
+                        <span class="visually-hidden">Weitere Optionen aufklappen</span>
                     </button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" @click.prevent="saveService(false)" href="#">
+                        <button type="button" class="dropdown-item" @click.prevent="saveService(false)">
                             <span class="mdi mdi-content-save"></span> Speichern, ohne zu schließen
-                        </a>
-                        <a class="dropdown-item" @click.prevent="cancelEdit" href="#">
+                        </button>
+                        <button type="button" class="dropdown-item" @click.prevent="cancelEdit">
                             <span class="mdi mdi-cancel"></span> Schließen, ohne zu speichern
-                        </a>
+                        </button>
                     </div>
                 </div>
                 <button class="btn btn-danger" @click.prevent="deleteService"><span
@@ -54,7 +54,7 @@
             </template>
             <template #navbar-right>
                 <div class="btn-group calendar-mode-toggle" role="group" aria-label="Ansicht umschalten" v-if="editedService.event_class == 'service'">
-                    <button class="btn btn-secondary" href="#">
+                    <button type="button" class="btn btn-secondary">
                         <span class="mdi mdi-pencil me-1"></span>
                         <span class="d-none d-xl-inline">Bearbeiten</span>
                     </button>
@@ -69,10 +69,10 @@
                 </div>
 
                 <div class="ms-1 dropdown show">
-                    <a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuLink"
                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Weitere Aktionen
-                    </a>
+                    </button>
 
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" v-if="service.slug">
                         <a class="dropdown-item" :href="route('service.ical', {service: service.slug})">In Outlook
@@ -114,7 +114,7 @@
                                 :count="service.comments ? service.comments.length : 0"/>
                 </tab-headers>
             </template>
-            <form @submit.prevent="saveService" id="formSermon">
+            <form @submit.prevent="saveService" id="serviceEditorForm" class="service-editor-form" aria-label="Veranstaltung bearbeiten">
                 <tabs>
                     <tab id="home" :active-tab="activeTab">
                         <home-tab :service="editedService" :locations="locations"
@@ -219,14 +219,16 @@ export default {
         adsConfig: Object,
         adChannels: Object,
     },
+    created() {
+        this.normalizeServiceArrays(this.service);
+    },
     computed: {
+        hasStreaming() {
+            return Boolean(this.service?.id && this.service?.city?.google_access_token);
+        },
         hasAnnouncements() {
             if (!this.service.id) return false;
-            let found = false;
-            this.service.attachments.forEach(attachment => {
-                found = found || (attachment.title == 'Bekanntgaben');
-            });
-            return found;
+            return this.service.attachments.some(attachment => attachment.title == 'Bekanntgaben');
         },
     },
     data() {
@@ -270,6 +272,15 @@ export default {
         this.updatePeopleCounter();
     },
     methods: {
+        normalizeServiceArrays(service) {
+            ['pastors', 'organists', 'sacristans', 'tags', 'service_groups', 'related_cities'].forEach(key => {
+                if (!Array.isArray(service[key])) service[key] = [];
+            });
+
+            if (!service.ministriesByCategory || Array.isArray(service.ministriesByCategory)) {
+                service.ministriesByCategory = {};
+            }
+        },
         updatePeopleCounter() {
             let count = 0;
             let ministries = this.service.ministriesByCategory;
@@ -288,8 +299,7 @@ export default {
             this.peopleCount = count;
         },
         saveService(closeAfterSaving) {
-            // build a request record:
-            var record = {
+            const record = {
                 ...this.editedService,
                 alt_liturgy_date: this.editedService.alt_liturgy_date ? moment(this.editedService.alt_liturgy_date).format('DD.MM.YYYY') : null,
                 participants: {
@@ -302,7 +312,7 @@ export default {
                 serviceGroups: [],
                 ...this.files,
             };
-            var ct = 0;
+            let ct = 0;
             Object.keys(this.editedService.ministriesByCategory).forEach(key => {
                 record.ministries[ct] = {description: key, people: []};
                 this.editedService.ministriesByCategory[key].forEach(person => {
@@ -319,12 +329,6 @@ export default {
 
             record.closeAfterSaving = closeAfterSaving ? 1 : 0;
 
-            // convert to FormData
-            let fd = new FormData();
-            for (const [key, value] of Object.entries(record)) {
-                fd.append(key, value || '');
-            }
-            // send the request
             this.$inertia.patch(route('service.update', this.service.slug), record, {
                 preserveState: false
             });
@@ -339,17 +343,11 @@ export default {
             });
             return items;
         },
-        hasKonfiApp() {
-            return (undefined != this.service.id) && (this.service.city.konfiapp_apikey != '');
-        },
-        hasStreaming() {
-            return (undefined != this.service.id) && (this.service.city.google_access_token != '');
-        },
         countAttachments() {
             if (!this.service.slug) return 0;
-            var ctr = this.editedService.attachments.length;
+            let ctr = this.editedService.attachments.length;
             if (this.editedService.liturgy_blocks.length) {
-                for (var sheet in this.liturgySheets) {
+                for (const sheet in this.liturgySheets) {
                     if (!this.liturgySheets[sheet].isNotAFile) ctr++;
                 }
             }
@@ -379,7 +377,7 @@ export default {
         });
         Object.defineProperty(lists, 'ministries', {
             enumerable: true,
-            get: () => this.lists.teams,
+            get: () => this.lists.ministries,
         });
         return {
             lists,
@@ -390,6 +388,9 @@ export default {
 </script>
 
 <style scoped>
+.service-editor-form {
+    padding-bottom: 2rem;
+}
 
 .tab-loader {
     width: 100%;

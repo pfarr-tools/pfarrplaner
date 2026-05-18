@@ -60,7 +60,7 @@ class Attachment extends AbstractModel
      */
     protected $fillable = ['title', 'file', 'attachable_id', 'attachable_type', 'cut'];
 
-    protected $appends = ['size', 'mimeType', 'icon', 'extension'];
+    protected $appends = ['size', 'mimeType', 'icon', 'extension', 'hasFile', 'errorMessage'];
 
     /**
      * @return MorphTo
@@ -70,28 +70,58 @@ class Attachment extends AbstractModel
         return $this->morphTo();
     }
 
+    /**
+     * @return string
+     */
     public function getLabelAttribute(): string
     {
         return (string) ($this->title ?? basename((string) $this->file));
     }
 
-    public function getSizeAttribute()
+    /**
+     * @return bool
+     */
+    public function getHasFileAttribute(): bool
     {
+        return $this->file && Storage::exists($this->file);
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getSizeAttribute(): ?int
+    {
+        if (! $this->hasFile) {
+            return null;
+        }
+
         return Storage::size($this->file);
     }
 
-    public function getMimeTypeAttribute()
+    /**
+     * @return string
+     */
+    public function getMimeTypeAttribute(): string
     {
+        if (! $this->hasFile) {
+            return '';
+        }
+
         return Storage::mimeType($this->file);
     }
 
     /**
      * Get correct file icon by mime type
+     *
      * @return string
      * @source https://gist.github.com/colemanw/9c9a12aae16a4bfe2678de86b661d922
      */
-    public function getIconAttribute()
+    public function getIconAttribute(): string
     {
+        if (! $this->hasFile) {
+            return 'fa-exclamation-triangle';
+        }
+
         $icon_classes = [
             // Media
             'image' => 'fa-file-image',
@@ -124,9 +154,24 @@ class Attachment extends AbstractModel
         return 'fa-file';
     }
 
-    public function getExtensionAttribute()
+    /**
+     * @return string
+     */
+    public function getExtensionAttribute(): string
     {
-        return pathinfo($this->file, PATHINFO_EXTENSION);
+        return (string) pathinfo((string) $this->file, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getErrorMessageAttribute(): ?string
+    {
+        if ($this->hasFile) {
+            return null;
+        }
+
+        return 'Die gespeicherte Datei wurde nicht gefunden.';
     }
 
 }

@@ -28,10 +28,11 @@
   -->
 
 <template>
-    <form-group :id="myId" :label="label" :help="help" :name="name" :pre-label="preLabel" :is-checked-item="isCheckedItem">
+    <form-group :id="myId" :input-id="`${myId}Input`" :label="label" :help="help" :name="name"
+                :pre-label="preLabel" :is-checked-item="isCheckedItem" v-slot="field">
         <Multiselect
-            :id="myId + 'Input'"
-            :class="{'is-invalid': $page.props.errors && $page.props.errors[name]}"
+            :id="field.fieldId"
+            :class="{'is-invalid': field.error}"
             v-model="myValue"
             :options="resolvedOptions"
             :value-prop="resolvedIdKey"
@@ -42,6 +43,8 @@
             :disabled="disabled"
             :searchable="true"
             :name="name"
+            :aria-invalid="field.error ? 'true' : 'false'"
+            :aria-describedby="field.describedBy || undefined"
             locale="de"
             :no-results-text="{ de: 'Keine Ergebnisse gefunden', en: 'No results found' }"
             :no-options-text="{ de: 'Die Liste ist leer', en: 'The list is empty' }"
@@ -95,13 +98,11 @@ export default {
         isCheckedItem: { type: Boolean },
     },
     emits: ['input', 'update:modelValue'],
-    mounted() {
-        if (this.myId === '') this.myId = uid();
-    },
     data() {
+        const initialValue = this.modelValue !== undefined ? this.modelValue : this.value;
         return {
-            myId: this.id || '',
-            myValue: this.modelValue !== undefined ? this.modelValue : this.value,
+            myId: this.id || uid(),
+            myValue: this.normalizeValue(initialValue),
         };
     },
     computed: {
@@ -148,10 +149,14 @@ export default {
         },
     },
     watch: {
-        value(v) { this.myValue = v; },
-        modelValue(v) { this.myValue = v; },
+        value(v) { this.myValue = this.normalizeValue(v); },
+        modelValue(v) { this.myValue = this.normalizeValue(v); },
     },
     methods: {
+        normalizeValue(value) {
+            if (this.multiple) return Array.isArray(value) ? value : [];
+            return value;
+        },
         changed(newVal) {
             this.$emit('input', newVal);
             this.$emit('update:modelValue', newVal);

@@ -40,19 +40,20 @@
                         und bietet dadurch Einblicke in die Verwendung des Dienstes.
                         Ein Passwort ist nicht erforderlich. Bitte wähle den gewünschten Benutzer einfach unten aus.
                     </p>
-                    <form method="POST" id="loginForm" @submit.prevent.stop="submit">
+                    <form method="POST" id="loginForm" @submit.prevent.stop="submit" novalidate>
                         <form-csrf-token />
                         <!-- Email input -->
                         <form-group label="E-Mailadresse">
-                            <select name="email" class="form-control" v-model="form.email">
-                                <option v-for="user in users" :value="user.email">
+                            <select id="demoUsers" name="email" class="form-control" v-model="form.email" aria-describedby="demoUsersHelp">
+                                <option v-for="user in users" :key="user.email" :value="user.email">
                                     {{ user.title ? user.title + ' ' : '' }}{{ user.name }} ({{ user.email }})
                                 </option>
                             </select>
+                            <small id="demoUsersHelp" class="form-text text-muted">Wählen Sie den gewünschten Demo-Benutzer aus.</small>
                         </form-group>
                         <div class="text-end text-lg-start mt-4 pt-2" :key="attempts">
-                            <button class="btn btn-primary btn-lg"
-                                    @click="submit"
+                            <button type="submit" class="btn btn-primary btn-lg"
+                                    :disabled="loggingIn"
                                     style="padding-left: 2.5rem; padding-right: 2.5rem;">Anmelden
                             </button>
                         </div>
@@ -85,13 +86,12 @@
 
 
 <script>
-import FormInput from "../../components/Ui/forms/FormInput.vue";
-import FormCheck from "../../components/Ui/forms/FormCheck.vue";
 import FormCsrfToken from "../../components/Ui/forms/FormCsrfToken.vue";
+import FormGroup from "../../components/Ui/forms/FormGroup.vue";
 
 export default {
     name: "Login",
-    components: {FormCsrfToken, FormCheck, FormInput},
+    components: {FormCsrfToken, FormGroup},
     props: ['users'],
     computed: {
         layout() {
@@ -105,7 +105,7 @@ export default {
             attempts: 0,
             loggingIn: false,
             form: {
-                email: '',
+                email: this.users?.[0]?.email || '',
                 password: 'test',
                 remember: false,
             }

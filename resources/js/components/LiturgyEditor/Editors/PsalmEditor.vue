@@ -29,10 +29,7 @@
 
 <template>
     <div class="liturgy-item-psalm-editor">
-        <div class="form-group">
-            <label for="title">Titel im Ablaufplan</label>
-            <input class="form-control" v-model="editedElement.title" v-focus/>
-        </div>
+        <form-input id="psalmEditorTitle" v-model="editedElement.title" label="Titel im Ablaufplan" />
         <div v-if="psalms === null">
             Bitte warten, Liste der Psalmen wird geladen...
         </div>
@@ -41,40 +38,21 @@
                             :options="psalms" :settings="{ searchField: ['name'], }"
                             @input="handlePsalmSelection"/>
             <div v-if="(editedElement.data.psalm.id == -1) || editPsalm">
-                <div class="form-group">
-                    <label for="title">Titel des Psalms</label>
-                    <input class="form-control" v-model="editedElement.data.psalm.title"/>
-                </div>
-                <div class="form-group">
-                    <label>Einleitende Worte</label>
-                    <textarea class="form-control" v-model="editedElement.data.psalm.intro"
-                              placeholder="Leer lassen, wenn es keinen spezielle Einleitungstext gibt"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Text</label>
-                    <textarea rows="10" class="form-control" v-model="editedElement.data.psalm.text"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Copyrights</label>
-                    <textarea class="form-control" v-model="editedElement.data.psalm.copyrights"></textarea>
-                </div>
+                <form-input id="psalmTitle" label="Titel des Psalms" v-model="editedElement.data.psalm.title"/>
+                <form-textarea id="psalmIntro" label="Einleitende Worte" v-model="editedElement.data.psalm.intro"
+                               placeholder="Leer lassen, wenn es keinen spezielle Einleitungstext gibt"/>
+                <form-textarea id="psalmText" label="Text" rows="10" v-model="editedElement.data.psalm.text"/>
+                <form-textarea id="psalmCopyrights" label="Copyrights" v-model="editedElement.data.psalm.copyrights"/>
                 <div class="row">
                     <div class="col-11">
-                        <div class="form-group">
-                            <label>Liederbuch</label>
-                            <textarea class="form-control" v-model="editedElement.data.psalm.songbook"></textarea>
-                        </div>
+                        <form-textarea id="psalmSongbook" label="Liederbuch" v-model="editedElement.data.psalm.songbook"/>
                     </div>
-                    <div class="col-1 form-group">
-                        <label>Abkürzung</label>
-                        <input type="text" class="form-control"
-                               v-model="editedElement.data.psalm.songbook_abbreviation"/>
+                    <div class="col-1">
+                        <form-input id="psalmSongbookAbbreviation" label="Abkürzung"
+                                    v-model="editedElement.data.psalm.songbook_abbreviation"/>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="reference">Liednummer</label>
-                    <input class="form-control" v-model="editedElement.data.psalm.reference"/>
-                </div>
+                <form-input id="psalmReference" label="Liednummer" v-model="editedElement.data.psalm.reference"/>
                 <div class="form-group">
                     <button class="btn btn-sm btn-light" @click.prevent="saveText" v-if="!editPsalm">Als neuen Psalm
                         speichern
@@ -101,13 +79,17 @@
 
 <script>
 import Nl2br from '../../Ui/Nl2br.vue';
+import FormInput from "../../Ui/forms/FormInput.vue";
 import FormSelectize from "../../Ui/forms/FormSelectize";
+import FormTextarea from "../../Ui/forms/FormTextarea.vue";
 import TextStats from "../Elements/TextStats";
 import TimeFields from "./Elements/TimeFields";
 
 export default {
     name: "PsalmEditor",
     components: {
+        FormTextarea,
+        FormInput,
         TimeFields,
         TextStats,
         Nl2br,

@@ -28,14 +28,15 @@
   -->
 
 <template>
-    <div class="attachment btn btn-light" @click.prevent="download" :title="attachment.title + ' herunterladen'">
+    <div class="attachment btn btn-light" @click.prevent="download" :title="tooltipTitle">
         <b><span class="fa" :class="attachment.icon"></span> {{ attachment.title }}</b><br/>
-        <small>.{{ attachment.extension }}, {{ fileSize(attachment.size) }}</small>
+        <small v-if="attachment.errorMessage" class="text-danger">{{ attachment.errorMessage }}</small>
+        <small v-else>.{{ attachment.extension }}<span v-if="attachment.size !== null">, {{ fileSize(attachment.size) }}</span></small>
         <button v-if="allowDelete" class="float-right btn btn-xs btn-danger" title="Anhang löschen"
                 @click.prevent.stop="deleteAttachment($event)">
             <span class="mdi mdi-delete"></span>
         </button>
-        <span class="float-right mdi mdi-download" :class="allowDelete ? 'me-3 mt-1' : ''"></span>
+        <span class="float-right mdi" :class="[downloadIconClass, allowDelete ? 'me-3 mt-1' : '']"></span>
         <img v-if="isImage" class="float-right preview me-4" :src="imageRoute()" @click.stop="showLightBox = true"/>
         <div v-if="isImage && showLightBox" class="lightbox-backdrop"
              @click.stop="showLightBox = false"
@@ -61,12 +62,25 @@ export default {
     },
     data() {
         return {
-            isImage: this.attachment.mimeType.substr(0, 5) == 'image',
             showLightBox: false,
+        }
+    },
+    computed: {
+        isImage() {
+            return this.attachment.hasFile && this.attachment.mimeType.substr(0, 5) === 'image';
+        },
+        tooltipTitle() {
+            return this.attachment.errorMessage
+                ? this.attachment.errorMessage
+                : this.attachment.title + ' herunterladen';
+        },
+        downloadIconClass() {
+            return this.attachment.hasFile ? 'mdi-download' : 'mdi-alert-circle text-danger';
         }
     },
     methods: {
         download() {
+            if (!this.attachment.hasFile) return;
             this.redirectTo(route('attachment', {attachment: this.attachment.id}));
         },
         redirectTo(url) {
@@ -79,6 +93,7 @@ export default {
          * @source https://programanddesign.com/js/human-readable-file-size-in-javascript/
          */
         fileSize(size) {
+            if (!size) return '0 B';
             var i = Math.floor(Math.log(size) / Math.log(1024));
             return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
         },

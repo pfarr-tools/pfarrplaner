@@ -31,10 +31,7 @@
     <div class="liturgy-item-song-editor">
         <div class="row">
             <div class="col-md-6">
-                <div class="form-group">
-                    <label for="title">Titel im Ablaufplan</label>
-                    <input class="form-control" v-model="editedElement.title" v-focus/>
-                </div>
+                <form-input id="liturgySongEditorTitle" v-model="editedElement.title" label="Titel im Ablaufplan" />
                 <div v-if="(!lists.songs) || (!lists.songs.length)">
                     <span class="mdi mdi-spin mdi-loading"></span> Bitte warten, Liederliste wird geladen...
                 </div>
@@ -43,11 +40,14 @@
                                     :key="songListState"
                                     v-model="selectedSong"/>
                     <div class="form-group">
-                        <label for="verses">Zu singende Strophen</label>
-                        <input class="form-control" :value="editedElement.data.verses"
+                        <label for="songVersesInput">Zu singende Strophen</label>
+                        <input id="songVersesInput" class="form-control" :value="editedElement.data.verses"
                                placeholder="Gültiges Format z.B. 1-2+4; leer lassen = alle Strophen"
+                               aria-describedby="songVersesHelp"
                                @input="updateQuote($event)"/>
-                        <small>Strophen: {{ getVersesToDisplay(editedElement.data.verses) }}</small>
+                        <small id="songVersesHelp" class="form-text text-muted">
+                            Strophen: {{ getVersesToDisplay(editedElement.data.verses) }}
+                        </small>
                     </div>
                     <div class="form-group">
                         <inertia-link class="btn btn-sm btn-light" title="Neues Lied anlegen" :href="route('admin.songs.create')">

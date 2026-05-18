@@ -28,50 +28,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\Calendar\Occurence;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 
-class OccurenceController extends Controller
+class OccurenceController extends \App\Http\Controllers\Controller
 {
 
     public function __construct()
     {
-        $this->middleware('auth');
-    }
-
-    /**
-     * Create a detached editable event from a single recurrence.
-     *
-     * @param Occurence $occurence
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function editDecoupled(Occurence $occurence)
-    {
-        Gate::authorize('update', $occurence->event);
-        $newEvent = $occurence->event->replicate()->fill([
-            'rrule' => '',
-            'date' => $occurence->start
-                                                         ]);
-        $newEvent->save();
-        $occurence->delete();
-        return redirect(route('service.edit', $newEvent->slug));
+        $this->middleware('auth:api');
     }
 
     /**
      * Delete a single occurrence from a recurring event.
      *
      * @param Occurence $occurence
-     * @return \Illuminate\Http\RedirectResponse
+     * @return JsonResponse
      */
     public function destroy(Occurence $occurence)
     {
         Gate::authorize('update', $occurence->event);
-        $date = $occurence->event->date;
         $occurence->delete();
-        return redirect(route('calendar', $date->format('Y-m')));
+        return response()->json([]);
     }
-
 }

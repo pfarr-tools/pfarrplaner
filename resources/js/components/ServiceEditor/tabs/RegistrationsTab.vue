@@ -105,9 +105,9 @@
                     <tr v-for="(booking,bookingKey,bookingIndex) in service.bookings" :key="bookingKey">
                         <td>{{ booking.name }}<span v-if="booking.first_name">, {{ booking.first_name }}</span></td>
                         <td>{{ booking.number }}</td>
-                        <td>
-                            <div v-html="booking.contact.replace('\n', '<br />')"/>
-                            {{ booking.email }}
+                        <td class="booking-contact">
+                            <div>{{ booking.contact }}</div>
+                            <div v-if="booking.email">{{ booking.email }}</div>
                         </td>
                         <td>{{ moment(booking.created_at).locale('de').format('LLL') }}</td>
                         <td>
@@ -177,7 +177,7 @@ export default {
         deleteBooking(booking, bookingKey) {
             if (confirm('Soll diese Anmeldung wirklich gelöscht werden?')) {
                 axios.delete(route('booking.destroy', booking.id),)
-                    .then(res => {
+                    .then(() => {
                         this.myService.bookings.splice(bookingKey, 1);
                     })
             }
@@ -194,5 +194,7 @@ export default {
 </script>
 
 <style scoped>
-
+.booking-contact {
+    white-space: pre-line;
+}
 </style>

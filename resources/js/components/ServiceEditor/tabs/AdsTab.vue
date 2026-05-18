@@ -33,9 +33,10 @@
             <div class="col-md-8">
                 <form-textarea label="Kurzbeschreibung für Werbung" v-model="myService.ad_text" />
                 <hr />
-                <h3>Veröffentlichungen</h3>
+                <h3 class="h5">Veröffentlichungen</h3>
 
-                <table class="input-table" width="100%" :key="adConfigsUpdated">
+                <table class="input-table table align-middle" width="100%" :key="adConfigsUpdated">
+                    <caption class="visually-hidden">Einstellungen für Veröffentlichungen in einzelnen Kanälen</caption>
                     <thead>
                     <tr>
                         <th>Ort</th>
@@ -44,8 +45,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(adChannel, adChannelKey) in adChannels">
-                            <th valign="top" width="30%">
+                        <tr v-for="(adChannel, adChannelKey) in adChannels" :key="adChannelKey">
+                            <th scope="row" valign="top" width="30%">
                                 <checked-process-item :check="myService.ad_configs[adChannelKey].offset > 0"
                                                       :key="myService.ad_configs[adChannelKey].offset">
                                     <template #negative>{{ adChannel.name }}</template>
@@ -54,18 +55,22 @@
                             </th>
                             <td valign="top" width="10%">
                                 <input class="form-control" :value="myService.ad_configs[adChannelKey].offset" type="number" min="0"
+                                    :aria-label="`Vorlauf in Tagen für ${adChannel.name}`"
                                     @input="adConfigUpdateOffset(adChannelKey, $event)" />
                             </td>
                             <td valign="top" width="60%">
-                                <form-textarea v-model="myService.ad_configs[adChannelKey].ad_text" :rows="1"
-                                    :disabled="!myService.ad_configs[adChannelKey].offset"/>
+                                <textarea class="form-control" rows="1"
+                                          :value="myService.ad_configs[adChannelKey].ad_text"
+                                          :aria-label="`Abweichender Text für ${adChannel.name}`"
+                                          :disabled="!myService.ad_configs[adChannelKey].offset"
+                                          @input="myService.ad_configs[adChannelKey].ad_text = $event.target.value" />
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div class="col-md-4">
-                <h2>Verfügbare Bilder</h2>
+                <h2 class="h4">Verfügbare Bilder</h2>
                 <div class="row">
                     <div
                         class="col-6 col-md-3 col-lg-2 mb-3"
@@ -94,9 +99,9 @@
                         </div>
                     </div>                </div>
                 <hr />
-                <h2>Zuschnitte</h2>
+                <h2 class="h4">Zuschnitte</h2>
                 <div class="row" >
-                    <div class="col-4 border border-light-subtle p-1" v-for="(size,title) in config.images.cuts">
+                    <div class="col-4 border border-light-subtle p-1" v-for="(size,title) in config.images.cuts" :key="title">
                         <div class="row">
                             <div class="col-8 cut-title">
                                 <div class="fs-7 text-muted text-start">
@@ -151,10 +156,6 @@ export default {
         config: Object,
         adChannels: Object,
     },
-    computed: {
-        disabled() {
-        }
-    },
     data() {
         /**
          * default Ads channels
@@ -202,25 +203,13 @@ export default {
             return route('image', {path: url.replace('attachments/', '')});
         },
         getCutImage(cut) {
-            let f = null;
-            this.myService.attachments.forEach(attachment => {
-                if (attachment.cut == cut) f = attachment.file;
-            });
-            return f;
+            return this.myService.attachments.find(attachment => attachment.cut == cut)?.file || null;
         },
         getCutAttachment(cut) {
-            let f = null;
-            this.myService.attachments.forEach(attachment => {
-                if (attachment.cut == cut) f = attachment;
-            });
-            return f;
+            return this.myService.attachments.find(attachment => attachment.cut == cut) || null;
         },
         hasCutImage(cut) {
-            let f = false
-            this.myService.attachments.forEach(attachment => {
-                if (attachment.cut == cut) f = true;
-            });
-            return f;
+            return this.myService.attachments.some(attachment => attachment.cut == cut);
         },
         deleteAttachment(attachment) {
             axios.delete(route('service.detach', {service: this.myService.slug, attachment: attachment.id}))
@@ -235,8 +224,7 @@ export default {
                 this.myService.ad_configs[adChannelKey].offset = null;
 
             }
-            this.myService.adConfigsUpdated++;
-            this.$forceUpdate();
+            this.adConfigsUpdated++;
         }
     }
 }

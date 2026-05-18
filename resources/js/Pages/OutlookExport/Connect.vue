@@ -46,9 +46,8 @@
             <li>Gib als Speicherort folgenden Link ein:<br>
                 <div class="input-group mb-3">
                     <input id="link" type="text" class="form-control" placeholder="Link zum Kalenderexport"
-                           aria-label="Link zum Kalenderexport" aria-describedby="basic-addon2"
-                           :value="url">
-                    <div class="input-group-append">
+                           aria-label="Link zum Kalenderexport" :value="url" readonly>
+                    <div class="input-group-text p-0">
                         <button class="btn btn-outline-secondary" type="button"
                                 @click="copyToClipboard"
                                 title="In die Zwischenablage kopieren">
@@ -102,9 +101,7 @@ export default {
     },
     methods: {
         copyToClipboard() {
-            const cb = navigator.clipboard;
-            cb.writeText(this.url).then(result => {
-            });
+            navigator.clipboard?.writeText(this.url).then(() => {});
         }
     },
 }

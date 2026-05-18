@@ -36,22 +36,22 @@
                 <div class="col-md-4">
                     <form-group class="form-inline" label="Wiederholen alle">
                         <div class="input-group">
-                            <input type="number" class="form-control" aria-label="Intervall" min="1"
+                            <input id="recurrenceIntervalInput" type="number" class="form-control" aria-label="Intervall" min="1"
                                    v-model="recurrOptions.interval">
-                            <div class="input-group-append">
+                            <div class="input-group-text p-0">
                                 <button class="btn btn-outline-secondary dropdown-toggle" type="button"
                                         @click="freqDropdown= !freqDropdown"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ freqText }}
+                                        data-toggle="dropdown" aria-haspopup="true" :aria-expanded="freqDropdown ? 'true' : 'false'">{{ freqText }}
                                 </button>
                                 <div class="dropdown-menu" :class="{show: freqDropdown}">
-                                    <a class="dropdown-item" href="#"
-                                       @click="recurrOptions.freq = 'DAILY'; freqDropdown = false;">Tage</a>
-                                    <a class="dropdown-item" href="#"
-                                       @click="recurrOptions.freq = 'WEEKLY'; freqDropdown = false;">Wochen</a>
-                                    <a class="dropdown-item" href="#"
-                                       @click="recurrOptions.freq = 'MONTHLY'; freqDropdown = false;">Monate</a>
-                                    <a class="dropdown-item" href="#"
-                                       @click="recurrOptions.freq = 'YEARLY'; freqDropdown = false;">Jahre</a>
+                                    <button type="button" class="dropdown-item"
+                                       @click="recurrOptions.freq = 'DAILY'; freqDropdown = false;">Tage</button>
+                                    <button type="button" class="dropdown-item"
+                                       @click="recurrOptions.freq = 'WEEKLY'; freqDropdown = false;">Wochen</button>
+                                    <button type="button" class="dropdown-item"
+                                       @click="recurrOptions.freq = 'MONTHLY'; freqDropdown = false;">Monate</button>
+                                    <button type="button" class="dropdown-item"
+                                       @click="recurrOptions.freq = 'YEARLY'; freqDropdown = false;">Jahre</button>
                                 </div>
                             </div>
                         </div>
@@ -59,37 +59,39 @@
                 </div>
                 <div class="col-md-4" v-if="recurrOptions.freq == 'WEEKLY'">
                     <form-group label="An folgenden Wochentagen">
-                        <div>
-                        <span
-                            v-for="(dayName, dayKey) in {MO: 'Mo', TU: 'Di', WE: 'Mi', TH: 'Do', FR: 'Fr', SA: 'Sa', SU: 'So'}">
-                            <input type="checkbox" class="form-check-input"
+                        <div class="d-flex flex-wrap gap-3">
+                        <div class="form-check" v-for="(dayName, dayKey) in {MO: 'Mo', TU: 'Di', WE: 'Mi', TH: 'Do', FR: 'Fr', SA: 'Sa', SU: 'So'}" :key="dayKey">
+                            <input :id="`recurrence-${dayKey}`" type="checkbox" class="form-check-input"
                                    :checked="recurrOptions.byday.includes(dayKey)"
-                                   @input="setWeekDayFromInput($event, dayKey)"/> {{ dayName }}
-                        </span>
+                                   @input="setWeekDayFromInput($event, dayKey)"/>
+                            <label class="form-check-label ms-1" :for="`recurrence-${dayKey}`">{{ dayName }}</label>
+                        </div>
                         </div>
                     </form-group>
                 </div>
                 <div class="col-md-8" v-if="recurrOptions.freq == 'MONTHLY'">
-                    <label>Wiederholen bis:</label>
+                    <label class="form-label">Im Monat wiederholen:</label>
                     <div class="row mb-2">
                         <div class="col-1">
-                            <input type="radio" class="form-check-input" value="dayNo"
+                            <input id="monthModeDayNo" type="radio" class="form-check-input" value="dayNo"
                                    v-model="recurrOptions.monthMode">
-                            <label>am:</label>
+                            <label for="monthModeDayNo">am:</label>
                         </div>
                         <div class="col-3">
-                            <input class="form-control" type="number" v-model="recurrOptions.bymonthday" :disabled="recurrOptions.monthMode != 'dayNo'"/>
+                            <input id="recurrenceMonthDayInput" class="form-control" type="number" aria-label="Tag im Monat"
+                                   v-model="recurrOptions.bymonthday" :disabled="recurrOptions.monthMode != 'dayNo'"/>
                         </div>
                         <div class="col-1">&nbsp;Tag</div>
                     </div>
                     <div class="row">
                         <div class="col-1">
-                            <input type="radio" class="form-check-input"value="rule"
+                            <input id="monthModeRule" type="radio" class="form-check-input"value="rule"
                                    v-model="recurrOptions.monthMode">
-                            <label>am:</label>
+                            <label for="monthModeRule">am:</label>
                         </div>
                         <div class="col-4">
-                            <select class="form-control" v-model="recurrOptions.bysetpos"  :disabled="recurrOptions.monthMode != 'rule'">
+                            <select id="recurrenceBySetPosInput" class="form-control" v-model="recurrOptions.bysetpos"
+                                    aria-label="Position im Monat" :disabled="recurrOptions.monthMode != 'rule'">
                                 <option value="1">ersten</option>
                                 <option value="2">zweiten</option>
                                 <option value="3">dritten</option>
@@ -101,7 +103,8 @@
                             </select>
                         </div>
                         <div class="col-4">
-                            <select class="form-control" v-model="recurrOptions.byday"  :disabled="recurrOptions.monthMode != 'rule'">
+                            <select id="recurrenceByDayInput" class="form-control" v-model="recurrOptions.byday"
+                                    aria-label="Wochentag im Monat" :disabled="recurrOptions.monthMode != 'rule'">
                                 <option value="MO">Montag</option>
                                 <option value="TU">Dienstag</option>
                                 <option value="WE">Mittwoch</option>
@@ -263,7 +266,7 @@ export default {
         setDefaults(service) {
             return {
                 freq: 'WEEKLY',
-                until: moment(this.service.start).add(1, 'year').toISOString(),
+                until: moment(service.date).add(1, 'year').toISOString(),
                 count: 12,
                 interval: 1,
                 byday: ['SU','MO','TU','WE','TH','FR','SA'][moment(service.date).day()],
@@ -283,7 +286,7 @@ export default {
                 let pSet = parts[key].split('=');
                 parsed[pSet[0].toLowerCase()] = pSet[1];
             }
-            if (parsed['interval']) parsed['repeatMode'] = 'count';
+            if (parsed['count']) parsed['repeatMode'] = 'count';
             if (parsed['until']) parsed['repeatMode'] = 'until';
 
             return {

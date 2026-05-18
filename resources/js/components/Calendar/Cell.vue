@@ -40,7 +40,8 @@
             </template>
             <div v-for="(service,index) in services" :key="service.id">
                 <calendar-service :service="service" :key="service.id" :index="index" :city="city"
-                                  :targetMode="targetMode" :target="target"/>
+                                  :targetMode="targetMode" :target="target"
+                                  @deleted="forwardDeletedService"/>
             </div>
         </div>
     </td>
@@ -54,11 +55,17 @@ import CalendarServiceSkeleton from "./Service/Skeleton.vue";
 
 export default {
     name: 'CalendarCell',
+    emits: ['deleted'],
     props: ['city', 'day', 'services', 'targetMode', 'target', 'loading'],
     components: {CalendarServiceSkeleton, CalendarService, NavButton},
     computed: {
         skeletonCount() {
             return this.city?.is_org ? 3 : 2;
+        }
+    },
+    methods: {
+        forwardDeletedService(payload) {
+            this.$emit('deleted', payload);
         }
     }
 }

@@ -28,20 +28,21 @@
   -->
 
 <template>
-    <div class="form-group">
-        <div v-if="label || preLabel"><span v-if="preLabel"><span :class="preLabel"></span> </span><label>{{ label }}</label></div>
+    <fieldset class="form-group form-field" :aria-describedby="describedBy || undefined">
+        <legend v-if="label || preLabel" class="control-label form-label mb-2">
+            <span v-if="preLabel"><span :class="preLabel" aria-hidden="true"></span> </span>{{ label }}
+        </legend>
         <div>
-            <div class="form-check" :class="{'form-check-inline': inline}" v-for="(subLabel,subValue,index) in items" :key="subValue">
-                <input class="form-check-input"
-                       :class="{'is-invalid': $page.props.errors[name]}"
-                       type="radio" :name="name" :id="'radio'+myId+index" :value="subValue"
-                       v-model="myValue" :disabled="disabled"
-                       @input="changed($event)" />
-                <label class="form-check-label" :for="'radio'+myId+index">{{ subLabel }}</label>
-                <div v-if="$page.props.errors[name]" class="invalid-feedback">{{ $page.props.errors[name] }}</div>
+            <div class="form-check" :class="{'form-check-inline': inline}" v-for="(subLabel, subValue, index) in items" :key="subValue">
+                <input :id="`radio${myId}${index}`" class="form-check-input" :class="{'is-invalid': hasError}"
+                       type="radio" :name="name" :value="subValue" :checked="myValue === normalizeValue(subValue)"
+                       :disabled="disabled" :aria-invalid="hasError ? 'true' : 'false'" @input="changed($event)" />
+                <label class="form-check-label" :for="`radio${myId}${index}`">{{ subLabel }}</label>
             </div>
         </div>
-    </div>
+        <small v-if="help" :id="helpId" class="message form-text text-muted">{{ help }}</small>
+        <div v-if="hasError" :id="errorId" class="message invalid-feedback d-block">{{ errorMessage }}</div>
+    </fieldset>
 </template>
 
 <script>
@@ -67,14 +68,29 @@ export default {
             default: true,
         }
     },
-    mounted() {
-        if (this.myId == '') this.myId = uid();
+    computed: {
+        errorMessage() {
+            const message = this.name ? this.$page.props.errors?.[this.name] : null;
+            if (!message) return '';
+            return Array.isArray(message) ? message.join(' ') : message;
+        },
+        hasError() {
+            return this.errorMessage !== '';
+        },
+        helpId() {
+            return `${this.myId}Help`;
+        },
+        errorId() {
+            return `${this.myId}Error`;
+        },
+        describedBy() {
+            return [this.help ? this.helpId : null, this.hasError ? this.errorId : null].filter(Boolean).join(' ');
+        },
     },
     data() {
         return {
-            myId: this.id || '',
+            myId: this.id || uid(),
             myValue: (this.modelValue !== undefined ? this.modelValue : this.value) || '',
-            error: this.$page.props.errors[this.name],
         }
     },
     watch: {
@@ -82,19 +98,27 @@ export default {
         value(v) { if (this.modelValue === undefined) this.myValue = v; },
     },
     methods: {
+        normalizeValue(value) {
+            if (value === '') return '';
+            if (!isNaN(value) && value !== null && value !== false) return parseInt(value);
+            return value;
+        },
         changed(event) {
-            var result = typeof event.target.value == Array ? event.target.value[0] : event.target.value;
-            if (!isNaN(result)) result=parseInt(result);
+            let result = Array.isArray(event.target.value) ? event.target.value[0] : event.target.value;
+            if (result !== '' && !isNaN(result)) result = parseInt(result);
             if (event.target.checked) {
+                this.myValue = result;
                 this.$emit('input', result);
                 this.$emit('update:modelValue', result);
             }
-            this.$forceUpdate();
         },
     }
 }
 </script>
 
 <style scoped>
+.message {
+    font-size: .8em;
+}
 
 </style>

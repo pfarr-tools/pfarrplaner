@@ -36,6 +36,7 @@ class DuskRunCommand extends Command
      */
     protected $signature = 'dusk:run
                 {--browse : Open a browser instead of using headless mode}
+                {--without-server : Reuse an already running Laravel server}
                 {--without-tty : Disable output to TTY}';
 
     /**
@@ -80,7 +81,7 @@ class DuskRunCommand extends Command
         $options = collect($_SERVER['argv'])
             ->slice(2)
             ->diff([
-                '--browse', '--without-tty',
+                '--browse', '--without-server', '--without-tty',
                 '--quiet', '-q',
                 '--verbose', '-v', '-vv', '-vvv',
                 '--no-interaction', '-n',
@@ -89,7 +90,7 @@ class DuskRunCommand extends Command
             ->all();
 
         return $this->withDuskEnvironment(function () use ($options) {
-            $server = $this->startTestServer();
+            $server = $this->option('without-server') ? null : $this->startTestServer();
 
             try {
                 $process = (new Process(array_merge(
@@ -124,7 +125,7 @@ class DuskRunCommand extends Command
      */
     protected function startTestServer(): Process
     {
-        $appUrl = $_ENV['APP_URL'] ?? 'http://127.0.0.1:8000';
+        $appUrl = getenv('APP_URL') ?: ($_ENV['APP_URL'] ?? 'http://127.0.0.1:8000');
         $host   = parse_url($appUrl, PHP_URL_HOST) ?? '127.0.0.1';
         $port   = parse_url($appUrl, PHP_URL_PORT) ?? 8000;
 
@@ -348,6 +349,25 @@ class DuskRunCommand extends Command
     protected function refreshEnvironment()
     {
         Dotenv::createMutable(base_path())->load();
+
+        $this->preserveEnvironmentOverride('APP_URL');
+    }
+
+    /**
+     * Re-apply selected parent-process environment variables after loading the
+     * Dusk env file so wrapper scripts can target a temporary app server.
+     */
+    protected function preserveEnvironmentOverride(string $key): void
+    {
+        $value = getenv($key);
+
+        if ($value === false || $value === '') {
+            return;
+        }
+
+        $_ENV[$key] = $value;
+        $_SERVER[$key] = $value;
+        putenv("{$key}={$value}");
     }
 
     /**
@@ -435,4 +455,3 @@ class DuskRunCommand extends Command
         return '.env.dusk';
     }
 }
-

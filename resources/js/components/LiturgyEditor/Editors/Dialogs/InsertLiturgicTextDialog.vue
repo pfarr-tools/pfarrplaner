@@ -40,34 +40,37 @@
                 </div>
 
 
-                <div v-if="myUnfilteredText.includes('[bestattung:')" class="form-group">
-                    <label>Platzhalter ersetzen für Beerdigung</label>
-                    <select class="form-control" v-model="replacementFuneral">
+                <form-group v-if="myUnfilteredText.includes('[bestattung:')" id="replacementFuneral" input-id="replacementFuneralInput"
+                            label="Platzhalter ersetzen für Beerdigung" v-slot="field">
+                    <select :id="field.fieldId" class="form-control" v-model="replacementFuneral"
+                            :aria-describedby="field.describedBy || undefined">
                         <option v-for="funeral in service.funerals" :value="funeral.id">{{
                                 funeral.buried_name
                             }}
                         </option>
                     </select>
-                </div>
-                <div v-if="myUnfilteredText.includes('[taufe:')" class="form-group">
-                    <label>Platzhalter ersetzen für Taufe</label>
-                    <select class="form-control" v-model="replacementBaptism">
+                </form-group>
+                <form-group v-if="myUnfilteredText.includes('[taufe:')" id="replacementBaptism" input-id="replacementBaptismInput"
+                            label="Platzhalter ersetzen für Taufe" v-slot="field">
+                    <select :id="field.fieldId" class="form-control" v-model="replacementBaptism"
+                            :aria-describedby="field.describedBy || undefined">
                         <option v-for="baptism in service.baptisms" :value="baptism.id">{{
                                 baptism.candidate_name
                             }}
                         </option>
                     </select>
-                </div>
-                <div v-if="myUnfilteredText.includes('[trauung:')" class="form-group">
-                    <label>Platzhalter ersetzen für Trauung</label>
-                    <select class="form-control" v-model="replacementWedding">
+                </form-group>
+                <form-group v-if="myUnfilteredText.includes('[trauung:')" id="replacementWedding" input-id="replacementWeddingInput"
+                            label="Platzhalter ersetzen für Trauung" v-slot="field">
+                    <select :id="field.fieldId" class="form-control" v-model="replacementWedding"
+                            :aria-describedby="field.describedBy || undefined">
                         <option v-for="wedding in service.weddings" :value="wedding.id">{{
                                 wedding.spouse1_name
                             }}
                             &amp; {{ wedding.spouse2_name }}
                         </option>
                     </select>
-                </div>
+                </form-group>
 
 
             </div>
@@ -82,6 +85,7 @@
 import Modal from "../../../Ui/modals/Modal.vue";
 import NavButton from "../../../Ui/buttons/NavButton.vue";
 import FormSelectize from "../../../Ui/forms/FormSelectize.vue";
+import FormGroup from "../../../Ui/forms/FormGroup.vue";
 import {PronounSetFactory} from "../../../../libraries/PronounSets/PronounSetFactory";
 import RelativeDate from "@pfarr.tools/relative-date";
 import {NameService} from "../../../../libraries/NameService";
@@ -90,7 +94,7 @@ export default {
     name: "InsertLiturgicTextDialog",
     emits: ['input'],
     props: ['service'],
-    components: {FormSelectize, NavButton, Modal},
+    components: {FormGroup, FormSelectize, NavButton, Modal},
     inject: ['lists'],
     computed: {
         myUnfilteredText() {

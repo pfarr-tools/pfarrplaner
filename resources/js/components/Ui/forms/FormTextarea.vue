@@ -28,10 +28,13 @@
   -->
 
 <template>
-    <form-group :id="myId" :label="label" :help="help" :name="name" :pre-label="preLabel" :required="required">
-        <textarea class="form-control" :class="{'is-invalid': $page.props.errors[name]}" :rows="rows" v-model="myValue" :id="myId+'Input'"
-               :placeholder="placeholder" :aria-placeholder="placeholder" :disabled="disabled" :name="name" :aria-required="required"
-               @input="onInput($event.target.value)" />
+    <form-group :id="myId" :input-id="`${myId}Input`" :label="label" :help="help" :name="name"
+                :pre-label="preLabel" :required="required" v-slot="field">
+        <textarea :id="field.fieldId" :value="currentValue" class="form-control" :class="{'is-invalid': field.error}"
+                  :rows="rows" :placeholder="placeholder" :disabled="disabled" :name="name"
+                  :required="required" :aria-required="required ? 'true' : 'false'"
+                  :aria-invalid="field.error ? 'true' : 'false'" :aria-describedby="field.describedBy || undefined"
+                  @input="onInput($event.target.value)" />
     </form-group>
 </template>
 
@@ -62,22 +65,18 @@ export default {
             default: false,
         },
     },
-    mounted() {
-        if (this.myId == '') this.myId = uid();
+    computed: {
+        currentValue() {
+            return this.modelValue !== undefined ? this.modelValue : this.value;
+        },
     },
     data() {
         return {
-            myId: this.id || '',
-            myValue: this.modelValue !== undefined ? this.modelValue : this.value,
+            myId: this.id || uid(),
         }
-    },
-    watch: {
-        modelValue(v) { this.myValue = v; },
-        value(v) { if (this.modelValue === undefined) this.myValue = v; },
     },
     methods: {
         onInput(v) {
-            this.myValue = v;
             this.$emit('input', v);
             this.$emit('update:modelValue', v);
         }

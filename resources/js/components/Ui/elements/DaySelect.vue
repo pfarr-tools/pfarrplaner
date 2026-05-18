@@ -28,9 +28,10 @@
   -->
 
 <template>
-    <form-group :id="id" :name="name" :label="label" :help="help">
-        <select :id="id+'Input'" :name="name" class="form-control"
-                :class="{'is-invalid' :error}" v-model="myValue"
+    <form-group :id="myId" :input-id="`${myId}Input`" :name="name" :label="label" :help="help" :error="error" v-slot="field">
+        <select :id="field.fieldId" :name="name" class="form-control"
+                :class="{'is-invalid' : field.error}" :value="myValue"
+                :aria-invalid="field.error ? 'true' : 'false'" :aria-describedby="field.describedBy || undefined"
                 @input="changed">
             <option v-for="day in days" :value="day.id">{{ moment(day.date).format('DD.MM.YYYY') }}</option>
         </select>
@@ -61,19 +62,24 @@ export default {
         city: Object,
         days: Array,
     },
-    mounted() {
-        if (this.myId == '') this.myId = uid();
-    },
     data() {
         const initVal = this.modelValue !== undefined ? this.modelValue : this.value;
         return {
-            myId: this.id || '',
+            myId: this.id || uid(),
             myValue: initVal ? initVal.id : null,
         }
     },
+    watch: {
+        modelValue(v) {
+            this.myValue = v ? v.id : null;
+        },
+        value(v) {
+            if (this.modelValue === undefined) this.myValue = v ? v.id : null;
+        },
+    },
     methods: {
         changed(event) {
-            var found = false;
+            let found = false;
             const target = event.target.value;
             this.days.forEach(function (day) {
                 if (target == day.id) found = day;

@@ -98,7 +98,7 @@ export default {
             aria-expanded="false"
             title="Kirchengemeinden auswählen"
         >
-            <span class="mdi mdi-church"></span>
+            <span class="mdi mdi-map-marker-outline"></span>
             <span class="d-none d-md-inline">Kirchengemeinden</span>
             <span class="badge text-bg-secondary">{{ visibleCount }}</span>
         </button>

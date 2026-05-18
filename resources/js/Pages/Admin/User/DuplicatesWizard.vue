@@ -43,16 +43,21 @@
                             Behalten
                         </div>
                         <div class="mb-2">
-                            <input class="form-control form-control-sm mb-1"
-                                   v-model="person.editTitle"
-                                   placeholder="Titel (z.B. Pfarrer, Dr.)" />
-                            <div class="input-group input-group-sm mb-1">
-                                <input class="form-control"
-                                       v-model="person.editFirstName"
-                                       placeholder="Vorname" />
-                                <input class="form-control"
-                                       v-model="person.editLastName"
-                                       placeholder="Nachname" />
+                            <form-input class="mb-1"
+                                        :id="`duplicateTitle${person.id}`"
+                                        v-model="person.editTitle"
+                                        placeholder="Titel (z.B. Pfarrer, Dr.)" />
+                            <div class="row g-2 mb-1">
+                                <div class="col-sm-6">
+                                    <form-input :id="`duplicateFirstName${person.id}`"
+                                                v-model="person.editFirstName"
+                                                placeholder="Vorname" />
+                                </div>
+                                <div class="col-sm-6">
+                                    <form-input :id="`duplicateLastName${person.id}`"
+                                                v-model="person.editLastName"
+                                                placeholder="Nachname" />
+                                </div>
                             </div>
                         </div>
                         <small class="text-muted">
@@ -109,12 +114,13 @@
 <script>
 
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
+import FormInput from "../../../components/Ui/forms/FormInput.vue";
 import SaveButton from "../../../components/Ui/buttons/SaveButton";
 
 export default {
     name: "DuplicatesWizard",
     props: { possibleDuplicates: Array, withoutDuplicates: Array },
-    components: { SaveButton, FormSelectize },
+    components: { SaveButton, FormSelectize, FormInput },
     data() {
         const people = this.possibleDuplicates.map(person => ({
             ...person,

@@ -28,23 +28,25 @@
   -->
 
 <template>
-    <form-group :id="myId" :label="label" :help="help" :name="name" :pre-label="preLabel" :required="required"
-                :value="currentValue" :is-checked-item="isCheckedItem">
-        <input class="form-control" :class="{'is-invalid': $page.props.errors[name], 'checked-input': isCheckedItem}" :type="type" v-model="myValue" :id="myId+'Input'"
-               :placeholder="placeholder" :aria-placeholder="placeholder" :autofocus="autofocus"
-               @input="onInput($event.target.value)" :disabled="disabled"
-               :required="required" :aria-required="required" :name="name"/>
+    <form-group :id="myId" :input-id="`${myId}Input`" :label="label" :help="help" :name="name"
+                :pre-label="preLabel" :required="required" :value="currentValue" :is-checked-item="isCheckedItem"
+                v-slot="field">
+        <input :id="field.fieldId" :value="currentValue" class="form-control"
+               :class="{'is-invalid': field.error, 'checked-input': isCheckedItem}" :type="type"
+               :placeholder="placeholder" :autofocus="autofocus" :disabled="disabled"
+               :required="required" :aria-required="required ? 'true' : 'false'"
+               :aria-invalid="field.error ? 'true' : 'false'" :aria-describedby="field.describedBy || undefined"
+               :name="name" @input="onInput($event.target.value)"/>
     </form-group>
 </template>
 
 <script>
 import FormGroup from "./FormGroup";
-import ValueCheck from "../elements/ValueCheck";
 import { uid } from '../../../libraries/uid';
 
 export default {
     name: "FormInput",
-    components: {ValueCheck, FormGroup},
+    components: {FormGroup},
     emits: ['input', 'update:modelValue'],
     props: {
         label: String,
@@ -79,31 +81,15 @@ export default {
             return this.modelValue !== undefined ? this.modelValue : this.value;
         }
     },
-    mounted() {
-        if (this.myId == '') this.myId = uid();
-    },
     data() {
         return {
-            errors: this.$page.props.errors,
-            error: this.$page.props.errors[this.name] || false,
-            myId: this.id || '',
-            myValue: this.modelValue !== undefined ? this.modelValue : this.value,
+            myId: this.id || uid(),
         }
     },
     methods: {
         onInput(v) {
-            this.myValue = v;
             this.$emit('input', v);
             this.$emit('update:modelValue', v);
-        }
-    },
-    watch: {
-        currentValue(newVal) {
-            this.myValue = newVal;
-            if (this.required) {
-                this.error = this.$page.props.errors[this.name] = newVal ? '' : 'Dieses Feld darf nicht leer bleiben.';
-                this.$forceUpdate();
-            }
         }
     },
 }

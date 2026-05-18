@@ -32,20 +32,22 @@
         <template v-slot:navbar-left>
             <save-button @click="register" />
         </template>
-        <form-input name="name" label="Nachname" v-model="record.name" required/>
-        <form-input name="first_name" label="Vorname" v-model="record.first_name" />
-        <form-textarea name="contact" label="Kontaktdaten" v-model="record.contact" required />
-        <form-input name="email" label="E-Mailadresse" v-model="record.email" />
-        <form-input name="number" label="Anzahl Personen" v-model="record.number" type="number" />
-        <hr />
-        <h3>Manuelle Platzierung</h3>
-        <p>Mit den folgenden Felder kannst du die automatische Platzierung dieser Person(en) verhindern und einen festen Platz zuweisen.
-            Dabei können auch die normale Platzzahl oder die automatische Aufteilung einer Reihe überschrieben werden. Lasse diese Felder
-            einfach leer, um automatisch eine Position für diese Anmeldung zu finden.</p>
-        <form-input name="fixed_seat" label="Fester Sitzplatz" v-model="record.fixed_seat"
-                    placeholder="z.B. 1 für ganze Reihe 1, 1A für Platz 1A" />
-        <form-input name="override_seats" label="Abweichende Platzzahl an diesem Platz" v-model="record.override_seats" type="number" />
-        <form-input name="override_split" label="Abweichende Aufteilung der betroffenen Reihe" v-model="record.override_split" />
+        <form class="booking-editor-form" @submit.prevent="register">
+            <form-input name="name" label="Nachname" v-model="record.name" required/>
+            <form-input name="first_name" label="Vorname" v-model="record.first_name" />
+            <form-textarea name="contact" label="Kontaktdaten" v-model="record.contact" required />
+            <form-input name="email" label="E-Mailadresse" v-model="record.email" />
+            <form-input name="number" label="Anzahl Personen" v-model="record.number" type="number" />
+            <hr />
+            <h3>Manuelle Platzierung</h3>
+            <p>Mit den folgenden Feldern kannst du die automatische Platzierung dieser Person(en) verhindern und einen festen Platz zuweisen.
+                Dabei können auch die normale Platzzahl oder die automatische Aufteilung einer Reihe überschrieben werden. Lasse diese Felder
+                einfach leer, um automatisch eine Position für diese Anmeldung zu finden.</p>
+            <form-input name="fixed_seat" label="Fester Sitzplatz" v-model="record.fixed_seat"
+                        placeholder="z.B. 1 für ganze Reihe 1, 1A für Platz 1A" />
+            <form-input name="override_seats" label="Abweichende Platzzahl an diesem Platz" v-model="record.override_seats" type="number" />
+            <form-input name="override_split" label="Abweichende Aufteilung der betroffenen Reihe" v-model="record.override_split" />
+        </form>
     </admin-layout>
 </template>
 
@@ -75,5 +77,7 @@ export default {
 </script>
 
 <style scoped>
-
+.booking-editor-form {
+    max-width: 48rem;
+}
 </style>

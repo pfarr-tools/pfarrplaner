@@ -286,6 +286,8 @@ Der Reiter **Dateien** enthält:
 - **Automatisch angebotene Dateien**: Vordefinierte Dokumente, falls für Ihre Installation eingerichtet.
 - **Dateien hinzufügen**: Uploadfeld für weitere Dateien.
 
+Wenn eine gespeicherte Datei im System nicht mehr gefunden wird, bleibt sie in der Liste sichtbar. Statt Größenangabe oder Vorschau sehen Sie dann einen deutlichen Hinweis direkt an dieser Datei.
+
 Das Anmeldeformular zur Taufe soll im Reiter **Vorbereitung** hochgeladen werden, nicht im allgemeinen Datei-Reiter.
 
 ---
@@ -396,6 +398,8 @@ Der Reiter **Dateien** enthält:
 
 - **Angehängte Dateien**: Liste vorhandener Dateien.
 - **Dateien hinzufügen**: Uploadfeld für weitere Dateien.
+
+Wenn eine gespeicherte Datei im System nicht mehr gefunden wird, bleibt sie in der Liste sichtbar. Statt Größenangabe oder Vorschau sehen Sie dann einen deutlichen Hinweis direkt an dieser Datei.
 
 Das Anmeldeformular zur Trauung soll im Reiter **Vorbereitung** hochgeladen werden.
 
@@ -590,6 +594,8 @@ Der Reiter **Dateien** enthält:
 - **Angehängte Dateien**: Liste vorhandener Dateien.
 - **Formular für Kirchenregisteramt**: Automatisch angebotenes PDF.
 - **Dateien hinzufügen**: Uploadfeld für weitere Dateien.
+
+Wenn eine gespeicherte Datei im System nicht mehr gefunden wird, bleibt sie in der Liste sichtbar. Statt Größenangabe oder Vorschau sehen Sie dann einen deutlichen Hinweis direkt an dieser Datei.
 
 ---
 

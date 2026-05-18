@@ -37,6 +37,16 @@ Viele Eingabetabellen speichern Änderungen automatisch, sobald Sie ein Feld än
 
 In vielen Tabellen gibt es eine **Bearbeiten**-Schaltfläche mit Stift-Symbol. Sie öffnet den betroffenen [Editor für Veranstaltungen und Gottesdienste](veranstaltungen.md) in einem neuen Tab, falls Sie einen Gottesdienst genauer prüfen müssen.
 
+### Hinweise zu Formularfeldern
+
+In neueren Formularen und Assistenten sind Eingabefelder einheitlich aufgebaut:
+
+- **Beschriftung über dem Feld**: Beschreibt klar, was eingetragen oder ausgewählt werden soll.
+- **Sternchen bei Pflichtfeldern**: Diese Felder müssen ausgefüllt sein, bevor Sie speichern können.
+- **Hilfetext unter dem Feld**: Erklärt Besonderheiten oder gibt Beispiele.
+- **Fehlermeldung direkt am Feld**: Wenn etwas fehlt oder nicht passt, erscheint die Rückmeldung unmittelbar unter dem betreffenden Feld.
+- **Tastaturbedienung**: Sie können Felder wie gewohnt mit der Tabulatortaste durchgehen. Auswahllisten und Kontrollkästchen sind ebenfalls auf diese Bedienung vorbereitet.
+
 ---
 
 ## Opferplan bearbeiten

@@ -29,7 +29,7 @@
 
 <template>
     <div class="calendar-month calendar-vertical">
-        <div v-if="hasData" class="calendar-grid-wrapper">
+        <div class="calendar-grid-wrapper" :class="{'month-loading': loading}">
             <table class="table table-bordered table-sm mb-0 calendar-grid">
                 <colgroup>
                     <col class="day-column">
@@ -37,8 +37,8 @@
                 </colgroup>
                 <thead>
                 <tr>
-                    <th class="no-print text-start city-title day-column-header"><!-- // TODO: slave mode --></th>
-                    <th v-for="city in cities" :key="city.id" class="city-title">
+                    <th class="no-print text-start city-title day-column-header"></th>
+                    <th v-for="city in cities" :key="'header_'+city.id" class="city-title">
                         <div class="city-title-content">
                             <span class="mdi mdi-map-marker-outline city-title-icon"></span>
                             <span class="city-title-text">{{ city.name }}</span>
@@ -47,50 +47,21 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(day,dayDate) in data">
+                <tr v-for="(day, dayDate) in monthDays" :key="dayDate">
                     <calendar-day-header
                         :day="day"
                         :key="dayDate"
                     />
-                    <calendar-cell v-for="(city,index) in cities" :day="day" :key="city.id" :targetMode="targetMode" :target="target"
-                                   :services="getServices(city,dayDate)" :city="city" :can-create="canCreate" :loading="loading"
-                    />
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div v-else class="month-loading calendar-grid-wrapper">
-            <table class="table table-bordered table-sm mb-0 calendar-grid">
-                <colgroup>
-                    <col class="day-column">
-                    <col v-for="city in cities" :key="'skeleton_col_'+city.id" class="city-column">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th class="no-print text-start city-title day-column-header"></th>
-                    <th v-for="city in cities" :key="'skeleton_header_'+city.id" class="city-title">
-                        <div class="city-title-content">
-                            <span class="mdi mdi-map-marker-outline city-title-icon"></span>
-                            <span class="city-title-text">{{ city.name }}</span>
-                        </div>
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="day in skeletonDays" :key="day.date">
-                    <th class="day-header-cell skeleton-day-cell">
-                        <div class="skeleton-day-badge"></div>
-                        <div class="skeleton-day-line"></div>
-                    </th>
                     <calendar-cell
                         v-for="city in cities"
-                        :key="'skeleton_'+city.id+'_'+day.date"
+                        :key="'cell_'+city.id+'_'+dayDate"
                         :day="day"
                         :city="city"
-                        :services="[]"
+                        :services="getServices(city, dayDate)"
                         :targetMode="targetMode"
                         :target="target"
-                        :loading="true"
+                        :loading="loading"
+                        @deleted="removeService"
                     />
                 </tr>
                 </tbody>
@@ -111,8 +82,9 @@ export default {
     data() {
         return {
             loading: false,
-            data: this.initialData?.data || null,
+            data: this.initialData?.data || this.createMonthShell(this.initialData?.loadedDate || this.date),
             loadedDate: this.initialData?.loadedDate || null,
+            loadingRequestDate: null,
         }
     },
     mounted() {
@@ -128,20 +100,43 @@ export default {
         },
     },
     methods: {
+        createMonthShell(targetDate) {
+            const monthStart = moment(targetDate + '-01');
+            const result = {};
+            const dayCount = monthStart.daysInMonth();
+
+            for (let day = 1; day <= dayCount; day++) {
+                const dayDate = monthStart.clone().date(day).format('YYYY-MM-DD');
+                result[dayDate] = {
+                    date: dayDate,
+                    liturgy: {},
+                    absences: [],
+                    services: {},
+                };
+            }
+
+            return result;
+        },
         loadServices() {
+            const requestDate = this.date;
             this.loading = true;
-            this.data = null;
+            this.loadingRequestDate = requestDate;
+            this.data = this.createMonthShell(requestDate);
             this.$api().get(route('api.calendar.month', {
-                date: this.date,
+                date: requestDate,
             })).then(response => {
+                if (this.loadingRequestDate !== requestDate) return;
                 this.data = response.data.data;
                 this.loadedDate = response.data.loadedDate;
                 this.loading = false;
                 this.$forceUpdate();
+            }).catch(() => {
+                if (this.loadingRequestDate !== requestDate) return;
+                this.loading = false;
             });
         },
         getServices(city, day) {
-            if (this.data[day] == undefined) return [];
+            if (this.data?.[day] == undefined) return [];
             if (this.data[day].services == undefined) return [];
             if (!city.is_org) return this.data[day].services[city.id] || [];
 
@@ -158,19 +153,20 @@ export default {
             });
             return Object.values(result);
         },
+        removeService(service) {
+            const serviceDate = service?.date;
+            const serviceId = service?.id;
+            if (!serviceDate || !serviceId || !this.data?.[serviceDate]?.services) return;
+
+            Object.keys(this.data[serviceDate].services).forEach(cityId => {
+                this.data[serviceDate].services[cityId] = (this.data[serviceDate].services[cityId] || [])
+                    .filter(item => item.id !== serviceId);
+            });
+        },
     },
     computed: {
-        hasData() {
-            return !!this.data && Object.keys(this.data).length > 0;
-        },
-        skeletonDays() {
-            const firstDay = moment(this.date + '-01');
-            const result = [];
-            const dayCount = firstDay.daysInMonth();
-            for (let day = 1; day <= dayCount; day++) {
-                result.push({ date: firstDay.date(day).format('YYYY-MM-DD') });
-            }
-            return result;
+        monthDays() {
+            return this.data || this.createMonthShell(this.date);
         },
     }
 }
@@ -245,30 +241,6 @@ export default {
 
 .month-loading {
     min-height: 50vh;
-}
-
-.skeleton-day-cell {
-    min-width: 100px;
-    background-color: #f8fafc;
-}
-
-.skeleton-day-badge,
-.skeleton-day-line {
-    border-radius: 4px;
-    background: linear-gradient(90deg, #f3f5f7 25%, #e7ebef 37%, #f3f5f7 63%);
-    background-size: 400% 100%;
-    animation: skeleton-shimmer 1.4s ease infinite;
-}
-
-.skeleton-day-badge {
-    height: 1.2rem;
-    width: 55%;
-    margin-bottom: 0.6rem;
-}
-
-.skeleton-day-line {
-    height: 0.8rem;
-    width: 75%;
 }
 
 :deep(th.day-header-cell) {

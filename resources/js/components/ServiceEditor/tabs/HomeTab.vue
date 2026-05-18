@@ -56,35 +56,41 @@
             </div>
         </icon-block>
         <icon-block icon="mdi mdi-clock">
-            <div class="row">
-                <div class="col-md-4"  :key="'startTime_'+myService.is_allday+endTimeUpdated">
-                    <form-date-picker :label="(myService.event_class == 'service')  ? 'Datum und Uhrzeit' : 'Beginn'"
+            <div v-if="myService.event_class == 'service'" class="row">
+                <div class="col-md-4" :key="'startTime_'+myService.is_allday+endTimeUpdated">
+                    <form-date-picker label="Datum und Uhrzeit"
                                       v-model="myService.date"
-                                      v-if="!myService.is_allday"
                                       @input="adjustEndTime"
                                       :config="myDateTimePickerConfig" iso-date/>
-                    <form-date-picker label="Beginn" v-model="myService.date"
-                                      v-if="myService.is_allday"
-                                      @input="adjustEndTime"
-                                      :config="myDatePickerConfig" iso-date/>
                 </div>
-                <div class="col-md-4" v-if="(myService.event_class != 'service')"  :key="'endTime_'+myService.is_allday+endTimeUpdated">
-                    <form-date-picker label="Ende" v-model="myService.end"
-                                      v-if="!myService.is_allday"
-                                      :config="myDateTimePickerConfig" iso-date/>
-                    <form-date-picker label="Ende" v-model="myService.end"
-                                      v-if="myService.is_allday"
-                                      @input="adjustAllDay"
-                                      :config="myDatePickerConfig" iso-date/>
-                </div>
-                <div class="col-md-4" v-if="myService.event_class == 'service'">
+                <div class="col-md-4">
                     <proprium-select label="Zugehöriges Proprium" :liturgy-info="liturgyInfo"
                                      v-model="myService.alt_proprium"/>
                 </div>
             </div>
-            <form-check v-if="(myService.event_class != 'service')" label="Ganztägige Veranstaltung"
-                        class="mb-md-2" @input="adjustAllDay"
-                        v-model="myService.is_allday" />
+            <div v-else class="row">
+                <div class="col-md-8">
+                    <form-group label="Zeitraum">
+                        <VueDatePicker
+                            :model-value="eventDateRange"
+                            range
+                            multi-calendars
+                            :locale="dpLocale"
+                            :formats="{ input: myService.is_allday ? 'dd.MM.yyyy' : 'dd.MM.yyyy HH:mm' }"
+                            :enable-time-picker="!myService.is_allday"
+                            :text-input-options="{ format: myService.is_allday ? 'dd.MM.yyyy' : 'dd.MM.yyyy HH:mm' }"
+                            text-input
+                            auto-apply
+                            @update:model-value="setEventDateRange"
+                        />
+                    </form-group>
+                </div>
+                <div class="col-md-4 pt-md-4">
+                    <form-check label="Ganztägige Veranstaltung"
+                                class="mb-md-2" @input="adjustAllDay"
+                                v-model="myService.is_allday" />
+                </div>
+            </div>
         </icon-block>
         <icon-block icon="mdi mdi-map-marker">
             <div class="row">
@@ -169,17 +175,19 @@ import FormTextarea from "../../Ui/forms/FormTextarea";
 import FormSelectize from "../../Ui/forms/FormSelectize";
 import KonfiAppEventTypeSelect from "../../Ui/elements/KonfiAppEventTypeSelect";
 import FormGroup from "../../Ui/forms/FormGroup";
-import DatePickerConfig from "../../Ui/config/DatePickerConfig.js";
 import TagSelect from "../../Ui/elements/TagSelect";
 import ServiceGroupSelect from "../../Ui/elements/ServiceGroupSelect";
 import FormDatePicker from "../../Ui/forms/FormDatePicker";
 import PropriumSelect from "../PropriumSelect.vue";
 import FormRadioGroup from "../../Ui/forms/FormRadioGroup.vue";
 import IconBlock from "../IconBlock.vue";
+import { VueDatePicker } from "@vuepic/vue-datepicker";
+import * as dateFnsLocales from "date-fns/locale";
 
 export default {
     name: "HomeTab",
     components: {
+        VueDatePicker,
         IconBlock,
         FormRadioGroup,
         PropriumSelect,
@@ -212,6 +220,12 @@ export default {
                 found = found || (attachment.title == 'Bekanntgaben');
             });
             return found;
+        },
+        dpLocale() {
+            return dateFnsLocales.de;
+        },
+        eventDateRange() {
+            return [this.toPickerDate(this.myService.date), this.toPickerDate(this.myService.end || this.myService.date)];
         },
     },
     data() {
@@ -250,6 +264,38 @@ export default {
         }
     },
     methods: {
+        toPickerDate(value) {
+            if (!value) return null;
+            const parsed = moment(value);
+            return parsed.isValid() ? parsed.toDate() : null;
+        },
+        setEventDateRange(range) {
+            if (!range || range.length < 2 || !range[0] || !range[1]) return;
+
+            const start = moment(range[0]);
+            const end = moment(range[1]);
+
+            if (this.myService.is_allday) {
+                this.myService.date = start.startOf('day').toISOString();
+                this.myService.end = end.endOf('day').toISOString();
+            } else {
+                this.myService.date = start.second(0).millisecond(0).toISOString();
+                this.myService.end = end.second(0).millisecond(0).toISOString();
+                this.ensureEventEndAfterStart();
+            }
+
+            this.endTimeUpdated++;
+        },
+        ensureEventEndAfterStart() {
+            if (this.myService.event_class === 'service') return;
+            const start = moment(this.myService.date);
+            const end = moment(this.myService.end);
+
+            if (!end.isValid() || end.isBefore(start)) {
+                this.myService.end = start.clone().add(1, 'hours').toISOString();
+                this.endTimeUpdated++;
+            }
+        },
         setLocation(location) {
             this.locationUpdating = true;
             if (location === null || location === undefined) {

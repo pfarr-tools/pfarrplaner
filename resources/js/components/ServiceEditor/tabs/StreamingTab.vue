@@ -54,10 +54,12 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group" v-if="service.youtube_url">
-                        <iframe width="560" height="315" :src="embedUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe><br />
+                        <iframe width="560" height="315" :src="embedUrl" title="YouTube-Vorschau"
+                                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe><br />
                         <form-group>
-                            <a class="btn btn-light" :href="myService.youtube_url" title="Öffnet das YouTube-Video in einem neuen Fenster" target="_blank"><span class="mdi mdi-youtube"></span> Zum Video</a>
-                            <a v-if="myService.city.google_access_token" class="btn btn-light" :href="dashboardUrl" title="Öffnet das  Live-Dashboard zum Stream in einem neuen Fenster" target="_blank"><span class="mdi mdi-video"></span> Zum Live-Dashboard</a>
+                            <a class="btn btn-light" :href="myService.youtube_url" title="Öffnet das YouTube-Video in einem neuen Fenster" target="_blank" rel="noopener noreferrer"><span class="mdi mdi-youtube"></span> Zum Video</a>
+                            <a v-if="myService.city.google_access_token" class="btn btn-light" :href="dashboardUrl" title="Öffnet das  Live-Dashboard zum Stream in einem neuen Fenster" target="_blank" rel="noopener noreferrer"><span class="mdi mdi-video"></span> Zum Live-Dashboard</a>
                         </form-group>
                     </div>
                 </div>
@@ -74,7 +76,7 @@
         <hr />
         <div class="row">
             <div class="col-md-6">
-                <form-input name="recording_url" label="URL zu einer Audioaufzeichnung des Gottesdiensts" v-model="myService.recording_ucrl" />
+                <form-input name="recording_url" label="URL zu einer Audioaufzeichnung des Gottesdiensts" v-model="myService.recording_url" />
             </div>
             <div class="col-md-6">
                 <audio v-if="myService.recording_url" :src="myService.recording_url" controls />

@@ -322,7 +322,7 @@ class AbstractModel extends Model
      */
     public function getLabelAttribute(): string
     {
-        return $this->name;
+        return $this->name ?? '';
     }
 
 

@@ -31,8 +31,9 @@
     <div class="homescreen-configuration-tab">
         <div class="mb-3 p-1">
             <div v-if="thirdParty">
-                <form-group name="homeScreen" label="Startseite für diese Person">
-                    <select name="homeScreen" class="form-control" v-model="settings.homeScreen">
+                <form-group id="homeScreen" name="homeScreen" input-id="homeScreenInput" label="Startseite für diese Person" v-slot="field">
+                    <select :id="field.fieldId" name="homeScreen" class="form-control" v-model="settings.homeScreen"
+                            :aria-describedby="field.describedBy || undefined">
                         <option value="homescreen:configurable">Konfigurierbare Startseite (Standard)</option>
                         <optgroup v-for="(group,groupKey,groupIndex) in moduleGroups" :label="(groupKey == 'default') ? 'Oberste Menügruppe' : 'Menügruppe '+groupKey">
                             <option v-for="module in group" :value="'route:'+module.defaultRoute" v-if="module.defaultRoute">

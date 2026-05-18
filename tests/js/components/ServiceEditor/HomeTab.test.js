@@ -39,6 +39,7 @@ const stubs = {
     FormCheck: true,
     FormTextarea: true,
     FormDatePicker: true,
+    VueDatePicker: true,
     PropriumSelect: true,
     KonfiAppEventTypeSelect: true,
     TagSelect: true,
@@ -100,5 +101,33 @@ describe('HomeTab.setLocation', () => {
         const w = mountIt()
         w.vm.setLocation(null)
         expect(w.vm.locationUpdating).toBe(false)
+    })
+})
+
+describe('HomeTab event date range bridge', () => {
+    it('maps the date range to start and end dates for all-day events', () => {
+        const w = mountIt({
+            event_class: 'event',
+            is_allday: true,
+            end: '2025-01-01T23:59:59Z',
+        })
+
+        w.vm.setEventDateRange([new Date(2025, 1, 10), new Date(2025, 1, 12)])
+
+        expect(moment(w.vm.myService.date).format('YYYY-MM-DD HH:mm:ss')).toBe('2025-02-10 00:00:00')
+        expect(moment(w.vm.myService.end).format('YYYY-MM-DD HH:mm:ss')).toBe('2025-02-12 23:59:59')
+    })
+
+    it('stores start and end timestamps from the event date range picker', () => {
+        const w = mountIt({
+            event_class: 'event',
+            date: '2025-01-01T09:30:00Z',
+            end: '2025-01-03T18:15:00Z',
+        })
+
+        w.vm.setEventDateRange([new Date(2025, 1, 10, 9, 30), new Date(2025, 1, 12, 18, 15)])
+
+        expect(moment(w.vm.myService.date).format('YYYY-MM-DD HH:mm:ss')).toBe('2025-02-10 09:30:00')
+        expect(moment(w.vm.myService.end).format('YYYY-MM-DD HH:mm:ss')).toBe('2025-02-12 18:15:00')
     })
 })

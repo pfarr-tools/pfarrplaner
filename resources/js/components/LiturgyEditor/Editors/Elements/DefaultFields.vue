@@ -29,14 +29,9 @@
 
 <template>
     <div class="default-fields">
-        <div class="form-group">
-            <label for="title">Titel im Ablaufplan</label>
-            <input class="form-control" v-model="element.title" v-focus/>
-        </div>
-        <div v-if="agendaMode" class="form-group">
-            <label for="agenda_instructions">Agendarische Hinweise</label>
-            <textarea class="form-control" v-model="editedElement.data.agenda_instructions" />
-        </div>
+        <form-input id="defaultFieldTitle" label="Titel im Ablaufplan" v-model="element.title" />
+        <form-textarea v-if="agendaMode" id="agendaInstructions" label="Agendarische Hinweise"
+                       v-model="editedElement.data.agenda_instructions" />
         <div v-else v-if="editedElement.data.agenda_instructions" class="agenda-instructions">
             {{ editedElement.data.agenda_instructions }}
         </div>
@@ -44,8 +39,12 @@
 </template>
 
 <script>
+import FormInput from "../../../Ui/forms/FormInput.vue";
+import FormTextarea from "../../../Ui/forms/FormTextarea.vue";
+
 export default {
     name: "DefaultFields",
+    components: {FormTextarea, FormInput},
     props: {
         element: Object,
         service: Object,
@@ -67,6 +66,6 @@ export default {
 
 <style scoped>
     .agenda-instructions {
-        italic: true;
+        font-style: italic;
     }
 </style>

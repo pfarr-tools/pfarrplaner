@@ -29,10 +29,7 @@
 
 <template>
     <div class="liturgy-item-sermon-editor">
-        <div class="form-group">
-            <label for="title">Titel im Ablaufplan</label>
-            <input class="form-control" v-model="editedElement.title" v-focus/>
-        </div>
+        <form-input id="sermonEditorTitle" v-model="editedElement.title" label="Titel im Ablaufplan" />
         <div v-if="myService.sermon === null">
             <p>Für diesen Gottesdienst ist noch keine Predigt angelegt. Hier kannst du eine bestehende Predigt auswählen oder eine neue anlegen.</p>
             <form-selectize v-if="lists.sermons.length > 0" :options="lists.sermons" id-key="id"
@@ -69,11 +66,12 @@
 
 <script>
 import TimeFields from "./Elements/TimeFields";
+import FormInput from "../../Ui/forms/FormInput.vue";
 import FormSelectize from "../../Ui/forms/FormSelectize.vue";
 
 export default {
     name: "SermonEditor",
-    components: {FormSelectize, TimeFields},
+    components: {FormInput, FormSelectize, TimeFields},
     props: {
         element: Object,
         service: Object,
