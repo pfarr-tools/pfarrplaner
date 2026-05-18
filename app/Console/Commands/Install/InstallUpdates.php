@@ -30,13 +30,7 @@
 
 namespace App\Console\Commands\Install;
 
-use App\Services\InstanceRegistryService;
-use App\Services\UpdateService;
 use Illuminate\Console\Command;
-use Illuminate\Console\Command\Install;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Str;
 
 class InstallUpdates extends Command
 {
@@ -61,111 +55,14 @@ class InstallUpdates extends Command
      */
     public function handle()
     {
-        $updateService = new UpdateService();
+        $command = 'npm run install:updates';
 
-        $files = $updateService->getUpdateableFiles();
-        $this->line('');
-
-        if ($files->count() == 0) {
-            $this->line('<info>INFO</info> There are no new updates to be installed..');
-            return Command::SUCCESS;
+        if ($this->option('dry-run')) {
+            $command .= ' -- --dry-run';
         }
 
-        $actions = $updateService->getUpdateActions($files);
+        passthru($command, $exitCode);
 
-        if (true === $this->options('dry-run')) {
-            $this->line('The following '.$files->count().' files will be affected by the next update: ');
-            foreach ($files as $file) {
-                $this->line(' - '.$file);
-            }
-            $this->line('');
-            $this->line('The following actions will be required by the next update:');
-            foreach ($actions as $action => $description) {
-                $this->line(' - '.$description);
-            }
-            return Command::SUCCESS;
-        }
-
-        // pull
-        $this->getOutput()->section('Fetching updates to '.$files->count().' files');
-        exec('git pull');
-
-
-        // composer
-        if (isset($actions['composer'])) {
-            $this->getOutput()->section('Composer');
-            passthru('composer update');
-            $this->line('');
-        }
-        if (isset($actions['skip_composer'])) {
-            $this->info($actions['skip_composer']);
-        }
-
-        // npm install
-        if (isset($actions['npm'])) {
-            $this->getOutput()->section('NPM packages');
-            passthru('npm install');
-            $this->line('');
-        }
-
-        if (isset($actions['skip_npm'])) {
-            $this->info($actions['skip_npm']);
-        }
-
-        // npx browserslist@latest --update-db
-        if (isset($actions['browserslist'])) {
-            $this->getOutput()->section('Update browser list');
-            passthru('npx --yes update-browserslist-db@latest');
-            passthru('npm i baseline-browser-mapping@latest -D');
-            $this->line('');
-        }
-
-        // npm run prod
-        if (isset($actions['webpack'])) {
-            $this->getOutput()->section('NPM build');
-            passthru('npm run prod');
-            $this->line('');
-        }
-
-        // art migrate
-        if (isset($actions['migrations'])) {
-            $this->getOutput()->section('Database migrations');
-            Artisan::call('migrate', [], $this->getOutput());
-            $this->line('');
-        }
-
-        // view-cache
-        if (isset($actions['view-cache'])) {
-            $this->getOutput()->section('View cache');
-            Artisan::call('view:clear', [], $this->getOutput());
-            Artisan::call('view:cache', [], $this->getOutput());
-            $this->line('');
-        }
-
-        // art optimize
-        if (isset($actions['optimizations'])) {
-            $this->getOutput()->section('Optimizations');
-            Artisan::call('optimize', [], $this->getOutput());
-            $this->line('');
-        }
-
-        // art optimize
-        if (isset($actions['queue'])) {
-            $this->getOutput()->section('Queue workers');
-            Artisan::call('queue:restart', [], $this->getOutput());
-            $this->line('');
-        }
-
-        // ping instance registry with updated info
-        InstanceRegistryService::ping();
-
-        $this->line('<info>INFO</info> Done installing updates.');
-        return Command::SUCCESS;
-    }
-
-    protected function hasFileChanges(Collection $files, $tag) {
-        return $files->filter(function ($item) use ($tag) {
-            return Str::startsWith($item, $tag);
-        })->count() > 0;
+        return $exitCode === 0 ? Command::SUCCESS : Command::FAILURE;
     }
 }
