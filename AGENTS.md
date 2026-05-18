@@ -162,4 +162,4 @@ build: Mix toolchain auf v6 aktualisiert
 - Where it seems useful to include screenshots in the documentation, provide a separate set of dusk tests setting   
   up the desired situation and saving a screenshot to the docs folder.
 - Documentation must be entirely in German, using simple, non-technical language an average user in a church office
-  can understand.                     
+  can understand. Correct German umlauts must be used.                      
