@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.11.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.0...v2026.11.1) (2026-05-18)
+
+
+### Bug Fixes
+
+* Formularwerte aus Multiselect-Feldern korrekt übermitteln. ([5f04ef7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5f04ef7a9e390181d39c8a2f6a1a1dbea120a47e))
+
 ## [2026.11.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.10.2...v2026.11.0) (2026-05-18)
 
 
