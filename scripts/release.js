@@ -124,14 +124,8 @@ try {
     process.exit(err.status ?? 1);
 }
 
-const dockerRepo = 'pfarrtools/pfarrplaner';
-const versionTag = `${dockerRepo}:${newPkg.version}`;
-console.log(`Building Docker image ${versionTag}...`);
 try {
-    execSync(`docker build -t ${versionTag} -t ${dockerRepo}:latest .`, { stdio: 'inherit' });
-    execSync(`docker push ${versionTag}`, { stdio: 'inherit' });
-    execSync(`docker push ${dockerRepo}:latest`, { stdio: 'inherit' });
+    execSync(`node ${__dirname}/docker-build.js ${newPkg.version} --push`, { stdio: 'inherit' });
 } catch (err) {
-    console.error('Docker build/push failed.');
     process.exit(err.status ?? 1);
 }

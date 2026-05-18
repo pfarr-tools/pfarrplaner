@@ -6,7 +6,7 @@
         "build": "vite build",
         "watch": "vite build --watch",
         "prepare": "husky install",
-        "docker:build": "docker build -t pfarrtools/pfarrplaner:latest .",
+        "docker:build": "node scripts/docker-build.js",
         "release": "node scripts/release.js",
         "release:major": "node scripts/release.js major",
         "release:minor": "node scripts/release.js minor",
