@@ -84,7 +84,7 @@ class Wedding extends AbstractModel implements HasDAVCalendarItems
         'signed' => 'nullable|bool',
         'docs_ready' => 'nullable|bool',
         'docs_where' => 'nullable|string',
-        'appointment' => 'nullable|date',
+        'appointment' => 'nullable|date_format:d.m.Y H:i',
         'spouse1_dob' => 'nullable|date_format:d.m.Y',
         'spouse1_address' => 'nullable|string',
         'spouse1_zip' => 'nullable|string',

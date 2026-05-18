@@ -64,10 +64,11 @@ class UpdateBaptism extends AbstractUpdateAction implements UpdatesBaptisms
     {
         Gate::forUser($user)->authorize('update', $baptism);
 
-        $normalized = $this->normalizeInput($user, array_merge($baptism->only($baptism->getFillable()), $input));
-        $validated = Validator::make($normalized, Baptism::$validationRules)->validateWithBag('updateBaptism');
+        $input = $this->prepareInputForValidation(array_merge($baptism->only($baptism->getFillable()), $input));
+        $this->authorizeCityWriteAccess($user, $input['city_id'] ?? null);
+        $validated = Validator::make($input, Baptism::$validationRules)->validateWithBag('updateBaptism');
 
-        $baptism->update($validated);
+        $baptism->update($this->normalizeValidatedInput($validated));
         if ($baptism->service) {
             ServiceUpdated::dispatch($baptism->service, $baptism->service->participants);
             $this->redirectUrl = route('service.edit', ['service' => $this->getServiceSlug($baptism->service), 'tab' => 'rites']);

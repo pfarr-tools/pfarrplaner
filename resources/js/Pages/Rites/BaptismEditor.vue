@@ -87,10 +87,8 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <form-group label="Geburtsdatum" :value="myBaptism.dob"
-                                        name="dob">
-                                <date-picker v-model="myBaptism.dob" :config="myDatePickerConfig"/>
-                            </form-group>
+                            <form-date-picker label="Geburtsdatum" name="dob"
+                                              v-model="myBaptism.dob" :config="myDatePickerConfig"/>
                         </div>
                         <div class="col-md-6">
                             <form-input label="Geburtsort" name="birth_place"
@@ -128,16 +126,12 @@
                                         is-checked-item="1"/>
                         </div>
                         <div class="col-md-4">
-                            <form-group label="Datum" is-checked-item="1" :value="myBaptism.first_contact_on"
-                                        name="first_contact_on">
-                                <date-picker v-model="myBaptism.first_contact_on" :config="myDatePickerConfig"/>
-                            </form-group>
+                            <form-date-picker label="Datum" :is-checked-item="true" name="first_contact_on"
+                                              v-model="myBaptism.first_contact_on" :config="myDatePickerConfig"/>
                         </div>
                         <div class="col-md-4">
-                            <form-group label="Taufgespräch" is-checked-item="1" :value="myBaptism.appointment"
-                                        name="candidate_appointment">
-                                <date-picker v-model="myBaptism.appointment" :config="myDateTimePickerConfig"/>
-                            </form-group>
+                            <form-date-picker label="Taufgespräch" :is-checked-item="true" name="appointment"
+                                              v-model="myBaptism.appointment" :config="myDateTimePickerConfig"/>
                         </div>
                     </div>
                 </fieldset>
@@ -201,6 +195,7 @@
 </template>
 
 <script>
+import { useForm } from '@inertiajs/vue3';
 import TabHeaders from "../../components/Ui/tabs/tabHeaders";
 import TabHeader from "../../components/Ui/tabs/tabHeader";
 import FormGroup from "../../components/Ui/forms/FormGroup";
@@ -216,12 +211,39 @@ import FormTextarea from "../../components/Ui/forms/FormTextarea";
 import DimissorialFormPart from "../../components/RiteEditors/DimissorialFormPart";
 import FormBibleReferenceInput from "../../components/Ui/forms/FormBibleReferenceInput";
 import FakeAttachment from "../../components/Ui/elements/FakeAttachment.vue";
+import FormDatePicker from "../../components/Ui/forms/FormDatePicker";
+
+function formatDateValue(value) {
+    if (!value) return value;
+    if ((typeof value === 'string') && moment(value, 'DD.MM.YYYY', true).isValid()) return value;
+    return moment(value).format('DD.MM.YYYY');
+}
+
+function formatDateTimeValue(value) {
+    if (!value) return value;
+    if ((typeof value === 'string') && moment(value, 'DD.MM.YYYY HH:mm', true).isValid()) return value;
+    return moment(value).format('DD.MM.YYYY HH:mm');
+}
+
+function formatBaptismForForm(baptism, currentUserName) {
+    const formData = structuredClone(baptism);
+    formData.attachments = formData.attachments || [];
+    formData.dob = formatDateValue(formData.dob);
+    formData.first_contact_on = formData.first_contact_on ? formatDateValue(formData.first_contact_on) : moment().format('DD.MM.YYYY');
+    formData.appointment = formatDateTimeValue(formData.appointment);
+    formData.dimissorial_requested = formatDateValue(formData.dimissorial_requested);
+    formData.dimissorial_received = formatDateValue(formData.dimissorial_received);
+    formData.first_contact_with = formData.first_contact_with || currentUserName;
+
+    return formData;
+}
 
 export default {
     name: "BaptismEditor",
     components: {
         FakeAttachment,
         FormBibleReferenceInput,
+        FormDatePicker,
         DimissorialFormPart,
         FormTextarea,
         CheckedProcessItem,
@@ -232,11 +254,7 @@ export default {
     },
     props: ['baptism', 'services', 'cities', 'pronounSets', 'attachments'],
     data() {
-        var myBaptism = this.baptism;
-        myBaptism.dob = myBaptism.dob ? moment(myBaptism.dob).format('DD.MM.YYYY') : null;
-        myBaptism.first_contact_on = myBaptism.first_contact_on ? moment(myBaptism.first_contact_on).format('DD.MM.YYYY') : moment().format('DD.MM.YYYY');
-        myBaptism.appointment = myBaptism.appointment ? moment(myBaptism.appointment).format('DD.MM.YYYY HH:mm') : null;
-        myBaptism.first_contact_with = myBaptism.first_contact_with || this.$page.props.currentUser.data.name;
+        const myBaptism = useForm(formatBaptismForForm(this.baptism, this.$page.props.currentUser.data.name));
         return {
             myDatePickerConfig: {
                 locale: 'de',
@@ -284,8 +302,20 @@ export default {
                 && (this.myBaptism.text)
                 && (this.myBaptism.processed);
         },
+        prepareBaptismForm() {
+            const record = structuredClone(this.myBaptism.data());
+            record.dob = formatDateValue(record.dob);
+            record.first_contact_on = formatDateValue(record.first_contact_on);
+            record.dimissorial_requested = formatDateValue(record.dimissorial_requested);
+            record.dimissorial_received = formatDateValue(record.dimissorial_received);
+            record.appointment = formatDateTimeValue(record.appointment);
+
+            return record;
+        },
         saveBaptism() {
-            this.$inertia.patch(route('baptisms.update', {modelId: this.myBaptism.id}), this.myBaptism);
+            this.myBaptism.transform(() => this.prepareBaptismForm()).patch(route('baptisms.update', {modelId: this.myBaptism.id}), {
+                errorBag: 'updateBaptism',
+            });
         },
         deleteBaptism() {
             if (!confirm('Willst du diese Taufe wirklich unwiderruflich löschen?')) return;

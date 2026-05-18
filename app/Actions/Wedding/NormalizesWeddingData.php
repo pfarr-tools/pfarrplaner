@@ -21,12 +21,10 @@ use Illuminate\Validation\ValidationException;
 trait NormalizesWeddingData
 {
     /**
-     * @param User $user
      * @param array $input
      * @return array
-     * @throws ValidationException
      */
-    protected function normalizeInput(User $user, array $input): array
+    protected function prepareInputForValidation(array $input): array
     {
         if (isset($input['service']) && !isset($input['service_id'])) {
             $input['service_id'] = $input['service'];
@@ -46,6 +44,32 @@ trait NormalizesWeddingData
         $input['needs_permission'] ??= 0;
         $input['processed'] ??= 0;
 
+        return $input;
+    }
+
+    /**
+     * @param User $user
+     * @param int|string|null $serviceId
+     * @return void
+     * @throws ValidationException
+     */
+    protected function authorizeServiceWriteAccess(User $user, int|string|null $serviceId): void
+    {
+        if (!empty($serviceId) && !$user->isAdmin) {
+            $service = Service::find($serviceId);
+            $allowed = $service && $user->writableCities->pluck('id')->contains((int)$service->city_id);
+            if (!$allowed) {
+                throw ValidationException::withMessages(['service_id' => 'Für diesen Gottesdienst fehlen Schreibrechte.']);
+            }
+        }
+    }
+
+    /**
+     * @param array $input
+     * @return array
+     */
+    protected function normalizeValidatedInput(array $input): array
+    {
         $input['appointment'] = $this->parseDateTime($input['appointment'] ?? null);
         $input['spouse1_dob'] = $this->parseDate($input['spouse1_dob'] ?? null);
         $input['spouse1_dimissorial_requested'] = $this->parseDate($input['spouse1_dimissorial_requested'] ?? null);
@@ -55,14 +79,6 @@ trait NormalizesWeddingData
         $input['spouse2_dimissorial_received'] = $this->parseDate($input['spouse2_dimissorial_received'] ?? null);
         $input['permission_requested'] = $this->parseDate($input['permission_requested'] ?? null);
         $input['permission_received'] = $this->parseDate($input['permission_received'] ?? null);
-
-        if (!empty($input['service_id']) && !$user->isAdmin) {
-            $service = Service::find($input['service_id']);
-            $allowed = $service && $user->writableCities->pluck('id')->contains((int)$service->city_id);
-            if (!$allowed) {
-                throw ValidationException::withMessages(['service_id' => 'Für diesen Gottesdienst fehlen Schreibrechte.']);
-            }
-        }
 
         return $input;
     }

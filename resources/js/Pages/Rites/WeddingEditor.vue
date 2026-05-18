@@ -52,7 +52,7 @@
                 <div class="row">
                     <div v-for="spouseIndex in [1,2]" class="col-md-6">
                         <form-input :name="spouseKey(spouseIndex, 'name')" label="Name"
-                                    v-model="wedding[spouseKey(spouseIndex, 'name')]"/>
+                                    v-model="myWedding[spouseKey(spouseIndex, 'name')]"/>
                         <form-group label="Zu verwendendes Pronomen">
                             <div>
                                 <div class="form-check-inline"
@@ -68,31 +68,31 @@
                         </form-group>
                         <form-input :name="spouseKey(spouseIndex, 'birth_name')"
                                     label="Evtl. Geburtsname"
-                                    v-model="wedding[spouseKey(spouseIndex, 'birth_name')]"/>
+                                    v-model="myWedding[spouseKey(spouseIndex, 'birth_name')]"/>
                         <form-input :name="spouseKey(spouseIndex, 'phone')"
                                     label="Telefon"
-                                    v-model="wedding[spouseKey(spouseIndex, 'phone')]"/>
+                                    v-model="myWedding[spouseKey(spouseIndex, 'phone')]"/>
                         <form-input :name="spouseKey(spouseIndex, 'email')"
                                     label="E-Mailadresse"
-                                    v-model="wedding[spouseKey(spouseIndex, 'email')]"/>
+                                    v-model="myWedding[spouseKey(spouseIndex, 'email')]"/>
                         <form-check :name="spouseKey(spouseIndex, 'needs_dimissorial')"
                                     label="Dimissoriale benötigt"
-                                    v-model="wedding[spouseKey(spouseIndex, 'needs_dimissorial')]"/>
-                        <div v-if="wedding[spouseKey(spouseIndex, 'needs_dimissorial')]">
+                                    v-model="myWedding[spouseKey(spouseIndex, 'needs_dimissorial')]"/>
+                        <div v-if="myWedding[spouseKey(spouseIndex, 'needs_dimissorial')]">
                             <form-input :name="spouseKey(spouseIndex, 'dimissorial_issuer')"
                                         label="Zuständiges Pfarramt"
                                         :is-checked-item="true"
-                                        v-model="wedding[spouseKey(spouseIndex, 'dimissorial_issuer')]"/>
+                                        v-model="myWedding[spouseKey(spouseIndex, 'dimissorial_issuer')]"/>
                             <form-date-picker :name="spouseKey(spouseIndex, 'dimissorial_requested')"
-                                              v-model="wedding[spouseKey(spouseIndex, 'dimissorial_requested')]"
+                                              v-model="myWedding[spouseKey(spouseIndex, 'dimissorial_requested')]"
                                               :is-checked-item="true"
                                               label="Dimissoriale beantragt am"/>
                             <form-date-picker :name="spouseKey(spouseIndex, 'dimissorial_received')"
-                                              v-model="wedding[spouseKey(spouseIndex, 'dimissorial_received')]"
+                                              v-model="myWedding[spouseKey(spouseIndex, 'dimissorial_received')]"
                                               :is-checked-item="true"
                                               label="Dimissoriale erhalten am"/>
                             <div>
-                                <dimissorial-url :url="wedding['spouse'+spouseIndex+'DimissorialUrl']"/>
+                                <dimissorial-url :url="myWedding['spouse'+spouseIndex+'DimissorialUrl']"/>
                             </div>
                         </div>
                     </div>
@@ -154,8 +154,8 @@
                 <hr/>
                 <fieldset id="fsPrep">
                     <legend>Traugespräch</legend>
-                    <form-date-picker label="Traugespräch" :is-checked-item="true" :value="myWedding.appointment" iso-date
-                                name="candidate_appointment" v-model="myWedding.appointment" :config="myDateTimePickerConfig"/>
+                    <form-date-picker label="Traugespräch" :is-checked-item="true"
+                                name="appointment" v-model="myWedding.appointment" :config="myDateTimePickerConfig"/>
                     <form-bible-reference-input name="text" label="Trautext" v-model="myWedding.text" :is-checked-item="true"/>
                     <form-textarea name="notes" label="Notizen aus dem Traugespräch" v-model="myWedding.notes"/>
                 </fieldset>
@@ -232,6 +232,7 @@
 </template>
 
 <script>
+import { useForm } from '@inertiajs/vue3';
 import Tab from '../../components/Ui/tabs/tab';
 import Tabs from "../../components/Ui/tabs/tabs";
 import TabHeaders from "../../components/Ui/tabs/tabHeaders";
@@ -251,6 +252,40 @@ import FormBibleReferenceInput from "../../components/Ui/forms/FormBibleReferenc
 import FakeTable from "../../components/Ui/FakeTable";
 import Participants from "../../components/Calendar/Service/Participants";
 
+function formatDateValue(value) {
+    if (!value) return value;
+    if ((typeof value === 'string') && moment(value, 'DD.MM.YYYY', true).isValid()) return value;
+    return moment(value).format('DD.MM.YYYY');
+}
+
+function formatDateTimeValue(value) {
+    if (!value) return value;
+    if ((typeof value === 'string') && moment(value, 'DD.MM.YYYY HH:mm', true).isValid()) return value;
+    return moment(value).format('DD.MM.YYYY HH:mm');
+}
+
+function formatWeddingForForm(wedding) {
+    const formData = structuredClone(wedding);
+    formData.attachments = formData.attachments || [];
+    formData.docs_format = formData.docs_format || 0;
+    formData.needs_permission = formData.needs_permission || 0;
+    formData.appointment = formatDateTimeValue(formData.appointment);
+    [
+        'permission_requested',
+        'permission_received',
+        'spouse1_dimissorial_requested',
+        'spouse1_dimissorial_received',
+        'spouse2_dimissorial_requested',
+        'spouse2_dimissorial_received',
+        'spouse1_dob',
+        'spouse2_dob',
+    ].forEach((item) => {
+        formData[item] = formatDateValue(formData[item]);
+    });
+
+    return formData;
+}
+
 export default {
     name: "WeddingEditor",
     components: {
@@ -267,10 +302,6 @@ export default {
         FormFileUploader,
         AttachmentList, FormGroup, FormInput, Tab,  TabHeader, TabHeaders, Tabs,
     },
-    created() {
-        this.wedding.docs_format = this.wedding.docs_format || 0;
-        this.wedding.needs_permission = this.wedding.needs_permission || 0;
-    },
     computed: {
         hasRegistrationForm() {
             var found = false;
@@ -282,21 +313,7 @@ export default {
     },
     props: ['wedding', 'tab', 'pronounSets'],
     data() {
-        var myWedding = this.wedding;
-        myWedding.docs_format = myWedding.docs_format || 0;
-        myWedding.needs_permission = myWedding.needs_permission || 0;
-
-        if (myWedding.appointment) myWedding.appointment = moment(myWedding.appointment);
-        [
-            'permission_requested',
-            'permission_received',
-            'spouse1_dimissorial_requested',
-            'spouse1_dimissorial_received',
-            'spouse2_dimissorial_requested',
-            'spouse2_dimissorial_received'
-        ].forEach(item => {
-            if (myWedding[item]) myWedding[item] = moment(myWedding[item]);
-        });
+        const myWedding = useForm(formatWeddingForForm(this.wedding));
 
         return {
             myWedding: myWedding,
@@ -349,27 +366,33 @@ export default {
         spouseKey(index, key) {
             return 'spouse' + index + '_' + key;
         },
-        saveWedding() {
-            var result = {
-                ...this.myWedding,
+        prepareWeddingForm() {
+            const result = {
+                ...structuredClone(this.myWedding.data()),
                 needs_permission: this.permissionState,
                 service: this.myWedding.service.id,
             };
 
-
-            ['permission_requested',
+            [
+                'permission_requested',
                 'permission_received',
                 'spouse1_dimissorial_requested',
                 'spouse1_dimissorial_received',
                 'spouse2_dimissorial_requested',
-                'spouse2_dimissorial_received'
-            ].forEach(item => {
-                if (this.myWedding[item] && moment.isMoment(this.myWedding[item])) {
-                    result[item] = this.myWedding[item].format('DD.MM.YYYY');
-                }
+                'spouse2_dimissorial_received',
+                'spouse1_dob',
+                'spouse2_dob',
+            ].forEach((item) => {
+                result[item] = formatDateValue(result[item]);
             });
+            result.appointment = formatDateTimeValue(result.appointment);
 
-            this.$inertia.patch(route('weddings.update', this.myWedding.id), result);
+            return result;
+        },
+        saveWedding() {
+            this.myWedding.transform(() => this.prepareWeddingForm()).patch(route('weddings.update', this.myWedding.id), {
+                errorBag: 'updateWedding',
+            });
         },
         deleteWedding() {
             if (!confirm('Willst du diese Trauung wirklich unwiderruflich löschen?')) return;

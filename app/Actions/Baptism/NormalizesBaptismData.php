@@ -40,12 +40,10 @@ use Illuminate\Validation\ValidationException;
 trait NormalizesBaptismData
 {
     /**
-     * @param User $user
      * @param array $input
      * @return array
-     * @throws ValidationException
      */
-    protected function normalizeInput(User $user, array $input): array
+    protected function prepareInputForValidation(array $input): array
     {
         if (isset($input['service']) && !isset($input['service_id'])) {
             $input['service_id'] = $input['service'];
@@ -75,18 +73,36 @@ trait NormalizesBaptismData
         $input['dimissorial_issuer'] ??= '';
         $input['birth_place'] ??= '';
 
+        return $input;
+    }
+
+    /**
+     * @param User $user
+     * @param int|string|null $cityId
+     * @return void
+     * @throws ValidationException
+     */
+    protected function authorizeCityWriteAccess(User $user, int|string|null $cityId): void
+    {
+        if (!empty($cityId) && !$user->isAdmin) {
+            $allowed = $user->writableCities->pluck('id')->contains((int) $cityId);
+            if (!$allowed) {
+                throw ValidationException::withMessages(['city_id' => 'Für diese Kirchengemeinde fehlen Schreibrechte.']);
+            }
+        }
+    }
+
+    /**
+     * @param array $input
+     * @return array
+     */
+    protected function normalizeValidatedInput(array $input): array
+    {
         $input['dob'] = $this->parseDate($input['dob'] ?? null);
         $input['first_contact_on'] = $this->parseDate($input['first_contact_on'] ?? null);
         $input['dimissorial_requested'] = $this->parseDate($input['dimissorial_requested'] ?? null);
         $input['dimissorial_received'] = $this->parseDate($input['dimissorial_received'] ?? null);
         $input['appointment'] = $this->parseDateTime($input['appointment'] ?? null);
-
-        if (!empty($input['city_id']) && !$user->isAdmin) {
-            $allowed = $user->writableCities->pluck('id')->contains((int) $input['city_id']);
-            if (!$allowed) {
-                throw ValidationException::withMessages(['city_id' => 'Für diese Kirchengemeinde fehlen Schreibrechte.']);
-            }
-        }
 
         return $input;
     }
