@@ -27,7 +27,11 @@
         "manual:all:skip-dusk": "SKIP_DUSK=1 npm run manual:all:server",
         "manual:release": "npm run manual:all:server && npm run manual:site &&npm run manual:deploy && git add manual/versionsangaben.md manual/lizenzen.md manual/media/images manual/media/site"
     },
-    "standard-version": {},
+    "standard-version": {
+        "scripts": {
+            "precommit": "node scripts/release-precommit.js"
+        }
+    },
     "overrides": {
         "dompurify": ">=3.3.4",
         "isomorphic-dompurify": {

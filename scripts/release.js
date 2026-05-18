@@ -36,6 +36,10 @@ for (let i = 0; i < args.length; i++) {
 
 const currentYear = new Date().getFullYear();
 const versionMajor = parseInt(pkg.version.split('.')[0], 10);
+const releaseEnv = {
+    ...process.env,
+    PFARRPLANER_RELEASE_TYPE: '',
+};
 
 let releaseType;
 
@@ -67,20 +71,10 @@ if (forcedType) {
     console.log(`Determined release type: ${releaseType}`);
 }
 
-if (releaseType === 'major' || releaseType === 'minor') {
-    console.log('Rebuilding and deploying manual...');
-    try {
-        execSync('npm run manual:all:server', { stdio: 'inherit' });
-        execSync('npm run manual:deploy', { stdio: 'inherit' });
-        execSync('git add manual/versionsangaben.md manual/lizenzen.md manual/media/images manual/media/site', { stdio: 'inherit' });
-    } catch (err) {
-        console.error('Manual build/deploy failed.');
-        process.exit(err.status ?? 1);
-    }
-}
+releaseEnv.PFARRPLANER_RELEASE_TYPE = releaseType;
 
 try {
-    execSync(`npx standard-version --release-as ${releaseType}`, { stdio: 'inherit' });
+    execSync(`npx standard-version --release-as ${releaseType} --commit-all`, { stdio: 'inherit', env: releaseEnv });
 } catch (err) {
     process.exit(err.status ?? 1);
 }
