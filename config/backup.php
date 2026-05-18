@@ -57,7 +57,8 @@ return [
                  * The list of directories and files that will be included in the backup.
                  */
                 'include' => [
-                    base_path(),
+                    storage_path('app'),
+                    storage_path('logs'),
                 ],
 
                 /*
@@ -65,11 +66,7 @@ return [
                  *
                  * Directories used by the backup process will automatically be excluded.
                  */
-                'exclude' => [
-                    base_path('vendor'),
-                    base_path('node_modules'),
-                    storage_path('framework'),
-                ],
+                'exclude' => [],
 
                 /*
                  * Determines if symlinks should be followed.
