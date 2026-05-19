@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
@@ -14,6 +15,16 @@ abstract class DuskTestCase extends BaseTestCase
     use CreatesApplication;
 
     private static bool $databaseResetDone = false;
+    protected string $downloadDirectory;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->downloadDirectory = static::downloadDirectory();
+        File::ensureDirectoryExists($this->downloadDirectory);
+        File::cleanDirectory($this->downloadDirectory);
+    }
 
     public static function setUpBeforeClass(): void
     {
@@ -36,6 +47,8 @@ abstract class DuskTestCase extends BaseTestCase
      */
     protected function driver(): RemoteWebDriver
     {
+        File::ensureDirectoryExists(static::downloadDirectory());
+
         $options = (new ChromeOptions)->addArguments(collect([
             $this->shouldStartMaximized() ? '--start-maximized' : '--window-size=1920,1080',
             '--no-sandbox',
@@ -49,6 +62,12 @@ abstract class DuskTestCase extends BaseTestCase
                 '--headless=new',
             ]);
         })->all());
+        $options->setExperimentalOption('prefs', [
+            'download.default_directory' => static::downloadDirectory(),
+            'download.prompt_for_download' => false,
+            'download.directory_upgrade' => true,
+            'safebrowsing.enabled' => true,
+        ]);
 
         return RemoteWebDriver::create(
             $_ENV['DUSK_DRIVER_URL'] ?? 'http://localhost:9515',
@@ -74,5 +93,10 @@ abstract class DuskTestCase extends BaseTestCase
     {
         return isset($_SERVER['DUSK_START_MAXIMIZED']) ||
                isset($_ENV['DUSK_START_MAXIMIZED']);
+    }
+
+    protected static function downloadDirectory(): string
+    {
+        return base_path('tests/Browser/downloads');
     }
 }
