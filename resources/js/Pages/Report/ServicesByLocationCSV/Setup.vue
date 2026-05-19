@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Liste der Gottesdienste für einen Ort erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'servicesByLocationCSV'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'servicesByLocationCSV'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="location_id" label="Ort" v-model="myLocation" :options="locations" />
             <form-date-range-picker label="Von" v-model:from="myStart" v-model:to="myEnd" iso-date />
@@ -47,6 +47,7 @@ import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['locations'],
@@ -63,7 +64,11 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'servicesByLocationCSV'}), {
+                location_id: this.myLocation,
+                start: this.myStart,
+                end: this.myEnd,
+            });
         },
     }
 }

@@ -37,7 +37,7 @@
         <template v-slot:before-flash>
             <div v-if="servicesLoading || lastServiceLoading" class="alert alert-warning">Lade Daten, bitte warten...</div>
         </template>
-        <form method="post" :action="route('reports.render', {report: 'announcements'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'announcements'})" @submit.prevent="submitForm">
             <form-csrf-token/>
             <form-selectize label="Kirchengemeinde" name="city" v-model="myCity" :options="cities"/>
             <div v-if="(!servicesLoading) && (services.length > 0)">
@@ -77,6 +77,7 @@ import FormTextarea from "../../../components/Ui/forms/FormTextarea";
 import NavButton from "../../../components/Ui/buttons/NavButton";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 
 export default {
     name: "Setup",
@@ -187,7 +188,13 @@ export default {
             this.myLocations = e;
         },
         submitForm() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'announcements'}), {
+                city: this.myCity,
+                service: this.myService,
+                excludeRegularWeekly: this.excludeRegularWeekly,
+                lastService: this.myLastServiceDay,
+                offerings: this.amount,
+            });
         },
     }
 }

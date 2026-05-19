@@ -33,7 +33,7 @@
             <save-button label="Erstellen" title="Zu vertretende Dienste für eine Person finden" @click="renderReport" />
             <nav-button title="Zur Übersicht der Diensten mit Möglichkeit zum Eintragen" icon="mdi mdi-list" class="ms-1" @click="wizard">Direkt eintragen</nav-button>
         </template>
-        <form method="post" :action="myAction" ref="myForm" :key="myAction">
+        <form method="post" :action="myAction" @submit.prevent="renderReport" :key="myAction">
             <form-csrf-token />
             <form-selectize name="person" label="Nach folgender Person suchen" :options="users" v-model="myUser" />
             <form-date-range-picker label="Dienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
@@ -48,6 +48,7 @@ import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import NavButton from "../../../components/Ui/buttons/NavButton.vue";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['users'],
@@ -63,13 +64,19 @@ export default {
     methods: {
         renderReport() {
             this.myAction = route('reports.render', {report: 'replaceableServices'});
-            this.$refs.myForm.action = this.myAction;
-            this.$refs.myForm.submit();
+            submitReportForm(this.myAction, {
+                person: this.myUser,
+                start: this.myStart,
+                end: this.myEnd,
+            });
         },
         wizard() {
             this.myAction = route('report.step', {report: 'replaceableServices', step: 'wizard'})
-            this.$refs.myForm.action = this.myAction;
-            this.$refs.myForm.submit();
+            submitReportForm(this.myAction, {
+                person: this.myUser,
+                start: this.myStart,
+                end: this.myEnd,
+            });
         }
     }
 }

@@ -32,12 +32,12 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Terminliste erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'eventList'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'eventList'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="city" label="Liste für folgende Kirchengemeinde erstellen" v-model="myCity" :options="cities" />
             <form-date-range-picker label="Von" v-model:from="myStart" v-model:to="myEnd" iso-date />
-            <form-check name="mixOutlook" label="Veranstaltungen aus dem Outlook-Kalender mit aufnehmen." />
-            <form-check name="mixOP" label="Veranstaltungen aus dem Online Planer mit aufnehmen." />
+            <form-check name="mixOutlook" label="Veranstaltungen aus dem Outlook-Kalender mit aufnehmen." v-model="mixOutlook" />
+            <form-check name="mixOP" label="Veranstaltungen aus dem Online Planer mit aufnehmen." v-model="mixOP" />
         </form>
     </admin-layout>
 </template>
@@ -49,6 +49,7 @@ import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities'],
@@ -61,11 +62,19 @@ export default {
             myCity: this.cities.length ? this.cities[0].id : null,
             myStart,
             myEnd,
+            mixOutlook: false,
+            mixOP: false,
         }
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'eventList'}), {
+                city: this.myCity,
+                start: this.myStart,
+                end: this.myEnd,
+                mixOutlook: this.mixOutlook,
+                mixOP: this.mixOP,
+            });
         },
     }
 }

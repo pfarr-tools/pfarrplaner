@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Dienstplan für einzelne Dienste erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'singleMinistry'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'singleMinistry'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="cities[]" label="Plan für folgende Kirchengemeinden erstellen"
                             :options="cities" v-model="myCities" multiple />
@@ -56,6 +56,7 @@ import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import FormRadioGroup from "../../../components/Ui/forms/FormRadioGroup.vue";
 import FormCheck from "../../../components/Ui/forms/FormCheck.vue";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities', 'ministries'],
@@ -71,7 +72,7 @@ export default {
             myStart: moment(),
             myEnd: moment().endOf('year'),
             myMinistries,
-            mySelectedMinistries: 'P',
+            mySelectedMinistries: ['P'],
             myCities: this.cities.length > 0 ? [this.cities[0].id] : [],
             myFileFormat: 'pdf',
             includeHeader: true,
@@ -79,7 +80,14 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'singleMinistry'}), {
+                cities: this.myCities,
+                ministries: this.mySelectedMinistries,
+                start: this.myStart,
+                end: this.myEnd,
+                file_format: this.myFileFormat,
+                includeHeader: this.includeHeader,
+            });
         },
     }
 }

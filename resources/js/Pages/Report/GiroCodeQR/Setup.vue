@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="GiroCodes für Gottesdienste erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'giroCodeQR'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'giroCodeQR'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="city" label="GiroCodes für folgende Kirchengemeinde erstellen" v-model="myCity" :options="cities" />
             <input type="hidden" name="city" v-model="myCity" />
@@ -48,6 +48,7 @@ import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities', 'start'],
@@ -66,7 +67,12 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'giroCodeQR'}), {
+                city: this.myCity,
+                start: this.myStart,
+                end: this.myEnd,
+                copies: this.myCopies,
+            });
         },
     }
 }

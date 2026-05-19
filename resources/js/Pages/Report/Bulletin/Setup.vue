@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Gottesdienstliste für den Gemeindebrief erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'bulletin'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'bulletin'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="includeCities[]" label="Folgende Kirchengemeinden mit einbeziehen"
                             v-model="myCities" :options="cities" multiple/>
@@ -57,6 +57,7 @@ import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import {kebabCase} from "lodash";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities', 'formats'],
@@ -71,7 +72,12 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'bulletin'}), {
+                includeCities: this.myCities,
+                start: this.myStart,
+                end: this.myEnd,
+                format: this.myFormat,
+            });
         },
         slug(s) {
             return kebabCase(s);

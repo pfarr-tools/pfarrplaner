@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Urlaubsantrag erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'leaveRequestForm'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'leaveRequestForm'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="absence" label="Abwesenheitseintrag" v-model="myAbsence" :options="myAbsences" />
             <input type="hidden" name="absence" v-model="myAbsence" />
@@ -44,6 +44,7 @@
 import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['absences'],
@@ -62,7 +63,9 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'leaveRequestForm'}), {
+                absence: this.myAbsence,
+            });
         },
     }
 }

@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Opferplan ausgeben" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'offeringPlan'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'offeringPlan'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="cities[]" label="Opferplan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple />
             <form-input name="year" label="Jahr" v-model="myYear" type="number" />
@@ -51,6 +51,7 @@ import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck.vue";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities'],
@@ -66,7 +67,13 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'offeringPlan'}), {
+                cities: this.myCities,
+                year: this.myYear,
+                includeOfferingCounters: this.myIncludeOfferingCounters,
+                emptyAsOwn: this.myEmptyAsOwn,
+                highlightEmpty: this.myHighlightEmpty,
+            });
         },
     }
 }

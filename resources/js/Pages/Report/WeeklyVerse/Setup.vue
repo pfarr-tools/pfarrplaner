@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Liste der Wochensprüche erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'weeklyVerse'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'weeklyVerse'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-date-range-picker label="Von" v-model:from="myStart" v-model:to="myEnd" iso-date />
         </form>
@@ -46,6 +46,7 @@ import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     components: {FormCheck, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
@@ -60,7 +61,10 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'weeklyVerse'}), {
+                start: this.myStart,
+                end: this.myEnd,
+            });
         },
     }
 }

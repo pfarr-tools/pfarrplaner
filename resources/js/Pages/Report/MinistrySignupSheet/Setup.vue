@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Leeren Dienstplan für einen Dienst erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'ministrySignupSheet'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'ministrySignupSheet'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="cities[]" label="Plan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple />
             <form-selectize name="ministries[]" label="Plan für folgende Dienste erstellen" :options="ministries" v-model="myMinistries" multiple/>
@@ -47,6 +47,7 @@ import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities', 'ministries'],
@@ -62,7 +63,12 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'ministrySignupSheet'}), {
+                cities: this.myCities,
+                ministries: this.myMinistries,
+                start: this.myStart,
+                end: this.myEnd,
+            });
         },
     }
 }

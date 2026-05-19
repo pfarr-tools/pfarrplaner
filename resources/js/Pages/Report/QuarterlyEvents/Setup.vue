@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Quartalsprogramm erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'quarterlyEvents'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'quarterlyEvents'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-input name="title" label="Titel" v-model="myTitle" />
             <form-selectize name="location" label="Liste für folgenden Veranstaltungsort" :options="locations" v-model="myLocation"/>
@@ -40,19 +40,19 @@
             <div class="form-group"> <!-- Radio group !-->
                 <label class="control-label">Folgende Informationen mit einbeziehen:</label>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="includePastor" value="1" checked >
+                    <input class="form-check-input" type="checkbox" name="includePastor" value="1" v-model="includePastor" >
                     <label class="form-check-label" for="includePastor">{{ globalLabels.pastor}}</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="includeOrganist" value="1" checked >
+                    <input class="form-check-input" type="checkbox" name="includeOrganist" value="1" v-model="includeOrganist" >
                     <label class="form-check-label" for="includeOrganist">{{ globalLabels.organist }}</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="includeSacristan" value="1" checked >
+                    <input class="form-check-input" type="checkbox" name="includeSacristan" value="1" v-model="includeSacristan" >
                     <label class="form-check-label" for="includeSacristan">{{ globalLabels.sacristan }}</label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="includeDescription" value="1" checked >
+                    <input class="form-check-input" type="checkbox" name="includeDescription" value="1" v-model="includeDescription" >
                     <label class="form-check-label" for="includeDescription">Besonderheiten</label>
                 </div>
             </div>
@@ -71,6 +71,7 @@ import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
 import FormTextarea from "../../../components/Ui/forms/FormTextarea";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['locations'],
@@ -98,12 +99,27 @@ export default {
             myNotes1: this.$page.props.settings.quarterly_events_report_notes1 || '',
             myNotes2: this.$page.props.settings.quarterly_events_report_notes2 || '',
             myIncludeContact: true,
+            includePastor: true,
+            includeOrganist: true,
+            includeSacristan: true,
+            includeDescription: true,
             globalLabels: this.$page.props.labels,
         }
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'quarterlyEvents'}), {
+                title: this.myTitle,
+                location: this.myLocation,
+                quarter: this.myQuarter,
+                includePastor: this.includePastor,
+                includeOrganist: this.includeOrganist,
+                includeSacristan: this.includeSacristan,
+                includeDescription: this.includeDescription,
+                notes1: this.myNotes1,
+                notes2: this.myNotes2,
+                includeContact: this.myIncludeContact,
+            });
         },
     }
 }

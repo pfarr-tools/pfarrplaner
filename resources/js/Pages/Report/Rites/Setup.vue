@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Freud & Leid für den Gemeindebrief erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'rites'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'rites'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="includeCities[]" label="Folgende Kirchengemeinden mit einbeziehen"
                             v-model="myCities" :options="cities" multiple/>
@@ -51,6 +51,7 @@ import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities'],
@@ -66,7 +67,13 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'rites'}), {
+                includeCities: this.myCities,
+                start: this.myStart,
+                end: this.myEnd,
+                baptismDatesStart: this.myBaptismDatesStart,
+                baptismDatesEnd: this.myBaptismDatesEnd,
+            });
         },
     }
 }

@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Adressliste der Angehörigen erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'funeralsRelatives'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'funeralsRelatives'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="city" label="Adressliste für Beerdigungen in folgender Kirchengemeinde erstellen:" v-model="myCity" :options="cities" />
             <input type="hidden" name="city" v-model="myCity" />
@@ -47,6 +47,7 @@ import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities', 'start'],
@@ -59,7 +60,10 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'funeralsRelatives'}), {
+                city: this.myCity,
+                start: this.myStart,
+            });
         },
     }
 }

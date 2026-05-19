@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="EKD-Statistikbericht erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'eKDStats'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'eKDStats'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="cities[]" label="Themenplan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple/>
             <form-input name="year" label="Jahr" v-model="myYear" type="number" />
@@ -46,6 +46,7 @@ import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities'],
@@ -60,7 +61,10 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'eKDStats'}), {
+                cities: this.myCities,
+                year: this.myYear,
+            });
         },
     }
 }

@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Liste der Gottesdienste für bestimmte Kirchengemeinden erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'servicesByCitiesCSV'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'servicesByCitiesCSV'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="cities[]" label="Kirchengemeinden" v-model="myCities" :options="cities" multiple />
             <form-check name="full_location" label="Komplette Ortsangabe bei der Bezeichung des Gottesdienstortes" v-model="myFullLocation" />
@@ -48,6 +48,7 @@ import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities'],
@@ -65,7 +66,12 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'servicesByCitiesCSV'}), {
+                cities: this.myCities,
+                full_location: this.myFullLocation,
+                start: this.myStart,
+                end: this.myEnd,
+            });
         },
     }
 }

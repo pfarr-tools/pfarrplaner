@@ -32,7 +32,7 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Jahresplan der Gottesdienste erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'serviceTable'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'serviceTable'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="cities[]" label="Jahresplan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple/>
             <form-input name="year" label="Jahr" v-model="myYear" type="number" />
@@ -48,6 +48,7 @@ import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities', 'ministries'],
@@ -71,7 +72,12 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'serviceTable'}), {
+                cities: this.myCities,
+                year: this.myYear,
+                ministries: this.myMinistries,
+                name_format: this.myNameFormat,
+            });
         },
     }
 }

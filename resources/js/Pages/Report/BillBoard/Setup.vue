@@ -32,12 +32,12 @@
         <template v-slot:navbar-left>
             <save-button label="Erstellen" title="Kirchliche Nachrichten erstellen" @click="renderReport" />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'billBoard'})" ref="myForm">
+        <form method="post" :action="route('reports.render', {report: 'billBoard'})" @submit.prevent="renderReport">
             <form-csrf-token />
             <form-selectize name="cities[]" label="Kirchliche Nachrichten für folgende Kirchengemeinden erstellen" v-model="myCities"
                             @input="setParishes" multiple
                             :options="cities" />
-            <form-input name="altCity" label="Alternative Ortsbezeichnung" />
+            <form-input name="altCity" label="Alternative Ortsbezeichnung" v-model="altCity" />
             <form-date-picker name="start" label="Gottesdienste ab" v-model="myStart" iso-date />
             <form-selectize name="parishes[]" label="Folgende Pfarrämter mit einbeziehen"
                             v-model="myParishes" :key="'parish_'+cityUpdated"
@@ -58,6 +58,7 @@ import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
 import PeopleSelect from "../../../components/Ui/elements/PeopleSelect.vue";
+import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
     props: ['cities', 'parishes'],
@@ -84,6 +85,7 @@ export default {
             cityUpdated: 0,
             parishUpdated: 0,
             myStart,
+            altCity: '',
         }
     },
     mounted() {
@@ -92,7 +94,13 @@ export default {
     },
     methods: {
         renderReport() {
-            this.$refs.myForm.submit();
+            submitReportForm(route('reports.render', {report: 'billBoard'}), {
+                cities: this.myCities,
+                altCity: this.altCity,
+                start: this.myStart,
+                parishes: this.myParishes,
+                pastors: this.myPastors,
+            });
         },
         setParishes(e) {
             this.myParishes = this.availableParishes.map(({id}) => id);
