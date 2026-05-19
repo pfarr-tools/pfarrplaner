@@ -932,15 +932,10 @@ class Service extends Model implements HasDAVCalendarItems
     public function scopeInCities(Builder $query, $cities)
     {
         if (is_string($cities)) $cities = [$cities];
-        $cityIds = collect();
-        // get model objects
-        foreach ($cities as $key => $city) {
-            $cities[$key] = $city = ($city instanceof City ? $city : City::query()->findOrFail($city));
-            $cityIds->push($city->id);
-            if ($city->is_org) {
-                $cityIds = $cityIds->merge($city->children->pluck('id'));
-            }
-        }
+        $cityIds = collect($cities)->map(function ($item) {
+            if (is_array($item)) $item = array_first($item);
+            return is_numeric($item) ? $item : $item->id;
+        });
         return $query->where(function ($q) use ($cityIds) {
             $q->whereIn('city_id', $cityIds);
             $q->orWhereHas('relatedCities', function ($q2) use ($cityIds) {
