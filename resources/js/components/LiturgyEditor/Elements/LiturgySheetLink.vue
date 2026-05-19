@@ -29,11 +29,7 @@
 
 <template>
     <div>
-        <a v-if="sheet.configurationPage" class="dropdown-item" @click="$emit('open')">
-            <span v-if="sheet.icon" :class="sheet.icon"></span> {{ sheet.title }}
-        </a>
-        <a v-else class="dropdown-item"
-           :href="route('liturgy.download', {service: service.slug, key: sheet.key})">
+        <a class="dropdown-item" href="#" @click.prevent="downloadSheet">
             <span v-if="sheet.icon" :class="sheet.icon"></span> {{ sheet.title }}
         </a>
     </div>
@@ -43,6 +39,21 @@
 export default {
     name: "LiturgySheetLink",
     props: ['service', 'sheet'],
+    methods: {
+        downloadSheet() {
+            if (this.sheet.configurationComponent) {
+                this.$emit('open');
+                return;
+            }
+
+            if (this.sheet.configurationPage) {
+                this.$inertia.visit(route('liturgy.configure', {service: this.service.slug, key: this.sheet.key}));
+                return;
+            }
+
+            window.location.href = route('liturgy.download', {service: this.service.slug, key: this.sheet.key});
+        },
+    },
 }
 </script>
 

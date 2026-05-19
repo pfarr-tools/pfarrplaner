@@ -204,13 +204,14 @@
                     Importmöglichquellen werden geladen... <span class="mdi mdi-spin mdi-loading"></span>
                 </div>
             </modal>
-            <modal v-for="(sheet,sheetKey) in sheets" v-if="dialogs[sheet?.key]" :title="sheet.title + ' herunterladen'"
-                   :key="'dlg'+sheet.key"
-                   @close="downloadConfiguredSheet(sheet)"
-                   @cancel="dialogs[sheet.key] = false"
-                   close-button-label="Herunterladen" cancel-button-label="Abbrechen">
-                <component :is="sheet.configurationComponent" :service="service" :sheet="sheet"/>
-            </modal>
+            <template v-for="(sheet,sheetKey) in sheets" :key="'dlg'+sheet.key">
+                <modal v-if="dialogs[sheet.key]" :title="sheet.title + ' herunterladen'"
+                       @close="downloadConfiguredSheet(sheet)"
+                       @cancel="dialogs[sheet.key] = false"
+                       close-button-label="Herunterladen" cancel-button-label="Abbrechen">
+                    <component :is="sheet.configurationComponent" :service="service" :sheet="sheet"/>
+                </modal>
+            </template>
         </div>
     </div>
 </template>
