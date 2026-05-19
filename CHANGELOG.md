@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.11.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.3...v2026.11.4) (2026-05-19)
+
+
+### Bug Fixes
+
+* Leeres Arbeitsverzeichnis für PDF-Downloads abgefangen. ([9cf9984](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9cf9984be764b1a2b2d705ab91bb62fc26f2cb1a))
+* **liturgie:** Downloads im Liturgie-Dropdown wieder öffnen. ([ec42c57](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ec42c57b0eace121e10b92cab9f991815ed636a8))
+* Powerpoint-Präsentation wird nicht erstellt ([8201ce7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8201ce7b8989189f7d9befc16393c177e0eb26ca))
+
 ### [2026.11.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.2...v2026.11.3) (2026-05-19)
 
 
