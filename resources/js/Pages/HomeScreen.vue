@@ -244,7 +244,7 @@ export default {
                 format: 'L',
                 locale: 'de',
             },
-            myQuickPickerDate: moment().locale('de').format('DD.MM.YYYY'),
+            myQuickPickerDate: moment(),
             myQuickPickViewDate: moment(),
             myQuickPickerServices: [],
             myQuickPickerChanges: 0,
@@ -292,11 +292,16 @@ export default {
             this.$forceUpdate();
         },
         quickPickDate(d) {
-            this.myQuickPickerDate = d;
+            const quickPickerDate = moment.isMoment(d) ? d : moment(d);
+            if (!quickPickerDate.isValid()) {
+                return;
+            }
+
+            this.myQuickPickerDate = quickPickerDate;
             this.myQuickPickerLoading = true;
             axios.get(route('api.calendar.quick-pick', {
                 api_token: this.apiToken,
-                date: moment(this.myQuickPickerDate).format('DD.MM.YYYY'),
+                date: this.myQuickPickerDate.format('DD.MM.YYYY'),
             })).then(response => {
                 this.myQuickPickerServices = response.data;
                 this.myQuickPickerLoading = false;
@@ -305,7 +310,9 @@ export default {
             });
         },
         updateViewDate(e) {
-            this.myQuickPickViewDate = e.viewDate;
+            if (e && e.viewDate) {
+                this.myQuickPickViewDate = e.viewDate;
+            }
             this.$forceUpdate();
         },
         openCalendar() {
