@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.11.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.4...v2026.11.5) (2026-05-19)
+
+
+### Bug Fixes
+
+* **absences:** Horizontales Scrollen im Urlaubsplan auf Mobilgeräten. ([3f078fe](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3f078fe3004b84ecf9d2bcd4e8feb8084546099f))
+* Zeitzonenfehler beim Speichern von Gottesdienstzeiten beheben. ([cb5d392](https://codeberg.org/pfarr.tools/pfarrplaner/commit/cb5d392fd62d74747fbe65bc1a975ee7757c7a61))
+
 ### [2026.11.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.3...v2026.11.4) (2026-05-19)
 
 
