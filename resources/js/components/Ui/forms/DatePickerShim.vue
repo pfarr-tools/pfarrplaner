@@ -51,6 +51,7 @@
 <script>
 import { VueDatePicker } from '@vuepic/vue-datepicker';
 import * as dateFnsLocales from 'date-fns/locale';
+import { DateTime } from 'luxon';
 
 export default {
     name: 'DatePickerShim',
@@ -80,9 +81,56 @@ export default {
         modelValue(v) { this.internalDate = this.parseInput(v); },
     },
     methods: {
+        getLuxonFormat() {
+            return ((this.config && this.config.format) || 'DD.MM.YYYY').replace(/DD/g, 'dd').replace(/YYYY/g, 'yyyy');
+        },
+        localDateFromParts(dateTime) {
+            return new Date(
+                dateTime.year,
+                dateTime.month - 1,
+                dateTime.day,
+                dateTime.hour,
+                dateTime.minute,
+                dateTime.second,
+                dateTime.millisecond
+            );
+        },
+        berlinDateTimeFromInput(value) {
+            if (!value) return null;
+
+            if (value instanceof Date) {
+                const local = DateTime.fromJSDate(value);
+                return DateTime.fromObject(
+                    {
+                        year: local.year,
+                        month: local.month,
+                        day: local.day,
+                        hour: local.hour,
+                        minute: local.minute,
+                        second: local.second,
+                        millisecond: local.millisecond,
+                    },
+                    { zone: 'Europe/Berlin' }
+                );
+            }
+
+            if (typeof value === 'string') {
+                const formatted = DateTime.fromFormat(value, this.getLuxonFormat(), { zone: 'Europe/Berlin', locale: this.localeString });
+                if (formatted.isValid) return formatted;
+
+                const iso = DateTime.fromISO(value, { zone: 'utc' }).setZone('Europe/Berlin');
+                if (iso.isValid) return iso;
+            }
+
+            return null;
+        },
         parseInput(v) {
             if (!v) return null;
             if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
+            if (this.isoDate) {
+                const berlinTime = this.berlinDateTimeFromInput(v);
+                return berlinTime ? this.localDateFromParts(berlinTime) : null;
+            }
             const m = window.moment(v, this.momentFormat, true);
             if (m.isValid()) return m.toDate();
             const fallback = window.moment(v);
@@ -94,11 +142,14 @@ export default {
                 this.$emit('input', null);
                 return;
             }
-            const formatted = window.moment(date).format(this.momentFormat);
-            this.$emit('update:modelValue', formatted);
             if (this.isoDate) {
-                this.$emit('input', window.moment(date).toISOString());
+                const berlinTime = this.berlinDateTimeFromInput(date);
+                const formatted = berlinTime ? berlinTime.toFormat(this.getLuxonFormat(), { locale: this.localeString }) : null;
+                this.$emit('update:modelValue', formatted);
+                this.$emit('input', berlinTime ? berlinTime.toUTC().toISO() : null);
             } else {
+                const formatted = window.moment(date).format(this.momentFormat);
+                this.$emit('update:modelValue', formatted);
                 this.$emit('input', formatted);
             }
         },

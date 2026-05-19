@@ -44,6 +44,30 @@ class ServiceEditorPage extends Page
             '@saveButton'  => 'button.btn-primary',
             '@form'        => '#formSermon',
             '@deleteButton' => 'button.btn-danger',
+            '@dateInput' => '.home-tab .dp__input',
         ];
+    }
+
+    /**
+     * Set the main service date/time input via the VueDatePicker text field.
+     *
+     * @param Browser $browser
+     * @param string $value
+     * @return void
+     */
+    public function setDateTime(Browser $browser, string $value): void
+    {
+        $browser->waitFor($this->elements()['@dateInput'], 10);
+        $browser->script(<<<JS
+const input = document.querySelector('.home-tab .dp__input');
+if (!input) throw new Error('Service date input not found');
+input.focus();
+input.value = '{$value}';
+input.dispatchEvent(new Event('input', { bubbles: true }));
+input.dispatchEvent(new Event('change', { bubbles: true }));
+input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', bubbles: true }));
+input.dispatchEvent(new Event('blur', { bubbles: true }));
+JS);
     }
 }

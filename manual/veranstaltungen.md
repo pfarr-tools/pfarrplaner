@@ -72,6 +72,7 @@ Der erste Reiter enthält die wichtigsten Angaben zum Gottesdienst oder zur Vera
 ### Datum und Uhrzeit
 
 - **Datum und Uhrzeit**: Wählen Sie Beginn des Gottesdienstes aus. Bei anderen Veranstaltungen gibt es stattdessen den **Zeitraum** und die Auswahl **Ganztägige Veranstaltung**.
+- Die angezeigte Uhrzeit im Editor richtet sich nach der Ortszeit der Kirchengemeinde in Deutschland. Dadurch bleibt dieselbe Uhrzeit auch dann erhalten, wenn Sie Pfarrplaner unterwegs oder aus einer anderen Zeitzone heraus benutzen.
 - **Zugehöriges Proprium**: Bei Gottesdiensten können Sie ein abweichendes Proprium auswählen.
 - **Dauer** oder **Ende**: Falls sichtbar, geben Sie an, wann der Termin ungefähr endet. Das hilft bei Raum- und Kalenderplanung.
 - **Zeitraum**: Bei anderen Veranstaltungen wählen Sie Beginn und Ende in einem gemeinsamen Feld. Wenn die Veranstaltung nicht ganztägig ist, gehören Datum und Uhrzeit zusammen in diesen Zeitraum. Ein Klick auf das Feld öffnet einen Kalender; dort wählen Sie zuerst den Beginn und dann das Ende.
