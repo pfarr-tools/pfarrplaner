@@ -233,6 +233,7 @@
 
 <script>
 import { useForm } from '@inertiajs/vue3';
+import __ from 'lodash';
 import Tab from '../../components/Ui/tabs/tab';
 import Tabs from "../../components/Ui/tabs/tabs";
 import TabHeaders from "../../components/Ui/tabs/tabHeaders";
@@ -265,7 +266,7 @@ function formatDateTimeValue(value) {
 }
 
 function formatWeddingForForm(wedding) {
-    const formData = structuredClone(wedding);
+    const formData = __.cloneDeep(wedding);
     formData.attachments = formData.attachments || [];
     formData.docs_format = formData.docs_format || 0;
     formData.needs_permission = formData.needs_permission || 0;
@@ -368,7 +369,7 @@ export default {
         },
         prepareWeddingForm() {
             const result = {
-                ...structuredClone(this.myWedding.data()),
+                ...__.cloneDeep(this.myWedding.data()),
                 needs_permission: this.permissionState,
                 service: this.myWedding.service.id,
             };

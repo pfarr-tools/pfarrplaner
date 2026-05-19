@@ -196,6 +196,7 @@
 
 <script>
 import { useForm } from '@inertiajs/vue3';
+import __ from 'lodash';
 import TabHeaders from "../../components/Ui/tabs/tabHeaders";
 import TabHeader from "../../components/Ui/tabs/tabHeader";
 import FormGroup from "../../components/Ui/forms/FormGroup";
@@ -226,7 +227,7 @@ function formatDateTimeValue(value) {
 }
 
 function formatBaptismForForm(baptism, currentUserName) {
-    const formData = structuredClone(baptism);
+    const formData = __.cloneDeep(baptism);
     formData.attachments = formData.attachments || [];
     formData.dob = formatDateValue(formData.dob);
     formData.first_contact_on = formData.first_contact_on ? formatDateValue(formData.first_contact_on) : moment().format('DD.MM.YYYY');
@@ -303,7 +304,7 @@ export default {
                 && (this.myBaptism.processed);
         },
         prepareBaptismForm() {
-            const record = structuredClone(this.myBaptism.data());
+            const record = __.cloneDeep(this.myBaptism.data());
             record.dob = formatDateValue(record.dob);
             record.first_contact_on = formatDateValue(record.first_contact_on);
             record.dimissorial_requested = formatDateValue(record.dimissorial_requested);
