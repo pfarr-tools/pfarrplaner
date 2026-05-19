@@ -183,6 +183,7 @@ export default {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: 0;
     transition: margin-left 0.3s ease;
     margin-left: var(--sidebar-collapsed);
 }
@@ -193,8 +194,16 @@ export default {
 
 .admin-content {
     flex: 1;
-    overflow-y: auto;
+    min-width: 0;
+    overflow: auto;
     padding: 1rem;
+}
+
+@media (max-width: 991.98px) {
+    .admin-main,
+    .admin-layout.sidebar-pinned .admin-main {
+        margin-left: 0;
+    }
 }
 
 /* Animationen */

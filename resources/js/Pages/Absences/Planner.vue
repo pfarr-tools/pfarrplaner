@@ -528,6 +528,7 @@ export default {
     flex: 1 1 auto;
     flex-direction: column;
     min-height: 0;
+    min-width: 0;
     border: 0;
     box-shadow: var(--bs-box-shadow-sm);
 }
@@ -537,12 +538,14 @@ export default {
     flex: 1 1 auto;
     flex-direction: column;
     min-height: 0;
+    min-width: 0;
 }
 
 .planner-card-body {
     display: flex;
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
 }
 
 .planner-skeleton-row .planner-sticky-column {
@@ -614,15 +617,19 @@ export default {
 .tbl-absences {
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
     height: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
-.tbl-absences .table {
+.absence-planner-table {
     min-width: max-content;
 }
 
-.tbl-absences .table th,
-.tbl-absences .table td {
+.absence-planner-table th,
+.absence-planner-table td {
     padding: 0.2rem;
     vertical-align: middle;
 }
@@ -634,20 +641,20 @@ export default {
     background: var(--bs-white);
 }
 
-.tbl-absences thead th {
+.absence-planner-table thead th {
     position: sticky;
     top: 0;
     z-index: 3;
     background: var(--bs-light);
 }
 
-.tbl-absences thead .planner-sticky-column {
+.absence-planner-table thead .planner-sticky-column {
     z-index: 4;
     background: var(--bs-light);
 }
 
 .planner-name-header,
-.tbl-absences .table th.user-name {
+.absence-planner-table th.user-name {
     min-width: 16rem;
     max-width: 16rem;
     padding: 0.5rem 0.75rem;
@@ -670,7 +677,7 @@ export default {
     white-space: nowrap;
 }
 
-.tbl-absences .cal-cell {
+.absence-planner-table .cal-cell {
     font-size: 0.72rem;
     width: 2.5rem;
     min-width: 2.5rem;
@@ -700,7 +707,7 @@ export default {
     font-weight: 500;
 }
 
-.tbl-absences thead .planner-day-header.sunday-header {
+.absence-planner-table thead .planner-day-header.sunday-header {
     color: var(--bs-danger) !important;
 }
 
@@ -718,14 +725,14 @@ export default {
     background-color: theme.elkw-color("orange");
 }
 
-.tbl-absences .cal-cell.absent {
+.absence-planner-table .cal-cell.absent {
     background-color: theme.elkw-color("orange");
     border-right-color: theme.elkw-color("orange");
 }
 
-.tbl-absences .cal-cell.absent.absence-status-0,
-.tbl-absences .cal-cell.absent.absence-status-1,
-.tbl-absences .cal-cell.absent.absence-status-10 {
+.absence-planner-table .cal-cell.absent.absence-status-0,
+.absence-planner-table .cal-cell.absent.absence-status-1,
+.absence-planner-table .cal-cell.absent.absence-status-10 {
     background-color: tint-color(theme.theme-color("warning"), 50%);
 }
 
@@ -738,16 +745,16 @@ export default {
     color: white;
 }
 
-.tbl-absences tbody .cal-cell.sunday {
+.absence-planner-table tbody .cal-cell.sunday {
     background-color: rgba(var(--bs-danger-rgb), 0.12) !important;
     color: var(--bs-danger) !important;
 }
 
-.tbl-absences tbody .cal-cell.sunday.sunday-busy {
+.absence-planner-table tbody .cal-cell.sunday.sunday-busy {
     background-color: rgba(var(--bs-danger-rgb), 0.22) !important;
 }
 
-.tbl-absences tbody .cal-cell.busy-day {
+.absence-planner-table tbody .cal-cell.busy-day {
     background-color: rgba(var(--bs-primary-rgb), 0.10) !important;
     color: var(--bs-primary) !important;
 }
@@ -757,7 +764,7 @@ export default {
     color: var(--bs-success-text-emphasis, var(--bs-success));
 }
 
-.tbl-absences tbody .cal-cell.vacation.vacation-busy {
+.absence-planner-table tbody .cal-cell.vacation.vacation-busy {
     background-color: rgba(25, 135, 84, 0.18) !important;
     color: var(--bs-success-text-emphasis, var(--bs-success)) !important;
 }
@@ -781,11 +788,11 @@ export default {
     background-color: theme.theme-color("success");
 }
 
-.tbl-absences .cal-cell.is-clickable {
+.absence-planner-table .cal-cell.is-clickable {
     cursor: pointer;
 }
 
-.tbl-absences .cal-cell.is-static {
+.absence-planner-table .cal-cell.is-static {
     cursor: default;
 }
 
@@ -795,7 +802,7 @@ export default {
     }
 
     .planner-name-header,
-    .tbl-absences .table th.user-name {
+    .absence-planner-table th.user-name {
         min-width: 13rem;
         max-width: 13rem;
     }
