@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.11.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.2...v2026.11.3) (2026-05-19)
+
+
+### Bug Fixes
+
+* Klonfehler in Tauf- und Traueditor behoben. ([04e7962](https://codeberg.org/pfarr.tools/pfarrplaner/commit/04e7962dd2349d26fb2b32b98cb8d336d3c5883a))
+* Quickpicker-Datum auf der Startseite korrekt initialisieren. ([79921ec](https://codeberg.org/pfarr.tools/pfarrplaner/commit/79921eccfd5135ffac7d6ef160b151bb3469d2d6))
+
+### [2026.11.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.0...v2026.11.1) (2026-05-18)
+
 ### [2026.11.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.0...v2026.11.2) (2026-05-18)
 
 
