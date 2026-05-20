@@ -195,7 +195,7 @@
 </template>
 
 <script>
-import { useForm } from '@inertiajs/vue3';
+import { useForm } from "@inertiajs/vue3";
 import __ from 'lodash';
 import TabHeaders from "../../components/Ui/tabs/tabHeaders";
 import TabHeader from "../../components/Ui/tabs/tabHeader";

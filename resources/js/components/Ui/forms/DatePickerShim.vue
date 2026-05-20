@@ -41,8 +41,7 @@
         :locale="locale"
         :clearable="showClear"
         :disabled="disabled"
-        text-input
-        :text-input-options="{ format: dpFormat }"
+        :text-input="textInputConfig"
         auto-apply
         @update:model-value="onDateChange"
     />
@@ -73,6 +72,12 @@ export default {
         },
         hasTime() { return this.momentFormat.includes('HH'); },
         showClear() { return !!(this.config && this.config.showClear); },
+        textInputConfig() {
+            return {
+                format: this.dpFormat,
+                pattern: this.parseTypedInput,
+            };
+        },
     },
     data() {
         return { internalDate: this.parseInput(this.modelValue) };
@@ -115,7 +120,10 @@ export default {
             }
 
             if (typeof value === 'string') {
-                const formatted = DateTime.fromFormat(value, this.getLuxonFormat(), { zone: 'Europe/Berlin', locale: this.localeString });
+                const formatted = DateTime.fromFormat(value, this.getLuxonFormat(), {
+                    zone: 'Europe/Berlin',
+                    locale: this.localeString,
+                });
                 if (formatted.isValid) return formatted;
 
                 const iso = DateTime.fromISO(value, { zone: 'utc' }).setZone('Europe/Berlin');
@@ -124,6 +132,16 @@ export default {
 
             return null;
         },
+        parseTypedInput(value) {
+            if (typeof value !== 'string') return null;
+
+            const parsed = DateTime.fromFormat(value.trim(), this.getLuxonFormat(), {
+                zone: 'Europe/Berlin',
+                locale: this.localeString,
+            });
+
+            return parsed.isValid ? this.localDateFromParts(parsed) : null;
+        },
         parseInput(v) {
             if (!v) return null;
             if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
@@ -131,10 +149,17 @@ export default {
                 const berlinTime = this.berlinDateTimeFromInput(v);
                 return berlinTime ? this.localDateFromParts(berlinTime) : null;
             }
-            const m = window.moment(v, this.momentFormat, true);
-            if (m.isValid()) return m.toDate();
-            const fallback = window.moment(v);
-            return fallback.isValid() ? fallback.toDate() : null;
+            const parsedInput = this.parseTypedInput(v);
+            if (parsedInput) return parsedInput;
+
+            if (typeof v === 'string') {
+                const iso = DateTime.fromISO(v, { setZone: true });
+                if (iso.isValid) {
+                    return this.localDateFromParts(iso.setZone('Europe/Berlin'));
+                }
+            }
+
+            return null;
         },
         onDateChange(date) {
             if (!date) {
