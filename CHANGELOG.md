@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.11.6](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.5...v2026.11.6) (2026-05-20)
+
+
+### Bug Fixes
+
+* Datumsformat im Beerdigungseditor strikt deutsch parsen. ([51c446f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/51c446f5d4f319118d7c41a931a2d9fb8266b799))
+
 ### [2026.11.5](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.4...v2026.11.5) (2026-05-19)
 
 
