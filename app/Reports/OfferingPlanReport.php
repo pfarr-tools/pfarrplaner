@@ -31,14 +31,12 @@
 namespace App\Reports;
 
 use App\Models\Calendar\Occurence;
+use App\Models\Location;
 use App\Models\Places\City;
-use App\Models\Scopes\ServicesOnlyScope;
-use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 
 
@@ -72,7 +70,8 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
     public function setup()
     {
         $cities = Auth::user()->cities;
-        return Inertia::render('Report/OfferingPlan/Setup', compact('cities'));
+        $locations = Location::inCities($cities->pluck('id'))->get();
+        return Inertia::render('Report/OfferingPlan/Setup', compact('cities', 'locations'));
     }
 
     /**
@@ -85,22 +84,31 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
         $data = $request->validate(
             [
                 'cities.*' => 'required|int|exists:cities,id',
+                'locations' => 'nullable|array',
+                'locations.*' => 'nullable|int|exists:locations,id',
                 'year' => 'required|int',
                 'includeOfferingCounters' => 'bool',
                 'emptyAsOwn' => 'bool',
                 'highlightEmpty' => 'bool',
             ]
         );
-
         $data['occurences'] = Occurence::with('event')->whereHas('event', function ($query) use ($data) {
             $query->servicesOnly()
-                ->whereIn('city_id', $data['cities'])
-		        ->whereDoesntHave('funerals')
+                ->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
+                ->whereDoesntHave('funerals')
                 ->between(Carbon::parse('01-01-'.$data['year'])->startOfYear(), Carbon::parse('01-01-'.$data['year'])->endOfYear())
                 ->ordered();
         })->orderBy('start')->get();
         $data['cities'] = City::whereIn('id', $data['cities'])->get();
 
+
+        $this->setHeader('');
+        $this->setFooter(
+            '<div style="width: 100%; font-size: 8px; color: #666; padding: 0 10mm;">'
+            . '<span style="float: left;">Stand: ' . Carbon::now()->setTimezone('Europe/Berlin')->format('d.m.Y H:i') . ' Uhr</span>'
+            . '<span style="float: right;">Seite <span class="pageNumber"></span> / <span class="totalPages"></span></span>'
+            . '</div>'
+        );
 
         return $this->sendToFile(
             FileNameService::make(

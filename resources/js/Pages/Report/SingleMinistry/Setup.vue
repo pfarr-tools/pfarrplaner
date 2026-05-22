@@ -34,8 +34,15 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'singleMinistry'})" @submit.prevent="renderReport">
             <form-csrf-token />
-            <form-selectize name="cities[]" label="Plan für folgende Kirchengemeinden erstellen"
-                            :options="cities" v-model="myCities" multiple />
+            <city-location-filter
+                :cities="cities"
+                :locations="locations"
+                city-label="Plan für folgende Kirchengemeinden erstellen"
+                location-label="Auf folgende Orte beschränken"
+                location-placeholder="Leer lassen für alle Orte"
+                v-model:city-model-value="myCities"
+                v-model:location-model-value="myLocations"
+            />
             <form-selectize name="ministries[]" label="Dienste" :options="myMinistries"
                             v-model="mySelectedMinistries" multiple />
             <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
@@ -52,15 +59,15 @@
 import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import FormRadioGroup from "../../../components/Ui/forms/FormRadioGroup.vue";
 import FormCheck from "../../../components/Ui/forms/FormCheck.vue";
+import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
 import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
-    props: ['cities', 'ministries'],
-    components: {FormCheck, FormRadioGroup, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    props: ['cities', 'locations', 'ministries'],
+    components: {CityLocationFilter, FormCheck, FormRadioGroup, FormDateRangePicker, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         let myMinistries = [];
         for (let key in this.ministries) {
@@ -74,6 +81,7 @@ export default {
             myMinistries,
             mySelectedMinistries: ['P'],
             myCities: this.cities.length > 0 ? [this.cities[0].id] : [],
+            myLocations: [],
             myFileFormat: 'pdf',
             includeHeader: true,
         }
@@ -82,6 +90,7 @@ export default {
         renderReport() {
             submitReportForm(route('reports.render', {report: 'singleMinistry'}), {
                 cities: this.myCities,
+                locations: this.myLocations,
                 ministries: this.mySelectedMinistries,
                 start: this.myStart,
                 end: this.myEnd,

@@ -44,18 +44,89 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class PDF extends Browsershot
 {
     /**
+     * @return string
+     */
+    protected static function getDefaultPdfStyles(): string
+    {
+        $lightFont = static::getEmbeddedFontDataUri(resource_path('fonts/Sarabun-Light.ttf'));
+        $semiBoldFont = static::getEmbeddedFontDataUri(resource_path('fonts/Sarabun-SemiBold.ttf'));
+
+        return <<<HTML
+<style>
+    @font-face {
+        font-family: 'Sarabun Light';
+        src: url('{$lightFont}') format('truetype');
+        font-weight: 300;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: 'Sarabun SemiBold';
+        src: url('{$semiBoldFont}') format('truetype');
+        font-weight: 600;
+        font-style: normal;
+    }
+
+    *, html, body, table td {
+        font-family: 'Sarabun Light', sans-serif;
+        font-weight: 300;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Sarabun SemiBold', sans-serif;
+        font-weight: 600;
+    }
+</style>
+HTML;
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    protected static function getEmbeddedFontDataUri(string $path): string
+    {
+        return 'data:font/ttf;base64,' . base64_encode(file_get_contents($path));
+    }
+
+    /**
+     * @param string $html
+     * @return string
+     */
+    protected static function applyDefaultPdfStyles(string $html): string
+    {
+        $styles = static::getDefaultPdfStyles();
+
+        if (str_contains($html, '</head>')) {
+            return str_replace('</head>', $styles . '</head>', $html);
+        }
+
+        return $styles . $html;
+    }
+
+    /**
      * @param string $viewName
      * @param array $data
      * @return static
      */
-    public static function fromView($viewName, $data)
+    public static function fromView($viewName, $data, $header = '', $footer = '')
     {
-        return static::html(View::make($viewName, $data)->render())
+        $html = static::applyDefaultPdfStyles(View::make($viewName, $data)->render());
+
+        $pdf = static::html($html)
             ->setCustomTempPath(storage_path('app/tmp'))
             ->format('A4')
             ->margins(10, 20, 10, 20)
             ->showBackground()
             ->waitUntilNetworkIdle();
+
+        if (($header !== '') || ($footer !== '')) {
+            $pdf->showBrowserHeaderAndFooter()
+                ->headerHtml($header ?: '<div style="font-size: 8px; width: 100%;"></div>')
+                ->footerHtml($footer ?: '<div style="font-size: 8px; width: 100%;"></div>');
+        }
+
+        return $pdf;
     }
 
     /**

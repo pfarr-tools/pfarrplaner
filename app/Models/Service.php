@@ -945,6 +945,35 @@ class Service extends Model implements HasDAVCalendarItems
     }
 
     /**
+     * Scope a query to filter by given cities and, optionally, locations.
+     *
+     * @param Builder $query
+     * @param mixed $cities An array or collection of cities, each having an id property.
+     * @param mixed|null $locations An optional array or collection of locations, each having an id property.
+     * @return Builder
+     */
+    public function scopeInCitiesAndLocations(Builder $query, $cities, $locations = null)
+    {
+        $query = $this->scopeInCities($query, $cities);
+
+        if (null === $locations || collect($locations)->filter()->isEmpty()) {
+            return $query;
+        }
+
+        if (is_string($locations)) $locations = [$locations];
+        $locationIds = collect($locations)->map(function ($item) {
+            if (is_array($item)) $item = array_first($item);
+            return is_numeric($item) ? $item : $item->id;
+        })->filter()->values();
+
+        if ($locationIds->isEmpty()) {
+            return $query;
+        }
+
+        return $query->whereIn('location_id', $locationIds);
+    }
+
+    /**
      * Scope a query to filter by a given city
      *
      * If the city has is_org=true, child cities will be included

@@ -30,6 +30,7 @@
 
 namespace App\Reports;
 
+use App\Models\Location;
 use App\Models\People\Participant;
 use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
@@ -78,8 +79,9 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
     public function setup()
     {
         $cities = Auth::user()->cities;
+        $locations = Location::inCities($cities->pluck('id'))->get();
         $ministries = $this->getAvailableMinistries();
-        return Inertia::render('Report/SingleMinistry/Setup', compact('cities', 'ministries'));
+        return Inertia::render('Report/SingleMinistry/Setup', compact('cities', 'locations', 'ministries'));
     }
 
     /**
@@ -93,6 +95,8 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
                 'start' => 'required|date',
                 'end' => 'required|date',
                 'cities.*' => 'required|int|exists:cities,id',
+                'locations' => 'nullable|array',
+                'locations.*' => 'nullable|int|exists:locations,id',
                 'ministries.*' => 'string',
                 'file_format' => 'required|string',
                 'includeHeader' => 'bool',
@@ -111,7 +115,7 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
             ->between(Carbon::parse($data['start']), Carbon::parse($data['end']))
             ->whereDoesntHave('funerals')
             ->whereDoesntHave('weddings')
-            ->inCities($data['cities'])
+            ->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
             ->ordered()
             ->get();
 

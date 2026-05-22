@@ -34,8 +34,8 @@ use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
 use App\Models\Announcements;
 use App\Models\Calendar\Occurence;
+use App\Models\Location;
 use App\Models\Places\City;
-use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -77,7 +77,8 @@ class NewsletterReport extends AbstractWordDocumentReport
     public function setup()
     {
         $cities = Auth::user()->cities;
-        return Inertia::render('Report/Newsletter/Setup', compact('cities'));
+        $locations = Location::inCities($cities->pluck('id'))->get();
+        return Inertia::render('Report/Newsletter/Setup', compact('cities', 'locations'));
     }
 
 
@@ -90,6 +91,8 @@ class NewsletterReport extends AbstractWordDocumentReport
         $data = $request->validate(
             [
                 'cities.*' => 'required|int|exists:cities,id',
+                'locations' => 'nullable|array',
+                'locations.*' => 'nullable|int|exists:locations,id',
                 'start' => 'required|date',
                 'end' => 'required|date',
                 'includeWeeklyVerse' => 'bool'
@@ -102,7 +105,7 @@ class NewsletterReport extends AbstractWordDocumentReport
         $events = Occurence::with('event')
             ->between($start, $end)
             ->whereHas('service', function ($query) use ($data, $start, $end) {
-                $query->inCities($data['cities'])
+                $query->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
                     ->displayable($start)
                     ->notHidden();
             })
@@ -117,7 +120,7 @@ class NewsletterReport extends AbstractWordDocumentReport
         $featuredEvents = Occurence::with('event')
             ->adRunningAt('newsletter', $start)
             ->whereHas('service', function ($query) use ($data, $start, $end) {
-                $query->inCities($data['cities'])
+                $query->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
                     ->displayable($start)
                     ->notHidden();
             })

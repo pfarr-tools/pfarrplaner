@@ -36,6 +36,7 @@
             value-prop="id"
             label="name"
             track-by="name"
+            :mode="multiple ? 'tags' : 'single'"
             :groups="true"
             group-label="label"
             group-options="options"
@@ -76,44 +77,68 @@ export default {
     },
     data() {
         const initVal = this.modelValue !== undefined ? this.modelValue : this.value;
-
-        // Build city-grouped options
-        const cityGroups = {};
-        (this.locations || []).forEach(item => {
-            const cityName = item.city.name;
-            if (!cityGroups[cityName]) cityGroups[cityName] = [];
-            cityGroups[cityName].push(item);
-        });
-
-        const groupedOptions = Object.keys(cityGroups).map(cityName => ({
-            label: cityName,
-            options: cityGroups[cityName],
-        }));
-
-        const freiOptions = [];
-        let myValue = null;
+        let myValue = this.multiple ? [] : null;
 
         if (initVal !== null && initVal !== undefined) {
-            if (typeof initVal === 'object') {
+            if (this.multiple && Array.isArray(initVal)) {
+                myValue = initVal.map(item => typeof item === 'object' ? item.id : item);
+            } else if (typeof initVal === 'object') {
                 myValue = initVal.id;
             } else {
                 myValue = initVal;
-                if (isNaN(initVal) || String(initVal).trim() === '') {
-                    // freetext — add to the Freie Ortsangabe group so it displays
-                    if (initVal !== '') freiOptions.push({ id: initVal, name: initVal });
-                }
             }
         }
-
-        groupedOptions.push({ label: 'Freie Ortsangabe', options: freiOptions });
 
         return {
             myId: this.id || '',
             myValue,
-            groupedOptions,
         };
     },
+    computed: {
+        groupedOptions() {
+            const cityGroups = {};
+            (this.locations || []).forEach(item => {
+                const cityName = item.city?.name || '';
+                if (!cityGroups[cityName]) cityGroups[cityName] = [];
+                cityGroups[cityName].push(item);
+            });
+
+            const groupedOptions = Object.keys(cityGroups).map(cityName => ({
+                label: cityName,
+                options: cityGroups[cityName],
+            }));
+
+            const freiOptions = [];
+            const currentValues = this.multiple ? (Array.isArray(this.myValue) ? this.myValue : []) : [this.myValue];
+            currentValues.forEach(value => {
+                if ((value !== null) && (value !== undefined) && String(value).trim() !== '' && isNaN(value)) {
+                    freiOptions.push({ id: value, name: value });
+                }
+            });
+
+            groupedOptions.push({ label: 'Freie Ortsangabe', options: freiOptions });
+
+            return groupedOptions;
+        },
+    },
+    watch: {
+        value(newVal) {
+            this.myValue = this.normalizeValue(newVal);
+        },
+        modelValue(newVal) {
+            this.myValue = this.normalizeValue(newVal);
+        },
+    },
     methods: {
+        normalizeValue(value) {
+            if (this.multiple) {
+                if (Array.isArray(value)) return value.map(item => typeof item === 'object' ? item.id : item);
+                return [];
+            }
+            if ((value !== null) && (value !== undefined) && (typeof value === 'object')) return value.id;
+            return value ?? null;
+        },
+
         /**
          * Called by Multiselect @change. newVal is the value-prop value ('id').
          * @param {string|number|null} newVal
@@ -121,6 +146,11 @@ export default {
         locationChanged(newVal) {
             if (newVal === null || newVal === undefined) {
                 this.sendEvent(null);
+                return;
+            }
+
+            if (this.multiple && Array.isArray(newVal)) {
+                this.sendEvent(newVal);
                 return;
             }
 

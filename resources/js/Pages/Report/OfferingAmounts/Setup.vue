@@ -34,8 +34,15 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'offeringAmounts'})" @submit.prevent="renderReport">
             <form-csrf-token />
-            <form-selectize name="cities[]" label="Bericht für folgende Kirchengemeinden erstellen" v-model="myCities"
-                            :options="cities" multiple />
+            <city-location-filter
+                :cities="cities"
+                :locations="locations"
+                city-label="Bericht für folgende Kirchengemeinden erstellen"
+                location-label="Auf folgende Orte beschränken"
+                location-placeholder="Leer lassen für alle Orte"
+                v-model:city-model-value="myCities"
+                v-model:location-model-value="myLocations"
+            />
             <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
         </form>
     </admin-layout>
@@ -43,21 +50,21 @@
 
 <script>
 import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
+import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
 import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
-    props: ['cities'],
-    components: {FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    props: ['cities', 'locations'],
+    components: {CityLocationFilter, FormDateRangePicker, FormCsrfToken, SaveButton},
     data() {
         let myStart = moment().startOf('year');
         let myEnd = moment().endOf('year');
 
         return {
             myCities: this.cities.length ? [this.cities[0].id] : null,
+            myLocations: [],
             myStart,
             myEnd,
         }
@@ -66,6 +73,7 @@ export default {
         renderReport() {
             submitReportForm(route('reports.render', {report: 'offeringAmounts'}), {
                 cities: this.myCities,
+                locations: this.myLocations,
                 start: this.myStart,
                 end: this.myEnd,
             });

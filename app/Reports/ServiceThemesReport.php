@@ -33,7 +33,7 @@ namespace App\Reports;
 use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use App\Services\MinistryService;
-use App\Models\Calendar\Day;
+use App\Models\Location;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Models\People\User;
@@ -82,7 +82,8 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
     public function setup()
     {
         $cities = Auth::user()->cities;
-        return Inertia::render('Report/ServiceThemes/Setup', compact('cities'));
+        $locations = Location::inCities($cities->pluck('id'))->get();
+        return Inertia::render('Report/ServiceThemes/Setup', compact('cities', 'locations'));
     }
 
 
@@ -102,6 +103,8 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
         $data = $request->validate(
             [
                 'cities.*' => 'required|integer|exists:cities,id',
+                'locations' => 'nullable|array',
+                'locations.*' => 'nullable|integer|exists:locations,id',
                 'year' => 'required|integer',
             ]
         );
@@ -112,7 +115,7 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
             Carbon::createFromDate($data['year'], 1, 1),
             Carbon::createFromDate($data['year'], 12, 31)->setTime(23, 59, 59),
         )->displayable()
-            ->inCities($data['cities'])
+            ->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
             ->ordered()
             ->get()
             ->groupBy('key_date');

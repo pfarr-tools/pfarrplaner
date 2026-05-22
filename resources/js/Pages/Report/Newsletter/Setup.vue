@@ -34,7 +34,15 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'newsletter'})" ref="myForm">
             <form-csrf-token />
-            <form-selectize name="cities[]" label="Newsletter für folgende Kirchengemeinden erstellen" v-model="myForm.cities" :options="cities" multiple />
+            <city-location-filter
+                :cities="cities"
+                :locations="locations"
+                city-label="Newsletter für folgende Kirchengemeinden erstellen"
+                location-label="Auf folgende Orte beschränken"
+                location-placeholder="Leer lassen für alle Orte"
+                v-model:city-model-value="myForm.cities"
+                v-model:location-model-value="myForm.locations"
+            />
             <form-check name="includeWeeklyVerse" label="Wochenspruch mit aufnehmen." v-model="myForm.includeWeeklyVerse"/>
             <form-date-range-picker label="Gottesdienste von" v-model:from="myForm.start" v-model:to="myForm.end" iso-date />
         </form>
@@ -43,15 +51,14 @@
 
 <script>
 import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
 import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck";
+import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
 export default {
     name: "Setup",
-    props: ['cities'],
-    components: {FormCheck, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    props: ['cities', 'locations'],
+    components: {CityLocationFilter, FormCheck, FormDateRangePicker, FormCsrfToken, SaveButton},
     data() {
         let myStart = moment();
         let myEnd = moment().add(7, 'days');
@@ -59,6 +66,7 @@ export default {
         return {
             myForm: {
                 cities: this.cities.length ? [this.cities[0].id] : null,
+                locations: [],
                 start: myStart,
                 end: myEnd,
                 includeWeeklyVerse: false,

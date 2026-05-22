@@ -34,7 +34,15 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'serviceThemes'})" @submit.prevent="renderReport">
             <form-csrf-token />
-            <form-selectize name="cities[]" label="Themenplan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple/>
+            <city-location-filter
+                :cities="cities"
+                :locations="locations"
+                city-label="Themenplan für folgende Kirchengemeinden erstellen"
+                location-label="Auf folgende Orte beschränken"
+                location-placeholder="Leer lassen für alle Orte"
+                v-model:city-model-value="myCities"
+                v-model:location-model-value="myLocations"
+            />
             <form-input name="year" label="Jahr" v-model="myYear" type="number" />
         </form>
     </admin-layout>
@@ -42,20 +50,20 @@
 
 <script>
 import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
 import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
-    props: ['cities'],
-    components: {FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    props: ['cities', 'locations'],
+    components: {CityLocationFilter, FormInput, FormCsrfToken, SaveButton},
     data() {
 
         return {
             myUser: this.$page.props.currentUser.data.id,
             myCities: this.cities.length > 0 ? [this.cities[0].id] : [],
+            myLocations: [],
             myYear: moment().format('YYYY'),
         }
     },
@@ -63,6 +71,7 @@ export default {
         renderReport() {
             submitReportForm(route('reports.render', {report: 'serviceThemes'}), {
                 cities: this.myCities,
+                locations: this.myLocations,
                 year: this.myYear,
             });
         },

@@ -37,6 +37,16 @@ describe('LocationSelect', () => {
             expect(freiGroup).toBeDefined()
         })
 
+        it('updates groups when locations prop changes', async () => {
+            const w = mountIt({ locations: [locations[0]] })
+            expect(w.vm.groupedOptions.find(g => g.label === 'Musterstadt')?.options).toHaveLength(1)
+
+            await w.setProps({ locations: [locations[2]] })
+
+            expect(w.vm.groupedOptions.find(g => g.label === 'Musterstadt')).toBeUndefined()
+            expect(w.vm.groupedOptions.find(g => g.label === 'Nebenort')?.options).toHaveLength(1)
+        })
+
         it('adds freetext initial value to Freie Ortsangabe group', () => {
             const w = mountIt({ modelValue: 'Gemeindesaal Süd' })
             const freiGroup = w.vm.groupedOptions.find(g => g.label === 'Freie Ortsangabe')

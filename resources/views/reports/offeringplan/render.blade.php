@@ -22,16 +22,11 @@
 <body>
 <h1 style="margin-bottom: 0cm; padding-bottom: 0;">Opferplan {{ $year }}
     für {{ $cities->pluck('name')->join(', ') }}</h1>
-<p style="font-size: 0.6em; color: gray; margin-top: 0;">Stand: {{strftime('%A, %d. %B %Y, %H:%M Uhr')}}</p>
 
-<htmlpagefooter name="myFooter2">
-    <div style="width: 100%; font-size: 8pt; text-align: right;">Seite {PAGENO}/{nbpg}</div>
-</htmlpagefooter>
-<sethtmlpagefooter name="myFooter2" value="on"/>
 
 @if(count($occurences))
 
-    <table class="table table-fluid table-striped" cellspacing="0" border="0">
+    <table class="table table-fluid table-striped" width="100%" cellspacing="0" border="0">
         <thead>
         <tr>
             <th>Gottesdienst</th>

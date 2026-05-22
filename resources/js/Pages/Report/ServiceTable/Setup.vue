@@ -34,7 +34,15 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'serviceTable'})" @submit.prevent="renderReport">
             <form-csrf-token />
-            <form-selectize name="cities[]" label="Jahresplan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple/>
+            <city-location-filter
+                :cities="cities"
+                :locations="locations"
+                city-label="Jahresplan für folgende Kirchengemeinden erstellen"
+                location-label="Auf folgende Orte beschränken"
+                location-placeholder="Leer lassen für alle Orte"
+                v-model:city-model-value="myCities"
+                v-model:location-model-value="myLocations"
+            />
             <form-input name="year" label="Jahr" v-model="myYear" type="number" />
             <form-selectize name="ministries[]" label="Folgende Dienste mit einschließen" :options="ministries" v-model="myMinistries" multiple/>
             <form-selectize name="name_format" label="Namen ausgeben als" :options="nameFormats" v-model="myNameFormat" />
@@ -47,12 +55,12 @@ import SaveButton from "../../../components/Ui/buttons/SaveButton";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
+import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
 import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
-    props: ['cities', 'ministries'],
-    components: {FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    props: ['cities', 'locations', 'ministries'],
+    components: {CityLocationFilter, FormInput, FormCsrfToken, FormSelectize, SaveButton},
     data() {
         let nameFormats = [
             {id: 1, name: 'Pfr. Müller'},
@@ -65,6 +73,7 @@ export default {
             myUser: this.$page.props.currentUser.data.id,
             myMinistries: [],
             myCities: this.cities.length > 0 ? [this.cities[0].id] : [],
+            myLocations: [],
             myYear: moment().format('YYYY'),
             nameFormats,
             myNameFormat: 3,
@@ -74,6 +83,7 @@ export default {
         renderReport() {
             submitReportForm(route('reports.render', {report: 'serviceTable'}), {
                 cities: this.myCities,
+                locations: this.myLocations,
                 year: this.myYear,
                 ministries: this.myMinistries,
                 name_format: this.myNameFormat,

@@ -33,7 +33,7 @@ namespace App\Reports;
 use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use App\Services\MinistryService;
-use App\Models\Calendar\Day;
+use App\Models\Location;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Models\People\User;
@@ -82,8 +82,9 @@ class ServiceTableReport extends AbstractExcelDocumentReport
     public function setup()
     {
         $cities = Auth::user()->cities;
+        $locations = Location::inCities($cities->pluck('id'))->get();
         $ministries = MinistryService::selectList();
-        return Inertia::render('Report/ServiceTable/Setup', compact('cities', 'ministries'));
+        return Inertia::render('Report/ServiceTable/Setup', compact('cities', 'locations', 'ministries'));
     }
 
     private function columnAddress($col, $cities)
@@ -110,6 +111,8 @@ class ServiceTableReport extends AbstractExcelDocumentReport
         $data = $request->validate(
             [
                 'cities.*' => 'required|integer|exists:cities,id',
+                'locations' => 'nullable|array',
+                'locations.*' => 'nullable|integer|exists:locations,id',
                 'year' => 'required|integer',
                 'ministries' => 'nullable',
                 'ministries.*' => 'nullable|string',
@@ -122,7 +125,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             Carbon::createFromDate($data['year'], 12, 31)->setTime(23, 59, 59),
         )->displayable()
             ->where('event_class', 'service')
-            ->inCities($data['cities'])
+            ->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
             ->ordered()
             ->get()
             ->groupBy('key_date');

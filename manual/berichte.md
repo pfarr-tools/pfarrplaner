@@ -321,6 +321,7 @@ Seite: **Gottesdienstliste für den Newsletter erstellen**
 Felder:
 
 - **Newsletter für folgende Kirchengemeinden erstellen**: Gemeinden.
+- **Auf folgende Orte beschränken**: Optional. Zeigt nur Orte aus den gewählten Gemeinden. Leer bedeutet, dass alle Orte der gewählten Gemeinden einbezogen werden.
 - **Wochenspruch mit aufnehmen.**: Fügt den Wochenspruch ein.
 - **Gottesdienste von**: Zeitraum (Beginn und Ende).
 
@@ -340,6 +341,7 @@ Seite: **Übersicht der eingenommenen Opfer erstellen**
 Felder:
 
 - **Bericht für folgende Kirchengemeinden erstellen**: Gemeinden.
+- **Auf folgende Orte beschränken**: Optional. Zeigt nur Orte aus den gewählten Gemeinden. Leer bedeutet, dass alle Orte der gewählten Gemeinden einbezogen werden.
 - **Gottesdienste von**: Zeitraum (Beginn und Ende).
 
 Die Beträge stammen aus den Opferfeldern der Gottesdienste und aus dem Assistenten [Opferplan bearbeiten](eingaben.md).
@@ -355,6 +357,7 @@ Seite: **Opferplan ausgeben**
 Felder:
 
 - **Opferplan für folgende Kirchengemeinden erstellen**: Gemeinden.
+- **Auf folgende Orte beschränken**: Optional. Zeigt nur Orte aus den vorher gewählten Gemeinden. Leer bedeutet, dass alle Orte der gewählten Gemeinden einbezogen werden.
 - **Jahr**: Jahr des Opferplans.
 - **Opferzähler mit ausgeben**: Nimmt die Namen der Opferzähler auf.
 - **Leere Felder als "eigene Gemeinde" ausgeben**: Behandelt leere Angaben als eigene Gemeinde.
@@ -463,6 +466,7 @@ Seite: **Jahresplan der Gottesdienste erstellen**
 Felder:
 
 - **Jahresplan für folgende Kirchengemeinden erstellen**: Gemeinden.
+- **Auf folgende Orte beschränken**: Optional. Zeigt nur Orte aus den gewählten Gemeinden. Leer bedeutet, dass alle Orte der gewählten Gemeinden einbezogen werden.
 - **Jahr**: Jahr.
 - **Folgende Dienste mit einschließen**: Dienste, die als Spalten aufgenommen werden.
 - **Namen ausgeben als**: Format der Namen.
@@ -478,6 +482,7 @@ Seite: **Themenplan der Gottesdienste erstellen**
 Felder:
 
 - **Themenplan für folgende Kirchengemeinden erstellen**: Gemeinden.
+- **Auf folgende Orte beschränken**: Optional. Zeigt nur Orte aus den gewählten Gemeinden. Leer bedeutet, dass alle Orte der gewählten Gemeinden einbezogen werden.
 - **Jahr**: Jahr.
 
 ---
@@ -546,6 +551,7 @@ Seite: **Dienstplan für einzelne Dienste erstellen**
 Felder:
 
 - **Plan für folgende Kirchengemeinden erstellen**: Gemeinden.
+- **Auf folgende Orte beschränken**: Optional. Zeigt nur Orte aus den gewählten Gemeinden. Leer bedeutet, dass alle Orte der gewählten Gemeinden einbezogen werden.
 - **Dienste**: Dienste.
 - **Gottesdienste von**: Zeitraum (Beginn und Ende).
 - **Dateiformat**: PDF oder Excel, je nach Auswahl.

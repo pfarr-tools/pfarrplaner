@@ -30,8 +30,8 @@
 
 namespace App\Reports;
 
+use App\Models\Location;
 use App\Models\Places\City;
-use App\Models\Calendar\Day;
 use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
@@ -75,7 +75,8 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
     public function setup()
     {
         $cities = Auth::user()->cities;
-        return Inertia::render('Report/OfferingAmounts/Setup', compact('cities'));
+        $locations = Location::inCities($cities->pluck('id'))->get();
+        return Inertia::render('Report/OfferingAmounts/Setup', compact('cities', 'locations'));
     }
 
     /**
@@ -88,6 +89,8 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
         $data = $request->validate(
             [
                 'cities.*' => 'required|integer|exists:cities,id',
+                'locations' => 'nullable|array',
+                'locations.*' => 'nullable|integer|exists:locations,id',
                 'start' => 'required|date',
                 'end' => 'required|date',
             ]
@@ -95,7 +98,7 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
 
         $cities = City::whereIn('id', $data['cities'])->get();
 
-        $services = Service::inCities($data['cities'])
+        $services = Service::inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
             ->between(Carbon::parse($data['start']), Carbon::parse($data['end']))
             ->ordered()
             ->get();

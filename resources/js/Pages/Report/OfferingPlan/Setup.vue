@@ -34,7 +34,15 @@
         </template>
         <form method="post" :action="route('reports.render', {report: 'offeringPlan'})" @submit.prevent="renderReport">
             <form-csrf-token />
-            <form-selectize name="cities[]" label="Opferplan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple />
+            <city-location-filter
+                :cities="cities"
+                :locations="locations"
+                city-label="Opferplan für folgende Kirchengemeinden erstellen"
+                location-label="Auf folgende Orte beschränken"
+                location-placeholder="Leer lassen für alle Orte"
+                v-model:city-model-value="myCities"
+                v-model:location-model-value="myLocations"
+            />
             <form-input name="year" label="Jahr" v-model="myYear" type="number" />
             <br />
             <form-check name="includeOfferingCounters" v-model="myIncludeOfferingCounters" label="Opferzähler mit ausgeben"/>
@@ -46,19 +54,19 @@
 
 <script>
 import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
 import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
 import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
 import FormCheck from "../../../components/Ui/forms/FormCheck.vue";
+import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
 import { submitReportForm } from "../../../helpers/submitReportForm";
 export default {
     name: "Setup",
-    props: ['cities'],
-    components: {FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    props: ['cities', 'locations'],
+    components: {CityLocationFilter, FormCheck, FormInput, FormCsrfToken, SaveButton},
     data() {
         return {
             myCities: this.cities.length > 0 ? [this.cities[0].id] : null,
+            myLocations: [],
             myYear: moment().format('YYYY'),
             myIncludeOfferingCounters: false,
             myEmptyAsOwn: true,
@@ -69,6 +77,7 @@ export default {
         renderReport() {
             submitReportForm(route('reports.render', {report: 'offeringPlan'}), {
                 cities: this.myCities,
+                locations: this.myLocations,
                 year: this.myYear,
                 includeOfferingCounters: this.myIncludeOfferingCounters,
                 emptyAsOwn: this.myEmptyAsOwn,

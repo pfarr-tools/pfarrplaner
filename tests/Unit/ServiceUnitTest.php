@@ -30,6 +30,7 @@
 
 namespace Tests\Unit;
 
+use App\Models\Location;
 use App\Http\Requests\ServiceRequest;
 use App\Models\Places\City;
 use App\Models\Service;
@@ -157,6 +158,66 @@ class ServiceUnitTest extends TestCase
         $results = Service::atDate($date)->get();
         $this->assertCount(1, $results);
         $this->assertEquals($service->id, $results->first()->id);
+    }
+
+    /**
+     * @return void
+     */
+    public function testScopeInCitiesAndLocationsFiltersByCityAndLocation(): void
+    {
+        $cityA = City::factory()->create();
+        $cityB = City::factory()->create();
+        $locationA1 = Location::factory()->create(['city_id' => $cityA->id]);
+        $locationA2 = Location::factory()->create(['city_id' => $cityA->id]);
+        $locationB1 = Location::factory()->create(['city_id' => $cityB->id]);
+
+        $matching = Service::factory()->create([
+            'city_id' => $cityA->id,
+            'location_id' => $locationA1->id,
+        ]);
+        Service::factory()->create([
+            'city_id' => $cityA->id,
+            'location_id' => $locationA2->id,
+        ]);
+        Service::factory()->create([
+            'city_id' => $cityB->id,
+            'location_id' => $locationB1->id,
+        ]);
+
+        $results = Service::inCitiesAndLocations([$cityA->id, $cityB->id], [$locationA1->id])->get();
+
+        $this->assertCount(1, $results);
+        $this->assertEquals($matching->id, $results->first()->id);
+    }
+
+    /**
+     * @return void
+     */
+    public function testScopeInCitiesAndLocationsBehavesLikeInCitiesWhenLocationsAreEmpty(): void
+    {
+        $city = City::factory()->create();
+        $otherCity = City::factory()->create();
+        $location1 = Location::factory()->create(['city_id' => $city->id]);
+        $location2 = Location::factory()->create(['city_id' => $city->id]);
+        $otherLocation = Location::factory()->create(['city_id' => $otherCity->id]);
+
+        Service::factory()->create([
+            'city_id' => $city->id,
+            'location_id' => $location1->id,
+        ]);
+        Service::factory()->create([
+            'city_id' => $city->id,
+            'location_id' => $location2->id,
+        ]);
+        Service::factory()->create([
+            'city_id' => $otherCity->id,
+            'location_id' => $otherLocation->id,
+        ]);
+
+        $cityOnlyResults = Service::inCities([$city->id])->pluck('id')->sort()->values()->all();
+        $cityAndEmptyLocationsResults = Service::inCitiesAndLocations([$city->id], [])->pluck('id')->sort()->values()->all();
+
+        $this->assertEquals($cityOnlyResults, $cityAndEmptyLocationsResults);
     }
 
 
