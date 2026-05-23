@@ -338,13 +338,30 @@ class Absence extends Model implements HasDAVCalendarItems
         foreach ($data as $replacementData) {
             $replacement = app(Replacement::getContractName('create'))->create($user, $this, [
                 'absence_id' => $this->id,
-                'from' => max(Carbon::createFromFormat('d.m.Y', $replacementData['from']), $this->from),
-                'to' => min(Carbon::createFromFormat('d.m.Y', $replacementData['to']), $this->to),
+                'from' => max($this->normalizePlannerDateValue($replacementData['from'])->setTime(0, 0, 0), $this->from),
+                'to' => min($this->normalizePlannerDateValue($replacementData['to'])->setTime(23, 59, 59), $this->to),
                 'pool_id' => $replacementData['pool_id'] ?? null,
                 'users' => $replacementData['users'] ?? [],
             ]);
             $replacementIds[] = $replacement->id;
         }
+    }
+
+    /**
+     * Normalize ISO or legacy d.m.Y input to a UTC calendar date.
+     *
+     * @param mixed $value
+     * @return Carbon
+     */
+    protected function normalizePlannerDateValue(mixed $value): Carbon
+    {
+        if (is_string($value) && preg_match('/^\d{2}\.\d{2}\.\d{4}$/', trim($value))) {
+            return Carbon::createFromFormat('d.m.Y', trim($value), 'UTC');
+        }
+
+        $date = Carbon::parse($value)->setTimezone('Europe/Berlin');
+
+        return Carbon::create($date->year, $date->month, $date->day, 0, 0, 0, 'UTC');
     }
 
     /**

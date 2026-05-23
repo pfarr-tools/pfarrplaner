@@ -198,6 +198,7 @@
 </template>
 
 <script>
+import { DateTime } from 'luxon';
 import AbsenceNav from "./AbsenceNav";
 import Card from "../../components/Ui/cards/card";
 import CardBody from "../../components/Ui/cards/cardBody";
@@ -230,7 +231,7 @@ export default {
     },
     computed: {
         pageTitle() {
-            return 'Urlaubsplaner ' + moment(this.start).locale('de').format('MMMM YYYY');
+            return 'Urlaubsplaner ' + this.formatPlannerDate(this.start, 'LLLL yyyy');
         },
         calendarDays() {
             return Object.values(this.days || {})
@@ -240,8 +241,8 @@ export default {
                     days.push({
                         ...day,
                         key: `day-${day.day}`,
-                        weekdayShort: moment(day.date).locale('de').format('dd'),
-                        dayOfMonth: moment(day.date).locale('de').format('DD'),
+                        weekdayShort: this.formatPlannerDate(day.date, 'ccc'),
+                        dayOfMonth: this.formatPlannerDate(day.date, 'dd'),
                     });
                     return days;
                 }, []);
@@ -260,6 +261,32 @@ export default {
         },
     },
     methods: {
+        plannerDateTime(value) {
+            if (!value) return null;
+            if (DateTime.isDateTime(value)) {
+                return value.setZone('Europe/Berlin').setLocale('de');
+            }
+            if (typeof value === 'string') {
+                const iso = DateTime.fromISO(value, { setZone: true });
+                if (iso.isValid) {
+                    return iso.setZone('Europe/Berlin').setLocale('de');
+                }
+            }
+
+            const fallback = moment(value);
+            if (!fallback.isValid()) return null;
+
+            return DateTime.fromJSDate(fallback.toDate())
+                .setZone('Europe/Berlin')
+                .setLocale('de');
+        },
+        formatPlannerDate(value, format) {
+            const plannerDate = this.plannerDateTime(value);
+            return plannerDate ? plannerDate.toFormat(format) : '';
+        },
+        plannerIsoWeekday(value) {
+            return this.plannerDateTime(value)?.weekday || null;
+        },
         normalizeOpenSections(sectionConfig, defaults) {
             return {
                 ...defaults,
@@ -274,7 +301,7 @@ export default {
 
             response.data.forEach(user => {
                 this.loadingUserDays[user.id] = true;
-                axios.get(route('planner.days', {user: user.id, date: moment(this.start).format('YYYY-MM')}))
+                axios.get(route('planner.days', {user: user.id, date: this.formatPlannerDate(this.start, 'yyyy-MM')}))
                     .then(userResponse => {
                         this.userDays[user.id] = userResponse.data;
                     })
@@ -314,14 +341,14 @@ export default {
         },
         dayClass(user, day) {
             let prefix = user.canEdit ? 'editable ' : '';
-            if (moment(day.date).isoWeekday() === 7) return prefix + 'sunday';
+            if (this.plannerIsoWeekday(day.date) === 7) return prefix + 'sunday';
             if (day.holiday) return prefix + 'vacation';
             return prefix + 'day';
         },
         headerDayClass(day) {
             let classes = 'day';
             if (day.holiday) classes += ' vacation';
-            if (moment(day.date).isoWeekday() === 7) classes += ' sunday-header';
+            if (this.plannerIsoWeekday(day.date) === 7) classes += ' sunday-header';
             return classes;
         },
         canEditCell(user, absence) {
@@ -346,7 +373,7 @@ export default {
             }
 
             let classes = this.dayClass(user, day);
-            if (moment(day.date).isoWeekday() === 7 && userDay?.busy) {
+            if (this.plannerIsoWeekday(day.date) === 7 && userDay?.busy) {
                 classes += ' sunday-busy';
             } else if (day.holiday && userDay?.busy) {
                 classes += ' vacation-busy';
@@ -416,8 +443,8 @@ export default {
         },
         absenceTitle(user, absence) {
             if ((!user.canEdit) && (!absence.canEdit) && (!absence.replacing)) {
-                return absence.user.name + ' (' + moment(absence.from).format('DD.MM.YYYY') + ' - '
-                    + moment(absence.to).format('DD.MM.YYYY') + ')';
+                return absence.user.name + ' (' + this.formatPlannerDate(absence.from, 'dd.MM.yyyy') + ' - '
+                    + this.formatPlannerDate(absence.to, 'dd.MM.yyyy') + ')';
             }
 
             let statusText = '';
@@ -429,8 +456,8 @@ export default {
                 replacementText = 'V: ' + absence.replacementText;
             }
 
-            return absence.reason + ' (' + moment(absence.from).format('DD.MM.YYYY') + ' - '
-                + moment(absence.to).format('DD.MM.YYYY') + ') ' + replacementText + statusText + (user.canEdit ? ' --> Klicken, um zu bearbeiten' : '');
+            return absence.reason + ' (' + this.formatPlannerDate(absence.from, 'dd.MM.yyyy') + ' - '
+                + this.formatPlannerDate(absence.to, 'dd.MM.yyyy') + ') ' + replacementText + statusText + (user.canEdit ? ' --> Klicken, um zu bearbeiten' : '');
         },
         colspan(user, day) {
             if (undefined === this.userDays[user.id]) return this.calendarDays.length;

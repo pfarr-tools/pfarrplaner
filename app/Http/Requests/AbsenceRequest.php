@@ -33,6 +33,7 @@ namespace App\Http\Requests;
 use App\Models\Leave\Absence;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Closure;
 
 class AbsenceRequest extends FormRequest
 {
@@ -65,8 +66,8 @@ class AbsenceRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'from' => 'required|date_format:d.m.Y',
-            'to' => 'required|date_format:d.m.Y',
+            'from' => ['required', $this->dateValueRule()],
+            'to' => ['required', $this->dateValueRule()],
             'reason' => 'required|string',
             'replacement_notes' => 'nullable|string',
             'workflow_status' => 'int|in:' . Absence::STATUS_NEW,
@@ -125,8 +126,8 @@ class AbsenceRequest extends FormRequest
     {
         $data = parent::validated();
 
-        $data['from'] = Carbon::createFromFormat('d.m.Y', $data['from'])->setTime(0, 0, 0);
-        $data['to'] = Carbon::createFromFormat('d.m.Y', $data['to'])->setTime(23, 59, 59);
+        $data['from'] = $this->normalizePlannerDate($data['from'])->setTime(0, 0, 0);
+        $data['to'] = $this->normalizePlannerDate($data['to'])->setTime(23, 59, 59);
 
         if (isset($data['approved_at'])) {
             if (strlen($data['approved_at']) == 10) $data['approved_at'] .= ' 0:00:00';
@@ -151,6 +152,69 @@ class AbsenceRequest extends FormRequest
             }
         }
         return $data;
+    }
+
+    /**
+     * Validate a planner date value in ISO or legacy d.m.Y format.
+     *
+     * @return Closure
+     */
+    protected function dateValueRule(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail): void {
+            if (null === $this->parsePlannerDate($value)) {
+                $fail('Das Feld '.$attribute.' muss ein gueltiges Datum sein.');
+            }
+        };
+    }
+
+    /**
+     * Normalize a planner date to a UTC calendar day.
+     *
+     * @param mixed $value
+     * @return Carbon|null
+     */
+    protected function normalizePlannerDate(mixed $value): ?Carbon
+    {
+        $date = $this->parsePlannerDate($value);
+
+        if (null === $date) {
+            return null;
+        }
+
+        return Carbon::create(
+            $date->year,
+            $date->month,
+            $date->day,
+            0,
+            0,
+            0,
+            'UTC'
+        );
+    }
+
+    /**
+     * Parse a planner date from ISO or legacy d.m.Y input.
+     *
+     * @param mixed $value
+     * @return Carbon|null
+     */
+    protected function parsePlannerDate(mixed $value): ?Carbon
+    {
+        if (!is_string($value) || '' === trim($value)) {
+            return null;
+        }
+
+        $value = trim($value);
+        if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $value)) {
+            return Carbon::createFromFormat('d.m.Y', $value, 'UTC');
+        }
+
+        try {
+            return Carbon::parse($value)->setTimezone('Europe/Berlin');
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     /**

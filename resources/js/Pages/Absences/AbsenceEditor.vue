@@ -350,21 +350,62 @@ export default {
 
         return {
             form,
-            role: 'editor',
-            mayEdit: true,
-            setApproved: false,
+            setApproved: [2, 11].includes(Number(this.absence.workflow_status)),
         };
     },
 
     computed: {
+        role() {
+            if (this.maySelfAdminister) {
+                return 'self-editor';
+            }
+
+            if (!this.mayEdit) {
+                return 'readonly';
+            }
+
+            if (this.mayApprove) {
+                return 'approver';
+            }
+
+            if (this.mayCheck) {
+                return 'admin';
+            }
+
+            return 'editor';
+        },
+        mayEdit() {
+            const workflowStatus = Number(this.form.workflow_status);
+
+            if (this.maySelfAdminister) {
+                return true;
+            }
+
+            return (this.mayCheck && workflowStatus === 0)
+                || (this.mayApprove && workflowStatus === 1)
+                || (workflowStatus <= 0);
+        },
+        mayDelete() {
+            const workflowStatus = Number(this.form.workflow_status);
+
+            return !!(
+                this.form.id
+                && (
+                    ((this.role === 'editor') && (workflowStatus === 0))
+                    || (this.role === 'self-editor')
+                    || this.mayCheck
+                    || this.mayApprove
+                )
+            );
+        },
         // ✅ bridge for new DateRangeInput
         dateRange: {
             get() {
                 return [this.form.from, this.form.to];
             },
             set([from, to]) {
-                this.form.from = moment(from).format('YYYY-MM-DD HH:mm:ss');
-                this.form.to = moment(to).format('YYYY-MM-DD HH:mm:ss');
+                this.form.from = from ? moment(from).toISOString() : null;
+                this.form.to = to ? moment(to).toISOString() : null;
             }
         },
 
@@ -399,9 +440,19 @@ export default {
 
             record.replacements = record.replacements.map(r => ({
                 ...r,
-                from: moment(r.range?.[0]).format('YYYY-MM-DD HH:mm:ss'),
-                to: moment(r.range?.[1]).format('YYYY-MM-DD HH:mm:ss'),
+                from: r.range?.[0] ? moment(r.range[0]).toISOString() : null,
+                to: r.range?.[1] ? moment(r.range[1]).toISOString() : null,
             }));
+
+            if (this.maySelfAdminister) {
+                record.workflow_status = this.setApproved ? 11 : 10;
+            } else if (this.role === 'editor') {
+                record.workflow_status = 0;
+            }
+
+            if (record.sick_days && (record.reason === 'Urlaub')) {
+                record.reason = 'Krankheit';
+            }
 
             return record;
         },
@@ -410,6 +461,46 @@ export default {
             this.form
                 .transform(() => this.prepareForm())
                 .patch(route('absence.update', { absence: this.absence.id }));
+        },
+        checkAndSave() {
+            this.form.workflow_status = 1;
+            this.saveAbsence();
+        },
+        approveAndSave() {
+            this.form.workflow_status = 2;
+            this.saveAbsence();
+        },
+        returnAndSave() {
+            this.form.workflow_status = 0;
+            this.saveAbsence();
+        },
+        rejectAbsence() {
+            if (!confirm('Willst du diesen Abwesenheitseintrag ablehnen und löschen?')) return;
+
+            this.$inertia.delete(route('absence.destroy', { absence: this.absence.id }), {
+                data: {
+                    sendRejectionMail: true,
+                    month: moment(this.form.from).format('M'),
+                    year: moment(this.form.from).format('YYYY'),
+                },
+            });
+        },
+        deleteAbsence() {
+            if (!confirm('Willst du diese Abwesenheit wirklich unwiderruflich löschen?')) return;
+
+            this.$inertia.delete(route('absence.destroy', { absence: this.absence.id }), {
+                data: {
+                    month: moment(this.form.from).format('M'),
+                    year: moment(this.form.from).format('YYYY'),
+                },
+            });
+        },
+    },
+    watch: {
+        setApproved(value) {
+            if (!this.maySelfAdminister) return;
+
+            this.form.workflow_status = value ? 11 : 10;
         }
     }
 };

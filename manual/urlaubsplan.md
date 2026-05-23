@@ -97,6 +97,8 @@ Die Tabelle nutzt Farben und Hinweise:
 
 In einem Abwesenheitsfeld stehen Name, Beschreibung und, falls vorhanden, die Vertretung mit **V:**. Wenn Sie die Maus über den Eintrag halten, zeigt Pfarrplaner zusätzliche Informationen wie Zeitraum, Vertretung und Status an.
 
+Datumsangaben im Urlaubsplan werden immer als Kalendertage angezeigt. Beginn- und Endtag bleiben deshalb auch dann richtig, wenn Ihr Gerät eine andere Zeitzone verwendet.
+
 Ein Eintrag ist anklickbar, wenn Sie ihn bearbeiten dürfen. Leere Tage sind anklickbar, wenn Sie für diese Person einen Eintrag anlegen dürfen.
 
 ---
@@ -142,6 +144,8 @@ Der Reiter **Abwesenheit** enthält die Grunddaten.
 - **Beschreibung**: Grund der Abwesenheit, zum Beispiel **Urlaub**, **Fortbildung** oder **Krank**.
 - **Es handelt sich um eine Krankmeldung**: Markierung für Krankmeldungen. Krankmeldungen werden im Plan gesondert eingefärbt, sofern Sie den Eintrag sehen oder bearbeiten dürfen.
 - **Interne Anmerkungen**: Freies Feld für interne Hinweise.
+
+Wenn Sie den Zeitraum speichern, behandelt Pfarrplaner beide Angaben immer als ganze Kalendertage. Der erste und letzte Tag bleiben dadurch auch bei unterschiedlichen Geräteeinstellungen unverändert.
 
 Bei Selbstverwaltung können zusätzlich erscheinen:
 
