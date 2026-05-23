@@ -64,7 +64,8 @@ class SermonController extends Controller
     public function editor(Sermon $sermon)
     {
         $services = $sermon->services;
-        return Inertia::render('sermonEditor', compact('services', 'sermon'));
+        $service = $services->first();
+        return Inertia::render('sermonEditor', compact('services', 'sermon', 'service'));
     }
 
     public function store(Request $request, Service $service)

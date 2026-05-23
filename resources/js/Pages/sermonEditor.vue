@@ -39,7 +39,7 @@
                 </a>
             </template>
             <template #navbar-right>
-                <div class="btn-group calendar-mode-toggle" role="group" aria-label="Ansicht umschalten" v-if="service.isEditable">
+                <div class="btn-group calendar-mode-toggle" role="group" aria-label="Ansicht umschalten" v-if="currentService?.isEditable">
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-outline-secondary dropdown-toggle"
                                 data-bs-toggle="dropdown" aria-expanded="false" title="Gottesdienst bearbeiten">
@@ -195,6 +195,9 @@ export default {
         },
     },
     computed: {
+        currentService() {
+            return this.service || this.services?.[0] || null;
+        },
         funerals() {
             let f = [];
             this.services.forEach(s => {
@@ -229,7 +232,7 @@ export default {
         var editedSermon = this.sermon ? this.sermon : emptySermon
         if (null === editedSermon.text) editedSermon.text = '';
 
-        let allServices = this.services || [this.service];
+        let allServices = this.services?.length ? this.services : [this.currentService].filter(Boolean);
         let textSources = {};
         allServices.forEach(thisService => {
             const theseTextSources = getTextSources(thisService);
@@ -282,7 +285,7 @@ export default {
                 formData.append('image', this.fileUpload);
             }
             if (undefined === this.editedSermon.id) {
-                this.$inertia.post(route('sermon.store', {service: this.service.slug}), formData, {
+                this.$inertia.post(route('sermon.store', {service: this.currentService.slug}), formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                     preserveState: false,
                 });

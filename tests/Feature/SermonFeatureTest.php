@@ -15,6 +15,7 @@ namespace Tests\Feature;
 use App\Models\People\User;
 use App\Models\Sermon;
 use App\Services\RoleService;
+use App\Http\Middleware\ForceDomain;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -28,6 +29,7 @@ class SermonFeatureTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware(ForceDomain::class);
         $this->user = User::factory()->create();
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
