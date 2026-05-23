@@ -120,7 +120,7 @@ Die **Leseansicht** ist eine eigene Ansicht für den gespeicherten Predigttext. 
 
 Sie öffnen die Leseansicht über **Zur Leseansicht**. Die Schaltfläche erscheint erst, wenn die Predigt bereits gespeichert ist, weil die Leseansicht einen vorhandenen Predigtdatensatz braucht. Die Ansicht öffnet in einem neuen Tab. Der Titel der Seite besteht aus dem Predigttitel und dem Zusatz **Leseansicht**.
 
-In der Leseansicht sehen Sie nur den Predigttext aus dem Feld **Text der Predigt**. Die Bearbeitungsfelder, Literaturhinweise, Hauptpunkte, Fragen und Gottesdienstverknüpfungen werden dort nicht angezeigt. Der Text wird sehr groß dargestellt, damit er aus etwas Abstand gut lesbar ist.
+In der Leseansicht sehen Sie nur den Predigttext aus dem Feld **Text der Predigt**. Die Bearbeitungsfelder, Literaturhinweise, Hauptpunkte, Fragen und Gottesdienstverknüpfungen werden dort nicht angezeigt. Der Text wird sehr groß dargestellt, damit er aus etwas Abstand gut lesbar ist. Als Zitat formatierte Abschnitte werden dabei auch in der Leseansicht deutlich als eingerückte Zitate dargestellt.
 
 Die Ansicht eignet sich besonders für diese Arbeitsweise:
 
@@ -132,11 +132,13 @@ Die Ansicht eignet sich besonders für diese Arbeitsweise:
 6. Wenn Ihnen beim Lesen ein Fehler auffällt, klicken Sie auf das betreffende Wort.
 7. Korrigieren Sie die markierten Stellen später im Predigteditor.
 
-Beim Klicken auf ein Wort hebt Pfarrplaner dieses Wort farbig hervor. Die Markierung ist als Gedächtnisstütze gedacht: Sie können während einer Aufnahme schnell festhalten, wo ein Tippfehler, eine unglückliche Formulierung oder eine störende Stelle war, ohne den Lesefluss zu unterbrechen.
+Beim Klicken auf ein Wort hebt Pfarrplaner dieses Wort farbig hervor. Auch einzelne Satzzeichen wie Punkt, Komma oder Fragezeichen können Sie direkt markieren. Die Markierung ist als Gedächtnisstütze gedacht: Sie können während einer Aufnahme schnell festhalten, wo ein Tippfehler, eine unglückliche Formulierung oder eine störende Stelle war, ohne den Lesefluss zu unterbrechen.
+
+Oben rechts sehen Sie die Schaltflächen **Vorherige** und **Nächste**. Damit springen Sie zur vorherigen oder nächsten Markierung. Daneben zeigt Pfarrplaner an, die wievielte Markierung gerade aktiv ist.
 
 Wichtig: Die Markierungen werden nicht in der Predigt gespeichert. Sie verändern nur die gerade geöffnete Leseansicht im Browser. Wenn Sie die Seite neu laden oder den Tab schließen, sind die Markierungen weg. Lassen Sie die Leseansicht deshalb geöffnet, bis Sie die markierten Stellen im Predigteditor korrigiert haben.
 
-Die Markierung arbeitet wortweise. Wenn Sie mitten in ein Wort klicken, versucht Pfarrplaner, genau dieses Wort zu markieren. Bei Leerzeichen, Satzzeichen oder sehr ungewöhnlicher Formatierung kann es sein, dass keine sinnvolle Markierung entsteht. Klicken Sie dann direkt auf das Wort, das Sie später korrigieren möchten.
+Die Markierung arbeitet wortweise. Wenn Sie mitten in ein Wort klicken, versucht Pfarrplaner, genau dieses Wort zu markieren. Das gilt auch für Wörter mit Umlauten oder dem Buchstaben ß. Satzzeichen werden einzeln markiert. Ein zweiter Klick auf eine bestehende Markierung entfernt sie wieder. Bei Leerzeichen oder sehr ungewöhnlicher Formatierung kann es sein, dass keine sinnvolle Markierung entsteht. Klicken Sie dann direkt auf das Wort oder Satzzeichen, das Sie später korrigieren möchten.
 
 Die Leseansicht ist nur verfügbar, wenn die Predigt bereits gespeichert ist.
 
