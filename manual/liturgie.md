@@ -31,6 +31,8 @@ Oben links können je nach Situation diese Schaltflächen erscheinen:
 - **Predigt**: Öffnet den [Predigteditor](predigt.md) für diesen Gottesdienst. Diese Schaltfläche erscheint nur bei bearbeitbaren Gottesdiensten und nicht im Vorlagenmodus.
 - **Vorlage speichern**: Speichert eine Liturgievorlage. Diese Schaltfläche erscheint nur im Vorlagenmodus.
 
+Oben rechts kann zusätzlich **Herunterladen** erscheinen. Damit öffnen Sie die verfügbaren Liturgie-Ausgaben. Die Schaltfläche erscheint nur, wenn bereits Ablaufelemente vorhanden sind und Ausgaben eingerichtet wurden.
+
 Weitere Schaltflächen können über die Seiteneinstellungen oder durch eingebettete Funktionen der Installation hinzukommen.
 
 ---
@@ -102,7 +104,6 @@ Wenn Sie bearbeiten dürfen, sehen Sie oben im Ablauf:
 
 - **Abschnitt hinzufügen...**: Legt einen neuen Abschnitt an und öffnet ihn zur Bearbeitung.
 - **Ablaufelemente importieren...**: Öffnet ein Fenster, in dem Sie Ablaufteile aus Vorlagen oder anderen Gottesdiensten importieren können.
-- **Herunterladen**: Öffnet die verfügbaren Liturgie-Ausgaben. Diese Schaltfläche erscheint nur, wenn es bereits Ablaufelemente gibt und Ausgaben eingerichtet sind.
 
 In jedem Abschnitt stehen kleine Schaltflächen zum Einfügen neuer Elemente. Neue Elemente werden im gewählten Abschnitt angelegt und direkt zur Bearbeitung geöffnet.
 
@@ -325,7 +326,7 @@ Vorlagen sparen Zeit und sorgen dafür, dass wichtige Teile eines Gottesdienstes
 
 ## Herunterladen und Ausgaben
 
-Die Schaltfläche **Herunterladen** erscheint nur, wenn der Gottesdienst Ablaufelemente hat und Ausgaben eingerichtet sind. Welche Einträge sichtbar sind, hängt von Installation, Rechten und Ausgabeart ab.
+Die Schaltfläche **Herunterladen** finden Sie oben rechts in der oberen Leiste des Liturgie-Editors. Sie erscheint nur, wenn der Gottesdienst Ablaufelemente hat und Ausgaben eingerichtet sind. Welche Einträge sichtbar sind, hängt von Installation, Rechten und Ausgabeart ab.
 
 Mögliche Ausgaben sind zum Beispiel:
 
@@ -425,6 +426,8 @@ Im Reiter **Werbung** können Veranstaltungsfolien in die Präsentation eingebau
 - **Werbefolien nach ___ Sekunden weiterschalten**: Legt fest, nach wie vielen Sekunden die nächste Werbefolie angezeigt wird. Bei `0` erfolgt keine automatische Weiterschaltung.
 
 Werbeoptionen sind nur sinnvoll, wenn Veranstaltungen und Werbekanäle in Pfarrplaner gepflegt werden.
+
+Wenn für eine Veranstaltung bereits eine eigene hervorgehobene Werbefolie erzeugt wird, lässt Pfarrplaner reine Listenfolien weg, auf denen nur noch genau diese hervorgehobenen Veranstaltungen stehen würden. So entstehen keine doppelten Hinweise hintereinander.
 
 ### Reiter Ausgabeformat
 

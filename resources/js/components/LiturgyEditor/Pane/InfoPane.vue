@@ -29,25 +29,23 @@
 
 <template xmlns="http://www.w3.org/1999/html">
     <div class="liturgy-editor-info-pane">
-        <div class="mb-3" v-html="credits"></div>
         <div v-if="showable && liturgy['Bezeichnung']">
             <div v-if="myService.isAlternateProprium" class="alert alert-warning mb-1">
                 In den Gottesdiensteinstellungen wurde ein vom normalen Kalender abweichendes Proprium
                 festgelegt.
             </div>
             <div v-if="liturgy['Bezeichnung']">
-                <hr />
                 <div class="row">
                     <div class="col-12 col-md-10 fs-3">
                             <div v-if="liturgy['Bezeichnung']">
-                                <b class="fw-bold">{{ liturgy['Bezeichnung'] }}</b>
+                                <b class="fw-bold me-1">{{ liturgy['Bezeichnung'] }}</b>
                                 <span v-if="liturgy['Festkreis']" class="badge bg-info" :class="'bg-circle-'+liturgy['CSS-Farbe']">{{
                                         liturgy['Festkreis']
                                     }} ({{ romanize(liturgy['Lesejahr']) }}) </span>
                             </div>
                     </div>
                     <div class="col-12 col-md-2 text-md-end">
-                        <div v-if="Object.keys(myService.liturgicalInfo.Links).length > 0" class="dropdown">
+                        <div v-if="showMaterialsButton && Object.keys(myService.liturgicalInfo.Links).length > 0" class="dropdown">
                             <button type="button" id="dropdownLinksMenuButton" data-bs-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="false" title="Links zu Predigthilfen"
                                     class="btn btn-light btn-sm mt-1 dropdown-toggle"><span data-v-5d98b2c4=""
@@ -156,23 +154,14 @@ export default {
             if ((!this.liturgy['title']) && (this.myService.funerals.length > 0)) return false;
             return true;
         },
-        credits() {
-            let ministries = {
-                'P': this.myService.pastors,
-                'O': this.myService.organists,
-                'M': this.myService.sacristans,
-                ...this.myService.ministriesByCategory,
-            }
-            let c = [];
-            for (const category in ministries) {
-                let names = [];
-                ministries[category].forEach(person => names.push(person.name));
-                c.push(category+': '+names.join(', '));
-            }
-            return c.join(' &middot; ');
+    },
+    props: {
+        service: Object,
+        showMaterialsButton: {
+            type: Boolean,
+            default: true,
         },
     },
-    props: ['service'],
     methods: {
         /**
          * @source http://blog.stevenlevithan.com/archives/javascript-roman-numeral-converter
@@ -218,6 +207,10 @@ export default {
 <style scoped>
 .liturgy-editor-info-pane {
     font-size: 0.8em;
+    padding: 0.85rem 1.1rem;
+    background: rgba(var(--bs-white-rgb), 0.95);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.08);
+    border-radius: 1rem;
 }
 
 .bg-circle-white {

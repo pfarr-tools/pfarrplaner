@@ -46,7 +46,7 @@ Beispiele:
 - Im [Kalender](kalender.md) stehen dort Monatsnavigation, Ansichtswechsel, **Gottesdienst anlegen**, **Anfrage senden...** und weitere Kalenderfunktionen.
 - Im [Editor für Veranstaltungen und Gottesdienste](veranstaltungen.md) stehen dort **Speichern**, **Liturgie**, **Predigt** und weitere Funktionen zum geöffneten Gottesdienst.
 - Im [Predigteditor](predigt.md) stehen dort **Speichern** und **Zur Leseansicht**.
-- Im [Liturgie-Editor](liturgie.md) stehen dort zum Beispiel **Gottesdienst**, **Predigt** oder **Vorlage speichern**.
+- Im [Liturgie-Editor](liturgie.md) stehen dort zum Beispiel **Gottesdienst**, **Predigt**, **Herunterladen** oder **Vorlage speichern**.
 
 Diese Schaltflächen sind deshalb nicht auf jeder Seite gleich. Sie beziehen sich immer auf die Seite, die gerade geöffnet ist. Manche Schaltflächen erscheinen nur, wenn Sie die nötigen Rechte haben oder wenn die passende Funktion für diesen Datensatz sinnvoll ist.
 

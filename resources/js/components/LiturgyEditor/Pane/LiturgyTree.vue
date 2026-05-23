@@ -32,150 +32,148 @@
         <div v-if="reloadingTree" class="tree-loader">
             <span class="mdi mdi-spin mdi-loading"></span>
         </div>
-        <div v-else>
-            <div class="row py-2 border-bottom mb-2">
-                <div class="col-md-6">
-                    <button class="btn btn-success me-1" @click="addBlock"><span class="mdi mdi-format-section"></span>
-                        Abschnitt
-                        hinzufügen...
-                    </button>
-                    <button class="btn btn-light" @click.prevent="modalOpen = true">Ablaufelemente importieren...
-                    </button>
+        <div v-else class="liturgy-tree__surface">
+            <div v-if="editable && !blocks.length" class="liturgy-tree__empty">
+                <div class="liturgy-tree__empty-copy">
+                    Noch keine Abschnitte vorhanden.
                 </div>
-                <div class="col-md-6 text-end">
-                    <div class="dropdown" v-if="hasDownload()">
-                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                title="Dokumente herunterladen">
-                            <span class="mdi mdi-download"></span> Herunterladen
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <div v-for="sheet in sheets">
-                                <liturgy-sheet-link :service="service" :sheet="sheet"
-                                                    @open="dialogs[sheet?.key] = true"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <button class="btn btn-primary" @click.prevent.stop="addBlock()">
+                    <span class="mdi mdi-format-section me-1"></span>
+                    Abschnitt einfügen
+                </button>
             </div>
             <draggable :list="blocks" item-key="id" group="blocks" v-bind:class="{ghostClass: 'ghost-block'}"
                        class="liturgy-blocks-list" :key="treeState+blocks.length"
                        @start="focusOff" @end="saveState" :disabled="!editable" handle=".handle">
               <template #item="{ element: block, index: blockIndex }">
-                <div class="liturgy-block"
-                     :class="{focused: (focusedBlock == blockIndex) && (focusedItem == null)}"
-                     @click="focusBlock(blockIndex)">
-                    <div class="row" :ref="'block'+blockIndex" :key="'block'+blockIndex">
-                        <div class="col-11 liturgy-block-title">
-                        <span class="mdi mdi-drag-horizontal handle me-1"
-                              title="Klicken und ziehen, um die Position im Ablauf zu verändern"></span>
-                            <span class="mdi mdi-chevron-right-circle" style="display: none;"></span> {{ block.title }}
-                        </div>
-                        <div class="col-1 text-end" v-if="editable">
-                            <button @click.stop="deleteBlock(blockIndex)" class="btn btn-sm btn-danger"
-                                    title="Abschnitt löschen">
-                                <span class="mdi mdi-delete"></span>
-                            </button>
-                        </div>
+                <div class="liturgy-block-shell">
+                    <div v-if="editable" class="insert-zone insert-zone--section">
+                        <div class="insert-zone__line"></div>
+                        <button class="btn btn-sm btn-outline-secondary insert-zone__section-button"
+                                @click.prevent.stop="addBlock(blockIndex)">
+                            <span class="mdi mdi-format-section me-md-1"></span>
+                            <span class="d-none d-md-inline">Abschnitt hier einfügen</span>
+                        </button>
                     </div>
-                    <div class="row" v-if="editable">
-                        <div class="col-12">
-                            <button @click.stop="addItem(blockIndex, 'Freetext')" class="btn btn-sm btn-light"
-                                    title="Freitext hinzufügen"><span class="mdi mdi-text"></span>
-                            </button>
-                            <button @click.stop="addItem(blockIndex, 'Psalm')" class="btn btn-sm btn-light"
-                                    title="Psalm hinzufügen"><span class="mdi mdi-hands-pray"></span>
-                            </button>
-                            <button @click.stop="addItem(blockIndex, 'Reading')" class="btn btn-sm btn-light"
-                                    title="Schriftlesung hinzufügen"><span class="mdi mdi-book-open-variant"></span>
-                            </button>
-                            <button @click.stop="addItem(blockIndex, 'Sermon')" class="btn btn-sm btn-light"
-                                    title="Predigt hinzufügen"><span
-                                class="mdi mdi-microphone"></span></button>
-                            <button @click.stop="addItem(blockIndex, 'Song')" class="btn btn-sm btn-light"
-                                    title="Lied hinzufügen"><span class="mdi mdi-music"></span></button>
+                    <div class="liturgy-block"
+                         :class="{focused: (focusedBlock == blockIndex) && (focusedItem == null)}"
+                         @click="focusBlock(blockIndex)">
+                        <div class="row align-items-center pe-2" :ref="'block'+blockIndex" :key="'block'+blockIndex">
+                            <div class="col-10 liturgy-block-title">
+                            <span class="mdi mdi-drag-horizontal handle me-1"
+                                  title="Klicken und ziehen, um die Position im Ablauf zu verändern"></span>
+                                <span class="mdi mdi-chevron-right-circle" style="display: none;"></span> {{ block.title }}
+                            </div>
+                            <div class="col-2 text-end pe-2" v-if="editable">
+                                <button @click.stop="deleteBlock(blockIndex)" class="btn btn-sm btn-danger liturgy-block__delete-button me-2"
+                                        title="Abschnitt löschen">
+                                    <span class="mdi mdi-delete"></span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <details-pane v-if="block.editing == true" :service="service" :element="block"
-                                  @unfocus="cancelEditing($event, blockIndex)"
-                                  :agenda-mode="agendaMode" :markers="markers"/>
+                        <details-pane v-if="block.editing == true" :service="service" :element="block"
+                                      @unfocus="cancelEditing($event, blockIndex)"
+                                      :agenda-mode="agendaMode" :markers="markers"/>
+                        <div v-if="editable" class="insert-zone insert-zone--block">
+                            <div class="insert-zone__line"></div>
+                            <liturgy-insert-menu label="Am Anfang einfügen" @insert="addItem(blockIndex, $event, 0)"/>
+                        </div>
 
-                    <draggable :list="block.items" item-key="id" group="items" class="liturgy-items-list" handle=".handle"
-                               v-bind:class="{ghostClass: 'ghost-item'}" @start="focusOff" @end="saveState"
-                               :disabled="!editable">
-                      <template #item="{ element: item, index: itemIndex }">
-                        <div class="liturgy-item"
-                             @click.stop="focusItem(blockIndex, itemIndex)"
-                             :class="{focused: (focusedBlock == blockIndex) && (focusedItem == itemIndex)}"
-                             :data-block-index="blockIndex" :data-item-index="itemIndex">
-                            <div class="row item" :ref="'block'+blockIndex+'_item'+itemIndex"
-                                 title="Klicken, um zu bearbeiten.">
-                                <div class="col-sm-3 item-title">
-                                    <span class="fa data-type-icon handle me-1" :class="icons[item.data_type]"
-                                          title="Klicken und ziehen, um die Position im Ablauf zu verändern"></span>
-                                    <span class="mdi mdi-chevron-right-circle"
-                                          style="display: none;"></span> {{ item.title }}
-                                </div>
-                                <div class="col-sm-4" v-if="item.data_type == 'sermon'">
-                                    <div v-if="myService.sermon === null">
-                                        <i>Für diesen Gottesdienst ist noch keine Predigt angelegt.</i>
-                                    </div>
-                                    <div v-else>
-                                        <inertia-link :href="route('sermon.editor', {sermon: myService.sermon.id})"
-                                                      @click.stop="" title="Hier klicken, um die Predigt zu bearbeiten">
-                                            {{ myService.sermon.title }}<span
-                                            v-if="myService.sermon.subtitle">: {{ myService.sermon.subtitle }}</span>
-                                        </inertia-link>
-                                        <div v-if="myService.sermon.reference" class="text-sm text-muted">
-                                            {{ myService.sermon.reference }}
+                        <draggable :list="block.items" item-key="id" group="items" class="liturgy-items-list" handle=".handle"
+                                   v-bind:class="{ghostClass: 'ghost-item'}" @start="focusOff" @end="saveState"
+                                   :disabled="!editable">
+                          <template #item="{ element: item, index: itemIndex }">
+                            <div class="liturgy-item-shell">
+                                <div class="liturgy-item"
+                                     @click.stop="focusItem(blockIndex, itemIndex)"
+                                     :class="{focused: (focusedBlock == blockIndex) && (focusedItem == itemIndex)}"
+                                     :data-block-index="blockIndex" :data-item-index="itemIndex">
+                                    <div class="row item align-items-start" :ref="'block'+blockIndex+'_item'+itemIndex"
+                                         title="Klicken, um zu bearbeiten.">
+                                        <div class="col-sm-3 item-title">
+                                            <span class="fa data-type-icon handle me-1" :class="icons[item.data_type]"
+                                                  title="Klicken und ziehen, um die Position im Ablauf zu verändern"></span>
+                                            <span class="mdi mdi-chevron-right-circle"
+                                                  style="display: none;"></span> {{ item.title }}
+                                        </div>
+                                        <div class="col-sm-4" v-if="item.data_type == 'sermon'">
+                                            <div v-if="myService.sermon === null">
+                                                <i>Für diesen Gottesdienst ist noch keine Predigt angelegt.</i>
+                                            </div>
+                                            <div v-else>
+                                                <inertia-link :href="route('sermon.editor', {sermon: myService.sermon.id})"
+                                                              @click.stop="" title="Hier klicken, um die Predigt zu bearbeiten">
+                                                    {{ myService.sermon.title }}<span
+                                                    v-if="myService.sermon.subtitle">: {{ myService.sermon.subtitle }}</span>
+                                                </inertia-link>
+                                                <div v-if="myService.sermon.reference" class="text-sm text-muted">
+                                                    {{ myService.sermon.reference }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4" v-else>{{ itemDescription(item) }}
+                                            <span v-if="item.data.needs_replacement" class="badge"
+                                                  :class="dataReplacerClass(item)">
+                                                <span class="mdi mdi-account" :title="dataReplacerTitle(item)"></span>
+                                            </span>
+                                            <span v-if="(item.data_type=='song') && item.data.song && item.data.song.notation"
+                                                  class="mdi mdi-music text-success"
+                                                  title="Zu diesem Lied sind Noten vorhanden."/>
+                                        </div>
+                                        <div class="col-sm-2 responsible-list">
+                                            <div v-if="item.data.responsible.length > 0">
+                                                    <span class="badge bg-light me-1" v-for="record in item.data.responsible"
+                                                          v-html="displayResponsible(record)"/>
+                                            </div>
+                                            <div v-else>
+                                                <div v-if="editable">
+                                                    <span class="mdi mdi-account-multiple"></span> Hier klicken, um
+                                                    Verantwortliche
+                                                    auszuwählen.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class="row" v-if="!agendaMode">
+                                                <item-starting-time class="col-6" :item="item" :service="service"/>
+                                                <item-text-stats class="col-6" :item="item" :service="service"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-1 text-end" v-if="editable">
+                                            <button @click.stop="deleteItem(blockIndex, itemIndex)"
+                                                    class="btn btn-sm btn-danger" title="Element löschen">
+                                                <span class="mdi mdi-delete"></span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-4" v-else>{{ itemDescription(item) }}
-                                    <span v-if="item.data.needs_replacement" class="badge"
-                                          :class="dataReplacerClass(item)">
-                                        <span class="mdi mdi-account" :title="dataReplacerTitle(item)"></span>
-                                    </span>
-                                    <span v-if="(item.data_type=='song') && item.data.song && item.data.song.notation"
-                                          class="mdi mdi-music text-success"
-                                          title="Zu diesem Lied sind Noten vorhanden."/>
-                                </div>
-                                <div class="col-sm-2 responsible-list">
-                                    <div v-if="item.data.responsible.length > 0">
-                                            <span class="badge bg-light" v-for="record in item.data.responsible"
-                                                  v-html="displayResponsible(record)"/>
-                                    </div>
-                                    <div v-else>
-                                        <div v-if="editable">
-                                            <span class="mdi mdi-account-multiple"></span> Hier klicken, um
-                                            Verantwortliche
-                                            auszuwählen.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-2">
-                                    <div class="row" v-if="!agendaMode">
-                                        <item-starting-time class="col-6" :item="item" :service="service"/>
-                                        <item-text-stats class="col-6" :item="item" :service="service"/>
-                                    </div>
-                                </div>
-                                <div class="col-1 text-end" v-if="editable">
-                                    <button @click.stop="deleteItem(blockIndex, itemIndex)"
-                                            class="btn btn-sm btn-danger" title="Element löschen">
-                                        <span class="mdi mdi-delete"></span>
-                                    </button>
+                                <details-pane v-if="item.editing == true" :service="service" :element="item"
+                                              :key="treeState+blockIndex+'_'+itemIndex+'_'+(item.editing ? 1 : 2)"
+                                              @unfocus="cancelEditing($event, blockIndex, itemIndex)"
+                                              :agenda-mode="agendaMode" :markers="markers"/>
+                                <div v-if="editable" class="insert-zone">
+                                    <div class="insert-zone__line"></div>
+                                    <liturgy-insert-menu @insert="addItem(blockIndex, $event, itemIndex + 1)"/>
                                 </div>
                             </div>
-                            <details-pane v-if="item.editing == true" :service="service" :element="item"
-                                          :key="treeState+blockIndex+'_'+itemIndex+'_'+(item.editing ? 1 : 2)"
-                                          @unfocus="cancelEditing($event, blockIndex, itemIndex)"
-                                          :agenda-mode="agendaMode" :markers="markers"/>
+                          </template>
+                        </draggable>
+                        <div v-if="editable && !block.items.length" class="liturgy-block__empty">
+                            <div class="text-muted mb-2">Dieser Abschnitt ist noch leer.</div>
+                            <liturgy-insert-menu label="Element einfügen" @insert="addItem(blockIndex, $event, 0)"/>
                         </div>
-                      </template>
-                    </draggable>
+                    </div>
                 </div>
               </template>
             </draggable>
+            <div v-if="editable && blocks.length" class="insert-zone insert-zone--section insert-zone--section-end">
+                <div class="insert-zone__line"></div>
+                <button class="btn btn-sm btn-outline-secondary insert-zone__section-button"
+                        @click.prevent.stop="addBlock(blocks.length)">
+                    <span class="mdi mdi-format-section me-md-1"></span>
+                    <span class="d-none d-md-inline">Abschnitt hier einfügen</span>
+                </button>
+            </div>
             <div class="row" v-if="blocks.length > 0 && !agendaMode">
                 <div class="col-sm-7"></div>
                 <div class="col-sm-2" style="border-top: solid 1px lightgray;">
@@ -204,14 +202,6 @@
                     Importmöglichquellen werden geladen... <span class="mdi mdi-spin mdi-loading"></span>
                 </div>
             </modal>
-            <template v-for="(sheet,sheetKey) in sheets" :key="'dlg'+sheet.key">
-                <modal v-if="dialogs[sheet.key]" :title="sheet.title + ' herunterladen'"
-                       @close="downloadConfiguredSheet(sheet)"
-                       @cancel="dialogs[sheet.key] = false"
-                       close-button-label="Herunterladen" cancel-button-label="Abbrechen">
-                    <component :is="sheet.configurationComponent" :service="service" :sheet="sheet"/>
-                </modal>
-            </template>
         </div>
     </div>
 </template>
@@ -221,16 +211,11 @@ import draggable from 'vuedraggable'
 import LiturgyBlock from "../Elements/LiturgyBlock";
 import DetailsPane from "./DetailsPane";
 import Modal from "../../Ui/modals/Modal";
-import LiturgySheetLink from "../Elements/LiturgySheetLink";
 import FormSelectize from "../../Ui/forms/FormSelectize";
-import FullTextLiturgySheetConfiguration from "../LiturgySheets/FullTextLiturgySheetConfiguration";
-import A4WordSpecificLiturgySheetConfiguration from "../LiturgySheets/A4WordSpecificLiturgySheetConfiguration";
-import SongPPTLiturgySheetConfiguration from "../LiturgySheets/SongPPTLiturgySheetConfiguration";
-import SongSheetLiturgySheetConfiguration from "../LiturgySheets/SongSheetLiturgySheetConfiguration";
-import SBLiturgySheetConfiguration from "../LiturgySheets/SBLiturgySheetConfiguration.vue";
 import ItemTextStats from "../Elements/ItemTextStats";
 import ItemStartingTime from "../Elements/ItemStartingTime";
 import NavButton from "../../Ui/buttons/NavButton";
+import LiturgyInsertMenu from "../Elements/LiturgyInsertMenu.vue";
 
 export default {
     name: "LiturgyTree",
@@ -239,16 +224,11 @@ export default {
         ItemStartingTime,
         ItemTextStats,
         FormSelectize,
-        LiturgySheetLink,
         Modal,
         LiturgyBlock,
         DetailsPane,
         draggable,
-        FullTextLiturgySheetConfiguration,
-        SongPPTLiturgySheetConfiguration,
-        A4WordSpecificLiturgySheetConfiguration,
-        SongSheetLiturgySheetConfiguration,
-        SBLiturgySheetConfiguration,
+        LiturgyInsertMenu,
     },
     props: {
         service: Object,
@@ -348,11 +328,6 @@ export default {
             });
         });
 
-        var dialogs = {};
-        Object.entries(this.sheets).forEach(sheet => {
-            if (sheet[1].configurationComponent) dialogs[sheet[1].key] = false;
-        });
-
         return {
             myService,
             apiToken: this.$page.props.currentUser.data.api_token,
@@ -371,7 +346,6 @@ export default {
             editable: true,
             importFrom: null,
             modalOpen: false,
-            dialogs: dialogs,
             sermons: [],
             songList: [],
             texts: [],
@@ -389,7 +363,10 @@ export default {
         }
     },
     methods: {
-        addBlock() {
+        openImportModal() {
+            this.modalOpen = true;
+        },
+        addBlock(insertIndex = null) {
             axios.post(route('api.liturgy.block.store', {
                 api_token: this.apiToken,
                 service: this.service.id,
@@ -401,8 +378,15 @@ export default {
                 block.data_type = 'block';
                 block.typeDescription = 'Abschnitt';
                 block.editing = false;
-                let blockIndex = this.blocks.push(response.data);
-                this.focusBlock(blockIndex - 1);
+                if ((insertIndex === null) || (insertIndex >= this.blocks.length)) {
+                    let blockIndex = this.blocks.push(response.data);
+                    this.focusBlock(blockIndex - 1);
+                    return;
+                }
+
+                this.blocks.splice(insertIndex, 0, block);
+                this.focusBlock(insertIndex);
+                this.saveState(false);
             });
         },
         deleteBlock(index) {
@@ -413,7 +397,7 @@ export default {
                 this.blocks.splice(index, 1);
             });
         },
-        saveState() {
+        saveState(reload = true) {
             var i = 0;
             this.blocks.forEach(function (block) {
                 block.sortable = i++;
@@ -426,9 +410,11 @@ export default {
             axios.post(route('api.liturgy.tree.save', {service: this.service.id, api_token: this.apiToken}), {
                 blocks: this.blocks
             })
-                .then(response => this.reloadTree(response.data));
+                .then(response => {
+                    if (reload) this.reloadTree(response.data);
+                });
         },
-        addItem(blockIndex, type) {
+        addItem(blockIndex, type, insertIndex = null) {
             if (!this.editable) return false;
             var obj;
             switch (type) {
@@ -473,10 +459,16 @@ export default {
                     let item = response.data.item;
                     if (item.data.length == 0) item.data = {};
                     if (undefined == item.data.responsible) item.data.responsible = [];
-                    let itemIndex = this.blocks[blockIndex].items.push(item);
-                    this.focusItem(blockIndex, itemIndex - 1);
+                    if ((insertIndex === null) || (insertIndex >= this.blocks[blockIndex].items.length)) {
+                        let itemIndex = this.blocks[blockIndex].items.push(item);
+                        this.focusItem(blockIndex, itemIndex - 1);
+                        return;
+                    }
+
+                    this.blocks[blockIndex].items.splice(insertIndex, 0, item);
+                    this.focusItem(blockIndex, insertIndex);
+                    this.saveState(false);
                 });
-            //var index = this.blocks[blockIndex].items.push(obj);
         },
         deleteItem(blockIndex, itemIndex) {
             axios.delete(route('api.liturgy.item.destroy', {
@@ -634,10 +626,6 @@ export default {
                 this.reloadTree(response.data);
             });
         },
-        downloadConfiguredSheet(sheet) {
-            document.getElementById('frm' + sheet.key).submit();
-            this.dialogs[sheet.key] = false;
-        },
         dataReplacerTitle(item) {
             if (!item.data.needs_replacement) return '';
             var t = 'Dieses Element wird mit Hilfe von persönlichen Daten ';
@@ -705,10 +693,15 @@ export default {
             this.treeState = Math.random().toString(36).substr(2, 9);
             this.$forceUpdate();
             this.focusOff();
-        },
-        hasDownload() {
-            return (this.blocks.length > 0) && (Object.keys(this.sheets).length > 0);
         }
+    },
+    watch: {
+        blocks: {
+            handler(blocks) {
+                this.$emit('update-block-count', blocks.length);
+            },
+            immediate: true,
+        },
     },
     provide() {
         const lists = {};
@@ -745,22 +738,42 @@ export default {
     text-align: center;
 }
 
+.liturgy-tree__surface {
+    padding: 1rem 1rem 1.25rem;
+    background: rgba(var(--bs-white-rgb), 0.95);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.08);
+    border-radius: 1rem;
+}
+
+.liturgy-tree__empty {
+    padding: 1rem 0 1.4rem;
+    text-align: center;
+}
+
+.liturgy-tree__empty-copy {
+    margin-bottom: 0.65rem;
+    color: var(--bs-secondary-color);
+}
+
+.liturgy-block-shell + .liturgy-block-shell {
+    margin-top: 0.1rem;
+}
+
 .liturgy-block {
-    border-top: solid 1px darkgray;
-    padding: 3px 5px;
-    margin: 5px;
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.08);
+    border-radius: 0.9rem;
+    padding: 0.65rem 0.8rem;
+    margin: 0 0 0.85rem;
+    background: rgba(var(--bs-white-rgb), 0.98);
     cursor: pointer;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .liturgy-block.focused {
-    box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-    border: 1px solid rgba(81, 203, 238, 1);
+    box-shadow: 0 0.8rem 2rem rgba(var(--bs-primary-rgb), 0.12);
+    border-color: rgba(var(--bs-primary-rgb), 0.24);
+    transform: translateY(-1px);
 }
-
-.liturgy-blocks-list .liturgy-block:first-child {
-    border-top: 0;
-}
-
 
 .liturgy-items-list {
     min-height: 10px;
@@ -768,15 +781,29 @@ export default {
 
 .liturgy-block-title {
     font-weight: bold;
-    font-size: 1.4em;
+    font-size: 1.15rem;
     color: rgb(145, 45, 125);
 }
 
+.liturgy-block__delete-button {
+    margin-right: 0.35rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease;
+}
+
+.liturgy-block__empty {
+    padding: 0.6rem 0 0.15rem;
+    text-align: center;
+}
+
 .liturgy-item {
-    border-top: dotted 1px gray;
-    padding: 3px 0;
-    margin: 3px 0px;
+    padding: 0.45rem 0.65rem;
+    margin: 0;
     cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 0.8rem;
+    background: rgba(var(--bs-primary-rgb), 0.02);
 }
 
 .liturgy-item.focused .item-title {
@@ -790,17 +817,116 @@ export default {
 }
 
 .liturgy-item.focused {
-    box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-    border: 1px solid rgba(81, 203, 238, 1);
+    box-shadow: 0 0.8rem 1.6rem rgba(var(--bs-primary-rgb), 0.08);
+    border-color: rgba(var(--bs-primary-rgb), 0.24);
 }
 
-
-.liturgy-items-list .liturgy-item:first-child {
-    border-top: 0;
+.liturgy-item-shell + .liturgy-item-shell {
+    margin-top: 0.15rem;
 }
 
 .responsible-list {
     color: gray;
+}
+
+.insert-zone {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 0;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+    overflow: visible;
+    transition: opacity 0.12s ease;
+}
+
+.insert-zone--block {
+    margin-top: 0.15rem;
+}
+
+.insert-zone--section {
+    margin-bottom: 0.15rem;
+}
+
+.insert-zone--section-end {
+    height: 2rem;
+    margin-top: 0.15rem;
+}
+
+.insert-zone__line {
+    position: absolute;
+    inset: 50% 0 auto;
+    border-top: 1px dashed rgba(var(--bs-primary-rgb), 0.2);
+    transform: translateY(-50%);
+}
+
+.insert-zone :deep(.liturgy-insert-menu) {
+    position: relative;
+    z-index: 1;
+    transform: scale(0.96);
+    transition: transform 0.12s ease;
+}
+
+.insert-zone__section-button {
+    position: relative;
+    z-index: 1;
+    border-radius: 999px;
+    background: rgba(var(--bs-white-rgb), 0.96);
+    transform: scale(0.96);
+    transition: transform 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.insert-zone__section-button:hover,
+.insert-zone__section-button:focus {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    border-color: rgba(var(--bs-primary-rgb), 0.28);
+    color: var(--bs-primary);
+}
+
+.liturgy-block:hover > .insert-zone,
+.liturgy-block-shell:hover > .insert-zone,
+.liturgy-item-shell:hover > .insert-zone,
+.liturgy-block:focus-within > .insert-zone,
+.liturgy-block-shell:focus-within > .insert-zone,
+.liturgy-item-shell:focus-within > .insert-zone {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.liturgy-tree__surface:hover > .insert-zone--section-end,
+.liturgy-tree__surface:focus-within > .insert-zone--section-end {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.liturgy-block:hover > .insert-zone :deep(.liturgy-insert-menu),
+.liturgy-block-shell:hover > .insert-zone .insert-zone__section-button,
+.liturgy-item-shell:hover > .insert-zone :deep(.liturgy-insert-menu),
+.liturgy-block:focus-within > .insert-zone :deep(.liturgy-insert-menu),
+.liturgy-block-shell:focus-within > .insert-zone .insert-zone__section-button,
+.liturgy-item-shell:focus-within > .insert-zone :deep(.liturgy-insert-menu) {
+    transform: scale(1);
+}
+
+.liturgy-tree__surface:hover > .insert-zone--section-end .insert-zone__section-button,
+.liturgy-tree__surface:focus-within > .insert-zone--section-end .insert-zone__section-button {
+    transform: scale(1);
+}
+
+.liturgy-block:hover .liturgy-block__delete-button,
+.liturgy-block:focus-within .liturgy-block__delete-button,
+.liturgy-item:hover .btn-danger,
+.liturgy-item:focus-within .btn-danger {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.liturgy-item .btn-danger {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease;
 }
 
 .source-select {

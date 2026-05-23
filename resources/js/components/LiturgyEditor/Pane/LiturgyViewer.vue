@@ -32,21 +32,7 @@
         <div class="row py-2 border-bottom mb-2">
             <div class="col-md-6">
             </div>
-            <div class="col-md-6 text-end">
-                <div class="dropdown" v-if="hasDownload()">
-                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                            title="Dokumente herunterladen">
-                        <span class="mdi mdi-download"></span> Herunterladen
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <div v-for="sheet in sheets">
-                            <liturgy-sheet-link v-if="!sheet.privileged" :service="service" :sheet="sheet"
-                                                @open="dialogs[sheet.key] = true"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="col-md-6 text-end"></div>
         </div>
         <div v-for="(block,blockIndex) in blocks" class="liturgy-block">
             <div class="row" :ref="'block'+blockIndex" :key="'block'+blockIndex">
@@ -125,13 +111,7 @@
 import LiturgyBlock from "../Elements/LiturgyBlock";
 import DetailsPane from "./DetailsPane";
 import Modal from "../../Ui/modals/Modal";
-import LiturgySheetLink from "../Elements/LiturgySheetLink";
 import FormSelectize from "../../Ui/forms/FormSelectize";
-import FullTextLiturgySheetConfiguration from "../LiturgySheets/FullTextLiturgySheetConfiguration";
-import A4WordSpecificLiturgySheetConfiguration from "../LiturgySheets/A4WordSpecificLiturgySheetConfiguration";
-import SongPPTLiturgySheetConfiguration from "../LiturgySheets/SongPPTLiturgySheetConfiguration";
-import SongSheetLiturgySheetConfiguration from "../LiturgySheets/SongSheetLiturgySheetConfiguration";
-import SBLiturgySheetConfiguration from "../LiturgySheets/SBLiturgySheetConfiguration.vue";
 import ItemTextStats from "../Elements/ItemTextStats";
 import ItemStartingTime from "../Elements/ItemStartingTime";
 import NavButton from "../../Ui/buttons/NavButton";
@@ -143,15 +123,9 @@ export default {
         ItemStartingTime,
         ItemTextStats,
         FormSelectize,
-        LiturgySheetLink,
         Modal,
         LiturgyBlock,
         DetailsPane,
-        FullTextLiturgySheetConfiguration,
-        SongPPTLiturgySheetConfiguration,
-        A4WordSpecificLiturgySheetConfiguration,
-        SongSheetLiturgySheetConfiguration,
-        SBLiturgySheetConfiguration,
     },
     props: {
         service: Object,
@@ -245,11 +219,6 @@ export default {
             });
         });
 
-        var dialogs = {};
-        Object.entries(this.sheets).forEach(sheet => {
-            if (sheet[1].configurationComponent) dialogs[sheet[1].key] = false;
-        });
-
         return {
             myService,
             apiToken: this.$page.props.currentUser.data.api_token,
@@ -268,7 +237,6 @@ export default {
             editable: true,
             importFrom: null,
             modalOpen: false,
-            dialogs: dialogs,
             sermons: [],
             songList: [],
             texts: [],
@@ -531,10 +499,6 @@ export default {
                 this.reloadTree(response.data);
             });
         },
-        downloadConfiguredSheet(sheet) {
-            document.getElementById('frm' + sheet.key).submit();
-            this.dialogs[sheet.key] = false;
-        },
         dataReplacerTitle(item) {
             if (!item.data.needs_replacement) return '';
             var t = 'Dieses Element wird mit Hilfe von persönlichen Daten ';
@@ -602,9 +566,6 @@ export default {
             this.treeState = Math.random().toString(36).substr(2, 9);
             this.$forceUpdate();
             this.focusOff();
-        },
-        hasDownload() {
-            return (this.blocks.length > 0) && (Object.keys(this.sheets).length > 0);
         }
     },
     provide() {

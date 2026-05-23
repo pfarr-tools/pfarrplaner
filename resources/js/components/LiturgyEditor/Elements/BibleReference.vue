@@ -30,7 +30,7 @@
 <template xmlns="http://www.w3.org/1999/html">
     <div class="bible-reference" :class="{'bible-reference-inline' : inline}" :title="text">
         <div v-if="myPerikope.Bibelstelle" :key="myPerikope.Bibelstelle.replaceAll(' ', '_')+'Text__'+text">
-            <span v-if="title">{{ title }} </span><a v-if="myPerikope.URL" :href="myPerikope.URL"
+            <span v-if="title" class="bible-reference__label">{{ title }}</span><a v-if="myPerikope.URL" :href="myPerikope.URL"
                    target="_blank">{{ myPerikope.Bibelstelle }}</a><span v-else>{{ myPerikope.Bibelstelle }} </span>
             <span v-if="loading" class="mdi mdi-spin mdi-loading"></span>
             <span v-if="!loading" class="mdi mdi-content-copy" @click.prevent.stop="copyToClipboard"
@@ -81,6 +81,11 @@ export default {
 <style scoped>
     .bible-reference.bible-reference-inline, .bible-reference.bible-reference-inline div {
         display: inline;
+    }
+
+    .bible-reference__label {
+        display: inline-block;
+        min-width: 2.5rem;
     }
 
     .mdi.mdi-spin {

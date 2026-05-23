@@ -28,31 +28,44 @@
   -->
 
 <template>
-    <admin-layout :enable-control-sidebar="true" :title="title(service)">
+    <admin-layout :enable-control-sidebar="true" :title="title(service)" no-content-header>
         <template #navbar-left>
+            <button v-if="service.isEditable" class="btn btn-secondary me-2"
+                    title="Ablaufelemente importieren" @click.prevent.stop="openImport">
+                <span class="mdi mdi-file-import-outline me-lg-1"></span>
+                <span class="d-none d-lg-inline">Importieren</span>
+            </button>
+            <liturgy-sheet-download-button class="me-2"
+                                           :service="service"
+                                           :sheets="templateMode ? {} : liturgySheets"
+                                           :block-count="blockCount"
+                                           :show-privileged="service.isEditable"/>
             <span v-if="!templateMode">
-                <a v-if="service.isEditable" class="btn btn-secondary" title="Als Vorlage speichern" @click.prevent.stop="saveAsTemplate"><span class="mdi mdi-file-plus"></span> Als Vorlage speichern</a>&nbsp;
+                <a v-if="service.isEditable" class="btn btn-secondary" title="Als Vorlage speichern" @click.prevent.stop="saveAsTemplate"><span class="mdi mdi-file-plus me-lg-1"></span><span class="d-none d-lg-inline">Als Vorlage speichern</span></a>&nbsp;
             </span>
             <span v-else>
                 <save-button v-if="service.isEditable" @click="saveTemplate">Vorlage speichern</save-button>&nbsp;
-                <a class="btn btn-danger" title="Vorlage löschen" @click.prevent.stop="deleteTemplate"><span class="mdi mdi-delete"></span> Löschen</a>
+                <a class="btn btn-danger" title="Vorlage löschen" @click.prevent.stop="deleteTemplate"><span class="mdi mdi-delete me-lg-1"></span><span class="d-none d-lg-inline">Löschen</span></a>
             </span>
             <slot name="toolbar"/>
         </template>
         <template #navbar-right>
-            <div class="btn-group calendar-mode-toggle" role="group" aria-label="Ansicht umschalten" v-if="service.isEditable">
-                <inertia-link class="btn btn-outline-secondary" :href="route('service.edit', service.slug)" title="Gottesdienst bearbeiten">
-                    <span class="mdi mdi-pencil me-1"></span>
-                    <span class="d-none d-xl-inline">Bearbeiten</span>
-                </inertia-link>
-                <button class="btn btn-secondary" href="#">
-                    <span class="mdi mdi-view-list me-1"></span>
-                    <span class="d-none d-xl-inline">Liturgie</span>
-                </button>
-                <inertia-link class="btn btn-outline-secondary" :href="route('service.sermon.editor', service.slug)" title="Liturgie anzeigen">
-                    <span class="mdi mdi-microphone me-1"></span>
-                    <span class="d-none d-xl-inline">Predigt</span>
-                </inertia-link>
+            <div class="d-flex align-items-center">
+                <liturgy-materials-button class="me-2" :service="service"/>
+                <div class="btn-group calendar-mode-toggle" role="group" aria-label="Ansicht umschalten" v-if="service.isEditable">
+                    <inertia-link class="btn btn-outline-secondary" :href="route('service.edit', service.slug)" title="Gottesdienst bearbeiten">
+                        <span class="mdi mdi-pencil me-lg-1"></span>
+                        <span class="d-none d-lg-inline">Bearbeiten</span>
+                    </inertia-link>
+                    <button class="btn btn-secondary" href="#">
+                        <span class="mdi mdi-view-list me-lg-1"></span>
+                        <span class="d-none d-lg-inline">Liturgie</span>
+                    </button>
+                    <inertia-link class="btn btn-outline-secondary" :href="route('service.sermon.editor', service.slug)" title="Liturgie anzeigen">
+                        <span class="mdi mdi-microphone me-lg-1"></span>
+                        <span class="d-none d-lg-inline">Predigt</span>
+                    </inertia-link>
+                </div>
             </div>
         </template>
         <template #control-sidebar v-if="service.isEditable" >
@@ -62,14 +75,17 @@
                         help="Wörter pro Minute"/>
             <button class="btn btn-sm btn-primary" @click.prevent.stop="reloadPage">Anwenden</button>
         </template>
-        <info-pane v-if="!templateMode" :service="service" @info="infoWindow = true"/>
-        <template-info-pane v-if="templateMode" v-model="myService"/>
-        <hr />
-        <liturgy-tree v-if="service.isEditable" :service="service" :sheets="templateMode ? {} : liturgySheets" :agenda-mode="templateMode"
+        <div class="liturgy-editor-page">
+            <liturgy-workspace-header :service="service" :template-mode="templateMode"
+                                      :editable="service.isEditable" :block-count="blockCount"/>
+            <info-pane v-if="!templateMode" :service="service" :show-materials-button="false" @info="infoWindow = true"/>
+            <template-info-pane v-if="templateMode" v-model="myService"/>
+            <liturgy-tree ref="liturgyTree" v-if="service.isEditable" :service="service" :sheets="templateMode ? {} : liturgySheets" :agenda-mode="templateMode"
                       :auto-focus-block="autoFocusBlock" :auto-focus-item="autoFocusItem"
                       :ministries="ministries" :markers="markers"
-                      @update-focus="updateFocus"/>
-        <liturgy-viewer v-else="service.isEditable" :service="service" :sheets="templateMode ? {} : liturgySheets" />
+                      @update-focus="updateFocus" @update-block-count="updateBlockCount"/>
+            <liturgy-viewer v-else="service.isEditable" :service="service" :sheets="templateMode ? {} : liturgySheets" />
+        </div>
     </admin-layout>
 </template>
 
@@ -82,6 +98,9 @@ import InfoPane from '../components/LiturgyEditor/Pane/InfoPane';
 import TemplateInfoPane from '../components/TemplateEditor/Pane/InfoPane';
 import LiturgyTree from '../components/LiturgyEditor/Pane/LiturgyTree';
 import LiturgyViewer from '../components/LiturgyEditor/Pane/LiturgyViewer';
+import LiturgyMaterialsButton from '../components/LiturgyEditor/Elements/LiturgyMaterialsButton.vue';
+import LiturgySheetDownloadButton from '../components/LiturgyEditor/Elements/LiturgySheetDownloadButton.vue';
+import LiturgyWorkspaceHeader from '../components/LiturgyEditor/Pane/LiturgyWorkspaceHeader.vue';
 
 export default {
     props: {
@@ -113,6 +132,9 @@ export default {
         TemplateInfoPane,
         LiturgyTree,
         LiturgyViewer,
+        LiturgyMaterialsButton,
+        LiturgySheetDownloadButton,
+        LiturgyWorkspaceHeader,
     },
     data() {
         if (undefined == this.$settings.liturgy_times_rounded) this.$settings.liturgy_times_rounded = false;
@@ -125,6 +147,7 @@ export default {
             infoWindow: false,
             templateMode: this.service.isTemplate,
             myService: this.service,
+            blockCount: (this.service.liturgy_blocks || []).length,
         }
     },
     methods: {
@@ -137,6 +160,9 @@ export default {
             this.itemIndex = itemIndex;
             this.element = element;
             this.showModal = true;
+        },
+        updateBlockCount(blockCount) {
+            this.blockCount = blockCount;
         },
         setLiturgyTimesRounded() {
             this.$inertia.post(route('setting.set', {
@@ -155,6 +181,9 @@ export default {
         reloadPage() {
             window.location.reload();
         },
+        openImport() {
+            this.$refs.liturgyTree?.openImportModal();
+        },
         saveTemplate() {
             this.$inertia.patch(route('template.update', this.myService.id), this.myService);
         },
@@ -169,4 +198,9 @@ export default {
 }
 </script>
 <style scoped>
+.liturgy-editor-page {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
 </style>
