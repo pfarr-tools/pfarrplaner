@@ -13,6 +13,7 @@
 namespace Tests\Feature;
 
 use App\Liturgy\LiturgySheets\SongPPTLiturgySheet;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Tests\TestCase;
 
@@ -31,6 +32,16 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
             public function paginateSlidesForTest(Collection $events): array
             {
                 return $this->paginateEventListSlides($events);
+            }
+
+            /**
+             * @param array<string, array<int, Collection>> $pagesByDate
+             * @param iterable $highlightedEventsByDate
+             * @return array<string, array<int, Collection>>
+             */
+            public function suppressHighlightedOnlySlidesForTest(array $pagesByDate, iterable $highlightedEventsByDate): array
+            {
+                return $this->suppressHighlightedOnlyEventListSlides($pagesByDate, $highlightedEventsByDate);
             }
         };
 
@@ -97,5 +108,103 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
         $this->assertSame(8, collect($pages)->sum(function (Collection $page) {
             return $page->count();
         }));
+    }
+
+    /**
+     * @return void
+     */
+    public function testEventListSlidesContainingOnlyHighlightedEventsAreSuppressed(): void
+    {
+        $sheet = new class extends SongPPTLiturgySheet {
+            /**
+             * @param array<string, array<int, Collection>> $pagesByDate
+             * @param iterable $highlightedEventsByDate
+             * @return array<string, array<int, Collection>>
+             */
+            public function suppressHighlightedOnlySlidesForTest(array $pagesByDate, iterable $highlightedEventsByDate): array
+            {
+                return $this->suppressHighlightedOnlyEventListSlides($pagesByDate, $highlightedEventsByDate);
+            }
+        };
+
+        $highlightedEvent = $this->fakeAdEvent(1);
+        $plainEvent = $this->fakeAdEvent(2);
+
+        $pagesByDate = [
+            '2026-05-24' => [
+                collect([$highlightedEvent]),
+                collect([$highlightedEvent, $plainEvent]),
+            ],
+        ];
+
+        $filteredPages = $sheet->suppressHighlightedOnlySlidesForTest($pagesByDate, [
+            '2026-05-24' => collect([$highlightedEvent]),
+        ]);
+
+        $this->assertCount(1, $filteredPages['2026-05-24']);
+        $this->assertSame([1, 2], $filteredPages['2026-05-24'][0]->pluck('id')->all());
+    }
+
+    /**
+     * @param int $id
+     * @return object
+     */
+    protected function fakeAdEvent(int $id): object
+    {
+        $service = new class($id) {
+            public int $id;
+            public string $locationTextWithCity = 'Musterkirche, Musterstadt';
+
+            public function __construct(int $id)
+            {
+                $this->id = $id;
+            }
+
+            /**
+             * @return string
+             */
+            public function timeText(): string
+            {
+                return '10:00';
+            }
+
+            /**
+             * @param bool $short
+             * @return string
+             */
+            public function titleText($short = true): string
+            {
+                return 'Fallback-Titel';
+            }
+        };
+
+        $eventMeta = new class {
+            public bool $is_allday = false;
+        };
+
+        return new class($id, $service, $eventMeta) {
+            public int $id;
+            public object $service;
+            public object $event;
+            public Carbon $start;
+
+            public function __construct(int $id, object $service, object $event)
+            {
+                $this->id = $id;
+                $this->service = $service;
+                $this->event = $event;
+                $this->start = Carbon::parse('2026-05-24 10:00:00');
+            }
+
+            /**
+             * @param string $adChannelKey
+             * @param string $defaultTo
+             * @return string
+             */
+            public function getAdText(string $adChannelKey, string $defaultTo = ''): string
+            {
+                return 'Veranstaltung ' . $this->id;
+            }
+        };
     }
 }

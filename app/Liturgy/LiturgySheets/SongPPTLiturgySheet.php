@@ -877,7 +877,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 });
         }
 
-        $eventListSlideChunks = $this->paginateEventListSlidesByDate($this->adEventsToBeListed);
+        $eventListSlideChunks = $this->suppressHighlightedOnlyEventListSlides(
+            $this->paginateEventListSlidesByDate($this->adEventsToBeListed),
+            $this->adEventsToBeHighlighted
+        );
         $listedSlidesCount = collect($eventListSlideChunks)->sum(function (array $pages) {
             return count($pages);
         });
@@ -958,6 +961,46 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     }
 
     /**
+     * Remove event list slides whose entries are all rendered as dedicated highlight slides.
+     *
+     * @param array<string, array<int, Collection>> $pagesByDate
+     * @param iterable $highlightedEventsByDate
+     * @return array<string, array<int, Collection>>
+     */
+    protected function suppressHighlightedOnlyEventListSlides(array $pagesByDate, iterable $highlightedEventsByDate): array
+    {
+        $highlightKeysByDate = [];
+
+        foreach ($highlightedEventsByDate as $date => $events) {
+            $highlightKeysByDate[$date] = collect($events)
+                ->map(function ($event) {
+                    return $this->getEventListComparisonKey($event);
+                })
+                ->filter()
+                ->values()
+                ->all();
+        }
+
+        foreach ($pagesByDate as $date => $pages) {
+            $highlightKeys = $highlightKeysByDate[$date] ?? [];
+
+            if (!count($highlightKeys)) {
+                continue;
+            }
+
+            $pagesByDate[$date] = array_values(array_filter($pages, function (Collection $page) use ($highlightKeys) {
+                return $page->contains(function ($event) use ($highlightKeys) {
+                    $comparisonKey = $this->getEventListComparisonKey($event);
+
+                    return empty($comparisonKey) || !in_array($comparisonKey, $highlightKeys, true);
+                });
+            }));
+        }
+
+        return $pagesByDate;
+    }
+
+    /**
      * Split a single day's event list into multiple slide-sized chunks.
      *
      * @param Collection $events
@@ -995,6 +1038,29 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
 
         return $pages;
+    }
+
+    /**
+     * Build a stable comparison key for matching list entries to highlight slides.
+     *
+     * @param mixed $event
+     * @return string|null
+     */
+    protected function getEventListComparisonKey($event): ?string
+    {
+        if (isset($event->id) && $event->id) {
+            return 'id:' . $event->id;
+        }
+
+        if (method_exists($event, 'getKey') && $event->getKey()) {
+            return 'key:' . $event->getKey();
+        }
+
+        if (isset($event->service->id) && isset($event->start)) {
+            return 'service:' . $event->service->id . '|start:' . $event->start;
+        }
+
+        return null;
     }
 
     /**
