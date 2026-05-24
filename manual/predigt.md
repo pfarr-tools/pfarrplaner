@@ -71,6 +71,8 @@ Im Feld **Text der Predigt** schreiben Sie den ausgearbeiteten Predigttext. Dire
 
 Unter dem Text zeigt Pfarrplaner eine Textstatistik an. Sie hilft beim Einschätzen der Länge.
 
+Als Zitat formatierte Abschnitte bleiben auch in Word-Ausgaben als eingerückte Zitate erhalten. Zeilenumbrüche und getrennte Absätze innerhalb eines Zitats werden dabei mit übernommen.
+
 Wenn der Gottesdienst mit einer Beerdigung verbunden ist, erscheint zusätzlich eine Schaltfläche **Lebenslauf von ... einfügen**. Damit wird der gespeicherte Lebenslauf der verstorbenen Person in den Predigttext übernommen. Diese Schaltfläche erscheint nur bei passenden Beerdigungsdaten.
 
 ---

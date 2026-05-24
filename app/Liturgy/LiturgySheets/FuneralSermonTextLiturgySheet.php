@@ -190,7 +190,12 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
             /** @var \DOMNode $node */
             foreach ($body->childNodes as $node) {
                 if ($node->nodeName == 'blockquote') {
-                    $doc->renderText($node->nodeValue, $doc::BLOCKQUOTE, ['size' => 10]);
+                    foreach (explode("\n\n", DefaultWordDocument::getTextWithBreaksFromDomNode($node)) as $paragraph) {
+                        if (trim($paragraph) === '') {
+                            continue;
+                        }
+                        $doc->renderText($paragraph, $doc::BLOCKQUOTE, ['size' => 10]);
+                    }
                 } else {
                     Html::addHtml(
                         $doc->getSection(),

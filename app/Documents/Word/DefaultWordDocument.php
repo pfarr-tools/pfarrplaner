@@ -34,6 +34,7 @@ namespace App\Documents\Word;
 use App\Models\Service;
 use Illuminate\Support\Facades\Response;
 use DOMDocument;
+use DOMNode;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Exception\Exception;
@@ -237,6 +238,20 @@ class DefaultWordDocument
     }
 
     /**
+     * Convert a DOM node to plain text while preserving paragraph and line breaks.
+     *
+     * @param DOMNode $node
+     * @return string
+     */
+    public static function getTextWithBreaksFromDomNode(DOMNode $node): string
+    {
+        $text = self::extractTextWithBreaksFromDomNode($node);
+        $text = preg_replace("/\n{3,}/", "\n\n", $text) ?? $text;
+
+        return trim($text);
+    }
+
+    /**
      * Render some text with default formatting
      * @param $text Text
      * @param array $fontOption Font options
@@ -311,6 +326,39 @@ class DefaultWordDocument
                 $textRun->addTextBreak();
             }
         }
+    }
+
+    /**
+     * Recursively extract text content from a DOM node while keeping semantic breaks.
+     *
+     * @param DOMNode $node
+     * @return string
+     */
+    protected static function extractTextWithBreaksFromDomNode(DOMNode $node): string
+    {
+        if ($node->nodeType === XML_TEXT_NODE) {
+            return html_entity_decode($node->nodeValue ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        }
+
+        if ($node->nodeName === 'br') {
+            return "\n";
+        }
+
+        $text = '';
+        foreach ($node->childNodes as $childNode) {
+            $text .= self::extractTextWithBreaksFromDomNode($childNode);
+        }
+
+        if (in_array($node->nodeName, ['p', 'div', 'blockquote', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])) {
+            $text = trim($text);
+            if ($text === '') {
+                return '';
+            }
+
+            return $text . "\n\n";
+        }
+
+        return $text;
     }
 
 
@@ -416,5 +464,4 @@ class DefaultWordDocument
 
 
 }
-
 
