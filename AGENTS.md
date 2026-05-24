@@ -150,6 +150,7 @@ build: Mix toolchain auf v6 aktualisiert
 ## End-user documentation
 - Every change to the code must be reflected in the full end-user manual for Pfarrplaner, covering everything. 
 - The end-user manual must stay focused on user-visible behavior. Do not document technical implementation details, bugfix internals, data formats, or similar developer-facing information unless they directly change what users see or do.
+- When essential new user-visible features or major workflow improvements are added, also review `/was-ist-der-pfarrplaner` and update the page if the public-facing product description, screenshots, feature overview, or handbook link placement should change.
 - The manual should exist in a series of .md files in a suitable folder. 
 - The app layout needs to include a help button on every page (somewhere  
   on the right side of the Top Nav), opening the appropriate manual page in a separate tab. 
