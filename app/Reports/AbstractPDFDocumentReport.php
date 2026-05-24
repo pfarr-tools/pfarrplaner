@@ -43,6 +43,12 @@ class AbstractPDFDocumentReport extends AbstractReport
     /** @var bool  */
     protected $landscape = false;
 
+    /** @var string  */
+    protected $header = '';
+
+    /** @var string  */
+    protected $footer = '';
+
     /**
      * @var string
      */
@@ -76,6 +82,49 @@ class AbstractPDFDocumentReport extends AbstractReport
      */
     public function sendToFile($filename, $data, $layout)
     {
-        return PDF::fromView($this->getRenderViewName(), $data)->download($filename);
+        return PDF::fromView($this->getRenderViewName(), $data, $this->header, $this->footer)->download($filename);
     }
+
+    public function isLandscape(): bool
+    {
+        return $this->landscape;
+    }
+
+    public function setLandscape(bool $landscape): void
+    {
+        $this->landscape = $landscape;
+    }
+
+    public function getHeader(): string
+    {
+        return $this->header;
+    }
+
+    public function setHeader(string $header): void
+    {
+        $this->header = $header;
+    }
+
+    public function getFooter(): string
+    {
+        return $this->footer;
+    }
+
+    public function setFooter(string $footer): void
+    {
+        $this->footer = $footer;
+    }
+
+    public function getIcon(): string
+    {
+        return $this->icon;
+    }
+
+    public function setIcon(string $icon): void
+    {
+        $this->icon = $icon;
+    }
+
+
+
 }
