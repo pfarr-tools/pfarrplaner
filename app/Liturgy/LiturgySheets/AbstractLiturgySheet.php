@@ -48,6 +48,7 @@ class AbstractLiturgySheet
     protected $isNotAFile = false;
     protected $configurationPage = null;
     protected $configurationComponent = null;
+    protected $configurationCloseOnly = false;
     protected $defaultConfig = [];
     protected $config = [];
 
@@ -81,6 +82,17 @@ class AbstractLiturgySheet
             ->hideHeader()
             ->footerHtml($this->getFooter())
             ->download($this->getFileName($service));
+    }
+
+    /**
+     * Provide additional data for configuration dialogs that do not submit a download form.
+     *
+     * @param Service $service
+     * @return array
+     */
+    public function getDialogData(Service $service): array
+    {
+        return [];
     }
 
     protected function getFooter()
@@ -283,6 +295,23 @@ class AbstractLiturgySheet
     public function setConfigurationComponent($configurationComponent): void
     {
         $this->configurationComponent = $configurationComponent;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isConfigurationCloseOnly(): bool
+    {
+        return $this->configurationCloseOnly;
+    }
+
+    /**
+     * @param bool $configurationCloseOnly
+     * @return void
+     */
+    public function setConfigurationCloseOnly(bool $configurationCloseOnly): void
+    {
+        $this->configurationCloseOnly = $configurationCloseOnly;
     }
 
     public function isPrivileged(): bool

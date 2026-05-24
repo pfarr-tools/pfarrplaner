@@ -136,6 +136,26 @@ class LiturgyEditorController extends Controller
         return Inertia::render($sheet->getConfigurationPage(), compact('service', 'sheetConfig', 'config'));
     }
 
+    /**
+     * Return content data for a liturgy sheet dialog.
+     *
+     * @param Service $service
+     * @param string $key
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function liturgySheetDialogData(Service $service, string $key)
+    {
+        $class = 'App\\Liturgy\\LiturgySheets\\' . $key . 'LiturgySheet';
+        if (!class_exists($class)) {
+            abort(404);
+        }
+
+        /** @var AbstractLiturgySheet $sheet */
+        $sheet = new $class();
+
+        return response()->json($sheet->getDialogData($service));
+    }
+
     public function sources(Service $service)
     {
         $services1 = Service::with([])

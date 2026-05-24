@@ -42,9 +42,24 @@ class AIPromptLiturgySheet extends AbstractLiturgySheet
     protected $title = 'KI-Prompt';
     protected $icon = 'fa fa-file-text';
     protected $isNotAFile = true;
+    protected $configurationComponent = 'AIPromptLiturgySheetDialog';
+    protected $configurationCloseOnly = true;
     protected $privileged = true;
 
     public function render(Service $service)
+    {
+        $prompt = $this->buildPrompt($service);
+
+        return Inertia::render('Liturgy/LiturgySheets/KIPrompt', compact('prompt', 'service'));
+
+    }
+
+    public function getDialogData(Service $service): array
+    {
+        return ['prompt' => $this->buildPrompt($service)];
+    }
+
+    protected function buildPrompt(Service $service): string
     {
         $liturgy = $service->liturgical_info;
         $prompt = 'Am ' . $service->date->isoFormat('dddd, DD. MMMM YYYY') . ', ' . $service->timeText() .
@@ -54,13 +69,11 @@ class AIPromptLiturgySheet extends AbstractLiturgySheet
             $prompt .= ' ist ' . $liturgy['Bezeichnung'].'.'.PHP_EOL.'Wochenspruch ist: '
                 .$liturgy['Wochenspruch']['Text'].' ('.$liturgy['Wochenspruch']['Bibelstelle'].').';
         } else {
-            $prompt. ' feiern wir Gottesdienst.';
+            $prompt .= ' feiern wir Gottesdienst.';
         }
         $prompt .= PHP_EOL . PHP_EOL.'Folgender Ablauf ist vorgesehen: '.PHP_EOL.PHP_EOL;
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
-                $concernsOrganists = false;
-
                 if (($item->data_type == 'song') && (isset($item->data['song']))) {
                     $helper = new SongItemHelper($item);
                     $verseCount = $helper->getActiveVerseCount(true, true);
@@ -95,9 +108,7 @@ class AIPromptLiturgySheet extends AbstractLiturgySheet
         if ($liturgy['Predigt'] ?? false) {
             $prompt .= PHP_EOL . PHP_EOL . 'Predigttext ist ' .$liturgy['Predigt']['Bibelstelle'].'.';
         }
-        $prompt .= PHP_EOL . PHP_EOL;
 
-        return Inertia::render('Liturgy/LiturgySheets/KIPrompt', compact('prompt', 'service'));
-
+        return $prompt . PHP_EOL . PHP_EOL;
     }
 }

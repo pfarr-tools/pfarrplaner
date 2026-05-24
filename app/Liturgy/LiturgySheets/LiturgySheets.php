@@ -51,6 +51,7 @@ class LiturgySheets
                     'isNotAFile' => $object->isNotAFile(),
                     'configurationPage' => $object->getConfigurationPage(),
                     'configurationComponent' => $object->getConfigurationComponent(),
+                    'configurationCloseOnly' => $object->isConfigurationCloseOnly(),
                     'config' => $object->getConfiguration(),
                     'privileged' => $object->isPrivileged(),
                 ];

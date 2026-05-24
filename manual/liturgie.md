@@ -339,7 +339,7 @@ Mögliche Ausgaben sind zum Beispiel:
 | **SongBeamer** | Erstellt Dateien für SongBeamer. |
 | **Personenbezogene Word-Ausgabe** | Erstellt Abläufe für einzelne Mitwirkende, bei denen deren eigene Texte besonders berücksichtigt werden. |
 
-Einige Ausgaben starten direkt. Andere öffnen zuerst ein Konfigurationsfenster.
+Einige Ausgaben starten direkt. Andere öffnen zuerst ein Konfigurationsfenster. Wieder andere zeigen zunächst einen Dialog mit Text zum Kopieren, zum Beispiel für E-Mails oder KI-Prompts.
 
 ---
 

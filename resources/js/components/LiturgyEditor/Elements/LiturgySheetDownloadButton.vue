@@ -45,10 +45,11 @@
         </div>
 
         <template v-for="sheet in downloadableSheets" :key="'dlg' + sheet.key">
-            <modal v-if="dialogs[sheet.key]" :title="sheet.title + ' herunterladen'"
-                   @close="downloadConfiguredSheet(sheet)"
+            <modal v-if="dialogs[sheet.key]" :title="dialogTitle(sheet)"
+                   :allow-cancel="!sheet.configurationCloseOnly"
+                   @close="handleDialogClose(sheet)"
                    @cancel="dialogs[sheet.key] = false"
-                   close-button-label="Herunterladen" cancel-button-label="Abbrechen">
+                   :close-button-label="dialogCloseButtonLabel(sheet)" cancel-button-label="Abbrechen">
                 <component :is="sheet.configurationComponent" :service="service" :sheet="sheet"/>
             </modal>
         </template>
@@ -63,6 +64,8 @@ import A4WordSpecificLiturgySheetConfiguration from "../LiturgySheets/A4WordSpec
 import SongPPTLiturgySheetConfiguration from "../LiturgySheets/SongPPTLiturgySheetConfiguration";
 import SongSheetLiturgySheetConfiguration from "../LiturgySheets/SongSheetLiturgySheetConfiguration";
 import SBLiturgySheetConfiguration from "../LiturgySheets/SBLiturgySheetConfiguration.vue";
+import SongMailLiturgySheetDialog from "../LiturgySheets/SongMailLiturgySheetDialog.vue";
+import AIPromptLiturgySheetDialog from "../LiturgySheets/AIPromptLiturgySheetDialog.vue";
 
 export default {
     name: "LiturgySheetDownloadButton",
@@ -74,6 +77,8 @@ export default {
         A4WordSpecificLiturgySheetConfiguration,
         SongSheetLiturgySheetConfiguration,
         SBLiturgySheetConfiguration,
+        SongMailLiturgySheetDialog,
+        AIPromptLiturgySheetDialog,
     },
     props: {
         service: Object,
@@ -125,6 +130,22 @@ export default {
         downloadConfiguredSheet(sheet) {
             document.getElementById('frm' + sheet.key).submit();
             this.dialogs[sheet.key] = false;
+        },
+        handleDialogClose(sheet) {
+            if (sheet.configurationCloseOnly) {
+                this.dialogs[sheet.key] = false;
+                return;
+            }
+
+            this.downloadConfiguredSheet(sheet);
+        },
+        dialogTitle(sheet) {
+            if (sheet.configurationCloseOnly) return sheet.title;
+            return sheet.title + ' herunterladen';
+        },
+        dialogCloseButtonLabel(sheet) {
+            if (sheet.configurationCloseOnly) return 'Schließen';
+            return 'Herunterladen';
         },
     },
 }

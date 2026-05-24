@@ -67,11 +67,12 @@
                             :upload-route="route('service.attach', this.myService.slug)"
                             v-model="myService.attachments"/>
 
-        <modal v-for="(sheet,sheetKey) in liturgySheets" v-if="dialogs[sheet?.key]" :title="sheet.title + ' herunterladen'"
+        <modal v-for="(sheet,sheetKey) in liturgySheets" v-if="dialogs[sheet?.key]" :title="dialogTitle(sheet)"
                :key="'dlg'+sheet.key"
-               @close="downloadConfiguredSheet(sheet)"
+               :allow-cancel="!sheet.configurationCloseOnly"
+               @close="handleDialogClose(sheet)"
                @cancel="dialogs[sheet.key] = false"
-               close-button-label="Herunterladen" cancel-button-label="Abbrechen">
+               :close-button-label="dialogCloseButtonLabel(sheet)" cancel-button-label="Abbrechen">
             <component :is="sheet.configurationComponent" :service="service" :sheet="sheet" />
         </modal>
     </div>
@@ -90,6 +91,8 @@ import SongSheetLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheet
 import SBLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/SBLiturgySheetConfiguration.vue";
 import A4WordSpecificLiturgySheetConfiguration
     from "../../LiturgyEditor/LiturgySheets/A4WordSpecificLiturgySheetConfiguration.vue";
+import SongMailLiturgySheetDialog from "../../LiturgyEditor/LiturgySheets/SongMailLiturgySheetDialog.vue";
+import AIPromptLiturgySheetDialog from "../../LiturgyEditor/LiturgySheets/AIPromptLiturgySheetDialog.vue";
 
 export default {
     name: "AttachmentsTab",
@@ -105,6 +108,8 @@ export default {
         SongPPTLiturgySheetConfiguration,
         SongSheetLiturgySheetConfiguration,
         SBLiturgySheetConfiguration,
+        SongMailLiturgySheetDialog,
+        AIPromptLiturgySheetDialog,
     },
     props: {
         service: Object,
@@ -152,6 +157,22 @@ export default {
         downloadConfiguredSheet(sheet) {
             document.getElementById('frm'+sheet.key).submit();
             this.dialogs[sheet.key] = false;
+        },
+        handleDialogClose(sheet) {
+            if (sheet.configurationCloseOnly) {
+                this.dialogs[sheet.key] = false;
+                return;
+            }
+
+            this.downloadConfiguredSheet(sheet);
+        },
+        dialogTitle(sheet) {
+            if (sheet.configurationCloseOnly) return sheet.title;
+            return sheet.title + ' herunterladen';
+        },
+        dialogCloseButtonLabel(sheet) {
+            if (sheet.configurationCloseOnly) return 'Schließen';
+            return 'Herunterladen';
         },
         downloadQR() {
             window.location.href = route('report.step', {report: 'KonfiAppQR', step: 'single', service: this.myService.id});

@@ -250,7 +250,7 @@ Den [Liturgie-Editor](liturgie.md) öffnen Sie über die Schaltfläche **Liturgi
 
 Hier können Sie Dateien an den Gottesdienst anhängen (z. B. PDFs, Bilder, Word-Dokumente).
 
-- **Automatische Liturgie-Ausgaben**: Wenn eine Liturgie vorhanden ist, werden verfügbare Liedblätter oder Exporte als Download-Kacheln angezeigt. Manche öffnen vor dem Herunterladen ein Einstellungsfenster.
+- **Automatische Liturgie-Ausgaben**: Wenn eine Liturgie vorhanden ist, werden verfügbare Liedblätter oder Exporte als Download-Kacheln angezeigt. Manche öffnen vor dem Herunterladen ein Einstellungsfenster. Andere zeigen einen Dialog mit Text zum Kopieren, etwa für E-Mails oder KI-Prompts.
 - **QR-Code für Konfis**: Erscheint nur, wenn für den Eintrag ein KonfiApp-QR-Code vorhanden ist.
 - **Bekanntgaben**: Erstellt eine Word-Datei mit Bekanntgaben, falls noch keine Datei mit diesem Titel angehängt ist.
 - **Anlage hinzufügen**: Wählt eine Datei von Ihrem Computer aus und lädt sie hoch.
