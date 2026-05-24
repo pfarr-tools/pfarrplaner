@@ -96,6 +96,8 @@
                 </main>
             </div>
         </div>
+
+        <InterstitialOverlay />
     </div>
 </template>
 
@@ -103,10 +105,11 @@
 import Sidebar from './Parts/Sidebar.vue'
 import Topbar from './Parts/Topbar.vue'
 import FlashMessage from './Parts/FlashMessage.vue'
+import InterstitialOverlay from '../../components/Ui/Interstitials/InterstitialOverlay.vue'
 
 export default {
     name: 'AdminLayout',
-    components: { Sidebar, Topbar, FlashMessage },
+    components: { Sidebar, Topbar, FlashMessage, InterstitialOverlay },
     props: {
         flash: { type: Object, default: () => ({}) },
         'enableControlSidebar': {

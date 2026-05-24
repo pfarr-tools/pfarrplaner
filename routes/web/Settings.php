@@ -42,5 +42,7 @@
 
 
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\InterstitialController;
 
 Route::post('/setting/{user}/{key}', [SettingsController::class, 'set'])->name('setting.set');
+Route::post('/interstitial/{key}', [InterstitialController::class, 'update'])->name('interstitial.update');

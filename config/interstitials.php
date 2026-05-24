@@ -28,22 +28,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 return [
-    'defaults' => [
-        'calendar_view' => 'vertical',
-        'calendar_name_format' => 3,
-        'homeScreen' => [
-            'homescreen:configurable',
+    'setting_key' => 'interstitials',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Interstitials
+    |--------------------------------------------------------------------------
+    |
+    | Jeder Eintrag wird über seinen Array-Key identifiziert. Wenn Sie eine
+    | Meldung später erneut anzeigen möchten, ändern Sie einfach den Key.
+    |
+    | audience:
+    | - all: für alle Benutzer:innen
+    | - admin: nur für globale oder lokale Administrator:innen
+    | - writer: nur für Benutzer:innen mit Schreibrechten in mind. einer Gemeinde
+    */
+    'items' => [
+        /*
+        'breaking-change-2026-11' => [
+            'enabled' => true,
+            'audience' => 'all',
+            'level' => 'warning',
+            'title' => 'Wichtige Änderung in der nächsten Version',
+            'text' => 'Ab Version 2026.11 ändert sich die Arbeitsweise für ...',
+            'details' => [
+                'Bitte prüfen Sie Ihre Vorlagen vor dem Update.',
+                'Bei Rückfragen wenden Sie sich an Ihre Administration.',
+            ],
         ],
-        'homeScreenConfig' => [
-            'wizardButtons' => false,
-            'showReplacements' => false,
-        ],
-        'homeScreenTabsConfig' => [
-            'tabs' => [],
-            'migrated' => true,
-        ],
-        'interstitials' => [],
+        */
     ],
 ];

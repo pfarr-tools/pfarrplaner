@@ -28,22 +28,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+namespace App\Http\Controllers;
 
-return [
-    'defaults' => [
-        'calendar_view' => 'vertical',
-        'calendar_name_format' => 3,
-        'homeScreen' => [
-            'homescreen:configurable',
-        ],
-        'homeScreenConfig' => [
-            'wizardButtons' => false,
-            'showReplacements' => false,
-        ],
-        'homeScreenTabsConfig' => [
-            'tabs' => [],
-            'migrated' => true,
-        ],
-        'interstitials' => [],
-    ],
-];
+use App\Services\InterstitialService;
+use Illuminate\Http\Request;
+
+class InterstitialController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * Store the current user's response for a configured interstitial.
+     *
+     * @param Request $request
+     * @param InterstitialService $interstitialService
+     * @param string $key
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     */
+    public function update(Request $request, InterstitialService $interstitialService, string $key)
+    {
+        $data = $request->validate([
+            'action' => 'required|string|in:' . implode(',', [
+                InterstitialService::ACTION_DISMISS,
+                InterstitialService::ACTION_LATER,
+            ]),
+        ]);
+
+        $result = $interstitialService->remember($request->user(), $key, $data['action']);
+
+        if ($request->header('x-inertia')) {
+            return redirect()->back();
+        }
+
+        return response()->json($result, 200);
+    }
+}

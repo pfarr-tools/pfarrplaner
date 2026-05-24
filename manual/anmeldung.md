@@ -37,6 +37,13 @@ Die Anmeldeseite enthält diese Elemente:
 
 Nach erfolgreicher Anmeldung werden Sie zu der Startansicht weitergeleitet, die für Ihr Konto eingestellt ist. Häufig ist das die [Startseite](startseite.md), manchmal auch direkt der [Kalender](kalender.md) oder ein anderes Modul.
 
+Wenn Ihre Administration eine wichtige Mitteilung hinterlegt hat, erscheint direkt nach der Anmeldung zusätzlich ein Hinweisfenster über der eigentlichen Seite. So können Änderungen angekündigt werden, die alle Benutzerinnen und Benutzer oder nur bestimmte Gruppen betreffen.
+
+Das Hinweisfenster enthält diese Schaltflächen:
+
+- **Später**: Blendet den Hinweis für die aktuelle Anmeldung aus. Nach einer späteren neuen Anmeldung kann er erneut erscheinen.
+- **Nicht wieder anzeigen**: Versteckt diesen Hinweis dauerhaft für Ihr Benutzerkonto.
+
 > **Tipp:** Wenn Sie das Häkchen bei „Angemeldet bleiben" setzen, werden Sie nicht automatisch abgemeldet, wenn Sie den Browser schließen. Nutzen Sie diese Option nur auf Ihrem eigenen Gerät, nicht auf gemeinsam genutzten Computern.
 
 ---

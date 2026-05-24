@@ -13,6 +13,7 @@
 namespace Tests\Feature;
 
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Models\People\User;
 use Illuminate\Support\Facades\Session;
 use Tests\TestCase;
 
@@ -67,5 +68,24 @@ class HandleInertiaRequestsFeatureTest extends TestCase
 
         $shared = ($props['errors'])();
         $this->assertObjectHasProperty('name', $shared);
+    }
+
+    public function testAuthenticatedSharedPropsContainInterstitials()
+    {
+        config()->set('interstitials.items', [
+            'breaking-change' => [
+                'enabled' => true,
+                'audience' => 'all',
+                'title' => 'Wichtige Änderung',
+            ],
+        ]);
+
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $props = $this->sharedProps();
+
+        $this->assertArrayHasKey('interstitials', $props);
+        $this->assertSame('breaking-change', $props['interstitials']()[0]['key']);
     }
 }

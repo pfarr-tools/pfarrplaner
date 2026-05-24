@@ -33,6 +33,7 @@ namespace App\Http\Middleware;
 use App\Facades\Settings;
 use App\Http\Resources\UserResource;
 use App\Services\PackageService;
+use App\Services\InterstitialService;
 use App\UI\MenuBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -108,6 +109,7 @@ class HandleInertiaRequests extends Middleware
                     : null,
                 'menu' => fn() => MenuBuilder::sidebar(),
                 'settings' => fn() => Settings::all(Auth::user()),
+                'interstitials' => fn() => app(InterstitialService::class)->forUser(Auth::user()),
                 'adminUserSwitchBack' => Session::has('adminUserSwitchBack'),
                 'appName' => config('app.name'),
             ]);

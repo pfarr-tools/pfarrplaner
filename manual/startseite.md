@@ -6,6 +6,8 @@ Die Startseite ist für viele Benutzerinnen und Benutzer die erste Seite nach de
 
 Wenn Ihr Konto anders eingestellt ist, kann Pfarrplaner nach der Anmeldung auch direkt ein anderes Modul öffnen, zum Beispiel den [Kalender](kalender.md).
 
+Vor der eigentlichen Seite kann nach der Anmeldung ein wichtiges Hinweisfenster erscheinen. Solche Hinweise werden von Ihrer Administration zentral vorbereitet, zum Beispiel vor größeren Änderungen. Mit **Später** verschieben Sie den Hinweis bis zur nächsten Anmeldung. Mit **Nicht wieder anzeigen** schließen Sie genau diesen Hinweis dauerhaft für Ihr eigenes Konto.
+
 ---
 
 ## Aufbau der Startseite
