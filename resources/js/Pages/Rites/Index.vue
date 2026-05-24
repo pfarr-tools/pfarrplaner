@@ -130,7 +130,7 @@ export default {
                 return;
             }
             this.searching = true;
-            axios.get(route('api.rites.query', {query: query, api_token: this.apiToken}))
+            this.$api().get(route('api.rites.query', {query: query}))
                 .then(response => {
                     this.searching = false;
                     this.results = response.data;

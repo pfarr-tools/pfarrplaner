@@ -233,7 +233,6 @@ export default {
     data() {
         let myTabNames = this.settings.homeScreenTabs ? this.settings.homeScreenTabs.split(',') : [];
         return {
-            apiToken: this.$page.props.currentUser.data.api_token,
             myUser: this.user,
             config: this.settings.homeScreenConfig || {},
             myTabNames: myTabNames,
@@ -299,8 +298,7 @@ export default {
 
             this.myQuickPickerDate = quickPickerDate;
             this.myQuickPickerLoading = true;
-            axios.get(route('api.calendar.quick-pick', {
-                api_token: this.apiToken,
+            this.$api().get(route('api.calendar.quick-pick', {
                 date: this.myQuickPickerDate.format('DD.MM.YYYY'),
             })).then(response => {
                 this.myQuickPickerServices = response.data;

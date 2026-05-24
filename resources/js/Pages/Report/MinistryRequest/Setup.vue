@@ -171,8 +171,7 @@ export default {
         async getServices() {
             if (!(this.myCity && this.from && this.to)) return [];
             this.servicesLoading = true;
-            this.services = await axios.post(route('api.report.step', {
-                api_token: this.apiToken,
+            this.services = await this.$api().post(route('api.report.step', {
                 report: 'ministryRequest',
                 step: 'services',
                 city: this.myCity,

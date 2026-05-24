@@ -84,11 +84,11 @@ export default {
     components: {FormSelectize, SongbookSelect, FormInput, NavButton},
     props: ['modelValue', 'allowSplit'],
     created() {
-        axios.get(route('api.songbooks.index', { api_token: this.apiToken }))
+        this.$api().get(route('api.songbooks.index'))
         .then(result => {
             this.allSongbooks = result.data;
         });
-        axios.get(route('api.songbooks.colors', { api_token: this.apiToken }))
+        this.$api().get(route('api.songbooks.colors'))
         .then(result => {
             this.colors = result.data;
         });
@@ -99,7 +99,6 @@ export default {
             mySongbooks: [...(this.modelValue || [])],
             allSongbooks: [],
             colors: [],
-            apiToken: this.$page.props.currentUser.data.api_token,
         };
     },
     watch: {

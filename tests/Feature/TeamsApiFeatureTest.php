@@ -28,9 +28,11 @@ class TeamsApiFeatureTest extends TestCase
     public function testByCityReturnsTeamsForCity()
     {
         $city = City::factory()->create();
+        $user = User::factory()->create();
         Team::factory()->create(['city_id' => $city->id]);
 
-        $response = $this->getJson(route('api.teams.byCity', $city));
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.teams.byCity', $city));
 
         $response->assertOk();
         $this->assertCount(1, $response->json());
@@ -42,8 +44,10 @@ class TeamsApiFeatureTest extends TestCase
     public function testByCityReturnsEmptyArrayForCityWithNoTeams()
     {
         $city = City::factory()->create();
+        $user = User::factory()->create();
 
-        $response = $this->getJson(route('api.teams.byCity', $city));
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.teams.byCity', $city));
 
         $response->assertOk();
         $this->assertCount(0, $response->json());
@@ -54,7 +58,22 @@ class TeamsApiFeatureTest extends TestCase
      */
     public function testByCityReturns404ForMissingCity()
     {
-        $response = $this->getJson(route('api.teams.byCity', 999999));
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.teams.byCity', 999999));
         $response->assertNotFound();
+    }
+
+    /**
+     * @return void
+     */
+    public function testByCityRequiresAuth()
+    {
+        $city = City::factory()->create();
+
+        $response = $this->getJson(route('api.teams.byCity', $city));
+
+        $response->assertUnauthorized();
     }
 }

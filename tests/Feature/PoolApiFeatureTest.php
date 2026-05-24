@@ -27,8 +27,10 @@ class PoolApiFeatureTest extends TestCase
     public function testPoolmastersReturnsDayMap()
     {
         $pool = Pool::factory()->create();
+        $user = User::factory()->create();
 
-        $response = $this->getJson(route('api.pool.poolmasters', ['pool' => $pool->id, 'date' => '2024-01']));
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.pool.poolmasters', ['pool' => $pool->id, 'date' => '2024-01']));
 
         $response->assertOk();
         $this->assertIsArray($response->json());
@@ -39,7 +41,10 @@ class PoolApiFeatureTest extends TestCase
      */
     public function testPoolmastersReturns404ForMissingPool()
     {
-        $response = $this->getJson(route('api.pool.poolmasters', ['pool' => 999999, 'date' => '2024-01']));
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.pool.poolmasters', ['pool' => 999999, 'date' => '2024-01']));
         $response->assertNotFound();
     }
 
@@ -50,7 +55,8 @@ class PoolApiFeatureTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->getJson(route('api.pools.mastered', ['user' => $user->id, 'date' => '2024-01-15']));
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.pools.mastered', ['user' => $user->id, 'date' => '2024-01-15']));
 
         $response->assertOk();
         $response->assertJsonStructure(['users', 'period']);
@@ -61,7 +67,34 @@ class PoolApiFeatureTest extends TestCase
      */
     public function testMasteredReturns404ForMissingUser()
     {
-        $response = $this->getJson(route('api.pools.mastered', ['user' => 999999, 'date' => '2024-01-15']));
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.pools.mastered', ['user' => 999999, 'date' => '2024-01-15']));
         $response->assertNotFound();
+    }
+
+    /**
+     * @return void
+     */
+    public function testPoolmastersRequiresAuth()
+    {
+        $pool = Pool::factory()->create();
+
+        $response = $this->getJson(route('api.pool.poolmasters', ['pool' => $pool->id, 'date' => '2024-01']));
+
+        $response->assertUnauthorized();
+    }
+
+    /**
+     * @return void
+     */
+    public function testMasteredRequiresAuth()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->getJson(route('api.pools.mastered', ['user' => $user->id, 'date' => '2024-01-15']));
+
+        $response->assertUnauthorized();
     }
 }

@@ -86,10 +86,9 @@ export default {
     methods: {
         getData(api_url) {
             api_url = api_url || '/api/service/' + this.serviceId;
-            fetch(api_url)
-                .then(response => response.json())
+            this.$api().get(api_url)
                 .then(response => {
-                    this.service = response;
+                    this.service = response.data;
                     this.loading = false;
                 });
         },

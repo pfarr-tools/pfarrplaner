@@ -52,10 +52,9 @@
         methods: {
             getCities(api_url) {
                 api_url = api_url || '/api/cities';
-                fetch(api_url)
-                    .then(response => response.json())
+                this.$api().get(api_url)
                     .then(response => {
-                        this.cities= response;
+                        this.cities= response.data;
                     });
             }
         }

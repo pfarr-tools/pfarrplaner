@@ -61,10 +61,9 @@
         methods: {
             getData(api_url) {
                 api_url = api_url || route('api.services.byDayAndCity', {day: this.day.id, city: this.city.id});
-                fetch(api_url)
-                    .then(response => response.json())
+                this.$api().get(api_url)
                     .then(response => {
-                        this.services = response;
+                        this.services = response.data;
                         this.loading = false;
                     });
             },

@@ -341,8 +341,7 @@ export default {
         extendPersonScopeAndCloseModal(person) {
             this.showNewPersonModal = false;
             if (this.city) {
-                axios.post(route('api.people.activate', {
-                    api_token: this.apiToken,
+                this.$api().post(route('api.people.activate', {
                     user: person.id,
                     city: this.city.id,
                 }));
@@ -380,8 +379,7 @@ export default {
             this.searchingForPerson = true;
             this.showNewPersonModal = true;
             this.searchResults = [];
-            axios.post(route('api.people.search', {
-                api_token: this.apiToken,
+            this.$api().post(route('api.people.search', {
                 searchString: item,
             })).then(response => {
                 this.searchResults = response.data;

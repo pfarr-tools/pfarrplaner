@@ -50,7 +50,7 @@ export default {
     },
     components: {FormSelectize},
     created() {
-        axios.get('/api/city/'+this.city.id+'/konfiapp-types')
+        this.$api().get('/api/city/'+this.city.id+'/konfiapp-types')
         .then(response => {
             return response.data
         }).then(data => {

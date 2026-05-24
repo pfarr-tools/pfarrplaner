@@ -48,7 +48,6 @@ export default {
     components: {FormFileUpload, Modal},
     data() {
         return {
-            apiToken: this.$page.props.currentUser.data.api_token,
             insertBibleReference: '',
         }
     },
@@ -58,9 +57,7 @@ export default {
             fd.append('import', file);
 
             this.uploading = true;
-            axios.post(route('api.liturgy.text.import', {
-                api_token: this.apiToken,
-            }), fd, {
+            this.$api().post(route('api.liturgy.text.import'), fd, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

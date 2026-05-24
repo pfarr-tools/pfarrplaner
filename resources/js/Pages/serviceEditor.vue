@@ -256,16 +256,12 @@ export default {
         };
     },
     mounted() {
-        axios.get(route('api.people.select', {
-            api_token: this.apiToken,
-        })).then(response => {
+        this.$api().get(route('api.people.select')).then(response => {
             this.lists.users = response.data.users;
             this.lists.teams = response.data.teams;
             this.peopleLoaded = true;
         });
-        axios.get(route('api.ministries.list', {
-            api_token: this.apiToken,
-        })).then(response => {
+        this.$api().get(route('api.ministries.list')).then(response => {
             this.lists.ministries = response.data;
             this.ministriesLoaded = true;
         });

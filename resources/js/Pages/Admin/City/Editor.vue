@@ -216,9 +216,7 @@ export default {
     },
     props: ['city', 'streams', 'ministries', 'tab', 'canDelete', 'possibleChildren'],
     created() {
-        axios.get(route('api.ministries.list', {
-            api_token: this.apiToken,
-        })).then(response => {
+        this.$api().get(route('api.ministries.list')).then(response => {
             for (const ministryKey in response.data) {
                 this.myMinistries.push({id: response.data[ministryKey].category, name: response.data[ministryKey].category});
             }

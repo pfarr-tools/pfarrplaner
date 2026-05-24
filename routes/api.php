@@ -40,7 +40,15 @@
 */
 
 Route::name('api.')->group(function () {
-    foreach (glob(base_path('routes/api/*.php')) as $file) {
-        Route::group([], $file);
-    }
+    Route::group([], base_path('routes/api/Health.php'));
+
+    Route::middleware('auth:api')->group(function () {
+        foreach (glob(base_path('routes/api/*.php')) as $file) {
+            if (basename($file) === 'Health.php') {
+                continue;
+            }
+
+            Route::group([], $file);
+        }
+    });
 });

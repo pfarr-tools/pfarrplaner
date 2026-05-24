@@ -12,6 +12,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\People\User;
 use Tests\TestCase;
 
 class InboxApiFeatureTest extends TestCase
@@ -21,10 +22,23 @@ class InboxApiFeatureTest extends TestCase
      */
     public function testIndexReturnsValidResponse()
     {
-        $response = $this->getJson(route('api.inbox.index'));
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.inbox.index'));
 
         $response->assertOk();
         // Returns false when inbox is not configured, or a file array when it is.
         $this->assertTrue($response->json() === false || is_array($response->json()));
+    }
+
+    /**
+     * @return void
+     */
+    public function testIndexRequiresAuth()
+    {
+        $response = $this->getJson(route('api.inbox.index'));
+
+        $response->assertUnauthorized();
     }
 }

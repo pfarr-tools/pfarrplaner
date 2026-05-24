@@ -79,10 +79,9 @@
         methods: {
             getData(api_url) {
                 api_url = api_url || '/api/calendar/month/'+this.year+'/'+this.month;
-                fetch(api_url)
-                    .then(response => response.json())
+                this.$api().get(api_url)
                     .then(response => {
-                        this.days = response.days;
+                        this.days = response.data.days;
                     });
             },
             formatDate: function(dateString) {

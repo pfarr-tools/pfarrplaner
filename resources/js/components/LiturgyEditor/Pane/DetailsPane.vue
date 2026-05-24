@@ -93,7 +93,6 @@ export default {
     inject: ['lists'],
     data() {
         return {
-            apiToken: this.$page.props.currentUser.data.api_token,
             savedState: Object.assign({}, this.element),
             editorComponent: this.element.data_type.charAt(0).toUpperCase() + this.element.data_type.slice(1) + 'Editor',
             editedElement: this.element,
@@ -103,16 +102,14 @@ export default {
     methods: {
         save: function () {
             if (this.editedElement.data_type == 'block') {
-                axios.patch(route('api.liturgy.block.update', {
-                    api_token: this.apiToken,
+                this.$api().patch(route('api.liturgy.block.update', {
                     block: this.editedElement.id,
                 }), this.editedElement).then(response => {
                     this.editedElement.editing = false;
                     this.$emit('unfocus', this.editedElement);
                 })
             } else {
-                axios.patch(route('api.liturgy.item.update', {
-                    api_token: this.apiToken,
+                this.$api().patch(route('api.liturgy.item.update', {
                     item: this.editedElement.id,
                 }), this.editedElement).then(response => {
                     this.editedElement.editing = false;

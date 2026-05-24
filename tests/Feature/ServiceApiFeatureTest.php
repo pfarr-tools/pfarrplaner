@@ -89,12 +89,14 @@ class ServiceApiFeatureTest extends TestCase
     {
         $city = City::factory()->create();
         $day = Day::factory()->create();
+        $user = User::factory()->create();
         $service = Service::factory()->create([
             'day_id' => $day->id,
             'city_id' => $city->id,
         ]);
 
-        $response = $this->getJson(route('api.services.byDayAndCity', ['day' => $day->id, 'city' => $city->id]));
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.services.byDayAndCity', ['day' => $day->id, 'city' => $city->id]));
 
         $response->assertOk();
         $this->assertTrue(collect($response->json())->contains($service->id));
@@ -107,10 +109,36 @@ class ServiceApiFeatureTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->getJson(route('api.user.services', $user));
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.user.services', $user));
 
         $response->assertOk();
         $response->assertJsonStructure(['services']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testByDayAndCityRequiresAuth()
+    {
+        $city = City::factory()->create();
+        $day = Day::factory()->create();
+
+        $response = $this->getJson(route('api.services.byDayAndCity', ['day' => $day->id, 'city' => $city->id]));
+
+        $response->assertUnauthorized();
+    }
+
+    /**
+     * @return void
+     */
+    public function testByUserRequiresAuth()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->getJson(route('api.user.services', $user));
+
+        $response->assertUnauthorized();
     }
 
     /**

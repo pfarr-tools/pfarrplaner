@@ -137,8 +137,7 @@ export default {
         async getServices() {
             if (!this.myCity) return [];
             this.servicesLoading = true;
-            this.services = await axios.post(route('api.report.step', {
-                api_token: this.apiToken,
+            this.services = await this.$api().post(route('api.report.step', {
                 report: 'announcements',
                 step: 'services',
                 city: this.myCity,
@@ -153,8 +152,7 @@ export default {
         async getLastServiceDays() {
             if ((!this.myCity) || (!this.myService)) return [];
             this.lastServiceLoading = true;
-            this.myLastServiceDays = await axios.post(route('api.report.step', {
-                api_token: this.apiToken,
+            this.myLastServiceDays = await this.$api().post(route('api.report.step', {
                 report: 'announcements',
                 step: 'lastServiceDays',
                 city: this.myCity,
@@ -171,8 +169,7 @@ export default {
         async getAmount() {
             if ((!this.myCity) || (!this.myLastServiceDay)) return [];
             this.amountLoading = true;
-            this.amount = await axios.post(route('api.report.step', {
-                api_token: this.apiToken,
+            this.amount = await this.$api().post(route('api.report.step', {
                 report: 'announcements',
                 step: 'offerings',
                 city: this.myCity,

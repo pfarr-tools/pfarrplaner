@@ -93,7 +93,7 @@ class ServiceController extends Controller
             ['location', 'city', 'participants', 'weddings', 'funerals', 'baptisms', 'day', 'tags', 'serviceGroups']
         );
         $service->liturgy = LiturgyService::getLiturgyInfoByDate($service->day);
-        if (isset($liturgy['Bezeichnung']) && ($service->day->name == '')) {
+        if (isset($service->liturgy['Bezeichnung']) && ($service->day->name == '')) {
             $service->day->name = $service->liturgy['title'];
         }
         return response()->json($service);

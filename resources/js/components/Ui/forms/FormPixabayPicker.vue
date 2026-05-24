@@ -78,7 +78,7 @@ export default {
                 return;
             }
             component.page = page;
-            axios.get(route('api.pixabay.query', {query: component.search, page, api_token: component.token}))
+            component.$api().get(route('api.pixabay.query', {query: component.search, page}))
                 .then(response => {
                     component.totalHits = response.data.totalHits;
                     component.results = response.data.hits;

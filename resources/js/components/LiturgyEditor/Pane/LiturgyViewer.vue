@@ -156,8 +156,7 @@ export default {
      * @returns {Promise<void>}
      */
     async created() {
-        axios.get(route('api.liturgy.sources', {
-            api_token: this.apiToken,
+        this.$api().get(route('api.liturgy.sources', {
             serviceId: this.service.id,
         })).then(response => {
             if (response.data) {
@@ -168,8 +167,8 @@ export default {
         });
 
         axios.get(route('liturgy.sermons', this.myService.slug)).then(response => this.sermons = response.data);
-        axios.get(route('api.liturgy.text.list', {api_token: this.apiToken})).then(response => this.texts = response.data);
-        axios.get(route('api.liturgy.song.select', {api_token: this.apiToken})).then(response => {
+        this.$api().get(route('api.liturgy.text.list')).then(response => this.texts = response.data);
+        this.$api().get(route('api.liturgy.song.select')).then(response => {
             this.songList = response.data;
         });
     },
@@ -255,8 +254,7 @@ export default {
     },
     methods: {
         addBlock() {
-            axios.post(route('api.liturgy.block.store', {
-                api_token: this.apiToken,
+            this.$api().post(route('api.liturgy.block.store', {
                 service: this.service.id,
             }), {
                 title: 'Abschnitt ' + (this.blocks.length + 1)
@@ -271,8 +269,7 @@ export default {
             });
         },
         deleteBlock(index) {
-            axios.delete(route('api.liturgy.block.destroy', {
-                api_token: this.apiToken,
+            this.$api().delete(route('api.liturgy.block.destroy', {
                 block: this.blocks[index].id
             })).then(response => {
                 this.blocks.splice(index, 1);
@@ -288,7 +285,7 @@ export default {
                 })
             })
 
-            axios.post(route('api.liturgy.tree.save', {service: this.service.id, api_token: this.apiToken}), {
+            this.$api().post(route('api.liturgy.tree.save', {service: this.service.id}), {
                 blocks: this.blocks
             })
                 .then(response => this.reloadTree(response.data));
@@ -330,9 +327,8 @@ export default {
                     };
                     break;
             }
-            axios.post(route('api.liturgy.item.store', {
+            this.$api().post(route('api.liturgy.item.store', {
                 block: this.blocks[blockIndex].id,
-                api_token: this.apiToken
             }), obj)
                 .then(response => {
                     let item = response.data.item;
@@ -344,8 +340,7 @@ export default {
             //var index = this.blocks[blockIndex].items.push(obj);
         },
         deleteItem(blockIndex, itemIndex) {
-            axios.delete(route('api.liturgy.item.destroy', {
-                api_token: this.apiToken,
+            this.$api().delete(route('api.liturgy.item.destroy', {
                 item: this.blocks[blockIndex].items[itemIndex].id,
             })).then(response => {
                 this.blocks[blockIndex].items.splice(itemIndex, 1);
@@ -458,9 +453,8 @@ export default {
         },
         save() {
             this.reloadingTree = true;
-            axios.post(route('api.liturgy.tree.save', {
+            this.$api().post(route('api.liturgy.tree.save', {
                 service: this.service.id,
-                api_token: this.apiToken
             }), {blocks: this.blocks})
                 .then(response => this.reloadTree(response.data));
         },
@@ -491,8 +485,7 @@ export default {
             this.modalOpen = false;
             if (this.importFrom == -1) return;
             this.reloadingTree = true;
-            axios.post(route('api.liturgy.tree.import', {
-                api_token: this.apiToken,
+            this.$api().post(route('api.liturgy.tree.import', {
                 service: this.service.id,
                 source: this.importFrom,
             })).then(response => {

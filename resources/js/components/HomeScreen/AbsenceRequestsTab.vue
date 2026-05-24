@@ -126,7 +126,6 @@ export default {
         }
 
         return {
-            apiToken: this.$page.props.currentUser.data.api_token,
             myCheckableAbsences,
             myApprovableAbsences,
         }
@@ -136,8 +135,7 @@ export default {
             this.$inertia.get(route('absence.edit', absence.id));
         },
         deleteAbsence(absence) {
-            axios.delete(route('api.absence.destroy', {
-                api_token: this.apiToken,
+            this.$api().delete(route('api.absence.destroy', {
                 absence: absence.id,
             })).then(response => {
                 this.myCheckableAbsences = this.myCheckableAbsences.filter(item => item.id != absence.id);
@@ -145,16 +143,14 @@ export default {
             });
         },
         forceChecked(absence) {
-            axios.post(route('api.absence.set-checked', {
-                api_token: this.apiToken,
+            this.$api().post(route('api.absence.set-checked', {
                 absence: absence.id,
             })).then(response => {
                 this.myCheckableAbsences = this.myCheckableAbsences.filter(item => item.id != absence.id);
             });
         },
         forceApproved(absence) {
-            axios.post(route('api.absence.set-approved', {
-                api_token: this.apiToken,
+            this.$api().post(route('api.absence.set-approved', {
                 absence: absence.id,
             })).then(response => {
                 this.myApprovableAbsences = this.myApprovableAbsences.filter(item => item.id != absence.id);

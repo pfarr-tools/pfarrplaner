@@ -206,8 +206,7 @@ export default {
             if (!e) return;
             if (e < 0) return;
             if (undefined == this.songList[e]) {
-                axios.get(route('api.liturgy.song.single', {
-                    api_token: this.apiToken,
+                this.$api().get(route('api.liturgy.song.single', {
                     songReferenceId: e,
                 })).then(response => {
                     this.songList[e] = response.data;

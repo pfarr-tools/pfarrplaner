@@ -54,8 +54,7 @@ class CalendarApiFeatureTest extends TestCase
         $user = User::factory()->create();
         $user->cities()->attach($city->id);
 
-        $response = $this->withoutMiddleware()
-            ->actingAs($user)
+        $response = $this->actingAs($user, 'api')
             ->getJson(route('api.calendar.month', ['date' => '2024-01']));
 
         $response->assertOk();
@@ -83,8 +82,7 @@ class CalendarApiFeatureTest extends TestCase
         $service->relatedCities()->attach($relatedCity->id);
         $service->refresh();
 
-        $response = $this->withoutMiddleware()
-            ->actingAs($user)
+        $response = $this->actingAs($user, 'api')
             ->getJson(route('api.calendar.month', ['date' => '2024-01']));
 
         $response->assertOk();
@@ -102,7 +100,7 @@ class CalendarApiFeatureTest extends TestCase
     public function testMonthRequiresAuth()
     {
         $response = $this->getJson(route('api.calendar.month', ['date' => '2024-01']));
-        $response->assertForbidden();
+        $response->assertUnauthorized();
     }
 
     /**
@@ -113,7 +111,7 @@ class CalendarApiFeatureTest extends TestCase
         $service = Service::factory()->create();
 
         $response = $this->getJson(route('api.calendar.service', $service));
-        $response->assertForbidden();
+        $response->assertUnauthorized();
     }
 
     /**
@@ -125,11 +123,20 @@ class CalendarApiFeatureTest extends TestCase
         $user = User::factory()->create();
         $user->cities()->attach($city->id);
 
-        $response = $this->withoutMiddleware()
-            ->actingAs($user)
+        $response = $this->actingAs($user, 'api')
             ->getJson(route('api.calendar.quick-pick', ['date' => '01.01.2024']));
 
         $response->assertOk();
+    }
+
+    /**
+     * @return void
+     */
+    public function testQuickPickRequiresAuth()
+    {
+        $response = $this->getJson(route('api.calendar.quick-pick', ['date' => '01.01.2024']));
+
+        $response->assertUnauthorized();
     }
 
     /**

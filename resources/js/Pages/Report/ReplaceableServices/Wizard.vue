@@ -180,9 +180,8 @@ export default {
         },
         deleteService(row, rowIndex) {
             if (!confirm('Willst du den gewählten Gottesdienst wirklich komplett löschen?')) return;
-            axios.delete(route('api.service.destroy', {
+            this.$api().delete(route('api.service.destroy', {
                 service: row.service.slug,
-                api_token: this.apiToken,
             })).then(response => {
                 console.log('rowIndex', rowIndex);
                 this.myServices.splice(rowIndex, 1);
