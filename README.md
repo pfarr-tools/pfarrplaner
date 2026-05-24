@@ -20,6 +20,13 @@ Das Projekt stammt aus dem [Evangelischen Kirchenbezirk Balingen](https://www.ki
 
 Das vollständige Benutzerhandbuch ist unter [handbuch.pfarrplaner.de](https://handbuch.pfarrplaner.de) erreichbar.
 
+## Pfarrplaner unterstützen
+
+Pfarrplaner ist ein freies Projekt für Kirchengemeinden. Die Weiterentwicklung kostet Zeit und Geld. Wenn Ihnen Pfarrplaner hilft, können Sie das Projekt freiwillig unterstützen.
+
+- Einmalig per PayPal: [paypal.me/potofcoffee](https://paypal.me/potofcoffee)
+- Regelmäßig per Liberapay: [liberapay.com/christoph.fischer](https://liberapay.com/christoph.fischer)
+
 ## Bereitstellung
 
 Pfarrplaner ist als Open-Source-Software verfügbar. Gehostete Versionen werden derzeit ausschließlich für Kirchengemeinden aus dem Kirchenbezirk Balingen und dem Kirchenbezirk Herrenberg angeboten.
