@@ -34,6 +34,7 @@ Die Anmeldeseite enthält diese Elemente:
 - **Passwort**: Ihr persönliches Passwort.
 - **Angemeldet bleiben**: Merkt sich die Anmeldung auf diesem Gerät länger.
 - **Anmelden**: Prüft Ihre Eingaben und öffnet Pfarrplaner.
+- **Hinweis zur Unterstützung**: Unter dem Formular finden Sie einen kurzen Hinweis mit Links für eine einmalige oder regelmäßige freiwillige Unterstützung des Projekts.
 
 Nach erfolgreicher Anmeldung werden Sie zu der Startansicht weitergeleitet, die für Ihr Konto eingestellt ist. Häufig ist das die [Startseite](startseite.md), manchmal auch direkt der [Kalender](kalender.md) oder ein anderes Modul.
 

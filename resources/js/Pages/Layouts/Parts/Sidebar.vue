@@ -60,6 +60,16 @@
                 </a>
             </li>
         </ul>
+        <div class="mt-auto pt-3 border-top sidebar-support">
+            <button
+                type="button"
+                class="px-4 py-2 text-start w-100 nav-link d-flex align-items-center gap-2 border-0 bg-transparent"
+                @click="toggleSupportMenu($event)"
+            >
+                <span aria-hidden="true">❤️</span>
+                <span>Pfarrplaner unterstützen</span>
+            </button>
+        </div>
     </aside>
 
     <aside
@@ -108,7 +118,45 @@
                 </a>
             </li>
         </ul>
+        <div class="sidebar-support border-top">
+            <button
+                type="button"
+                class="px-4 py-3 text-start w-100 nav-link d-flex align-items-center border-0 bg-transparent"
+                @click="toggleSupportMenu($event)"
+            >
+                <span aria-hidden="true">❤️</span>
+                <span v-if="expanded" class="ms-2">Pfarrplaner unterstützen</span>
+            </button>
+        </div>
     </aside>
+
+    <div
+        v-if="supportMenuOpen"
+        ref="supportPopup"
+        class="support-popup card shadow"
+        :style="supportMenuStyle"
+    >
+        <div class="card-body p-2">
+            <a
+                class="support-popup-link"
+                href="https://paypal.me/potofcoffee"
+                target="_blank"
+                rel="noopener noreferrer"
+                @click="closeSupportMenu"
+            >
+                Einmalig per PayPal
+            </a>
+            <a
+                class="support-popup-link"
+                href="https://liberapay.com/christoph.fischer"
+                target="_blank"
+                rel="noopener noreferrer"
+                @click="closeSupportMenu"
+            >
+                Regelmäßig per Liberapay
+            </a>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -118,6 +166,13 @@ export default {
         pinned: Boolean,
         hovered: Boolean,
         mobile: Boolean,
+    },
+    data() {
+        return {
+            supportMenuOpen: false,
+            supportMenuStyle: {},
+            supportMenuButton: null,
+        }
     },
     computed: {
         expanded() {
@@ -136,9 +191,53 @@ export default {
             return this.$page.props.dev;
         }
     },
+    mounted() {
+        document.addEventListener('click', this.handleDocumentClick)
+        window.addEventListener('resize', this.closeSupportMenu)
+    },
+    beforeUnmount() {
+        document.removeEventListener('click', this.handleDocumentClick)
+        window.removeEventListener('resize', this.closeSupportMenu)
+    },
     methods: {
+        closeSupportMenu() {
+            this.supportMenuOpen = false
+            this.supportMenuButton = null
+        },
+        handleDocumentClick(event) {
+            if (!this.supportMenuOpen) return
+
+            const clickedButton = this.supportMenuButton?.contains(event.target)
+            const clickedPopup = this.$refs.supportPopup?.contains(event.target)
+
+            if (!clickedButton && !clickedPopup) {
+                this.closeSupportMenu()
+            }
+        },
         setHover(state) {
             this.$emit('hover', state)
+        },
+        toggleSupportMenu(event) {
+            if (this.supportMenuOpen) {
+                this.closeSupportMenu()
+                return
+            }
+
+            const rect = event.currentTarget.getBoundingClientRect()
+            const popupWidth = 240
+            const left = Math.min(
+                Math.max(12, rect.left),
+                window.innerWidth - popupWidth - 12
+            )
+
+            this.supportMenuButton = event.currentTarget
+            this.supportMenuStyle = {
+                top: `${rect.top - 8}px`,
+                left: `${left}px`,
+                width: `${popupWidth}px`,
+                transform: 'translateY(-100%)',
+            }
+            this.supportMenuOpen = true
         }
     }
 }
@@ -204,13 +303,37 @@ aside {
     line-height: 0.8;
 }
 
-a.nav-link {
+a.nav-link,
+button.nav-link {
     color: #c2c7d0;
 }
 
-a.nav-link:hover {
+a.nav-link:hover,
+button.nav-link:hover {
     color: white;
     background-color: rgb(152.28, 165.24, 191.64);
+}
+
+.sidebar-support {
+    flex-shrink: 0;
+}
+
+.support-popup {
+    position: fixed;
+    z-index: 1100;
+    min-width: 220px;
+}
+
+.support-popup-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: #212529;
+    text-decoration: none;
+    border-radius: 0.375rem;
+}
+
+.support-popup-link:hover {
+    background-color: #f1f3f5;
 }
 
 </style>

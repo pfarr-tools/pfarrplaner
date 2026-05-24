@@ -60,6 +60,7 @@
 
 
                     </form>
+                    <donation-notice class="mt-4 pt-3 border-top"/>
                 </div>
             </div>
         </div>
@@ -88,10 +89,11 @@
 <script>
 import FormCsrfToken from "../../components/Ui/forms/FormCsrfToken.vue";
 import FormGroup from "../../components/Ui/forms/FormGroup.vue";
+import DonationNotice from "../../components/Ui/DonationNotice.vue";
 
 export default {
     name: "Login",
-    components: {FormCsrfToken, FormGroup},
+    components: {DonationNotice, FormCsrfToken, FormGroup},
     props: ['users'],
     computed: {
         layout() {

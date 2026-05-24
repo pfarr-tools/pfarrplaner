@@ -70,6 +70,7 @@
 
 
                     </form>
+                    <donation-notice class="mt-4 pt-3 border-top"/>
                 </div>
             </div>
         </div>
@@ -99,10 +100,11 @@
 import FormInput from "../../components/Ui/forms/FormInput.vue";
 import FormCheck from "../../components/Ui/forms/FormCheck.vue";
 import FormCsrfToken from "../../components/Ui/forms/FormCsrfToken.vue";
+import DonationNotice from "../../components/Ui/DonationNotice.vue";
 
 export default {
     name: "Login",
-    components: {FormCsrfToken, FormCheck, FormInput},
+    components: {DonationNotice, FormCsrfToken, FormCheck, FormInput},
     computed: {
         layout() {
             return this.$page.props;

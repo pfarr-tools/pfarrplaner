@@ -41,6 +41,7 @@
             der <a href="https://codeberg.org/pfarr.tools/pfarrplaner/blob/master/LICENSE" target="_blank">GNU General
                 Public License (GPL) 3.0</a> oder höher.
         </p>
+        <donation-notice class="mb-4"/>
         <hr class="my-3"/>
         <vue-markdown class="changelog" :source="changelog"/>
     </admin-layout>
@@ -50,11 +51,12 @@
 import CardHeader from "../components/Ui/cards/cardHeader";
 import CardBody from "../components/Ui/cards/cardBody";
 import Card from "../components/Ui/cards/card";
+import DonationNotice from "../components/Ui/DonationNotice.vue";
 import VueMarkdown from 'vue-markdown-render';
 
 export default {
     name: "About",
-    components: {Card, CardBody, CardHeader, VueMarkdown},
+    components: {Card, CardBody, CardHeader, DonationNotice, VueMarkdown},
 
     props: ['version', 'date', 'changelog', 'env', 'phpVersion', 'laravelVersion', 'appName'],
     computed: {

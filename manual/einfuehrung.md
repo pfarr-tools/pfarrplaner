@@ -8,6 +8,17 @@ Pfarrplaner ist kein öffentliches Gemeindeverzeichnis und keine allgemeine Webs
 
 ---
 
+## Pfarrplaner unterstützen
+
+Pfarrplaner ist ein freies Projekt für Kirchengemeinden. Die Weiterentwicklung kostet Zeit und Geld. Wenn Ihnen Pfarrplaner hilft, können Sie das Projekt freiwillig unterstützen.
+
+- Einmalig per PayPal: <https://paypal.me/potofcoffee>
+- Regelmäßig per Liberapay: <https://liberapay.com/christoph.fischer>
+
+Der Hinweis erscheint auch auf der Anmeldeseite, auf der Seite **Über Pfarrplaner** und als Link unten in der linken Seitenleiste.
+
+---
+
 ## Für wen ist Pfarrplaner gedacht?
 
 Pfarrplaner wird typischerweise von diesen Gruppen genutzt:
