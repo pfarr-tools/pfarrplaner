@@ -61,4 +61,16 @@ describe('AbsenceEditor ISO submission', () => {
         expect(role).toBe('self-editor')
         expect(mayDelete).toBe(true)
     })
+
+    it('detects unsaved absences by missing id', () => {
+        const unsaved = AbsenceEditor.computed.isPersisted.call({
+            form: { id: null },
+        })
+        const saved = AbsenceEditor.computed.isPersisted.call({
+            form: { id: 12 },
+        })
+
+        expect(unsaved).toBe(false)
+        expect(saved).toBe(true)
+    })
 })

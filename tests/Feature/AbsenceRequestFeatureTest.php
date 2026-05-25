@@ -68,6 +68,28 @@ class AbsenceRequestFeatureTest extends TestCase
         $this->assertSame('2026-06-04 23:59:59', $absence->to->format('Y-m-d H:i:s'));
     }
 
+    public function testStoreRulesRequireUserId(): void
+    {
+        $request = AbsenceRequest::create('/urlaub', 'POST', [
+            'from' => '2026-05-31T22:00:00.000Z',
+            'to' => '2026-06-04T21:59:59.000Z',
+            'reason' => 'Urlaub',
+        ]);
+        $request->setContainer($this->app)->setRedirector($this->app->make('redirect'));
+        $request->setUserResolver(fn () => $this->user);
+        $request->setRouteResolver(fn () => new class {
+            public function getName(): string
+            {
+                return 'absence.store';
+            }
+        });
+
+        $validator = Validator::make($request->all(), $request->rules());
+
+        $this->assertTrue($validator->fails());
+        $this->assertArrayHasKey('user_id', $validator->errors()->toArray());
+    }
+
     public function testIsoReplacementDatesAreNormalizedToAbsencePeriod(): void
     {
         $absence = Absence::factory()->create([

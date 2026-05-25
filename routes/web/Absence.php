@@ -29,12 +29,15 @@
  */
 
 use App\Http\Controllers\AbsenceController;
+use App\Models\Leave\Absence;
 
 Route::get('urlaubsplan/{year?}/{month?}', [AbsenceController::class, 'index'])
     ->name('absences.index');
 Route::get('urlaubsplan/neu/{year}/{month}/{user}/{day?}', [AbsenceController::class, 'create'])
     ->name('absence.create')
-    ->middleware('can:create,App\Models\Absence');
+    ->middleware('can:create,'.Absence::class);
+Route::post('urlaub', [AbsenceController::class, 'store'])
+    ->name('absence.store');
 
 
 Route::get('urlaub/{absence}', [AbsenceController::class, 'edit'])
@@ -55,7 +58,6 @@ Route::get('planner/users', [AbsenceController::class, 'users'])
     ->name('planner.users');
 Route::get('planner/days/{date}/{user}', [AbsenceController::class, 'days'])
     ->name('planner.days');
-
 
 
 

@@ -48,6 +48,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -98,25 +99,39 @@ class AbsenceController extends Controller
      */
     public function create($year, $month, User $user, $day = 1)
     {
-        $users = User::visibleFor(Auth::user())->get();
-        $workflowStatus = 0;
-        if (Auth::user()->id == $user->id) {
-            if (Auth::user()->can('selfAdminister', Absence::class)) {
-                $workflowStatus = 10;
-            }
+        return $this->renderEditor($this->makeDraftAbsence($year, $month, $user, $day), request());
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param AbsenceRequest $request
+     * @return JsonResponse|RedirectResponse
+     */
+    public function store(AbsenceRequest $request)
+    {
+        $absence = Absence::create($request->validated());
+        $absence->setupReplacements($request->user(), $request->get('replacements') ?: []);
+
+        event(new AbsenceUpdated($absence));
+
+        if ($request->get('noRedirect', false)) {
+            $absence->refresh();
+            $absence->load(['replacements', 'attachments', 'user', 'checkedBy', 'approvedBy']);
+            return response()->json([
+                'absence' => $absence,
+                'editUrl' => route('absence.edit', $absence->id),
+            ]);
         }
 
-        $absence = Absence::create(
-            [
-                'user_id' => $user->id,
-                'reason' => 'Urlaub',
-                'from' => Carbon::create($year, $month, $day, 0, 0, 0),
-                'to' => Carbon::create($year, $month, $day, 0, 0, 0),
-                'workflow_status' => $workflowStatus,
-            ]
-        );
+        if ($url = $request->get('redirectTo', false)) {
+            return Inertia::location($url);
+        }
 
-        return redirect()->route('absence.edit', $absence->id);
+        return redirect()->route(
+            'absences.index',
+            ['month' => $absence->from->format('m'), 'year' => $absence->from->format('Y')]
+        );
     }
 
 
@@ -205,8 +220,10 @@ class AbsenceController extends Controller
 
         foreach ($absences as $absence) {
             $index = ($absence->from < $start ? 1 : $absence->from->day);
+            $visibleStart = $absence->from->copy()->startOfDay()->max($start->copy());
+            $visibleEnd = $absence->to->copy()->startOfDay()->min($end->copy()->startOfDay());
             $days[$index]['absence'] = $absence;
-            $days[$index]['duration'] = abs((int)$absence->to->diffInDays($days[$index]['date']))+1;
+            $days[$index]['duration'] = $visibleStart->diffInDays($visibleEnd) + 1;
             $endIndex = ($absence->to > $end ? $end->day : $absence->to->day);
             for ($i = $index; $i <= $endIndex; $i++) {
                 $days[$i]['absent'] = true;
@@ -227,11 +244,25 @@ class AbsenceController extends Controller
      */
     public function edit(Request $request, Absence $absence)
     {
-        $absence->load(['replacements', 'user', 'checkedBy', 'approvedBy']);
-        $absence->user->load(['vacationAdmins', 'vacationApprovers', 'cities', 'pools']);
+        return $this->renderEditor($absence, $request);
+    }
 
-        $mayCheck = $absence->user->vacationAdmins->pluck('id')->contains(Auth::user()->id);
-        $mayApprove = $absence->user->vacationApprovers->pluck('id')->contains(Auth::user()->id);
+    /**
+     * Render the absence editor.
+     *
+     * @param Absence $absence
+     * @param Request $request
+     * @return \Inertia\Response
+     */
+    protected function renderEditor(Absence $absence, Request $request)
+    {
+        $absence->load(['replacements', 'checkedBy', 'approvedBy']);
+        $absenceUser = $absence->user ?: User::findOrFail($absence->user_id);
+        $absence->setRelation('user', $absenceUser);
+        $absenceUser->load(['vacationAdmins', 'vacationApprovers', 'cities', 'pools']);
+
+        $mayCheck = $absenceUser->vacationAdmins->pluck('id')->contains(Auth::user()->id);
+        $mayApprove = $absenceUser->vacationApprovers->pluck('id')->contains(Auth::user()->id);
         $maySelfAdminister = Auth::user()->can('selfAdminister', $absence);
 
 
@@ -251,6 +282,44 @@ class AbsenceController extends Controller
             'Absences/AbsenceEditor',
             compact('absence', 'month', 'year', 'users', 'mayCheck', 'mayApprove', 'maySelfAdminister')
         );
+    }
+
+    /**
+     * Build a draft absence for the editor without persisting it.
+     *
+     * @param int $year
+     * @param int $month
+     * @param User $user
+     * @param int $day
+     * @return Absence
+     */
+    protected function makeDraftAbsence(int $year, int $month, User $user, int $day = 1): Absence
+    {
+        $workflowStatus = Absence::STATUS_NEW;
+        if ((Auth::user()->id == $user->id) && Auth::user()->can('selfAdminister', new Absence(['user_id' => $user->id]))) {
+            $workflowStatus = Absence::STATUS_SELF_ADMINISTERED;
+        }
+
+        $absence = new Absence([
+            'user_id' => $user->id,
+            'reason' => 'Urlaub',
+            'from' => Carbon::create($year, $month, $day, 0, 0, 0),
+            'to' => Carbon::create($year, $month, $day, 0, 0, 0),
+            'workflow_status' => $workflowStatus,
+            'sick_days' => false,
+            'replacement_notes' => '',
+            'internal_notes' => '',
+            'admin_notes' => '',
+            'approver_notes' => '',
+        ]);
+
+        $absence->setRelation('user', $user);
+        $absence->setRelation('replacements', collect());
+        $absence->setRelation('attachments', collect());
+        $absence->setRelation('checkedBy', null);
+        $absence->setRelation('approvedBy', null);
+
+        return $absence;
     }
 
     /**
@@ -361,6 +430,7 @@ class AbsenceController extends Controller
      */
     public function attach(Request $request, Absence $absence)
     {
+        Gate::authorize('update', $absence);
         $this->handleAttachments($request, $absence);
         $absence->refresh();
         return response()->json($absence->attachments);
@@ -375,6 +445,8 @@ class AbsenceController extends Controller
      */
     public function detach(Request $request, Absence $absence, Attachment $attachment)
     {
+        Gate::authorize('update', $absence);
+        $attachment = $absence->attachments()->findOrFail($attachment->id);
         $file = $attachment->file;
         $absence->attachments()->where('id', $attachment->id)->delete();
         Storage::delete($file);

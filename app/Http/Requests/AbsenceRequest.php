@@ -31,9 +31,11 @@
 namespace App\Http\Requests;
 
 use App\Models\Leave\Absence;
+use App\Models\People\User;
 use Carbon\Carbon;
-use Illuminate\Foundation\Http\FormRequest;
 use Closure;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class AbsenceRequest extends FormRequest
 {
@@ -49,13 +51,18 @@ class AbsenceRequest extends FormRequest
      */
     public function authorize()
     {
-        if (!$this->has('id')) {
+        $routeName = $this->route() ? $this->route()->getName() : null;
+        $absence = $this->resolveAbsence();
+
+        if (null === $absence) {
             return false;
         }
-        if (null === $this->absence) {
-            $this->absence = Absence::find($this->get('id'));
+
+        if ('absence.store' === $routeName) {
+            return Gate::forUser($this->user())->check('create', [Absence::class, $absence]);
         }
-        return $this->user()->can('update', $this->absence);
+
+        return $this->user()->can('update', $absence);
     }
 
     /**
@@ -74,13 +81,15 @@ class AbsenceRequest extends FormRequest
             'sick_days' => 'nullable|bool',
             'internal_notes' => 'nullable|string',
         ];
-        if ($this->route()->getName() == 'absences.store') {
+        if ($this->route()->getName() == 'absence.store') {
             $rules['user_id'] = 'required|exists:users,id';
         }
 
+        $this->resolveAbsence();
         if (null === $this->absence) {
-            $this->absence = Absence::find($this->get('id'));
+            return $rules;
         }
+
         // self-administrator?
         if ($this->user()->can('selfAdminister', $this->absence)) {
             $rules['workflow_status'] = 'nullable|int|in:' . join(
@@ -152,6 +161,40 @@ class AbsenceRequest extends FormRequest
             }
         }
         return $data;
+    }
+
+    /**
+     * Resolve the absence that is being stored or updated.
+     *
+     * @return Absence|null
+     */
+    protected function resolveAbsence(): ?Absence
+    {
+        if (null !== $this->absence) {
+            return $this->absence;
+        }
+
+        if ($this->has('id')) {
+            $this->absence = Absence::find($this->get('id'));
+            return $this->absence;
+        }
+
+        if (($this->route() ? $this->route()->getName() : null) !== 'absence.store') {
+            return null;
+        }
+
+        $user = User::find($this->get('user_id'));
+        if (null === $user) {
+            return null;
+        }
+
+        $this->absence = new Absence([
+            'user_id' => $user->id,
+            'workflow_status' => Absence::STATUS_NEW,
+        ]);
+        $this->absence->setRelation('user', $user);
+
+        return $this->absence;
     }
 
     /**

@@ -151,15 +151,15 @@
 
         <template #tab-headers>
             <tab-headers>
-                <tab-header id="home" :active-tab="activeTab" title="Abwesenheit" />
-                <tab-header v-if="form.user.needs_replacement" id="replacement" :active-tab="activeTab" title="Vertretung" />
-                <tab-header id="attachments" :active-tab="activeTab" title="Dateien" :count="fileCount" />
+                <tab-header id="home" :active-tab="myActiveTab" title="Abwesenheit" :switch-handler="true" @tab="switchTab" />
+                <tab-header v-if="form.user.needs_replacement" id="replacement" :active-tab="myActiveTab" title="Vertretung" :switch-handler="true" @tab="switchTab" />
+                <tab-header id="attachments" :active-tab="myActiveTab" title="Dateien" :count="fileCount" :switch-handler="true" @tab="switchTab" />
             </tab-headers>
         </template>
 
 
         <tabs>
-            <tab id="home" :active-tab="activeTab">
+            <tab id="home" :active-tab="myActiveTab">
 
                 <!-- ✅ NEW: v-model DateRangeInput -->
                 <date-range-input
@@ -204,7 +204,10 @@
             </tab>
 
 
-            <tab v-if="form.user.needs_replacement" id="replacement" :active-tab="activeTab">
+            <tab v-if="form.user.needs_replacement" id="replacement" :active-tab="myActiveTab">
+                <div v-if="!isPersisted" class="alert alert-info mt-3">
+                    Pfarrplaner speichert diesen Entwurf zuerst, bevor Vertretungen bearbeitet werden können.
+                </div>
 
                 <fake-table :columns="[3,2,4,1]"
                             :headers="['Vertreter:in', 'oder: Pool', 'Zeitraum', '']"
@@ -265,7 +268,7 @@
             </tab>
 
 
-            <tab id="attachments" :active-tab="activeTab">
+            <tab id="attachments" :active-tab="myActiveTab">
 
                 <h3>Angehängte Dateien</h3>
 
@@ -277,11 +280,17 @@
 
                 <hr/>
 
-                <h3>Dateien hinzufügen.</h3>
+                <div v-if="!isPersisted" class="alert alert-info">
+                    Dateien können hinzugefügt werden, sobald der Abwesenheitseintrag einmal gespeichert wurde.
+                </div>
 
-                <form-file-uploader :parent="form" :no-pixabay="true"
-                                    :upload-route="route('absence.attach', form.id)"
-                                    v-model="form.attachments"/>
+                <template v-else>
+                    <h3>Dateien hinzufügen.</h3>
+
+                    <form-file-uploader :parent="form" :no-pixabay="true"
+                                        :upload-route="route('absence.attach', form.id)"
+                                        v-model="form.attachments"/>
+                </template>
             </tab>
 
         </tabs>
@@ -351,10 +360,14 @@ export default {
         return {
             form,
             setApproved: [2, 11].includes(Number(this.absence.workflow_status)),
+            myActiveTab: this.activeTab ?? 'home',
         };
     },
 
     computed: {
+        isPersisted() {
+            return !!this.form.id;
+        },
         role() {
             if (this.maySelfAdminister) {
                 return 'self-editor';
@@ -424,6 +437,15 @@ export default {
         },
 
         addReplacement() {
+            if (!this.isPersisted) {
+                this.ensurePersisted().then((saved) => {
+                    if (saved) {
+                        this.addReplacement();
+                    }
+                });
+                return;
+            }
+
             this.form.replacements.push({
                 users: [],
                 pool_id: null,
@@ -457,10 +479,62 @@ export default {
             return record;
         },
 
+        syncPersistedAbsence(payload) {
+            Object.keys(payload).forEach((key) => {
+                this.form[key] = payload[key];
+            });
+            this.form.replacements = payload.replacements ?? [];
+            this.form.attachments = payload.attachments ?? [];
+        },
+        async persistWithoutRedirect() {
+            const record = {
+                ...this.prepareForm(),
+                noRedirect: true,
+            };
+
+            const request = this.isPersisted
+                ? this.$api().patch(route('absence.update', { absence: this.form.id }), record)
+                : this.$api().post(route('absence.store'), record);
+
+            try {
+                const response = await request;
+                if (response.data?.absence) {
+                    this.syncPersistedAbsence(response.data.absence);
+                }
+                if (response.data?.editUrl) {
+                    window.history.replaceState(window.history.state, '', response.data.editUrl);
+                }
+                this.form.clearErrors();
+                return true;
+            } catch (error) {
+                if (error.response?.status === 422 && error.response?.data?.errors) {
+                    this.form.setError(error.response.data.errors);
+                }
+                return false;
+            }
+        },
+        async ensurePersisted() {
+            if (this.isPersisted) {
+                return true;
+            }
+
+            return await this.persistWithoutRedirect();
+        },
+        async switchTab(tab) {
+            if (['replacement', 'attachments'].includes(tab) && !(await this.ensurePersisted())) {
+                this.myActiveTab = 'home';
+                return;
+            }
+
+            this.myActiveTab = tab;
+        },
         saveAbsence() {
+            const routeName = this.isPersisted ? 'absence.update' : 'absence.store';
+            const parameters = this.isPersisted ? { absence: this.form.id } : {};
+
             this.form
                 .transform(() => this.prepareForm())
-                .patch(route('absence.update', { absence: this.absence.id }));
+                [this.isPersisted ? 'patch' : 'post'](route(routeName, parameters));
         },
         checkAndSave() {
             this.form.workflow_status = 1;
@@ -477,7 +551,7 @@ export default {
         rejectAbsence() {
             if (!confirm('Willst du diesen Abwesenheitseintrag ablehnen und löschen?')) return;
 
-            this.$inertia.delete(route('absence.destroy', { absence: this.absence.id }), {
+            this.$inertia.delete(route('absence.destroy', { absence: this.form.id }), {
                 data: {
                     sendRejectionMail: true,
                     month: moment(this.form.from).format('M'),
@@ -488,7 +562,7 @@ export default {
         deleteAbsence() {
             if (!confirm('Willst du diese Abwesenheit wirklich unwiderruflich löschen?')) return;
 
-            this.$inertia.delete(route('absence.destroy', { absence: this.absence.id }), {
+            this.$inertia.delete(route('absence.destroy', { absence: this.form.id }), {
                 data: {
                     month: moment(this.form.from).format('M'),
                     year: moment(this.form.from).format('YYYY'),
@@ -497,6 +571,9 @@ export default {
         },
     },
     watch: {
+        activeTab(value) {
+            this.myActiveTab = value ?? 'home';
+        },
         setApproved(value) {
             if (!this.maySelfAdminister) return;
 
