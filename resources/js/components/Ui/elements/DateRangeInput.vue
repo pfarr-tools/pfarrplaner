@@ -38,6 +38,8 @@
             :model-value="internalRange"
             range
             multi-calendars
+            :inline="inline"
+            timezone="Europe/Berlin"
             :locale="dpLocale"
             :formats="{ input: 'dd.MM.yyyy' }"
             :enable-time-picker="false"
@@ -54,6 +56,7 @@
 import { VueDatePicker } from '@vuepic/vue-datepicker';
 import FormGroup from "../forms/FormGroup";
 import * as dateFnsLocales from 'date-fns/locale';
+import { formatPlannerDateForDisplay, plannerValueToPickerDate } from "../../../helpers/plannerDates";
 
 export default {
     name: "DateRangeInput",
@@ -68,6 +71,10 @@ export default {
         help: String,
         isCheckedItem: Boolean,
         disabled: Boolean,
+        inline: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     emits: ["update:modelValue", "input"],
@@ -90,23 +97,20 @@ export default {
 
     methods: {
         toDate(val) {
-            if (!val) return null;
-            const m = window.moment(val);
-            if (!m.isValid()) return null;
-            return new Date(Date.UTC(m.year(), m.month(), m.date()));
+            return plannerValueToPickerDate(val);
         },
 
         formatDisplay(dates) {
             if (!dates || !dates[0]) return '';
-            const from = window.moment(dates[0]).format('DD.MM.YYYY');
+            const from = formatPlannerDateForDisplay(dates[0]);
             if (!dates[1]) return from;
-            return `${from} – ${window.moment(dates[1]).format('DD.MM.YYYY')}`;
+            return `${from} – ${formatPlannerDateForDisplay(dates[1])}`;
         },
 
         onRangeChange(range) {
             if (!range || range.length < 2 || !range[1]) return;
-            const start = window.moment(range[0]).startOf('day');
-            const end = window.moment(range[1]).endOf('day');
+            const start = plannerValueToPickerDate(range[0]);
+            const end = plannerValueToPickerDate(range[1]);
             this.$emit('update:modelValue', [start, end]);
             this.$emit('input', [start, end]);
         },

@@ -35,6 +35,7 @@ use App\Models\Service;
 use App\Traits\HandlesAttachedImageTrait;
 use App\Traits\HandlesAttachmentsTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class SermonController extends Controller
@@ -52,6 +53,7 @@ class SermonController extends Controller
 
     public function editorByService(Service $service)
     {
+        Gate::authorize('update', $service);
         $sermon = $service->sermon;
         if ($sermon) {
             $services = $sermon->services;
@@ -63,6 +65,7 @@ class SermonController extends Controller
 
     public function editor(Sermon $sermon)
     {
+        $this->authorizeSermonUpdate($sermon);
         $services = $sermon->services;
         $service = $services->first();
         return Inertia::render('sermonEditor', compact('services', 'sermon', 'service'));
@@ -70,6 +73,7 @@ class SermonController extends Controller
 
     public function store(Request $request, Service $service)
     {
+        Gate::authorize('update', $service);
         $data = $this->validateRequest($request);
         $sermon = Sermon::create($data);
         $this->handleIndividualAttachment($request, $sermon, 'image');
@@ -82,6 +86,7 @@ class SermonController extends Controller
 
     public function update(Request $request, Sermon $sermon)
     {
+        $this->authorizeSermonUpdate($sermon);
         $data = $this->validateRequest($request);
         $sermon->update($data);
         $this->handleIndividualAttachment($request, $sermon, 'image');
@@ -90,6 +95,7 @@ class SermonController extends Controller
 
     public function uncouple(Request $request, Service $service)
     {
+        Gate::authorize('update', $service);
         if (null === $service->sermon) abort(404);
         /** @var Sermon $sermon */
         $sermon = $service->sermon;
@@ -105,11 +111,13 @@ class SermonController extends Controller
 
     public function reader(Sermon $sermon)
     {
+        $this->authorizeSermonUpdate($sermon);
         return Inertia::render('Sermon/Reader', compact('sermon'));
     }
 
     public function readerByService(Service $service)
     {
+        Gate::authorize('update', $service);
         if (!$service->sermon_id) abort(404);
         return $this->reader($service->sermon);
     }
@@ -144,5 +152,14 @@ class SermonController extends Controller
         );
         $data = $this->handleCheckBoxes($data, ['cc_license', 'permit_handouts']);
         return $data;
+    }
+
+    protected function authorizeSermonUpdate(Sermon $sermon): void
+    {
+        $sermon->loadMissing('services');
+        abort_if($sermon->services->isEmpty(), 403);
+        foreach ($sermon->services as $service) {
+            Gate::authorize('update', $service);
+        }
     }
 }

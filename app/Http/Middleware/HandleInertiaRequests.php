@@ -125,15 +125,21 @@ class HandleInertiaRequests extends Middleware
     private function resolveHelpPage(?string $routeName): string
     {
         if (!$routeName) {
-            return 'index';
+            return 'benutzerhandbuch';
         }
         foreach (config('manual', []) as $chapter => $prefixes) {
+            $manual = 'benutzerhandbuch';
+            if (is_array($prefixes) && isset($prefixes['prefixes'])) {
+                $manual = $prefixes['manual'] ?? $manual;
+                $prefixes = $prefixes['prefixes'];
+            }
+
             foreach ($prefixes as $prefix) {
                 if (str_starts_with($routeName, $prefix) || $routeName === $prefix) {
-                    return $chapter;
+                    return trim($manual.'/'.$chapter, '/');
                 }
             }
         }
-        return 'index';
+        return 'benutzerhandbuch';
     }
 }

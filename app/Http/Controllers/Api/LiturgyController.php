@@ -35,6 +35,7 @@ use App\Models\Liturgy\Item;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class LiturgyController extends \App\Http\Controllers\Controller
 {
@@ -50,13 +51,15 @@ class LiturgyController extends \App\Http\Controllers\Controller
      */
     public function saveTreeState(Request $request, Service $service)
     {
+        Gate::authorize('update', $service);
         foreach ($request->get('blocks') as $block) {
-            Block::find($block['id'])->update(['sortable' => $block['sortable']]);
+            $currentBlock = $service->liturgyBlocks()->findOrFail($block['id']);
+            $currentBlock->update(['sortable' => $block['sortable']]);
             foreach ($block['items'] as $item) {
-                Item::find($item['id'])->update(
+                $currentBlock->items()->findOrFail($item['id'])->update(
                     [
                         'sortable' => $item['sortable'],
-                        'liturgy_block_id' => $block['id'],
+                        'liturgy_block_id' => $currentBlock->id,
                     ]
                 );
             }
@@ -69,6 +72,8 @@ class LiturgyController extends \App\Http\Controllers\Controller
 
     public function importToTree(Request $request, Service $service, Service $source)
     {
+        Gate::authorize('update', $service);
+        Gate::authorize('update', $source);
         $ct = 0;
         foreach ($service->liturgyBlocks as $block) {
             $block->update(['sortable' => ++$ct]);
@@ -103,6 +108,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
      */
     public function storeBlock(Request $request, Service $service)
     {
+        Gate::authorize('update', $service);
         $data = $this->validateBlockRequest($request);
         $data['service_id'] = $service->id;
         $data['sortable'] = count($service->liturgyBlocks);
@@ -118,6 +124,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
      */
     public function updateBlock(Request $request, Block $block)
     {
+        Gate::authorize('update', $block->service);
         $block->update($this->validateBlockRequest($request));
         return response()->json($block);
     }
@@ -129,6 +136,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
      */
     public function destroyBlock(Block $block)
     {
+        Gate::authorize('update', $block->service);
         $block->delete();
         return response()->json();
     }
@@ -141,6 +149,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
      */
     public function storeItem(Request $request, Block $block)
     {
+        Gate::authorize('update', $block->service);
         $data = $this->validateItemRequest($request);
         $data['liturgy_block_id'] = $block->id;
         $data['sortable'] = count($block->items);
@@ -171,6 +180,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
      */
     public function assignToItem(Request $request, Item $item)
     {
+        Gate::authorize('update', $item->liturgyBlock->service);
         $data = $item->data;
         $data['responsible'] = $request->all();
         unset($data['responsible']['api_token']);
@@ -187,6 +197,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
      */
     public function updateItem(Request $request, Item $item)
     {
+        Gate::authorize('update', $item->liturgyBlock->service);
         $data = $this->validateItemRequest($request);
         $item->update($data);
         $item->data = $data['data'];
@@ -197,6 +208,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
 
     public function destroyItem(Item $item)
     {
+        Gate::authorize('update', $item->liturgyBlock->service);
         $item->delete();
         return response()->json();
     }
@@ -209,6 +221,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
      */
     public function sources(Service $service)
     {
+        Gate::authorize('update', $service);
         $serviceGroups = [
             Service::setEagerLoads([])->with(['location'])
                 ->select(['id', 'title', 'date', 'location_id'])

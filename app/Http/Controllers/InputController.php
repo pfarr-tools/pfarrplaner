@@ -32,6 +32,7 @@ namespace App\Http\Controllers;
 
 use App\Inputs\AbstractInput;
 use App\Inputs\Inputs;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
@@ -76,16 +77,13 @@ class InputController extends Controller
      */
     protected function getInputClass($input): AbstractInput
     {
-        $inputClass = 'App\\Inputs\\' . ucfirst($input) . 'Input';
-        if (class_exists($inputClass)) {
-            $input = new $inputClass();
-            if (!$input->canEdit()) {
-                return redirect()->back();
-            }
-            return $input;
-        } else {
-            return redirect()->back();
+        try {
+            $input = Inputs::get($input);
+        } catch (Exception $exception) {
+            abort(404);
         }
+        abort_unless($input->canEdit(), 403);
+        return $input;
     }
 
     /**

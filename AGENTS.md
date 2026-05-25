@@ -77,6 +77,8 @@ Controllers have subdirectories for `Api/`, `Auth/`, `Extranet/`.
 - Component slot pattern: `@component('components.ui.card') @slot('cardHeader') ... @endslot @endcomponent`
 - Blade includes registered as aliases in `AppServiceProvider` via `Blade::include()`
 - Inertia.js used for all interactive views; traditional Blade for emails and print layouts
+- `window.moment` in the frontend is `dayjs` with the `utc` plugin, not Moment Timezone
+- Any user-facing date/time output in frontend, generated files, exports, emails, PDFs, and similar surfaces must be rendered in `Europe/Berlin`
 
 ## File Headers
 
@@ -139,6 +141,7 @@ build: Mix toolchain auf v6 aktualisiert
 - Never commit or push unless I specifically ask you to.
 - When changing models, migrations, fillable/cast fields, personal data fields, attachments, calendar integrations, seating bookings, rites, user/profile data, or demo-login behavior, check whether `app/Console/Commands/DevBuilder/DemoBuilder.php` must be updated so the online demo remains buildable and safely anonymized.
 - If a change introduces new user-facing or personally identifying data, either extend the DemoBuilder anonymization/deletion logic in the same change or explicitly document why no DemoBuilder update is needed.
+- All dates and times stored in the database must be UTC.
 
 ## Releases
 - None of Codex will be done in the main branch. Usually in Codex-testing, occasionally in a dedicated feature branch.
@@ -147,20 +150,33 @@ build: Mix toolchain auf v6 aktualisiert
 - After the release is done, push the main branch to origin.
 - Go back to the Codex-testing branch and continue working there.
 
-## End-user documentation
-- Every change to the code must be reflected in the full end-user manual for Pfarrplaner, covering everything. 
+## Documentation
+- Every code change must be checked against all Pfarrplaner manuals and reflected there whenever the change affects documented behavior, configuration, operation, interfaces, or administrator/developer knowledge.
+- This documentation duty does not apply to fixes that only restore already expected and already documented behavior without changing workflows, requirements, configuration, or interfaces.
+- Maintain three separate manuals with the same overall quality standard and chapter-based Markdown/PDF workflow:
+  - End-user manual
+  - Administrator's manual
+  - Technical manual including the full API documentation
+- All manuals should exist as `.md` files in suitable folders and be published as separate manuals/PDFs on the handbook site.
+- Each manual needs links to its own index and table of contents.
+- Each manual needs a build step that produces a downloadable PDF with table of contents and index where appropriate.
+- Where useful, add or update Dusk screenshot coverage that prepares the right screen state and saves screenshots into the documentation assets.
+- All German handbook text must use correct German umlauts and `ß` in normal prose. Do not replace them with `ae`, `oe`, `ue` or `ss`, except inside technical literals such as filenames, URLs, code, CLI options, or identifiers that must stay ASCII.
+
+### End-user manual
 - The end-user manual must stay focused on user-visible behavior. Do not document technical implementation details, bugfix internals, data formats, or similar developer-facing information unless they directly change what users see or do.
 - When essential new user-visible features or major workflow improvements are added, also review `/was-ist-der-pfarrplaner` and update the page if the public-facing product description, screenshots, feature overview, or handbook link placement should change.
-- The manual should exist in a series of .md files in a suitable folder. 
-- The app layout needs to include a help button on every page (somewhere  
-  on the right side of the Top Nav), opening the appropriate manual page in a separate tab. 
-- There need to be links to an index and a table of contents. 
-- There needs to be a build step compiling the manual into a downloadable PDF  
-  with TOC and index.
+- The app layout needs to include a help button on every page (somewhere on the right side of the Top Nav), opening the appropriate manual page in a separate tab.
 - Documentation needs to explain each screen to the fullest, covering every UI element relevant to the user.
-- The documentation also needs to be structured into chapters arranged by useful topic, guiding a novice user into the app. 
-- Installation, maintenance, technical docs are not part of this documentation at this point.
-- Where it seems useful to include screenshots in the documentation, provide a separate set of dusk tests setting   
-  up the desired situation and saving a screenshot to the docs folder.
-- Documentation must be entirely in German, using simple, non-technical language an average user in a church office
-  can understand. Correct German umlauts must be used.                      
+- The documentation needs to be structured into chapters arranged by useful topic, guiding a novice user into the app.
+- Documentation must be entirely in German, using simple, non-technical language an average user in a church office can understand. Correct German umlauts must be used.
+
+### Administrator's manual
+- The administrator's manual must cover installation, updates, hosting requirements, security-relevant settings, operations, backups, cron/queue setup, troubleshooting, and all administrator-facing workflows.
+- It must describe each supported installation and update path in full, including prerequisite software, server setup, and required runtime dependencies.
+- It must stay focused on what an administrator needs to run and maintain Pfarrplaner safely in practice, in clear German.
+
+### Technical manual
+- The technical manual must cover architecture, domain concepts, development-relevant configuration, deployment internals, background jobs, storage, integrations, and extension points as needed for technical operators and developers.
+- It must include and keep current a full API documentation covering authentication, endpoints, payloads, permissions, and relevant examples.
+- Technical documentation may include implementation details where they are necessary for developers or operators.

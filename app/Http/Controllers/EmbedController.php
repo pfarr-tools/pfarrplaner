@@ -46,6 +46,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 /**
@@ -58,6 +59,7 @@ class EmbedController extends Controller
     public function __construct()
     {
         $this->middleware('cors');
+        $this->middleware('auth')->only('embedUserVacations');
     }
 
 
@@ -140,6 +142,7 @@ class EmbedController extends Controller
      */
     public function embedUserVacations(Request $request, User $user)
     {
+        abort_unless($request->user()->can('editAbsences', $user), 403);
         $start = Carbon::now();
         $end = (clone $start)->addWeek(2);
         //$vacations = Vacations::getByPeriodAndUser($start, $end, $user);

@@ -181,6 +181,6 @@
         @endif
     </td>
     <td valign="top" style="vertical-align:top;">
-        @if (is_array($event)) @if(isset($event['place'])){{ $event['place'] }} @else @dd ($event) @endif @else {{ $event->locationText() }}@endif
+        @if (is_array($event)){{ $event['place'] ?? '' }}@else {{ $event->locationText() }}@endif
     </td>
 </tr>

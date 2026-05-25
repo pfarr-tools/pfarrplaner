@@ -205,10 +205,6 @@
 
 
             <tab v-if="form.user.needs_replacement" id="replacement" :active-tab="myActiveTab">
-                <div v-if="!isPersisted" class="alert alert-info mt-3">
-                    Pfarrplaner speichert diesen Entwurf zuerst, bevor Vertretungen bearbeitet werden können.
-                </div>
-
                 <fake-table :columns="[3,2,4,1]"
                             :headers="['Vertreter:in', 'oder: Pool', 'Zeitraum', '']"
                             collapsed-header="Vertreten durch"
@@ -280,17 +276,11 @@
 
                 <hr/>
 
-                <div v-if="!isPersisted" class="alert alert-info">
-                    Dateien können hinzugefügt werden, sobald der Abwesenheitseintrag einmal gespeichert wurde.
-                </div>
+                <h3>Dateien hinzufügen.</h3>
 
-                <template v-else>
-                    <h3>Dateien hinzufügen.</h3>
-
-                    <form-file-uploader :parent="form" :no-pixabay="true"
-                                        :upload-route="route('absence.attach', form.id)"
-                                        v-model="form.attachments"/>
-                </template>
+                <form-file-uploader :parent="form" :no-pixabay="true"
+                                    :upload-route="route('absence.attach', form.id)"
+                                    v-model="form.attachments"/>
             </tab>
 
         </tabs>
@@ -304,7 +294,6 @@ import {clone} from "lodash";
 import FormTextarea from "../../components/Ui/forms/FormTextarea.vue";
 import CheckedProcessItem from "../../components/Ui/elements/CheckedProcessItem.vue";
 import NavButton from "../../components/Ui/buttons/NavButton.vue";
-import SaveButton from "../../components/Ui/buttons/SaveButton.vue";
 import TabHeaders from "../../components/Ui/tabHeaders.vue";
 import TabHeader from "../../components/Ui/tabs/tabHeader.vue";
 import Tabs from "../../components/Ui/tabs/tabs.vue";
@@ -317,6 +306,8 @@ import PeopleSelect from "../../components/Ui/elements/PeopleSelect.vue";
 import FormSelectize from "../../components/Ui/forms/FormSelectize.vue";
 import AttachmentList from "../../components/Ui/elements/AttachmentList.vue";
 import FormFileUploader from "../../components/Ui/forms/FormFileUploader.vue";
+import SaveButton from "../../components/Ui/buttons/SaveButton.vue";
+import { serializePlannerDateToUtc } from "../../helpers/plannerDates";
 
 export default {
     name: "AbsenceEditor",
@@ -334,11 +325,11 @@ export default {
         Tabs,
         TabHeader,
         TabHeaders,
-        SaveButton,
         NavButton,
         CheckedProcessItem,
         FormTextarea,
         DateRangeInput,
+        SaveButton,
     },
 
     props: [
@@ -417,8 +408,8 @@ export default {
                 return [this.form.from, this.form.to];
             },
             set([from, to]) {
-                this.form.from = from ? moment(from).toISOString() : null;
-                this.form.to = to ? moment(to).toISOString() : null;
+                this.form.from = from ? this.serializePlannerDate(from) : null;
+                this.form.to = to ? this.serializePlannerDate(to, true) : null;
             }
         },
 
@@ -428,6 +419,9 @@ export default {
     },
 
     methods: {
+        serializePlannerDate(value, endOfDay = false) {
+            return serializePlannerDateToUtc(value, { endOfDay });
+        },
         needsCheckText(users, action) {
             if (!users || !users.length) {
                 return `Dieser Antrag muss noch ${action} werden.`;
@@ -437,15 +431,6 @@ export default {
         },
 
         addReplacement() {
-            if (!this.isPersisted) {
-                this.ensurePersisted().then((saved) => {
-                    if (saved) {
-                        this.addReplacement();
-                    }
-                });
-                return;
-            }
-
             this.form.replacements.push({
                 users: [],
                 pool_id: null,
@@ -460,10 +445,13 @@ export default {
         prepareForm() {
             let record = clone(this.form);
 
+            record.from = this.serializePlannerDate(record.from);
+            record.to = this.serializePlannerDate(record.to, true);
+
             record.replacements = record.replacements.map(r => ({
                 ...r,
-                from: r.range?.[0] ? moment(r.range[0]).toISOString() : null,
-                to: r.range?.[1] ? moment(r.range[1]).toISOString() : null,
+                from: r.range?.[0] ? this.serializePlannerDate(r.range[0]) : null,
+                to: r.range?.[1] ? this.serializePlannerDate(r.range[1], true) : null,
             }));
 
             if (this.maySelfAdminister) {
@@ -479,53 +467,7 @@ export default {
             return record;
         },
 
-        syncPersistedAbsence(payload) {
-            Object.keys(payload).forEach((key) => {
-                this.form[key] = payload[key];
-            });
-            this.form.replacements = payload.replacements ?? [];
-            this.form.attachments = payload.attachments ?? [];
-        },
-        async persistWithoutRedirect() {
-            const record = {
-                ...this.prepareForm(),
-                noRedirect: true,
-            };
-
-            const request = this.isPersisted
-                ? this.$api().patch(route('absence.update', { absence: this.form.id }), record)
-                : this.$api().post(route('absence.store'), record);
-
-            try {
-                const response = await request;
-                if (response.data?.absence) {
-                    this.syncPersistedAbsence(response.data.absence);
-                }
-                if (response.data?.editUrl) {
-                    window.history.replaceState(window.history.state, '', response.data.editUrl);
-                }
-                this.form.clearErrors();
-                return true;
-            } catch (error) {
-                if (error.response?.status === 422 && error.response?.data?.errors) {
-                    this.form.setError(error.response.data.errors);
-                }
-                return false;
-            }
-        },
-        async ensurePersisted() {
-            if (this.isPersisted) {
-                return true;
-            }
-
-            return await this.persistWithoutRedirect();
-        },
-        async switchTab(tab) {
-            if (['replacement', 'attachments'].includes(tab) && !(await this.ensurePersisted())) {
-                this.myActiveTab = 'home';
-                return;
-            }
-
+        switchTab(tab) {
             this.myActiveTab = tab;
         },
         saveAbsence() {

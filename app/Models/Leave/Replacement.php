@@ -31,6 +31,7 @@
 namespace App\Models\Leave;
 
 use App\Models\AbstractModel;
+use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
 use App\Tools\StringTool;
 use Carbon\Carbon;
@@ -116,11 +117,7 @@ class Replacement extends AbstractModel
             if ($this->pool->contact) {
                 $texts[] = $this->pool->contact.($this->pool->office ? ', '.$this->pool->office : '').' [Kontakt für Pool "'.$this->pool->name.'"]';
             } else {
-                $poolmasters = Poolmaster::with('user')
-                    ->where('pool_id', $this->pool_id)
-                    ->where('start', '<=', $this->to)
-                    ->where('end', '>=', $this->from)
-                    ->get();
+                $poolmasters = $this->relevantPoolmasters();
                 foreach ($poolmasters as $poolmaster) {
                     $from = max(Carbon::parse($poolmaster->start)->startOfDay(), $this->from);
                     $to = min(Carbon::parse($poolmaster->end)->endOfDay(), $this->to);
@@ -161,11 +158,7 @@ class Replacement extends AbstractModel
                 'poolmaster' => $this->pool->name,
             ];
         } else {
-            $poolmasters = Poolmaster::with('user')
-                ->where('pool_id', $this->pool_id)
-                ->where('start', '<=', $this->to)
-                ->where('end', '>=', $this->from)
-                ->get();
+            $poolmasters = $this->relevantPoolmasters();
             foreach ($poolmasters as $poolmaster) {
                 $from = max(Carbon::parse($poolmaster->start)->startOfDay(), $this->from);
                 $to = min(Carbon::parse($poolmaster->end)->endOfDay(), $this->to);
@@ -184,5 +177,60 @@ class Replacement extends AbstractModel
 
         ksort($users);
         return $users;
+    }
+
+    /**
+     * @param mixed $value
+     * @return void
+     */
+    public function setFromAttribute($value): void
+    {
+        $this->attributes['from'] = $this->normalizeDateAttribute($value, false);
+    }
+
+    /**
+     * @param mixed $value
+     * @return void
+     */
+    public function setToAttribute($value): void
+    {
+        $this->attributes['to'] = $this->normalizeDateAttribute($value, true);
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, Poolmaster>
+     */
+    protected function relevantPoolmasters()
+    {
+        $absentUserId = null;
+        if ($this->relationLoaded('absence')) {
+            $absentUserId = $this->getRelation('absence')?->user_id;
+        } elseif ($this->absence_id) {
+            $absentUserId = Absence::query()
+                ->whereKey($this->absence_id)
+                ->value('user_id');
+        }
+
+        return Poolmaster::with('user', 'pool')
+            ->where('pool_id', $this->pool_id)
+            ->where('start', '<=', $this->to)
+            ->where('end', '>=', $this->from)
+            ->when($absentUserId, function ($query) use ($absentUserId) {
+                $query->where('user_id', '!=', $absentUserId);
+            })
+            ->get();
+    }
+
+    /**
+     * @param mixed $value
+     * @return string|null
+     */
+    protected function normalizeDateAttribute($value, bool $endOfDay = false): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+
+        return Carbon::parse($value)->setTimezone('Europe/Berlin')->toDateString();
     }
 }

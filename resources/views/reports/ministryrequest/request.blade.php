@@ -3,7 +3,7 @@
 @section('title', 'Dienstanfrage')
 
 @section('content')
-    <form method="post" action="{{ route('ministry.request.fill', compact('ministry', 'user', 'sender')) }}">
+    <form method="post" action="{{ route('ministry.request.fill', ['ministry' => $ministry, 'user' => $user, 'services' => $services->pluck('id')->join(','), 'sender' => $sender] + request()->query()) }}">
         @csrf
         @component('components.ui.card')
             @slot('cardHeader')

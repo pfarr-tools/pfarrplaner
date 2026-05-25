@@ -68,8 +68,8 @@
                                         <td style="text-align: right">
                                             <inertia-link class="btn btn-sm btn-primary mt-md-2" v-if="canEdit(row)"
                                                           :href="route('user.edit', {user: row.id})"><span class="mdi mdi-pencil"></span></inertia-link>
-                                            <a class="btn btn-sm btn-light mt-md-2" v-if="canEdit(row)"
-                                               :href="route('user.switch', {user: row.id})"><span class="mdi mdi-account-switch"></span></a>
+                                            <button type="button" class="btn btn-sm btn-light mt-md-2" v-if="canEdit(row)"
+                                                    @click="$inertia.post(route('user.switch', {user: row.id}))"><span class="mdi mdi-account-switch"></span></button>
                                             <nav-button type="light" icon="mdi mdi-lock-reset" title="Passwort zurücksetzen"
                                                         class="btn-sm mt-md-2" v-if="canEdit(row)"
                                                         force-icon force-no-text @click="resetPassword(row)"/>

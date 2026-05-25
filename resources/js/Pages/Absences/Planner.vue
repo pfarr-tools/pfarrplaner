@@ -123,22 +123,23 @@
                                             <div class="planner-user-label">{{ formatUserName(user) }}</div>
                                         </div>
                                         <div v-if="user.canEdit" class="btn-group btn-group-sm planner-user-actions" role="group">
-                                            <inertia-link
-                                                v-if="user.canEdit"
+                                            <button
+                                                type="button"
                                                 class="btn btn-success me-1"
-                                                title="Neuen Urlaubseintrag hinzufügen"
-                                                :href="route('absence.create', { year: year, month: month, user: user.id })"
+                                                title="Neue Abwesenheit anlegen"
+                                                @click.prevent="openAbsenceCreateModal(user)"
                                             >
                                                 <span class="mdi mdi-briefcase-plus"></span>
-                                            </inertia-link>
-                                            <inertia-link
-                                                v-if="user.canEdit && pools.length > 0"
+                                            </button>
+                                            <button
+                                                v-if="availablePools(user).length > 0"
+                                                type="button"
                                                 class="btn btn-primary"
-                                                title="Poolmaster:in werden"
-                                                :href="route('admin.poolmasters.create', { user: user.id, year, month })"
+                                                title="Poolmaster:in anlegen"
+                                                @click.prevent="openPoolmasterCreateModal(user)"
                                             >
                                                 <span class="mdi mdi-account-tie"></span>
-                                            </inertia-link>
+                                            </button>
                                         </div>
                                     </div>
                                 </th>
@@ -194,6 +195,60 @@
             </card-body>
         </card>
         </div>
+
+        <modal
+            v-if="activeAbsenceCreateUser"
+            title="Neue Abwesenheit anlegen"
+            close-button-label="Anlegen"
+            cancel-button-label="Abbrechen"
+            max-width="54rem"
+            @close="createAbsenceForRange(activeAbsenceCreateUser)"
+            @cancel="closeCreateModals"
+        >
+            <p class="mb-3">
+                Neue Abwesenheit für <strong>{{ formatUserName(activeAbsenceCreateUser) }}</strong>
+            </p>
+            <date-range-input
+                label="Zeitraum"
+                inline
+                :model-value="draftAbsenceRange(activeAbsenceCreateUser)"
+                @update:model-value="setDraftAbsenceRange(activeAbsenceCreateUser, $event)"
+            />
+        </modal>
+
+        <modal
+            v-if="activePoolmasterCreateUser"
+            title="Poolmaster:in anlegen"
+            close-button-label="Anlegen"
+            cancel-button-label="Abbrechen"
+            max-width="54rem"
+            @close="createPoolmasterForRange(activePoolmasterCreateUser)"
+            @cancel="closeCreateModals"
+        >
+            <p class="mb-3">
+                Neuen Poolmaster-Einsatz für <strong>{{ formatUserName(activePoolmasterCreateUser) }}</strong>
+            </p>
+            <label class="form-label">Pool</label>
+            <select
+                class="form-select mb-3"
+                :value="selectedPoolId(activePoolmasterCreateUser)"
+                @change="setSelectedPoolId(activePoolmasterCreateUser, $event.target.value)"
+            >
+                <option
+                    v-for="pool in availablePools(activePoolmasterCreateUser)"
+                    :key="pool.id"
+                    :value="pool.id"
+                >
+                    {{ pool.name }}
+                </option>
+            </select>
+            <date-range-input
+                label="Zeitraum"
+                inline
+                :model-value="draftPoolmasterRange(activePoolmasterCreateUser)"
+                @update:model-value="setDraftPoolmasterRange(activePoolmasterCreateUser, $event)"
+            />
+        </modal>
     </admin-layout>
 </template>
 
@@ -202,10 +257,13 @@ import { DateTime } from 'luxon';
 import AbsenceNav from "./AbsenceNav";
 import Card from "../../components/Ui/cards/card";
 import CardBody from "../../components/Ui/cards/cardBody";
+import DateRangeInput from "../../components/Ui/elements/DateRangeInput.vue";
+import Modal from "../../components/Ui/modals/Modal.vue";
+import { serializePlannerDateToBerlinDateString, serializePlannerDateToUtc } from "../../helpers/plannerDates";
 
 export default {
     name: "Planner",
-    components: {AbsenceNav, Card, CardBody},
+    components: {AbsenceNav, Card, CardBody, DateRangeInput, Modal},
     props: ['start', 'end', 'year', 'month', 'months', 'years', 'now', 'holidays', 'days', 'sectionConfig', 'pinList', 'pools'],
     mounted() {
         this.loadPlanner();
@@ -227,6 +285,11 @@ export default {
             pinnedUsers: this.pinList || [],
             toggleableUsers: [],
             isPastor: this.$page.props.currentUser.data.isPastor,
+            draftAbsenceRanges: {},
+            draftPoolmasterRanges: {},
+            selectedPoolIds: {},
+            activeAbsenceCreateUserId: null,
+            activePoolmasterCreateUserId: null,
         }
     },
     computed: {
@@ -258,6 +321,12 @@ export default {
         },
         activeToggleableUsersCount() {
             return this.plannerVisibilityUsers.filter(user => user.pinned).length;
+        },
+        activeAbsenceCreateUser() {
+            return this.findUserById(this.activeAbsenceCreateUserId);
+        },
+        activePoolmasterCreateUser() {
+            return this.findUserById(this.activePoolmasterCreateUserId);
         },
     },
     methods: {
@@ -293,6 +362,104 @@ export default {
                 ...(sectionConfig || {}),
             };
         },
+        defaultPlannerRange() {
+            const firstDay = this.calendarDays[0]?.date ?? this.start;
+            const fallback = this.plannerDateTime(firstDay);
+
+            return fallback ? [fallback.toJSDate(), fallback.toJSDate()] : [];
+        },
+        availablePools(user) {
+            return user?.pools ?? [];
+        },
+        findUserById(userId) {
+            if (!userId) return null;
+
+            return Object.values(this.users)
+                .flat()
+                .find(user => Number(user.id) === Number(userId)) || null;
+        },
+        closeCreateModals() {
+            this.activeAbsenceCreateUserId = null;
+            this.activePoolmasterCreateUserId = null;
+        },
+        openAbsenceCreateModal(user) {
+            this.draftAbsenceRange(user);
+            this.activePoolmasterCreateUserId = null;
+            this.activeAbsenceCreateUserId = user.id;
+        },
+        openPoolmasterCreateModal(user) {
+            this.draftPoolmasterRange(user);
+            this.selectedPoolId(user);
+            this.activeAbsenceCreateUserId = null;
+            this.activePoolmasterCreateUserId = user.id;
+        },
+        draftAbsenceRange(user) {
+            if (!this.draftAbsenceRanges[user.id]) {
+                this.draftAbsenceRanges[user.id] = this.defaultPlannerRange();
+            }
+
+            return this.draftAbsenceRanges[user.id];
+        },
+        setDraftAbsenceRange(user, range) {
+            this.draftAbsenceRanges[user.id] = range;
+        },
+        draftPoolmasterRange(user) {
+            if (!this.draftPoolmasterRanges[user.id]) {
+                this.draftPoolmasterRanges[user.id] = this.defaultPlannerRange();
+            }
+
+            return this.draftPoolmasterRanges[user.id];
+        },
+        setDraftPoolmasterRange(user, range) {
+            this.draftPoolmasterRanges[user.id] = range;
+        },
+        selectedPoolId(user) {
+            if (!this.selectedPoolIds[user.id]) {
+                this.selectedPoolIds[user.id] = this.availablePools(user)[0]?.id ?? '';
+            }
+
+            return this.selectedPoolIds[user.id];
+        },
+        setSelectedPoolId(user, poolId) {
+            this.selectedPoolIds[user.id] = Number(poolId);
+        },
+        createAbsencePayload(user, from, to) {
+            return {
+                user_id: user.id,
+                reason: 'Urlaub',
+                from: serializePlannerDateToUtc(from),
+                to: serializePlannerDateToUtc(to, { endOfDay: true }),
+            };
+        },
+        submitNewAbsence(user, from, to) {
+            this.$inertia.post(route('absence.store'), this.createAbsencePayload(user, from, to));
+        },
+        createAbsenceForRange(user) {
+            const range = this.draftAbsenceRange(user);
+            if (!range?.[0] || !range?.[1]) return;
+
+            this.closeCreateModals();
+            this.submitNewAbsence(user, range[0], range[1]);
+        },
+        createPoolmasterForRange(user) {
+            const range = this.draftPoolmasterRange(user);
+            const poolId = this.selectedPoolId(user);
+            if (!range?.[0] || !range?.[1] || !poolId) return;
+
+            this.$inertia.post(route('admin.poolmasters.store'), {
+                user_id: user.id,
+                pool_id: poolId,
+                start: serializePlannerDateToBerlinDateString(range[0]),
+                end: serializePlannerDateToBerlinDateString(range[1]),
+            }, {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    this.closeCreateModals();
+                    this.reloadUserDays(user);
+                },
+            });
+        },
         async loadPlanner() {
             const response = await axios.get(route('planner.users'));
             const users = this.sortUsers(response.data);
@@ -300,15 +467,20 @@ export default {
             this.loadingUsers = false;
 
             response.data.forEach(user => {
-                this.loadingUserDays[user.id] = true;
-                axios.get(route('planner.days', {user: user.id, date: this.formatPlannerDate(this.start, 'yyyy-MM')}))
-                    .then(userResponse => {
-                        this.userDays[user.id] = userResponse.data;
-                    })
-                    .finally(() => {
-                        delete this.loadingUserDays[user.id];
-                    });
+                this.reloadUserDays(user);
             });
+        },
+        reloadUserDays(user) {
+            if (!user?.id) return;
+
+            this.loadingUserDays[user.id] = true;
+            axios.get(route('planner.days', {user: user.id, date: this.formatPlannerDate(this.start, 'yyyy-MM')}))
+                .then(userResponse => {
+                    this.userDays[user.id] = userResponse.data;
+                })
+                .finally(() => {
+                    delete this.loadingUserDays[user.id];
+                });
         },
         formatUserName(user) {
             if (user.first_name && user.last_name) {
@@ -424,12 +596,7 @@ export default {
 
             if (!this.canCreateAbsenceOnDay(user, day)) return;
 
-            this.$inertia.visit(route('absence.create', {
-                year: this.year,
-                month: this.month,
-                day: day.day,
-                user: user.id
-            }));
+            this.submitNewAbsence(user, day.date, day.date);
         },
         absenceClass(user, day) {
             const absence = this.userDays[user.id][day.day].absence;

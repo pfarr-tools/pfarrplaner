@@ -57,6 +57,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
@@ -73,7 +74,7 @@ class ServiceController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth')->except(['createQR', 'publicLiturgy']);
+        $this->middleware('auth')->except(['publicLiturgy']);
         ServicesOnlyScope::deactivate();
     }
 
@@ -110,12 +111,14 @@ class ServiceController extends Controller
 
     public function create(City $city, $date = null)
     {
+        Gate::authorize('create', Service::class);
         $service = Service::create($this->presetDataForNewService($date, $city));
         return redirect()->route('service.edit', $service->slug);
     }
 
     public function createEvent($filter, $date = null)
     {
+        Gate::authorize('create', Service::class);
         $localCalendar = LocalEventCalendarFactory::get($filter);
         $service = Service::create($localCalendar->presetData($this->presetDataForNewService($date, null)));
         return redirect()->route('service.edit', $service->slug);
@@ -131,6 +134,7 @@ class ServiceController extends Controller
      */
     public function edit(Request $request, Service $service, $tab = 'home')
     {
+        Gate::authorize('update', $service);
         $tab = $request->get('tab', 'home');
         $service->load(
             ['attachments', 'comments', 'bookings', 'liturgyBlocks', 'tags', 'serviceGroups', 'relatedCities', 'adConfigs']
@@ -263,6 +267,7 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
+        Gate::authorize('delete', $service);
         $date = $service->date->format('Y-m');
 
         // emit event so that integrations may react to impending delete
@@ -280,6 +285,7 @@ class ServiceController extends Controller
      */
     public function add($date, City $city)
     {
+        Gate::authorize('create', Service::class);
         $day = Day::find($date);
 
         $data = [
@@ -376,6 +382,7 @@ class ServiceController extends Controller
      */
     public function attach(Request $request, Service $service)
     {
+        Gate::authorize('update', $service);
         $this->handleAttachments($request, $service);
         return response()->json($service->attachments);
     }
@@ -389,6 +396,8 @@ class ServiceController extends Controller
      */
     public function detach(Request $request, Service $service, Attachment $attachment)
     {
+        Gate::authorize('update', $service);
+        $attachment = $service->attachments()->findOrFail($attachment->id);
         Storage::delete($attachment->file);
         $service->attachments()->where('id', $attachment->id)->delete();
         $attachment->delete();
@@ -431,6 +440,7 @@ class ServiceController extends Controller
         }
         $service = $serviceQuery->first();
         if (!$service) return response()->json(null);
+        Gate::authorize('view', $service);
         if ($request->has('append')) $service->setAppends($appends);
         foreach ($load as $l) $service->load($l);
 
@@ -446,6 +456,7 @@ class ServiceController extends Controller
      */
     public function setSermon(Request $request, Service $service)
     {
+        Gate::authorize('update', $service);
         $data = $request->validate(['sermon_id' => 'int|nullable|exists:sermons,id']);
         $service->update(['sermon_id' => $data['sermon_id']]);
         return response()->json($service);
@@ -453,6 +464,7 @@ class ServiceController extends Controller
 
     public function createQR(Request $request, Service $service)
     {
+        Gate::authorize('update', $service);
         if (!$service->city->konfiapp_apikey) abort(404);
 
         $type = $request->validate(['type' => 'nullable|int'])['type'] ?? $service->city->konfiapp_default_type ?? null;;

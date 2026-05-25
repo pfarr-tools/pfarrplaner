@@ -1,5 +1,5 @@
 /**
- * Publish the manual source into a dedicated Git repository.
+ * Publish the handbook source into a dedicated Git repository.
  *
  * This intentionally is not part of the release script. It overwrites the
  * target repository content with the current manual source when run manually.
@@ -13,6 +13,7 @@ const ROOT = path.resolve(__dirname, '..');
 const TARGET_DIR = path.join(ROOT, 'build/manual-repository');
 const REMOTE = process.env.MANUAL_SOURCE_REMOTE || 'ssh://git@codeberg.org/pfarr.tools/pfarrplaner-manual.git';
 const BRANCH = process.env.MANUAL_SOURCE_BRANCH || 'main';
+const SOURCE_DIRECTORIES = ['manual'];
 
 function run(command, args, options = {}) {
     return new Promise((resolve, reject) => {
@@ -56,35 +57,19 @@ function copyDirectory(source, target) {
     fs.rmSync(TARGET_DIR, { recursive: true, force: true });
     fs.mkdirSync(TARGET_DIR, { recursive: true });
 
-    copyDirectory(path.join(ROOT, 'manual'), path.join(TARGET_DIR, 'manual'));
+    for (const directory of SOURCE_DIRECTORIES) {
+        copyDirectory(path.join(ROOT, directory), path.join(TARGET_DIR, directory));
+    }
     fs.copyFileSync(path.join(ROOT, 'requirements-manual.txt'), path.join(TARGET_DIR, 'requirements-manual.txt'));
-    fs.writeFileSync(path.join(TARGET_DIR, 'mkdocs.yml'), [
-        'site_name: Pfarrplaner Benutzerhandbuch',
-        'site_url: https://handbuch.pfarrplaner.de/',
-        'docs_dir: manual',
-        'site_dir: site',
-        'theme:',
-        '  name: material',
-        '  language: de',
-        '  logo: media/site/pfarrplaner.svg',
-        '  favicon: media/site/favicon.ico',
-        '  features:',
-        '    - navigation.footer',
-        '    - navigation.top',
-        'plugins:',
-        '  - search',
-        '',
-    ].join('\n'));
 
     fs.writeFileSync(path.join(TARGET_DIR, 'README.md'), [
-        '# Pfarrplaner-Handbuch',
+        '# Pfarrplaner-Handbuecher',
         '',
-        'Dieses Repository enthält die Quellen des Pfarrplaner-Benutzerhandbuchs.',
+        'Dieses Repository enthaelt die Quellen des Pfarrplaner-Benutzerhandbuchs,',
+        'des Administratorhandbuchs und des technischen Handbuchs.',
         '',
-        '```sh',
-        'python3 -m pip install -r requirements-manual.txt',
-        'mkdocs build',
-        '```',
+        'Die eigentlichen Build-Skripte liegen im Hauptrepository von Pfarrplaner.',
+        'Fuer den lokalen Build werden ausserdem die dortigen Node-Skripte benoetigt.',
         '',
     ].join('\n'));
 

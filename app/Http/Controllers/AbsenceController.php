@@ -97,9 +97,36 @@ class AbsenceController extends Controller
      *
      * @return Response
      */
-    public function create($year, $month, User $user, $day = 1)
+    public function create(Request $request, $year, $month, User $user, $day = 1)
     {
-        return $this->renderEditor($this->makeDraftAbsence($year, $month, $user, $day), request());
+        $absence = new Absence([
+            'user_id' => $user->id,
+            'workflow_status' => Absence::STATUS_NEW,
+        ]);
+        $absence->setRelation('user', $user);
+
+        Gate::authorize('create', $absence);
+
+        [$from, $to] = $this->resolveCreateRange($request, (int)$year, (int)$month, (int)$day);
+        $workflowStatus = Absence::STATUS_NEW;
+        if ((Auth::user()->id == $user->id) && Auth::user()->can('selfAdminister', $absence)) {
+            $workflowStatus = Absence::STATUS_SELF_ADMINISTERED;
+        }
+
+        $absence = Absence::create([
+            'user_id' => $user->id,
+            'reason' => 'Urlaub',
+            'from' => $from,
+            'to' => $to,
+            'workflow_status' => $workflowStatus,
+            'sick_days' => false,
+            'replacement_notes' => '',
+            'internal_notes' => '',
+            'admin_notes' => '',
+            'approver_notes' => '',
+        ]);
+
+        return redirect()->route('absence.edit', $absence->id);
     }
 
     /**
@@ -128,10 +155,7 @@ class AbsenceController extends Controller
             return Inertia::location($url);
         }
 
-        return redirect()->route(
-            'absences.index',
-            ['month' => $absence->from->format('m'), 'year' => $absence->from->format('Y')]
-        );
+        return redirect()->route('absence.edit', $absence->id);
     }
 
 
@@ -141,7 +165,7 @@ class AbsenceController extends Controller
      */
     public function users()
     {
-        $users = Auth::user()->getViewableAbsenceUsers();
+        $users = Auth::user()->getViewableAbsenceUsers()->load('pools');
         foreach ($users as $key => $user) {
             $user->canEdit = false;
             if (($user->id == Auth::user()->id)
@@ -165,7 +189,9 @@ class AbsenceController extends Controller
     {
         $start = CalendarService::getStartOfPeriod($start);
         $end = $start->copy()->addMonth(1)->subDay(1);
-        $days = Absence::getDaysForPlanner($start->copy());
+        $plannerStart = $this->plannerDay($start);
+        $plannerEnd = $this->plannerDay($end);
+        $days = Absence::getDaysForPlanner($plannerStart->copy());
 
         $absences = Absence::where('user_id', $user->id)
             ->where('to', '>=', $start)
@@ -191,19 +217,13 @@ class AbsenceController extends Controller
                 }
             }
         }
+        $realAbsences = $absences->values();
+
         // add poolmaster "absences"
         foreach ($poolmasters as $poolmaster) {
-            $absence = new Absence([
-                'reason' => 'Poolmaster:in für "'.$poolmaster->pool->name.'"',
-                'from' => $poolmaster->start,
-                'to' => $poolmaster->end,
-                'user_id' => $user->id,
-                                   ]);
-            $absence->poolmaster = true;
-            $absence->poolmaster_id = $poolmaster->id;
-            $absence->user = $user;
-            $absence->canEdit = Auth::user()->can('update', $poolmaster);
-            $absences->push($absence);
+            foreach ($this->buildPoolmasterPlannerAbsences($poolmaster, $user, $realAbsences) as $absence) {
+                $absences->push($absence);
+            }
         }
 
         foreach ($days as $index => $day) {
@@ -219,12 +239,14 @@ class AbsenceController extends Controller
 
 
         foreach ($absences as $absence) {
-            $index = ($absence->from < $start ? 1 : $absence->from->day);
-            $visibleStart = $absence->from->copy()->startOfDay()->max($start->copy());
-            $visibleEnd = $absence->to->copy()->startOfDay()->min($end->copy()->startOfDay());
+            $absenceStart = $this->plannerDay($absence->from);
+            $absenceEnd = $this->plannerDay($absence->to);
+            $index = ($absenceStart < $plannerStart ? 1 : $absenceStart->day);
+            $visibleStart = $absenceStart->copy()->max($plannerStart->copy());
+            $visibleEnd = $absenceEnd->copy()->min($plannerEnd->copy());
             $days[$index]['absence'] = $absence;
             $days[$index]['duration'] = $visibleStart->diffInDays($visibleEnd) + 1;
-            $endIndex = ($absence->to > $end ? $end->day : $absence->to->day);
+            $endIndex = ($absenceEnd > $plannerEnd ? $plannerEnd->day : $absenceEnd->day);
             for ($i = $index; $i <= $endIndex; $i++) {
                 $days[$i]['absent'] = true;
                 if ($i > $index) {
@@ -234,6 +256,82 @@ class AbsenceController extends Controller
         }
 
         return response()->json($days);
+    }
+
+    /**
+     * @param Poolmaster $poolmaster
+     * @param User $user
+     * @param \Illuminate\Support\Collection<int, Absence> $realAbsences
+     * @return array<int, Absence>
+     */
+    protected function buildPoolmasterPlannerAbsences(Poolmaster $poolmaster, User $user, $realAbsences): array
+    {
+        $segments = [[
+            'from' => $this->plannerDay($poolmaster->start),
+            'to' => $this->plannerDay($poolmaster->end),
+        ]];
+
+        foreach ($realAbsences as $realAbsence) {
+            $absenceStart = $this->plannerDay($realAbsence->from);
+            $absenceEnd = $this->plannerDay($realAbsence->to);
+            $updatedSegments = [];
+
+            foreach ($segments as $segment) {
+                if (($absenceEnd < $segment['from']) || ($absenceStart > $segment['to'])) {
+                    $updatedSegments[] = $segment;
+                    continue;
+                }
+
+                if ($absenceStart > $segment['from']) {
+                    $updatedSegments[] = [
+                        'from' => $segment['from']->copy(),
+                        'to' => $absenceStart->copy()->subDay(),
+                    ];
+                }
+
+                if ($absenceEnd < $segment['to']) {
+                    $updatedSegments[] = [
+                        'from' => $absenceEnd->copy()->addDay(),
+                        'to' => $segment['to']->copy(),
+                    ];
+                }
+            }
+
+            $segments = $updatedSegments;
+            if (!$segments) {
+                break;
+            }
+        }
+
+        return array_map(function (array $segment) use ($poolmaster, $user) {
+            $absence = new Absence([
+                'reason' => 'Poolmaster:in für "'.$poolmaster->pool->name.'"',
+                'from' => $segment['from']->copy(),
+                'to' => $segment['to']->copy(),
+                'user_id' => $user->id,
+            ]);
+            $absence->poolmaster = true;
+            $absence->poolmaster_id = $poolmaster->id;
+            $absence->user = $user;
+            $absence->canEdit = Auth::user()->can('update', $poolmaster);
+
+            return $absence;
+        }, $segments);
+    }
+
+    /**
+     * Normalize a stored timestamp to the rendered Berlin calendar day.
+     *
+     * @param mixed $value
+     * @return Carbon
+     */
+    protected function plannerDay($value): Carbon
+    {
+        if ($value instanceof Carbon) {
+            return $value->copy()->setTimezone('Europe/Berlin')->startOfDay();
+        }
+
+        return Carbon::parse($value)->setTimezone('Europe/Berlin')->startOfDay();
     }
 
     /**
@@ -285,41 +383,30 @@ class AbsenceController extends Controller
     }
 
     /**
-     * Build a draft absence for the editor without persisting it.
-     *
+     * @param Request $request
      * @param int $year
      * @param int $month
-     * @param User $user
      * @param int $day
-     * @return Absence
+     * @return array{0: Carbon, 1: Carbon}
      */
-    protected function makeDraftAbsence(int $year, int $month, User $user, int $day = 1): Absence
+    protected function resolveCreateRange(Request $request, int $year, int $month, int $day): array
     {
-        $workflowStatus = Absence::STATUS_NEW;
-        if ((Auth::user()->id == $user->id) && Auth::user()->can('selfAdminister', new Absence(['user_id' => $user->id]))) {
-            $workflowStatus = Absence::STATUS_SELF_ADMINISTERED;
+        $fromDate = $request->query('fromDate');
+        $toDate = $request->query('toDate');
+
+        if ($fromDate && $toDate) {
+            return [
+                Carbon::createFromFormat('Y-m-d', $fromDate, 'Europe/Berlin')->startOfDay()->setTimezone('UTC'),
+                Carbon::createFromFormat('Y-m-d', $toDate, 'Europe/Berlin')->endOfDay()->setTimezone('UTC'),
+            ];
         }
 
-        $absence = new Absence([
-            'user_id' => $user->id,
-            'reason' => 'Urlaub',
-            'from' => Carbon::create($year, $month, $day, 0, 0, 0),
-            'to' => Carbon::create($year, $month, $day, 0, 0, 0),
-            'workflow_status' => $workflowStatus,
-            'sick_days' => false,
-            'replacement_notes' => '',
-            'internal_notes' => '',
-            'admin_notes' => '',
-            'approver_notes' => '',
-        ]);
+        $date = Carbon::create($year, $month, $day, 0, 0, 0, 'Europe/Berlin');
 
-        $absence->setRelation('user', $user);
-        $absence->setRelation('replacements', collect());
-        $absence->setRelation('attachments', collect());
-        $absence->setRelation('checkedBy', null);
-        $absence->setRelation('approvedBy', null);
-
-        return $absence;
+        return [
+            $date->copy()->startOfDay()->setTimezone('UTC'),
+            $date->copy()->endOfDay()->setTimezone('UTC'),
+        ];
     }
 
     /**

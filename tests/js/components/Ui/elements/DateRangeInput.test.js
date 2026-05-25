@@ -21,18 +21,12 @@ function mountInput(props = {}) {
 }
 
 describe('DateRangeInput — internalRange from modelValue', () => {
-    it('converts modelValue [moment, moment] to UTC-midnight Date objects', () => {
+    it('converts modelValue [moment, moment] to picker dates for the same Berlin calendar day', () => {
         const w = mountInput({ modelValue: [jan1, dec31] })
         const [f, t] = w.vm.internalRange
         expect(f).toBeInstanceOf(Date)
         expect(t).toBeInstanceOf(Date)
-        // UTC date must equal the local calendar date (no DST shift)
-        expect(f.getUTCFullYear()).toBe(2025)
-        expect(f.getUTCMonth()).toBe(0)
-        expect(f.getUTCDate()).toBe(1)
-        expect(f.getUTCHours()).toBe(0)
-        expect(t.getUTCDate()).toBe(31)
-        expect(t.getUTCMonth()).toBe(11)
+        expect(w.vm.formatDisplay([f, t])).toBe('01.01.2025 – 31.12.2025')
     })
 
     it('returns null when modelValue is empty', () => {

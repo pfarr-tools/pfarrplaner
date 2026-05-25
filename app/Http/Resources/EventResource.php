@@ -16,7 +16,6 @@ class EventResource extends JsonResource
     public function toArray(Request $request): array
     {
         /** @var Service $this */
-        dd(Auth::guest(), Auth::user());
         return [
             'id' => $this->slug,
             'title' => $this->titleText(false),

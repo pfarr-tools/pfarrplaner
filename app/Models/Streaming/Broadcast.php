@@ -374,7 +374,7 @@ class Broadcast
                 try {
                     $this->getYoutube()->liveBroadcasts->bind($item->getId(), 'id,snippet,status', ['streamId' => $this->getCity()->youtube_passive_stream_id]);
                 } catch (\Google\Service\Exception $e) {
-                    dd ($item, $e);
+                    report($e);
                 }
             }
         }

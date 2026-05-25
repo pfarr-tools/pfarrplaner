@@ -30,8 +30,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\People\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -44,6 +46,7 @@ class TokenController extends Controller
 
     public function index()
     {
+        Gate::authorize('update', Auth::user());
         $tokens = Auth::user()->tokens;
         $token = null;
         return Inertia::render('tokens', compact('tokens', 'token'));
@@ -51,6 +54,7 @@ class TokenController extends Controller
 
     public function create(Request $request)
     {
+        Gate::authorize('update', Auth::user());
         $request->validate(['title' => 'required|string']);
         $token = Auth::user()->createToken($request->get('title'));
         $tokens = Auth::user()->tokens;
@@ -59,6 +63,7 @@ class TokenController extends Controller
 
     public function destroy(Request $request, PersonalAccessToken $token)
     {
+        Gate::authorize('update', Auth::user());
         Auth::user()->tokens()->where('id', $token->id)->delete();
         return redirect()->route('tokens.index');
     }

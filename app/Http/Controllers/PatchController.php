@@ -32,6 +32,7 @@ namespace App\Http\Controllers;
 
 
 use Illuminate\Http\Request;
+use App\Providers\AuthServiceProvider;
 
 class PatchController extends Controller
 {
@@ -43,6 +44,12 @@ class PatchController extends Controller
 
     public function patch(Request $request, $patch)
     {
+        abort_unless(
+            $request->user()->hasRole(AuthServiceProvider::ADMIN)
+            || $request->user()->hasRole(AuthServiceProvider::SUPER),
+            403
+        );
+
         $patchClass = '\\App\\Maintenance\\Patches\\'.ucfirst($patch).'Patch';
         if (class_exists($patchClass)) {
             $patch = new $patchClass();

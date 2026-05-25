@@ -29,6 +29,7 @@
  */
 
 use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\BlockDevHelperRoutes;
 use App\Http\Middleware\Cors;
 use App\Http\Middleware\ForceDomain;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -56,6 +57,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Global middleware appended to every request
         $middleware->append([
+            BlockDevHelperRoutes::class,
             ForceDomain::class,
             TrustProxies::class,
         ]);

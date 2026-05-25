@@ -34,9 +34,9 @@
             </div>
 
             <div v-if="adminUserSwitchBack" class="nav-item">
-                <a class="btn btn-warning mr-1" :href="route('user.switchback')">
+                <button type="button" class="btn btn-warning mr-1" @click="$inertia.post(route('user.switchback'))">
                     <i class="mdi mdi-account-switch"></i>
-                </a>
+                </button>
             </div>
 
             <!-- Help button -->
@@ -92,13 +92,13 @@
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <inertia-link :href="route('logout')" class="dropdown-item profile-menu-item profile-menu-item-danger">
+                        <button type="button" class="dropdown-item profile-menu-item profile-menu-item-danger" @click="$inertia.post(route('logout'))">
                             <span class="profile-menu-item-icon mdi mdi-logout"></span>
                             <span>
                                 <strong>Abmelden</strong><br>
                                 <small>Sitzung auf diesem Gerät beenden</small>
                             </span>
-                        </inertia-link>
+                        </button>
                     </li>
                 </ul>
             </div>
@@ -117,13 +117,14 @@ export default {
             return this.$page.props.adminUserSwitchBack;
         },
         helpPage() {
-            return this.$page.props.helpPage ?? 'index';
+            return this.$page.props.helpPage ?? 'benutzerhandbuch';
         },
         helpUrl() {
             const baseUrl = (this.$page.props.manualBaseUrl ?? 'https://handbuch.pfarrplaner.de').replace(/\/+$/, '');
-            const helpPage = this.helpPage === 'index' ? '' : `${this.helpPage}/`;
+            const helpPage = String(this.helpPage || '').replace(/^\/+|\/+$/g, '');
+            const suffix = helpPage ? `/${helpPage}/` : '';
 
-            return `${baseUrl}/${helpPage}`;
+            return `${baseUrl}${suffix}`;
         },
     },
     props: {

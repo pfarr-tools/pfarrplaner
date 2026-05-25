@@ -43,4 +43,4 @@
 
 use App\Http\Controllers\PatchController;
 
-Route::get('/patch/{patch}', [PatchController::class, 'patch']);
+Route::post('/patch/{patch}', [PatchController::class, 'patch']);

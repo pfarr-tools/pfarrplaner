@@ -43,4 +43,4 @@
 
 use App\Http\Controllers\ApiTokenController;
 
-Route::get('apiToken', [ApiTokenController::class, 'update'])->name('apitoken');
+Route::post('apiToken', [ApiTokenController::class, 'update'])->name('apitoken');

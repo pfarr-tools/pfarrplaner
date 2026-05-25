@@ -20,7 +20,7 @@
                     zu erteilen.</p>
                 <p>Wenn Sie das Dimissoriale hiermit erteilen wollen, klicken Sie hier:</p>
                 <div class="mt-1 mb-4">
-                    <form method="post" action="{{ route('dimissorial.grant', ['type' => lcfirst($type), 'id' => $id, 'spouse' => $spouse]) }}">
+                    <form method="post" action="{{ route('dimissorial.grant', ['type' => lcfirst($type), 'id' => $id, 'spouse' => $spouse] + request()->query()) }}">
                         @csrf
                         <input type="submit" class="btn btn-primary" title="Dimissoriale erteilen" value="Dimissoriale erteilen" />
                     </form>

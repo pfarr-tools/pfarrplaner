@@ -90,6 +90,7 @@ class FuneralController extends AbstractCRUDController
      */
     public function add(Service $service): RedirectResponse
     {
+        Gate::authorize('create', [Funeral::class, $service]);
         return redirect()->route('funerals.create', ['service' => $service->id]);
     }
 
@@ -100,19 +101,14 @@ class FuneralController extends AbstractCRUDController
      */
     public function wizard(Request $request)
     {
+        Gate::authorize('create', Funeral::class);
         $user = Auth::user();
-        $cities = $user->writableCities;
+        $cities = $this->getWritableFuneralCities($user);
         $mastered = Poolmaster::with(['pool', 'pool.users', 'pool.cities'])
             ->where('user_id', $user->id)
             ->where('start', '<=', now()->startOfDay())
             ->where('end', '>=', now()->endOfDay())
             ->get();
-        foreach ($mastered as $poolmaster) {
-            foreach ($poolmaster->pool->cities as $city) {
-                $cities->push($city);
-            }
-        }
-        $cities = $cities->unique();
 
         $locations = Location::inCities($cities->pluck('id'))->get();
         $people = User::visibleFor(Auth::user())->get();
@@ -123,6 +119,7 @@ class FuneralController extends AbstractCRUDController
 
     public function wizardSave(Request $request)
     {
+        Gate::authorize('create', Funeral::class);
         $data = $request->validate(
             [
                 'date' => 'required|date',
@@ -138,6 +135,7 @@ class FuneralController extends AbstractCRUDController
         $data['date'] = Carbon::parse($data['date'], 'Europe/Berlin')->setTimezone('UTC');
 
         $city = City::find($data['city']);
+        abort_unless($this->getWritableFuneralCities(Auth::user())->pluck('id')->contains($city?->id), 403);
 
         $location = $specialLocation = null;
         if ((!is_numeric($data['location'])) || (null === Location::find($data['location']))) {
@@ -229,6 +227,7 @@ class FuneralController extends AbstractCRUDController
      */
     public function pdfForm(Funeral $funeral)
     {
+        Gate::authorize('update', $funeral);
         $funeral->load('service');
         $funeral->service->load('location', 'city');
         $filename = $funeral->service->date->format('Ymd') . ' ' . $funeral->buried_name . ' KRA.pdf';
@@ -246,6 +245,7 @@ class FuneralController extends AbstractCRUDController
      */
     public function done(Funeral $funeral)
     {
+        Gate::authorize('update', $funeral);
         $funeral->done = true;
         $funeral->save();
         return json_encode(true);
@@ -258,6 +258,7 @@ class FuneralController extends AbstractCRUDController
      */
     public function appointmentIcal(Funeral $funeral)
     {
+        Gate::authorize('update', $funeral);
         $service = Service::find($funeral->service_id);
         $raw = View::make('funerals.appointment.ical', compact('funeral', 'service'));
         $raw = str_replace(
@@ -280,6 +281,7 @@ class FuneralController extends AbstractCRUDController
      */
     public function attach(Request $request, Funeral $funeral)
     {
+        Gate::authorize('update', $funeral);
         $this->handleAttachments($request, $funeral);
         $funeral->refresh();
         return response()->json($funeral->attachments);
@@ -294,12 +296,31 @@ class FuneralController extends AbstractCRUDController
      */
     public function detach(Request $request, Funeral $funeral, Attachment $attachment)
     {
+        Gate::authorize('update', $funeral);
+        $attachment = $funeral->attachments()->findOrFail($attachment->id);
         $file = $attachment->file;
         $funeral->attachments()->where('id', $attachment->id)->delete();
         Storage::delete($file);
         $attachment->delete();
         $funeral->refresh();
         return response()->json($funeral->attachments);
+    }
+
+    protected function getWritableFuneralCities(User $user)
+    {
+        $cities = $user->writableCities;
+        $mastered = Poolmaster::with(['pool.cities'])
+            ->where('user_id', $user->id)
+            ->where('start', '<=', now()->startOfDay())
+            ->where('end', '>=', now()->endOfDay())
+            ->get();
+        foreach ($mastered as $poolmaster) {
+            foreach ($poolmaster->pool->cities as $city) {
+                $cities->push($city);
+            }
+        }
+
+        return $cities->unique('id')->values();
     }
 
 }

@@ -58,9 +58,7 @@ class AmazonService
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $result = curl_exec($ch);
         curl_close($ch);
-        dump($result);
-        $xml = simplexml_load_string($result) or die("Error: Cannot create object");
-        dd($xml);
+        return simplexml_load_string($result) ?: null;
     }
 
 }

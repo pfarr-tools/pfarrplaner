@@ -39,6 +39,7 @@ use App\Services\QRService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -114,6 +115,9 @@ class DownloadController extends Controller
      */
     public function storage($path, $prettyName = '')
     {
+        if (!Auth::check() && !request()->hasValidSignature()) {
+            abort(401);
+        }
         if ((pathinfo($path, PATHINFO_EXTENSION) == '') && (pathinfo($prettyName, PATHINFO_EXTENSION) != '')) {
             $path .= '.' . pathinfo($prettyName, PATHINFO_EXTENSION);
         }
@@ -133,6 +137,9 @@ class DownloadController extends Controller
      */
     public function image(Request $request, $path, $prettyName = '')
     {
+        if (!Auth::check() && !$request->hasValidSignature()) {
+            abort(401);
+        }
         if (substr($path, 0, 12) == 'attachments/') $path = substr($path, 12);
         if ((pathinfo($path, PATHINFO_EXTENSION) == '') && (pathinfo($prettyName, PATHINFO_EXTENSION) != '')) {
             $path .= '.' . pathinfo($prettyName, PATHINFO_EXTENSION);

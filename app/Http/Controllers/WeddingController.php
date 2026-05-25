@@ -60,6 +60,11 @@ class WeddingController extends AbstractCRUDController
 
     protected string $modelClass = Wedding::class;
 
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -82,6 +87,7 @@ class WeddingController extends AbstractCRUDController
      */
     public function add(Service $service): RedirectResponse
     {
+        Gate::authorize('create', [Wedding::class, $service]);
         return redirect()->route('weddings.create', ['service' => $service->id]);
     }
 
@@ -107,6 +113,7 @@ class WeddingController extends AbstractCRUDController
      */
     public function wizard(Request $request)
     {
+        Gate::authorize('create', Wedding::class);
         $cities = Auth::user()->writableCities;
         $locations = Location::inCities($cities->pluck('id'))->get();
         $people = User::visibleFor(Auth::user())->get();
@@ -116,6 +123,7 @@ class WeddingController extends AbstractCRUDController
 
     public function wizardSave(Request $request)
     {
+        Gate::authorize('create', Wedding::class);
         $data = $request->validate(
             [
                 'date' => 'required|date_format:d.m.Y H:i',
@@ -133,6 +141,7 @@ class WeddingController extends AbstractCRUDController
         $data['date'] = Carbon::createFromFormat('d.m.Y H:i', $data['date'], 'Europe/Berlin')->setTimezone('UTC');
 
         $city = City::find($data['city']);
+        abort_unless(Auth::user()->writableCities->pluck('id')->contains($city?->id), 403);
 
         $location = $specialLocation = null;
         if ((!is_numeric($data['location'])) || (null === Location::find($data['location']))) {
@@ -222,6 +231,7 @@ class WeddingController extends AbstractCRUDController
      */
     public function done(Wedding $wedding)
     {
+        Gate::authorize('update', $wedding);
         $wedding->done = true;
         $wedding->save();
         return json_encode(true);
@@ -234,6 +244,7 @@ class WeddingController extends AbstractCRUDController
      */
     public function attach(Request $request, Wedding $wedding)
     {
+        Gate::authorize('update', $wedding);
         $this->handleAttachments($request, $wedding);
         $wedding->refresh();
         return response()->json($wedding->attachments);
@@ -248,6 +259,8 @@ class WeddingController extends AbstractCRUDController
      */
     public function detach(Request $request, Wedding $wedding, Attachment $attachment)
     {
+        Gate::authorize('update', $wedding);
+        $attachment = $wedding->attachments()->findOrFail($attachment->id);
         $file = $attachment->file;
         $wedding->attachments()->where('id', $attachment->id)->delete();
         Storage::delete($file);

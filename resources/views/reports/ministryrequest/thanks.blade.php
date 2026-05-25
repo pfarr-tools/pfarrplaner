@@ -3,17 +3,12 @@
 @section('title', 'Dienstanfrage')
 
 @section('content')
-    <form method="post" action="{{ route('ministry.request.fill', compact('ministry', 'user')) }}">
-        @csrf
-        @component('components.ui.card')
-            @slot('cardHeader')
-                Dienstanfrage für "{{ $ministryTitle }}"
-            @endslot
+    @component('components.ui.card')
+        @slot('cardHeader')
+            Dienstanfrage für "{{ $ministryTitle }}"
+        @endslot
 
-            <p>Herzlichen Dank, {{ $user->fullName() }}!</p>
-            <p>Deine Zusagen wurden eingetragen. Danke für deine Bereitschaft zur Mitarbeit.</p>
-
-
-        @endcomponent
-    </form>
+        <p>Herzlichen Dank, {{ $user->fullName() }}!</p>
+        <p>Deine Zusagen wurden eingetragen. Danke für deine Bereitschaft zur Mitarbeit.</p>
+    @endcomponent
 @endsection

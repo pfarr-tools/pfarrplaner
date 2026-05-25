@@ -35,6 +35,7 @@ use App\Models\Liturgy\Block;
 use App\Models\Liturgy\Item;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class LiturgyItemController extends Controller
 {
@@ -55,6 +56,8 @@ class LiturgyItemController extends Controller
      */
     public function store(Request $request, Service $service, Block $block)
     {
+        Gate::authorize('update', $service);
+        abort_unless((int) $block->service_id === (int) $service->id, 404);
         $data = $this->validateRequest($request);
         $data['liturgy_block_id'] = $block->id;
         $data['sortable'] = count($block->items);
@@ -77,6 +80,9 @@ class LiturgyItemController extends Controller
      */
     public function update(Request $request, Service $service, Block $block, Item $item)
     {
+        Gate::authorize('update', $service);
+        abort_unless((int) $block->service_id === (int) $service->id, 404);
+        abort_unless((int) $item->liturgy_block_id === (int) $block->id, 404);
         $data = $this->validateRequest($request);
         $item->update($data);
         if ($data['data']) {
@@ -96,6 +102,9 @@ class LiturgyItemController extends Controller
      */
     public function destroy(Request $request, Service $service, Block $block, Item $item)
     {
+        Gate::authorize('update', $service);
+        abort_unless((int) $block->service_id === (int) $service->id, 404);
+        abort_unless((int) $item->liturgy_block_id === (int) $block->id, 404);
         $item->delete();
         return redirect()->route('liturgy.editor', $service->slug);
     }

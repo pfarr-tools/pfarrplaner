@@ -69,10 +69,14 @@
                             class="fas fa-cogs"></i></a>
                 </li>
                 <li class="nav-item">
-                    <a class="btn btn-navbar" href="{{ route('logout') }}">
+                    <a class="btn btn-navbar" href="{{ route('logout') }}"
+                       onclick="event.preventDefault(); document.getElementById('legacy-logout-form').submit();">
                         <i class="fa fa-power-off"></i><span class="d-none d-md-inline"> Abmelden</span>
                     </a>
                 </li>
+                <form id="legacy-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
             @endauth
         </ul>
     </nav>
@@ -217,7 +221,7 @@
 
     window.setTimeout(function () {
         if (window.Laravel.loggedIn) {
-            location.href = '{!! route('logout') !!}';
+            document.getElementById('legacy-logout-form').submit();
         } else {
             console.log('Refreshing window to update crsf token.');
             location.reload();

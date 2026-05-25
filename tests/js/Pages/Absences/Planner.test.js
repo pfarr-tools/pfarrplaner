@@ -30,4 +30,30 @@ describe('Absences Planner timezone handling', () => {
 
         expect(title).toContain('(01.06.2026 - 04.06.2026)')
     })
+
+    it('creates absences from Berlin calendar dates in the planner modal', () => {
+        const post = vi.fn()
+        const ctx = {
+            year: 2026,
+            month: 5,
+            $inertia: { post },
+            draftAbsenceRange: () => [
+                new Date('2026-05-05T22:00:00.000Z'),
+                new Date('2026-05-06T22:00:00.000Z'),
+            ],
+            closeCreateModals: vi.fn(),
+            createAbsencePayload: Planner.methods.createAbsencePayload,
+            submitNewAbsence: Planner.methods.submitNewAbsence,
+        }
+
+        Planner.methods.createAbsenceForRange.call(ctx, { id: 30 })
+
+        expect(ctx.closeCreateModals).toHaveBeenCalled()
+        expect(post).toHaveBeenCalledWith('/absence.store', {
+            user_id: 30,
+            reason: 'Urlaub',
+            from: '2026-05-05T22:00:00.000Z',
+            to: '2026-05-07T21:59:59.000Z',
+        })
+    })
 })

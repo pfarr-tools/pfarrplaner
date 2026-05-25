@@ -193,14 +193,20 @@ class PublicController extends Controller
         );
     }
 
-    public function ministryRequestFilled(Request $request, $ministry, User $user, $sender = null)
+    public function ministryRequestFilled(Request $request, $ministry, User $user, $services, $sender = null)
     {
+        if (!$request->hasValidSignature()) abort(401);
         if (is_numeric($user)) $user = User::findOrFail($user);
-        $services = [];
+        $allowedServiceIds = collect(explode(',', $services))
+            ->filter()
+            ->map(fn ($serviceId) => (int) $serviceId);
+        $selectedServiceIds = [];
         foreach($request->get('services', []) as $key => $service) {
-            if ($service) $services[] = $key;
+            if ($service && $allowedServiceIds->contains((int) $key)) {
+                $selectedServiceIds[] = (int) $key;
+            }
         };
-        $services = Service::whereIn('id', $services)->get();
+        $services = Service::whereIn('id', $selectedServiceIds)->get();
         foreach ($services as $service) {
             $service->participants()->attach([$user->id => ['category' => $ministry]]);
         }
@@ -294,13 +300,14 @@ class PublicController extends Controller
 
     public function grantDimissorial(Request $request, $type, $id)
     {
+        if (!$request->hasValidSignature()) abort(401);
         if (!$rite = $this->getRite($type, $id)) abort(404);
         $rite->load(['service']);
         if ($type == 'trauung') {
             if (!$request->has('spouse')) abort(404);
             $spouse = $request->get('spouse');
             $method = 'spouse'.$spouse.'_needs_dimissorial';
-            if (!$rite->$method) dd($method);
+            if (!$rite->$method) abort(403);
             $rite->update(['spouse'.$spouse.'_dimissorial_received' => Carbon::now()]);
         } else {
             if (!$rite->needs_dimissorial) abort(403);

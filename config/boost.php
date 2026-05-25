@@ -28,11 +28,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-use App\Http\Controllers\Auth\DGM\DGMAuthController;
-
-Route::get('/dgm', [DGMAuthController::class, 'redirect'])
-    ->name('auth.dgm.redirect');
-
-Route::get('/dgm/auth', [DGMAuthController::class, 'callback'])
-    ->name('auth.dgm.callback');
+return [
+    'enabled' => env('BOOST_ENABLED', false),
+    'browser_logs_watcher' => env('BOOST_BROWSER_LOGS_WATCHER', false),
+    'executable_paths' => [
+        'php' => env('BOOST_PHP_EXECUTABLE_PATH'),
+        'composer' => env('BOOST_COMPOSER_EXECUTABLE_PATH'),
+        'npm' => env('BOOST_NPM_EXECUTABLE_PATH'),
+        'vendor_bin' => env('BOOST_VENDOR_BIN_EXECUTABLE_PATH'),
+        'current_directory' => env('BOOST_CURRENT_DIRECTORY_EXECUTABLE_PATH', base_path()),
+    ],
+];

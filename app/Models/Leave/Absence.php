@@ -143,6 +143,18 @@ class Absence extends Model implements HasDAVCalendarItems
     }
 // END ACCESSORS
 
+// MUTATORS
+    public function setFromAttribute($value): void
+    {
+        $this->attributes['from'] = $this->normalizeDateAttribute($value);
+    }
+
+    public function setToAttribute($value): void
+    {
+        $this->attributes['to'] = $this->normalizeDateAttribute($value);
+    }
+// END MUTATORS
+
 // SCOPES
     /**
      * @param Builder $query
@@ -338,8 +350,8 @@ class Absence extends Model implements HasDAVCalendarItems
         foreach ($data as $replacementData) {
             $replacement = app(Replacement::getContractName('create'))->create($user, $this, [
                 'absence_id' => $this->id,
-                'from' => max($this->normalizePlannerDateValue($replacementData['from'])->setTime(0, 0, 0), $this->from),
-                'to' => min($this->normalizePlannerDateValue($replacementData['to'])->setTime(23, 59, 59), $this->to),
+                'from' => max($this->normalizePlannerDateValue($replacementData['from']), $this->from),
+                'to' => min($this->normalizePlannerDateValue($replacementData['to'], true), $this->to),
                 'pool_id' => $replacementData['pool_id'] ?? null,
                 'users' => $replacementData['users'] ?? [],
             ]);
@@ -353,15 +365,35 @@ class Absence extends Model implements HasDAVCalendarItems
      * @param mixed $value
      * @return Carbon
      */
-    protected function normalizePlannerDateValue(mixed $value): Carbon
+    protected function normalizePlannerDateValue(mixed $value, bool $endOfDay = false): Carbon
     {
         if (is_string($value) && preg_match('/^\d{2}\.\d{2}\.\d{4}$/', trim($value))) {
-            return Carbon::createFromFormat('d.m.Y', trim($value), 'UTC');
+            return Carbon::createFromFormat('d.m.Y', trim($value), 'Europe/Berlin')
+                ->setTime($endOfDay ? 23 : 0, $endOfDay ? 59 : 0, $endOfDay ? 59 : 0)
+                ->setTimezone('UTC');
+        }
+
+        if (is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', trim($value))) {
+            return Carbon::createFromFormat('Y-m-d', trim($value), 'Europe/Berlin')
+                ->setTime($endOfDay ? 23 : 0, $endOfDay ? 59 : 0, $endOfDay ? 59 : 0)
+                ->setTimezone('UTC');
+        }
+
+        if (is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', trim($value))) {
+            return Carbon::createFromFormat('Y-m-d H:i:s', trim($value), 'Europe/Berlin')
+                ->setTimezone('UTC');
+        }
+
+        if (is_string($value) && preg_match('/T.*(?:Z|[+\-]\d{2}:\d{2})$/', trim($value))) {
+            return Carbon::parse($value)->setTimezone('UTC');
         }
 
         $date = Carbon::parse($value)->setTimezone('Europe/Berlin');
 
-        return Carbon::create($date->year, $date->month, $date->day, 0, 0, 0, 'UTC');
+        return $date
+            ->copy()
+            ->setTime($endOfDay ? 23 : 0, $endOfDay ? 59 : 0, $endOfDay ? 59 : 0)
+            ->setTimezone('UTC');
     }
 
     /**
@@ -426,6 +458,15 @@ class Absence extends Model implements HasDAVCalendarItems
                 'freeBusy' => $status,
             ]
         ];
+    }
+
+    protected function normalizeDateAttribute($value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+
+        return Carbon::parse($value)->setTimezone('Europe/Berlin')->toDateString();
     }
 
 

@@ -66,7 +66,9 @@ class ZVStudyHelper extends AbstractStudyHelper
 
             } else {
                 preg_match('/(.*?) \| (\d\d\.\d\d\.\d\d\d\d) \| (.*)<ul(?:.*?)href="(.*?)"/', $li, $parts);
-                if ($parts[2]=='Pfingstmontag') dd('baz');
+                if (!isset($parts[2], $parts[4])) {
+                    continue;
+                }
                 if (!isset($this->records[$parts[2]])) $this->records[$parts[2]] = [];
                 $this->records[$parts[2]]['[Zentrum Verkündigung] '.$parts[1].', '.$parts[2].': '.$parts[3]] = 'https://www.zentrum-verkuendigung.de'.Str::before($parts[4], '"');
                 $lastMatch = [

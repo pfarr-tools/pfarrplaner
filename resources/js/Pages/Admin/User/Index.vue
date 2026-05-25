@@ -219,7 +219,7 @@ export default {
             }
         },
         loginAsUser(user) {
-            window.location.href = route('user.switch', user.id);
+            this.$inertia.post(route('user.switch', user.id));
         },
         mergeUser(user) {
             window.location.href = route('user.join', user.id);

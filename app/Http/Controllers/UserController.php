@@ -82,6 +82,7 @@ class UserController extends Controller
      */
     public function index()
     {
+        Gate::authorize('index', User::class);
         $userQuery = User::with(['homeCities', 'cities', 'writableCities', 'adminCities', 'roles', 'roles.permissions'])
             ->orderBy('last_name')
             ->orderBy('first_name')
@@ -123,6 +124,7 @@ class UserController extends Controller
      */
     public function create()
     {
+        Gate::authorize('create', User::class);
         $user = (new User())->load([
                                        'homeCities',
                                        'parishes',
@@ -184,6 +186,7 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
+        Gate::authorize('create', User::class);
         $data = $request->validated();
         $user = User::create($data);
         $this->updateUserDataFromRequest($request, $user);
@@ -199,6 +202,7 @@ class UserController extends Controller
      */
     public function edit(User $user, Request $request)
     {
+        Gate::authorize('update', $user);
         $user->load([
                         'homeCities',
                         'parishes',
@@ -314,6 +318,7 @@ class UserController extends Controller
     public function profileSave(Request $request)
     {
         $user = Auth::user();
+        Gate::authorize('update', $user);
         $data = $this->validateRequest($request, $user);
         $user->update($data);
 
@@ -355,6 +360,7 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, User $user)
     {
+        Gate::authorize('update', $user);
         $data = $request->validated();
 
         $user->update($data);
@@ -407,7 +413,7 @@ class UserController extends Controller
             $user->setSetting($key, $setting);
         }
         $user->setSubscriptionsFromArray($request->get('subscriptions') ?: []);
-        $user->updateCityPermissions($request->get('permissions') ?: []);
+        $user->updateCityPermissions($request->get('permissions') ?: [], Auth::user());
 
         if ($request->get('createAccount', false)) {
             $user->resetAccount();
@@ -422,6 +428,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        Gate::authorize('delete', $user);
         $user->delete();
         return redirect()->route('users.index')->with('success', 'Der Benutzer wurde gelöscht.');
     }
@@ -433,6 +440,7 @@ class UserController extends Controller
      */
     public function join(User $user)
     {
+        Gate::authorize('join', $user);
         $people = User::where('id', '!=', $user->id)->orderBy('last_name')->orderBy('first_name')->get();
         return Inertia::render('Admin/User/Join', compact('user', 'people'));
     }
@@ -466,25 +474,29 @@ class UserController extends Controller
      * @param User $user
      * @return RedirectResponse
      */
-    public function switch(User $user)
+    public function switch(Request $request, User $user)
     {
-        if (!Auth::user()->isAdmin) {
-            abort(403);
-        }
+        Gate::authorize('impersonate', $user);
         $adminId = Auth::user()->id;
         Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         Auth::login($user);
+        $request->session()->regenerate();
         Session::put('adminUserSwitchBack', $adminId);
         // save switch in session!
         return redirect()->route('home');
     }
 
-    public function switchBack()
+    public function switchBack(Request $request)
     {
         if (!Session::has('adminUserSwitchBack')) abort(403);
         $user = User::findOrFail(Session::get('adminUserSwitchBack'));
         Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         Auth::login($user);
+        $request->session()->regenerate();
         Session::remove('adminUserSwitchBack');
         return redirect()->route('home');
     }
@@ -508,10 +520,7 @@ class UserController extends Controller
      */
     protected function validateCityPermissions(Request $request)
     {
-        if (Auth::user()->isLocalAdmin) {
-            $permissions = $request->get('cityPermission');
-            dd(Auth::user()->adminCities->pluck('id'), $permissions);
-        }
+        // Kept for backward compatibility with older call sites.
     }
 
 
@@ -580,6 +589,7 @@ class UserController extends Controller
 
     public function add(Request $request)
     {
+        Gate::authorize('create', User::class);
         $data = $this->validateRequest($request, null, true);
         $user = User::create($data);
 
@@ -707,7 +717,7 @@ class UserController extends Controller
 
     public function resetPassword(Request $request, User $user)
     {
-        if (!$request->user()->can('update', $user)) abort(403);
+        Gate::authorize('resetPassword', $user);
         $user->resetAccount();
         return redirect()->route('users.index')->with('success', 'Das Benutzerpasswort für '.$user->fullName().' wurde zurückgesetzt. Eine E-Mail mit neuen Zugangsdaten wurde an '.$user->email.' versandt.');
     }

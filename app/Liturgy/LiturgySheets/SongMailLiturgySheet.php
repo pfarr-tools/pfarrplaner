@@ -34,6 +34,7 @@ namespace App\Liturgy\LiturgySheets;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 
 class SongMailLiturgySheet extends AbstractLiturgySheet
@@ -140,9 +141,9 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
 
         return $body . PHP_EOL
             . 'Der komplette Ablauf kann hier in einem druckbaren Format heruntergeladen werden:' . PHP_EOL
-            . route('liturgy.download', ['service' => $service->slug, 'key' => 'A4']) . PHP_EOL . PHP_EOL
+            . URL::temporarySignedRoute('liturgy.download', now()->addDays(14), ['service' => $service->slug, 'key' => 'A4']) . PHP_EOL . PHP_EOL
             . 'Außerdem gibt es den Ablauf in einem druckbaren, für Organist:innen optimierten Format hier:' . PHP_EOL
-            . route('liturgy.download', ['service' => $service->slug, 'key' => 'Organist']) . PHP_EOL
+            . URL::temporarySignedRoute('liturgy.download', now()->addDays(14), ['service' => $service->slug, 'key' => 'Organist']) . PHP_EOL
             . PHP_EOL . 'Freundliche Grüße, ' . PHP_EOL . Auth::user()->fullName();
     }
 

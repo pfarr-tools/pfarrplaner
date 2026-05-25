@@ -1050,8 +1050,10 @@ class User extends Authenticatable
      * Format [ city_id => ['permission' => level]]
      * @param $permissions
      */
-    public function updateCityPermissions($permissions)
+    public function updateCityPermissions($permissions, ?User $actingUser = null)
     {
+        $actingUser ??= $this;
+
         // change array format
         foreach ($permissions as $cityId => $permission) {
             $permissions[$cityId] = ['permission' => $permission];
@@ -1059,8 +1061,8 @@ class User extends Authenticatable
         // check user rights, remove entries for cities without admin rights
         foreach ($permissions as $cityId => $permission) {
             $city = City::find($cityId);
-            if (!$city->administeredBy($this)) {
-                unset($permission);
+            if (!$city || !$city->administeredBy($actingUser)) {
+                unset($permissions[$cityId]);
             }
         }
 

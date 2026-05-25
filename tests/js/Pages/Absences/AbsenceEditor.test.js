@@ -1,8 +1,10 @@
 import AbsenceEditor from '@/Pages/Absences/AbsenceEditor.vue'
+import PoolmasterEditor from '@/Pages/Admin/Poolmaster/Editor.vue'
 
 describe('AbsenceEditor ISO submission', () => {
     it('stores ISO timestamps when the date range changes', () => {
         const ctx = {
+            serializePlannerDate: AbsenceEditor.methods.serializePlannerDate,
             form: {
                 from: null,
                 to: null,
@@ -22,6 +24,7 @@ describe('AbsenceEditor ISO submission', () => {
         const ctx = {
             maySelfAdminister: false,
             role: 'editor',
+            serializePlannerDate: AbsenceEditor.methods.serializePlannerDate,
             form: {
                 sick_days: false,
                 reason: 'Urlaub',
@@ -40,6 +43,26 @@ describe('AbsenceEditor ISO submission', () => {
 
         expect(prepared.replacements[0].from).toBe('2026-05-31T22:00:00.000Z')
         expect(prepared.replacements[0].to).toBe('2026-06-04T21:59:59.000Z')
+    })
+
+    it('prepares main absence range as ISO timestamps even from naive local strings', () => {
+        const ctx = {
+            maySelfAdminister: false,
+            role: 'editor',
+            serializePlannerDate: AbsenceEditor.methods.serializePlannerDate,
+            form: {
+                from: '2026-08-02 00:00:00',
+                to: '2026-08-03 23:59:59',
+                sick_days: false,
+                reason: 'Urlaub',
+                replacements: [],
+            },
+        }
+
+        const prepared = AbsenceEditor.methods.prepareForm.call(ctx)
+
+        expect(prepared.from).toBe('2026-08-01T22:00:00.000Z')
+        expect(prepared.to).toBe('2026-08-03T21:59:59.000Z')
     })
 
     it('treats self-administered absences as self-editor and allows deletion', () => {
@@ -72,5 +95,40 @@ describe('AbsenceEditor ISO submission', () => {
 
         expect(unsaved).toBe(false)
         expect(saved).toBe(true)
+    })
+
+    it('adds a replacement row using the current absence range', () => {
+        const ctx = {
+            form: {
+                replacements: [],
+                from: '2026-08-01T22:00:00.000Z',
+                to: '2026-08-03T21:59:59.000Z',
+            },
+        }
+
+        AbsenceEditor.methods.addReplacement.call(ctx)
+
+        expect(ctx.form.replacements).toHaveLength(1)
+        expect(ctx.form.replacements[0].range).toEqual([
+            '2026-08-01T22:00:00.000Z',
+            '2026-08-03T21:59:59.000Z',
+        ])
+    })
+
+    it('stores berlin calendar dates for poolmaster ranges', () => {
+        const ctx = {
+            myPoolmaster: {
+                start: null,
+                end: null,
+            },
+        }
+
+        PoolmasterEditor.methods.setDateRange.call(ctx, [
+            new Date('2026-08-22T00:00:00+02:00'),
+            new Date('2026-08-31T23:59:59+02:00'),
+        ])
+
+        expect(ctx.myPoolmaster.start).toBe('2026-08-22')
+        expect(ctx.myPoolmaster.end).toBe('2026-08-31')
     })
 })

@@ -35,6 +35,7 @@ use App\Models\Liturgy\Block;
 use App\Models\Liturgy\Item;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 
 class LiturgyBlockController extends Controller
@@ -56,6 +57,7 @@ class LiturgyBlockController extends Controller
      */
     public function store(Request $request, Service $service)
     {
+        Gate::authorize('update', $service);
         $data = $this->validateRequest($request);
         $data['service_id'] = $service->id;
         $data['sortable'] = count($service->liturgyBlocks);
@@ -71,6 +73,8 @@ class LiturgyBlockController extends Controller
      */
     public function update(Request $request, Service $service, Block $block)
     {
+        Gate::authorize('update', $service);
+        abort_unless((int) $block->service_id === (int) $service->id, 404);
         $data = $this->validateRequest($request);
         $block->update($data);
         return Redirect::route('liturgy.editor', $service);
@@ -84,6 +88,8 @@ class LiturgyBlockController extends Controller
      */
     public function destroy(Request $request, Service $service, Block $block)
     {
+        Gate::authorize('update', $service);
+        abort_unless((int) $block->service_id === (int) $service->id, 404);
         $block->delete();
         return Redirect::route('liturgy.editor', $service);
     }
@@ -95,8 +101,10 @@ class LiturgyBlockController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function sync(Request $request, Service $service, Block $block) {
+        Gate::authorize('update', $service);
+        abort_unless((int) $block->service_id === (int) $service->id, 404);
         foreach ($request->all() as $item) {
-            Item::find($item['id'])->update(['sortable' => $item['sortable']]);
+            $block->items()->findOrFail($item['id'])->update(['sortable' => $item['sortable']]);
         }
         return redirect()->back();
     }

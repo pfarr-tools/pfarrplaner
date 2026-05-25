@@ -100,8 +100,8 @@ if (releaseType === 'major' || releaseType === 'minor') {
         execSync('npm run manual:all:server', { stdio: 'inherit' });
         execSync('npm run manual:deploy', { stdio: 'inherit' });
         gitAddExisting([
-            'manual/versionsangaben.md',
-            'manual/lizenzen.md',
+            'manual/benutzerhandbuch/versionsangaben.md',
+            'manual/benutzerhandbuch/lizenzen.md',
             'manual/media/images',
             'manual/media/site',
         ]);

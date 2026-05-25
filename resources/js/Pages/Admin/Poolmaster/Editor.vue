@@ -48,6 +48,7 @@ import FormInput from "../../../components/Ui/forms/FormInput.vue";
 import FormSelectize from "../../../components/Ui/forms/FormSelectize.vue";
 import PeopleSelect from "../../../components/Ui/elements/PeopleSelect.vue";
 import DateRangeInput from "../../../components/Ui/elements/DateRangeInput.vue";
+import { serializePlannerDateToBerlinDateString } from "../../../helpers/plannerDates";
 
 export default {
     name: "Editor",
@@ -74,8 +75,8 @@ export default {
             return 'Einsatz als Poolmaster:in bearbeiten';
         },
         setDateRange(e) {
-            this.myPoolmaster.start = moment(e[0]).format('YYYY-MM-DD HH:mm:ss');
-            this.myPoolmaster.end = moment(e[1]).format('YYYY-MM-DD HH:mm:ss');
+            this.myPoolmaster.start = serializePlannerDateToBerlinDateString(e[0]);
+            this.myPoolmaster.end = serializePlannerDateToBerlinDateString(e[1]);
         },
         savePoolmaster() {
             if (!this.myPoolmaster.id) {

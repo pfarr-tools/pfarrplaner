@@ -27,7 +27,7 @@
                                         <td valign="top">
                                             Zu diesem Gottesdienst gibt es Texte und Lieder zum Herunterladen.<br/>
                                             <a class="btn btn-secondary"
-                                               href="{{ route('storage', ['path' => pathinfo($nextService->songsheet, PATHINFO_FILENAME), 'prettyName' => $nextService->date->format('Ymd').'-Liedblatt.'.pathinfo($nextService->songsheet, PATHINFO_EXTENSION)]) }}">Liedblatt
+                                               href="{{ URL::signedRoute('storage', ['path' => pathinfo($nextService->songsheet, PATHINFO_FILENAME), 'prettyName' => $nextService->date->format('Ymd').'-Liedblatt.'.pathinfo($nextService->songsheet, PATHINFO_EXTENSION)]) }}">Liedblatt
                                                 herunterladen</a>
                                         </td>
                                     </tr>

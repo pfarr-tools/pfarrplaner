@@ -33,5 +33,4 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 
 Auth::routes(['logout' => false, 'register' => false]);
-Route::match(['GET', 'POST'], '/logout', [UserController::class, 'logout'])->name('logout');
-
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');

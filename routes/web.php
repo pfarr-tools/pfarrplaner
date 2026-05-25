@@ -43,17 +43,6 @@
 use Illuminate\Support\Str;
 
 Route::match(['GET','POST'],'/csrf-cookie', fn () => response()->noContent());
-Route::post('/_debug/needs-csrf', function () {
-    return response()->json(['ok' => true]);
-});
-Route::get('/_debug/form', function () {
-    return '<form method="POST" action="/_debug/needs-csrf"><button>Send</button></form>';
-});
-
-Route::get('/test-node', function () {
-    return shell_exec('node -v') ?: 'node not found';
-});
-
 
 if (!function_exists('routeNames')) {
     function routeNames($model)
@@ -87,25 +76,4 @@ Route::prefix('admin')->group(function () {
     foreach (glob(base_path('routes/web/admin/*.php')) as $file) {
         Route::group([], $file);
     }
-});
-
-// update trigger
-Route::get('/ping/update', function (\Illuminate\Http\Request $request) {
-    exit();
-    \Illuminate\Support\Facades\Log::debug(
-        'Update triggered via remote ping from ' . gethostbyaddr($request->ip()) . ' [' . $request->ip() . ']'
-    );
-    //exec ('php artisan install:updates >/storage/logs/update.log  &');
-    \Illuminate\Support\Facades\Artisan::call('install:updates');
-    $result = \Illuminate\Support\Facades\Artisan::output();
-    \Illuminate\Support\Facades\Log::debug('Update terminated: ' . $result);
-    return $result;
-})->middleware('signed')->name('ping.update');
-
-Route::get('/panic', function () {
-    throw new \Exception('Whoops');
-});
-
-Route::get('/dash', function () {
-    return \Inertia\Inertia::render('Dash');
 });

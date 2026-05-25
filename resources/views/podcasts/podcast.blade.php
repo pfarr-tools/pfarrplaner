@@ -34,7 +34,7 @@
             @if($service->sermon)
                 <item>
                     <title>{{ $service->sermon->fullTitle }}</title>
-                    @if($service->sermon->image)<itunes:image href="{{ route('image', $service->sermon->image) }}" />@else<itunes:image href="{{ route('image', $service->city->sermon_default_image) }}" />@endif
+                    @if($service->sermon->image)<itunes:image href="{{ URL::signedRoute('image', ['path' => str_replace('attachments/', '', $service->sermon->image)]) }}" />@else<itunes:image href="{{ URL::signedRoute('image', ['path' => str_replace('attachments/', '', $service->city->sermon_default_image)]) }}" />@endif
                     <itunes:summary><![CDATA[ @if($service->sermon->summary){{ $service->sermon->summary }}
                         (Predigt vom {{ $service->date->format('d.m.Y') }}, @if($service->participantsText('Predigt')){{ $service->participantsText('Predigt', true) }} @else {{ $service->participantsText('P', true) }} @endif)@else Predigt vom {{ $service->date->format('d.m.Y') }}, @if($service->participantsText('Predigt')){{ $service->participantsText('Predigt', true) }} @else {{ $service->participantsText('P', true) }} @endif @endif ]]></itunes:summary>
                     <link>{{ $city->homepage.(substr($city->homepage, -1) == '/' ? '' : '/') }}?podcast_id={{ md5( $service->id) }}</link>

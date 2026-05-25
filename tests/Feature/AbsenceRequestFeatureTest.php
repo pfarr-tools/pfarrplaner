@@ -64,8 +64,29 @@ class AbsenceRequestFeatureTest extends TestCase
         $absence->update($request->validated());
         $absence->refresh();
 
-        $this->assertSame('2026-06-01 00:00:00', $absence->from->format('Y-m-d H:i:s'));
-        $this->assertSame('2026-06-04 23:59:59', $absence->to->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-06-01', $absence->getRawOriginal('from'));
+        $this->assertSame('2026-06-04', $absence->getRawOriginal('to'));
+    }
+
+    public function testNaiveBerlinDatetimeStringsStayOnSameCalendarDay(): void
+    {
+        $absence = Absence::factory()->create(['user_id' => $this->user->id]);
+        $request = $this->makeRequest([
+            'id' => $absence->id,
+            'from' => '2026-08-02 00:00:00',
+            'to' => '2026-08-03 23:59:59',
+            'reason' => 'Urlaub',
+        ], $absence);
+
+        $validator = Validator::make($request->all(), $request->rules());
+        $this->assertFalse($validator->fails());
+        $request->setValidator($validator);
+
+        $absence->update($request->validated());
+        $absence->refresh();
+
+        $this->assertSame('2026-08-02', $absence->getRawOriginal('from'));
+        $this->assertSame('2026-08-03', $absence->getRawOriginal('to'));
     }
 
     public function testStoreRulesRequireUserId(): void
@@ -124,8 +145,46 @@ class AbsenceRequestFeatureTest extends TestCase
         $replacement = $absence->fresh()->replacements()->first();
 
         $this->assertNotNull($replacement);
-        $this->assertSame('2026-06-01 00:00:00', $replacement->from->format('Y-m-d H:i:s'));
-        $this->assertSame('2026-06-04 23:59:59', $replacement->to->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-06-01', $replacement->getRawOriginal('from'));
+        $this->assertSame('2026-06-04', $replacement->getRawOriginal('to'));
+    }
+
+    public function testNaiveReplacementDatesAreNormalizedToSameBerlinCalendarDays(): void
+    {
+        $absence = Absence::factory()->create([
+            'user_id' => $this->user->id,
+            'from' => '2026-08-01 00:00:00',
+            'to' => '2026-08-10 23:59:59',
+        ]);
+
+        $replacementUser = User::factory()->create();
+        $payload = [
+            'id' => $absence->id,
+            'from' => '2026-08-01 00:00:00',
+            'to' => '2026-08-10 23:59:59',
+            'reason' => 'Urlaub',
+            'replacements' => [
+                [
+                    'from' => '2026-08-02 00:00:00',
+                    'to' => '2026-08-03 23:59:59',
+                    'users' => [$replacementUser->id],
+                ],
+            ],
+        ];
+        $request = $this->makeRequest($payload, $absence);
+
+        $validator = Validator::make($request->all(), $request->rules());
+        $this->assertFalse($validator->fails());
+        $request->setValidator($validator);
+
+        $absence->update($request->validated());
+        $absence->setupReplacements($this->user, $payload['replacements']);
+
+        $replacement = $absence->fresh()->replacements()->first();
+
+        $this->assertNotNull($replacement);
+        $this->assertSame('2026-08-02', $replacement->getRawOriginal('from'));
+        $this->assertSame('2026-08-03', $replacement->getRawOriginal('to'));
     }
 
     public function testMissingFromFieldFailsValidation(): void

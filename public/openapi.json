@@ -1,0 +1,103 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Pfarrplaner API",
+        "description": "REST API for collaborative church service planning.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "\/api",
+            "description": "Pfarrplaner API server"
+        }
+    ],
+    "paths": {
+        "\/absence\/{absence}\/set-checked": {
+            "post": {
+                "tags": [
+                    "Absence"
+                ],
+                "summary": "Mark an absence as checked",
+                "description": "Force checked flag on absence to on",
+                "operationId": "setAbsenceChecked",
+                "parameters": [
+                    {
+                        "name": "absence",
+                        "in": "path",
+                        "description": "Absence",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated absence"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "apiToken": []
+                    }
+                ]
+            }
+        },
+        "\/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Application health check",
+                "operationId": "getHealth",
+                "responses": {
+                    "200": {
+                        "description": "Health status",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        },
+                                        "app": {
+                                            "type": "string"
+                                        },
+                                        "db": {
+                                            "type": "string",
+                                            "example": "connected"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "apiToken": {
+                "type": "apiKey",
+                "name": "api_token",
+                "in": "query"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Health",
+            "description": "Application health check"
+        },
+        {
+            "name": "Absence",
+            "description": "Absence and leave management"
+        }
+    ]
+}

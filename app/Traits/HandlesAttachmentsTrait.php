@@ -86,7 +86,7 @@ trait HandlesAttachmentsTrait
     {
         if ($request->has('remove_attachment')) {
             foreach ($request->get('remove_attachment') as $attachmentId) {
-                $attachment = Attachment::findOrFail($attachmentId);
+                $attachment = $object->attachments()->findOrFail($attachmentId);
                 if (Attachment::where('file', $attachment->file)->count() == 1) {
                     Storage::delete($attachment->file);
                 }

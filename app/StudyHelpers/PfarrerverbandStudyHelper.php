@@ -31,8 +31,8 @@
 namespace App\StudyHelpers;
 
 use App\StudyHelpers\AbstractStudyHelper;
-use GuzzleHttp\Client;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class PfarrerverbandStudyHelper extends AbstractStudyHelper
 {
@@ -54,7 +54,8 @@ class PfarrerverbandStudyHelper extends AbstractStudyHelper
                 $matches
             );
         } catch (\Exception $e) {
-            dd($e);
+            Log::warning('Could not parse Pfarrerverband study helper response.', ['exception' => $e]);
+            return [];
         }
 
         foreach ($matches[1] as $index => $date) {

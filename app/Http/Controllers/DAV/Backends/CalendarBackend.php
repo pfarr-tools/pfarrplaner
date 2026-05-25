@@ -27,13 +27,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace App\Http\Controllers\DAV\Backends;
 
 use App\DAV\DAVCalendarItem;
 use App\Models\Calendar\External\CalendarConnection;
 use App\Models\People\User;
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Sabre\CalDAV\Backend\AbstractBackend;
 use Sabre\CalDAV\Backend\SyncSupport;
@@ -108,6 +106,11 @@ class CalendarBackend extends AbstractBackend implements SyncSupport
 
     public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null)
     {
-        dd('getChangesForCalendar', $calendarId, $syncLevel, $syncLevel, $limit, Carbon::parse($syncToken), Carbon::now());
+        return [
+            'syncToken' => CalendarConnection::findOrFail($calendarId)->getCurrentSyncToken(),
+            'added' => [],
+            'modified' => [],
+            'deleted' => [],
+        ];
     }
 }

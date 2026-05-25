@@ -31,6 +31,7 @@
 namespace App\Traits;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -39,8 +40,10 @@ trait HandlesAttachedImageTrait
 
     public function attachImage(Request $request, $model, $field = null)
     {
-
-        $modelObject = $this->model::find($model);
+        $modelClass = $this->model ?? $this->modelClass ?? null;
+        abort_unless($modelClass, 500);
+        $modelObject = $modelClass::findOrFail($model);
+        Gate::authorize('update', $modelObject);
         $imageField = $field ?? $modelObject->getImageField();
         if ($request->hasFile('attachments')) {
             $files = $request->file('attachments');
@@ -64,7 +67,10 @@ trait HandlesAttachedImageTrait
 
     public function detachImage(Request $request, $model, $field = null)
     {
-        $modelObject = $this->model::find($model);
+        $modelClass = $this->model ?? $this->modelClass ?? null;
+        abort_unless($modelClass, 500);
+        $modelObject = $modelClass::findOrFail($model);
+        Gate::authorize('update', $modelObject);
         $imageField = $field ?? $modelObject->getImageField();
         if ($modelObject->$imageField) {
             Storage::delete($modelObject->$imageField);

@@ -70,4 +70,20 @@ class NameServiceUnitTest extends TestCase
         $ns = new NameService('Hans', 'Müller', 'Prof.');
         $this->assertEquals('Prof.', $ns->getTitle());
     }
+
+    public function testFromNameWithTitle(): void
+    {
+        $ns = NameService::fromName('Dr. Eva Lehmann');
+        $this->assertSame('Dr.', $ns->getTitle());
+        $this->assertSame('Eva', $ns->getFirstName());
+        $this->assertSame('Lehmann', $ns->getLastName());
+    }
+
+    public function testFromNameWithCommaAndTitle(): void
+    {
+        $ns = NameService::fromName('Lehmann, Dr. Eva');
+        $this->assertSame('Dr.', $ns->getTitle());
+        $this->assertSame('Eva', $ns->getFirstName());
+        $this->assertSame('Lehmann', $ns->getLastName());
+    }
 }

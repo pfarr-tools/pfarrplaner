@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Reports\AbstractEmbedReport;
 use App\Reports\AbstractReport;
 use App\Services\ColorService;
 use Illuminate\Contracts\Foundation\Application;
@@ -88,14 +89,7 @@ class ReportsController extends Controller
      */
     public function setup($report)
     {
-        $reportClass = 'App\\Reports\\' . ucfirst($report) . 'Report';
-        if (class_exists($reportClass)) {
-            /** @var AbstractReport $report */
-            $report = new $reportClass();
-            return $report->setup();
-        } else {
-            return redirect()->route('home');
-        }
+        return $this->resolveReport($report)->setup();
     }
 
     /**
@@ -105,14 +99,7 @@ class ReportsController extends Controller
      */
     public function render(Request $request, $report)
     {
-        $reportClass = 'App\\Reports\\' . ucfirst($report) . 'Report';
-        if (class_exists($reportClass)) {
-            /** @var AbstractReport $report */
-            $report = new $reportClass();
-            return $report->render($request);
-        } else {
-            return redirect()->route('home');
-        }
+        return $this->resolveReport($report)->render($request);
     }
 
     /**
@@ -123,15 +110,15 @@ class ReportsController extends Controller
      */
     public function step(Request $request, $report, $step)
     {
-        $reportClass = 'App\\Reports\\' . ucfirst($report) . 'Report';
-        if (class_exists($reportClass)) {
-            /** @var AbstractReport $report */
-            $report = new $reportClass();
-            if (method_exists($report, $step)) {
-                return $report->$step($request);
-            }
-        }
-        return redirect()->route('home');
+        $report = $this->resolveReport($report);
+        abort_unless(
+            preg_match('/^[A-Za-z][A-Za-z0-9_]*$/', $step)
+            && !in_array($step, ['setup', 'render', 'embed', 'isActive', 'renderView', 'renderSetupView'], true)
+            && method_exists($report, $step),
+            404
+        );
+
+        return $report->$step($request);
     }
 
     /**
@@ -140,14 +127,25 @@ class ReportsController extends Controller
      */
     public function embed(Request $request, $report)
     {
+        $report = $this->resolveReport($report, true);
+        abort_unless(method_exists($report, 'embed'), 404);
+        return $report->embed($request);
+    }
+
+    protected function resolveReport(string $report, bool $allowPublicEmbed = false): AbstractReport
+    {
         $reportClass = 'App\\Reports\\' . ucfirst($report) . 'Report';
-        if (class_exists($reportClass)) {
-            /** @var AbstractReport $report */
-            $report = new $reportClass();
-            if (method_exists($report, 'embed')) {
-                return $report->embed($request);
-            }
+        abort_unless(class_exists($reportClass), 404);
+
+        /** @var AbstractReport $reportInstance */
+        $reportInstance = new $reportClass();
+
+        if ($allowPublicEmbed) {
+            abort_unless($reportInstance instanceof AbstractEmbedReport, 404);
+            return $reportInstance;
         }
-        return abort(404);
+
+        abort_unless($reportInstance->isActive(), 403);
+        return $reportInstance;
     }
 }

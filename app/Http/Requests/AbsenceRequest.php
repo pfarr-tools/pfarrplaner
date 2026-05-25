@@ -135,8 +135,8 @@ class AbsenceRequest extends FormRequest
     {
         $data = parent::validated();
 
-        $data['from'] = $this->normalizePlannerDate($data['from'])->setTime(0, 0, 0);
-        $data['to'] = $this->normalizePlannerDate($data['to'])->setTime(23, 59, 59);
+        $data['from'] = $this->normalizePlannerDate($data['from']);
+        $data['to'] = $this->normalizePlannerDate($data['to'], true);
 
         if (isset($data['approved_at'])) {
             if (strlen($data['approved_at']) == 10) $data['approved_at'] .= ' 0:00:00';
@@ -217,23 +217,28 @@ class AbsenceRequest extends FormRequest
      * @param mixed $value
      * @return Carbon|null
      */
-    protected function normalizePlannerDate(mixed $value): ?Carbon
+    protected function normalizePlannerDate(mixed $value, bool $endOfDay = false): ?Carbon
     {
-        $date = $this->parsePlannerDate($value);
+        if (!is_string($value) || '' === trim($value)) {
+            return null;
+        }
 
+        $value = trim($value);
+
+        if (preg_match('/T.*(?:Z|[+\-]\d{2}:\d{2})$/', $value)) {
+            return Carbon::parse($value)->setTimezone('UTC');
+        }
+
+        $date = $this->parsePlannerDate($value);
         if (null === $date) {
             return null;
         }
 
-        return Carbon::create(
-            $date->year,
-            $date->month,
-            $date->day,
-            0,
-            0,
-            0,
-            'UTC'
-        );
+        return $date
+            ->copy()
+            ->setTimezone('Europe/Berlin')
+            ->setTime($endOfDay ? 23 : 0, $endOfDay ? 59 : 0, $endOfDay ? 59 : 0)
+            ->setTimezone('UTC');
     }
 
     /**
@@ -250,7 +255,15 @@ class AbsenceRequest extends FormRequest
 
         $value = trim($value);
         if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', $value)) {
-            return Carbon::createFromFormat('d.m.Y', $value, 'UTC');
+            return Carbon::createFromFormat('d.m.Y', $value, 'Europe/Berlin');
+        }
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            return Carbon::createFromFormat('Y-m-d', $value, 'Europe/Berlin');
+        }
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $value)) {
+            return Carbon::createFromFormat('Y-m-d H:i:s', $value, 'Europe/Berlin');
         }
 
         try {

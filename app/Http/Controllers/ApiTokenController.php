@@ -32,6 +32,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 /**
@@ -54,6 +55,7 @@ class ApiTokenController extends Controller
      */
     public function update(Request $request)
     {
+        Gate::authorize('update', $request->user());
         $token = Str::random(60);
 
         $request->user()->forceFill(

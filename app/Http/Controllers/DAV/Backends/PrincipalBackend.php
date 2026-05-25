@@ -112,7 +112,15 @@ class PrincipalBackend implements BackendInterface
 
     public function findByUri($uri, $principalPrefix)
     {
-        dd('findByUri', $uri, $principalPrefix, Str::after($uri, $principalPrefix));
+        $principalPrefix = Str::finish($principalPrefix, '/');
+
+        foreach ($this->getPrincipalsByPrefix($principalPrefix) as $principal) {
+            if (($principal['{'.Server::NS_SABREDAV.'}email-address'] ?? null) === $uri) {
+                return $principal['uri'];
+            }
+        }
+
+        return null;
     }
 
     public function getGroupMemberSet($principal)

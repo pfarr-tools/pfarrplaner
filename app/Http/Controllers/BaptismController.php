@@ -72,7 +72,11 @@ class BaptismController extends AbstractCRUDController
      */
     public function create(Request $request)
     {
-        Gate::authorize('create', Baptism::class);
+        if ($request->filled('service_id')) {
+            Gate::authorize('update', Service::findOrFail($request->get('service_id')));
+        } else {
+            Gate::authorize('create', Baptism::class);
+        }
         $creator = app(Baptism::getContractName('create'));
         $baptism = $creator->create($request->user(), $request->all());
         return redirect()->route('baptisms.edit', $baptism->id);
@@ -84,6 +88,7 @@ class BaptismController extends AbstractCRUDController
      */
     public function add(Service $service)
     {
+        Gate::authorize('update', $service);
         return redirect()->route('baptisms.create', ['service_id' => $service->id]);
     }
 
@@ -161,6 +166,7 @@ class BaptismController extends AbstractCRUDController
     function appointmentIcal(
         Baptism $baptism
     ) {
+        Gate::authorize('update', $baptism);
         $service = Service::find($baptism->service_id);
         $raw = View::make('baptisms.appointment.ical', compact('baptism', 'service'));
         $raw = str_replace(
@@ -183,6 +189,7 @@ class BaptismController extends AbstractCRUDController
     function done(
         Baptism $baptism
     ) {
+        Gate::authorize('update', $baptism);
         $baptism->done = true;
         $baptism->save();
         return json_encode(true);
@@ -196,6 +203,7 @@ class BaptismController extends AbstractCRUDController
      */
     public function attach(Request $request, Baptism $baptism)
     {
+        Gate::authorize('update', $baptism);
         $this->handleAttachments($request, $baptism);
         $baptism->refresh();
         return response()->json($baptism->attachments);
@@ -214,6 +222,8 @@ class BaptismController extends AbstractCRUDController
         Baptism $baptism,
         Attachment $attachment
     ) {
+        Gate::authorize('update', $baptism);
+        $attachment = $baptism->attachments()->findOrFail($attachment->id);
         $file = $attachment->file;
         $baptism->attachments()->where('id', $attachment->id)->delete();
         Storage::delete($file);

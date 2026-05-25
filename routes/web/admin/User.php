@@ -63,4 +63,4 @@ Route::post('/benutzer/{model}/attach', [UserController::class, 'attachImage'])-
 Route::delete('/benutzer/{model}/detach', [UserController::class, 'detachImage'])->name('user.detach');
 Route::post('/benutzer/{user}/passwort-zuruecksetzen', [UserController::class, 'resetPassword'])->name('user.password.reset');
 
-Route::get('/benutzer/login-als/{user}', [UserController::class, 'switch'])->name('user.switch');
+Route::post('/benutzer/login-als/{user}', [UserController::class, 'switch'])->name('user.switch');

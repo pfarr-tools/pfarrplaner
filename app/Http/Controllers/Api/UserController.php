@@ -35,6 +35,8 @@ use App\Models\People\Team;
 use App\Models\People\User;
 use App\Models\Places\City;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use App\Providers\AuthServiceProvider;
 
 class UserController extends \App\Http\Controllers\Controller
 {
@@ -67,6 +69,7 @@ class UserController extends \App\Http\Controllers\Controller
      */
     public function search($searchString)
     {
+        Gate::authorize('create', User::class);
         if (empty($searchString)) return response()->json([]);
         $users = User::with('cityScopes')
             ->whereRaw(
@@ -90,6 +93,13 @@ class UserController extends \App\Http\Controllers\Controller
      */
     public function activate(User $user, City $city)
     {
+        Gate::authorize('create', User::class);
+        abort_unless(
+            $city->administeredBy(Auth::user())
+            || Auth::user()->hasRole(AuthServiceProvider::ADMIN)
+            || Auth::user()->hasRole(AuthServiceProvider::SUPER),
+            403
+        );
         $user->cityScopes()->attach($city->id);
         return response()->json(true);
     }

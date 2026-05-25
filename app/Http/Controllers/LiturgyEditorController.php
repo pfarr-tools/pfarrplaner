@@ -43,6 +43,7 @@ use App\Models\Service;
 use App\Services\LiturgyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class LiturgyEditorController extends Controller
@@ -54,6 +55,7 @@ class LiturgyEditorController extends Controller
 
     public function editor(Request $request, Service $service)
     {
+        Gate::authorize('update', $service);
         $service->load('liturgyBlocks', 'sermon');
         $liturgySheets = LiturgySheets::all();
         $services = [];
@@ -69,13 +71,15 @@ class LiturgyEditorController extends Controller
 
     public function save(Request $request, Service $service)
     {
+        Gate::authorize('update', $service);
         foreach ($request->all() as $block) {
-            Block::find($block['id'])->update(['sortable' => $block['sortable']]);
+            $currentBlock = $service->liturgyBlocks()->findOrFail($block['id']);
+            $currentBlock->update(['sortable' => $block['sortable']]);
             foreach ($block['items'] as $item) {
-                Item::find($item['id'])->update(
+                $currentBlock->items()->findOrFail($item['id'])->update(
                     [
                         'sortable' => $item['sortable'],
-                        'liturgy_block_id' => $block['id'],
+                        'liturgy_block_id' => $currentBlock->id,
                     ]
                 );
             }
@@ -92,6 +96,10 @@ class LiturgyEditorController extends Controller
      */
     public function download(Request $request, Service $service, $key)
     {
+        if (!Auth::check() && !$request->hasValidSignature()) {
+            abort(401);
+        }
+
         $class = 'App\\Liturgy\\LiturgySheets\\' . $key . 'LiturgySheet';
         if (!class_exists($class)) {
             abort(404);
@@ -118,6 +126,7 @@ class LiturgyEditorController extends Controller
      */
     public function configureLiturgySheet(Request $request, Service $service, $key)
     {
+        Gate::authorize('update', $service);
         $class = 'App\\Liturgy\\LiturgySheets\\' . $key . 'LiturgySheet';
         if (!class_exists($class)) {
             abort(404);
@@ -145,6 +154,7 @@ class LiturgyEditorController extends Controller
      */
     public function liturgySheetDialogData(Service $service, string $key)
     {
+        Gate::authorize('update', $service);
         $class = 'App\\Liturgy\\LiturgySheets\\' . $key . 'LiturgySheet';
         if (!class_exists($class)) {
             abort(404);
@@ -158,6 +168,7 @@ class LiturgyEditorController extends Controller
 
     public function sources(Service $service)
     {
+        Gate::authorize('update', $service);
         $services1 = Service::with([])
             ->isNotAgenda()
             ->writable()
@@ -204,6 +215,8 @@ class LiturgyEditorController extends Controller
 
     public function import(Service $service, Service $source)
     {
+        Gate::authorize('update', $service);
+        Gate::authorize('update', $source);
         $ct = count($service->liturgyBlocks);
         foreach ($source->liturgyBlocks as $sourceBlock) {
             $ct++;
@@ -226,6 +239,7 @@ class LiturgyEditorController extends Controller
 
     public function recipients(Service $service)
     {
+        Gate::authorize('update', $service);
         $recipients = [];
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {

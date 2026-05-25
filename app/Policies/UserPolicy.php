@@ -99,6 +99,9 @@ class UserPolicy
         if ($model->hasRole(AuthServiceProvider::SUPER)) {
             return false;
         }
+        if ($user->id === $model->id) {
+            return true;
+        }
         if ($user->hasRole(AuthServiceProvider::ADMIN)) {
             return true;
         }
@@ -111,9 +114,6 @@ class UserPolicy
                     return true;
                 }
             }
-        }
-        if ($user->isLocalAdmin) {
-            return true;
         }
         return false;
     }
@@ -223,6 +223,20 @@ class UserPolicy
             || $user->adminCities->intersect($model->homeCities)->isNotEmpty();
     }
 
+    public function impersonate(User $user, User $model): bool
+    {
+        if ($model->hasRole(AuthServiceProvider::SUPER)) {
+            return false;
+        }
+
+        return $user->hasRole(AuthServiceProvider::ADMIN);
+    }
+
+    public function resetPassword(User $user, User $model): bool
+    {
+        return $this->update($user, $model);
+    }
+
     /**
      * Determine whether the user can merge this user into another one
      *
@@ -257,4 +271,3 @@ class UserPolicy
     }
 
 }
-

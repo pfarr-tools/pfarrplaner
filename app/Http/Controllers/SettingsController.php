@@ -33,6 +33,7 @@ namespace App\Http\Controllers;
 use App\Facades\Settings;
 use App\Models\People\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class SettingsController extends Controller
 {
@@ -43,9 +44,7 @@ class SettingsController extends Controller
 
     public function set(Request $request, User $user, $key)
     {
-        if ($user->id != \Auth::user()->id) {
-            abort(403);
-        }
+        Gate::authorize('update', $user);
         $data = $request->validate(['value' => 'nullable']);
         $userSetting = Settings::set($user, $key, $data['value']);
 
