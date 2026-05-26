@@ -15,14 +15,14 @@ describe('FormRadioGroup', () => {
         expect(labels.some(l => l.text() === 'Zwei')).toBe(true)
     })
     it('pre-selects the current modelValue', () => {
-        const w = mount(FormRadioGroup, { props: { name: 'choice', items, modelValue: '2' } })
+        const w = mount(FormRadioGroup, { props: { name: 'choice', items, modelValue: 2 } })
         const radios = w.findAll('input[type="radio"]')
         const checked = radios.find(r => r.element.checked)
         expect(checked.element.value).toBe('2')
     })
     it('renders label when label prop is set', () => {
         const w = mount(FormRadioGroup, { props: { name: 'choice', items, modelValue: '', label: 'Auswahl' } })
-        expect(w.find('label').text()).toBe('Auswahl')
+        expect(w.find('legend').text()).toBe('Auswahl')
     })
     it('is disabled when disabled prop is set', () => {
         const w = mount(FormRadioGroup, { props: { name: 'choice', items, modelValue: '', disabled: true } })

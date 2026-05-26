@@ -35,6 +35,7 @@ use App\Models\Places\City;
 use App\Models\Rites\Baptism;
 use App\Models\Service;
 use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Validation\ValidationException;
 
 trait NormalizesBaptismData
@@ -72,8 +73,39 @@ trait NormalizesBaptismData
         $input['needs_dimissorial'] ??= 0;
         $input['dimissorial_issuer'] ??= '';
         $input['birth_place'] ??= '';
+        $input['first_contact_on'] = $this->formatDateForValidation($input['first_contact_on'] ?? null);
+        $input['appointment'] = $this->formatDateTimeForValidation($input['appointment'] ?? null);
+        $input['dimissorial_requested'] = $this->formatDateForValidation($input['dimissorial_requested'] ?? null);
+        $input['dimissorial_received'] = $this->formatDateForValidation($input['dimissorial_received'] ?? null);
+        $input['dob'] = $this->formatDateForValidation($input['dob'] ?? null);
 
         return $input;
+    }
+
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function formatDateForValidation($value)
+    {
+        if ($value instanceof DateTimeInterface) {
+            return Carbon::instance($value)->setTimezone('Europe/Berlin')->format('d.m.Y');
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function formatDateTimeForValidation($value)
+    {
+        if ($value instanceof DateTimeInterface) {
+            return Carbon::instance($value)->setTimezone('Europe/Berlin')->format('d.m.Y H:i');
+        }
+
+        return $value;
     }
 
     /**

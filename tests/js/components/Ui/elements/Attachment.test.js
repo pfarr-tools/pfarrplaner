@@ -3,11 +3,11 @@ import Attachment from '@/components/Ui/elements/Attachment.vue'
 
 const att = {
     id: 1, title: 'Test.pdf', extension: 'pdf', size: 1024,
-    icon: 'fa-file-pdf', mimeType: 'application/pdf', file: 'attachments/test.pdf',
+    icon: 'fa-file-pdf', mimeType: 'application/pdf', file: 'attachments/test.pdf', hasFile: true,
 }
 const imgAtt = {
     id: 2, title: 'Photo.jpg', extension: 'jpg', size: 2048,
-    icon: 'fa-file-image', mimeType: 'image/jpeg', file: 'attachments/photo.jpg',
+    icon: 'fa-file-image', mimeType: 'image/jpeg', file: 'attachments/photo.jpg', hasFile: true,
 }
 
 describe('Attachment', () => {

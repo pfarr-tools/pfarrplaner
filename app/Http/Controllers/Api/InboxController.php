@@ -52,10 +52,10 @@ class InboxController extends Controller
                 'extension' => $extension,
                 'filesize' => filesize($item),
                 'icon' => $extension == 'pdf' ? 'mdi mdi-file-pdf-box' : 'fa fa-file-image',
-                'date' => Carbon::createFromTimestamp(filectime($item)),
+                'date' => Carbon::createFromTimestamp(filectime($item))->toIso8601String(),
             ];
         });
-        return response()->json($files);
+        return response()->json($files->values()->all());
     }
 
 }

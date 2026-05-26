@@ -87,7 +87,8 @@ describe('FormDateRangePicker — onRangeChange without iso-date', () => {
         await w.vm.onRangeChange([new Date('2025-04-01')])
         expect(w.emitted('update:from')).toBeFalsy()
         await w.vm.onRangeChange(null)
-        expect(w.emitted('update:from')).toBeFalsy()
+        expect(w.emitted('update:from')).toEqual([[null]])
+        expect(w.emitted('update:to')).toEqual([[null]])
     })
 })
 

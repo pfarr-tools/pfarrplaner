@@ -72,8 +72,8 @@ class AbsenceWebFeatureTest extends TestCase
         $this->assertNotNull($absence);
         $this->assertSame($this->user->id, $absence->user_id);
         $this->assertSame('Urlaub', $absence->reason);
-        $this->assertSame('2026-08-01 22:00:00', Carbon::parse($absence->from)->utc()->format('Y-m-d H:i:s'));
-        $this->assertSame('2026-08-02 21:59:59', Carbon::parse($absence->to)->utc()->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-08-02 00:00:00', Carbon::parse($absence->from)->utc()->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-08-02 00:00:00', Carbon::parse($absence->to)->utc()->format('Y-m-d H:i:s'));
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame(route('absence.edit', $absence->id), $response->getTargetUrl());
     }
@@ -95,8 +95,8 @@ class AbsenceWebFeatureTest extends TestCase
         $absence = Absence::latest('id')->first();
 
         $this->assertNotNull($absence);
-        $this->assertSame('2026-08-01 22:00:00', Carbon::parse($absence->from)->utc()->format('Y-m-d H:i:s'));
-        $this->assertSame('2026-08-03 21:59:59', Carbon::parse($absence->to)->utc()->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-08-02 00:00:00', Carbon::parse($absence->from)->utc()->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-08-03 00:00:00', Carbon::parse($absence->to)->utc()->format('Y-m-d H:i:s'));
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame(route('absence.edit', $absence->id), $response->getTargetUrl());
     }

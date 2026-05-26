@@ -14,6 +14,7 @@ namespace Tests\Feature;
 
 use App\Models\People\User;
 use App\Models\Sermon;
+use App\Models\Service;
 use App\Services\RoleService;
 use App\Http\Middleware\ForceDomain;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,7 +37,9 @@ class SermonFeatureTest extends TestCase
 
     public function testEditorLoads(): void
     {
+        $service = Service::factory()->create();
         $sermon = Sermon::create(['title' => 'Testpredigt']);
+        $service->update(['sermon_id' => $sermon->id]);
         $this->actingAs($this->user)
             ->get(route('sermon.editor', $sermon->id))
             ->assertStatus(200)

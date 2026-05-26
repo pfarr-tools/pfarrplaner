@@ -33,6 +33,7 @@ namespace App\Services;
 use App\Models\Calendar\Day;
 use App\Models\LiturgyInfo;
 use Carbon\Carbon;
+use Throwable;
 use Illuminate\Support\Collection;
 use Storage;
 
@@ -112,7 +113,7 @@ class LiturgyService
     {
         if (isset(static::$calendars[$year])) return static::$calendars[$year];
         if (!Storage::exists('liturgy/'.$year.'.json')) {
-            Storage::put('liturgy/'.$year.'.json', file_get_contents('https://kirchenjahr.pfarr.tools/api/jahr/'.$year));
+            Storage::put('liturgy/'.$year.'.json', static::fetchCalendarJson('https://kirchenjahr.pfarr.tools/api/jahr/'.$year));
         }
         return static::$calendars[$year] = json_decode(Storage::get('liturgy/'.$year.'.json'), true);
     }
@@ -120,7 +121,7 @@ class LiturgyService
     public static function getLectionaryYear($year) {
         if (isset(static::$lectionaryYears[$year])) return static::$lectionaryYears[$year];
         if (!Storage::exists('liturgy/lesejahr-'.$year.'.json')) {
-            Storage::put('liturgy/lesejahr-'.$year.'.json', file_get_contents('https://kirchenjahr.pfarr.tools/api/lesejahr/'.$year));
+            Storage::put('liturgy/lesejahr-'.$year.'.json', static::fetchCalendarJson('https://kirchenjahr.pfarr.tools/api/lesejahr/'.$year));
         }
         return static::$lectionaryYears[$year] = json_decode(Storage::get('liturgy/lesejahr-'.$year.'.json'), true);
     }
@@ -132,6 +133,19 @@ class LiturgyService
         if (!$subCode) return [];
         if ($lectionaryYear = static::getLectionaryYear($year)) return $lectionaryYear[$subCode] ?? [];
         return [];
+    }
+
+    /**
+     * @param string $url
+     * @return string
+     */
+    protected static function fetchCalendarJson(string $url): string
+    {
+        try {
+            return file_get_contents($url) ?: '{}';
+        } catch (Throwable) {
+            return '{}';
+        }
     }
 
 }

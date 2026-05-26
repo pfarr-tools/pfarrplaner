@@ -16,6 +16,7 @@ use App\Models\Liturgy\Block;
 use App\Models\Liturgy\Item;
 use App\Models\People\User;
 use App\Models\Service;
+use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -29,6 +30,7 @@ class LiturgyApiFeatureTest extends TestCase
     public function testStoreBlockCreatesBlock()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $service = Service::factory()->create();
 
         $response = $this->actingAs($user, 'api')
@@ -47,6 +49,7 @@ class LiturgyApiFeatureTest extends TestCase
     public function testStoreBlockRequiresTitle()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $service = Service::factory()->create();
 
         $response = $this->actingAs($user, 'api')
@@ -72,6 +75,7 @@ class LiturgyApiFeatureTest extends TestCase
     public function testUpdateBlockModifiesBlock()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $service = Service::factory()->create();
         $block = Block::create(['title' => 'Alt', 'service_id' => $service->id, 'sortable' => 1]);
 
@@ -90,6 +94,7 @@ class LiturgyApiFeatureTest extends TestCase
     public function testDestroyBlockDeletesBlock()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $service = Service::factory()->create();
         $block = Block::create(['title' => 'Zu löschen', 'service_id' => $service->id, 'sortable' => 1]);
         $id = $block->id;
@@ -107,6 +112,7 @@ class LiturgyApiFeatureTest extends TestCase
     public function testStoreItemCreatesItem()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $service = Service::factory()->create();
         $block = Block::create(['title' => 'Block', 'service_id' => $service->id, 'sortable' => 1]);
 
@@ -139,6 +145,7 @@ class LiturgyApiFeatureTest extends TestCase
     public function testDestroyItemDeletesItem()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $service = Service::factory()->create();
         $block = Block::create(['title' => 'Block', 'service_id' => $service->id, 'sortable' => 1]);
         $item = Item::create([
@@ -162,6 +169,7 @@ class LiturgyApiFeatureTest extends TestCase
     public function testSaveTreeStateUpdatesBlockOrder()
     {
         $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $service = Service::factory()->create();
         $block = Block::create(['title' => 'Block', 'service_id' => $service->id, 'sortable' => 5]);
 

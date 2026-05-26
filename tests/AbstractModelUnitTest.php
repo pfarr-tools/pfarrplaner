@@ -34,6 +34,7 @@ use App\Http\Controllers\AbstractCRUDController;
 use App\Http\Controllers\Api\AbstractApiCRUDController;
 use App\Models\AbstractModel;
 use App\Models\People\User;
+use App\Services\RoleService;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -425,6 +426,7 @@ abstract class AbstractModelUnitTest extends TestCase
         $this->assertGreaterThan(1, count($matches));
         $this->modelName = $matches[1];
         $this->testUser = User::factory()->create();
+        $this->testUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
 

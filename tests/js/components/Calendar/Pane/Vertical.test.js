@@ -42,7 +42,6 @@ describe('Calendar vertical pane', () => {
         const wrapper = mountVerticalPane({}, apiMock)
 
         expect(apiMock.get).not.toHaveBeenCalled()
-        expect(wrapper.vm.hasData).toBe(true)
         expect(wrapper.vm.getServices({ id: 1, is_org: false }, '2024-01-14')).toHaveLength(1)
     })
 
@@ -71,8 +70,11 @@ describe('Calendar vertical pane', () => {
         await Promise.resolve()
         await Promise.resolve()
 
+        expect(window.route).toHaveBeenCalledWith('api.calendar.month', {
+            date: '2024-02',
+        })
         expect(apiMock.get).toHaveBeenCalledWith('/api.calendar.month')
         expect(wrapper.vm.loadedDate).toBe('2024-02')
-        expect(wrapper.vm.hasData).toBe(true)
+        expect(wrapper.vm.getServices({ id: 1, is_org: false }, '2024-02-04')).toHaveLength(1)
     })
 })

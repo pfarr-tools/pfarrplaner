@@ -29,7 +29,8 @@ class InboxApiFeatureTest extends TestCase
 
         $response->assertOk();
         // Returns false when inbox is not configured, or a file array when it is.
-        $this->assertTrue($response->json() === false || is_array($response->json()));
+        $payload = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertTrue($payload === false || is_array($payload));
     }
 
     /**

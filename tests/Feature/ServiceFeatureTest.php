@@ -120,14 +120,15 @@ class ServiceFeatureTest extends TestCase
         $this->withoutMiddleware(Authenticate::class);
         $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
-        Permission::create(['name' => 'gd-bearbeiten']);
-        Permission::create(['name' => 'gd-allgemein-bearbeiten']);
+        Permission::firstOrCreate(['name' => 'gd-bearbeiten']);
+        Permission::firstOrCreate(['name' => 'gd-allgemein-bearbeiten']);
 
         $this->city = (City::class)::factory()->create();
 
         /** @var User */
         $this->user = User::factory()->create();
         $this->user->givePermissionTo('gd-bearbeiten');
+        $this->user->givePermissionTo('gd-allgemein-bearbeiten');
         $this->user->writableCities()->attach($this->city);
     }
 

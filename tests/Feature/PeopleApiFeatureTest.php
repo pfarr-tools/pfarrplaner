@@ -14,6 +14,7 @@ namespace Tests\Feature;
 
 use App\Models\People\User;
 use App\Models\Places\City;
+use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -28,6 +29,7 @@ class PeopleApiFeatureTest extends TestCase
     {
         $city = City::factory()->create();
         $requester = User::factory()->create();
+        $requester->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $requester->cities()->attach($city->id);
 
         $other = User::factory()->create(['first_name' => 'Brigitte', 'last_name' => 'Musterfrau']);
@@ -47,6 +49,7 @@ class PeopleApiFeatureTest extends TestCase
     {
         $city = City::factory()->create();
         $requester = User::factory()->create();
+        $requester->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $requester->cities()->attach($city->id);
 
         $inCity = User::factory()->create(['first_name' => 'Sichtbar', 'last_name' => 'Person']);
@@ -76,6 +79,7 @@ class PeopleApiFeatureTest extends TestCase
     {
         $city = City::factory()->create();
         $requester = User::factory()->create();
+        $requester->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $requester->cities()->attach($city->id);
 
         $target = User::factory()->create();

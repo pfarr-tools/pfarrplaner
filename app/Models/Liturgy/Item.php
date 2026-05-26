@@ -69,6 +69,11 @@ class Item extends Model
         return $this->belongsTo(Block::class, 'liturgy_block_id');
     }
 
+    public function liturgyBlock()
+    {
+        return $this->block();
+    }
+
     public function getDataAttribute()
     {
         return unserialize($this->attributes['serialized_data']) ?: [];
