@@ -97,13 +97,7 @@ export default {
 
         return {
             myService,
-            myCommittees: [],
         }
-    },
-    mounted() {
-        this.$api().get(route('api.committees.index')).then(response => {
-            console.log(response.data);
-        });
     },
     methods: {
         addRow() {
