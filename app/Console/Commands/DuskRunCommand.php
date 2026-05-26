@@ -29,6 +29,7 @@ use Laravel\Dusk\Console\Concerns\InteractsWithTestingFrameworks;
 class DuskRunCommand extends Command
 {
     use InteractsWithTestingFrameworks;
+    protected const QUIET_PROGRESS_INTERVAL_SECONDS = 30;
 
     /**
      * The name and signature of the console command.
@@ -37,6 +38,12 @@ class DuskRunCommand extends Command
      */
     protected $signature = 'dusk:run
                 {--browse : Open a browser instead of using headless mode}
+                {--compact : Use the compact Collision printer output}
+                {--debug-tests : Show each PHPUnit browser test while it runs}
+                {--profile : List the slowest browser tests at the end}
+                {--stop-on-failure : Stop the browser suite after the first failing test}
+                {--testdox : Show browser tests in PHPUnit TestDox format}
+                {--without-build : Reuse the existing frontend build artifacts}
                 {--without-server : Reuse an already running Laravel server}
                 {--without-tty : Disable output to TTY}';
 
@@ -82,7 +89,7 @@ class DuskRunCommand extends Command
         $options = collect($_SERVER['argv'])
             ->slice(2)
             ->diff([
-                '--browse', '--without-server', '--without-tty',
+                '--browse', '--compact', '--debug-tests', '--profile', '--stop-on-failure', '--testdox', '--without-build', '--without-server', '--without-tty',
                 '--quiet', '-q',
                 '--verbose', '-v', '-vv', '-vvv',
                 '--no-interaction', '-n',
@@ -90,14 +97,20 @@ class DuskRunCommand extends Command
             ->values()
             ->all();
 
-        $buildExitCode = $this->prepareFrontendBuild();
+        $this->reportBuildPhase();
 
-        if ($buildExitCode !== 0) {
-            return $buildExitCode;
+        if (! $this->option('without-build')) {
+            $buildExitCode = $this->prepareFrontendBuild();
+
+            if ($buildExitCode !== 0) {
+                return $buildExitCode;
+            }
         }
 
         return $this->withDuskEnvironment(function () use ($options) {
             $this->resetDuskDatabase();
+
+            $this->reportRunConfiguration($options);
 
             $server = $this->option('without-server') ? null : $this->startTestServer();
 
@@ -112,19 +125,26 @@ class DuskRunCommand extends Command
                     $this->output->writeln('Warning: '.$e->getMessage());
                 }
 
-                try {
-                    return $process->run(function ($type, $line) {
-                        $this->output->write($line);
-                    });
-                } catch (ProcessSignaledException $e) {
-                    if (extension_loaded('pcntl') && $e->getSignal() !== SIGINT) {
-                        throw $e;
-                    }
-                }
+                return $this->runPhpUnitProcess($process, $options);
             } finally {
                 $server?->stop();
             }
         });
+    }
+
+    /**
+     * Report whether the frontend build will run for this test pass.
+     *
+     * @return void
+     */
+    protected function reportBuildPhase(): void
+    {
+        if ($this->option('without-build')) {
+            $this->components->twoColumnDetail('Frontend build', 'übersprungen');
+            return;
+        }
+
+        $this->components->twoColumnDetail('Frontend build', 'vite build');
     }
 
     protected function prepareFrontendBuild(): int
@@ -149,6 +169,89 @@ class DuskRunCommand extends Command
         });
     }
 
+    /**
+     * Run the PHPUnit child process and emit heartbeats during quiet compact runs.
+     *
+     * @param  Process  $process
+     * @param  array  $options
+     * @return int
+     */
+    protected function runPhpUnitProcess(Process $process, array $options): int
+    {
+        $showsQuietProgress = $this->shouldShowQuietProgress($options);
+        $startedAt = microtime(true);
+        $lastVisibleOutputAt = $startedAt;
+
+        try {
+            $process->start();
+
+            while ($process->isRunning()) {
+                $lastVisibleOutputAt = $this->drainPhpUnitOutput($process, $lastVisibleOutputAt);
+
+                if (
+                    $showsQuietProgress
+                    && (microtime(true) - $lastVisibleOutputAt) >= self::QUIET_PROGRESS_INTERVAL_SECONDS
+                ) {
+                    $this->output->writeln(sprintf(
+                        '  [Dusk] Läuft noch... %s ohne sichtbares Testergebnis. Für Live-Testnamen: `npm run test:dusk:debug`.',
+                        $this->formatElapsedTime((int) floor(microtime(true) - $startedAt))
+                    ));
+                    $lastVisibleOutputAt = microtime(true);
+                }
+
+                usleep(100000);
+            }
+
+            $this->drainPhpUnitOutput($process, $lastVisibleOutputAt);
+
+            return $process->getExitCode() ?? 1;
+        } catch (ProcessSignaledException $e) {
+            if (extension_loaded('pcntl') && $e->getSignal() !== SIGINT) {
+                throw $e;
+            }
+
+            return 0;
+        }
+    }
+
+    /**
+     * Print the active Dusk runtime configuration before the suite starts.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    protected function reportRunConfiguration(array $options): void
+    {
+        $this->newLine();
+        $this->components->twoColumnDetail('Dusk env', $this->resolvedDuskFile());
+        $this->components->twoColumnDetail('APP_URL', $this->resolvedAppUrl());
+        $this->components->twoColumnDetail('Browser mode', $this->option('browse') ? 'sichtbar' : 'headless');
+        $this->components->twoColumnDetail('Laravel server', $this->option('without-server') ? 'bestehenden Server verwenden' : 'lokalen Testserver starten');
+        $outputMode = 'Standardausgabe';
+        if ($this->option('debug-tests')) {
+            $outputMode = 'PHPUnit --debug';
+        } elseif ($this->option('testdox')) {
+            $outputMode = 'PHPUnit --testdox';
+        }
+        $this->components->twoColumnDetail('Testausgabe', $outputMode);
+
+        if ($this->option('stop-on-failure')) {
+            $this->components->twoColumnDetail('Abbruch bei Fehlern', 'aktiv');
+        }
+
+        if ($this->option('compact')) {
+            $this->components->twoColumnDetail('Collision-Ausgabe', 'kompakt');
+        } elseif ($this->option('profile')) {
+            $this->components->twoColumnDetail('Collision-Ausgabe', 'mit Langsamste-Tests-Profil');
+        }
+
+        if ($options !== []) {
+            $this->components->twoColumnDetail('Weitere Argumente', implode(' ', $options));
+        }
+
+        $this->newLine();
+    }
+
     protected function resetDuskDatabase(): void
     {
         if ((string) Env::get('DB_CONNECTION') !== 'sqlite') {
@@ -171,7 +274,7 @@ class DuskRunCommand extends Command
      */
     protected function startTestServer(): Process
     {
-        $appUrl = getenv('APP_URL') ?: ($_ENV['APP_URL'] ?? 'http://127.0.0.1:8000');
+        $appUrl = $this->resolvedAppUrl();
         $host   = parse_url($appUrl, PHP_URL_HOST) ?? '127.0.0.1';
         $port   = parse_url($appUrl, PHP_URL_PORT) ?? 8000;
 
@@ -222,8 +325,20 @@ class DuskRunCommand extends Command
      */
     protected function phpunitArguments($options)
     {
-        if ($this->shouldUseCollisionPrinter()) {
+        if ($this->shouldUseCollisionPrinter($options)) {
             $options[] = '--no-output';
+        }
+
+        if ($this->option('debug-tests') && ! in_array('--debug', $options, true)) {
+            $options[] = '--debug';
+        }
+
+        if ($this->option('testdox') && ! in_array('--testdox', $options, true)) {
+            $options[] = '--testdox';
+        }
+
+        if ($this->option('stop-on-failure') && ! in_array('--stop-on-failure', $options, true)) {
+            $options[] = '--stop-on-failure';
         }
 
         $options = array_values(array_filter($options, function ($option) {
@@ -260,8 +375,16 @@ class DuskRunCommand extends Command
             $variables['DUSK_HEADLESS_DISABLED'] = true;
         }
 
-        if ($this->shouldUseCollisionPrinter()) {
+        if ($this->shouldUseCollisionPrinter($this->forwardedPhpUnitOptions())) {
             $variables['COLLISION_PRINTER'] = 'DefaultPrinter';
+
+            if ($this->option('compact')) {
+                $variables['COLLISION_PRINTER_COMPACT'] = 'true';
+            }
+
+            if ($this->option('profile')) {
+                $variables['COLLISION_PRINTER_PROFILE'] = 'true';
+            }
         }
 
         return $variables;
@@ -272,11 +395,105 @@ class DuskRunCommand extends Command
      *
      * @return bool
      */
-    protected function shouldUseCollisionPrinter()
+    protected function shouldUseCollisionPrinter(array $options = [])
     {
-        return ! $this->usingPest()
+        return ! $this->option('debug-tests')
+            && ! $this->option('testdox')
+            && ! $this->wantsPhpUnitOwnOutput($options)
+            && ! $this->usingPest()
             && class_exists(EnsurePrinterIsRegisteredSubscriber::class)
             && version_compare(Version::id(), '10.0', '>=');
+    }
+
+    /**
+     * Determine if PHPUnit should render its own human-readable output mode.
+     *
+     * @param  string[]  $options
+     * @return bool
+     */
+    protected function wantsPhpUnitOwnOutput(array $options): bool
+    {
+        foreach ($options as $option) {
+            if ($option === '--debug' || $option === '--testdox' || str_starts_with($option, '--testdox-')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine whether compact/default runs should emit quiet heartbeats.
+     *
+     * @param  string[]  $options
+     * @return bool
+     */
+    protected function shouldShowQuietProgress(array $options): bool
+    {
+        return ! $this->wantsPhpUnitOwnOutput($options);
+    }
+
+    /**
+     * Flush incremental output from the PHPUnit child process.
+     *
+     * @param  Process  $process
+     * @param  float  $lastVisibleOutputAt
+     * @return float
+     */
+    protected function drainPhpUnitOutput(Process $process, float $lastVisibleOutputAt): float
+    {
+        $output = $process->getIncrementalOutput();
+        $errorOutput = $process->getIncrementalErrorOutput();
+
+        if ($output !== '') {
+            $this->output->write($output);
+            $lastVisibleOutputAt = microtime(true);
+        }
+
+        if ($errorOutput !== '') {
+            $this->output->write($errorOutput);
+            $lastVisibleOutputAt = microtime(true);
+        }
+
+        return $lastVisibleOutputAt;
+    }
+
+    /**
+     * Get the PHPUnit arguments forwarded from the current CLI invocation.
+     *
+     * @return string[]
+     */
+    protected function forwardedPhpUnitOptions(): array
+    {
+        return collect($_SERVER['argv'])
+            ->slice(2)
+            ->diff([
+                '--browse', '--compact', '--debug-tests', '--profile', '--stop-on-failure', '--testdox', '--without-build', '--without-server', '--without-tty',
+                '--quiet', '-q',
+                '--verbose', '-v', '-vv', '-vvv',
+                '--no-interaction', '-n',
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Format elapsed runtime as MM:SS or HH:MM:SS.
+     *
+     * @param  int  $seconds
+     * @return string
+     */
+    protected function formatElapsedTime(int $seconds): string
+    {
+        $hours = intdiv($seconds, 3600);
+        $minutes = intdiv($seconds % 3600, 60);
+        $remainingSeconds = $seconds % 60;
+
+        if ($hours > 0) {
+            return sprintf('%02d:%02d:%02d', $hours, $minutes, $remainingSeconds);
+        }
+
+        return sprintf('%02d:%02d', $minutes, $remainingSeconds);
     }
 
     /**
@@ -499,5 +716,27 @@ class DuskRunCommand extends Command
         }
 
         return '.env.dusk';
+    }
+
+    /**
+     * Get the Dusk env file that will be loaded for this run.
+     *
+     * @return string
+     */
+    protected function resolvedDuskFile(): string
+    {
+        return file_exists(base_path($this->duskFile()))
+            ? $this->duskFile()
+            : 'keine eigene Dusk-Env-Datei';
+    }
+
+    /**
+     * Resolve the app URL for the current Dusk run.
+     *
+     * @return string
+     */
+    protected function resolvedAppUrl(): string
+    {
+        return getenv('APP_URL') ?: ($_ENV['APP_URL'] ?? 'http://127.0.0.1:8000');
     }
 }

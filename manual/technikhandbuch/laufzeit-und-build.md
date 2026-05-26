@@ -33,6 +33,22 @@ Der Handbook-Build erzeugt jetzt:
 
 Benutzerhandbuch-Screenshots werden über Dusk-Tests unter `tests/Browser/Manual/` erzeugt. Der kombinierte Build mit temporärem Laravel-Server läuft über `scripts/build-manual-with-server.js`.
 
+## Browser-Tests (Dusk)
+
+Für lokale Browser-Tests steht `npm run test:dusk` zur Verfügung. Der Aufruf startet `php artisan dusk:run --compact` mit der kompakten Collision-Ausgabe im Stil von `php artisan test --compact`. Während längerer stiller Phasen gibt der Runner zusätzlich regelmäßige Statusmeldungen aus, damit ein langsamer Browser-Test nicht wie ein Hänger aussieht.
+
+Zusätzlich gibt es gezielte Varianten für die lokale Fehlersuche:
+
+- `npm run test:dusk:compact` verwendet ebenfalls die kompakte Collision-Ausgabe und erlaubt zusätzliche Optionen wie `--stop-on-failure`.
+- `npm run test:dusk:debug` zeigt die jeweils laufenden PHPUnit-Browser-Tests direkt im Terminal an.
+- `npm run test:dusk:testdox` verwendet die PHPUnit-TestDox-Ausgabe.
+
+Der Dusk-Command baut das Frontend standardmäßig genau einmal selbst, setzt die SQLite-Testdatenbank zurück und startet bei Bedarf einen lokalen Laravel-Testserver. Für schnellere Wiederholungsläufe stehen unter anderem diese Optionen zur Verfügung:
+
+- `php artisan dusk:run --without-build` verwendet den vorhandenen Vite-Build erneut.
+- `php artisan dusk:run --stop-on-failure` bricht nach dem ersten fehlschlagenden Browser-Test ab.
+- `php artisan dusk:run --without-server` verwendet einen bereits laufenden lokalen Server mit passender `APP_URL`.
+
 Entwickler-Hilfsrouten werden in Pfarrplaner bewusst restriktiv behandelt:
 
 - `APP_DEBUG` fällt ohne explizite Umgebungsvariable auf `false` zurück.
