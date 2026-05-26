@@ -88,11 +88,13 @@ import TextStats from "../Elements/TextStats";
 import TimeFields from "./Elements/TimeFields";
 import SongEditPane from "./Elements/SongEditPane";
 import FormSelectize from "../../Ui/forms/FormSelectize";
+import FormInput from '../../Ui/forms/FormInput.vue'
 
 export default {
     name: "SongEditor",
     components: {
         FormSelectize,
+        FormInput,
         SongEditPane,
         TimeFields,
         TextStats,
