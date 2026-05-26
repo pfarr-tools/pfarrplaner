@@ -14,6 +14,7 @@ namespace App\Console\Commands;
 
 use Dotenv\Dotenv;
 use Illuminate\Console\Command;
+use Illuminate\Support\Env;
 use Illuminate\Support\Str;
 use NunoMaduro\Collision\Adapters\Phpunit\Subscribers\EnsurePrinterIsRegisteredSubscriber;
 use PHPUnit\Runner\Version;
@@ -89,7 +90,15 @@ class DuskRunCommand extends Command
             ->values()
             ->all();
 
+        $buildExitCode = $this->prepareFrontendBuild();
+
+        if ($buildExitCode !== 0) {
+            return $buildExitCode;
+        }
+
         return $this->withDuskEnvironment(function () use ($options) {
+            $this->resetDuskDatabase();
+
             $server = $this->option('without-server') ? null : $this->startTestServer();
 
             try {
@@ -116,6 +125,43 @@ class DuskRunCommand extends Command
                 $server?->stop();
             }
         });
+    }
+
+    protected function prepareFrontendBuild(): int
+    {
+        $process = (new Process(
+            ['npm', 'run', 'build'],
+            base_path(),
+            array_merge($_ENV, $_SERVER, [
+                'npm_config_cache' => '/tmp/.npm',
+                'NPM_CONFIG_CACHE' => '/tmp/.npm',
+            ]),
+        ))->setTimeout(null);
+
+        try {
+            $process->setTty(! $this->option('without-tty'));
+        } catch (RuntimeException $e) {
+            $this->output->writeln('Warning: '.$e->getMessage());
+        }
+
+        return $process->run(function ($type, $line) {
+            $this->output->write($line);
+        });
+    }
+
+    protected function resetDuskDatabase(): void
+    {
+        if ((string) Env::get('DB_CONNECTION') !== 'sqlite') {
+            return;
+        }
+
+        $database = Env::get('DB_DATABASE');
+
+        if (! is_string($database) || $database === '' || ! file_exists($database)) {
+            return;
+        }
+
+        @unlink($database);
     }
 
     /**
