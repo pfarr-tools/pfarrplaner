@@ -60,6 +60,10 @@ export default {
         };
     },
     computed: {
+        storageKey() {
+            const sessionId = this.$page.props.sessionId || 'guest';
+            return `pfarrplaner_interstitials_later:${sessionId}`;
+        },
         interstitials() {
             return this.$page.props.interstitials || [];
         },
@@ -87,13 +91,13 @@ export default {
     methods: {
         loadDeferredKeys() {
             try {
-                return JSON.parse(sessionStorage.getItem('pfarrplaner_interstitials_later') || '[]');
+                return JSON.parse(sessionStorage.getItem(this.storageKey) || '[]');
             } catch (e) {
                 return [];
             }
         },
         saveDeferredKeys() {
-            sessionStorage.setItem('pfarrplaner_interstitials_later', JSON.stringify(this.deferredKeys));
+            sessionStorage.setItem(this.storageKey, JSON.stringify(this.deferredKeys));
         },
         async handleAction(action) {
             if (!this.currentInterstitial || this.busy) {

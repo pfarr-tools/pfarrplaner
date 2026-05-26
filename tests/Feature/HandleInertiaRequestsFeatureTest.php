@@ -86,6 +86,8 @@ class HandleInertiaRequestsFeatureTest extends TestCase
         $props = $this->sharedProps();
 
         $this->assertArrayHasKey('interstitials', $props);
+        $this->assertArrayHasKey('sessionId', $props);
         $this->assertSame('breaking-change', $props['interstitials']()[0]['key']);
+        $this->assertIsString($props['sessionId']());
     }
 }

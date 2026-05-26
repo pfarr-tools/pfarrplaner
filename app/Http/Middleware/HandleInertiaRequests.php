@@ -107,6 +107,7 @@ class HandleInertiaRequests extends Middleware
                 'currentUser' => fn () => $request->user()
                     ? new UserResource($request->user())
                     : null,
+                'sessionId' => fn() => $request->session()->getId(),
                 'menu' => fn() => MenuBuilder::sidebar(),
                 'settings' => fn() => Settings::all(Auth::user()),
                 'interstitials' => fn() => app(InterstitialService::class)->forUser(Auth::user()),
