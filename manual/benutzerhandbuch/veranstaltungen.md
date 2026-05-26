@@ -160,6 +160,8 @@ Hier erfassen Sie, wofür die Kollekte bestimmt ist und, falls der Gottesdienst 
 - **Betrag**: Tragen Sie den gezählten Betrag ein, meist in Euro.
 - **Anmerkung**: Nutzen Sie dieses Feld für kurze Hinweise, zum Beispiel wenn eine Kollekte nachgetragen wurde.
 
+> **Wichtiger Hinweis:** Zum 30. Juni 2026 werden die Felder **Opferzähler 1** und **Opferzähler 2** entfernt. Die Angaben werden dann als normaler Dienst weitergeführt. Prüfen Sie deshalb bitte rechtzeitig alle vorhandenen Einträge. Tragen Sie vollständige Namen möglichst im Format **„Nachname, Vorname“** ein. Das Format **„Vorname Nachname“** kann ebenfalls funktionieren, ist aber weniger sicher. Unklare oder uneinheitliche Schreibweisen können dazu führen, dass Angaben bei der Umstellung nicht korrekt übernommen werden.
+
 Wenn **Opferzweck** oder **Anmerkungen** leer bleiben, kann Pfarrplaner automatisch hinterlegte Standardwerte der Kirchengemeinde verwenden. Für normale Gottesdienste, Beerdigungen und Trauungen können dabei unterschiedliche Standardwerte gelten. Sind keine Standardwerte hinterlegt, bleiben die Felder leer.
 Im Editor bleiben diese Felder trotzdem leer, solange Sie keinen eigenen Wert eintragen. Die Standardwerte erscheinen vor allem in Ausgaben, Berichten und öffentlichen Texten.
 

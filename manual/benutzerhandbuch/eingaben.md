@@ -80,6 +80,8 @@ Spalten:
 - **Opferzähler 2**: Zweite Person, die gezählt hat.
 - **Betrag**: Eingenommener Betrag.
 
+> **Wichtiger Hinweis:** Zum 30. Juni 2026 werden die Spalten **Opferzähler 1** und **Opferzähler 2** entfernt. Die Namen werden dann als normaler Dienst übernommen. Prüfen Sie deshalb bitte alle vorhandenen Namen in dieser Tabelle. Verwenden Sie möglichst das Format **„Nachname, Vorname“**. **„Vorname Nachname“** kann ebenfalls funktionieren, ist aber weniger sicher. Unklare oder unterschiedlich geschriebene Namen können bei der Umstellung verloren gehen.
+
 Änderungen werden automatisch gespeichert. Die Daten erscheinen später unter anderem im [Opferplan](berichte.md), in der [Übersicht der eingenommenen Opfer](berichte.md) und in anderen Ausgaben.
 
 ---

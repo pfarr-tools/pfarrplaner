@@ -45,18 +45,18 @@ return [
     | - writer: nur für Benutzer:innen mit Schreibrechten in mind. einer Gemeinde
     */
     'items' => [
-        /*
-        'breaking-change-2026-11' => [
+        'opferzaehler-umstellung-2026-06-30' => [
             'enabled' => true,
-            'audience' => 'all',
+            'audience' => 'writer',
             'level' => 'warning',
-            'title' => 'Wichtige Änderung in der nächsten Version',
-            'text' => 'Ab Version 2026.11 ändert sich die Arbeitsweise für ...',
+            'title' => 'Wichtige Änderung bei den Opferzähler-Feldern',
+            'text' => 'Zum 30. Juni 2026 werden die Felder "Opferzähler 1" und "Opferzähler 2" entfernt. Stattdessen werden die Angaben in einen normalen Dienst eingetragen, ähnlich wie bei "Schriftlesung" oder anderen Diensten.',
             'details' => [
-                'Bitte prüfen Sie Ihre Vorlagen vor dem Update.',
-                'Bei Rückfragen wenden Sie sich an Ihre Administration.',
+                'Bitte prüfe vor der Umstellung alle Einträge in den Opferzähler-Feldern.',
+                'Trage dort vollständige Namen ein, am besten im Format "Nachname, Vorname".',
+                'Das Format "Vorname Nachname" kann ebenfalls funktionieren, ist aber weniger sicher.',
+                'Falsch oder uneinheitlich geschriebene Einträge können bei der Umstellung verloren gehen.',
             ],
         ],
-        */
     ],
 ];
