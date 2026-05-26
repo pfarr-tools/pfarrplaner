@@ -32,12 +32,12 @@
                                         </td>
                                     </tr>
                                 @endif
-                                @if($nextService->offering_goal)
+                                @if($nextService->offeringGoal())
                                     <tr>
                                         <td valign="top"><span class="fa fa-euro-sign fa-2x"></span></td>
                                         <td valign="top">
                                             Zu diesem Gottesdienst bitten wir um Spenden für folgenden
-                                            Zweck: {{ $nextService->offering_goal }}<br/>
+                                            Zweck: {{ $nextService->offeringGoal() }}<br/>
                                             @if($nextService->offerings_url)
                                                 <a class="btn btn-secondary" href="{{ $nextService->offerings_url }}"
                                                    target="_blank">Spenden</a>
@@ -109,12 +109,12 @@
                                 <div id="{{ uniqid() }}" class="col s12 default ">
                                     <table class="table serviceTable">
                                         <tbody>
-                                        @if($lastService->offering_goal)
+                                        @if($lastService->offeringGoal())
                                             <tr>
                                                 <td valign="top"><span class="fa fa-euro-sign fa-2x"></span></td>
                                                 <td valign="top">
                                                     Zu diesem Gottesdienst bitten wir um Spenden für folgenden
-                                                    Zweck: {{ $lastService->offering_goal }}<br/>
+                                                    Zweck: {{ $lastService->offeringGoal() }}<br/>
                                                     @if($lastService->offerings_url)
                                                         <a class="btn btn-secondary"
                                                            href="{{ $lastService->offerings_url }}"

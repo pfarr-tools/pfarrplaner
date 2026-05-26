@@ -105,17 +105,18 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
 
         $offerings = [];
         foreach ($services as $service) {
-            if ($service->offering_goal != '') {
-                if (!isset($offerings[$service->offering_goal])) {
-                    $offerings[$service->offering_goal] = ['ct' => 0, 'amount' => 0, 'done' => 0];
+            $offeringGoal = $service->offeringGoal();
+            if ($offeringGoal != '') {
+                if (!isset($offerings[$offeringGoal])) {
+                    $offerings[$offeringGoal] = ['ct' => 0, 'amount' => 0, 'done' => 0];
                 }
-                $offerings[$service->offering_goal]['ct']++;
+                $offerings[$offeringGoal]['ct']++;
                 $x = trim(strtr((string)$service->offering_amount, [',' => '.', '€' => '']));
                 if (is_numeric($x)) {
-                    $offerings[$service->offering_goal]['amount'] += (float)$x;
+                    $offerings[$offeringGoal]['amount'] += (float)$x;
                 }
                 if ($service->date <= Carbon::now()) {
-                    $offerings[$service->offering_goal]['done']++;
+                    $offerings[$offeringGoal]['done']++;
                 }
             }
         }

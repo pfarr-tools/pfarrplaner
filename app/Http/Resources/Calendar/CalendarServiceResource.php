@@ -56,6 +56,8 @@ class CalendarServiceResource extends JsonResource
             'description' => $this->description,
             'descriptionText' => $this->descriptionText(),
             'internal_remarks' => $this->internal_remarks,
+            'offering_goal' => $this->offeringGoal(),
+            'offering_description' => $this->offeringDescription(),
             'locationText' => $this->locationText(),
             'locationTextWithCity' => $this->locationTextWithCity,
             'location' => new CalendarLocationResource($this->location),

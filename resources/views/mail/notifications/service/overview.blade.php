@@ -113,11 +113,11 @@
         </tr>
         <tr>
             @component('mail.layout.blocks.cell')Opferzweck @endcomponent
-            @component('mail.layout.blocks.cell'){{ $service->offering_goal }} @endcomponent
+            @component('mail.layout.blocks.cell'){{ $service->offeringGoal() }} @endcomponent
         </tr>
         <tr>
             @component('mail.layout.blocks.cell')Notizen zum Opfer @endcomponent
-            @component('mail.layout.blocks.cell'){{ $service->offering_description }} @endcomponent
+            @component('mail.layout.blocks.cell'){{ $service->offeringDescription() }} @endcomponent
         </tr>
         <tr>
             @component('mail.layout.blocks.cell')Opfertyp @endcomponent

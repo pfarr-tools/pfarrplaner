@@ -5,6 +5,7 @@
 Berichte lesen Daten aus Pfarrplaner und erstellen daraus Listen, Dateien, Formulare, E-Mails oder HTML-Code für Websites. Sie verändern normalerweise keine Gottesdienste. Ausnahmen sind ausdrücklich beschrieben, zum Beispiel beim Senden einer Dienstanfrage.
 
 Wenn ein Bericht unvollständig wirkt, fehlen die Angaben meistens im [Editor für Veranstaltungen und Gottesdienste](veranstaltungen.md), in [Kasualien](kasualien.md), im [Urlaubsplan](urlaubsplan.md) oder in den [Sammeleingaben](eingaben.md).
+Wenn Berichte einen Opferzweck oder eine Opferanmerkung ausgeben, verwendet Pfarrplaner bei leeren Feldern automatisch die Standardwerte der Kirchengemeinde. Für normale Gottesdienste, Beerdigungen und Trauungen können dabei unterschiedliche Standardwerte gelten.
 
 ---
 
@@ -201,6 +202,7 @@ Felder:
 - **Anzahl Kopien pro QR-Code**: Wie oft jeder QR-Code ausgegeben werden soll.
 
 Voraussetzung ist, dass die nötigen Zahlungsdaten für die Gemeinde gepflegt sind.
+Wenn im Gottesdienst kein eigener Opferzweck eingetragen ist, verwendet der QR-Code automatisch den hinterlegten Standardwert der Kirchengemeinde.
 
 ---
 
@@ -345,6 +347,7 @@ Felder:
 - **Gottesdienste von**: Zeitraum (Beginn und Ende).
 
 Die Beträge stammen aus den Opferfeldern der Gottesdienste und aus dem Assistenten [Opferplan bearbeiten](eingaben.md).
+Die Gruppierung nach Opferzweck verwendet ebenfalls automatisch hinterlegte Standardwerte der Kirchengemeinde, wenn beim einzelnen Gottesdienst kein eigener Opferzweck eingetragen ist.
 
 ---
 
@@ -360,8 +363,9 @@ Felder:
 - **Auf folgende Orte beschränken**: Optional. Zeigt nur Orte aus den vorher gewählten Gemeinden. Leer bedeutet, dass alle Orte der gewählten Gemeinden einbezogen werden.
 - **Jahr**: Jahr des Opferplans.
 - **Opferzähler mit ausgeben**: Nimmt die Namen der Opferzähler auf.
-- **Leere Felder als "eigene Gemeinde" ausgeben**: Behandelt leere Angaben als eigene Gemeinde.
 - **Fehlende Einträge hervorheben**: Markiert Gottesdienste ohne vollständige Opferangaben.
+
+Wenn bei einem Gottesdienst kein eigener Opferzweck oder keine eigene Opferanmerkung eingetragen ist, zeigt der Bericht automatisch die hinterlegten Standardwerte der Kirchengemeinde an. Die zusätzliche Übersicht unter der Tabelle zeigt diese Standardwerte noch einmal getrennt nach allgemeinem Gottesdienst, Beerdigung und Trauung.
 
 ---
 
@@ -679,6 +683,7 @@ Felder:
 - **Aufrufende Website**: Website, auf der der Code laufen darf. Dieses Feld ist erforderlich, damit der Browser die Einbindung erlaubt.
 
 Die Ausgabe ist nur sinnvoll, wenn Streamingdaten in den Gottesdiensten gepflegt sind.
+Falls in der Streaming-Ausgabe ein Opferzweck angezeigt wird, verwendet Pfarrplaner bei leeren Gottesdienstfeldern automatisch den passenden Standardwert der Kirchengemeinde.
 
 ---
 

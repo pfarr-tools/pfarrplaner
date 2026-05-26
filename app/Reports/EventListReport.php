@@ -292,11 +292,11 @@ class EventListReport extends AbstractWordDocumentReport
                         );
                     }
 
-                    if ($event->offering_goal) {
+                    if ($event->offeringGoal()) {
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                ["<w:br />\t\tOpfer: " . $event->offering_goal, []],
+                                ["<w:br />\t\tOpfer: " . $event->offeringGoal(), []],
                             ],
                             0,
                             $run

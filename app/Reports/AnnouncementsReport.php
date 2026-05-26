@@ -312,9 +312,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             $this->renderMinistryLine($ministry, $people);
         }
 
-        if ($service->offering_goal) {
+        if ($service->offeringGoal()) {
             $this->doc->renderParagraph(self::INDENT, [
-                ["Opfer:\t{$service->offering_goal}", []]
+                ["Opfer:\t{$service->offeringGoal()}", []]
             ]);
         }
 

@@ -477,8 +477,8 @@ class Announcements
     public function getOfferingsArray(string $lastService = '', string $offerings = ''): array
     {
         $paragraphs = [];
-        if (!empty($this->service->offering_goal)) {
-            $paragraphs[] = 'Das Opfer heute erbitten wir für: ' . $this->service->offering_goal;
+        if (!empty($this->service->offeringGoal())) {
+            $paragraphs[] = 'Das Opfer heute erbitten wir für: ' . $this->service->offeringGoal();
         } else {
             $paragraphs[] = 'Das Opfer heute erbitten wir für die vielfältigen Aufgaben in unserer Kirchengemeinde.';
         }

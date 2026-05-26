@@ -840,7 +840,7 @@
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                 align="left"
-                                                                                valign="top">{{ $service->offering_goal }}</td>
+                                                                                valign="top">{{ $service->offeringGoal() }}</td>
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
@@ -857,7 +857,7 @@
                                                                             </td>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"
                                                                                 align="left"
-                                                                                valign="top">{{ $service->offering_description }}</td>
+                                                                                valign="top">{{ $service->offeringDescription() }}</td>
                                                                         </tr>
                                                                         <tr>
                                                                             <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 1px; border-top-color: #e9ecef; border-top-style: solid; margin: 0; padding: 12px;"

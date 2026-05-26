@@ -36,7 +36,7 @@
                     <span style="font-size: .8em;">am {{ $service->date->format('d.m.Y') }} um {{ $service->timeText() }}</span></p>
                 <p>
                     Alle Spenden zum heutigen Gottesdienst sind für:<br />
-                    <b>{{ $service->offering_goal ?: 'Unsere Kirchengemeinde'}}</b>
+                    <b>{{ $service->offeringGoal() ?: 'Unsere Kirchengemeinde'}}</b>
                 </p>
                 <p style="font-size: .8em;">Scanne den folgenden Code mit deiner Online-Banking-App, um per Überweisung zu spenden:</p>
                 <p>
@@ -44,7 +44,7 @@
                         $service->city->official_name ?: 'Evangelische Kirchengemeinde '.$service->city->name,
                         $service->city->iban,
                         null,
-                        'Spende: '.($service->offering_goal ?: 'Allgemeine Gemeindearbeit'),
+                        'Spende: '.($service->offeringGoal() ?: 'Allgemeine Gemeindearbeit'),
                         $service->city->bic ?? null,
 )                   ) }}" />
                     <br/>

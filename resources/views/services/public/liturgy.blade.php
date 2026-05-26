@@ -156,8 +156,8 @@
     </div>
     <hr />
     <div class="p-3">
-        @if ($service->offering_goal)
-            Anlässlich dieses Gottesdiensts bitten wir um ein Opfer für: {{ $service->offering_goal }}.
+        @if ($service->offeringGoal())
+            Anlässlich dieses Gottesdiensts bitten wir um ein Opfer für: {{ $service->offeringGoal() }}.
         @else
             Anlässlich dieses Gottesdiensts bitten wir um ein Opfer zugunsten der vielfältigen Aufgaben in unserer Kirchengemeinde.
         @endif
@@ -172,6 +172,5 @@
     </div>
 
 </body>
-
 
 

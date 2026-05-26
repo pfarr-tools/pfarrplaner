@@ -228,7 +228,7 @@ class BulletinReport extends AbstractWordDocumentReport
                     isset($liturgy[0]['Predigt']) ? $liturgy[0]['Predigt']['Bibelstelle'] : ''
                 );
                 $table->addCell(Converter::cmToTwip(2.5))->addText(
-                    $service->offering_goal ? 'Opfer für ' . $service->offering_goal : ''
+                    $service->offeringGoal() ? 'Opfer für ' . $service->offeringGoal() : ''
                 );
                 $first = false;
             }

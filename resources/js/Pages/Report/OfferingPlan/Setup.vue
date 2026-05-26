@@ -46,7 +46,6 @@
             <form-input name="year" label="Jahr" v-model="myYear" type="number" />
             <br />
             <form-check name="includeOfferingCounters" v-model="myIncludeOfferingCounters" label="Opferzähler mit ausgeben"/>
-            <form-check name="emptyAsOwn" v-model="myEmptyAsOwn" label="Leere Felder als &quot;eigene Gemeinde&quot; ausgeben"/>
             <form-check name="highlightEmpty" v-model="myHighlightEmpty" label="Fehlende Einträge hervorheben"/>
         </form>
     </admin-layout>
@@ -69,7 +68,6 @@ export default {
             myLocations: [],
             myYear: moment().format('YYYY'),
             myIncludeOfferingCounters: false,
-            myEmptyAsOwn: true,
             myHighlightEmpty: false,
         }
     },
@@ -80,7 +78,6 @@ export default {
                 locations: this.myLocations,
                 year: this.myYear,
                 includeOfferingCounters: this.myIncludeOfferingCounters,
-                emptyAsOwn: this.myEmptyAsOwn,
                 highlightEmpty: this.myHighlightEmpty,
             });
         },

@@ -432,7 +432,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                 $sheet->setCellValue($this->cellAddress('J', $row, $cities), $service->offerings_counter1);
                 $sheet->setCellValue($this->cellAddress('A', $row2, $cities), $service->offerings_counter2);
                 $sheet->setCellValue($this->cellAddress('K', $row, $cities), $service->offeringText());
-                $sheet->setCellValue($this->cellAddress('L', $row, $cities), $service->offering_description);
+                $sheet->setCellValue($this->cellAddress('L', $row, $cities), $service->offeringDescription());
 
 
                 $colCtr = 0;
@@ -475,7 +475,7 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                     );
                 }
 
-                if ($service->offering_description) {
+                if ($service->offeringDescription()) {
                     $sheet->getStyle($this->cellAddress('L', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('ffffc000');
                 }

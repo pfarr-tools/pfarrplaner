@@ -486,7 +486,7 @@ class ServiceController extends Controller
     {
         if (!$service->city->iban) abort(404);
 
-        $purpose = $service->offering_goal ?: 'Allgemeine Gemeindearbeit';
+        $purpose = $service->offeringGoal() ?: 'Allgemeine Gemeindearbeit';
 
         return redirect()->route('qrcode', GiroCodeService::codeValue(
              $service->city->official_name ?: 'Evang. Kirchengemeinde '.$service->city->name,

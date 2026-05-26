@@ -100,7 +100,7 @@ class BekanntgabenReplacer extends AbstractReplacer
             . $fmt->formatCurrency($offeringAmount, 'EUR') . '.'
             . PHP_EOL . PHP_EOL;
 
-        $text .= 'Das heutige Opfer ist für folgenden Zweck bestimmt: ' . $service->offering_goal . PHP_EOL ;
+        $text .= 'Das heutige Opfer ist für folgenden Zweck bestimmt: ' . $service->offeringGoal() . PHP_EOL ;
 
         $ctr = 0;
         $lastDay = $nextWeek->format('Ymd');

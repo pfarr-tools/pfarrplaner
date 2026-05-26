@@ -44,27 +44,23 @@
             <?php $ct = 0 ?>
         @foreach ($occurences as $occurence)
                 <?php $ct++; ?>
-            <tr style="background-color: {{ ($highlightEmpty && empty(trim($occurence->service->offering_goal))) ? ($ct %2 == 1 ? 'orange' : 'yellow') : ($ct %2 == 1 ? 'lightgray' : 'white')}};">
+            <tr style="background-color: {{ ($highlightEmpty && empty(trim($occurence->service->offeringGoal()))) ? ($ct %2 == 1 ? 'orange' : 'yellow') : ($ct %2 == 1 ? 'lightgray' : 'white')}};">
                 <td valign="top" style="max-width: 3.5cm; width: 3.5cm;">
                     <small><b>{{ $occurence->start->format('d.m.Y') }}, {{ $occurence->event->timeText(true) }}
                             <br/>{{ $occurence->event->locationText() }}</b>
                         @if ($occurence->event->descriptionText() != '')<br/>{{ $occurence->event->descriptionText }}
                     </small>@endif
                 </td>
-                <td valign="top">{{ trim($occurence->event->offering_goal) ?: ($emptyAsOwn ? 'Eigene Gemeinde' : '') }}</td>
-                <td valign="top" style="width: 1.3cm;"><small>@if((trim($occurence->event->offering_goal) == '') && $emptyAsOwn)
-                            eig.
-                        @elseif($occurence->event->offering_type == 'PO')
+                <td valign="top">{{ trim($occurence->event->offeringGoal()) }}</td>
+                <td valign="top" style="width: 1.3cm;"><small>@if($occurence->event->offering_type == 'PO')
                             Pflicht
+                        @elseif($occurence->event->offering_type == 'eO')
+                            empf.
                         @else
-                            @if($occurence->event->offering_type == 'eO')
-                                empf.
-                            @else
-                                eig.
-                            @endif
+                            eig.
                         @endif</small>
                 </td>
-                <td valign="top">{{ $occurence->event->offering_description }}</td>
+                <td valign="top">{{ $occurence->event->offeringDescription() }}</td>
                 @if($includeOfferingCounters)
                     <td valign="top"><small>{{ $occurence->event->offerings_counter1 }}</small></td>
                     <td valign="top"><small>{{ $occurence->event->offerings_counter2 }}</small></td>
@@ -113,7 +109,6 @@
     </table>
     <p style="margin-top: 1cm; font-size: .7em">
         Erklärungen: Pflicht - durch die Landeskirche festgelegtes Pflichtopfer; empf. - von der Landeskirche empfohlener Opferzweck; eig. - eigene Festlegung des Opferzwecks.
-        @if($emptyAsOwn) Nicht ausdrücklich festgelegte Opferzwecke wurden automatisch als "Eigene Gemeinde" (eig.) angegeben.@endif
     </p>
 
 @else

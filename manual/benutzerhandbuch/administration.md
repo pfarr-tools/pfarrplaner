@@ -145,7 +145,7 @@ Im Reiter **Allgemeines** pflegen Sie den Namen, die offizielle Bezeichnung, die
 
 ![Kirchengemeinde bearbeiten: Allgemeines](media/images/admin-gemeinde-allgemein.png)
 
-Im Reiter **Opfer** hinterlegen Sie Standardangaben für Opferzwecke. Diese Werte helfen beim Anlegen von Gottesdiensten, Beerdigungen und Trauungen, weil Pfarrplaner bei leeren Feldern sinnvolle Vorschläge übernehmen kann. Die allgemeine Spendenseite sowie IBAN und BIC können für öffentliche Hinweise oder Ausgaben verwendet werden.
+Im Reiter **Opfer** hinterlegen Sie Standardangaben für Opferzwecke. Diese Werte helfen beim Anlegen von Gottesdiensten, Beerdigungen und Trauungen, weil Pfarrplaner bei leeren Feldern sinnvolle Vorschläge übernehmen kann. Außerdem nutzt Pfarrplaner diese Standardwerte in Ausgaben, Berichten, E-Mails und öffentlichen Texten automatisch, wenn beim einzelnen Gottesdienst kein eigener Opferzweck oder keine eigene Opferanmerkung eingetragen ist. Die allgemeine Spendenseite sowie IBAN und BIC können für öffentliche Hinweise oder Ausgaben verwendet werden.
 
 ![Kirchengemeinde bearbeiten: Opfer](media/images/admin-gemeinde-opfer.png)
 

@@ -64,7 +64,7 @@
                                 ({{ $occurence->event->participantsText('P') }})@endif
                             @if($occurence->event->descriptionText())<br/>{{ $occurence->event->descriptionText() }}@endif
                             @if($occurence->event->controlled_access) @component('components.service.controlledAccess', ['service' => $occurence->event]) @endcomponent @endif
-                            @if ($occurence->event->offering_goal)<br/>Opfer: {{ $occurence->event->offering_goal }}@endif
+                            @if ($occurence->event->offeringGoal())<br/>Opfer: {{ $occurence->event->offeringGoal() }}@endif
                             @if ($occurence->event->event_class == 'service')
                                 <div>
                                     @if ($occurence->event->songsheet) <span class="small-button" href="{{ $occurence->event->songsheetUrl }}" title="Klicken Sie hier, um das Liedblatt herunterzuladen"><span class="fa fa-file-pdf"></span> Liedblatt</span> @endif

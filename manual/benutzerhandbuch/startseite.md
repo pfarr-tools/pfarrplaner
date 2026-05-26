@@ -82,6 +82,7 @@ Wenn keine passenden Gottesdienste vorhanden sind, zeigt Pfarrplaner einen Hinwe
 ## Reiter: Nächste Gottesdienste mit Opferzweck
 
 Dieser Reiter zeigt Gottesdienste der nächsten zwei Monate zusammen mit dem geplanten Opferzweck.
+Wenn im Gottesdienst selbst kein eigener Opferzweck eingetragen ist, zeigt Pfarrplaner hier automatisch den hinterlegten Standardwert der Kirchengemeinde an. Das gilt auch für besondere Standardwerte bei Beerdigungen und Trauungen.
 
 Die Tabelle enthält:
 

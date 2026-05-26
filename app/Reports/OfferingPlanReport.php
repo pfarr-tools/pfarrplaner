@@ -88,7 +88,6 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
                 'locations.*' => 'nullable|int|exists:locations,id',
                 'year' => 'required|int',
                 'includeOfferingCounters' => 'bool',
-                'emptyAsOwn' => 'bool',
                 'highlightEmpty' => 'bool',
             ]
         );

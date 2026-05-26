@@ -347,7 +347,7 @@ class BillBoardReport extends AbstractWordDocumentReport
 
                 if ($event->event->event_class == 'service') {
                     if ($s = $this->getNameListLine($event->event->organists))$line[] = 'Musik: ' . $s;
-                    if ($event->event->offering_goal) $line[] = 'Opfer: ' . $event->event->offering_goal;
+                    if ($event->event->offeringGoal()) $line[] = 'Opfer: ' . $event->event->offeringGoal();
                     $line[] = '';
                 }
                 $this->doc->renderParagraph(
