@@ -184,4 +184,20 @@ class LiturgyApiFeatureTest extends TestCase
         $response->assertJsonStructure(['tree']);
         $this->assertSame(1, $block->fresh()->sortable);
     }
+
+    /**
+     * @return void
+     */
+    public function testSourcesReturnsImportableSourcesForServiceIdRouteParameter()
+    {
+        $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
+        $service = Service::factory()->create();
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.liturgy.sources', ['serviceId' => $service->id]));
+
+        $response->assertOk();
+        $response->assertJsonIsArray();
+    }
 }

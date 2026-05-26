@@ -215,12 +215,14 @@ class LiturgyController extends \App\Http\Controllers\Controller
 
 
     /**
-     * Return all import sources for a service
-     * @param Service $service
+     * Return all import sources for a service.
+     *
+     * @param int $serviceId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function sources(Service $service)
+    public function sources(int $serviceId)
     {
+        $service = Service::findOrFail($serviceId);
         Gate::authorize('update', $service);
         $serviceGroups = [
             Service::setEagerLoads([])->with(['location'])
