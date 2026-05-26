@@ -27,4 +27,28 @@ class ReportsScreenshotTest extends ManualScreenshotTestCase
             );
         });
     }
+
+    public function testCaptureServiceTableReportSetup(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $this->captureManualScreenshot(
+                $browser,
+                route('reports.setup', 'ServiceTable'),
+                'berichte-jahresplan-gottesdienste',
+                800
+            );
+        });
+    }
+
+    public function testCaptureServiceExcelTableReportSetup(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $this->captureManualScreenshot(
+                $browser,
+                route('reports.setup', 'ServiceExcelTable'),
+                'berichte-excel-tabelle-gottesdienste',
+                800
+            );
+        });
+    }
 }

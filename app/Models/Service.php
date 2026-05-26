@@ -1608,7 +1608,70 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function offeringText()
     {
-        return $this->offering_goal . ($this->offering_type ? ' (' . $this->offering_type . ')' : '');
+        return $this->offeringGoal() . ($this->offering_type ? ' (' . $this->offering_type . ')' : '');
+    }
+
+    /**
+     * Get the effective offering goal, including city defaults for services, funerals and weddings.
+     *
+     * @return string
+     */
+    public function offeringGoal(): string
+    {
+        if (trim((string)$this->offering_goal) !== '') {
+            return (string)$this->offering_goal;
+        }
+
+        return $this->defaultOfferingValues()['goal'];
+    }
+
+    /**
+     * Get the effective offering description, including city defaults when the goal falls back to a city default.
+     *
+     * @return string
+     */
+    public function offeringDescription(): string
+    {
+        if (trim((string)$this->offering_description) !== '') {
+            return (string)$this->offering_description;
+        }
+
+        return $this->defaultOfferingValues()['description'];
+    }
+
+    /**
+     * Resolve default offering goal and description from the city, respecting funeral and wedding overrides.
+     *
+     * @return string[]
+     */
+    protected function defaultOfferingValues(): array
+    {
+        if (null === $this->city) {
+            return ['goal' => '', 'description' => ''];
+        }
+
+        if ((count($this->funerals) > 0) && ($this->city->default_funeral_offering_goal != '')) {
+            return [
+                'goal' => (string)$this->city->default_funeral_offering_goal,
+                'description' => (string)$this->city->default_funeral_offering_description,
+            ];
+        }
+
+        if ((count($this->weddings) > 0) && ($this->city->default_wedding_offering_goal != '')) {
+            return [
+                'goal' => (string)$this->city->default_wedding_offering_goal,
+                'description' => (string)$this->city->default_wedding_offering_description,
+            ];
+        }
+
+        if ($this->city->default_offering_goal != '') {
+            return [
+                'goal' => (string)$this->city->default_offering_goal,
+                'description' => (string)$this->city->default_offering_description,
+            ];
+        }
+
+        return ['goal' => '', 'description' => ''];
     }
 
     public function oneLiner($title = false)
@@ -1648,20 +1711,9 @@ class Service extends Model implements HasDAVCalendarItems
             return;
         }
         if ($this->offering_goal == '') {
-            if ((count($this->funerals) > 0) && $this->city->default_funeral_offering_goal != '') {
-                $this->offering_goal = $this->city->default_funeral_offering_goal;
-                $this->offering_description = $this->city->default_funeral_offering_description;
-                return;
-            }
-            if ((count($this->weddings) > 0) && $this->city->default_wedding_offering_goal != '') {
-                $this->offering_goal = $this->city->default_wedding_offering_goal;
-                $this->offering_description = $this->city->default_wedding_offering_description;
-                return;
-            }
-            if ($this->city->default_offering_goal != '') {
-                $this->offering_goal = $this->city->default_offering_goal;
-                $this->offering_description = $this->city->default_offering_description;
-            }
+            $defaults = $this->defaultOfferingValues();
+            $this->offering_goal = $defaults['goal'];
+            $this->offering_description = $defaults['description'];
         }
     }
 

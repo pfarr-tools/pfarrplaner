@@ -387,7 +387,6 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                     }
                     for ($thisRow = $row; $thisRow <= $maxRow; $thisRow++) {
                         $style = $sheet->getStyle("{$column}{$thisRow}");
-                        // font sizes
                         for ($i = 6; $i <= 8; $i++) {
                             if (in_array($column, $fontSizes[$i])) {
                                 $fontSize = $i;
@@ -447,22 +446,17 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                 }
 
 
-                // COLORS:
-                // red for "Konfirmation" / "Konfirmandenabendmahl"
                 if ($service->hasDescription('Konfirmation') || $service->hasDescription('Konfirmandenabendmahl')) {
                     $liturgy['CSS-Farbe'] = 'red';
                 }
-                // liturgical color
                 $sheet->getStyle($this->cellAddress('B', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
                     ->getStartColor()->setARGB($colors[$liturgy['CSS-Farbe'] ?? 'white'] ?? 'ffffffff');
 
-                // yellow for special location
                 if (!is_object($service->location)) {
                     $sheet->getStyle($this->cellAddress('E', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('ffffff00');
                 }
 
-                // light green for "Gottesdienst im Grünen"
                 if ($service->hasDescription('gottesdienst im grünen')) {
                     $sheet->getStyle($this->cellAddress('C', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('ff92d050');
@@ -470,7 +464,6 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                         ->getStartColor()->setARGB('ff92d050');
                 }
 
-                // colors for required/recommended offerings
                 if ($service->offering_type == 'PO') {
                     $sheet->getStyle($this->cellAddress('K', $row, $cities))->getFont()->getColor()->setARGB(
                         'ffff0000'
@@ -482,7 +475,6 @@ class ServiceTableReport extends AbstractExcelDocumentReport
                     );
                 }
 
-                // color for offering description
                 if ($service->offering_description) {
                     $sheet->getStyle($this->cellAddress('L', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('ffffc000');
@@ -490,7 +482,6 @@ class ServiceTableReport extends AbstractExcelDocumentReport
             }
         }
 
-        // output
         return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),

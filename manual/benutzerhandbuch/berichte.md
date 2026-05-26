@@ -457,11 +457,40 @@ Die Daten stammen aus [Kasualien](kasualien.md).
 
 ---
 
+## Excel-Tabelle der Gottesdienste
+
+Der Bericht **Excel-Tabelle der Gottesdienste** erstellt eine große Excel-Tabelle mit Gottesdiensten, liturgischen Angaben, Veranstaltungsdaten, Opfern und Diensten.
+
+Seite: **Excel-Tabelle der Gottesdienste erstellen**
+
+![Excel-Tabelle der Gottesdienste](media/images/berichte-excel-tabelle-gottesdienste.png)
+
+Auf dieser Seite sehen Sie oben links die Schaltfläche **Erstellen**. Darunter folgen die Filterfelder für Gemeinden und Orte. Danach kommt der Zeitraum als gemeinsames Datumsfeld für Beginn und Ende. Standardmäßig ist dort immer der komplette Zeitraum der nächsten zwei Monate vorbelegt. Weiter unten wählen Sie zusätzliche Dienste aus, die als eigene Spalten in der Excel-Datei erscheinen sollen. Danach folgen die Optionen **Lesbare Überschriften** und **Nur Gottesdienste**. Wenn **Lesbare Überschriften** eingeschaltet ist, verwendet der Bericht normale deutsche Spaltenüberschriften. Wenn die Option ausgeschaltet ist, werden die Überschriften als kompakte PascalCase-Begriffe ohne Leerzeichen ausgegeben.
+
+Felder:
+
+- **Tabelle für folgende Kirchengemeinden erstellen**: Gemeinden.
+- **Auf folgende Orte beschränken**: Optional. Zeigt nur Orte aus den gewählten Gemeinden. Leer bedeutet, dass alle Orte der gewählten Gemeinden einbezogen werden.
+- **Zeitraum**: Beginn und Ende der auszugebenden Termine.
+- **Folgende weiteren Dienste mit einschließen**: Zusätzliche Dienste, die als eigene Spalten aufgenommen werden.
+- **Lesbare Überschriften**: Wenn diese Option aktiv ist, werden die Spaltenüberschriften in normal lesbarer Form ausgegeben. Wenn sie nicht aktiv ist, bestehen die Überschriften aus kompakten PascalCase-Bezeichnungen ohne Leerzeichen.
+- **Nur Gottesdienste**: Begrenzt die Ausgabe auf Gottesdienste. Wenn die Option ausgeschaltet ist, werden auch andere Veranstaltungen mit ausgegeben.
+
+Die Excel-Datei enthält für jeden gefundenen Termin eine Zeile. Wichtige Angaben wie Datum und Uhrzeit werden als echte Excel-Datums- und Zeitwerte geschrieben, damit Sie in Excel damit weiterarbeiten, sortieren oder filtern können. Der Bericht enthält außerdem Spalten für liturgische Angaben, Sichtbarkeit, Tauf- und Abendmahlskennzeichen, Titel, Ort, interne Hinweise, zusätzliche Bekanntgaben, Pfarrperson, Organist:innen, Mesner:innen, weitere ausgewählte Dienste und Opferangaben. Die Spalte für den Veranstaltungstyp erscheint nur dann, wenn **Nur Gottesdienste** ausgeschaltet ist. Wenn bei Opferzweck oder Opferanmerkung nichts direkt eingetragen ist, verwendet der Bericht automatisch die hinterlegten Standardtexte der gewählten Kirchengemeinde für allgemeine Gottesdienste, Beerdigungen oder Trauungen. Sind auch dort keine Standardtexte hinterlegt, bleiben die Felder leer.
+
+Der Pfarrplaner merkt sich die Auswahl der zusätzlichen Dienste, die Einstellung für die Überschriften und die Auswahl **Nur Gottesdienste** für die aktuelle Person. Beim nächsten Öffnen sind diese Angaben deshalb wieder vorbelegt.
+
+---
+
 ## Jahresplan der Gottesdienste
 
-Der Bericht **Jahresplan der Gottesdienste** erstellt eine große Excel-Tabelle mit Gottesdiensten, liturgischen Angaben, Opfern und Diensten.
+Der Bericht **Jahresplan der Gottesdienste** erstellt weiterhin die bisherige große Excel-Tabelle mit Jahresübersicht zu Gottesdiensten, liturgischen Farben, Opfern und Diensten.
 
 Seite: **Jahresplan der Gottesdienste erstellen**
+
+![Jahresplan der Gottesdienste](media/images/berichte-jahresplan-gottesdienste.png)
+
+Auf dieser Seite steht ebenfalls oben links die Schaltfläche **Erstellen**. Darunter wählen Sie die Kirchengemeinden und optional einzelne Orte aus. Danach geben Sie das gewünschte Kalenderjahr an. Im Feld für die Dienste legen Sie fest, welche weiteren Dienste als zusätzliche Spalten erscheinen sollen. Mit **Namen ausgeben als** wählen Sie, ob Namen kurz oder ausführlich dargestellt werden.
 
 Felder:
 
@@ -470,6 +499,8 @@ Felder:
 - **Jahr**: Jahr.
 - **Folgende Dienste mit einschließen**: Dienste, die als Spalten aufgenommen werden.
 - **Namen ausgeben als**: Format der Namen.
+
+Die erzeugte Datei ist auf eine Jahresübersicht ausgelegt. Sie zeigt die Gottesdienste in der bisherigen Tabellenform mit farblich markierten liturgischen Angaben, Spalten für Beteiligte und Opferspalten. Wenn Sie statt einer Jahresübersicht einen frei wählbaren Zeitraum und die neuen kompakten Spaltenüberschriften brauchen, verwenden Sie den Bericht **Excel-Tabelle der Gottesdienste**.
 
 ---
 

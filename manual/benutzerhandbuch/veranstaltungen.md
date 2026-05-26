@@ -160,6 +160,8 @@ Hier erfassen Sie, wofür die Kollekte bestimmt ist und, falls der Gottesdienst 
 - **Betrag**: Tragen Sie den gezählten Betrag ein, meist in Euro.
 - **Anmerkung**: Nutzen Sie dieses Feld für kurze Hinweise, zum Beispiel wenn eine Kollekte nachgetragen wurde.
 
+Wenn **Opferzweck** oder **Anmerkungen** leer bleiben, kann Pfarrplaner automatisch hinterlegte Standardwerte der Kirchengemeinde verwenden. Für normale Gottesdienste, Beerdigungen und Trauungen können dabei unterschiedliche Standardwerte gelten. Sind keine Standardwerte hinterlegt, bleiben die Felder leer.
+
 Diese Angaben werden in [Berichten und Ausgaben](berichte.md), zum Beispiel Kollektenplan oder Kollektenabrechnung, verwendet.
 
 ---

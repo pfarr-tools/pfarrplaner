@@ -38,6 +38,17 @@ class ReportsFeatureTest extends AbstractPageLoadTest
         });
     }
 
+    public function testReportsIndexListsBothServiceTableReports(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->loginAs($this->superAdminUser, 'web')
+                    ->visit(route('reports.list'))
+                    ->waitFor('#app', 10)
+                    ->assertSee('Jahresplan der Gottesdienste')
+                    ->assertSee('Excel-Tabelle der Gottesdienste');
+        });
+    }
+
     public function testServiceTableReportSetupRendersWithoutError(): void
     {
         $this->browse(function (Browser $browser) {
@@ -56,6 +67,40 @@ class ReportsFeatureTest extends AbstractPageLoadTest
                     ->visit(route('reports.setup', 'ServiceTable'))
                     ->waitFor('#app', 10)
                     ->assertPresent('button[type="submit"], button.btn-primary, .btn-primary');
+        });
+    }
+
+    public function testServiceExcelTableReportSetupRendersWithoutError(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->loginAs($this->superAdminUser, 'web')
+                    ->visit(route('reports.setup', 'ServiceExcelTable'))
+                    ->waitFor('#app', 10)
+                    ->assertDontSee('500')
+                    ->assertDontSee('Whoops');
+        });
+    }
+
+    public function testServiceExcelTableReportHasRenderButton(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->loginAs($this->superAdminUser, 'web')
+                    ->visit(route('reports.setup', 'ServiceExcelTable'))
+                    ->waitFor('#app', 10)
+                    ->assertPresent('button[type="submit"], button.btn-primary, .btn-primary');
+        });
+    }
+
+    public function testServiceExcelTableReportShowsNewConfigurationFields(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->loginAs($this->superAdminUser, 'web')
+                    ->visit(route('reports.setup', 'ServiceExcelTable'))
+                    ->waitFor('#app', 10)
+                    ->assertSee('Zeitraum')
+                    ->assertSee('Folgende weiteren Dienste mit einschließen')
+                    ->assertSee('Lesbare Überschriften')
+                    ->assertSee('Nur Gottesdienste');
         });
     }
 }
