@@ -126,6 +126,7 @@
                                             <button
                                                 type="button"
                                                 class="btn btn-success me-1"
+                                                :data-dusk="'create-absence-' + user.id"
                                                 title="Neue Abwesenheit anlegen"
                                                 @click.prevent="openAbsenceCreateModal(user)"
                                             >
@@ -135,6 +136,7 @@
                                                 v-if="availablePools(user).length > 0"
                                                 type="button"
                                                 class="btn btn-primary"
+                                                :data-dusk="'create-poolmaster-' + user.id"
                                                 title="Poolmaster:in anlegen"
                                                 @click.prevent="openPoolmasterCreateModal(user)"
                                             >
@@ -202,6 +204,7 @@
             close-button-label="Anlegen"
             cancel-button-label="Abbrechen"
             max-width="54rem"
+            data-dusk="absence-create-modal"
             @close="createAbsenceForRange(activeAbsenceCreateUser)"
             @cancel="closeCreateModals"
         >
@@ -222,6 +225,7 @@
             close-button-label="Anlegen"
             cancel-button-label="Abbrechen"
             max-width="54rem"
+            data-dusk="poolmaster-create-modal"
             @close="createPoolmasterForRange(activePoolmasterCreateUser)"
             @cancel="closeCreateModals"
         >

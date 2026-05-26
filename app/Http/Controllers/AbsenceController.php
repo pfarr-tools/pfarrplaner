@@ -165,7 +165,7 @@ class AbsenceController extends Controller
      */
     public function users()
     {
-        $users = Auth::user()->getViewableAbsenceUsers()->load('pools');
+        $users = Auth::user()->getViewableAbsenceUsers()->each->load('pools');
         foreach ($users as $key => $user) {
             $user->canEdit = false;
             if (($user->id == Auth::user()->id)

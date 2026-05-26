@@ -111,6 +111,18 @@ import WeddingsTabConfig from "../TabConfig/WeddingsTabConfig";
 import FormCheck from "../../Ui/forms/FormCheck";
 import FormGroup from "../../Ui/forms/FormGroup";
 
+function normalizeHomeScreenTabsConfig(config) {
+    if (!config || typeof config !== 'object' || Array.isArray(config)) {
+        return { tabs: [] };
+    }
+
+    if (!Array.isArray(config.tabs)) {
+        config.tabs = [];
+    }
+
+    return config;
+}
+
 export default {
     name: "homeScreenConfigurationTab",
     components: {
@@ -133,14 +145,14 @@ export default {
         if (undefined === this.settings.homeScreenConfig.showReplacements) this.settings.homeScreenConfig.showReplacements = false;
     },
     data() {
-        if (!this.homeScreenTabsConfig.tabs) this.homeScreenTabsConfig.tabs = [];
+        const tabsConfig = normalizeHomeScreenTabsConfig(this.homeScreenTabsConfig);
 
-        this.homeScreenTabsConfig.tabs.forEach(tab => {
+        tabsConfig.tabs.forEach(tab => {
             tab['configVisible'] = false;
         })
 
         return {
-            myTabs: this.homeScreenTabsConfig.tabs,
+            myTabs: tabsConfig.tabs,
         }
     },
     methods: {

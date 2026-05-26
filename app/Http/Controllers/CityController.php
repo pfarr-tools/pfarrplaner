@@ -118,9 +118,13 @@ class CityController extends AbstractCRUDController
      */
     public function qr(Request $request, $city) {
         $city = City::where('name', 'like', '%' . Str::replace(['-', 'ae', 'oe', 'ue'], [' ', 'ä', 'ö', 'ü'], $city) . '%')->first();
+        abort_unless($city, 404);
+
         $services = Service::where('city_id', $city->id)->whereDate('date', Carbon::now()->setTime(0,0,0))
             ->whereNotNull('konfiapp_event_qr')->get();
-        $types = KonfiAppIntegration::get($city)->listEventTypes();
+        $types = KonfiAppIntegration::isActive($city)
+            ? KonfiAppIntegration::get($city)->listEventTypes()
+            : collect();
 
         $servicesWithoutQR = Service::where('city_id', $city->id)->whereDate('date', Carbon::now()->setTime(0,0,0))
             ->whereNull('konfiapp_event_qr')->get();

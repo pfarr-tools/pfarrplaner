@@ -34,7 +34,7 @@ class CorePageLoadTest extends AbstractPageLoadTest
     public function testDashPageLoads(): void
     {
         $this->browse(function (Browser $browser) {
-            $this->assertPageLoads($browser, '/dash');
+            $this->assertPageLoads($browser, '/home');
         });
     }
 }

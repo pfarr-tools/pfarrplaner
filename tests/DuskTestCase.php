@@ -2,9 +2,9 @@
 
 namespace Tests;
 
+use Throwable;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
@@ -22,8 +22,18 @@ abstract class DuskTestCase extends BaseTestCase
         parent::setUp();
 
         $this->downloadDirectory = static::downloadDirectory();
-        File::ensureDirectoryExists($this->downloadDirectory);
-        File::cleanDirectory($this->downloadDirectory);
+        if (!is_dir($this->downloadDirectory)) {
+            mkdir($this->downloadDirectory, 0777, true);
+        }
+
+        $files = glob($this->downloadDirectory . DIRECTORY_SEPARATOR . '*');
+        if (is_array($files)) {
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
+        }
     }
 
     public static function setUpBeforeClass(): void
@@ -31,6 +41,7 @@ abstract class DuskTestCase extends BaseTestCase
         // Reset migration state once per process so DatabaseTruncation re-migrates
         // the Dusk SQLite file instead of assuming the feature-test in-memory DB state.
         if (! self::$databaseResetDone) {
+            static::resetDuskDatabaseFile();
             RefreshDatabaseState::$migrated = false;
             self::$databaseResetDone = true;
         }
@@ -47,7 +58,10 @@ abstract class DuskTestCase extends BaseTestCase
      */
     protected function driver(): RemoteWebDriver
     {
-        File::ensureDirectoryExists(static::downloadDirectory());
+        $downloadDirectory = static::downloadDirectory();
+        if (!is_dir($downloadDirectory)) {
+            mkdir($downloadDirectory, 0777, true);
+        }
 
         $options = (new ChromeOptions)->addArguments(collect([
             $this->shouldStartMaximized() ? '--start-maximized' : '--window-size=1920,1080',
@@ -63,9 +77,10 @@ abstract class DuskTestCase extends BaseTestCase
             ]);
         })->all());
         $options->setExperimentalOption('prefs', [
-            'download.default_directory' => static::downloadDirectory(),
+            'download.default_directory' => $downloadDirectory,
             'download.prompt_for_download' => false,
             'download.directory_upgrade' => true,
+            'plugins.always_open_pdf_externally' => true,
             'safebrowsing.enabled' => true,
         ]);
 
@@ -98,5 +113,33 @@ abstract class DuskTestCase extends BaseTestCase
     protected static function downloadDirectory(): string
     {
         return base_path('tests/Browser/downloads');
+    }
+
+    protected static function resetDuskDatabaseFile(): void
+    {
+        if ((string) env('DB_CONNECTION') !== 'sqlite') {
+            return;
+        }
+
+        $database = env('DB_DATABASE');
+        if (!is_string($database) || $database === '') {
+            return;
+        }
+
+        if (file_exists($database)) {
+            unlink($database);
+        }
+    }
+
+    protected function storeConsoleLogsFor($browsers): void
+    {
+        $browsers->each(function ($browser, $key) {
+            try {
+                $name = $this->getCallerName();
+                $browser->storeConsoleLog($name.'-'.$key);
+            } catch (Throwable) {
+                // ChromeDriver can disappear before log collection on long Dusk runs.
+            }
+        });
     }
 }

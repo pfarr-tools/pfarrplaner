@@ -33,9 +33,10 @@ class PublicPageLoadTest extends AbstractPageLoadTest
     public function testCityQrLoads(): void
     {
         $this->browse(function (Browser $browser) {
-            $browser->visit(route('qr', $this->city->id))
+            $browser->visit(route('qr', $this->city->name))
                     ->waitFor('#app', 10)
-                    ->assertDontSee('500')
+                    ->assertSee($this->city->name)
+                    ->assertDontSee('Oops! An Error Occurred')
                     ->assertDontSee('Whoops');
         });
     }

@@ -49,13 +49,13 @@ class UserProfileFeatureTest extends AbstractPageLoadTest
         });
     }
 
-    public function testApiTokenPageRendersWithoutError(): void
+    public function testTokenManagementPageRendersWithoutError(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('apitoken'))
+                    ->visit(route('tokens.index'))
                     ->waitFor('#app', 10)
-                    ->assertDontSee('500')
+                    ->assertDontSee('Oops! An Error Occurred')
                     ->assertDontSee('Whoops');
         });
     }

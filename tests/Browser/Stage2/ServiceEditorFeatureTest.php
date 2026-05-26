@@ -56,7 +56,7 @@ class ServiceEditorFeatureTest extends AbstractPageLoadTest
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
                     ->visit(new ServiceEditorPage($this->service->slug))
-                    ->assertPresent('#formSermon');
+                    ->assertPresent('#serviceEditorForm');
         });
     }
 
@@ -125,7 +125,7 @@ class ServiceEditorFeatureTest extends AbstractPageLoadTest
 
             $this->service->refresh();
             $this->assertSame('2026-07-29 06:00:00', $this->service->date->copy()->setTimezone('UTC')->format('Y-m-d H:i:s'));
-            $this->assertSame('08:00:00', $this->service->time);
+            $this->assertSame('08:00', $this->service->time);
 
             $browser->visit(new CalendarPage(2026, 7))
                 ->waitFor('.service-entry', 10)

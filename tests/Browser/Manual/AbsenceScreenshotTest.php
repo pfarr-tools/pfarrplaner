@@ -67,6 +67,31 @@ class AbsenceScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
+    public function testCaptureAbsenceCreateModal(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $this->captureManualScreenshot(
+                $browser,
+                route('absences.index'),
+                'urlaubsplan-uebersicht',
+                800
+            );
+
+            $browser->waitFor('[data-dusk="create-absence-'.$this->superAdminUser->id.'"]', self::APP_RENDER_TIMEOUT_SECONDS)
+                ->click('[data-dusk="create-absence-'.$this->superAdminUser->id.'"]')
+                ->waitForText('Neue Abwesenheit anlegen', self::APP_RENDER_TIMEOUT_SECONDS)
+                ->assertSee('Neue Abwesenheit für')
+                ->assertSee('Zeitraum');
+
+            $this->captureCurrentManualElementScreenshot(
+                $browser,
+                '[data-dusk="absence-create-modal"] .modal-dialog',
+                'urlaubsplan-abwesenheit-anlegen',
+                400
+            );
+        });
+    }
+
     public function testCaptureAbsenceEditorTabs(): void
     {
         $this->browse(function (Browser $browser) {
@@ -78,6 +103,32 @@ class AbsenceScreenshotTest extends ManualScreenshotTestCase
             );
             $this->captureTab($browser, 'replacement', 'urlaubsplan-editor-vertretung');
             $this->captureTab($browser, 'attachments', 'urlaubsplan-editor-dateien');
+        });
+    }
+
+    public function testCapturePoolmasterCreateModal(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $this->captureManualScreenshot(
+                $browser,
+                route('absences.index'),
+                'urlaubsplan-uebersicht',
+                800
+            );
+
+            $browser->waitFor('[data-dusk="create-poolmaster-'.$this->superAdminUser->id.'"]', self::APP_RENDER_TIMEOUT_SECONDS)
+                ->click('[data-dusk="create-poolmaster-'.$this->superAdminUser->id.'"]')
+                ->waitForText('Poolmaster:in anlegen', self::APP_RENDER_TIMEOUT_SECONDS)
+                ->assertSee('Neuen Poolmaster-Einsatz für')
+                ->assertSee('Pool')
+                ->assertSee('Zeitraum');
+
+            $this->captureCurrentManualElementScreenshot(
+                $browser,
+                '[data-dusk="poolmaster-create-modal"] .modal-dialog',
+                'urlaubsplan-poolmaster-anlegen',
+                400
+            );
         });
     }
 

@@ -59,7 +59,7 @@
             </tab>
             <tab id="homeScreenConfiguration" :active-tab="activeTab">
                 <home-screen-configuration-tab :available-tabs="availableTabs" :cities="cities"
-                                               :home-screen-tabs-config="homeScreenTabsConfig"
+                                               :home-screen-tabs-config="myHomeScreenTabsConfig"
                                                :locations="locations" :ministries="ministries"
                                                :settings="settings"/>
             </tab>
@@ -88,6 +88,18 @@ import SubscriptionsTab from "../../components/Profile/Tabs/SubscriptionsTab";
 import HomeScreenConfigurationTab from "../../components/Profile/Tabs/HomeScreenConfigurationTab";
 import ExternalContentTab from "../../components/Profile/Tabs/ExternalContentTab";
 
+function normalizeHomeScreenTabsConfig(config) {
+    if (!config || typeof config !== 'object' || Array.isArray(config)) {
+        return { tabs: [] };
+    }
+
+    if (!Array.isArray(config.tabs)) {
+        config.tabs = [];
+    }
+
+    return config;
+}
+
 export default {
     name: "ProfileEditor",
     props: ['tab', 'user', 'calendarConnections', 'cities', 'subscriptions', 'availableTabs', 'homeScreenTabsConfig',
@@ -104,6 +116,7 @@ export default {
             activeTab: this.tab || 'profile',
             password: {current: '', new: '', confirm: ''},
             editedUser: this.user,
+            myHomeScreenTabsConfig: normalizeHomeScreenTabsConfig(this.homeScreenTabsConfig),
         }
     },
     methods: {
@@ -116,7 +129,7 @@ export default {
                 address: this.user.address,
                 phone: this.user.phone,
                 subscriptions: this.subscriptions,
-                homeScreenTabsConfig: this.homeScreenTabsConfig,
+                homeScreenTabsConfig: this.myHomeScreenTabsConfig,
                 settings: this.settings,
                 own_website: this.user.own_website,
                 own_podcast_title: this.user.own_podcast_title,

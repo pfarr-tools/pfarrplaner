@@ -40,8 +40,9 @@ class AuthFeatureTest extends AbstractPageLoadTest
                     ->type('[name="email"]', 'noone@example.com')
                     ->type('[name="password"]', 'wrongpassword')
                     ->press('Anmelden')
-                    ->waitFor('#app', 10)
-                    ->assertSee('Anmeldedaten');
+                    ->waitUntilMissing('#nprogress .spinner', 10)
+                    ->waitFor('.invalid-feedback', 10)
+                    ->assertSeeIn('.invalid-feedback', 'Diese Kombination aus Zugangsdaten');
         });
     }
 
@@ -63,7 +64,7 @@ class AuthFeatureTest extends AbstractPageLoadTest
                     ->visit('/passwort/aendern')
                     ->waitFor('#app', 10)
                     ->assertDontSee('500')
-                    ->assertPresent('[name="password"]');
+                    ->assertPresent('[name="new_password"]');
         });
     }
 }

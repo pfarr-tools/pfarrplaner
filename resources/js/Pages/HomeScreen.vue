@@ -187,6 +187,37 @@ import FormDatePicker from "../components/Ui/forms/FormDatePicker.vue";
 import NavButton from "../components/Ui/buttons/NavButton.vue";
 import CreateServiceWizardButton from "../components/Ui/wizards/CreateServiceWizardButton.vue";
 
+function normalizeHomeScreenTabsConfig(config) {
+    if (!config || typeof config !== 'object' || Array.isArray(config)) {
+        return { tabs: [] };
+    }
+
+    if (!Array.isArray(config.tabs)) {
+        config.tabs = [];
+    }
+
+    return config;
+}
+
+function normalizeHomeScreenConfig(config) {
+    if (!config || typeof config !== 'object' || Array.isArray(config)) {
+        return {
+            wizardButtons: false,
+            showReplacements: false,
+        };
+    }
+
+    if (typeof config.wizardButtons === 'undefined') {
+        config.wizardButtons = false;
+    }
+
+    if (typeof config.showReplacements === 'undefined') {
+        config.showReplacements = false;
+    }
+
+    return config;
+}
+
 export default {
     name: "HomeScreen",
     components: {
@@ -213,6 +244,8 @@ export default {
     },
     props: ['user', 'settings', 'activeTab', 'replacements', 'tab', 'tabTitles', 'cities', 'masteredPools'],
     created() {
+        this.settings.homeScreenConfig = normalizeHomeScreenConfig(this.settings.homeScreenConfig);
+        this.settings.homeScreenTabsConfig = normalizeHomeScreenTabsConfig(this.settings.homeScreenTabsConfig);
         var index = 0;
         this.myTabsConfig.tabs.forEach(function (tab, tabIndex) {
             this.myTabs[tab.type + tabIndex] = {
@@ -232,13 +265,16 @@ export default {
     },
     data() {
         let myTabNames = this.settings.homeScreenTabs ? this.settings.homeScreenTabs.split(',') : [];
+        const homeScreenConfig = normalizeHomeScreenConfig(this.settings.homeScreenConfig);
+        const tabsConfig = normalizeHomeScreenTabsConfig(this.settings.homeScreenTabsConfig);
+
         return {
             myUser: this.user,
-            config: this.settings.homeScreenConfig || {},
+            config: homeScreenConfig,
             myTabNames: myTabNames,
-            myTabsConfig: this.settings.homeScreenTabsConfig,
+            myTabsConfig: tabsConfig,
             myTabs: {},
-            myActiveTab: this.activeTab || (this.settings.homeScreenTabsConfig.tabs[0] ? this.settings.homeScreenTabsConfig.tabs[0].type + '0' : null),
+            myActiveTab: this.activeTab || (tabsConfig.tabs[0] ? tabsConfig.tabs[0].type + '0' : null),
             myDatePickerSettings: {
                 format: 'L',
                 locale: 'de',
@@ -251,34 +287,36 @@ export default {
         }
     },
     async mounted() {
-        await this.$api().get(route('api.tab', {
-            tab: this.myActiveTab,
-        })).then(response => {
-            this.myTabs[this.myActiveTab] = response.data.data;
-            this.myTabs[this.myActiveTab].loaded = true;
-            this.$forceUpdate();
-        })
-
-        await Object.keys(this.myTabs).forEach(function (tabKey) {
-            this.$api().get(route('api.tab.count', {
-                tab: tabKey,
+        if (this.myActiveTab) {
+            await this.$api().get(route('api.tab', {
+                tab: this.myActiveTab,
             })).then(response => {
-                this.myTabs[response.data.key].count = response.data.count;
+                this.myTabs[this.myActiveTab] = response.data.data;
+                this.myTabs[this.myActiveTab].loaded = true;
                 this.$forceUpdate();
-            });
-        }, this);
+            })
 
-        await Object.keys(this.myTabs).forEach(function (tabKey) {
-            if (!this.myTabs[tabKey].loaded) {
-                this.$api().get(route('api.tab', {
+            await Object.keys(this.myTabs).forEach(function (tabKey) {
+                this.$api().get(route('api.tab.count', {
                     tab: tabKey,
                 })).then(response => {
-                    this.myTabs[tabKey] = response.data.data;
-                    this.myTabs[tabKey].loaded = true;
+                    this.myTabs[response.data.key].count = response.data.count;
                     this.$forceUpdate();
                 });
-            }
-        }, this);
+            }, this);
+
+            await Object.keys(this.myTabs).forEach(function (tabKey) {
+                if (!this.myTabs[tabKey].loaded) {
+                    this.$api().get(route('api.tab', {
+                        tab: tabKey,
+                    })).then(response => {
+                        this.myTabs[tabKey] = response.data.data;
+                        this.myTabs[tabKey].loaded = true;
+                        this.$forceUpdate();
+                    });
+                }
+            }, this);
+        }
 
         this.quickPickDate(this.myQuickPickerDate);
     },

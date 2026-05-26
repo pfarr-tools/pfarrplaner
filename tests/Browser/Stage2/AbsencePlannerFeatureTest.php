@@ -67,7 +67,7 @@ class AbsencePlannerFeatureTest extends AbstractPageLoadTest
             $browser->loginAs($this->superAdminUser, 'web')
                     ->visit(route('absence.edit', $this->absence->id))
                     ->waitFor('#app', 10)
-                    ->assertPresent('button.btn-primary, .save-button');
+                    ->assertPresent('.main-header .btn, nav .btn');
         });
     }
 }

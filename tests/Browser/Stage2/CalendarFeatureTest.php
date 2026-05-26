@@ -70,6 +70,8 @@ class CalendarFeatureTest extends AbstractPageLoadTest
             $browser->loginAs($this->superAdminUser, 'web')
                     ->visit(new CalendarPage(2025, 6))
                     ->waitFor('#app', 10)
+                    ->click('#btnGroupDrop1')
+                    ->waitFor('.dropdown-menu.show', 5)
                     ->assertSee('Januar');
         });
     }

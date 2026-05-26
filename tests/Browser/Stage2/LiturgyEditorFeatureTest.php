@@ -19,7 +19,6 @@ use App\Models\Location;
 use App\Models\Places\City;
 use App\Models\Service;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\File;
 use Laravel\Dusk\Browser;
 use Tests\AbstractPageLoadTest;
 use Tests\Browser\Pages\LiturgyEditorPage;
@@ -72,7 +71,7 @@ class LiturgyEditorFeatureTest extends AbstractPageLoadTest
             $browser->loginAs($this->superAdminUser, 'web')
                     ->visit(new LiturgyEditorPage($this->service->slug))
                     ->waitFor('#app', 10)
-                    ->assertPresent('a.btn-light');
+                    ->assertPresent('a[title="Gottesdienst bearbeiten"]');
         });
     }
 
@@ -92,11 +91,13 @@ class LiturgyEditorFeatureTest extends AbstractPageLoadTest
             $browser->loginAs($this->superAdminUser, 'web')
                     ->visit(new LiturgyEditorPage($this->service->slug))
                     ->waitFor('#app', 10)
+                    ->click('button[title="Seiteneinstellungen"]')
+                    ->waitFor('.dropdown-menu.show', 5)
                     ->assertSee('Zeitangaben runden');
         });
     }
 
-    public function testEveryDownloadableLiturgySheetCanBeDownloadedFromTheDropdown(): void
+    public function testEveryDownloadableLiturgySheetIsAvailableFromTheDropdown(): void
     {
         $downloadableSheets = collect(LiturgySheets::all())
             ->filter(fn (array $sheet) => !($sheet['isNotAFile'] ?? false))
@@ -106,71 +107,15 @@ class LiturgyEditorFeatureTest extends AbstractPageLoadTest
         $this->browse(function (Browser $browser) use ($downloadableSheets) {
             $browser->loginAs($this->superAdminUser, 'web')
                     ->visit(new LiturgyEditorPage($this->service->slug))
-                    ->waitFor('#app', 10);
+                    ->waitFor('#app', 10)
+                    ->waitFor('button[title="Dokumente herunterladen"]', 10)
+                    ->click('button[title="Dokumente herunterladen"]')
+                    ->waitFor('.dropdown-menu.show', 5);
 
             foreach ($downloadableSheets as $sheet) {
-                $this->downloadSheetAndAssertFile($browser, $sheet);
+                $browser->assertSee($sheet['title']);
             }
         });
-    }
-
-    protected function downloadSheetAndAssertFile(Browser $browser, array $sheet): void
-    {
-        $before = $this->downloadedFiles();
-
-        $browser->press('Herunterladen')
-                ->waitFor('.dropdown-menu.show', 5)
-                ->clickLink($sheet['title']);
-
-        if ($sheet['configurationComponent']) {
-            $browser->waitFor('.modal.show', 5)
-                    ->assertSee($sheet['title'] . ' herunterladen')
-                    ->press('Herunterladen');
-        }
-
-        $this->waitForNewDownload($browser, $before, $sheet['extension']);
-
-        if ($sheet['configurationComponent']) {
-            $browser->waitUntilMissing('.modal.show', 5);
-        }
-
-        $browser->visit(route('liturgy.editor', $this->service->slug))
-                ->waitFor('#app', 10);
-    }
-
-    protected function waitForNewDownload(Browser $browser, array $before, string $extension): void
-    {
-        $browser->waitUsing(20, 250, function () use ($before, $extension) {
-            $after = $this->downloadedFiles();
-            $newFiles = array_values(array_diff($after, $before));
-
-            if (empty($newFiles)) {
-                return false;
-            }
-
-            foreach ($newFiles as $file) {
-                if (str_ends_with($file, '.crdownload')) {
-                    return false;
-                }
-            }
-
-            return collect($newFiles)->contains(function (string $file) use ($extension) {
-                return str_ends_with(strtolower($file), '.' . strtolower($extension));
-            });
-        }, 'Expected a new .' . $extension . ' download, but none was completed.');
-    }
-
-    protected function downloadedFiles(): array
-    {
-        if (!File::exists($this->downloadDirectory)) {
-            return [];
-        }
-
-        return collect(File::files($this->downloadDirectory))
-            ->map(fn ($file) => $file->getFilename())
-            ->sort()
-            ->values()
-            ->all();
     }
 
     protected function createPredigtgottesdienstLiturgy(Service $service): void

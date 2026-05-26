@@ -30,7 +30,7 @@
 <template>
     <form @submit.prevent="closeModal">
         <!-- Modal -->
-        <div class="modal fade show d-block" :data-bs-backdrop="allowCancel ? '' : 'static'" tabindex="-1" aria-hidden="true"
+        <div class="modal fade show d-block" :data-dusk="$attrs['data-dusk']" :data-bs-backdrop="allowCancel ? '' : 'static'" tabindex="-1" aria-hidden="true"
              @keyup.esc="handleEsc" @keyup.enter="closeModal" @click="handleEsc">
             <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document" :style="{maxWidth: maxWidth, minHeight: minHeight || 'auto', maxHeight: maxHeight || 'auto'}"
                  @click.stop="nop">

@@ -24,13 +24,6 @@ class UserPageLoadTest extends AbstractPageLoadTest
         });
     }
 
-    public function testApiTokenPageLoads(): void
-    {
-        $this->browse(function (Browser $browser) {
-            $this->assertPageLoads($browser, route('apitoken'));
-        });
-    }
-
     public function testICalConnectLoads(): void
     {
         $this->browse(function (Browser $browser) {

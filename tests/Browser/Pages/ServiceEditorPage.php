@@ -42,7 +42,7 @@ class ServiceEditorPage extends Page
     {
         return [
             '@saveButton'  => 'button.btn-primary',
-            '@form'        => '#formSermon',
+            '@form'        => '#serviceEditorForm',
             '@deleteButton' => 'button.btn-danger',
             '@dateInput' => '.home-tab .dp__input',
         ];

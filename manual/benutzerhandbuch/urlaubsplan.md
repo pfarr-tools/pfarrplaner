@@ -105,6 +105,8 @@ Ein Eintrag ist anklickbar, wenn Sie ihn bearbeiten dürfen. Leere Tage sind ank
 
 ## Abwesenheit anlegen
 
+![Dialog zum Anlegen einer Abwesenheit](media/images/urlaubsplan-abwesenheit-anlegen.png)
+
 Sie können eine Abwesenheit auf zwei Arten anlegen:
 
 - Klicken Sie in einer bearbeitbaren Zeile auf die Schaltfläche **Neuen Urlaubseintrag hinzufügen**.
@@ -112,7 +114,11 @@ Sie können eine Abwesenheit auf zwei Arten anlegen:
 
 Die Schaltfläche **Neuen Urlaubseintrag hinzufügen** zeigt ein Aktenkoffer-Symbol mit Plus. Sie erscheint nur bei Personen, für die Sie Einträge anlegen dürfen.
 
-Beim Anlegen öffnet Pfarrplaner zuerst einen neuen Entwurf mit der Beschreibung **Urlaub**. Der Zeitraum beginnt mit dem gewählten Tag. Erst wenn Sie speichern oder in **Vertretung** beziehungsweise **Dateien** wechseln, wird daraus ein echter Abwesenheitseintrag.
+Wenn Sie die Schaltfläche verwenden, öffnet sich ein Dialog **Neue Abwesenheit anlegen**. Dort wählen Sie den Zeitraum direkt im eingeblendeten Kalender aus und schließen den Dialog mit **Anlegen** ab.
+
+Wenn Sie stattdessen auf einen leeren Tag klicken, legt Pfarrplaner sofort eine neue eintägige Abwesenheit für genau diesen Kalendertag an.
+
+In beiden Fällen öffnet Pfarrplaner danach den **Abwesenheitseditor** für den bereits angelegten Eintrag. So arbeiten Sie immer mit einem echten Eintrag und nicht mit einem bloßen Entwurf.
 
 ---
 
@@ -147,6 +153,8 @@ Der Reiter **Abwesenheit** enthält die Grunddaten.
 
 Wenn Sie den Zeitraum speichern, behandelt Pfarrplaner beide Angaben immer als ganze Kalendertage. Der erste und letzte Tag bleiben dadurch auch bei unterschiedlichen Geräteeinstellungen unverändert.
 
+Die Reiter **Vertretung** und **Dateien** erscheinen erst, nachdem der Eintrag bereits angelegt wurde. Wenn Sie den Editor über den Dialog oder per Klick auf einen freien Tag geöffnet haben, ist das bereits erfüllt.
+
 Bei Selbstverwaltung können zusätzlich erscheinen:
 
 - **Von der zuständigen Stelle genehmigt**: Markierung, dass die Genehmigung bereits außerhalb des Pfarrplaners vorliegt.
@@ -167,8 +175,6 @@ Wenn Sie als genehmigende Person arbeiten, kann im Statusbereich erscheinen:
 ![Abwesenheitseditor: Vertretung](media/images/urlaubsplan-editor-vertretung.png)
 
 Der Reiter **Vertretung** erscheint nur, wenn für die betroffene Person in der Administration **Urlaubsvertretung benötigt** aktiviert ist.
-
-Wenn Sie einen neuen Abwesenheitseintrag gerade erst geöffnet haben, speichert Pfarrplaner ihn zunächst im Hintergrund, bevor der Reiter **Vertretung** bearbeitet werden kann. So bleiben keine leeren Abwesenheitseinträge zurück, wenn der Editor sofort wieder geschlossen wird.
 
 In diesem Reiter planen Sie, wer den Dienst während der Abwesenheit übernimmt. Eine Abwesenheit kann mehrere Vertretungszeilen haben. Das ist nützlich, wenn verschiedene Zeitabschnitte unterschiedlich vertreten werden.
 
@@ -197,7 +203,7 @@ Der Reiter **Dateien** enthält:
 - **Angehängte Dateien**: Liste bereits gespeicherter Dateien.
 - **Dateien hinzufügen**: Uploadfeld für weitere Dateien.
 
-Auch dieser Reiter steht erst zur Verfügung, nachdem der Abwesenheitseintrag einmal gespeichert wurde. Beim ersten Wechsel dorthin speichert Pfarrplaner den Entwurf deshalb automatisch.
+Auch dieser Reiter steht nur bei bereits angelegten Abwesenheiten zur Verfügung.
 
 Wenn eine gespeicherte Datei im System nicht mehr gefunden wird, bleibt sie in der Liste sichtbar. Statt Größenangabe oder Vorschau sehen Sie dann einen deutlichen Hinweis direkt an dieser Datei.
 
@@ -306,20 +312,20 @@ Im Abschnitt **Zur Genehmigung** sehen genehmigende Personen:
 
 ## Poolmaster:in werden
 
-![Poolmaster-Editor](media/images/urlaubsplan-poolmaster-editor.png)
+![Dialog zum Anlegen einer Poolmaster-Zeit](media/images/urlaubsplan-poolmaster-anlegen.png)
 
 Im Urlaubsplan kann neben einer bearbeitbaren Person die Schaltfläche **Poolmaster:in werden** erscheinen. Sie ist an einem Person-mit-Krawatte-Symbol zu erkennen und erscheint nur, wenn Pools vorhanden sind.
 
-Die Schaltfläche öffnet den Editor **Poolmaster:in werden**.
+Die Schaltfläche öffnet den Dialog **Poolmaster:in anlegen**.
 
-Felder im Poolmaster-Editor:
+Felder im Dialog:
 
 - **Pool**: Auswahl des Pools.
 - **Zeitraum**: Beginn und Ende der Poolmaster-Zuständigkeit.
-- **Speichern**: Speichert den Einsatz.
-- **Löschen**: Löscht den Einsatz. Bei einem neuen, noch nicht gespeicherten Einsatz führt die Schaltfläche zurück.
+- **Anlegen**: Speichert den Einsatz direkt.
+- **Abbrechen**: Schließt den Dialog ohne neuen Eintrag.
 
-Ein gespeicherter Poolmaster-Einsatz erscheint im Urlaubsplan als dunkelblauer Eintrag. Wenn Sie ihn bearbeiten dürfen, können Sie ihn anklicken.
+Nach dem Anlegen erscheint der Poolmaster-Einsatz sofort im Urlaubsplan als dunkelblauer Eintrag. Wenn Sie ihn später bearbeiten dürfen, können Sie den Eintrag im Plan anklicken. Dann öffnet sich der ausführliche Editor für diesen bereits gespeicherten Einsatz.
 
 ---
 

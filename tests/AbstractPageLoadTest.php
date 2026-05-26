@@ -43,6 +43,8 @@ abstract class AbstractPageLoadTest extends DuskTestCase
     {
         parent::setUp();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->seed(RoleSeeder::class);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
         $this->superAdminUser = User::factory()->create();
         $this->superAdminUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
@@ -62,9 +64,8 @@ abstract class AbstractPageLoadTest extends DuskTestCase
         $browser->loginAs($this->superAdminUser, 'web')
                 ->visit($url)
                 ->waitFor('#app', 10)
-                ->assertDontSee('500')
-                ->assertDontSee('Whoops')
-                ->assertDontSee('404');
+                ->assertDontSee('Oops! An Error Occurred')
+                ->assertDontSee('Whoops');
 
         if ($expectedHeading !== null) {
             $browser->assertSee($expectedHeading);

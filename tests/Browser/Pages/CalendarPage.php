@@ -28,7 +28,7 @@ class CalendarPage extends Page
     /** @return string */
     public function url(): string
     {
-        return route('calendar', ['year' => $this->year, 'month' => $this->month]);
+        return route('calendar', ['date' => sprintf('%04d-%02d', $this->year, $this->month)]);
     }
 
     /** @param Browser $browser */
