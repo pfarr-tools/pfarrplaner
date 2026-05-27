@@ -47,6 +47,11 @@ class InterstitialService
      */
     public function forUser(User $user): array
     {
+        // no interstitials in test environment, unless specifically enabled in url by ?show_interstitial=1
+        if ((app()->environment('local', 'dusk')) && (!request()->boolean('show_interstitial'))) {
+            return [];
+        }
+
         $states = $this->statesForUser($user);
         $interstitials = [];
 
