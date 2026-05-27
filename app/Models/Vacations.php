@@ -98,7 +98,7 @@ class Vacations
      * @param User|null $user
      * @return mixed
      */
-    public static function getByPeriodAndUser($start, $end, User $user = null)
+    public static function getByPeriodAndUser($start, $end, ?User $user)
     {
         return Absence::with('replacements')->byUserAndPeriod($user, $start, $end);
     }

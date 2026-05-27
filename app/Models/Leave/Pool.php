@@ -76,6 +76,20 @@ class Pool extends AbstractModel
         return $this->belongsToMany(User::class, 'poolmasters', 'pool_id', 'user_id');
     }
 
+    /**
+     * Get an empty model instance with editor relations preloaded.
+     *
+     * @return self
+     */
+    public static function getEmptyModel(): self
+    {
+        $model = parent::getEmptyModel();
+        $model->setRelation('cities', collect());
+        $model->setRelation('users', collect());
+
+        return $model;
+    }
+
     protected static function boot()
     {
         parent::boot();

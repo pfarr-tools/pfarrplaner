@@ -9,6 +9,7 @@ use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Laravel\Dusk\TestCase as BaseTestCase;
+use RuntimeException;
 
 abstract class DuskTestCase extends BaseTestCase
 {
@@ -47,10 +48,49 @@ abstract class DuskTestCase extends BaseTestCase
         }
         parent::setUpBeforeClass();
         if (! static::runningInSail()) {
-            static::startChromeDriver([
-                '--port=9515'
-            ]);
+            static::startLocalChromeDriver();
         }
+    }
+
+    /**
+     * Start a ChromeDriver process and wait until it accepts WebDriver sessions.
+     *
+     * @return void
+     */
+    protected static function startLocalChromeDriver(): void
+    {
+        $systemChromeDriver = '/usr/bin/chromedriver';
+        if (is_executable($systemChromeDriver)) {
+            static::useChromedriver($systemChromeDriver);
+        }
+
+        static::startChromeDriver([
+            '--port=9515'
+        ]);
+
+        static::waitForChromeDriver();
+    }
+
+    /**
+     * Wait for ChromeDriver to listen before Dusk creates the first browser.
+     *
+     * @return void
+     */
+    protected static function waitForChromeDriver(): void
+    {
+        $startedAt = microtime(true);
+
+        do {
+            $connection = @fsockopen('127.0.0.1', 9515, $errorCode, $errorMessage, 0.2);
+            if (is_resource($connection)) {
+                fclose($connection);
+                return;
+            }
+
+            usleep(100000);
+        } while (microtime(true) - $startedAt < 5);
+
+        throw new RuntimeException('ChromeDriver did not become available on port 9515.');
     }
 
     /**

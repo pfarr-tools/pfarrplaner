@@ -207,7 +207,28 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
             $model->refresh();
         }
 
+        $this->prepareBrowserAccessForModel($model);
+
         return $model;
+    }
+
+    /**
+     * Ensure the browser user can see city-scoped models created by factories.
+     *
+     * @param Model&BaseAbstractModel $model
+     * @return void
+     */
+    protected function prepareBrowserAccessForModel(Model $model): void
+    {
+        if (!$model->getAttribute('city_id')) {
+            return;
+        }
+
+        $this->testUser->cities()->syncWithoutDetaching([
+            $model->getAttribute('city_id') => ['permission' => 'w'],
+        ]);
+        $this->testUser->unsetRelation('cities');
+        $this->testUser->unsetRelation('writableCities');
     }
 
     /**

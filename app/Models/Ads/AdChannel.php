@@ -41,7 +41,7 @@ class AdChannel extends AbstractModel
 
     protected static string $prefix = 'werbekanal';
     protected static string $prefixPlural = 'werbekanaele';
-    public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
+    public static array $exceptRoutes = ['web' => ['index', 'show'], 'api' => ['show']];
     public static array $validationRules = [
         'name' => 'required|max:255',
         'city_id' => 'required|exists:cities,id',

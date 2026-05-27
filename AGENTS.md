@@ -140,6 +140,7 @@ build: Mix toolchain auf v6 aktualisiert
 ## Dev Instructions
 - Never commit or push unless I specifically ask you to.
 - In this workspace, the repository `.git` directory is on a read-only mount for the sandbox. Any `git` command that writes there, such as `git add`, `git commit`, or similar index/ref updates, needs elevated permissions from the start.
+- Dusk runs need elevated permissions from the start because ChromeDriver and the Laravel test server must bind local ports.
 - When changing models, migrations, fillable/cast fields, personal data fields, attachments, calendar integrations, seating bookings, rites, user/profile data, or demo-login behavior, check whether `app/Console/Commands/DevBuilder/DemoBuilder.php` must be updated so the online demo remains buildable and safely anonymized.
 - If a change introduces new user-facing or personally identifying data, either extend the DemoBuilder anonymization/deletion logic in the same change or explicitly document why no DemoBuilder update is needed.
 - All dates and times stored in the database must be UTC.
