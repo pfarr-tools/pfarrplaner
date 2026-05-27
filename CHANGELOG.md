@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.12.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.6...v2026.12.0) (2026-05-27)
+
+
+### Features
+
+* Dusk-Testausgabe für lokale Läufe verbessert ([daafcc3](https://codeberg.org/pfarr.tools/pfarrplaner/commit/daafcc3b61a5342da952ca475100dd0efc5f3a30))
+* Handbücher, Abwesenheiten und Sicherheitsaudit überarbeiten ([66e8984](https://codeberg.org/pfarr.tools/pfarrplaner/commit/66e89844c69787aa1cd628e674f5cfa03f47340a))
+* Hinweis zur Umstellung der Opferzähler-Felder ([deafc4d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/deafc4d095b7ea29ac0b63b5112b4438fc2c6f6f))
+* **installer:** Erstinstallation fuer Pfarrplaner ([d894a1a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d894a1ab2ad4cede709028281450ef25c46ad06f))
+* Interstitial-Hinweise nach der Anmeldung ([2c73a38](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2c73a38acff027ace9a80a56734d871548bd3300))
+* Leseansicht für Predigten verbessert ([ebc7fc6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ebc7fc69a6b1de73962748b7096b037bb832b3d3))
+* **liturgie:** Liturgie-Editor einheitlich neu strukturieren ([13ad950](https://codeberg.org/pfarr.tools/pfarrplaner/commit/13ad950b6d5e53c8a28bd204a3af6966aa7296a8))
+* **liturgie:** Sheet-Dialoge ohne Download-Submit unterstützen ([c2f90ff](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c2f90ff26e14901057a2a6f9fe4cf8675da14ef9))
+* Öffentliche Infoseite und Pflegehinweise aktualisiert ([3261687](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3261687ede0a0a3900959f2fdf78e53ca7c0b6d9))
+* Ortsfilter für dienstbezogene Berichte ([cdc3faf](https://codeberg.org/pfarr.tools/pfarrplaner/commit/cdc3faf94d2b91f207e811e5c97da88c093898dc))
+* **reports:** Neue Excel-Tabelle für Gottesdienste und Veranstaltungen ([eca800b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/eca800b78b4569641c247c21ce3d47b9ad1f351a))
+* Sitzungsmodelle entfernt ([5cb003d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/5cb003d7e036064cbba26dd503d9e3df72e0a0de))
+* Überflüssige Listenfolien in PowerPoint-Werbung ausblenden ([1c3f8a1](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1c3f8a10e0ce297326d22c62c26d5d57cb113f49))
+
+
+### Bug Fixes
+
+* **absence:** Entwurf erst beim Bearbeiten speichern. ([9b935a2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9b935a22359769f31285afee3fe0d5edb24ff17a))
+* **api:** API-Endpunkte standardmäßig absichern. ([b3b08f6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b3b08f68adb5ff229fbce6bc78651f558bfac161))
+* Datumslogik und Aktionen im Urlaubseditor korrigiert. ([14c27bb](https://codeberg.org/pfarr.tools/pfarrplaner/commit/14c27bb403554636056750b4334cd2c8d6470e9b))
+* **dusk:** Browser-Tests stabilisiert. ([2195e04](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2195e04b4a4b98a1e2732bf064fe27e1f4376bc0))
+* Fehlende Navigationsleiste im Predigteditor nach dem Speichern beheben. ([e4496a9](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e4496a9a2e953c9f9ae7fc0d6e1a58589b8e9537))
+* Importquellen der Liturgie-API korrekt auflösen. ([27dca58](https://codeberg.org/pfarr.tools/pfarrplaner/commit/27dca585814a92eb65883494e9e017bafae25da4))
+* **report:** Opferzwecke in Ausgaben mit Standardwerten verwenden. ([c9bb3e0](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c9bb3e0d87222865a4eead962bfe1f076b99e503))
+* Später bei Interstitials an die Anmeldung binden. ([2d733bc](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2d733bcc3bb5687a1521265e604065d64f43d2dc))
+* Spendenlinks und Hinweise korrigiert. ([a341593](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a34159350f7421bf26d4afa31c6a29fde75831e6))
+* **tests:** Fehlgeschlagene Testläufe stabilisiert. ([3af3983](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3af398369f3e5f06468deba5bf0ad602a2426858))
+* Titel im Ablaufplan fehlt beim Bearbeiten von Liedelementen ([4d9eefe](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4d9eefe279156f902f15d2a5a6190c78a935a716))
+* Zeilen- und Absatzumbrüche in Predigtzitaten exportieren. ([05c2c6b](https://codeberg.org/pfarr.tools/pfarrplaner/commit/05c2c6bf0693bb059370be6190edde8f0d0f4e31))
+
 ### [2026.11.6](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.5...v2026.11.6) (2026-05-20)
 
 
