@@ -80,7 +80,7 @@ class Day extends Model
      */
     public function getLiturgyAttribute(): array
     {
-        return LiturgyService::getLiturgyInfoByDate($this);
+        return LiturgyService::getLiturgyInfoByDate($this->date);
     }
 // END ACCESSORS
 
