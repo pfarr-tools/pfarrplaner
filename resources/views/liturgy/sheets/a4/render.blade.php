@@ -241,7 +241,7 @@
             <tr>
                 <td valign="top" width="25%" style="font-weight: bold">{{ $item->title }}</td>
                 @if($item->data_type == 'freetext')
-                    <td valign="top">{{ $item->getHelper()->getText(80) }}</td>
+                    <td valign="top">{{ $item->getHelper()->getText(40) }}</td>
                 @elseif($item->data_type == 'song')
                     <td valign="top">
                         @if(isset($item->data['song']) && isset($item->data['song']['song']))

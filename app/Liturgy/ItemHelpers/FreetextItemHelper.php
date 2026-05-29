@@ -31,6 +31,8 @@
 namespace App\Liturgy\ItemHelpers;
 
 
+use Illuminate\Support\Str;
+
 class FreetextItemHelper extends AbstractItemHelper
 {
 
@@ -57,7 +59,7 @@ class FreetextItemHelper extends AbstractItemHelper
             '&nbsp;' => ' ',
         ]);
         if ($shorten) {
-            return str_contains($s, "\n") ? explode("\n", $s)[0] : substr($s, 0, $shorten).'...';
+            return Str::limit($s, $shorten, '...', true);
         }
         return $s;
     }
