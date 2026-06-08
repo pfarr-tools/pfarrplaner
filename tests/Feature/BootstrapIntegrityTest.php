@@ -12,8 +12,10 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schedule;
+use ReflectionClass;
 use Tests\TestCase;
 
 class BootstrapIntegrityTest extends TestCase
@@ -56,6 +58,28 @@ class BootstrapIntegrityTest extends TestCase
             collect($commands)->contains(fn($c) => str_contains($c, 'cache:prune-stale-tags')),
             'cache:prune-stale-tags is not scheduled'
         );
+    }
+
+    public function testIntegrationCommandsAreRegistered()
+    {
+        $registeredCommands = array_keys(Artisan::all());
+        $integrationCommands = collect(glob(app_path('Integrations/*/Commands/*.php')) ?: [])
+            ->map(function (string $path) {
+                $relativePath = str_replace([app_path() . '/', '.php', '/'], ['', '', '\\'], $path);
+                $class = 'App\\' . $relativePath;
+                $reflection = new ReflectionClass($class);
+                $signature = $reflection->getDefaultProperties()['signature'] ?? '';
+
+                return strtok($signature, ' ');
+            })
+            ->filter()
+            ->values();
+
+        $this->assertNotEmpty($integrationCommands, 'No integration commands found');
+
+        foreach ($integrationCommands as $commandName) {
+            $this->assertContains($commandName, $registeredCommands, "Integration command \"{$commandName}\" is not registered");
+        }
     }
 
     public function testCustomExceptionHandlerIsRegistered()
