@@ -32,15 +32,16 @@
         <h3>Angehängte Dateien</h3>
         <div v-if="hasAutoAttachments || (service.attachments.length > 0)">
             <div v-if="myService.liturgy_blocks.length > 0">
-                <template v-if="sheet">
-                <div class="liturgy-sheet btn btn-light" v-for="(sheet,key,index) in liturgySheets" :key="key"
-                     @click.prevent="(sheet.configurationComponent) ? dialogs[sheet?.key] = true : downloadSheet(sheet)"
-                     v-if="!sheet.isNotAFile">
+                <div
+                    v-for="sheet in downloadableLiturgySheets"
+                    :key="sheet.key"
+                    class="liturgy-sheet btn btn-light"
+                    @click.prevent="sheet.configurationComponent ? openDialog(sheet.key) : downloadSheet(sheet)"
+                >
                     <b><span :class="sheet.icon"></span> {{ sheet.title }}</b><br/>
                     <small>.{{ sheet.extension }}, Größe unbekannt</small>
                     <span class="float-right mdi mdi-download"></span>
                 </div>
-                </template>
             </div>
             <div v-if="myService.konfiapp_event_qr">
                 <div class="liturgy-sheet btn btn-light" @click.prevent="downloadQR">
@@ -67,14 +68,19 @@
                             :upload-route="route('service.attach', this.myService.slug)"
                             v-model="myService.attachments"/>
 
-        <modal v-for="(sheet,sheetKey) in liturgySheets" v-if="dialogs[sheet?.key]" :title="dialogTitle(sheet)"
-               :key="'dlg'+sheet.key"
-               :allow-cancel="!sheet.configurationCloseOnly"
-               @close="handleDialogClose(sheet)"
-               @cancel="dialogs[sheet.key] = false"
-               :close-button-label="dialogCloseButtonLabel(sheet)" cancel-button-label="Abbrechen">
-            <component :is="sheet.configurationComponent" :service="service" :sheet="sheet" />
-        </modal>
+        <template v-for="sheet in configurableLiturgySheets" :key="'dlg' + sheet.key">
+            <modal
+                v-if="dialogs[sheet.key]"
+                :title="dialogTitle(sheet)"
+                :allow-cancel="!sheet.configurationCloseOnly"
+                @close="handleDialogClose(sheet)"
+                @cancel="dialogs[sheet.key] = false"
+                :close-button-label="dialogCloseButtonLabel(sheet)"
+                cancel-button-label="Abbrechen"
+            >
+                <component :is="sheet.configurationComponent" :service="service" :sheet="sheet" />
+            </modal>
+        </template>
     </div>
 </template>
 
@@ -117,6 +123,14 @@ export default {
         files: Object,
     },
     computed: {
+        downloadableLiturgySheets() {
+            return Object.values(this.liturgySheets)
+                .filter(sheet => sheet && !sheet.isNotAFile);
+        },
+        configurableLiturgySheets() {
+            return this.downloadableLiturgySheets
+                .filter(sheet => sheet.configurationComponent);
+        },
         hasAutoAttachments() {
             return this.myService.event_class == 'service';
         },
@@ -133,20 +147,34 @@ export default {
         },
     },
     data() {
-        var myService = this.service;
-
-        var dialogs = {};
-        Object.entries(this.liturgySheets).forEach(sheet => {
-            if (sheet[1].configurationComponent) dialogs[sheet[1].key] = false;
-        });
-
         return {
-            myService: myService,
+            myService: this.service,
             uploading: false,
-            dialogs: dialogs,
+            dialogs: this.createDialogs(this.liturgySheets),
         }
     },
+    watch: {
+        liturgySheets(newSheets) {
+            const newDialogs = this.createDialogs(newSheets);
+            Object.keys(this.dialogs).forEach(key => {
+                if (Object.prototype.hasOwnProperty.call(newDialogs, key)) newDialogs[key] = this.dialogs[key];
+            });
+            this.dialogs = newDialogs;
+        },
+    },
     methods: {
+        createDialogs(sheets) {
+            const dialogs = {};
+            Object.values(sheets).forEach(sheet => {
+                if (sheet.configurationComponent) dialogs[sheet.key] = false;
+            });
+            return dialogs;
+        },
+        openDialog(key) {
+            this.$nextTick(() => {
+                this.dialogs[key] = true;
+            });
+        },
         downloadSheet(sheet) {
             if (sheet.configurationPage) {
                 this.$inertia.visit(route('liturgy.configure', {service: this.service.slug, key: sheet.key}));
