@@ -37,16 +37,11 @@ use App\Models\Service;
 use App\Models\Streaming\Broadcast;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 
 class StreamingTroubleshooterController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
 
     public function index(Request $request, $city)
     {
@@ -83,7 +78,6 @@ class StreamingTroubleshooterController extends Controller
 
     public function activateService(Service $service)
     {
-        Gate::authorize('update', $service);
         $broadcast = Broadcast::get($service);
         if (null === $broadcast) {
             $broadcast = Broadcast::create($service);
@@ -97,7 +91,6 @@ class StreamingTroubleshooterController extends Controller
     {
         $city = City::where('name', $city)->first();
         if(!$city) abort(404);
-        Gate::authorize('update', $city);
 
         $broadcast = Broadcast::getFromId($broadcast, $city);
         $broadcast->activate();
@@ -106,7 +99,6 @@ class StreamingTroubleshooterController extends Controller
 
     public function resetService(Service $service)
     {
-        Gate::authorize('update', $service);
         $youtube = YoutubeIntegration::get($service->city)->getYoutube();
         $youtube->liveBroadcasts->delete(YoutubeHelper::getCode($service->youtube_url));
         $broadcast = Broadcast::create($service);
