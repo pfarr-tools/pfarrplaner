@@ -932,10 +932,16 @@ class Service extends Model implements HasDAVCalendarItems
     public function scopeInCities(Builder $query, $cities)
     {
         if (is_string($cities)) $cities = [$cities];
-        $cityIds = collect($cities)->map(function ($item) {
+        $cityIds = collect();
+        foreach (collect($cities) as $item) {
             if (is_array($item)) $item = array_first($item);
-            return is_numeric($item) ? $item : $item->id;
-        });
+            $city = $item instanceof City ? $item : City::query()->findOrFail($item);
+            $cityIds->push($city->id);
+            if ($city->is_org) {
+                $cityIds = $cityIds->merge($city->children->pluck('id'));
+            }
+        }
+        $cityIds = $cityIds->unique()->values();
         return $query->where(function ($q) use ($cityIds) {
             $q->whereIn('city_id', $cityIds);
             $q->orWhereHas('relatedCities', function ($q2) use ($cityIds) {
@@ -984,14 +990,7 @@ class Service extends Model implements HasDAVCalendarItems
      */
     public function scopeInCity(Builder $query, $city)
     {
-        $city = $city instanceof City ? $city : City::query()->findOrFail($city);
-        if ($city->is_org) {
-            return $this->scopeInCities($query, [$city->id]);
-        }
-        return $query->where('city_id', $city->id)
-                ->orWhereHas('relatedCities', function ($q2) use ($city) {
-                    $q2->where('cities.id', $city->id);
-                });
+        return $this->scopeInCities($query, [$city]);
     }
 
     /**
