@@ -136,6 +136,7 @@ class HandleInertiaRequests extends Middleware
             }
 
             foreach ($prefixes as $prefix) {
+                if (is_array($prefix)) return 'benutzerhandbuch';
                 if (str_starts_with($routeName, $prefix) || $routeName === $prefix) {
                     return trim($manual.'/'.$chapter, '/');
                 }
