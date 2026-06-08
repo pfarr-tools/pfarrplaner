@@ -110,6 +110,7 @@ Every PHP file carries this block comment immediately after `<?php`:
 - Method naming: `public function test{Description}()` (camelCase, `test` prefix)
 - Factories: `Model::factory()->create([...])`
 - Auth: `$this->actingAs($this->user)->patch(route(...), $data)`
+- Never, ever, EVER overwrite .env!
 
 ## Key Packages
 
