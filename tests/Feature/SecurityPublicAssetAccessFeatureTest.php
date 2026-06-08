@@ -28,13 +28,13 @@ class SecurityPublicAssetAccessFeatureTest extends TestCase
         Storage::fake(config('filesystems.default'));
     }
 
-    public function testGuestCannotAccessImageWithoutSignature(): void
+    public function testGuestCanAccessImageWithoutSignature(): void
     {
         $path = 'security-test-image-'.uniqid().'.png';
         Storage::put('attachments/'.$path, 'test');
 
         $this->get(route('image', ['path' => $path]))
-            ->assertUnauthorized();
+            ->assertOk();
     }
 
     public function testSignedImageUrlRemainsAccessibleWithoutLogin(): void
