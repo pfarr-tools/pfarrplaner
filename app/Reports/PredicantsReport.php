@@ -94,13 +94,16 @@ class PredicantsReport extends AbstractWordDocumentReport
         $data = $request->validate(
             [
                 'cities.*' => 'required|int|exists:cities,id',
-                'start' => 'required|date|date_format:d.m.Y',
-                'end' => 'required|date|date_format:d.m.Y',
+                'start' => 'required|string',
+                'end' => 'required|string',
             ]
         );
 
+        $start = $this->parseDateInput($data['start']);
+        $end = $this->parseDateInput($data['end']);
+
         $cities = City::whereIn('id', $data['cities'])->get();
-        $serviceList = Service::between(Carbon::createFromFormat('d.m.Y', $data['start']), Carbon::createFromFormat('d.m.Y', $data['end']))
+        $serviceList = Service::between($start, $end)
             ->notHidden()
             ->whereDoesntHave('funerals')
             ->where('need_predicant', 1)
@@ -124,7 +127,7 @@ class PredicantsReport extends AbstractWordDocumentReport
 
 
         $section->addText(
-            'Anforderung von '.config('label.predicant').'nen bzw. Pfarrer:innen im Ruhestand über das Dekanatamt',
+            'Anforderung von '.config('labels.predicant').'nen bzw. Pfarrer:innen im Ruhestand über das Dekanatamt',
             [
                 'size' => 13,
                 'bold' => true,
@@ -165,25 +168,43 @@ class PredicantsReport extends AbstractWordDocumentReport
 
         $table = $section->addTable('table');
         $table->addRow();
-        $table->addCell(Converter::cmToTwip(3.25))->addText("Datum<w:br />", ['bold' => true]);
-        $table->addCell(Converter::cmToTwip(5))->addText("Kirche /<w:br />Gemeindezentrum", ['bold' => true]);
-        $table->addCell(Converter::cmToTwip(3.75))->addText("Beginn des<w:br />Gottesdienstes", ['bold' => true]);
-        $table->addCell(Converter::cmToTwip(6))->addText("Abendmahl / Taufe /<w:br />Bemerkungen", ['bold' => true]);
+        $textRun = $table->addCell(Converter::cmToTwip(3.25))->addTextRun();
+        $textRun->addText('Datum', ['bold' => true]);
+        $textRun->addTextBreak();
+
+        $textRun = $table->addCell(Converter::cmToTwip(5))->addTextRun();
+        $textRun->addText('Kirche /', ['bold' => true]);
+        $textRun->addTextBreak();
+        $textRun->addText('Gemeindezentrum', ['bold' => true]);
+
+        $textRun = $table->addCell(Converter::cmToTwip(3.75))->addTextRun();
+        $textRun->addText('Beginn des', ['bold' => true]);
+        $textRun->addTextBreak();
+        $textRun->addText('Gottesdienstes', ['bold' => true]);
+
+        $textRun = $table->addCell(Converter::cmToTwip(6))->addTextRun();
+        $textRun->addText('Abendmahl / Taufe /', ['bold' => true]);
+        $textRun->addTextBreak();
+        $textRun->addText('Bemerkungen', ['bold' => true]);
+
         $textRun = $table->addCell(Converter::cmToTwip(7.25))->addTextRun();
         $textRun->addText(
-            'Rückmeldung Dekanatamt<w:br />',
+            'Rückmeldung Dekanatamt',
             [
                 'bold' => true,
                 'underline' => Font::UNDERLINE_SINGLE,
                 'italic' => true,
             ]
         );
+        $textRun->addTextBreak();
         $textRun->addText('GD-Vertretung übernimmt:', ['bold' => true]);
 
         foreach ($serviceList as $services) {
             foreach ($services as $service) {
                 $table->addRow();
-                $table->addCell(Converter::cmToTwip(3.25))->addText($service->date->format('d.m.Y') . '<w:br />');
+                $textRun = $table->addCell(Converter::cmToTwip(3.25))->addTextRun();
+                $textRun->addText($service->date->format('d.m.Y'));
+                $textRun->addTextBreak();
                 $table->addCell(Converter::cmToTwip(5))->addText($service->locationTextWithCity);
                 $table->addCell(Converter::cmToTwip(3.25))->addText($service->timeText());
                 $table->addCell(Converter::cmToTwip(6))->addText($service->descriptionText());
@@ -196,8 +217,17 @@ class PredicantsReport extends AbstractWordDocumentReport
                 static::FILE_TITLE.' '.$cities->pluck('name')->join(' '),
                 'docx',
                 static::FILE_SIGNATURE,
-                [$data['start'], $data['end']])
+                [$start->format('d.m.Y'), $end->format('d.m.Y')])
         );
+    }
+
+    protected function parseDateInput(string $date): Carbon
+    {
+        if (str_contains($date, '.')) {
+            return Carbon::createFromFormat('d.m.Y', $date, 'Europe/Berlin');
+        }
+
+        return Carbon::parse($date, 'Europe/Berlin');
     }
 
 }

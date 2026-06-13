@@ -84,6 +84,10 @@ export default {
             return dateFnsLocales.de;
         },
 
+        propRange() {
+            return [this.from, this.to];
+        },
+
         hiddenFrom() {
             if (!this.from) return '';
             return this.isoDate
@@ -100,13 +104,7 @@ export default {
     },
 
     watch: {
-        from: {
-            immediate: true,
-            handler() {
-                this.syncPickerRangeFromProps();
-            },
-        },
-        to: {
+        propRange: {
             immediate: true,
             handler() {
                 this.syncPickerRangeFromProps();
@@ -126,6 +124,10 @@ export default {
             if (!val) return null;
             if (val instanceof Date) {
                 return isNaN(val.getTime()) ? null : val;
+            }
+            if (typeof val === 'object' && typeof val.toDate === 'function') {
+                const nativeDate = val.toDate();
+                return nativeDate instanceof Date && !isNaN(nativeDate.getTime()) ? nativeDate : null;
             }
             if (typeof val !== 'string') return null;
 
