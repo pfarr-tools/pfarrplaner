@@ -877,14 +877,26 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 });
         }
 
+        $renderableHighlightedEvents = collect($this->adEventsToBeHighlighted)
+            ->map(function ($events) {
+                return collect($events)
+                    ->filter(function (Occurence $event) {
+                        return !empty($event->service->getImageCutPath('bildschirm-16x9'));
+                    })
+                    ->values();
+            })
+            ->filter(function (Collection $events) {
+                return $events->isNotEmpty();
+            });
+
         $eventListSlideChunks = $this->suppressHighlightedOnlyEventListSlides(
             $this->paginateEventListSlidesByDate($this->adEventsToBeListed),
-            $this->adEventsToBeHighlighted
+            $renderableHighlightedEvents
         );
         $listedSlidesCount = collect($eventListSlideChunks)->sum(function (array $pages) {
             return count($pages);
         });
-        $highlightedSlidesCount = collect($this->adEventsToBeHighlighted)->sum(function ($events) {
+        $highlightedSlidesCount = $renderableHighlightedEvents->sum(function ($events) {
             return count($events);
         });
 
@@ -915,8 +927,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                                              $finalAdSlideNumber,
                                              $isFinalLoop);
             }
-            if (count($this->adEventsToBeHighlighted[$cursor->format('Y-m-d')] ?? [])) {
-                foreach ($this->adEventsToBeHighlighted[$cursor->format('Y-m-d')] as $event) {
+            if (count($renderableHighlightedEvents[$cursor->format('Y-m-d')] ?? [])) {
+                foreach ($renderableHighlightedEvents[$cursor->format('Y-m-d')] as $event) {
                     $this->renderEventHighlightSlide($cursor,
                                                      $event,
                                                      $currentSlideNumber+1,
@@ -928,10 +940,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
 
         // add future highlights
-        foreach ($this->adEventsToBeHighlighted as $date => $events) {
+        foreach ($renderableHighlightedEvents as $date => $events) {
             $cursor = Carbon::parse($date);
             if ($cursor->gt($end)) {
-                foreach ($this->adEventsToBeHighlighted[$date] as $event) {
+                foreach ($events as $event) {
                     $this->renderEventHighlightSlide($cursor,
                                                      $event,
                                                      $currentSlideNumber+1,
