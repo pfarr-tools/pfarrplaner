@@ -36,29 +36,11 @@ use Illuminate\Database\Eloquent\Scope;
 
 class ServicesOnlyScope implements Scope
 {
-
-    private static $active = true;
-
     /**
      * Apply the scope to a given Eloquent query builder.
      */
     public function apply(Builder $builder, Model $model): void
     {
-        if (static::$active) $builder->where('event_class', 'service');
-    }
-
-    public static function activate()
-    {
-        static::$active = true;
-    }
-
-    public static function deactivate()
-    {
-        static::$active = false;
-    }
-
-    public static function toggle()
-    {
-        static::$active = !static::$active;
+        $builder->where('event_class', 'service');
     }
 }

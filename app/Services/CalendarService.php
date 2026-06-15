@@ -180,6 +180,7 @@ class CalendarService
 
         $dates = Service::setEagerLoads([])->with([])
             ->select(DB::raw('DISTINCT DATE(services.date) as day'))
+            ->servicesOnly()
             ->inCities($user->visibleCities)
             ->inMonthByDate($date)
             ->orderBy('day', 'ASC')
@@ -253,7 +254,8 @@ class CalendarService
             'funerals:id,service_id,buried_name,type',
             'weddings:id,service_id,spouse1_name,spouse1_birth_name,spouse2_name,spouse2_birth_name',
             'relatedCities:id',
-        ])->inMonthByDate($date)
+        ])->servicesOnly()
+            ->inMonthByDate($date)
             ->inCities($user->visibleCities)
             ->ordered()
             ->get();

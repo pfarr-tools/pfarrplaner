@@ -43,7 +43,6 @@ use App\Models\Places\City;
 use App\Models\Calendar\Day;
 use App\Models\LiturgyInfo;
 use App\Models\Location;
-use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Models\ServiceGroup;
 use App\Models\Tag;
@@ -75,7 +74,6 @@ class ServiceController extends Controller
     public function __construct()
     {
         $this->middleware('auth')->except(['publicLiturgy']);
-        ServicesOnlyScope::deactivate();
     }
 
     /**
@@ -309,7 +307,6 @@ class ServiceController extends Controller
      */
     public function ical(Service $service)
     {
-        ServicesOnlyScope::activate();
         $services = [$service];
         $raw = View::make('ical.ical', ['services' => $services, 'token' => null]);
 
@@ -330,7 +327,6 @@ class ServiceController extends Controller
      */
     public function lastUpdate()
     {
-        ServicesOnlyScope::activate();
         $lastUpdated = Service::inCities(Auth::user()->cities->pluck('id'))
             ->orderBy('updated_at', 'DESC')
             ->first();
@@ -428,7 +424,7 @@ class ServiceController extends Controller
         } else {
             $load = ['location', 'city', 'participants', 'weddings', 'funerals', 'baptisms', 'tags', 'serviceGroups'];
         }
-        $serviceQuery = Service::setEagerLoads([])->where('slug', $service);
+        $serviceQuery = Service::setEagerLoads([])->includeAllEventTypes()->where('slug', $service);
 
         $appends = $this->arrayFromRequest($request, 'append');
 

@@ -61,6 +61,28 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
+    public function testShowReturnsEventData()
+    {
+        $city = City::factory()->create();
+        $user = User::factory()->create();
+        $user->cities()->attach($city->id);
+        $event = Service::factory()->create([
+            'city_id' => $city->id,
+            'date' => '2024-01-14 18:00:00',
+            'title' => 'Gemeindeabend',
+            'event_class' => 'event',
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.service.show', $event));
+
+        $response->assertOk();
+        $response->assertJsonFragment(['id' => $event->id, 'event_class' => 'event']);
+    }
+
+    /**
+     * @return void
+     */
     public function testShowRequiresAuth()
     {
         $service = Service::factory()->create();

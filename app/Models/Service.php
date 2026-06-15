@@ -1213,6 +1213,26 @@ class Service extends Model implements HasDAVCalendarItems
             . ($this->city ? '-' . Str::slug($this->city->name) : '');
     }
 
+    /**
+     * Resolve route model bindings across all event types.
+     *
+     * Routes such as the service editor are also used for non-service events,
+     * so route model binding must explicitly opt out of the default scope.
+     *
+     * @param mixed $query
+     * @param mixed $value
+     * @param string|null $field
+     * @return mixed
+     */
+    public function resolveRouteBindingQuery($query, $value, $field = null)
+    {
+        $field ??= $this->getRouteKeyName();
+
+        return $query
+            ->withoutGlobalScope(ServicesOnlyScope::class)
+            ->where($field, $value);
+    }
+
     public function isTemplate(): bool
     {
         return $this->date->format('Y-m-d') == '1978-03-05';

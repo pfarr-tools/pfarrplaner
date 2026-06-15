@@ -158,4 +158,35 @@ class CalendarApiFeatureTest extends TestCase
         $this->assertArrayHasKey('2024-01-21', $payload['data']);
         $this->assertArrayHasKey($city->id, $payload['data']['2024-01-21']['services']);
     }
+
+    /**
+     * @return void
+     */
+    public function testMonthOnlyReturnsServiceEvents()
+    {
+        $city = City::factory()->create();
+        $user = User::factory()->create();
+        $user->cities()->attach($city->id);
+
+        $service = Service::factory()->create([
+            'city_id' => $city->id,
+            'date' => '2024-01-14 10:00:00',
+            'event_class' => 'service',
+            'title' => 'Gottesdienst',
+        ]);
+
+        Service::factory()->create([
+            'city_id' => $city->id,
+            'date' => '2024-01-15 19:00:00',
+            'event_class' => 'event',
+            'title' => 'Konzert',
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.calendar.month', ['date' => '2024-01']));
+
+        $response->assertOk();
+        $response->assertJsonPath('data.2024-01-14.services.'.$city->id.'.0.id', $service->id);
+        $response->assertJsonMissingPath('data.2024-01-15.services.'.$city->id.'.0');
+    }
 }
