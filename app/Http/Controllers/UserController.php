@@ -485,7 +485,7 @@ class UserController extends Controller
         $request->session()->regenerate();
         Session::put('adminUserSwitchBack', $adminId);
         // save switch in session!
-        return redirect()->route('home');
+        return $this->switchRedirectResponse($request);
     }
 
     public function switchBack(Request $request)
@@ -498,6 +498,21 @@ class UserController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
         Session::remove('adminUserSwitchBack');
+        return $this->switchRedirectResponse($request);
+    }
+
+    /**
+     * Force a full frontend reload after an impersonation change.
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function switchRedirectResponse(Request $request)
+    {
+        if ($request->headers->has('X-Inertia')) {
+            return Inertia::location(route('home'));
+        }
+
         return redirect()->route('home');
     }
 

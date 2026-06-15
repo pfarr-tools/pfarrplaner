@@ -222,7 +222,7 @@ class BillBoardReport extends AbstractWordDocumentReport
         $this->renderBibleText($start);
         $this->section->addTextBreak(2);
 
-        if ($firstService->announcements) {
+        if ($firstService?->announcements) {
             foreach (explode("\n", str_replace("\r", '', $firstService->announcements)) as $announcement) {
                 $this->doc->renderParagraph(static::DEFAULT, [[$announcement, []]]);
             }

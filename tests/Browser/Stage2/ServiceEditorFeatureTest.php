@@ -12,6 +12,8 @@
 
 namespace Tests\Browser\Stage2;
 
+use App\Liturgy\LiturgySheets\LiturgySheets;
+use App\Models\Liturgy\Block;
 use App\Models\Location;
 use App\Models\Places\City;
 use App\Models\Service;
@@ -46,6 +48,12 @@ class ServiceEditorFeatureTest extends AbstractPageLoadTest
             'location_id' => $this->location->id,
             'date' => Carbon::create(2026, 7, 29, 5, 45, 0, 'UTC'),
             'time' => '07:45',
+        ]);
+        Block::create([
+            'service_id' => $this->service->id,
+            'title' => 'Eröffnung',
+            'instructions' => '',
+            'sortable' => 0,
         ]);
         $this->sermon  = Sermon::create(['title' => 'Testpredigt']);
         $this->service->update(['sermon_id' => $this->sermon->id]);
@@ -101,6 +109,23 @@ class ServiceEditorFeatureTest extends AbstractPageLoadTest
                     ->pause(1000)
                     ->assertDontSee('Whoops')
                     ->assertDontSee('500');
+        });
+    }
+
+    public function testAttachmentsTabShowsAutoAttachmentsForServicesWithLiturgyBlocks(): void
+    {
+        $firstDownloadableSheet = collect(LiturgySheets::all())
+            ->first(fn (array $sheet) => !($sheet['isNotAFile'] ?? false));
+
+        $this->assertNotNull($firstDownloadableSheet);
+
+        $this->browse(function (Browser $browser) use ($firstDownloadableSheet) {
+            $browser->loginAs($this->superAdminUser, 'web')
+                    ->visit(new ServiceEditorPage($this->service->slug))
+                    ->waitFor('#attachmentsTab a', 10)
+                    ->click('#attachmentsTab a')
+                    ->waitFor('#attachments', 10)
+                    ->assertSee($firstDownloadableSheet['title']);
         });
     }
 

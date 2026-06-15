@@ -123,20 +123,36 @@ export default {
             deep: true,
             handler(newVal) {
                 this.pruneLocations();
-                this.$emit('update:cityModelValue', this.normalizeToArray(newVal));
+                const normalizedValue = this.normalizeToArray(newVal);
+
+                if (!this.areArraysEqual(normalizedValue, this.normalizeToArray(this.cityModelValue))) {
+                    this.$emit('update:cityModelValue', normalizedValue);
+                }
             }
         },
         myLocations: {
             deep: true,
             handler(newVal) {
-                this.$emit('update:locationModelValue', this.normalizeToArray(newVal));
+                const normalizedValue = this.normalizeToArray(newVal);
+
+                if (!this.areArraysEqual(normalizedValue, this.normalizeToArray(this.locationModelValue))) {
+                    this.$emit('update:locationModelValue', normalizedValue);
+                }
             }
         },
         cityModelValue(newVal) {
-            this.myCities = this.normalizeToArray(newVal);
+            const normalizedValue = this.normalizeToArray(newVal);
+
+            if (!this.areArraysEqual(this.normalizeToArray(this.myCities), normalizedValue)) {
+                this.myCities = normalizedValue;
+            }
         },
         locationModelValue(newVal) {
-            this.myLocations = this.normalizeToArray(newVal);
+            const normalizedValue = this.normalizeToArray(newVal);
+
+            if (!this.areArraysEqual(this.normalizeToArray(this.myLocations), normalizedValue)) {
+                this.myLocations = normalizedValue;
+            }
         }
     },
     methods: {
@@ -145,10 +161,19 @@ export default {
             if ((value === null) || (value === undefined) || (value === '')) return [];
             return [value];
         },
+        areArraysEqual(left, right) {
+            if (left.length !== right.length) return false;
+
+            return left.every((item, index) => item === right[index]);
+        },
         pruneLocations() {
-            this.myLocations = this.normalizeToArray(this.myLocations).filter(locationId => {
+            const prunedLocations = this.normalizeToArray(this.myLocations).filter(locationId => {
                 return this.filteredLocationIds.includes(parseInt(locationId, 10));
             });
+
+            if (!this.areArraysEqual(this.normalizeToArray(this.myLocations), prunedLocations)) {
+                this.myLocations = prunedLocations;
+            }
         },
     }
 }

@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.12.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.12.0...v2026.12.1) (2026-06-08)
+
+
+### Bug Fixes
+
+* A4LiturgySheet enthält zu viel Vorschautext ([d913d83](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d913d83056607335d574668e9be0327f7f3c5b24))
+* Abfragen mit Sammelkirchengemeinden funktionieren nicht mehr ([bb4b14d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/bb4b14d85aa7a27a73b2ea75094485e7c3c0d651))
+* artisan-Befehle aus Integrationen nicht mehr verfügbar ([2c837de](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2c837de0bb35e5866ec98eb7fcab92f7a6c98eae))
+* AutoAttachments werden nicht angezeigt. ([58396ab](https://codeberg.org/pfarr.tools/pfarrplaner/commit/58396abc15b719115d3dd5fd3d81cc06268b29fe))
+* Beim Umschalten von Benutzern (Admin) wird der Bildschirminhalt nicht vollständig erneuert. ([bdf28ea](https://codeberg.org/pfarr.tools/pfarrplaner/commit/bdf28ea8f3416671aeea05d9abe5e42c09f75cf8))
+* BillboardReport produziert Fehler ([e7e8d66](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e7e8d66e4605987ed95983dfea4eac10729143e2))
+* Fehlende Berechtigung für Predigtbilder behoben. ([b0f9a57](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b0f9a57532c5337cf46b1f2071719b0f4631d133))
+* Fehler beim An-/Abmelden ([ee6e839](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ee6e8393dbad69aac47b1285a6d26267033b763c))
+* Öffentliche Downloads brauchen Login ([b3da998](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b3da99868bb2a57ccb1aae06f5a6c142095287e8))
+* Reiter "Trauungen" lädt nicht ([1a90af1](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1a90af10133aa44d459f97c7606157ff1b9b62b1))
+* StreamingTroubleshooterController ist nicht mehr öffentlich erreichbar. ([6c883cf](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6c883cf89e69022e5286a9812522af8662a2fb4f))
+
 ## [2026.12.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.11.6...v2026.12.0) (2026-05-27)
 
 

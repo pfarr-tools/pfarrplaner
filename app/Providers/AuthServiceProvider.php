@@ -47,6 +47,7 @@ use App\Models\Places\City;
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
+use App\Models\Sermon;
 use App\Models\ServiceGroup;
 use App\Models\Seating\Booking;
 use App\Models\Tag;
@@ -66,6 +67,7 @@ use App\Policies\SongPolicy;
 use App\Policies\SongbookPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\ReplacementPolicy;
+use App\Policies\SermonPolicy;
 use App\Policies\ServicePolicy;
 use App\Policies\ServiceGroupPolicy;
 use App\Policies\StreetRangePolicy;
@@ -117,6 +119,7 @@ class AuthServiceProvider extends ServiceProvider
         Funeral::class => FuneralPolicy::class,
         Parish::class => ParishPolicy::class,
         Psalm::class => PsalmPolicy::class,
+        Sermon::class => SermonPolicy::class,
         Song::class => SongPolicy::class,
         Songbook::class => SongbookPolicy::class,
         ServiceGroup::class => ServiceGroupPolicy::class,

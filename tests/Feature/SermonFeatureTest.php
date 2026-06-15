@@ -18,6 +18,8 @@ use App\Models\Service;
 use App\Services\RoleService;
 use App\Http\Middleware\ForceDomain;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -31,6 +33,7 @@ class SermonFeatureTest extends TestCase
     {
         parent::setUp();
         $this->withoutMiddleware(ForceDomain::class);
+        Storage::fake();
         $this->user = User::factory()->create();
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
@@ -44,5 +47,25 @@ class SermonFeatureTest extends TestCase
             ->get(route('sermon.editor', $sermon->id))
             ->assertStatus(200)
             ->assertInertia(fn(Assert $page) => $page->component('sermonEditor'));
+    }
+
+    public function testUserWithServicePermissionCanAttachSermonImage(): void
+    {
+        $service = Service::factory()->create();
+        $sermon = Sermon::create(['title' => 'Testpredigt']);
+        $service->update(['sermon_id' => $sermon->id]);
+
+        $user = User::factory()->create();
+        $user->givePermissionTo('gd-bearbeiten');
+        $user->cities()->attach($service->city_id, ['permission' => 'w']);
+
+        $response = $this->actingAs($user)->post(route('sermon.image.attach', ['model' => $sermon->id]), [
+            'attachments' => [UploadedFile::fake()->image('sermon.jpg')],
+        ]);
+
+        $response->assertOk();
+        $sermon->refresh();
+        $this->assertNotEmpty($sermon->image);
+        $this->assertStringStartsWith('attachments/', $sermon->image);
     }
 }

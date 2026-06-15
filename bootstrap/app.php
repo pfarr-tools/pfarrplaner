@@ -52,8 +52,14 @@ use Illuminate\Validation\ValidationException;
 
 setlocale(LC_ALL, 'de_DE.utf8');
 
+$integrationCommandPaths = array_values(array_filter(
+    glob(__DIR__.'/../app/Integrations/*/Commands') ?: [],
+    'is_dir'
+));
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(commands: __DIR__.'/../routes/console.php')
+    ->withCommands($integrationCommandPaths)
     ->withMiddleware(function (Middleware $middleware) {
         // Global middleware appended to every request
         $middleware->append([
