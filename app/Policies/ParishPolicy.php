@@ -32,6 +32,7 @@ namespace App\Policies;
 
 use App\Models\Parish;
 use App\Models\People\User;
+use App\Models\Places\City;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
@@ -67,12 +68,15 @@ class ParishPolicy
 
     /**
      * @param User $user
-     * @param Parish $model
+     * @param City|null $city
      * @return bool
      */
-    public function create(User $user)
+    public function create(User $user, ?City $city = null): bool
     {
-        return (count($user->adminCities) > 0) || $user->hasPermissionTo('pfarramt-bearbeiten');
+        if (null === $city) {
+            return count($user->writableCities) > 0;
+        }
+        return $user->writableCities->contains($city);
     }
 
     /**

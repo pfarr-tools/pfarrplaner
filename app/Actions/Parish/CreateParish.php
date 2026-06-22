@@ -63,9 +63,9 @@ class CreateParish extends AbstractCreateAction implements CreatesParishes
      */
     public function create(User $user, array $input): Parish
     {
-        Gate::forUser($user)->authorize('create', Parish::class);
         $input = Validator::make($input, Parish::$validationRules)->validateWithBag('createParish');
         $this->city = City::findOrFail($input['city_id']);
+        Gate::forUser($user)->authorize('create', [Parish::class, $this->city]);
         $parish = Parish::create($input);
         CreatedParish::dispatch($user, $parish);
         $this->messages = ['success' => 'Das neue Pfarramt wurde gespeichert.'];

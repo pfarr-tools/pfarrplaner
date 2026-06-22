@@ -32,6 +32,7 @@ namespace App\Policies;
 
 use App\Models\Location;
 use App\Models\People\User;
+use App\Models\Places\City;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
@@ -76,11 +77,15 @@ class LocationPolicy
      * Determine whether the user can create locations.
      *
      * @param User $user
-     * @return mixed
+     * @param City|null $city
+     * @return bool
      */
-    public function create(User $user)
+    public function create(User $user, ?City $city = null): bool
     {
-        return $user->isAdmin;
+        if (null === $city) {
+            return count($user->writableCities) > 0;
+        }
+        return $user->writableCities->contains($city);
     }
 
     /**

@@ -14,6 +14,7 @@ namespace Tests\Unit\Policies;
 
 use App\Models\Parish;
 use App\Models\People\User;
+use App\Models\Places\City;
 use App\Policies\ParishPolicy;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -59,11 +60,14 @@ class ParishPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testUserWithPermissionCanCreate(): void
+    public function testUserWithWriteAccessCanCreate(): void
     {
         $user = User::factory()->create();
-        $user->givePermissionTo('pfarramt-bearbeiten');
+        $city = City::factory()->create();
+        $user->cities()->attach($city->id, ['permission' => 'w']);
+
         $this->assertTrue($this->policy->create($user));
+        $this->assertTrue($this->policy->create($user, $city));
     }
 
     public function testRegularUserCannotUpdate(): void

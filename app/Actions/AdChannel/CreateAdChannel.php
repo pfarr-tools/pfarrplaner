@@ -67,9 +67,9 @@ class CreateAdChannel extends AbstractCreateAction implements CreatesAdChannels
      */
     public function create(User $user, array $input)
     {
-        Gate::forUser($user)->authorize('create', AdChannel::class);
         $input = Validator::make($input, AdChannel::$validationRules)->validateWithBag('createTag');
         $this->city = City::findOrFail($input['city_id']);
+        Gate::forUser($user)->authorize('create', [AdChannel::class, $this->city]);
         if (empty($input['code'] ?? '')) {
             $input['code'] = Str::slug($input['name']);
         }

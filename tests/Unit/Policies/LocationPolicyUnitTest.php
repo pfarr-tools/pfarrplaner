@@ -14,6 +14,7 @@ namespace Tests\Unit\Policies;
 
 use App\Models\Location;
 use App\Models\People\User;
+use App\Models\Places\City;
 use App\Policies\LocationPolicy;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -48,11 +49,14 @@ class LocationPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testAdminCanCreate(): void
+    public function testUserWithWriteAccessCanCreate(): void
     {
         $user = User::factory()->create();
-        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
+        $city = City::factory()->create();
+        $user->cities()->attach($city->id, ['permission' => 'w']);
+
         $this->assertTrue($this->policy->create($user));
+        $this->assertTrue($this->policy->create($user, $city));
     }
 
     public function testRegularUserCannotIndex(): void
