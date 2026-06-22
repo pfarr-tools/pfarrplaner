@@ -209,7 +209,7 @@
             @cancel="closeCreateModals"
         >
             <p class="mb-3">
-                Neue Abwesenheit für <strong>{{ formatUserName(activeAbsenceCreateUser) }}</strong>
+                Neue Abwesenheit für <strong>{{ formatUserName(activeAbsenceCreateUser) }}. Bitte wähle Anfangs- und Enddatum.</strong>
             </p>
             <date-range-input
                 label="Zeitraum"
@@ -290,6 +290,7 @@ export default {
             toggleableUsers: [],
             isPastor: this.$page.props.currentUser.data.isPastor,
             draftAbsenceRanges: {},
+            draftAbsenceRangeFormatted: '',
             draftPoolmasterRanges: {},
             selectedPoolIds: {},
             activeAbsenceCreateUserId: null,
