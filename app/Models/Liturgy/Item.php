@@ -38,6 +38,7 @@ use App\Liturgy\ItemHelpers\ItemHelperNotFoundException;
 use App\Models\People\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Item extends Model
 {
@@ -97,7 +98,12 @@ class Item extends Model
                 $type = $participant['type'];
                 $id = $participant['name'];
             } else {
-                [$type, $id] = explode(':', $participant, 2);
+                if (Str::contains($participant, ':')) {
+                    [$type, $id] = explode(':', $participant, 2);
+                } else {
+                    $id = $participant;
+                    $type = 'free';
+                }
             }
             if ((!$type) || (!$id)) continue;
             if ($type == 'ministry') {

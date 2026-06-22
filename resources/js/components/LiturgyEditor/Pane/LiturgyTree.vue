@@ -586,9 +586,14 @@ export default {
                 .then(response => this.reloadTree(response.data));
         },
         displayResponsible(record) {
-            var title = '';
+            let title = '';
+            let tmp = [];
             if (typeof record != 'string') return;
-            var tmp = record.split(':');
+            if (record.includes(':')) {
+                tmp = record.split(':');
+            } else {
+                tmp = ['free', record];
+            }
             if (tmp[0] == 'user') {
                 this.myService.participants.forEach(function (person) {
                     if (person.id == tmp[1]) title = '<span class="mdi mdi-account-check"></span> ' + person.name;
