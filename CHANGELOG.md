@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.12.3](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.12.2...v2026.12.3) (2026-07-03)
+
+
+### Bug Fixes
+
+* Kasualien mit Dimissoriale können nicht gespeichert werden. ([a1ab39e](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a1ab39ef3dc2f90ba046026e32ff557723f0577e))
+
 ### [2026.12.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.12.0...v2026.12.2) (2026-07-03)
 
 
