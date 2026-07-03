@@ -43,7 +43,7 @@
                                   :is-checked-item="true" />
             </div>
             <div class="col-md-3" v-if="needed">
-                <form-date-picker name="dimissorial_requested" label="Erhalten" v-model="parent.dimissorial_received"
+                <form-date-picker name="dimissorial_received" label="Erhalten" v-model="parent.dimissorial_received"
                                   :is-checked-item="true" />
             </div>
         </div>
@@ -57,6 +57,16 @@ import FormInput from "../Ui/forms/FormInput";
 import FormDatePicker from "../Ui/forms/FormDatePicker";
 import DimissorialUrl from "./DimissorialUrl";
 
+function normalizeDateValue(value) {
+    if (!value) return value;
+    if ((typeof value === 'string') && moment(value, 'DD.MM.YYYY', true).isValid()) return value;
+
+    const parsedValue = moment(value, ['YYYY-MM-DD', moment.ISO_8601], true);
+    if (parsedValue.isValid()) return parsedValue.format('DD.MM.YYYY');
+
+    return '';
+}
+
 export default {
     name: "DimissorialFormPart",
     components: {DimissorialUrl, FormDatePicker, FormInput, FormCheck},
@@ -68,8 +78,8 @@ export default {
     },
     data() {
         var myParent = this.parent;
-        if (myParent.dimissorial_requested) myParent.dimissorial_requested = moment(myParent.dimissorial_requested).format('DD.MM.YYYY');
-        if (myParent.dimissorial_received) myParent.dimissorial_received = moment(myParent.dimissorial_received).format('DD.MM.YYYY');
+        myParent.dimissorial_requested = normalizeDateValue(myParent.dimissorial_requested);
+        myParent.dimissorial_received = normalizeDateValue(myParent.dimissorial_received);
 
         return {
             myParent: myParent,

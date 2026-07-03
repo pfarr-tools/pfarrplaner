@@ -399,17 +399,13 @@ import QuillDropdown from "../../components/LiturgyEditor/Editors/Quill/QuillDro
 function formatDateValue(value) {
     if (!value) return value;
     if ((typeof value === 'string') && moment(value, 'DD.MM.YYYY', true).isValid()) return value;
-
-    const isoValue = moment(value, moment.ISO_8601, true);
-    return isoValue.isValid() ? isoValue.format('DD.MM.YYYY') : value;
+    return moment(value).format('DD.MM.YYYY');
 }
 
 function formatDateTimeValue(value) {
     if (!value) return value;
     if ((typeof value === 'string') && moment(value, 'DD.MM.YYYY HH:mm', true).isValid()) return value;
-
-    const isoValue = moment(value, moment.ISO_8601, true);
-    return isoValue.isValid() ? isoValue.format('DD.MM.YYYY HH:mm') : value;
+    return moment(value).format('DD.MM.YYYY HH:mm');
 }
 
 function formatFuneralForForm(funeral) {
