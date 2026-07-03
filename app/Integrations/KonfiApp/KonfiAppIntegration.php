@@ -39,6 +39,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\ResponseInterface;
+use stdClass;
 
 /**
  * Class KonfiAppIntegration
@@ -59,6 +60,15 @@ class KonfiAppIntegration extends AbstractIntegration
 
     /** @var Client */
     protected $client;
+
+    /** @var array last request */
+    protected $lastRequest = [];
+
+    /** @var string last endpoint */
+    protected $lastEndpoint = '';
+
+    /** @var string  last request type */
+    protected $lastRequestType = '';
 
     /**
      * KonfiAppIntegration constructor.
@@ -101,7 +111,8 @@ class KonfiAppIntegration extends AbstractIntegration
      */
     public function listEventTypes()
     {
-        return collect($this->requestData('verwaltung/veranstaltungen/')->data->veranstaltungen);
+        $response = $this->requestData('verwaltung/veranstaltungen/');
+        return $response ? collect($response->data->veranstaltungen) : collect();
     }
 
     /**
@@ -114,11 +125,11 @@ class KonfiAppIntegration extends AbstractIntegration
      * @return mixed Response data field
      * @throws Exception
      */
-    protected function requestData($path, $arguments = [], $requestType = 'GET')
+    protected function requestData($path, $arguments = [], $requestType = 'GET'): stdClass|bool
     {
         $response = $this->request($requestType, $path, $arguments);
-        if ($response->getStatusCode() != 200) {
-            throw new Exception ('Could not retrieve event types from KonfiApp.');
+        if ((!$response) || ($response->getStatusCode() != 200)) {
+            return false;
         }
         return json_decode((string)$response->getBody());
     }
@@ -131,19 +142,36 @@ class KonfiAppIntegration extends AbstractIntegration
      * @param $requestType
      * @param $path
      * @param array $arguments
-     * @return ResponseInterface
+     * @return ResponseInterface|bool
      */
-    protected function request($requestType, $path, $arguments = []): ResponseInterface
+    protected function request($requestType, $path, $arguments = []): ResponseInterface|bool
     {
-        return $this->client->request(
+        $this->lastRequest = [
+            'query' => $arguments,
+            'form_params' => $arguments,
+            'headers' => ['X-Konfiapp-Token' => $this->apiKey]
+        ];
+        $this->lastEndpoint = static::API_URL.$path;
+        $this->lastRequestType = $requestType;
+
+        $response = $this->client->request(
             $requestType,
             $path,
-            [
-                'query' => $arguments,
-                'form_params' => $arguments,
-                'headers' => ['X-Konfiapp-Token' => $this->apiKey]
-            ]
+            $this->lastRequest,
         );
+
+        if ((!$response) || $response->getStatusCode() != 200 || (!isset(json_decode($response->getBody(), true)['data']))) {
+            Log::debug('KonfiApp: KonfiApp returns error response', [
+                'requestType' => $this->lastRequestType,
+                'endpoint' => $this->lastEndpoint,
+                'token' => $this->apiKey,
+                'request' => $this->lastRequest,
+                'response' => $response ? json_decode($response->getBody(), true) : 'false',
+            ]);
+            return false;
+        }
+
+        return $response;
     }
 
     /**
