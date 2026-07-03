@@ -62,16 +62,16 @@
                                     <span class="mdi mdi-drag-horizontal"></span>
                                 </div>
                                 <div class="col-9">
-                                    <div class="text-bold">{{ tab.config.title || availableTabs[tab.type].title }}</div>
-                                    <div>{{ availableTabs[tab.type].description }}</div>
+                                    <div class="text-bold">{{ tab.config.title || availableTabs[tab.type]?.title }}</div>
+                                    <div>{{ availableTabs[tab.type]?.description }}</div>
                                     <div v-if="tab.configVisible">
                                         <hr />
-                                        <div :is="configurationComponent(tab)" :tab="tab" :cities="cities"
-                                             :locations="locations" :ministries="ministries" />
+                                        <component :is="configurationComponent(tab)" :tab="tab" :cities="cities"
+                                                   :locations="locations" :ministries="ministries" />
                                     </div>
                                 </div>
                                 <div class="col-2 text-end">
-                                    <button v-if="Object.entries(tab.config).length" class="btn btn-light btn-sm"
+                                    <button v-if="hasConfiguration(tab)" class="btn btn-light btn-sm"
                                             @click="toggleConfig(tabIndex)"
                                         :title="tab.configVisible ? 'Konfiguration einklappen' : 'Dieser Reiter kann weiter konfiguriert werden'">
                                         <span :class="tab.configVisible ? 'mdi mdi-chevron-down' : 'mdi mdi-chevron-right'"></span>
@@ -111,6 +111,24 @@ import WeddingsTabConfig from "../TabConfig/WeddingsTabConfig";
 import FormCheck from "../../Ui/forms/FormCheck";
 import FormGroup from "../../Ui/forms/FormGroup";
 
+const TAB_CONFIGURATION_COMPONENTS = {
+    nextServices: NextServicesTabConfig,
+    baptisms: BaptismsTabConfig,
+    cases: CasesTabConfig,
+    funerals: FuneralsTabConfig,
+    missingEntries: MissingEntriesTabConfig,
+    streaming: StreamingTabConfig,
+    weddings: WeddingsTabConfig,
+};
+
+function cloneConfig(config) {
+    if (!config || typeof config !== 'object' || Array.isArray(config)) {
+        return {};
+    }
+
+    return { ...config };
+}
+
 function normalizeHomeScreenTabsConfig(config) {
     if (!config || typeof config !== 'object' || Array.isArray(config)) {
         return { tabs: [] };
@@ -146,21 +164,32 @@ export default {
     },
     data() {
         const tabsConfig = normalizeHomeScreenTabsConfig(this.homeScreenTabsConfig);
-
-        tabsConfig.tabs.forEach(tab => {
-            tab['configVisible'] = false;
-        })
+        tabsConfig.tabs = tabsConfig.tabs.map(tab => this.normalizeTab(tab));
 
         return {
             myTabs: tabsConfig.tabs,
         }
     },
     methods: {
+        normalizeTab(tab) {
+            const defaultTab = this.availableTabs[tab.type] || {};
+            const defaultConfig = cloneConfig(defaultTab.config);
+            const currentConfig = cloneConfig(tab.config);
+
+            return {
+                ...tab,
+                config: {
+                    ...defaultConfig,
+                    ...currentConfig,
+                },
+                configVisible: false,
+            };
+        },
         addTab(tabType) {
-            this.myTabs.push({
+            this.myTabs.push(this.normalizeTab({
                 type: tabType,
-                config: this.availableTabs[tabType].config,
-            });
+                config: this.availableTabs[tabType]?.config,
+            }));
         },
         deleteTab(tabIndex) {
             this.MyTabs = this.myTabs.splice(tabIndex, 1);
@@ -169,8 +198,11 @@ export default {
             this.myTabs[tabIndex].configVisible = !this.myTabs[tabIndex].configVisible;
             this.$forceUpdate();
         },
+        hasConfiguration(tab) {
+            return !!this.configurationComponent(tab) && Object.keys(tab.config || {}).length > 0;
+        },
         configurationComponent(tab) {
-            return tab.type.substr(0,1).toUpperCase()+tab.type.substr(1)+'TabConfig';
+            return TAB_CONFIGURATION_COMPONENTS[tab.type] || null;
         }
     }
 }
