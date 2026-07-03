@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.12.2](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.12.0...v2026.12.2) (2026-07-03)
+
+
+### Bug Fixes
+
+* A4LiturgySheet enthält zu viel Vorschautext ([d913d83](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d913d83056607335d574668e9be0327f7f3c5b24))
+* Abfragen mit Sammelkirchengemeinden funktionieren nicht mehr ([bb4b14d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/bb4b14d85aa7a27a73b2ea75094485e7c3c0d651))
+* artisan-Befehle aus Integrationen nicht mehr verfügbar ([2c837de](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2c837de0bb35e5866ec98eb7fcab92f7a6c98eae))
+* AutoAttachments werden nicht angezeigt. ([58396ab](https://codeberg.org/pfarr.tools/pfarrplaner/commit/58396abc15b719115d3dd5fd3d81cc06268b29fe))
+* Beim Umschalten von Benutzern (Admin) wird der Bildschirminhalt nicht vollständig erneuert. ([bdf28ea](https://codeberg.org/pfarr.tools/pfarrplaner/commit/bdf28ea8f3416671aeea05d9abe5e42c09f75cf8))
+* Besserer Umgang mit Fehlern in der KonfiApp-API ([a916e97](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a916e97ce702b8a7d393138cec56795e484fe7c9))
+* BillboardReport produziert Fehler ([e7e8d66](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e7e8d66e4605987ed95983dfea4eac10729143e2))
+* Falsch gesetzte Abfrage von Benutzerrechten ([a1868e9](https://codeberg.org/pfarr.tools/pfarrplaner/commit/a1868e96d44330fc42610d55e695619273cc44cf))
+* Fehlende Berechtigung für Predigtbilder behoben. ([b0f9a57](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b0f9a57532c5337cf46b1f2071719b0f4631d133))
+* Fehler bei Freitexteingaben im Feld "Verantwortliche" der Liturgie ([89f3894](https://codeberg.org/pfarr.tools/pfarrplaner/commit/89f389405e862dbf63dc8f1822fa0bd2febea0de))
+* Fehler beim An-/Abmelden ([ee6e839](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ee6e8393dbad69aac47b1285a6d26267033b763c))
+* Girocodes abgeschnitten bei langen Opferzwecken ([e71f30d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/e71f30d5437ba5d6cc3f4544e73ecdd1b871db30))
+* Girocodes können nicht gedruckt werden. ([3bf2720](https://codeberg.org/pfarr.tools/pfarrplaner/commit/3bf2720b18724bb03d20d8a2d9e63ab9b9972a0b))
+* Gottesdienstkalender zeigt alle Veranstaltungen ([4e6f2f2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/4e6f2f2ca8250f6ca13cd46be1e3111da0fd5deb))
+* Konfigurationskomponenten in der Startseitenkonfiguration wieder anzeigen. ([1558cfa](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1558cfa00d4586c9c4c112a979aec44585c79102))
+* Öffentliche Downloads brauchen Login ([b3da998](https://codeberg.org/pfarr.tools/pfarrplaner/commit/b3da99868bb2a57ccb1aae06f5a6c142095287e8))
+* Prädikant:innenformular lädt nicht ([03ca1f6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/03ca1f67a8806259e61d7b5a227032700d6fa628))
+* QR-Codes für Konfis können nicht gedruckt werden. ([ca4c660](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ca4c660b2cc6d2356e9869b0148fa2a0eee162d0))
+* Reiter "Trauungen" lädt nicht ([1a90af1](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1a90af10133aa44d459f97c7606157ff1b9b62b1))
+* StreamingTroubleshooterController ist nicht mehr öffentlich erreichbar. ([6c883cf](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6c883cf89e69022e5286a9812522af8662a2fb4f))
+* Unklare Beschriftung. ([9dbdd4a](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9dbdd4a14619ae33e60965099e0a9668d8d1cc17))
+* Werbeschleifen funktionieren nicht mehr ([5403611](https://codeberg.org/pfarr.tools/pfarrplaner/commit/54036115c9aef9c4649cd1155a785ed041d21cc0))
+
 ### [2026.12.1](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.12.0...v2026.12.1) (2026-06-08)
 
 
