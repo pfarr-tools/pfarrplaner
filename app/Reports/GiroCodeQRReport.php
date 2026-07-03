@@ -107,15 +107,15 @@ class GiroCodeQRReport extends AbstractPDFDocumentReport
         $data = $request->validate(
             [
                 'city' => 'required|int|exists:cities,id',
-                'start' => 'required|date|date_format:d.m.Y',
-                'end' => 'required|date|date_format:d.m.Y',
+                'start' => 'required|date|date_format:Y-m-d',
+                'end' => 'required|date|date_format:Y-m-d',
                 'copies' => 'required|int',
             ]
         );
 
         $allServices = Service::where('city_id', $data['city'])
-            ->between(Carbon::createFromFormat('d.m.Y', $data['start']),
-                      Carbon::createFromFormat('d.m.Y', $data['end'])
+            ->between(Carbon::createFromFormat('Y-m-d', $data['start']),
+                      Carbon::createFromFormat('Y-m-d', $data['end'])
             )->ordered()->get();
 
 
