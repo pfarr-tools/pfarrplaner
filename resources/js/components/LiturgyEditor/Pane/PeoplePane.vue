@@ -125,7 +125,7 @@ export default {
             }
         }, this);
         e.data.responsible.forEach(item => {
-            if (item && typeof item == 'string' && (item.substr(0, 5) == 'free:') || (!item.includes(':')))  {
+            if (item && typeof item == 'string' && ((item.substr(0, 5) == 'free:') || (!item.includes(':'))))  {
                 options.push({ id: item, name: item.includes(':') ? item.split(':')[1] : item, category: 'Eigene Eingaben', type: 'user-times' });
             }
         });
