@@ -109,11 +109,13 @@ class WeeklyVerseReport extends AbstractCSVReport
                 ]);
             },
             'Überschrift' => function($item, $key) {
-                return (Carbon::parse($item['dateSql'])->weekday()) ? 'Für diesen besonderen Tag' : 'Für die neue Woche';
+                return (Carbon::parse($key)->weekday()) ? 'Für diesen besonderen Tag' : 'Für die neue Woche';
             },
-            'Wochenspruch' => 'litTextsWeeklyQuoteText',
+            'Wochenspruch' => function($item, $key) {
+                return $item['Wochenspruch']['Text'];
+            },
             'Bibelstelle' => function($item, $key) use ($bible) {
-                return (ReferenceParser::getInstance()->beautify($item['litTextsWeeklyQuote']));
+                return (ReferenceParser::getInstance()->beautify($item['Wochenspruch']['Bibelstelle'], []));
             },
         ]);
 
