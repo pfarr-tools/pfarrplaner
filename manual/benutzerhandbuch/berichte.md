@@ -94,12 +94,14 @@ Seite: **Kirchliche Nachrichten erstellen**
 Felder:
 
 - **Kirchliche Nachrichten für folgende Kirchengemeinden erstellen**: Gemeinden, die einbezogen werden.
+- **Kopfzeilen drucken**: Blendet die Kopfzeilen mit den Gemeinde- und Pfarramtsangaben ein oder aus. Aktivieren Sie die Option, wenn die Ausgabe als vollständiger Aushang mit diesen Zusatzangaben gedacht ist. Lassen Sie sie ausgeschaltet, wenn Sie nur den eigentlichen Nachrichtentext brauchen.
 - **Alternative Ortsbezeichnung**: Optionaler Ortsname, wenn in der Ausgabe nicht der normale Gemeindename erscheinen soll.
 - **Gottesdienste ab**: Startdatum.
 - **Folgende Pfarrämter mit einbeziehen**: Pfarrämter, deren Angaben einfließen.
 - **Urlaub für folgende Pfarrer:innen mit einbeziehen**: Personen, deren Urlaubszeiten berücksichtigt werden.
 
 Die Listen der Pfarrämter und Personen hängen von den gewählten Gemeinden ab.
+Pfarrplaner merkt sich die zuletzt verwendeten Gemeinden, Pfarrämter, Personen, die alternative Ortsbezeichnung und die Einstellung für **Kopfzeilen drucken** für den nächsten Aufruf dieses Berichts.
 
 ---
 

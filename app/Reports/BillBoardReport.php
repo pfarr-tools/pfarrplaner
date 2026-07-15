@@ -134,13 +134,18 @@ class BillBoardReport extends AbstractWordDocumentReport
                 'cities' => 'required',
                 'cities.*' => 'int|exists:cities,id',
                 'altCity' => 'nullable|string',
+                'printHeaders' => 'nullable|boolean',
                 'start' => 'required|date',
                 'parishes.*' => 'nullable|int|exists:parishes,id',
                 'pastors.*' => 'nullable|int|exists:users,id',
             ]
         );
 
-        $start = Carbon::parse($data['start'])->startOfDay();
+        $presets = $data;
+        unset($presets['start']);
+        Auth::user()->setSetting('reports_billboard_presets', $presets);
+
+        $start = Carbon::parse($data['start'], 'UTC')->setTimeZone('Europe/Berlin')->startOfDay();
         $end = $start->copy()->addDays(7)->endOfDay();
         $cities = City::whereIn('id', $data['cities'])->get();
         $parishes = (count($data['parishes'] ?? [])) ? Parish::with('users')->whereIn('id', $data['parishes'])->get() : collect();
@@ -229,10 +234,12 @@ class BillBoardReport extends AbstractWordDocumentReport
             $this->section->addTextBreak(2);
         }
 
-        $this->renderInfoHeader($cities, $parishes);
-        $this->section->addTextBreak(2);
+        if ($data['printHeaders']) {
+            $this->renderInfoHeader($cities, $parishes);
+        }
+        $this->doc->renderParagraph();
         $this->renderEvents($events, $cities);
-        $this->section->addTextBreak(3);
+        $this->doc->renderParagraph();
         $this->renderAbsences($absences);
 
 
@@ -245,9 +252,15 @@ class BillBoardReport extends AbstractWordDocumentReport
         );
     }
 
-    protected function renderBibleText($start)
+    /**
+     * @param Carbon $start
+     * @return void
+     */
+    protected function renderBibleText(Carbon $start)
     {
-        if(($liturgy = LiturgyService::getLiturgyInfoByDate($start)) && (isset($liturgy[0]))) {
+        $liturgyDay = $start->dayOfWeek == 0 ? $start->copy() : $start->copy()->parse('next sunday');
+        $liturgy = LiturgyService::getLiturgyInfoByDate($liturgyDay);
+        if($liturgy && (isset($liturgy[0]))) {
             $liturgy = $liturgy[0];
             $this->doc->renderParagraph(static::HEADING1, [['Wochenspruch:', ['size' => 18, 'color' => '#0070c0']]]);
             $this->doc->renderParagraph(static::HEADING1, [[$liturgy['Wochenspruch']['Text'], ['size' => 16, 'color' => '#0070c0']]]);

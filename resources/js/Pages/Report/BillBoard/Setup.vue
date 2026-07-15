@@ -37,6 +37,7 @@
             <form-selectize name="cities[]" label="Kirchliche Nachrichten für folgende Kirchengemeinden erstellen" v-model="myCities"
                             @input="setParishes" multiple
                             :options="cities" />
+            <form-check name="printHeaders" label="Kopfzeilen drucken" v-model="printHeaders" />
             <form-input name="altCity" label="Alternative Ortsbezeichnung" v-model="altCity" />
             <form-date-picker name="start" label="Gottesdienste ab" v-model="myStart" iso-date />
             <form-selectize name="parishes[]" label="Folgende Pfarrämter mit einbeziehen"
@@ -78,14 +79,25 @@ export default {
     data() {
         let myStart = moment().startOf('isoWeek').add(6, 'days');
 
+        let presets = this.$page.props.settings['reports_billboard_presets'] || {};
+        console.log('presets from setting', presets);
+        presets.cities = presets.cities || [];
+        presets.parishes = presets.parishes || [];
+        presets.pastors = presets.pastors || [];
+        presets.altCity = presets.altCity || '';
+        presets.printHeaders = presets.printHeaders || false;
+        console.log('presets normalized', presets);
+
+
         return {
-            myCities: this.cities.length ? [this.cities[0].id] : null,
-            myParishes: [],
-            myPastors: [],
+            myCities: presets.cities,
+            printHeaders: presets.printHeaders,
+            myParishes: presets.parishes,
+            myPastors: presets.pastors,
             cityUpdated: 0,
             parishUpdated: 0,
             myStart,
-            altCity: '',
+            altCity: presets.altCity,
         }
     },
     mounted() {
@@ -100,6 +112,7 @@ export default {
                 start: this.myStart,
                 parishes: this.myParishes,
                 pastors: this.myPastors,
+                printHeaders: this.printHeaders,
             });
         },
         setParishes(e) {
