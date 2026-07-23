@@ -49,13 +49,16 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <date-range-input label="Zeitraum" :model-value="dateRange" @update:modelValue="onDateRangeChange" />
+            </div>
+            <div class="col-md-3">
+                <form-input label="Uhrzeit" type="time" v-model="setup.time" />
             </div>
             <div class="col-md-3">
                 <form-selectize label="Wochentag" :options="weekDays" v-model="setup.weekDay"  @input="serviceList"/>
             </div>
-            <div class="col-md-3 ">
+            <div class="col-md-3">
                 <form-group label="Rhythmus (jede ... Woche)">
                     <input class="mx-1 form-control" type="number" v-model="setup.rhythm" size="4"  @input="serviceList"/>
                 </form-group>
@@ -81,7 +84,7 @@
                                 <dataset-item tag="tbody">
                                     <template #default="{ row, rowIndex }">
                                         <tr>
-                                            <td>{{ row.date.format('DD.MM.YYYY') }}</td>
+                                            <td>{{ row.date.format('DD.MM.YYYY') }} (KW {{ String(row.date.isoWeek()).padStart(2, '0') }})</td>
                                             <td>
                                                 <form-input type="time" v-model="row.time" :key="computeCounter" />
                                             </td>
@@ -178,6 +181,7 @@ export default {
                 from: moment().startOf('year').toISOString(),
                 to: moment().endOf('year').toISOString(),
                 location: this.locations.length ? this.locations[0].id : null,
+                time: this.locations.length && this.locations[0].default_time ? this.locations[0].default_time.substr(0, 5) : '',
                 title: '',
                 rhythm: 1,
                 weekDay: 0,
@@ -196,6 +200,13 @@ export default {
         }
     },
     watch: {
+        'setup.location': function (newLocation) {
+            this.setup.time = this.defaultTimeForLocation(newLocation);
+            this.serviceList();
+        },
+        'setup.time': function () {
+            this.serviceList();
+        },
         setup: {
             handler (newVal, oldVal) {
                 let newCity = this.locations.filter(item => {
@@ -215,6 +226,11 @@ export default {
         }
     },
     methods: {
+        defaultTimeForLocation(locationId = this.setup.location) {
+            const location = this.locations.find(item => item.id == locationId);
+
+            return location && location.default_time ? location.default_time.substr(0, 5) : '';
+        },
         onDateRangeChange(val) {
             if (val && val.length === 2 && val[1]) {
                 this.setup.from = moment(val[0]).toISOString();
@@ -240,7 +256,7 @@ export default {
                 this.services.push(
                     {
                         date: moment(current),
-                        time: this.location.default_time ? this.location.default_time.substr(0,5) : '',
+                        time: this.setup.time || '',
                         locationText: this.location.name,
                         location: this.location.id,
                     }

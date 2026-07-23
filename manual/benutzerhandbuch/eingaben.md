@@ -163,6 +163,7 @@ Felder:
 - **KonfiApp**: Erscheint nur, wenn für die Gemeinde KonfiApp-Veranstaltungsarten eingerichtet sind. Hier wählen Sie die Veranstaltungsart.
 - **Abweichender Titel**: Optionaler Titel für alle anzulegenden Gottesdienste.
 - **Zeitraum**: Beginn und Ende der Reihe. Ein Klick auf das Feld öffnet einen Zweimonatskalender. Klicken Sie zuerst auf das Startdatum, dann auf das Enddatum. Das Feld zeigt danach den gewählten Zeitraum, z. B. „01.01.2026 – 31.12.2026". Sie können das Datum auch direkt eintippen.
+- **Uhrzeit**: Startwert für die Uhrzeit aller vorgeschlagenen Gottesdienste. Beim Wechsel des Ortes wird hier die Standarduhrzeit des Ortes eingetragen, falls dort eine hinterlegt ist. Sie können den Wert vor dem Anlegen der Reihe ändern.
 - **Wochentag**: Wochentag, an dem Gottesdienste angelegt werden.
 - **Rhythmus**: Abstand der Termine. Tragen Sie ein, alle wie viele Wochen ein Gottesdienst angelegt werden soll.
 
