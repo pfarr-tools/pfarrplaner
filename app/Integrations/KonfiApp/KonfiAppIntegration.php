@@ -148,10 +148,15 @@ class KonfiAppIntegration extends AbstractIntegration
     protected function request($requestType, $path, $arguments = []): ResponseInterface|bool
     {
         $this->lastRequest = [
-            'query' => $arguments,
-            'form_params' => $arguments,
             'headers' => ['X-Konfiapp-Token' => $this->apiKey]
         ];
+        if (strtoupper($requestType) === 'GET') {
+            $this->lastRequest['query'] = $arguments;
+        } else {
+            $this->lastRequest['json'] = $arguments;
+            $this->lastRequest['headers']['Accept'] = 'application/json';
+            $this->lastRequest['headers']['Content-Type'] = 'application/json';
+        }
         $this->lastEndpoint = static::API_URL.$path;
         $this->lastRequestType = $requestType;
 
