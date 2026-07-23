@@ -35,12 +35,9 @@
         </template>
             <dataset
                  v-slot="{ ds }"
-                 :ds-data="mySongs"
+                 :ds-data="searchableSongs"
                  ds-sort-by="title"
-                 :ds-search-in="['title']"
-                 :ds-search-as="{
-                     title: searchFullTitle,
-                 }">
+                 :ds-search-in="['search_text']">
             <div class="row mb-3" :data-page-count="ds.dsPagecount">
                 <div class="col-md-6 mb-2 mb-md-0">
                     <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
@@ -110,11 +107,6 @@ import NavButton from "../../../components/Ui/buttons/NavButton";
 export default {
     name: "Index",
     props: ['songs'],
-    data() {
-        return {
-            mySongs: this.songs,
-        }
-    },
     components: {
         NavButton,
         Dataset,
@@ -124,18 +116,32 @@ export default {
         DatasetSearch,
         DatasetShow
     },
+    computed: {
+        searchableSongs() {
+            return (this.songs || []).map(song => {
+                const songbookReferences = (song.songbooks || []).map(songbook => {
+                    return [
+                        songbook.code || '',
+                        songbook.pivot?.reference || '',
+                        songbook.name || '',
+                    ].join(' ').trim();
+                }).join(' ');
+
+                return {
+                    ...song,
+                    search_text: [
+                        song.title || '',
+                        songbookReferences,
+                        song.alt_eg ? `EG ${song.alt_eg}` : '',
+                    ].join(' ').trim(),
+                };
+            });
+        },
+    },
     methods: {
         deleteSong(song) {
             if (!confirm('Willst du wirklich das komplette Lied löschen?')) return;
             this.$inertia.delete(route('admin.song.destroy', song.id));
-        },
-        searchFullTitle(value, searchString, rowData) {
-            let found = false;
-            rowData.songbooks.forEach(songbook => {
-                if (String(songbook.code+' '+songbook.pivot.reference+' '+rowData.title)
-                    .trim().toLowerCase().includes(searchString.toLowerCase())) found = true;
-            })
-            return found;
         },
     }
 }
