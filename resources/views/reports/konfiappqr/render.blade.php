@@ -122,7 +122,11 @@
                                         {{ $service->locationText() }}
                                     </p>
                                     <p class="qr">
-                                        <img src="{{ route('qrcode', $service->konfiapp_event_qr) }}" alt="QR-Code" />
+                                        @if (!empty($service->konfiapp_event_qr))
+                                            <img src="{{ route('qrcode', $service->konfiapp_event_qr) }}" alt="QR-Code" />
+                                        @else
+                                            Kein QR-Code vorhanden.
+                                        @endif
                                     </p>
                                     <p class="meta">
                                         @foreach ($types as $type)

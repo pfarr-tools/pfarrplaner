@@ -33,6 +33,7 @@ namespace App\Models;
 use App\DAV\DAVCalendarItem;
 use App\DAV\HasDAVCalendarItems;
 use App\Helpers\YoutubeHelper;
+use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Models\Ads\AdConfig;
 use App\Models\Calendar\Day;
 use App\Models\Calendar\Occurence;
@@ -68,7 +69,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 use Venturecraft\Revisionable\RevisionableTrait;
 
 /**
@@ -251,6 +254,54 @@ class Service extends Model implements HasDAVCalendarItems
     public function getBaptismsTextAttribute()
     {
         return $this->baptismsText(true);
+    }
+
+    /**
+     * @param string|null $value
+     * @return string|null
+     */
+    public function getKonfiappEventQrAttribute($value)
+    {
+        return $this->ensureKonfiAppQrCode($value);
+    }
+
+    /**
+     * @param string|null $value
+     * @return string|null
+     */
+    public function ensureKonfiAppQrCode($value = null)
+    {
+        $value ??= $this->getRawOriginal('konfiapp_event_qr');
+        if (($value !== null) && ($value !== '')) {
+            return $value;
+        }
+
+        $eventType = $this->getRawOriginal('konfiapp_event_type');
+        if (empty($eventType)) {
+            return $value;
+        }
+
+        $city = $this->relationLoaded('city') ? $this->city : $this->city()->first();
+        if ((!$city) || (!KonfiAppIntegration::isActive($city))) {
+            return $value;
+        }
+
+        try {
+            $service = KonfiAppIntegration::get($city)->addQRCodeToService($this);
+            $value = $service->getRawOriginal('konfiapp_event_qr');
+            if (($value !== null) && ($value !== '')) {
+                $this->attributes['konfiapp_event_qr'] = $value;
+            }
+        } catch (Throwable $exception) {
+            Log::warning('KonfiApp: QR-Code konnte bei Zugriff nicht erzeugt werden.', [
+                'service' => $this->id,
+                'eventType' => $eventType,
+                'message' => $exception->getMessage(),
+                'exception' => $exception::class,
+            ]);
+        }
+
+        return $value;
     }
 
     /**
