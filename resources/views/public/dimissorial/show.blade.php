@@ -7,7 +7,7 @@
     <div class="card">
         <div class="card-header">Dimissoriale für eine {{ $type }} erteilen</div>
         <div class="card-body">
-            @if(!$rite->dimissorial_received)
+            @if(!$dimissorialReceived)
                 <p>Sie wurden gebeten, ein Dimissoriale für die {{ $type }} von
             @if ($type=='Taufe') <b>{{ $rite->candidate_name }}</b> @endif
             @if ($type=='Beerdigung')<b>{{ $rite->buried_name }}</b> @if($rite->dob && $rite->dod)({{ $rite->dob->format('d.m.Y') }}-{{ $rite->dod->format('d.m.Y') }}) @endif @endif

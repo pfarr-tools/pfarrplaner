@@ -288,14 +288,16 @@ class PublicController extends Controller
             $spouse = $request->get('spouse');
             $method = 'spouse'.$spouse.'_needs_dimissorial';
             if (!$rite->$method) abort(403);
+            $dimissorialReceived = (bool) $rite->{'spouse'.$spouse.'_dimissorial_received'};
         } else {
             if (!$rite->needs_dimissorial) abort(403);
             $spouse = null;
+            $dimissorialReceived = (bool) $rite->dimissorial_received;
         }
 
         $rite->load(['service']);
         $type = ucfirst($type);
-        return view('public.dimissorial.show', compact('rite', 'type', 'id', 'spouse'));
+        return view('public.dimissorial.show', compact('rite', 'type', 'id', 'spouse', 'dimissorialReceived'));
     }
 
     public function grantDimissorial(Request $request, $type, $id)
