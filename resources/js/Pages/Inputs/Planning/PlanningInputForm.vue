@@ -83,7 +83,7 @@
                                                                v-model="row.ministries[ministryKey]"
                                                                :key="'people_'+rowIndex+'_'+ministryKey+'_'+(users.length)"
                                                                @added="onPersonAdded"
-                                                               @input="saveService(row.slug, row, rowIndex, ministryKey)"/>
+                                                               @update:modelValue="onMinistryChanged(row, ministryKey, $event)"/>
                                             </td>
                                         </tr>
                                     </template>
@@ -179,24 +179,64 @@ export default {
             saved: false,
             showEntries: 25,
             addPerson: null,
+            saveHandlers: {},
+            saveQueue: {},
+            saveInFlight: {},
         }
     },
     methods: {
-        saveService(slug, service, index, ministryKey) {
+        cloneService(service) {
+            return {
+                slug: service.slug,
+                ministries: Object.fromEntries(
+                    Object.entries(service.ministries || {}).map(([ministryKey, people]) => [
+                        ministryKey,
+                        (people || []).map(person => person && person.id ? {id: person.id} : person),
+                    ])
+                ),
+            };
+        },
+        onMinistryChanged(service, ministryKey, people) {
+            service.ministries[ministryKey] = people;
+            this.saveService(service.slug, service);
+        },
+        getSaveHandler(slug) {
+            if (!this.saveHandlers[slug]) {
+                this.saveHandlers[slug] = __.debounce(() => {
+                    this.flushQueuedSave(slug);
+                }, 400);
+            }
+
+            return this.saveHandlers[slug];
+        },
+        saveService(slug, service) {
             this.saved = false;
             this.saving = true;
             this.$forceUpdate();
 
-            this.$api().post(route('inputs.save', 'planning'), service).then(response => {
+            this.saveQueue[slug] = this.cloneService(service);
+            this.getSaveHandler(slug)();
+        },
+        flushQueuedSave(slug) {
+            if (this.saveInFlight[slug] || !this.saveQueue[slug]) return;
+
+            const payload = this.saveQueue[slug];
+            delete this.saveQueue[slug];
+            this.saveInFlight[slug] = true;
+
+            this.$api().post(route('inputs.save', 'planning'), payload).then(response => {
                 this.saving = false;
                 this.saved = true;
-                if (this.addPerson) {
-                    this.$forceUpdate();
-                    this.users.push(this.addPerson);
-                    this.services[index].ministries[ministryKey].push(this.addPerson);
-                    //this.addPerson = null;
-                }
                 this.$forceUpdate();
+            }).finally(() => {
+                this.saveInFlight[slug] = false;
+
+                if (this.saveQueue[slug]) {
+                    this.flushQueuedSave(slug);
+                    return;
+                }
+
+                this.addPerson = null;
             });
         },
         editService(service) {
