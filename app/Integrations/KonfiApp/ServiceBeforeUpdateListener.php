@@ -32,7 +32,7 @@ namespace App\Integrations\KonfiApp;
 
 
 use App\Events\ServiceBeforeUpdate;
-use Illuminate\Support\Facades\Log;
+use App\Models\Places\City;
 
 class ServiceBeforeUpdateListener
 {
@@ -46,13 +46,33 @@ class ServiceBeforeUpdateListener
     public function handle(ServiceBeforeUpdate $event)
     {
         if (!isset($event->data['konfiapp_event_type'])) return;
-        if (!isset($event->data['time']) || (!$event->data['time'])) return;
-        if (KonfiAppIntegration::isActive($event->service->city)) {
-            KonfiAppIntegration::get($event->service->city)->handleServiceUpdate(
-                $event->service,
-                $event->data['konfiapp_event_type'] ?? ''
-            );
+        if (!$this->isIntegrationActive($event->service->city)) return;
+        if (isset($event->data['date'])) {
+            $event->service->date = $event->data['date'];
         }
+
+        $this->resolveIntegration($event->service->city)->handleServiceUpdate(
+            $event->service,
+            $event->data['konfiapp_event_type'] ?? ''
+        );
+    }
+
+    /**
+     * @param City $city
+     * @return bool
+     */
+    protected function isIntegrationActive(City $city): bool
+    {
+        return KonfiAppIntegration::isActive($city);
+    }
+
+    /**
+     * @param City $city
+     * @return KonfiAppIntegration
+     */
+    protected function resolveIntegration(City $city): KonfiAppIntegration
+    {
+        return KonfiAppIntegration::get($city);
     }
 
 }

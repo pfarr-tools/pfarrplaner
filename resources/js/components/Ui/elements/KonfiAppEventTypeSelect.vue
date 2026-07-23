@@ -65,8 +65,9 @@ export default {
     },
     methods: {
         handleInput(e) {
-            this.$emit('input', e.id);
-            this.$emit('update:modelValue', e.id);
+            const value = (e && (typeof e === 'object') && ('id' in e)) ? e.id : e;
+            this.$emit('input', value);
+            this.$emit('update:modelValue', value);
         },
     }
 }

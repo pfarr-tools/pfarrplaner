@@ -35,4 +35,10 @@ describe('KonfiAppEventTypeSelect', () => {
         expect(w.emitted('update:modelValue')?.[0]).toEqual([3])
         expect(w.emitted('input')?.[0]).toEqual([3])
     })
+    it('handleInput keeps scalar ids unchanged', () => {
+        const w = mountSelect()
+        w.vm.handleInput(4)
+        expect(w.emitted('update:modelValue')?.[0]).toEqual([4])
+        expect(w.emitted('input')?.[0]).toEqual([4])
+    })
 })
