@@ -30,7 +30,12 @@
 <template>
     <div class="songbook-select">
         <div :key="songbooks.length">
-            <form-selectize :options="songbooks" v-model="myValue" :settings="settings" @input="handleSelect"/>
+            <form-selectize
+                :options="songbooks"
+                v-model="myValue"
+                :settings="settings"
+                @update:modelValue="handleSelect"
+            />
         </div>
         <modal title="Neues Liederbuch anlegen" v-if="showModal" @close="closeModal" @cancel="cancelModal"
                @shown="modalShown" close-button-label="Speichern">
@@ -77,6 +82,11 @@ export default {
             showModal: false,
         }
     },
+    watch: {
+        modelValue(val) {
+            this.myValue = val ? (val.id || val) : null;
+        },
+    },
     methods: {
         addSongbook(item, callback = null) {
             this.createCallback = callback;
@@ -104,7 +114,8 @@ export default {
         cancelModal() {
             this.showModal = false;
         },
-        handleSelect() {
+        handleSelect(value = this.myValue) {
+            this.myValue = value;
             let filtered = this.songbooks.filter(item => {
                 return item.id == this.myValue
             });

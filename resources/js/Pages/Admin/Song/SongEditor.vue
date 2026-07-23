@@ -44,11 +44,11 @@
         </template>
         <tabs>
             <tab id="home" :active-tab="activeTab">
-                <form-input label="Titel des Lieds" v-model="song.title"/>
-                <form-textarea label="Copyrights" v-model="song.copyrights"/>
+                <form-input label="Titel des Lieds" v-model="mySong.title"/>
+                <form-textarea label="Copyrights" v-model="mySong.copyrights"/>
             </tab>
             <tab id="text" :active-tab="activeTab">
-                <form-textarea label="Kehrvers" v-model="song.refrain"
+                <form-textarea label="Kehrvers" v-model="mySong.refrain"
                                placeholder="Leer lassen, wenn es keinen Kehrvers gibt"/>
                 <div class="row">
                     <div class="col-1 form-group">
@@ -58,7 +58,7 @@
                         <label>Text der Strophe</label>
                     </div>
                 </div>
-                <div v-for="(verse,verseKey,verseIndex) in song.verses">
+                <div v-for="(verse, verseIndex) in mySong.verses" :key="verse.id || `verse-${verseIndex}`">
                     <div class="row">
                         <div class="col-1">
                             <form-input :id="`verseNumber${verseIndex}`" label="" v-model="verse.number"/>
@@ -75,7 +75,7 @@
                             </div>
                         </div>
                         <div class="col-1 text-end" style="margin-top: 2em;">
-                            <button class="btn btn-sm btn-danger" @click.prevent="deleteVerse(verseKey)">
+                            <button class="btn btn-sm btn-danger" @click.prevent="deleteVerse(verseIndex)">
                                 <span class="mdi mdi-delete"></span>
                             </button>
                         </div>
@@ -87,9 +87,9 @@
                 </div>
             </tab>
             <tab id="songbooks" :active-tab="activeTab">
-                <songbook-list v-model="song.songbooks" :allow-split="true" />
+                <songbook-list v-model="mySong.songbooks" :allow-split="true" />
                 <hr class="mt-3" />
-                <form-input label="Alternative EG-Nummer" v-model="song.alt_eg" />
+                <form-input label="Alternative EG-Nummer" v-model="mySong.alt_eg" />
             </tab>
         </tabs>
     </admin-layout>
@@ -107,6 +107,7 @@ import Tabs from "../../../components/Ui/tabs/tabs";
 import Tab from "../../../components/Ui/tabs/tab";
 import SongbookList from "../../../components/LiturgyEditor/Editors/Elements/SongbookList";
 import FormGroup from "../../../components/Ui/forms/FormGroup";
+import __ from "lodash";
 
 export default {
     name: "SongEditor",
@@ -117,9 +118,17 @@ export default {
     props: ['song'],
     data() {
         return {
-            mySong: this.song,
+            mySong: __.cloneDeep(this.song),
             activeTab: 'home',
         }
+    },
+    watch: {
+        song: {
+            deep: true,
+            handler(song) {
+                this.mySong = __.cloneDeep(song);
+            },
+        },
     },
     methods: {
         saveSong() {
@@ -130,16 +139,16 @@ export default {
             }
         },
         addVerse() {
-            this.song.verses.push({
+            this.mySong.verses.push({
                 id: -1,
-                number: this.song.verses.length + 1,
+                number: this.mySong.verses.length + 1,
                 text: '',
                 refrain_before: false,
                 refrain_after: false
             });
         },
         deleteVerse(verseIndex) {
-            this.song.verses.splice(verseIndex, 1);
+            this.mySong.verses.splice(verseIndex, 1);
         },
     }
 }

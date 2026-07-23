@@ -32,9 +32,14 @@
         <label>Steht in folgenden Liederbüchern:</label>
         <table class="table table-striped table-hover" :key="mySongbooks.length">
             <tbody>
-            <tr v-for="(songbook,songbookIndex,songbookKey) in mySongbooks" :key="songbookKey">
+            <tr v-for="(songbook, songbookIndex) in mySongbooks" :key="songbook.id || songbook.pivot?.id || `songbook-${songbookIndex}`">
                 <td colspan="2" v-if="editing == songbookIndex">
-                    <songbook-select :songbooks="allSongbooks" v-model="mySongbooks[songbookIndex]" :pivot="songbook.pivot"/>
+                    <songbook-select
+                        :songbooks="allSongbooks"
+                        :model-value="mySongbooks[songbookIndex]"
+                        :pivot="songbook.pivot"
+                        @update:modelValue="updateSongbook(songbookIndex, $event)"
+                    />
                 </td>
                 <td v-if="editing != songbookIndex">{{ songbook.code }}</td>
                 <td v-if="editing != songbookIndex">{{ songbook.name }}</td>
@@ -110,6 +115,10 @@ export default {
     methods: {
         editEntry(songbookIndex) {
             this.editing = songbookIndex;
+        },
+        updateSongbook(songbookIndex, songbook) {
+            this.mySongbooks.splice(songbookIndex, 1, songbook);
+            this.$emit('update:modelValue', [...this.mySongbooks]);
         },
         confirmEdit() {
             this.editing = -1;

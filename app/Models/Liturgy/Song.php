@@ -175,13 +175,26 @@ class Song extends AbstractModel
      * @param array $data
      * @return void
      */
-    public function syncSongbooksFromRequest($data)
+    public function syncSongbooksFromRequest(array $data): void
     {
-        if (!isset($data['songbooks'])) return;
+        if (!isset($data['songbooks'])) {
+            return;
+        }
+
         $sync = [];
         foreach ($data['songbooks'] as $item) {
-            $sync[$item['pivot']['songbook_id']] = ['reference' => $item['pivot']['reference'], 'code' => $item['code'], 'color' => ($item['pivot']['color'] ?? '')];
+            $songbookId = $item['pivot']['songbook_id'] ?? null;
+            if (!$songbookId) {
+                continue;
+            }
+
+            $sync[$songbookId] = [
+                'reference' => $item['pivot']['reference'] ?? '',
+                'code' => $item['code'] ?? '',
+                'color' => $item['pivot']['color'] ?? '',
+            ];
         }
+
         $this->songbooks()->sync($sync, true);
     }
 

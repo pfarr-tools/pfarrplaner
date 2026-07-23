@@ -13,6 +13,7 @@
 namespace Tests\Feature;
 
 use App\Models\Liturgy\Song;
+use App\Models\Liturgy\Songbook;
 use App\Models\People\User;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -59,5 +60,43 @@ class SongFeatureTest extends TestCase
             ])
             ->assertRedirect(route('admin.songs.index'));
         $this->assertTrue(Song::where('title', 'Testlied')->exists());
+    }
+
+    public function testCreateSongIgnoresEmptySongbookRows(): void
+    {
+        $songbook = Songbook::factory()->create();
+
+        $this->actingAs($this->user)
+            ->post(route('admin.songs.store'), [
+                'title' => 'Testlied mit Liederbuch',
+                'verses' => [],
+                'songbooks' => [
+                    [
+                        'code' => 'EG',
+                        'pivot' => [
+                            'songbook_id' => $songbook->id,
+                            'reference' => '12',
+                            'color' => '',
+                        ],
+                    ],
+                    [
+                        'code' => '',
+                        'pivot' => [
+                            'songbook_id' => '',
+                            'reference' => '',
+                            'color' => '',
+                        ],
+                    ],
+                ],
+            ])
+            ->assertRedirect(route('admin.songs.index'));
+
+        /** @var Song $song */
+        $song = Song::where('title', 'Testlied mit Liederbuch')->firstOrFail();
+        $song->load('songbooks');
+
+        $this->assertCount(1, $song->songbooks);
+        $this->assertSame($songbook->id, $song->songbooks->first()->id);
+        $this->assertSame('12', $song->songbooks->first()->pivot->reference);
     }
 }
