@@ -279,7 +279,7 @@ export default {
             const groups = {};
             const order = ['Ich', 'Ich selbst', 'Andere Personen', 'Teams'];
             this.myPeople.forEach(person => {
-                const cat = person.category || 'Andere Personen';
+                const cat = (person.category === 'Personen') ? 'Andere Personen' : (person.category || 'Andere Personen');
                 if (!groups[cat]) groups[cat] = [];
                 groups[cat].push(person);
             });
@@ -322,7 +322,7 @@ export default {
                 .then(response => response.data)
                 .then(data => {
                     data.type = 'mdi mdi-account';
-                    data.category = 'Personen';
+                    data.category = 'Andere Personen';
                     data.userString = '';
 
                     component.myPeople.push(data);
@@ -347,7 +347,7 @@ export default {
                 }));
             }
             person.type = 'mdi mdi-account';
-            person.category = 'Personen';
+            person.category = 'Andere Personen';
             person.userString = '';
             this.myPeople.push(person);
             this.personCreatedData = person;
@@ -393,7 +393,12 @@ export default {
         },
         handleGlobalAddNewPersonEvent(e) {
             if (e.origin == this.uuid) return;
-            this.myPeople.push(e.person);
+            const person = {
+                ...e.person,
+                category: (e.person.category === 'Personen') ? 'Andere Personen' : (e.person.category || 'Andere Personen'),
+            };
+            this.myPeople.push(person);
+            this.myPeopleReference[person.id] = person;
         },
     },
 };
