@@ -347,8 +347,8 @@ class BillBoardReport extends AbstractWordDocumentReport
                         $event->event->pastors ?? []
                     ) ? ' mit ' . $this->getNameListLine($event->event->pastors) : '')
                 ];
-                if ($event->event->description) {
-                    $line[] = $event->event->description;
+                if ($event->event->descriptionText() != '') {
+                    $line[] = $event->event->descriptionText();
                 }
 
                 // figure out whether city name must be added to location string

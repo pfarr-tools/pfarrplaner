@@ -27,6 +27,9 @@
                             @if ($event->controlled_access)
                                 @component('components.service.controlledAccess', ['service' => $event]) @endcomponent
                             @endif
+                            @if ($event->descriptionText() != '')
+                                <br />{{ $event->descriptionText }}
+                            @endif
                         </td>
                         <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0;"
                             valign="top">

@@ -1026,6 +1026,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         $layout = $this->getEventsListLayout();
         $titleLineHeight = PPTUnitsHelper::estimateLineHeightPx($layout['titleFontTtfPath'], $layout['listFontSize']);
+        $descriptionLineHeight = PPTUnitsHelper::estimateLineHeightPx($layout['descriptionFontTtfPath'], $layout['descriptionFontSize']);
         $locationLineHeight = PPTUnitsHelper::estimateLineHeightPx($layout['locationFontTtfPath'], $layout['locationFontSize']);
 
         $pages = [];
@@ -1033,7 +1034,13 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $currentHeight = 0;
 
         foreach ($events as $event) {
-            $eventHeight = $this->estimateEventListEntryHeight($event, $layout, $titleLineHeight, $locationLineHeight);
+            $eventHeight = $this->estimateEventListEntryHeight(
+                $event,
+                $layout,
+                $titleLineHeight,
+                $descriptionLineHeight,
+                $locationLineHeight
+            );
 
             if ($currentPageEvents->isNotEmpty() && (($currentHeight + $eventHeight) > $layout['listHeight'])) {
                 $pages[] = $currentPageEvents;
@@ -1084,6 +1091,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     {
         $listFontSize     = (int)($this->config['fontSize'] * 0.8);
         $locationFontSize = (int)($listFontSize * 0.6);
+        $descriptionFontSize = $locationFontSize;
         $listWidth        = 950;
         $listHeight       = 500;
         $leftColumnWidthPixels = (int)PPTUnitsHelper::convert(5.75, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL);
@@ -1092,6 +1100,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         return [
             'listFontSize' => $listFontSize,
+            'descriptionFontSize' => $descriptionFontSize,
             'locationFontSize' => $locationFontSize,
             'listWidth' => $listWidth,
             'listHeight' => $listHeight,
@@ -1103,9 +1112,44 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             'detailsInnerPaddingPx' => $detailsInnerPaddingPx,
             'maxTitleWidthPx' => max(50, $rightColumnWidth - $detailsInnerPaddingPx),
             'titleFontTtfPath' => resource_path('fonts/Sarabun-SemiBold.ttf'),
+            'descriptionFontTtfPath' => resource_path('fonts/Sarabun-SemiBold.ttf'),
             'locationFontTtfPath' => resource_path('fonts/Sarabun-Light.ttf'),
             'titleMarginBottom' => 4,
+            'descriptionMarginBottom' => 4,
             'locationMarginBottom' => 14,
+        ];
+    }
+
+    /**
+     * Build the wrapped text layout for a single event list entry.
+     *
+     * @param mixed $event
+     * @param array<string, int|string> $layout
+     * @return array<string, mixed>
+     */
+    protected function getEventListEntryLayout($event, array $layout): array
+    {
+        $titleText = $event->getAdText('ppt', $event->service->titleText(false));
+        $descriptionText = trim($event->event->descriptionText());
+        $titleLines = PPTUnitsHelper::wrapTextByPixelWidth(
+            $titleText,
+            $layout['titleFontTtfPath'],
+            $layout['listFontSize'],
+            $layout['maxTitleWidthPx']
+        );
+        $descriptionLines = $descriptionText === ''
+            ? []
+            : PPTUnitsHelper::wrapTextByPixelWidth(
+                $descriptionText,
+                $layout['descriptionFontTtfPath'],
+                $layout['descriptionFontSize'],
+                $layout['maxTitleWidthPx']
+            );
+
+        return [
+            'titleLines' => $titleLines,
+            'descriptionLines' => $descriptionLines,
+            'locationText' => $event->service->locationTextWithCity,
         ];
     }
 
@@ -1115,20 +1159,16 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
      * @param mixed $event
      * @param array<string, int|string> $layout
      * @param int $titleLineHeight
+     * @param int $descriptionLineHeight
      * @param int $locationLineHeight
      * @return int
      */
-    protected function estimateEventListEntryHeight($event, array $layout, int $titleLineHeight, int $locationLineHeight): int
+    protected function estimateEventListEntryHeight($event, array $layout, int $titleLineHeight, int $descriptionLineHeight, int $locationLineHeight): int
     {
-        $titleText = $event->getAdText('ppt', $event->service->titleText(false));
-        $titleLines = PPTUnitsHelper::wrapTextByPixelWidth(
-            $titleText,
-            $layout['titleFontTtfPath'],
-            $layout['listFontSize'],
-            $layout['maxTitleWidthPx']
-        );
+        $entryLayout = $this->getEventListEntryLayout($event, $layout);
 
-        return (count($titleLines) * ($titleLineHeight + $layout['titleMarginBottom']))
+        return (count($entryLayout['titleLines']) * ($titleLineHeight + $layout['titleMarginBottom']))
+            + (count($entryLayout['descriptionLines']) * ($descriptionLineHeight + $layout['descriptionMarginBottom']))
             + $locationLineHeight
             + $layout['locationMarginBottom'];
     }
@@ -1320,9 +1360,9 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         foreach ($events as $event) {
             $timeText = (!$event->event->is_allday) ? $event->service->timeText() : '';
-
-            $titleText = $event->getAdText('ppt', $event->service->titleText(false));
-            $titleLines = PPTUnitsHelper::wrapTextByPixelWidth($titleText, $layout['titleFontTtfPath'], $layout['listFontSize'], $layout['maxTitleWidthPx']);
+            $entryLayout = $this->getEventListEntryLayout($event, $layout);
+            $titleLines = $entryLayout['titleLines'];
+            $descriptionLines = $entryLayout['descriptionLines'];
 
             // --- LEFT COLUMN: time on first line, then spacer lines to match wrapped title, then spacer for location
             $timeParagraph = $isFirstTimeParagraph
@@ -1358,6 +1398,21 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                     ->setName('Sarabun Light');
             }
 
+            foreach ($descriptionLines as $descriptionLine) {
+                $timeDescriptionSpacerParagraph = $timeColumnShape->createParagraph();
+                $timeDescriptionSpacerParagraph->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_RIGHT)
+                    ->setMarginRight(10)
+                    ->setMarginBottom($layout['descriptionMarginBottom']);
+
+                $timeDescriptionSpacerParagraph->createTextRun("\u{00A0}")
+                    ->getFont()
+                    ->setBold(false)
+                    ->setSize($layout['descriptionFontSize'])
+                    ->setColor($textColor)
+                    ->setName('Sarabun SemiBold');
+            }
+
             // Spacer line for the location line (keeps left/right aligned)
             $timeLocationSpacerParagraph = $timeColumnShape->createParagraph();
             $timeLocationSpacerParagraph->getAlignment()
@@ -1390,12 +1445,26 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                     ->setName('Sarabun SemiBold');
             }
 
+            foreach ($descriptionLines as $descriptionLine) {
+                $descriptionParagraph = $detailsColumnShape->createParagraph();
+                $descriptionParagraph->getAlignment()
+                    ->setHorizontal(Alignment::HORIZONTAL_LEFT)
+                    ->setMarginBottom($layout['descriptionMarginBottom']);
+
+                $descriptionParagraph->createTextRun($descriptionLine)
+                    ->getFont()
+                    ->setBold(true)
+                    ->setSize($layout['descriptionFontSize'])
+                    ->setColor($textColor)
+                    ->setName('Sarabun SemiBold');
+            }
+
             $locationParagraph = $detailsColumnShape->createParagraph();
             $locationParagraph->getAlignment()
                 ->setHorizontal(Alignment::HORIZONTAL_LEFT)
                 ->setMarginBottom(14);
 
-            $locationParagraph->createTextRun($event->service->locationTextWithCity)
+            $locationParagraph->createTextRun($entryLayout['locationText'])
                 ->getFont()
                 ->setBold(false)
                 ->setSize($layout['locationFontSize'])
