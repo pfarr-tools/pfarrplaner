@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.13.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.12.4...v2026.13.0) (2026-07-23)
+
+
+### Features
+
+* Kirchliche Nachrichten ohne Kopfzeilen drucken ([373d377](https://codeberg.org/pfarr.tools/pfarrplaner/commit/373d3771688212724fb69195aa05084859d1d2c6))
+* Uhrzeit-Vorgabe für Seriengottesdienste ([07c72a2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/07c72a22913cfd6c2b082419910aae4b4a912073))
+
+
+### Bug Fixes
+
+* Bereits erteilte Dimissoriale bei Trauungen korrekt erkennen. ([f6d1c4d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/f6d1c4db44a88fc1f2dabe1fbc10596eb5c19f1b))
+* Fehlende Youtube-Links in der Gottesdienstliste ([6e1b6ec](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6e1b6ecc2bfabf157e2ba2d2644bbb4e0a0084b3))
+* Fehler bei der KonfiApp-API ([fb12a99](https://codeberg.org/pfarr.tools/pfarrplaner/commit/fb12a99b2a5f15bcc5b7cf959166493ff0b5db36))
+* Fehler beim Erstellen von QR Codes. ([9455328](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9455328eea3f51985157f4046a5d1bb5dc5183c3))
+* Liederbücher können nicht zu Liedern hinzugefügt werden. ([1c3aefe](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1c3aefe2b5d37286bddcfe284e8a5ca9419340f6))
+* Neue Personen erscheinen nicht in der Auswahlliste ([c2d6df8](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c2d6df8ec513095d84ac04b68e28bd60929943d5))
+* Planungstabelle speichert nicht verlässlich ([d73bbc6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d73bbc6ed146557b003b16f9b443a33d30559815))
+* Speichern bei KonfiApp-API-Fehler nicht möglich ([8565049](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8565049bb03e1a442d6f4f699ca1728567a95afe))
+* Suchfilter in der Liederliste funktioniert nicht ([5101758](https://codeberg.org/pfarr.tools/pfarrplaner/commit/51017583d6ce3741cd0f25e72dcb686ee9e4fd82))
+* UserEditor lässt sich nicht öffnen ([2d6f1bf](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2d6f1bf480c2fc24dd4572514ef5fd41f574bf4d))
+* WeeklyVerseReport verwendet obsolete API ([bda40b6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/bda40b66c21e7a3db2780ae580c89f4e3fc279e4))
+
 ### [2026.12.4](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.12.3...v2026.12.4) (2026-07-08)
 
 
