@@ -119,10 +119,6 @@
                            title="Predigt bearbeiten" @click.prevent.stop="editFromButton(myService, 'service.sermon.editor', $event)">
                             <span class="mdi mdi-microphone"></span>
                         </a>
-                        <a href="#" class="btn btn-danger mb-1 me-1" role="button"
-                           title="Gottesdienst löschen" @click.prevent.stop="deleteService(myService, index)">
-                            <span class="mdi mdi-delete"></span>
-                        </a>
                         <a href="#" class="btn btn-info mb-1 me-1" role="button"
                            title="Mich für diesen Gottesdienst eintragen"
                            @click.prevent.stop="selfEntry">
@@ -291,20 +287,6 @@ export default {
                 window.open(route(myRoute, service.slug), '_blank');
             } else {
                 this.$inertia.visit(route(myRoute, service.slug));
-            }
-        },
-        deleteService(service) {
-            if (confirm('Willst du diesen Gottesdienst wirklich komplett löschen?')) {
-                this.$api().delete(route('api.service.destroy', {
-                    service: service.slug,
-                })).then(() => {
-                    this.$emit('deleted', {
-                        id: service.id,
-                        slug: service.slug,
-                        cityId: service.city_id,
-                        date: moment(service.date).format('YYYY-MM-DD'),
-                    });
-                });
             }
         },
         selfEntry() {
