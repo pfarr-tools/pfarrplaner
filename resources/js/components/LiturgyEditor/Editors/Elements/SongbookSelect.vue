@@ -107,7 +107,7 @@ export default {
                     this.songbooks.push(this.modalSongbook);
                     this.myValue = this.modalSongbook.id;
                     this.$forceUpdate();
-                    this.handleSelect();
+                    this.handleSelect(this.myValue);
                 });
             this.showModal = false;
         },
@@ -117,12 +117,12 @@ export default {
         handleSelect(value = this.myValue) {
             this.myValue = value;
             let filtered = this.songbooks.filter(item => {
-                return item.id == this.myValue
+                return item.id == value
             });
             if (filtered.length) {
                 filtered = filtered[0];
                 filtered.pivot = this.pivot;
-                filtered.pivot.songbook_id = this.myValue;
+                filtered.pivot.songbook_id = value;
                 this.$emit('update:modelValue', filtered);
             }
         }

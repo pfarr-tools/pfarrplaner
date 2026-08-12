@@ -32,7 +32,7 @@
         <label>Steht in folgenden Liederbüchern:</label>
         <table class="table table-striped table-hover" :key="mySongbooks.length">
             <tbody>
-            <tr v-for="(songbook, songbookIndex) in mySongbooks" :key="songbook.id || songbook.pivot?.id || `songbook-${songbookIndex}`">
+            <tr v-for="(songbook, songbookIndex) in mySongbooks" :key="`${songbook.id || songbook.pivot?.id || `songbook-${songbookIndex}`}-${editing === songbookIndex ? 'editing' : 'view'}`">
                 <td colspan="2" v-if="editing == songbookIndex">
                     <songbook-select
                         :songbooks="allSongbooks"
@@ -109,7 +109,11 @@ export default {
     watch: {
         modelValue: {
             deep: true,
-            handler(val) { this.mySongbooks = [...val]; },
+            handler(val) {
+                if (this.editing === -1) {
+                    this.mySongbooks = [...val];
+                }
+            },
         },
     },
     methods: {
