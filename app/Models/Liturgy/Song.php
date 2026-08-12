@@ -72,6 +72,11 @@ class Song extends AbstractModel
     public static $adminIcon = 'mdi mdi-music';
     public static $adminGroup = 'Liturgie';
 
+    public static function getAdminModuleConfig()
+    {
+        return false;
+    }
+
     protected $fillable = [
         'title',
         'refrain',

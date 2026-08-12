@@ -94,10 +94,10 @@ class AbstractModel extends Model
     public static function getAdminModuleConfig()
     {
         if (!static::$adminIcon) {
-            false;
+            return false;
         }
         if (!Auth::user() || !Auth::user()->can('index', get_called_class())) {
-            false;
+            return false;
         }
         return [
             'text' => static::$adminTitle ?: ucfirst(static::$prefixPlural),
