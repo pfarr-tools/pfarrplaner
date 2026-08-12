@@ -135,6 +135,7 @@ export default {
             this.$inertia.get(route('absence.edit', absence.id));
         },
         deleteAbsence(absence) {
+            if (!confirm('Willst du diesen Abwesenheitseintrag wirklich löschen?')) return;
             this.$api().delete(route('api.absence.destroy', {
                 absence: absence.id,
             })).then(response => {

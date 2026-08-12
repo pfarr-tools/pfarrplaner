@@ -84,6 +84,7 @@ export default {
             });
         },
         deleteComment(id, key, index) {
+            if (!confirm('Willst du diesen Kommentar wirklich löschen?')) return;
             axios.delete(route('comment.destroy', id))
                 .then(() => {
                     this.myService.comments.splice(key, 1);

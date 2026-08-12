@@ -88,6 +88,7 @@ export default {
             this.$inertia.post(route('tokens.create', {title: this.newTokenTitle}));
         },
         deleteToken(token) {
+            if (!confirm('Willst du diesen Zugangsschlüssel wirklich löschen?')) return;
             this.$inertia.delete(route('tokens.destroy', {token: token.id}));
         }
     }

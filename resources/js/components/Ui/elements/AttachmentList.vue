@@ -55,6 +55,7 @@ export default {
     },
     methods: {
         deleteAttachment(attachment) {
+            if (!confirm('Willst du diese Datei wirklich löschen?')) return;
             let config = {attachment: attachment.id};
             config[this.parentType] = this.parentObject.id;
             axios.delete(route(this.deleteRouteName, config))

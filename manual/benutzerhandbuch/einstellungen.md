@@ -101,7 +101,7 @@ Sie können externe Kalender mit Pfarrplaner verbinden. Für Outlook weist Pfarr
 1. Öffnen Sie den Reiter **Verbundene Kalender**.
 2. Klicken Sie auf **Neue Verbindung anlegen**, falls diese Funktion in Ihrer Installation freigeschaltet ist.
 3. Folgen Sie den Angaben auf der Einrichtungsseite.
-4. Bestehende Verbindungen können Sie über das Stift-Symbol bearbeiten oder über das Papierkorb-Symbol löschen.
+4. Bestehende Verbindungen können Sie über das Stift-Symbol bearbeiten oder über das Papierkorb-Symbol löschen. Vor dem Löschen fragt Pfarrplaner noch einmal nach.
 
 Änderungen in Pfarrplaner werden dann regelmäßig in Ihr externes Kalender-Programm übernommen.
 

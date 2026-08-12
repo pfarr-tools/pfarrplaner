@@ -132,6 +132,7 @@ export default {
     },
     methods: {
         deleteBroadcast(service) {
+            if (!confirm('Willst du diesen Livestream wirklich löschen?')) return;
             this.$inertia.delete(route('broadcast.delete', service.id), {preserveState: false});
         },
         dashboardUrl(service) {

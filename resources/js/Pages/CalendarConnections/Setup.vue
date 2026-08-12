@@ -103,6 +103,7 @@ export default {
             this.$inertia.patch(route('calendarConnection.update', this.myConnection.id), this.myConnection);
         },
         deleteConnection() {
+            if (!confirm('Willst du diese Verbindung wirklich löschen?')) return;
             this.$inertia.delete(route('calendarConnection.destroy', this.myConnection.id));
         },
     },

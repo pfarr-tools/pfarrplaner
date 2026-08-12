@@ -87,6 +87,7 @@ export default {
         },
         deletePoolmaster() {
             if (!this.myPoolmaster.id) window.history.back();
+            if (!confirm('Willst du diese Poolmaster-Zuordnung wirklich löschen?')) return;
             this.$inertia.delete(route('admin.poolmaster.destroy', {modelId: this.myPoolmaster.id }));
         }
     },

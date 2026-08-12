@@ -330,6 +330,7 @@ export default {
             });
         },
         deleteService() {
+            if (!confirm('Willst du diese Veranstaltung wirklich unwiderruflich löschen?')) return;
             this.$inertia.delete(route('service.destroy', this.editedService.slug), {}, {preserveState: false});
         },
         extractParticipants(e) {

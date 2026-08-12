@@ -214,6 +214,7 @@ export default {
             this.$forceUpdate();
         },
         deleteAttachment(attachment, key) {
+            if (!confirm('Willst du diese Datei wirklich löschen?')) return;
             axios.delete(route('service.detach', {service: this.myService.slug, attachment: attachment.id}))
             .then(response => {
                 this.myService.attachments = response.data;

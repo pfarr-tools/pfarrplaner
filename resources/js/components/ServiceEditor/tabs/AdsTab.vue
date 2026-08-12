@@ -212,6 +212,7 @@ export default {
             return this.myService.attachments.some(attachment => attachment.cut == cut);
         },
         deleteAttachment(attachment) {
+            if (!confirm('Willst du diese Datei wirklich löschen?')) return;
             axios.delete(route('service.detach', {service: this.myService.slug, attachment: attachment.id}))
                 .then(response => {
                     this.myService.attachments = response.data;

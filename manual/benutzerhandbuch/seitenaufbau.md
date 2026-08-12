@@ -50,6 +50,8 @@ Beispiele:
 
 Diese Schaltflächen sind deshalb nicht auf jeder Seite gleich. Sie beziehen sich immer auf die Seite, die gerade geöffnet ist. Manche Schaltflächen erscheinen nur, wenn Sie die nötigen Rechte haben oder wenn die passende Funktion für diesen Datensatz sinnvoll ist.
 
+Wenn eine Schaltfläche etwas löscht, fragt Pfarrplaner vor dem endgültigen Entfernen noch einmal nach. Erst nach Ihrer Bestätigung wird der Eintrag, die Datei oder die Zuordnung wirklich gelöscht.
+
 ---
 
 ## Seiteneinstellungen in der oberen Leiste

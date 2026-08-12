@@ -40,4 +40,21 @@ describe('AttachmentList', () => {
         expect(window.axios.delete).toHaveBeenCalled()
         expect(w.emitted('update:modelValue')?.[0]).toEqual([[]])
     })
+    it('does not delete attachment when confirmation is declined', async () => {
+        window.confirm.mockReturnValue(false)
+        const w = mount(AttachmentList, {
+            props: {
+                modelValue: [makeAtt(1)],
+                deleteRouteName: 'attachment.delete',
+                parentType: 'service',
+                parentObject: { id: 10 },
+            },
+        })
+
+        w.vm.deleteAttachment(makeAtt(1))
+        await flushPromises()
+
+        expect(window.axios.delete).not.toHaveBeenCalled()
+        expect(w.emitted('update:modelValue')).toBeUndefined()
+    })
 })

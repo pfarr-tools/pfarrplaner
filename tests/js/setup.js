@@ -8,6 +8,7 @@ window.Laravel = { assetUrl: '/', permissions: [] }
 
 // window.route — Ziggy helper; returns a deterministic fake URL
 window.route = vi.fn((name) => `/${name}`)
+window.confirm = vi.fn(() => true)
 
 // window.axios / window.api — minimal mock so $api() doesn't throw
 const makeAxiosMock = () => ({
@@ -70,4 +71,5 @@ config.global.plugins = [EventBus, LaravelPermission]
 beforeEach(() => {
     vi.clearAllMocks()
     window.Laravel.permissions = []
+    window.confirm.mockReturnValue(true)
 })

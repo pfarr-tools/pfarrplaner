@@ -144,6 +144,7 @@ export default {
             this.cropableAttachment = data;
         },
         detachImage() {
+            if (!confirm('Willst du dieses Bild wirklich löschen?')) return;
             axios.delete(this.detachRoute).then(response => {
                 this.myValue = '';
                 this.$emit('update:modelValue', '');

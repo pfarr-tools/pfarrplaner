@@ -66,6 +66,7 @@ function commentEditButtons() {
 
     $('.btnDeleteComment').click(function(){
         event.preventDefault();
+        if (!confirm('Willst du diesen Kommentar wirklich löschen?')) return;
         axios.delete($(this).data('route'), {
             id: $(this).data('comment-id'),
         }).then((response) => {
@@ -102,4 +103,3 @@ $(document).ready(function(){
 
     commentEditButtons();
 });
-
