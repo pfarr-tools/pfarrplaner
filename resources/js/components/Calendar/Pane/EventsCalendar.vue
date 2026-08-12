@@ -571,7 +571,7 @@ export default {
                 return;
             }
 
-            if (!confirm('Willst du diese Veranstaltung wirklich löschen?')) return;
+            if (!confirm('Willst du diese Veranstaltung wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.')) return;
 
             this.$api().delete(route('api.service.destroy', {service: event.raw.event_slug})).then(() => {
                 this.events = this.events.filter(item => item.raw?.event_id !== event.raw.event_id);

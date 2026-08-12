@@ -32,10 +32,13 @@ namespace Tests\Feature;
 
 use App\Models\Attachment;
 use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Service;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class AttachmentFeatureTest extends TestCase
@@ -47,7 +50,10 @@ class AttachmentFeatureTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware();
         Storage::fake();
+        Permission::findOrCreate('gd-bearbeiten');
+        Permission::findOrCreate('gd-allgemein-bearbeiten');
         $this->user = User::factory()->create();
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
@@ -84,5 +90,29 @@ class AttachmentFeatureTest extends TestCase
         $this->assertSame('fa-exclamation-triangle', $data['icon']);
         $this->assertSame('pdf', $data['extension']);
         $this->assertSame('Die gespeicherte Datei wurde nicht gefunden.', $data['errorMessage']);
+    }
+
+    /**
+     * @return void
+     */
+    public function testAttachmentDownloadIsForbiddenWhenParentServiceIsTrashed(): void
+    {
+        $city = City::factory()->create();
+        $service = Service::factory()->create(['city_id' => $city->id]);
+        $attachment = Attachment::factory()->create([
+            'attachable_id' => $service->id,
+            'attachable_type' => Service::class,
+        ]);
+
+        $user = User::factory()->create();
+        $user->givePermissionTo('gd-bearbeiten');
+        $user->givePermissionTo('gd-allgemein-bearbeiten');
+        $user->cities()->attach($city->id, ['permission' => 'w']);
+
+        $service->delete();
+
+        $response = $this->actingAs($user)->get(route('attachment', $attachment->id));
+
+        $response->assertForbidden();
     }
 }

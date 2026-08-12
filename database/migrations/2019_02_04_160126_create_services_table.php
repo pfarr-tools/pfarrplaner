@@ -56,6 +56,7 @@ class CreateServicesTable extends Migration
                 $table->string('sacristan');
                 $table->mediumText('description');
                 $table->timestamps();
+                $table->softDeletes();
             }
         );
     }

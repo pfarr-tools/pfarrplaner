@@ -32,6 +32,7 @@ namespace App\Traits;
 
 
 use App\Models\Attachment;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Trait HasAttachmentsTrait
@@ -39,6 +40,15 @@ use App\Models\Attachment;
  */
 trait HasAttachmentsTrait
 {
+    /**
+     * @return void
+     */
+    public static function bootHasAttachmentsTrait(): void
+    {
+        static::forceDeleted(function ($model) {
+            $model->purgeAttachments();
+        });
+    }
 
     /**
      * @return mixed
@@ -46,6 +56,21 @@ trait HasAttachmentsTrait
     public function attachments()
     {
         return $this->morphMany(Attachment::class, 'attachable');
+    }
+
+    /**
+     * @return void
+     */
+    protected function purgeAttachments(): void
+    {
+        /** @var Attachment $attachment */
+        foreach ($this->attachments()->get() as $attachment) {
+            if ($attachment->file && Attachment::where('file', $attachment->file)->count() === 1) {
+                Storage::delete($attachment->file);
+            }
+
+            $attachment->delete();
+        }
     }
 
 }

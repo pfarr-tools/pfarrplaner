@@ -39,6 +39,7 @@ use App\Services\CalendarService;
 use App\Services\NameService;
 use App\Tools\StringTool;
 use App\Traits\HasAttachmentsTrait;
+use App\Traits\TracksDeletedByTrait;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -46,6 +47,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -57,6 +59,8 @@ class Absence extends Model implements HasDAVCalendarItems
 {
 
     use HasFactory;
+    use TracksDeletedByTrait;
+    use SoftDeletes;
 
     public const STATUS_NEW = 0;
     public const STATUS_CHECKED = 1;
@@ -107,6 +111,24 @@ class Absence extends Model implements HasDAVCalendarItems
         'replacements',
         'attachments'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (Absence $absence) {
+            if ($absence->isForceDeleting()) {
+                $absence->replacements()->withTrashed()->get()->each->forceDelete();
+                return;
+            }
+
+            $absence->replacements()->get()->each->delete();
+        });
+
+        static::restored(function (Absence $absence) {
+            $absence->replacements()->withTrashed()->get()->each->restore();
+        });
+    }
 
 // ACCESSORS
     public function getDurationTextAttribute()
@@ -294,9 +316,6 @@ class Absence extends Model implements HasDAVCalendarItems
      */
     public function delete()
     {
-        foreach ($this->replacements as $replacement) {
-            $replacement->delete();
-        }
         return parent::delete();
     }
 

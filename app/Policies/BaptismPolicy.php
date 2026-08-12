@@ -99,6 +99,26 @@ class BaptismPolicy
      */
     public function delete(User $user, Baptism $baptism = null): bool
     {
-        return $this->mayChange($user, $baptism);
+        return $this->update($user, $baptism);
+    }
+
+    /**
+     * @param User $user
+     * @param Baptism $baptism
+     * @return bool
+     */
+    public function restore(User $user, Baptism $baptism): bool
+    {
+        return $this->delete($user, $baptism);
+    }
+
+    /**
+     * @param User $user
+     * @param Baptism $baptism
+     * @return bool
+     */
+    public function forceDelete(User $user, Baptism $baptism): bool
+    {
+        return $this->delete($user, $baptism);
     }
 }

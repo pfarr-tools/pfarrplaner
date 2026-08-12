@@ -79,4 +79,24 @@ class FuneralPolicy
     {
         return $this->update($user, $funeral);
     }
+
+    /**
+     * @param User $user
+     * @param Funeral|null $funeral
+     * @return bool
+     */
+    public function restore(User $user, ?Funeral $funeral = null): bool
+    {
+        return $this->delete($user, $funeral);
+    }
+
+    /**
+     * @param User $user
+     * @param Funeral|null $funeral
+     * @return bool
+     */
+    public function forceDelete(User $user, ?Funeral $funeral = null): bool
+    {
+        return $this->delete($user, $funeral);
+    }
 }

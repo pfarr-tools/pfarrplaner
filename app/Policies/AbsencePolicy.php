@@ -109,6 +109,26 @@ class AbsencePolicy
         return $this->update($user, $absence);
     }
 
+    /**
+     * @param User $user
+     * @param Absence $absence
+     * @return bool
+     */
+    public function restore(User $user, Absence $absence)
+    {
+        return $this->delete($user, $absence);
+    }
+
+    /**
+     * @param User $user
+     * @param Absence $absence
+     * @return bool
+     */
+    public function forceDelete(User $user, Absence $absence)
+    {
+        return $this->delete($user, $absence);
+    }
+
 
     /**
      * Check if the user can manage his own vacation entries

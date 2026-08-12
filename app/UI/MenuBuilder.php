@@ -69,7 +69,10 @@ class MenuBuilder
         $route = Route::currentRouteName();
 
         $modulesGroups = config('modules.groups');
-        $modulesConfig = Auth::user()->getSetting('modules', Modules::defaultConfig());
+        $modulesConfig = array_merge(
+            Modules::defaultConfig(),
+            Auth::user()->getSetting('modules', [])
+        );
 
         $menu = [];
         foreach ($modulesGroups as $groupTitle => $modulesGroup) {

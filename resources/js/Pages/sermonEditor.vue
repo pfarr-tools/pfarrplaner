@@ -92,23 +92,6 @@
                                     <form-bible-reference-input name="reference" :key="referenceCopied"
                                                                 label="Predigttext"
                                                                 v-model="editedSermon.reference" :sources="textSources" />
-                                    <div v-if="!(editedSermon.id)" class="alert alert-info">
-                                        Du musst die Predigt erst einmal speichern, um ein Bild hinzufügen zu können.
-                                    </div>
-                                    <div v-else>
-                                        <form-image-attacher
-                                            :attach-route="route('sermon.image.attach', {model: editedSermon.id})"
-                                            :detach-route="route('sermon.image.detach', {model: editedSermon.id})"
-                                            label="Bild zur Predigt" :handle-paste="true"
-                                            v-model="editedSermon.image" width="1024" height="768"
-                                        />
-                                    </div>
-                                    <div class="form-check my-2">
-                                        <input class="form-check-input" type="checkbox" id="inputCCLicense"
-                                               v-model="editedSermon.cc_license" value="1"/>
-                                        <label class="form-check-label" for="inputCCLicense">Predigt und Materialien unter
-                                            der CC-BY-SA 4.0 Lizenz freigeben</label>
-                                    </div>
                                 </card-body>
                             </card>
 
@@ -162,8 +145,6 @@ import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
 
-import FormFileUploader from "../components/Ui/forms/FormFileUploader";
-import FormImageAttacher from "../components/Ui/forms/FormImageAttacher";
 import TextStats from "../components/LiturgyEditor/Elements/TextStats";
 import Card from "../components/Ui/cards/card";
 import CardBody from "../components/Ui/cards/cardBody";
@@ -183,8 +164,6 @@ export default {
         CardBody,
         Card,
         TextStats,
-        FormImageAttacher,
-        FormFileUploader,
         EditorContent,
     },
     props: {

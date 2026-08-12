@@ -151,7 +151,7 @@ Bei einer **Taufe** sehen Sie:
 - **Kirchenbuch**: Ob der Kirchenbucheintrag abgeschlossen ist.
 - **Dokumente**: Angehängte Dateien. Neue Dateien lassen sich in diesen Bereich ziehen.
 - **Stift**: Taufe bearbeiten.
-- **Papierkorb**: Taufe nach Rückfrage löschen.
+- **Papierkorb**: Taufe nach Rückfrage in den Papierkorb verschieben. Im Administrationsbereich kann sie später wiederhergestellt oder endgültig gelöscht werden.
 
 Bei einer **Beerdigung** sehen Sie:
 
@@ -164,7 +164,7 @@ Bei einer **Beerdigung** sehen Sie:
 - **Kirchenbuch**: Ob der Kirchenbucheintrag abgeschlossen ist.
 - **Dokumente**: Angehängte Dateien und das automatisch angebotene **Formular für Kirchenregisteramt**.
 - **Stift**: Bestattung bearbeiten.
-- **Papierkorb**: Bestattung nach Rückfrage löschen.
+- **Papierkorb**: Bestattung nach Rückfrage in den Papierkorb verschieben. Im Administrationsbereich kann sie später wiederhergestellt oder endgültig gelöscht werden.
 
 Bei einer **Trauung** sehen Sie:
 
@@ -180,7 +180,7 @@ Bei einer **Trauung** sehen Sie:
 - **Kirchenbuch**: Ob der Kirchenbucheintrag abgeschlossen ist.
 - **Dokumente**: Angehängte Dateien.
 - **Stift**: Trauung bearbeiten.
-- **Papierkorb**: Trauung nach Rückfrage löschen.
+- **Papierkorb**: Trauung nach Rückfrage in den Papierkorb verschieben. Im Administrationsbereich kann sie später wiederhergestellt oder endgültig gelöscht werden.
 
 ---
 
@@ -601,7 +601,7 @@ Wenn eine gespeicherte Datei im System nicht mehr gefunden wird, bleibt sie in d
 
 ## Löschen
 
-In den Editoren und Listen gibt es eine Papierkorb- oder **Löschen**-Schaltfläche. Vor dem Löschen fragt Pfarrplaner nach, ob die Kasualie wirklich unwiderruflich gelöscht werden soll.
+In den Editoren und Listen gibt es eine Papierkorb- oder **Löschen**-Schaltfläche. Vor dem Löschen fragt Pfarrplaner nach. Danach liegt die Kasualie zunächst im Papierkorb und kann dort wiederhergestellt oder endgültig gelöscht werden.
 
 > **Achtung:** Beim Löschen wird nur die Kasualie gelöscht. Prüfen Sie anschließend den verbundenen Gottesdienst, wenn auch der Gottesdienst nicht mehr gebraucht wird.
 

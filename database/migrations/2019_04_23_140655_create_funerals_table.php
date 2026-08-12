@@ -62,6 +62,7 @@ class CreateFuneralsTable extends Migration
                 $table->text('relative_zip');
                 $table->text('relative_city');
                 $table->timestamps();
+                $table->softDeletes();
             }
         );
     }

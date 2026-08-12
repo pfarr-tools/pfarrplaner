@@ -43,6 +43,7 @@ use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('telescope:prune --hours=48')->daily();
 Schedule::command('liturgy:get')->daily();
+Schedule::command('trash:prune --days=30')->daily();
 Schedule::command('cache:prune-stale-tags')->hourly();
 
 // Integration schedules

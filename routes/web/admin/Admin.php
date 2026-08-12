@@ -30,5 +30,13 @@
 
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PapierkorbController;
 
 Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+Route::get('/papierkorb', [PapierkorbController::class, 'index'])->name('admin.trash.index');
+Route::patch('/papierkorb/{type}/{id}/restore', [PapierkorbController::class, 'restore'])
+    ->whereNumber('id')
+    ->name('admin.trash.restore');
+Route::delete('/papierkorb/{type}/{id}', [PapierkorbController::class, 'destroy'])
+    ->whereNumber('id')
+    ->name('admin.trash.destroy');

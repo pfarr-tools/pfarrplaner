@@ -491,7 +491,7 @@ export default {
             this.saveAbsence();
         },
         rejectAbsence() {
-            if (!confirm('Willst du diesen Abwesenheitseintrag ablehnen und löschen?')) return;
+            if (!confirm('Willst du diesen Abwesenheitseintrag wirklich ablehnen und in den Papierkorb verschieben?')) return;
 
             this.$inertia.delete(route('absence.destroy', { absence: this.form.id }), {
                 data: {
@@ -502,7 +502,7 @@ export default {
             });
         },
         deleteAbsence() {
-            if (!confirm('Willst du diese Abwesenheit wirklich unwiderruflich löschen?')) return;
+            if (!confirm('Willst du diese Abwesenheit wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.')) return;
 
             this.$inertia.delete(route('absence.destroy', { absence: this.form.id }), {
                 data: {

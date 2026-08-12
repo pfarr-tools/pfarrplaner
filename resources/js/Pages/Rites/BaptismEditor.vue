@@ -319,7 +319,7 @@ export default {
             });
         },
         deleteBaptism() {
-            if (!confirm('Willst du diese Taufe wirklich unwiderruflich löschen?')) return;
+            if (!confirm('Willst du diese Taufe wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.')) return;
             this.$inertia.delete(route('baptisms.destroy', {modelId: this.myBaptism.id}));
         },
     }

@@ -49,4 +49,18 @@ class AttachmentPolicyUnitTest extends TestCase
 
         $this->assertTrue($this->policy->update($user, $attachment));
     }
+
+    /**
+     * @return void
+     */
+    public function testAttachmentOnTrashedParentCannotBeUpdated(): void
+    {
+        $user = User::factory()->create();
+        $attachment = Attachment::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
+
+        $attachment->attachable->delete();
+
+        $this->assertFalse($this->policy->update($user, $attachment->fresh()));
+    }
 }

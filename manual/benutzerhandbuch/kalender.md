@@ -123,7 +123,7 @@ Wenn Sie einen Gottesdienst bearbeiten dürfen, können Sie die Kachel anklicken
 - **:material-pencil: Stift**: Gottesdienst im [Editor für Veranstaltungen und Gottesdienste](veranstaltungen.md) bearbeiten.
 - **:material-view-list: Listen-Symbol**: [Liturgie-Editor](liturgie.md) öffnen.
 - **:material-microphone: Mikrofon**: [Predigteditor](predigt.md) öffnen.
-- **:material-delete: Papierkorb**: Gottesdienst löschen. Nach dem Klick fragt Pfarrplaner noch einmal nach. Erst nach Ihrer Bestätigung wird der Eintrag entfernt und verschwindet sofort aus dem Kalender.
+- **:material-delete: Papierkorb**: Gottesdienst löschen. Nach dem Klick fragt Pfarrplaner noch einmal nach. Erst nach Ihrer Bestätigung wird der Eintrag in den Papierkorb verschoben und verschwindet sofort aus dem Kalender. Im Administrationsbereich kann er wiederhergestellt oder endgültig gelöscht werden.
 - **:material-target-account: Zielscheibe mit Person**: Sich selbst für einen Dienst in diesem Gottesdienst eintragen.
 
 Wenn Sie den Gottesdienst nicht bearbeiten dürfen, können trotzdem Schaltflächen sichtbar sein:

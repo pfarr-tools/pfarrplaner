@@ -39,8 +39,10 @@ use App\Models\Service;
 use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCityScopes;
 use App\Traits\HasCommentsTrait;
+use App\Traits\TracksDeletedByTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\URL;
 
 /**
@@ -49,7 +51,7 @@ use Illuminate\Support\Facades\URL;
  */
 class Baptism extends AbstractModel implements HasDAVCalendarItems
 {
-    use HasCommentsTrait, HasAttachmentsTrait, HasFactory, HasCityScopes;
+    use HasCommentsTrait, HasAttachmentsTrait, HasFactory, HasCityScopes, TracksDeletedByTrait, SoftDeletes;
 
     protected static string $prefix = 'baptism';
     protected static string $prefixPlural = 'baptisms';

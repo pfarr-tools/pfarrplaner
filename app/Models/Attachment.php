@@ -31,7 +31,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -68,6 +70,23 @@ class Attachment extends AbstractModel
     public function attachable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * @return Model|null
+     */
+    public function resolveAttachableIncludingTrashed(): ?Model
+    {
+        if (!$this->attachable_type || !$this->attachable_id || !class_exists($this->attachable_type)) {
+            return null;
+        }
+
+        $modelClass = $this->attachable_type;
+        $query = in_array(SoftDeletes::class, class_uses_recursive($modelClass), true)
+            ? $modelClass::withTrashed()
+            : $modelClass::query();
+
+        return $query->find($this->attachable_id);
     }
 
     /**

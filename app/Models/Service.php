@@ -55,6 +55,7 @@ use App\Traits\HasAttachmentsTrait;
 use App\Traits\HasCommentsTrait;
 use App\Traits\HasLiturgicalInfo;
 use App\Traits\IncludesPermissionAttributes;
+use App\Traits\TracksDeletedByTrait;
 use App\Traits\TracksChangesTrait;
 use Carbon\Carbon;
 use Exception;
@@ -66,6 +67,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -86,6 +88,8 @@ class Service extends Model implements HasDAVCalendarItems
     use HasAttachmentsTrait;
     use IncludesPermissionAttributes;
     use HasLiturgicalInfo;
+    use TracksDeletedByTrait;
+    use SoftDeletes;
 
     /**
      * @var array
@@ -1250,6 +1254,32 @@ class Service extends Model implements HasDAVCalendarItems
 
         static::updating(function ($service) {
             $service->slug = $service->createSlug();
+        });
+
+        static::deleting(function (Service $service) {
+            if ($service->isForceDeleting()) {
+                $service->baptisms()->withTrashed()->get()->each->forceDelete();
+                $service->funerals()->withTrashed()->get()->each->forceDelete();
+                $service->weddings()->withTrashed()->get()->each->forceDelete();
+                $service->AdConfigs()->withTrashed()->get()->each->forceDelete();
+                $service->occurences()->delete();
+                return;
+            }
+
+            $service->baptisms()->get()->each->delete();
+            $service->funerals()->get()->each->delete();
+            $service->weddings()->get()->each->delete();
+            $service->AdConfigs()->get()->each->delete();
+            $service->occurences()->delete();
+        });
+
+        static::restored(function (Service $service) {
+            $service->baptisms()->withTrashed()->get()->each->restore();
+            $service->funerals()->withTrashed()->get()->each->restore();
+            $service->weddings()->withTrashed()->get()->each->restore();
+            $service->AdConfigs()->withTrashed()->get()->each->restore();
+
+            app(\App\Observers\EventRecurrenceObserver::class)->updated($service);
         });
     }
 

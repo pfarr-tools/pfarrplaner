@@ -12,13 +12,16 @@
 
 namespace Tests\Browser\Manual;
 
+use App\Models\Leave\Absence;
 use App\Models\Leave\Pool;
 use App\Models\Location;
 use App\Models\Parish;
 use App\Models\People\User;
 use App\Models\Places\City;
+use App\Models\Rites\Baptism;
 use App\Models\Seating\SeatingRow;
 use App\Models\Seating\SeatingSection;
+use App\Models\Service;
 use App\Seating\RowBasedSeatingModel;
 use Laravel\Dusk\Browser;
 
@@ -64,6 +67,36 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
         ]);
         $this->pool->cities()->attach($cities->take(3)->pluck('id')->all());
         $this->pool->users()->attach($this->superAdminUser->id);
+
+        $this->createManualTrashData();
+    }
+
+    protected function createManualTrashData(): void
+    {
+        $this->superAdminUser->update([
+            'manage_absences' => 1,
+        ]);
+
+        $service = Service::factory()->create([
+            'city_id' => $this->city->id,
+            'location_id' => $this->location->id,
+            'title' => 'Abendgottesdienst mit Taufe',
+        ]);
+        Baptism::factory()->create([
+            'service_id' => $service->id,
+            'city_id' => $this->city->id,
+            'candidate_name' => 'Leonie Beispiel',
+        ]);
+
+        $absence = Absence::factory()->create([
+            'user_id' => $this->superAdminUser->id,
+            'reason' => 'Fortbildung',
+            'from' => now()->addDays(5)->startOfDay(),
+            'to' => now()->addDays(7)->endOfDay(),
+        ]);
+
+        $service->delete();
+        $absence->delete();
     }
 
     protected function createManualPlaces(City $city): void
@@ -252,6 +285,18 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
                 $browser,
                 route('admin.pool.edit', ['modelId' => $this->pool->id]),
                 'admin-pool-editor',
+                800
+            );
+        });
+    }
+
+    public function testCaptureTrashAdministration(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $this->captureManualScreenshot(
+                $browser,
+                route('admin.trash.index'),
+                'admin-papierkorb',
                 800
             );
         });

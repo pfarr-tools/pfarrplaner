@@ -179,7 +179,7 @@ export default {
             });
         },
         deleteService(row, rowIndex) {
-            if (!confirm('Willst du den gewählten Gottesdienst wirklich komplett löschen?')) return;
+            if (!confirm('Willst du den gewählten Gottesdienst wirklich in den Papierkorb verschieben? Du kannst ihn dort später wiederherstellen.')) return;
             this.$api().delete(route('api.service.destroy', {
                 service: row.service.slug,
             })).then(response => {

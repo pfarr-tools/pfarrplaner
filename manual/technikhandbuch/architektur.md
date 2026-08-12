@@ -20,6 +20,24 @@ Das Projekt folgt im Kern einer Laravel-Struktur, nutzt aber mehrere projektweit
 - **Urlaub und Vertretung**: Abwesenheiten, Pools, Poolmaster
 - **Liturgie**: Bausteine, Lieder, Psalmen, liturgische Texte
 
+## Soft-Delete-Domäne
+
+Für `Service`, `Absence`, `Baptism`, `Funeral`, `Wedding` sowie fachlich abhängige `Replacement`- und `AdConfig`-Datensätze nutzt Pfarrplaner Soft Deletes.
+
+Die fachliche Wirkung ist:
+
+- normales Löschen verschiebt den Datensatz in den administrativen Papierkorb
+- Standardabfragen zeigen diese Datensätze nicht mehr an
+- bei angemeldeten Löschvorgängen wird das ausführende Benutzerkonto in `deleted_by` protokolliert
+- Einträge bleiben 30 Tage im Papierkorb und werden danach täglich automatisch per `trash:prune` endgültig gelöscht
+- Wiederherstellung und endgültiges Löschen laufen über eigene Admin-Flows
+
+Bei `Service` werden die abhängigen Kasualien und `AdConfig`-Einträge mit soft-deleted; `Occurence` bleibt dagegen eine technische Projektion und wird beim Löschen entfernt und beim Restore neu aufgebaut.
+
+Bei `Absence` werden die abhängigen `Replacement`-Datensätze mit soft-deleted und beim Restore wiederhergestellt.
+
+Anhänge (`Attachment`) werden selbst nicht soft-deleted. Beim normalen Soft Delete des Elternobjekts bleiben ihre Datenbankeinträge und Dateien unverändert bestehen, damit sie beim Restore sofort wieder verfügbar sind. Beim `forceDelete()` des Elternobjekts werden die zugehörigen Attachment-Datensätze und ihre Dateien entfernt. Für Einträge im Papierkorb bleibt der normale Zugriff auf Anhänge gesperrt.
+
 ## Routing-Modell
 
 - Web-Routen werden zentral geladen und um zusätzliche Teilrouten ergänzt.
