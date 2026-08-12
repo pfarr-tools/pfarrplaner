@@ -77,6 +77,7 @@
 <script>
 import Multiselect from '@vueform/multiselect';
 import '@vueform/multiselect/themes/default.css';
+import { markRaw } from 'vue';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -133,13 +134,13 @@ export default {
         return {
             editedElement: e,
             options: options,
-            editor: new Editor({
+            editor: markRaw(new Editor({
                 content: e.data.agenda_description || '',
                 extensions: [StarterKit, Underline],
                 onUpdate: ({ editor }) => {
                     this.editedElement.data.agenda_description = editor.getHTML();
                 },
-            }),
+            })),
         };
     },
     computed: {

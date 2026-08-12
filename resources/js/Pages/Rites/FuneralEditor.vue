@@ -363,6 +363,7 @@
 
 <script>
 import { useForm } from '@inertiajs/vue3';
+import { markRaw } from 'vue';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -540,7 +541,7 @@ export default {
             myFuneral: myFuneral,
             copied: 0,
             appointmentPlaceCopied: 0,
-            editorText: new Editor({
+            editorText: markRaw(new Editor({
                 content: myFuneral.life || '',
                 extensions: [
                     StarterKit,
@@ -548,7 +549,7 @@ export default {
                     Placeholder.configure({ placeholder: 'Hier kannst du einen Textentwurf für den Lebenslauf schreiben...' }),
                 ],
                 onUpdate: ({ editor }) => { myFuneral.life = editor.getHTML(); },
-            }),
+            })),
             inLocalStorage,
         }
     },

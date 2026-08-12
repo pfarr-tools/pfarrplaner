@@ -156,6 +156,7 @@
 </template>
 
 <script>
+import { markRaw } from 'vue';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -249,7 +250,7 @@ export default {
             fileUpload: null,
             removeImage: false,
             textSources,
-            editorText: new Editor({
+            editorText: markRaw(new Editor({
                 content: editedSermon.text,
                 extensions: [
                     StarterKit,
@@ -257,15 +258,15 @@ export default {
                     Placeholder.configure({ placeholder: 'Schreibe hier den Text deiner Predigt hin...' }),
                 ],
                 onUpdate: ({ editor }) => { editedSermon.text = editor.getHTML(); this.textUpdated++; },
-            }),
-            editorLiterature: new Editor({
+            })),
+            editorLiterature: markRaw(new Editor({
                 content: editedSermon.literature,
                 extensions: [
                     StarterKit,
                     Placeholder.configure({ placeholder: 'Hier gibt es Platz z.B. für eine Literaturliste...' }),
                 ],
                 onUpdate: ({ editor }) => { editedSermon.literature = editor.getHTML(); },
-            }),
+            })),
         }
     },
     beforeUnmount() {

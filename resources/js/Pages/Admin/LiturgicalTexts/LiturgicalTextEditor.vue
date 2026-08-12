@@ -29,6 +29,7 @@
 
 <script>
 
+import { markRaw } from 'vue';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -62,13 +63,13 @@ export default {
                     }
                 },
             },
-            editor: new Editor({
+            editor: markRaw(new Editor({
                 content: this.text.text || '',
                 extensions: [StarterKit, Underline],
                 onUpdate: ({ editor }) => {
                     this.myText.text = editor.getHTML();
                 },
-            }),
+            })),
         }
     },
     beforeUnmount() {

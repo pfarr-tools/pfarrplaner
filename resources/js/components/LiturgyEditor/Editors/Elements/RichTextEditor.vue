@@ -64,6 +64,7 @@
 
 
 <script>
+import { markRaw } from 'vue';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -92,7 +93,7 @@ export default {
         return {
             myLabel: this.label || 'Inhalt',
             mySettings,
-            editor: new Editor({
+            editor: markRaw(new Editor({
                 content: initContent,
                 extensions: [
                     StarterKit,
@@ -102,7 +103,7 @@ export default {
                 onUpdate: ({ editor }) => {
                     this.$emit('update:modelValue', editor.getHTML());
                 },
-            }),
+            })),
         }
     },
     watch: {

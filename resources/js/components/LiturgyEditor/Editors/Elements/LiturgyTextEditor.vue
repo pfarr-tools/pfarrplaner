@@ -98,6 +98,7 @@
 
 
 <script>
+import { markRaw } from 'vue';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -193,7 +194,7 @@ export default {
             funeralDataSets,
             baptismDataSets,
             weddingDataSets,
-            editor: new Editor({
+            editor: markRaw(new Editor({
                 content: this.modelValue || '',
                 extensions: [
                     StarterKit,
@@ -203,7 +204,7 @@ export default {
                 onUpdate: ({ editor }) => {
                     this.$emit('update:modelValue', editor.getHTML());
                 },
-            }),
+            })),
         }
     },
     watch: {
