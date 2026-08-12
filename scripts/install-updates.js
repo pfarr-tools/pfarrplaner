@@ -13,6 +13,7 @@
 
 'use strict';
 
+const fs = require('fs');
 const { spawnSync } = require('child_process');
 const path = require('path');
 
@@ -80,6 +81,62 @@ function capture(command, args, allowFailure = false) {
     }
 
     return (result.stdout || '').trim();
+}
+
+/**
+ * Return the value of an environment key from the local .env file.
+ *
+ * @param {string} key Environment variable name
+ * @return {string|null}
+ */
+function getDotEnvValue(key) {
+    const envPath = path.join(rootDir, '.env');
+    if (!fs.existsSync(envPath)) {
+        return null;
+    }
+
+    const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) {
+            continue;
+        }
+
+        const separatorIndex = trimmed.indexOf('=');
+        if (separatorIndex === -1) {
+            continue;
+        }
+
+        if (trimmed.slice(0, separatorIndex) !== key) {
+            continue;
+        }
+
+        const rawValue = trimmed.slice(separatorIndex + 1).trim();
+        if (
+            (rawValue.startsWith('"') && rawValue.endsWith('"'))
+            || (rawValue.startsWith('\'') && rawValue.endsWith('\''))
+        ) {
+            return rawValue.slice(1, -1);
+        }
+
+        return rawValue;
+    }
+
+    return null;
+}
+
+/**
+ * Return whether Octane is configured for this installation.
+ *
+ * @return {boolean}
+ */
+function isOctaneActivated() {
+    const octaneServer = getDotEnvValue('OCTANE_SERVER');
+    if (octaneServer === null) {
+        return false;
+    }
+
+    return !['', 'false', '0', 'off', 'null'].includes(octaneServer.toLowerCase());
 }
 
 /**
@@ -184,9 +241,10 @@ function includesPath(files, prefixes) {
  * @param {string[]} files Changed files
  * @param {string} beforeRevision Old revision
  * @param {string} afterRevision New revision
+ * @param {boolean} octaneActivated Whether Octane is configured
  * @return {{composerInstall: boolean, npmInstall: boolean, browserslist: boolean, build: boolean, migrations: boolean, viewCache: boolean, optimize: boolean, queueRestart: boolean, ping: boolean, octaneReload: boolean, messages: string[]}}
  */
-function determineActions(files, beforeRevision, afterRevision) {
+function determineActions(files, beforeRevision, afterRevision, octaneActivated) {
     const composerJsonChanged = files.includes('composer.json');
     const composerLockChanged = files.includes('composer.lock');
     const packageJsonChanged = files.includes('package.json');
@@ -222,7 +280,7 @@ function determineActions(files, beforeRevision, afterRevision) {
         optimize: true,
         queueRestart: true,
         ping: true,
-        octaneReload: true,
+        octaneReload: octaneActivated,
         messages,
     };
 }
@@ -307,6 +365,7 @@ section('Fetching updates');
 const updateTarget = getUpdateTarget();
 const upstream = updateTarget.upstream;
 const beforeRevision = capture('git', ['rev-parse', 'HEAD']);
+const octaneActivated = isOctaneActivated();
 run('git', ['fetch', '--prune', upstream.split('/')[0]]);
 
 const { ahead, behind } = getAheadBehind(upstream);
@@ -324,7 +383,7 @@ const pendingFiles = capture('git', ['diff', '--name-only', `HEAD..${upstream}`]
     .split('\n')
     .map((file) => file.trim())
     .filter(Boolean);
-const actions = determineActions(pendingFiles, beforeRevision, upstream);
+const actions = determineActions(pendingFiles, beforeRevision, upstream, octaneActivated);
 
 console.log(`Found updates for ${pendingFiles.length} file(s) from ${upstream}.`);
 
@@ -355,7 +414,7 @@ section('Pulling updates');
 run('git', ['pull', '--ff-only', ...updateTarget.pullArgs]);
 
 const afterRevision = capture('git', ['rev-parse', 'HEAD']);
-const installedActions = determineActions(pendingFiles, beforeRevision, afterRevision);
+const installedActions = determineActions(pendingFiles, beforeRevision, afterRevision, octaneActivated);
 
 if (installedActions.composerInstall) {
     section('Composer');
@@ -403,7 +462,7 @@ section('Instance registry');
 run('php', ['artisan', 'ping']);
 
 const artisanCommands = capture('php', ['artisan', 'list', '--raw'], true) || '';
-if (artisanCommands.split('\n').includes('octane:reload')) {
+if (installedActions.octaneReload && artisanCommands.split('\n').includes('octane:reload')) {
     section('Octane');
     run('php', ['artisan', 'octane:reload']);
 }

@@ -29,7 +29,8 @@ Im Hintergrund wird das npm-Skript `install:updates` ausgeführt. Dieses Skript 
 - ob `npm install` nötig ist
 - ob Assets neu gebaut werden müssen
 - ob Migrationen auszuführen sind
-- ob Caches, Queue und Octane neu gestartet werden müssen
+- ob Caches und Queue neu gestartet werden müssen
+- ob Octane neu geladen werden muss, wenn die Instanz über `OCTANE_SERVER` in der `.env` mit Octane konfiguriert ist
 
 ### Trockentest
 
