@@ -298,7 +298,7 @@ Im Abschnitt **Zur Überprüfung** sehen prüfende Personen:
 - **Beschreibung**: Grund und Zeitraum.
 - **Als überprüft markieren**: Häkchen-Schaltfläche, die den Antrag direkt als überprüft markiert.
 - **Zur Überprüfung des Antrags**: Stift-Schaltfläche, öffnet den Editor.
-- **Antrag kommentarlos löschen**: Papierkorb-Schaltfläche, löscht den Antrag ohne Kommentar.
+- **Antrag kommentarlos löschen**: Papierkorb-Schaltfläche, verschiebt den Antrag ohne Kommentar in den Papierkorb. Dort kann er wiederhergestellt oder endgültig gelöscht werden.
 
 Im Abschnitt **Zur Genehmigung** sehen genehmigende Personen:
 

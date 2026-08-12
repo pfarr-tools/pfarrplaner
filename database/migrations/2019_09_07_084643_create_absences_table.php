@@ -54,6 +54,7 @@ class CreateAbsencesTable extends Migration
                 $table->integer('replacement')->nullable();
                 $table->text('reason');
                 $table->timestamps();
+                $table->softDeletes();
             }
         );
 

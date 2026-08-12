@@ -330,7 +330,7 @@ export default {
             });
         },
         deleteService() {
-            if (!confirm('Willst du diese Veranstaltung wirklich unwiderruflich löschen?')) return;
+            if (!confirm('Willst du diese Veranstaltung wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.')) return;
             this.$inertia.delete(route('service.destroy', this.editedService.slug), {}, {preserveState: false});
         },
         extractParticipants(e) {

@@ -64,6 +64,7 @@ class CreateBaptismsTable extends Migration
                 $table->integer('docs_ready');
                 $table->string('docs_where');
                 $table->timestamps();
+                $table->softDeletes();
             }
         );
     }

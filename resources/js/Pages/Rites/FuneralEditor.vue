@@ -601,7 +601,7 @@ export default {
             });
         },
         deleteFuneral() {
-            if (!confirm('Willst du diese Beerdigung wirklich unwiderruflich löschen?')) return;
+            if (!confirm('Willst du diese Beerdigung wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.')) return;
             this.myFuneral.delete(route('funerals.destroy', {modelId: this.myFuneral.id}), {
                 preserveState: false,
             })

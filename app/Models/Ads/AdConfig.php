@@ -31,14 +31,18 @@ namespace App\Models\Ads;
 
 use App\Models\AbstractModel;
 use App\Models\Service;
+use App\Traits\TracksDeletedByTrait;
 use Database\Factories\AdConfigFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AdConfig extends AbstractModel
 {
     /** @use HasFactory<\Database\Factories\AdConfigFactory> */
     use HasFactory;
+    use TracksDeletedByTrait;
+    use SoftDeletes;
 
     protected static string $prefix = 'adconfig';
     protected static string $prefixPlural = 'adconfigs';

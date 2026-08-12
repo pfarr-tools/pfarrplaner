@@ -52,6 +52,7 @@ class CreateReplacementsTable extends Migration
                 $table->date('from');
                 $table->date('to');
                 $table->timestamps();
+                $table->softDeletes();
             }
         );
         Schema::create(

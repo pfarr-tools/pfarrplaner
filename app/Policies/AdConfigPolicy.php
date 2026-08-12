@@ -63,4 +63,14 @@ class AdConfigPolicy
     {
         return $user->can('update', $adConfig->service);
     }
+
+    public function restore(User $user, AdConfig $adConfig): bool
+    {
+        return $user->can('update', $adConfig->service);
+    }
+
+    public function forceDelete(User $user, AdConfig $adConfig): bool
+    {
+        return $user->can('update', $adConfig->service);
+    }
 }

@@ -18,6 +18,42 @@ Klicken Sie im Hauptmenü auf **„Administration"**.
 
 ---
 
+## Papierkorb
+
+Wenn Sie gelöschte Gottesdienste, Abwesenheiten, Taufen, Bestattungen oder Trauungen wiederfinden oder endgültig entfernen müssen, öffnen Sie **Administration → Papierkorb**.
+
+Der Papierkorb zeigt pro Eintrag:
+
+- **Typ**: zum Beispiel Gottesdienst, Abwesenheit oder Trauung
+- **Eintrag**: die fachliche Bezeichnung
+- **Ort**: zugeordnete Gemeinde oder der relevante Ort, soweit vorhanden
+- **Gelöscht am**: Zeitpunkt der Löschung
+- **Gelöscht von**: Benutzerkonto, das den Eintrag in den Papierkorb verschoben hat, soweit diese Information vorliegt
+
+In jeder Zeile gibt es je nach Ihren Rechten zwei Schaltflächen:
+
+- **Wiederherstellen**: Holt den Eintrag aus dem Papierkorb zurück.
+- **Endgültig löschen**: Entfernt den Eintrag unwiderruflich.
+
+Oberhalb der Liste sehen Sie:
+
+- ein Suchfeld für Bezeichnung, Typ, Ort und Löschzeitpunkt
+- einen Filter für den Objekttyp
+- einen Filter für den Ort
+- den Hinweis auf die Aufbewahrungsfrist von 30 Tagen
+
+Pfarrplaner leert den Papierkorb nicht auf Knopfdruck. Es gibt keine Schaltfläche zum sofortigen kompletten Leeren. Stattdessen werden Einträge nach 30 Tagen automatisch im täglichen Bereinigungslauf endgültig gelöscht.
+
+Bei Taufen, Bestattungen und Trauungen kann die Wiederherstellung zusätzlich den zugehörigen Gottesdienst mit zurückholen. Pfarrplaner weist vor der Bestätigung darauf hin.
+
+Solange ein Eintrag nur im Papierkorb liegt, bleibt er aus normalen Listen und Kalenderansichten verschwunden. Erst nach der Wiederherstellung erscheint er wieder an den üblichen Stellen. Einträge bleiben 30 Tage im Papierkorb und werden danach automatisch täglich endgültig gelöscht.
+
+Anhänge bleiben dabei am Eintrag erhalten. Wenn Sie einen Gottesdienst, eine Abwesenheit oder eine Kasualie aus dem Papierkorb wiederherstellen, stehen die zugehörigen Dateien wieder wie zuvor zur Verfügung. Erst beim **endgültigen Löschen** werden diese Dateien mit entfernt.
+
+Wenn ein Eintrag bereits älter als 30 Tage ist, kann es also sein, dass er nicht mehr im Papierkorb steht. In diesem Fall hilft nur noch ein Backup.
+
+---
+
 ## Benutzerverwaltung
 
 ### Benutzerübersicht

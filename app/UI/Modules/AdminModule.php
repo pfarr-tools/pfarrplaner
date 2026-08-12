@@ -30,6 +30,7 @@
 
 namespace App\UI\Modules;
 
+use App\Http\Controllers\PapierkorbController;
 use App\Models\Liturgy\Psalm;
 use App\Models\Liturgy\Song;
 use App\Models\Liturgy\Text;
@@ -148,6 +149,9 @@ class AdminModule extends AbstractModule
                 'active' => $route == 'template.index',
                 'inertia' => true,
             ];
+        }
+        if ($config = PapierkorbController::getAdminModuleConfig()) {
+            $adminMenu[] = $config;
         }
         return array_values(collect($adminMenu)->sortBy('text')->toArray());
     }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedInteger('offset');
             $table->text('ad_text');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('service_id')->references('id')->on('services')->cascadeOnDelete();
         });

@@ -79,4 +79,24 @@ class WeddingPolicy
     {
         return $this->update($user, $wedding);
     }
+
+    /**
+     * @param User $user
+     * @param Wedding|null $wedding
+     * @return bool
+     */
+    public function restore(User $user, ?Wedding $wedding = null): bool
+    {
+        return $this->delete($user, $wedding);
+    }
+
+    /**
+     * @param User $user
+     * @param Wedding|null $wedding
+     * @return bool
+     */
+    public function forceDelete(User $user, ?Wedding $wedding = null): bool
+    {
+        return $this->delete($user, $wedding);
+    }
 }

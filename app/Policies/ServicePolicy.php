@@ -120,9 +120,7 @@ class ServicePolicy
      */
     public function delete(User $user, Service $service)
     {
-        if ($service->isTemplate()) return $user->hasPermissionTo('gd-bearbeiten');
-        if ($user->isCurrentlyPoolmasterForCity($service->city)) return true;
-        return $user->hasPermissionTo('gd-allgemein-bearbeiten') && $this->hasCityPermission($user, $service);
+        return $this->update($user, $service);
     }
 
     /**
@@ -134,8 +132,7 @@ class ServicePolicy
      */
     public function restore(User $user, Service $service)
     {
-        if ($service->isTemplate()) return $user->hasPermissionTo('gd-bearbeiten');
-        return $user->hasPermissionTo('gd-allgemein-bearbeiten') && $this->hasCityPermission($user, $service);
+        return $this->delete($user, $service);
     }
 
     /**
@@ -147,7 +144,6 @@ class ServicePolicy
      */
     public function forceDelete(User $user, Service $service)
     {
-        if ($service->isTemplate()) return $user->hasPermissionTo('gd-bearbeiten');
-        return $user->hasPermissionTo('gd-allgemein-bearbeiten') && $this->hasCityPermission($user, $service);
+        return $this->delete($user, $service);
     }
 }

@@ -45,6 +45,7 @@ return [
         ],
         'Administration' => [
             \App\UI\Modules\AdminModule::class,
+            \App\UI\Modules\PapierkorbModule::class,
         ],
         'Information' => [
             \App\UI\Modules\InfoModule::class,

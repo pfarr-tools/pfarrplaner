@@ -34,10 +34,12 @@ use App\Models\AbstractModel;
 use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
 use App\Tools\StringTool;
+use App\Traits\TracksDeletedByTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Replacement
@@ -47,6 +49,8 @@ class Replacement extends AbstractModel
 {
 
     use HasFactory;
+    use TracksDeletedByTrait;
+    use SoftDeletes;
 
     protected static string $prefix = 'replacement';
     protected static string $prefixPlural = 'replacements';
@@ -72,6 +76,17 @@ class Replacement extends AbstractModel
     protected $casts = ['from' => 'datetime', 'to' => 'datetime'];
 
     protected $with = ['pool'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (Replacement $replacement) {
+            if ($replacement->isForceDeleting()) {
+                $replacement->users()->sync([]);
+            }
+        });
+    }
 
     /**
      * @return BelongsTo

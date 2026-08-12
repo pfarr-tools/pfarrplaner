@@ -78,27 +78,7 @@ class DownloadController extends Controller
      */
     public function attachment(Request $request, Attachment $attachment, $prettyName = '')
     {
-        if (get_class($attachment->attachable) == Service::class) {
-            if (!Auth::user()->can('update', $attachment->attachable)) {
-                abort(403);
-            }
-            if (!Auth::user()->can('gd-bearbeiten')) {
-                abort(403);
-            }
-            if (!Auth::user()->writableCities->contains($attachment->attachable->city)) {
-                abort(403);
-            }
-        } else {
-            if ((null !== $attachment->attachable->service) && (!Auth::user()->can('update', $attachment->attachable->service))) {
-                abort(403);
-            }
-            if (!Auth::user()->can('gd-kasualien-bearbeiten')) {
-                abort(403);
-            }
-            if ((null !== $attachment->attachable->service) && (!Auth::user()->writableCities->contains($attachment->attachable->service->city))) {
-                abort(403);
-            }
-        }
+        $this->authorize('update', $attachment);
 
         $prettyName = $prettyName ? FileHelper::normalizeFilename($prettyName) :
             (FileHelper::normalizeFilename($attachment->title) ?? $attachment->id) . '.' . pathinfo(

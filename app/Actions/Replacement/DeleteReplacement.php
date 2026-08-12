@@ -47,7 +47,6 @@ class DeleteReplacement extends AbstractDeleteAction implements DeletesReplaceme
     public function delete(User $user, Replacement $replacement): ?bool
     {
         Gate::forUser($user)->authorize('delete', $replacement);
-        $replacement->users()->sync([]);
         $result = $replacement->delete();
         DeletedReplacement::dispatch($user, $replacement);
         $this->messages = ['success' => 'Die Vertretung wurde gelöscht.'];

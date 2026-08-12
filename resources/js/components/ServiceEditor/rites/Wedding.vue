@@ -154,7 +154,7 @@ export default {
     props: ['wedding', 'showService', 'showPastor'],
     methods: {
         deleteWedding() {
-            if (!confirm('Willst du diese Trauung wirklich unwiderruflich löschen?')) return;
+            if (!confirm('Willst du diese Trauung wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.')) return;
             this.$inertia.delete(route('weddings.destroy', {modelId: this.wedding.id}), {preserveState: false});
         },
         spouseName(index) {

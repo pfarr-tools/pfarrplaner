@@ -39,18 +39,37 @@ class AttachmentPolicy
 {
     use HandlesAuthorization;
 
+    /**
+     * @param User $user
+     * @param Attachment $attachment
+     * @return bool
+     */
     public function update(User $user, Attachment $attachment): bool
     {
-        $attachable = $attachment->attachable;
+        $attachable = $attachment->resolveAttachableIncludingTrashed();
 
+        if (!$attachable) {
+            return false;
+        }
+
+        if (method_exists($attachable, 'trashed') && $attachable->trashed()) {
+            return false;
+        }
+
+        $service = null;
         if ($attachable instanceof Service) {
-            return $user->can('update', $attachable);
+            $service = $attachable;
+        } elseif (method_exists($attachable, 'service')) {
+            $service = $attachable->service;
+            if ((null === $service) && isset($attachable->service_id) && $attachable->service_id) {
+                $service = Service::withTrashed()->find($attachable->service_id);
+            }
         }
 
-        if ($attachable && isset($attachable->service) && $attachable->service) {
-            return $user->can('update', $attachable->service);
+        if ($service && method_exists($service, 'trashed') && $service->trashed()) {
+            return false;
         }
 
-        return false;
+        return $user->can('update', $attachable);
     }
 }
