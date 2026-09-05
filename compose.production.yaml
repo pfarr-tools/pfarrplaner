@@ -1,0 +1,126 @@
+name: pfarrplaner-production
+
+x-app: &app
+  build: {context: ., dockerfile: Dockerfile, target: production}
+  working_dir: /var/www/html
+  env_file:
+    - path: .env
+      required: false
+  volumes:
+    - ./src/storage:/var/www/html/storage
+    - ./backups:/var/backups/pfarrplaner
+  depends_on:
+    mariadb: {condition: service_healthy}
+    redis: {condition: service_healthy}
+    minio: {condition: service_healthy}
+  networks: [backend]
+
+services:
+  app:
+    <<: *app
+    command: >-
+      php artisan octane:start --server=swoole --host=0.0.0.0 --port=8000
+      --workers=${OCTANE_WORKERS:-4} --max-requests=${OCTANE_MAX_REQUESTS:-500}
+    restart: unless-stopped
+    expose: ["8000"]
+    healthcheck: {test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8000/up"], interval: 10s, timeout: 5s, retries: 10}
+  web:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["127.0.0.1:${APP_PORT:-8080}:80"]
+    volumes:
+      - public_assets:/var/www/html/public:ro
+      - ./docker/caddy/Caddyfile.production:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app: {condition: service_healthy}
+      public-assets: {condition: service_completed_successfully}
+    networks: [frontend, backend]
+  public-assets:
+    <<: *app
+    user: root
+    command: sh -lc "rm -rf /public/* && cp -a /var/www/html/public/. /public/"
+    volumes: [public_assets:/public]
+    restart: "no"
+    depends_on: {app: {condition: service_healthy}}
+    networks: [backend]
+  horizon:
+    <<: *app
+    command: php artisan horizon
+    restart: unless-stopped
+  scheduler:
+    <<: *app
+    command: php artisan schedule:work
+    restart: unless-stopped
+  mariadb:
+    image: mariadb:11
+    command: ["--max_allowed_packet=256M"]
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE:?DB_DATABASE muss gesetzt sein}
+      MARIADB_USER: ${DB_USERNAME:?DB_USERNAME muss gesetzt sein}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD muss gesetzt sein}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD muss gesetzt sein}
+    volumes: [mariadb_data:/var/lib/mysql]
+    healthcheck: {test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -p\"$$MARIADB_ROOT_PASSWORD\" --silent"], interval: 5s, timeout: 5s, retries: 20}
+    networks: [backend]
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: [redis-server, --appendonly, "yes", --requirepass, "${REDIS_PASSWORD:?REDIS_PASSWORD muss gesetzt sein}"]
+    volumes: [redis_data:/data]
+    healthcheck: {test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"], interval: 5s, timeout: 3s, retries: 20}
+    networks: [backend]
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID:?AWS_ACCESS_KEY_ID muss gesetzt sein}
+      MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY:?AWS_SECRET_ACCESS_KEY muss gesetzt sein}
+    volumes: [minio_data:/data]
+    healthcheck: {test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9000/minio/health/live"], interval: 10s, timeout: 5s, retries: 20}
+    networks: [backend]
+  create-buckets:
+    image: minio/mc:latest
+    restart: "no"
+    env_file:
+      - path: .env
+        required: false
+    entrypoint: >-
+      /bin/sh -lc 'until mc alias set local http://minio:9000
+      "$${AWS_ACCESS_KEY_ID}" "$${AWS_SECRET_ACCESS_KEY}"; do sleep 2; done;
+      mc mb --ignore-existing local/$${AWS_BUCKET}; mc mb --ignore-existing local/$${MINIO_BACKUP_BUCKET};'
+    depends_on: {minio: {condition: service_healthy}}
+    networks: [backend]
+  soketi:
+    image: quay.io/soketi/soketi:latest
+    restart: unless-stopped
+    environment:
+      SOKETI_DEFAULT_APP_ID: ${PUSHER_APP_ID:?PUSHER_APP_ID muss gesetzt sein}
+      SOKETI_DEFAULT_APP_KEY: ${PUSHER_APP_KEY:?PUSHER_APP_KEY muss gesetzt sein}
+      SOKETI_DEFAULT_APP_SECRET: ${PUSHER_APP_SECRET:?PUSHER_APP_SECRET muss gesetzt sein}
+    networks: [backend]
+  postfix:
+    profiles: [mail]
+    build: {context: docker/postfix}
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./secrets:/run/secrets:ro
+    networks: [backend]
+
+networks:
+  frontend:
+  backend:
+    internal: true
+volumes:
+  mariadb_data:
+  redis_data:
+  minio_data:
+  caddy_data:
+  caddy_config:
+  public_assets:

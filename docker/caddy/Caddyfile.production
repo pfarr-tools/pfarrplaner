@@ -1,0 +1,6 @@
+:80 {
+    root * /var/www/html/public
+    encode gzip
+    reverse_proxy app:8000
+    file_server
+}

@@ -1,0 +1,174 @@
+# Pfarrplaner: Installation, Migration und Betrieb
+
+Dieses Dokument ist das verbindliche Installations- und Migrationshandbuch für
+die Docker-Struktur von Pfarrplaner. Vor jeder Übernahme oder Aktualisierung
+werden ein Backup, ein Testlauf und eine dokumentierte Rückfallmöglichkeit
+benötigt.
+
+## Zielstruktur und Erstinstallation
+
+Die Betriebsdateien liegen am Repository-Root, der Laravel-Code unter
+`src/`. Der Pflichtkern besteht aus PHP-FPM, Caddy, MariaDB, Redis, MinIO,
+Horizon, Scheduler und Soketi. Dauerhafte Anwendungsdateien liegen im
+MinIO-Bucket; lokale Volumes enthalten nur Laufzeitdaten, Logs und temporäre
+Dateien. Die Entwicklungsumgebung verwendet `compose.yaml` mit PHP-FPM, die
+Produktion `compose.production.yaml` mit Laravel Octane/Swoole.
+
+Voraussetzungen sind Docker Engine mit Compose Plugin, mindestens 2 CPU-Kerne,
+4 GB RAM, ausreichend Speicher für MariaDB, MinIO und Backups, ein DNS-Name
+mit TLS sowie ein unabhängiges Backup-Ziel außerhalb des Servers.
+
+```sh
+./planer bootstrap
+```
+
+Der Horizon-Zugang wird über `HORIZON_ALLOWED_EMAILS` gesteuert. Die Variable
+enthält eine komma-separierte Liste gültiger Benutzer-E-Mail-Adressen:
+
+```env
+HORIZON_ALLOWED_EMAILS=admin@example.org,office@example.org
+```
+
+Leerzeichen werden entfernt und die Prüfung ist unabhängig von Groß- und
+Kleinschreibung. Eine leere Liste gewährt in Produktionsumgebungen niemandem
+Zugriff auf `/horizon`.
+
+`.env` wird nur angelegt, wenn sie fehlt, und niemals überschrieben. Setze
+`APP_KEY`, `APP_ENV`, `APP_URL`, MariaDB-/Redis-Passwörter, MinIO-Zugangsdaten,
+`BACKUP_ARCHIVE_PASSWORD` und ein unabhängiges `BACKUP_S3_ENDPOINT`. Produktion
+verlangt `APP_ENV=production`.
+
+```sh
+./planer up
+./planer artisan migrate
+./planer status
+```
+
+## Sichere Tests und Objektspeicher
+
+```sh
+./planer test
+./planer artisan <befehl>
+```
+
+`./planer test` erzwingt SQLite im Speicher. `./planer artisan test` wird mit
+einer Warnung blockiert und akzeptiert nur die exakte interaktive Eingabe `ja`.
+`./planer fresh` benötigt zusätzlich `--force`.
+
+`FILESYSTEM_DRIVER=s3` und `AWS_ENDPOINT` zeigen auf MinIO oder S3. Der
+Live-Bucket (`AWS_BUCKET`) und der Backup-Bucket (`BACKUP_S3_BUCKET`) müssen
+getrennt sein. Ein Backup-Ziel auf derselben physischen Platte wie die einzige
+MariaDB-/MinIO-Instanz ist kein Disaster-Recovery-Backup.
+
+Bei der Übernahme werden mindestens `storage/app`, `storage/inbox`, öffentliche
+Upload-Verzeichnisse und alle datenbankreferenzierten Dateien geprüft.
+Schlüssel werden nicht umbenannt. Cache, Sessions, Logs und temporäre
+PDF-Dateien werden nicht als langlebige Objekte übernommen.
+
+## Backups und Restore
+
+Spatie Laravel Backup erzeugt ein verschlüsseltes MariaDB-Archiv. MinIO-Objekte
+werden mit derselben Backup-ID in ein unabhängiges S3-/MinIO-Ziel gespiegelt.
+`verify_backup` ist aktiviert; die Retention beträgt standardmäßig 7 Tage
+alle Backups, 16 Tage tägliche, 8 Wochen wöchentliche, 4 Monate monatliche
+und 2 Jahre jährliche Backups.
+
+```sh
+./planer backup create
+./planer backup list
+./planer backup verify
+./planer backup restore ./backups/pfarrplaner-<zeitstempel>.zip --dry-run --confirm
+./planer prod backup create
+```
+
+Ein Restore ist destruktiv und darf nur nach Dry-Run, aktueller Sicherung und
+expliziter Bestätigung erfolgen. Vor dem Produktivbetrieb muss ein Restore in
+einem isolierten Compose-Projekt geübt werden. Alte Legacy-Dateien werden erst
+nach erfolgreicher Abnahme gelöscht.
+
+## Aktualisierung mit kurzer Unterbrechung
+
+```sh
+./planer prod backup create
+./planer prod update --backup-confirmed
+```
+
+Das Update verhindert parallele Ausrollungen, prüft `APP_ENV=production`, baut
+das neue Image vor dem Umschalten, führt Migrationen mit diesem Image aus,
+aktualisiert öffentliche Assets, ersetzt App/Worker/Scheduler und wartet auf
+Gesundheitschecks. `--ref <tag|commit>` baut einen bestimmten Git-Stand.
+
+Migrationen müssen expand-and-contract-kompatibel sein: erst neue Strukturen
+hinzufügen, dann die Anwendung ausrollen, alte Strukturen erst später
+entfernen. Nicht kompatible Änderungen erhalten eine geplante kurze
+Wartungszeit. Das vorherige Image bleibt als Rollback-Grundlage erhalten.
+
+## Datenübertragung und Legacy-Migration
+
+```sh
+./planer data push user@ziel:/opt/pfarrplaner
+./planer data pull user@quelle:/opt/pfarrplaner --source-down
+
+./planer migrate legacy user@altserver:/var/www/pfarrplaner --dry-run
+./planer migrate legacy user@altserver:/var/www/pfarrplaner --confirm
+```
+
+`--database` und `--user` sind optionale Überschreibungen. Standardmäßig liest der
+Legacy-Import `DB_DATABASE`, `DB_USERNAME`, `DB_HOST`, `DB_PORT` und
+`DB_PASSWORD` aus der entfernten `.env`; als Fallback werden `MYSQL_DATABASE`,
+`MYSQL_USER` und `MYSQL_PASSWORD` unterstützt. Die Datei wird als Daten geparst
+und niemals als Shell-Code ausgeführt. Vor dem Import wird die echte
+Datenbankverbindung getestet. Auf dem Legacy-Server muss dafür `mariadb-dump`
+oder `mysqldump` installiert sein.
+
+Befindet sich die alte Datenbank in Docker, erkennt das Skript automatisch den
+ersten laufenden Container mit einem MariaDB-/MySQL-Image und führt den Dump
+über `docker exec` und den MariaDB-Unix-Socket darin aus. Der in der
+Legacy-`.env` konfigurierte Benutzer
+und das dort konfigurierte Passwort bleiben maßgeblich; Container-Umgebungs-
+variablen werden nicht automatisch als Ersatz verwendet. Ein Fehler `1045
+Access denied` bedeutet daher, dass die `.env` nicht zu den tatsächlich
+initialisierten Datenbankzugangsdaten passt oder der Benutzer keinen Zugriff
+vom gewählten Container-Netzwerk hat.
+
+Die kryptografische Identität wird ebenfalls aus der Legacy-`.env` gelesen:
+`APP_KEY`, `DATABASE_KEY` und `DATABASE_CIPHER` sind erforderlich. Diese drei
+Werte werden nach Erstellung des Legacy-Archivs in die lokale Ziel-`.env`
+übernommen, weil sonst Laravel-Cookies und verschlüsselte Datenbankfelder nicht
+lesbar wären. Die lokalen Zielwerte für `DB_HOST`, `DB_PORT`, `DB_DATABASE`,
+`DB_USERNAME`, `DB_PASSWORD`, `APP_URL` und MinIO bleiben unverändert. Vor der
+Änderung wird eine Kopie unter `backups/legacy/target-env-<zeitstempel>.env`
+angelegt und bei einem Fehler automatisch zurückgespielt.
+
+`data push/pull` übertragen MariaDB per logischem Dump und den Live-MinIO-
+Bucket; Backup-Buckets bleiben unberührt. Der Legacy-Import erstellt SQL-/
+Dateiarchive mit SHA-256-Prüfsummen. Daten aus `failed_jobs` sowie den
+Telescope-Tabellen werden beim Dump bewusst ausgelassen; die Tabellenstrukturen
+bleiben erhalten. Anschließend importiert der Prozess MariaDB, führt Migrationen aus,
+überträgt `storage/app` und `storage/inbox` und lässt die alte Installation
+unverändert.
+
+## Optionaler Maildienst
+
+```sh
+docker compose -f compose.production.yaml --profile mail up -d postfix
+```
+
+Postfix ist send-only und hat keinen öffentlichen Port 25. SMTP-Relay wird
+über `MAIL_RELAY_HOST`/`MAIL_RELAY_PORT` mit TLS und optionaler Authentifizierung
+konfiguriert. Direkte MX-Zustellung benötigt zusätzlich PTR/rDNS, SPF, DKIM,
+DMARC, stabile Hostnamen, TLS und Bounce-Überwachung. DNS, rDNS und Mail-
+Reputation werden beim Provider eingerichtet; SMTP-Relay bleibt empfohlen.
+
+## Fehlerbehebung und Rollback
+
+```sh
+./planer prod status
+./planer prod logs app
+./planer prod logs web
+./planer prod logs mariadb
+```
+
+Bei Fehlern nicht blind `migrate:fresh` ausführen. Gesundheitsstatus und
+Migration prüfen, gegebenenfalls das vorige Image starten und anschließend
+das getestete Datenbank-/Objektbackup wiederherstellen.
