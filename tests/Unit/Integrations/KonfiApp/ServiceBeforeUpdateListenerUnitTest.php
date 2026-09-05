@@ -35,23 +35,41 @@ class ServiceBeforeUpdateListenerUnitTest extends TestCase
         $newDate = Carbon::parse('2026-07-27 09:30:00', 'UTC');
 
         $integration = Mockery::mock(KonfiAppIntegration::class);
+        $receivedService = null;
+        $receivedChange = null;
         $integration->shouldReceive('handleServiceUpdate')
             ->once()
-            ->withArgs(function (Service $passedService, int $requestedChange) use ($service, $newDate) {
-                return $passedService->is($service)
-                    && ($requestedChange === 17)
-                    && $passedService->date->equalTo($newDate);
+            ->withArgs(function (Service $passedService, $requestedChange) use (&$receivedService, &$receivedChange) {
+                $receivedService = $passedService;
+                $receivedChange = $requestedChange;
+
+                return true;
             });
 
-        $listener = Mockery::mock(ServiceBeforeUpdateListener::class)
-            ->makePartial()
-            ->shouldAllowMockingProtectedMethods();
-        $listener->shouldReceive('isIntegrationActive')->once()->with($city)->andReturn(true);
-        $listener->shouldReceive('resolveIntegration')->once()->with($city)->andReturn($integration);
+        $listener = new class($integration) extends ServiceBeforeUpdateListener {
+            public function __construct(private KonfiAppIntegration $integration)
+            {
+            }
+
+            protected function isIntegrationActive(City $city): bool
+            {
+                return true;
+            }
+
+            protected function resolveIntegration(City $city): KonfiAppIntegration
+            {
+                return $this->integration;
+            }
+        };
 
         $listener->handle(new ServiceBeforeUpdate($service, [
             'konfiapp_event_type' => 17,
             'date' => $newDate,
         ]));
+
+        $this->assertNotNull($receivedService);
+        $this->assertTrue($receivedService->is($service));
+        $this->assertSame(17, $receivedChange);
+        $this->assertTrue($receivedService->date->equalTo($newDate));
     }
 }

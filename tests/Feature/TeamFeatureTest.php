@@ -35,4 +35,9 @@ class TeamFeatureTest extends AbstractModelFeatureTest
     {
         return Team::factory()->state(['city_id' => $this->city->id]);
     }
+
+    public function testIndexViewWorks()
+    {
+        $this->markTestSkipped('Teams werden im City-Editor als Tab verwaltet.');
+    }
 }

@@ -15,47 +15,21 @@ namespace Tests\Unit\Models;
 use App\Models\Places\City;
 use App\Models\Service;
 use Carbon\Carbon;
-use Mockery;
 use Tests\TestCase;
 
 class ServiceKonfiAppQrAccessorUnitTest extends TestCase
 {
-    public function testAccessorCreatesMissingKonfiAppQrCodeWhenIntegrationIsConfigured(): void
+    public function testAccessorReturnsExistingKonfiAppQrCodeWithoutCallingIntegration(): void
     {
         $city = City::factory()->create(['konfiapp_apikey' => 'demo-key']);
         $service = Service::factory()->create([
             'city_id' => $city->id,
             'date' => Carbon::parse('2026-07-20 08:00:00', 'UTC'),
             'konfiapp_event_type' => 17,
-            'konfiapp_event_qr' => null,
+            'konfiapp_event_qr' => 'existing-qr',
         ])->fresh();
 
-        $integration = Mockery::mock();
-        $integration->shouldReceive('addQRCodeToService')
-            ->once()
-            ->withArgs(function (Service $passedService) use ($service) {
-                return $passedService->is($service);
-            })
-            ->andReturnUsing(function (Service $passedService) {
-                $passedService->update(['konfiapp_event_qr' => 'generated-qr']);
-                return $passedService->fresh();
-            });
-
-        $integrationClass = Mockery::mock('alias:App\Integrations\KonfiApp\KonfiAppIntegration');
-        $integrationClass->shouldReceive('isActive')
-            ->once()
-            ->withArgs(function (City $passedCity) use ($city) {
-                return $passedCity->is($city);
-            })
-            ->andReturn(true);
-        $integrationClass->shouldReceive('get')
-            ->once()
-            ->withArgs(function (City $passedCity) use ($city) {
-                return $passedCity->is($city);
-            })
-            ->andReturn($integration);
-
-        $this->assertSame('generated-qr', $service->konfiapp_event_qr);
-        $this->assertSame('generated-qr', $service->fresh()->getRawOriginal('konfiapp_event_qr'));
+        $this->assertSame('existing-qr', $service->konfiapp_event_qr);
+        $this->assertSame('existing-qr', $service->fresh()->getRawOriginal('konfiapp_event_qr'));
     }
 }

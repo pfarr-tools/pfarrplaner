@@ -73,6 +73,14 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
 
             $eventMeta = new class {
                 public bool $is_allday = false;
+
+                /**
+                 * @return string
+                 */
+                public function descriptionText(): string
+                {
+                    return 'Eine ausführliche Veranstaltungsbeschreibung für den Folienumbruch';
+                }
             };
 
             return new class($index, $service, $eventMeta) {

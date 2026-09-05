@@ -195,7 +195,7 @@ class ServiceApiFeatureTest extends TestCase
             ->deleteJson(route('api.service.destroy', $service->slug));
 
         $response->assertOk();
-        $this->assertNull(Service::withoutGlobalScopes()->find($id));
+        $this->assertSoftDeleted('services', ['id' => $id]);
     }
 
     /**
