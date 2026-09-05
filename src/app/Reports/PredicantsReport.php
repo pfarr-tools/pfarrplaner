@@ -1,0 +1,233 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace App\Reports;
+
+use App\Models\Places\City;
+use App\Models\Calendar\Day;
+use App\Models\Service;
+use App\Services\FileNameService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use PhpOffice\PhpWord\Exception\Exception;
+use PhpOffice\PhpWord\Shared\Converter;
+use PhpOffice\PhpWord\Style\Font;
+use PhpOffice\PhpWord\Style\Section;
+
+/**
+ * Class PredicantsReport
+ * @package App\Reports
+ */
+class PredicantsReport extends AbstractWordDocumentReport
+{
+    public const FILE_SIGNATURE = '50.0';
+    public const FILE_TITLE = 'Prädikant_innenanforderung';
+
+    /**
+     * @var string
+     */
+    public $title = 'Prädikant:innenanforderung';
+    /**
+     * @var string
+     */
+    public $group = 'Formulare';
+    /**
+     * @var string
+     */
+    public $description = 'Vorausgefülltes Prädikant:innenformular für das Dekanatamt';
+
+    protected $inertia = true;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->title = config('labels.predicant').'nenanforderung';
+        $this->description = 'Vorausgefülltes '.config('labels.predicant').'nenformular für das Dekanatamt';
+    }
+
+    /**
+     * @return \Inertia\Response
+     */
+    public function setup()
+    {
+        $maxDate = Day::orderBy('date', 'DESC')->limit(1)->get()->first();
+        $cities = Auth::user()->cities;
+        return Inertia::render('Report/Predicants/Setup', compact('cities'));
+    }
+
+    /**
+     * @param Request $request
+     * @return string|void
+     * @throws Exception
+     */
+    public function render(Request $request)
+    {
+        $data = $request->validate(
+            [
+                'cities.*' => 'required|int|exists:cities,id',
+                'start' => 'required|string',
+                'end' => 'required|string',
+            ]
+        );
+
+        $start = $this->parseDateInput($data['start']);
+        $end = $this->parseDateInput($data['end']);
+
+        $cities = City::whereIn('id', $data['cities'])->get();
+        $serviceList = Service::between($start, $end)
+            ->notHidden()
+            ->whereDoesntHave('funerals')
+            ->where('need_predicant', 1)
+            ->inCities($cities)
+            ->ordered()
+            ->get()
+            ->groupBy('key_date');
+
+
+        $this->wordDocument->setDefaultFontName('Arial');
+        $this->wordDocument->setDefaultFontSize(11);
+        $section = $this->wordDocument->addSection(
+            [
+                'orientation' => Section::ORIENTATION_LANDSCAPE,
+                'marginTop' => Converter::cmToTwip('1.59'),
+                'marginBottom' => Converter::cmToTwip('2'),
+                'marginLeft' => Converter::cmToTwip('2'),
+                'marginRight' => Converter::cmToTwip('2.5'),
+            ]
+        );
+
+
+        $section->addText(
+            'Anforderung von '.config('labels.predicant').'nen bzw. Pfarrer:innen im Ruhestand über das Dekanatamt',
+            [
+                'size' => 13,
+                'bold' => true,
+            ],
+            [
+                'alignment' => 'center',
+                "borderSize" => 6,
+                "borderColor" => "000000",
+                'spaceAfter' => 0,
+            ]
+        );
+
+        for ($i = 1; $i <= 3; $i++) {
+            $section->addText('', [], ['spaceAfter' => 0]);
+        }
+        $section->addText(
+            'Für ' . $cities->pluck('name')->join(' / '),
+            [],
+            [
+                "borderSize" => 6,
+                "borderColor" => "000000",
+                'indentation' => ['right' => Converter::cmToTwip(10.5)],
+                'spaceAfter' => 0,
+            ]
+        );
+        for ($i = 1; $i <= 4; $i++) {
+            $section->addText('', [], ['spaceAfter' => 0]);
+        }
+
+        $this->wordDocument->addTableStyle(
+            'table',
+            [
+                'borderSize' => 6,
+                'borderColor' => '000000',
+            ],
+            []
+        );
+
+        $table = $section->addTable('table');
+        $table->addRow();
+        $textRun = $table->addCell(Converter::cmToTwip(3.25))->addTextRun();
+        $textRun->addText('Datum', ['bold' => true]);
+        $textRun->addTextBreak();
+
+        $textRun = $table->addCell(Converter::cmToTwip(5))->addTextRun();
+        $textRun->addText('Kirche /', ['bold' => true]);
+        $textRun->addTextBreak();
+        $textRun->addText('Gemeindezentrum', ['bold' => true]);
+
+        $textRun = $table->addCell(Converter::cmToTwip(3.75))->addTextRun();
+        $textRun->addText('Beginn des', ['bold' => true]);
+        $textRun->addTextBreak();
+        $textRun->addText('Gottesdienstes', ['bold' => true]);
+
+        $textRun = $table->addCell(Converter::cmToTwip(6))->addTextRun();
+        $textRun->addText('Abendmahl / Taufe /', ['bold' => true]);
+        $textRun->addTextBreak();
+        $textRun->addText('Bemerkungen', ['bold' => true]);
+
+        $textRun = $table->addCell(Converter::cmToTwip(7.25))->addTextRun();
+        $textRun->addText(
+            'Rückmeldung Dekanatamt',
+            [
+                'bold' => true,
+                'underline' => Font::UNDERLINE_SINGLE,
+                'italic' => true,
+            ]
+        );
+        $textRun->addTextBreak();
+        $textRun->addText('GD-Vertretung übernimmt:', ['bold' => true]);
+
+        foreach ($serviceList as $services) {
+            foreach ($services as $service) {
+                $table->addRow();
+                $textRun = $table->addCell(Converter::cmToTwip(3.25))->addTextRun();
+                $textRun->addText($service->date->format('d.m.Y'));
+                $textRun->addTextBreak();
+                $table->addCell(Converter::cmToTwip(5))->addText($service->locationTextWithCity);
+                $table->addCell(Converter::cmToTwip(3.25))->addText($service->timeText());
+                $table->addCell(Converter::cmToTwip(6))->addText($service->descriptionText());
+                $table->addCell(Converter::cmToTwip(7.25));
+            }
+        }
+
+        return $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE.' '.$cities->pluck('name')->join(' '),
+                'docx',
+                static::FILE_SIGNATURE,
+                [$start->format('d.m.Y'), $end->format('d.m.Y')])
+        );
+    }
+
+    protected function parseDateInput(string $date): Carbon
+    {
+        if (str_contains($date, '.')) {
+            return Carbon::createFromFormat('d.m.Y', $date, 'Europe/Berlin');
+        }
+
+        return Carbon::parse($date, 'Europe/Berlin');
+    }
+
+}

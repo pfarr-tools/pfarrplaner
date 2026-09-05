@@ -1,0 +1,87 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace App\Models\People;
+
+use App\Models\AbstractModel;
+use App\Models\Places\City;
+use App\Traits\HasCityScopes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Team extends AbstractModel
+{
+    use HasFactory, HasCityScopes;
+
+    protected static string $prefix = 'team';
+    protected static string $prefixPlural = 'teams';
+    public static array $exceptRoutes = [
+        'web' => ['show'],
+        'api' => ['show'],
+    ];
+    public static array $validationRules = [
+        'name' => 'required|string',
+        'city_id' => 'required|int|exists:cities,id',
+        'users' => 'nullable|array',
+        'users.*' => 'nullable|int|exists:users,id',
+    ];
+    public static $relationsForIndex = ['city', 'users'];
+    public static $relationsForEditor = ['city', 'users'];
+
+    protected $fillable = ['name', 'city_id'];
+
+    public static function getVuePath($page)
+    {
+        return match ($page) {
+            'index' => 'Teams/Index',
+            'editor' => 'Teams/TeamEditor',
+            default => parent::getVuePath($page),
+        };
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class);
+    }
+
+    public function fillDefaults(): array
+    {
+        return [
+            'users' => collect(),
+        ];
+    }
+
+}

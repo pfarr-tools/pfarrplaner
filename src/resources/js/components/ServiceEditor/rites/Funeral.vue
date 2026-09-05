@@ -1,0 +1,156 @@
+<!--
+  - Pfarrplaner
+  -
+  - @package Pfarrplaner
+  - @author Christoph Fischer <chris@toph.de>
+  - @copyright (c) Christoph Fischer, https://christoph-fischer.org
+  - @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+  - @link https://codeberg.org/pfarr.tools/pfarrplaner
+  - @version git: $Id$
+  -
+  - Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+  -
+  - Pfarrplaner is based on the Laravel framework (https://laravel.com).
+  - This file may contain code created by Laravel's scaffolding functions.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU General Public License for more details.
+  -
+  - You should have received a copy of the GNU General Public License
+  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<template>
+    <div class="funeral row">
+        <div class="col-md-2" v-if="showService">
+            {{ moment(funeral.service.date).format('DD.MM.YYYY') }}<br/>
+            {{ funeral.service.timeText }}<br/>
+            {{ funeral.service.locationText }}
+            <div v-if="showPastor">
+                <participants :participants="funeral.service.pastors"/>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <b>{{ funeral.buried_name }}</b><br/>
+            <div v-if="funeral.dob && funeral.dod" style="font-size: .8em;">
+                {{ moment(funeral.dob).format('DD.MM.YYYY') }} - {{ moment(funeral.dod).format('DD.MM.YYYY') }}
+                ({{ funeral.age }})
+            </div>
+            <div style="font-size: .8em;">
+                {{ funeral.type }}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div>
+                <checked-process-item :check="(funeral.appointment)" negative="Trauergespräch noch nicht vereinbart">
+                    <template #positive>
+                        <a :href="route('funeral.appointment.ical', funeral)" title="In den Kalender übernehmen">
+                            <span class="mdi mdi-calendar"></span> Trauergespräch am
+                            {{ DateTime.fromISO(funeral.appointment).setZone('Europe/Berlin' , {keepLocalTime: true}).setLocale('de').toLocaleString(DateTime.DATETIME_SHORT) }} Uhr
+                        </a>
+                    </template>
+                </checked-process-item>
+                <dimissorial-check-item :parent="funeral" />
+                <checked-process-item :check="(funeral.text)" negative="Predigttext noch nicht eingetragen">
+                    <template #positive>
+                        <bible-reference title="Predigttext:" :perikope="{ Bibelstelle: funeral.text }" inline="1" />
+                    </template>
+                </checked-process-item>
+                <checked-process-item :check="(funeral.announcement)"
+                                      negative="Abkündigungstermin noch nicht festgelegt">
+                    <template #positive>
+                        Abkündigung im GD am {{ moment(funeral.announcement).locale('de').format('LL') }}
+                    </template>
+                </checked-process-item>
+            </div>
+            <div>
+                <checked-process-item :check="funeral.processed" positive="Ins Kirchenbuch eingetragen" negative="Noch nicht ins Kirchenbuch eingetragen" />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <file-drag-receiver multi
+                                v-model="myFuneral.attachments"
+                                :upload-route="route('funeral.attach', funeral.id)" :key="Object.keys(myFuneral.attachments).length">
+                    <attachment v-for="(attachment,key,index) in funeral.attachments" :key="'attachment_'+key"
+                                :attachment="attachment"/>
+                    <fake-attachment :href="route('funeral.form', {funeral: funeral.id})"
+                                     title="Formular für Kirchenregisteramt" extension="pdf"
+                                     icon="mdi mdi-file-pdf-box" size="ca. 135 kB"/>
+            </file-drag-receiver>
+        </div>
+        <div class="col-md-1 text-end">
+            <a class="btn btn-sm btn-light" title="Bestattung bearbeiten"
+               :href="route('funerals.edit', {modelId: funeral.id})"><span class="mdi mdi-pencil"></span></a>
+            <button class="btn btn-sm btn-danger" title="Bestattung löschen"
+                    @click.prevent="deleteFuneral"><span class="mdi mdi-delete"></span></button>
+        </div>
+    </div>
+
+</template>
+
+<script>
+import CheckedProcessItem from "../../Ui/elements/CheckedProcessItem";
+import Attachment from "../../Ui/elements/Attachment";
+import DetailsInfo from "../../Service/DetailsInfo";
+import Participants from "../../Calendar/Service/Participants";
+import FakeAttachment from "../../Ui/elements/FakeAttachment";
+import FileDragReceiver from "../../Ui/elements/FileDragReceiver";
+import AttachmentList from "../../Ui/elements/AttachmentList";
+import BibleReference from "../../LiturgyEditor/Elements/BibleReference";
+import DimissorialCheckItem from "../../RiteEditors/DimissorialCheckItem";
+import { DateTime } from 'luxon';
+
+export default {
+    name: "Funeral",
+    components: {
+        DimissorialCheckItem,
+        BibleReference,
+        AttachmentList,
+        FileDragReceiver,
+        FakeAttachment,
+        Participants,
+        DetailsInfo,
+        Attachment,
+        CheckedProcessItem,
+        DateTime,
+    },
+    props: ['funeral', 'showService', 'showPastor'],
+    data() {
+        return {
+            myFuneral : this.funeral,
+            DateTime: DateTime,
+        }
+    },
+    methods: {
+        deleteFuneral() {
+            if (!confirm('Willst du diese Beerdigung wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.')) return;
+            this.$inertia.delete(route('funerals.destroy', {modelId: this.funeral.id}), {preserveState: false});
+            },
+        downloadForm() {
+            window.location.href = route('funeral.form', {funeral: this.funeral.id});
+        }
+    }
+
+}
+</script>
+
+<style scoped>
+.attachment {
+    width: 100%;
+    text-align: left;
+    margin-bottom: .25rem;
+    vertical-align: middle;
+}
+
+.mdi-download {
+    margin-right: 20px;
+    color: gray;
+}
+</style>

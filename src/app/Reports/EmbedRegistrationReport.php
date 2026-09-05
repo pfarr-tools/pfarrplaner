@@ -1,0 +1,213 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Created by PhpStorm.
+ * User: Christoph Fischer
+ * Date: 02.11.2019
+ * Time: 12:30
+ */
+
+namespace App\Reports;
+
+
+use App\Http\CORS;
+use App\Models\Seating\Booking;
+use App\Models\Service;
+use Carbon\Carbon;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\MessageBag;
+use Illuminate\View\View;
+use Inertia\Inertia;
+
+/**
+ * Class EmbedContactLookupReport
+ * @package App\Reports
+ */
+class EmbedRegistrationReport extends AbstractEmbedReport
+{
+
+    /**
+     * @var string
+     */
+    public $title = 'Anmeldung zu Gottesdiensten';
+    /**
+     * @var string
+     */
+    public $group = 'Website (Gemeindebaukasten)';
+    /**
+     * @var string
+     */
+    public $description = 'Erzeugt HTML-Code für die Einbindung einer Anmeldebox für Gottesdienste';
+    /**
+     * @var string
+     */
+    public $icon = 'fa fa-file-code';
+
+    protected $inertia = true;
+
+    /**
+     * @return \Inertia\Response
+     */
+    public function setup()
+    {
+        $cities = Auth::user()->cities;
+        return Inertia::render('Report/EmbedRegistration/Setup', compact('cities'));
+    }
+
+    /**
+     * @param Request $request
+     * @return Application|Factory|View|string
+     */
+    public function render(Request $request)
+    {
+        $request->validate(
+            [
+                'cors-origin' => 'required|url',
+                'includeCities' => 'nullable',
+                'includeCities.*' => 'nullable|exists:cities,id',
+                'singleDay' => 'nullable|date',
+                'singleService' => 'nullable|exists:services,id',
+            ]
+        );
+        $cities = join(',', $request->get('includeCities', []));
+        $corsOrigin = CORS::formatUrl($request->get('cors-origin'));
+        $report = $this->getKey();
+        $singleDay = $request->get('singleDay', '');
+        $singleService = $request->get('singleService', '');
+        if ($singleDay != '') $singleDay = Carbon::createFromFormat('d.m.Y', $singleDay)->format('Y-m-d');
+
+        $url = route('report.embed', compact('report', 'cities', 'corsOrigin', 'singleDay', 'singleService'));
+        $randomId = uniqid();
+
+        $html = \Illuminate\Support\Facades\View::make('reports.embedregistration.render', compact('url', 'randomId'))->render();
+        $title = 'HTML-Code für Onlineanmeldungen erstellen';
+
+        return Inertia::render('Report/EmbedRegistration/Render', compact('html', 'title'));
+    }
+
+
+    /**
+     * @param Request $request
+     * @return Response|Application|Factory|View|string
+     */
+    public function embed(Request $request)
+    {
+        $cities = $request->get('cities', []);
+        if (!is_array($cities)) {
+            $cities = explode(',', $cities);
+        }
+
+        $noScript = $request->get('noScript', 0);
+        $singleService = $request->get('singleService', '');
+
+        $singleDay = $request->get('singleDay', '');
+        if ($singleDay != '') {
+            $start = Carbon::createFromFormat('Y-m-d', $request->get('singleDay'))->setTime(0,0,0);
+            $end = $start->copy()->setTime(23.59,59);
+        }else {
+            $start = Carbon::now()->setTime(0,0,0);
+            $end = $start->copy()->addMonth(1);
+        }
+
+
+        $errors = new MessageBag();
+        $success = new MessageBag();
+
+        if ($request->has('name')) {
+            $data = Validator::make(
+                $request->all(),
+                [
+                    'name' => 'required|string',
+                    'first_name' => 'required|string',
+                    'contact' => 'required|string',
+                    'email' => 'nullable|email',
+                    'number' => 'required|int|min:1',
+                    'service' => 'required|int:exists:services,id'
+                ]
+            );
+            $errors = $data->errors();
+            $data = $data->getData();
+            if (count($errors) == 0) {
+                $service = Service::find($data['service']);
+                $test = $service->getSeatFinder()->find($data['number']);
+                if ($test) {
+                    $data['service_id'] = $data['service'];
+                    $data['code'] = Booking::createCode();
+                    $booking = Booking::create($data);
+                    $message = (($data['number'] == 1) ? 'Ihr Platz wurde ' : $data['number'].' Plätze wurden ')
+                        .'erfolgreich reserviert. Falls eine individuelle Platzvergabe erfolgt, erfahren Sie am Eingang, '
+                        .'wo genau Sie sitzen.';
+                    $success->add('success', $message);
+                } else {
+                    $message = ($data['number'] == 1 ? 'Leider konnte kein Platz für Sie reserviert werden.' : 'Leider konnten keine ' . $data['number'] . ' zusammenhängendende Plätze für Sie reserviert werden.');
+                    $errors->add('sorry', $message);
+                }
+            }
+        }
+
+        if ($singleService) {
+            $tmpServices = Service::with('day')->where('id', $singleService)->get();
+        } else {
+            $tmpServices = Service::where('needs_reservations', 1)
+                ->between($start, $end)
+                ->inCities($cities)
+                ->where('hidden', '!=', 1)
+                ->ordered()
+                ->get();
+        }
+
+        $services = [];
+        foreach ($tmpServices as $service) {
+            $services[$service->date->format('Ymd')][] = $service;
+        }
+
+
+        $corsOrigin = $request->get('corsOrigin', '');
+        $report = $this->getKey();
+        $url = route('report.embed', compact('report', 'corsOrigin', 'singleDay', 'singleService', 'noScript'));
+
+        $randomId = uniqid();
+        /** @var Response $response */
+        $response = response()
+            ->view(
+                $this->getViewName('embed'),
+                compact('randomId', 'services', 'url', 'cities', 'errors', 'success', 'singleService', 'noScript')
+            );
+
+
+        return $response;
+    }
+}

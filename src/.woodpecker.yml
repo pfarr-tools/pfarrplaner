@@ -1,0 +1,23 @@
+when:
+  event: tag
+
+steps:
+  build-and-push:
+    image: docker
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      DOCKER_USERNAME:
+        from_secret: DOCKER_USERNAME
+      DOCKER_PASSWORD:
+        from_secret: DOCKER_PASSWORD
+    commands:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - "docker build -t pfarrtools/pfarrplaner:${CI_COMMIT_TAG} ."
+      - "docker tag pfarrtools/pfarrplaner:${CI_COMMIT_TAG} pfarrtools/pfarrplaner:latest"
+      - "docker push pfarrtools/pfarrplaner:${CI_COMMIT_TAG}"
+      - "docker push pfarrtools/pfarrplaner:latest"
+    when:
+      event: tag
+

@@ -1,0 +1,82 @@
+
+Installation
+============
+
+Der Pfarrplaner läuft auf einer LAMP-Plattform unter Apache 2 und MySQL/MariaDB. 
+Folgende Schritte sind zur Installation einer eigenen Instanz notwendig:
+
+### Voraussetzungen installieren
+
+- PHP installieren (Version 8.1 oder neuer, mit folgenden Extensions: mysql, soap, mbstring)
+- Apache installieren und einrichten. Der verwendete Virtualhost muss auf *Pfarrplaner-Ordner*/public zeigen.
+- MySQL oder MariaDB installieren, eine Datenbank und den zugehörigen Benutzer einrichten
+- Composer installieren
+- Node.js/NPM installieren. (Hinweis: Bei einer Node-Version ab 17 sollte folgende Option gesetzt werden: ````export NODE_OPTIONS="--openssl-legacy-provider"````)
+
+### Pfarrplaner installieren
+
+````bash
+git clone https://codeberg.org/pfarr.tools/pfarrplaner.git
+cd pfarrplaner
+mkdir bootstrap/cache
+chmod -R 777 bootstrap/cache
+composer install
+npm install
+npm run prod
+````
+
+### Pfarrplaner konfigurieren
+
+.env-Datei anlegen:
+````bash
+cp .env.example .env
+````
+
+Schlüssel für Session und Datenbank anlegen:
+
+````
+php artisan key:generate
+php artisan key:database
+````
+
+
+Anschließend die Datei .env bearbeiten und alle wichtigen Felder 
+(v.a. Datenbank-Zugangsdaten) ausfüllen.
+
+### Datenbankstruktur anlegen
+````bash
+php artisan migrate
+````
+
+### Setup ausführen
+
+````bash
+php artisan install:setup
+````
+
+Jetzt sollte es möglich sein, sich als Administrator anzumelden. Die Zugangsdaten dazu werden als Ergebnis des letzten 
+Schritts angezeigt.
+
+### Cache vorbelegen
+````bash
+php artisan optimize
+````
+
+# Updates installieren
+
+Mit dem Artisan-Befehl ````ìnstall:updates```` werden neue Updates aus dem Git-Repository auf Codeberg
+automatisch geladen und die notwendigen Aktionen ausgeführt.
+
+````bash
+cd pfarrplaner
+php artisan install:updates
+````
+
+Mit der Option ````--dry-run```` ist es möglich, nur zu prüfen, ob ein Update vorhanden ist
+und welche Änderungen damit verbunden sind.
+
+````bash
+cd pfarrplaner
+php artisan install:updates --dry-run
+````
+

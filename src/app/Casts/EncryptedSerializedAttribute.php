@@ -1,0 +1,58 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace App\Casts;
+
+use Illuminate\Support\Str;
+
+class EncryptedSerializedAttribute extends EncryptedAttribute
+{
+
+    public function get($model, $key, $value, $attributes)
+    {
+        $decrypted = parent::get($model, $key, $value, $attributes);
+        if (is_string($decrypted) && Str::startsWith($decrypted, '_____')) $decrypted = substr($decrypted, 5);
+        while (is_string($decrypted)) {
+            $unserialized = @unserialize($decrypted);
+            // unserialize() returns false both on failure and for a serialized false value;
+            // only stop if it actually failed (i.e. input wasn't the serialization of false)
+            if ($unserialized === false && $decrypted !== 'b:0;') break;
+            $decrypted = $unserialized;
+            if (is_string($decrypted) && Str::startsWith($decrypted, '_____')) $decrypted = substr($decrypted, 5);
+        }
+        return $decrypted;
+    }
+
+    public static function encrypt($value)
+    {
+        return parent::encrypt(serialize($value));
+    }
+
+}

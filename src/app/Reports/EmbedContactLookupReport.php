@@ -1,0 +1,182 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Created by PhpStorm.
+ * User: Christoph Fischer
+ * Date: 02.11.2019
+ * Time: 12:30
+ */
+
+namespace App\Reports;
+
+
+use App\Models\Parish;
+use App\Models\Places\StreetRange;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
+use Inertia\Inertia;
+
+/**
+ * Class EmbedContactLookupReport
+ * @package App\Reports
+ */
+class EmbedContactLookupReport extends AbstractEmbedReport
+{
+
+    /**
+     * @var string
+     */
+    public $title = 'Ansprechpartner finden';
+    /**
+     * @var string
+     */
+    public $group = 'Website (Gemeindebaukasten)';
+    /**
+     * @var string
+     */
+    public $description = 'Erzeugt HTML-Code für die Einbindung einer Ansprechpartner-Box in die Website der Gemeinde';
+    /**
+     * @var string
+     */
+    public $icon = 'fa fa-file-code';
+
+    protected $inertia = true;
+
+    /**
+     * @return \Inertia\Response
+     */
+    public function setup()
+    {
+        $cities = Auth::user()->cities;
+        return Inertia::render('Report/EmbedContactLookup/Setup', compact('cities'));
+    }
+
+    /**
+     * @param Request $request
+     * @return Application|Factory|View|string
+     */
+    public function render(Request $request)
+    {
+        $request->validate(
+            [
+                'cors-origin' => 'required|url',
+                'includeCities' => 'required',
+                'includeCities.*' => 'required|exists:cities,id',
+            ]
+        );
+        $cities = join(',', $request->get('includeCities'));
+        $corsOrigin = $request->get('cors-origin');
+        $report = $this->getKey();
+
+        $url = route('report.embed', compact('report', 'cities', 'corsOrigin'));
+        $randomId = uniqid();
+
+        $title = 'HTML-Code für Ansprechpartnerformular erstellen';
+        $html = \Illuminate\Support\Facades\View::make('reports.embedcontactlookup.html', compact('url', 'randomId'))->render();
+
+        return Inertia::render('Report/EmbedContactLookup/Render', compact('html', 'title'));
+    }
+
+
+    /**
+     * @param Request $request
+     * @return Response|Application|Factory|View|string
+     */
+    public function embed(Request $request)
+    {
+        if ($request->has('city')) {
+            $cities = [$request->get('city')];
+        } elseif($request->has('resultCities')) {
+             $cities = $request->get('resultCities');
+        } else {
+            $cities = $request->get('cities');
+            if(!is_array($cities)) $cities = explode(',', $cities);
+        }
+
+        $street = $request->get('street', '');
+        $number = $request->get('number', '');
+
+        $streetRanges = StreetRange::whereHas(
+            'parish',
+            function ($query) use ($cities) {
+                $query->whereIn('parishes.city_id', $cities);
+            }
+        )->get();
+
+        $streets = [];
+
+        /** @var StreetRange $streetRange */
+        foreach ($streetRanges as $streetRange) {
+            $streets[$streetRange->name] = $streetRange->name;
+        }
+        ksort($streets);
+
+        $randomId = uniqid();
+        $corsOrigin = $request->get('cors-origin');
+        $report = $this->getKey();
+
+        $parish = false;
+        if ($request->has('parish')) {
+            $parish = Parish::findOrFail($request->get('parish'));
+        } elseif (($street != '') && ($number != '')) {
+            $parish = Parish::byAddress($street, $number)->inCities($cities)->first();
+        } elseif ($request->cookie('parish')) {
+            $parish = Parish::findOrFail($request->cookie('parish'));
+        }
+
+        $url = route('report.embed', compact('report', 'corsOrigin'));
+        $report = $this->getKey();
+
+        if (null === $parish) {
+            $randomId = uniqid();
+            $corsOrigin = $request->get('cors-origin');
+            return $this->renderView('render', compact('url', 'randomId'));
+        }
+
+
+        /** @var Response $response */
+        $response = response()
+            ->view(
+                $this->getViewName('embed'),
+                compact('cities', 'street', 'number', 'streets', 'randomId', 'url', 'parish', 'report')
+            );
+
+        if (false !== $parish) {
+            $response->withCookie('parish', $parish->id);
+        }
+
+        return $response;
+    }
+}

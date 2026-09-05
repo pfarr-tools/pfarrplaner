@@ -1,0 +1,41 @@
+@extends('layouts.app', ['noNavBar' => 1, 'noNav' => 1])
+
+@section('title', 'Dienstanfrage')
+
+@section('content')
+    <form method="post" action="{{ route('ministry.request.fill', ['ministry' => $ministry, 'user' => $user, 'services' => $services->pluck('id')->join(','), 'sender' => $sender] + request()->query()) }}">
+        @csrf
+        @component('components.ui.card')
+            @slot('cardHeader')
+                Dienstanfrage für "{{ $ministryTitle }}"
+            @endslot
+            @slot('cardFooter')
+                <button type="submit" class="btn btn-primary">Absenden</button>
+            @endslot
+
+            <p>Guten Tag, {{ $user->fullName() }}!</p>
+            <p>Bei welchem der folgenden Gottesdienste könnten Sie den Dienst "{{ $ministryTitle }}" übernehmen? Bitte kreuzen Sie einfach an:</p>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Zusagen</th>
+                        <th>Gottesdienst</th>
+                        <th>Bereits eingetragen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach ($services as $service)
+                    <tr>
+                        <td>@checkbox(['name' => 'services['.$service->id.']', 'label' => ''])</td>
+                        <td><b>{{$service->date->isoFormat('dddd, DD. MMMM YYYY')}} {{$service->timeText()}}</b><br /> {{$service->locationText()}}</td>
+                        <td>{{ $service->participantsText($ministry, true) }}</td>
+                    </tr>
+                @endforeach
+
+                </tbody>
+            </table>
+
+        @endcomponent
+    </form>
+@endsection

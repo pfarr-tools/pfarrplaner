@@ -1,0 +1,506 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace App\Http\Controllers;
+
+use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
+use App\Events\ServiceBeforeDelete;
+use App\Events\ServiceBeforeUpdate;
+use App\Events\ServiceUpdated;
+use App\Http\Requests\ServiceRequest;
+use App\Http\Resources\ServiceResource;
+use App\Integrations\KonfiApp\KonfiAppIntegration;
+use App\Liturgy\LiturgySheets\LiturgySheets;
+use App\Models\Attachment;
+use App\Models\Places\City;
+use App\Models\Calendar\Day;
+use App\Models\LiturgyInfo;
+use App\Models\Location;
+use App\Models\Service;
+use App\Models\ServiceGroup;
+use App\Models\Tag;
+use App\Services\GiroCodeService;
+use App\Services\RedirectorService;
+use App\Traits\HandlesAttachmentsTrait;
+use Carbon\Carbon;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
+use Inertia\Inertia;
+
+
+/**
+ * Class ServiceController
+ * @package App\Http\Controllers
+ */
+class ServiceController extends Controller
+{
+
+    use HandlesAttachmentsTrait;
+
+    public function __construct()
+    {
+        $this->middleware('auth')->except(['publicLiturgy']);
+    }
+
+    /**
+     * @param ServiceRequest $request
+     * @param Service $service
+     */
+    protected function updateFromRequest(ServiceRequest $request, Service $service): void
+    {
+        $service->associateParticipants($request, $service);
+        $service->checkIfPredicantNeeded();
+
+        $service->tags()->sync($request->get('tags') ?: []);
+        $service->serviceGroups()->sync(ServiceGroup::createIfMissing($request->get('serviceGroups') ?: []));
+        $service->updateRelatedCitiesFromRequest($request);
+        $service->setAdConfigFromRequest($request);
+    }
+
+    protected function presetDataForNewService($date = null, City $city = null): Array {
+        $data = [];
+        $location = $city ? $city->locations->first() : null;
+        $date = $date ? Carbon::parse($date) : Carbon::parse('next Sunday');
+        if ($location && $location->default_time) {
+            $date = Carbon::parse($date->format('Y-m-d') . ' ' . $location->default_time, 'Europe/Berlin');
+        } else {
+            $date = Carbon::parse($date->format('Y-m-d') . ' 10:00:00', 'Europe/Berlin');
+        }
+        return [
+            'city_id' => $city ? $city->id : null,
+            'date' => $date->setTimezone('UTC'),
+            'location_id' => $location ? $location->id : null,
+        ];
+    }
+
+    public function create(City $city, $date = null)
+    {
+        Gate::authorize('create', Service::class);
+        $service = Service::create($this->presetDataForNewService($date, $city));
+        return redirect()->route('service.edit', $service->slug);
+    }
+
+    public function createEvent($filter, $date = null)
+    {
+        Gate::authorize('create', Service::class);
+        $localCalendar = LocalEventCalendarFactory::get($filter);
+        $service = Service::create($localCalendar->presetData($this->presetDataForNewService($date, null)));
+        return redirect()->route('service.edit', $service->slug);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param Request $request
+     * @param Service $service
+     * @param string $tab optional tab name
+     * @return Response
+     */
+    public function edit(Request $request, Service $service, $tab = 'home')
+    {
+        Gate::authorize('update', $service);
+        $tab = $request->get('tab', 'home');
+        $service->load(
+            ['attachments', 'comments', 'bookings', 'liturgyBlocks', 'tags', 'serviceGroups', 'relatedCities', 'adConfigs']
+        );
+        $service->setAppends(
+            [
+                'pastors',
+                'organists',
+                'sacristans',
+                'otherParticipants',
+                'descriptionText',
+                'locationText',
+                'dateText',
+                'timeText',
+                'baptismsText',
+                'descriptionText',
+                'liturgy',
+                'ministriesByCategory',
+                'isShowable',
+                'isEditable',
+                'isDeletable',
+                'isMine',
+                'titleText',
+                'liveDashboardUrl',
+                'datetime',
+                'seating',
+                'remainingCapacity',
+                'maximumCapacity',
+                'freeSeatsText',
+                'hasSeats',
+
+            ]
+        );
+
+        $availableCities = Auth::user()->cities;
+
+        $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
+        $liturgySheets = LiturgySheets::all();
+
+        $liturgyInfo = LiturgyInfo::select(['id', 'date', 'title', 'litColor'])->orderBy('date')->get();
+
+        $backRoute = RedirectorService::backRoute();
+
+        $tags = Tag::all();
+        $serviceGroups = ServiceGroup::all();
+
+        $adsConfig = config('ads');
+        $adChannels = $service->city->getActiveAdChannels();
+
+        return Inertia::render(
+            'serviceEditor',
+            compact(
+                'service',
+                'locations',
+                'tab',
+                'tags',
+                'serviceGroups',
+                'liturgySheets',
+                'backRoute',
+                'availableCities',
+                'liturgyInfo',
+                'adsConfig',
+                'adChannels',
+            )
+        );
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param ServiceRequest $request
+     * @param Service $service
+     * @return Response
+     */
+    public function update(ServiceRequest $request, Service $service)
+    {
+        $service->trackChanges();
+        $originalParticipants = $service->participants;
+
+        $validatedData = $request->validated();
+
+        // emit event, so that integrations can react to the intended update
+        event(new ServiceBeforeUpdate($service, $validatedData));
+
+        $service->fill($validatedData);
+        $service->slug = $service->createSlug();
+        $service->setDefaultOfferingValues();
+        $this->updateFromRequest($request, $service);
+        $service->save();
+
+        $this->handleAttachments($request, $service);
+        $this->handleIndividualAttachment($request, $service, 'songsheet');
+        $this->handleIndividualAttachment($request, $service, 'sermon_image');
+
+        $success = '';
+        if ($service->isChanged()) {
+            $service->storeDiff();
+            event(new ServiceUpdated($service, $originalParticipants));
+            $success = 'Der Gottesdienst wurde mit geänderten Angaben gespeichert.';
+        }
+
+        $service->refresh();
+
+        if ($request->get('format', null) == 'json') {
+            return \response()->json($service);
+        }
+
+
+        $closeAfterSaving = $request->get('closeAfterSaving', 1);
+        if ($closeAfterSaving) {
+            $route = $request->get('routeBack') ?: '';
+            if ($route) {
+                return redirect($route)->with('success', $success);
+            } else {
+                if (RedirectorService::backRoute() == route('calendar')) {
+                    RedirectorService::setReturnRoute(route('calendar', ['date' => $service->date->format('Y-m')]));
+                }
+                return RedirectorService::back();
+            }
+        } else {
+            return redirect()->route('service.edit', $service->slug);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param Service $service
+     * @return Response
+     */
+    public function destroy(Service $service)
+    {
+        Gate::authorize('delete', $service);
+        $date = $service->date->format('Y-m');
+
+        // emit event so that integrations may react to impending delete
+        event(new ServiceBeforeDelete($service));
+
+        $service->delete();
+        return redirect()->route('calendar', $date)
+            ->with('success', 'Die Veranstaltung wurde gelöscht.');
+    }
+
+    /**
+     * @param $date
+     * @param $city
+     * @return Application|Factory|\Illuminate\View\View
+     */
+    public function add($date, City $city)
+    {
+        Gate::authorize('create', Service::class);
+        $day = Day::find($date);
+
+        $data = [
+            'city_id' => $city->id,
+            'day_id' => $day->id,
+            'location_id' => $city->locations->first()->id,
+        ];
+
+        if ($city->konfiapp_default_type) {
+            $data['konfiapp_event_type'] = $city->konfiapp_default_type;
+        }
+
+        $service = Service::create($data);
+        $service->update(['slug' => $service->createSlug()]);
+        return redirect()->route('service.edit', $service->slug);
+    }
+
+    /**
+     * Export a service as ical
+     * @param $service Service
+     */
+    public function ical(Service $service)
+    {
+        $services = [$service];
+        $raw = View::make('ical.ical', ['services' => $services, 'token' => null]);
+
+        $raw = str_replace(
+            "\r\n\r\n",
+            "\r\n",
+            str_replace('@@@@', "\r\n", str_replace("\n", "\r\n", str_replace("\r\n", '@@@@', $raw)))
+        );
+        return response($raw, 200)
+            ->header('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+            ->header('Expires', '0')
+            ->header('Content-Type', 'text/calendar')
+            ->header('Content-Disposition', 'inline; filename=' . $service->slug . '.ics');
+    }
+
+    /**
+     * Return timestamp of last update
+     */
+    public function lastUpdate()
+    {
+        $lastUpdated = Service::inCities(Auth::user()->cities->pluck('id'))
+            ->orderBy('updated_at', 'DESC')
+            ->first();
+        $lastCreated = Service::inCities(Auth::user()->cities->pluck('id'))
+            ->orderBy('created_at', 'DESC')
+            ->first();
+
+        if ($lastUpdated->updated_at > $lastCreated->created_at) {
+            $service = $lastUpdated;
+            $timestamp = $service->updated_at;
+        } else {
+            $service = $lastCreated;
+            $timestamp = $service->created_at;
+        }
+
+        $route = route(
+            'calendar',
+            [
+                'year' => $service->date->format('Y'),
+                'month' => $service->date->format('m'),
+                'highlight' => $service->id,
+                'slave' => 1
+            ]
+        );
+
+        // tie in automatic month switching
+        $timestamp2 = Carbon::createFromTimestamp(Auth::user()->getSetting('display-timestamp', 0));
+        if ($timestamp2 > $timestamp) {
+            $timestamp = $timestamp2;
+            $route = route(
+                'calendar',
+                [
+                    'year' => Auth::user()->getSetting('display-year', date('Y')),
+                    'month' => Auth::user()->getSetting('display-month', date('m')),
+                    'slave' => 1
+                ]
+            );
+        }
+
+        $update = $timestamp->setTimeZone('UTC')->format('Ymd\THis\Z');
+
+        return response()->json(compact('route', 'update', 'service'));
+    }
+
+    /**
+     * @param Request $request
+     * @param Service $service
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function attach(Request $request, Service $service)
+    {
+        Gate::authorize('update', $service);
+        $this->handleAttachments($request, $service);
+        return response()->json($service->attachments);
+    }
+
+    /**
+     * @param Request $request
+     * @param Service $service
+     * @param Attachment $attachment
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function detach(Request $request, Service $service, Attachment $attachment)
+    {
+        Gate::authorize('update', $service);
+        $attachment = $service->attachments()->findOrFail($attachment->id);
+        Storage::delete($attachment->file);
+        $service->attachments()->where('id', $attachment->id)->delete();
+        $attachment->delete();
+        return response()->json($service->attachments);
+    }
+
+    /**
+     * @param Request $request
+     * @param $key
+     * @return array|mixed|string[]
+     */
+    private function arrayFromRequest(Request $request, $key) {
+        if (!$request->has($key)) return [];
+        $value = $request->get($key);
+        if (!is_array($value)) $value = explode(',', $value);
+        return $value;
+    }
+
+    /**
+     * @param int $service
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function data(Request $request, $service)
+    {
+        if ($request->has('load')) {
+            $load = $this->arrayFromRequest($request, 'load');
+        } else {
+            $load = ['location', 'city', 'participants', 'weddings', 'funerals', 'baptisms', 'tags', 'serviceGroups'];
+        }
+        $serviceQuery = Service::setEagerLoads([])->includeAllEventTypes()->where('slug', $service);
+
+        $appends = $this->arrayFromRequest($request, 'append');
+
+        if ($request->has('fields')) {
+            $fields = $this->arrayFromRequest($request, 'fields');
+            if (!in_array('id', $fields)) $fields[] = 'id';
+            if (!in_array('date', $fields)) $fields[] = 'date';
+            $serviceQuery->select($fields);
+        }
+        $service = $serviceQuery->first();
+        if (!$service) return response()->json(null);
+        Gate::authorize('view', $service);
+        if ($request->has('append')) $service->setAppends($appends);
+        foreach ($load as $l) $service->load($l);
+
+        // NOTE: This overrides buggy JSON conversion in JsonResponse
+        return response($service->toJson())->withHeaders(['Content-Type' => 'application/json']);
+    }
+
+    /**
+     * Set the sermon for a service
+     * @param Request $request
+     * @param Service $service
+     * @return JsonResponse
+     */
+    public function setSermon(Request $request, Service $service)
+    {
+        Gate::authorize('update', $service);
+        $data = $request->validate(['sermon_id' => 'int|nullable|exists:sermons,id']);
+        $service->update(['sermon_id' => $data['sermon_id']]);
+        return response()->json($service);
+    }
+
+    public function createQR(Request $request, Service $service)
+    {
+        Gate::authorize('update', $service);
+        if (!$service->city->konfiapp_apikey) abort(404);
+
+        $type = $request->validate(['type' => 'nullable|int'])['type'] ?? $service->city->konfiapp_default_type ?? null;;
+        if (!$type) abort(403);
+
+        $konfiApp = new KonfiAppIntegration($service->city());
+        $service->konfiapp_event_type = $type;
+        $service->konfiapp_event_qr = $konfiApp->createQRCode($service);
+        $service->save();
+
+        return redirect()->route('qr', $service->city->name);
+    }
+
+    /**
+     * Return a EPC code for donations
+     * @return void
+     */
+    public function epc(Service $service)
+    {
+        if (!$service->city->iban) abort(404);
+
+        $purpose = $service->offeringGoal() ?: 'Allgemeine Gemeindearbeit';
+
+        return redirect()->route('qrcode', GiroCodeService::codeValue(
+             $service->city->official_name ?: 'Evang. Kirchengemeinde '.$service->city->name,
+            $service->city->iban,
+            null, // empty amount
+            'Spende: '.$purpose,
+            $service->city->bic ?? null,
+        ));
+    }
+
+
+    /**
+     *
+     */
+    public function publicLiturgy(Service $service)
+    {
+        return view('services.public.liturgy', compact('service'));
+    }
+
+
+}

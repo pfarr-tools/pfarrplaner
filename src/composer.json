@@ -1,0 +1,96 @@
+{
+    "name": "potofcoffee/pfarrplaner",
+    "type": "project",
+    "description": "Eine kollaborative Plattform, die es evangelischen Kirchengemeinden erlaubt, gemeinsam Gottesdienste zu planen, Urlaubskalender zu verwalten und Kasualien zu bearbeiten.",
+    "license": "GPL-3.0-or-later",
+    "version": "2023.25.0",
+    "require": {
+        "php": "^8.4",
+        "ext-dom": "*",
+        "ext-zip": "*",
+        "barryvdh/laravel-ide-helper": "^3.0",
+        "firebase/php-jwt": "^7.0",
+        "google/apiclient": "^2.0",
+        "inertiajs/inertia-laravel": "^3.0",
+        "laravel/boost": "^2.0",
+        "laravel/framework": "^13.0",
+        "laravel/octane": "^2.11",
+        "laravel/sanctum": "^4.0",
+        "laravel/tinker": "^3.0",
+        "laravel/ui": "^4.0",
+        "league/flysystem-aws-s3-v3": "~3.10",
+        "league/flysystem-sftp-v3": "~3.10",
+        "nesbot/carbon": "^3.0",
+        "peregrinus/bible-reference-parser": "^1.0.2",
+        "phpoffice/phppresentation": "^1.2.0",
+        "phpoffice/phpspreadsheet": "^2.0",
+        "phpoffice/phpword": "^1.2.0",
+        "predis/predis": "^2.0",
+        "psr/log": "^3",
+        "sabre/dav": "^4.4",
+        "simshaun/recurr": "^5.0",
+        "spatie/browsershot": "^5.0",
+        "spatie/laravel-backup": "^10.0",
+        "spatie/laravel-ignition": "^2.0",
+        "spatie/laravel-permission": "^6.12",
+        "spiral/roadrunner-cli": "*",
+        "spiral/roadrunner-http": "*",
+        "staudenmeir/belongs-to-through": "^2.3",
+        "tightenco/ziggy": "^1.0",
+        "zircote/swagger-php": "^6.1"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.24",
+        "filp/whoops": "^2.0",
+        "laravel/dusk": "^8.0",
+        "laravel/legacy-factories": "^1.1",
+        "laravel/telescope": "^5.10",
+        "mockery/mockery": "^1.0",
+        "nunomaduro/collision": "^8.1",
+        "phpunit/phpunit": "^12.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": [
+                "laravel/telescope"
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeds/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
+        ],
+        "post-update-cmd": [
+            "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+            "php artisan ide-helper:generate",
+            "php artisan ide-helper:meta",
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ]
+    }
+}

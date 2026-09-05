@@ -1,0 +1,86 @@
+<!--
+  - Pfarrplaner
+  -
+  - @package Pfarrplaner
+  - @author Christoph Fischer <chris@toph.de>
+  - @copyright (c) Christoph Fischer, https://christoph-fischer.org
+  - @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+  - @link https://codeberg.org/pfarr.tools/pfarrplaner
+  - @version git: $Id$
+  -
+  - Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+  -
+  - Pfarrplaner is based on the Laravel framework (https://laravel.com).
+  - This file may contain code created by Laravel's scaffolding functions.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU General Public License for more details.
+  -
+  - You should have received a copy of the GNU General Public License
+  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<script>
+    export default {
+        name: 'CreateServiceWizardButton',
+        props: ['cities', 'type', 'date', 'events', 'title'],
+        data() {
+            return {
+                myClass: this.type ? 'btn-'+this.type : 'btn-light',
+                myDate: moment(this.date).format('YYYY-MM-DD'),
+                myTitle: this.title || (this.events ? 'Veranstaltung anlegen' : 'Gottesdienst anlegen'),
+            }
+        },
+        methods: {
+            createNewEntry(city) {
+                if (!this.events) {
+                    this.$inertia.get(route('service.create', {city: city.id, date: this.myDate}));
+                } else {
+                    this.$inertia.get(route('event.create', {
+                        filter: 'city:'+city.id,
+                        date: moment(this.date).format('YYYY-MM'),
+                    }));
+                }
+            }
+        }
+    }
+
+</script>
+
+<template>
+    <div class="createServiceWizardButton">
+        <inertia-link v-if="cities.length == 1" class="btn me-1" :class="myClass" :title="myTitle"
+                      :href="route('service.create', {city: cities[0].id, date: myDate})">
+            <span class="mdi mdi-church"></span> <span
+            class="d-none d-md-inline">{{ myTitle }}</span>
+        </inertia-link>
+        <div class="dropdown" v-if="cities.length > 1">
+            <button v-if="cities.length > 1" type="button" class="btn dropdown-toggle me-1" :class="myClass" :title="myTitle"
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="mdi mdi-church"></span> <span
+                class="d-none d-md-inline">{{ myTitle }}</span>
+                <span class="visually-hidden">Weitere Optionen aufklappen</span>
+            </button>
+            <div class="dropdown-menu p-1">
+                <button v-for="city in cities" type="button" class="dropdown-item" :key="city.name+city.id"
+                   @click="createNewEntry(city)">{{ city.name }}</button>
+                <hr class="dropdown-divider" v-if="!events">
+                <inertia-link class="dropdown-item" :href="route('inputs.setup', 'multipleServices')" v-if="!events">
+                    Mehrere Gottesdienste auf einmal anlegen...
+                </inertia-link>
+            </div>
+        </div>
+
+
+    </div>
+
+</template>
+
+<style scoped>
+</style>

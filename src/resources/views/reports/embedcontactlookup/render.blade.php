@@ -1,0 +1,18 @@
+@extends('layouts.app')
+
+@section('title', 'HTML-Code einbinden')
+
+@section('content')<script defer>document.addEventListener("DOMContentLoaded", function(event) {
+                @component('reports.embedhtml')
+        var url = '{{ $url }}';
+                var parish;
+                if (parish=localStorage.getItem('parish')) url = url + '&parish='+parish;
+                fetch(url).then((res) => {return res.text();}).then((data) => {document.getElementById('{{ $randomId }}').innerHTML = data;});});
+        </script>
+        <div id="{{ $randomId }}">Bitte warten, Daten werden geladen...</div>
+    @endcomponent
+@endsection
+
+@section('scripts')
+    <script src="{{ asset('js/pfarrplaner/copy-code.js') }}"></script>
+@endsection

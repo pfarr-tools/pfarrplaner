@@ -1,0 +1,42 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: .docker/dev/php.Dockerfile
+        working_dir: /var/www/html
+        volumes:
+            - .:/var/www/html
+        depends_on:
+            - mariadb
+            - redis
+
+    caddy:
+        image: caddy:2
+        ports:
+            - "8080:80"
+        volumes:
+            - .:/var/www/html
+            - ./.docker/dev/Caddyfile:/etc/caddy/Caddyfile:ro
+        depends_on:
+            - app
+
+    mariadb:
+        image: mariadb:11
+        environment:
+            MARIADB_DATABASE: pfarrplaner
+            MARIADB_USER: pfarrplaner
+            MARIADB_PASSWORD: pfarrplaner
+            MARIADB_ROOT_PASSWORD: root
+        volumes:
+            - pfarrplaner_mariadb:/var/lib/mysql
+
+    redis:
+        image: redis:7-alpine
+
+    mailpit:
+        image: axllent/mailpit
+        ports:
+            - "8025:8025"
+
+volumes:
+    pfarrplaner_mariadb:

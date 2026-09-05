@@ -1,0 +1,158 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Created by PhpStorm.
+ * User: Christoph Fischer
+ * Date: 11.10.2019
+ * Time: 19:03
+ */
+
+namespace App\Tools;
+
+
+use Carbon\Carbon;
+
+/**
+ * Class StringTool
+ * @package App\Tools
+ */
+class StringTool
+{
+    /**
+     * @param $s
+     * @param bool $clockText
+     * @param string $separator
+     * @return string
+     */
+    public static function timeString($s, $clockText = true, $separator = ':')
+    {
+        return Carbon::createFromTimeString($s)->isoFormat('HH' . $separator . 'mm') . ($clockText ? ' Uhr' : '');
+    }
+
+    public static function durationText(Carbon $from, Carbon $to): string
+    {
+        if ($from == $to) {
+            return $from->format('d.m.Y');
+        } elseif ($from->year == $to->year) {
+            return $from->format('d.m.') . ' - ' . $to->format('d.m.Y');
+        } else {
+            return $from->format('d.m.Y') . ' - ' . $to->format('d.m.Y');
+        }
+        return '';
+    }
+
+    /**
+     * @param $count
+     * @param $singular
+     * @param $plural
+     * @param string $zeroString
+     * @return string
+     */
+    public static function pluralString($count, $singular, $plural, $zeroString = '')
+    {
+        if ($count == 0) {
+            return $zeroString ?: $plural;
+        }
+        return ($count == 1) ? $singular : $plural;
+    }
+
+    /**
+     * @param $s
+     * @param $maxLength
+     * @return string
+     */
+    public static function trimToLen($s, $maxLength)
+    {
+        if (strlen($s) > $maxLength) {
+            $offset = ($maxLength - 3) - strlen($s);
+            $s = substr($s, 0, strrpos($s, ' ', $offset)) . '...';
+        }
+        return $s;
+    }
+
+    /**
+     * @param $time
+     * @param bool $uhr
+     * @param string $separator
+     * @param bool $skipMinutes
+     * @param bool $nbsp
+     * @param bool $leadingZero
+     * @return string
+     */
+    public static function timeText(
+        $time,
+        $uhr = true,
+        $separator = ':',
+        $skipMinutes = false,
+        $nbsp = false,
+        $leadingZero = false
+    ) {
+        if (!is_numeric($time)) {
+            $time = strtotime($time);
+        }
+        $format = ($leadingZero ? '%H' : '%k') . $separator . '%M';
+        if ($skipMinutes) {
+            if ((int)strftime('%M', $time) == 0) {
+                $format = '%H';
+            }
+        }
+        return trim(strftime($format, $time) . ($uhr ? ($nbsp ? '&nbsp;' : ' ') . 'Uhr' : ''));
+    }
+
+    /**
+     * @param $text
+     * @return string
+     */
+    public static function indent($text)
+    {
+        $indent = 0;
+        $lines = explode("\n", $text);
+        foreach ($lines as $index => $line) {
+            $line = trim($line);
+            if (substr($line, 0, 2) == '</') {
+                $indent--;
+            } elseif (substr($line, 0, 1) == '<') {
+                $indent++;
+            }
+            $lines[$index] = str_pad($line, 4 * $indent, ' ', STR_PAD_LEFT);
+        }
+        return join("\n", $lines);
+    }
+
+    /**
+     * @param string $s
+     * @return string
+     */
+    public static function sanitizeXMLString(string $s): string
+    {
+        return htmlspecialchars($s, ENT_XML1 | ENT_COMPAT, 'UTF-8');
+    }
+}

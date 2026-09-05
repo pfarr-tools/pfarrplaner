@@ -1,0 +1,159 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace App\UI\Modules;
+
+use App\Http\Controllers\PapierkorbController;
+use App\Models\Liturgy\Psalm;
+use App\Models\Liturgy\Song;
+use App\Models\Liturgy\Text;
+use App\Models\Location;
+use App\Models\Parish;
+use App\Models\People\Team;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Service;
+use App\Models\Tag;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
+
+class AdminModule extends AbstractModule
+{
+    protected $title = 'Administration';
+    protected $icon = 'mdi mdi-account-tie-hat';
+
+    public function addItems(array $items): array
+    {
+        if (count(self::modules())) {
+            $items[] = [
+                'text' => 'Administration',
+                'icon' => 'mdi mdi-shield-account',
+                'url' => route('admin.index'),
+                'active' => request()->is('admin.*'),
+                'inertia' => true,
+            ];
+        }
+        return $items;
+    }
+
+    public static function modules() {
+        $adminMenu = [];
+        $user = Auth::user();
+        $route = Route::currentRouteName();
+
+        // auto-register model routes
+        foreach (\File::allFiles(app_path('Models')) as $file) {
+            if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract'))) {
+                $className = substr('App\\Models\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+                if (method_exists($className, 'getAdminModuleConfig')) {
+                    if ($config = $className::getAdminModuleConfig()) $adminMenu[] = $config;
+                }
+            }
+        };
+
+        if ($user->can('index', User::class)) {
+            $adminMenu[] = [
+                'text' => 'Benutzer',
+                'group' => 'Personen',
+                'icon' => 'mdi mdi-account',
+                'url' => route('users.index'),
+                'active' => $route == 'users.index',
+                'inertia' => true,
+            ];
+        }
+        if ($user->can('index', Team::class)) {
+            $adminMenu[] = [
+                'text' => 'Teams',
+                'group' => 'Personen',
+                'icon' => 'mdi mdi-account-multiple',
+                'url' => route('admin.teams.index'),
+                'active' => $route == 'admin.teams.index',
+                'inertia' => true,
+            ];
+        }
+        if ($user->can('index', Role::class)) {
+            $adminMenu[] = [
+                'text' => 'Benutzerrollen',
+                'group' => 'Personen',
+                'icon' => 'mdi mdi-badge-account',
+                'url' => route('roles.index'),
+                'active' => $route == 'roles.index',
+                'inertia' => true,
+            ];
+        }
+        if ($user->can('viewAny', Psalm::class)) {
+            $adminMenu[] = [
+                'text' => 'Psalmen',
+                'group' => 'Liturgie',
+                'icon' => 'mdi mdi-hands-pray',
+                'url' => route('admin.psalms.index'),
+                'active' => $route == 'admin.psalms.index',
+                'inertia' => true,
+            ];
+        }
+        if ($user->can('viewAny', Song::class)) {
+            $adminMenu[] = [
+                'text' => 'Lieder',
+                'group' => 'Liturgie',
+                'icon' => 'mdi mdi-music',
+                'url' => route('admin.songs.index'),
+                'active' => $route == 'admin.songs.index',
+                'inertia' => true,
+            ];
+        }
+        if ($user->can('viewAny', Text::class)) {
+            $adminMenu[] = [
+                'text' => 'Liturgische Texte',
+                'group' => 'Liturgie',
+                'icon' => 'mdi mdi-text',
+                'url' => route('admin.text.index'),
+                'active' => $route == 'admin.text.index',
+                'inertia' => true,
+            ];
+        }
+        if ($user->can('viewAny', Service::class)) {
+            $adminMenu[] = [
+                'text' => 'Vorlagen',
+                'group' => 'Liturgie',
+                'icon' => 'mdi mdi-text',
+                'url' => route('template.index'),
+                'active' => $route == 'template.index',
+                'inertia' => true,
+            ];
+        }
+        if ($config = PapierkorbController::getAdminModuleConfig()) {
+            $adminMenu[] = $config;
+        }
+        return array_values(collect($adminMenu)->sortBy('text')->toArray());
+    }
+
+}

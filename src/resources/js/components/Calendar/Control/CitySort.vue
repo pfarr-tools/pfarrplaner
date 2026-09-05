@@ -1,0 +1,139 @@
+<!--
+  - Pfarrplaner
+  -
+  - @package Pfarrplaner
+  - @author Christoph Fischer <chris@toph.de>
+  - @copyright (c) Christoph Fischer, https://christoph-fischer.org
+  - @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+  - @link https://codeberg.org/pfarr.tools/pfarrplaner
+  - @version git: $Id$
+  -
+  - Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+  -
+  - Pfarrplaner is based on the Laravel framework (https://laravel.com).
+  - This file may contain code created by Laravel's scaffolding functions.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU General Public License for more details.
+  -
+  - You should have received a copy of the GNU General Public License
+  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<template>
+    <div class="calendar-city-sort">
+        <div class="calendar-city-sort-section">
+            <div class="calendar-city-sort-title">Im Kalender sichtbar</div>
+            <draggable :list="list1" item-key="id" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities" @change="handleChange">
+                <template #item="{ element: city }">
+                    <div class="sortable-city"><span class="mdi mdi-church"></span>
+                        {{ city.name }}
+                    </div>
+                </template>
+            </draggable>
+        </div>
+
+        <div class="calendar-city-sort-section">
+            <div class="calendar-city-sort-title">Ausgeblendet</div>
+            <draggable :list="list2" item-key="id" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities" @change="handleChange">
+                <template #item="{ element: city }">
+                    <div class="sortable-city sortable-city-muted"><span class="mdi mdi-church-outline"></span>
+                        {{ city.name }}
+                    </div>
+                </template>
+            </draggable>
+        </div>
+    </div>
+</template>
+
+<script>
+import draggable from 'vuedraggable'
+import EventBus from "../../../plugins/EventBus";
+import {CalendarNewSortOrderEvent} from '../../../events/CalendarNewSortOrderEvent';
+
+export default {
+    name: 'CalendarControlCitySort',
+    components: {
+        draggable,
+    },
+    props: ['cities'],
+    data() {
+        return {
+            list1: Object.values(this.cities),
+            list2: Object.values(this.$page.props.currentUser.data.hiddenCities),
+            user: this.$page.props.currentUser.data,
+        }
+    },
+    methods: {
+        handleChange() {
+            EventBus.publish(new CalendarNewSortOrderEvent(this.list1));
+
+            var ids = [];
+            this.list1.forEach(function(city){
+                ids.push(city.id);
+            });
+            axios.post(route('setting.set', {user: this.user.id, key: 'sorted_cities'}), {
+                value: ids.join(',')
+            });
+        }
+    }
+}
+</script>
+
+<style scoped>
+.calendar-city-sort {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.calendar-city-sort-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.calendar-city-sort-title {
+    color: #495057;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.sortable-cities {
+    min-height: 3rem;
+    padding: 0.35rem;
+    border: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+.sortable-city {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: 100%;
+    border: 1px solid #dee2e6;
+    list-style: none;
+    padding: 0.55rem 0.7rem;
+    margin: 0 0 0.35rem;
+    border-radius: 0;
+    background: #fff;
+    color: #212529;
+    cursor: move !important;
+}
+
+.sortable-city:last-child {
+    margin-bottom: 0;
+}
+
+.sortable-city-muted {
+    background: #f1f3f5;
+    color: #495057;
+}
+</style>

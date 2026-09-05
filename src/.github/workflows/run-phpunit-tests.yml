@@ -1,0 +1,32 @@
+name: PHPUnit Tests
+
+on: [pull_request, push]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, zip, pdo, pdo_sqlite
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Create .env
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Create required directories
+        run: mkdir -p bootstrap/cache storage/logs storage/app/tmp
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --no-coverage
+

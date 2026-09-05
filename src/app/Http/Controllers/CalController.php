@@ -1,0 +1,121 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace App\Http\Controllers;
+
+use App\Calendars\LocalEventCalendars\LocalEventCalendarFactory;
+use App\Models\Calendar\Day;
+use App\Models\Leave\Absence;
+use App\Models\Places\City;
+use App\Models\Service;
+use App\Services\CalendarService;
+use App\Services\RedirectorService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
+
+class CalController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    public function singleDay($day, City $city)
+    {
+        $day = Carbon::parse($day)->setTime(0,0,0);
+        $services = Service::setEagerLoads([])
+            ->with(['day', 'baptisms', 'funerals', 'weddings', 'participants'])
+            ->whereDate('date', $day)
+            ->inCities([$city->id])
+            ->orderBy('time')
+            ->get();
+
+        $canCreate = Auth::user()->can('create', Service::class);
+
+        // absences
+        $absences = Absence::with('user')->byPeriod($day, $day)
+                ->visibleForUser(Auth::user())
+                ->get();
+
+        return Inertia::render('Calendar/SingleDay', compact('day', 'city', 'services', 'absences', 'canCreate'));
+
+    }
+
+    public function index(Request $request, $date = null, $month = null)
+    {
+        RedirectorService::saveCurrentRoute();
+        if ($month) {
+            $date .= '-' . $month;
+        }
+        $date = ($date ? new Carbon ($date . '-01') : Carbon::now())->setTime(0, 0, 0);
+        if ($date->format('Ym') < 201801) abort(404);
+        $monthEnd = $date->copy()->addMonth(1)->subSecond(1);
+
+        $yearExpression = DB::connection()->getDriverName() == 'sqlite'
+            ? "strftime('%Y', services.date)"
+            : 'YEAR(DATE(services.date))';
+        $years = Service::select(DB::raw('DISTINCT '.$yearExpression.' as year'))
+            ->inCities(Auth::user()->visibleCities)
+            ->orderBy('year', 'ASC')
+            ->get()->pluck('year');
+
+
+        $user = Auth::user();
+        $writableCities = $user->writableCities;
+        $cities = array_values($user->getSortedCities()->map(function ($city) {
+            $city->childIds = $city->is_org ? $city->children->pluck('id')->toArray() : [];
+            return $city;
+        })->all());
+
+        $canCreate = $user->can('create', Service::class);
+        $calendars = LocalEventCalendarFactory::list();
+        $initialCalendarData = CalendarService::buildMonthPayload($date->copy(), $user);
+
+        return Inertia::render(
+            'Calendar/Calendar',
+            compact('date', 'cities', 'years', 'canCreate', 'writableCities', 'calendars', 'initialCalendarData')
+        );
+    }
+
+    public function day(Day $day, City $city)
+    {
+        $services = Service::setEagerLoads([])
+            ->with(['day', 'baptisms', 'funerals', 'weddings', 'participants'])
+            ->where('day_id', $day->id)
+            ->inCities([$city->id])
+            ->orderBy('time')
+            ->get();
+
+        return response()->json($services);
+    }
+}

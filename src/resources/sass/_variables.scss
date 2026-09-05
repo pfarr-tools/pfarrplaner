@@ -1,0 +1,72 @@
+/*!
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+// Body
+$body-bg: #f8fafc;
+
+// Typography
+$font-family-sans-serif: "Sarabun", "Nunito", sans-serif;
+$font-size-base: 0.9rem;
+$font-weight-base: 300;
+$font-weight-bold: 600;
+$line-height-base: 1.6;
+
+// Colors
+$blue: #29447b;
+$indigo: #707aa0;
+$purple: #8d197c;
+$pink: #cb957d;
+$red: #b61231;
+$orange: #dc9018;
+$yellow: #f5d403;
+$green: #518471;
+$teal: #a4b37a;
+$cyan: #5eb3d2;
+
+// Sass modules
+@use "sass:map";
+
+// ELKW color map
+@use "elkw-colors/elkw-colors" as elkw;
+
+// Colors from ELKW map for Bootstrap theme
+$theme-colors: (
+    "primary": map.get(elkw.$elkw-colors, "dunkelviolett"),
+    "success": map.get(elkw.$elkw-colors, "gelbgrün"),
+    "info": map.get(elkw.$elkw-colors, "blaugrün"),
+    "warning": map.get(elkw.$elkw-colors, "gelb"),
+    "danger": map.get(elkw.$elkw-colors, "rot"),
+    "light": map.get(elkw.$elkw-colors, "taubenblau"),
+    "default": map.get(elkw.$elkw-colors, "taubenblau"),
+    "secondary": map.get(elkw.$elkw-colors, "dunkelgrau"),
+);
+
+$enable-rounded: false;
+

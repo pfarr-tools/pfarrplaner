@@ -1,0 +1,233 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace App\Reports;
+
+use App\Models\Calendar\Day;
+use App\Models\Location;
+use App\Models\Service;
+use App\Services\FileNameService;
+use Carbon\Carbon;
+use DateTimeZone;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use PhpOffice\PhpWord\Shared\Converter;
+use PhpOffice\PhpWord\Style\Font;
+use PhpOffice\PhpWord\Style\Section;
+
+
+/**
+ * Class QuarterlyEventsReport
+ * @package App\Reports
+ */
+class QuarterlyEventsReport extends AbstractWordDocumentReport
+{
+
+    public const FILE_SIGNATURE = '35.2';
+    public const FILE_TITLE = 'Quartalsprogramm';
+
+
+    /**
+     * @var string
+     */
+    public $title = 'Quartalsprogramm';
+    /**
+     * @var string
+     */
+    public $group = 'Listen';
+    /**
+     * @var string
+     */
+    public $description = 'Übersicht aller Termine für ein Quartal an einem bestimmten Veranstaltungsort';
+
+    protected $inertia = true;
+
+    /**
+     * @return \Inertia\Response
+     */
+    public function setup()
+    {
+        $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
+        return Inertia::render('Report/QuarterlyEvents/Setup', compact('locations'));
+    }
+
+    /**
+     * @param Request $request
+     * @return string|void
+     */
+    public function render(Request $request)
+    {
+        $data = $request->validate(
+            [
+                'title' => 'required',
+                'quarter' => 'required',
+                'location' => 'required|int|exists:locations,id',
+                'notes1' => 'nullable|string',
+                'notes2' => 'nullable|string',
+            ]
+        );
+
+        $location = Location::findOrFail($data['location']);
+        $title = $data['title'] ?: 'Quartalsprogramm für ' . $location->name;
+        $quarter = Carbon::createFromFormat('Y-m-d', $data['quarter']);
+
+        $serviceList = Service::between($quarter, $quarter->copy()->endOfQuarter())
+            ->displayable($quarter)
+            ->where('location_id', $location->id)
+            ->ordered()
+            ->get()
+            ->groupBy('key_date');
+
+
+        $this->wordDocument->setDefaultFontName('Sarabun Light');
+        $this->wordDocument->setDefaultFontSize(14);
+        $section = $this->wordDocument->addSection(
+            [
+                'orientation' => Section::ORIENTATION_PORTRAIT,
+                'marginTop' => Converter::cmToTwip('1.59'),
+                'marginBottom' => Converter::cmToTwip('2'),
+                'marginLeft' => Converter::cmToTwip('2'),
+                'marginRight' => Converter::cmToTwip('2.5'),
+            ]
+        );
+
+
+        $section->addText(
+            $title,
+            [
+                'size' => 24,
+                'bold' => true,
+            ]
+        );
+        $sectionStyle = $section->getStyle();
+
+        $section->addText('Für das ' . $quarter->quarter . '. Quartal ' . $quarter->year, ['size' => 18]);
+
+        if (isset($data['notes1'])) {
+            $section->addText(str_replace("\n", '<w:br />', $data['notes1']));
+            $section->addText();
+        }
+
+        $this->wordDocument->addTableStyle(
+            'table',
+            [
+                'unit' => 'dxa',
+                'width' => $sectionStyle->getPageSizeW() - $sectionStyle->getMarginLeft(
+                    ) - $sectionStyle->getMarginRight(),
+                'borderSize' => 6,
+                'borderColor' => '000000',
+                'cellMargin' => Converter::cmToTwip('0.2'),
+            ],
+            []
+        );
+
+        $table = $section->addTable('table');
+        $table->addRow();
+        $table->addCell()->addText('Datum', ['bold' => true]);
+        $table->addCell()->addText('Uhrzeit', ['bold' => true]);
+        if ($request->get('includePastor')) {
+            $table->addCell()->addText(config('labels.pastor'), ['bold' => true]);
+        }
+        if ($request->get('includeOrganist')) {
+            $table->addCell()->addText(config('labels.organist'), ['bold' => true]);
+        }
+        if ($request->get('includeSacristan')) {
+            $table->addCell()->addText(config('labels.sacristan'), ['bold' => true]);
+        }
+        if ($request->get('includeDescription')) {
+            $table->addCell()->addText('Hinweise', ['bold' => true]);
+        }
+
+        foreach ($serviceList as $dayList) {
+            foreach ($dayList as $service) {
+                $table->addRow();
+                $table->addCell()->addText($service->date->isoFormat('dd, DD. MMMM'));
+                $table->addCell()->addText($service->timeText());
+                if ($request->get('includePastor')) {
+                    $table->addCell()->addText($service->participantsText('P'));
+                }
+                if ($request->get('includeOrganist')) {
+                    $table->addCell()->addText($service->participantsText('O'));
+                }
+                if ($request->get('includeSacristan')) {
+                    $table->addCell()->addText($service->participantsText('M'));
+                }
+                if ($request->get('includeDescription')) {
+                    $table->addCell()->addText(htmlspecialchars($service->descriptionText()));
+                }
+            }
+        }
+
+        if (isset($data['notes2'])) {
+            $section->addText();
+            $section->addText(str_replace("\n", '<w:br />', $data['notes2']));
+        }
+
+        if ($request->get('includeContact')) {
+            if ($x = Auth::user()->office) {
+                $data[] = $x;
+            }
+            $data[] = Auth::user()->fullName();
+            if ($x = Auth::user()->phone) {
+                $data[] = 'Tel. ' . $x;
+            }
+            $data[] = Auth::user()->email;
+
+            $section->addText();
+            $run = $section->addTextRun();
+            $run->addText('Weitere Informationen:', ['underline' => Font::UNDERLINE_SINGLE]);
+            $run->addText('<w:br />');
+            $run->addText(join(', ', $data));
+        }
+
+        $section->addText(
+            'Stand: ' . Carbon::now()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y, H:i') . ' Uhr',
+            ['size' => 7]
+        );
+
+        Auth::user()->setSetting('quarterly_events_report_title', $request->get('title', ''));
+        Auth::user()->setSetting('quarterly_events_report_notes1', $request->get('notes1', ''));
+        Auth::user()->setSetting('quarterly_events_report_notes2', $request->get('notes2', ''));
+
+
+        return $this->sendToBrowser(
+            FileNameService::make(
+                static::FILE_TITLE,
+                'docx',
+                static::FILE_SIGNATURE,
+                $quarter,
+                false,
+                null,
+                'Y-Q'.$quarter->quarter,
+            )
+        );
+    }
+}

@@ -1,0 +1,219 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace App\Inputs;
+
+use App\Events\ServiceUpdated;
+use App\Models\Location;
+use App\Models\People\Participant;
+use App\Models\People\Team;
+use App\Models\Service;
+use App\Models\People\User;
+use Carbon\Carbon;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
+use Inertia\Inertia;
+
+/**
+ * Class PlanningInput
+ * @package App\Inputs
+ */
+class PlanningInput extends AbstractInput
+{
+
+    /**
+     * @var string
+     */
+    public $title = 'Planungstabelle';
+    public $description = 'Beliebige Dienste für einen bestimmten Zeitraum eintragen';
+
+    public function canEdit(): bool
+    {
+        return Auth::user()->can('gd-pfarrer-bearbeiten') ||
+            Auth::user()->can('gd-organist-bearbeiten') ||
+            Auth::user()->can('gd-mesner-bearbeiten') ||
+            Auth::user()->can('gd-allgemein-bearbeiten');
+    }
+
+    /**
+     * @param Request $request
+     * @return Application|Factory|View
+     */
+    public function setup(Request $request)
+    {
+        $cities = Auth::user()->writableCities;
+        $locations = Location::inCities($cities->pluck('id'))->get();
+
+        $ministries = $this->getAvailableMinistries(
+            Participant::all()
+                ->pluck('category')
+                ->unique()
+        );
+
+        return Inertia::render('Inputs/Planning/PlanningInputSetup', compact('cities', 'ministries', 'locations'));
+    }
+
+    /**
+     * @param $reqMinistries
+     * @return array
+     */
+    protected function getAvailableMinistries($reqMinistries)
+    {
+        $ministries = [];
+        foreach ($reqMinistries as $ministry) {
+            switch ($ministry) {
+                case 'P':
+                    if (Auth::user()->can('gd-pfarrer-bearbeiten')) {
+                        $ministries[$ministry] = config('labels.pastor');
+                    }
+                    break;
+                case 'O':
+                    if (Auth::user()->can('gd-organist-bearbeiten')) {
+                        $ministries[$ministry] = config('labels.organist');
+                    }
+                    break;
+                case 'M':
+                    if (Auth::user()->can('gd-mesner-bearbeiten')) {
+                        $ministries[$ministry] = config('labels.sacristan');
+                    }
+                    break;
+                case 'A':
+                    if (Auth::user()->can('gd-allgemein-bearbeiten')) {
+                        $ministries[$ministry] = 'Weitere Beteiligte';
+                    }
+                    break;
+                default:
+                    if (Auth::user()->can('gd-allgemein-bearbeiten') || Auth::user()->can(
+                            'gd-freie-dienste-bearbeiten'
+                        )) {
+                        $ministries[$ministry] = $ministry;
+                    }
+            }
+        }
+        return $ministries;
+    }
+
+    /**
+     * @param Request $request
+     * @return Application|Factory|View|void
+     */
+    public function input(Request $request)
+    {
+        $setup = $request->validate(
+            [
+                'from' => 'required|date_format:d.m.Y',
+                'to' => 'required|date_format:d.m.Y',
+                'cities.*' => 'required|exists:cities,id',
+                'locations.*' => 'nullable|exists:locations,id',
+                'ministries.*' => 'required|string',
+            ]
+        );
+
+        $locations = Location::inCities($setup['cities'])->get();
+
+        $teams = Team::with('users')->inCities($setup['cities'])->get();
+
+        $query = Service::with(['city'])
+            ->select('services.slug')
+            ->between(
+                Carbon::createFromFormat('d.m.Y', $setup['from']),
+                Carbon::createFromFormat('d.m.Y', $setup['to'])
+            )
+            ->inCities($setup['cities'])
+            ->ordered();
+
+        if (count($setup['locations'] ?? [])) {
+            $query->whereIn('services.location_id', $setup['locations']);
+        }
+
+        $serviceSlugs = $query->get()->pluck('slug');
+
+        $users = User::visibleFor(Auth::user())->get();
+
+        $ministries = $this->getAvailableMinistries($setup['ministries'] ?: []);
+
+
+        $input = $this;
+
+        return Inertia::render(
+            'Inputs/Planning/PlanningInputForm',
+            compact('serviceSlugs', 'users', 'ministries', 'teams')
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @return RedirectResponse|void
+     */
+    public function save(Request $request)
+    {
+        $data = $request->validate([
+                                       'slug' => 'required|string|exists:services,slug',
+                                       'ministries' => 'required',
+                                   ]);
+
+        $service = Service::where('slug', $data['slug'])->first();
+        $service->trackChanges();
+        $originalParticipants = $service->participants;
+
+        // build existing participants table
+        $participants = [];
+        foreach ($service->participants as $participant) {
+            $participants[$participant->pivot->category][$participant->id] = ['category' => $participant->pivot->category];
+        }
+
+        // replace with new ministry settings
+        foreach ($data['ministries'] as $ministry => $people) {
+            $participants[$ministry] = [];
+            foreach ($people as $person) {
+                $id = is_array($person) ? $person['id'] : $person;
+                $participants[$ministry][$id] = ['category' => $ministry];
+            }
+        }
+
+        $service->participants()->sync([]);
+        if (count($participants)) {
+            foreach ($participants as $category => $participant) {
+                $service->participants()->attach($participant);
+            }
+        }
+
+        if ($service->isChanged()) {
+            $service->storeDiff();
+            event(new ServiceUpdated($service, $originalParticipants));
+        }
+
+        return response()->json($service->slug);
+    }
+}

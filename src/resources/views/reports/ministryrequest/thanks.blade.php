@@ -1,0 +1,14 @@
+@extends('layouts.app', ['noNavBar' => 1, 'noNav' => 1])
+
+@section('title', 'Dienstanfrage')
+
+@section('content')
+    @component('components.ui.card')
+        @slot('cardHeader')
+            Dienstanfrage für "{{ $ministryTitle }}"
+        @endslot
+
+        <p>Herzlichen Dank, {{ $user->fullName() }}!</p>
+        <p>Deine Zusagen wurden eingetragen. Danke für deine Bereitschaft zur Mitarbeit.</p>
+    @endcomponent
+@endsection

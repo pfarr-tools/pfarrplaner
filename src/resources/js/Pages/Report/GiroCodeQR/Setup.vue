@@ -1,0 +1,83 @@
+<!--
+  - Pfarrplaner
+  -
+  - @package Pfarrplaner
+  - @author Christoph Fischer <chris@toph.de>
+  - @copyright (c) Christoph Fischer, https://christoph-fischer.org
+  - @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+  - @link https://codeberg.org/pfarr.tools/pfarrplaner
+  - @version git: $Id$
+  -
+  - Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+  -
+  - Pfarrplaner is based on the Laravel framework (https://laravel.com).
+  - This file may contain code created by Laravel's scaffolding functions.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU General Public License for more details.
+  -
+  - You should have received a copy of the GNU General Public License
+  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<template>
+    <admin-layout title="GiroCodes für Gottesdienste erstellen">
+        <template v-slot:navbar-left>
+            <save-button label="Erstellen" title="GiroCodes für Gottesdienste erstellen" @click="renderReport" />
+        </template>
+        <form method="post" :action="route('reports.render', {report: 'giroCodeQR'})" @submit.prevent="renderReport">
+            <form-csrf-token />
+            <form-selectize name="city" label="GiroCodes für folgende Kirchengemeinde erstellen" v-model="myCity" :options="cities" />
+            <input type="hidden" name="city" v-model="myCity" />
+            <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
+            <form-input name="copies" label="Anzahl Kopien pro QR-Code" type="number" v-model="myCopies" />
+        </form>
+    </admin-layout>
+</template>
+
+<script>
+import SaveButton from "../../../components/Ui/buttons/SaveButton";
+import FormSelectize from "../../../components/Ui/forms/FormSelectize";
+import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
+import FormInput from "../../../components/Ui/forms/FormInput";
+import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
+import { submitReportForm } from "../../../helpers/submitReportForm";
+export default {
+    name: "Setup",
+    props: ['cities', 'start'],
+    components: {FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    data() {
+        let myStart = moment();
+        let myEnd = moment().add(3, 'months');
+        let myCopies = 1;
+
+        return {
+            myCity: this.cities.length ? this.cities[0].id : null,
+            myStart,
+            myEnd,
+            myCopies,
+        }
+    },
+    methods: {
+        renderReport() {
+            submitReportForm(route('reports.render', {report: 'giroCodeQR'}), {
+                city: this.myCity,
+                start: this.myStart,
+                end: this.myEnd,
+                copies: this.myCopies,
+            });
+        },
+    }
+}
+</script>
+
+<style scoped>
+
+</style>

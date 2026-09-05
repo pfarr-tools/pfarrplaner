@@ -1,0 +1,79 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace App\Services;
+
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Service;
+use GuzzleHttp\Client;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
+
+class InstanceRegistryService
+{
+
+    /**
+     * Pings the central registry for Pfarrplaner instances
+     * Note that this is obligatory if you hope to get any kind of help from the developer
+     * concerning your instance.
+     *
+     * @param bool $debug Debug output?
+     * @return void
+     */
+    public static function ping($debug = false) {
+        if (env('NO_PING')) return;
+
+        $package = PackageService::info();
+
+        $data = [
+            'url' => url('/'),
+            'host' => parse_url(url('/'), PHP_URL_HOST),
+            'version' => $package['versionString'],
+            'buildDate' => $package['buildDateString'],
+            'appName' => config('app.name'),
+            'commit' => (new UpdateService())->currentCommit(),
+            'churches' => City::count(),
+            'people' => User::count(),
+            'services' => Service::count(),
+            'env' => App::environment(),
+            'administrator' => config('app.administrator'),
+        ];
+
+        Log::debug('Pinging central registry');
+        $client = new Client();
+        try {
+            $client->post('https://instances.pfarrplaner.de/api/ping', ['form_params' => $data]);
+        } catch (\Exception $exception) {
+            return;
+        }
+    }
+
+}

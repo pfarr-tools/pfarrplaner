@@ -1,0 +1,219 @@
+<!--
+  - Pfarrplaner
+  -
+  - @package Pfarrplaner
+  - @author Christoph Fischer <chris@toph.de>
+  - @copyright (c) Christoph Fischer, https://christoph-fischer.org
+  - @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+  - @link https://codeberg.org/pfarr.tools/pfarrplaner
+  - @version git: $Id$
+  -
+  - Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+  -
+  - Pfarrplaner is based on the Laravel framework (https://laravel.com).
+  - This file may contain code created by Laravel's scaffolding functions.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU General Public License for more details.
+  -
+  - You should have received a copy of the GNU General Public License
+  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<template>
+    <div class="homescreen-configuration-tab">
+        <div class="mb-3 p-1">
+            <div v-if="thirdParty">
+                <form-group id="homeScreen" name="homeScreen" input-id="homeScreenInput" label="Startseite für diese Person" v-slot="field">
+                    <select :id="field.fieldId" name="homeScreen" class="form-control" v-model="settings.homeScreen"
+                            :aria-describedby="field.describedBy || undefined">
+                        <option value="homescreen:configurable">Konfigurierbare Startseite (Standard)</option>
+                        <optgroup v-for="(group,groupKey,groupIndex) in moduleGroups" :label="(groupKey == 'default') ? 'Oberste Menügruppe' : 'Menügruppe '+groupKey">
+                            <option v-for="module in group" :value="'route:'+module.defaultRoute" v-if="module && module.defaultRoute">
+                                Startseite deaktivieren und direkt zum Modul "{{ module.title}}" gehen
+                            </option>
+                        </optgroup>
+                    </select>
+                </form-group>
+            </div>
+        </div>
+        <div class="mb-3 p-1" v-if="settings.homeScreen == 'homescreen:configurable'">
+            <hr />
+            <form-check label="Schaltflächen für das schnelle Erstellen von Kasualien anzeigen"
+                        v-model="settings.homeScreenConfig.wizardButtons" />
+            <form-check :label="thirdParty ? 'Aktuell von dieser Person vertretene Kolleg:innen anzeigen' : 'Aktuell von mir vertretene Kolleg:innen anzeigen'"
+                        v-model="settings.homeScreenConfig.showReplacements" />
+        </div>
+        <div class="row" v-if="settings.homeScreen == 'homescreen:configurable'">
+            <div class="col-md-9 pl-3">
+                <h3>Angezeigte Reiter</h3>
+                <draggable :list="myTabs" item-key="type" group="tabs">
+                    <template #item="{ element: tab, index: tabIndex }">
+                        <div class="tab-block p-1 m-1 rounded-sm">
+                            <div class="row">
+                                <div class="col-1">
+                                    <span class="mdi mdi-drag-horizontal"></span>
+                                </div>
+                                <div class="col-9">
+                                    <div class="text-bold">{{ tab.config.title || availableTabs[tab.type]?.title }}</div>
+                                    <div>{{ availableTabs[tab.type]?.description }}</div>
+                                    <div v-if="tab.configVisible">
+                                        <hr />
+                                        <component :is="configurationComponent(tab)" :tab="tab" :cities="cities"
+                                                   :locations="locations" :ministries="ministries" />
+                                    </div>
+                                </div>
+                                <div class="col-2 text-end">
+                                    <button v-if="hasConfiguration(tab)" class="btn btn-light btn-sm"
+                                            @click="toggleConfig(tabIndex)"
+                                        :title="tab.configVisible ? 'Konfiguration einklappen' : 'Dieser Reiter kann weiter konfiguriert werden'">
+                                        <span :class="tab.configVisible ? 'mdi mdi-chevron-down' : 'mdi mdi-chevron-right'"></span>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" @click="deleteTab(tabIndex)" title="Reiter entfernen">
+                                        <span class="mdi mdi-delete"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </draggable>
+            </div>
+            <div class="col-md-3">
+                <h3>Hinzufügen</h3>
+                <div class="available-tab btn btn-light mb-1 text-start" v-for="(tab,tabIndex) in availableTabs"
+                    @click="addTab(tab.type)">
+                    <div class="text-bold">
+                        <span class="mdi mdi-toy-brick"></span> {{ tab.title }}
+                    </div>
+                    <div>{{ tab.description }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import draggable from 'vuedraggable'
+import NextServicesTabConfig from "../TabConfig/NextServicesTabConfig";
+import BaptismsTabConfig from "../TabConfig/BaptismsTabConfig";
+import CasesTabConfig from "../TabConfig/CasesTabConfig";
+import FuneralsTabConfig from "../TabConfig/FuneralsTabConfig";
+import MissingEntriesTabConfig from "../TabConfig/MissingEntriesTabConfig";
+import StreamingTabConfig from "../TabConfig/StreamingTabConfig";
+import WeddingsTabConfig from "../TabConfig/WeddingsTabConfig";
+import FormCheck from "../../Ui/forms/FormCheck";
+import FormGroup from "../../Ui/forms/FormGroup";
+
+const TAB_CONFIGURATION_COMPONENTS = {
+    nextServices: NextServicesTabConfig,
+    baptisms: BaptismsTabConfig,
+    cases: CasesTabConfig,
+    funerals: FuneralsTabConfig,
+    missingEntries: MissingEntriesTabConfig,
+    streaming: StreamingTabConfig,
+    weddings: WeddingsTabConfig,
+};
+
+function cloneConfig(config) {
+    if (!config || typeof config !== 'object' || Array.isArray(config)) {
+        return {};
+    }
+
+    return { ...config };
+}
+
+function normalizeHomeScreenTabsConfig(config) {
+    if (!config || typeof config !== 'object' || Array.isArray(config)) {
+        return { tabs: [] };
+    }
+
+    if (!Array.isArray(config.tabs)) {
+        config.tabs = [];
+    }
+
+    return config;
+}
+
+export default {
+    name: "homeScreenConfigurationTab",
+    components: {
+        FormGroup,
+        FormCheck,
+        draggable,
+        NextServicesTabConfig,
+        BaptismsTabConfig,
+        CasesTabConfig,
+        FuneralsTabConfig,
+        MissingEntriesTabConfig,
+        StreamingTabConfig,
+        WeddingsTabConfig,
+    },
+    props: ['availableTabs', 'homeScreenTabsConfig', 'cities', 'locations', 'ministries', 'settings', 'thirdParty', 'moduleGroups'],
+    created() {
+        if (undefined === this.settings.homeScreen) this.settings.homeScreen = 'homescreen:configurable';
+        if (undefined === this.settings.homeScreenConfig) this.settings.homeScreenConfig = {};
+        if (undefined === this.settings.homeScreenConfig.wizardButtons) this.settings.homeScreenConfig.wizardButtons = false;
+        if (undefined === this.settings.homeScreenConfig.showReplacements) this.settings.homeScreenConfig.showReplacements = false;
+    },
+    data() {
+        const tabsConfig = normalizeHomeScreenTabsConfig(this.homeScreenTabsConfig);
+        tabsConfig.tabs = tabsConfig.tabs.map(tab => this.normalizeTab(tab));
+
+        return {
+            myTabs: tabsConfig.tabs,
+        }
+    },
+    methods: {
+        normalizeTab(tab) {
+            const defaultTab = this.availableTabs[tab.type] || {};
+            const defaultConfig = cloneConfig(defaultTab.config);
+            const currentConfig = cloneConfig(tab.config);
+
+            return {
+                ...tab,
+                config: {
+                    ...defaultConfig,
+                    ...currentConfig,
+                },
+                configVisible: false,
+            };
+        },
+        addTab(tabType) {
+            this.myTabs.push(this.normalizeTab({
+                type: tabType,
+                config: this.availableTabs[tabType]?.config,
+            }));
+        },
+        deleteTab(tabIndex) {
+            this.MyTabs = this.myTabs.splice(tabIndex, 1);
+        },
+        toggleConfig(tabIndex) {
+            this.myTabs[tabIndex].configVisible = !this.myTabs[tabIndex].configVisible;
+            this.$forceUpdate();
+        },
+        hasConfiguration(tab) {
+            return !!this.configurationComponent(tab) && Object.keys(tab.config || {}).length > 0;
+        },
+        configurationComponent(tab) {
+            return TAB_CONFIGURATION_COMPONENTS[tab.type] || null;
+        }
+    }
+}
+</script>
+
+<style scoped>
+    .tab-block {
+        border: solid 1px gray;
+    }
+    .available-tab {
+        border: solid 1px gray;
+        width: 100%;
+    }
+</style>

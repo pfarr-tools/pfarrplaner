@@ -1,0 +1,326 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace App\Http\Controllers;
+
+use App\Events\ServiceUpdated;
+use App\Liturgy\PronounSets\PronounSets;
+use App\Models\Attachment;
+use App\Models\Leave\Poolmaster;
+use App\Models\Location;
+use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Rites\Funeral;
+use App\Models\Service;
+use App\Traits\HandlesAttachmentsTrait;
+use Carbon\Carbon;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
+use Inertia\Inertia;
+use App\Documents\PDF;
+
+/**
+ * Class FuneralController
+ * @package App\Http\Controllers
+ */
+class FuneralController extends AbstractCRUDController
+{
+
+    use HandlesAttachmentsTrait;
+
+    protected string $modelClass = Funeral::class;
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function create(Request $request): RedirectResponse
+    {
+        $service = Service::findOrFail($request->get('service') ?: $request->get('service_id'));
+        Gate::authorize('create', [Funeral::class, $service]);
+        $creator = app(Funeral::getContractName('create'));
+        $funeral = $creator->create($request->user(), $request->all());
+
+        return redirect()->route('funerals.edit', $funeral->id);
+    }
+
+    /**
+     * @param Service $service
+     * @return RedirectResponse
+     */
+    public function add(Service $service): RedirectResponse
+    {
+        Gate::authorize('create', [Funeral::class, $service]);
+        return redirect()->route('funerals.create', ['service' => $service->id]);
+    }
+
+
+    /**
+     * @param Request $request
+     * @return \Inertia\Response
+     */
+    public function wizard(Request $request)
+    {
+        Gate::authorize('create', Funeral::class);
+        $user = Auth::user();
+        $cities = $this->getWritableFuneralCities($user);
+        $mastered = Poolmaster::with(['pool', 'pool.users', 'pool.cities'])
+            ->where('user_id', $user->id)
+            ->where('start', '<=', now()->startOfDay())
+            ->where('end', '>=', now()->endOfDay())
+            ->get();
+
+        $locations = Location::inCities($cities->pluck('id'))->get();
+        $people = User::visibleFor(Auth::user())->get();
+
+
+        return Inertia::render('Rites/FuneralWizard', compact('cities', 'locations', 'people', 'user', 'mastered'));
+    }
+
+    public function wizardSave(Request $request)
+    {
+        Gate::authorize('create', Funeral::class);
+        $data = $request->validate(
+            [
+                'date' => 'required|date',
+                'city' => 'required|exists:cities,id',
+                'location' => 'required',
+                'name' => 'required|string',
+                'pastor' => 'nullable',
+            ]
+        );
+        if (is_numeric($data['location'])) {
+            $request->validate(['location' => 'exists:locations,id']);
+        }
+        $data['date'] = Carbon::parse($data['date'], 'Europe/Berlin')->setTimezone('UTC');
+
+        $city = City::find($data['city']);
+        abort_unless($this->getWritableFuneralCities(Auth::user())->pluck('id')->contains($city?->id), 403);
+
+        $location = $specialLocation = null;
+        if ((!is_numeric($data['location'])) || (null === Location::find($data['location']))) {
+            $specialLocation = $data['location'];
+            $data['location'] = 0;
+            $time = $data['date']->format('H:i');
+            $ccLocation = $request->get('cc_location') ?: '';
+        } else {
+            if ($data['location']) {
+                $location = Location::find($data['location']);
+                $time = $data['date']->format('H:i');
+                $ccLocation = $request->get('cc_location') ?: ($request->get(
+                    'cc'
+                ) ? $location->cc_default_location : '');
+            } else {
+                $time = $data['date']->format('H:i');
+                $ccLocation = $request->get('cc_location') ?: '';
+            }
+        }
+
+        $service = Service::create(
+            [
+                'date' => $data['date'],
+                'location_id' => ($location ? $location->id : null),
+                'special_location' => $specialLocation ?? null,
+                'city_id' => $city->id,
+                'others' => '',
+                'description' => '',
+                'need_predicant' => 0,
+                'baptism' => 0,
+                'eucharist' => 0,
+                'offerings_counter1' => '',
+                'offerings_counter2' => '',
+                'offering_goal' => '',
+                'offering_description' => '',
+                'offering_type' => '',
+                'cc' => 0,
+                'cc_location' => '',
+                'cc_lesson' => '',
+                'cc_staff' => '',
+                'wtc_category' => 'WG',
+            ]
+        );
+        $service->update(['slug' => $service->createSlug()]);
+        if (!is_array($data['pastor'])) {
+            if (Auth::user()->hasRole('Pfarrer:in')) {
+                $service->pastors()->sync([Auth::user()->id => ['category' => 'P']]);
+            }
+        } else {
+            $sync = [];
+            foreach ($data['pastor'] as $person) {
+                if (null !== $person) {
+                    $sync[(is_numeric($person) ? $person : $person['id'])] = ['category' => 'P'];
+                }
+            }
+            $service->pastors()->sync($sync);
+        }
+
+
+        $funeral = Funeral::create(
+            [
+                'service_id' => $service->id,
+                'buried_name' => $data['name']
+            ]
+        );
+
+        return redirect()->route('funerals.edit', $funeral->id);
+    }
+
+
+    /**
+     * @param Request $request
+     * @param Funeral|null $funeral
+     * @return array
+     */
+    protected function getResourcesForEditor(Request $request, $funeral = null): array
+    {
+        if ($funeral?->service) {
+            $funeral->service->setAppends(['pastors', 'locationText', 'timeText']);
+        }
+        $pronounSets = PronounSets::toArray();
+        return compact('pronounSets');
+    }
+
+    /**
+     * Create a pdf form with funeral data
+     * @param Funeral $funeral
+     * @return Response
+     */
+    public function pdfForm(Funeral $funeral)
+    {
+        Gate::authorize('update', $funeral);
+        $funeral->load('service');
+        $funeral->service->load('location', 'city');
+        $filename = $funeral->service->date->format('Ymd') . ' ' . $funeral->buried_name . ' KRA.pdf';
+
+        return PDF::fromView('funerals.pdf.form', compact('funeral'))
+            ->format('A5')
+            ->margins(10, 10, 10, 10)
+            ->download($filename);
+    }
+
+
+    /**
+     * @param Funeral $funeral
+     * @return false|string
+     */
+    public function done(Funeral $funeral)
+    {
+        Gate::authorize('update', $funeral);
+        $funeral->done = true;
+        $funeral->save();
+        return json_encode(true);
+    }
+
+
+    /**
+     * @param Funeral $funeral
+     * @return Application|ResponseFactory|Response
+     */
+    public function appointmentIcal(Funeral $funeral)
+    {
+        Gate::authorize('update', $funeral);
+        $service = Service::find($funeral->service_id);
+        $raw = View::make('funerals.appointment.ical', compact('funeral', 'service'));
+        $raw = str_replace(
+            "\r\n\r\n",
+            "\r\n",
+            str_replace('@@@@', "\r\n", str_replace("\n", "\r\n", str_replace("\r\n", '@@@@', $raw)))
+        );
+        return response($raw, 200)
+            ->header('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
+            ->header('Expires', '0')
+            ->header('Content-Type', 'text/calendar')
+            ->header('Content-Disposition', 'inline; filename=Trauergespraech-' . $funeral->id . '.ics');
+    }
+
+
+    /**
+     * @param Request $request
+     * @param Funeral $funeral
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function attach(Request $request, Funeral $funeral)
+    {
+        Gate::authorize('update', $funeral);
+        $this->handleAttachments($request, $funeral);
+        $funeral->refresh();
+        return response()->json($funeral->attachments);
+    }
+
+    /**
+     * @param Request $request
+     * @param Funeral $funeral
+     * @param Attachment $attachment
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function detach(Request $request, Funeral $funeral, Attachment $attachment)
+    {
+        Gate::authorize('update', $funeral);
+        $attachment = $funeral->attachments()->findOrFail($attachment->id);
+        $file = $attachment->file;
+        $funeral->attachments()->where('id', $attachment->id)->delete();
+        Storage::delete($file);
+        $attachment->delete();
+        $funeral->refresh();
+        return response()->json($funeral->attachments);
+    }
+
+    protected function getWritableFuneralCities(User $user)
+    {
+        $cities = $user->writableCities;
+        $mastered = Poolmaster::with(['pool.cities'])
+            ->where('user_id', $user->id)
+            ->where('start', '<=', now()->startOfDay())
+            ->where('end', '>=', now()->endOfDay())
+            ->get();
+        foreach ($mastered as $poolmaster) {
+            foreach ($poolmaster->pool->cities as $city) {
+                $cities->push($city);
+            }
+        }
+
+        return $cities->unique('id')->values();
+    }
+
+}

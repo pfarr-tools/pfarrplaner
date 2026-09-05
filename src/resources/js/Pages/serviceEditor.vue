@@ -1,0 +1,400 @@
+<!--
+  - Pfarrplaner
+  -
+  - @package Pfarrplaner
+  - @author Christoph Fischer <chris@toph.de>
+  - @copyright (c) Christoph Fischer, https://christoph-fischer.org
+  - @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+  - @link https://codeberg.org/pfarr.tools/pfarrplaner
+  - @version git: $Id$
+  -
+  - Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+  -
+  - Pfarrplaner is based on the Laravel framework (https://laravel.com).
+  - This file may contain code created by Laravel's scaffolding functions.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU General Public License as published by
+  - the Free Software Foundation, either version 3 of the License, or
+  - (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU General Public License for more details.
+  -
+  - You should have received a copy of the GNU General Public License
+  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<template>
+    <div class="service-editor">
+        <admin-layout title="Veranstaltung bearbeiten">
+            <template #navbar-left>
+                <div class="btn-group me-1">
+                    <button type="button" class="btn btn-primary" @click.prevent="saveService(true)"
+                            title="Speichern und schließen">
+                        <span class="mdi mdi-content-save d-md-none"></span><span class="d-none d-md-inline"> Speichern</span>
+                    </button>
+                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="visually-hidden">Weitere Optionen aufklappen</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <button type="button" class="dropdown-item" @click.prevent="saveService(false)">
+                            <span class="mdi mdi-content-save"></span> Speichern, ohne zu schließen
+                        </button>
+                        <button type="button" class="dropdown-item" @click.prevent="cancelEdit">
+                            <span class="mdi mdi-cancel"></span> Schließen, ohne zu speichern
+                        </button>
+                    </div>
+                </div>
+                <button class="btn btn-danger" @click.prevent="deleteService"><span
+                    class="mdi mdi-delete d-md-none"></span><span class="d-none d-md-inline"> Löschen</span></button>&nbsp;
+            </template>
+            <template #navbar-right>
+                <div class="btn-group calendar-mode-toggle" role="group" aria-label="Ansicht umschalten" v-if="editedService.event_class == 'service'">
+                    <button type="button" class="btn btn-secondary">
+                        <span class="mdi mdi-pencil me-1"></span>
+                        <span class="d-none d-xl-inline">Bearbeiten</span>
+                    </button>
+                    <inertia-link class="btn btn-outline-secondary" :href="route('liturgy.editor', service.slug)" title="Liturgie anzeigen">
+                        <span class="mdi mdi-view-list me-1"></span>
+                        <span class="d-none d-xl-inline">Liturgie</span>
+                    </inertia-link>
+                    <inertia-link class="btn btn-outline-secondary" :href="route('service.sermon.editor', service.slug)" title="Liturgie anzeigen">
+                        <span class="mdi mdi-microphone me-1"></span>
+                        <span class="d-none d-xl-inline">Predigt</span>
+                    </inertia-link>
+                </div>
+
+                <div class="ms-1 dropdown show">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuLink"
+                       data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Weitere Aktionen
+                    </button>
+
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink" v-if="service.slug">
+                        <a class="dropdown-item" :href="route('service.ical', {service: service.slug})">In Outlook
+                            übernehmen</a>
+                        <!--
+                        This report is currently not needed and therefore disabled
+                        <a class="dropdown-item"
+                           :href="route('reports.setup', {report: 'regulatory', service: service.id})">Meldung an das
+                            Ordnungsamt</a>
+                            -->
+                    </div>
+                </div>
+
+            </template>
+            <template #tab-headers>
+                <tab-headers>
+                    <tab-header id="home" title="Allgemeines" :active-tab="activeTab"/>
+                    <tab-header v-if="editedService.event_class == 'service'"
+                                id="people" title="Mitwirkende" :active-tab="activeTab" :count="peopleCount" />
+                    <tab-header v-if="editedService.event_class == 'event'"
+                                id="recurrence" title="Wiederholungen" :active-tab="activeTab" />
+                    <tab-header  v-if="(editedService.event_class == 'service')"
+                                 id="offerings" title="Opfer" :active-tab="activeTab"/>
+                    <tab-header  v-if="(editedService.event_class == 'service') && (service.id)"
+                                id="rites" title="Kasualien" :active-tab="activeTab"
+                                :count="service.funerals.length+service.baptisms.length+service.weddings.length"/>
+                    <tab-header v-if="(editedService.event_class == 'service')"
+                                id="cc" title="Kinderkirche" :active-tab="activeTab"/>
+                    <tab-header v-if="(editedService.event_class == 'service') && service.id && hasStreaming"
+                                id="streaming" title="Streaming" :active-tab="activeTab"/>
+                    <tab-header id="registrations" title="Anmeldungen" :active-tab="activeTab"
+                                :count="service.seating ? service.seating.count : 0"/>
+                    <tab-header v-if="service.id"
+                                id="ads" title="Werbung" :active-tab="activeTab" />
+                    <tab-header v-if="service.id"
+                                id="attachments" title="Dateien" :active-tab="activeTab" :count="countAttachments()"/>
+                    <tab-header v-if="service.id"
+                                id="comments" title="Kommentare" :active-tab="activeTab"
+                                :count="service.comments ? service.comments.length : 0"/>
+                </tab-headers>
+            </template>
+            <form @submit.prevent="saveService" id="serviceEditorForm" class="service-editor-form" aria-label="Veranstaltung bearbeiten">
+                <tabs>
+                    <tab id="home" :active-tab="activeTab">
+                        <home-tab :service="editedService" :locations="locations"
+                                  :cities="availableCities" :liturgy-info="liturgyInfo"
+                                  :tags="tags" :service-groups="serviceGroups"/>
+                    </tab>
+                    <tab v-if="(editedService.event_class == 'event')"
+                         id="recurrence" :active-tab="activeTab">
+                        <recurrence-tab :service="editedService" />
+                    </tab>
+                    <tab id="people" v-if="editedService.event_class == 'service'"
+                         :active-tab="activeTab">
+                        <people-tab v-if="(peopleLoaded) && (ministriesLoaded)"
+                                    :service="service" :teams="lists.teams"
+                                    :people="lists.users" :ministries="lists.ministries"
+                                    @count="updatePeopleCounter"/>
+                        <div v-else class="tab-loader">
+                            <span class="mdi mdi-spin mdi-loading"></span>
+                        </div>
+                    </tab>
+                    <tab v-if="editedService.event_class == 'service'"
+                         id="offerings" :active-tab="activeTab">
+                        <offerings-tab :service="service"/>
+                    </tab>
+                    <tab v-if="editedService.event_class == 'service'"
+                         id="rites" :active-tab="activeTab">
+                        <rites-tab :service="service"/>
+                    </tab>
+                    <tab v-if="editedService.event_class == 'service'"
+                         id="cc" :active-tab="activeTab">
+                        <c-c-tab :service="service"/>
+                    </tab>
+                    <tab v-if="(editedService.event_class == 'service') && hasStreaming"
+                         id="streaming" :active-tab="activeTab">
+                        <streaming-tab :service="service"/>
+                    </tab>
+                    <tab id="registrations" :active-tab="activeTab">
+                        <registrations-tab :service="service"/>
+                    </tab>
+                    <tab id="ads" :active-tab="activeTab">
+                        <ads-tab :service="service" :config="adsConfig" :ad-channels="adChannels" />
+                    </tab>
+                    <tab id="attachments" :active-tab="activeTab">
+                        <attachments-tab :service="service" :liturgy-sheets="liturgySheets" :files="files"/>
+                    </tab>
+                    <tab id="comments" :active-tab="activeTab">
+                        <comments-tab :service="service"/>
+                    </tab>
+                </tabs>
+            </form>
+        </admin-layout>
+    </div>
+</template>
+
+<script>
+import TabHeaders from "../components/Ui/tabs/tabHeaders";
+import TabHeader from "../components/Ui/tabs/tabHeader";
+import Tabs from "../components/Ui/tabs/tabs";
+import Tab from "../components/Ui/tabs/tab";
+import HomeTab from "../components/ServiceEditor/tabs/HomeTab";
+import OfferingsTab from "../components/ServiceEditor/tabs/OfferingsTab";
+import Card from "../components/Ui/cards/card";
+import CardHeader from "../components/Ui/cards/cardHeader";
+import CardBody from "../components/Ui/cards/cardBody";
+import CCTab from "../components/ServiceEditor/tabs/CCTab";
+import StreamingTab from "../components/ServiceEditor/tabs/StreamingTab";
+import RitesTab from "../components/ServiceEditor/tabs/RitesTab";
+import AttachmentsTab from "../components/ServiceEditor/tabs/AttachmentsTab";
+import PeopleTab from "../components/ServiceEditor/tabs/PeopleTab";
+import CommentsTab from "../components/ServiceEditor/tabs/CommentsTab";
+import RegistrationsTab from "../components/ServiceEditor/tabs/RegistrationsTab";
+import NavButton from "../components/Ui/buttons/NavButton";
+import RecurrenceTab from "../components/ServiceEditor/tabs/RecurrenceTab.vue";
+import AdsTab from "../components/ServiceEditor/tabs/AdsTab.vue";
+import {Link as InertiaLink} from "@inertiajs/vue3";
+
+export default {
+    name: "serviceEditor",
+    components: {
+        InertiaLink,
+        AdsTab,
+        RecurrenceTab,
+        NavButton,
+        RegistrationsTab,
+        CommentsTab,
+        PeopleTab,
+        AttachmentsTab,
+        RitesTab,
+        StreamingTab,
+        CCTab, CardBody, CardHeader, Card, OfferingsTab, HomeTab, Tab, Tabs, TabHeader, TabHeaders
+    },
+    props: {
+        service: Object,
+        tab: String,
+        locations: Array,
+        tags: Array,
+        serviceGroups: Array,
+        liturgySheets: Object,
+        backRoute: String,
+        availableCities: Array,
+        liturgyInfo: Array,
+        adsConfig: Object,
+        adChannels: Object,
+    },
+    created() {
+        this.normalizeServiceArrays(this.service);
+    },
+    computed: {
+        hasStreaming() {
+            return Boolean(this.service?.id && this.service?.city?.google_access_token);
+        },
+        hasAnnouncements() {
+            if (!this.service.id) return false;
+            return this.service.attachments.some(attachment => attachment.title == 'Bekanntgaben');
+        },
+    },
+    data() {
+        for (const relatedCityId in this.service.related_cities) {
+            this.service.related_cities[relatedCityId] = this.service.related_cities[relatedCityId].id;
+        }
+
+        let myService = this.service;
+        myService.event_class = myService.event_class || 'service';
+
+        return {
+            apiToken: this.$page.props.currentUser.data.api_token,
+            activeTab: this.tab,
+            editedService: myService,
+            files: {attachments: [null], attachment_text: ['']},
+            counted: 0,
+            peopleCount: 0,
+            peopleLoaded: false,
+            ministriesLoaded: false,
+            lists: {
+                users: [],
+                teams: [],
+                ministries: {},
+            }
+        };
+    },
+    mounted() {
+        this.$api().get(route('api.people.select')).then(response => {
+            this.lists.users = response.data.users;
+            this.lists.teams = response.data.teams;
+            this.peopleLoaded = true;
+        });
+        this.$api().get(route('api.ministries.list')).then(response => {
+            this.lists.ministries = response.data;
+            this.ministriesLoaded = true;
+        });
+        this.updatePeopleCounter();
+    },
+    methods: {
+        normalizeServiceArrays(service) {
+            ['pastors', 'organists', 'sacristans', 'tags', 'service_groups', 'related_cities'].forEach(key => {
+                if (!Array.isArray(service[key])) service[key] = [];
+            });
+
+            if (!service.ministriesByCategory || Array.isArray(service.ministriesByCategory)) {
+                service.ministriesByCategory = {};
+            }
+        },
+        updatePeopleCounter() {
+            let count = 0;
+            let ministries = this.service.ministriesByCategory;
+
+            [this.editedService.pastors, this.editedService.organists, this.editedService.sacristans].forEach(group => {
+                group.forEach(person => {
+                    if (isNaN(person)) count++;
+                });
+            });
+
+            Object.keys(ministries).forEach(ministry => {
+                ministries[ministry].forEach(item => {
+                    if (isNaN(item)) count++;
+                })
+            });
+            this.peopleCount = count;
+        },
+        saveService(closeAfterSaving) {
+            const record = {
+                ...this.editedService,
+                alt_liturgy_date: this.editedService.alt_liturgy_date ? moment(this.editedService.alt_liturgy_date).format('DD.MM.YYYY') : null,
+                participants: {
+                    P: this.extractParticipants(this.editedService.pastors),
+                    O: this.extractParticipants(this.editedService.organists),
+                    M: this.extractParticipants(this.editedService.sacristans),
+                },
+                ministries: {},
+                tags: [],
+                serviceGroups: [],
+                ...this.files,
+            };
+            let ct = 0;
+            Object.keys(this.editedService.ministriesByCategory).forEach(key => {
+                record.ministries[ct] = {description: key, people: []};
+                this.editedService.ministriesByCategory[key].forEach(person => {
+                    if (person) record.ministries[ct].people.push(person.id)
+                });
+                ct++;
+            });
+            this.editedService.tags.forEach(tag => {
+                record.tags.push(tag.id);
+            });
+            this.editedService.service_groups.forEach(group => {
+                record.serviceGroups.push(group.id);
+            });
+
+            record.closeAfterSaving = closeAfterSaving ? 1 : 0;
+
+            this.$inertia.patch(route('service.update', this.service.slug), record, {
+                preserveState: false
+            });
+        },
+        deleteService() {
+            if (!confirm('Willst du diese Veranstaltung wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.')) return;
+            this.$inertia.delete(route('service.destroy', this.editedService.slug), {}, {preserveState: false});
+        },
+        extractParticipants(e) {
+            var items = [];
+            e.forEach(person => {
+                items.push(person.id)
+            });
+            return items;
+        },
+        countAttachments() {
+            if (!this.service.slug) return 0;
+            let ctr = this.editedService.attachments.length;
+            if (this.editedService.liturgy_blocks.length) {
+                for (const sheet in this.liturgySheets) {
+                    if (!this.liturgySheets[sheet].isNotAFile) ctr++;
+                }
+            }
+            if (this.editedService.konfiapp_event_qr) ctr++;
+
+            // default auto attachments:
+            if (!this.hasAnnouncements) ctr++;
+
+            return ctr;
+        },
+        cancelEdit() {
+            if (confirm('Willst du dieses Formular wirklich schließen, ohne zu speichern? Alle deine Änderungen gehen dann verloren!')) {
+                window.location.href = this.backRoute;
+            }
+        }
+    },
+    provide() {
+        const lists = {};
+
+        Object.defineProperty(lists, 'users', {
+            enumerable: true,
+            get: () => this.lists.users,
+        });
+        Object.defineProperty(lists, 'teams', {
+            enumerable: true,
+            get: () => this.lists.teams,
+        });
+        Object.defineProperty(lists, 'ministries', {
+            enumerable: true,
+            get: () => this.lists.ministries,
+        });
+        return {
+            lists,
+        }
+    }
+
+}
+</script>
+
+<style scoped>
+.service-editor-form {
+    padding-bottom: 2rem;
+}
+
+.tab-loader {
+    width: 100%;
+    margin-top: 30vh;
+    font-size: 8em;
+    color: lightgray;
+    text-align: center;
+}
+
+</style>

@@ -1,0 +1,893 @@
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@charset "UTF-8";
+@use 'theme' as theme;
+
+:root {
+    --dp-font-family: "Sarabun", "Nunito", sans-serif !important;
+}
+
+ul.nav-tabs {
+    margin-bottom: 15px;
+}
+
+.hide-buttons .btn {
+    display: none;
+}
+
+.hide-buttons:hover .btn {
+    display: inline;
+}
+
+.button-row {
+    margin: 0 0 3px 5px;
+}
+
+
+body.slave nav,
+body.slave aside,
+body.slave footer,
+body.login nav,
+body.login footer {
+    display: none;
+}
+
+
+body.slave .content-wrapper,
+body.login .content-wrapper {
+    min-height: 100vh;
+    margin-left: 0 !important;
+    font-size: .8rem;
+}
+
+
+body.calendar .content,
+body.calendar .container-fluid {
+    margin: 0;
+    padding: 0;
+}
+
+body.calendar .content-header {
+    display: none;
+}
+
+.calendar-month {
+    padding: 0;
+}
+
+.calendar-month h1 {
+    margin-left: 5px;
+}
+
+.calendar-month td,
+.calendar-month thead th {
+    vertical-align: top;
+    padding: 1px;
+}
+
+.calendar-month th .btn {
+    font-size: 0.5em;
+}
+
+.calendar-month th .day-header-collapse-hover {
+    display: none;
+}
+
+.calendar-month th.collapsed .day-header-collapse-hover {
+    display: block;
+}
+
+.calendar-month th.collapsed:hover .day-header-collapse-hover {
+    font-size: 20px;
+}
+
+
+.day-header-collapse-hover {
+    font-size: 1em;
+}
+
+.calendar-horizontal .day-header-collapse-hover {
+    margin-left: -4px;
+    writing-mode: vertical-lr;
+}
+
+.collapsed.day-header-collapse-hover:hover {
+    display: block;
+}
+
+
+.calendar-month th.collapsed .card,
+.calendar-month th.collapsed .vacation {
+    display: none;
+}
+
+
+.calendar-month td.limited.not-my-city .btn-add-day,
+.calendar-month td.limited:not(.for-city) .btn-add-day {
+    display: none;
+}
+
+.calendar-month th.limited.not-for-city,
+.calendar-month td.limited.not-for-city {
+    display: none;
+}
+
+
+.calendar-month .special-weekday {
+    color: map-get($theme-colors, 'danger');
+}
+
+
+.calendar-month th .card-effect {
+    position: relative;
+}
+
+.calendar-month th .card-effect:before, .calendar-month th .card-effect:after {
+    z-index: -1;
+    position: absolute;
+    content: "";
+    bottom: 15px;
+    left: 10px;
+    width: 50%;
+    top: 80%;
+    max-width: 300px;
+    background: map-get($theme-colors, 'light');
+    box-shadow: 0 15px 10px map-get($theme-colors, 'light');
+    transform: rotate(-3deg);
+}
+
+.effect2:after {
+    transform: rotate(3deg);
+    right: 10px;
+    left: auto;
+}
+
+.calendar-month th .card-header {
+    padding: 0;
+    text-align: center;
+    background-color: black;
+    color: white;
+    font-size: .7rem;
+}
+
+.calendar-month th .day-header-So {
+    background-color: map-get($theme-colors, 'danger');
+}
+
+.calendar-month th .card-body {
+    padding: 1px;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.calendar-month th .card-footer {
+    padding: 0;
+    text-align: center;
+    font-size: .6rem;
+}
+
+
+.calendar-month .day-description {
+    font-weight: $font-weight-base;
+    font-style: italic;
+}
+
+.calendar-month .vacation {
+    display: inline-block;
+    font-weight: $font-weight-base;
+    background-color: theme.elkw-color("orange");
+    font-size: 0.7em;
+    padding: 3px;
+    margin: 0 1px 1px 1px;
+}
+
+span.vacation-conflict {
+    background-color: theme.elkw-color("orange");
+    text-decoration: underline;
+    text-decoration-color: map-get($theme-colors, 'danger');
+}
+
+.calendar-month .liturgy {
+    font-size: 0.6em;
+    font-weight: $font-weight-base;
+}
+
+.calendar-month .liturgy-sermon,
+.calendar-month .liturgy-color {
+    display: inline-block;
+}
+
+.calendar-month .liturgy-color {
+    width: 10px;
+    height: 10px;
+    border: solid 1px transparent;
+    border-radius: 0;
+}
+
+.calendar-month td.now,
+.calendar-month th.now {
+    background-color: lightyellow;
+}
+
+.calendar-month .service-entry {
+    background-color: white;
+    border: solid 1px theme.elkw-color("dunkelgrau");
+    padding: 5px;
+    margin-bottom: 3px;
+}
+
+.calendar-month .service-entry.mine {
+    background-color: map-get($theme-colors, 'info');
+}
+
+.calendar-month .service-entry.highlighted {
+    background-color: map-get($theme-colors, 'warning');
+}
+
+.calendar-month .service-entry.hidden {
+    background-color: white !important;
+    color: gray;
+    border-color: gray;
+}
+
+.calendar-month .service-entry.hidden.funeral {
+    background-color: #888888 !important;
+}
+
+.calendar-month .service-entry.mine.hidden {
+    background-color: white !important;
+    color: map-get($theme-colors, 'info');
+}
+
+
+.calendar-month .service-entry.editable:hover {
+    border-color: map-get($theme-colors, 'primary');
+    outline: 0;
+    box-shadow: 0 0 0 .2rem rgba(52, 144, 220, .25);
+}
+
+.calendar-month .service-entry.funeral {
+    background-color: theme.elkw-color("dunkelgrau") !important;
+    color: white !important;
+}
+
+.calendar-month .service-entry.funeral.mine {
+    background-color: theme.elkw-color("dunkelblau") !important;
+    color: white !important;
+}
+
+.calendar-month .service-entry h3 {
+    margin-top: 15px;
+}
+
+.calendar-month .service-entry .separator {
+    color: gray;
+}
+
+.calendar-month .service-time, .calendar-month .service-location {
+    display: inline;
+}
+
+.calendar-month .service-time.service-special-time {
+    color: map-get($theme-colors, 'danger');
+    font-weight: $font-weight-semibold;
+}
+
+.calendar-month .service-special-location {
+    color: map-get($theme-colors, 'danger');
+    font-weight: $font-weight-semibold;
+}
+
+.calendar-month .service-pastor {
+    font-weight: $font-weight-semibold;
+}
+
+.calendar-month .need-predicant {
+    font-weight: $font-weight-semibold;
+    color: map-get($theme-colors, 'danger');
+}
+
+.calendar-month .designation {
+    font-weight: $font-weight-base;
+}
+
+.calendar-month .service-team, .calendar-month .service-description {
+    font-size: 0.8em;
+}
+
+.calendar-month .service-description {
+    font-style: italic;
+}
+
+.calendar-month .service-calendar-button {
+    display: none;
+}
+
+.calendar-month .service-entry:hover .service-calendar-button {
+    display: inherit;
+}
+
+.instructions li {
+    margin-bottom: 1em;
+    font-weight: $font-weight-semibold;
+}
+
+
+.print-only {
+    display: none;
+}
+
+.revisions {
+    font-size: 0.6em;
+}
+
+@media print {
+    .btn, .no-print {
+        display: none;
+    }
+
+    .print-only {
+        display: unset;
+    }
+}
+
+pre {
+    border: solid 1px theme.elkw-color("dunkelgrau");
+    padding: 5px;
+    border-radius: 0;
+}
+
+ol.steps li {
+    margin-bottom: 20px;
+}
+
+ol.steps img {
+    margin-top: 20px;
+}
+
+.service-row.cc {
+    background-color: theme.elkw-color("hellgrün");
+}
+
+.service-row.no-cc {
+    color: theme.elkw-color("dunkelgrau");
+}
+
+.data-row.no-cc {
+    display: none;
+}
+
+
+table.table tr.past td {
+    background-color: theme.elkw-color("pastellviolett");
+}
+
+table.table .fa-check-circle {
+    color: theme.theme-color("success");
+}
+
+table.table .fa-times-circle {
+    color: map-get($theme-colors, 'danger');
+}
+
+
+body.dragging, body.dragging * {
+    cursor: move !important;
+}
+
+.dragged {
+    position: absolute;
+    opacity: 0.5;
+    z-index: 2000;
+}
+
+ul.sortable {
+    min-height: 50px;
+    padding: 0;
+}
+
+ul.sortable li {
+    width: 100%;
+    border: solid 1px gray;
+    list-style: none;
+    padding: 5px;
+    margin: 1px;
+    border-radius: 0;
+}
+
+ul.sortable li:hover {
+    cursor: move !important;
+}
+
+ul.sortable li.placeholder {
+    position: relative;
+    background-color: theme.elkw-color("apricot");
+    border: none;
+    /** More li styles **/
+}
+
+ul.sortable li.placeholder:before {
+    position: absolute;
+    /** Define arrowhead **/
+}
+
+
+.date-picker-wrapper {
+    border: 0;
+    background-color: transparent;
+    padding-left: 0;
+}
+
+.loader {
+    position: fixed;
+    padding: 10em 0 0;
+    margin: 0;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+#date-range12-container .month-wrapper {
+    border: 0;
+}
+
+#absencesTab a {
+    background-color: theme.elkw-color("orange");
+}
+
+#absencesTab a.active {
+    background-color: theme.elkw-color("orange");
+}
+
+.card-counter {
+    box-shadow: 2px 2px 10px #DADADA;
+    margin: 5px;
+    padding: 20px 10px;
+    background-color: #fff;
+    height: 100px;
+    border-radius: 0;
+    transition: .3s linear all;
+}
+
+.card-counter:hover {
+    box-shadow: 4px 4px 20px #DADADA;
+    transition: .3s linear all;
+    cursor: pointer;
+}
+
+.card-counter.primary {
+    background-color: theme.theme-color("primary");
+    color: #FFF;
+}
+
+.card-counter.danger {
+    background-color: theme.theme-color("danger");
+    color: #FFF;
+}
+
+.card-counter.success {
+    background-color: theme.theme-color("success");
+    color: #FFF;
+}
+
+.card-counter.info {
+    background-color: theme.theme-color("info");
+    color: black;
+}
+
+.card-counter i {
+    font-size: 5em;
+    opacity: 0.2;
+}
+
+.card-counter .count-numbers {
+    position: absolute;
+    right: 35px;
+    top: 20px;
+    font-size: 32px;
+    display: block;
+}
+
+.card-counter .count-name {
+    position: absolute;
+    right: 35px;
+    top: 65px;
+    font-style: italic;
+    text-transform: capitalize;
+    opacity: 0.5;
+    display: block;
+    font-size: 18px;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+
+body.sidebar-collapse .main-sidebar .hidden-collapsed {
+    display: none;
+}
+
+body.sidebar-collapse .main-sidebar:hover .hidden-collapsed {
+    display: block;
+}
+
+body.sidebar-collapse .main-sidebar:hover .sidebar-form label {
+    color: gray;
+}
+
+body.login .main-sidebar:hover .login-form.hidden-collapsed {
+    display: none !important;
+}
+
+.form-group.required label:after {
+    content: ' *';
+    color: map-get($theme-colors, 'danger');
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group .form-label,
+.form-group legend.form-label {
+    font-weight: $font-weight-medium;
+    margin-bottom: .35rem;
+}
+
+.form-group .invalid-feedback {
+    display: block;
+}
+
+.form-control, input.form-check-input {
+    background-color: white;
+}
+
+input.form-control, textarea.form-control, select.form-control, select.form-select {
+    border-width: 0 0 1px 1px;
+}
+
+input.form-control:focus, textarea.form-control:focus, select.form-control:focus, select.form-select:focus {
+    background-color: tint-color(theme.elkw-color("hellblau"), 70%);
+    font-weight: $font-weight-semibold;
+    box-shadow: none;
+    border-color: theme.elkw-color("dunkelblau");
+}
+
+.form-check-input:checked {
+    background-color: theme.theme-color("primary");
+    border-color: theme.theme-color("primary");
+}
+
+.selectize-input {
+    border-radius: 0;
+    border-width: 0 0 1px 1px;
+}
+
+.selectize-input:focus, .selectize-input.focus {
+    border-radius: 0 !important;
+    border-color: theme.elkw-color("dunkelblau");
+    box-shadow: none;
+    background-color: tint-color(theme.elkw-color("hellblau"), 70%) !important;
+    font-weight: $font-weight-semibold;
+}
+
+// @vueform/multiselect — match FormInput styling
+.multiselect {
+    background-color: white;
+    border-width: 0 0 1px 1px !important;
+    border-radius: 0;
+}
+
+.multiselect.is-active {
+    border-width: 0 0 1px 1px !important;
+    border-color: theme.elkw-color("dunkelblau") !important;
+    box-shadow: none !important;
+    font-weight: $font-weight-semibold !important;
+}
+
+.multiselect.is-active .multiselect-search,
+.multiselect.is-active .multiselect-tags-search {
+    background-color: tint-color(theme.elkw-color("hellblau"), 70%);
+}
+
+.multiselect.is-open,
+.multiselect.is-open-top {
+    border-radius: 0;
+}
+
+.multiselect-dropdown {
+    border-radius: 0;
+    border-width: 0 0 1px 1px;
+}
+
+.multiselect-option.is-selected {
+    background: tint-color(theme.elkw-color("hellblau"), 70%) !important;
+    color: #212529 !important;
+}
+
+.multiselect-option.is-selected.is-pointed {
+    background: tint-color(theme.elkw-color("hellblau"), 55%)  !important;
+    color: #212529 !important;
+}
+
+.multiselect.is-invalid {
+    border-color: map-get($theme-colors, 'danger') !important;
+}
+
+// @vuepic/vue-datepicker — match FormInput styling
+.dp__input {
+    border-width: 0 0 1px 1px !important;
+    border-radius: 0 !important;
+    background-color: white !important;
+    font-weight: 300 !important;
+}
+
+.dp__input, .dp__input_wrap {
+    font-family: inherit !important;
+}
+
+.dp__input_focus {
+    background-color: tint-color(theme.elkw-color("hellblau"), 70%) !important;
+    border-color: theme.elkw-color("dunkelblau") !important;
+    font-weight: $font-weight-semibold !important;
+    box-shadow: none !important;
+}
+
+.dp__input[aria-invalid="true"] {
+    border-color: map-get($theme-colors, 'danger') !important;
+}
+
+.dp__menu {
+    border-radius: 0 !important;
+}
+
+.badge-permission-a {
+    background-color: theme.theme-color("primary") !important;
+}
+
+.badge-permission-w {
+    background-color: theme.theme-color("success") !important;
+}
+
+.badge-permission-r {
+    background-color: theme.theme-color("warning") !important;
+}
+
+.badge-permission-n {
+    background-color: map-get($theme-colors, 'danger') !important;
+}
+
+.attachment-row {
+    cursor: pointer;
+}
+
+tr.changed, tr.changed td, tr.changed th {
+    background-color: theme.elkw-color("hellgrün");
+}
+
+.content .footer {
+    padding-left: 10px;
+    font-size: .6em;
+    color: theme.elkw-color("dunkelgrau");
+}
+
+.content .footer a {
+    color: theme.elkw-color("dunkelgrau");
+    font-weight: $font-weight-semibold;
+}
+
+.profile-homescreen-accordion {
+    min-height: 20px;
+    background-color: #dddddd;
+    padding: 5px;
+    border: solid 1px #aaaaaa;
+}
+
+.stripe-odd {
+    background-color: #f2f2f2;
+}
+
+.fake-table-head {
+    font-weight: $font-weight-semibold;
+    border-top: solid 1px #dee2e6;
+    border-bottom: solid 2px #dee2e6;
+}
+
+.fake-table-body {
+    margin: 0 15px;
+}
+
+.nav-tabs .nav-item.tabheader-absences a.nav-link {
+    background-color: theme.elkw-color("orange") !important;
+}
+
+.calendar-vertical .day-header-cell {
+    max-width: 150px;
+    padding: 0;
+}
+
+
+.main-header.navbar {
+    position: sticky;
+    top: 0px;
+}
+
+.ql-custom.ql-picker .ql-picker-label::before {
+    content: attr(data-label);
+    padding-right: 15px;
+}
+
+.ql-snow .ql-picker-options .ql-picker-item:before {
+    content: attr(data-label);
+}
+
+.ql-toolbar .quill-fa-button {
+    padding-top: 1px;
+}
+
+.mdi {
+    font-size: 1.1em;
+}
+
+.ql-picker.float-right .ql-picker-options {
+    right: 0;
+}
+
+#nprogress .bar {
+    background: theme.elkw-color("violett") !important;
+}
+
+#nprogress .peg {
+    box-shadow: 0 0 10px theme.elkw-color("violett"), 0 0 5px theme.elkw-color("violett");
+}
+
+#nprogress .spinner-icon {
+    border-top-color: theme.elkw-color("violett");
+    border-left-color: theme.elkw-color("violett");
+}
+
+
+
+.admin-layout .datepicker table tr td.today {
+    background-color: tint-color(theme.theme-color("warning"), 50%) !important;
+}
+
+.admin-layout .datepicker table tr td.today.active,
+.admin-layout .datepicker table tr td.active {
+    background-color: theme.theme-color("primary") !important;
+}
+
+
+.nav-tabs .nav-link {
+    background-color: lightgray;
+}
+
+.badge-primary {
+    background-color: theme.theme-color("primary") !important;
+}
+
+.mdi.mdi-youtube, span.mdi-youtube {
+    background-color: theme.elkw-color("red") !important;
+}
+
+.stripe-odd {
+    background-color: #f2f2f2;
+}
+
+.multiselect-tag {
+    background-color: #efefef !important;
+    color: black !important;
+    font-weight: normal !important;
+}
+
+.tiptap blockquote {
+    padding-left: 1em;
+    padding-right: 2em;
+    text-align: justify;
+    font-size: .9em;
+}
+
+.tiptap-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    background-color: #e9ecef;
+    padding: 4px 6px;
+    margin-bottom: 0 !important;
+    width: 100%;
+    border: 1px solid #ced4da;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+
+    .btn-group {
+        display: inline-flex;
+
+        .btn {
+            border-radius: 0;
+
+            &:first-child { border-radius: 3px 0 0 3px; }
+            &:last-child  { border-radius: 0 3px 3px 0; }
+            &:only-child  { border-radius: 3px; }
+        }
+    }
+
+    // Standalone buttons outside a btn-group
+    > .btn {
+        border-radius: 3px;
+    }
+
+    // Override outline-secondary → solid light-gray within toolbar
+    .btn-outline-secondary {
+        background-color: #f8f9fa;
+        color: #495057;
+        border-color: #ced4da;
+
+        &:hover, &:focus {
+            background-color: #dee2e6;
+            color: #212529;
+            border-color: #adb5bd;
+        }
+
+        &.active, &:active {
+            background-color: #6c757d;
+            color: #fff;
+            border-color: #6c757d;
+        }
+    }
+
+    // Remove Bootstrap spacing helpers that push margin back
+    .me-1, .me-2 { margin-right: 0 !important; }
+}

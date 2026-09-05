@@ -1,0 +1,296 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace App\Liturgy\LiturgySheets;
+
+
+use App\Documents\Word\DefaultA5WordDocument;
+use App\Documents\Word\DefaultWordDocument;
+use App\Integrations\KonfiApp\KonfiAppIntegration;
+use App\Liturgy\ItemHelpers\PsalmItemHelper;
+use App\Liturgy\ItemHelpers\ReadingItemHelper;
+use App\Liturgy\ItemHelpers\SongItemHelper;
+use App\Liturgy\Replacement\Replacement;
+use App\Models\Liturgy\Item;
+use App\Models\Service;
+use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpWord\Element\Footer;
+use PhpOffice\PhpWord\Element\TextRun;
+use PhpOffice\PhpWord\Shared\Converter;
+use PhpOffice\PhpWord\Shared\Html;
+use PhpOffice\PhpWord\Style\Tab;
+
+class FullTextLiturgySheet extends AbstractLiturgySheet
+{
+    protected $title = 'Volltext';
+    protected $icon = 'fa fa-file-word';
+
+    /** @var Service $service */
+    protected $service = null;
+    protected $extension = 'docx';
+    protected $configurationPage = 'Liturgy/LiturgySheets/FullTextSongSheetConfiguration';
+    protected $configurationComponent = 'FullTextLiturgySheetConfiguration';
+    protected $privileged = true;
+
+    protected $defaultConfig = [
+        'includeSongTexts' => 1,
+        'includeFullReadings' => 1,
+        'includeQR' => 1,
+        'includeRecipients' => 1,
+        'pageNumbers' => 1,
+    ];
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function render(Service $service)
+    {
+        $this->service = $service;
+
+        $doc = new DefaultA5WordDocument([
+            'styles' => [
+                'paragraphs' => [
+                    'titles' => [
+                        2 => [
+                            'tabs' => [
+                                new Tab('right', Converter::cmToTwip(12)),
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+                                         ]);
+
+        $this->setProperties($doc);
+
+        // page numbers
+        if ($this->config['pageNumbers']) {
+            $doc->getPhpWord()->getSettings()->setEvenAndOddHeaders(true);
+            $footer = $doc->getSection()->addFooter();
+            $footer->addPreserveText(
+                '{PAGE}',
+                [
+                    'size' => 8,
+                    'name' => 'Sarabun Light'
+                ],
+                [
+                    'align' => 'right',
+                ]
+            );
+            $footer = $doc->getSection()->addFooter(Footer::EVEN);
+            $footer->addPreserveText(
+                '{PAGE}',
+                [
+                    'size' => 8,
+                    'name' => 'Sarabun Light'
+                ],
+                [
+                    'align' => 'left',
+                ]
+            );
+        }
+
+        // heading
+        $doc->renderServiceTitleHeading($service);
+
+        foreach ($service->liturgyBlocks as $block) {
+            $doc->getSection()->addTitle($block->title, 1);
+            foreach ($block->items as $item) {
+                $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][2]);
+                $run->addText($item->title, $doc->getConfig()['styles']['fonts']['titles'][2]);
+                if ($this->config['includeRecipients']) {
+                    $run->addText(
+                        "\t".join(', ', $item->recipients()),
+                        ['name' => 'Sarabun Light', 'size' => 8, 'bold' => false, 'italic' => true]
+                    );
+                }
+
+                $doc->getSection()->addTitle($run, 2);
+                if (method_exists($this, ($method = 'render' . ucfirst($item->data_type . 'Item')))) {
+                    $this->$method($doc, $item);
+                }
+            }
+        }
+
+        if ($this->config['includeQR'] && (!empty($this->service->konfiapp_event_qr))) {
+            $doc->getSection()->addPageBreak();
+            $doc->getSection()->addTitle('QR-Code für die KonfiApp', 1);
+            $types = KonfiAppIntegration::get($service->city)->listEventTypes();
+            $text = '';
+            foreach ($types as $type) {
+                if ($type->id == $service->konfiapp_event_type) {
+                    $text = $type->punktzahl . ' ' . ($type->punktzahl == 1 ? 'Punkt' : 'Punkte') . ' in der Kategorie "' . $type->name . '"';
+                }
+            }
+            if ($text) {
+                $doc->renderNormalText($text);
+            }
+            $doc->renderNormalText(
+                'Gültig nur am ' . $service->dateTime->isoFormat('dddd, DD. MMMM YYYY')
+                . ' von ' . $service->date->setTimezone('Europe/Berlin')->format('H:i')
+                . ' bis ' . $service->date->setTimezone('Europe/Berlin')->copy()->addHours(3)->format('H:i') . ' Uhr.'
+            );
+            $doc->getSection()->addImage(
+                route('qrcode', $this->service->konfiapp_event_qr),
+                ['width' => Converter::cmToPoint(11.5)]
+            );
+        }
+
+        return $doc->sendToBrowser($this->getFileName($service));
+    }
+
+    protected function setProperties(DefaultWordDocument $doc)
+    {
+        $properties = $doc->getPhpWord()->getDocInfo();
+        $properties->setCreator(Auth::user()->fullName());
+        $properties->setCompany(Auth::user()->office ?? '');
+        $properties->setTitle($this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi') . ' ' . $this->getFileTitle());
+        $properties->setDescription($this->getFileTitle() . ' (' . $this->title . ')');
+        $properties->setCategory('Gottesdienste');
+        $properties->setLastModifiedBy(Auth::user()->fullName());
+        $properties->setSubject('Komplette Liturgie');
+    }
+
+    public function getFileTitle(): string
+    {
+        if (!$this->service) {
+            return 'Volltext';
+        }
+
+        return $this->service->titleText(
+                false
+            ) . ($this->service->sermon ? ' - ' . $this->service->sermon->title : '');
+    }
+
+    protected function renderFreetextItem(DefaultWordDocument $doc, Item $item)
+    {
+        if (!$item->data['description']) {
+            return;
+        }
+        $doc->renderNormalText(Replacement::replaceAll($item->getHelper()->getText(), $this->service));
+    }
+
+    protected function renderSermonItem(DefaultWordDocument $doc, Item $item)
+    {
+        if (null === $this->service->sermon) {
+            $doc->renderNormalText('Für diesen Gottesdienst wurde noch keine Predigt angelegt.', ['italic' => true]);
+        } else {
+            if (!$this->service->sermon->text) {
+                return;
+            }
+            $text = strtr($this->service->sermon->text, [
+                '<h1>' => '<h3>',
+                '</h1>' => '</h3>',
+                '<h2>' => '<h4>',
+                '</h2>' => '</h4>',
+            ]);
+            $dom = DefaultWordDocument::createDomDocumentFromHtml($text);
+            $body = $dom->getElementsByTagName('body')->item(0);
+            if (!$body) {
+                return;
+            }
+            $nodes = [];
+            /** @var \DOMNode $node */
+            foreach ($body->childNodes as $node) {
+                if ($node->nodeName == 'blockquote') {
+                    foreach (explode("\n\n", DefaultWordDocument::getTextWithBreaksFromDomNode($node)) as $paragraph) {
+                        if (trim($paragraph) === '') {
+                            continue;
+                        }
+                        $doc->renderText($paragraph, $doc::BLOCKQUOTE, ['size' => 10]);
+                    }
+                } else {
+                    Html::addHtml(
+                        $doc->getSection(),
+                        '<body>' . str_replace('<br>', '<br />', $dom->saveHTML($node)) . '</body>'
+                    );
+                }
+                $nodes[] = $node->nodeName . ' -> ' . $node->nodeValue;
+            }
+        }
+    }
+
+    protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
+    {
+        if (!isset($item->data['psalm'])) {
+            return;
+        }
+        if (!$item->data['psalm']['text']) {
+            return;
+        }
+        /** @var PsalmItemHelper $helper */
+        $helper = $item->getHelper();
+        $doc->getSection()->addTitle($helper->getTitleText(), 3);
+        $doc->renderNormalText($item->data['psalm']['text']);
+    }
+
+    protected function renderSongItem(DefaultWordDocument $doc, Item $item)
+    {
+        if (!isset($item->data['song'])) {
+            return;
+        }
+        /** @var SongItemHelper $helper */
+        $helper = $item->getHelper();
+        $doc->getSection()->addTitle($helper->getTitleText(), 3);
+        if (isset($item->data['song'])) {
+            if (isset($item->data['song']['song']['copyrights'])) {
+                if ($item->data['song']['song']['copyrights']) {
+                    $doc->renderNormalText($item->data['song']['song']['copyrights'], ['size' => 8]);
+                }
+            }
+        }
+        if (!$this->config['includeSongTexts']) {
+            return;
+        }
+
+        foreach ($helper->getActiveVerses() as $verse) {
+            if ($verse['refrain_before']) {
+                $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true]);
+            }
+            $doc->renderNormalText($verse['number'] . '. ' . $verse['text']);
+            if ($verse['refrain_after']) {
+                $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true]);
+            }
+        }
+    }
+
+    protected function renderReadingItem(DefaultWordDocument $doc, Item $item)
+    {
+        if (!$item->data['reference']) {
+            return;
+        }
+
+        $helper = new ReadingItemHelper($item);
+        $helper->renderToWordDocument($doc, $this->config['includeFullReadings'], true);
+    }
+
+}

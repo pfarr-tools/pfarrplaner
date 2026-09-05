@@ -1,0 +1,53 @@
+<?php
+/*
+ * Pfarrplaner
+ *
+ * @package Pfarrplaner
+ * @author Christoph Fischer <chris@toph.de>
+ * @copyright (c) Christoph Fischer, https://christoph-fischer.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
+ * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @version git: $Id$
+ *
+ * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
+ *
+ * Pfarrplaner is based on the Laravel framework (https://laravel.com).
+ * This file may contain code created by Laravel's scaffolding functions.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+
+
+use App\Http\Controllers\DownloadController;
+
+Route::get('download/{storage}/{code}/{prettyName?}', [DownloadController::class, 'download'])->name('download');
+Route::get('attachment/{attachment}', [DownloadController::class, 'attachment'])->name('attachment');
+Route::get('files/{path}/{prettyName?}', [DownloadController::class, 'storage'])->name('storage');
+Route::get('image/{path}/{prettyName?}', [DownloadController::class, 'image'])->name('image');
+Route::get('qrcode/{value}', [DownloadController::class, 'qr'])->name('qrcode');
+
+Route::get('attachment/auto/{type}/{attachable}/{attachment}', [DownloadController::class, 'autoAttachment'])->name('auto-attachment');
+Route::get('attachment/setup/{type}/{attachable}/{attachment}', [DownloadController::class, 'autoAttachmentSetup'])->name('auto-attachment.setup');
