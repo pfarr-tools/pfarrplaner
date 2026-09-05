@@ -53,11 +53,18 @@ $verbs = [
 
 Router::$verbs = array_merge(Router::$verbs, $verbs);
 
-Route::permanentRedirect('/.well-known/caldav', '/dav/')->withoutMiddleware(['auth', 'csrf']);
+Route::permanentRedirect('/.well-known/caldav', '/dav/')->withoutMiddleware([
+    'auth',
+    'csrf',
+    \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+]);
 
 Route::any('/dav/{any?}', [\App\Http\Controllers\DAV\DAVController::class, 'handle'])
     ->where('any', '.*')
     ->middleware('auth.basic')
-    ->withoutMiddleware(['auth', 'csrf'])
+    ->withoutMiddleware([
+        'auth',
+        'csrf',
+        \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+    ])
     ->name('sabre.dav');
-

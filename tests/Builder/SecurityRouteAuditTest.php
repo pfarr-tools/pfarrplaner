@@ -128,6 +128,17 @@ class SecurityRouteAuditTest extends TestCase
         $this->assertTrue($this->hasAuthenticationMiddleware(collect($route['middleware'] ?? [])));
     }
 
+    public function testDavRoutesDoNotUseCsrfProtection(): void
+    {
+        $route = Route::getRoutes()->getByName('sabre.dav');
+
+        $this->assertNotNull($route);
+        $this->assertContains(
+            \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+            $route->excludedMiddleware()
+        );
+    }
+
     protected function hasAuthenticationMiddleware(Collection $middleware): bool
     {
         return $middleware->contains(function ($item) {
