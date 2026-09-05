@@ -213,6 +213,7 @@ return [
         App\Providers\AutoModelsProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\HorizonServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         \Spatie\Permission\PermissionServiceProvider::class,

@@ -57,7 +57,6 @@ return [
                  * The list of directories and files that will be included in the backup.
                  */
                 'include' => [
-                    storage_path('app'),
                     storage_path('logs'),
                 ],
 
@@ -138,11 +137,10 @@ return [
             /*
              * The disk names on which the backups will be stored.
              */
-            'disks' => [
-                'backup',
-                'local-backup',
-                's3',
-            ],
+            'disks' => array_values(array_filter(array_map(
+                'trim',
+                explode(',', env('BACKUP_DISKS', 'local-backup,backup-s3'))
+            ))),
 
             /*
              * Determines whether to allow backups to continue when some targets fail.
@@ -170,7 +168,7 @@ return [
         /*
          * After creating the zip, verify it can be opened and contains files.
          */
-        'verify_backup' => false,
+        'verify_backup' => true,
 
         /*
          * The number of attempts, in case the backup command encounters an exception.
@@ -240,7 +238,10 @@ return [
     'monitor_backups' => [
         [
             'name' => config('app.name'),
-            'disks' => ['backup', 'local-backup', 's3'],
+            'disks' => array_values(array_filter(array_map(
+                'trim',
+                explode(',', env('BACKUP_DISKS', 'local-backup,backup-s3'))
+            ))),
             'health_checks' => [
                 MaximumAgeInDays::class => 1,
                 MaximumStorageInMegabytes::class => 100000,

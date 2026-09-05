@@ -44,8 +44,9 @@ class PreventOrphans extends Migration
             throw new \InvalidArgumentException("Column {$column} not found on table {$table}");
         }
 
-        return $col['type_name']
-            . (!empty($col['unsigned']) ? 'Unsigned' : 'Signed');
+        $isUnsigned = str_contains(strtolower($col['type'] ?? ''), 'unsigned');
+
+        return $col['type_name'] . ($isUnsigned ? 'Unsigned' : 'Signed');
     }
 
     public function createCascadingDelete($tableName, $foreignKey, $foreignTableName) {
@@ -60,11 +61,13 @@ class PreventOrphans extends Migration
         $keyType = $this->getColumnType($foreignTableName, 'id');
         $localKeyType = $this->getColumnType($tableName, $foreignKey);
         if ($keyType != $localKeyType) {
-            Schema::table($tableName, function (Blueprint $table) use ($keyType, $foreignKey) {
-                if ($keyType == 'bigint') {
-                    $table->unsignedBigInteger($foreignKey)->change();
-                } elseif (substr($keyType,0,7) == 'integer') {
-                    $table->unsignedInteger($foreignKey)->change();
+            Schema::table($tableName, function (Blueprint $table) use ($keyType, $foreignKey, $tableName) {
+                $normalizedKeyType = strtolower($keyType);
+
+                if (str_starts_with($normalizedKeyType, 'bigint')) {
+                    DB::statement("ALTER TABLE `{$tableName}` MODIFY `{$foreignKey}` BIGINT UNSIGNED NOT NULL");
+                } elseif (str_starts_with($normalizedKeyType, 'int')) {
+                    DB::statement("ALTER TABLE `{$tableName}` MODIFY `{$foreignKey}` INT UNSIGNED NOT NULL");
                 }
             });
         }

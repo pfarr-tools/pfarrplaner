@@ -40,6 +40,7 @@ use App\Models\Service;
 use App\Services\FileNameService;
 use App\Services\LiturgyService;
 use App\Services\NameService;
+use App\Helpers\StoragePath;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -272,7 +273,7 @@ class BillBoardReport extends AbstractWordDocumentReport
         $run = $this->section->addTextRun(static::DEFAULT);
         $run->addText($text."\t", $textFormat);
         if ($image && Storage::exists('app/'.$image)) {
-            $run->addImage(storage_path('app/'.$image), $imageOptions);
+            $run->addImage(StoragePath::for($image), $imageOptions);
         }
     }
 

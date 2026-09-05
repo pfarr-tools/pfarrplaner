@@ -34,6 +34,7 @@ namespace App\Liturgy\LiturgySheets;
 use App\FileFormats\ODP;
 use App\FileFormats\PowerPoint;
 use App\Helpers\PPTUnitsHelper;
+use App\Helpers\StoragePath;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Music\ABCMusic;
@@ -345,7 +346,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 if ($listItem['image']) {
                     $shape = $slide->createDrawingShape();
                     $shape->setName('')
-                        ->setPath(storage_path('app/' . $listItem['image']))
+                        ->setPath(StoragePath::for($listItem['image']))
                         ->setResizeProportional(true)
                         ->setHeight(PPTUnitsHelper::convert(1, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
                         ->setOffsetX(PPTUnitsHelper::convert(1.5, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
@@ -695,7 +696,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             if (trim($data[$key]['songbook']['image'])) {
                 $shape = $slide->createDrawingShape();
                 $shape->setName('')
-                    ->setPath(storage_path('app/' . $data[$key]['songbook']['image']))
+                        ->setPath(StoragePath::for($data[$key]['songbook']['image']))
                     ->setResizeProportional(true)
                     ->setWidth(PPTUnitsHelper::convert(4, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
                     ->setOffsetX(PPTUnitsHelper::convert(10.7, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))

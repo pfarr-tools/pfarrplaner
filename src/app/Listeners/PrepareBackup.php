@@ -13,7 +13,6 @@
 namespace App\Listeners;
 
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 use Spatie\Backup\Events\BackupManifestWasCreated;
 
 class PrepareBackup
@@ -26,7 +25,6 @@ class PrepareBackup
      */
     public function handle(BackupManifestWasCreated $event): void
     {
-        DB::table('failed_jobs')->truncate();
         Artisan::call('telescope:prune', ['--hours' => 24]);
     }
 }

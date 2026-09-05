@@ -18,6 +18,9 @@ Das Projekt stammt aus dem [Evangelischen Kirchenbezirk Balingen](https://www.ki
 
 ## Handbuch
 
+Die technische Installations- und Migrationsanleitung befindet sich unter
+`../docs/admin/installation-und-migration.md`.
+
 Das vollständige Benutzerhandbuch ist unter [handbuch.pfarrplaner.de](https://handbuch.pfarrplaner.de) erreichbar.
 
 ## Pfarrplaner unterstützen

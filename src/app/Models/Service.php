@@ -33,6 +33,7 @@ namespace App\Models;
 use App\DAV\DAVCalendarItem;
 use App\DAV\HasDAVCalendarItems;
 use App\Helpers\YoutubeHelper;
+use App\Helpers\StoragePath;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Models\Ads\AdConfig;
 use App\Models\Calendar\Day;
@@ -606,7 +607,7 @@ class Service extends Model implements HasDAVCalendarItems
     public function getImageCutPath(string $cut): string
     {
         if ($attachment = $this->attachments()->firstWhere('cut', Str::slug($cut))) {
-            return storage_path('app/' . $attachment->file);
+            return StoragePath::for($attachment->file);
         }
         return '';
     }

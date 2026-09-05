@@ -33,6 +33,7 @@ namespace App\Liturgy\LiturgySheets;
 use App\Documents\Word\DefaultWordDocument;
 use App\Documents\Word\FoldedFlyerWordDocument;
 use App\Helpers\ImageHelper;
+use App\Helpers\StoragePath;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Replacement\Replacement;
@@ -202,9 +203,9 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         $centerHeight = 15.5;
         if ($this->service->city->logo) {
             $cell->addTextRun(['align' => 'right'])
-                ->addImage(storage_path('app/'.$this->service->city->logo), ['width' => Converter::cmToPoint(3)]);
+                ->addImage(StoragePath::for($this->service->city->logo), ['width' => Converter::cmToPoint(3)]);
 
-            $centerHeight -= ImageHelper::getProportionalHeight(storage_path('app/'.$this->service->city->logo), 3);
+            $centerHeight -= ImageHelper::getProportionalHeight(StoragePath::for($this->service->city->logo), 3);
         }
         $table->addRow(Converter::cmToTwip($centerHeight));
         $cell = $table->addCell(Converter::cmToTwip(9.75), ['gridSpan' => 2, 'valign' => 'center']);
@@ -216,9 +217,9 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         }
         if ($this->service->sermon->image) {
             $run->addTextBreak();
-            $run->addImage(storage_path('app/'.$this->service->sermon->image), ['width' => Converter::cmToPoint(8)]);
+            $run->addImage(StoragePath::for($this->service->sermon->image), ['width' => Converter::cmToPoint(8)]);
 
-            $license = ImageHelper::getEmbeddedLicenseString(storage_path('app/'.$this->service->sermon->image));
+            $license = ImageHelper::getEmbeddedLicenseString(StoragePath::for($this->service->sermon->image));
             if ($license) {
                 $run->addTextBreak();
                 $run->addText('Bild: '.$license, ['size' => 6, 'color' => '777777']);
