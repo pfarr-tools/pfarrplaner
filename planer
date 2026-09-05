@@ -65,6 +65,9 @@ EOF
   backup)
     exec "$ROOT/scripts/backup.sh" "${1:-help}" "${@:2}"
     ;;
+  release)
+    exec "$ROOT/scripts/release.sh" "$@"
+    ;;
   migrate)
     [[ "${1:-}" == legacy ]] || { echo 'Verwendung: ./planer migrate legacy ...' >&2; exit 2; }
     shift
@@ -107,6 +110,7 @@ Verwendung:
   ./planer fresh --force
   ./planer data push|pull <ssh-path> [--source-down]
   ./planer backup create|list|verify|restore
+  ./planer release [major|minor|patch]
   ./planer migrate legacy <ssh-path> [Optionen]
   ./planer prod up|down|restart|status|logs|exec|compose|backup|update
 EOF

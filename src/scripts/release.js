@@ -123,9 +123,3 @@ try {
 } catch (err) {
     process.exit(err.status ?? 1);
 }
-
-try {
-    execSync(`node ${__dirname}/docker-build.js ${newPkg.version} --push`, { stdio: 'inherit' });
-} catch (err) {
-    process.exit(err.status ?? 1);
-}

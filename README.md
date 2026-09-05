@@ -117,6 +117,30 @@ Das optionale send-only-Mail-Relay wird mit den Relay- und TLS-Variablen aus
 docker compose -f compose.production.yaml --profile mail up -d postfix
 ```
 
+## Releases und Updates
+
+Ein Release wird aus einem sauberen Arbeitsbaum erstellt. Der bestehende
+Pfarrplaner-Release-Mechanismus aktualisiert Version und Changelog in `src/`,
+erstellt den semantischen Release-Commit und setzt den Tag:
+
+```sh
+./planer release
+./planer release minor
+git push origin main v2026.15.0
+```
+
+Es gibt keinen separaten Legacy-Docker-Image-Build mehr. Das Produktionsimage
+wird beim kontrollierten Update aus dem veröffentlichten Tag gebaut:
+
+```sh
+./planer prod backup create
+./planer prod update --ref v2026.15.0 --backup-confirmed
+```
+
+Der Build erfolgt vor dem Umschalten der laufenden Container. Migrationen
+werden mit dem neuen Image ausgeführt; anschließend werden Octane, Horizon und
+Scheduler neu gestartet und die Gesundheitschecks abgewartet.
+
 ## Dokumentation
 
 Das verbindliche [Installations-, Migrations- und Betriebshandbuch](docs/admin/installation-und-migration.md)

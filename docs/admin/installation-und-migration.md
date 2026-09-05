@@ -103,6 +103,38 @@ hinzufügen, dann die Anwendung ausrollen, alte Strukturen erst später
 entfernen. Nicht kompatible Änderungen erhalten eine geplante kurze
 Wartungszeit. Das vorherige Image bleibt als Rollback-Grundlage erhalten.
 
+### Release erstellen und ausrollen
+
+Die Versionierung folgt dem bestehenden Pfarrplaner-Schema. Im sauberen
+Arbeitsbaum wird der Release über den zentralen Einstiegspunkt erstellt:
+
+```sh
+./planer release
+./planer release minor
+git push origin main v2026.15.0
+```
+
+Der Release aktualisiert `src/package.json`, `src/package-lock.json` und
+`src/CHANGELOG.md`, erstellt `chore(release): VERSION` und setzt den Tag
+`vVERSION`. Die automatische Wahl ist ein Major-Release beim Jahreswechsel,
+ein Minor-Release bei neuen Features und sonst ein Patch-Release.
+
+Der frühere Einzel-Image-Build aus `src/scripts/docker-build.js` und der
+zugehörige Tag-Build wurden entfernt. Das Produktionsimage wird ausschließlich
+aus dem Root-Repository und dem veröffentlichten Tag gebaut:
+
+```sh
+./planer prod backup create
+./planer prod update --ref v2026.15.0 --backup-confirmed
+```
+
+`prod update` baut zuerst das neue Image, führt danach die Migrationen in einem
+separaten Container aus und aktualisiert anschließend Assets, Octane, Horizon
+und Scheduler. Der bisher laufende App-Container bleibt bis zum erfolgreichen
+Build und zur erfolgreichen Migration aktiv. Ein Tag-Update ist deshalb der
+empfohlene Produktionsweg; ein Update vom lokalen, ungetaggten Arbeitsstand
+bleibt für Notfälle möglich.
+
 ## Datenübertragung und Legacy-Migration
 
 ```sh
