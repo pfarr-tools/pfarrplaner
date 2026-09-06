@@ -18,7 +18,7 @@ COPY src/ /var/www/html/
 RUN composer install --no-interaction --prefer-dist --no-scripts \
  && cp -a vendor /opt/pfarrplaner-vendor \
  && npm install \
- && mkdir -p storage/logs storage/framework/{cache,sessions,views} bootstrap/cache \
+ && mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
 RUN printf '%s\n' \
   '#!/bin/sh' \
