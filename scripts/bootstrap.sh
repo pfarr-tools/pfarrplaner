@@ -69,6 +69,7 @@ cp .env.example .env
 echo 'Pfarrplaner-Startkonfiguration'
 ask APP_PORT 'HTTP-Port' 8180
 ask VITE_PORT 'Vite-Port' 5273
+set_env VITE_HMR_CLIENT_PORT "$(grep '^VITE_PORT=' .env | cut -d= -f2-)"
 ask FORWARD_DB_PORT 'MariaDB-Port' 53306
 ask FORWARD_S3_PORT 'MinIO-Port' 9900
 ask FORWARD_S3_CONSOLE_PORT 'MinIO-Konsolenport' 9901

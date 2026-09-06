@@ -1,33 +1,37 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import laravel from 'laravel-vite-plugin'
 import path from 'path'
 import vue from "@vitejs/plugin-vue";
 
-export default defineConfig({
-    server: {
-        host: '0.0.0.0',
-        port: 5173,
-        strictPort: true,
-        hmr: {
-            host: 'dev.pfarrplaner.de',
-            protocol: 'wss',
-            clientPort: 443,
+export default ({ mode }) => {
+    const env = loadEnv(mode, process.cwd(), '')
+    const hmrClientPort = Number(env.VITE_HMR_CLIENT_PORT || env.VITE_PORT || 5173)
+
+    return defineConfig({
+        server: {
+            host: '0.0.0.0',
+            port: 5173,
+            strictPort: true,
+            hmr: {
+                host: env.VITE_HMR_HOST || 'localhost',
+                protocol: env.VITE_HMR_PROTOCOL || 'http',
+                clientPort: hmrClientPort,
+            },
         },
-    },
-    plugins: [
-        laravel({ input: ['resources/js/inertia-app.js'], refresh: true }),
-        vue({ template: { transformAssetUrls: { base: null, includeAbsolute: false } } }),
-    ],
-    resolve: {
-        alias: {
-            '@': path.resolve(__dirname, 'resources/js'),
+        plugins: [
+            laravel({ input: ['resources/js/inertia-app.js'], refresh: true }),
+            vue({ template: { transformAssetUrls: { base: null, includeAbsolute: false } } }),
+        ],
+        resolve: {
+            alias: {
+                '@': path.resolve(__dirname, 'resources/js'),
+            },
+            extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
         },
-        extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
-    },
-    build: {
-        rollupOptions: {
-            output: {
-                manualChunks(id) {
+        build: {
+            rollupOptions: {
+                output: {
+                    manualChunks(id) {
                     // Admin sub-chunks — specific rules before the catch-all
                     if (id.includes('/Pages/Admin/User/')) return 'Chunk-Admin-User'
                     if (id.includes('/Pages/Admin/City/') ||
@@ -52,9 +56,9 @@ export default defineConfig({
                         id.includes('/Pages/Dash') ||
                         id.includes('/components/HomeScreen/')) return 'Chunk-Home'
                     if (id.includes('node_modules/quill')) return 'Vendor-Quill'
+                    },
                 },
             },
         },
-    },
-})
-
+    })
+}

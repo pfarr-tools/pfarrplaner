@@ -53,6 +53,7 @@ RUN npm ci \
 RUN printf '%s\n' \
   '#!/bin/sh' \
   'set -eu' \
+  'rm -f /app/public/hot' \
   'if [ ! -x /app/node_modules/.bin/vite ]; then' \
   '  mkdir -p /app/node_modules' \
   '  cp -a /opt/pfarrplaner-node-modules/. /app/node_modules/' \
