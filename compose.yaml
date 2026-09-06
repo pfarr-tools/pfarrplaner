@@ -14,6 +14,7 @@ x-app: &app
     - ./docs/manual:/var/www/docs/manual
     - ./backups:/var/backups/pfarrplaner
     - composer_cache:/tmp/composer-cache
+    - vendor:/var/www/html/vendor
   depends_on:
     mariadb: {condition: service_healthy}
     redis: {condition: service_healthy}
@@ -23,10 +24,8 @@ x-app: &app
 services:
   app:
     <<: *app
-    command: >-
-      sh -lc "chmod -R a+rwX storage bootstrap/cache /var/backups/pfarrplaner &&
-      (php artisan config:clear >/dev/null 2>&1 || true);
-      exec php-fpm8.4 -F"
+    entrypoint: ["/usr/local/bin/pfarrplaner-dev-entrypoint"]
+    command: ["php-fpm8.4", "-F"]
     healthcheck:
       test: ["CMD-SHELL", "php-fpm-healthcheck || exit 1"]
       interval: 10s
@@ -54,11 +53,13 @@ services:
     networks: [pfarrplaner]
   horizon:
     <<: *app
-    command: sh -lc "php artisan horizon"
+    entrypoint: ["/usr/local/bin/pfarrplaner-dev-entrypoint"]
+    command: ["php", "artisan", "horizon"]
     restart: unless-stopped
   scheduler:
     <<: *app
-    command: sh -lc "php artisan schedule:work"
+    entrypoint: ["/usr/local/bin/pfarrplaner-dev-entrypoint"]
+    command: ["php", "artisan", "schedule:work"]
     restart: unless-stopped
   mariadb:
     image: mariadb:11
@@ -130,5 +131,6 @@ volumes:
   minio_data:
   composer_cache:
   node_modules:
+  vendor:
   caddy_data:
   caddy_config:

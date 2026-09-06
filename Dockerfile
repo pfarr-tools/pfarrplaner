@@ -16,9 +16,23 @@ ENV LANG=de_DE.UTF-8 LANGUAGE=de_DE:de LC_ALL=de_DE.UTF-8 TZ=Europe/Berlin
 WORKDIR /var/www/html
 COPY src/ /var/www/html/
 RUN composer install --no-interaction --prefer-dist --no-scripts \
+ && cp -a vendor /opt/pfarrplaner-vendor \
  && npm install \
  && mkdir -p storage/logs storage/framework/{cache,sessions,views} bootstrap/cache \
  && chmod -R 775 storage bootstrap/cache
+RUN printf '%s\n' \
+  '#!/bin/sh' \
+  'set -eu' \
+  'if [ ! -f /var/www/html/vendor/autoload.php ]; then' \
+  '  mkdir -p /var/www/html/vendor' \
+  '  cp -a /opt/pfarrplaner-vendor/. /var/www/html/vendor/' \
+  'fi' \
+  'mkdir -p /var/www/html/storage/logs /var/www/html/storage/framework/cache /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/bootstrap/cache /var/backups/pfarrplaner' \
+  'chmod -R a+rwX /var/www/html/storage /var/www/html/bootstrap/cache /var/backups/pfarrplaner' \
+  '(cd /var/www/html && php artisan config:clear >/dev/null 2>&1 || true)' \
+  'exec "$@"' \
+  > /usr/local/bin/pfarrplaner-dev-entrypoint \
+ && chmod +x /usr/local/bin/pfarrplaner-dev-entrypoint
 
 FROM base AS development
 RUN printf '#!/bin/sh\nexec php-fpm8.4 -t\n' > /usr/local/bin/php-fpm-healthcheck && chmod +x /usr/local/bin/php-fpm-healthcheck
