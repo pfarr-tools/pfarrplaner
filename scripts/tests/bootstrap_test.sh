@@ -11,6 +11,7 @@ test -s "$TEST_ROOT/.env"
 grep -q '^APP_KEY=base64:' "$TEST_ROOT/.env"
 grep -q '^APP_ENV=local$' "$TEST_ROOT/.env"
 grep -q '^APP_URL=http://localhost:8180$' "$TEST_ROOT/.env"
+grep -q '^MAIL_DRIVER=smtp$' "$TEST_ROOT/.env"
 grep -q '^APP_PORT=8180$' "$TEST_ROOT/.env"
 grep -q '^VITE_PORT=5273$' "$TEST_ROOT/.env"
 grep -B1 '^APP_URL=' "$TEST_ROOT/.env" | grep -q 'Public URL'
@@ -20,6 +21,7 @@ PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" "$ROOT/scripts/bootstrap.sh" --prod --default
 grep -q '^APP_ENV=production$' "$TEST_ROOT/.env"
 grep -q '^APP_DEBUG=false$' "$TEST_ROOT/.env"
 grep -q '^APP_URL=https://localhost$' "$TEST_ROOT/.env"
+grep -q '^MAIL_DRIVER=smtp$' "$TEST_ROOT/.env"
 grep -B1 '^APP_URL=' "$TEST_ROOT/.env" | grep -q 'Public URL'
 
 example_keys="$(grep -E '^[A-Z][A-Z0-9_]*=' "$TEST_ROOT/.env.example" | cut -d= -f1 | sort)"
