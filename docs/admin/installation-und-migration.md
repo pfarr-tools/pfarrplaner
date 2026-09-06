@@ -141,9 +141,17 @@ bleibt für Notfälle möglich.
 ./planer data push user@ziel:/opt/pfarrplaner
 ./planer data pull user@quelle:/opt/pfarrplaner --source-down
 
-./planer migrate legacy user@altserver:/var/www/pfarrplaner --dry-run
-./planer migrate legacy user@altserver:/var/www/pfarrplaner --confirm
+./planer migrate legacy user@altserver:/var/www/pfarrplaner --dev --dry-run
+./planer migrate legacy user@altserver:/var/www/pfarrplaner --prod --dry-run
+./planer migrate legacy user@altserver:/var/www/pfarrplaner --prod --confirm
 ```
+
+Ohne Zieloption verwendet der Import weiterhin die Entwicklungsumgebung
+(`--dev`). Für einen produktiven Import muss `--prod` ausdrücklich angegeben
+werden; dabei wird `compose.production.yaml` verwendet und `APP_ENV=production`
+in der Ziel-`.env` verlangt. Umgekehrt verhindert der Import, dass `--dev` eine
+Zielumgebung mit `APP_ENV=production` verwendet. `--dev` und `--prod` dürfen
+nicht gemeinsam angegeben werden.
 
 `--database` und `--user` sind optionale Überschreibungen. Standardmäßig liest der
 Legacy-Import `DB_DATABASE`, `DB_USERNAME`, `DB_HOST`, `DB_PORT` und

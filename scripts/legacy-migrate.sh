@@ -2,13 +2,12 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-COMPOSE=(docker compose -f "$ROOT/compose.yaml")
 ENV_READER="$ROOT/scripts/legacy-env.sh"
 usage() {
   cat <<'EOF'
 Verwendung:
-  ./planer migrate legacy <user@host:/legacy-root> [--database NAME] [--user USER] [--dry-run]
-  LEGACY_DB_PASSWORD='...' ./planer migrate legacy <path> --database NAME --user USER --confirm
+  ./planer migrate legacy <user@host:/legacy-root> [--dev|--prod] [--database NAME] [--user USER] [--dry-run]
+  LEGACY_DB_PASSWORD='...' ./planer migrate legacy <path> [--dev|--prod] --database NAME --user USER --confirm
 
 Die Datenbank wird per mysqldump oder mariadb-dump übernommen. storage/app und bekannte Datei-Roots
 werden in den konfigurierten MinIO-Bucket übertragen. Alte Dateien werden nie
@@ -18,9 +17,17 @@ EOF
 die() { echo "Fehler: $*" >&2; exit 2; }
 [[ $# -ge 1 ]] || { usage >&2; exit 2; }
 legacy_path="$1"; shift
-db_name=''; db_user=''; dry_run=0; confirmed=0
+db_name=''; db_user=''; dry_run=0; confirmed=0; target=''
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --dev)
+      [[ -z "$target" || "$target" == dev ]] || die '--dev und --prod können nicht gleichzeitig verwendet werden.'
+      target=dev
+      ;;
+    --prod)
+      [[ -z "$target" || "$target" == prod ]] || die '--dev und --prod können nicht gleichzeitig verwendet werden.'
+      target=prod
+      ;;
     --database) [[ $# -ge 2 ]] || die '--database benötigt einen Wert'; db_name="$2"; shift ;;
     --user) [[ $# -ge 2 ]] || die '--user benötigt einen Wert'; db_user="$2"; shift ;;
     --dry-run) dry_run=1 ;;
@@ -30,6 +37,21 @@ while [[ $# -gt 0 ]]; do
   esac
   shift
 done
+target="${target:-dev}"
+[[ -f "$ROOT/.env" ]] || die 'Ziel-.env fehlt.'
+target_app_env="$(bash "$ENV_READER" "$ROOT/.env" APP_ENV 2>/dev/null || true)"
+case "$target" in
+  dev)
+    [[ "$target_app_env" != production ]] || die 'Für --dev darf APP_ENV nicht production sein.'
+    COMPOSE=(docker compose -f "$ROOT/compose.yaml")
+    ;;
+  prod)
+    [[ "$target_app_env" == production ]] || die 'Für --prod muss APP_ENV=production gesetzt sein.'
+    COMPOSE=(docker compose -f "$ROOT/compose.production.yaml")
+    ;;
+  *) die "Unbekanntes Ziel: $target" ;;
+esac
+echo "  Zielumgebung: $target"
 [[ "$legacy_path" == *:* ]] || die 'Legacy-Pfad muss [user@]host:/absoluter/pfad sein.'
 legacy_host="${legacy_path%%:*}"; legacy_root="${legacy_path#*:}"
 [[ "$legacy_root" == /* ]] || die 'Der Legacy-Pfad muss absolut sein.'
