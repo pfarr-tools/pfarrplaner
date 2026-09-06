@@ -22,6 +22,23 @@ mit TLS sowie ein unabhängiges Backup-Ziel außerhalb des Servers.
 ./planer bootstrap
 ```
 
+Für eine Produktionsumgebung wird der Produktionsmodus verwendet. Er fragt die
+öffentliche URL oder den Hostnamen ab, setzt `APP_ENV=production` und legt eine
+vollständig kommentierte `.env` mit allen verfügbaren Betriebs-, Backup-,
+Mail-Relay- und Integrationsvariablen an:
+
+```sh
+./planer bootstrap --prod
+./planer prod up --build
+./planer prod status
+```
+
+`./planer bootstrap --defaults` ist für automatisierte Entwicklungsumgebungen
+geeignet; mit `--prod --defaults` werden synthetische Produktionsdefaults
+verwendet. Vor dem öffentlichen Betrieb müssen insbesondere `APP_URL`,
+Backup-Ziel, Mail-Relay und `HORIZON_ALLOWED_EMAILS` geprüft werden. Die
+kommentierte `.env.example` ist die vollständige Referenz aller Einstellungen.
+
 Der Horizon-Zugang wird über `HORIZON_ALLOWED_EMAILS` gesteuert. Die Variable
 enthält eine komma-separierte Liste gültiger Benutzer-E-Mail-Adressen:
 

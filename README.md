@@ -61,6 +61,20 @@ werden. Die wichtigsten lokalen Endpunkte werden danach mit `./planer status`
 angezeigt; typischerweise sind die Anwendung, Vite, MinIO, Soketi und Mailpit
 über die in `.env` gesetzten Forwarding-Ports erreichbar.
 
+Für eine neue Produktionsumgebung wird die vollständig kommentierte `.env`
+mit Produktionswerten angelegt:
+
+```sh
+./planer bootstrap --prod
+./planer prod up --build
+./planer prod status
+```
+
+Der Produktions-Bootstrap fragt nach der öffentlichen URL oder dem Hostnamen,
+setzt `APP_ENV=production` und deaktiviert den Debug-Modus. Die Vorlage enthält
+auch optionale Einstellungen für Backups, Mail-Relay, Integrationen und
+Beobachtungswerkzeuge.
+
 Häufige Befehle:
 
 ```sh
