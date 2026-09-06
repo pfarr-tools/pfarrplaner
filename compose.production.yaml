@@ -69,6 +69,8 @@ services:
     image: redis:7-alpine
     restart: unless-stopped
     command: [redis-server, --appendonly, "yes", --requirepass, "${REDIS_PASSWORD:?REDIS_PASSWORD muss gesetzt sein}"]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD muss gesetzt sein}
     volumes: [redis_data:/data]
     healthcheck: {test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"], interval: 5s, timeout: 3s, retries: 20}
     networks: [backend]
