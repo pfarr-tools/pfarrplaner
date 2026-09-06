@@ -44,6 +44,7 @@ services:
   vite:
     build: {context: ., dockerfile: Dockerfile, target: node}
     working_dir: /app
+    entrypoint: ["/usr/local/bin/pfarrplaner-vite-entrypoint"]
     env_file:
       - path: .env
         required: false

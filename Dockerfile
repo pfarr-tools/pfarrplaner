@@ -47,3 +47,16 @@ CMD ["php-fpm8.4", "-F"]
 
 FROM node:22-bookworm-slim AS node
 WORKDIR /app
+COPY src/package*.json /app/
+RUN npm ci \
+ && cp -a node_modules /opt/pfarrplaner-node-modules
+RUN printf '%s\n' \
+  '#!/bin/sh' \
+  'set -eu' \
+  'if [ ! -x /app/node_modules/.bin/vite ]; then' \
+  '  mkdir -p /app/node_modules' \
+  '  cp -a /opt/pfarrplaner-node-modules/. /app/node_modules/' \
+  'fi' \
+  'exec "$@"' \
+  > /usr/local/bin/pfarrplaner-vite-entrypoint \
+ && chmod +x /usr/local/bin/pfarrplaner-vite-entrypoint

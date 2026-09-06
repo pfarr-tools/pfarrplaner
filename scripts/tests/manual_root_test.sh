@@ -11,5 +11,6 @@ grep -q "PFARRPLANER_MANUAL_ROOT" "$ROOT/src/config/manual.php"
 grep -q './docs/manual:/var/www/docs/manual' "$ROOT/compose.yaml"
 grep -q "MANUAL_ROOT" "$ROOT/src/scripts/build-manual-site.js"
 grep -q "config('manual.root'" "$ROOT/src/app/Console/Commands/DevBuilder/BuildManualPages.php"
+grep -q 'if (!is_array(\$prefixes))' "$ROOT/src/app/Http/Middleware/HandleInertiaRequests.php"
 
 echo 'Manual root tests passed'

@@ -129,10 +129,18 @@ class HandleInertiaRequests extends Middleware
             return 'benutzerhandbuch';
         }
         foreach (config('manual', []) as $chapter => $prefixes) {
+            if (!is_array($prefixes)) {
+                continue;
+            }
+
             $manual = 'benutzerhandbuch';
-            if (is_array($prefixes) && isset($prefixes['prefixes'])) {
+            if (isset($prefixes['prefixes'])) {
                 $manual = $prefixes['manual'] ?? $manual;
                 $prefixes = $prefixes['prefixes'];
+            }
+
+            if (!is_array($prefixes)) {
+                continue;
             }
 
             foreach ($prefixes as $prefix) {
