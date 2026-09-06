@@ -16,6 +16,11 @@
  * opens the matching chapter on the static manual site.
  */
 return [
+    'root' => env(
+        'PFARRPLANER_MANUAL_ROOT',
+        is_dir(base_path('../docs/manual')) ? base_path('../docs/manual') : base_path('manual')
+    ),
+
     'anmeldung' => [
         'manual' => 'benutzerhandbuch',
         'prefixes' => ['login', 'password.', 'logout', 'about'],

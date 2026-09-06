@@ -11,6 +11,7 @@ x-app: &app
       required: false
   volumes:
     - ./src:/var/www/html
+    - ./docs/manual:/var/www/docs/manual
     - ./backups:/var/backups/pfarrplaner
     - composer_cache:/tmp/composer-cache
   depends_on:

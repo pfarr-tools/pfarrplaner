@@ -34,9 +34,6 @@ use App\Services\PackageService;
 use Illuminate\Console\Command;
 class BuildManualPages extends Command
 {
-    protected const MANUAL_ROOT = 'manual';
-    protected const USER_MANUAL_DIR = 'manual/benutzerhandbuch';
-
     /**
      * The name and signature of the console command.
      *
@@ -73,8 +70,8 @@ class BuildManualPages extends Command
         $this->writeLicensePage();
 
         $this->line('Moving image files...');
-        foreach (glob(base_path('manual/img*.png')) as $file) {
-            copy($file, base_path(self::MANUAL_ROOT.'/media/images/'.basename($file)));
+        foreach (glob($this->manualRoot().'/img*.png') as $file) {
+            copy($file, $this->manualRoot().'/media/images/'.basename($file));
             unlink($file);
         }
         $this->line('Rewriting image references...');
@@ -92,7 +89,7 @@ class BuildManualPages extends Command
         $gitCommit = trim((string) shell_exec('git rev-parse --short HEAD 2>/dev/null')) ?: 'unbekannt';
         $gitBranch = trim((string) shell_exec('git branch --show-current 2>/dev/null')) ?: 'unbekannt';
 
-        file_put_contents(base_path(self::USER_MANUAL_DIR.'/versionsangaben.md'), implode(PHP_EOL, [
+        file_put_contents($this->userManualDir().'/versionsangaben.md', implode(PHP_EOL, [
             '[//]: # (TOC: 16. Versionsangaben)',
             '',
             '# Versionsangaben',
@@ -130,10 +127,10 @@ class BuildManualPages extends Command
      */
     protected function writeLicensePage(): void
     {
-        $licenseFile = base_path(self::MANUAL_ROOT.'/media/licenses/gpl-3.0.de.txt');
+        $licenseFile = $this->manualRoot().'/media/licenses/gpl-3.0.de.txt';
         $licenseText = file_exists($licenseFile) ? trim(file_get_contents($licenseFile)) : '';
 
-        file_put_contents(base_path(self::USER_MANUAL_DIR.'/lizenzen.md'), implode(PHP_EOL, [
+        file_put_contents($this->userManualDir().'/lizenzen.md', implode(PHP_EOL, [
             '[//]: # (TOC: 17. Lizenzen)',
             '',
             '# Lizenzen',
@@ -301,7 +298,17 @@ class BuildManualPages extends Command
 
     protected function getAllPages()
     {
-        return glob(base_path(self::USER_MANUAL_DIR.'/*.md'));
+        return glob($this->userManualDir().'/*.md');
+    }
+
+    protected function manualRoot(): string
+    {
+        return rtrim((string) config('manual.root', base_path('manual')), '/');
+    }
+
+    protected function userManualDir(): string
+    {
+        return $this->manualRoot().'/benutzerhandbuch';
     }
 
 }

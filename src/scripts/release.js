@@ -18,6 +18,7 @@ const fs = require('fs');
 const path = require('path');
 
 const packagePath = path.resolve(__dirname, '..', 'package.json');
+const repositoryRoot = execSync('git rev-parse --show-toplevel', { encoding: 'utf8' }).trim();
 const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
 const standardVersionConfig = pkg['standard-version'] || {};
 const tagPrefix = standardVersionConfig.tagPrefix || 'v';
@@ -48,13 +49,13 @@ let releaseType;
  * @return {void}
  */
 function gitAddExisting(paths) {
-    const existingPaths = paths.filter((target) => fs.existsSync(path.resolve(__dirname, '..', target)));
+    const existingPaths = paths.filter((target) => fs.existsSync(path.resolve(repositoryRoot, target)));
 
     if (existingPaths.length === 0) {
         return;
     }
 
-    execSync(`git add ${existingPaths.join(' ')}`, { stdio: 'inherit' });
+    execSync(`git -C "${repositoryRoot}" add -- ${existingPaths.join(' ')}`, { stdio: 'inherit' });
 }
 
 if (forcedType) {
@@ -100,10 +101,10 @@ if (releaseType === 'major' || releaseType === 'minor') {
         execSync('npm run manual:all:server', { stdio: 'inherit' });
         execSync('npm run manual:deploy', { stdio: 'inherit' });
         gitAddExisting([
-            'manual/benutzerhandbuch/versionsangaben.md',
-            'manual/benutzerhandbuch/lizenzen.md',
-            'manual/media/images',
-            'manual/media/site',
+            'docs/manual/benutzerhandbuch/versionsangaben.md',
+            'docs/manual/benutzerhandbuch/lizenzen.md',
+            'docs/manual/media/images',
+            'docs/manual/media/site',
         ]);
     } catch (err) {
         console.error('Manual build/deploy failed.');

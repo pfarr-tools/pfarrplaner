@@ -18,7 +18,8 @@ use Tests\AbstractPageLoadTest;
 /**
  * Base class for Dusk tests that capture screenshots for the user manual.
  *
- * Screenshots are saved to manual/media/images/ so they can be referenced
+ * Screenshots are saved to the configured manual media directory so they can
+ * be referenced
  * directly in the manual's Markdown files as ![alt](media/images/name.png).
  */
 abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
@@ -30,7 +31,7 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
     protected function setUp(): void
     {
         parent::setUp();
-        $this->screenshotDir = base_path('manual/media/images');
+        $this->screenshotDir = config('manual.root').'/media/images';
         if (!is_dir($this->screenshotDir)) {
             mkdir($this->screenshotDir, 0755, true);
         }
@@ -40,7 +41,7 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
 
     /**
      * Navigate to $url, wait for the app to render, take a screenshot and
-     * copy it to manual/media/images/{$filename}.png.
+     * copy it to the configured manual media directory.
      *
      * @param Browser $browser       Already-authenticated browser instance
      * @param string  $url           URL to navigate to

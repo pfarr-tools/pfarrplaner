@@ -26,7 +26,7 @@ fi
 echo "Pfarrplaner-Release starten (Typ: $release_type)."
 (
   cd "$ROOT/src"
-  npm run release -- "$@"
+  PFARRPLANER_MANUAL_ROOT="$ROOT/docs/manual" npm run release -- "$@"
 )
 
 tag=$(git -C "$ROOT" describe --tags --exact-match HEAD 2>/dev/null || true)

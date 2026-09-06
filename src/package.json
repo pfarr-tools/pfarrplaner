@@ -29,7 +29,7 @@
         "manual:all": "npm run manual:all:server",
         "manual:all:server": "node scripts/build-manual-with-server.js",
         "manual:all:skip-dusk": "SKIP_DUSK=1 npm run manual:all:server",
-        "manual:release": "npm run manual:all:server && npm run manual:site &&npm run manual:deploy && git add manual/benutzerhandbuch/versionsangaben.md manual/benutzerhandbuch/lizenzen.md manual/media/images manual/media/site"
+        "manual:release": "npm run manual:all:server && npm run manual:site && npm run manual:deploy && git add ../docs/manual/benutzerhandbuch/versionsangaben.md ../docs/manual/benutzerhandbuch/lizenzen.md ../docs/manual/media/images ../docs/manual/media/site"
     },
     "standard-version": {},
     "overrides": {

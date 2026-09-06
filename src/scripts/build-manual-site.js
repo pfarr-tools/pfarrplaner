@@ -11,6 +11,12 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
+const MANUAL_ROOT = path.resolve(
+    process.env.PFARRPLANER_MANUAL_ROOT
+        || (fs.existsSync(path.join(ROOT, '..', 'docs', 'manual'))
+            ? path.join(ROOT, '..', 'docs', 'manual')
+            : path.join(ROOT, 'manual'))
+);
 const BUILD_DIR = path.join(ROOT, 'build');
 const UNIFIED_BUILD_DIR = path.join(BUILD_DIR, 'manual-site');
 const DOCS_SOURCE_DIR = path.join(UNIFIED_BUILD_DIR, 'source');
@@ -19,8 +25,8 @@ const THEME_OVERRIDE_DIR = path.join(UNIFIED_BUILD_DIR, 'theme-overrides');
 const CONFIG_FILE = path.join(UNIFIED_BUILD_DIR, 'mkdocs.handbook.yml');
 const SITE_DIR = path.resolve(ROOT, process.env.MANUAL_SITE_DIR || 'build/handbuch-site');
 const FONTS_SRC_DIR = path.join(ROOT, 'resources', 'fonts');
-const SHARED_SITE_ASSETS_DIR = path.join(ROOT, 'manual', 'media', 'site');
-const SHARED_LICENSE_ASSETS_DIR = path.join(ROOT, 'manual', 'media', 'licenses');
+const SHARED_SITE_ASSETS_DIR = path.join(MANUAL_ROOT, 'media', 'site');
+const SHARED_LICENSE_ASSETS_DIR = path.join(MANUAL_ROOT, 'media', 'licenses');
 const OPENAPI_FILE = path.join(ROOT, 'public', 'openapi.json');
 const MKDOCS_PYTHON = process.env.MKDOCS_PYTHON
     ? path.resolve(process.env.MKDOCS_PYTHON)
@@ -29,7 +35,7 @@ const MKDOCS_PYTHON = process.env.MKDOCS_PYTHON
 const MANUALS = [
     {
         id: 'benutzerhandbuch',
-        sourceDir: path.join(ROOT, 'manual', 'benutzerhandbuch'),
+        sourceDir: path.join(MANUAL_ROOT, 'benutzerhandbuch'),
         title: 'Pfarrplaner Benutzerhandbuch',
         shortTitle: 'Benutzerhandbuch',
         description: 'Hilfe für die tägliche Arbeit im Pfarramt und Gemeindebüro.',
@@ -40,7 +46,7 @@ const MANUALS = [
     },
     {
         id: 'administratorhandbuch',
-        sourceDir: path.join(ROOT, 'manual', 'administratorhandbuch'),
+        sourceDir: path.join(MANUAL_ROOT, 'administratorhandbuch'),
         title: 'Pfarrplaner Administratorhandbuch',
         shortTitle: 'Administratorhandbuch',
         description: 'Installation, Betrieb, Updates und Wartung für Administratorinnen und Administratoren.',
@@ -51,7 +57,7 @@ const MANUALS = [
     },
     {
         id: 'technikhandbuch',
-        sourceDir: path.join(ROOT, 'manual', 'technikhandbuch'),
+        sourceDir: path.join(MANUAL_ROOT, 'technikhandbuch'),
         title: 'Pfarrplaner Technisches Handbuch',
         shortTitle: 'Technisches Handbuch',
         description: 'Architektur, Entwicklung, Deployment und API-Dokumentation.',
@@ -349,7 +355,7 @@ function prepareUnifiedSource() {
     for (const manual of MANUALS) {
         const targetDir = path.join(DOCS_SOURCE_DIR, manual.id);
         copyManualSource(manual.sourceDir, targetDir);
-        copyDirectory(path.join(ROOT, 'manual', 'media'), path.join(targetDir, 'media'));
+        copyDirectory(path.join(MANUAL_ROOT, 'media'), path.join(targetDir, 'media'));
 
         if (manual.id === 'technikhandbuch' && fs.existsSync(OPENAPI_FILE)) {
             fs.copyFileSync(OPENAPI_FILE, path.join(targetDir, 'openapi.json'));
@@ -569,7 +575,7 @@ function preparePdfSource(manual, paths) {
     copyManualSource(manual.sourceDir, paths.docsDir);
     fs.writeFileSync(path.join(paths.docsDir, manual.pdfFile), '');
 
-    copyDirectory(path.join(ROOT, 'manual', 'media'), path.join(paths.docsDir, 'media'));
+    copyDirectory(path.join(MANUAL_ROOT, 'media'), path.join(paths.docsDir, 'media'));
 
     if (manual.id === 'technikhandbuch' && fs.existsSync(OPENAPI_FILE)) {
         fs.copyFileSync(OPENAPI_FILE, path.join(paths.docsDir, 'openapi.json'));

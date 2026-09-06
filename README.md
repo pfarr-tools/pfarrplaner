@@ -147,6 +147,10 @@ Das verbindliche [Installations-, Migrations- und Betriebshandbuch](docs/admin/i
 beschreibt Konfiguration, Objektmigration, Backups/Restore, sichere Updates,
 Mail-Relay, Daten-Push/Pull und Fehlerbehebung.
 
+Die drei Handbücher und ihre gemeinsamen Medien liegen unter
+[`docs/manual/`](docs/manual/). Eine Übersicht der Dokumentationsstruktur steht
+in [`docs/README.md`](docs/README.md).
+
 Die Anwendung selbst ist unter [`src/`](src/) dokumentiert. Die ursprüngliche
 Projektbeschreibung befindet sich weiterhin in [`src/README.md`](src/README.md).
 Das vollständige [Benutzerhandbuch](https://handbuch.pfarrplaner.de) beschreibt

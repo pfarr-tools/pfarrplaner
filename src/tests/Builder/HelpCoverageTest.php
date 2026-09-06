@@ -46,7 +46,7 @@ class HelpCoverageTest extends TestCase
         foreach ($routes['GET'] as $route) {
             $routeKey = $route->getAction('as');
             if ($routeKey) {
-                if (!file_exists(base_path('manual/benutzerhandbuch/'.$routeKey.'.md'))) $routeKeys[] = $routeKey;
+                if (!file_exists(config('manual.root').'/benutzerhandbuch/'.$routeKey.'.md')) $routeKeys[] = $routeKey;
             }
         }
         if (count($routeKeys)) {
