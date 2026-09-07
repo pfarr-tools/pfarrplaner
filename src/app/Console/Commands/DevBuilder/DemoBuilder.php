@@ -91,7 +91,7 @@ class DemoBuilder extends Command
 
         $this->output->section('Pre-flight checks');
         if (!$this->checkRequirements()) {
-            return;
+            return self::FAILURE;
         }
 
 
@@ -165,16 +165,16 @@ class DemoBuilder extends Command
 
     protected function checkRequirements()
     {
-        $totalChecks = $this->checkRequirement('DEMO_MODE set in .env', env('DEMO_MODE'))
-            && $this->checkRequirement('Environment is demo', app()->environment(), 'demo')
+        $demoMode = filter_var(env('DEMO_MODE'), FILTER_VALIDATE_BOOLEAN);
+        $databaseName = (string) Config::get('database.connections.' . Config::get('database.default') . '.database');
+
+        $totalChecks = $this->checkRequirement('DEMO_MODE enabled', $demoMode)
+            && $this->checkRequirement('Environment is demo or DEMO_MODE enabled', app()->environment(), 'demo', $demoMode)
             && $this->checkRequirement(
-                'Database name contains _demo',
-                Config::get('database.connections.' . Config::get('database.default') . '.database'),
+                'Database name contains _demo or DEMO_MODE enabled',
+                $databaseName,
                 true,
-                str_contains(
-                    Config::get('database.connections.' . Config::get('database.default') . '.database'),
-                    '_demo'
-                ),
+                $demoMode || str_contains($databaseName, '_demo'),
             );
 
         return $totalChecks;

@@ -179,7 +179,9 @@ sendet also keine Nachrichten an externe Empfänger. Die Mailpit-Oberfläche ist
 unter dem lokal gebundenen `FORWARD_MAILPIT_PORT` erreichbar. Umgekehrt
 verhindert der Import, dass `--dev` eine Zielumgebung mit `APP_ENV=production`
 verwendet. `--dev`, `--prod` und `--demo` dürfen nicht gemeinsam angegeben
-werden.
+werden. Für `--demo` setzt der Import `DEMO_MODE=true`; dieser explizite
+Schalter erlaubt dem DemoBuilder die produktionsgleiche Compose-Umgebung und
+verhindert, dass ein fehlender Demo-Preflight als erfolgreicher Import endet.
 
 `--database` und `--user` sind optionale Überschreibungen. Standardmäßig liest der
 Legacy-Import `DB_DATABASE`, `DB_USERNAME`, `DB_HOST`, `DB_PORT` und

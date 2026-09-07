@@ -192,6 +192,7 @@ if [[ -f "$legacy_bible_archive" ]]; then
   echo '  Remote-Bibelordner nach src/resources/bible übernommen; Produktionsbild wird neu gebaut.'
 fi
 if [[ "$target" == demo ]]; then
+  set_env_value DEMO_MODE true
   set_env_value MAIL_MAILER smtp
   set_env_value MAIL_DRIVER smtp
   set_env_value MAIL_HOST mailpit
