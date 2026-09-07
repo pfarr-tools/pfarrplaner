@@ -120,7 +120,7 @@ class DemoBuilder extends Command
             $this->output->section('Anonymizing ' . $unit);
             if (method_exists($this, $prepMethodName)) {
                 if (!$this->writeResult('Preparing environment for demo ' . $unit, $this->$prepMethodName())) {
-                    return;
+                    return self::FAILURE;
                 }
             }
             if (class_exists($model)) {
@@ -135,7 +135,8 @@ class DemoBuilder extends Command
                     $this->writeResult($count . ' ' . $unit . ' anonymized.', true);
                 }
             } else {
-                return $this->writeResult('Model ' . $model . ' not found', false);
+                $this->writeResult('Model ' . $model . ' not found', false);
+                return self::FAILURE;
             }
         }
     }
@@ -402,7 +403,6 @@ class DemoBuilder extends Command
         try {
             if ($this->hasIndex('users', 'users_api_token_unique')) {
                 Schema::table('users', function (Blueprint $table) {
-                    $table->string('api_token')->change();
                     $table->dropUnique('users_api_token_unique');
                 });
             }
