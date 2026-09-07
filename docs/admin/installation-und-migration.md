@@ -205,8 +205,10 @@ Bucket; Backup-Buckets bleiben unberührt. Der Legacy-Import erstellt SQL-/
 Dateiarchive mit SHA-256-Prüfsummen. Daten aus `failed_jobs` sowie den
 Telescope-Tabellen werden beim Dump bewusst ausgelassen; die Tabellenstrukturen
 bleiben erhalten. Anschließend importiert der Prozess MariaDB, führt Migrationen aus,
-überträgt `storage/app` und `storage/inbox` und lässt die alte Installation
-unverändert.
+überträgt `storage/app`, `storage/inbox` und — falls vorhanden — den gesamten
+Ordner `src/resources/bible` in die lokale Anwendung. Bereits vorhandene lokale
+Bibeldateien werden dabei ergänzt oder überschrieben, aber nicht gelöscht. Die
+alte Installation bleibt unverändert.
 
 ## Optionaler Maildienst
 

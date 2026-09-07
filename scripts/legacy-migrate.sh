@@ -171,7 +171,14 @@ set_env_value() {
 echo '3/6 Unveränderliches Legacy-Datenbankarchiv erstellen.'
 legacy_dump "--single-transaction --routines --events $legacy_volatile_data_options $legacy_db_auth_options --databases $(quote "$legacy_db_name")" > "$ROOT/backups/legacy/legacy-$stamp.sql"
 remote 'tar -C . -cf - storage/app storage/inbox public/uploads 2>/dev/null || true' > "$archive"
-sha256sum "$ROOT/backups/legacy/legacy-$stamp.sql" "$archive" > "$ROOT/backups/legacy/legacy-$stamp.sha256"
+legacy_archives=("$ROOT/backups/legacy/legacy-$stamp.sql" "$archive")
+legacy_bible_archive="$ROOT/backups/legacy/legacy-$stamp-bible.tar"
+if remote 'test -d src/resources/bible'; then
+  remote 'tar -C src/resources -cf - bible' > "$legacy_bible_archive"
+  legacy_archives+=("$legacy_bible_archive")
+  echo '  Remote-Bibelordner archiviert.'
+fi
+sha256sum "${legacy_archives[@]}" > "$ROOT/backups/legacy/legacy-$stamp.sha256"
 
 echo '4/6 Legacy-Schlüssel in die lokale .env übernehmen.'
 set_env_value APP_KEY "$legacy_app_key"
@@ -193,5 +200,10 @@ echo '5/5 Legacy-Dateien in MinIO übernehmen.'
 legacy_files="$(mktemp -d)"
 tar -C "$legacy_files" -xf "$archive"
 "${COMPOSE[@]}" run --rm --no-deps -v "$legacy_files:/tmp/legacy:ro" --entrypoint /bin/sh create-buckets -lc 'mc alias set dst "${AWS_ENDPOINT:-http://minio:9000}" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" && if [ -d /tmp/legacy/storage/app ]; then mc mirror --overwrite /tmp/legacy/storage/app dst/"$AWS_BUCKET"; fi && if [ -d /tmp/legacy/storage/inbox ]; then mc mirror --overwrite /tmp/legacy/storage/inbox dst/"$AWS_BUCKET"/inbox; fi'
+if [[ -f "$legacy_bible_archive" ]]; then
+  mkdir -p "$ROOT/src/resources"
+  tar -C "$ROOT/src/resources" -xf "$legacy_bible_archive"
+  echo '  Remote-Bibelordner nach src/resources/bible übernommen.'
+fi
 "${COMPOSE[@]}" exec -T app php artisan optimize:clear
 echo 'Legacy-Import abgeschlossen. Die alten Dateien und Prüfsummen liegen unter backups/legacy/.'

@@ -30,6 +30,9 @@ grep -q 'failed_jobs' "$ROOT/scripts/legacy-migrate.sh"
 grep -q 'telescope_entries' "$ROOT/scripts/legacy-migrate.sh"
 grep -q 'MARIADB_ROOT_PASSWORD' "$ROOT/scripts/legacy-migrate.sh"
 grep -q 'tar -C "\$legacy_files" -xf "\$archive"' "$ROOT/scripts/legacy-migrate.sh"
+grep -q 'src/resources/bible' "$ROOT/scripts/legacy-migrate.sh"
+grep -q 'tar -C src/resources -cf - bible' "$ROOT/scripts/legacy-migrate.sh"
+grep -q 'tar -C "\$ROOT/src/resources" -xf "\$legacy_bible_archive"' "$ROOT/scripts/legacy-migrate.sh"
 grep -q 'force-recreate app web horizon scheduler' "$ROOT/scripts/legacy-migrate.sh"
 
 echo 'Legacy environment tests passed'
