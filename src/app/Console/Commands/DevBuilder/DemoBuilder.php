@@ -34,6 +34,8 @@ use App\Models\Attachment;
 use App\Models\Comment;
 use App\Models\Leave\Absence;
 use App\Models\Leave\Pool;
+use App\Models\Liturgy\Block;
+use App\Models\Liturgy\Item;
 use App\Models\Location;
 use App\Models\Parish;
 use App\Models\People\User;
@@ -51,6 +53,7 @@ use Faker\Generator;
 use Illuminate\Console\Command;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -139,6 +142,16 @@ class DemoBuilder extends Command
                 return self::FAILURE;
             }
         }
+
+        $this->output->section('Anonymizing liturgy data');
+        if (!$this->anonymizeLiturgyData()) {
+            return self::FAILURE;
+        }
+
+        $this->output->section('Clearing operational demo data');
+        if (!$this->anonymizeOperationalData()) {
+            return self::FAILURE;
+        }
     }
 
     protected function writeDelayedResult($title, $resultCallBack)
@@ -210,6 +223,7 @@ class DemoBuilder extends Command
     protected function handleAttachments(Attachment $attachment)
     {
         $oldFile = $attachment->file;
+        $attachment->update(['title' => 'Demo-Anhang ' . $attachment->id]);
         if (substr($attachment->mimeType, 0, 5) == 'image') {
             $attachment->update(['file' => 'demo/demo.jpg']);
         } else {
@@ -222,7 +236,7 @@ class DemoBuilder extends Command
 
     protected function handleBaptisms(Baptism $baptism)
     {
-        $baptism->update([
+        $data = [
                              'candidate_name' => $this->faker->name,
                              'candidate_address' => $this->faker->streetAddress,
                              'candidate_zip' => $this->faker->postcode,
@@ -230,11 +244,29 @@ class DemoBuilder extends Command
                              'candidate_phone' => $this->faker->phoneNumber,
                              'candidate_email' => $this->faker->email,
                              'first_contact_with' => $this->faker->name,
-                             'text' => $this->faker->text(),
                              'notes' => $this->faker->text(),
                              'dimissorial_issuer' => 'Pfarramt ' . $this->faker->city,
                              'birth_place' => $this->faker->city,
-                         ]);
+                         ];
+        if ($baptism->first_contact_on) {
+            $data['first_contact_on'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y');
+        }
+        if ($baptism->appointment) {
+            $data['appointment'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y H:i');
+        }
+        if ($baptism->docs_where) {
+            $data['docs_where'] = 'Demo-Dokumentation';
+        }
+        if ($baptism->dimissorial_requested) {
+            $data['dimissorial_requested'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y');
+        }
+        if ($baptism->dimissorial_received) {
+            $data['dimissorial_received'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y');
+        }
+        if ($baptism->dob) {
+            $data['dob'] = $this->faker->dateTimeBetween('-95 years', '-1 year')->format('d.m.Y');
+        }
+        $baptism->update($data);
     }
 
     protected function handleBookings(Booking $booking)
@@ -292,7 +324,14 @@ class DemoBuilder extends Command
         $locations = Location::where('city_id', $city->id)->get();
         /** @var Location $location */
         foreach ($locations as $location) {
-            $location->update(['name' => str_replace($oldName, $newName, $location->name)]);
+            $locationData = ['name' => str_replace($oldName, $newName, $location->name)];
+            if ($location->at_text) {
+                $locationData['at_text'] = 'Demo-Ort ' . $newName;
+            }
+            if ($location->instructions) {
+                $locationData['instructions'] = $this->faker->text();
+            }
+            $location->update($locationData);
         }
     }
 
@@ -303,7 +342,7 @@ class DemoBuilder extends Command
 
     protected function handleFunerals(Funeral $funeral)
     {
-        $funeral->update([
+        $data = [
                              'buried_name' => $this->faker->name,
                              'buried_address' => $this->faker->streetAddress,
                              'buried_zip' => $this->faker->postcode,
@@ -328,7 +367,6 @@ class DemoBuilder extends Command
                              'confirmation' => '',
                              'undertaker' => $this->faker->name . ' (' . $this->faker->phoneNumber . ')',
                              'eulogies' => '',
-                             'text' => $this->faker->text(),
                              'notes' => $this->faker->text(),
                              'announcements' => $this->faker->text(),
                              'childhood' => $this->faker->text(),
@@ -352,21 +390,44 @@ class DemoBuilder extends Command
                              'appointment_address' => $this->faker->address,
                              'confirmation_text' => $this->faker->sentence,
                              'wedding_text' => $this->faker->sentence,
-                         ]);
+                         ];
+        foreach (['wake', 'announcement', 'baptism_date', 'confirmation_date', 'wedding_date', 'dod_spouse',
+                  'dimissorial_requested', 'dimissorial_received'] as $field) {
+            if ($funeral->{$field}) {
+                $data[$field] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y');
+            }
+        }
+        if ($funeral->wake_location) {
+            $data['wake_location'] = 'Demo-Ort';
+        }
+        $funeral->update($data);
     }
 
     protected function handleParishes(Parish $parish)
     {
         $parish->load('owningCity');
         $name = str_replace('Pfarramt ', '', $parish->name);
-        $parish->update([
-                            'code' => trim('Pfarramt ' . $parish->owningCity->name . ' ' . $name),
-                            'address' => $this->faker->streetAddress,
-                            'zip' => $this->faker->postcode,
-                            'city' => $parish->owningCity->name,
-                            'phone' => $this->faker->phoneNumber,
-                            'email' => $this->faker->email,
-                        ]);
+        $data = [
+            'code' => trim('Pfarramt ' . $parish->owningCity->name . ' ' . $name),
+            'address' => $this->faker->streetAddress,
+            'zip' => $this->faker->postcode,
+            'city' => $parish->owningCity->name,
+            'phone' => $this->faker->phoneNumber,
+            'email' => $this->faker->email,
+        ];
+        if ($parish->assistant) {
+            $data['assistant'] = $this->faker->name;
+        }
+        if ($parish->congregation_name) {
+            $data['congregation_name'] = 'Evangelische Kirchengemeinde ' . $parish->owningCity->name;
+        }
+        if ($parish->congregation_url) {
+            $data['congregation_url'] = 'https://demo.pfarrplaner.de/gemeinde/' . $parish->id;
+        }
+        if ($parish->opening_hours) {
+            $data['opening_hours'] = 'Montag bis Freitag, 9:00 bis 12:00 Uhr';
+        }
+        $parish->update($data);
     }
 
     protected function handlePools(Pool $pool)
@@ -391,6 +452,47 @@ class DemoBuilder extends Command
             } else {
                 $data['special_location'] = 'Auf der grünen Wiese';
             }
+        }
+        $loremFields = [
+            'description',
+            'others',
+            'sermon_description',
+            'announcements',
+            'offering_text',
+            'youtube_prefix_description',
+            'youtube_postfix_description',
+            'ad_text',
+        ];
+        foreach ($loremFields as $field) {
+            if ($service->{$field}) {
+                $data[$field] = $this->faker->text();
+            }
+        }
+        if ($service->cc_staff) {
+            $data['cc_staff'] = $this->faker->name . ', ' . $this->faker->name;
+        }
+        if ($service->cc_location) {
+            $data['cc_location'] = 'Demo-Ort';
+        }
+        if ($service->title) {
+            $data['title'] = 'Gottesdienst Nr. ' . $service->id;
+        }
+        foreach (['youtube_url', 'cc_streaming_url', 'offerings_url', 'meeting_url', 'recording_url', 'external_url'] as $field) {
+            if ($service->{$field}) {
+                $data[$field] = 'https://demo.pfarrplaner.de/services/' . $service->id;
+            }
+        }
+        if ($service->songsheet) {
+            $data['songsheet'] = 'demo/demo.pdf';
+        }
+        if ($service->sermon_title) {
+            $data['sermon_title'] = 'Predigttitel Nr. ' . $service->id;
+        }
+        if ($service->sermon_image) {
+            $data['sermon_image'] = 'demo/demo.jpg';
+        }
+        if ($service->konfiapp_event_qr) {
+            $data['konfiapp_event_qr'] = 'demo-event-' . $service->id;
         }
         $service->update($data);
     }
@@ -430,6 +532,7 @@ class DemoBuilder extends Command
             'own_podcast_spotify' => false,
             'own_podcast_itunes' => false,
             'api_token' => Str::random(60),
+            'remember_token' => Str::random(60),
             'email' => 'demo-user-' . $user->id . '@demo.pfarrplaner.de',
             'image' => '',
         ];
@@ -442,7 +545,7 @@ class DemoBuilder extends Command
 
     protected function handleWeddings(Wedding $wedding)
     {
-        $wedding->update([
+        $data = [
                              'spouse1_name' => $this->faker->name('male'),
                              'spouse1_phone' => $this->faker->phoneNumber,
                              'spouse1_email' => $this->faker->email,
@@ -462,11 +565,101 @@ class DemoBuilder extends Command
                              'spouse2_city' => $this->faker->city,
                              'spouse2_dimissorial_issuer' => 'Pfarramt ' . $this->faker->city,
                              'notes' => $this->faker->text(),
-                             'text' => $this->faker->text(),
                              'music' => $this->faker->text(),
                              'gift' => $this->faker->text(),
                              'flowers' => $this->faker->text(),
-                         ]);
+                         ];
+        foreach (['spouse1_dimissorial_requested', 'spouse1_dimissorial_received',
+                  'spouse2_dimissorial_requested', 'spouse2_dimissorial_received',
+                  'permission_requested', 'permission_received'] as $field) {
+            if ($wedding->{$field}) {
+                $data[$field] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y');
+            }
+        }
+        if ($wedding->appointment) {
+            $data['appointment'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y H:i');
+        }
+        if ($wedding->registration_document) {
+            $data['registration_document'] = 'Demo-Dokument';
+        }
+        if ($wedding->docs_where) {
+            $data['docs_where'] = 'Demo-Dokumentation';
+        }
+        $wedding->update($data);
+    }
+
+    protected function anonymizeLiturgyData(): bool
+    {
+        try {
+            if (Schema::hasTable('liturgy_blocks')) {
+                foreach (Block::cursor() as $block) {
+                    if ($block->instructions) {
+                        $block->update(['instructions' => $this->faker->text()]);
+                    }
+                }
+            }
+
+            if (Schema::hasTable('liturgy_items')) {
+                foreach (Item::cursor() as $item) {
+                    $data = $item->data;
+                    $changed = false;
+                    if (is_array($data) && isset($data['responsible']) && is_array($data['responsible'])) {
+                        foreach ($data['responsible'] as $index => $participant) {
+                            if (is_array($participant)) {
+                                if (($participant['type'] ?? null) === 'free' && !empty($participant['name'])) {
+                                    $data['responsible'][$index]['name'] = $this->faker->name;
+                                    $changed = true;
+                                }
+                            } elseif (is_string($participant)) {
+                                if (str_starts_with($participant, 'free:')) {
+                                    $data['responsible'][$index] = 'free:' . $this->faker->name;
+                                    $changed = true;
+                                } elseif (!str_contains($participant, ':')) {
+                                    $data['responsible'][$index] = $this->faker->name;
+                                    $changed = true;
+                                }
+                            }
+                        }
+                    }
+                    $update = [];
+                    if ($item->instructions) {
+                        $update['instructions'] = $this->faker->text();
+                    }
+                    if ($changed) {
+                        $item->data = $data;
+                        $update['serialized_data'] = $item->getAttributes()['serialized_data'];
+                    }
+                    if ($update) {
+                        $item->update($update);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function anonymizeOperationalData(): bool
+    {
+        try {
+            foreach (['sessions', 'password_resets', 'visits', 'personal_access_tokens', 'failed_jobs'] as $table) {
+                if (Schema::hasTable($table)) {
+                    DB::table($table)->delete();
+                }
+            }
+            if (Schema::hasTable('telescope_entries_tags')) {
+                DB::table('telescope_entries_tags')->delete();
+            }
+            if (Schema::hasTable('telescope_entries')) {
+                DB::table('telescope_entries')->delete();
+            }
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return true;
     }
 
     protected function hasIndex(string $table, string $index): bool
