@@ -14,5 +14,7 @@ fi
 users_block="$(sed -n '/protected function handleUsers(/,/protected function handleWeddings(/p' "$COMMAND")"
 grep -q "'own_podcast_spotify' => false" <<<"$users_block"
 grep -q "'own_podcast_itunes' => false" <<<"$users_block"
+cities_block="$(sed -n '/protected function handleCities(/,/protected function handleComments(/p' "$COMMAND")"
+grep -q "'default_ministries' => \[\]" <<<"$cities_block"
 
 echo 'DemoBuilder preflight tests passed'

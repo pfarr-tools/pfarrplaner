@@ -281,7 +281,7 @@ class DemoBuilder extends Command
                           'konfiapp_default_type' => '',
                           'official_name' => 'Evangelische Kirchengemeinde ' . $newName,
                           'logo' => '',
-                          'default_ministries' => '',
+                          'default_ministries' => [],
                           'iban' => '',
                           'bic' => '',
                       ]);
