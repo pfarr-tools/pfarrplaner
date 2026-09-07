@@ -164,14 +164,17 @@ bleibt für Notfälle möglich.
 ./planer migrate legacy user@altserver:/var/www/pfarrplaner --dev --dry-run
 ./planer migrate legacy user@altserver:/var/www/pfarrplaner --prod --dry-run
 ./planer migrate legacy user@altserver:/var/www/pfarrplaner --prod --confirm
+./planer migrate legacy user@altserver:/var/www/pfarrplaner --demo --confirm
 ```
 
 Ohne Zieloption verwendet der Import weiterhin die Entwicklungsumgebung
 (`--dev`). Für einen produktiven Import muss `--prod` ausdrücklich angegeben
 werden; dabei wird `compose.production.yaml` verwendet und `APP_ENV=production`
-in der Ziel-`.env` verlangt. Umgekehrt verhindert der Import, dass `--dev` eine
-Zielumgebung mit `APP_ENV=production` verwendet. `--dev` und `--prod` dürfen
-nicht gemeinsam angegeben werden.
+in der Ziel-`.env` verlangt. `--demo` verwendet dieselbe Produktionsumgebung
+und führt nach dem Import zusätzlich `php artisan demo:build` aus. Umgekehrt
+verhindert der Import, dass `--dev` eine Zielumgebung mit `APP_ENV=production`
+verwendet. `--dev`, `--prod` und `--demo` dürfen nicht gemeinsam angegeben
+werden.
 
 `--database` und `--user` sind optionale Überschreibungen. Standardmäßig liest der
 Legacy-Import `DB_DATABASE`, `DB_USERNAME`, `DB_HOST`, `DB_PORT` und

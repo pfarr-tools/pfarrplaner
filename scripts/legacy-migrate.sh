@@ -6,8 +6,8 @@ ENV_READER="$ROOT/scripts/legacy-env.sh"
 usage() {
   cat <<'EOF'
 Verwendung:
-  ./planer migrate legacy <user@host:/legacy-root> [--dev|--prod] [--database NAME] [--user USER] [--dry-run]
-  LEGACY_DB_PASSWORD='...' ./planer migrate legacy <path> [--dev|--prod] --database NAME --user USER --confirm
+  ./planer migrate legacy <user@host:/legacy-root> [--dev|--prod|--demo] [--database NAME] [--user USER] [--dry-run]
+  LEGACY_DB_PASSWORD='...' ./planer migrate legacy <path> [--dev|--prod|--demo] --database NAME --user USER --confirm
 
 Die Datenbank wird per mysqldump oder mariadb-dump übernommen. storage/app und bekannte Datei-Roots
 werden in den konfigurierten MinIO-Bucket übertragen. Alte Dateien werden nie
@@ -28,6 +28,10 @@ while [[ $# -gt 0 ]]; do
       [[ -z "$target" || "$target" == prod ]] || die '--dev und --prod können nicht gleichzeitig verwendet werden.'
       target=prod
       ;;
+    --demo)
+      [[ -z "$target" || "$target" == demo ]] || die '--dev, --prod und --demo können nicht gleichzeitig verwendet werden.'
+      target=demo
+      ;;
     --database) [[ $# -ge 2 ]] || die '--database benötigt einen Wert'; db_name="$2"; shift ;;
     --user) [[ $# -ge 2 ]] || die '--user benötigt einen Wert'; db_user="$2"; shift ;;
     --dry-run) dry_run=1 ;;
@@ -45,8 +49,8 @@ case "$target" in
     [[ "$target_app_env" != production ]] || die 'Für --dev darf APP_ENV nicht production sein.'
     COMPOSE=(docker compose -f "$ROOT/compose.yaml")
     ;;
-  prod)
-    [[ "$target_app_env" == production ]] || die 'Für --prod muss APP_ENV=production gesetzt sein.'
+  prod|demo)
+    [[ "$target_app_env" == production ]] || die 'Für --prod und --demo muss APP_ENV=production gesetzt sein.'
     COMPOSE=(docker compose -f "$ROOT/compose.production.yaml")
     ;;
   *) die "Unbekanntes Ziel: $target" ;;
@@ -209,4 +213,8 @@ legacy_files="$(mktemp -d)"
 tar -C "$legacy_files" -xf "$archive"
 "${COMPOSE[@]}" run --rm --no-deps -v "$legacy_files:/tmp/legacy:ro" --entrypoint /bin/sh create-buckets -lc 'mc alias set dst "${AWS_ENDPOINT:-http://minio:9000}" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" && if [ -d /tmp/legacy/storage/app ]; then mc mirror --overwrite /tmp/legacy/storage/app dst/"$AWS_BUCKET"; fi && if [ -d /tmp/legacy/storage/inbox ]; then mc mirror --overwrite /tmp/legacy/storage/inbox dst/"$AWS_BUCKET"/inbox; fi'
 "${COMPOSE[@]}" exec -T app php artisan optimize:clear
+if [[ "$target" == demo ]]; then
+  echo 'Demo-Daten aus der migrierten Anwendung erstellen.'
+  "${COMPOSE[@]}" exec -T app php artisan demo:build
+fi
 echo 'Legacy-Import abgeschlossen. Die alten Dateien und Prüfsummen liegen unter backups/legacy/.'
