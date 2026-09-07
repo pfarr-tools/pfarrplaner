@@ -166,7 +166,7 @@ class DemoBuilder extends Command
 
     protected function checkRequirements()
     {
-        $demoMode = filter_var(env('DEMO_MODE'), FILTER_VALIDATE_BOOLEAN);
+        $demoMode = config('app.demo_mode');
         $databaseName = (string) Config::get('database.connections.' . Config::get('database.default') . '.database');
 
         $totalChecks = $this->checkRequirement('DEMO_MODE enabled', $demoMode)

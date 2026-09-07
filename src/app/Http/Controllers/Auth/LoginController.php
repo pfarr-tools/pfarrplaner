@@ -82,7 +82,7 @@ class LoginController extends Controller
     public function showLoginForm(Request $request)
     {
         $request->session()->regenerateToken();
-        $demo = (app()->environment() == 'demo');
+        $demo = config('app.demo_mode');
         $users = $demo ? User::with('roles', 'homeCities')->where('password', '!=', '')->orderBy('id')->get() : [];
 
 

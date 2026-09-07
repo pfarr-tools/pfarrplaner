@@ -88,7 +88,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'dev' => config('app.dev') ? true:  false,
-            'demo' => config('demo_mode') ? true:  false,
+            'demo' => config('app.demo_mode'),
             'package' =>  fn() => PackageService::info(),
             'route' => fn() => Route::currentRouteName(),
             'currentRoute' => fn() => Route::currentRouteName(),
