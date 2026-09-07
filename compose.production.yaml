@@ -30,7 +30,7 @@ services:
           app_host="$${APP_URL#*://}";
           app_host="$${app_host%%/*}";
           app_host="$${app_host%%:*}";
-          curl -fsS -H "Host: $${app_host}" http://127.0.0.1:8000/up
+          curl -fsS -H "Host: $${app_host}" http://127.0.0.1:8000/api/health
       interval: 10s
       timeout: 5s
       retries: 10

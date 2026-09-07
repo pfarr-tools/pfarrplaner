@@ -219,6 +219,20 @@ Reputation werden beim Provider eingerichtet; SMTP-Relay bleibt empfohlen.
 
 ## Fehlerbehebung und Rollback
 
+Der Produktions-App-Container prüft den tatsächlich registrierten Endpunkt
+`/api/health`. Der Endpunkt benötigt den in `APP_URL` konfigurierten Hostnamen,
+weil die Produktionsanwendung Anfragen an fremde Hosts ablehnt. Ein direkter
+Test auf dem Server muss deshalb den Host-Header mitsenden:
+
+```sh
+./planer prod exec app sh -lc \
+  "curl -i -H 'Host: dev.example.org' http://127.0.0.1:8000/api/health"
+```
+
+Wenn der Container gesund ist, veröffentlicht der interne Caddy den in
+`APP_PORT` konfigurierten lokalen Port. Ein fehlender `web`-Container oder ein
+unhealthy `app`-Container verhindert die Port-Veröffentlichung.
+
 ```sh
 ./planer prod status
 ./planer prod logs app

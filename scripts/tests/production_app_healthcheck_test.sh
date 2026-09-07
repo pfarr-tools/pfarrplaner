@@ -7,7 +7,7 @@ COMPOSE="$ROOT/compose.production.yaml"
 app_block="$(sed -n '/^  app:/,/^  web:/p' "$COMPOSE")"
 grep -Fq 'APP_URL' <<<"$app_block"
 grep -Fq 'Host:' <<<"$app_block"
-grep -Fq 'http://127.0.0.1:8000/up' <<<"$app_block"
-! grep -Fq 'curl -fsS http://127.0.0.1:8000/up' <<<"$app_block"
+grep -Fq 'http://127.0.0.1:8000/api/health' <<<"$app_block"
+! grep -Fq 'http://127.0.0.1:8000/up' <<<"$app_block"
 
 echo 'Production app healthcheck tests passed'
