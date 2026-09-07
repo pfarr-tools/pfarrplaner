@@ -194,11 +194,14 @@ class DemoBuilder extends Command
 
     protected function prepAttachments()
     {
-        Storage::makeDirectory('demo');
         try {
-            copy(public_path('demo/demo.jpg'), storage_path('app/demo/demo.jpg'));
-            copy(public_path('demo/demo.pdf'), storage_path('app/demo/demo.pdf'));
-        } catch (\Exception $e) {
+            foreach (['demo.jpg', 'demo.pdf'] as $file) {
+                $contents = file_get_contents(public_path('demo/' . $file));
+                if ($contents === false || !Storage::put('demo/' . $file, $contents)) {
+                    return false;
+                }
+            }
+        } catch (\Throwable $e) {
             return false;
         }
         return true;

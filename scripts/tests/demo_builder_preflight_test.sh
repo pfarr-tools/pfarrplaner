@@ -16,5 +16,13 @@ grep -q "'own_podcast_spotify' => false" <<<"$users_block"
 grep -q "'own_podcast_itunes' => false" <<<"$users_block"
 cities_block="$(sed -n '/protected function handleCities(/,/protected function handleComments(/p' "$COMMAND")"
 grep -q "'default_ministries' => \[\]" <<<"$cities_block"
+attachments_block="$(sed -n '/protected function prepAttachments()/,/protected function handleAttachments(/p' "$COMMAND")"
+grep -q "Storage::put('demo/' . \$file" <<<"$attachments_block"
+grep -q "'demo.jpg'" <<<"$attachments_block"
+grep -q "'demo.pdf'" <<<"$attachments_block"
+if grep -q 'copy(public_path' <<<"$attachments_block"; then
+  echo 'prepAttachments must use configured Storage instead of local copy' >&2
+  exit 1
+fi
 
 echo 'DemoBuilder preflight tests passed'
