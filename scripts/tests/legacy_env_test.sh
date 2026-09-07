@@ -34,6 +34,7 @@ grep -q "remote 'test -d resources/bible'" "$ROOT/scripts/legacy-migrate.sh"
 grep -q "remote 'tar -C resources -cf - bible'" "$ROOT/scripts/legacy-migrate.sh"
 grep -q 'src/resources/bible' "$ROOT/scripts/legacy-migrate.sh"
 grep -q 'tar -C "\$ROOT/src/resources" -xf "\$legacy_bible_archive"' "$ROOT/scripts/legacy-migrate.sh"
-grep -q 'force-recreate app web horizon scheduler' "$ROOT/scripts/legacy-migrate.sh"
+grep -q 'up -d --build --force-recreate app web horizon scheduler' "$ROOT/scripts/legacy-migrate.sh"
+grep -q -- '--force-recreate app web horizon scheduler' "$ROOT/scripts/legacy-migrate.sh"
 
 echo 'Legacy environment tests passed'

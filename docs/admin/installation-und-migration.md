@@ -209,7 +209,9 @@ bleiben erhalten. Anschließend importiert der Prozess MariaDB, führt Migration
 Ordner `resources/bible` der Legacy-Installation in das lokale
 `src/resources/bible`. Bereits vorhandene lokale Bibeldateien werden dabei
 ergänzt oder überschrieben, aber nicht gelöscht. Die alte Installation bleibt
-unverändert.
+unverändert. Wenn der Ordner vorhanden ist, wird das Ziel-App-Image vor dem
+Start neu gebaut, damit die Dateien auch in Produktionscontainern verfügbar
+sind.
 
 ## Optionaler Maildienst
 
