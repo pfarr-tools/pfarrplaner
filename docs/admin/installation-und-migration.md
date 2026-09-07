@@ -38,6 +38,9 @@ geeignet; mit `--prod --defaults` werden synthetische Produktionsdefaults
 verwendet. Vor dem öffentlichen Betrieb müssen insbesondere `APP_URL`,
 Backup-Ziel, Mail-Relay und `HORIZON_ALLOWED_EMAILS` geprüft werden. Die
 kommentierte `.env.example` ist die vollständige Referenz aller Einstellungen.
+Im Produktionsmodus setzt das Bootstrap außerdem `OCTANE_HTTPS=true`, damit
+Laravel hinter einem externen TLS-Reverse-Proxy sichere absolute Asset- und
+Anwendungs-URLs erzeugt.
 
 Der Horizon-Zugang wird über `HORIZON_ALLOWED_EMAILS` gesteuert. Die Variable
 enthält eine komma-separierte Liste gültiger Benutzer-E-Mail-Adressen:

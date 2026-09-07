@@ -107,18 +107,21 @@ cp .env.example .env
 if [[ "$TARGET" == prod ]]; then
   APP_ENV=production
   APP_DEBUG=false
+  OCTANE_HTTPS_DEFAULT=true
   APP_PORT_DEFAULT=8080
   VITE_PORT_DEFAULT=5173
   APP_URL_DEFAULT=https://localhost
 else
   APP_ENV=local
   APP_DEBUG=true
+  OCTANE_HTTPS_DEFAULT=false
   APP_PORT_DEFAULT=8180
   VITE_PORT_DEFAULT=5273
   APP_URL_DEFAULT=http://localhost:8180
 fi
 set_env APP_ENV "$APP_ENV"
 set_env APP_DEBUG "$APP_DEBUG"
+set_env OCTANE_HTTPS "$OCTANE_HTTPS_DEFAULT"
 echo "Pfarrplaner-Startkonfiguration (${TARGET})"
 ask_url APP_URL 'Öffentliche URL oder Host' "$APP_URL_DEFAULT"
 ask APP_PORT 'HTTP-Port' "$APP_PORT_DEFAULT"
