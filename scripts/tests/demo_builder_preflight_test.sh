@@ -33,16 +33,23 @@ grep -q "'docs_where'" <<<"$baptisms_block"
 grep -q "'dimissorial_requested'" <<<"$baptisms_block"
 grep -q "'dimissorial_received'" <<<"$baptisms_block"
 grep -q "'dob'" <<<"$baptisms_block"
+grep -q "\$data\['dob'\].*format('Y-m-d')" <<<"$baptisms_block"
+! grep -q "format('d.m.Y'" <<<"$baptisms_block"
+grep -q "format('Y-m-d H:i:s')" <<<"$baptisms_block"
 ! grep -q "'text' =>" <<<"$baptisms_block"
 funerals_block="$(sed -n '/protected function handleFunerals(/,/protected function handleParishes(/p' "$COMMAND")"
 for field in announcement wake wake_location baptism_date confirmation_date wedding_date dod_spouse dimissorial_requested dimissorial_received; do
   grep -q "'$field'" <<<"$funerals_block"
 done
+! grep -q "format('d.m.Y'" <<<"$funerals_block"
+grep -q 'Carbon::instance' <<<"$funerals_block"
 ! grep -q "'text' =>" <<<"$funerals_block"
 weddings_block="$(sed -n '/protected function handleWeddings(/,/protected function hasIndex(/p' "$COMMAND")"
 for field in appointment registration_document docs_where spouse1_dimissorial_requested spouse1_dimissorial_received spouse2_dimissorial_requested spouse2_dimissorial_received permission_requested permission_received; do
   grep -q "'$field'" <<<"$weddings_block"
 done
+! grep -q "format('d.m.Y'" <<<"$weddings_block"
+grep -q "format('Y-m-d H:i:s')" <<<"$weddings_block"
 ! grep -q "'text' =>" <<<"$weddings_block"
 services_block="$(sed -n '/protected function handleServices(/,/protected function handleStreetRanges(/p' "$COMMAND")"
 for field in description cc_staff title youtube_url cc_streaming_url offerings_url meeting_url recording_url songsheet external_url sermon_title sermon_image sermon_description konfiapp_event_qr announcements offering_text youtube_prefix_description youtube_postfix_description ad_text others cc_location; do

@@ -249,22 +249,22 @@ class DemoBuilder extends Command
                              'birth_place' => $this->faker->city,
                          ];
         if ($baptism->first_contact_on) {
-            $data['first_contact_on'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y');
+            $data['first_contact_on'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d');
         }
         if ($baptism->appointment) {
-            $data['appointment'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y H:i');
+            $data['appointment'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d H:i:s');
         }
         if ($baptism->docs_where) {
             $data['docs_where'] = 'Demo-Dokumentation';
         }
         if ($baptism->dimissorial_requested) {
-            $data['dimissorial_requested'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y');
+            $data['dimissorial_requested'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d');
         }
         if ($baptism->dimissorial_received) {
-            $data['dimissorial_received'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y');
+            $data['dimissorial_received'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d');
         }
         if ($baptism->dob) {
-            $data['dob'] = $this->faker->dateTimeBetween('-95 years', '-1 year')->format('d.m.Y');
+            $data['dob'] = $this->faker->dateTimeBetween('-95 years', '-1 year')->format('Y-m-d');
         }
         $baptism->update($data);
     }
@@ -353,11 +353,11 @@ class DemoBuilder extends Command
                              'relative_city' => $this->faker->city,
                              'relative_contact_data' => $this->faker->phoneNumber,
                              'appointment' => $funeral->appointment
-                                 ? $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y H:i')
+                                 ? Carbon::instance($this->faker->dateTimeBetween('-1 year', 'now'))
                                  : null,
-                             'dob' => $this->faker->dateTimeBetween('-95 years', '-70 years')->format('d.m.Y'),
+                             'dob' => Carbon::instance($this->faker->dateTimeBetween('-95 years', '-70 years')),
                              'dod' => $funeral->dod
-                                 ? $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y')
+                                 ? Carbon::instance($this->faker->dateTimeBetween('-1 year', 'now'))
                                  : null,
                              'spouse' => $this->faker->name,
                              'parents' => $this->faker->name('male') . ' / ' . $this->faker->name('female'),
@@ -394,7 +394,7 @@ class DemoBuilder extends Command
         foreach (['wake', 'announcement', 'baptism_date', 'confirmation_date', 'wedding_date', 'dod_spouse',
                   'dimissorial_requested', 'dimissorial_received'] as $field) {
             if ($funeral->{$field}) {
-                $data[$field] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y');
+                $data[$field] = Carbon::instance($this->faker->dateTimeBetween('-1 year', 'now'));
             }
         }
         if ($funeral->wake_location) {
@@ -573,11 +573,11 @@ class DemoBuilder extends Command
                   'spouse2_dimissorial_requested', 'spouse2_dimissorial_received',
                   'permission_requested', 'permission_received'] as $field) {
             if ($wedding->{$field}) {
-                $data[$field] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y');
+                $data[$field] = $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d');
             }
         }
         if ($wedding->appointment) {
-            $data['appointment'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('d.m.Y H:i');
+            $data['appointment'] = $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d H:i:s');
         }
         if ($wedding->registration_document) {
             $data['registration_document'] = 'Demo-Dokument';
