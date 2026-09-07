@@ -1,4 +1,4 @@
-name: pfarrplaner
+name: ${COMPOSE_PROJECT_NAME:-pfarrplaner}
 
 x-app: &app
   build:

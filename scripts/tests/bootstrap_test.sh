@@ -10,6 +10,7 @@ PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" "$ROOT/scripts/bootstrap.sh" --defaults >/dev
 test -s "$TEST_ROOT/.env"
 grep -q '^APP_KEY=base64:' "$TEST_ROOT/.env"
 grep -q '^APP_ENV=local$' "$TEST_ROOT/.env"
+grep -q '^COMPOSE_PROJECT_NAME=pfarrplaner$' "$TEST_ROOT/.env"
 grep -q '^APP_URL=http://localhost:8180$' "$TEST_ROOT/.env"
 grep -q '^OCTANE_HTTPS=false$' "$TEST_ROOT/.env"
 grep -q '^MAIL_DRIVER=smtp$' "$TEST_ROOT/.env"
@@ -20,6 +21,7 @@ grep -B1 '^APP_URL=' "$TEST_ROOT/.env" | grep -q 'Public URL'
 rm "$TEST_ROOT/.env"
 PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" "$ROOT/scripts/bootstrap.sh" --prod --defaults >/dev/null
 grep -q '^APP_ENV=production$' "$TEST_ROOT/.env"
+grep -q '^COMPOSE_PROJECT_NAME=pfarrplaner$' "$TEST_ROOT/.env"
 grep -q '^APP_DEBUG=false$' "$TEST_ROOT/.env"
 grep -q '^APP_URL=https://localhost$' "$TEST_ROOT/.env"
 grep -q '^OCTANE_HTTPS=true$' "$TEST_ROOT/.env"

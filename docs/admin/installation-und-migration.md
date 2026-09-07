@@ -40,7 +40,9 @@ Backup-Ziel, Mail-Relay und `HORIZON_ALLOWED_EMAILS` geprüft werden. Die
 kommentierte `.env.example` ist die vollständige Referenz aller Einstellungen.
 Im Produktionsmodus setzt das Bootstrap außerdem `OCTANE_HTTPS=true`, damit
 Laravel hinter einem externen TLS-Reverse-Proxy sichere absolute Asset- und
-Anwendungs-URLs erzeugt.
+Anwendungs-URLs erzeugt. Für mehrere Instanzen auf einem Server fragt das
+Bootstrap den Docker-Projektnamen ab; er muss pro Instanz eindeutig sein. Der
+Default ist `pfarrplaner`.
 
 Der Horizon-Zugang wird über `HORIZON_ALLOWED_EMAILS` gesteuert. Die Variable
 enthält eine komma-separierte Liste gültiger Benutzer-E-Mail-Adressen:
@@ -171,7 +173,10 @@ Ohne Zieloption verwendet der Import weiterhin die Entwicklungsumgebung
 (`--dev`). Für einen produktiven Import muss `--prod` ausdrücklich angegeben
 werden; dabei wird `compose.production.yaml` verwendet und `APP_ENV=production`
 in der Ziel-`.env` verlangt. `--demo` verwendet dieselbe Produktionsumgebung
-und führt nach dem Import zusätzlich `php artisan demo:build` aus. Umgekehrt
+und führt nach dem Import zusätzlich `php artisan demo:build` aus. Der
+Demo-Import konfiguriert SMTP auf den internen Mailpit-Dienst (`mailpit:1025`),
+sendet also keine Nachrichten an externe Empfänger. Die Mailpit-Oberfläche ist
+unter dem lokal gebundenen `FORWARD_MAILPIT_PORT` erreichbar. Umgekehrt
 verhindert der Import, dass `--dev` eine Zielumgebung mit `APP_ENV=production`
 verwendet. `--dev`, `--prod` und `--demo` dürfen nicht gemeinsam angegeben
 werden.

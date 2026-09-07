@@ -34,7 +34,7 @@ done
 
 if [[ -e .env ]]; then
   if (( CHECK )); then
-    for key in APP_KEY APP_ENV APP_URL DB_DATABASE DB_USERNAME DB_PASSWORD AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+    for key in APP_KEY APP_ENV APP_URL COMPOSE_PROJECT_NAME DB_DATABASE DB_USERNAME DB_PASSWORD AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
       grep -Eq "^${key}=.+" .env || { echo "Fehlt oder leer: ${key}" >&2; exit 2; }
     done
     echo '.env ist vorhanden und enthält die erforderlichen Grundwerte.'
@@ -72,6 +72,24 @@ ask() {
       exit 2
     }
   fi
+  set_env "$key" "$value"
+  printf '  %-28s %s\n' "$key" "$value"
+}
+ask_project_name() {
+  local key=COMPOSE_PROJECT_NAME label='Docker-Projektname' default=pfarrplaner value
+  if [[ "$MODE" == defaults ]]; then
+    value="$default"
+  else
+    read -r -p "$label [$default]: " value < /dev/tty || {
+      echo 'Abbruch: interaktive Eingabe nicht verfügbar. Nutze --defaults.' >&2
+      exit 2
+    }
+    value="${value:-$default}"
+  fi
+  [[ "$value" =~ ^[a-z0-9][a-z0-9_-]*$ ]] || {
+    echo "Ungültiger Docker-Projektname: ${value}" >&2
+    exit 2
+  }
   set_env "$key" "$value"
   printf '  %-28s %s\n' "$key" "$value"
 }
@@ -123,6 +141,7 @@ set_env APP_ENV "$APP_ENV"
 set_env APP_DEBUG "$APP_DEBUG"
 set_env OCTANE_HTTPS "$OCTANE_HTTPS_DEFAULT"
 echo "Pfarrplaner-Startkonfiguration (${TARGET})"
+ask_project_name
 ask_url APP_URL 'Öffentliche URL oder Host' "$APP_URL_DEFAULT"
 ask APP_PORT 'HTTP-Port' "$APP_PORT_DEFAULT"
 ask VITE_PORT 'Vite-Port' "$VITE_PORT_DEFAULT"

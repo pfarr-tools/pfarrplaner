@@ -37,5 +37,8 @@ grep -q 'tar -C "\$ROOT/src/resources" -xf "\$legacy_bible_archive"' "$ROOT/scri
 grep -q 'up -d --build --force-recreate app web horizon scheduler' "$ROOT/scripts/legacy-migrate.sh"
 grep -q -- '--force-recreate app web horizon scheduler' "$ROOT/scripts/legacy-migrate.sh"
 grep -q 'php artisan demo:build' "$ROOT/scripts/legacy-migrate.sh"
+grep -q 'set_env_value MAIL_HOST mailpit' "$ROOT/scripts/legacy-migrate.sh"
+grep -q 'set_env_value MAIL_PORT 1025' "$ROOT/scripts/legacy-migrate.sh"
+grep -q '^  mailpit:' "$ROOT/compose.production.yaml"
 
 echo 'Legacy environment tests passed'

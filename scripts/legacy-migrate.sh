@@ -191,6 +191,16 @@ if [[ -f "$legacy_bible_archive" ]]; then
   compose_up_args=(up -d --build --force-recreate app web horizon scheduler)
   echo '  Remote-Bibelordner nach src/resources/bible übernommen; Produktionsbild wird neu gebaut.'
 fi
+if [[ "$target" == demo ]]; then
+  set_env_value MAIL_MAILER smtp
+  set_env_value MAIL_DRIVER smtp
+  set_env_value MAIL_HOST mailpit
+  set_env_value MAIL_PORT 1025
+  set_env_value MAIL_ENCRYPTION ''
+  set_env_value MAIL_USERNAME ''
+  set_env_value MAIL_PASSWORD ''
+  compose_up_args+=(mailpit)
+fi
 
 echo '4/6 Legacy-Schlüssel in die lokale .env übernehmen.'
 set_env_value APP_KEY "$legacy_app_key"

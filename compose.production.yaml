@@ -1,4 +1,4 @@
-name: pfarrplaner-production
+name: ${COMPOSE_PROJECT_NAME:-pfarrplaner}
 
 x-app: &app
   build: {context: ., dockerfile: Dockerfile, target: production}
@@ -113,6 +113,11 @@ services:
       SOKETI_DEFAULT_APP_ID: ${PUSHER_APP_ID:?PUSHER_APP_ID muss gesetzt sein}
       SOKETI_DEFAULT_APP_KEY: ${PUSHER_APP_KEY:?PUSHER_APP_KEY muss gesetzt sein}
       SOKETI_DEFAULT_APP_SECRET: ${PUSHER_APP_SECRET:?PUSHER_APP_SECRET muss gesetzt sein}
+    networks: [backend]
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports: ["127.0.0.1:${FORWARD_MAILPIT_PORT:-9825}:8025"]
     networks: [backend]
   postfix:
     profiles: [mail]
