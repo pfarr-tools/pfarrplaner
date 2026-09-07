@@ -11,5 +11,8 @@ if grep -q -- '->change()' <<<"$prep_users"; then
   echo 'prepUsers must not alter the api_token column' >&2
   exit 1
 fi
+users_block="$(sed -n '/protected function handleUsers(/,/protected function handleWeddings(/p' "$COMMAND")"
+grep -q "'own_podcast_spotify' => false" <<<"$users_block"
+grep -q "'own_podcast_itunes' => false" <<<"$users_block"
 
 echo 'DemoBuilder preflight tests passed'
