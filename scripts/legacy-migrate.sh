@@ -173,8 +173,8 @@ legacy_dump "--single-transaction --routines --events $legacy_volatile_data_opti
 remote 'tar -C . -cf - storage/app storage/inbox public/uploads 2>/dev/null || true' > "$archive"
 legacy_archives=("$ROOT/backups/legacy/legacy-$stamp.sql" "$archive")
 legacy_bible_archive="$ROOT/backups/legacy/legacy-$stamp-bible.tar"
-if remote 'test -d src/resources/bible'; then
-  remote 'tar -C src/resources -cf - bible' > "$legacy_bible_archive"
+if remote 'test -d resources/bible'; then
+  remote 'tar -C resources -cf - bible' > "$legacy_bible_archive"
   legacy_archives+=("$legacy_bible_archive")
   echo '  Remote-Bibelordner archiviert.'
 fi
