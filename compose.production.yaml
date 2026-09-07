@@ -23,7 +23,17 @@ services:
       --workers=${OCTANE_WORKERS:-4} --max-requests=${OCTANE_MAX_REQUESTS:-500}
     restart: unless-stopped
     expose: ["8000"]
-    healthcheck: {test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8000/up"], interval: 10s, timeout: 5s, retries: 10}
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          app_host="$${APP_URL#*://}";
+          app_host="$${app_host%%/*}";
+          app_host="$${app_host%%:*}";
+          curl -fsS -H "Host: $${app_host}" http://127.0.0.1:8000/up
+      interval: 10s
+      timeout: 5s
+      retries: 10
   web:
     image: caddy:2-alpine
     restart: unless-stopped
