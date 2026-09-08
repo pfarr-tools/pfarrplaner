@@ -34,15 +34,14 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Spatie\FlareClient\Report;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 class ExceptionMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    /** @var FlattenException */
-    protected $flattenedException;
+    /** @var array{message: string, file: string, line: int, trace: string} */
+    protected array $exception;
 
     /** @var array */
     protected $report;
@@ -53,9 +52,43 @@ class ExceptionMail extends Mailable implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($flat, $report) {
-        $this->flattenedException = $flat;
-        $this->report = $report;
+    public function __construct(FlattenException $flat, array $report) {
+        $this->exception = [
+            'message' => self::sanitizeUtf8($flat->getMessage()),
+            'file' => self::sanitizeUtf8($flat->getFile()),
+            'line' => (int) $flat->getLine(),
+            'trace' => self::sanitizeUtf8($flat->getTraceAsString()),
+        ];
+        $this->report = self::sanitizeUtf8($report);
+    }
+
+    private static function sanitizeUtf8(mixed $value): mixed
+    {
+        if (is_string($value)) {
+            return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+        }
+
+        if (is_array($value)) {
+            $sanitized = [];
+            foreach ($value as $key => $item) {
+                $sanitized[is_string($key) ? self::sanitizeUtf8($key) : $key] = self::sanitizeUtf8($item);
+            }
+            return $sanitized;
+        }
+
+        if (is_scalar($value) || $value === null) {
+            return $value;
+        }
+
+        if ($value instanceof \JsonSerializable) {
+            return self::sanitizeUtf8($value->jsonSerialize());
+        }
+
+        if ($value instanceof \Stringable) {
+            return self::sanitizeUtf8((string) $value);
+        }
+
+        return '[' . get_debug_type($value) . ']';
     }
 
     /**
@@ -66,8 +99,8 @@ class ExceptionMail extends Mailable implements ShouldQueue
     public function build()
     {
         return $this->markdown('mail.dev.exception', [
-            'flat' => $this->flattenedException,
+            'exception' => $this->exception,
             'report' => $this->report,
-        ])->subject('Exception: '.$this->flattenedException->getMessage());
+        ])->subject('Exception: ' . $this->exception['message']);
     }
 }

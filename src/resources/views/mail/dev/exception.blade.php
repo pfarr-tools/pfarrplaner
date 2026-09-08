@@ -1,6 +1,6 @@
 @component('mail::message')
-# Exception: {{ $flat->getMessage() }}
-{{ $flat->getFile() }}:{{ $flat->getLine() }}
+# Exception: {{ $exception['message'] }}
+{{ $exception['file'] }}:{{ $exception['line'] }}
 
 ````
 @foreach($report['stacktrace'][0]['code_snippet'] as $n => $line){{ str_pad($n, 8, ' ') }}{!!  $line."\n" !!} @endforeach
@@ -9,7 +9,7 @@
 # Stacktrace
 @component('mail::panel')
 ````
-{!!  $flat->getTraceAsString() !!}
+{!!  $exception['trace'] !!}
 ````
 @endcomponent
 
