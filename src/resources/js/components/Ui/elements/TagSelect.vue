@@ -75,10 +75,11 @@ export default {
         handleInput(e) {
             this.myValue = e;
             var items = [];
+            const selectedIds = e.map(item => String(item));
             if (!this.myReturnProperty) {
-                this.tags.forEach(tag => { if (e.includes(tag.id.toString())) items.push(tag); });
+                this.tags.forEach(tag => { if (selectedIds.includes(String(tag.id))) items.push(tag); });
             } else {
-                this.tags.forEach(tag => { if (e.includes(tag.id.toString())) items.push(tag[this.myReturnProperty]); });
+                this.tags.forEach(tag => { if (selectedIds.includes(String(tag.id))) items.push(tag[this.myReturnProperty]); });
             }
             this.$emit('update:modelValue', items);
         },
