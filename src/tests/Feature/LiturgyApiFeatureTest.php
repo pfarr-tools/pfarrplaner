@@ -188,6 +188,41 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
+    public function testSaveTreeStateMovesItemsBetweenBlocks()
+    {
+        $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
+        $service = Service::factory()->create();
+        $sourceBlock = Block::create(['title' => 'Quelle', 'service_id' => $service->id, 'sortable' => 0]);
+        $targetBlock = Block::create(['title' => 'Ziel', 'service_id' => $service->id, 'sortable' => 1]);
+        $item = Item::create([
+            'title' => 'Verschobenes Element',
+            'liturgy_block_id' => $sourceBlock->id,
+            'sortable' => 0,
+            'data_type' => 'song',
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->postJson(route('api.liturgy.tree.save', $service), [
+                'blocks' => [
+                    ['id' => $sourceBlock->id, 'sortable' => 0, 'items' => []],
+                    ['id' => $targetBlock->id, 'sortable' => 1, 'items' => [
+                        ['id' => $item->id, 'sortable' => 0],
+                    ]],
+                ],
+            ]);
+
+        $response->assertOk();
+        $this->assertDatabaseHas('liturgy_items', [
+            'id' => $item->id,
+            'liturgy_block_id' => $targetBlock->id,
+            'sortable' => 0,
+        ]);
+    }
+
+    /**
+     * @return void
+     */
     public function testSourcesReturnsImportableSourcesForServiceIdRouteParameter()
     {
         $user = User::factory()->create();

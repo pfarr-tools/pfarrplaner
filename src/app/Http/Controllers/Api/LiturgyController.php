@@ -52,11 +52,12 @@ class LiturgyController extends \App\Http\Controllers\Controller
     public function saveTreeState(Request $request, Service $service)
     {
         Gate::authorize('update', $service);
+        $blockIds = $service->liturgyBlocks()->pluck('id');
         foreach ($request->get('blocks') as $block) {
             $currentBlock = $service->liturgyBlocks()->findOrFail($block['id']);
             $currentBlock->update(['sortable' => $block['sortable']]);
             foreach ($block['items'] as $item) {
-                $currentBlock->items()->findOrFail($item['id'])->update(
+                Item::whereIn('liturgy_block_id', $blockIds)->findOrFail($item['id'])->update(
                     [
                         'sortable' => $item['sortable'],
                         'liturgy_block_id' => $currentBlock->id,
