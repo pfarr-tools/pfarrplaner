@@ -17,7 +17,7 @@ Nach der Installation beginnt die eigentliche Arbeit. Eine stabile Pfarrplaner-I
 
 ### Konfiguration
 
-Die zentrale Laufzeitkonfiguration liegt in der `.env`. Änderungen dort sollten bewusst dokumentiert werden. Nach relevanten Änderungen sind meist Cache- und Konfigurationsbefehle nötig, zum Beispiel `php artisan optimize` oder gezielte Cache-Clears.
+Die zentrale Laufzeitkonfiguration liegt in der `.env`. Änderungen dort sollten bewusst dokumentiert werden. Im Docker-Betrieb werden Laravel-Befehle über den Root-Einstieg ausgeführt, zum Beispiel `./planer prod exec app php artisan optimize`.
 
 ### Caches
 
@@ -27,13 +27,21 @@ Laravel und Vite arbeiten mit verschiedenen Caches. Nach Änderungen an Konfigur
 
 Sobald Pfarrplaner Hintergrundaufgaben nutzt, brauchen Sie eine überwachte Worker-Instanz. Ein abgestürzter Queue-Worker fällt im Alltag oft erst spät auf, wenn E-Mails, Exporte oder Folgeaktionen nicht mehr ankommen.
 
+In der Produktionsumgebung ist Horizon der Queue-Worker für ausgehende Mails.
+Postfix verwaltet zusätzlich seine eigene persistente Zustellwarteschlange.
+Prüfen Sie beide Ebenen mit `./planer prod exec app php artisan queue:failed` und
+den Postfix-Logs. Details stehen im [Mail-Betriebskapitel](mail.md).
+
 ### Scheduler
 
 Der Scheduler sollte einmal pro Minute laufen. Fehlt dieser Cronjob oder ist er defekt, bleiben geplante Aufgaben liegen.
 
 ### Dateispeicher
 
-Anhänge, Bilder und andere Dateien dürfen nicht nur in Backups berücksichtigt werden. Sie brauchen auch ausreichend Speicherplatz und funktionierende Schreibrechte.
+Anhänge, Bilder und andere Dateien liegen im Produktionsbetrieb im MinIO-Bucket.
+Sie müssen im Backup enthalten sein; lokale Containerdateien oder `storage/`
+allein sind dafür nicht ausreichend. Prüfen Sie außerdem Speicherplatz und
+Zugriff auf das MinIO-Volume.
 
 ## Prüfliste nach Server-Arbeiten
 

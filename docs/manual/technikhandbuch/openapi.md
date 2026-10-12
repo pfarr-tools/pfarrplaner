@@ -9,7 +9,7 @@ Pfarrplaner enthält bereits eine technische Grundlage für eine maschinenlesbar
 Der OpenAPI-Build wird über diesen Artisan-Befehl erzeugt:
 
 ```bash
-php artisan openapi:generate
+./planer artisan openapi:generate
 ```
 
 Standardziel ist:
@@ -33,7 +33,7 @@ Wenn `public/openapi.json` vorhanden ist, wird die Datei beim Build des technisc
 1. API-Route anlegen oder ändern.
 2. Controller und Request-Klassen anpassen.
 3. OpenAPI-Attribute ergänzen oder aktualisieren.
-4. `php artisan openapi:generate` ausführen.
+4. `./planer artisan openapi:generate` ausführen.
 5. Technisches Handbuch prüfen und gegebenenfalls Kapiteltexte aktualisieren.
 
 ## Zielbild

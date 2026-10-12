@@ -15,13 +15,14 @@ Pfarrplaner ist eine Laravel-Anwendung mit Inertia.js und Vue. Das System verbin
 
 ## Wichtige Betriebsmodi
 
-- klassische PHP-Webanwendung hinter Apache oder Nginx
-- optional erweiterte Laufzeit mit Octane/RoadRunner
+- Docker-Compose-Entwicklung mit PHP-FPM, Caddy und Vite
+- Docker-Compose-Produktion mit Octane/Swoole und Caddy
+- klassische Installation als separat dokumentierter Legacy-Weg
 - lokale Entwicklungsumgebungen
 - Docker-Compose-Umgebungen
 
 ## Drei technische Sichtweisen
 
 1. **Domänenlogik**: Gottesdienste, Kasualien, Benutzer, Orte, Urlaub, Liturgie.
-2. **Betrieb**: `.env`, Datenbank, Storage, Queue, Scheduler, Logs, Chromium.
+2. **Betrieb**: Root-`.env`, MariaDB, Redis, MinIO, Horizon, Scheduler, Logs, Chromium und optional Postfix.
 3. **Schnittstellen**: Web-Routen, API-Routen, OpenAPI, Exporte, externe Integrationen.

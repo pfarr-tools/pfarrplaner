@@ -69,6 +69,6 @@ class SendApprovalNotification
         }
 
         Log::debug('AbsenceApproved listener: Sende AbsenceApproved an ' . $users->pluck('email')->unique->join(', '));
-        Mail::to($users)->send(new \App\Mail\AbsenceApproved($event->absence, $event->approval));
+        Mail::to($users)->queue(new \App\Mail\AbsenceApproved($event->absence, $event->approval));
     }
 }

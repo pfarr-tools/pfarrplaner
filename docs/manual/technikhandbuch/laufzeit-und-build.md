@@ -18,9 +18,18 @@ Das Frontend wird mit Vite gebaut. Relevante Schritte:
 
 Für die Handbook-Site gibt es eine eigene Pipeline:
 
-- `php artisan build:manual`
-- `node scripts/build-manual-site.js`
-- optional `node scripts/deploy-manual-site.js`
+- `./planer manual build` erzeugt die generierten Seiten und Lizenzseiten.
+- `./planer manual dusk` führt die Browser-Screenshot-Tests aus.
+- `./planer manual site` baut die statische Website und die drei PDFs.
+- `./planer manual all` verbindet Screenshot-, Generierungs- und Site-Build.
+- `./planer manual deploy --dry-run` prüft die Veröffentlichung ohne Übertragung.
+- `./planer manual deploy` veröffentlicht die fertige Site per Rsync.
+- `./planer manual source-publish` veröffentlicht die Quellen in das konfigurierte Quell-Repository.
+
+Die zugrunde liegenden Laravel-, Node- und JavaScript-Befehle können weiterhin
+direkt verwendet werden. Der Root-Einstieg `./planer manual` setzt jedoch den
+gemeinsamen Manual-Pfad `docs/manual` korrekt und führt PHP-Schritte im
+Anwendungscontainer aus.
 
 Der Handbook-Build erzeugt jetzt:
 
@@ -36,6 +45,11 @@ Benutzerhandbuch-Screenshots werden über Dusk-Tests unter `tests/Browser/Manual
 ## Browser-Tests (Dusk)
 
 Für lokale Browser-Tests steht `npm run test:dusk` zur Verfügung. Der Aufruf startet `php artisan dusk:run --compact` mit der kompakten Collision-Ausgabe im Stil von `php artisan test --compact`. Während längerer stiller Phasen gibt der Runner zusätzlich regelmäßige Statusmeldungen aus, damit ein langsamer Browser-Test nicht wie ein Hänger aussieht.
+
+Aus dem Root-Repository werden die Manual-Screenshot-Tests bevorzugt über
+`./planer manual dusk` beziehungsweise als Teil von `./planer manual all`
+gestartet. Die direkten npm- und Artisan-Befehle gelten für einen Lauf im
+`src/`-Checkout beziehungsweise innerhalb des App-Containers.
 
 Zusätzlich gibt es gezielte Varianten für die lokale Fehlersuche:
 

@@ -40,9 +40,14 @@ Prüfen Sie:
 Prüfen Sie:
 
 - Mail-Konfiguration in `.env`
-- SMTP-Verbindung
+- Status und Logs des optionalen Produktionsdienstes `postfix`
+- `./planer prod exec app php artisan queue:failed` und Horizon
+- SMTP-Verbindung beziehungsweise Relay-Zugang
 - SPF, DKIM, DMARC
-- Queue-Worker, falls Mailversand asynchron läuft
+- öffentliche DNS- und PTR/rDNS-Einträge bei direkter MX-Zustellung
+
+Eine ausführliche Prüfreihenfolge und der anwendungsseitige Rollback stehen im
+[Mail-Betriebskapitel](mail.md).
 
 ### PDF- oder Browser-Ausgaben schlagen fehl
 
@@ -65,7 +70,7 @@ Prüfen Sie:
 
 ## Wichtige Protokollquellen
 
-- Laravel-Logs in `storage/logs/`
+- Laravel-Logs in `src/storage/logs/` beziehungsweise im App-Container
 - Webserver-Logs
 - PHP-FPM- oder Prozess-Logs
 - Queue- und Scheduler-Logs
@@ -76,5 +81,6 @@ Prüfen Sie:
 1. Symptom kurz beschreiben.
 2. Reproduzierbarkeit prüfen.
 3. Logs derselben Zeitspanne ansehen.
-4. zuletzt geänderte Systemteile notieren.
+4. zuletzt geänderte Systemteile notieren; bei Docker zusätzlich `./planer prod ps`
+   und die relevanten `./planer prod logs` prüfen.
 5. erst dann korrigieren oder zurückrollen.

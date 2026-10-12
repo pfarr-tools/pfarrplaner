@@ -30,6 +30,7 @@ capture:
     - .env
     - docker/
     - scripts/
+    - secrets/
     - src/storage/app/
   exclude_paths:
     - src/storage/logs/

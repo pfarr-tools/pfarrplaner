@@ -41,6 +41,7 @@ namespace App\Mail;
 use App\Models\Service;
 use App\Models\People\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
@@ -48,7 +49,7 @@ use Illuminate\Queue\SerializesModels;
  * Class AbstractServiceMailable
  * @package App\Mail
  */
-class AbstractServiceMailable extends Mailable
+class AbstractServiceMailable extends Mailable implements ShouldQueue
 {
 
     use Queueable, SerializesModels;

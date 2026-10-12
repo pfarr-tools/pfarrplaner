@@ -980,7 +980,7 @@ class User extends Authenticatable
     {
         $password = PasswordService::randomPassword();
         $this->update(['password' => $password, 'must_change_password' => 1]);
-        Mail::to($this->email)->send(new AccountData($this, Auth::user(), $password));
+        Mail::to($this->email)->queue(new AccountData($this, Auth::user(), $password));
     }
 
     /**

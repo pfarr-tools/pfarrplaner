@@ -15,14 +15,26 @@ Dieses Handbuch ist deshalb kein Entwicklerhandbuch. Es beschreibt die praktisch
 - Backups, Wiederherstellung und Protokolle im Blick behalten.
 - Externe Integrationen, Dateiausgabe und Browser-Automatisierung funktionsfähig halten.
 
-## Wichtige Grundentscheidung
+## Der vorgesehene Betriebsweg
 
-Vor der ersten Installation sollten Sie festlegen, welchen Betriebsweg Sie dauerhaft nutzen möchten:
+Dieses Repository ist die Betriebs- und Migrationsschicht von Pfarrplaner. Die
+Laravel-Anwendung liegt darunter in `src/`; der zentrale Einstieg für
+Entwicklung, Backups, Migrationen und Produktionsupdates ist `./planer`.
 
-1. **Klassische Installation**: Quellcode mit `git clone`, Abhängigkeiten mit Composer und npm, Einrichtung mit dem neuen CLI-Installer `php artisan pfarrplaner:install`.
-2. **Docker-Compose-Installation**: Container für App, Datenbank und ergänzende Dienste, danach ebenfalls der CLI-Installer innerhalb der Containerumgebung.
+Der vorgesehene Produktionsweg ist Docker Compose. Die klassische Installation
+aus dem ursprünglichen Anwendungscode ist weiterhin als Sonder- beziehungsweise
+Legacy-Weg dokumentiert, verwendet aber nicht die Root-Befehle und darf nicht
+mit einer Docker-Installation vermischt werden.
 
-Beide Wege sind möglich. Wichtig ist vor allem, dass Sie einen Weg sauber dokumentieren und danach bei Updates dabei bleiben.
+Für eine neue Instanz beginnen Sie mit:
+
+```sh
+./planer bootstrap --prod
+./planer prod up --build
+./planer prod status
+```
+
+Der konkrete Ablauf steht in [Installation mit Docker Compose](installation-docker.md).
 
 ## Was dieses Handbuch abdeckt
 

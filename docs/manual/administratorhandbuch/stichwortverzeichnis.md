@@ -34,6 +34,7 @@ Dieses Stichwortverzeichnis hilft beim schnellen Finden typischer Administration
 ## E
 
 - **E-Mail**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md), [Fehlersuche](fehlersuche.md)
+- **Mailbetrieb**: [Mailbetrieb](mail.md), [Betrieb und Wartung](betrieb.md)
 - **Erstinstallation**: [Klassische Installation](installation-klassisch.md), [Installation mit Docker Compose](installation-docker.md)
 
 ## F

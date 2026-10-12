@@ -109,7 +109,7 @@ class SendAbsenceWorkflowNotification
             Log::debug('SendAbsenceWorkflowNotification: Sende Workflow-Update ('
                        .get_class($message)
                        .') an ' . $recipients->pluck('email')->unique()->join(', '));
-            Mail::to($recipients)->send($message);
+            Mail::to($recipients)->queue($message);
         }
 
 

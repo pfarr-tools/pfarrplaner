@@ -253,11 +253,11 @@ sind.
 docker compose -f compose.production.yaml --profile mail up -d postfix
 ```
 
-Postfix ist send-only und hat keinen öffentlichen Port 25. SMTP-Relay wird
-über `MAIL_RELAY_HOST`/`MAIL_RELAY_PORT` mit TLS und optionaler Authentifizierung
-konfiguriert. Direkte MX-Zustellung benötigt zusätzlich PTR/rDNS, SPF, DKIM,
-DMARC, stabile Hostnamen, TLS und Bounce-Überwachung. DNS, rDNS und Mail-
-Reputation werden beim Provider eingerichtet; SMTP-Relay bleibt empfohlen.
+Postfix ist send-only und hat keinen veröffentlichten SMTP-Port. App und
+Horizon erreichen den Dienst ausschließlich über das private Mail-Netzwerk auf
+Port 587; die Anwendung stellt Mails über Horizon asynchron zu. Die vollständige
+Konfiguration für direkte MX-Zustellung, Upstream-Relay, DKIM, Queue-Prüfung,
+Volumes, Sicherheit und Rollback steht in [`docs/mail.md`](../mail.md).
 
 ## Fehlerbehebung und Rollback
 

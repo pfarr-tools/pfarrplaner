@@ -12,6 +12,7 @@ Dieses Handbuch beschreibt Pfarrplaner aus Sicht von Administratorinnen und Admi
 - [Installation mit Docker Compose](installation-docker.md)
 - [Updates und Releases](updates.md)
 - [Betrieb und Wartung](betrieb.md)
+- [Mailbetrieb](mail.md)
 - [Datenschutz und personenbezogene Daten](datenschutz.md)
 - [Sicherheit, Backup und Datenschutz](sicherheit.md)
 - [Fehlersuche](fehlersuche.md)

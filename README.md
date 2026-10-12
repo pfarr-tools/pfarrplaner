@@ -39,7 +39,8 @@ Die Entwicklungsumgebung besteht aus:
 - Mailpit für lokale E-Mail-Tests
 
 Die Produktionsumgebung verwendet Laravel Octane mit Swoole. Ein send-only
-Postfix-Relay kann über das optionale Compose-Profil `mail` aktiviert werden.
+Postfix-Container kann über das optionale Compose-Profil `mail` aktiviert
+werden. Die Anwendung stellt Mails über Horizon asynchron zu.
 
 ## Voraussetzungen
 
@@ -135,8 +136,9 @@ verifizierten Backup:
 ./planer prod update --backup-confirmed
 ```
 
-Das optionale send-only-Mail-Relay wird mit den Relay- und TLS-Variablen aus
-`.env` aktiviert:
+Der optionale send-only-Postfix wird mit den Mail- und TLS-Variablen aus `.env`
+aktiviert. Details zu DNS, DKIM, Queue, Sicherheit und Rollback stehen in
+[`docs/mail.md`](docs/mail.md):
 
 ```sh
 docker compose -f compose.production.yaml --profile mail up -d postfix

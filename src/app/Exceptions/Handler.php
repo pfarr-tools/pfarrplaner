@@ -143,7 +143,7 @@ class Handler extends ExceptionHandler
         );
         $report = $flare->createReport($e);
         try {
-            Mail::to('dev@toph.de')->send(new ExceptionMail($flat, $report->toArray()));
+            Mail::to('dev@toph.de')->queue(new ExceptionMail($flat, $report->toArray()));
         } catch (Throwable $mailException) {
             Log::warning('Exception notification could not be queued.', [
                 'exception' => get_class($mailException),

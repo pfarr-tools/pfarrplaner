@@ -96,7 +96,7 @@ class RegulatoryReport extends AbstractReport
 
         Mail::to($data['email'])
             ->bcc(Auth::user())
-            ->send(new RegulatoryReportMail($data));
+            ->queue(new RegulatoryReportMail($data));
 
         return redirect()->to(Session::pull('back'))->with('success', 'Deine Gottesdienstmeldung wurde an '.$data['email'].' gesendet.');
     }

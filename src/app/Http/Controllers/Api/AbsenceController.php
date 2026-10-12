@@ -73,7 +73,7 @@ class AbsenceController extends \App\Http\Controllers\Controller
                              'workflow_status' => Absence::STATUS_CHECKED,
                          ]);
         $absence->refresh();
-        Mail::to($absence->user->vacationApprovers)->send(new AbsenceChecked($absence));
+        Mail::to($absence->user->vacationApprovers)->queue(new AbsenceChecked($absence));
         return response()->json($absence);
     }
 
@@ -99,7 +99,7 @@ class AbsenceController extends \App\Http\Controllers\Controller
                     return empty($user->email);
                 })
         )
-            ->send(new AbsenceApproved($absence));
+            ->queue(new AbsenceApproved($absence));
         return response()->json($absence);
     }
 

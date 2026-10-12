@@ -33,11 +33,12 @@ namespace App\Mail\Absence;
 use App\Models\Leave\Absence;
 use App\Models\People\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class AbsenceRejected extends Mailable
+class AbsenceRejected extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

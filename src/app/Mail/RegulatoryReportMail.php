@@ -32,11 +32,12 @@ namespace App\Mail;
 
 use App\Models\Service;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
 
-class RegulatoryReportMail extends Mailable
+class RegulatoryReportMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

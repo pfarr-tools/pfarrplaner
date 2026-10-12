@@ -13,6 +13,14 @@ x-app: &app
     mariadb: {condition: service_healthy}
     redis: {condition: service_healthy}
     minio: {condition: service_healthy}
+  environment:
+    MAIL_MAILER: smtp
+    MAIL_HOST: postfix
+    MAIL_PORT: "587"
+    MAIL_SCHEME: ""
+    MAIL_ENCRYPTION: ""
+    MAIL_USERNAME: ""
+    MAIL_PASSWORD: ""
   networks: [backend]
 
 services:
@@ -22,6 +30,7 @@ services:
       php artisan octane:start --server=swoole --host=0.0.0.0 --port=8000
       --workers=${OCTANE_WORKERS:-4} --max-requests=${OCTANE_MAX_REQUESTS:-500}
     restart: unless-stopped
+    networks: [backend, mail]
     expose: ["8000"]
     healthcheck:
       test:
@@ -59,6 +68,7 @@ services:
     <<: *app
     command: php artisan horizon
     restart: unless-stopped
+    networks: [backend, mail]
   scheduler:
     <<: *app
     command: php artisan schedule:work
@@ -134,19 +144,38 @@ services:
     networks: [backend]
   postfix:
     profiles: [mail]
-    build: {context: docker/postfix}
+    image: boky/postfix:v5.1.0@sha256:aafc772384232497bed875e1eb66b4d3e54ba1ebc86e2e185a6dc1dbc48182ef
     restart: unless-stopped
-    env_file:
-      - path: .env
-        required: false
+    environment:
+      ALLOWED_SENDER_DOMAINS: ${MAIL_ALLOWED_SENDER_DOMAINS:?MAIL_ALLOWED_SENDER_DOMAINS muss gesetzt sein}
+      POSTFIX_myhostname: ${MAIL_HOSTNAME:?MAIL_HOSTNAME muss gesetzt sein}
+      POSTFIX_mynetworks: "127.0.0.0/8,${MAIL_NETWORK_SUBNET:-172.31.0.0/24}"
+      RELAYHOST: ${MAIL_RELAY_HOST:-}
+      RELAYHOST_USERNAME: ${MAIL_RELAY_USERNAME:-}
+      RELAYHOST_PASSWORD_FILE: /run/secrets/mail-relay-password
+      POSTFIX_smtp_tls_security_level: ${MAIL_RELAY_TLS_LEVEL:-may}
+      DKIM_SELECTOR: ${MAIL_DKIM_SELECTOR:-mail}
     volumes:
+      - postfix_queue:/var/spool/postfix
       - ./secrets:/run/secrets:ro
-    networks: [backend]
+      - ./secrets/dkim:/etc/opendkim/keys:ro
+    networks: [mail, mail-egress]
+    healthcheck:
+      test: ["CMD-SHELL", "postfix status >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
 
 networks:
   frontend:
   backend:
     internal: true
+  mail:
+    internal: true
+    ipam:
+      config:
+        - subnet: ${MAIL_NETWORK_SUBNET:-172.31.0.0/24}
+  mail-egress:
 volumes:
   mariadb_data:
   redis_data:
@@ -154,3 +183,4 @@ volumes:
   caddy_data:
   caddy_config:
   public_assets:
+  postfix_queue:

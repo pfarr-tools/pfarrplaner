@@ -175,7 +175,7 @@ class MinistryRequestReport extends AbstractReport
 
         foreach ($data['recipients'] as $user) {
             $sender = Auth::user();
-            Mail::to($data['address'][$user->id] ?? $user->email)->cc($sender)->send(
+            Mail::to($data['address'][$user->id] ?? $user->email)->cc($sender)->queue(
                 new MinistryRequest($user, $sender, $data['ministry'], $data['services'], $data['text'])
             );
         }

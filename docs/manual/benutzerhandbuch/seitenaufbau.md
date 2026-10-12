@@ -77,7 +77,7 @@ Rechts oben befindet sich der Button **Hilfe** mit einem Fragezeichen-Symbol :ma
 
 Er öffnet das passende Handbuchkapitel in einem neuen Tab. Pfarrplaner versucht dabei, zur gerade geöffneten Seite das richtige Kapitel zu wählen. Wenn keine genaue Zuordnung vorhanden ist, öffnet Pfarrplaner die Startseite des Online-Handbuchs.
 
-Im Online-Handbuch sehen Sie links die Kapitelübersicht. Unten auf einer Seite können Sie zum vorherigen oder nächsten Kapitel blättern. Die PDF-Version steht unter `https://handbuch.pfarrplaner.de/handbuch.pdf` bereit.
+Im Online-Handbuch sehen Sie links die Kapitelübersicht. Unten auf einer Seite können Sie zum vorherigen oder nächsten Kapitel blättern. Die PDF-Version dieses Handbuchs finden Sie über den Link **PDF-Ausgabe** auf der Startseite des Benutzerhandbuchs.
 
 ---
 

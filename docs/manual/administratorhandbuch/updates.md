@@ -8,12 +8,34 @@ Pfarrplaner kann sich in einem Release an mehreren Stellen ändern: PHP-Abhängi
 
 Vor jedem Update brauchen Sie:
 
-- aktuelles Backup der Datenbank
-- Sicherung wichtiger Anwendungsdaten aus `storage/`
+- aktuelles Backup der MariaDB-Datenbank und der MinIO-Objekte
+- Sicherung von `backup.yaml` und den benötigten Secrets außerhalb von Git
 - kurze Prüfung offener lokaler Änderungen
 - Klarheit, auf welchem Branch die produktive Instanz läuft
 
-## Updatepfad 1: klassische Installation
+## Updatepfad 1: Docker Compose (vorgesehen)
+
+Der Root-Befehl prüft die Produktionsumgebung, verlangt ein bestätigtes Backup,
+baut das neue Image vor dem Umschalten, führt die Migration aus, aktualisiert
+öffentliche Assets und startet App, Horizon und Scheduler neu:
+
+```bash
+./planer prod backup create
+./planer prod update --ref v2026.15.0 --backup-confirmed
+```
+
+Ohne `--ref` wird der aktuelle Checkout verwendet. Für ein Release sollte ein
+veröffentlichter Tag verwendet werden. Das Update verlangt eine produktive
+`.env`, verhindert parallele Ausrollungen und wartet auf den Health-Check.
+
+### Rollback
+
+Das vorherige Image und das vorherige Release-Tag bleiben als Rückfallbasis
+erhalten. Bei kompatiblen Migrationen wird zunächst auf das vorherige Image
+zurückgestellt. Bei nicht kompatiblen Migrationen ist zusätzlich der
+dokumentierte Datenbank- und MinIO-Restore aus dem Backup erforderlich.
+
+### Klassische Installation
 
 Für klassische Installationen ist der vorgesehene Weg der Update-Befehl:
 
@@ -50,9 +72,13 @@ Damit sehen Sie, welche Schritte ein Update auslösen würde, ohne sie schon aus
 4. `php artisan install:updates`
 5. Login, zentrale Ansichten, Mail und wichtige Berichte prüfen.
 
-## Updatepfad 2: Docker Compose
+## Manueller Compose-Ablauf für bestehende Altinstallationen
 
-Im Containerbetrieb hängt das genaue Update von Ihrer Build-Strategie ab. Der sichere Grundablauf bleibt aber gleich:
+Für alte Installationen, die nicht aus diesem Root-Repository betrieben werden,
+hängt der genaue Updateablauf von der jeweiligen Compose- und Image-Struktur ab.
+Der oben beschriebene `./planer prod update`-Weg ist für neue Installationen
+maßgeblich. Ein manueller Compose-Ablauf darf nur verwendet werden, wenn die
+Zielumgebung und die Datenbank vorher ausdrücklich geprüft wurden:
 
 1. Backup von Datenbank und persistenten Volumes erstellen.
 2. Neues Image bauen oder ziehen.
@@ -64,10 +90,9 @@ Im Containerbetrieb hängt das genaue Update von Ihrer Build-Strategie ab. Der s
 Typische Befehle sehen zum Beispiel so aus:
 
 ```bash
-docker compose pull
-docker compose up -d
-docker compose exec app php artisan migrate --force
-docker compose exec app php artisan optimize
+docker compose -f compose.production.yaml build --pull app
+docker compose -f compose.production.yaml run --rm --no-deps app php artisan migrate --force
+docker compose -f compose.production.yaml up -d --wait web
 ```
 
 Wenn Sie Assets bereits im Image bauen, entfällt der Asset-Build auf dem Zielsystem. Wenn nicht, muss auch im Containerkontext ein neuer Frontend-Build Teil des Updates sein.

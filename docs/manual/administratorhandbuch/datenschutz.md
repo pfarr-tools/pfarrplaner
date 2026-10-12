@@ -509,7 +509,8 @@ Auch wenn Nutzerinnen und Nutzer sie nicht direkt sehen, enthalten diese Bereich
 - Anwendungslogs
 - Mail- und Fehlerlogs
 - Datenbank-Backups
-- Dateisicherungen aus `storage/`
+- Datenbank-Backups und MinIO-Objektsicherungen
+- separat verwahrte Konfiguration, Backup-Geheimnisse und gegebenenfalls DKIM-Schlüssel
 - temporäre Exporte oder Renderdateien
 
 ### Zweck

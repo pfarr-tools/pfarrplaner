@@ -33,10 +33,11 @@ namespace App\Mail;
 use App\Services\MinistryService;
 use App\Models\People\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class MinistryRequestFilled extends Mailable
+class MinistryRequestFilled extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

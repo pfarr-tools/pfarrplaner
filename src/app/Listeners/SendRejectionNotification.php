@@ -65,6 +65,6 @@ class SendRejectionNotification
             }
         }
 
-        Mail::to($users)->send(new \App\Mail\AbsenceRejected($event->absence));
+        Mail::to($users)->queue(new \App\Mail\AbsenceRejected($event->absence));
     }
 }

@@ -4,16 +4,23 @@
 
 Pfarrplaner ist eine Laravel-Anwendung mit Vue-Frontend und zusätzlichen Werkzeugen für Dateiausgaben, Browser-Automatisierung und Dokumenterzeugung. Für einen stabilen Betrieb müssen deshalb mehrere Laufzeiten zusammenpassen.
 
-## Mindestbestandteile einer produktiven Umgebung
+## Mindestbestandteile des Docker-Betriebs
 
 - Linux-Server mit dauerhaftem Speicher
-- Webserver wie Apache oder Nginx
-- PHP **8.4**
-- Composer
-- Node.js mit npm für Build und manche Updates
-- MySQL, MariaDB, PostgreSQL, SQL Server oder SQLite
-- Cron
-- Prozessüberwachung für Queue-Worker, falls Warteschlangen genutzt werden
+- Docker Engine mit Docker-Compose-Plugin
+- mindestens 2 CPU-Kerne und 4 GB RAM als Ausgangspunkt
+- DNS-Name und TLS vor dem Caddy-Container
+- ausreichend Speicher für MariaDB, Redis, MinIO und Backups
+- unabhängiges Backup-Ziel außerhalb des Servers
+
+Die Produktions-Compose-Datei bringt PHP, Caddy, MariaDB, Redis, MinIO,
+Soketi, Horizon und den Scheduler als Container mit. Ein optionales
+Postfix-Profil übernimmt die ausgehende Zustellung. Für den Betrieb wird
+keine separat installierte PHP-, Node- oder Webserver-Laufzeit auf dem Host
+benötigt.
+
+Eine klassische Installation hat zusätzliche Anforderungen und wird separat in
+[Klassische Installation](installation-klassisch.md) beschrieben.
 
 ## PHP-Anforderungen
 
@@ -37,9 +44,12 @@ Zusätzlich braucht Laravel in der Praxis weitere übliche Erweiterungen, zum Be
 
 Wenn Sie Dateiausgaben, Importe oder Office-Dokumente nutzen, sollten Sie fehlende Basis-Erweiterungen vor der Installation gezielt prüfen, nicht erst bei der ersten Fehlermeldung.
 
-## Datenbank
+## Datenbank und Objektspeicher
 
-Der neue Installer unterstützt:
+Im Docker-Betrieb ist MariaDB 11 der Datenbankdienst. MinIO ist der verbindliche
+S3-kompatible Objektspeicher für Uploads und andere Anwendungsdateien.
+
+Eine klassische Installation kann zusätzlich folgende Datenbanken verwenden:
 
 - `mysql`
 - `sqlite`
@@ -56,7 +66,8 @@ Pfarrplaner nutzt Vite und ein modernes npm-Ökosystem. Für produktive Builds b
 - `npm`
 - ausreichend Arbeitsspeicher für `npm install` und `npm run build`
 
-Node wird nicht nur bei der Erstinstallation gebraucht. Auch Updates können neue npm-Abhängigkeiten oder neue Assets mitbringen.
+Node wird im Docker-Build verwendet. Auf dem Host wird Node nur benötigt, wenn
+Sie lokale Frontend- oder Manual-Builds außerhalb von Docker ausführen.
 
 ## Chromium, Puppeteer und Browsershot
 
@@ -74,9 +85,12 @@ Darum muss auf dem Zielsystem ein lauffähiger Chromium- beziehungsweise Chrome-
 
 Fehlt diese Laufzeit, schlagen PDF-, Screenshot- oder Browser-basierte Ausgaben oft erst später im Betrieb fehl.
 
-## Webserver
+## Webserver und öffentliche Netze
 
-Der Webserver muss auf das Verzeichnis `public/` zeigen. Alles andere bleibt außerhalb des direkt erreichbaren Document Roots.
+Im Produktionsbetrieb nimmt Caddy die öffentliche Verbindung entgegen und reicht
+sie intern an den App-Container weiter. Der Host-Port wird über `APP_PORT`
+konfiguriert und standardmäßig nur an `127.0.0.1` gebunden; TLS kann davor über
+einen externen Reverse Proxy terminiert werden.
 
 Wichtig sind außerdem:
 
@@ -92,15 +106,16 @@ Pfarrplaner verschickt Systemmails. Deshalb brauchen Sie:
 - gültige Absenderadresse
 - funktionierenden SMTP- oder anderen Mail-Transport
 - SPF, DKIM und DMARC passend zur Absenderdomain
+- im Docker-Produktionsbetrieb das optionale Compose-Profil `mail`
+- ausgehender TCP-Port 25 oder ein erreichbarer authentifizierter SMTP-Relay
 
 Ohne funktionierende Mailzustellung sind Passwort-Resets, Benachrichtigungen und manche Arbeitsabläufe unzuverlässig.
 
 ## Hintergrundaufgaben
 
-Für einen vollständigen Betrieb sollten Sie mindestens einplanen:
-
-- Cron für den Laravel-Scheduler
-- Queue-Worker für verzögerte Aufgaben
-- Neustart der Worker nach Deployments
+Für einen vollständigen Docker-Betrieb sind `horizon` und `scheduler` eigene
+Compose-Dienste. Sie werden beim Produktionsupdate gemeinsam mit `app`
+aktualisiert. Ein Host-Cronjob für den Laravel-Scheduler ist in diesem Weg
+nicht erforderlich.
 
 Wenn Sie Octane oder RoadRunner verwenden, kommen eigene Betriebsaufgaben wie Reloads und Health-Checks dazu.

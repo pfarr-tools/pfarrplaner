@@ -18,9 +18,23 @@ gemeinsamen Root-Bestand. Der Pfad kann mit `PFARRPLANER_MANUAL_ROOT`
 `/var/www/docs/manual` eingebunden.
 
 ```sh
-./planer npm run manual:all:server
-./planer npm run manual:site
+./planer manual all --skip-dusk
+./planer manual site
+./planer manual deploy --dry-run
 ```
+
+Für einen vollständigen Build einschließlich der Browser-Screenshot-Tests wird
+`./planer manual all` verwendet. Die Veröffentlichung bleibt ein eigener,
+bewusst expliziter Schritt:
+
+```sh
+./planer manual deploy
+./planer manual source-publish
+```
+
+`deploy --dry-run` prüft das Rsync-Ziel ohne Dateien zu übertragen. Die
+Variablen `MANUAL_DEPLOY_*` und `MANUAL_SOURCE_*` konfigurieren die jeweiligen
+externen Ziele.
 
 ## Betriebsdokumentation
 

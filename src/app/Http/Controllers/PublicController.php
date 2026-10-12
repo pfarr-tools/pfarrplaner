@@ -215,7 +215,7 @@ class PublicController extends Controller
             $sender = User::find($sender);
             if (null !== $sender) {
                 Mail::to($sender->email)
-                    ->send(new MinistryRequestFilled($user, $sender, $ministry, $services));
+                    ->queue(new MinistryRequestFilled($user, $sender, $ministry, $services));
             }
         }
 
@@ -339,7 +339,7 @@ class PublicController extends Controller
         ]);
         if (!json_decode($response->getBody(), true)['success']) abort(403);
 
-        Mail::to('christoph.fischer@elkw.de')->send(new ContactFormMessage($data));
+        Mail::to('christoph.fischer@elkw.de')->queue(new ContactFormMessage($data));
         return response('OK');
     }
 

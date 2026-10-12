@@ -2,7 +2,18 @@
 
 # Dateien und Verzeichnisse
 
-## Besonders wichtige Verzeichnisse
+## Repository-Root
+
+- `planer`: zentraler Entwicklungs-, Betriebs- und Migrationsbefehl
+- `compose.yaml`: lokale Docker-Compose-Umgebung
+- `compose.production.yaml`: produktive Docker-Compose-Umgebung
+- `Dockerfile`: PHP-/Node-Build- und Laufzeit-Images
+- `backup.yaml`: nicht versionierte Backup-Konfiguration
+- `scripts/`: Root-Betriebs-, Backup-, Migrations- und Testskripte
+- `docs/manual/`: drei veröffentlichte Handbücher und gemeinsame Medien
+- `src/`: Laravel-Anwendung als Git-Subtree
+
+## Anwendungsquellcode unter `src/`
 
 - `app/`: Anwendungslogik
 - `app/Http/Controllers/Api/`: API-Controller
@@ -10,20 +21,19 @@
 - `app/Models/`: Domänenmodelle
 - `config/`: Laufzeitkonfiguration
 - `database/`: Migrationen, Factories, Seeder
-- `manual/`: Benutzerhandbuch
-- `manual/administratorhandbuch/`: Administratorhandbuch
-- `manual/technikhandbuch/`: Technisches Handbuch
+- `config/manual.php`: Zuordnung von Anwendungsrouten zu Handbuchkapiteln
 - `resources/js/`: Vue- und Inertia-Frontend
 - `routes/`: Web-, API- und Teilrouten
 - `scripts/`: Build-, Release- und Hilfsskripte
-- `storage/`: Logs, temporäre Dateien, Anwendungsdaten
+- `storage/`: Logs und lokale Laufzeitdaten der Laravel-Anwendung
 
 ## Dokumentationsrelevante Dateien
 
-- `config/manual.php`: Zuordnung von Anwendungsrouten zu Handbuchkapiteln
+- `../docs/manual/`: gemeinsame Manual-Quelle aus Sicht von `src/`
 - `scripts/build-manual-site.js`: baut alle drei Manuals als statische Site und PDF
 - `scripts/deploy-manual-site.js`: deployt die gebaute Handbook-Site
 - `app/Console/Commands/DevBuilder/BuildManualPages.php`: erzeugt Benutzerhandbuch-Seiten wie Versionsangaben und Lizenzen
+- `../scripts/manual.sh`: Root-Dispatcher für Manual-Build, Dusk, Site und Veröffentlichung
 
 ## Installations- und Update-relevante Dateien
 

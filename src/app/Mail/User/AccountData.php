@@ -36,7 +36,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class AccountData extends Mailable
+class AccountData extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

@@ -2,17 +2,15 @@
 
 # Installation mit Docker Compose
 
-Dieser Weg ist für Umgebungen gedacht, in denen Pfarrplaner zusammen mit seinen Laufzeiten in Containern betrieben werden soll. Die inhaltliche Tiefe dieses Kapitels kann später noch ausgebaut werden; die Grundstruktur und der empfohlene Ablauf stehen bereits fest.
+Dieser Weg ist der vorgesehene Produktionsweg für dieses Repository. Die
+Betriebsdateien liegen am Root, die Laravel-Anwendung unter `src/`, und alle
+wichtigen Operationen werden über `./planer` ausgeführt.
 
 ## Zielbild
 
-Eine Docker-Compose-Installation sollte mindestens diese Bestandteile sauber trennen:
-
-- App-Container für PHP und die Laravel-Anwendung
-- Datenbank-Container
-- optional separater Webserver oder Reverse Proxy
-- optional separater Queue-Worker
-- optional separater Scheduler-Container oder Cron im App-Umfeld
+Die Entwicklungsumgebung und die Produktionsumgebung haben unterschiedliche
+Compose-Dateien. `compose.yaml` verwendet PHP-FPM und Vite; `compose.production.yaml`
+verwendet Octane/Swoole und bindet nur den Webserver an den Host.
 
 ## Was in Docker trotzdem gleich bleibt
 
@@ -21,25 +19,47 @@ Auch im Containerbetrieb brauchen Sie weiterhin:
 - eine gültige öffentliche URL
 - HTTPS vor dem System
 - persistente Datenbankdaten
-- persistente Anwendungsdaten in `storage/`
+- persistente MariaDB-Daten
+- persistente Redis-Daten
+- persistente MinIO-Objekte als verbindlichen Dateispeicher
+- lokale Laufzeitdaten unter `src/storage/` und den konfigurierten Backup-Pfaden
 - Mail-Konfiguration
 - Chromium-Laufzeit für Puppeteer und Browsershot
 
-## Empfohlene Compose-Bausteine
+## Compose-Dienste
 
-- `app`: Pfarrplaner-Anwendung
-- `db`: MySQL oder MariaDB
-- `queue`: optional eigener Worker-Prozess
-- `scheduler`: optional eigener Scheduler-Prozess
-- `proxy`: optional Nginx, Traefik oder ein externer Reverse Proxy
+Die Entwicklungsdatei enthält unter anderem:
+
+- `app`: PHP-FPM und Laravel-Anwendung
+- `web`: Caddy
+- `vite`: Frontend-Entwicklungsserver
+- `mariadb`, `redis`, `minio`: Infrastruktur
+- `horizon` und `scheduler`: Hintergrundprozesse
+- `soketi`: WebSocket-Broadcasting
+- `mailpit`: lokale Mailprüfung
+
+Die Produktionsdatei ergänzt beziehungsweise ersetzt dies durch:
+
+- `app`: Laravel Octane/Swoole
+- `web`: Caddy als Reverse Proxy
+- `public-assets`: öffentlicher Asset-Snapshot
+- `horizon` und `scheduler`
+- `mariadb`, `redis`, `minio`, `soketi` und `backup`
+- optional `postfix` im Compose-Profil `mail`
 
 ## Persistente Volumes
 
 Mindestens diese Daten dürfen bei Container-Neustarts nicht verloren gehen:
 
 - Datenbankdaten
-- `storage/`
-- gegebenenfalls Uploads, Caches oder exportierte Dateien, sofern sie betriebsrelevant sind
+- MariaDB-Volume
+- Redis-Volume
+- MinIO-Volume
+- das Postfix-Queue-Volume `postfix_queue`, sofern das Mail-Profil verwendet wird
+- `backup.yaml` und `secrets/` außerhalb von Git
+
+Dateien werden nicht ungeprüft dauerhaft in `storage/app` abgelegt. Der
+verbindliche Objektspeicher ist MinIO; siehe [Dateien und Verzeichnisse](../technikhandbuch/dateien-und-verzeichnisse.md).
 
 ## Build oder Image
 
@@ -50,38 +70,39 @@ Es gibt zwei übliche Wege:
 
 Für produktive Umgebungen ist ein reproduzierbares Image meist die sauberere Wahl.
 
-## CLI-Installer im Container
+## Erstinstallation
 
-Auch bei Docker Compose wird die Anwendung mit dem neuen CLI-Installer fertig eingerichtet, zum Beispiel:
+Die Root-Konfiguration wird interaktiv erzeugt:
 
 ```bash
-docker compose exec app php artisan pfarrplaner:install
+./planer bootstrap --prod
 ```
 
-Oder nicht-interaktiv mit denselben Optionen wie bei der klassischen Installation.
+Danach werden die Produktionsdienste gestartet:
+
+```bash
+./planer prod up --build
+./planer prod status
+```
+
+Falls eine Laravel-Installation oder Migration im laufenden Container nötig ist,
+wird sie mit `./planer prod exec app php artisan ...` ausgeführt. Die produktive
+`.env` wird niemals durch Testdaten ersetzt.
 
 ## Besondere Punkte bei Docker
 
 - Dateirechte zwischen Host und Container müssen passen.
 - Die öffentliche URL in `APP_URL` muss auf die echte Außenadresse zeigen, nicht auf einen internen Containernamen.
 - Headless-Chromium braucht im Image die passenden Pakete und Bibliotheken.
-- Queue- und Scheduler-Prozesse dürfen nicht davon abhängen, dass jemand interaktiv im Container angemeldet ist.
+- Horizon und Scheduler laufen als eigene, überwachte Compose-Dienste.
+- Für Produktionsmail wird der optionale send-only-Postfix mit `--profile mail` gestartet; er veröffentlicht keinen Host-Port.
+- App und Horizon senden über `postfix:587`, während Mailpit ausschließlich in der Entwicklungsumgebung bleibt.
 
 ## Empfohlene Reihenfolge
 
-1. Compose-Datei und Volumes anlegen.
-2. Container für App und Datenbank starten.
-3. Erreichbarkeit der Datenbank aus dem App-Container prüfen.
-4. `php artisan pfarrplaner:install` im App-Container ausführen.
-5. Assets, Mail, Login und Hintergrundprozesse testen.
-
-## Noch gezielt zu ergänzen
-
-Dieses Kapitel ist bewusst so aufgebaut, dass später zusätzliche Details leicht ergänzt werden können, zum Beispiel:
-
-- konkrete Beispiel-`docker-compose.yml`
-- Trennung von Build- und Runtime-Image
-- Reverse-Proxy-Beispiele
-- Health-Checks
-- Backup von Volumes
-- Rolling-Update-Strategien
+1. `./planer bootstrap --prod` ausführen und `.env` prüfen.
+2. `./planer prod up --build` starten.
+3. `./planer prod status` und den Health-Endpunkt prüfen.
+4. `./planer prod backup create` einrichten und einen Restore-Test planen.
+5. Mail, Login, Dateiablage, Berichte und Hintergrundprozesse testen.
+6. Für Mail siehe das [Mail-Betriebskapitel](mail.md), für Updates [Updates](updates.md).

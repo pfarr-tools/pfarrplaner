@@ -33,11 +33,19 @@ Ein technischer Überblick über den Sicherheitsdurchgang und die abgesicherten 
 
 ## Backup
 
-Ein brauchbares Backup umfasst mindestens:
+Ein brauchbares Backup des Docker-Betriebs umfasst mindestens:
 
-- Datenbank
-- `storage/`
-- falls nötig `.env` oder andere sicher verwahrte Konfigurationsdaten
+- MariaDB-Datenbank
+- alle Objekte im MinIO-Bucket
+- `backup.yaml`, Restic-Passwörter und SSH-Dateien in `secrets/`, separat und geschützt
+- DKIM-Schlüssel unter `secrets/dkim`, wenn das Mail-Profil verwendet wird
+- das benannte Postfix-Queue-Volume, wenn eine laufende Zustellwarteschlange erhalten werden muss
+
+`./planer backup create` erstellt den Datenbank- und MinIO-Satz und lädt ihn in
+die aktivierten Restic-Repositories. `./planer backup verify` prüft die
+Sicherung; `./planer backup restore` schreibt zunächst in ein separates
+Verzeichnis. Ein produktiver Restore benötigt zusätzlich `--apply --yes` und
+eine vorherige Sicherheitskopie.
 
 Wichtig ist nicht nur das Erstellen, sondern auch das Wiederherstellen. Testen Sie regelmäßig, ob sich aus den Sicherungen wirklich eine lauffähige Instanz herstellen lässt.
 
@@ -58,7 +66,7 @@ Externe Integrationen sollten sparsam und nachvollziehbar konfiguriert sein. Zug
 
 Vor Updates, Serverumzügen oder Integrationsarbeiten:
 
-1. Backup prüfen.
+1. Mit `./planer backup verify` ein Backup prüfen.
 2. Wartungsfenster festlegen.
 3. Rückfallplan festhalten.
 4. Verantwortliche informieren.

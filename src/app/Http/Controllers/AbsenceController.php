@@ -453,7 +453,7 @@ class AbsenceController extends Controller
             }
             // filter out users without email address
             $recipients->reject(function ($user) { return empty($user->email); });
-            Mail::to($recipients)->send(new \App\Mail\Absence\AbsenceRejected($absence, Auth::user()));
+            Mail::to($recipients)->queue(new \App\Mail\Absence\AbsenceRejected($absence, Auth::user()));
         }
 
         $absence->delete();

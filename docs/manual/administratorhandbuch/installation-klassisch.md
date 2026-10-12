@@ -1,8 +1,11 @@
 [//]: # (TOC: 3. Klassische Installation)
 
-# Klassische Installation mit Git und CLI-Installer
+# Klassische Installation mit Git und CLI-Installer (Legacy)
 
-Die klassische Installation ist der direkteste und transparenteste Weg. Sie eignet sich besonders, wenn Sie eine feste Linux-Umgebung mit Webserver, PHP und Datenbank selbst betreiben.
+Die klassische Installation ist ein Legacy-/Sonderweg für einen unabhängigen
+Anwendungs-Checkout. Für neue Installationen ist die Docker-Compose-Struktur
+des Root-Repository mit `./planer` vorgesehen. Die beiden Betriebswege dürfen
+nicht vermischt werden.
 
 ## Zielbild
 
