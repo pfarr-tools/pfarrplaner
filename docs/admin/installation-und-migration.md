@@ -56,8 +56,9 @@ Kleinschreibung. Eine leere Liste gewährt in Produktionsumgebungen niemandem
 Zugriff auf `/horizon`.
 
 `.env` wird nur angelegt, wenn sie fehlt, und niemals überschrieben. Setze
-`APP_KEY`, `APP_ENV`, `APP_URL`, MariaDB-/Redis-Passwörter, MinIO-Zugangsdaten,
-`BACKUP_ARCHIVE_PASSWORD` und ein unabhängiges `BACKUP_S3_ENDPOINT`. Produktion
+`APP_KEY`, `APP_ENV`, `APP_URL`, MariaDB-/Redis-Passwörter und MinIO-Zugangsdaten.
+Backup-Ziele und Backup-Geheimnisse stehen ausschließlich in `backup.yaml`.
+Produktion
 verlangt `APP_ENV=production`.
 
 ```sh
@@ -77,10 +78,10 @@ verlangt `APP_ENV=production`.
 einer Warnung blockiert und akzeptiert nur die exakte interaktive Eingabe `ja`.
 `./planer fresh` benötigt zusätzlich `--force`.
 
-`FILESYSTEM_DRIVER=s3` und `AWS_ENDPOINT` zeigen auf MinIO oder S3. Der
-Live-Bucket (`AWS_BUCKET`) und der Backup-Bucket (`BACKUP_S3_BUCKET`) müssen
-getrennt sein. Ein Backup-Ziel auf derselben physischen Platte wie die einzige
-MariaDB-/MinIO-Instanz ist kein Disaster-Recovery-Backup.
+`FILESYSTEM_DRIVER=s3` und `AWS_ENDPOINT` zeigen auf den Live-MinIO-Bucket.
+Backups verwenden eigene Restic-Repositories. Ein lokales Repository ist für
+Entwicklung geeignet; Produktion muss ein unabhängiges SFTP-Repository
+aktivieren.
 
 Bei der Übernahme werden mindestens `storage/app`, `storage/inbox`, öffentliche
 Upload-Verzeichnisse und alle datenbankreferenzierten Dateien geprüft.
@@ -89,24 +90,47 @@ PDF-Dateien werden nicht als langlebige Objekte übernommen.
 
 ## Backups und Restore
 
-Spatie Laravel Backup erzeugt ein verschlüsseltes MariaDB-Archiv. MinIO-Objekte
-werden mit derselben Backup-ID in ein unabhängiges S3-/MinIO-Ziel gespiegelt.
-`verify_backup` ist aktiviert; die Retention beträgt standardmäßig 7 Tage
-alle Backups, 16 Tage tägliche, 8 Wochen wöchentliche, 4 Monate monatliche
-und 2 Jahre jährliche Backups.
+`./planer backup create` startet einen kurzlebigen Backup-Container. Dieser
+quiesziert App, Horizon und Scheduler, erstellt eine MariaDB-Sicherung und
+exportiert den Live-MinIO-Bucket, legt beides mit Deployment-Konfiguration und
+`manifest.json` in einem geschützten Staging-Verzeichnis ab und lädt denselben
+unveränderlichen Satz in jedes aktivierte Restic-Repository. Restic verschlüsselt
+und versioniert die Snapshots; AWS S3 ist kein Backup-Backend.
+
+Der aktuelle MinIO-Export sichert Objektinhalt, Schlüssel und Größeninventar.
+MinIO-Versionenhistorie, Tags und Bucket-Metadaten werden nicht als eigene
+Historie reproduziert; falls die produktive Bucket-Konfiguration diese benötigt,
+muss vor dem Restore ein entsprechendes MinIO-Wiederherstellungsverfahren
+ergänzt werden.
+
+Die Aufbewahrung wird separat ausgeführt: 14 tägliche, 8 wöchentliche und 12
+monatliche Snapshots sind der Standard. `create` löscht niemals alte Backups.
 
 ```sh
+./planer backup targets
 ./planer backup create
 ./planer backup list
 ./planer backup verify
-./planer backup restore ./backups/pfarrplaner-<zeitstempel>.zip --dry-run --confirm
+./planer backup prune
+./planer backup check
+./planer backup restore 20261012T030000Z --target offsite
 ./planer prod backup create
 ```
 
-Ein Restore ist destruktiv und darf nur nach Dry-Run, aktueller Sicherung und
-expliziter Bestätigung erfolgen. Vor dem Produktivbetrieb muss ein Restore in
-einem isolierten Compose-Projekt geübt werden. Alte Legacy-Dateien werden erst
-nach erfolgreicher Abnahme gelöscht.
+`restore` schreibt standardmäßig in ein separates Verzeichnis. Ein Anwenden auf
+eine laufende Installation ist erst mit `--apply --yes`, einer vorherigen
+Sicherheitskopie und quieszierten Diensten zulässig. Die Wiederherstellung
+benötigt nur ein einzelnes Offsite-Repository und niemals alte Spatie-Archive.
+`backup.yaml`, Restic-Passwörter und SSH-Dateien müssen für einen Notfall
+zusätzlich außerhalb des Systems verwahrt werden.
+SSH-Schlüssel und `known_hosts` werden aus dem projektbezogenen `secrets/`
+Verzeichnis nach `/run/secrets/` eingehängt; sie müssen auf dem Host dem
+Backup-Benutzer gehören und dürfen nicht gruppen- oder weltweit lesbar sein.
+
+Für Cron reichen Docker Compose, eine POSIX-Shell und der Projektzugriff auf dem
+Host; Restic, `mariadb-dump`, `mc`, SSH und der YAML-Parser befinden sich im
+Backup-Image. Die CLI übernimmt die Sperre, daher darf Cron keine zweite
+`flock`-Sperre verwenden.
 
 ## Aktualisierung mit kurzer Unterbrechung
 

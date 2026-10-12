@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+backup.yaml
+secrets
 backups
 src/vendor
 src/node_modules

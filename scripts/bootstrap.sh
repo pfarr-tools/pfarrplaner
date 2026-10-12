@@ -159,7 +159,6 @@ set_env REDIS_PASSWORD "$(random_secret)"
 set_env AWS_SECRET_ACCESS_KEY "$(random_secret)"
 set_env PUSHER_APP_KEY "$(random_secret)"
 set_env PUSHER_APP_SECRET "$(random_secret)"
-set_env BACKUP_ARCHIVE_PASSWORD "$(random_secret)"
 
 mkdir -p src/storage/app src/storage/framework/{cache,sessions,views} src/storage/logs src/bootstrap/cache
 chmod +x planer scripts/*.sh 2>/dev/null || true

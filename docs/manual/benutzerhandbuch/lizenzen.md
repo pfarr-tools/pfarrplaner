@@ -1064,11 +1064,9 @@ http://www.gnu.org/philosophy/why-not-lgpl.html.
 | Composer | simshaun/recurr | v5.0.3 | MIT |
 | Composer | spatie/backtrace | 1.8.2 | MIT |
 | Composer | spatie/browsershot | 5.3.0 | MIT |
-| Composer | spatie/db-dumper | 4.1.1 | MIT |
 | Composer | spatie/error-solutions | 1.1.3 | MIT |
 | Composer | spatie/flare-client-php | 1.11.0 | MIT |
 | Composer | spatie/ignition | 1.16.0 | MIT |
-| Composer | spatie/laravel-backup | 10.2.1 | MIT |
 | Composer | spatie/laravel-ignition | 2.12.0 | MIT |
 | Composer | spatie/laravel-package-tools | 1.93.0 | MIT |
 | Composer | spatie/laravel-permission | 6.25.0 | MIT |

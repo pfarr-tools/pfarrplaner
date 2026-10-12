@@ -106,9 +106,21 @@ services:
     entrypoint: >-
       /bin/sh -lc 'until mc alias set local http://minio:9000
       "$${AWS_ACCESS_KEY_ID:-pfarrplaner}" "$${AWS_SECRET_ACCESS_KEY:-pfarrplaner-development-secret}"; do sleep 2; done;
-      mc mb --ignore-existing local/$${AWS_BUCKET:-pfarrplaner};
-      mc mb --ignore-existing local/$${MINIO_BACKUP_BUCKET:-pfarrplaner-backups};'
+      mc mb --ignore-existing local/$${AWS_BUCKET:-pfarrplaner};'
     depends_on: {minio: {condition: service_started}}
+    networks: [pfarrplaner]
+  backup:
+    build:
+      context: .
+      dockerfile: docker/backup/Dockerfile
+    profiles: [tools]
+    restart: "no"
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:ro
+      - ./backup.yaml:/workspace/backup.yaml:ro
+      - ./backups:/backups
+      - ./secrets:/run/secrets:ro
     networks: [pfarrplaner]
   soketi:
     image: quay.io/soketi/soketi:latest

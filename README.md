@@ -94,6 +94,10 @@ bewusst geschützt.
 ## Daten, Backups und Migration
 
 ```sh
+cp backup-example.yaml backup.yaml
+chmod 600 backup.yaml
+./planer backup targets
+./planer backup init
 ./planer backup create
 ./planer backup verify
 ./planer data push user@server:/opt/pfarrplaner
@@ -119,7 +123,9 @@ nicht importiert. Der Dry-Run ist vor jeder bestätigten Migration erforderlich.
 
 ## Produktion
 
-Produktionswerte werden ausschließlich in der produktiven `.env` hinterlegt.
+Produktionswerte werden ausschließlich in der produktiven `.env` hinterlegt;
+Backup-Ziele und Backup-Geheimnisse stehen ausschließlich in der nicht
+versionierten, auf `0600` gesetzten `backup.yaml`.
 Die Produktions-Compose-Datei verwendet persistente Volumes, interne
 Backend-Netzwerke, Octane/Swoole und MariaDB. Ein Update erfolgt nach einem
 verifizierten Backup:

@@ -30,7 +30,13 @@
 <template>
     <div class="admin-backup-tab">
         <h3>Backup Status</h3>
+        <p v-if="!backups.length">
+            Backups werden über <code>./planer backup</code> verwaltet. Verwende
+            <code>targets</code>, <code>list</code> und <code>verify</code> für
+            Status und Prüfungen.
+        </p>
         <fake-table :headers="['Ziel', 'Erreichbar', 'Gesund', 'Anzahl Backups', 'Neuestes Backup', 'Benötigter Speicherplatz']"
+                    v-else
                     :columns="[2,2,2,2,2,2]" collapsed-header="Backups">
             <div class="row" v-for="backup in backups">
                 <div class="col-md-2"><checked-process-item :check="backup.diskCheck" :positive="backup.disk" :negative="backup.disk"/></div>

@@ -1,5 +1,8 @@
 # Pfarrplaner Docker- und Migrationsarchitektur
 
+> Hinweis: Die in diesem historischen Design beschriebene Spatie-Backup-Integration
+> ist durch `build/backup-plan.md` und den aktuellen Restic-Backup-Container ersetzt.
+
 ## Ziel
 
 Pfarrplaner erhält dieselbe sichere, Docker-basierte Betriebsstruktur wie Roo,
@@ -75,4 +78,3 @@ SMTP-Relay und direkte MX-Zustellung werden unterstützt. DKIM-Signierung wird
 im Mail-Stack konfiguriert; SPF, DMARC, DNS und rDNS sind externe
 Provider-/DNS-Voraussetzungen und werden vollständig im Installationshandbuch
 beschrieben. Ohne Profil läuft kein Mailcontainer.
-

@@ -2,6 +2,8 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
 if [[ "${PLANER_PRODUCTION:-0}" == 1 ]]; then
   COMPOSE=(docker compose -f "$ROOT/compose.production.yaml")
 else
@@ -11,69 +13,96 @@ fi
 usage() {
   cat <<'EOF'
 Verwendung:
+  ./planer backup init [--target NAME]
+  ./planer backup targets
   ./planer backup create
-  ./planer backup list
-  ./planer backup verify
-  ./planer backup restore --dry-run
+  ./planer backup list [--target NAME]
+  ./planer backup verify [BACKUP_ID] [--target NAME]
+  ./planer backup restore BACKUP_ID --target NAME
+  ./planer backup prune [--target NAME]
+  ./planer backup check [--target NAME]
 
-Ein Backup besteht aus einem verschlüsselten Spatie-Archiv und einem separaten
-MinIO/S3-Objektbestand.
+Die Konfiguration liegt ausschließlich in ./backup.yaml.
 EOF
 }
-die() { echo "Fehler: $*" >&2; exit 2; }
-compose_app() { "${COMPOSE[@]}" exec -T app php artisan "$@"; }
+
+[[ -f "$ROOT/backup.yaml" ]] || {
+  echo 'Fehler: ./backup.yaml fehlt. Kopiere backup-example.yaml und setze chmod 600.' >&2
+  exit 2
+}
+
+run_backup() {
+  "${COMPOSE[@]}" run --rm --no-deps -T backup "$@"
+}
+
+running_writers=()
+restore_writers() {
+  if ((${#running_writers[@]})); then
+    "${COMPOSE[@]}" start "${running_writers[@]}" >/dev/null
+  fi
+}
+
+was_running() {
+  [[ -n "$("${COMPOSE[@]}" ps -q --status running "$1" 2>/dev/null)" ]]
+}
+
+quiesce() {
+  running_writers=()
+  for service in app horizon scheduler; do
+    if was_running "$service"; then
+      running_writers+=("$service")
+    fi
+  done
+  ((${#running_writers[@]})) && "${COMPOSE[@]}" stop "${running_writers[@]}" >/dev/null
+}
 
 command_name="${1:-help}"
 shift || true
 case "$command_name" in
   create)
-    backup_id="$(date -u +%Y%m%dT%H%M%SZ)"
-    echo "Backup $backup_id: Spatie-Archiv erstellen."
-    compose_app backup:run --disable-notifications
-    echo "Backup $backup_id: MinIO-Objekte in unabhängiges Ziel spiegeln."
-    "${COMPOSE[@]}" run --rm --no-deps --entrypoint /bin/sh create-buckets -lc \
-      'mc alias set live "${AWS_ENDPOINT:-http://minio:9000}" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" &&
-       mc alias set backup "${BACKUP_S3_ENDPOINT:-${AWS_ENDPOINT:-http://minio:9000}}" "${BACKUP_S3_ACCESS_KEY_ID:-$AWS_ACCESS_KEY_ID}" "${BACKUP_S3_SECRET_ACCESS_KEY:-$AWS_SECRET_ACCESS_KEY}" &&
-       mc mirror --overwrite live/"$AWS_BUCKET" backup/"${BACKUP_S3_BUCKET:-${MINIO_BACKUP_BUCKET:-pfarrplaner-backups}}"/objects/'"$backup_id"
-    echo "Backup $backup_id erstellt."
-    ;;
-  list) compose_app backup:list ;;
-  verify) compose_app backup:monitor ;;
-  restore)
-    archive="${1:-}"
-    [[ -n "$archive" ]] || die 'restore benötigt den Pfad zu einem Spatie-Archiv.'
-    [[ -f "$archive" ]] || die "Backup-Archiv nicht gefunden: $archive"
-    shift
-    confirmed=0
-    dry_run=0
-    for option in "$@"; do
-      case "$option" in
-        --confirm) confirmed=1 ;;
-        --dry-run) dry_run=1 ;;
-        *) die "Unbekannte Option: $option" ;;
-      esac
+    release_file="$ROOT/backups/.backup-release"
+    ready_file="$ROOT/backups/.backup-ready"
+    rm -f "$release_file" "$ready_file"
+    trap 'restore_writers; rm -f "$release_file" "$ready_file"' EXIT INT TERM
+    quiesce
+    "${COMPOSE[@]}" run --rm --no-deps -T \
+      -e BACKUP_RELEASE_FILE=/backups/.backup-release \
+      -e BACKUP_READY_FILE=/backups/.backup-ready \
+      backup create &
+    backup_pid=$!
+    for _ in $(seq 1 900); do
+      [[ -f "$ready_file" ]] && break
+      if ! kill -0 "$backup_pid" 2>/dev/null; then
+        wait "$backup_pid" || {
+          status=$?
+          echo "Fehler: Backup-Container wurde vor der Freigabe beendet (Status $status)." >&2
+          exit "$status"
+        }
+      fi
+      sleep 1
     done
-    (( confirmed )) || die 'Restore ist destruktiv. Verwende zusätzlich --confirm.'
-    if (( dry_run )); then
-      unzip -l "$archive" | sed -n '1,25p'
-      echo 'Dry-Run: Spatie-Archiv und MinIO-Objektbestand würden wiederhergestellt.'
-    else
-      local_down=0
-      cleanup() { status=$?; (( local_down )) && compose_app up || true; exit "$status"; }
-      trap cleanup EXIT
-      compose_app down
-      local_down=1
-      dump_entry="$(unzip -Z1 "$archive" | grep -E '(^|/)mysql\.sql$' | head -1)"
-      [[ -n "$dump_entry" ]] || die 'Kein mysql.sql-Dump im Spatie-Archiv gefunden.'
-      unzip -p "$archive" "$dump_entry" |
-        "${COMPOSE[@]}" exec -T mariadb sh -lc 'mariadb -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" -e "DROP DATABASE IF EXISTS $MARIADB_DATABASE; CREATE DATABASE $MARIADB_DATABASE;" && mariadb -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE"'
-      compose_app migrate --force
-      "${COMPOSE[@]}" run --rm --no-deps --entrypoint /bin/sh create-buckets -lc 'mc alias set live "${AWS_ENDPOINT:-http://minio:9000}" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" && mc alias set backup "${BACKUP_S3_ENDPOINT:-${AWS_ENDPOINT:-http://minio:9000}}" "${BACKUP_S3_ACCESS_KEY_ID:-$AWS_ACCESS_KEY_ID}" "${BACKUP_S3_SECRET_ACCESS_KEY:-$AWS_SECRET_ACCESS_KEY}" && mc mirror --overwrite backup/"${BACKUP_S3_BUCKET:-${MINIO_BACKUP_BUCKET:-pfarrplaner-backups}}"/objects "$AWS_BUCKET"'
-      compose_app optimize:clear
-      compose_app up
-      local_down=0
-      echo 'Restore abgeschlossen.'
+    [[ -f "$ready_file" ]] || { echo 'Fehler: Backup-Erfassung wurde nicht freigegeben.' >&2; exit 2; }
+    restore_writers
+    touch "$release_file"
+    wait "$backup_pid" || {
+      status=$?
+      echo "Fehler: Backup-Upload fehlgeschlagen (Status $status)." >&2
+      exit "$status"
+    }
+    running_writers=()
+    ;;
+  restore)
+    apply=0
+    for argument in "$@"; do [[ "$argument" == --apply ]] && apply=1; done
+    if ((apply)); then
+      [[ " ${*} " == *' --yes '* ]] || { echo 'Fehler: --apply benötigt zusätzlich --yes.' >&2; exit 2; }
+      trap 'restore_writers' EXIT INT TERM
+      quiesce
     fi
+    run_backup restore "$@"
+    ;;
+  init|targets|list|verify|prune|check)
+    run_backup "$command_name" "$@"
     ;;
   help|--help|-h) usage ;;
   *) usage >&2; exit 2 ;;

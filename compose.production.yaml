@@ -103,8 +103,21 @@ services:
     entrypoint: >-
       /bin/sh -lc 'until mc alias set local http://minio:9000
       "$${AWS_ACCESS_KEY_ID}" "$${AWS_SECRET_ACCESS_KEY}"; do sleep 2; done;
-      mc mb --ignore-existing local/$${AWS_BUCKET}; mc mb --ignore-existing local/$${MINIO_BACKUP_BUCKET};'
+      mc mb --ignore-existing local/$${AWS_BUCKET};'
     depends_on: {minio: {condition: service_healthy}}
+    networks: [backend]
+  backup:
+    build:
+      context: .
+      dockerfile: docker/backup/Dockerfile
+    profiles: [tools]
+    restart: "no"
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:ro
+      - ./backup.yaml:/workspace/backup.yaml:ro
+      - ./backups:/backups
+      - ./secrets:/run/secrets:ro
     networks: [backend]
   soketi:
     image: quay.io/soketi/soketi:latest

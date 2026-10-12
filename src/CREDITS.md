@@ -425,7 +425,6 @@ Pfarrplaner uses the following open-source libraries:
  - [spatie/backtrace](https://packagist.org/packages/spatie/backtrace) 1.7.4
     under the MIT license
 
- - [spatie/db-dumper](https://packagist.org/packages/spatie/db-dumper) 3.8.0
     under the MIT license
 
  - [spatie/error-solutions](https://packagist.org/packages/spatie/error-solutions) 1.1.3
@@ -437,7 +436,6 @@ Pfarrplaner uses the following open-source libraries:
  - [spatie/ignition](https://packagist.org/packages/spatie/ignition) 1.15.1
     under the MIT license
 
- - [spatie/laravel-backup](https://packagist.org/packages/spatie/laravel-backup) 8.8.2
     under the MIT license
 
  - [spatie/laravel-ignition](https://packagist.org/packages/spatie/laravel-ignition) 2.9.1
@@ -5914,4 +5912,3 @@ Pfarrplaner uses the following open-source libraries:
  - [yocto-queue](https://github.com/sindresorhus/yocto-queue) 0.1.0
     by Sindre Sorhus (sindresorhus@gmail.com)
     under the MIT license
-

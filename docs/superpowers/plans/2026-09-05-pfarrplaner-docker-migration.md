@@ -4,9 +4,11 @@
 
 **Goal:** Build a safe MariaDB/MinIO Docker runtime for Pfarrplaner with `planer`, Soketi, optional Postfix, backups, synchronization, and legacy SSH migration.
 
-**Architecture:** Keep Laravel under `src/`, add root-level operational files, and use separate development and production Compose projects. Retain Spatie Backup for database archives while adding a coordinated MinIO object backup and migration layer.
+**Backup note:** The historical Spatie backup tasks in this plan are superseded by `build/backup-plan.md` and the dedicated Restic backup container.
 
-**Tech Stack:** Docker Compose, PHP-FPM/Laravel 11, MariaDB 11, Redis 7, MinIO, Soketi, Caddy, Postfix, Spatie Laravel Backup, Bash, `mariadb-dump`/`mariadb`.
+**Architecture:** Keep Laravel under `src/`, add root-level operational files, and use separate development and production Compose projects. The current backup implementation is the dedicated Restic container described in `build/backup-plan.md`.
+
+**Tech Stack:** Docker Compose, PHP-FPM/Laravel 11, MariaDB 11, Redis 7, MinIO, Soketi, Caddy, Postfix, Restic, Bash, `mariadb-dump`/`mariadb`.
 
 **Spec:** `docs/superpowers/specs/2026-09-05-pfarrplaner-docker-migration-design.md`
 
@@ -87,4 +89,3 @@
 - [ ] Run focused Laravel tests, shell tests, frontend build, Pint, and `git diff --check`.
 - [ ] Perform a live smoke test covering login, upload/download, broadcasting, queue, scheduled task, backup, and restore.
 - [ ] Report any unavailable Docker/network/SMTP verification separately from passing checks.
-

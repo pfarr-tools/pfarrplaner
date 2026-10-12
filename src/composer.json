@@ -31,7 +31,6 @@
         "sabre/dav": "^4.4",
         "simshaun/recurr": "^5.0",
         "spatie/browsershot": "^5.0",
-        "spatie/laravel-backup": "^10.0",
         "spatie/laravel-ignition": "^2.0",
         "spatie/laravel-permission": "^6.12",
         "spiral/roadrunner-cli": "*",

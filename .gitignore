@@ -1,6 +1,8 @@
 .env
 .env.*
 !.env.example
+/backup.yaml
+/secrets/
 
 backups/
 .planer-production-update.lock
@@ -30,3 +32,4 @@ src/.composer-licenses
 *.sql
 *.log
 *.map
+build/

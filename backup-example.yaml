@@ -1,0 +1,70 @@
+version: 1
+
+policy:
+  require_offsite: false
+
+compose:
+  project_directory: .
+  files:
+    - compose.yaml
+  database_service: mariadb
+  minio_service: minio
+
+capture:
+  staging_directory: ./backups/staging
+  database:
+    host: mariadb
+    port: 3306
+    name: pfarrplaner
+    user: pfarrplaner
+    password: REPLACE_WITH_DATABASE_PASSWORD
+    dump_flags: [--single-transaction, --quick, --routines, --events, --triggers]
+  objects:
+    endpoint: http://minio:9000
+    bucket: pfarrplaner
+    access_key: pfarrplaner
+    secret_key: REPLACE_WITH_OBJECT_STORAGE_SECRET
+  include_paths:
+    - compose.yaml
+    - compose.production.yaml
+    - .env
+    - docker/
+    - scripts/
+    - src/storage/app/
+  exclude_paths:
+    - src/storage/logs/
+    - src/storage/framework/cache/
+    - src/storage/framework/sessions/
+    - src/storage/framework/views/
+    - backups/
+    - src/vendor/
+    - src/node_modules/
+
+repositories:
+  local:
+    type: local
+    enabled: true
+    required: true
+    path: ./backups/restic
+    password: REPLACE_WITH_STRONG_UNIQUE_RESTIC_PASSWORD
+
+  offsite:
+    type: sftp
+    enabled: false
+    required: true
+    url: sftp:backup-user@backup.example.net:/backups/pfarrplaner/restic
+    password: REPLACE_WITH_ANOTHER_STRONG_UNIQUE_RESTIC_PASSWORD
+    ssh_key: /run/secrets/id_ed25519
+    known_hosts: /run/secrets/known_hosts
+
+retention:
+  keep_daily: 14
+  keep_weekly: 8
+  keep_monthly: 12
+
+verification:
+  check_after_backup: true
+  read_data_subset: 1/12
+
+notifications:
+  on_failure: true
