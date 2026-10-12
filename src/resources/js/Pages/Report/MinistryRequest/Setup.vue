@@ -37,8 +37,8 @@
         </template>
         <div class="row">
             <div class="col-md-6">
-                <form-selectize label="Kirchengemeinde" name="city" v-model="myCity"
-                                :options="cities"/>
+                <form-selectize label="Kirchengemeinde" name="cities" v-model="myCities"
+                                :options="cities" multiple/>
             </div>
             <div class="col-md-6">
                 <location-select name="locations" :locations="locations" label="Auf folgende Orte beschränken"
@@ -112,10 +112,13 @@ export default {
             return s;
         },
         myTeams() {
-            return this.teams[this.myCity] || [];
+            const teams = this.myCities.flatMap(city => this.teams[city] || []);
+            return teams.filter((team, index, allTeams) =>
+                allTeams.findIndex(otherTeam => otherTeam.id === team.id) === index
+            );
         },
         myCityObject() {
-            return this.cities.filter(city => city.id == this.myCity)[0];
+            return this.cities.find(city => city.id == this.myCities[0]);
         }
     },
     mounted() {
@@ -134,7 +137,7 @@ export default {
             myMinistries,
             myMinistry: null,
             myLocations: [],
-            myCity: (this.cities.length ? this.cities[0].id : null),
+            myCities: (this.cities.length ? [this.cities[0].id] : []),
             services: [],
             apiToken: this.$page.props.currentUser.data.api_token,
             usersLoading: false,
@@ -153,7 +156,7 @@ export default {
         async to() {
             await this.getServices();
         },
-        async myCity() {
+        async myCities() {
             await this.getServices();
             await this.getRecipients();
         },
@@ -169,12 +172,12 @@ export default {
             return typeof d == 'object' ? d.format('YYYY-MM-DD') : moment(d, 'DD.MM.YYYY').format('YYYY-MM-DD');
         },
         async getServices() {
-            if (!(this.myCity && this.from && this.to)) return [];
+            if (!(this.myCities.length && this.from && this.to)) return [];
             this.servicesLoading = true;
             this.services = await this.$api().post(route('api.report.step', {
                 report: 'ministryRequest',
                 step: 'services',
-                city: this.myCity,
+                cities: this.myCities,
                 locations: this.myLocations,
                 start: this.queryDate(this.from),
                 end: this.queryDate(this.to),
@@ -201,25 +204,29 @@ export default {
                 ministry: this.myMinistry,
                 text: this.message,
             };
-            this.recipients.forEach(recipient => record.recipients.push(recipient.id));
             this.services.forEach(service => {
                 if (service.checked) record.services.push(service.id)
             });
+            let missingAddress = false;
             this.recipients.forEach(recipient => {
+                const recipientId = typeof recipient === 'object' ? recipient.id : recipient;
                 let user = this.users.filter(u => {
-                    return u.id === recipient;
+                    return u.id === recipientId;
                 })[0];
                 if (user) {
+                    let address = user.email;
                     if (!user.email) {
-                        let address = window.prompt('Bitte gib eine E-Mailadresse für ' + user.name + ' an.');
-                        if (address) {
-                            record.address[recipient] = address;
-                        }
-                    } else {
-                        record.address[recipient] = user.email;
+                        address = window.prompt('Bitte gib eine E-Mailadresse für ' + user.name + ' an.');
                     }
+                    if (!address) {
+                        missingAddress = true;
+                        return;
+                    }
+                    record.recipients.push(recipientId);
+                    record.address[recipientId] = address;
                 }
             });
+            if (missingAddress) return;
             this.$inertia.post(route('reports.render', {report: 'ministryRequest'}), record);
         },
     }

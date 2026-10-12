@@ -43,6 +43,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Inertia\Inertia;
 
@@ -96,10 +97,11 @@ class MinistryRequestReport extends AbstractReport
             'start' => 'date',
             'end' => 'date',
             'locations.*' => 'int|exists:locations,id',
-            'city' => 'int|exists:cities,id',
+            'cities' => 'required|array|min:1',
+            'cities.*' => 'int|exists:cities,id',
                            ]);
 
-        $services = Service::where('city_id', $data['city'])
+        $services = Service::whereIn('city_id', $data['cities'])
             ->between(Carbon::parse($data['start']), Carbon::parse($data['end']))
             ->ordered();
 
@@ -114,14 +116,15 @@ class MinistryRequestReport extends AbstractReport
     {
         $data = $request->validate([
                                        'ministry' => 'string',
-                                       'city' => 'int|exists:cities,id',
+                                       'cities' => 'required|array|min:1',
+                                       'cities.*' => 'int|exists:cities,id',
                                    ]);
 
         $users = User::select('id')->whereHas(
             'services',
             function ($query) use ($data) {
                 $query->where('service_user.category', $data['ministry']);
-                $query->where('city_id', $data['city']);
+                $query->whereIn('city_id', $data['cities']);
             }
         )->get()->pluck('id')->unique();
 
@@ -133,8 +136,10 @@ class MinistryRequestReport extends AbstractReport
         $data = $request->validate(
             [
                 'ministry' => 'required',
-                'services' => 'required',
-                'recipients' => 'required|exists:users,id',
+                'services' => 'required|array|min:1',
+                'services.*' => 'integer|exists:services,id',
+                'recipients' => 'required|array|min:1',
+                'recipients.*' => 'integer|exists:users,id',
                 'address' => 'nullable',
                 'address.*' => 'nullable|email',
                 'text' => 'nullable|string',
@@ -152,6 +157,15 @@ class MinistryRequestReport extends AbstractReport
 
         $data['recipients'] = User::whereIn('id', $data['recipients'])->get();
 
+        foreach ($data['recipients'] as $user) {
+            $address = $data['address'][$user->id] ?? $user->email;
+            if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+                throw ValidationException::withMessages([
+                    'recipients' => 'Für ' . $user->name . ' ist keine gültige E-Mailadresse hinterlegt.',
+                ]);
+            }
+        }
+
         $data['services'] = Service::whereIn('id', $data['services'])
             ->ordered()
             ->get();
@@ -161,7 +175,7 @@ class MinistryRequestReport extends AbstractReport
 
         foreach ($data['recipients'] as $user) {
             $sender = Auth::user();
-            Mail::to($user->email)->cc($sender)->send(
+            Mail::to($data['address'][$user->id] ?? $user->email)->cc($sender)->send(
                 new MinistryRequest($user, $sender, $data['ministry'], $data['services'], $data['text'])
             );
         }
