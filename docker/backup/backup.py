@@ -222,13 +222,12 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
             user, host, port = sftp_target(repo["url"])
             ssh_destination = shlex.quote(f"{user}@{host}")
             ssh_port = f"-p {port} " if port else ""
+            ssh_environment = ''
             if repo.get("ssh_key"):
                 key = path_in_container(repo["ssh_key"])
                 if not key.is_file():
                     fail(f"SFTP-sle: SSH-Datei fehlt ({key}).")
-                ssh_command = (
-                    f"ssh -i {shlex.quote(str(key))} {ssh_common_options} {ssh_port}-s {ssh_destination} sftp"
-                )
+                ssh_options = f"-i {shlex.quote(str(key))} {ssh_common_options}"
             else:
                 ssh_password_path = path_in_container(repo["ssh_password_file"])
                 if not ssh_password_path.is_file():
@@ -242,15 +241,25 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
                     encoding="utf-8",
                 )
                 temporary_paths.append(askpass_script)
-                ssh_command = (
-                    f"env DISPLAY=:0 SSH_ASKPASS={shlex.quote(str(askpass_script))} "
-                    "SSH_ASKPASS_REQUIRE=force ssh "
+                ssh_environment = (
+                    f"export DISPLAY=:0 SSH_ASKPASS={shlex.quote(str(askpass_script))} "
+                    "SSH_ASKPASS_REQUIRE=force\n"
+                )
+                ssh_options = (
                     f"{ssh_common_options} -o RequestTTY=no "
                     "-o PreferredAuthentications=password,keyboard-interactive "
-                    "-o PubkeyAuthentication=no "
-                    f"-o NumberOfPasswordPrompts=1 {ssh_port}-s {ssh_destination} sftp"
+                    "-o PubkeyAuthentication=no -o NumberOfPasswordPrompts=1"
                 )
-            restic_options = ["-o", f"sftp.command={ssh_command}"]
+            fd, name = tempfile.mkstemp(prefix="restic-ssh-wrapper-", dir="/tmp")
+            os.close(fd)
+            ssh_wrapper = Path(name)
+            ssh_wrapper.chmod(0o700)
+            ssh_wrapper.write_text(
+                f"#!/bin/sh\n{ssh_environment}exec ssh {ssh_options} {ssh_port}-s {ssh_destination} sftp\n",
+                encoding="utf-8",
+            )
+            temporary_paths.append(ssh_wrapper)
+            restic_options = ["-o", f"sftp.command={ssh_wrapper}"]
         env["RESTIC_CACHE_DIR"] = "/tmp/restic-cache"
         return run(["restic", *restic_options, "--repo", repo_path(repo), *args],
                    env={**os.environ, **env}, cwd=cwd, capture=True)
