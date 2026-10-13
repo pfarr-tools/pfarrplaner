@@ -58,11 +58,13 @@ Leerzeichen werden entfernt und die Prüfung ist unabhängig von Groß- und
 Kleinschreibung. Eine leere Liste gewährt in Produktionsumgebungen niemandem
 Zugriff auf `/horizon`.
 
-`.env` wird nur angelegt, wenn sie fehlt, und niemals überschrieben. Setze
-`APP_KEY`, `APP_ENV`, `APP_URL`, MariaDB-/Redis-Passwörter und MinIO-Zugangsdaten.
+`.env` wird nur angelegt, wenn sie fehlt, und niemals überschrieben. Das
+Bootstrap erzeugt beim ersten Anlegen zufällige Werte für `APP_KEY`,
+`DATABASE_KEY`, `TOKEN_SALT`, die MariaDB-/Redis-Passwörter, den MinIO-
+Secret-Schlüssel und die Soketi-Schlüssel. Externe Zugangsdaten wie Mail-,
+Stripe- oder andere Provider-Geheimnisse werden nicht automatisch gesetzt.
 Backup-Ziele und Backup-Geheimnisse stehen ausschließlich in `backup.yaml`.
-Produktion
-verlangt `APP_ENV=production`.
+Produktion verlangt `APP_ENV=production`.
 
 ```sh
 ./planer up

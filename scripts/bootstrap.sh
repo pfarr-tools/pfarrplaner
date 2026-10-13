@@ -120,6 +120,7 @@ ask_url() {
 }
 random_secret() { openssl rand -hex 24; }
 random_app_key() { printf 'base64:%s' "$(openssl rand -base64 32 | tr -d '\n')"; }
+set_random_secret() { set_env "$1" "$(random_secret)"; }
 
 cp .env.example .env
 if [[ "$TARGET" == prod ]]; then
@@ -152,13 +153,14 @@ ask FORWARD_S3_CONSOLE_PORT 'MinIO-Konsolenport' 9901
 ask SOKETI_PORT 'Soketi-Port' 6601
 ask FORWARD_MAILPIT_PORT 'Mailpit-Port' 9825
 set_env APP_KEY "$(random_app_key)"
-set_env DB_PASSWORD "$(random_secret)"
-set_env DB_ROOT_PASSWORD "$(random_secret)"
-set_env DATABASE_KEY "$(random_secret)"
-set_env REDIS_PASSWORD "$(random_secret)"
-set_env AWS_SECRET_ACCESS_KEY "$(random_secret)"
-set_env PUSHER_APP_KEY "$(random_secret)"
-set_env PUSHER_APP_SECRET "$(random_secret)"
+set_random_secret DB_PASSWORD
+set_random_secret DB_ROOT_PASSWORD
+set_random_secret DATABASE_KEY
+set_random_secret TOKEN_SALT
+set_random_secret REDIS_PASSWORD
+set_random_secret AWS_SECRET_ACCESS_KEY
+set_random_secret PUSHER_APP_KEY
+set_random_secret PUSHER_APP_SECRET
 
 mkdir -p src/storage/app src/storage/framework/{cache,sessions,views} src/storage/logs src/bootstrap/cache
 chmod +x planer scripts/*.sh 2>/dev/null || true

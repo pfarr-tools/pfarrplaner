@@ -6,6 +6,11 @@ TEST_ROOT="$(mktemp -d)"
 trap 'rm -rf "$TEST_ROOT"' EXIT
 cp "$ROOT/.env.example" "$TEST_ROOT/.env.example"
 
+for key in DB_PASSWORD DB_ROOT_PASSWORD REDIS_PASSWORD AWS_SECRET_ACCESS_KEY PUSHER_APP_KEY PUSHER_APP_SECRET; do
+  grep -q "^${key}=$" "$TEST_ROOT/.env.example"
+done
+! grep -Eq '=(change-|REPLACE_THIS_WITH)' "$TEST_ROOT/.env.example"
+
 PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" "$ROOT/scripts/bootstrap.sh" --defaults >/dev/null
 test -s "$TEST_ROOT/.env"
 grep -q '^APP_KEY=base64:' "$TEST_ROOT/.env"
@@ -27,6 +32,13 @@ grep -q '^APP_URL=https://localhost$' "$TEST_ROOT/.env"
 grep -q '^OCTANE_HTTPS=false$' "$TEST_ROOT/.env"
 grep -q '^MAIL_DRIVER=smtp$' "$TEST_ROOT/.env"
 grep -B1 '^APP_URL=' "$TEST_ROOT/.env" | grep -q 'Public URL'
+for key in APP_KEY DB_PASSWORD DB_ROOT_PASSWORD DATABASE_KEY TOKEN_SALT REDIS_PASSWORD AWS_SECRET_ACCESS_KEY PUSHER_APP_KEY PUSHER_APP_SECRET; do
+  value="$(grep "^${key}=" "$TEST_ROOT/.env" | cut -d= -f2-)"
+  test -n "$value"
+  case "$value" in
+    change-*|REPLACE_THIS_WITH*) exit 1 ;;
+  esac
+done
 
 example_keys="$(grep -E '^[A-Z][A-Z0-9_]*=' "$TEST_ROOT/.env.example" | cut -d= -f1 | sort)"
 generated_keys="$(grep -E '^[A-Z][A-Z0-9_]*=' "$TEST_ROOT/.env" | cut -d= -f1 | sort)"
