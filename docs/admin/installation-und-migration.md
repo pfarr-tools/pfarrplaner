@@ -28,14 +28,28 @@ vollständig kommentierte `.env` mit allen verfügbaren Betriebs-, Backup-,
 Mail-Relay- und Integrationsvariablen an:
 
 ```sh
-./planer bootstrap --prod
-./planer prod up --build
-./planer prod status
+./planer bootstrap
+./planer up -d --build
+./planer status
 ```
 
-`./planer bootstrap --defaults` ist für automatisierte Entwicklungsumgebungen
-geeignet; mit `--prod --defaults` werden synthetische Produktionsdefaults
-verwendet. Vor dem öffentlichen Betrieb müssen insbesondere `APP_URL`,
+Der Produktionsbootstrap setzt das Compose-Projekt fest auf `pfarrplaner` und
+fragt `APP_PROVIDER`, den ersten Administrator, Backup-Ziele und den Mailmodus
+ab. Optional kann anschließend ein Restic-Backup oder eine Legacy-Installation
+übernommen werden. Ohne Datenimport wird ein initialer
+`Super-Administrator:in` angelegt. Entwicklung verwendet ausdrücklich
+`./planer bootstrap --dev` und `./planer dev ...`.
+
+Bei der Datenübernahme startet der Bootstrap die Produktionsdienste zunächst
+selbst. Für ein Backup werden Ziel und Backup-ID abgefragt und der Restore nur
+nach der Bestätigung `JA` angewendet. Für eine Legacy-Installation wird zuerst
+ein Dry-Run ausgeführt; ein absoluter lokaler Pfad wird direkt gelesen, während
+nur `user@host:/absoluter/pfad` SSH verwendet. Wird keine Quelle gewählt,
+werden Migrationen, Rollen und der initiale Administrator eingerichtet.
+
+`./planer bootstrap --dev --defaults` ist für automatisierte
+Entwicklungsumgebungen geeignet; mit `--defaults` werden synthetische
+Produktionsdefaults verwendet. Vor dem öffentlichen Betrieb müssen insbesondere `APP_URL`,
 Backup-Ziel, Mail-Relay und `HORIZON_ALLOWED_EMAILS` geprüft werden. Die
 kommentierte `.env.example` ist die vollständige Referenz aller Einstellungen.
 Im Produktionsmodus setzt das Bootstrap `OCTANE_HTTPS=false`, weil Pfarrplaner
@@ -67,21 +81,21 @@ Backup-Ziele und Backup-Geheimnisse stehen ausschließlich in `backup.yaml`.
 Produktion verlangt `APP_ENV=production`.
 
 ```sh
-./planer up
-./planer artisan migrate
-./planer status
+./planer dev up -d
+./planer dev artisan migrate
+./planer dev status
 ```
 
 ## Sichere Tests und Objektspeicher
 
 ```sh
-./planer test
+./planer dev test
 ./planer artisan <befehl>
 ```
 
-`./planer test` erzwingt SQLite im Speicher. `./planer artisan test` wird mit
+`./planer dev test` erzwingt SQLite im Speicher. `./planer dev artisan test` wird mit
 einer Warnung blockiert und akzeptiert nur die exakte interaktive Eingabe `ja`.
-`./planer fresh` benötigt zusätzlich `--force`.
+`./planer dev fresh` benötigt zusätzlich `--force`.
 
 `FILESYSTEM_DRIVER=s3` und `AWS_ENDPOINT` zeigen auf den Live-MinIO-Bucket.
 Die Compose-Dateien beziehen den MinIO-Server als community-gepflegten,
@@ -126,7 +140,7 @@ monatliche Snapshots sind der Standard. `create` löscht niemals alte Backups.
 ./planer backup prune
 ./planer backup check
 ./planer backup restore 20261012T030000Z --target offsite
-./planer prod backup create
+./planer backup create
 ```
 
 `restore` schreibt standardmäßig in ein separates Verzeichnis. Ein Anwenden auf
@@ -147,8 +161,8 @@ Backup-Image. Die CLI übernimmt die Sperre, daher darf Cron keine zweite
 ## Aktualisierung mit kurzer Unterbrechung
 
 ```sh
-./planer prod backup create
-./planer prod update --backup-confirmed
+./planer backup create
+./planer update --backup-confirmed
 ```
 
 Das Update verhindert parallele Ausrollungen, prüft `APP_ENV=production`, baut
@@ -182,11 +196,11 @@ zugehörige Tag-Build wurden entfernt. Das Produktionsimage wird ausschließlich
 aus dem Root-Repository und dem veröffentlichten Tag gebaut:
 
 ```sh
-./planer prod backup create
-./planer prod update --ref v2026.15.0 --backup-confirmed
+./planer backup create
+./planer update --ref v2026.15.0 --backup-confirmed
 ```
 
-`prod update` baut zuerst das neue Image, führt danach die Migrationen in einem
+`update` baut zuerst das neue Image, führt danach die Migrationen in einem
 separaten Container aus und aktualisiert anschließend Assets, Octane, Horizon
 und Scheduler. Der bisher laufende App-Container bleibt bis zum erfolgreichen
 Build und zur erfolgreichen Migration aktiv. Ein Tag-Update ist deshalb der
@@ -281,7 +295,7 @@ weil die Produktionsanwendung Anfragen an fremde Hosts ablehnt. Ein direkter
 Test auf dem Server muss deshalb den Host-Header mitsenden:
 
 ```sh
-./planer prod exec app sh -lc \
+./planer exec app sh -lc \
   "curl -i -H 'Host: dev.example.org' http://127.0.0.1:8000/api/health"
 ```
 
@@ -290,10 +304,10 @@ Wenn der Container gesund ist, veröffentlicht der interne Caddy den in
 unhealthy `app`-Container verhindert die Port-Veröffentlichung.
 
 ```sh
-./planer prod status
-./planer prod logs app
-./planer prod logs web
-./planer prod logs mariadb
+./planer status
+./planer logs app
+./planer logs web
+./planer logs mariadb
 ```
 
 Bei Fehlern nicht blind `migrate:fresh` ausführen. Gesundheitsstatus und

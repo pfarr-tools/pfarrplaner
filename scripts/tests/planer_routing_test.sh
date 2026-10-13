@@ -35,4 +35,7 @@ PLANER_ROUTING_LOG="$TEST_ROOT/log" run_and_assert "$TEST_ROOT/development-test"
 printf 'compose -f %s/compose.production.yaml ps\n' "$ROOT" > "$TEST_ROOT/production-alias"
 PLANER_ROUTING_LOG="$TEST_ROOT/log" run_and_assert "$TEST_ROOT/production-alias" prod ps
 
+grep -q 'legacy-migrate.sh.*"\$@" --prod' "$ROOT/planer"
+grep -q 'PLANER_MANUAL_DEV=1' "$ROOT/planer"
+
 echo 'planer routing tests passed'

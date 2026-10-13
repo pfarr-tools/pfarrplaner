@@ -83,11 +83,13 @@ EOF
     composer) compose exec app composer "$@" ;;
     npm) compose run --rm vite npm "$@" ;;
     pint) compose exec app ./vendor/bin/pint "$@" ;;
+    manual) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" "${1:-help}" "${@:2}" ;;
     fresh)
       [[ "${1:-}" == --force ]] || { echo 'Abbruch: ./planer dev fresh löscht die lokale Datenbank. Nutze --force.' >&2; exit 2; }
       shift
       compose exec app php artisan migrate:fresh --seed --force "$@"
       ;;
+    data) PLANER_DEVELOPMENT=1 exec "$ROOT/scripts/data-sync.sh" "$@" ;;
     help|--help|-h) usage ;;
     *) usage >&2; exit 2 ;;
   esac
@@ -105,14 +107,15 @@ run_production() {
     exec) production_compose exec "$@" ;;
     shell) production_compose exec app bash "$@" ;;
     artisan) production_compose exec -e XDG_CONFIG_HOME=/tmp/config app php artisan "$@" ;;
-    data) exec "$ROOT/scripts/data-sync.sh" "$@" ;;
+    data) PLANER_PRODUCTION=1 exec "$ROOT/scripts/data-sync.sh" "$@" ;;
     backup) PLANER_PRODUCTION=1 exec "$ROOT/scripts/backup.sh" "${1:-help}" "${@:2}" ;;
     manual) exec "$ROOT/scripts/manual.sh" "${1:-help}" "${@:2}" ;;
     release) exec "$ROOT/scripts/release.sh" "$@" ;;
+    update) exec "$ROOT/scripts/update-production.sh" "$@" ;;
     migrate)
       [[ "${1:-}" == legacy ]] || { echo 'Verwendung: ./planer migrate legacy ...' >&2; exit 2; }
       shift
-      exec "$ROOT/scripts/legacy-migrate.sh" "$@"
+      exec "$ROOT/scripts/legacy-migrate.sh" "$@" --prod
       ;;
     bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
     help|--help|-h) usage ;;
@@ -130,7 +133,7 @@ case "$COMMAND" in
   dev) run_dev "$@" ;;
   prod|production) run_production "$@" ;;
   bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
-  up|down|restart|status|ps|logs|exec|shell|artisan|data|backup|manual|release|migrate|test|composer|npm|pint|fresh)
+  up|down|restart|status|ps|logs|exec|shell|artisan|data|backup|manual|release|update|migrate|test|composer|npm|pint|fresh)
     run_production "$COMMAND" "$@"
     ;;
   help|--help|-h) usage ;;

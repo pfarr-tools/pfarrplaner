@@ -12,9 +12,9 @@ Mailpit der lokale Testdienst.
 Der Produktionsdienst wird nur mit dem Compose-Profil `mail` gestartet:
 
 ```sh
-./planer prod up -d app horizon scheduler web
+./planer up -d app horizon scheduler web
 docker compose -f compose.production.yaml --profile mail up -d postfix
-./planer prod exec app php artisan queue:failed
+./planer exec app php artisan queue:failed
 ```
 
 Postfix veröffentlicht keinen Host-Port. App und Horizon erreichen ihn nur als
@@ -49,11 +49,11 @@ normalen Neustarts darf sie nicht mit `docker compose down -v` gelöscht werden.
 ## Prüfung und Fehlersuche
 
 ```sh
-./planer prod ps
-./planer prod logs --tail=200 postfix
-./planer prod logs --tail=200 horizon
-./planer prod exec app php artisan queue:failed
-./planer prod exec app php artisan queue:retry all
+./planer status
+./planer logs --tail=200 postfix
+./planer logs --tail=200 horizon
+./planer exec app php artisan queue:failed
+./planer exec app php artisan queue:retry all
 ```
 
 Prüfen Sie zusätzlich die freigegebene Absenderdomain, `MAIL_HOSTNAME`, DNS,

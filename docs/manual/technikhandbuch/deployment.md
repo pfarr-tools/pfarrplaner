@@ -16,11 +16,11 @@ Ein Release und seine Auslieferung laufen über:
 ```sh
 ./planer release
 git push origin main v2026.15.0
-./planer prod backup create
-./planer prod update --ref v2026.15.0 --backup-confirmed
+./planer backup create
+./planer update --ref v2026.15.0 --backup-confirmed
 ```
 
-`prod update` baut das Produktionsimage, führt Migrationen aus, aktualisiert
+`update` baut das Produktionsimage, führt Migrationen aus, aktualisiert
 die öffentlichen Assets und startet App, Horizon und Scheduler mit Health-Check
 neu. Der alte Image-Stand bleibt als Rollback-Grundlage erhalten.
 

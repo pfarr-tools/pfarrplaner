@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-COMPOSE=(docker compose -f "$ROOT/compose.yaml")
+if [[ "${PLANER_PRODUCTION:-0}" == 1 ]]; then
+  COMPOSE=(docker compose -f "$ROOT/compose.production.yaml")
+else
+  COMPOSE=(docker compose -f "$ROOT/compose.yaml")
+fi
 usage() { echo 'Verwendung: ./planer data push|pull [user@]host:/pfad [--source-down]'; }
 die() { echo "Fehler: $*" >&2; exit 2; }
 [[ $# -ge 2 && $# -le 3 ]] || { usage >&2; exit 2; }

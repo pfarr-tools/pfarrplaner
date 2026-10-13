@@ -41,7 +41,7 @@ Prüfen Sie:
 
 - Mail-Konfiguration in `.env`
 - Status und Logs des optionalen Produktionsdienstes `postfix`
-- `./planer prod exec app php artisan queue:failed` und Horizon
+- `./planer exec app php artisan queue:failed` und Horizon
 - SMTP-Verbindung beziehungsweise Relay-Zugang
 - SPF, DKIM, DMARC
 - öffentliche DNS- und PTR/rDNS-Einträge bei direkter MX-Zustellung
@@ -81,6 +81,6 @@ Prüfen Sie:
 1. Symptom kurz beschreiben.
 2. Reproduzierbarkeit prüfen.
 3. Logs derselben Zeitspanne ansehen.
-4. zuletzt geänderte Systemteile notieren; bei Docker zusätzlich `./planer prod ps`
-   und die relevanten `./planer prod logs` prüfen.
+4. zuletzt geänderte Systemteile notieren; bei Docker zusätzlich `./planer status`
+   und die relevanten `./planer logs` prüfen.
 5. erst dann korrigieren oder zurückrollen.

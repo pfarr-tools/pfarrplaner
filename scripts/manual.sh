@@ -4,7 +4,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-compose() { docker compose -f "$ROOT/compose.yaml" "$@"; }
+if [[ "${PLANER_MANUAL_DEV:-0}" == 1 ]]; then
+  compose() { docker compose -f "$ROOT/compose.yaml" "$@"; }
+else
+  compose() { docker compose -f "$ROOT/compose.production.yaml" "$@"; }
+fi
 src_npm() {
   command -v npm >/dev/null 2>&1 || {
     echo 'Fehler: npm wird für den Manual-Build benötigt.' >&2

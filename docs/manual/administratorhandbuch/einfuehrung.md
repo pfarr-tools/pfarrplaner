@@ -29,9 +29,9 @@ mit einer Docker-Installation vermischt werden.
 Für eine neue Instanz beginnen Sie mit:
 
 ```sh
-./planer bootstrap --prod
-./planer prod up --build
-./planer prod status
+./planer bootstrap
+./planer up -d --build
+./planer status
 ```
 
 Der konkrete Ablauf steht in [Installation mit Docker Compose](installation-docker.md).

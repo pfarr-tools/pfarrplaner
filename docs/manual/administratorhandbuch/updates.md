@@ -20,8 +20,8 @@ baut das neue Image vor dem Umschalten, führt die Migration aus, aktualisiert
 öffentliche Assets und startet App, Horizon und Scheduler neu:
 
 ```bash
-./planer prod backup create
-./planer prod update --ref v2026.15.0 --backup-confirmed
+./planer backup create
+./planer update --ref v2026.15.0 --backup-confirmed
 ```
 
 Ohne `--ref` wird der aktuelle Checkout verwendet. Für ein Release sollte ein
@@ -76,7 +76,7 @@ Damit sehen Sie, welche Schritte ein Update auslösen würde, ohne sie schon aus
 
 Für alte Installationen, die nicht aus diesem Root-Repository betrieben werden,
 hängt der genaue Updateablauf von der jeweiligen Compose- und Image-Struktur ab.
-Der oben beschriebene `./planer prod update`-Weg ist für neue Installationen
+Der oben beschriebene `./planer update`-Weg ist für neue Installationen
 maßgeblich. Ein manueller Compose-Ablauf darf nur verwendet werden, wenn die
 Zielumgebung und die Datenbank vorher ausdrücklich geprüft wurden:
 

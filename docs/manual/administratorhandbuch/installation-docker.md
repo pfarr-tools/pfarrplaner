@@ -77,21 +77,26 @@ Für produktive Umgebungen ist ein reproduzierbares Image meist die sauberere Wa
 
 ## Erstinstallation
 
-Die Root-Konfiguration wird interaktiv erzeugt:
+Die Root-Konfiguration wird interaktiv erzeugt. Der Produktionsbootstrap setzt
+das Projekt `pfarrplaner`, fragt Provider, Administrator, Backup-Ziele und
+Mailmodus ab und bietet optional den Import eines Backups oder einer Legacy-
+Installation an:
 
 ```bash
-./planer bootstrap --prod
+./planer bootstrap
 ```
 
-Danach werden die Produktionsdienste gestartet:
+Ohne Datenimport wird ein initialer Super-Administrator angelegt. Danach werden
+die Produktionsdienste gestartet:
 
 ```bash
-./planer prod up --build
-./planer prod status
+./planer up -d --build
+./planer status
 ```
 
 Falls eine Laravel-Installation oder Migration im laufenden Container nötig ist,
-wird sie mit `./planer prod exec app php artisan ...` ausgeführt. Die produktive
+wird sie mit `./planer exec app php artisan ...` ausgeführt. Entwicklung wird
+immer über `./planer dev ...` angesprochen. Die produktive
 `.env` wird niemals durch Testdaten ersetzt.
 
 ## Besondere Punkte bei Docker
@@ -105,9 +110,9 @@ wird sie mit `./planer prod exec app php artisan ...` ausgeführt. Die produktiv
 
 ## Empfohlene Reihenfolge
 
-1. `./planer bootstrap --prod` ausführen und `.env` prüfen.
-2. `./planer prod up --build` starten.
-3. `./planer prod status` und den Health-Endpunkt prüfen.
-4. `./planer prod backup create` einrichten und einen Restore-Test planen.
+1. `./planer bootstrap` ausführen und `.env` prüfen.
+2. `./planer up -d --build` starten.
+3. `./planer status` und den Health-Endpunkt prüfen.
+4. `./planer backup create` einrichten und einen Restore-Test planen.
 5. Mail, Login, Dateiablage, Berichte und Hintergrundprozesse testen.
 6. Für Mail siehe das [Mail-Betriebskapitel](mail.md), für Updates [Updates](updates.md).

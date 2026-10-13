@@ -35,7 +35,8 @@ grep -q '^VITE_PORT=5273$' "$TEST_ROOT/.env"
 grep -q '^COMPOSE_PROJECT_NAME=pfarrplaner$' "$TEST_ROOT/.env"
 
 rm "$TEST_ROOT/.env"
-PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" "$ROOT/scripts/bootstrap.sh" --prod --defaults >/dev/null
+PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" "$ROOT/scripts/bootstrap.sh" --prod --defaults > "$TEST_ROOT/bootstrap-output"
+grep -q 'Starte mit ./planer up -d --build' "$TEST_ROOT/bootstrap-output"
 grep -q '^APP_ENV=production$' "$TEST_ROOT/.env"
 grep -q '^COMPOSE_PROJECT_NAME=pfarrplaner$' "$TEST_ROOT/.env"
 grep -q '^APP_DEBUG=false$' "$TEST_ROOT/.env"

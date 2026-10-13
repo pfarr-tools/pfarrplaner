@@ -17,7 +17,7 @@ Nach der Installation beginnt die eigentliche Arbeit. Eine stabile Pfarrplaner-I
 
 ### Konfiguration
 
-Die zentrale Laufzeitkonfiguration liegt in der `.env`. Änderungen dort sollten bewusst dokumentiert werden. Im Docker-Betrieb werden Laravel-Befehle über den Root-Einstieg ausgeführt, zum Beispiel `./planer prod exec app php artisan optimize`.
+Die zentrale Laufzeitkonfiguration liegt in der `.env`. Änderungen dort sollten bewusst dokumentiert werden. Im Docker-Betrieb werden Laravel-Befehle über den Root-Einstieg ausgeführt, zum Beispiel `./planer exec app php artisan optimize`.
 
 ### Caches
 
@@ -29,7 +29,7 @@ Sobald Pfarrplaner Hintergrundaufgaben nutzt, brauchen Sie eine überwachte Work
 
 In der Produktionsumgebung ist Horizon der Queue-Worker für ausgehende Mails.
 Postfix verwaltet zusätzlich seine eigene persistente Zustellwarteschlange.
-Prüfen Sie beide Ebenen mit `./planer prod exec app php artisan queue:failed` und
+Prüfen Sie beide Ebenen mit `./planer exec app php artisan queue:failed` und
 den Postfix-Logs. Details stehen im [Mail-Betriebskapitel](mail.md).
 
 ### Scheduler

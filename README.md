@@ -48,33 +48,29 @@ Benötigt werden Docker Engine mit Docker Compose sowie Git. Für den lokalen
 Entwicklungsbetrieb sollten die konfigurierten Ports frei sein; sie können in
 `.env` geändert werden.
 
-## Entwicklungsumgebung starten
+## Produktionsumgebung starten
 
 ```sh
 ./planer bootstrap
-./planer up --build
+./planer up -d --build
 ./planer status
 ```
 
-`bootstrap` führt interaktiv durch die Erstellung der lokalen `.env`. Die
-Standardwerte vermeiden die üblichen Roo-Ports, können aber jederzeit geändert
-werden. Die wichtigsten lokalen Endpunkte werden danach mit `./planer status`
-angezeigt; typischerweise sind die Anwendung, Vite, MinIO, Soketi und Mailpit
-über die in `.env` gesetzten Forwarding-Ports erreichbar.
+`bootstrap` richtet die Produktionsinstanz interaktiv ein. Dabei werden
+`APP_PROVIDER`, der Administrator, optionale Backup-Ziele, Mailversand und
+wahlweise ein Backup- oder Legacy-Import abgefragt. Wenn keine Daten importiert
+werden, wird ein initialer Super-Administrator angelegt.
 
-Für eine neue Produktionsumgebung wird die vollständig kommentierte `.env`
-mit Produktionswerten angelegt:
+Für Entwicklung wird der Modus ausdrücklich angegeben:
 
 ```sh
-./planer bootstrap --prod
-./planer prod up --build
-./planer prod status
+./planer bootstrap --dev
+./planer dev up -d --build
+./planer dev status
 ```
 
-Der Produktions-Bootstrap fragt nach der öffentlichen URL oder dem Hostnamen,
-setzt `APP_ENV=production` und deaktiviert den Debug-Modus. Die Vorlage enthält
-auch optionale Einstellungen für Backups, Mail-Relay, Integrationen und
-Beobachtungswerkzeuge.
+Der Produktions-Bootstrap setzt `APP_ENV=production`, deaktiviert den
+Debug-Modus und verwendet immer das Compose-Projekt `pfarrplaner`.
 
 Häufige Befehle:
 
@@ -82,9 +78,9 @@ Häufige Befehle:
 ./planer logs app
 ./planer shell
 ./planer artisan migrate
-./planer composer install
-./planer npm run build
-./planer test
+./planer dev composer install
+./planer dev npm run build
+./planer dev test
 ./planer down
 ```
 
@@ -115,9 +111,8 @@ Für eine bestehende Datei-/MySQL-Installation wird die Legacy-Migration genutzt
 ```
 
 Ein absoluter lokaler Pfad wird direkt gelesen; nur ein Pfad mit `user@host:`
-verwendet SSH. Ohne `--dev` oder `--prod` wird die Entwicklungsumgebung verwendet. Für einen
-Produktionsimport muss `--prod` ausdrücklich angegeben werden; die Ziel-`.env`
-muss dafür `APP_ENV=production` enthalten.
+verwendet SSH. Für den Produktionsimport ist `--prod` erforderlich; für einen
+Entwicklungsimport `--dev`.
 
 Dabei werden DB-Zugangsdaten und `APP_KEY`/`DATABASE_KEY` aus der Legacy-`.env`
 gelesen. Die lokalen Infrastrukturwerte bleiben erhalten. Dateien werden nach
@@ -134,8 +129,8 @@ Backend-Netzwerke, Octane/Swoole und MariaDB. Ein Update erfolgt nach einem
 verifizierten Backup:
 
 ```sh
-./planer prod backup create
-./planer prod update --backup-confirmed
+./planer backup create
+./planer update --backup-confirmed
 ```
 
 Der optionale send-only-Postfix wird mit den Mail- und TLS-Variablen aus `.env`
@@ -162,8 +157,8 @@ Es gibt keinen separaten Legacy-Docker-Image-Build mehr. Das Produktionsimage
 wird beim kontrollierten Update aus dem veröffentlichten Tag gebaut:
 
 ```sh
-./planer prod backup create
-./planer prod update --ref v2026.15.0 --backup-confirmed
+./planer backup create
+./planer update --ref v2026.15.0 --backup-confirmed
 ```
 
 Der Build erfolgt vor dem Umschalten der laufenden Container. Migrationen

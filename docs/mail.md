@@ -107,21 +107,24 @@ allein enthält diese Schlüssel und das Postfix-Queue-Volume nicht.
 ## Start und Prüfung
 
 Mailpit in `compose.yaml` bleibt unverändert und wird für lokale Tests wie
-bisher gestartet. Produktions-Postfix wird ausdrücklich mit seinem Profil
-gestartet:
+bisher gestartet. Der Produktionsbootstrap fragt nach der Aktivierung von
+Postfix. Bei Aktivierung setzt er `MAIL_POSTFIX_ENABLED=true`, erzeugt die
+DKIM-Schlüssel und aktiviert beim normalen Produktionsstart automatisch das
+Compose-Profil `mail`:
 
 ```sh
-docker compose -f compose.production.yaml --profile mail up -d postfix
-docker compose -f compose.production.yaml ps postfix
-docker compose -f compose.production.yaml logs --tail=100 postfix
+./planer bootstrap
+./planer up -d
+./planer status postfix
+./planer logs postfix
 ```
 
 Danach werden App und Horizon mit derselben Produktions-Compose-Datei gestartet
 beziehungsweise aktualisiert:
 
 ```sh
-./planer prod up -d app horizon scheduler web
-./planer prod exec app php artisan queue:failed
+./planer up -d app horizon scheduler web
+./planer exec app php artisan queue:failed
 ```
 
 Der App- und Horizon-Container verwenden intern `postfix:587`. Diese Verbindung
@@ -144,8 +147,8 @@ und Redis-Verbindung wie der App-Container. Fehlgeschlagene Laravel-Jobs
 bleiben in `failed_jobs` sichtbar:
 
 ```sh
-./planer prod exec app php artisan queue:failed
-./planer prod exec app php artisan queue:retry all
+./planer exec app php artisan queue:failed
+./planer exec app php artisan queue:retry all
 docker compose -f compose.production.yaml logs --tail=200 horizon postfix
 ```
 
