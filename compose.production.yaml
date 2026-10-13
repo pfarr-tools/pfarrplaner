@@ -121,7 +121,7 @@ services:
       - ./backup.yaml:/workspace/backup.yaml:ro
       - ./backups:/backups
       - ./secrets:/run/secrets:ro
-    networks: [backend]
+    networks: [backend, mail-egress]
   soketi:
     image: quay.io/soketi/soketi:latest
     restart: unless-stopped
