@@ -126,7 +126,8 @@ beziehungsweise aktualisiert:
 
 Der App- und Horizon-Container verwenden intern `postfix:587`. Diese Verbindung
 liegt nur im privaten `mail`-Netzwerk und verwendet dort bewusst keine externe
-SMTP-Authentifizierung. Das Mail-Netzwerk ist von anderen Containern getrennt;
+SMTP-Authentifizierung und kein STARTTLS; die Compose-Konfiguration setzt dafür
+`MAIL_URL=smtp://postfix:587?auto_tls=false`. Das Mail-Netzwerk ist von anderen Containern getrennt;
 Postfix besitzt zusätzlich ein nicht veröffentlichtes Egress-Netzwerk für die
 Verbindung zu MX- oder Relay-Servern.
 

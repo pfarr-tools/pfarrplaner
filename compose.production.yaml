@@ -17,6 +17,7 @@ x-app: &app
     MAIL_MAILER: smtp
     MAIL_HOST: postfix
     MAIL_PORT: "587"
+    MAIL_URL: smtp://postfix:587?auto_tls=false
     MAIL_SCHEME: ""
     MAIL_ENCRYPTION: ""
     MAIL_USERNAME: ""

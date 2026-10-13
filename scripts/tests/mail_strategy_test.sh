@@ -16,6 +16,7 @@ grep -q 'networks: \[mail, mail-egress\]' "$PROD"
 ! sed -n '/^  postfix:/,/^networks:/p' "$PROD" | grep -q 'ports:'
 grep -q 'MAIL_HOST: postfix' "$PROD"
 grep -q 'MAIL_PORT: "587"' "$PROD"
+grep -q 'MAIL_URL: smtp://postfix:587?auto_tls=false' "$PROD"
 grep -q '^  horizon:$' "$PROD"
 grep -q '^QUEUE_CONNECTION=redis$' "$ROOT/.env.example"
 grep -q "'table' => 'failed_jobs'" "$ROOT/src/config/queue.php"
