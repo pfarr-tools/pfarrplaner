@@ -51,7 +51,7 @@ return [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),
             'url' => env('MAIL_URL'),
-            'auto_tls' => env('MAIL_AUTO_TLS', true),
+            'auto_tls' => env('MAIL_AUTO_TLS', true) ? 'true' : 'false',
             'host' => env('MAIL_HOST', '127.0.0.1'),
             'port' => env('MAIL_PORT', 587),
             'username' => env('MAIL_USERNAME'),

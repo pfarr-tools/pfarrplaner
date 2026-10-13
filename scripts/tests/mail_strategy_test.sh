@@ -26,7 +26,7 @@ grep -q '^  mailpit:$' "$DEV"
 
 grep -q "'default' => env('MAIL_MAILER'" "$MAIL_CONFIG"
 grep -q "'scheme' => env('MAIL_SCHEME')" "$MAIL_CONFIG"
-grep -q "'auto_tls' => env('MAIL_AUTO_TLS', true)" "$MAIL_CONFIG"
+grep -q "'auto_tls' => env('MAIL_AUTO_TLS', true) ? 'true' : 'false'" "$MAIL_CONFIG"
 
 mailables=()
 while IFS= read -r file; do mailables+=("$file"); done < <(find "$ROOT/src/app/Mail" -type f -name '*.php' -print)
