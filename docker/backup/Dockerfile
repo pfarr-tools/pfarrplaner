@@ -8,7 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     RESTIC_CACHE_DIR=/tmp/restic-cache
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates curl openssh-client sshpass mariadb-client tini bzip2 \
+ && apt-get install -y --no-install-recommends ca-certificates curl openssh-client mariadb-client tini bzip2 \
  && rm -rf /var/lib/apt/lists/* \
  && curl -fsSL "https://github.com/restic/restic/releases/download/v${RESTIC_VERSION}/restic_${RESTIC_VERSION}_linux_$(dpkg --print-architecture).bz2" \
     | bunzip2 > /usr/local/bin/restic \

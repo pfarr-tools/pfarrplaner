@@ -153,8 +153,8 @@ SSH-Schlüssel oder eine SFTP-Passwortdatei sowie `known_hosts` werden aus dem
 projektbezogenen `secrets/`-Verzeichnis nach `/run/secrets/` eingehängt; sie
 müssen auf dem Host dem Backup-Benutzer gehören und dürfen nicht gruppen- oder
 weltweit lesbar sein. Bei Passwort-Anmeldung verwaltet der Backup-Dienst das
-Passwort über `sshpass -f`; es gehört weder in die SFTP-URL noch in
-`backup.yaml`.
+Passwort über einen temporären `SSH_ASKPASS`-Wrapper; es gehört weder in die
+SFTP-URL noch in `backup.yaml`.
 
 Für Cron reichen Docker Compose, eine POSIX-Shell und der Projektzugriff auf dem
 Host; Restic, `mariadb-dump`, `mc`, SSH und der YAML-Parser befinden sich im
