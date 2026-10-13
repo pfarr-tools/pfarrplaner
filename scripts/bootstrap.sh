@@ -156,7 +156,9 @@ set_random_secret PUSHER_APP_SECRET
 mkdir -p src/storage/app src/storage/framework/{cache,sessions,views} src/storage/logs src/bootstrap/cache
 if [[ "$TARGET" == prod ]]; then
   PLANER_BOOTSTRAP_MODE="$MODE" PLANER_BOOTSTRAP_ROOT="$ROOT" "$SCRIPT_ROOT/scripts/bootstrap-backup.sh"
+  PLANER_BOOTSTRAP_MODE="$MODE" PLANER_BOOTSTRAP_ROOT="$ROOT" "$SCRIPT_ROOT/scripts/bootstrap-mail.sh"
 fi
+chmod 600 .env
 chmod +x planer scripts/*.sh 2>/dev/null || true
 if [[ "$TARGET" == prod ]]; then
   echo 'Pfarrplaner ist für die Produktion vorbereitet. Starte mit ./planer up -d --build.'

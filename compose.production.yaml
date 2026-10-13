@@ -13,15 +13,6 @@ x-app: &app
     mariadb: {condition: service_healthy}
     redis: {condition: service_healthy}
     create-buckets: {condition: service_completed_successfully}
-  environment:
-    MAIL_MAILER: smtp
-    MAIL_HOST: postfix
-    MAIL_PORT: "587"
-    MAIL_AUTO_TLS: "false"
-    MAIL_SCHEME: ""
-    MAIL_ENCRYPTION: ""
-    MAIL_USERNAME: ""
-    MAIL_PASSWORD: ""
   networks: [backend]
 
 services:

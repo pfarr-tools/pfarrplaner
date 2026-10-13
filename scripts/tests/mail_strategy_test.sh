@@ -14,9 +14,11 @@ grep -q './secrets/dkim:/etc/opendkim/keys$' "$PROD"
 grep -q '^  mail:$' "$PROD"
 grep -q 'networks: \[mail, mail-egress\]' "$PROD"
 ! sed -n '/^  postfix:/,/^networks:/p' "$PROD" | grep -q 'ports:'
-grep -q 'MAIL_HOST: postfix' "$PROD"
-grep -q 'MAIL_PORT: "587"' "$PROD"
-grep -q 'MAIL_AUTO_TLS: "false"' "$PROD"
+! grep -q 'MAIL_HOST: postfix' "$PROD"
+! grep -q 'MAIL_PORT: "587"' "$PROD"
+! grep -q 'MAIL_AUTO_TLS: "false"' "$PROD"
+grep -q '^MAIL_POSTFIX_ENABLED=' "$ROOT/.env.example"
+test -x "$ROOT/scripts/bootstrap-mail.sh"
 grep -q '^  horizon:$' "$PROD"
 grep -q '^QUEUE_CONNECTION=redis$' "$ROOT/.env.example"
 grep -q "'table' => 'failed_jobs'" "$ROOT/src/config/queue.php"
@@ -27,6 +29,7 @@ grep -q '^  mailpit:$' "$DEV"
 grep -q "'default' => env('MAIL_MAILER'" "$MAIL_CONFIG"
 grep -q "'scheme' => env('MAIL_SCHEME')" "$MAIL_CONFIG"
 grep -q "'auto_tls' => env('MAIL_AUTO_TLS', true) ? 'true' : 'false'" "$MAIL_CONFIG"
+grep -q 'MAIL_POSTFIX_ENABLED' "$ROOT/scripts/bootstrap-mail.sh"
 
 mailables=()
 while IFS= read -r file; do mailables+=("$file"); done < <(find "$ROOT/src/app/Mail" -type f -name '*.php' -print)
