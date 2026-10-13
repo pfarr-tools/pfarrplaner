@@ -97,16 +97,70 @@ configure_defaults_fixture() {
     password: $(yaml_value "$secondary_password")" false
 }
 
+configure_known_hosts() {
+  local url="$1" name="$2" endpoint host remainder port scan_file fingerprint secret_file answer
+  endpoint="${url#sftp:}"
+  [[ "$endpoint" == *@* ]] || { echo 'SFTP-URL muss sftp:BENUTZER@HOST:/pfad entsprechen.' >&2; return 2; }
+  endpoint="${endpoint#*@}"
+  if [[ "$endpoint" == \[* ]]; then
+    host="${endpoint%%\]*}"
+    host="${host#\[}"
+    remainder="${endpoint#*]}"
+  else
+    host="${endpoint%%:*}"
+    remainder="${endpoint#"$host"}"
+  fi
+  if [[ "$remainder" =~ ^:([0-9]+)/ ]]; then
+    port="${BASH_REMATCH[1]}"
+  elif [[ "$remainder" == :/* ]]; then
+    port=22
+  else
+    echo 'SFTP-URL benötigt einen absoluten Pfad nach dem Host.' >&2
+    return 2
+  fi
+  [[ "$host" =~ ^[^[:space:]]+$ ]] || { echo 'SFTP-Host fehlt.' >&2; return 2; }
+  mkdir -p secrets
+  scan_file="$(mktemp)"
+  if ! ssh-keyscan -T 10 -p "$port" -H "$host" >"$scan_file" 2>/dev/null || [[ ! -s "$scan_file" ]]; then
+    rm -f "$scan_file"
+    echo "Kein SSH-Host-Schlüssel von ${host}:${port} erhalten." >&2
+    return 2
+  fi
+  fingerprint="$(ssh-keygen -lf "$scan_file" -E sha256 2>/dev/null)" || {
+    rm -f "$scan_file"
+    echo 'Die erhaltenen SSH-Host-Schlüssel konnten nicht geprüft werden.' >&2
+    return 2
+  }
+  printf 'Gefundene SSH-Host-Schlüssel für %s:%s:\n%s\n' "$host" "$port" "$fingerprint"
+  read -r -p 'Host-Schlüssel übernehmen? [j/N]: ' answer < /dev/tty
+  if [[ "${answer,,}" != j && "${answer,,}" != ja ]]; then
+    rm -f "$scan_file"
+    echo 'Übernahme des SSH-Host-Schlüssels abgebrochen.' >&2
+    return 2
+  fi
+  secret_file="${name}-known_hosts"
+  mv "$scan_file" "secrets/$secret_file"
+  chmod 600 "secrets/$secret_file"
+  KNOWN_HOSTS_FILE="$secret_file"
+}
+
 configure_interactive() {
-    local repository_yaml='' require_offsite=false count=0 name type required required_answer path url key known_hosts password answer auth sftp_password secret_file
+    local repository_yaml='' require_offsite=false count=0 local_count=0 remote_count=0 name type required required_answer path url key known_hosts password answer auth sftp_password secret_file
   while :; do
     ((count += 1))
-    read -r -p "Backup-Ziel ${count} Name: " name < /dev/tty
-    [[ "$name" =~ ^[a-z0-9][a-z0-9_-]*$ ]] || { echo 'Ungültiger Zielname.' >&2; continue; }
-    grep -q "^  ${name}:$" <<<"$repository_yaml" && { echo 'Zielname bereits vergeben.' >&2; continue; }
     read -r -p 'Typ [local/sftp] (local): ' type < /dev/tty
     type="${type:-local}"
     [[ "$type" == local || "$type" == sftp ]] || { echo 'Typ muss local oder sftp sein.' >&2; continue; }
+    if [[ "$type" == local ]]; then
+      name=local
+      ((local_count += 1))
+      if (( local_count > 1 )); then name="local$((local_count - 1))"; fi
+    else
+      name=remote
+      ((remote_count += 1))
+      if (( remote_count > 1 )); then name="remote$((remote_count - 1))"; fi
+    fi
+    printf '  Backup-Ziel %s\n' "$name"
     read -r -p 'Ziel ist erforderlich? [J/n]: ' required_answer < /dev/tty
     required=true
     [[ "${required_answer,,}" == n || "${required_answer,,}" == nein ]] && required=false
@@ -122,8 +176,8 @@ configure_interactive() {
       read -r -p 'SFTP-URL (sftp:BENUTZER@HOST:/absoluter/remote/pfad): ' url < /dev/tty
       read -r -p 'SSH-Authentifizierung [key/password] (key): ' auth < /dev/tty
       auth="${auth:-key}"
-      read -r -p 'known_hosts unter secrets/: ' known_hosts < /dev/tty
-      [[ -f "secrets/$known_hosts" ]] || { echo 'known_hosts muss unter secrets/ vorhanden sein.' >&2; return 2; }
+      configure_known_hosts "$url" "$name"
+      known_hosts="$KNOWN_HOSTS_FILE"
       repository_yaml+="    url: $(yaml_value "$url")"$'\n'
       if [[ "$auth" == key ]]; then
         read -r -p 'SSH-Key unter secrets/: ' key < /dev/tty

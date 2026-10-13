@@ -85,12 +85,16 @@ Der Produktionsbootstrap fragt, ob Backups eingerichtet werden sollen. Bei
 `./planer backup ...` meldet dann ausdrücklich, dass Backups nicht konfiguriert
 sind.
 
-Bei „Ja“ können beliebig viele Ziele angelegt werden. Für jedes Ziel werden
-Name, Typ (`local` oder `sftp`), Pflichtstatus und die erforderlichen Pfade
-beziehungsweise Verbindungsdaten abgefragt. Für jedes aktivierte Ziel wird
-ein zufälliges, nicht ausgegebenes Restic-Passwort erzeugt. SFTP-Schlüssel und
-`known_hosts` werden nicht kopiert oder erzeugt; der Bootstrap prüft die
-angegebenen Dateien und ihre restriktiven Berechtigungen.
+Bei „Ja“ können beliebig viele Ziele angelegt werden. Für jedes Ziel werden Typ
+(`local` oder `sftp`), Pflichtstatus und die erforderlichen Pfade beziehungsweise
+Verbindungsdaten abgefragt. Die Namen werden automatisch vergeben: `local`,
+`local1`, `local2` beziehungsweise `remote`, `remote1`, `remote2`. Für jedes
+aktivierte Ziel wird ein zufälliges, nicht ausgegebenes Restic-Passwort erzeugt.
+Bei SFTP fragt der Bootstrap die SSH-Authentifizierung ab. Für
+Passwort-Authentifizierung wird das Passwort geschützt unter `secrets/`
+gespeichert. Den Host-Schlüssel ermittelt der Bootstrap mit `ssh-keyscan`,
+zeigt den Fingerprint an und schreibt ihn erst nach Bestätigung als
+`known_hosts`-Datei unter `secrets/`.
 
 Der Bootstrap erzeugt eine gültige `backup.yaml` mit:
 
