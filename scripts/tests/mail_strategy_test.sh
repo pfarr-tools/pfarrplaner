@@ -27,6 +27,10 @@ grep -q '^  mailpit:$' "$DEV"
 ! grep -q '^  postfix:$' "$DEV"
 
 grep -q "'default' => env('MAIL_MAILER'" "$MAIL_CONFIG"
+if grep -q "driver.*MAIL_DRIVER" "$MAIL_CONFIG"; then
+  echo 'Legacy-Mailerpfad ist weiterhin aktiv.' >&2
+  exit 1
+fi
 grep -q "'scheme' => env('MAIL_SCHEME')" "$MAIL_CONFIG"
 grep -q "'auto_tls' => env('MAIL_AUTO_TLS', true) ? 'true' : 'false'" "$MAIL_CONFIG"
 grep -q 'MAIL_POSTFIX_ENABLED' "$ROOT/scripts/bootstrap-mail.sh"
