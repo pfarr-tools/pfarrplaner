@@ -199,13 +199,15 @@ bleibt für Notfälle möglich.
 ./planer data push user@ziel:/opt/pfarrplaner
 ./planer data pull user@quelle:/opt/pfarrplaner --source-down
 
+./planer migrate legacy /var/www/pfarrplaner --prod --dry-run
 ./planer migrate legacy user@altserver:/var/www/pfarrplaner --dev --dry-run
 ./planer migrate legacy user@altserver:/var/www/pfarrplaner --prod --dry-run
 ./planer migrate legacy user@altserver:/var/www/pfarrplaner --prod --confirm
 ./planer migrate legacy user@altserver:/var/www/pfarrplaner --demo --confirm
 ```
 
-Ohne Zieloption verwendet der Import weiterhin die Entwicklungsumgebung
+Ein absoluter lokaler Pfad wird direkt gelesen; nur ein Pfad mit `user@host:`
+verwendet SSH. Ohne Zieloption verwendet der Import weiterhin die Entwicklungsumgebung
 (`--dev`). Für einen produktiven Import muss `--prod` ausdrücklich angegeben
 werden; dabei wird `compose.production.yaml` verwendet und `APP_ENV=production`
 in der Ziel-`.env` verlangt. `--demo` verwendet dieselbe Produktionsumgebung

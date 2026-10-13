@@ -108,12 +108,14 @@ chmod 600 backup.yaml
 Für eine bestehende Datei-/MySQL-Installation wird die Legacy-Migration genutzt:
 
 ```sh
+./planer migrate legacy /var/www/pfarrplaner --prod --dry-run
 ./planer migrate legacy user@server:/var/www/pfarrplaner --dev --dry-run
 ./planer migrate legacy user@server:/var/www/pfarrplaner --prod --dry-run
 ./planer migrate legacy user@server:/var/www/pfarrplaner --prod --confirm
 ```
 
-Ohne `--dev` oder `--prod` wird die Entwicklungsumgebung verwendet. Für einen
+Ein absoluter lokaler Pfad wird direkt gelesen; nur ein Pfad mit `user@host:`
+verwendet SSH. Ohne `--dev` oder `--prod` wird die Entwicklungsumgebung verwendet. Für einen
 Produktionsimport muss `--prod` ausdrücklich angegeben werden; die Ziel-`.env`
 muss dafür `APP_ENV=production` enthalten.
 

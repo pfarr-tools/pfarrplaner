@@ -6,7 +6,7 @@ ENV_READER="$ROOT/scripts/legacy-env.sh"
 usage() {
   cat <<'EOF'
 Verwendung:
-  ./planer migrate legacy <user@host:/legacy-root> [--dev|--prod|--demo] [--database NAME] [--user USER] [--dry-run]
+  ./planer migrate legacy </absoluter/lokaler/legacy-root|user@host:/legacy-root> [--dev|--prod|--demo] [--database NAME] [--user USER] [--dry-run]
   LEGACY_DB_PASSWORD='...' ./planer migrate legacy <path> [--dev|--prod|--demo] --database NAME --user USER --confirm
 
 Die Datenbank wird per mysqldump oder mariadb-dump übernommen. storage/app und bekannte Datei-Roots
@@ -56,20 +56,33 @@ case "$target" in
   *) die "Unbekanntes Ziel: $target" ;;
 esac
 echo "  Zielumgebung: $target"
-[[ "$legacy_path" == *:* ]] || die 'Legacy-Pfad muss [user@]host:/absoluter/pfad sein.'
-legacy_host="${legacy_path%%:*}"; legacy_root="${legacy_path#*:}"
+legacy_local=0
+if [[ "$legacy_path" == /* ]]; then
+  legacy_local=1
+  legacy_host=''
+  legacy_root="$legacy_path"
+elif [[ "$legacy_path" == *:* ]]; then
+  legacy_host="${legacy_path%%:*}"
+  legacy_root="${legacy_path#*:}"
+else
+  die 'Legacy-Pfad muss ein absoluter lokaler Pfad oder [user@]host:/absoluter/pfad sein.'
+fi
 [[ "$legacy_root" == /* ]] || die 'Der Legacy-Pfad muss absolut sein.'
 (( dry_run || confirmed )) || die 'Der Import ist destruktiv. Für die finale Übernahme --confirm angeben.'
 quote() { printf '%q' "$1"; }
 remote() {
-  ssh -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliveCountMax=1 \
-    "$legacy_host" "cd $(quote "$legacy_root") && $*"
+  if (( legacy_local )); then
+    (cd -- "$legacy_root" && bash -c "$*")
+  else
+    ssh -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliveCountMax=1 \
+      "$legacy_host" "cd $(quote "$legacy_root") && $*"
+  fi
 }
 
 legacy_env="$(mktemp)"
 trap 'rm -f "$legacy_env"' EXIT
 
-echo '1/6 Legacy-Preflight prüfen: SSH und Anwendungspfad.'
+echo '1/6 Legacy-Preflight prüfen: Verbindung und Anwendungspfad.'
 remote 'test -d . && test -r .env'
 remote 'cat .env' > "$legacy_env"
 env_value() { bash "$ENV_READER" "$legacy_env" "$1" 2>/dev/null || true; }
