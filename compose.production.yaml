@@ -95,7 +95,7 @@ services:
     healthcheck: {test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"], interval: 5s, timeout: 3s, retries: 20}
     networks: [backend]
   minio:
-    image: ghcr.io/golithus/minio:latest
+    image: ghcr.io/coollabsio/minio:latest
     restart: unless-stopped
     command: server /data
     environment:

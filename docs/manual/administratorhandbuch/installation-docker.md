@@ -60,10 +60,11 @@ Mindestens diese Daten dürfen bei Container-Neustarts nicht verloren gehen:
 
 Dateien werden nicht ungeprüft dauerhaft in `storage/app` abgelegt. Der
 verbindliche Objektspeicher ist MinIO; siehe [Dateien und Verzeichnisse](../technikhandbuch/dateien-und-verzeichnisse.md).
-Die Compose-Dateien beziehen MinIO und `mc` als community-gepflegte öffentliche
-Builds von `ghcr.io/golithus`, weil die offiziellen MinIO-Community-Images
-nicht mehr anonym aus Docker Hub oder Quay bezogen werden können. Für
-Produktionsumgebungen sind die geprüften Image-Digests zusätzlich zu pinnen.
+Die Compose-Dateien beziehen den MinIO-Server als community-gepflegten
+öffentlichen Build von `ghcr.io/coollabsio` und `mc` von `ghcr.io/golithus`,
+weil die offiziellen MinIO-Community-Images nicht mehr anonym aus Docker Hub
+oder Quay bezogen werden können. Für Produktionsumgebungen sind die geprüften
+Image-Digests zusätzlich zu pinnen.
 
 ## Build oder Image
 

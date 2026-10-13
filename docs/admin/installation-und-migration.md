@@ -84,11 +84,12 @@ einer Warnung blockiert und akzeptiert nur die exakte interaktive Eingabe `ja`.
 `./planer fresh` benötigt zusätzlich `--force`.
 
 `FILESYSTEM_DRIVER=s3` und `AWS_ENDPOINT` zeigen auf den Live-MinIO-Bucket.
-Die Compose-Dateien beziehen die MinIO- und `mc`-Container als
-community-gepflegte, öffentliche Builds von `ghcr.io/golithus`; die offiziellen
-MinIO-Community-Images sind nicht mehr anonym aus Docker Hub oder Quay
-beziehbar. Für produktive Umgebungen sollten die verwendeten Image-Tags nach
-der Prüfung zusätzlich auf freigegebene Digests fixiert werden.
+Die Compose-Dateien beziehen den MinIO-Server als community-gepflegten,
+öffentlichen Build von `ghcr.io/coollabsio` und `mc` von `ghcr.io/golithus`; die
+offiziellen MinIO-Community-Images sind nicht mehr anonym aus Docker Hub oder
+Quay beziehbar. Das Server-Image enthält die für den Compose-Healthcheck
+benötigte `curl`-Umgebung. Für produktive Umgebungen sollten die verwendeten
+Image-Tags nach der Prüfung zusätzlich auf freigegebene Digests fixiert werden.
 Backups verwenden eigene Restic-Repositories. Ein lokales Repository ist für
 Entwicklung geeignet; Produktion muss ein unabhängiges SFTP-Repository
 aktivieren.

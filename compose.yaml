@@ -88,7 +88,7 @@ services:
     healthcheck: {test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"], interval: 5s, timeout: 3s, retries: 20}
     networks: [pfarrplaner]
   minio:
-    image: ghcr.io/golithus/minio:latest
+    image: ghcr.io/coollabsio/minio:latest
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID:-pfarrplaner}
