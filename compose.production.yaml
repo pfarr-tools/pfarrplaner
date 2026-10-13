@@ -102,7 +102,7 @@ services:
       MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID:?AWS_ACCESS_KEY_ID muss gesetzt sein}
       MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY:?AWS_SECRET_ACCESS_KEY muss gesetzt sein}
     volumes: [minio_data:/data]
-    healthcheck: {test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9000/minio/health/live"], interval: 10s, timeout: 5s, retries: 20}
+    healthcheck: {test: ["CMD", "curl", "-f", "http://127.0.0.1:9000/minio/health/live"], interval: 10s, timeout: 5s, retries: 20}
     networks: [backend]
   create-buckets:
     image: ghcr.io/golithus/mc:latest

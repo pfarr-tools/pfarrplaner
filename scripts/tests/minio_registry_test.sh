@@ -11,4 +11,8 @@ for compose_file in "$ROOT/compose.yaml" "$ROOT/compose.production.yaml"; do
   ! grep -qE 'image: minio/(minio|mc):latest' "$compose_file"
 done
 
+minio_production="$(sed -n '/^  minio:/,/^  create-buckets:/p' "$ROOT/compose.production.yaml")"
+grep -q 'test: \["CMD", "curl", "-f", "http://127.0.0.1:9000/minio/health/live"\]' <<<"$minio_production"
+! grep -q 'CMD-SHELL.*minio/health/live' <<<"$minio_production"
+
 echo 'MinIO registry tests passed'
