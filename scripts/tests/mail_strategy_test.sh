@@ -16,7 +16,7 @@ grep -q 'networks: \[mail, mail-egress\]' "$PROD"
 ! sed -n '/^  postfix:/,/^networks:/p' "$PROD" | grep -q 'ports:'
 grep -q 'MAIL_HOST: postfix' "$PROD"
 grep -q 'MAIL_PORT: "587"' "$PROD"
-grep -q 'MAIL_URL: smtp://postfix:587?auto_tls=false' "$PROD"
+grep -q 'MAIL_AUTO_TLS: "false"' "$PROD"
 grep -q '^  horizon:$' "$PROD"
 grep -q '^QUEUE_CONNECTION=redis$' "$ROOT/.env.example"
 grep -q "'table' => 'failed_jobs'" "$ROOT/src/config/queue.php"
@@ -26,6 +26,7 @@ grep -q '^  mailpit:$' "$DEV"
 
 grep -q "'default' => env('MAIL_MAILER'" "$MAIL_CONFIG"
 grep -q "'scheme' => env('MAIL_SCHEME')" "$MAIL_CONFIG"
+grep -q "'auto_tls' => env('MAIL_AUTO_TLS', true)" "$MAIL_CONFIG"
 
 mailables=()
 while IFS= read -r file; do mailables+=("$file"); done < <(find "$ROOT/src/app/Mail" -type f -name '*.php' -print)
