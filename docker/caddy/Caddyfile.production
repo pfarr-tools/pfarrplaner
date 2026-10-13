@@ -8,6 +8,10 @@
 :80 {
     root * /var/www/html/public
     encode gzip
-    reverse_proxy app:8000
+    reverse_proxy app:8000 {
+        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-Host {http.request.host}
+        header_up X-Forwarded-Port 443
+    }
     file_server
 }

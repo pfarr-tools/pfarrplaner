@@ -8,6 +8,8 @@ grep -q -- '--server=swoole' "$ROOT/compose.production.yaml"
 grep -q 'reverse_proxy app:8000' "$ROOT/docker/caddy/Caddyfile.production"
 grep -q 'trusted_proxies static private_ranges' "$ROOT/docker/caddy/Caddyfile.production"
 grep -q 'trusted_proxies_strict' "$ROOT/docker/caddy/Caddyfile.production"
+grep -q 'header_up X-Forwarded-Proto https' "$ROOT/docker/caddy/Caddyfile.production"
+grep -q 'header_up X-Forwarded-Port 443' "$ROOT/docker/caddy/Caddyfile.production"
 grep -q 'exec php-fpm8.4 -F' "$ROOT/compose.yaml"
 grep -q 'OCTANE_WORKERS' "$ROOT/.env.example"
 echo 'Octane runtime tests passed'
