@@ -208,26 +208,9 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
                 ssh_password_path = path_in_container(repo["ssh_password_file"])
                 if not ssh_password_path.is_file():
                     fail(f"SFTP-Sle: Passwortdatei fehlt ({ssh_password_path}).")
-                fd, name = tempfile.mkstemp(prefix="restic-ssh-password-", dir="/tmp")
-                os.close(fd)
-                askpass_password = Path(name)
-                askpass_password.chmod(0o600)
-                askpass_password.write_text(ssh_password_path.read_text(encoding="utf-8"), encoding="utf-8")
-                fd, name = tempfile.mkstemp(prefix="restic-ssh-askpass-", dir="/tmp")
-                os.close(fd)
-                askpass_script = Path(name)
-                askpass_script.chmod(0o700)
-                askpass_script.write_text(
-                    f"#!/bin/sh\ncat {shlex.quote(str(askpass_password))}\n",
-                    encoding="utf-8",
-                )
-                temporary_paths.extend((askpass_password, askpass_script))
                 env.update({
-                    "DISPLAY": ":0",
-                    "SSH_ASKPASS": str(askpass_script),
-                    "SSH_ASKPASS_REQUIRE": "force",
                     "RESTIC_SSH_COMMAND": (
-                        f"ssh {ssh_common_options} "
+                        f"sshpass -f {shlex.quote(str(ssh_password_path))} ssh {ssh_common_options} "
                         "-o PreferredAuthentications=password,keyboard-interactive "
                         "-o PubkeyAuthentication=no "
                         "-o NumberOfPasswordPrompts=1"
