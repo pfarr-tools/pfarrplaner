@@ -338,13 +338,21 @@ def restored_staging(config: dict, restore_root: Path) -> list[Path]:
 
 
 def init_repositories(config: dict, target: str | None) -> None:
+    failures = []
     for name, repo in selected(config, target):
         try:
             restic(repo, ["snapshots", "--no-lock"])
             print(f"{name}: bereits initialisiert")
         except BackupError:
-            restic(repo, ["init"])
-            print(f"{name}: initialisiert")
+            try:
+                restic(repo, ["init"])
+                print(f"{name}: initialisiert")
+            except BackupError as exc:
+                if repo.get("required"):
+                    failures.append(name)
+                print(f"{name}: WARNUNG: Initialisierung fehlgeschlagen: {exc}", file=sys.stderr)
+    if failures:
+        fail("Erforderliche Backup-Ziele konnten nicht initialisiert werden: " + ", ".join(failures))
 
 
 def upload(config: dict, staging: Path, run_id: str, target: str | None = None) -> None:
