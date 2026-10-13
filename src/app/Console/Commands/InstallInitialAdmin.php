@@ -1,6 +1,6 @@
 <?php
 
-namespace AppConsole\Commands;
+namespace App\Console\Commands;
 
 use App\Models\People\User;
 use App\Services\FirstRunInstallerService;

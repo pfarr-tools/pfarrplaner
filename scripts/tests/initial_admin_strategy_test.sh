@@ -6,6 +6,7 @@ COMMAND="$ROOT/src/app/Console/Commands/InstallInitialAdmin.php"
 
 test -f "$COMMAND"
 grep -q "protected \$signature = 'pfarrplaner:initial-admin" "$COMMAND"
+grep -q '^namespace App\\Console\\Commands;' "$COMMAND"
 grep -q "createOrUpdateAdminUser" "$COMMAND"
 grep -q "RoleService::ROLE_SUPER_ADMIN" "$COMMAND"
 grep -q "Role::firstOrCreate" "$COMMAND"
