@@ -220,15 +220,14 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
                 "-o ServerAliveCountMax=2"
             )
             user, host, port = sftp_target(repo["url"])
-            ssh_target = f"-l {shlex.quote(user)} {shlex.quote(host)}"
-            if port:
-                ssh_target = f"-p {port} {ssh_target}"
+            ssh_destination = shlex.quote(f"{user}@{host}")
+            ssh_port = f"-p {port} " if port else ""
             if repo.get("ssh_key"):
                 key = path_in_container(repo["ssh_key"])
                 if not key.is_file():
                     fail(f"SFTP-sle: SSH-Datei fehlt ({key}).")
                 ssh_command = (
-                    f"ssh -i {shlex.quote(str(key))} {ssh_common_options} {ssh_target} -s sftp"
+                    f"ssh -i {shlex.quote(str(key))} {ssh_common_options} {ssh_port}-s {ssh_destination} sftp"
                 )
             else:
                 ssh_password_path = path_in_container(repo["ssh_password_file"])
@@ -238,7 +237,7 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
                     f"sshpass -f {shlex.quote(str(ssh_password_path))} ssh {ssh_common_options} "
                     "-o PreferredAuthentications=password,keyboard-interactive "
                     "-o PubkeyAuthentication=no "
-                    f"-o NumberOfPasswordPrompts=1 {ssh_target} -s sftp"
+                    f"-o NumberOfPasswordPrompts=1 {ssh_port}-s {ssh_destination} sftp"
                 )
             restic_options = ["-o", f"sftp.command={ssh_command}"]
         env["RESTIC_CACHE_DIR"] = "/tmp/restic-cache"
