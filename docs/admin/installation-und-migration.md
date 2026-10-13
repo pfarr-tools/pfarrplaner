@@ -151,6 +151,10 @@ geleert und neu initialisiert. Die Voreinstellung ist „Nein“; Enter oder ein
 andere Eingabe bricht die Ersetzung ab. Vorhandene Backup-Daten werden dabei
 nicht verändert. Das gilt auch für SFTP-Ziele.
 
+Die interaktiven Ja/Nein-Fragen im Bootstrap zeigen den Standard in Groß- bzw.
+Kleinschreibung: `[J/n]` bedeutet, dass Enter „Ja“ auswählt, `[j/N]` bedeutet,
+dass Enter „Nein“ auswählt. Ungültige Eingaben werden erneut abgefragt.
+
 `restore` schreibt standardmäßig in ein separates Verzeichnis. Ein Anwenden auf
 eine laufende Installation ist erst mit `--apply --yes`, einer vorherigen
 Sicherheitskopie und quieszierten Diensten zulässig. Die Wiederherstellung

@@ -47,6 +47,37 @@ ui_text() {
   printf '%s' "${value:-$default}"
 }
 
+ui_confirm() {
+  local label="$1" default="${2:-no}" answer prompt
+  case "${default,,}" in
+    yes|y|ja|j)
+      prompt="$label [J/n]: "
+      ;;
+    no|n|nein)
+      prompt="$label [j/N]: "
+      ;;
+    *)
+      ui_error 'Ungültiger Standardwert für Ja/Nein-Frage.'
+      return 2
+      ;;
+  esac
+
+  while :; do
+    read -r -p "$prompt" answer < /dev/tty || {
+      ui_error 'Abbruch: Interaktive Eingabe nicht verfügbar. Nutze --defaults.'
+      return 2
+    }
+    case "${answer,,}" in
+      '') [[ "${default,,}" == yes || "${default,,}" == y || "${default,,}" == ja || "${default,,}" == j ]] && return 0 || return 1 ;;
+      j|ja|y|yes) return 0 ;;
+      n|nein|no) return 1 ;;
+      *)
+        ui_warning 'Bitte j/ja oder n/nein eingeben.'
+        ;;
+    esac
+  done
+}
+
 ui_choice() {
   local label="$1" default="$2" tty=/dev/tty key rest selected rendered=0 index
   shift 2

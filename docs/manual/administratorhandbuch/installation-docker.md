@@ -99,6 +99,9 @@ bereits ein Restic-Repository enthält. Ein vorhandenes Ziel wird nur nach der
 Bestätigung `j` oder `ja` ersetzt; Enter bedeutet „Nein“. Ohne diese
 Bestätigung bleiben die vorhandenen Backup-Daten unverändert.
 
+Bei den übrigen Ja/Nein-Fragen zeigt die Schreibweise den Standard: `[J/n]`
+bedeutet „Ja“ bei Enter, `[j/N]` bedeutet „Nein“ bei Enter.
+
 Falls eine Laravel-Installation oder Migration im laufenden Container nötig ist,
 wird sie mit `./planer exec app php artisan ...` ausgeführt. Entwicklung wird
 immer über `./planer dev ...` angesprochen. Die produktive

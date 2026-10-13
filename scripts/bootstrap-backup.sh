@@ -133,8 +133,7 @@ configure_known_hosts() {
     return 2
   }
   printf 'Gefundene SSH-Host-Schlüssel für %s:%s:\n%s\n' "$host" "$port" "$fingerprint"
-  read -r -p 'Host-Schlüssel übernehmen? [j/N]: ' answer < /dev/tty
-  if [[ "${answer,,}" != j && "${answer,,}" != ja ]]; then
+  if ! ui_confirm 'Host-Schlüssel übernehmen?' no; then
     rm -f "$scan_file"
     echo 'Übernahme des SSH-Host-Schlüssels abgebrochen.' >&2
     return 2
@@ -160,9 +159,8 @@ configure_interactive() {
       if (( remote_count > 1 )); then name="remote$((remote_count - 1))"; fi
     fi
     printf '  Backup-Ziel %s\n' "$name"
-    read -r -p 'Ziel ist erforderlich? [J/n]: ' required_answer < /dev/tty
     required=true
-    [[ "${required_answer,,}" == n || "${required_answer,,}" == nein ]] && required=false
+    ui_confirm 'Ziel ist erforderlich?' yes || required=false
     password="$(random_password)"
     repository_yaml+="  ${name}:"$'\n'"    type: ${type}"$'\n'"    enabled: true"$'\n'"    required: ${required}"$'\n'
     if [[ "$type" == local ]]; then
@@ -198,8 +196,7 @@ configure_interactive() {
       [[ "$required" == true ]] && require_offsite=true
     fi
     repository_yaml+="    password: $(yaml_value "$password")"$'\n\n'
-    read -r -p 'Weiteres Backup-Ziel hinzufügen? [j/N]: ' answer < /dev/tty
-    [[ "${answer,,}" == j || "${answer,,}" == ja ]] || break
+    ui_confirm 'Weiteres Backup-Ziel hinzufügen?' no || break
   done
   [[ -n "$repository_yaml" ]] || { echo 'Mindestens ein Backup-Ziel ist erforderlich.' >&2; return 2; }
   write_config "$repository_yaml" "$require_offsite"
@@ -211,8 +208,7 @@ if [[ "${PLANER_BOOTSTRAP_BACKUPS:-}" == fixture ]]; then
 elif [[ "${PLANER_BOOTSTRAP_MODE:-defaults}" == defaults ]]; then
   exit 0
 else
-  read -r -p 'Backups einrichten? [J/n]: ' enabled < /dev/tty
-  if [[ -n "$enabled" && "${enabled,,}" != j && "${enabled,,}" != ja ]]; then
+  if ! ui_confirm 'Backups einrichten?' yes; then
     ui_warning 'Backup-Konfiguration übersprungen.'
     exit 0
   fi
