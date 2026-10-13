@@ -5,118 +5,134 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
 compose() { docker compose -f "$ROOT/compose.yaml" "$@"; }
-prod_compose() { docker compose -f "$ROOT/compose.production.yaml" "$@"; }
+production_compose() {
+  local args=( -f "$ROOT/compose.production.yaml" )
+  if [[ "${MAIL_POSTFIX_ENABLED:-}" == true ]] || grep -q '^MAIL_POSTFIX_ENABLED=true$' "$ROOT/.env" 2>/dev/null; then
+    args+=(--profile mail)
+  fi
+  docker compose "${args[@]}" "$@"
+}
 
-COMMAND="${1:-help}"
-shift || true
+usage() {
+  cat <<'EOF'
+Pfarrplaner-Betriebshelfer
 
-case "$COMMAND" in
-  bootstrap)
-    exec "$ROOT/scripts/bootstrap.sh" "$@"
-    ;;
-  up) compose up -d "$@" ;;
-  down) compose down "$@" ;;
-  restart) compose restart "$@" ;;
-  status|ps) compose ps "$@" ;;
-  logs) compose logs -f "$@" ;;
-  shell) compose exec app bash "$@" ;;
-  artisan)
-    if [[ "${1:-}" == test ]]; then
-      cat >&2 <<'EOF'
+Produktion (Standard):
+  ./planer up|down|restart|status|logs|exec [Argumente]
+  ./planer shell
+  ./planer artisan <Befehl>
+  ./planer backup create|list|verify|restore|prune|check|init
+  ./planer manual build|dusk|site|all|deploy|source-publish
+  ./planer migrate legacy <Pfad> [Optionen]
+  ./planer bootstrap [--dev]
+
+Entwicklung:
+  ./planer dev up|down|restart|status|logs|exec [Argumente]
+  ./planer dev shell
+  ./planer dev artisan <Befehl>
+  ./planer dev test [Testoptionen]
+  ./planer dev composer <Befehl>
+  ./planer dev npm <Befehl>
+  ./planer dev pint <Optionen>
+  ./planer dev fresh --force
+
+Der explizite Alias ./planer prod ... bleibt für Produktion erhalten.
+EOF
+}
+
+run_dev() {
+  local command="${1:-help}"
+  shift || true
+  case "$command" in
+    up) compose up "$@" ;;
+    down) compose down "$@" ;;
+    restart) compose restart "$@" ;;
+    status|ps) compose ps "$@" ;;
+    logs) compose logs -f "$@" ;;
+    exec) compose exec "$@" ;;
+    shell) compose exec app bash "$@" ;;
+    artisan)
+      if [[ "${1:-}" == test ]]; then
+        cat >&2 <<'EOF'
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!! ACHTUNG: ./planer artisan test kann die normale MariaDB-Datenbank löschen !!
+!! ACHTUNG: artisan test kann die normale MariaDB-Datenbank löschen            !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 Verwende für Tests den sicheren Befehl:
 
-  ./planer test [Testoptionen]
-
-Dieser verwendet eine isolierte SQLite-In-Memory-Datenbank.
+  ./planer dev test [Testoptionen]
 EOF
-      confirmation=''
-      if ! read -r -p 'Wirklich fortfahren? Tippe exakt "ja": ' confirmation < /dev/tty; then
-        echo 'Abbruch: Keine interaktive Bestätigung erhalten.' >&2
-        exit 2
+        local confirmation=''
+        read -r -p 'Wirklich fortfahren? Tippe exakt "ja": ' confirmation < /dev/tty || {
+          echo 'Abbruch: Keine interaktive Bestätigung erhalten.' >&2
+          exit 2
+        }
+        [[ "$confirmation" == ja ]] || { echo 'Abbruch: nicht bestätigt.' >&2; exit 2; }
       fi
-      [[ "$confirmation" == ja ]] || { echo 'Abbruch: nicht bestätigt.' >&2; exit 2; }
-    fi
-    compose exec -e XDG_CONFIG_HOME=/tmp/config app php artisan "$@"
-    ;;
-  test)
-    compose exec \
-      -e APP_ENV=testing \
-      -e DB_CONNECTION=sqlite \
-      -e DB_DATABASE=:memory: \
-      -e APP_KEY='base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=' \
-      app php artisan test "$@"
-    ;;
-  composer) compose exec app composer "$@" ;;
-  npm) compose run --rm vite npm "$@" ;;
-  pint) compose exec app ./vendor/bin/pint "$@" ;;
-  fresh)
-    [[ "${1:-}" == --force ]] || { echo 'Abbruch: ./planer fresh löscht die lokale Datenbank. Nutze --force.' >&2; exit 2; }
-    shift
-    exec compose exec app php artisan migrate:fresh --seed --force "$@"
-    ;;
-  data)
-    exec "$ROOT/scripts/data-sync.sh" "${1:-help}" "${@:2}"
-    ;;
-  backup)
-    exec "$ROOT/scripts/backup.sh" "${1:-help}" "${@:2}"
-    ;;
-  manual)
-    exec "$ROOT/scripts/manual.sh" "${1:-help}" "${@:2}"
-    ;;
-  release)
-    exec "$ROOT/scripts/release.sh" "$@"
-    ;;
-  migrate)
-    [[ "${1:-}" == legacy ]] || { echo 'Verwendung: ./planer migrate legacy ...' >&2; exit 2; }
-    shift
-    exec "$ROOT/scripts/legacy-migrate.sh" "$@"
-    ;;
-  prod|production)
-    PROD_COMMAND="${1:-help}"
-    shift || true
-    case "$PROD_COMMAND" in
-      up) prod_compose up -d "$@" ;;
-      down) prod_compose down "$@" ;;
-      restart) prod_compose restart "$@" ;;
-      status|ps) prod_compose ps "$@" ;;
-      logs) prod_compose logs -f "$@" ;;
-      exec) prod_compose exec "$@" ;;
-      compose) prod_compose "$@" ;;
-      update)
-        exec "$ROOT/scripts/update-production.sh" "$@"
-        ;;
-      backup)
-        PLANER_PRODUCTION=1 exec "$ROOT/scripts/backup.sh" "${1:-help}" "${@:2}"
-        ;;
-      *)
-        cat >&2 <<'EOF'
-Verwendung: ./planer prod up|down|restart|status|logs|exec|compose|backup|update
-EOF
-        exit 2
-        ;;
-    esac
-    ;;
-  *)
-    cat <<'EOF'
-Pfarrplaner-Entwicklungshelfer
+      compose exec -e XDG_CONFIG_HOME=/tmp/config app php artisan "$@"
+      ;;
+    test)
+      compose exec \
+        -e APP_ENV=testing \
+        -e DB_CONNECTION=sqlite \
+        -e DB_DATABASE=:memory: \
+        -e APP_KEY='base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=' \
+        app php artisan test "$@"
+      ;;
+    composer) compose exec app composer "$@" ;;
+    npm) compose run --rm vite npm "$@" ;;
+    pint) compose exec app ./vendor/bin/pint "$@" ;;
+    fresh)
+      [[ "${1:-}" == --force ]] || { echo 'Abbruch: ./planer dev fresh löscht die lokale Datenbank. Nutze --force.' >&2; exit 2; }
+      shift
+      compose exec app php artisan migrate:fresh --seed --force "$@"
+      ;;
+    help|--help|-h) usage ;;
+    *) usage >&2; exit 2 ;;
+  esac
+}
 
-Verwendung:
-  ./planer up|down|restart|status|logs [Dienst]
-  ./planer shell
-  ./planer artisan <Befehl>
-  ./planer test [Testoptionen]
-  ./planer fresh --force
-  ./planer data push|pull <ssh-path> [--source-down]
-  ./planer backup create|list|verify|restore
-  ./planer manual build|dusk|site|all|deploy|source-publish
-  ./planer release [major|minor|patch]
-  ./planer migrate legacy <ssh-path> [Optionen]
-  ./planer prod up|down|restart|status|logs|exec|compose|backup|update
-EOF
+run_production() {
+  local command="${1:-help}"
+  shift || true
+  case "$command" in
+    up) production_compose up "$@" ;;
+    down) production_compose down "$@" ;;
+    restart) production_compose restart "$@" ;;
+    status|ps) production_compose ps "$@" ;;
+    logs) production_compose logs -f "$@" ;;
+    exec) production_compose exec "$@" ;;
+    shell) production_compose exec app bash "$@" ;;
+    artisan) production_compose exec -e XDG_CONFIG_HOME=/tmp/config app php artisan "$@" ;;
+    data) exec "$ROOT/scripts/data-sync.sh" "$@" ;;
+    backup) PLANER_PRODUCTION=1 exec "$ROOT/scripts/backup.sh" "${1:-help}" "${@:2}" ;;
+    manual) exec "$ROOT/scripts/manual.sh" "${1:-help}" "${@:2}" ;;
+    release) exec "$ROOT/scripts/release.sh" "$@" ;;
+    migrate)
+      [[ "${1:-}" == legacy ]] || { echo 'Verwendung: ./planer migrate legacy ...' >&2; exit 2; }
+      shift
+      exec "$ROOT/scripts/legacy-migrate.sh" "$@"
+      ;;
+    bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
+    help|--help|-h) usage ;;
+    test|composer|npm|pint|fresh)
+      echo "Fehler: '$command' ist ein Entwicklungsbefehl. Verwende ./planer dev $command ..." >&2
+      exit 2
+      ;;
+    *) usage >&2; exit 2 ;;
+  esac
+}
+
+COMMAND="${1:-help}"
+shift || true
+case "$COMMAND" in
+  dev) run_dev "$@" ;;
+  prod|production) run_production "$@" ;;
+  bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
+  up|down|restart|status|ps|logs|exec|shell|artisan|data|backup|manual|release|migrate|test|composer|npm|pint|fresh)
+    run_production "$COMMAND" "$@"
     ;;
+  help|--help|-h) usage ;;
+  *) usage >&2; exit 2 ;;
 esac
