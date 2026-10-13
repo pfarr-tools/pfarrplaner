@@ -19,5 +19,6 @@ grep -q 'docker/minio-init/Dockerfile' "$ROOT/compose.yaml"
 grep -q 'docker/minio-init/Dockerfile' "$ROOT/compose.production.yaml"
 grep -q 'create-buckets: {condition: service_completed_successfully}' "$ROOT/compose.yaml"
 grep -q 'create-buckets: {condition: service_completed_successfully}' "$ROOT/compose.production.yaml"
+! grep -q 'minio: {condition: service_healthy}' "$ROOT/compose.yaml" "$ROOT/compose.production.yaml"
 
 echo 'MinIO registry tests passed'

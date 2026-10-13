@@ -115,7 +115,7 @@ services:
       /bin/sh -lc 'until mc alias set local http://minio:9000
       "$${AWS_ACCESS_KEY_ID}" "$${AWS_SECRET_ACCESS_KEY}"; do sleep 2; done;
       mc mb --ignore-existing local/$${AWS_BUCKET};'
-    depends_on: {minio: {condition: service_healthy}}
+    depends_on: {minio: {condition: service_started}}
     networks: [backend]
   backup:
     build:
