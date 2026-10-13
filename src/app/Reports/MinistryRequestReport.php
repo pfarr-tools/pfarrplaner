@@ -99,17 +99,22 @@ class MinistryRequestReport extends AbstractReport
             'locations.*' => 'int|exists:locations,id',
             'cities' => 'required|array|min:1',
             'cities.*' => 'int|exists:cities,id',
+            'ministry' => 'nullable|string',
+            'only_open' => 'sometimes|boolean',
                            ]);
 
         $services = Service::whereIn('city_id', $data['cities'])
-            ->between(Carbon::parse($data['start']), Carbon::parse($data['end']))
-            ->ordered();
+            ->between(Carbon::parse($data['start']), Carbon::parse($data['end']));
+
+        if (($data['only_open'] ?? false) && !empty($data['ministry'])) {
+            $services->havingOpenMinistries([$data['ministry']]);
+        }
 
         if (count($data['locations'] ?? [])) {
             $services->whereIn('location_id', ($data['locations'] ?? []));
         }
 
-        return response()->json($services->get());
+        return response()->json($services->ordered()->get());
     }
 
     public function recipients(Request $request)

@@ -49,6 +49,16 @@
         <form-selectize label="Anfrage für folgenden Dienst senden"
                         v-model="myMinistry" name="ministry"
                         :options="myMinistries"/>
+        <div class="form-check mt-2 mb-3">
+            <input id="onlyOpenServices" class="form-check-input" type="checkbox"
+                   v-model="onlyOpenServices" :disabled="!myMinistry">
+            <label class="form-check-label" for="onlyOpenServices">
+                Nur Gottesdienste ohne Eintrag für diesen Dienst anzeigen
+            </label>
+            <small v-if="!myMinistry" class="form-text text-muted d-block">
+                Wähle zuerst einen Dienst aus.
+            </small>
+        </div>
 
         <div v-if="usersLoading"><span class="mdi mdi-spin mdi-loading"></span> Mitarbeiterliste wird geladen...</div>
         <div v-if="(!usersLoading)">
@@ -136,6 +146,7 @@ export default {
             to: moment().date(1).add(2, "month").subtract(1, 'day'),
             myMinistries,
             myMinistry: null,
+            onlyOpenServices: false,
             myLocations: [],
             myCities: (this.cities.length ? [this.cities[0].id] : []),
             services: [],
@@ -164,7 +175,10 @@ export default {
             await this.getServices();
         },
         async myMinistry() {
-            //await this.getRecipients();
+            await this.getServices();
+        },
+        async onlyOpenServices() {
+            await this.getServices();
         }
     },
     methods: {
@@ -179,6 +193,8 @@ export default {
                 step: 'services',
                 cities: this.myCities,
                 locations: this.myLocations,
+                ministry: this.myMinistry,
+                only_open: this.onlyOpenServices,
                 start: this.queryDate(this.from),
                 end: this.queryDate(this.to),
             })).then(response => {

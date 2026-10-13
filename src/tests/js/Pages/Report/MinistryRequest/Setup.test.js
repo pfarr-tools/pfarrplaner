@@ -72,4 +72,19 @@ describe('Ministry request setup', () => {
             address: { 2: 'empfaenger@example.test' },
         }))
     })
+
+    it('passes the selected ministry and open-only filter when loading services', async () => {
+        const { wrapper } = mountSetup()
+        wrapper.vm.myMinistry = 'P'
+        wrapper.vm.onlyOpenServices = true
+
+        await wrapper.vm.getServices()
+
+        const request = window.route.mock.calls
+            .map(call => call[1])
+            .filter(params => params?.step === 'services' && params?.cities)
+            .at(-1)
+        expect(request.ministry).toBe('P')
+        expect(request.only_open).toBe(true)
+    })
 })
