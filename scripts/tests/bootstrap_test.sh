@@ -2,6 +2,10 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+test -f "$ROOT/scripts/bootstrap-ui.sh"
+grep -q 'NO_COLOR' "$ROOT/scripts/bootstrap-ui.sh"
+grep -q 'ui_section' "$ROOT/scripts/bootstrap.sh"
+grep -q 'ui_success' "$ROOT/scripts/bootstrap.sh"
 TEST_ROOT="$(mktemp -d)"
 trap 'rm -rf "$TEST_ROOT"' EXIT
 cp "$ROOT/.env.example" "$TEST_ROOT/.env.example"

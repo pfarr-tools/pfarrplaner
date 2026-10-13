@@ -7,6 +7,7 @@ test -f "$ROOT/backup-example.yaml"
 test -f "$ROOT/docker/backup/Dockerfile"
 test -f "$ROOT/docker/backup/backup.py"
 test -x "$ROOT/scripts/bootstrap-backup.sh"
+grep -q 'bootstrap-ui.sh' "$ROOT/scripts/bootstrap-backup.sh"
 python3 - "$ROOT/scripts/bootstrap-backup.sh" <<'PY'
 from pathlib import Path
 import re

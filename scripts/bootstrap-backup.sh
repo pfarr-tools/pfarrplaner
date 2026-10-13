@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="${PLANER_BOOTSTRAP_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 cd "$ROOT"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/bootstrap-ui.sh"
 
 random_password() { openssl rand -hex 32; }
 env_value() { grep -m1 "^$1=" .env | cut -d= -f2-; }
@@ -219,6 +220,9 @@ elif [[ "${PLANER_BOOTSTRAP_MODE:-defaults}" == defaults ]]; then
   exit 0
 else
   read -r -p 'Backups einrichten? [J/n]: ' enabled < /dev/tty
-  [[ -z "$enabled" || "${enabled,,}" == j || "${enabled,,}" == ja ]] || exit 0
+  if [[ -n "$enabled" && "${enabled,,}" != j && "${enabled,,}" != ja ]]; then
+    ui_warning 'Backup-Konfiguration übersprungen.'
+    exit 0
+  fi
   configure_interactive
 fi

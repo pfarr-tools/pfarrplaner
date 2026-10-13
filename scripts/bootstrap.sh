@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="${PLANER_BOOTSTRAP_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/bootstrap-ui.sh"
 
 usage() {
   cat <<'EOF'
@@ -134,10 +135,12 @@ set_env APP_DEBUG "$APP_DEBUG"
 set_env OCTANE_HTTPS "$OCTANE_HTTPS_DEFAULT"
 set_env APP_NAME Pfarrplaner
 set_env COMPOSE_PROJECT_NAME pfarrplaner
-echo "Pfarrplaner-Startkonfiguration (${TARGET})"
+ui_section "Pfarrplaner-Startkonfiguration (${TARGET})"
+ui_section 'Grundkonfiguration'
 ask_url APP_URL 'Öffentliche URL oder Host' "$APP_URL_DEFAULT"
 ask APP_PROVIDER 'Bezeichnung des Anbieters' Pfarrplaner
 ask APP_ADMINISTRATOR 'Administrator-E-Mail-Adresse' admin@localhost
+ui_section 'Ports'
 ask APP_PORT 'HTTP-Port' "$APP_PORT_DEFAULT"
 ask VITE_PORT 'Vite-Port' "$VITE_PORT_DEFAULT"
 set_env VITE_HMR_CLIENT_PORT "$(grep '^VITE_PORT=' .env | cut -d= -f2-)"
@@ -146,6 +149,7 @@ ask FORWARD_S3_PORT 'MinIO-Port' 9900
 ask FORWARD_S3_CONSOLE_PORT 'MinIO-Konsolenport' 9901
 ask SOKETI_PORT 'Soketi-Port' 6601
 ask FORWARD_MAILPIT_PORT 'Mailpit-Port' 9825
+ui_section 'Sicherheitsgeheimnisse'
 set_env APP_KEY "$(random_app_key)"
 set_random_secret DB_PASSWORD
 set_random_secret DB_ROOT_PASSWORD
@@ -158,16 +162,19 @@ set_random_secret PUSHER_APP_SECRET
 
 mkdir -p src/storage/app src/storage/framework/{cache,sessions,views} src/storage/logs src/bootstrap/cache
 if [[ "$TARGET" == prod ]]; then
+  ui_section '4/6 Backups'
   PLANER_BOOTSTRAP_MODE="$MODE" PLANER_BOOTSTRAP_ROOT="$ROOT" "$SCRIPT_ROOT/scripts/bootstrap-backup.sh"
+  ui_section '5/6 Mailversand'
   PLANER_BOOTSTRAP_MODE="$MODE" PLANER_BOOTSTRAP_ROOT="$ROOT" "$SCRIPT_ROOT/scripts/bootstrap-mail.sh"
   if [[ "$MODE" == interactive ]]; then
+    ui_section '6/6 Datenübernahme und Administrator'
     PLANER_BOOTSTRAP_MODE="$MODE" PLANER_BOOTSTRAP_ROOT="$ROOT" "$SCRIPT_ROOT/scripts/bootstrap-import.sh"
   fi
 fi
 chmod 600 .env
 chmod +x planer scripts/*.sh 2>/dev/null || true
 if [[ "$TARGET" == prod ]]; then
-  echo 'Pfarrplaner ist für die Produktion vorbereitet. Starte mit ./planer up -d --build.'
+  ui_success 'Pfarrplaner ist für die Produktion vorbereitet. Starte mit ./planer up -d --build.'
 else
-  echo 'Pfarrplaner ist vorbereitet. Starte die Entwicklungsumgebung mit ./planer dev up -d --build.'
+  ui_success 'Pfarrplaner ist vorbereitet. Starte die Entwicklungsumgebung mit ./planer dev up -d --build.'
 fi
