@@ -59,7 +59,9 @@ $integrationCommandPaths = array_values(array_filter(
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(commands: __DIR__.'/../routes/console.php')
-    ->withCommands($integrationCommandPaths)
+    ->withCommands(array_merge([
+        __DIR__.'/../app/Console/Commands',
+    ], $integrationCommandPaths))
     ->withMiddleware(function (Middleware $middleware) {
         // Global middleware appended to every request
         $middleware->append([

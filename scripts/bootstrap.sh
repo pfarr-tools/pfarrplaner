@@ -8,21 +8,26 @@ usage() {
   cat <<'EOF'
 Verwendung:
   ./planer bootstrap
-  ./planer bootstrap --prod
+  ./planer bootstrap --dev
   ./planer bootstrap --defaults
+  ./planer bootstrap --dev --defaults
   ./planer bootstrap --prod --defaults
   ./planer bootstrap --check
 EOF
 }
 
 MODE=interactive
-TARGET=dev
+TARGET=prod
 CHECK=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --defaults) MODE=defaults ;;
+    --dev)
+      [[ "$TARGET" == prod ]] || { echo '--dev kann nicht mehrfach angegeben werden.' >&2; exit 2; }
+      TARGET=dev
+      ;;
     --prod)
-      [[ "$TARGET" == dev ]] || { echo '--prod kann nicht mehrfach angegeben werden.' >&2; exit 2; }
+      [[ "$TARGET" == prod ]] || { echo '--prod und --dev dürfen nicht gemeinsam angegeben werden.' >&2; exit 2; }
       TARGET=prod
       ;;
     --check) CHECK=1 ;;
@@ -75,24 +80,6 @@ ask() {
   set_env "$key" "$value"
   printf '  %-28s %s\n' "$key" "$value"
 }
-ask_project_name() {
-  local key=COMPOSE_PROJECT_NAME label='Docker-Projektname' default=pfarrplaner value
-  if [[ "$MODE" == defaults ]]; then
-    value="$default"
-  else
-    read -r -p "$label [$default]: " value < /dev/tty || {
-      echo 'Abbruch: interaktive Eingabe nicht verfügbar. Nutze --defaults.' >&2
-      exit 2
-    }
-    value="${value:-$default}"
-  fi
-  [[ "$value" =~ ^[a-z0-9][a-z0-9_-]*$ ]] || {
-    echo "Ungültiger Docker-Projektname: ${value}" >&2
-    exit 2
-  }
-  set_env "$key" "$value"
-  printf '  %-28s %s\n' "$key" "$value"
-}
 ask_url() {
   local key="$1" label="$2" default="$3" value
   if [[ "$MODE" == defaults ]]; then
@@ -141,9 +128,12 @@ fi
 set_env APP_ENV "$APP_ENV"
 set_env APP_DEBUG "$APP_DEBUG"
 set_env OCTANE_HTTPS "$OCTANE_HTTPS_DEFAULT"
+set_env APP_NAME Pfarrplaner
+set_env COMPOSE_PROJECT_NAME pfarrplaner
 echo "Pfarrplaner-Startkonfiguration (${TARGET})"
-ask_project_name
 ask_url APP_URL 'Öffentliche URL oder Host' "$APP_URL_DEFAULT"
+ask APP_PROVIDER 'Bezeichnung des Anbieters' Pfarrplaner
+ask APP_ADMINISTRATOR 'Administrator-E-Mail-Adresse' admin@localhost
 ask APP_PORT 'HTTP-Port' "$APP_PORT_DEFAULT"
 ask VITE_PORT 'Vite-Port' "$VITE_PORT_DEFAULT"
 set_env VITE_HMR_CLIENT_PORT "$(grep '^VITE_PORT=' .env | cut -d= -f2-)"
@@ -165,7 +155,7 @@ set_random_secret PUSHER_APP_SECRET
 mkdir -p src/storage/app src/storage/framework/{cache,sessions,views} src/storage/logs src/bootstrap/cache
 chmod +x planer scripts/*.sh 2>/dev/null || true
 if [[ "$TARGET" == prod ]]; then
-  echo 'Pfarrplaner ist für die Produktion vorbereitet. Starte mit ./planer prod up --build.'
+  echo 'Pfarrplaner ist für die Produktion vorbereitet. Starte mit ./planer up -d --build.'
 else
-  echo 'Pfarrplaner ist vorbereitet. Starte die Entwicklungsumgebung mit ./planer up --build.'
+  echo 'Pfarrplaner ist vorbereitet. Starte die Entwicklungsumgebung mit ./planer dev up -d --build.'
 fi

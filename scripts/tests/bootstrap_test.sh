@@ -14,14 +14,23 @@ done
 PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" "$ROOT/scripts/bootstrap.sh" --defaults >/dev/null
 test -s "$TEST_ROOT/.env"
 grep -q '^APP_KEY=base64:' "$TEST_ROOT/.env"
-grep -q '^APP_ENV=local$' "$TEST_ROOT/.env"
+grep -q '^APP_ENV=production$' "$TEST_ROOT/.env"
 grep -q '^COMPOSE_PROJECT_NAME=pfarrplaner$' "$TEST_ROOT/.env"
-grep -q '^APP_URL=http://localhost:8180$' "$TEST_ROOT/.env"
+grep -q '^APP_URL=https://localhost$' "$TEST_ROOT/.env"
 grep -q '^OCTANE_HTTPS=false$' "$TEST_ROOT/.env"
+grep -q '^APP_PROVIDER=Pfarrplaner$' "$TEST_ROOT/.env"
 grep -q '^MAIL_DRIVER=smtp$' "$TEST_ROOT/.env"
+grep -q '^APP_PORT=8080$' "$TEST_ROOT/.env"
+grep -q '^VITE_PORT=5173$' "$TEST_ROOT/.env"
+grep -B1 '^APP_URL=' "$TEST_ROOT/.env" | grep -q 'Public URL'
+
+rm "$TEST_ROOT/.env"
+PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" "$ROOT/scripts/bootstrap.sh" --dev --defaults >/dev/null
+grep -q '^APP_ENV=local$' "$TEST_ROOT/.env"
+grep -q '^APP_URL=http://localhost:8180$' "$TEST_ROOT/.env"
 grep -q '^APP_PORT=8180$' "$TEST_ROOT/.env"
 grep -q '^VITE_PORT=5273$' "$TEST_ROOT/.env"
-grep -B1 '^APP_URL=' "$TEST_ROOT/.env" | grep -q 'Public URL'
+grep -q '^COMPOSE_PROJECT_NAME=pfarrplaner$' "$TEST_ROOT/.env"
 
 rm "$TEST_ROOT/.env"
 PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" "$ROOT/scripts/bootstrap.sh" --prod --defaults >/dev/null
