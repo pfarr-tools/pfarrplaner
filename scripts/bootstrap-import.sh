@@ -6,7 +6,7 @@ cd "$ROOT"
 
 ask() {
   local label="$1" default="$2" value
-  read -r -p "$label [$default]: " value < /dev/tty || { echo 'Abbruch: Interaktive Eingabe nicht verfügbar.' >&2; exit 2; }
+  read -e -r -i "$default" -p "$label [$default]: " value < /dev/tty || { echo 'Abbruch: Interaktive Eingabe nicht verfügbar.' >&2; exit 2; }
   printf '%s' "${value:-$default}"
 }
 
@@ -68,7 +68,11 @@ if [[ -z "$mode" ]]; then
   if [[ "${PLANER_BOOTSTRAP_MODE:-defaults}" == defaults ]]; then
     exit 0
   fi
-  mode="$(ask 'Datenquelle [none/backup/legacy]' none)"
+  PS3='Datenquelle wählen: '
+  select mode in none backup legacy; do
+    [[ -n "$mode" ]] && break
+    echo 'Bitte 1 (keine Daten), 2 (backup) oder 3 (legacy) wählen.' >&2
+  done < /dev/tty
 fi
 
 case "$mode" in

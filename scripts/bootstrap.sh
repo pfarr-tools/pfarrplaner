@@ -69,7 +69,7 @@ ask() {
   if [[ "$MODE" == defaults ]]; then
     value="$default"
   else
-    read -r -p "$label [$default]: " value < /dev/tty || {
+    read -e -r -i "$default" -p "$label [$default]: " value < /dev/tty || {
       echo 'Abbruch: interaktive Eingabe nicht verfügbar. Nutze --defaults.' >&2
       exit 2
     }
@@ -89,7 +89,7 @@ ask_url() {
   if [[ "$MODE" == defaults ]]; then
     value="$default"
   else
-    read -r -p "$label [$default]: " value < /dev/tty || {
+    read -e -r -i "$default" -p "$label [$default]: " value < /dev/tty || {
       echo 'Abbruch: interaktive Eingabe nicht verfügbar. Nutze --defaults.' >&2
       exit 2
     }

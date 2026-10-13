@@ -12,5 +12,6 @@ grep -q -- '--prod --confirm' "$IMPORT"
 grep -q -- '--apply --yes' "$IMPORT"
 grep -q 'PLANER_BOOTSTRAP_IMPORT_MODE' "$IMPORT"
 grep -qi 'keine Daten' "$IMPORT"
+grep -q 'select mode in none backup legacy' "$IMPORT"
 
 echo 'bootstrap import strategy tests passed'

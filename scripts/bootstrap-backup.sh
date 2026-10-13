@@ -148,9 +148,11 @@ configure_interactive() {
     local repository_yaml='' require_offsite=false count=0 local_count=0 remote_count=0 name type required required_answer path url key known_hosts password answer auth sftp_password secret_file
   while :; do
     ((count += 1))
-    read -r -p 'Typ [local/sftp] (local): ' type < /dev/tty
-    type="${type:-local}"
-    [[ "$type" == local || "$type" == sftp ]] || { echo 'Typ muss local oder sftp sein.' >&2; continue; }
+    PS3='Typ wählen: '
+    select type in local sftp; do
+      [[ -n "$type" ]] && break
+      echo 'Bitte 1 (local) oder 2 (sftp) wählen.' >&2
+    done < /dev/tty
     if [[ "$type" == local ]]; then
       name=local
       ((local_count += 1))
@@ -174,8 +176,11 @@ configure_interactive() {
       repository_yaml+="    path: ./backups/${path}"$'\n'
     else
       read -r -p 'SFTP-URL (sftp:BENUTZER@HOST:/absoluter/remote/pfad): ' url < /dev/tty
-      read -r -p 'SSH-Authentifizierung [key/password] (key): ' auth < /dev/tty
-      auth="${auth:-key}"
+      PS3='SSH-Authentifizierung wählen: '
+      select auth in key password; do
+        [[ -n "$auth" ]] && break
+        echo 'Bitte 1 (key) oder 2 (password) wählen.' >&2
+      done < /dev/tty
       configure_known_hosts "$url" "$name"
       known_hosts="$KNOWN_HOSTS_FILE"
       repository_yaml+="    url: $(yaml_value "$url")"$'\n'
@@ -213,7 +218,7 @@ if [[ "${PLANER_BOOTSTRAP_BACKUPS:-}" == fixture ]]; then
 elif [[ "${PLANER_BOOTSTRAP_MODE:-defaults}" == defaults ]]; then
   exit 0
 else
-  read -r -p 'Backups einrichten? [j/N]: ' enabled < /dev/tty
-  [[ "${enabled,,}" == j || "${enabled,,}" == ja ]] || exit 0
+  read -r -p 'Backups einrichten? [J/n]: ' enabled < /dev/tty
+  [[ -z "$enabled" || "${enabled,,}" == j || "${enabled,,}" == ja ]] || exit 0
   configure_interactive
 fi

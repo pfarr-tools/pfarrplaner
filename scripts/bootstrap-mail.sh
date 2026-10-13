@@ -19,7 +19,7 @@ set_env() {
 
 ask() {
   local label="$1" default="$2" value
-  read -r -p "$label [$default]: " value < /dev/tty || {
+  read -e -r -i "$default" -p "$label [$default]: " value < /dev/tty || {
     echo 'Abbruch: Interaktive Eingabe nicht verfügbar. Nutze --defaults.' >&2
     exit 2
   }
@@ -67,11 +67,17 @@ configure_disabled() {
 }
 
 configure_smtp() {
-  local host port scheme username password from_address from_name
+  local host port scheme scheme_choice username password from_address from_name
   host="$(ask 'SMTP-Host' smtp.example.org)"
   port="$(ask 'SMTP-Port' 587)"
   [[ "$port" =~ ^[0-9]+$ && 10#$port -ge 1 && 10#$port -le 65535 ]] || { echo 'Ungültiger SMTP-Port.' >&2; exit 2; }
-  scheme="$(ask 'SMTP-Schema (leer, smtp oder smtps)' '')"
+  PS3='SMTP-Schema wählen: '
+  select scheme_choice in auto smtp smtps; do
+    [[ -n "$scheme_choice" ]] && break
+    echo 'Bitte 1 (auto), 2 (smtp) oder 3 (smtps) wählen.' >&2
+  done < /dev/tty
+  scheme=''
+  [[ "$scheme_choice" == smtp || "$scheme_choice" == smtps ]] && scheme="$scheme_choice"
   username="$(ask 'SMTP-Benutzername (leer möglich)' '')"
   password=''
   [[ -z "$username" ]] || password="$(ask_secret 'SMTP-Passwort')"
@@ -90,14 +96,17 @@ configure_smtp() {
 }
 
 configure_postfix() {
-  local domain hostname selector mode relay_host relay_username relay_password from_address from_name dns_file
+  local domain hostname selector delivery_mode relay_host relay_username relay_password from_address from_name dns_file
   domain="$(ask 'Erlaubte Absenderdomain' example.org)"
   hostname="$(ask 'Öffentlicher Mailhostname' "mail.${domain}")"
   selector="$(ask 'DKIM-Selector' dockermail)"
-  mode="$(ask 'Zustellung [direct/relay]' direct)"
-  [[ "$mode" == direct || "$mode" == relay ]] || { echo 'Zustellung muss direct oder relay sein.' >&2; exit 2; }
+  PS3='Zustellung wählen: '
+  select delivery_mode in direct relay; do
+    [[ -n "$delivery_mode" ]] && break
+    echo 'Bitte 1 (direct) oder 2 (relay) wählen.' >&2
+  done < /dev/tty
   relay_host=''; relay_username=''; relay_password=''
-  if [[ "$mode" == relay ]]; then
+  if [[ "$delivery_mode" == relay ]]; then
     relay_host="$(ask 'SMTP-Relay (z. B. [smtp.example.org]:587)' '')"
     relay_username="$(ask 'Relay-Benutzername' '')"
     relay_password="$(ask_secret 'Relay-Passwort')"
@@ -124,7 +133,7 @@ configure_postfix() {
   set_env DKIM_SELECTOR "$selector"
   set_env MAIL_RELAY_HOST "$relay_host"
   set_env MAIL_RELAY_USERNAME "$relay_username"
-  set_env MAIL_RELAY_TLS_LEVEL "$([[ "$mode" == relay ]] && echo encrypt || echo may)"
+  set_env MAIL_RELAY_TLS_LEVEL "$([[ "$delivery_mode" == relay ]] && echo encrypt || echo may)"
   if [[ "${PLANER_BOOTSTRAP_MAIL_MODE:-}" != fixture ]]; then
     dns_file="$(generate_dkim_key "$domain" "$selector")"
     echo "DKIM-DNS-Eintrag: $(tr '\n' ' ' < "$dns_file")"
@@ -136,7 +145,11 @@ if [[ -z "$mode" ]]; then
   if [[ "${PLANER_BOOTSTRAP_MODE:-defaults}" == defaults ]]; then
     mode=disabled
   else
-    mode="$(ask 'Mailmodus [smtp/postfix/disabled]' postfix)"
+    PS3='Mailmodus wählen: '
+    select mode in smtp postfix disabled; do
+      [[ -n "$mode" ]] && break
+      echo 'Bitte 1 (smtp), 2 (postfix) oder 3 (disabled) wählen.' >&2
+    done < /dev/tty
   fi
 fi
 
