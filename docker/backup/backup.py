@@ -13,6 +13,7 @@ import fcntl
 import hashlib
 import json
 import os
+import posixpath
 import re
 import shutil
 import signal
@@ -191,6 +192,101 @@ def sftp_target(url: str) -> tuple[str, str, int | None]:
             fail(f"Ungültige SFTP-URL: {url}")
         port = int(port_text)
     return user, host, port
+
+
+def sftp_path(url: str) -> str:
+    if url.startswith("sftp://"):
+        path = urlparse(url).path
+        return path[1:] if path.startswith("//") else path
+    _, separator, path = url[5:].partition(":")
+    if not separator or not path.startswith("/"):
+        fail(f"Ungültiger absoluter SFTP-Pfad: {url}")
+    return path
+
+
+def sftp_connection(repo: dict):
+    import paramiko
+
+    known_hosts = path_in_container(repo["known_hosts"])
+    if not known_hosts.is_file():
+        fail(f"SFTP-Sle: SSH-Datei fehlt ({known_hosts}).")
+    user, host, port = sftp_target(repo["url"])
+    client = paramiko.SSHClient()
+    try:
+        client.load_host_keys(str(known_hosts))
+        client.set_missing_host_key_policy(paramiko.RejectPolicy())
+        options = {
+            "hostname": host,
+            "port": port or 22,
+            "username": user,
+            "look_for_keys": False,
+            "allow_agent": False,
+            "timeout": 15,
+            "banner_timeout": 15,
+            "auth_timeout": 15,
+        }
+        if repo.get("ssh_key"):
+            key = path_in_container(repo["ssh_key"])
+            if not key.is_file():
+                fail(f"SFTP-Sle: SSH-Datei fehlt ({key}).")
+            options["key_filename"] = str(key)
+        else:
+            password = path_in_container(repo["ssh_password_file"])
+            if not password.is_file():
+                fail(f"SFTP-Sle: Passwortdatei fehlt ({password}).")
+            options["password"] = password.read_text(encoding="utf-8")
+        client.connect(**options)
+        return client, client.open_sftp()
+    except Exception as exc:
+        client.close()
+        fail(f"SFTP-Verbindung fehlgeschlagen: {exc}")
+
+
+def repository_exists(repo: dict) -> bool:
+    if repo["type"] == "local":
+        return (path_in_container(repo["path"]) / "config").is_file()
+    client, sftp = sftp_connection(repo)
+    try:
+        try:
+            sftp.stat(posixpath.join(sftp_path(repo["url"]), "config"))
+            return True
+        except OSError:
+            return False
+    finally:
+        sftp.close()
+        client.close()
+
+
+def remove_sftp_tree(sftp, path: str) -> None:
+    for entry in sftp.listdir_attr(path):
+        child = posixpath.join(path, entry.filename)
+        if stat.S_ISDIR(entry.st_mode):
+            remove_sftp_tree(sftp, child)
+            sftp.rmdir(child)
+        else:
+            sftp.remove(child)
+
+
+def replace_repository(repo: dict) -> None:
+    if repo["type"] == "local":
+        path = path_in_container(repo["path"])
+        for child in path.iterdir():
+            shutil.rmtree(child) if child.is_dir() else child.unlink()
+        return
+    client, sftp = sftp_connection(repo)
+    try:
+        remove_sftp_tree(sftp, sftp_path(repo["url"]))
+    finally:
+        sftp.close()
+        client.close()
+
+
+def confirm_repository_replacement(name: str) -> bool:
+    try:
+        answer = input(f"{name}: Restic-Repository existiert bereits. Ersetzen? [j/N] ")
+    except EOFError:
+        fail(f"{name}: Ersetzen erfordert eine interaktive Bestätigung (j/ja).")
+    return answer.strip().lower() in {"j", "ja", "y", "yes"}
 
 
 def password_file(password: str) -> tuple[Path, dict[str, str]]:
@@ -414,16 +510,17 @@ def init_repositories(config: dict, target: str | None) -> None:
     for name, repo in selected(config, target):
         print(f"{name}: initialisiere...", flush=True)
         try:
-            restic(repo, ["snapshots", "--no-lock"])
-            print(f"{name}: bereits initialisiert")
-        except BackupError:
-            try:
-                restic(repo, ["init"])
-                print(f"{name}: initialisiert")
-            except BackupError as exc:
-                if repo.get("required"):
-                    failures.append(name)
-                print(f"{name}: WARNUNG: Initialisierung fehlgeschlagen: {exc}", file=sys.stderr)
+            if repository_exists(repo):
+                if not confirm_repository_replacement(name):
+                    raise BackupError("Ersetzen nicht bestätigt.")
+                replace_repository(repo)
+                print(f"{name}: vorhandenes Repository ersetzt")
+            restic(repo, ["init"])
+            print(f"{name}: initialisiert")
+        except BackupError as exc:
+            if repo.get("required"):
+                failures.append(name)
+            print(f"{name}: WARNUNG: Initialisierung fehlgeschlagen: {exc}", file=sys.stderr)
     if failures:
         fail("Erforderliche Backup-Ziele konnten nicht initialisiert werden: " + ", ".join(failures))
 

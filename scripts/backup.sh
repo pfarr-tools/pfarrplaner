@@ -33,7 +33,7 @@ EOF
 
 run_backup() {
   if [[ "${1:-}" == init ]]; then
-    "${COMPOSE[@]}" run --build --rm --no-deps -T backup "$@"
+    "${COMPOSE[@]}" run --build --rm --no-deps backup "$@"
   else
     "${COMPOSE[@]}" run --rm --no-deps -T backup "$@"
   fi

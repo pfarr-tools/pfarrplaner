@@ -17,7 +17,7 @@ RUN apt-get update \
  && curl -fsSL "https://github.com/minio/mc/releases/download/${MC_VERSION}/mc.linux-${mc_arch}.${MC_VERSION}" -o /usr/local/bin/mc \
  && chmod 0755 /usr/local/bin/mc
 
-RUN pip install --no-cache-dir PyYAML==6.0.2
+RUN pip install --no-cache-dir PyYAML==6.0.2 paramiko==4.0.0
 
 WORKDIR /workspace
 COPY docker/backup/backup.py /usr/local/lib/pfarrplaner-backup/backup.py

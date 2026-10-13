@@ -94,6 +94,11 @@ die Produktionsdienste gestartet:
 ./planer status
 ```
 
+Beim Einrichten der Backup-Ziele prüft `./planer backup init`, ob ein Ziel
+bereits ein Restic-Repository enthält. Ein vorhandenes Ziel wird nur nach der
+Bestätigung `j` oder `ja` ersetzt; Enter bedeutet „Nein“. Ohne diese
+Bestätigung bleiben die vorhandenen Backup-Daten unverändert.
+
 Falls eine Laravel-Installation oder Migration im laufenden Container nötig ist,
 wird sie mit `./planer exec app php artisan ...` ausgeführt. Entwicklung wird
 immer über `./planer dev ...` angesprochen. Die produktive

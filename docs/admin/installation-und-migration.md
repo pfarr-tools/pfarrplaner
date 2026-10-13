@@ -139,9 +139,17 @@ monatliche Snapshots sind der Standard. `create` löscht niemals alte Backups.
 ./planer backup verify
 ./planer backup prune
 ./planer backup check
+./planer backup init
 ./planer backup restore 20261012T030000Z --target offsite
 ./planer backup create
 ```
+
+`./planer backup init` prüft vor der Initialisierung jedes aktivierten Ziels,
+ob dort bereits ein Restic-Repository liegt. In diesem Fall wird das Ziel nur
+nach der ausdrücklichen Bestätigung `j` oder `ja` (alternativ `y` oder `yes`)
+geleert und neu initialisiert. Die Voreinstellung ist „Nein“; Enter oder eine
+andere Eingabe bricht die Ersetzung ab. Vorhandene Backup-Daten werden dabei
+nicht verändert. Das gilt auch für SFTP-Ziele.
 
 `restore` schreibt standardmäßig in ein separates Verzeichnis. Ein Anwenden auf
 eine laufende Installation ist erst mit `--apply --yes`, einer vorherigen
