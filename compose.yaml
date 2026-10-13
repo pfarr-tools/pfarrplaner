@@ -18,7 +18,7 @@ x-app: &app
   depends_on:
     mariadb: {condition: service_healthy}
     redis: {condition: service_healthy}
-    minio: {condition: service_started}
+    create-buckets: {condition: service_completed_successfully}
   networks: [pfarrplaner]
 
 services:
@@ -99,7 +99,9 @@ services:
     volumes: [minio_data:/data]
     networks: [pfarrplaner]
   create-buckets:
-    image: ghcr.io/golithus/mc:latest
+    build:
+      context: .
+      dockerfile: docker/minio-init/Dockerfile
     env_file:
       - path: .env
         required: false
