@@ -23,7 +23,7 @@ import sys
 import tempfile
 import time
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 try:
     import yaml
@@ -172,6 +172,27 @@ def repo_path(repo: dict) -> str:
     return repo["url"]
 
 
+def sftp_target(url: str) -> tuple[str, str, int | None]:
+    if url.startswith("sftp://"):
+        parsed = urlparse(url)
+        if not parsed.username or not parsed.hostname:
+            fail(f"Ungültige SFTP-URL: {url}")
+        return parsed.username, parsed.hostname, parsed.port
+    if not url.startswith("sftp:"):
+        fail(f"Ungültige SFTP-URL: {url}")
+    authority, separator, remote_path = url[5:].partition(":")
+    if not separator or "@" not in authority:
+        fail(f"Ungültige SFTP-URL: {url}")
+    user, host = authority.rsplit("@", 1)
+    port = None
+    if remote_path and not remote_path.startswith("/"):
+        port_text, separator, _ = remote_path.partition("/")
+        if not separator or not port_text.isdigit():
+            fail(f"Ungültige SFTP-URL: {url}")
+        port = int(port_text)
+    return user, host, port
+
+
 def password_file(password: str) -> tuple[Path, dict[str, str]]:
     fd, name = tempfile.mkstemp(prefix="restic-password-", dir="/tmp")
     path = Path(name)
@@ -185,6 +206,7 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
     password, env = password_file(repo["password"])
     temporary_paths = [password]
     try:
+        restic_options: list[str] = []
         if repo["type"] == "sftp":
             known_hosts = path_in_container(repo["known_hosts"])
             if not known_hosts.is_file():
@@ -197,17 +219,16 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
                 "-o ServerAliveInterval=15 "
                 "-o ServerAliveCountMax=2"
             )
-            fd, name = tempfile.mkstemp(prefix="restic-ssh-wrapper-", dir="/tmp")
-            os.close(fd)
-            ssh_wrapper = Path(name)
-            ssh_wrapper.chmod(0o700)
-            temporary_paths.append(ssh_wrapper)
+            user, host, port = sftp_target(repo["url"])
+            ssh_target = f"-l {shlex.quote(user)} {shlex.quote(host)}"
+            if port:
+                ssh_target = f"-p {port} {ssh_target}"
             if repo.get("ssh_key"):
                 key = path_in_container(repo["ssh_key"])
                 if not key.is_file():
                     fail(f"SFTP-sle: SSH-Datei fehlt ({key}).")
                 ssh_command = (
-                    f"ssh -i {shlex.quote(str(key))} {ssh_common_options}"
+                    f"ssh -i {shlex.quote(str(key))} {ssh_common_options} {ssh_target} -s sftp"
                 )
             else:
                 ssh_password_path = path_in_container(repo["ssh_password_file"])
@@ -217,12 +238,12 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
                     f"sshpass -f {shlex.quote(str(ssh_password_path))} ssh {ssh_common_options} "
                     "-o PreferredAuthentications=password,keyboard-interactive "
                     "-o PubkeyAuthentication=no "
-                    "-o NumberOfPasswordPrompts=1"
+                    f"-o NumberOfPasswordPrompts=1 {ssh_target} -s sftp"
                 )
-            ssh_wrapper.write_text(f"#!/bin/sh\nexec {ssh_command} \"$@\"\n", encoding="utf-8")
-            env["RESTIC_SSH_COMMAND"] = str(ssh_wrapper)
+            restic_options = ["-o", f"sftp.command={ssh_command}"]
         env["RESTIC_CACHE_DIR"] = "/tmp/restic-cache"
-        return run(["restic", "--repo", repo_path(repo), *args], env={**os.environ, **env}, cwd=cwd, capture=True)
+        return run(["restic", *restic_options, "--repo", repo_path(repo), *args],
+                   env={**os.environ, **env}, cwd=cwd, capture=True)
     finally:
         for path in temporary_paths:
             path.unlink(missing_ok=True)
