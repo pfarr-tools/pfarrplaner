@@ -98,7 +98,7 @@ configure_defaults_fixture() {
 }
 
 configure_interactive() {
-    local repository_yaml='' require_offsite=false count=0 name type required required_answer path url key known_hosts password answer
+    local repository_yaml='' require_offsite=false count=0 name type required required_answer path url key known_hosts password answer auth sftp_password secret_file
   while :; do
     ((count += 1))
     read -r -p "Backup-Ziel ${count} Name: " name < /dev/tty
@@ -119,11 +119,30 @@ configure_interactive() {
       mkdir -p "backups/$path"
       repository_yaml+="    path: ./backups/${path}"$'\n'
     else
-      read -r -p 'SFTP-URL: ' url < /dev/tty
-      read -r -p 'SSH-Key unter secrets/: ' key < /dev/tty
+      read -r -p 'SFTP-URL (sftp:BENUTZER@HOST:/absoluter/remote/pfad): ' url < /dev/tty
+      read -r -p 'SSH-Authentifizierung [key/password] (key): ' auth < /dev/tty
+      auth="${auth:-key}"
       read -r -p 'known_hosts unter secrets/: ' known_hosts < /dev/tty
-      [[ -f "secrets/$key" && -f "secrets/$known_hosts" ]] || { echo 'SSH-Key und known_hosts müssen unter secrets/ vorhanden sein.' >&2; return 2; }
-      repository_yaml+="    url: $(yaml_value "$url")"$'\n'"    ssh_key: /run/secrets/${key}"$'\n'"    known_hosts: /run/secrets/${known_hosts}"$'\n'
+      [[ -f "secrets/$known_hosts" ]] || { echo 'known_hosts muss unter secrets/ vorhanden sein.' >&2; return 2; }
+      repository_yaml+="    url: $(yaml_value "$url")"$'\n'
+      if [[ "$auth" == key ]]; then
+        read -r -p 'SSH-Key unter secrets/: ' key < /dev/tty
+        [[ -f "secrets/$key" ]] || { echo 'SSH-Key muss unter secrets/ vorhanden sein.' >&2; return 2; }
+        repository_yaml+="    ssh_key: /run/secrets/${key}"$'\n'
+      elif [[ "$auth" == password ]]; then
+        read -r -s -p 'SFTP-Passwort: ' sftp_password < /dev/tty
+        printf '\n' > /dev/tty
+        [[ -n "$sftp_password" ]] || { echo 'SFTP-Passwort darf nicht leer sein.' >&2; return 2; }
+        mkdir -p secrets
+        secret_file="${name}-sftp-password"
+        umask 077
+        printf '%s' "$sftp_password" > "secrets/$secret_file"
+        repository_yaml+="    ssh_password_file: /run/secrets/${secret_file}"$'\n'
+      else
+        echo 'SSH-Authentifizierung muss key oder password sein.' >&2
+        return 2
+      fi
+      repository_yaml+="    known_hosts: /run/secrets/${known_hosts}"$'\n'
       [[ "$required" == true ]] && require_offsite=true
     fi
     repository_yaml+="    password: $(yaml_value "$password")"$'\n\n'

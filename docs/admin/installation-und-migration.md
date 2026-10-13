@@ -149,9 +149,12 @@ Sicherheitskopie und quieszierten Diensten zulässig. Die Wiederherstellung
 benötigt nur ein einzelnes Offsite-Repository und niemals alte Spatie-Archive.
 `backup.yaml`, Restic-Passwörter und SSH-Dateien müssen für einen Notfall
 zusätzlich außerhalb des Systems verwahrt werden.
-SSH-Schlüssel und `known_hosts` werden aus dem projektbezogenen `secrets/`
-Verzeichnis nach `/run/secrets/` eingehängt; sie müssen auf dem Host dem
-Backup-Benutzer gehören und dürfen nicht gruppen- oder weltweit lesbar sein.
+SSH-Schlüssel oder eine SFTP-Passwortdatei sowie `known_hosts` werden aus dem
+projektbezogenen `secrets/`-Verzeichnis nach `/run/secrets/` eingehängt; sie
+müssen auf dem Host dem Backup-Benutzer gehören und dürfen nicht gruppen- oder
+weltweit lesbar sein. Bei Passwort-Anmeldung verwaltet der Backup-Dienst das
+Passwort über `SSH_ASKPASS`; es gehört weder in die SFTP-URL noch in
+`backup.yaml`.
 
 Für Cron reichen Docker Compose, eine POSIX-Shell und der Projektzugriff auf dem
 Host; Restic, `mariadb-dump`, `mc`, SSH und der YAML-Parser befinden sich im

@@ -16,6 +16,7 @@ import os
 import re
 import shutil
 import signal
+import shlex
 import stat
 import subprocess
 import sys
@@ -107,7 +108,7 @@ def load_config() -> dict:
     for name, repo in repos.items():
         if not isinstance(name, str) or not name or not isinstance(repo, dict):
             fail("Repository-Namen und -Werte müssen gültig sein.")
-        ensure_keys(repo, {"type", "enabled", "required", "path", "password", "url", "ssh_key", "known_hosts"}, f"repositories.{name}")
+        ensure_keys(repo, {"type", "enabled", "required", "path", "password", "url", "ssh_key", "ssh_password_file", "known_hosts"}, f"repositories.{name}")
         if repo.get("type") not in ("local", "sftp"):
             fail(f"Repository {name}: nur local und sftp werden unterstützt.")
         if not isinstance(repo.get("enabled"), bool) or not isinstance(repo.get("required"), bool):
@@ -117,9 +118,11 @@ def load_config() -> dict:
         if repo["enabled"] and repo["type"] == "local" and not repo.get("path"):
             fail(f"Repository {name}: lokaler Pfad fehlt.")
         if repo["enabled"] and repo["type"] == "sftp":
-            for key in ("url", "ssh_key", "known_hosts"):
+            for key in ("url", "known_hosts"):
                 if not repo.get(key):
                     fail(f"Repository {name}: {key} fehlt.")
+            if bool(repo.get("ssh_key")) == bool(repo.get("ssh_password_file")):
+                fail(f"Repository {name}: genau eine SSH-Authentifizierung (ssh_key oder ssh_password_file) muss gesetzt sein.")
     enabled = [r for r in repos.values() if r.get("enabled")]
     if not enabled:
         fail("Mindestens ein Repository muss aktiviert sein.")
@@ -180,20 +183,54 @@ def password_file(password: str) -> tuple[Path, dict[str, str]]:
 
 def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
     password, env = password_file(repo["password"])
+    temporary_paths = [password]
     try:
         if repo["type"] == "sftp":
-            key = path_in_container(repo["ssh_key"])
             known_hosts = path_in_container(repo["known_hosts"])
-            if not key.is_file() or not known_hosts.is_file():
-                fail(f"SFTP-sle: SSH-Dateien fehlen ({key}, {known_hosts}).")
-            env["RESTIC_SSH_COMMAND"] = (
-                f"ssh -i {key} -o UserKnownHostsFile={known_hosts} "
-                "-o StrictHostKeyChecking=yes"
-            )
+            if not known_hosts.is_file():
+                fail(f"SFTP-sle: SSH-Datei fehlt ({known_hosts}).")
+            if repo.get("ssh_key"):
+                key = path_in_container(repo["ssh_key"])
+                if not key.is_file():
+                    fail(f"SFTP-sle: SSH-Datei fehlt ({key}).")
+                env["RESTIC_SSH_COMMAND"] = (
+                    f"ssh -i {key} -o UserKnownHostsFile={known_hosts} "
+                    "-o StrictHostKeyChecking=yes"
+                )
+            else:
+                ssh_password_path = path_in_container(repo["ssh_password_file"])
+                if not ssh_password_path.is_file():
+                    fail(f"SFTP-Sle: Passwortdatei fehlt ({ssh_password_path}).")
+                fd, name = tempfile.mkstemp(prefix="restic-ssh-password-", dir="/tmp")
+                os.close(fd)
+                askpass_password = Path(name)
+                askpass_password.chmod(0o600)
+                askpass_password.write_text(ssh_password_path.read_text(encoding="utf-8"), encoding="utf-8")
+                fd, name = tempfile.mkstemp(prefix="restic-ssh-askpass-", dir="/tmp")
+                os.close(fd)
+                askpass_script = Path(name)
+                askpass_script.chmod(0o700)
+                askpass_script.write_text(
+                    f"#!/bin/sh\ncat {shlex.quote(str(askpass_password))}\n",
+                    encoding="utf-8",
+                )
+                temporary_paths.extend((askpass_password, askpass_script))
+                env.update({
+                    "DISPLAY": ":0",
+                    "SSH_ASKPASS": str(askpass_script),
+                    "SSH_ASKPASS_REQUIRE": "force",
+                    "RESTIC_SSH_COMMAND": (
+                        f"ssh -o UserKnownHostsFile={known_hosts} "
+                        "-o StrictHostKeyChecking=yes "
+                        "-o PreferredAuthentications=password,keyboard-interactive "
+                        "-o PubkeyAuthentication=no"
+                    ),
+                })
         env["RESTIC_CACHE_DIR"] = "/tmp/restic-cache"
         return run(["restic", "--repo", repo_path(repo), *args], env={**os.environ, **env}, cwd=cwd, capture=True)
     finally:
-        password.unlink(missing_ok=True)
+        for path in temporary_paths:
+            path.unlink(missing_ok=True)
 
 
 def lock() -> object:

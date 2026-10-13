@@ -56,6 +56,8 @@ repositories:
     url: sftp:backup-user@backup.example.net:/backups/pfarrplaner/restic
     password: REPLACE_WITH_ANOTHER_STRONG_UNIQUE_RESTIC_PASSWORD
     ssh_key: /run/secrets/id_ed25519
+    # Alternativ zur Schlüsseldatei: Passwortdatei unter /run/secrets/.
+    # ssh_password_file: /run/secrets/offsite-sftp-password
     known_hosts: /run/secrets/known_hosts
 
 retention:
