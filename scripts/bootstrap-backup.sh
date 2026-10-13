@@ -100,7 +100,7 @@ configure_defaults_fixture() {
 configure_interactive() {
     local repository_yaml='' require_offsite=false count=0 name type required required_answer path url key known_hosts password answer
   while :; do
-    ((count++))
+    ((count += 1))
     read -r -p "Backup-Ziel ${count} Name: " name < /dev/tty
     [[ "$name" =~ ^[a-z0-9][a-z0-9_-]*$ ]] || { echo 'Ungültiger Zielname.' >&2; continue; }
     grep -q "^  ${name}:$" <<<"$repository_yaml" && { echo 'Zielname bereits vergeben.' >&2; continue; }

@@ -12,7 +12,9 @@ from pathlib import Path
 import re
 import sys
 
-assert not re.search(r'repository_yaml+="[^"]*\\n', Path(sys.argv[1]).read_text())
+source = Path(sys.argv[1]).read_text()
+assert not re.search(r'repository_yaml+="[^"]*\\n', source)
+assert '((count += 1))' in source
 PY
 grep -q 'profiles: \[tools\]' "$ROOT/compose.yaml"
 grep -q 'profiles: \[tools\]' "$ROOT/compose.production.yaml"
