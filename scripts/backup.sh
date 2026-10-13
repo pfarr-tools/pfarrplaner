@@ -27,7 +27,7 @@ EOF
 }
 
 [[ -f "$ROOT/backup.yaml" ]] || {
-  echo 'Fehler: ./backup.yaml fehlt. Kopiere backup-example.yaml und setze chmod 600.' >&2
+  echo 'Backups sind nicht konfiguriert: ./backup.yaml fehlt. Führe ./planer bootstrap erneut mit Backup-Zielen aus.' >&2
   exit 2
 }
 
