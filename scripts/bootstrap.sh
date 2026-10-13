@@ -157,6 +157,9 @@ mkdir -p src/storage/app src/storage/framework/{cache,sessions,views} src/storag
 if [[ "$TARGET" == prod ]]; then
   PLANER_BOOTSTRAP_MODE="$MODE" PLANER_BOOTSTRAP_ROOT="$ROOT" "$SCRIPT_ROOT/scripts/bootstrap-backup.sh"
   PLANER_BOOTSTRAP_MODE="$MODE" PLANER_BOOTSTRAP_ROOT="$ROOT" "$SCRIPT_ROOT/scripts/bootstrap-mail.sh"
+  if [[ "$MODE" == interactive ]]; then
+    PLANER_BOOTSTRAP_MODE="$MODE" PLANER_BOOTSTRAP_ROOT="$ROOT" "$SCRIPT_ROOT/scripts/bootstrap-import.sh"
+  fi
 fi
 chmod 600 .env
 chmod +x planer scripts/*.sh 2>/dev/null || true
