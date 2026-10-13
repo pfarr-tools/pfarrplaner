@@ -125,7 +125,7 @@ cp .env.example .env
 if [[ "$TARGET" == prod ]]; then
   APP_ENV=production
   APP_DEBUG=false
-  OCTANE_HTTPS_DEFAULT=true
+  OCTANE_HTTPS_DEFAULT=false
   APP_PORT_DEFAULT=8080
   VITE_PORT_DEFAULT=5173
   APP_URL_DEFAULT=https://localhost

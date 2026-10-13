@@ -24,7 +24,7 @@ grep -q '^APP_ENV=production$' "$TEST_ROOT/.env"
 grep -q '^COMPOSE_PROJECT_NAME=pfarrplaner$' "$TEST_ROOT/.env"
 grep -q '^APP_DEBUG=false$' "$TEST_ROOT/.env"
 grep -q '^APP_URL=https://localhost$' "$TEST_ROOT/.env"
-grep -q '^OCTANE_HTTPS=true$' "$TEST_ROOT/.env"
+grep -q '^OCTANE_HTTPS=false$' "$TEST_ROOT/.env"
 grep -q '^MAIL_DRIVER=smtp$' "$TEST_ROOT/.env"
 grep -B1 '^APP_URL=' "$TEST_ROOT/.env" | grep -q 'Public URL'
 

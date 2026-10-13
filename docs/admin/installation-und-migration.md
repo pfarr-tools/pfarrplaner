@@ -38,9 +38,12 @@ geeignet; mit `--prod --defaults` werden synthetische Produktionsdefaults
 verwendet. Vor dem öffentlichen Betrieb müssen insbesondere `APP_URL`,
 Backup-Ziel, Mail-Relay und `HORIZON_ALLOWED_EMAILS` geprüft werden. Die
 kommentierte `.env.example` ist die vollständige Referenz aller Einstellungen.
-Im Produktionsmodus setzt das Bootstrap außerdem `OCTANE_HTTPS=true`, damit
-Laravel hinter einem externen TLS-Reverse-Proxy sichere absolute Asset- und
-Anwendungs-URLs erzeugt. Für mehrere Instanzen auf einem Server fragt das
+Im Produktionsmodus setzt das Bootstrap `OCTANE_HTTPS=false`, weil Pfarrplaner
+typischerweise hinter einem externen TLS-Reverse-Proxy betrieben wird. Der
+Reverse Proxy terminiert TLS; die interne Verbindung zwischen Proxy, Caddy und
+Octane bleibt HTTP. Wenn die konkrete Topologie eine direkte HTTPS-Verbindung
+bis zu Octane benötigt, muss `OCTANE_HTTPS=true` ausdrücklich in `.env` gesetzt
+werden. Für mehrere Instanzen auf einem Server fragt das
 Bootstrap den Docker-Projektnamen ab; er muss pro Instanz eindeutig sein. Der
 Default ist `pfarrplaner`.
 
