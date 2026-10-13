@@ -7,7 +7,7 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/bootstrap-ui.sh"
 
 ask() {
   local label="$1" default="$2" value
-  read -e -r -i "$default" -p "$label [$default]: " value < /dev/tty || { echo 'Abbruch: Interaktive Eingabe nicht verfügbar.' >&2; exit 2; }
+  value="$(ui_text "$label" "$default")" || exit 2
   printf '%s' "${value:-$default}"
 }
 
@@ -69,11 +69,7 @@ if [[ -z "$mode" ]]; then
   if [[ "${PLANER_BOOTSTRAP_MODE:-defaults}" == defaults ]]; then
     exit 0
   fi
-  PS3='Datenquelle wählen: '
-  select mode in none backup legacy; do
-    [[ -n "$mode" ]] && break
-    echo 'Bitte 1 (keine Daten), 2 (backup) oder 3 (legacy) wählen.' >&2
-  done < /dev/tty
+  mode="$(ui_choice 'Datenquelle wählen' 1 none backup legacy)"
 fi
 
 case "$mode" in

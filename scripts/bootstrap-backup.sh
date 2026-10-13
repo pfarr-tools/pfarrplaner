@@ -149,11 +149,7 @@ configure_interactive() {
     local repository_yaml='' require_offsite=false count=0 local_count=0 remote_count=0 name type required required_answer path url key known_hosts password answer auth sftp_password secret_file
   while :; do
     ((count += 1))
-    PS3='Typ wählen: '
-    select type in local sftp; do
-      [[ -n "$type" ]] && break
-      echo 'Bitte 1 (local) oder 2 (sftp) wählen.' >&2
-    done < /dev/tty
+    type="$(ui_choice 'Typ wählen' 1 local sftp)"
     if [[ "$type" == local ]]; then
       name=local
       ((local_count += 1))
@@ -177,11 +173,7 @@ configure_interactive() {
       repository_yaml+="    path: ./backups/${path}"$'\n'
     else
       read -r -p 'SFTP-URL (sftp:BENUTZER@HOST:/absoluter/remote/pfad): ' url < /dev/tty
-      PS3='SSH-Authentifizierung wählen: '
-      select auth in key password; do
-        [[ -n "$auth" ]] && break
-        echo 'Bitte 1 (key) oder 2 (password) wählen.' >&2
-      done < /dev/tty
+      auth="$(ui_choice 'SSH-Authentifizierung wählen' 1 key password)"
       configure_known_hosts "$url" "$name"
       known_hosts="$KNOWN_HOSTS_FILE"
       repository_yaml+="    url: $(yaml_value "$url")"$'\n'

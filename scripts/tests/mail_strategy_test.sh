@@ -30,9 +30,9 @@ grep -q "'default' => env('MAIL_MAILER'" "$MAIL_CONFIG"
 grep -q "'scheme' => env('MAIL_SCHEME')" "$MAIL_CONFIG"
 grep -q "'auto_tls' => env('MAIL_AUTO_TLS', true) ? 'true' : 'false'" "$MAIL_CONFIG"
 grep -q 'MAIL_POSTFIX_ENABLED' "$ROOT/scripts/bootstrap-mail.sh"
-grep -q 'select mode in smtp postfix disabled' "$ROOT/scripts/bootstrap-mail.sh"
-grep -q 'select delivery_mode in direct relay' "$ROOT/scripts/bootstrap-mail.sh"
-grep -q 'select scheme_choice in auto smtp smtps' "$ROOT/scripts/bootstrap-mail.sh"
+grep -q "ui_choice 'Mailmodus wählen' 2 smtp postfix disabled" "$ROOT/scripts/bootstrap-mail.sh"
+grep -q "ui_choice 'Zustellung wählen' 1 direct relay" "$ROOT/scripts/bootstrap-mail.sh"
+grep -q "ui_choice 'SMTP-Schema wählen' 1 auto smtp smtps" "$ROOT/scripts/bootstrap-mail.sh"
 
 mailables=()
 while IFS= read -r file; do mailables+=("$file"); done < <(find "$ROOT/src/app/Mail" -type f -name '*.php' -print)

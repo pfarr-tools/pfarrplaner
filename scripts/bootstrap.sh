@@ -70,11 +70,7 @@ ask() {
   if [[ "$MODE" == defaults ]]; then
     value="$default"
   else
-    read -e -r -i "$default" -p "$label [$default]: " value < /dev/tty || {
-      echo 'Abbruch: interaktive Eingabe nicht verfügbar. Nutze --defaults.' >&2
-      exit 2
-    }
-    value="${value:-$default}"
+    value="$(ui_text "$label" "$default")" || exit 2
   fi
   if [[ "$key" == *_PORT ]]; then
     [[ "$value" =~ ^[0-9]+$ ]] && (( 10#$value >= 1 && 10#$value <= 65535 )) || {
@@ -90,11 +86,7 @@ ask_url() {
   if [[ "$MODE" == defaults ]]; then
     value="$default"
   else
-    read -e -r -i "$default" -p "$label [$default]: " value < /dev/tty || {
-      echo 'Abbruch: interaktive Eingabe nicht verfügbar. Nutze --defaults.' >&2
-      exit 2
-    }
-    value="${value:-$default}"
+    value="$(ui_text "$label" "$default")" || exit 2
   fi
   if [[ "$value" != *://* ]]; then
     if [[ "$TARGET" == prod ]]; then

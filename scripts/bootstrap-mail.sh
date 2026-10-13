@@ -20,11 +20,7 @@ set_env() {
 
 ask() {
   local label="$1" default="$2" value
-  read -e -r -i "$default" -p "$label [$default]: " value < /dev/tty || {
-    echo 'Abbruch: Interaktive Eingabe nicht verfügbar. Nutze --defaults.' >&2
-    exit 2
-  }
-  printf '%s' "${value:-$default}"
+  ui_text "$label" "$default"
 }
 
 ask_secret() {
@@ -72,11 +68,7 @@ configure_smtp() {
   host="$(ask 'SMTP-Host' smtp.example.org)"
   port="$(ask 'SMTP-Port' 587)"
   [[ "$port" =~ ^[0-9]+$ && 10#$port -ge 1 && 10#$port -le 65535 ]] || { echo 'Ungültiger SMTP-Port.' >&2; exit 2; }
-  PS3='SMTP-Schema wählen: '
-  select scheme_choice in auto smtp smtps; do
-    [[ -n "$scheme_choice" ]] && break
-    echo 'Bitte 1 (auto), 2 (smtp) oder 3 (smtps) wählen.' >&2
-  done < /dev/tty
+  scheme_choice="$(ui_choice 'SMTP-Schema wählen' 1 auto smtp smtps)"
   scheme=''
   [[ "$scheme_choice" == smtp || "$scheme_choice" == smtps ]] && scheme="$scheme_choice"
   username="$(ask 'SMTP-Benutzername (leer möglich)' '')"
@@ -101,11 +93,7 @@ configure_postfix() {
   domain="$(ask 'Erlaubte Absenderdomain' example.org)"
   hostname="$(ask 'Öffentlicher Mailhostname' "mail.${domain}")"
   selector="$(ask 'DKIM-Selector' dockermail)"
-  PS3='Zustellung wählen: '
-  select delivery_mode in direct relay; do
-    [[ -n "$delivery_mode" ]] && break
-    echo 'Bitte 1 (direct) oder 2 (relay) wählen.' >&2
-  done < /dev/tty
+  delivery_mode="$(ui_choice 'Zustellung wählen' 1 direct relay)"
   relay_host=''; relay_username=''; relay_password=''
   if [[ "$delivery_mode" == relay ]]; then
     relay_host="$(ask 'SMTP-Relay (z. B. [smtp.example.org]:587)' '')"
@@ -146,11 +134,7 @@ if [[ -z "$mode" ]]; then
   if [[ "${PLANER_BOOTSTRAP_MODE:-defaults}" == defaults ]]; then
     mode=disabled
   else
-    PS3='Mailmodus wählen: '
-    select mode in smtp postfix disabled; do
-      [[ -n "$mode" ]] && break
-      echo 'Bitte 1 (smtp), 2 (postfix) oder 3 (disabled) wählen.' >&2
-    done < /dev/tty
+    mode="$(ui_choice 'Mailmodus wählen' 2 smtp postfix disabled)"
   fi
 fi
 
