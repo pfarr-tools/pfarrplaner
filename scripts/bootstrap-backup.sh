@@ -111,22 +111,22 @@ configure_interactive() {
     required=true
     [[ "${required_answer,,}" == n || "${required_answer,,}" == nein ]] && required=false
     password="$(random_password)"
-    repository_yaml+="  ${name}:\n    type: ${type}\n    enabled: true\n    required: ${required}\n"
+    repository_yaml+="  ${name}:"$'\n'"    type: ${type}"$'\n'"    enabled: true"$'\n'"    required: ${required}"$'\n'
     if [[ "$type" == local ]]; then
       read -r -p 'Relativer Pfad unter backups (restic): ' path < /dev/tty
       path="${path:-restic}"
       [[ "$path" != /* && "$path" != *..* ]] || { echo 'Lokaler Backup-Pfad muss relativ und innerhalb von backups liegen.' >&2; return 2; }
       mkdir -p "backups/$path"
-      repository_yaml+="    path: ./backups/${path}\n"
+      repository_yaml+="    path: ./backups/${path}"$'\n'
     else
       read -r -p 'SFTP-URL: ' url < /dev/tty
       read -r -p 'SSH-Key unter secrets/: ' key < /dev/tty
       read -r -p 'known_hosts unter secrets/: ' known_hosts < /dev/tty
       [[ -f "secrets/$key" && -f "secrets/$known_hosts" ]] || { echo 'SSH-Key und known_hosts müssen unter secrets/ vorhanden sein.' >&2; return 2; }
-      repository_yaml+="    url: $(yaml_value "$url")\n    ssh_key: /run/secrets/${key}\n    known_hosts: /run/secrets/${known_hosts}\n"
+      repository_yaml+="    url: $(yaml_value "$url")"$'\n'"    ssh_key: /run/secrets/${key}"$'\n'"    known_hosts: /run/secrets/${known_hosts}"$'\n'
       [[ "$required" == true ]] && require_offsite=true
     fi
-    repository_yaml+="    password: $(yaml_value "$password")\n\n"
+    repository_yaml+="    password: $(yaml_value "$password")"$'\n\n'
     read -r -p 'Weiteres Backup-Ziel hinzufügen? [j/N]: ' answer < /dev/tty
     [[ "${answer,,}" == j || "${answer,,}" == ja ]] || break
   done

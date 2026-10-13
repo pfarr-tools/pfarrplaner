@@ -7,6 +7,13 @@ test -f "$ROOT/backup-example.yaml"
 test -f "$ROOT/docker/backup/Dockerfile"
 test -f "$ROOT/docker/backup/backup.py"
 test -x "$ROOT/scripts/bootstrap-backup.sh"
+python3 - "$ROOT/scripts/bootstrap-backup.sh" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+assert not re.search(r'repository_yaml+="[^"]*\\n', Path(sys.argv[1]).read_text())
+PY
 grep -q 'profiles: \[tools\]' "$ROOT/compose.yaml"
 grep -q 'profiles: \[tools\]' "$ROOT/compose.production.yaml"
 grep -q 'docker/backup/Dockerfile' "$ROOT/compose.yaml"

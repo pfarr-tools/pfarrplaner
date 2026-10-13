@@ -55,6 +55,9 @@ fi
 
 set_env() {
   local key="$1" value="$2"
+  value=${value//\\/\\\\}
+  value=${value//&/\\&}
+  value=${value//|/\\|}
   if grep -q "^${key}=" .env; then
     sed -i "s|^${key}=.*|${key}=${value}|" .env
   else
