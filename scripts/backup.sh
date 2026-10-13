@@ -32,7 +32,11 @@ EOF
 }
 
 run_backup() {
-  "${COMPOSE[@]}" run --rm --no-deps -T backup "$@"
+  if [[ "${1:-}" == init ]]; then
+    "${COMPOSE[@]}" run --build --rm --no-deps -T backup "$@"
+  else
+    "${COMPOSE[@]}" run --rm --no-deps -T backup "$@"
+  fi
 }
 
 running_writers=()
