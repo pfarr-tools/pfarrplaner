@@ -228,7 +228,7 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
                 if not key.is_file():
                     fail(f"SFTP-sle: SSH-Datei fehlt ({key}).")
                 ssh_command = (
-                    f"ssh -i {shlex.quote(str(key))} {ssh_common_options} -s {ssh_target}"
+                    f"ssh -i {shlex.quote(str(key))} {ssh_common_options} {ssh_target} -s sftp"
                 )
             else:
                 ssh_password_path = path_in_container(repo["ssh_password_file"])
@@ -238,7 +238,7 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
                     f"sshpass -f {shlex.quote(str(ssh_password_path))} ssh {ssh_common_options} "
                     "-o PreferredAuthentications=password,keyboard-interactive "
                     "-o PubkeyAuthentication=no "
-                    f"-o NumberOfPasswordPrompts=1 -s {ssh_target}"
+                    f"-o NumberOfPasswordPrompts=1 {ssh_target} -s sftp"
                 )
             restic_options = ["-o", f"sftp.command={ssh_command}"]
         env["RESTIC_CACHE_DIR"] = "/tmp/restic-cache"
