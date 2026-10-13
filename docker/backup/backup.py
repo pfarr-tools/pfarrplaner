@@ -189,13 +189,20 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
             known_hosts = path_in_container(repo["known_hosts"])
             if not known_hosts.is_file():
                 fail(f"SFTP-sle: SSH-Datei fehlt ({known_hosts}).")
+            ssh_common_options = (
+                f"-o UserKnownHostsFile={known_hosts} "
+                "-o StrictHostKeyChecking=yes "
+                "-o ConnectTimeout=15 "
+                "-o ConnectionAttempts=1 "
+                "-o ServerAliveInterval=15 "
+                "-o ServerAliveCountMax=2"
+            )
             if repo.get("ssh_key"):
                 key = path_in_container(repo["ssh_key"])
                 if not key.is_file():
                     fail(f"SFTP-sle: SSH-Datei fehlt ({key}).")
                 env["RESTIC_SSH_COMMAND"] = (
-                    f"ssh -i {key} -o UserKnownHostsFile={known_hosts} "
-                    "-o StrictHostKeyChecking=yes"
+                    f"ssh -i {key} {ssh_common_options}"
                 )
             else:
                 ssh_password_path = path_in_container(repo["ssh_password_file"])
@@ -220,10 +227,10 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
                     "SSH_ASKPASS": str(askpass_script),
                     "SSH_ASKPASS_REQUIRE": "force",
                     "RESTIC_SSH_COMMAND": (
-                        f"ssh -o UserKnownHostsFile={known_hosts} "
-                        "-o StrictHostKeyChecking=yes "
+                        f"ssh {ssh_common_options} "
                         "-o PreferredAuthentications=password,keyboard-interactive "
-                        "-o PubkeyAuthentication=no"
+                        "-o PubkeyAuthentication=no "
+                        "-o NumberOfPasswordPrompts=1"
                     ),
                 })
         env["RESTIC_CACHE_DIR"] = "/tmp/restic-cache"
@@ -377,6 +384,7 @@ def restored_staging(config: dict, restore_root: Path) -> list[Path]:
 def init_repositories(config: dict, target: str | None) -> None:
     failures = []
     for name, repo in selected(config, target):
+        print(f"{name}: initialisiere...", flush=True)
         try:
             restic(repo, ["snapshots", "--no-lock"])
             print(f"{name}: bereits initialisiert")
