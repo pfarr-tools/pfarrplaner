@@ -197,25 +197,30 @@ def restic(repo: dict, args: list[str], *, cwd: Path | None = None) -> str:
                 "-o ServerAliveInterval=15 "
                 "-o ServerAliveCountMax=2"
             )
+            fd, name = tempfile.mkstemp(prefix="restic-ssh-wrapper-", dir="/tmp")
+            os.close(fd)
+            ssh_wrapper = Path(name)
+            ssh_wrapper.chmod(0o700)
+            temporary_paths.append(ssh_wrapper)
             if repo.get("ssh_key"):
                 key = path_in_container(repo["ssh_key"])
                 if not key.is_file():
                     fail(f"SFTP-sle: SSH-Datei fehlt ({key}).")
-                env["RESTIC_SSH_COMMAND"] = (
-                    f"ssh -i {key} {ssh_common_options}"
+                ssh_command = (
+                    f"ssh -i {shlex.quote(str(key))} {ssh_common_options}"
                 )
             else:
                 ssh_password_path = path_in_container(repo["ssh_password_file"])
                 if not ssh_password_path.is_file():
                     fail(f"SFTP-Sle: Passwortdatei fehlt ({ssh_password_path}).")
-                env.update({
-                    "RESTIC_SSH_COMMAND": (
-                        f"sshpass -f {shlex.quote(str(ssh_password_path))} ssh {ssh_common_options} "
-                        "-o PreferredAuthentications=password,keyboard-interactive "
-                        "-o PubkeyAuthentication=no "
-                        "-o NumberOfPasswordPrompts=1"
-                    ),
-                })
+                ssh_command = (
+                    f"sshpass -f {shlex.quote(str(ssh_password_path))} ssh {ssh_common_options} "
+                    "-o PreferredAuthentications=password,keyboard-interactive "
+                    "-o PubkeyAuthentication=no "
+                    "-o NumberOfPasswordPrompts=1"
+                )
+            ssh_wrapper.write_text(f"#!/bin/sh\nexec {ssh_command} \"$@\"\n", encoding="utf-8")
+            env["RESTIC_SSH_COMMAND"] = str(ssh_wrapper)
         env["RESTIC_CACHE_DIR"] = "/tmp/restic-cache"
         return run(["restic", "--repo", repo_path(repo), *args], env={**os.environ, **env}, cwd=cwd, capture=True)
     finally:
