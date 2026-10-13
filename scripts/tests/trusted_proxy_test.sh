@@ -10,7 +10,7 @@ if grep -Fq "config('octane.trust.proxies'" "$MIDDLEWARE"; then
     echo 'TrustProxies uses the obsolete Octane config path' >&2
     exit 1
 fi
-grep -Fq "'trust_proxies' => env('TRUST_PROXY', '127.0.0.1')" "$OCTANE_CONFIG"
+grep -Fq "'trust_proxies' => env('TRUST_PROXY', '*')" "$OCTANE_CONFIG"
 if grep -Fq "'trust_proxies' => [env(" "$OCTANE_CONFIG"; then
     echo 'Octane trusted proxies must remain a string for wildcard support' >&2
     exit 1

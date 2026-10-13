@@ -61,6 +61,11 @@ werden. Für mehrere Instanzen auf einem Server fragt das
 Bootstrap den Docker-Projektnamen ab; er muss pro Instanz eindeutig sein. Der
 Default ist `pfarrplaner`.
 
+Für die Weitergabe des extern beendeten HTTPS setzt das Bootstrap
+`TRUST_PROXY=*`. Das ist für den Betrieb hinter einem Reverse Proxy erforderlich,
+damit Laravel `X-Forwarded-Proto` und den HTTPS-Schemawechsel vertrauenswürdig
+auswertet.
+
 Der Horizon-Zugang wird über `HORIZON_ALLOWED_EMAILS` gesteuert. Die Variable
 enthält eine komma-separierte Liste gültiger Benutzer-E-Mail-Adressen:
 
