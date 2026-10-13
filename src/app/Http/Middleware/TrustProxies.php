@@ -59,7 +59,7 @@ class TrustProxies extends Middleware
 
     public function __construct()
     {
-        $this->proxies = config('octane.trust.proxies', ['127.0.0.1']);
+        $this->proxies = config('octane.trust_proxies', ['127.0.0.1']);
     }
 
 
