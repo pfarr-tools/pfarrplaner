@@ -159,7 +159,7 @@ services:
     volumes:
       - postfix_queue:/var/spool/postfix
       - ./secrets:/run/secrets:ro
-      - ./secrets/dkim:/etc/opendkim/keys:ro
+      - ./secrets/dkim:/etc/opendkim/keys
     networks: [mail, mail-egress]
     healthcheck:
       test: ["CMD-SHELL", "postfix status >/dev/null 2>&1"]

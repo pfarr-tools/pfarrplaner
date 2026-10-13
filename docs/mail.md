@@ -93,15 +93,16 @@ Compose-Logs oder Tickets kopiert werden.
 
 Für produktive direkte Zustellung werden eigene DKIM-Schlüssel empfohlen. Das
 Image unterstützt die Schlüssel unter `secrets/dkim` und den Selector aus
-`MAIL_DKIM_SELECTOR` (Standard: `mail`). Für jede Versanddomain muss dort die
+`DKIM_SELECTOR` (Standard: `mail`). Für jede Versanddomain muss dort die
 vom Image erwartete Schlüsseldatei liegen. Der öffentliche Teil wird als
 `<selector>._domainkey.<domain>` im DNS veröffentlicht; prüfen Sie die genaue
 Dateibenennung gegen die verwendete Image-Version.
 
-Die privaten Schlüssel liegen außerhalb von Git unter `secrets/dkim`; sie
-gehören in den betrieblichen Backup- und Wiederherstellungsprozess. Ein Backup
-der Laravel-Anwendungsdaten allein enthält diese Schlüssel und das Postfix-
-Queue-Volume nicht.
+Die privaten Schlüssel liegen außerhalb von Git unter `secrets/dkim`; der
+Schlüssel-Mount bleibt für den OpenDKIM-Start beschreibbar, damit das Image die
+Dateien dem OpenDKIM-Benutzer zuordnen kann. Sie gehören in den betrieblichen
+Backup- und Wiederherstellungsprozess. Ein Backup der Laravel-Anwendungsdaten
+allein enthält diese Schlüssel und das Postfix-Queue-Volume nicht.
 
 ## Start und Prüfung
 

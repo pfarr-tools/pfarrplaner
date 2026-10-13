@@ -9,6 +9,8 @@ MAIL_CONFIG="$ROOT/src/config/mail.php"
 grep -q '^  postfix:$' "$PROD"
 grep -q 'image: boky/postfix:v5.1.0@sha256:aafc772384232497bed875e1eb66b4d3e54ba1ebc86e2e185a6dc1dbc48182ef' "$PROD"
 grep -q 'postfix_queue:/var/spool/postfix' "$PROD"
+grep -q './secrets/dkim:/etc/opendkim/keys$' "$PROD"
+! grep -q './secrets/dkim:/etc/opendkim/keys:ro$' "$PROD"
 grep -q '^  mail:$' "$PROD"
 grep -q 'networks: \[mail, mail-egress\]' "$PROD"
 ! sed -n '/^  postfix:/,/^networks:/p' "$PROD" | grep -q 'ports:'
