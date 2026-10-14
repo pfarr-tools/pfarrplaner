@@ -154,7 +154,7 @@ services:
       - ./secrets/dkim:/etc/opendkim/keys
     networks: [mail, mail-egress]
     healthcheck:
-      test: ["CMD-SHELL", "postfix status >/dev/null 2>&1"]
+      test: ["CMD-SHELL", "test -s /var/spool/postfix/pid/master.pid && kill -0 \"$$(cat /var/spool/postfix/pid/master.pid)\" 2>/dev/null"]
       interval: 10s
       timeout: 5s
       retries: 12

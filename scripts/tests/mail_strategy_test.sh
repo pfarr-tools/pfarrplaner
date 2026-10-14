@@ -14,6 +14,8 @@ grep -q './secrets/dkim:/etc/opendkim/keys$' "$PROD"
 grep -q '^  mail:$' "$PROD"
 grep -q 'networks: \[mail, mail-egress\]' "$PROD"
 ! sed -n '/^  postfix:/,/^networks:/p' "$PROD" | grep -q 'ports:'
+grep -q 'test -s /var/spool/postfix/pid/master.pid' "$PROD"
+! grep -q 'postfix status' "$PROD"
 ! grep -q 'MAIL_HOST: postfix' "$PROD"
 ! grep -q 'MAIL_PORT: "587"' "$PROD"
 ! grep -q 'MAIL_AUTO_TLS: "false"' "$PROD"
