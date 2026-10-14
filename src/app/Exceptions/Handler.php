@@ -32,12 +32,7 @@ namespace App\Exceptions;
 
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
-use Laravel\Octane\Exceptions\DdException;
-use Spatie\LaravelIgnition\ContextProviders\LaravelContextProviderDetector;
-use Spatie\LaravelIgnition\Facades\Flare;
-use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 use Illuminate\Support\Facades\Log;
@@ -75,80 +70,6 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
 
-    }
-
-    /**
-     * Converts the Exception in a PHP Exception to be able to serialize it.
-     *
-     * @param \Exception $exception
-     * @return \Symfony\Component\Debug\Exception\FlattenException
-     * @source https://github.com/squareboat/sneaker/blob/master/src/ExceptionHandler.php
-     */
-    private function getFlattenedException($exception)
-    {
-        if (!$exception instanceof FlattenException) {
-            $exception = FlattenException::createFromThrowable($exception);
-        }
-
-        return $exception;
-    }
-
-    public function report(Throwable $e)
-    {
-        if (in_array(get_class($e), $this->dontReport)) {
-            return;
-        }
-        foreach ($this->dontReport as $exemptedClass) {
-            if (is_a($e, $exemptedClass)) {
-                return;
-            }
-        }
-
-
-        parent::report($e);
-
-        if (app()->runningInConsole() || app()->runningUnitTests()) {
-            return;
-        }
-
-        // abort here, if 'mail.manager' is not available
-        try {
-            $mailManager = app('mail.manager');
-        } catch (\Exception $exception) {
-            return;
-        }
-
-
-        $flat = $this->getFlattenedException($e);
-        $flare = Flare::make()
-            ->setStage(app()->environment())
-            ->setContextProviderDetector(new LaravelContextProviderDetector())
-            ->setApiToken('')
-            ->filterExceptionsUsing(fn(Throwable $throwable) => !$throwable instanceof DdException)
-            ->registerMiddleware(
-                collect(config('flare.flare_middleware'))
-                    ->map(function ($value, $key) {
-                        if (is_string($key)) {
-                            $middlewareClass = $key;
-                            $parameters = $value ?? [];
-                        } else {
-                            $middlewareClass = $value;
-                            $parameters = [];
-                        }
-
-                        return new $middlewareClass(...array_values($parameters));
-                    })
-                    ->values()
-                    ->toArray()
-        );
-        $report = $flare->createReport($e);
-        try {
-            Mail::to('dev@toph.de')->queue(new ExceptionMail($flat, $report->toArray()));
-        } catch (Throwable $mailException) {
-            Log::warning('Exception notification could not be queued.', [
-                'exception' => get_class($mailException),
-            ]);
-        }
     }
 
     public function render($request, Throwable $e)

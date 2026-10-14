@@ -35,7 +35,9 @@ Mail-Relay- und Integrationsvariablen an:
 
 Der Produktionsbootstrap setzt das Compose-Projekt fest auf `pfarrplaner` und
 fragt `APP_PROVIDER`, den ersten Administrator, Backup-Ziele und den Mailmodus
-ab. Optional kann anschließend ein Restic-Backup oder eine Legacy-Installation
+ab. Zusätzlich fragt er die optionale Sentry-DSN (`SENTRY_LARAVEL_DSN`) und den
+Sentry-Tag (`SENTRY_TAG`) für die Fehlerüberwachung ab. Optional kann
+anschließend ein Restic-Backup oder eine Legacy-Installation
 übernommen werden. Ohne Datenimport wird ein initialer
 `Super-Administrator:in` angelegt. Entwicklung verwendet ausdrücklich
 `./planer bootstrap --dev` und `./planer dev ...`.

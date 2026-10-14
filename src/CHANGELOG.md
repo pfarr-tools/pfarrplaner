@@ -2748,7 +2748,6 @@ All notable changes to this project will be documented in this file. See [standa
 ### Bug Fixes
 
 * A4LiturgySheet, A5LiturgySheet fail when a song has no songbook abbreviation ([f615f4f](https://codeberg.org/pfarr.tools/pfarrplaner/commits/f615f4f4da87d1e6250685efcbe3f0f14a807302))
-* ExceptionMail is missing primary context info ([9f6cb66](https://codeberg.org/pfarr.tools/pfarrplaner/commits/9f6cb66856c9c27e5c4074b9fecd2e861b90e3a3))
 
 ## [2022.146.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2022.145.0...v2022.146.0) (2022-07-06)
 

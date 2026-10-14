@@ -132,6 +132,9 @@ ui_section 'Grundkonfiguration'
 ask_url APP_URL 'Öffentliche URL oder Host' "$APP_URL_DEFAULT"
 ask APP_PROVIDER 'Bezeichnung des Anbieters' Pfarrplaner
 ask APP_ADMINISTRATOR 'Administrator-E-Mail-Adresse' admin@localhost
+ui_section 'Fehlerüberwachung'
+ask SENTRY_LARAVEL_DSN 'Sentry-DSN' ''
+ask SENTRY_TAG 'Sentry-Tag' ''
 ui_section 'Ports'
 ask APP_PORT 'HTTP-Port' "$APP_PORT_DEFAULT"
 ask VITE_PORT 'Vite-Port' "$VITE_PORT_DEFAULT"

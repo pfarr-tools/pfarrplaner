@@ -29,6 +29,7 @@
         "predis/predis": "^2.0",
         "psr/log": "^3",
         "sabre/dav": "^4.4",
+        "sentry/sentry-laravel": "^4.29",
         "simshaun/recurr": "^5.0",
         "spatie/browsershot": "^5.0",
         "spatie/laravel-ignition": "^2.0",
