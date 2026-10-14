@@ -63,7 +63,7 @@ services:
     networks: [backend, mail]
   scheduler:
     <<: *app
-    command: ["bash", "-lc", "set -o pipefail; php artisan schedule:work 2>&1 | grep --line-buffered -vF 'No scheduled commands are ready to run.'"]
+    command: ["bash", "-lc", "set -o pipefail; php artisan schedule:work 2>&1 | grep --line-buffered -vE 'No scheduled commands are ready to run.|^[[:space:]]*$'"]
     restart: unless-stopped
   mariadb:
     image: mariadb:11
