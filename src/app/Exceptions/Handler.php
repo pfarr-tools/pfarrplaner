@@ -37,6 +37,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Str;
+use Sentry\SentrySdk;
 
 class Handler extends ExceptionHandler
 {
@@ -74,6 +76,10 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
+        if (! $request->attributes->has('error_reference')) {
+            $request->attributes->set('error_reference', (string) (SentrySdk::getCurrentHub()->getLastEventId() ?? Str::upper(Str::random(10))));
+        }
+
         $response = parent::render($request, $e);
 
         // Danach: 419 zuverlässig loggen (egal wie es entstanden ist)

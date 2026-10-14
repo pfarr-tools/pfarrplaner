@@ -40,9 +40,23 @@
 |
 */
 
+use App\Http\Controllers\ErrorFeedbackController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 Route::match(['GET','POST'],'/csrf-cookie', fn () => response()->noContent());
+
+Route::post('/error-feedback', [ErrorFeedbackController::class, 'store'])
+    ->middleware('throttle:5,10')
+    ->name('errors.feedback');
+
+Route::get('/__test/500', function (Request $request) {
+    abort_unless(app()->environment(['local', 'testing']), 404);
+
+    $request->attributes->set('error_reference', str_repeat('a', 32));
+
+    return response()->view('errors.500', [], 500);
+})->name('errors.test');
 
 if (!function_exists('routeNames')) {
     function routeNames($model)

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,6 +14,35 @@
             body {
                 font-family: 'Nunito', sans-serif;
             }
+        </style>
+
+        <style>
+            :root { --pf-blue: #1d4e89; --pf-ink: #203040; --pf-muted: #617386; --pf-line: #dce6ef; --pf-bg: #f4f8fb; }
+            body { background: linear-gradient(145deg, #edf5fb 0%, #fbfcfd 58%, #f3efe6 100%); color: var(--pf-ink); }
+            .error-card { width: min(100%, 720px); margin: 2rem auto; padding: 2.75rem; background: rgba(255,255,255,.96); border: 1px solid rgba(220,230,239,.9); border-radius: 1.25rem; box-shadow: 0 1rem 3rem rgba(32,48,64,.12); text-align: left; }
+            .error-logo { display: block; width: 8rem; height: 8rem; margin: 0 auto 1.4rem; }
+            .error-eyebrow { color: var(--pf-blue); font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; text-align: center; }
+            .error-card h1 { margin: .4rem 0 .7rem; color: var(--pf-ink); font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.15; text-align: center; }
+            .error-intro { max-width: 32rem; margin: 0 auto 1.7rem; color: var(--pf-muted); text-align: center; }
+            .error-reference { display: flex; align-items: center; gap: .7rem; margin: 1rem 0 1.5rem; padding: .75rem 1rem; background: var(--pf-bg); border: 1px solid var(--pf-line); border-radius: .65rem; }
+            .error-reference span { color: var(--pf-muted); font-size: .8rem; }
+            .error-reference code { flex: 1; overflow: hidden; color: var(--pf-ink); font-size: .82rem; text-overflow: ellipsis; }
+            .copy-button, .submit-button { border: 0; border-radius: .45rem; padding: .65rem 1rem; cursor: pointer; font-weight: 700; }
+            .copy-button { background: #fff; border: 1px solid var(--pf-line); color: var(--pf-blue); font-size: .78rem; }
+            .feedback-form { margin-top: 1.2rem; padding-top: 1.4rem; border-top: 1px solid var(--pf-line); }
+            .feedback-form label { display: block; margin-bottom: .35rem; color: var(--pf-ink); font-size: .88rem; font-weight: 700; }
+            .feedback-form label span { color: var(--pf-muted); font-weight: 400; }
+            .feedback-form textarea, .feedback-form input { display: block; width: 100%; margin-bottom: 1rem; padding: .7rem .8rem; border: 1px solid #cbd8e3; border-radius: .45rem; color: var(--pf-ink); font: inherit; }
+            .feedback-form textarea:focus, .feedback-form input:focus { border-color: var(--pf-blue); outline: 3px solid rgba(29,78,137,.14); }
+            .feedback-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+            .submit-button { background: var(--pf-blue); color: #fff; }
+            .feedback-message { margin: 1rem 0; padding: .9rem 1rem; border-radius: .5rem; font-size: .9rem; }
+            .feedback-message.success { background: #e8f6ef; color: #1a6944; }
+            .feedback-message.warning { background: #fff5dd; color: #805a12; }
+            .field-error { margin: -.4rem 0 1rem; color: #a52f3b; font-size: .82rem; }
+            .back-link { display: block; margin-top: 1.6rem; color: var(--pf-blue); font-size: .9rem; font-weight: 700; text-align: center; }
+            .error-code-label { color: var(--pf-muted); font-size: .8rem; }
+            @media (max-width: 640px) { .error-card { margin: 1rem; padding: 1.6rem; } .feedback-row { grid-template-columns: 1fr; gap: 0; } .error-reference { align-items: flex-start; flex-wrap: wrap; } .error-reference code { flex-basis: 100%; order: 3; } }
         </style>
     </head>
     <body class="antialiased">
