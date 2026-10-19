@@ -53,6 +53,17 @@ services:
     ports: ["${VITE_PORT:-5173}:5173"]
     volumes: ["./src:/app", "node_modules:/app/node_modules"]
     networks: [pfarrplaner]
+  manual:
+    build:
+      context: .
+      dockerfile: docker/manual/Dockerfile
+    working_dir: /var/www/html
+    environment:
+      PFARRPLANER_MANUAL_ROOT: /var/www/docs/manual
+    volumes:
+      - ./src:/var/www/html
+      - ./docs/manual:/var/www/docs/manual
+    networks: [pfarrplaner]
   horizon:
     <<: *app
     entrypoint: ["/usr/local/bin/pfarrplaner-dev-entrypoint"]

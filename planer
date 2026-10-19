@@ -22,8 +22,6 @@ Produktion (Standard):
   ./planer shell
   ./planer artisan <Befehl>
   ./planer backup create|list|verify|restore|prune|check|init
-  ./planer manual build|dusk|site|all|deploy|source-publish
-  ./planer manual:build|manual:dusk|manual:site|manual:all|manual:deploy|manual:source-publish
   ./planer migrate legacy <Pfad> [Optionen]
   ./planer bootstrap [--dev]
 
@@ -36,6 +34,8 @@ Entwicklung:
   ./planer dev npm <Befehl>
   ./planer dev pint <Optionen>
   ./planer dev fresh --force
+  ./planer dev manual build|dusk|site|all|deploy|source-publish
+  ./planer dev manual:build|manual:dusk|manual:site|manual:all|manual:deploy|manual:source-publish
 
 Der explizite Alias ./planer prod ... bleibt für Produktion erhalten.
 EOF
@@ -85,6 +85,12 @@ EOF
     npm) compose run --rm vite npm "$@" ;;
     pint) compose exec app ./vendor/bin/pint "$@" ;;
     manual) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" "${1:-help}" "${@:2}" ;;
+    manual:build) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" build "$@" ;;
+    manual:dusk) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" dusk "$@" ;;
+    manual:site) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" site "$@" ;;
+    manual:all) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" all "$@" ;;
+    manual:deploy) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" deploy "$@" ;;
+    manual:source-publish) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" source-publish "$@" ;;
     fresh)
       [[ "${1:-}" == --force ]] || { echo 'Abbruch: ./planer dev fresh löscht die lokale Datenbank. Nutze --force.' >&2; exit 2; }
       shift
@@ -110,7 +116,6 @@ run_production() {
     artisan) production_compose exec -e XDG_CONFIG_HOME=/tmp/config app php artisan "$@" ;;
     data) PLANER_PRODUCTION=1 exec "$ROOT/scripts/data-sync.sh" "$@" ;;
     backup) PLANER_PRODUCTION=1 exec "$ROOT/scripts/backup.sh" "${1:-help}" "${@:2}" ;;
-    manual) exec "$ROOT/scripts/manual.sh" "${1:-help}" "${@:2}" ;;
     release) exec "$ROOT/scripts/release.sh" "$@" ;;
     update) exec "$ROOT/scripts/update-production.sh" "$@" ;;
     migrate)
@@ -134,13 +139,9 @@ case "$COMMAND" in
   dev) run_dev "$@" ;;
   prod|production) run_production "$@" ;;
   bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
-  manual:build) run_production manual build "$@" ;;
-  manual:dusk) run_production manual dusk "$@" ;;
-  manual:site) run_production manual site "$@" ;;
-  manual:all) run_production manual all "$@" ;;
-  manual:deploy) run_production manual deploy "$@" ;;
-  manual:source-publish) run_production manual source-publish "$@" ;;
-  up|down|restart|status|ps|logs|exec|shell|artisan|data|backup|manual|release|update|migrate|test|composer|npm|pint|fresh)
+  manual|manual:build|manual:dusk|manual:site|manual:all|manual:deploy|manual:source-publish)
+    run_dev "$COMMAND" "$@" ;;
+  up|down|restart|status|ps|logs|exec|shell|artisan|data|backup|release|update|migrate|test|composer|npm|pint|fresh)
     run_production "$COMMAND" "$@"
     ;;
   help|--help|-h) usage ;;

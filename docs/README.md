@@ -18,23 +18,23 @@ gemeinsamen Root-Bestand. Der Pfad kann mit `PFARRPLANER_MANUAL_ROOT`
 `/var/www/docs/manual` eingebunden.
 
 ```sh
-./planer manual all --skip-dusk
-./planer manual site
-./planer manual deploy --dry-run
+./planer dev manual all --skip-dusk
+./planer dev manual site
+./planer dev manual deploy --dry-run
 ```
 
-Die wichtigsten Manual-Aktionen sind auch als eigenständige Root-Befehle
-verfügbar, zum Beispiel `./planer manual:build` und
-`./planer manual:deploy --dry-run`. Die verschachtelte Schreibweise bleibt
-als kompatible Variante erhalten.
+Die wichtigsten Manual-Aktionen sind auch als eigenständige
+Entwicklungsbefehle verfügbar, zum Beispiel `./planer dev manual:build` und
+`./planer dev manual:deploy --dry-run`. Die verschachtelte Schreibweise
+`./planer dev manual build` bleibt als kompatible Variante erhalten.
 
 Für einen vollständigen Build einschließlich der Browser-Screenshot-Tests wird
-`./planer manual all` verwendet. Die Veröffentlichung bleibt ein eigener,
+`./planer dev manual all` verwendet. Die Veröffentlichung bleibt ein eigener,
 bewusst expliziter Schritt:
 
 ```sh
-./planer manual deploy
-./planer manual source-publish
+./planer dev manual deploy
+./planer dev manual source-publish
 ```
 
 `deploy --dry-run` prüft das Rsync-Ziel ohne Dateien zu übertragen. Die

@@ -18,22 +18,27 @@ Das Frontend wird mit Vite gebaut. Relevante Schritte:
 
 Für die Handbook-Site gibt es eine eigene Pipeline:
 
-- `./planer manual build` erzeugt die generierten Seiten und Lizenzseiten.
-- `./planer manual dusk` führt die Browser-Screenshot-Tests aus.
-- `./planer manual site` baut die statische Website und die drei PDFs.
-- `./planer manual all` verbindet Screenshot-, Generierungs- und Site-Build.
-- `./planer manual deploy --dry-run` prüft die Veröffentlichung ohne Übertragung.
-- `./planer manual deploy` veröffentlicht die fertige Site per Rsync.
-- `./planer manual source-publish` veröffentlicht die Quellen in das konfigurierte Quell-Repository.
+- `./planer dev manual build` erzeugt die generierten Seiten und Lizenzseiten.
+- `./planer dev manual dusk` führt die Browser-Screenshot-Tests aus.
+- `./planer dev manual site` baut die statische Website und die drei PDFs.
+- `./planer dev manual all` verbindet Screenshot-, Generierungs- und Site-Build.
+- `./planer dev manual deploy --dry-run` prüft die Veröffentlichung ohne Übertragung.
+- `./planer dev manual deploy` veröffentlicht die fertige Site per Rsync.
+- `./planer dev manual source-publish` veröffentlicht die Quellen in das konfigurierte Quell-Repository.
 
-Dieselben Aktionen können als eigenständige Root-Befehle mit Doppelpunkt
-aufgerufen werden, zum Beispiel `./planer manual:build` oder
-`./planer manual:deploy --dry-run`. Die verschachtelte Schreibweise bleibt
-weiterhin gültig.
+Dieselben Aktionen können als eigenständige Entwicklungsbefehle mit Doppelpunkt
+aufgerufen werden, zum Beispiel `./planer dev manual:build` oder
+`./planer dev manual:deploy --dry-run`. Die verschachtelte Schreibweise
+`./planer dev manual build` bleibt weiterhin gültig.
+
+Der Site- und PDF-Build läuft im Dev-Compose-Workflow im dedizierten
+`manual`-Container. Dadurch sind MkDocs, Material for MkDocs und WeasyPrint
+unabhängig von der Python-Installation des Hostsystems. `./planer dev manual
+site` verwendet diesen Container automatisch.
 
 Die zugrunde liegenden Laravel-, Node- und JavaScript-Befehle können weiterhin
-direkt verwendet werden. Der Root-Einstieg `./planer manual` setzt jedoch den
-gemeinsamen Manual-Pfad `docs/manual` korrekt und führt PHP-Schritte im
+direkt verwendet werden. Der Dev-Einstieg `./planer dev manual` setzt jedoch
+den gemeinsamen Manual-Pfad `docs/manual` korrekt und führt PHP-Schritte im
 Anwendungscontainer aus.
 
 Der Handbook-Build erzeugt jetzt:
@@ -52,7 +57,7 @@ Benutzerhandbuch-Screenshots werden über Dusk-Tests unter `tests/Browser/Manual
 Für lokale Browser-Tests steht `npm run test:dusk` zur Verfügung. Der Aufruf startet `php artisan dusk:run --compact` mit der kompakten Collision-Ausgabe im Stil von `php artisan test --compact`. Während längerer stiller Phasen gibt der Runner zusätzlich regelmäßige Statusmeldungen aus, damit ein langsamer Browser-Test nicht wie ein Hänger aussieht.
 
 Aus dem Root-Repository werden die Manual-Screenshot-Tests bevorzugt über
-`./planer manual dusk` beziehungsweise als Teil von `./planer manual all`
+`./planer dev manual dusk` beziehungsweise als Teil von `./planer dev manual all`
 gestartet. Die direkten npm- und Artisan-Befehle gelten für einen Lauf im
 `src/`-Checkout beziehungsweise innerhalb des App-Containers.
 

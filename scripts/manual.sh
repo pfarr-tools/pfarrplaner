@@ -19,16 +19,19 @@ src_npm() {
     PFARRPLANER_MANUAL_ROOT="$ROOT/docs/manual" npm "$@"
   )
 }
+manual_npm() {
+  docker compose -f "$ROOT/compose.yaml" run --rm --no-deps manual npm "$@"
+}
 
 usage() {
   cat <<'EOF'
 Verwendung:
-  ./planer manual build
-  ./planer manual dusk [Dusk-Optionen]
-  ./planer manual site
-  ./planer manual all [--skip-dusk] [Dusk-Optionen]
-  ./planer manual deploy [--dry-run]
-  ./planer manual source-publish
+  ./planer dev manual build
+  ./planer dev manual dusk [Dusk-Optionen]
+  ./planer dev manual site
+  ./planer dev manual all [--skip-dusk] [Dusk-Optionen]
+  ./planer dev manual deploy [--dry-run]
+  ./planer dev manual source-publish
 
 Hinweise:
   build       Erzeugt generierte Manual-Seiten und Lizenzseiten.
@@ -56,7 +59,7 @@ manual_dusk() {
 }
 
 manual_site() {
-  src_npm run manual:site
+  manual_npm run manual:site
 }
 
 command_name="${1:-help}"
