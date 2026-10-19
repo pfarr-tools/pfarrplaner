@@ -26,6 +26,11 @@ Für die Handbook-Site gibt es eine eigene Pipeline:
 - `./planer manual deploy` veröffentlicht die fertige Site per Rsync.
 - `./planer manual source-publish` veröffentlicht die Quellen in das konfigurierte Quell-Repository.
 
+Dieselben Aktionen können als eigenständige Root-Befehle mit Doppelpunkt
+aufgerufen werden, zum Beispiel `./planer manual:build` oder
+`./planer manual:deploy --dry-run`. Die verschachtelte Schreibweise bleibt
+weiterhin gültig.
+
 Die zugrunde liegenden Laravel-, Node- und JavaScript-Befehle können weiterhin
 direkt verwendet werden. Der Root-Einstieg `./planer manual` setzt jedoch den
 gemeinsamen Manual-Pfad `docs/manual` korrekt und führt PHP-Schritte im
@@ -58,6 +63,13 @@ Zusätzlich gibt es gezielte Varianten für die lokale Fehlersuche:
 - `npm run test:dusk:testdox` verwendet die PHPUnit-TestDox-Ausgabe.
 
 Der Dusk-Command baut das Frontend standardmäßig genau einmal selbst, setzt die SQLite-Testdatenbank zurück und startet bei Bedarf einen lokalen Laravel-Testserver. Für schnellere Wiederholungsläufe stehen unter anderem diese Optionen zur Verfügung:
+
+Wenn keine `.env.dusk` vorhanden ist, erzeugt der Runner dafür eine temporäre,
+isolierte Dusk-Umgebung mit einer dateibasierten Session und einer eigenen
+SQLite-Datei. Der lokale Testserver läuft mit mehreren PHP-CLI-Workern und
+ohne ungeleitete Ausgabepipes; dadurch bleiben Login-Sessions und lange
+Screenshot-Läufe auch bei vielen Manual-Testklassen stabil. Jede Manual-
+Testmethode erhält außerdem eine neue Browser-Sitzung.
 
 - `php artisan dusk:run --without-build` verwendet den vorhandenen Vite-Build erneut.
 - `php artisan dusk:run --stop-on-failure` bricht nach dem ersten fehlschlagenden Browser-Test ab.

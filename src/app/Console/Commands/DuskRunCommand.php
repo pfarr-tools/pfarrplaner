@@ -32,6 +32,20 @@ class DuskRunCommand extends Command
     protected const QUIET_PROGRESS_INTERVAL_SECONDS = 30;
 
     /**
+     * Environment values supplied when no dedicated Dusk environment file exists.
+     *
+     * @var array<string, string>
+     */
+    protected array $duskEnvironment = [];
+
+    /**
+     * Whether the runner created a temporary .env file for this run.
+     *
+     * @var bool
+     */
+    protected bool $createdEnvironmentFile = false;
+
+    /**
      * The name and signature of the console command.
      *
      * @var string
@@ -107,6 +121,8 @@ class DuskRunCommand extends Command
             }
         }
 
+        $this->purgeViteHotFile();
+
         return $this->withDuskEnvironment(function () use ($options) {
             $this->resetDuskDatabase();
 
@@ -115,6 +131,11 @@ class DuskRunCommand extends Command
             $server = $this->option('without-server') ? null : $this->startTestServer();
 
             try {
+                // The Vite development container may recreate public/hot while
+                // the Laravel test server is starting; remove it immediately
+                // before PHPUnit starts so browser requests use the build.
+                $this->purgeViteHotFile();
+
                 $process = (new Process(array_merge(
                     $this->binary(), $this->phpunitArguments($options)
                 ), null, $this->env()))->setTimeout(null);
@@ -278,7 +299,20 @@ class DuskRunCommand extends Command
         $host   = parse_url($appUrl, PHP_URL_HOST) ?? '127.0.0.1';
         $port   = parse_url($appUrl, PHP_URL_PORT) ?? 8000;
 
-        $server = new Process([PHP_BINARY, 'artisan', 'serve', "--host={$host}", "--port={$port}"]);
+        $server = new Process(
+            [PHP_BINARY, 'artisan', 'serve', '--no-reload', "--host={$host}", "--port={$port}"],
+            base_path(),
+            array_merge($this->env(), [
+                // A browser page can keep API/assets requests open while the
+                // next Dusk test starts its login request. Multiple workers
+                // prevent the built-in server from serialising those requests.
+                'PHP_CLI_SERVER_WORKERS' => '4',
+            ])
+        );
+        // The test server emits one access line per browser request. Do not
+        // leave Symfony's stdout/stderr pipes unread or the server eventually
+        // blocks when their buffers fill during a long screenshot run.
+        $server->disableOutput();
         $server->start();
 
         $deadline = time() + 30;
@@ -387,7 +421,7 @@ class DuskRunCommand extends Command
             }
         }
 
-        return $variables;
+        return array_merge($this->duskEnvironment, $variables);
     }
 
     /**
@@ -533,6 +567,19 @@ class DuskRunCommand extends Command
     }
 
     /**
+     * Force Laravel Vite to use the build during browser tests.
+     *
+     * @return void
+     */
+    protected function purgeViteHotFile(): void
+    {
+        $hotFile = public_path('hot');
+        if (file_exists($hotFile)) {
+            @unlink($hotFile);
+        }
+    }
+
+    /**
      * Purge debugging files based on path and patterns.
      *
      * @param  string  $path
@@ -585,11 +632,79 @@ class DuskRunCommand extends Command
             }
 
             $this->refreshEnvironment();
+        } else {
+            $this->duskEnvironment = $this->defaultDuskEnvironment();
+            $this->applyEnvironment($this->duskEnvironment);
+            $this->createTemporaryEnvironmentFile();
         }
 
         $this->writeConfiguration();
 
         $this->setupSignalHandler();
+    }
+
+    /**
+     * Resolve the safe defaults for a Dusk run without a local env file.
+     *
+     * @return array<string, string>
+     */
+    protected function defaultDuskEnvironment(): array
+    {
+        return [
+            'APP_ENV' => 'dusk',
+            'APP_DEBUG' => 'true',
+            'DUSK_ENABLED' => 'true',
+            'DB_CONNECTION' => 'sqlite',
+            'DB_DATABASE' => dirname(__DIR__, 3).'/database/database.dusk.sqlite',
+            'DB_BUSY_TIMEOUT' => '5000',
+            'DB_JOURNAL_MODE' => 'WAL',
+            'CACHE_STORE' => 'array',
+            'CACHE_DRIVER' => 'array',
+            // The browser login and the following page request are handled by
+            // separate PHP server workers; array sessions cannot cross that
+            // process boundary.
+            'SESSION_DRIVER' => 'file',
+            'QUEUE_CONNECTION' => 'sync',
+            'MAIL_MAILER' => 'array',
+            'MAIL_DRIVER' => 'array',
+            'FILESYSTEM_DISK' => 'local',
+            'FILESYSTEM_DRIVER' => 'local',
+        ];
+    }
+
+    /**
+     * Make the Dusk environment available to Laravel and child processes.
+     *
+     * @param array<string, string> $variables
+     * @return void
+     */
+    protected function applyEnvironment(array $variables): void
+    {
+        foreach ($variables as $key => $value) {
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+            putenv("{$key}={$value}");
+        }
+    }
+
+    /**
+     * Create the minimal environment file required by Laravel's test bootstrap.
+     *
+     * @return void
+     */
+    protected function createTemporaryEnvironmentFile(): void
+    {
+        $environmentFile = base_path('.env');
+        if (file_exists($environmentFile)) {
+            return;
+        }
+
+        $contents = collect($this->duskEnvironment)
+            ->map(fn (string $value, string $key): string => $key.'='.str_replace(["\\", "\n", "\r"], ['\\\\', '', ''], $value))
+            ->implode("\n");
+
+        file_put_contents($environmentFile, $contents."\n");
+        $this->createdEnvironmentFile = true;
     }
 
     /**
@@ -677,6 +792,11 @@ class DuskRunCommand extends Command
 
         if (file_exists(base_path($this->duskFile())) && file_exists(base_path('.env.backup'))) {
             $this->restoreEnvironment();
+        }
+
+        if ($this->createdEnvironmentFile && file_exists(base_path('.env'))) {
+            unlink(base_path('.env'));
+            $this->createdEnvironmentFile = false;
         }
     }
 

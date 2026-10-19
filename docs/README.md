@@ -23,6 +23,11 @@ gemeinsamen Root-Bestand. Der Pfad kann mit `PFARRPLANER_MANUAL_ROOT`
 ./planer manual deploy --dry-run
 ```
 
+Die wichtigsten Manual-Aktionen sind auch als eigenständige Root-Befehle
+verfügbar, zum Beispiel `./planer manual:build` und
+`./planer manual:deploy --dry-run`. Die verschachtelte Schreibweise bleibt
+als kompatible Variante erhalten.
+
 Für einen vollständigen Build einschließlich der Browser-Screenshot-Tests wird
 `./planer manual all` verwendet. Die Veröffentlichung bleibt ein eigener,
 bewusst expliziter Schritt:

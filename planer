@@ -23,6 +23,7 @@ Produktion (Standard):
   ./planer artisan <Befehl>
   ./planer backup create|list|verify|restore|prune|check|init
   ./planer manual build|dusk|site|all|deploy|source-publish
+  ./planer manual:build|manual:dusk|manual:site|manual:all|manual:deploy|manual:source-publish
   ./planer migrate legacy <Pfad> [Optionen]
   ./planer bootstrap [--dev]
 
@@ -133,6 +134,12 @@ case "$COMMAND" in
   dev) run_dev "$@" ;;
   prod|production) run_production "$@" ;;
   bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
+  manual:build) run_production manual build "$@" ;;
+  manual:dusk) run_production manual dusk "$@" ;;
+  manual:site) run_production manual site "$@" ;;
+  manual:all) run_production manual all "$@" ;;
+  manual:deploy) run_production manual deploy "$@" ;;
+  manual:source-publish) run_production manual source-publish "$@" ;;
   up|down|restart|status|ps|logs|exec|shell|artisan|data|backup|manual|release|update|migrate|test|composer|npm|pint|fresh)
     run_production "$COMMAND" "$@"
     ;;

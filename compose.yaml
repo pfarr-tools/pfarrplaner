@@ -14,6 +14,7 @@ x-app: &app
     - ./docs/manual:/var/www/docs/manual
     - ./backups:/var/backups/pfarrplaner
     - composer_cache:/tmp/composer-cache
+    - node_modules:/var/www/html/node_modules
     - vendor:/var/www/html/vendor
   depends_on:
     mariadb: {condition: service_healthy}

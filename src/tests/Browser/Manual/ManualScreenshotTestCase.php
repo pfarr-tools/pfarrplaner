@@ -39,6 +39,18 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
         $this->superAdminUser->setSetting('homeScreenTabsConfig', ['tabs' => []]);
     }
 
+    protected function tearDown(): void
+    {
+        // Manual pages can leave long-lived JS state and large DOM trees in a
+        // reused Dusk session. Close it after every test so later screenshots
+        // start with a clean browser session.
+        try {
+            static::closeAll();
+        } finally {
+            parent::tearDown();
+        }
+    }
+
     /**
      * Navigate to $url, wait for the app to render, take a screenshot and
      * copy it to the configured manual media directory.
@@ -57,6 +69,7 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
     ): Browser {
         try {
             $browser->loginAs($this->superAdminUser, 'web')
+                    ->assertAuthenticated('web')
                     ->visit($url)
                     ->waitFor('#app', self::APP_RENDER_TIMEOUT_SECONDS)
                     ->assertDontSee('500')
@@ -81,13 +94,22 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
     protected function captureFailureArtifacts(Browser $browser, string $filename): void
     {
         $failureName = 'manual-failure-' . $filename;
-        $browser->screenshot($failureName);
+        try {
+            $browser->screenshot($failureName);
+        } catch (\Throwable) {
+            // Preserve the original browser assertion when ChromeDriver has
+            // already gone away; diagnostics must never mask the root error.
+        }
 
         $sourceDir = base_path('tests/Browser/source');
         if (!is_dir($sourceDir)) {
             mkdir($sourceDir, 0755, true);
         }
-        file_put_contents($sourceDir . '/' . $failureName . '.html', $browser->driver->getPageSource());
+        try {
+            file_put_contents($sourceDir . '/' . $failureName . '.html', $browser->driver->getPageSource());
+        } catch (\Throwable) {
+            // The screenshot and source are best-effort diagnostics only.
+        }
     }
 
     /**

@@ -15,6 +15,8 @@ grep -q './planer manual' /tmp/pfarrplaner-manual-cli-test.out
 
 grep -q 'manual)' "$ROOT/planer"
 grep -q 'manual.sh' "$ROOT/planer"
+grep -q 'manual:build)' "$ROOT/planer"
+grep -q 'manual:deploy)' "$ROOT/planer"
 grep -q 'tests/Browser/Manual' "$ROOT/scripts/manual.sh"
 grep -q 'PFARRPLANER_MANUAL_ROOT' "$ROOT/src/scripts/publish-manual-source.js"
 

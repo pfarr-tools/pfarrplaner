@@ -3,7 +3,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl gnupg lsb-release git unzip mariadb-client \
  && curl -sSLo /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg \
  && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list \
- && apt-get update && apt-get install -y --no-install-recommends php8.4-cli php8.4-fpm php8.4-mbstring php8.4-gd php8.4-intl php8.4-zip php8.4-xml php8.4-curl php8.4-mysql php8.4-yaml php8.4-posix locales tzdata \
+ && apt-get update && apt-get install -y --no-install-recommends php8.4-cli php8.4-fpm php8.4-mbstring php8.4-gd php8.4-intl php8.4-zip php8.4-xml php8.4-curl php8.4-mysql php8.4-sqlite3 php8.4-yaml php8.4-posix locales tzdata chromium chromium-driver \
  && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
  && apt-get install -y --no-install-recommends nodejs \
  && sed -i 's|^listen = .*|listen = 9000|' /etc/php/8.4/fpm/pool.d/www.conf \
