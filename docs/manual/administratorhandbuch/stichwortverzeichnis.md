@@ -6,36 +6,35 @@ Dieses Stichwortverzeichnis hilft beim schnellen Finden typischer Administration
 
 ## A
 
-- **APP_URL**: [Klassische Installation](installation-klassisch.md), [Betrieb und Wartung](betrieb.md)
-- **Assets bauen**: [Klassische Installation](installation-klassisch.md), [Updates](updates.md)
+- **APP_URL**: [Installation mit Docker Compose](installation-docker.md), [Betrieb und Wartung](betrieb.md)
+- **Assets bauen**: [Installation mit Docker Compose](installation-docker.md), [Updates](updates.md)
 - **Aufgaben im Hintergrund**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Betrieb und Wartung](betrieb.md)
-- **Automatisierte Installation**: [Klassische Installation](installation-klassisch.md)
+- **Automatisierte Installation**: [Installation mit Docker Compose](installation-docker.md)
 
 ## B
 
 - **Backup**: [Updates](updates.md), [Sicherheit, Backup und Datenschutz](sicherheit.md)
 - **Browsershot**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Fehlersuche](fehlersuche.md)
-- **Build**: [Klassische Installation](installation-klassisch.md), [Installation mit Docker Compose](installation-docker.md)
+- **Build**: [Installation mit Docker Compose](installation-docker.md)
 
 ## C
 
-- **Chromium**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md), [Fehlersuche](fehlersuche.md)
-- **CLI-Installer**: [Klassische Installation](installation-klassisch.md), [Installation mit Docker Compose](installation-docker.md)
-- **Composer**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md), [Updates](updates.md)
-- **Cron**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md), [Betrieb und Wartung](betrieb.md)
+- **Chromium**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Fehlersuche](fehlersuche.md)
+- **Composer**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Updates](updates.md)
+- **Cron**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Betrieb und Wartung](betrieb.md)
 
 ## D
 
-- **Datenbank**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md), [Updates](updates.md)
+- **Datenbank**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Updates](updates.md)
 - **Datenschutz**: [Datenschutz und personenbezogene Daten](datenschutz.md), [Sicherheit, Backup und Datenschutz](sicherheit.md)
-- **Deployments**: [Klassische Installation](installation-klassisch.md), [Updates](updates.md)
+- **Deployments**: [Installation mit Docker Compose](installation-docker.md), [Updates](updates.md)
 - **Docker Compose**: [Einführung](einfuehrung.md), [Installation mit Docker Compose](installation-docker.md), [Updates](updates.md)
 
 ## E
 
-- **E-Mail**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md), [Fehlersuche](fehlersuche.md)
+- **E-Mail**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Fehlersuche](fehlersuche.md)
 - **Mailbetrieb**: [Mailbetrieb](mail.md), [Betrieb und Wartung](betrieb.md)
-- **Erstinstallation**: [Klassische Installation](installation-klassisch.md), [Installation mit Docker Compose](installation-docker.md)
+- **Erstinstallation**: [Installation mit Docker Compose](installation-docker.md)
 
 ## F
 
@@ -43,7 +42,7 @@ Dieses Stichwortverzeichnis hilft beim schnellen Finden typischer Administration
 
 ## G
 
-- **Git**: [Klassische Installation](installation-klassisch.md), [Updates](updates.md)
+- **Git**: [Updates](updates.md)
 
 ## H
 
@@ -51,11 +50,11 @@ Dieses Stichwortverzeichnis hilft beim schnellen Finden typischer Administration
 
 ## I
 
-- **Installation**: [Klassische Installation](installation-klassisch.md), [Installation mit Docker Compose](installation-docker.md)
+- **Installation**: [Installation mit Docker Compose](installation-docker.md)
 
 ## K
 
-- **Konfiguration**: [Klassische Installation](installation-klassisch.md), [Betrieb und Wartung](betrieb.md)
+- **Konfiguration**: [Installation mit Docker Compose](installation-docker.md), [Betrieb und Wartung](betrieb.md)
 
 ## L
 
@@ -63,13 +62,13 @@ Dieses Stichwortverzeichnis hilft beim schnellen Finden typischer Administration
 
 ## M
 
-- **Mailversand**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md), [Fehlersuche](fehlersuche.md)
-- **Migrationen**: [Klassische Installation](installation-klassisch.md), [Updates](updates.md)
+- **Mailversand**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Fehlersuche](fehlersuche.md)
+- **Migrationen**: [Installation mit Docker Compose](installation-docker.md), [Updates](updates.md)
 
 ## N
 
-- **Node.js**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md)
-- **npm**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md), [Updates](updates.md)
+- **Node.js**: [Systemvoraussetzungen](systemvoraussetzungen.md)
+- **npm**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Updates](updates.md)
 
 ## P
 
@@ -79,7 +78,7 @@ Dieses Stichwortverzeichnis hilft beim schnellen Finden typischer Administration
 
 ## Q
 
-- **Queue**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md), [Betrieb und Wartung](betrieb.md), [Fehlersuche](fehlersuche.md)
+- **Queue**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Betrieb und Wartung](betrieb.md), [Fehlersuche](fehlersuche.md)
 
 ## R
 
@@ -88,10 +87,10 @@ Dieses Stichwortverzeichnis hilft beim schnellen Finden typischer Administration
 
 ## S
 
-- **Scheduler**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md), [Betrieb und Wartung](betrieb.md)
+- **Scheduler**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Betrieb und Wartung](betrieb.md)
 - **Sicherheit**: [Sicherheit, Backup und Datenschutz](sicherheit.md)
 - **SMTP**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Fehlersuche](fehlersuche.md)
-- **Storage**: [Klassische Installation](installation-klassisch.md), [Installation mit Docker Compose](installation-docker.md), [Sicherheit, Backup und Datenschutz](sicherheit.md)
+- **Storage**: [Installation mit Docker Compose](installation-docker.md), [Sicherheit, Backup und Datenschutz](sicherheit.md)
 
 ## U
 
@@ -99,10 +98,10 @@ Dieses Stichwortverzeichnis hilft beim schnellen Finden typischer Administration
 
 ## V
 
-- **VHost**: [Klassische Installation](installation-klassisch.md)
+- **VHost**: [Installation mit Docker Compose](installation-docker.md)
 - **Volumes**: [Installation mit Docker Compose](installation-docker.md), [Updates](updates.md)
 
 ## W
 
-- **Webserver**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Klassische Installation](installation-klassisch.md)
+- **Webserver**: [Systemvoraussetzungen](systemvoraussetzungen.md)
 - **Wiederherstellung**: [Sicherheit, Backup und Datenschutz](sicherheit.md)

@@ -17,7 +17,6 @@ Pfarrplaner ist eine Laravel-Anwendung mit Inertia.js und Vue. Das System verbin
 
 - Docker-Compose-Entwicklung mit PHP-FPM, Caddy und Vite
 - Docker-Compose-Produktion mit Octane/Swoole und Caddy
-- klassische Installation als separat dokumentierter Legacy-Weg
 - lokale Entwicklungsumgebungen
 - Docker-Compose-Umgebungen
 

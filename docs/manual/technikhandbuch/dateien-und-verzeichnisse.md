@@ -35,11 +35,12 @@
 - `app/Console/Commands/DevBuilder/BuildManualPages.php`: erzeugt Benutzerhandbuch-Seiten wie Versionsangaben und Lizenzen
 - `../scripts/manual.sh`: Root-Dispatcher für Manual-Build, Dusk, Site und Veröffentlichung
 
-## Installations- und Update-relevante Dateien
+## Betriebs- und Update-relevante Dateien
 
-- `app/Console/Commands/InstallCommand.php`: neuer CLI-Installer `pfarrplaner:install`
-- `app/Console/Commands/Install/InstallUpdates.php`: Laravel-Einstiegspunkt für Updates
-- `scripts/install-updates.js`: Update-Ablauf
+- `compose.yaml`: lokale Entwicklungsumgebung einschließlich Manual-Container
+- `compose.production.yaml`: Produktionsumgebung
+- `planer`: zentraler Einstieg für Betrieb, Updates und Datenpflege
+- `scripts/update-production.sh`: abgesicherter Produktions-Update-Ablauf
 
 ## API-relevante Dateien
 

@@ -35,50 +35,18 @@ erhalten. Bei kompatiblen Migrationen wird zunächst auf das vorherige Image
 zurückgestellt. Bei nicht kompatiblen Migrationen ist zusätzlich der
 dokumentierte Datenbank- und MinIO-Restore aus dem Backup erforderlich.
 
-### Klassische Installation
-
-Für klassische Installationen ist der vorgesehene Weg der Update-Befehl:
-
-```bash
-php artisan install:updates
-```
-
-Im Hintergrund wird das npm-Skript `install:updates` ausgeführt. Dieses Skript prüft unter anderem:
-
-- ob ein Upstream-Branch vorhanden ist
-- ob lokale Änderungen existieren
-- ob `composer install` nötig ist
-- ob `npm install` nötig ist
-- ob Assets neu gebaut werden müssen
-- ob Migrationen auszuführen sind
-- ob Caches und Queue neu gestartet werden müssen
-- ob Octane neu geladen werden muss, wenn die Instanz über `OCTANE_SERVER` in der `.env` mit Octane konfiguriert ist
-
-### Trockentest
-
-Vor produktiven Updates ist diese Prüfung sehr sinnvoll:
-
-```bash
-php artisan install:updates --dry-run
-```
-
-Damit sehen Sie, welche Schritte ein Update auslösen würde, ohne sie schon auszuführen.
-
 ### Typischer produktiver Ablauf
 
 1. Backup erstellen.
-2. `php artisan install:updates --dry-run`
-3. Wartungsfenster oder kurzen Hinweis vorbereiten.
-4. `php artisan install:updates`
-5. Login, zentrale Ansichten, Mail und wichtige Berichte prüfen.
+2. Wartungsfenster oder kurzen Hinweis vorbereiten.
+3. `./planer update --ref ... --backup-confirmed`
+4. Login, zentrale Ansichten, Mail und wichtige Berichte prüfen.
 
-## Manueller Compose-Ablauf für bestehende Altinstallationen
+## Manueller Compose-Ablauf für Sonderfälle
 
-Für alte Installationen, die nicht aus diesem Root-Repository betrieben werden,
-hängt der genaue Updateablauf von der jeweiligen Compose- und Image-Struktur ab.
-Der oben beschriebene `./planer update`-Weg ist für neue Installationen
-maßgeblich. Ein manueller Compose-Ablauf darf nur verwendet werden, wenn die
-Zielumgebung und die Datenbank vorher ausdrücklich geprüft wurden:
+Der oben beschriebene `./planer update`-Weg ist maßgeblich. Ein manueller
+Compose-Ablauf darf nur verwendet werden, wenn die Zielumgebung und die
+Datenbank vorher ausdrücklich geprüft wurden:
 
 1. Backup von Datenbank und persistenten Volumes erstellen.
 2. Neues Image bauen oder ziehen.
@@ -100,12 +68,6 @@ Wenn Sie Assets bereits im Image bauen, entfällt der Asset-Build auf dem Zielsy
 ## Rollback-Denken
 
 Ein gutes Update ist erst dann sauber geplant, wenn Sie auch den Rückweg kennen.
-
-Für klassische Installationen bedeutet das meist:
-
-- vorherigen Git-Stand kennen
-- Datenbank-Backup haben
-- wissen, ob Migrationen rückwärts überhaupt sicher sind
 
 Für Docker bedeutet das meist:
 

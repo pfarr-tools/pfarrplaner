@@ -21,10 +21,9 @@ Dieses Repository ist die Betriebs- und Migrationsschicht von Pfarrplaner. Die
 Laravel-Anwendung liegt darunter in `src/`; der zentrale Einstieg für
 Entwicklung, Backups, Migrationen und Produktionsupdates ist `./planer`.
 
-Der vorgesehene Produktionsweg ist Docker Compose. Die klassische Installation
-aus dem ursprünglichen Anwendungscode ist weiterhin als Sonder- beziehungsweise
-Legacy-Weg dokumentiert, verwendet aber nicht die Root-Befehle und darf nicht
-mit einer Docker-Installation vermischt werden.
+Der vorgesehene und künftig ausschließlich unterstützte Produktionsweg ist
+Docker Compose. Die Betriebsdateien liegen im Root-Repository; die Laravel-
+Anwendung wird über die zentralen `./planer`-Befehle betrieben.
 
 Für eine neue Instanz beginnen Sie mit:
 
@@ -39,8 +38,8 @@ Der konkrete Ablauf steht in [Installation mit Docker Compose](installation-dock
 ## Was dieses Handbuch abdeckt
 
 - Voraussetzungen für Server, Laufzeit und Zusatzprogramme
-- Einrichtungsabläufe für beide Installationswege
-- Updatepfade für beide Installationswege
+- Einrichtungsablauf mit Docker Compose
+- Updatepfad für Docker Compose
 - Betrieb, Wartung und Sicherheitsaufgaben
 - typische Fehlerbilder
 

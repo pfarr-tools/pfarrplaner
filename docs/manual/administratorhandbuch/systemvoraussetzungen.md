@@ -19,9 +19,6 @@ Postfix-Profil übernimmt die ausgehende Zustellung. Für den Betrieb wird
 keine separat installierte PHP-, Node- oder Webserver-Laufzeit auf dem Host
 benötigt.
 
-Eine klassische Installation hat zusätzliche Anforderungen und wird separat in
-[Klassische Installation](installation-klassisch.md) beschrieben.
-
 ## PHP-Anforderungen
 
 Aus `composer.json` ergeben sich mindestens diese harten Anforderungen:
@@ -48,13 +45,6 @@ Wenn Sie Dateiausgaben, Importe oder Office-Dokumente nutzen, sollten Sie fehlen
 
 Im Docker-Betrieb ist MariaDB 11 der Datenbankdienst. MinIO ist der verbindliche
 S3-kompatible Objektspeicher für Uploads und andere Anwendungsdateien.
-
-Eine klassische Installation kann zusätzlich folgende Datenbanken verwenden:
-
-- `mysql`
-- `sqlite`
-- `pgsql`
-- `sqlsrv`
 
 Für produktive Mehrbenutzer-Instanzen empfiehlt sich in der Regel MySQL oder MariaDB. SQLite ist vor allem für kleine Test- oder Demo-Umgebungen praktisch.
 

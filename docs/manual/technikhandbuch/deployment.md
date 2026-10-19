@@ -24,21 +24,6 @@ git push origin main v2026.15.0
 die öffentlichen Assets und startet App, Horizon und Scheduler mit Health-Check
 neu. Der alte Image-Stand bleibt als Rollback-Grundlage erhalten.
 
-## Klassische Installation (Legacy)
-
-Der klassische Weg kombiniert:
-
-- Git-Checkout
-- Composer
-- npm/Vite
-- `.env`
-- Migrationen
-- Cache- und Prozesspflege
-
-Für unabhängige klassische Anwendungs-Checkouts ist `php artisan pfarrplaner:install`
-der vorgesehene Weg. Für Updates dient `php artisan install:updates`. Dieser
-Pfad ist vom Root-Repository und seinem `./planer`-Betrieb getrennt.
-
 ## Docker-Deployment
 
 Im Containerbetrieb läuft das Deployment reproduzierbar über das Root-
@@ -53,9 +38,9 @@ Neubau und die Auslieferung des Handbuchs berücksichtigen. Manual-Operationen
 können unabhängig davon ausgeführt werden:
 
 ```sh
-./planer manual all
-./planer manual deploy --dry-run
-./planer manual deploy
+./planer dev manual all
+./planer dev manual deploy --dry-run
+./planer dev manual deploy
 ```
 
 ## Health und Monitoring

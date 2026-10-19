@@ -8,7 +8,6 @@ Dieses Handbuch beschreibt Pfarrplaner aus Sicht von Administratorinnen und Admi
 
 - [Einführung und Aufgaben](einfuehrung.md)
 - [Systemvoraussetzungen](systemvoraussetzungen.md)
-- [Klassische Installation mit Git und CLI-Installer](installation-klassisch.md)
 - [Installation mit Docker Compose](installation-docker.md)
 - [Updates und Releases](updates.md)
 - [Betrieb und Wartung](betrieb.md)
