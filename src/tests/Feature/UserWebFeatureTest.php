@@ -36,7 +36,14 @@ class UserWebFeatureTest extends TestCase
         $this->actingAs($this->user)
             ->get(route('users.index'))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Admin/User/Index'));
+            ->assertInertia(fn(Assert $page) => $page
+                ->component('Admin/User/Index')
+                ->has('users', 1)
+                ->missing('users.0.address')
+                ->missing('users.0.api_token')
+                ->missing('users.0.created_at')
+                ->missing('users.0.updated_at')
+            );
     }
 
     public function testEditorLoads(): void
@@ -45,6 +52,31 @@ class UserWebFeatureTest extends TestCase
         $this->actingAs($this->user)
             ->get(route('user.edit', $target->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Admin/User/UserEditor'));
+            ->assertInertia(fn(Assert $page) => $page
+                ->component('Admin/User/UserEditor')
+                ->has('users', 2)
+                ->missing('users.0.address')
+                ->missing('users.0.api_token')
+                ->missing('user.password')
+                ->missing('user.created_at')
+                ->missing('user.updated_at')
+            );
     }
+
+    public function testJoinLoadsCompactPeople(): void
+    {
+        $target = User::factory()->create();
+
+        $this->actingAs($this->user)
+            ->get(route('user.join', $target->id))
+            ->assertStatus(200)
+            ->assertInertia(fn(Assert $page) => $page
+                ->component('Admin/User/Join')
+                ->has('people', 1)
+                ->missing('user.address')
+                ->missing('people.0.address')
+                ->missing('people.0.api_token')
+            );
+    }
+
 }

@@ -40,6 +40,7 @@ use App\Models\Parish;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Subscription;
+use App\Providers\AuthServiceProvider;
 use App\Rules\CreatedInLocalAdminDomainRule;
 use App\Traits\HandlesAttachedImageTrait;
 use App\Traits\HandlesAttachmentsTrait;
@@ -83,7 +84,15 @@ class UserController extends Controller
     public function index()
     {
         Gate::authorize('index', User::class);
-        $userQuery = User::with(['homeCities', 'cities', 'writableCities', 'adminCities', 'roles', 'roles.permissions'])
+        $userQuery = User::select(['id', 'first_name', 'last_name', 'title', 'email', 'password'])
+            ->with([
+                'homeCities:id,name',
+                'cities:id,name',
+                'writableCities:id,name',
+                'adminCities:id,name',
+                'roles:id,name',
+                'roles.permissions:id,name',
+            ])
             ->orderBy('last_name')
             ->orderBy('first_name')
             ->orderBy('email');
@@ -114,7 +123,12 @@ class UserController extends Controller
 
         $canCreate = Auth::user()->can('create', User::class);
 
-        return Inertia::render('Admin/User/Index', ['users' => $userQuery->get(), 'canCreate' => $canCreate]);
+        $allCities = City::query()->select(['id', 'name'])->get();
+
+        return Inertia::render('Admin/User/Index', [
+            'users' => $userQuery->get()->map(fn (User $user) => $this->compactIndexUser($user, $allCities)),
+            'canCreate' => $canCreate,
+        ]);
     }
 
     /**
@@ -136,7 +150,7 @@ class UserController extends Controller
                                        'vacationApprovers',
                                    ]);
 
-        $cities = City::orderBy('name')->get();
+        $cities = City::query()->select(['id', 'name'])->orderBy('name')->get();
 
         $adminCities = [];
         foreach ($cities as $city) {
@@ -148,17 +162,17 @@ class UserController extends Controller
         return Inertia::render(
             'Admin/User/UserEditor',
             [
-                'user' => $user,
-                'cities' => $cities,
-                'adminCities' => $adminCities,
-                'roles' => Role::all(),
-                'parishes' => Parish::all(),
-                'users' => User::all(),
+                'user' => $this->compactEditorUser($user),
+                'cities' => $this->compactOptions($cities),
+                'adminCities' => $this->compactOptions($adminCities),
+                'roles' => $this->compactRoles(Role::all()),
+                'parishes' => $this->compactOptions(Parish::query()->select(['id', 'name'])->get()),
+                'users' => $this->compactPeople(),
                 'activeTab' => 'home',
                 'subscriptions' => [],
                 'settings' => [],
                 'availableTabs' => HomeScreenTabFactory::available(),
-                'locations' => Location::inCities(Auth::user()->cities->pluck('id'))->get(),
+                'locations' => $this->compactOptions($this->locationsForUser()),
                 'ministries' => MinistryService::all(),
                 'modules' => Modules::tree(),
             ]
@@ -213,7 +227,7 @@ class UserController extends Controller
                         'vacationAdmins',
                         'vacationApprovers',
                     ]);
-        $cities = City::orderBy('name')->get();
+        $cities = City::query()->select(['id', 'name'])->orderBy('name')->get();
         $adminCities = [];
         $adminCityIds = [];
         foreach ($cities as $city) {
@@ -229,7 +243,7 @@ class UserController extends Controller
 
         $parishes = Parish::inCities(Auth::user()->adminCities->pluck('id'))->get();
         $homescreen = $user->getSetting('homeScreen', 'route:calendar');
-        $users = User::all();
+        $users = $this->compactPeople();
         $subscriptions = Subscription::where('user_id', $user->id)
             ->inCities($adminCityIds)
             ->get();
@@ -237,9 +251,15 @@ class UserController extends Controller
         $homeScreenTabsConfig = $user->getSetting('homeScreenTabsConfig') ?? [];
         $settings = Settings::all($user);
         $availableTabs = HomeScreenTabFactory::available();
-        $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
+        $locations = $this->compactOptions($this->locationsForUser());
         $ministries = MinistryService::all();
         $modules = Modules::tree();
+
+        $user = $this->compactEditorUser($user);
+        $cities = $this->compactOptions($cities);
+        $adminCities = $this->compactOptions($adminCities);
+        $roles = $this->compactRoles($roles);
+        $parishes = $this->compactOptions($parishes);
 
 
         $activeTab = $request->get('tab', 'home');
@@ -263,6 +283,174 @@ class UserController extends Controller
                 'modules',
             )
         );
+    }
+
+    /**
+     * Build the small representation needed by the user overview.
+     *
+     * @param User $user
+     * @param Collection $allCities
+     * @return array<string, mixed>
+     */
+    protected function compactIndexUser(User $user, Collection $allCities): array
+    {
+        $adminCities = $user->hasRole(AuthServiceProvider::SUPER)
+            ? $allCities
+            : $user->getRelation('adminCities');
+        $writableCities = $user->hasRole(AuthServiceProvider::SUPER)
+            ? $allCities
+            : $user->getRelation('writableCities');
+
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'sortName' => $user->sortName,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'email' => $user->email,
+            'isOfficialUser' => $user->isOfficialUser,
+            'isAdmin' => $user->isAdmin,
+            'home_cities' => $this->compactOptions($user->getRelation('homeCities')),
+            'cities' => $this->compactOptions($user->getRelation('cities')),
+            'writable_cities' => $this->compactOptions($writableCities),
+            'admin_cities' => $this->compactOptions($adminCities),
+            'roles' => $this->compactRoles($user->getRelation('roles')),
+        ];
+    }
+
+    /**
+     * Build the representation needed by the user editor without serializing the model.
+     *
+     * @param User $user
+     * @return array<string, mixed>
+     */
+    protected function compactEditorUser(User $user): array
+    {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'title' => $user->title,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'office' => $user->office,
+            'address' => $user->address,
+            'phone' => $user->phone,
+            'email' => $user->email,
+            'image' => $user->image,
+            'manage_absences' => $user->manage_absences,
+            'show_vacations_with_services' => $user->show_vacations_with_services,
+            'needs_replacement' => $user->needs_replacement,
+            'isOfficialUser' => $user->isOfficialUser,
+            'home_cities' => $this->compactIds($user->getRelation('homeCities')),
+            'parishes' => $this->compactIds($user->getRelation('parishes')),
+            'roles' => $this->compactIds($user->getRelation('roles')),
+            'cities' => $this->compactIds($user->getRelation('cities')),
+            'writable_cities' => $this->compactIds($user->getRelation('writableCities')),
+            'admin_cities' => $this->compactIds($user->getRelation('adminCities')),
+            'vacation_admins' => $this->compactIds($user->getRelation('vacationAdmins')),
+            'vacation_approvers' => $this->compactIds($user->getRelation('vacationApprovers')),
+        ];
+    }
+
+    /**
+     * Return only the fields needed by people selectors.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function compactPeople(?int $exceptId = null): array
+    {
+        $query = User::query()
+            ->select(['id', 'title', 'first_name', 'last_name', 'email', 'image'])
+            ->orderBy('last_name')
+            ->orderBy('first_name');
+
+        if ($exceptId !== null) {
+            $query->where('id', '!=', $exceptId);
+        }
+
+        return $query->get()
+            ->map(fn (User $user) => $this->compactPerson($user))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Convert a person to the fields used by person selectors.
+     *
+     * @param User $user
+     * @return array<string, mixed>
+     */
+    protected function compactPerson(User $user): array
+    {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'title' => $user->title,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'email' => $user->email,
+            'image' => $user->image,
+        ];
+    }
+
+    /**
+     * Convert option models to the fields used by form select components.
+     *
+     * @param iterable $options
+     * @return array<int, array<string, mixed>>
+     */
+    protected function compactOptions(iterable $options): array
+    {
+        return collect($options)
+            ->map(fn ($option) => ['id' => $option->id, 'name' => $option->name])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Convert relation models to their IDs.
+     *
+     * @param iterable $records
+     * @return array<int, int|string>
+     */
+    protected function compactIds(iterable $records): array
+    {
+        return collect($records)->pluck('id')->values()->all();
+    }
+
+    /**
+     * Convert roles and permissions to the fields used by the user interface.
+     *
+     * @param iterable $roles
+     * @return array<int, array<string, mixed>>
+     */
+    protected function compactRoles(iterable $roles): array
+    {
+        return collect($roles)
+            ->map(fn ($role) => [
+                'id' => $role->id,
+                'name' => $role->name,
+                'permissions' => $role->permissions
+                    ->map(fn ($permission) => ['id' => $permission->id, 'name' => $permission->name])
+                    ->values()
+                    ->all(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Load only the location fields needed for home-screen configuration.
+     *
+     * @return Collection
+     */
+    protected function locationsForUser(): Collection
+    {
+        return Location::query()
+            ->without(['seatingSections', 'city'])
+            ->select(['id', 'name'])
+            ->inCities(Auth::user()->cities->pluck('id'))
+            ->get();
     }
 
 
@@ -441,8 +629,10 @@ class UserController extends Controller
     public function join(User $user)
     {
         Gate::authorize('join', $user);
-        $people = User::where('id', '!=', $user->id)->orderBy('last_name')->orderBy('first_name')->get();
-        return Inertia::render('Admin/User/Join', compact('user', 'people'));
+        return Inertia::render('Admin/User/Join', [
+            'user' => $this->compactPerson($user),
+            'people' => $this->compactPeople($user->id),
+        ]);
     }
 
     /**
