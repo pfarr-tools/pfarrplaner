@@ -10,6 +10,7 @@ src/node_modules
 src/storage
 src/bootstrap/cache
 src/public/build
+src/public/hot
 src/.phpunit.result.cache
 src/.phpunit.cache
 src/.idea
