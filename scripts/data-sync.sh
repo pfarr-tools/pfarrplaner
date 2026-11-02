@@ -36,16 +36,21 @@ remote_dump() {
   remote "./planer exec -T mariadb sh -lc 'mariadb-dump --single-transaction --routines --events -u\"\$MARIADB_USER\" -p\"\$MARIADB_PASSWORD\" \"\$MARIADB_DATABASE\"'"
 }
 local_objects() {
-  "${COMPOSE[@]}" run --rm --no-deps --entrypoint /bin/sh create-buckets -lc 'rm -rf /tmp/objects && mkdir /tmp/objects && mc alias set src "${AWS_ENDPOINT:-http://minio:9000}" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" && mc mirror src/"$AWS_BUCKET" /tmp/objects && tar -C /tmp/objects -cf - .'
+  "${COMPOSE[@]}" run --rm --no-deps --use-aliases --entrypoint /bin/sh create-buckets -lc 'rm -rf /tmp/objects && mkdir /tmp/objects && mc alias set src "${AWS_ENDPOINT:-http://minio:9000}" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" && mc mirror src/"$AWS_BUCKET" /tmp/objects && tar -C /tmp/objects -cf - .'
 }
 remote_objects() {
-  remote "docker compose -f compose.production.yaml run --rm --no-deps --entrypoint /bin/sh create-buckets -lc 'rm -rf /tmp/objects && mkdir /tmp/objects && mc alias set src \"\${AWS_ENDPOINT:-http://minio:9000}\" \"\$AWS_ACCESS_KEY_ID\" \"\$AWS_SECRET_ACCESS_KEY\" && mc mirror src/\"\$AWS_BUCKET\" /tmp/objects && tar -C /tmp/objects -cf - .'"
+  remote_planer up -d minio >/dev/null
+  remote "docker compose -f compose.production.yaml run --rm --no-deps --use-aliases --entrypoint /bin/sh create-buckets -lc 'set -eu; printf \"PFARRPLANER_OBJECTS_BEGIN\\n\"; rm -rf /tmp/objects && mkdir /tmp/objects && mc alias set src \"\${AWS_ENDPOINT:-http://minio:9000}\" \"\$AWS_ACCESS_KEY_ID\" \"\$AWS_SECRET_ACCESS_KEY\" >/dev/null && mc mirror --quiet src/\"\$AWS_BUCKET\" /tmp/objects >/dev/null && tar -C /tmp/objects -cf /tmp/pfarrplaner-objects.tar . && base64 /tmp/pfarrplaner-objects.tar; printf \"\\nPFARRPLANER_OBJECTS_END\\n\"'" \
+    | awk '/^PFARRPLANER_OBJECTS_BEGIN$/{capture=1; next} /^PFARRPLANER_OBJECTS_END$/{capture=0; next} capture' \
+    | base64 --decode
 }
 local_import_objects() {
-  "${COMPOSE[@]}" run --rm --no-deps --entrypoint /bin/sh create-buckets -lc 'rm -rf /tmp/objects && mkdir /tmp/objects && tar -C /tmp/objects -xf - && mc alias set dst "${AWS_ENDPOINT:-http://minio:9000}" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" && mc mirror --overwrite /tmp/objects dst/"$AWS_BUCKET"'
+  "${COMPOSE[@]}" up -d minio >/dev/null
+  "${COMPOSE[@]}" run --rm --no-deps --use-aliases --entrypoint /bin/sh create-buckets -lc 'rm -rf /tmp/objects && mkdir /tmp/objects && tar -C /tmp/objects -xf - && mc alias set dst "${AWS_ENDPOINT:-http://minio:9000}" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" && mc mirror --overwrite /tmp/objects dst/"$AWS_BUCKET"'
 }
 remote_import_objects() {
-  remote "docker compose -f compose.production.yaml run --rm --no-deps --entrypoint /bin/sh create-buckets -lc 'rm -rf /tmp/objects && mkdir /tmp/objects && tar -C /tmp/objects -xf - && mc alias set dst \"\${AWS_ENDPOINT:-http://minio:9000}\" \"\$AWS_ACCESS_KEY_ID\" \"\$AWS_SECRET_ACCESS_KEY\" && mc mirror --overwrite /tmp/objects dst/\"\$AWS_BUCKET\"'"
+  remote_planer up -d minio >/dev/null
+  remote "docker compose -f compose.production.yaml run --rm --no-deps --use-aliases --entrypoint /bin/sh create-buckets -lc 'rm -rf /tmp/objects && mkdir /tmp/objects && tar -C /tmp/objects -xf - && mc alias set dst \"\${AWS_ENDPOINT:-http://minio:9000}\" \"\$AWS_ACCESS_KEY_ID\" \"\$AWS_SECRET_ACCESS_KEY\" && mc mirror --overwrite /tmp/objects dst/\"\$AWS_BUCKET\"'"
 }
 if [[ "$direction" == push ]]; then
   (( source_down )) && "${COMPOSE[@]}" exec -T app php artisan down && local_down=1

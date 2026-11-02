@@ -7,7 +7,13 @@ SCRIPT="$ROOT/scripts/data-sync.sh"
 grep -q "remote \"./planer exec -T mariadb" "$SCRIPT"
 ! grep -q "remote 'docker compose -f compose.yaml exec" "$SCRIPT"
 grep -q 'docker compose -f compose.production.yaml run --rm --no-deps' "$SCRIPT"
+grep -q -- '--use-aliases' "$SCRIPT"
 ! grep -q 'mariadb --force' "$SCRIPT"
+grep -q 'PFARRPLANER_OBJECTS_BEGIN' "$SCRIPT"
+grep -q 'base64 --decode' "$SCRIPT"
+grep -q 'mc mirror --quiet' "$SCRIPT"
+grep -q 'remote_planer up -d minio' "$SCRIPT"
+grep -q '"\${COMPOSE\[@\]}" up -d minio' "$SCRIPT"
 awk '
   /^else$/ { in_pull = 1 }
   in_pull && /php artisan migrate --force/ { migrate = NR }
