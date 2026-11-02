@@ -5,6 +5,9 @@
 /secrets/
 
 backups/
+
+__pycache__/
+*.py[cod]
 .planer-production-update.lock
 
 src/vendor/
