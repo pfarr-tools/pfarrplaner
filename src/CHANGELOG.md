@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.18.2](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.1...v2026.18.2) (2026-11-02)
+
+
+### Bug Fixes
+
+* **migration:** Produktionsimage automatisch aus Release-Tag wählen. ([becc864](https://github.com/pfarr-tools/pfarrplaner/commit/becc864fbdf3c23d4ccafc11742d514a73842cf2))
+
 ### [2026.18.1](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.0...v2026.18.1) (2026-11-02)
 
 
