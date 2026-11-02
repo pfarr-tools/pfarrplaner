@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.18.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.16.0...v2026.18.0) (2026-11-02)
+
+
+### Features
+
+* **release:** Dusk-Tests bei unveränderten Ressourcen überspringen ([999121c](https://github.com/pfarr-tools/pfarrplaner/commit/999121cbcc0be2b7b3b88d96d9cc670ade96a01e))
+
+
+### Bug Fixes
+
+* **migration:** Bibelressourcen persistent übernehmen. ([4605e4e](https://github.com/pfarr-tools/pfarrplaner/commit/4605e4ec47516faad0c775893dbafe68ac6d0090))
+* **release:** Dev-Stack vor Manual-Build bereinigen. ([201b12f](https://github.com/pfarr-tools/pfarrplaner/commit/201b12fbd41b79caebc08437a4f574dd0b46100b))
+* **release:** Versionsdateien aus dem Subtree stagen. ([173ca2a](https://github.com/pfarr-tools/pfarrplaner/commit/173ca2a11720e74d9e886b018bc6c21be066034a))
+* **release:** Verwaiste Docker-Endpunkte bereinigen. ([2550e46](https://github.com/pfarr-tools/pfarrplaner/commit/2550e466542b5625bd67bcc6f3d83eb808d512d4))
+
 ## 2026.17.1 (2026-11-02)
 
 

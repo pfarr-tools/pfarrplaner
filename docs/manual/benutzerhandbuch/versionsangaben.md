@@ -5,10 +5,10 @@
 | Angabe | Wert |
 |---|---|
 | Handbuch | Pfarrplaner Benutzerhandbuch |
-| Programmversion | 2026.16.0 |
+| Programmversion | 2026.18.0 |
 | Umgebung | local |
-| Build-Datum der Anwendung | Montag, 02. November 2026 18:16 |
-| Handbuch erstellt am | 02.11.2026 18:20 |
+| Build-Datum der Anwendung | Montag, 02. November 2026 19:03 |
+| Handbuch erstellt am | 02.11.2026 19:04 |
 | Git-Branch | unbekannt |
 | Git-Stand | unbekannt |
 | Lizenz | GNU General Public License, Version 3.0 oder später |
@@ -19,7 +19,22 @@
 
 Die wichtigsten Änderungen der letzten Versionen stehen im Änderungsprotokoll. Für die tägliche Arbeit sind vor allem neue oder geänderte Schaltflächen, neue Berichte, neue Eingabefelder und geänderte Abläufe wichtig.
 
-## 2026.16.0 (2026-11-02)
+## [2026.18.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.16.0...v2026.18.0) (2026-11-02)
+
+
+### Features
+
+* **release:** Dusk-Tests bei unveränderten Ressourcen überspringen ([999121c](https://github.com/pfarr-tools/pfarrplaner/commit/999121cbcc0be2b7b3b88d96d9cc670ade96a01e))
+
+
+### Bug Fixes
+
+* **migration:** Bibelressourcen persistent übernehmen. ([4605e4e](https://github.com/pfarr-tools/pfarrplaner/commit/4605e4ec47516faad0c775893dbafe68ac6d0090))
+* **release:** Dev-Stack vor Manual-Build bereinigen. ([201b12f](https://github.com/pfarr-tools/pfarrplaner/commit/201b12fbd41b79cäbc08437a4f574dd0b46100b))
+* **release:** Versionsdateien aus dem Subtree stagen. ([173ca2a](https://github.com/pfarr-tools/pfarrplaner/commit/173ca2a11720e74d9e886b018bc6c21be066034a))
+* **release:** Verwaiste Docker-Endpunkte bereinigen. ([2550e46](https://github.com/pfarr-tools/pfarrplaner/commit/2550e466542b5625bd67bcc6f3d83eb808d512d4))
+
+## 2026.17.1 (2026-11-02)
 
 
 ### Features
@@ -1261,31 +1276,6 @@ Die wichtigsten Änderungen der letzten Versionen stehen im Änderungsprotokoll.
 * Neü Personen erscheinen nicht in der Auswahlliste ([c2d6df8](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c2d6df8ec513095d84ac04b68e28bd60929943d5))
 * Planungstabelle speichert nicht verlässlich ([d73bbc6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d73bbc6ed146557b003b16f9b443a33d30559815))
 * Sicherheitsabfragen vor Löschaktionen ergänzen. ([eed7c9c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/eed7c9cb4ä127bb54a7f9b647731082b75e74b8)), closes [#458](https://codeberg.org/pfarr.tools/pfarrplaner/issüs/458)
-* Speichern bei KonfiApp-API-Fehler nicht möglich ([8565049](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8565049bb03e1a442d6f4f699ca1728567a95afe))
-* Suchfilter in der Liederliste funktioniert nicht ([5101758](https://codeberg.org/pfarr.tools/pfarrplaner/commit/51017583d6ce3741cd0f25e72dcb686ee9e4fd82))
-* UserEditor lässt sich nicht öffnen ([2d6f1bf](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2d6f1bf480c2fc24dd4572514ef5fd41f574bf4d))
-* WeeklyVerseReport verwendet obsolete API ([bda40b6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/bda40b66c21e7a3db2780ä580c89f4e3fc279e4))
-
-## [2026.14.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.12.4...v2026.14.0) (2026-08-11)
-
-
-### Features
-
-* Kirchliche Nachrichten ohne Kopfzeilen drucken ([373d377](https://codeberg.org/pfarr.tools/pfarrplaner/commit/373d3771688212724fb69195aa05084859d1d2c6))
-* Lösch-Button aus Kalenderansicht entfernt ([ä75d3c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ä75d3cb73d824c43c702919a9e5a9c3ceca983b))
-* Uhrzeit-Vorgabe für Seriengottesdienste ([07c72a2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/07c72a22913cfd6c2b082419910aä4b4a912073))
-
-
-### Bug Fixes
-
-* Abendmahl erscheint nicht in der Gottesdienstbeschreibung ([ca4bc85](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ca4bc85be1ee2f548360c12c0901797c6556d167))
-* Bereits erteilte Dimissoriale bei Trauungen korrekt erkennen. ([f6d1c4d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/f6d1c4db44a88fc1f2dabe1fbc10596eb5c19f1b))
-* Fehlende Youtube-Links in der Gottesdienstliste ([6e1b6ec](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6e1b6ecc2bfabf157e2ba2d2644bbb4e0a0084b3))
-* Fehler bei der KonfiApp-API ([fb12a99](https://codeberg.org/pfarr.tools/pfarrplaner/commit/fb12a99b2a5f15bcc5b7cf959166493ff0b5db36))
-* Fehler beim Erstellen von QR Codes. ([9455328](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9455328eea3f51985157f4046a5d1bb5dc5183c3))
-* Liederbücher können nicht zu Liedern hinzugefügt werden. ([1c3äfe](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1c3äfe2b5d37286bddcfe284e8a5ca9419340f6))
-* Neü Personen erscheinen nicht in der Auswahlliste ([c2d6df8](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c2d6df8ec513095d84ac04b68e28bd60929943d5))
-* Planungstabelle speichert nicht verlässlich ([d73bbc6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d73bbc6ed146557b003b16f9b443a33d30559815))
 * Speichern bei KonfiApp-API-Fehler nicht möglich ([8565049](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8565049bb03e1a442d6f4f699ca1728567a95afe))
 * Suchfilter in der Liederliste funktioniert nicht ([5101758](https://codeberg.org/pfarr.tools/pfarrplaner/commit/51017583d6ce3741cd0f25e72dcb686ee9e4fd82))
 * UserEditor lässt sich nicht öffnen ([2d6f1bf](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2d6f1bf480c2fc24dd4572514ef5fd41f574bf4d))
