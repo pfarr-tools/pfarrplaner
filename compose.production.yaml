@@ -1,7 +1,7 @@
 name: ${COMPOSE_PROJECT_NAME:-pfarrplaner}
 
 x-app: &app
-  build: {context: ., dockerfile: Dockerfile, target: production}
+  image: ${PFARRPLANER_IMAGE:-pfarrtools/pfarrplaner:latest}
   working_dir: /var/www/html
   env_file:
     - path: .env

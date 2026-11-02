@@ -187,14 +187,17 @@ Backup-Image. Die CLI übernimmt die Sperre, daher darf Cron keine zweite
 ./planer update --backup-confirmed
 ```
 
-Das Update verhindert parallele Ausrollungen, prüft `APP_ENV=production`, baut
-das neue Image vor dem Umschalten, startet für die Migrationen die abhängigen
-Dienste und führt sie mit diesem Image aus,
+Das Update verhindert parallele Ausrollungen, prüft `APP_ENV=production`, holt
+das veröffentlichte Produktionsimage vor dem Umschalten, startet für die
+Migrationen die abhängigen Dienste und führt sie mit diesem Image aus,
 aktualisiert öffentliche Assets, ersetzt App/Worker/Scheduler und wartet auf
-Gesundheitschecks. `--ref <tag|commit>` baut einen bestimmten Git-Stand.
+Gesundheitschecks. `--ref <tag>` verwendet den passenden veröffentlichten
+Image-Tag.
 Ohne `--ref` holt `update` den aktuellen Branch zuvor mit
 `git pull --ff-only`; lokale nicht-committete Änderungen oder nicht
 automatisch vorwärts auflösbare Branches brechen das Update sicher ab.
+`--build` erstellt stattdessen ausdrücklich ein lokales Produktionsimage; mit
+`./planer build --ref <tag|commit>` kann dafür auch ein Commit gebaut werden.
 
 Migrationen müssen expand-and-contract-kompatibel sein: erst neue Strukturen
 hinzufügen, dann die Anwendung ausrollen, alte Strukturen erst später
@@ -209,29 +212,26 @@ Arbeitsbaum wird der Release über den zentralen Einstiegspunkt erstellt:
 ```sh
 ./planer release
 ./planer release minor
-git push origin main v2026.15.0
 ```
 
-Der Release aktualisiert `src/package.json`, `src/package-lock.json` und
-`src/CHANGELOG.md`, erstellt `chore(release): VERSION` und setzt den Tag
-`vVERSION`. Die automatische Wahl ist ein Major-Release beim Jahreswechsel,
+Die automatische Wahl ist ein Major-Release beim Jahreswechsel,
 ein Minor-Release bei neuen Features und sonst ein Patch-Release.
 
-Der frühere Einzel-Image-Build aus `src/scripts/docker-build.js` und der
-zugehörige Tag-Build wurden entfernt. Das Produktionsimage wird ausschließlich
-aus dem Root-Repository und dem veröffentlichten Tag gebaut:
+Der Release aktualisiert `src/package.json`, `src/package-lock.json` und
+`src/CHANGELOG.md`, erstellt `chore(release): VERSION`, setzt den Tag
+`vVERSION`, baut das Produktionsimage und veröffentlicht es als
+`pfarrtools/pfarrplaner:vVERSION`. Dafür muss Docker lokal am Docker Hub
+angemeldet sein.
 
 ```sh
-./planer backup create
-./planer update --ref v2026.15.0 --backup-confirmed
+./planer release
 ```
 
-`update` baut zuerst das neue Image, führt danach die Migrationen in einem
+`update` zieht zuerst das neue Image, führt danach die Migrationen in einem
 separaten Container aus und aktualisiert anschließend Assets, Octane, Horizon
-und Scheduler. Der bisher laufende App-Container bleibt bis zum erfolgreichen
-Build und zur erfolgreichen Migration aktiv. Ein Tag-Update ist deshalb der
-empfohlene Produktionsweg; ein Update vom lokalen, ungetaggten Arbeitsstand
-bleibt für Notfälle möglich.
+und Scheduler. Ein Tag-Update ist deshalb der empfohlene Produktionsweg.
+Für einen lokalen Notfall-Build stehen `./planer build --ref <tag|commit>` und
+`./planer update --build` zur Verfügung.
 
 ## Datenübertragung und Legacy-Migration
 

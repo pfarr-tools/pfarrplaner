@@ -15,19 +15,20 @@ Ein Release und seine Auslieferung laufen über:
 
 ```sh
 ./planer release
-git push origin main v2026.15.0
 ./planer backup create
 ./planer update --ref v2026.15.0 --backup-confirmed
 ```
 
-`update` baut das Produktionsimage, führt Migrationen aus, aktualisiert
-die öffentlichen Assets und startet App, Horizon und Scheduler mit Health-Check
-neu. Der alte Image-Stand bleibt als Rollback-Grundlage erhalten.
+`release` baut und veröffentlicht das versionierte Image
+`pfarrtools/pfarrplaner:vVERSION`. `update` zieht dieses Image, führt
+Migrationen aus, aktualisiert die öffentlichen Assets und startet App, Horizon
+und Scheduler mit Health-Check neu. Der alte Image-Stand bleibt als
+Rollback-Grundlage erhalten.
 
 ## Docker-Deployment
 
-Im Containerbetrieb läuft das Deployment reproduzierbar über das Root-
-Produktionsimage und `compose.production.yaml`. Entscheidend sind persistente
+Im Containerbetrieb läuft das Deployment reproduzierbar über das veröffentlichte
+Root-Produktionsimage und `compose.production.yaml`. Entscheidend sind persistente
 MariaDB-, Redis- und MinIO-Volumes, konsistente `.env`-Werte, ein geprüftes
 Backup und ein sauberer Umgang mit Migrationen, Horizon und Scheduler.
 

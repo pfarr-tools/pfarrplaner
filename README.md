@@ -150,20 +150,19 @@ erstellt den semantischen Release-Commit und setzt den Tag:
 ```sh
 ./planer release
 ./planer release minor
-git push origin main v2026.15.0
 ```
 
-Es gibt keinen separaten Legacy-Docker-Image-Build mehr. Das Produktionsimage
-wird beim kontrollierten Update aus dem veröffentlichten Tag gebaut:
+Der Release baut und veröffentlicht das versionierte Produktionsimage unter
+`pfarrtools/pfarrplaner`. Das Produktionsupdate zieht dieses veröffentlichte
+Image:
 
 ```sh
 ./planer backup create
 ./planer update --ref v2026.15.0 --backup-confirmed
 ```
 
-Der Build erfolgt vor dem Umschalten der laufenden Container. Migrationen
-werden mit dem neuen Image ausgeführt; anschließend werden Octane, Horizon und
-Scheduler neu gestartet und die Gesundheitschecks abgewartet.
+Für einen ausdrücklich lokalen Build stehen `./planer build [--ref <tag|commit>]`
+und `./planer update --build` zur Verfügung.
 
 ## Dokumentation
 

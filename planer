@@ -19,6 +19,7 @@ Pfarrplaner-Betriebshelfer
 
 Produktion (Standard):
   ./planer up|down|restart|status|logs|exec [Argumente]
+  ./planer build [--ref <tag|commit>]
   ./planer shell
   ./planer artisan <Befehl>
   ./planer backup create|list|verify|restore|prune|check|init
@@ -118,6 +119,7 @@ run_production() {
     backup) PLANER_PRODUCTION=1 exec "$ROOT/scripts/backup.sh" "${1:-help}" "${@:2}" ;;
     release) exec "$ROOT/scripts/release.sh" "$@" ;;
     update) exec "$ROOT/scripts/update-production.sh" "$@" ;;
+    build) exec "$ROOT/scripts/build-production.sh" "$@" ;;
     migrate)
       [[ "${1:-}" == legacy ]] || { echo 'Verwendung: ./planer migrate legacy ...' >&2; exit 2; }
       shift
@@ -141,7 +143,7 @@ case "$COMMAND" in
   bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
   manual|manual:build|manual:dusk|manual:site|manual:all|manual:deploy|manual:source-publish)
     run_dev "$COMMAND" "$@" ;;
-  up|down|restart|status|ps|logs|exec|shell|artisan|data|backup|release|update|migrate|test|composer|npm|pint|fresh)
+  up|down|restart|status|ps|logs|exec|shell|artisan|data|backup|release|update|build|migrate|test|composer|npm|pint|fresh)
     run_production "$COMMAND" "$@"
     ;;
   help|--help|-h) usage ;;
