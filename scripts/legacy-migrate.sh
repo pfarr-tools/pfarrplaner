@@ -55,6 +55,17 @@ case "$target" in
     ;;
   *) die "Unbekanntes Ziel: $target" ;;
 esac
+if [[ "$target" == prod || "$target" == demo ]]; then
+  image_ref="${PFARRPLANER_IMAGE:-$(bash "$ENV_READER" "$ROOT/.env" PFARRPLANER_IMAGE 2>/dev/null || true)}"
+  if [[ -z "$image_ref" ]]; then
+    release_tag="$(git -C "$ROOT" describe --tags --exact-match HEAD 2>/dev/null || true)"
+    [[ -n "$release_tag" ]] || die 'Für --prod/--demo muss PFARRPLANER_IMAGE gesetzt sein oder HEAD exakt auf einem Release-Tag stehen.'
+    image_repository="${PFARRPLANER_IMAGE_REPOSITORY:-pfarrtools/pfarrplaner}"
+    image_ref="$image_repository:$release_tag"
+  fi
+  export PFARRPLANER_IMAGE="$image_ref"
+  echo "  Produktionsbild: $PFARRPLANER_IMAGE"
+fi
 echo "  Zielumgebung: $target"
 legacy_local=0
 if [[ "$legacy_path" == /* ]]; then
@@ -227,13 +238,13 @@ echo '5/6 Zielanwendung in den Wartungsmodus versetzen.'
 "${COMPOSE[@]}" exec -T app php artisan down
 local_down=1
 
-echo '6/6 MariaDB importieren, migrieren und Objekte übernehmen.'
+echo '6/6 MariaDB importieren und migrieren.'
 "${COMPOSE[@]}" exec -T mariadb sh -lc 'mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" -e "SET GLOBAL max_allowed_packet=268435456; DROP DATABASE IF EXISTS $MARIADB_DATABASE; CREATE DATABASE $MARIADB_DATABASE;"'
 cat "$ROOT/backups/legacy/legacy-$stamp.sql" | "${COMPOSE[@]}" exec -T mariadb sh -lc 'mariadb --max_allowed_packet=256M -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE"'
 "${COMPOSE[@]}" exec -T app php artisan config:clear
 "${COMPOSE[@]}" exec -T app php artisan migrate --force
 
-echo '5/5 Legacy-Dateien in MinIO übernehmen.'
+echo '  Legacy-Dateien in MinIO übernehmen.'
 legacy_files="$(mktemp -d)"
 tar -C "$legacy_files" -xf "$archive"
 "${COMPOSE[@]}" run --rm --no-deps -v "$legacy_files:/tmp/legacy:ro" --entrypoint /bin/sh create-buckets -lc 'mc alias set dst "${AWS_ENDPOINT:-http://minio:9000}" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" && if [ -d /tmp/legacy/storage/app ]; then mc mirror --overwrite /tmp/legacy/storage/app dst/"$AWS_BUCKET"; fi && if [ -d /tmp/legacy/storage/inbox ]; then mc mirror --overwrite /tmp/legacy/storage/inbox dst/"$AWS_BUCKET"/inbox; fi'

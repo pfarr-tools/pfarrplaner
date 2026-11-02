@@ -263,6 +263,11 @@ verwendet. `--dev`, `--prod` und `--demo` dürfen nicht gemeinsam angegeben
 werden. Für `--demo` setzt der Import `DEMO_MODE=true`; dieser explizite
 Schalter erlaubt dem DemoBuilder die produktionsgleiche Compose-Umgebung und
 verhindert, dass ein fehlender Demo-Preflight als erfolgreicher Import endet.
+Bei `--prod` und `--demo` verwendet der Import automatisch das Produktionsimage
+des exakten Release-Tags auf `HEAD`. Alternativ kann mit
+`PFARRPLANER_IMAGE=pfarrtools/pfarrplaner:vVERSION` ein Image ausdrücklich
+vorgegeben werden. Ein ungetaggter Produktionsstand ohne diese Variable wird
+abgelehnt; das veränderliche Image `:latest` wird nicht automatisch verwendet.
 
 `--database` und `--user` sind optionale Überschreibungen. Standardmäßig liest der
 Legacy-Import `DB_DATABASE`, `DB_USERNAME`, `DB_HOST`, `DB_PORT` und
