@@ -13,7 +13,7 @@
 
 'use strict';
 
-const { execSync } = require('child_process');
+const { execFileSync, execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -98,7 +98,15 @@ const releaseMessage = `chore(release): ${newPkg.version}`;
 if (releaseType === 'major' || releaseType === 'minor') {
     console.log('Rebuilding and deploying manual...');
     try {
-        execSync('npm run manual:all:server', { stdio: 'inherit' });
+        const planer = path.resolve(repositoryRoot, 'planer');
+        execFileSync(planer, ['dev', 'up', '-d'], {
+            cwd: repositoryRoot,
+            stdio: 'inherit',
+        });
+        execFileSync(planer, ['dev', 'manual', 'all'], {
+            cwd: repositoryRoot,
+            stdio: 'inherit',
+        });
         execSync('npm run manual:deploy', { stdio: 'inherit' });
         gitAddExisting([
             'docs/manual/benutzerhandbuch/versionsangaben.md',
