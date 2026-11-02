@@ -293,13 +293,14 @@ Bucket; Backup-Buckets bleiben unberührt. Der Legacy-Import erstellt SQL-/
 Dateiarchive mit SHA-256-Prüfsummen. Daten aus `failed_jobs` sowie den
 Telescope-Tabellen werden beim Dump bewusst ausgelassen; die Tabellenstrukturen
 bleiben erhalten. Anschließend importiert der Prozess MariaDB, führt Migrationen aus,
-überträgt `storage/app`, `storage/inbox` und — falls vorhanden — den gesamten
-Ordner `resources/bible` der Legacy-Installation in das lokale
-`src/resources/bible`. Bereits vorhandene lokale Bibeldateien werden dabei
-ergänzt oder überschrieben, aber nicht gelöscht. Die alte Installation bleibt
-unverändert. Wenn der Ordner vorhanden ist, wird das Ziel-App-Image vor dem
-Start neu gebaut, damit die Dateien auch in Produktionscontainern verfügbar
-sind.
+überträgt `storage/app` und `storage/inbox` nach MinIO. Falls vorhanden, wird
+der gesamte Ordner `resources/bible` der Legacy-Installation vor dem Start der
+Zielanwendung in das persistente Docker-Volume `bible_resources` übernommen.
+Laravel liest die Dateien weiterhin über `resource_path('bible')`; App, Horizon
+und Scheduler verwenden dabei dasselbe Volume. Das Produktions-App-Image wird
+nicht verändert und nicht neu gebaut. Bereits vorhandene lokale Bibeldateien
+werden ergänzt oder überschrieben, aber nicht gelöscht. Die alte Installation
+bleibt unverändert.
 
 ## Optionaler Maildienst
 

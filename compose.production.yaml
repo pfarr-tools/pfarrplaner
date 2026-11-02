@@ -8,6 +8,7 @@ x-app: &app
       required: false
   volumes:
     - ./src/storage:/var/www/html/storage
+    - bible_resources:/var/www/html/resources/bible
     - ./backups:/var/backups/pfarrplaner
   depends_on:
     mariadb: {condition: service_healthy}
@@ -107,6 +108,8 @@ services:
       /bin/sh -lc 'until mc alias set local http://minio:9000
       "$${AWS_ACCESS_KEY_ID}" "$${AWS_SECRET_ACCESS_KEY}"; do sleep 2; done;
       mc mb --ignore-existing local/$${AWS_BUCKET};'
+    volumes:
+      - bible_resources:/bible
     depends_on: {minio: {condition: service_started}}
     networks: [backend]
   backup:
@@ -173,6 +176,7 @@ volumes:
   mariadb_data:
   redis_data:
   minio_data:
+  bible_resources:
   caddy_data:
   caddy_config:
   public_assets:

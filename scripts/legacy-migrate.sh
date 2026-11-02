@@ -198,12 +198,6 @@ fi
 sha256sum "${legacy_archives[@]}" > "$ROOT/backups/legacy/legacy-$stamp.sha256"
 
 compose_up_args=(up -d --force-recreate app web horizon scheduler)
-if [[ -f "$legacy_bible_archive" ]]; then
-  mkdir -p "$ROOT/src/resources"
-  tar -C "$ROOT/src/resources" -xf "$legacy_bible_archive"
-  compose_up_args=(up -d --build --force-recreate app web horizon scheduler)
-  echo '  Remote-Bibelordner nach src/resources/bible übernommen; Produktionsbild wird neu gebaut.'
-fi
 if [[ "$target" == demo ]]; then
   set_env_value DEMO_MODE true
   set_env_value MAIL_MAILER smtp
@@ -220,6 +214,13 @@ echo '4/6 Legacy-Schlüssel in die lokale .env übernehmen.'
 set_env_value APP_KEY "$legacy_app_key"
 set_env_value DATABASE_KEY "$legacy_database_key"
 set_env_value DATABASE_CIPHER "$legacy_database_cipher"
+if [[ -f "$legacy_bible_archive" ]]; then
+  echo '  Remote-Bibelordner wird in das persistente bible_resources-Volume übernommen.'
+  "${COMPOSE[@]}" run --rm --no-deps \
+    -v "$legacy_bible_archive:/tmp/legacy-bible.tar:ro" \
+    --entrypoint /bin/sh create-buckets \
+    -lc 'tar -xf /tmp/legacy-bible.tar -C /bible --strip-components=1'
+fi
 "${COMPOSE[@]}" "${compose_up_args[@]}"
 
 echo '5/6 Zielanwendung in den Wartungsmodus versetzen.'
