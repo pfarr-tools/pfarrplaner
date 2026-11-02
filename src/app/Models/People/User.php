@@ -313,9 +313,17 @@ class User extends Authenticatable
      */
     public function setPasswordAttribute($value)
     {
-        if ($value != '') {
-            $this->attributes['password'] = Hash::make($value);
+        if ($value === null || $value === '') {
+            $this->attributes['password'] = $value;
+            return;
         }
+
+        // Laravel's authentication provider may assign an already rehashed
+        // password hash to the model after a successful login. Do not hash
+        // that hash a second time.
+        $this->attributes['password'] = password_get_info((string) $value)['algo'] !== 0
+            ? $value
+            : Hash::make($value);
     }
 // END MUTATORS
 
