@@ -84,6 +84,49 @@ function manualNeedsDusk() {
     return changedFiles.trim().length > 0;
 }
 
+function removeStaleDevNetworkEndpoints() {
+    const composeFile = path.resolve(repositoryRoot, 'compose.yaml');
+    let composeConfig;
+
+    try {
+        composeConfig = JSON.parse(execFileSync('docker', [
+            'compose', '-f', composeFile, 'config', '--format', 'json',
+        ], {
+            cwd: repositoryRoot,
+            encoding: 'utf8',
+        }));
+    } catch {
+        return;
+    }
+
+    const networkName = composeConfig.networks?.pfarrplaner?.name;
+    if (!networkName) {
+        return;
+    }
+
+    let network;
+    try {
+        network = JSON.parse(execFileSync('docker', ['network', 'inspect', networkName], {
+            cwd: repositoryRoot,
+            encoding: 'utf8',
+        }))[0];
+    } catch {
+        return;
+    }
+
+    for (const container of Object.values(network.Containers || {})) {
+        try {
+            execFileSync('docker', ['network', 'disconnect', '-f', networkName, container.Name], {
+                cwd: repositoryRoot,
+                stdio: 'ignore',
+            });
+            console.log(`Bereinige verwaisten Docker-Netzwerk-Endpunkt: ${container.Name}`);
+        } catch {
+            // The endpoint may disappear while Compose is reconciling the stack.
+        }
+    }
+}
+
 if (forcedType) {
     releaseType = forcedType;
     console.log(`Forced release type: ${releaseType}`);
@@ -129,6 +172,7 @@ if (releaseType === 'major' || releaseType === 'minor') {
             cwd: repositoryRoot,
             stdio: 'inherit',
         });
+        removeStaleDevNetworkEndpoints();
         execFileSync(planer, ['dev', 'up', '-d', '--remove-orphans'], {
             cwd: repositoryRoot,
             stdio: 'inherit',
