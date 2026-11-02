@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.18.3](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.2...v2026.18.3) (2026-11-02)
+
+
+### Features
+
+* **cache:** Statische Antworten mit Caddy zwischenspeichern ([63c4e45](https://github.com/pfarr-tools/pfarrplaner/commit/63c4e459d69ac59e0b14db2363dd9fc0bc273949))
+
+
+### Bug Fixes
+
+* **auth:** Passwort beim automatischen Rehash nicht doppelt hashen. ([970e8a9](https://github.com/pfarr-tools/pfarrplaner/commit/970e8a9da678681647bbb5064168416dce597ed5))
+* **caddy:** Statische Dateien direkt aus dem Public-Volume liefern ([c7a25ba](https://github.com/pfarr-tools/pfarrplaner/commit/c7a25bad1ec4f5e4375fffa2c51dda9752a93c8b))
+* **performance:** Benutzer-Payloads für Adminseiten verkleinern. ([cef16f1](https://github.com/pfarr-tools/pfarrplaner/commit/cef16f195ca41cdab54ff953cd3354a970213d39))
+* **sync:** Produktionsdaten sicherer übertragen. ([b2a3e95](https://github.com/pfarr-tools/pfarrplaner/commit/b2a3e957ab12ce8f388fd40e7c94994d8a71ec8f))
+
 ### [2026.18.2](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.1...v2026.18.2) (2026-11-02)
 
 
