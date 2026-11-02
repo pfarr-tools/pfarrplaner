@@ -122,10 +122,10 @@ if (releaseType === 'major' || releaseType === 'minor') {
 
 try {
     gitAddExisting([
-        'CHANGELOG.md',
-        'package.json',
-        'package-lock.json',
-        'npm-shrinkwrap.json',
+        'src/CHANGELOG.md',
+        'src/package.json',
+        'src/package-lock.json',
+        'src/npm-shrinkwrap.json',
     ]);
     execSync(`git commit -m "${releaseMessage}"`, { stdio: 'inherit' });
     execSync(`git tag -a ${tagPrefix}${newPkg.version} -m "${releaseMessage}"`, { stdio: 'inherit' });
