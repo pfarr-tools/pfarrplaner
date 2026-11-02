@@ -33,7 +33,7 @@ fi
 echo '1/5 Neues Produktionsimage bauen.'
 "${COMPOSE[@]}" build --pull app
 echo '2/5 Migrationen mit dem neuen Image ausführen.'
-"${COMPOSE[@]}" run --rm --no-deps app php artisan migrate --force
+"${COMPOSE[@]}" run --rm app php artisan migrate --force
 echo '3/5 Öffentliche Assets aktualisieren.'
 "${COMPOSE[@]}" up -d --no-deps public-assets
 echo '4/5 App, Worker und Scheduler mit dem neuen Image starten.'

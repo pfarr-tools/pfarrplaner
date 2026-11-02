@@ -188,7 +188,8 @@ Backup-Image. Die CLI übernimmt die Sperre, daher darf Cron keine zweite
 ```
 
 Das Update verhindert parallele Ausrollungen, prüft `APP_ENV=production`, baut
-das neue Image vor dem Umschalten, führt Migrationen mit diesem Image aus,
+das neue Image vor dem Umschalten, startet für die Migrationen die abhängigen
+Dienste und führt sie mit diesem Image aus,
 aktualisiert öffentliche Assets, ersetzt App/Worker/Scheduler und wartet auf
 Gesundheitschecks. `--ref <tag|commit>` baut einen bestimmten Git-Stand.
 
