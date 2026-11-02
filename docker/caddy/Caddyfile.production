@@ -12,10 +12,17 @@
     header @immutable_assets Cache-Control "public, max-age=31536000, immutable"
     @immutable_bible path /bible/text/*
     header @immutable_bible Cache-Control "public, max-age=31536000, immutable"
-    reverse_proxy app:8000 {
-        header_up X-Forwarded-Proto https
-        header_up X-Forwarded-Host {http.request.host}
-        header_up X-Forwarded-Port 443
+    @static file {
+        root /var/www/html/public
     }
-    file_server
+    handle @static {
+        file_server
+    }
+    handle {
+        reverse_proxy app:8000 {
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {http.request.host}
+            header_up X-Forwarded-Port 443
+        }
+    }
 }

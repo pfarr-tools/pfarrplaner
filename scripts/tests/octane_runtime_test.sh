@@ -13,6 +13,9 @@ grep -q 'header_up X-Forwarded-Port 443' "$ROOT/docker/caddy/Caddyfile.productio
 grep -q '@immutable_assets path /build/\*' "$ROOT/docker/caddy/Caddyfile.production"
 grep -q '@immutable_bible path /bible/text/\*' "$ROOT/docker/caddy/Caddyfile.production"
 grep -q 'Cache-Control "public, max-age=31536000, immutable"' "$ROOT/docker/caddy/Caddyfile.production"
+grep -q '@static file' "$ROOT/docker/caddy/Caddyfile.production"
+grep -q 'handle @static' "$ROOT/docker/caddy/Caddyfile.production"
+grep -q 'file_server' "$ROOT/docker/caddy/Caddyfile.production"
 grep -q 'exec php-fpm8.4 -F' "$ROOT/compose.yaml"
 grep -q 'OCTANE_WORKERS' "$ROOT/.env.example"
 echo 'Octane runtime tests passed'
