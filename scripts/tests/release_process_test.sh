@@ -7,6 +7,7 @@ grep -q 'release)' "$ROOT/planer"
 test -x "$ROOT/scripts/release.sh"
 grep -q 'npm run release' "$ROOT/scripts/release.sh"
 grep -q 'build-production.sh.*--push' "$ROOT/scripts/release.sh"
+grep -q 'git -C "\$ROOT" push origin main "\$tag"' "$ROOT/scripts/release.sh"
 grep -q 'pfarrtools/pfarrplaner:vVERSION' "$ROOT/docs/admin/installation-und-migration.md"
 grep -q 'pfarrtools/pfarrplaner:vVERSION' "$ROOT/docs/manual/technikhandbuch/deployment.md"
 
