@@ -192,6 +192,9 @@ das neue Image vor dem Umschalten, startet für die Migrationen die abhängigen
 Dienste und führt sie mit diesem Image aus,
 aktualisiert öffentliche Assets, ersetzt App/Worker/Scheduler und wartet auf
 Gesundheitschecks. `--ref <tag|commit>` baut einen bestimmten Git-Stand.
+Ohne `--ref` holt `update` den aktuellen Branch zuvor mit
+`git pull --ff-only`; lokale nicht-committete Änderungen oder nicht
+automatisch vorwärts auflösbare Branches brechen das Update sicher ab.
 
 Migrationen müssen expand-and-contract-kompatibel sein: erst neue Strukturen
 hinzufügen, dann die Anwendung ausrollen, alte Strukturen erst später

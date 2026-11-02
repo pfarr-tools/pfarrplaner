@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SCRIPT="$ROOT/scripts/update-production.sh"
 
+grep -q 'git -C "\$ROOT" pull --ff-only' "$SCRIPT"
 migration_line="$(grep -n 'php artisan migrate --force' "$SCRIPT" | cut -d: -f1)"
 
 test -n "$migration_line"

@@ -28,6 +28,10 @@ if [[ -n "$ref" ]]; then
   git -C "$ROOT" fetch --tags --prune
   git -C "$ROOT" show-ref --verify --quiet "refs/tags/$ref" || git -C "$ROOT" rev-parse --verify "$ref^{commit}" >/dev/null || die "Release nicht gefunden: $ref"
   git -C "$ROOT" checkout --detach "$ref"
+else
+  command -v git >/dev/null || die 'Für das Update wird git benötigt.'
+  echo '0/5 Aktuellen Git-Stand holen.'
+  git -C "$ROOT" pull --ff-only
 fi
 
 echo '1/5 Neues Produktionsimage bauen.'
