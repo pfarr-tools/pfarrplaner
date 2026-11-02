@@ -58,6 +58,32 @@ function gitAddExisting(paths) {
     execSync(`git -C "${repositoryRoot}" add -- ${existingPaths.join(' ')}`, { stdio: 'inherit' });
 }
 
+function manualNeedsDusk() {
+    let lastTag = '';
+    try {
+        lastTag = execFileSync('git', ['describe', '--tags', '--abbrev=0'], {
+            cwd: repositoryRoot,
+            encoding: 'utf8',
+        }).trim();
+    } catch {
+        return true;
+    }
+
+    const changedFiles = execFileSync('git', [
+        'diff',
+        '--name-only',
+        `${lastTag}..HEAD`,
+        '--',
+        'src/resources',
+        'src/public',
+    ], {
+        cwd: repositoryRoot,
+        encoding: 'utf8',
+    });
+
+    return changedFiles.trim().length > 0;
+}
+
 if (forcedType) {
     releaseType = forcedType;
     console.log(`Forced release type: ${releaseType}`);
@@ -107,7 +133,12 @@ if (releaseType === 'major' || releaseType === 'minor') {
             cwd: repositoryRoot,
             stdio: 'inherit',
         });
-        execFileSync(planer, ['dev', 'manual', 'all'], {
+        const manualArgs = ['dev', 'manual', 'all'];
+        if (!manualNeedsDusk()) {
+            manualArgs.push('--skip-dusk');
+            console.log('Keine Änderungen unter src/resources/ oder src/public/ seit dem letzten Release; überspringe Dusk-Screenshot-Tests.');
+        }
+        execFileSync(planer, manualArgs, {
             cwd: repositoryRoot,
             stdio: 'inherit',
         });

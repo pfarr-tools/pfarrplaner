@@ -221,7 +221,10 @@ Der Release aktualisiert `src/package.json`, `src/package-lock.json` und
 `src/CHANGELOG.md`, erstellt `chore(release): VERSION`, setzt den Tag
 `vVERSION`, baut das Produktionsimage und veröffentlicht es als
 `pfarrtools/pfarrplaner:vVERSION`. Dafür muss Docker lokal am Docker Hub
-angemeldet sein.
+angemeldet sein. Der Manual-Build läuft im Dev-Container. Dusk-Screenshot-
+Tests werden dabei nur ausgeführt, wenn sich seit dem letzten Release Dateien
+unter `src/resources/` oder `src/public/` geändert haben; andernfalls wird nur
+der restliche Manual-Build ausgeführt.
 
 ```sh
 ./planer release

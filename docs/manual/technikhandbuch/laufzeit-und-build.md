@@ -48,6 +48,11 @@ Der Handbook-Build erzeugt jetzt:
 - `technikhandbuch/`
 - eine gemeinsame Landing-Page unter `https://handbuch.pfarrplaner.de/`
 
+Beim automatischen Release prüft das Release-Skript die Änderungen seit dem
+letzten Git-Tag. Dusk-Screenshot-Tests laufen dort nur bei Änderungen unter
+`src/resources/` oder `src/public/`; bei reinen Code-, Dokumentations- oder
+Betriebsänderungen wird der Manual-Build mit `--skip-dusk` ausgeführt.
+
 ## Screenshot-Workflow
 
 Benutzerhandbuch-Screenshots werden über Dusk-Tests unter `tests/Browser/Manual/` erzeugt. Der kombinierte Build mit temporärem Laravel-Server läuft über `scripts/build-manual-with-server.js`.
