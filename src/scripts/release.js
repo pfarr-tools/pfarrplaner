@@ -99,7 +99,11 @@ if (releaseType === 'major' || releaseType === 'minor') {
     console.log('Rebuilding and deploying manual...');
     try {
         const planer = path.resolve(repositoryRoot, 'planer');
-        execFileSync(planer, ['dev', 'up', '-d'], {
+        execFileSync(planer, ['dev', 'down', '--remove-orphans'], {
+            cwd: repositoryRoot,
+            stdio: 'inherit',
+        });
+        execFileSync(planer, ['dev', 'up', '-d', '--remove-orphans'], {
             cwd: repositoryRoot,
             stdio: 'inherit',
         });
