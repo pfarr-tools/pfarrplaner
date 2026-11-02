@@ -8,6 +8,10 @@
 :80 {
     root * /var/www/html/public
     encode gzip
+    @immutable_assets path /build/*
+    header @immutable_assets Cache-Control "public, max-age=31536000, immutable"
+    @immutable_bible path /bible/text/*
+    header @immutable_bible Cache-Control "public, max-age=31536000, immutable"
     reverse_proxy app:8000 {
         header_up X-Forwarded-Proto https
         header_up X-Forwarded-Host {http.request.host}

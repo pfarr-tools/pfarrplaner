@@ -10,6 +10,9 @@ grep -q 'trusted_proxies static private_ranges' "$ROOT/docker/caddy/Caddyfile.pr
 grep -q 'trusted_proxies_strict' "$ROOT/docker/caddy/Caddyfile.production"
 grep -q 'header_up X-Forwarded-Proto https' "$ROOT/docker/caddy/Caddyfile.production"
 grep -q 'header_up X-Forwarded-Port 443' "$ROOT/docker/caddy/Caddyfile.production"
+grep -q '@immutable_assets path /build/\*' "$ROOT/docker/caddy/Caddyfile.production"
+grep -q '@immutable_bible path /bible/text/\*' "$ROOT/docker/caddy/Caddyfile.production"
+grep -q 'Cache-Control "public, max-age=31536000, immutable"' "$ROOT/docker/caddy/Caddyfile.production"
 grep -q 'exec php-fpm8.4 -F' "$ROOT/compose.yaml"
 grep -q 'OCTANE_WORKERS' "$ROOT/.env.example"
 echo 'Octane runtime tests passed'

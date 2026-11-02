@@ -14,6 +14,12 @@ Das Frontend wird mit Vite gebaut. Relevante Schritte:
 - `npm run build`
 - lokal optional `npm run dev`
 
+Die Produktions-Caddy-Konfiguration versieht gebaute Vite-Dateien unter
+`/build/` mit `Cache-Control: public, max-age=31536000, immutable`. Auch die
+unveränderlichen Bibelantworten unter `/bible/text/` werden ein Jahr lang
+öffentlich und unveränderlich gecacht. Dynamische Laravel-Antworten erhalten
+dagegen keine pauschale öffentliche Cache-Regel.
+
 ## Dokumentations-Build
 
 Für die Handbook-Site gibt es eine eigene Pipeline:
