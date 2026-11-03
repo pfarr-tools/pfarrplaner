@@ -36,9 +36,12 @@
                             :aria-describedby="field.describedBy || undefined">
                         <option value="homescreen:configurable">Konfigurierbare Startseite (Standard)</option>
                         <optgroup v-for="(group,groupKey,groupIndex) in moduleGroups" :label="(groupKey == 'default') ? 'Oberste Menügruppe' : 'Menügruppe '+groupKey">
-                            <option v-for="module in group" :value="'route:'+module.defaultRoute" v-if="module && module.defaultRoute">
-                                Startseite deaktivieren und direkt zum Modul "{{ module.title}}" gehen
-                            </option>
+                            <template v-for="module in group">
+                                <option v-if="module && module.defaultRoute" :key="module.defaultRoute"
+                                        :value="'route:'+module.defaultRoute">
+                                    Startseite deaktivieren und direkt zum Modul "{{ module.title}}" gehen
+                                </option>
+                            </template>
                         </optgroup>
                     </select>
                 </form-group>
