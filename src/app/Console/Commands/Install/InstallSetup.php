@@ -138,6 +138,7 @@ class InstallSetup extends Command
                 'gd-organist-bearbeiten',
             ],
             'Gottesdienstbearbeiter:in' => ['gd-bearbeiten'],
+            'Prädikant:in' => [],
             'Urlaubsbearbeiter:in' => ['fremden-urlaub-bearbeiten'],
             'KGR' => ['gd-kasualien-nur-statistik'],
             'Opferverwaltung' => ['gd-bearbeiten'],

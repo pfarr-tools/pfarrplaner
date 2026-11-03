@@ -38,4 +38,6 @@ class RoleService
 
     public const ROLE_PASTOR = 'Pfarrer:in';
 
+    public const ROLE_PREDICANT = 'Prädikant:in';
+
 }

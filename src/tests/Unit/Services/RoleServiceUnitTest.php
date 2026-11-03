@@ -22,6 +22,7 @@ class RoleServiceUnitTest extends TestCase
         $this->assertEquals('Super-Administrator:in', RoleService::ROLE_SUPER_ADMIN);
         $this->assertEquals('Administrator:in', RoleService::ROLE_ADMIN);
         $this->assertEquals('Pfarrer:in', RoleService::ROLE_PASTOR);
+        $this->assertEquals('Prädikant:in', RoleService::ROLE_PREDICANT);
     }
 
     public function testRoleConstantsAreStrings(): void
@@ -29,11 +30,17 @@ class RoleServiceUnitTest extends TestCase
         $this->assertIsString(RoleService::ROLE_SUPER_ADMIN);
         $this->assertIsString(RoleService::ROLE_ADMIN);
         $this->assertIsString(RoleService::ROLE_PASTOR);
+        $this->assertIsString(RoleService::ROLE_PREDICANT);
     }
 
     public function testRoleConstantsAreDistinct(): void
     {
-        $roles = [RoleService::ROLE_SUPER_ADMIN, RoleService::ROLE_ADMIN, RoleService::ROLE_PASTOR];
-        $this->assertCount(3, array_unique($roles));
+        $roles = [
+            RoleService::ROLE_SUPER_ADMIN,
+            RoleService::ROLE_ADMIN,
+            RoleService::ROLE_PASTOR,
+            RoleService::ROLE_PREDICANT,
+        ];
+        $this->assertCount(4, array_unique($roles));
     }
 }

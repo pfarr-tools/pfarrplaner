@@ -105,6 +105,7 @@
 <script>
 import draggable from 'vuedraggable'
 import NextServicesTabConfig from "../TabConfig/NextServicesTabConfig";
+import PredicantServicesTabConfig from "../TabConfig/PredicantServicesTabConfig";
 import BaptismsTabConfig from "../TabConfig/BaptismsTabConfig";
 import CasesTabConfig from "../TabConfig/CasesTabConfig";
 import FuneralsTabConfig from "../TabConfig/FuneralsTabConfig";
@@ -116,6 +117,7 @@ import FormGroup from "../../Ui/forms/FormGroup";
 
 const TAB_CONFIGURATION_COMPONENTS = {
     nextServices: NextServicesTabConfig,
+    predicantServices: PredicantServicesTabConfig,
     baptisms: BaptismsTabConfig,
     cases: CasesTabConfig,
     funerals: FuneralsTabConfig,
@@ -151,6 +153,7 @@ export default {
         FormCheck,
         draggable,
         NextServicesTabConfig,
+        PredicantServicesTabConfig,
         BaptismsTabConfig,
         CasesTabConfig,
         FuneralsTabConfig,

@@ -47,10 +47,13 @@ use App\Models\Places\City;
 use App\Models\Service;
 use App\Models\ServiceGroup;
 use App\Services\LiturgyService;
+use App\Services\RoleService;
 use App\Traits\HandlesAttachmentsTrait;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class ServiceController
@@ -205,6 +208,35 @@ class ServiceController extends Controller
         $service->refresh();
         $service->load(['baptisms', 'funerals', 'weddings', 'participants']);
         return response()->json(compact('service'));
+    }
+
+    public function claimPredicant(Service $service): JsonResponse
+    {
+        $user = Auth::user();
+        abort_unless($user->hasAnyRole([
+            RoleService::ROLE_PREDICANT,
+            'Gottesdienstbearbeiter:in',
+            RoleService::ROLE_PASTOR,
+        ]), 403);
+
+        abort_unless(
+            Service::query()
+                ->inCities($user->visibleCities()->pluck('cities.id'))
+                ->whereKey($service->id)
+                ->exists(),
+            403
+        );
+
+        DB::transaction(function () use ($service, $user) {
+            $service = Service::query()->lockForUpdate()->findOrFail($service->id);
+            abort_unless($service->date?->isToday() || $service->date?->isFuture(), 422);
+            abort_unless($service->need_predicant && !$service->pastors()->exists(), 422);
+
+            $service->pastors()->attach($user->id, ['category' => 'P']);
+            $service->update(['need_predicant' => false]);
+        });
+
+        return response()->json(['success' => true]);
     }
 
     /**

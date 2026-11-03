@@ -180,6 +180,7 @@ import FuneralsTab from "../components/HomeScreen/FuneralsTab";
 import MissingEntriesTab from "../components/HomeScreen/MissingEntriesTab";
 import NextOfferingsTab from "../components/HomeScreen/NextOfferingsTab";
 import NextServicesTab from "../components/HomeScreen/NextServicesTab";
+import PredicantServicesTab from "../components/HomeScreen/PredicantServicesTab.vue";
 import RegistrationsTab from "../components/HomeScreen/RegistrationsTab";
 import StreamingTab from "../components/HomeScreen/StreamingTab";
 import WeddingsTab from "../components/HomeScreen/WeddingsTab";
@@ -238,6 +239,7 @@ export default {
         MissingEntriesTab,
         NextOfferingsTab,
         NextServicesTab,
+        PredicantServicesTab,
         RegistrationsTab,
         StreamingTab,
         WeddingsTab,

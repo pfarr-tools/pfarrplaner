@@ -113,3 +113,12 @@ Bezeichnern, Dateinamen, URLs und CLI-Optionen vorbehalten.
   erfolgreichen Push die entsprechende Prüfung frisch ausführen.
 - Committen oder pushen nur auf ausdrücklichen Auftrag. Ein solcher Auftrag
   liegt für den aktuellen Repository-Aufbau ausdrücklich vor.
+
+## Issues und Arbeitsgrundlage
+
+- Jede neue Aufgabe arbeitet auf einem vorhandenen GitHub-Issue auf. Wenn
+  keines angegeben ist, wird vor der Umsetzung ein passendes Issue angelegt.
+- Der abgestimmte Design- bzw. Umsetzungsplan wird als Kommentar im
+  zugehörigen Issue dokumentiert.
+- Der abschließende Commit verweist auf das Issue und markiert es mit
+  `fixed`/`close` als erledigt.

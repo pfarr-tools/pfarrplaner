@@ -23,6 +23,8 @@ class RoleSeeder extends Seeder
             Role::create(['name' => RoleService::ROLE_ADMIN]);
             Role::create(['name' => RoleService::ROLE_PASTOR]);
         }
+
+        Role::firstOrCreate(['name' => RoleService::ROLE_PREDICANT]);
     }
 
     /**
