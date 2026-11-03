@@ -139,6 +139,9 @@ Produktionsfehler werden über GlitchTip überwacht.
 - Ordne Fehler diesem Repository über das passende GlitchTip-Projekt zu.
 - Das Projekt `pfarrplaner-dev` erfasst die lokale Entwicklungsumgebung; das
   Projekt `pfarrplaner` erfasst ausschließlich die Produktionsserver.
+- Wenn du an einem Issue aus GlitchTip arbeitest, füge dem GlitchTip-Issue
+  immer einen Kommentar mit einem Link zum erstellten GitHub-Issue hinzu und
+  im GitHub-Issue umgekehrt einen Link zum GlitchTip-Issue.
 - Prüfe Stacktraces und Ereignisdetails, bevor du Fehlerbehebungen vorschlägst.
 - Markiere Issues niemals ohne ausdrückliche Genehmigung als gelöst.
 - Übernehme niemals personenbezogene Daten oder Zugangsdaten aus Fehlerereignissen
