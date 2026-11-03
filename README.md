@@ -103,6 +103,10 @@ chmod 600 backup.yaml
 ./planer data pull user@server:/opt/pfarrplaner
 ```
 
+Beim `data pull` wird der lokale MinIO-Dienst vor dem Objektimport automatisch
+neu erzeugt, damit API und Console wieder mit den in `.env` konfigurierten
+Host-Ports veröffentlicht sind.
+
 Für eine bestehende Datei-/MySQL-Installation wird die Legacy-Migration genutzt:
 
 ```sh

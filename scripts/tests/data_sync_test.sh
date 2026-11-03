@@ -13,7 +13,7 @@ grep -q 'PFARRPLANER_OBJECTS_BEGIN' "$SCRIPT"
 grep -q 'base64 --decode' "$SCRIPT"
 grep -q 'mc mirror --quiet' "$SCRIPT"
 grep -q 'remote_planer up -d minio' "$SCRIPT"
-grep -q '"\${COMPOSE\[@\]}" up -d minio' "$SCRIPT"
+grep -q '"\${COMPOSE\[@\]}" up -d --force-recreate minio' "$SCRIPT"
 awk '
   /^else$/ { in_pull = 1 }
   in_pull && /php artisan migrate --force/ { migrate = NR }

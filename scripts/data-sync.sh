@@ -45,7 +45,7 @@ remote_objects() {
     | base64 --decode
 }
 local_import_objects() {
-  "${COMPOSE[@]}" up -d minio >/dev/null
+  "${COMPOSE[@]}" up -d --force-recreate minio >/dev/null
   "${COMPOSE[@]}" run --rm --no-deps --use-aliases --entrypoint /bin/sh create-buckets -lc 'rm -rf /tmp/objects && mkdir /tmp/objects && tar -C /tmp/objects -xf - && mc alias set dst "${AWS_ENDPOINT:-http://minio:9000}" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY" && mc mirror --overwrite /tmp/objects dst/"$AWS_BUCKET"'
 }
 remote_import_objects() {
