@@ -64,7 +64,11 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['daily', 'stderr'],
+            'channels' => array_merge(
+                env('DAILY_LOGS', false) ? ['daily'] : [],
+                ['stderr'],
+                env('SENTRY_LOGS', false) ? ['sentry_logs'] : [],
+            ),
             'level' => 'debug'
         ],
 

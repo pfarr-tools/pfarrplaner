@@ -70,7 +70,8 @@ Prüfen Sie:
 
 ## Wichtige Protokollquellen
 
-- Laravel-Logs in `src/storage/logs/` beziehungsweise im App-Container
+- Container-Logs mit `./planer logs` beziehungsweise `./planer logs app horizon`
+- optionale Laravel-Logs in `src/storage/logs/`, wenn `DAILY_LOGS=true` gesetzt ist
 - Webserver-Logs
 - PHP-FPM- oder Prozess-Logs
 - Queue- und Scheduler-Logs
