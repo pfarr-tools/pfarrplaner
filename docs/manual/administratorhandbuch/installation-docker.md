@@ -25,6 +25,7 @@ Auch im Containerbetrieb brauchen Sie weiterhin:
 - lokale Laufzeitdaten unter `src/storage/` und den konfigurierten Backup-Pfaden
 - Mail-Konfiguration
 - Chromium-Laufzeit für Puppeteer und Browsershot
+- `qrencode` für die Erzeugung der QR-Codes in Berichten und öffentlichen Ausgaben
 
 ## Compose-Dienste
 
