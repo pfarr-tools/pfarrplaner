@@ -14,7 +14,7 @@ x-app: &app
     mariadb: {condition: service_healthy}
     redis: {condition: service_healthy}
     create-buckets: {condition: service_completed_successfully}
-  networks: [backend]
+  networks: [backend, sentry-egress]
 
 services:
   app:
@@ -23,7 +23,7 @@ services:
       php artisan octane:start --server=swoole --host=0.0.0.0 --port=8000
       --workers=${OCTANE_WORKERS:-4} --max-requests=${OCTANE_MAX_REQUESTS:-500}
     restart: unless-stopped
-    networks: [backend, mail]
+    networks: [backend, mail, sentry-egress]
     expose: ["8000"]
     healthcheck:
       test:
@@ -61,7 +61,7 @@ services:
     <<: *app
     command: php artisan horizon
     restart: unless-stopped
-    networks: [backend, mail]
+    networks: [backend, mail, sentry-egress]
   scheduler:
     <<: *app
     command: ["bash", "-lc", "set -o pipefail; php artisan schedule:work 2>&1 | grep --line-buffered -vE 'No scheduled commands are ready to run.|^[[:space:]]*$'"]
@@ -166,6 +166,7 @@ networks:
   frontend:
   backend:
     internal: true
+  sentry-egress:
   mail:
     internal: true
     ipam:

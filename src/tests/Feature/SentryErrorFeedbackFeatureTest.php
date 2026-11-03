@@ -13,10 +13,38 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Http;
+use Mockery;
+use Sentry\SentrySdk;
+use Sentry\State\HubInterface;
+use RuntimeException;
 use Tests\TestCase;
 
 class SentryErrorFeedbackFeatureTest extends TestCase
 {
+    /**
+     * Unexpected exceptions are reported through Laravel's exception handler.
+     *
+     * @return void
+     */
+    public function testUnexpectedExceptionsAreReportedToSentry(): void
+    {
+        $exception = new RuntimeException('Sentry regression test');
+        $originalHub = SentrySdk::getCurrentHub();
+        $hub = Mockery::mock(HubInterface::class);
+        $hub->shouldReceive('captureException')
+            ->once()
+            ->with($exception, Mockery::type('Sentry\\EventHint'))
+            ->andReturnNull();
+
+        SentrySdk::setCurrentHub($hub);
+
+        try {
+            app(\Illuminate\Contracts\Debug\ExceptionHandler::class)->report($exception);
+        } finally {
+            SentrySdk::setCurrentHub($originalHub);
+        }
+    }
+
     /**
      * The development test route renders the friendly error page.
      *

@@ -32,6 +32,13 @@ Root-Produktionsimage und `compose.production.yaml`. Entscheidend sind persisten
 MariaDB-, Redis- und MinIO-Volumes, konsistente `.env`-Werte, ein geprüftes
 Backup und ein sauberer Umgang mit Migrationen, Horizon und Scheduler.
 
+Die Produktions-Compose-Datei trennt interne Backend- und Mail-Netzwerke von
+einem nicht internen `sentry-egress`-Netzwerk. App, Horizon und Scheduler sind
+an dieses Egress-Netzwerk angebunden, damit der Sentry-Client den in
+`SENTRY_LARAVEL_DSN` konfigurierten Host über HTTPS erreichen kann. Der
+Egress-Pfad muss in Firewall und DNS des Servers erlaubt sein; die internen
+Netzwerke bleiben ohne direkten externen Zugriff.
+
 ## Release-Kontext
 
 Das Repository enthält Release-Skripte, die neben Versionsständen auch den

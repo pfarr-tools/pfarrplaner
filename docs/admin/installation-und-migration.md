@@ -54,6 +54,21 @@ Entwicklungsumgebungen geeignet; mit `--defaults` werden synthetische
 Produktionsdefaults verwendet. Vor dem öffentlichen Betrieb müssen insbesondere `APP_URL`,
 Backup-Ziel, Mail-Relay und `HORIZON_ALLOWED_EMAILS` geprüft werden. Die
 kommentierte `.env.example` ist die vollständige Referenz aller Einstellungen.
+
+Wenn `SENTRY_LARAVEL_DSN` gesetzt ist, benötigen App-, Horizon- und
+Scheduler-Container ausgehenden HTTPS-Zugriff auf den konfigurierten
+Sentry-Host (normalerweise TCP 443). Die Produktions-Compose-Datei bindet
+diese Container dafür zusätzlich an ein nicht internes Egress-Netzwerk; die
+fachlichen Backend- und Mail-Netzwerke bleiben intern. Nach einer Änderung an
+der Compose-Konfiguration müssen die betroffenen Dienste neu erstellt werden:
+
+```sh
+./planer up -d --force-recreate app horizon scheduler
+```
+
+Ein fehlender Egress-Pfad verhindert das Senden von Sentry-Ereignissen auch
+dann, wenn DSN und Sentry-Tag korrekt in `.env` gesetzt sind.
+
 Im Produktionsmodus setzt das Bootstrap `OCTANE_HTTPS=false`, weil Pfarrplaner
 typischerweise hinter einem externen TLS-Reverse-Proxy betrieben wird. Der
 Reverse Proxy terminiert TLS; die interne Verbindung zwischen Proxy, Caddy und
