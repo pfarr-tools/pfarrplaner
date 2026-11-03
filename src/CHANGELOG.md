@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.18.6](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.5...v2026.18.6) (2026-11-03)
+
+
+### Bug Fixes
+
+* **errors:** Fehlerseiten lokal erben lassen. Fixes [#14](https://github.com/pfarr-tools/pfarrplaner/issues/14) ([a1416fc](https://github.com/pfarr-tools/pfarrplaner/commit/a1416fcbda8230858d2a56b519ab33ef59e37c93))
+* **qr:** QR-Code-Rand auf ein Modul begrenzen. Fixes [#4](https://github.com/pfarr-tools/pfarrplaner/issues/4) ([ea7b8dd](https://github.com/pfarr-tools/pfarrplaner/commit/ea7b8dd53abfa70164792e9ffdedcb90edfcf2d0))
+* **qr:** QR-Codes mit ausreichender Ruhezone erzeugen. Fixes [#4](https://github.com/pfarr-tools/pfarrplaner/issues/4) ([06457c1](https://github.com/pfarr-tools/pfarrplaner/commit/06457c1a844c590678f15cece2370c25fa72285c))
+* **test:** Query-Log-Rechte vor Dusk reparieren. Fixes [#15](https://github.com/pfarr-tools/pfarrplaner/issues/15) ([815bb7b](https://github.com/pfarr-tools/pfarrplaner/commit/815bb7b3ae643837df139bfb7925ecbcf9c1a402))
+
 ### [2026.18.5](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.4...v2026.18.5) (2026-11-03)
 
 

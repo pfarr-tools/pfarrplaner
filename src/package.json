@@ -1,5 +1,5 @@
 {
-    "version": "2026.18.5",
+    "version": "2026.18.6",
     "private": true,
     "scripts": {
         "dev": "vite",
