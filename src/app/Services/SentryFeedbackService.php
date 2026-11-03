@@ -40,7 +40,7 @@ class SentryFeedbackService
             return false;
         }
 
-        $url = rtrim($feedback['endpoint'], '/')
+        $url = rtrim($this->endpoint($feedback['endpoint'] ?? null), '/')
             .'/projects/'.rawurlencode($feedback['organization'])
             .'/'.rawurlencode($feedback['project']).'/user-feedback/';
 
@@ -76,5 +76,30 @@ class SentryFeedbackService
         ]);
 
         return false;
+    }
+
+    /**
+     * Resolve the feedback API endpoint from an explicit override or the Sentry DSN.
+     *
+     * @param string|null $configuredEndpoint
+     * @return string
+     */
+    private function endpoint(?string $configuredEndpoint): string
+    {
+        if (filled($configuredEndpoint)) {
+            return $configuredEndpoint;
+        }
+
+        $dsn = config('sentry.dsn');
+        $parsedDsn = is_string($dsn) ? parse_url($dsn) : false;
+
+        if (is_array($parsedDsn) && filled($parsedDsn['host'] ?? null)) {
+            $scheme = $parsedDsn['scheme'] ?? 'https';
+            $port = isset($parsedDsn['port']) ? ':'.$parsedDsn['port'] : '';
+
+            return $scheme.'://'.$parsedDsn['host'].$port.'/api/0';
+        }
+
+        return 'https://sentry.io/api/0';
     }
 }

@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Services\SentryFeedbackService;
 use Mockery;
 use Sentry\SentrySdk;
 use Sentry\State\HubInterface;
@@ -131,6 +132,33 @@ class SentryErrorFeedbackFeatureTest extends TestCase
                 && $request['event_id'] === str_repeat('a', 32)
                 && $request['comments'] === 'Der Kalender konnte nicht geöffnet werden.';
         });
+    }
+
+    /**
+     * User feedback uses the DSN host when no API endpoint override is configured.
+     *
+     * @return void
+     */
+    public function testUserFeedbackUsesTheDsnHostWithoutAnEndpointOverride(): void
+    {
+        config()->set('sentry.dsn', 'https://public@example.invalid/42');
+        config()->set('sentry.feedback', [
+            'token' => 'feedback-token',
+            'organization' => 'pfarr-tools',
+            'project' => 'pfarrplaner',
+            'endpoint' => null,
+        ]);
+        Http::fake(['https://example.invalid/*' => Http::response([], 200)]);
+
+        $this->assertTrue(app(SentryFeedbackService::class)->send(
+            str_repeat('b', 32),
+            'Testperson',
+            'test@example.org',
+            'Der Kalender konnte nicht geöffnet werden.',
+        ));
+
+        Http::assertSent(fn ($request) => $request->url()
+            === 'https://example.invalid/api/0/projects/pfarr-tools/pfarrplaner/user-feedback/');
     }
 
     /**

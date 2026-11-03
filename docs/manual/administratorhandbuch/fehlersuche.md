@@ -111,6 +111,9 @@ SENTRY_PROJECT=
 ```
 
 Der Token benötigt nur die Berechtigung zum Schreiben von Projekt-Feedback.
+Wenn SENTRY_FEEDBACK_ENDPOINT leer bleibt, verwendet Pfarrplaner automatisch
+den Sentry-Host aus SENTRY_LARAVEL_DSN; ein abweichender Wert kann hier mit
+dem vollständigen API-Basispfad wie https://sentry.io/api/0 angegeben werden.
 Wenn diese Variablen fehlen oder Sentry nicht erreichbar ist, bleibt die
 Fehlerreferenz sichtbar; die Anwendung zeigt dann an, dass der Hinweis nicht
 automatisch übermittelt werden konnte.

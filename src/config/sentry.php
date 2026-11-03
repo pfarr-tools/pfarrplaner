@@ -41,7 +41,7 @@ return [
         'token' => env('SENTRY_FEEDBACK_TOKEN'),
         'organization' => env('SENTRY_ORGANIZATION'),
         'project' => env('SENTRY_PROJECT'),
-        'endpoint' => env('SENTRY_FEEDBACK_ENDPOINT', 'https://sentry.io/api/0'),
+        'endpoint' => env('SENTRY_FEEDBACK_ENDPOINT'),
     ],
 
     // Override the organization ID used for trace continuation checks.
