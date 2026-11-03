@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.18.5](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.4...v2026.18.5) (2026-11-03)
+
+
+### Bug Fixes
+
+* **build:** Vite-Assets in klassischen Ansichten verwenden. ([19acec7](https://github.com/pfarr-tools/pfarrplaner/commit/19acec72b621e34f571d50353deddea87d769195))
+* **mail:** Postfix beim Produktionsupdate mitstarten. ([7cc5b39](https://github.com/pfarr-tools/pfarrplaner/commit/7cc5b395b5bffac0b1b511a9003dc170e7973e94)), closes [#12](https://github.com/pfarr-tools/pfarrplaner/issues/12)
+* **monitoring:** Fehlerreferenz mit Ausnahme protokollieren. ([009b9d1](https://github.com/pfarr-tools/pfarrplaner/commit/009b9d109aa358616a2ed7261fa583c377a12fe7))
+* **sentry:** Feedback über den DSN-Host senden. ([51b55c8](https://github.com/pfarr-tools/pfarrplaner/commit/51b55c8203c6e18cb5efbbfc20d4c0db55bb4e71)), closes [#13](https://github.com/pfarr-tools/pfarrplaner/issues/13)
+
 ### [2026.18.4](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.3...v2026.18.4) (2026-11-03)
 
 
