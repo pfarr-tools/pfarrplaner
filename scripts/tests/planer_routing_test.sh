@@ -8,7 +8,7 @@ trap 'rm -rf "$TEST_ROOT"' EXIT
 mkdir -p "$TEST_ROOT/bin"
 cat > "$TEST_ROOT/bin/docker" <<'EOF'
 #!/usr/bin/env bash
-printf '%s\n' "$*" > "${PLANER_ROUTING_LOG:?}"
+printf '%s\n' "$*" >> "${PLANER_ROUTING_LOG:?}"
 EOF
 chmod +x "$TEST_ROOT/bin/docker"
 
@@ -30,6 +30,7 @@ printf 'compose -f %s/compose.production.yaml exec -e XDG_CONFIG_HOME=/tmp/confi
 PLANER_ROUTING_LOG="$TEST_ROOT/log" run_and_assert "$TEST_ROOT/production-artisan" artisan about
 
 printf 'compose -f %s/compose.yaml exec -e APP_ENV=testing -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: -e APP_KEY=base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI= app php artisan test\n' "$ROOT" > "$TEST_ROOT/development-test"
+printf 'compose -f %s/compose.yaml exec -T -u 0 app sh -c if [ -e storage/logs/query.log ]; then chmod 666 storage/logs/query.log; fi\n' "$ROOT" >> "$TEST_ROOT/development-test"
 PLANER_ROUTING_LOG="$TEST_ROOT/log" run_and_assert "$TEST_ROOT/development-test" dev test
 
 printf 'compose -f %s/compose.production.yaml ps\n' "$ROOT" > "$TEST_ROOT/production-alias"

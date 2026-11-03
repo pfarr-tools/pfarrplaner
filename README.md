@@ -86,7 +86,9 @@ Häufige Befehle:
 
 Der sichere Testbefehl verwendet eine isolierte SQLite-Datenbank. Ein direkter
 Aufruf von `./planer artisan test` wird wegen der möglichen Datenbankzerstörung
-bewusst geschützt.
+bewusst geschützt. Auch der Dusk-Teil von `./planer dev test` bricht ab, sobald
+keine SQLite-Datei unter `src/database/database.dusk.sqlite` verwendet wird;
+die offizielle Entwicklungsdatenbank kann damit nicht als Testziel dienen.
 
 ## Daten, Backups und Migration
 

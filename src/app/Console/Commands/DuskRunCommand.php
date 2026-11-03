@@ -609,9 +609,9 @@ class DuskRunCommand extends Command
      */
     protected function withDuskEnvironment($callback)
     {
-        $this->setupDuskEnvironment();
-
         try {
+            $this->setupDuskEnvironment();
+
             return $callback();
         } finally {
             $this->teardownDuskEnvironment();
@@ -637,6 +637,11 @@ class DuskRunCommand extends Command
             $this->applyEnvironment($this->duskEnvironment);
             $this->createTemporaryEnvironmentFile();
         }
+
+        $this->validateDuskDatabase([
+            'DB_CONNECTION' => Env::get('DB_CONNECTION'),
+            'DB_DATABASE' => Env::get('DB_DATABASE'),
+        ]);
 
         $this->writeConfiguration();
 
@@ -670,6 +675,27 @@ class DuskRunCommand extends Command
             'FILESYSTEM_DISK' => 'local',
             'FILESYSTEM_DRIVER' => 'local',
         ];
+    }
+
+    /**
+     * Ensure browser tests can never use the configured development database.
+     *
+     * @param array<string, mixed> $environment
+     * @return void
+     * @throws \RuntimeException
+     */
+    protected function validateDuskDatabase(array $environment): void
+    {
+        $expectedDatabase = dirname(__DIR__, 3).'/database/database.dusk.sqlite';
+
+        if (
+            (string) ($environment['DB_CONNECTION'] ?? '') !== 'sqlite'
+            || (string) ($environment['DB_DATABASE'] ?? '') !== $expectedDatabase
+        ) {
+            throw new \RuntimeException(
+                'Dusk benötigt die isolierte SQLite-Testdatenbank: '.$expectedDatabase
+            );
+        }
     }
 
     /**

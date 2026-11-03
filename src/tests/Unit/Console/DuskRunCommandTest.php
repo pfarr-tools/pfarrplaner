@@ -15,6 +15,7 @@ namespace Tests\Unit\Console;
 use App\Console\Commands\DuskRunCommand;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
+use RuntimeException;
 
 class DuskRunCommandTest extends TestCase
 {
@@ -34,5 +35,32 @@ class DuskRunCommandTest extends TestCase
         self::assertSame('array', $environment['CACHE_STORE']);
         self::assertSame('file', $environment['SESSION_DRIVER']);
         self::assertSame('sync', $environment['QUEUE_CONNECTION']);
+    }
+
+    public function testDuskRejectsTheOfficialDatabase(): void
+    {
+        $method = new ReflectionMethod(DuskRunCommand::class, 'validateDuskDatabase');
+        $method->setAccessible(true);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Dusk benötigt die isolierte SQLite-Testdatenbank');
+
+        $method->invoke(new DuskRunCommand(), [
+            'DB_CONNECTION' => 'mysql',
+            'DB_DATABASE' => 'pfarrplaner',
+        ]);
+    }
+
+    public function testDuskAcceptsOnlyItsDedicatedSqliteDatabase(): void
+    {
+        $method = new ReflectionMethod(DuskRunCommand::class, 'validateDuskDatabase');
+        $method->setAccessible(true);
+
+        $method->invoke(new DuskRunCommand(), [
+            'DB_CONNECTION' => 'sqlite',
+            'DB_DATABASE' => dirname(__DIR__, 3).'/database/database.dusk.sqlite',
+        ]);
+
+        self::assertTrue(true);
     }
 }

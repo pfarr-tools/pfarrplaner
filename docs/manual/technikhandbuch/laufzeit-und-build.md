@@ -81,8 +81,12 @@ Zusätzlich gibt es gezielte Varianten für die lokale Fehlersuche:
 Der Dusk-Command baut das Frontend standardmäßig genau einmal selbst, setzt die SQLite-Testdatenbank zurück und startet bei Bedarf einen lokalen Laravel-Testserver. Für schnellere Wiederholungsläufe stehen unter anderem diese Optionen zur Verfügung:
 
 Wenn keine `.env.dusk` vorhanden ist, erzeugt der Runner dafür eine temporäre,
-isolierte Dusk-Umgebung mit einer dateibasierten Session und einer eigenen
-SQLite-Datei. Der lokale Testserver läuft mit mehreren PHP-CLI-Workern und
+isolierte Dusk-Umgebung mit einer dateibasierten Session und der fest
+vorgegebenen SQLite-Datei `database/database.dusk.sqlite`. Eine vorhandene
+`.env.dusk` wird vor dem Lauf geprüft; bei MariaDB, PostgreSQL, SQLite `:memory:`
+oder einem anderen Datenbankpfad bricht der Runner ab, damit niemals die
+offizielle Entwicklungsdatenbank verwendet wird. Der lokale Testserver läuft
+mit mehreren PHP-CLI-Workern und
 ohne ungeleitete Ausgabepipes; dadurch bleiben Login-Sessions und lange
 Screenshot-Läufe auch bei vielen Manual-Testklassen stabil. Jede Manual-
 Testmethode erhält außerdem eine neue Browser-Sitzung.
