@@ -18,13 +18,14 @@ class RoleSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permissionName]);
         }
 
-        if (0 == Role::count()) {
-            Role::create(['name' => RoleService::ROLE_SUPER_ADMIN]);
-            Role::create(['name' => RoleService::ROLE_ADMIN]);
-            Role::create(['name' => RoleService::ROLE_PASTOR]);
+        foreach ([
+            RoleService::ROLE_SUPER_ADMIN,
+            RoleService::ROLE_ADMIN,
+            RoleService::ROLE_PASTOR,
+            RoleService::ROLE_PREDICANT,
+        ] as $roleName) {
+            Role::firstOrCreate(['name' => $roleName]);
         }
-
-        Role::firstOrCreate(['name' => RoleService::ROLE_PREDICANT]);
     }
 
     /**
