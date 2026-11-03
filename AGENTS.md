@@ -130,3 +130,16 @@ Bezeichnern, Dateinamen, URLs und CLI-Optionen vorbehalten.
   zugehörigen Issue dokumentiert.
 - Der abschließende Commit verweist auf das Issue und markiert es mit
   `fixed`/`close` als erledigt.
+
+## Fehlerüberwachung
+
+Produktionsfehler werden über GlitchTip überwacht.
+
+- Verwende den `glitchtip`-MCP-Server, um Produktionsfehler zu untersuchen.
+- Ordne Fehler diesem Repository über das passende GlitchTip-Projekt zu.
+- Das Projekt `pfarrplaner-dev` erfasst die lokale Entwicklungsumgebung; das
+  Projekt `pfarrplaner` erfasst ausschließlich die Produktionsserver.
+- Prüfe Stacktraces und Ereignisdetails, bevor du Fehlerbehebungen vorschlägst.
+- Markiere Issues niemals ohne ausdrückliche Genehmigung als gelöst.
+- Übernehme niemals personenbezogene Daten oder Zugangsdaten aus Fehlerereignissen
+  in Commits oder GitHub-Issues.
