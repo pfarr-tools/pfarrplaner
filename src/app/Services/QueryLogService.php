@@ -69,7 +69,6 @@ class QueryLogService
     public static function put($query)
     {
         File::append(self::file(), time() . '|||||||' . Crypt::encryptString($query) . self::SEPARATOR);
-        chmod(self::file(), 0666);
     }
 
     /**
@@ -137,7 +136,6 @@ class QueryLogService
     {
         File::delete(self::file());
         File::append(self::file(), '');
-        chmod(self::file(), 0666);
     }
 
     /**
