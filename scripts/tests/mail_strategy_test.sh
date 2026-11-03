@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PROD="$ROOT/compose.production.yaml"
 DEV="$ROOT/compose.yaml"
 MAIL_CONFIG="$ROOT/src/config/mail.php"
+UPDATE_SCRIPT="$ROOT/scripts/update-production.sh"
 
 grep -q '^  postfix:$' "$PROD"
 grep -q 'image: boky/postfix:v5.1.0@sha256:aafc772384232497bed875e1eb66b4d3e54ba1ebc86e2e185a6dc1dbc48182ef' "$PROD"
@@ -39,6 +40,9 @@ grep -q 'MAIL_POSTFIX_ENABLED' "$ROOT/scripts/bootstrap-mail.sh"
 grep -q "ui_choice 'Mailmodus wählen' 2 smtp postfix disabled" "$ROOT/scripts/bootstrap-mail.sh"
 grep -q "ui_choice 'Zustellung wählen' 1 direct relay" "$ROOT/scripts/bootstrap-mail.sh"
 grep -q "ui_choice 'SMTP-Schema wählen' 1 auto smtp smtps" "$ROOT/scripts/bootstrap-mail.sh"
+grep -q 'MAIL_POSTFIX_ENABLED' "$UPDATE_SCRIPT"
+grep -q -- '--profile mail' "$UPDATE_SCRIPT"
+grep -q 'services+=(postfix)' "$UPDATE_SCRIPT"
 
 mailables=()
 while IFS= read -r file; do mailables+=("$file"); done < <(find "$ROOT/src/app/Mail" -type f -name '*.php' -print)

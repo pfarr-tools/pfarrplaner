@@ -23,7 +23,10 @@ Ein Release und seine Auslieferung laufen über:
 `pfarrtools/pfarrplaner:vVERSION`. `update` zieht dieses Image, führt
 Migrationen aus, aktualisiert die öffentlichen Assets und startet App, Horizon
 und Scheduler mit Health-Check neu. Der alte Image-Stand bleibt als
-Rollback-Grundlage erhalten.
+Rollback-Grundlage erhalten. Wenn `MAIL_POSTFIX_ENABLED=true` gesetzt ist,
+aktiviert der Updatepfad automatisch das Compose-Profil `mail` und startet
+Postfix gemeinsam mit App, Horizon und Scheduler. Dadurch bleibt der interne
+Hostname `postfix` auch nach einem Containerwechsel erreichbar.
 
 ## Docker-Deployment
 

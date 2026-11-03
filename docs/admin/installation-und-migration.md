@@ -214,6 +214,11 @@ automatisch vorwärts auflösbare Branches brechen das Update sicher ab.
 `--build` erstellt stattdessen ausdrücklich ein lokales Produktionsimage; mit
 `./planer build --ref <tag|commit>` kann dafür auch ein Commit gebaut werden.
 
+Ist `MAIL_POSTFIX_ENABLED=true` gesetzt, aktiviert `./planer update` automatisch
+das Compose-Profil `mail` und startet den internen Postfix-Dienst zusammen mit
+App, Horizon und Scheduler. Dadurch bleibt `MAIL_HOST=postfix` nach dem Update
+auflösbar. Bei einem externen SMTP-Server bleibt das Profil deaktiviert.
+
 Migrationen müssen expand-and-contract-kompatibel sein: erst neue Strukturen
 hinzufügen, dann die Anwendung ausrollen, alte Strukturen erst später
 entfernen. Nicht kompatible Änderungen erhalten eine geplante kurze

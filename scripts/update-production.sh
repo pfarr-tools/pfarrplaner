@@ -9,6 +9,12 @@ die() { echo "Fehler: $*" >&2; exit 2; }
 [[ -f "$ROOT/.env" ]] || die '.env fehlt. Erst ./planer bootstrap ausführen.'
 grep -Eq '^APP_ENV=production([[:space:]]|$)' "$ROOT/.env" || die 'APP_ENV muss production sein.'
 
+postfix_services=()
+if grep -Eq '^MAIL_POSTFIX_ENABLED=true([[:space:]]|$)' "$ROOT/.env"; then
+  COMPOSE+=(--profile mail)
+  postfix_services+=(postfix)
+fi
+
 backup_confirmed=0
 ref=''
 build_local=0
@@ -59,7 +65,7 @@ PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" run --rm app php artisan migrate 
 echo '3/5 Öffentliche Assets aktualisieren.'
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" up -d --no-deps public-assets
 echo '4/5 App, Worker und Scheduler mit dem neuen Image starten.'
-PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" up -d --no-deps app horizon scheduler
+PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" up -d --no-deps app horizon scheduler "${postfix_services[@]}"
 echo '5/5 Gesundheitsstatus prüfen.'
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" up -d --wait web
 PFARRPLANER_IMAGE="$image_ref" "${COMPOSE[@]}" ps
