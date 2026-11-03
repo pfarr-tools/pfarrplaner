@@ -46,18 +46,22 @@ class QueryLogServiceUnitTest extends TestCase
 
     public function testPutAndAllRoundtrip(): void
     {
+        chmod(QueryLogService::file(), 0644);
         QueryLogService::put('INSERT INTO test VALUES (1)');
         $entries = QueryLogService::all();
         $this->assertCount(1, $entries);
         $this->assertEquals('INSERT INTO test VALUES (1)', $entries[0]['query']);
+        $this->assertSame(0666, fileperms(QueryLogService::file()) & 0777);
     }
 
     public function testClearEmptiesLog(): void
     {
         QueryLogService::put('INSERT INTO test VALUES (2)');
+        chmod(QueryLogService::file(), 0644);
         QueryLogService::clear();
         $entries = QueryLogService::all();
         $this->assertCount(0, $entries);
+        $this->assertSame(0666, fileperms(QueryLogService::file()) & 0777);
     }
 
     public function testDateReturnsCarbonInstance(): void
