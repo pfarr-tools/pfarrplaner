@@ -19,7 +19,10 @@ export default ({ mode }) => {
             },
         },
         plugins: [
-            laravel({ input: ['resources/js/inertia-app.js'], refresh: true }),
+            laravel({
+                input: ['resources/js/inertia-app.js', 'resources/css/prebuild.css'],
+                refresh: true,
+            }),
             vue({ template: { transformAssetUrls: { base: null, includeAbsolute: false } } }),
         ],
         resolve: {

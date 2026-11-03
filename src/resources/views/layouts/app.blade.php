@@ -26,7 +26,7 @@
     <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/jquery-date-range-picker/0.20.0/daterangepicker.min.css"/>
     <link href="{{ asset('css/pfarrplaner.css') }}" rel="stylesheet">
-    <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
+    @vite('resources/css/prebuild.css')
 @yield('styles', '')
 
 <!-- favicons -->

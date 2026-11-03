@@ -11,7 +11,7 @@
 
     <title>@yield('title', '') :: {{ config('app.name', 'Pfarrplaner') }}</title>
 
-    <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
+    @vite('resources/css/prebuild.css')
     @yield('styles', '')
 
     <!-- favicons -->

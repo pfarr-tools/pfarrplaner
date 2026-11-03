@@ -11,7 +11,7 @@
           integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('adminlte/css/adminlte.min.css') }}">
     <link href="{{ asset('css/pfarrplaner.css') }}" rel="stylesheet">
-    <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
+    @vite('resources/css/prebuild.css')
 
     <link rel="apple-touch-icon" sizes="180x180" href="/img/favicons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/img/favicons/favicon-32x32.png">
