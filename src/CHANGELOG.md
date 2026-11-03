@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.18.7](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.6...v2026.18.7) (2026-11-03)
+
+
+### Features
+
+* **logging:** Logkanäle über Umgebungsvariablen steuern. Fixes [#16](https://github.com/pfarr-tools/pfarrplaner/issues/16) ([0c4c402](https://github.com/pfarr-tools/pfarrplaner/commit/0c4c4028abc98d96520ca6193b4a9888eac80a38))
+
 ### [2026.18.6](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.5...v2026.18.6) (2026-11-03)
 
 
