@@ -82,8 +82,16 @@ beschrieben.
   betriebsrelevanten Abhängigkeiten berücksichtigen.
 - MinIO ist der verbindliche Objektspeicher; neue Dateipfade dürfen nicht
   ungeprüft direkt auf `storage/app` festgelegt werden.
-- Lokale Tests verwenden die isolierte Testdatenbank bzw. die vom
-  `./planer test`-Befehl vorgegebene Isolation.
+- Lokale Tests verwenden ausschließlich die vom `./planer dev test`-Befehl
+  vorgegebene Isolation oder eine ausdrücklich konfigurierte Testdatenbank.
+- PHPUnit darf niemals direkt mit der Standardkonfiguration des App-Containers
+  ausgeführt werden: `RefreshDatabase` kann sonst die Dev-Datenbank
+  zurücksetzen oder verändern. Direkte fokussierte Läufe benötigen mindestens
+  `APP_ENV=testing`, eine separate Datenbankverbindung und einen separaten
+  Datenbanknamen; SQLite `:memory:` ist für unabhängige Tests bevorzugt.
+- Vor jedem Testlauf ist die tatsächlich wirksame Datenbankverbindung und der
+  Datenbankname zu prüfen. Bei einer Verbindung zur Dev- oder
+  Produktionsdatenbank wird der Testlauf abgebrochen.
 
 ## Dokumentation
 
