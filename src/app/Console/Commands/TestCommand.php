@@ -53,6 +53,7 @@ class TestCommand extends Command
         $exitCode = 0;
 
         $exitCode = max($exitCode, $this->runPhpUnit());
+        $this->repairQueryLogPermissions();
 
         if (! $this->option('no-js')) {
             $exitCode = max($exitCode, $this->runVitest());
@@ -63,6 +64,23 @@ class TestCommand extends Command
         }
 
         return $exitCode;
+    }
+
+    /**
+     * Keep the query log writable for the following test process, especially Dusk.
+     *
+     * PHPUnit may recreate the mounted file as root with the default 0644 mode.
+     * The web container's PHP-FPM worker must still be able to append to it.
+     *
+     * @return void
+     */
+    protected function repairQueryLogPermissions(): void
+    {
+        $file = storage_path('logs/query.log');
+
+        if (is_file($file)) {
+            @chmod($file, 0666);
+        }
     }
 
     /**
