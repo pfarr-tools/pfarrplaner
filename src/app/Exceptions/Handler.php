@@ -80,6 +80,13 @@ class Handler extends ExceptionHandler
             $request->attributes->set('error_reference', (string) (SentrySdk::getCurrentHub()->getLastEventId() ?? Str::upper(Str::random(10))));
         }
 
+        if (! $this->shouldntReport($e)) {
+            Log::error('Unhandled exception rendered', [
+                'error_reference' => $request->attributes->get('error_reference'),
+                'exception' => $e,
+            ]);
+        }
+
         $response = parent::render($request, $e);
 
         // Danach: 419 zuverlässig loggen (egal wie es entstanden ist)

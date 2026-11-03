@@ -12,7 +12,10 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Http\Request;
+use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Mockery;
 use Sentry\SentrySdk;
 use Sentry\State\HubInterface;
@@ -43,6 +46,32 @@ class SentryErrorFeedbackFeatureTest extends TestCase
         } finally {
             SentrySdk::setCurrentHub($originalHub);
         }
+    }
+
+    /**
+     * Rendered exceptions are logged together with their displayed reference.
+     *
+     * @return void
+     */
+    public function testRenderedExceptionsAreLoggedWithTheirErrorReference(): void
+    {
+        $exception = new RuntimeException('Logged exception regression test');
+        $request = Request::create('/broken', 'GET');
+        $request->attributes->set('error_reference', '8334b37a4aa8479d98181455f812c63c');
+        $logged = null;
+
+        Log::listen(function (MessageLogged $event) use (&$logged): void {
+            if ($event->level === 'error') {
+                $logged = $event;
+            }
+        });
+
+        app(\Illuminate\Contracts\Debug\ExceptionHandler::class)->render($request, $exception);
+
+        $this->assertNotNull($logged);
+        $this->assertSame('Unhandled exception rendered', $logged->message);
+        $this->assertSame('8334b37a4aa8479d98181455f812c63c', $logged->context['error_reference']);
+        $this->assertSame($exception, $logged->context['exception']);
     }
 
     /**

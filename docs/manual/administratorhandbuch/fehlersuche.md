@@ -94,6 +94,8 @@ der großen Pfarrplaner-Marke und einer Fehlerreferenz an. Diese Referenz sollte
 bei einer Supportmeldung mitgeteilt werden. Wenn Sentry konfiguriert ist, ist
 sie die Event-ID des Sentry-Eintrags und kann dort direkt zum betroffenen Issue
 aufgelöst werden.
+Die Fehlerreferenz wird außerdem zusammen mit der ursprünglichen Ausnahme und
+ihrem Stacktrace im Anwendungslog protokolliert.
 
 Die Fehlerseite bietet außerdem ein freiwilliges Formular für eine kurze
 Beschreibung des Problems. Die Eingabe wird serverseitig an Sentrys
