@@ -46,7 +46,9 @@ return new class extends Migration {
             $table->unsignedInteger('day_id')->nullable()->change();
         });
 
-        foreach (Service::all() as $service) {
+        // event_class is introduced later, but the current Service model scopes
+        // every query by that column.
+        foreach (Service::withoutGlobalScope(\App\Models\Scopes\ServicesOnlyScope::class)->get() as $service) {
             $date = $service->day->date->format('Y-m-d');
             if ($service->time) {
                 $date .= ' '.trim($service->time);

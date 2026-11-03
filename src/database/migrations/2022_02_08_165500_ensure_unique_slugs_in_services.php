@@ -39,7 +39,9 @@ return new class extends Migration {
      */
     public function up()
     {
-        foreach (Service::all() as $service) {
+        // event_class is introduced later, but the current Service model scopes
+        // every query by that column.
+        foreach (Service::withoutGlobalScope(\App\Models\Scopes\ServicesOnlyScope::class)->get() as $service) {
             $service->update(['slug' => $service->createSlug()]);
         }
     }
