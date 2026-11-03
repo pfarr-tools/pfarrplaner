@@ -78,7 +78,11 @@ class KonfiAppIntegration extends AbstractIntegration
     public function __construct($apiKey)
     {
         $this->setApiKey($apiKey);
-        $this->setClient(new Client(['base_uri' => self::API_URL]));
+        $this->setClient(new Client([
+            'base_uri' => self::API_URL,
+            // Die Produktionscontainer haben keine nutzbare IPv6-Route.
+            'curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4],
+        ]));
     }
 
     /**

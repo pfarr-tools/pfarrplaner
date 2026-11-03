@@ -44,6 +44,15 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class PDF extends Browsershot
 {
     /**
+     * @param string $url
+     */
+    public function __construct(string $url = '')
+    {
+        parent::__construct($url);
+        $this->noSandbox();
+    }
+
+    /**
      * @return string
      */
     protected static function getDefaultPdfStyles(): string
