@@ -35,6 +35,7 @@
             :model-value="pickerRange"
             range
             multi-calendars
+            timezone="Europe/Berlin"
             :locale="dpLocale"
             :formats="{ input: 'dd.MM.yyyy' }"
             :enable-time-picker="false"
@@ -55,6 +56,11 @@ import { VueDatePicker } from '@vuepic/vue-datepicker';
 import FormGroup from './FormGroup';
 import * as dateFnsLocales from 'date-fns/locale';
 import { uid } from '../../../libraries/uid';
+import {
+    formatPlannerDateForDisplay,
+    plannerValueToPickerDate,
+    serializePlannerDateToBerlinDateString,
+} from '../../../helpers/plannerDates';
 
 export default {
     name: 'FormDateRangePicker',
@@ -114,58 +120,22 @@ export default {
 
     methods: {
         syncPickerRangeFromProps() {
-            const nextRange = [this.toDate(this.from), this.toDate(this.to)];
+            const nextRange = [plannerValueToPickerDate(this.from), plannerValueToPickerDate(this.to)];
             if (!this.isSameRange(this.pickerRange, nextRange)) {
                 this.pickerRange = nextRange;
             }
         },
 
         toDate(val) {
-            if (!val) return null;
-            if (val instanceof Date) {
-                return isNaN(val.getTime()) ? null : val;
-            }
-            if (typeof val === 'object' && typeof val.toDate === 'function') {
-                const nativeDate = val.toDate();
-                return nativeDate instanceof Date && !isNaN(nativeDate.getTime()) ? nativeDate : null;
-            }
-            if (typeof val !== 'string') return null;
-
-            let match = val.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-            if (match) {
-                return new Date(Date.UTC(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3])));
-            }
-
-            match = val.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
-            if (match) {
-                return new Date(Date.UTC(parseInt(match[3]), parseInt(match[2]) - 1, parseInt(match[1])));
-            }
-
-            const nativeDate = new Date(val);
-            if (isNaN(nativeDate.getTime())) return null;
-            return new Date(Date.UTC(
-                nativeDate.getUTCFullYear(),
-                nativeDate.getUTCMonth(),
-                nativeDate.getUTCDate()
-            ));
+            return plannerValueToPickerDate(val);
         },
 
         formatDisplayDate(value) {
-            const date = this.toDate(value);
-            if (!date) return '';
-            const day = String(date.getUTCDate()).padStart(2, '0');
-            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-            const year = String(date.getUTCFullYear());
-            return `${day}.${month}.${year}`;
+            return formatPlannerDateForDisplay(value);
         },
 
         formatIsoDate(value) {
-            const date = this.toDate(value);
-            if (!date) return '';
-            const day = String(date.getUTCDate()).padStart(2, '0');
-            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-            const year = String(date.getUTCFullYear());
-            return `${year}-${month}-${day}`;
+            return serializePlannerDateToBerlinDateString(value);
         },
 
         isSameDate(a, b) {
