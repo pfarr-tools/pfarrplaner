@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.18.4](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.3...v2026.18.4) (2026-11-03)
+
+
+### Features
+
+* **home:** Offene Gottesdienste für verfügbare Rollen ergänzen ([a2cb063](https://github.com/pfarr-tools/pfarrplaner/commit/a2cb0630c93bb080c174b8ece49e2fdaceb15562)), closes [#1](https://github.com/pfarr-tools/pfarrplaner/issues/1)
+
+
+### Bug Fixes
+
+* **dev:** Query-Log-Datei schreibbar halten. Fixes [#3](https://github.com/pfarr-tools/pfarrplaner/issues/3) ([21204a8](https://github.com/pfarr-tools/pfarrplaner/commit/21204a8b603cc366adfbbfa2bf10b4db15abf067))
+* **dev:** Query-Log-Rechte nach Tests wiederherstellen. Fixes [#3](https://github.com/pfarr-tools/pfarrplaner/issues/3) ([1b7b03f](https://github.com/pfarr-tools/pfarrplaner/commit/1b7b03f2caa4cde68ac973c9d19f777d5ba161aa))
+* **migration:** Ältere Service-Migrationen ohne Event-Scope ausführen ([4ac44f9](https://github.com/pfarr-tools/pfarrplaner/commit/4ac44f9b4692b6aaf58f7615c21f5f7d67083aee)), closes [#8](https://github.com/pfarr-tools/pfarrplaner/issues/8)
+* **migration:** Liturgy-Datumsmigration vom Event-Scope entkoppeln ([4f77d7f](https://github.com/pfarr-tools/pfarrplaner/commit/4f77d7f213b3f9bed0e0671af3ebb76f6d143557)), closes [#8](https://github.com/pfarr-tools/pfarrplaner/issues/8)
+* **migration:** Slug-Migration vom späteren Event-Scope entkoppeln ([2772b58](https://github.com/pfarr-tools/pfarrplaner/commit/2772b58d131dfc1fb8fed7299620b51301e96b45)), closes [#8](https://github.com/pfarr-tools/pfarrplaner/issues/8)
+* **monitoring:** Sentry-Egress für Produktionscontainer aktivieren. ([5222f76](https://github.com/pfarr-tools/pfarrplaner/commit/5222f76bceb8165f007089e910f3112494e83d3a)), closes [#7](https://github.com/pfarr-tools/pfarrplaner/issues/7)
+* PDF-Erstellung und KonfiApp-Anfragen reparieren. ([f34991f](https://github.com/pfarr-tools/pfarrplaner/commit/f34991fac6cbe1a13363442f126c3082c9e8925c)), closes [#9](https://github.com/pfarr-tools/pfarrplaner/issues/9) [#10](https://github.com/pfarr-tools/pfarrplaner/issues/10)
+* **qr:** KonfiApp-QR-Codes kompatibel erzeugen ([#4](https://github.com/pfarr-tools/pfarrplaner/issues/4)). ([adc4d46](https://github.com/pfarr-tools/pfarrplaner/commit/adc4d46c1751e60a26f29cfcd48f46e29c08571e))
+* **report:** Dienstanfrage-Zeitraum in Berliner Zeit behandeln. Fixes [#5](https://github.com/pfarr-tools/pfarrplaner/issues/5) ([1611583](https://github.com/pfarr-tools/pfarrplaner/commit/1611583aa6df06146e1fbb82985da75cdae24bc6))
+* Startseiten-Auswahl der Module wieder anzeigen. ([e7cb48c](https://github.com/pfarr-tools/pfarrplaner/commit/e7cb48cc9b34781b3a821e6b6f3e4aa067d4caef))
+* **sync:** Docker-Netzwerk für Objektsynchronisierung stabilisieren. ([fe3e3b8](https://github.com/pfarr-tools/pfarrplaner/commit/fe3e3b80eaf671293c1cc6620abbe93c8b162387))
+* **sync:** MinIO beim Datenabgleich neu erzeugen. ([f13d887](https://github.com/pfarr-tools/pfarrplaner/commit/f13d8874f70a7fc47b495b75ee92c85502683cf5))
+* **teams:** Team-Übersicht wieder laden. Fixes [#3](https://github.com/pfarr-tools/pfarrplaner/issues/3) ([5b988f0](https://github.com/pfarr-tools/pfarrplaner/commit/5b988f0cc2870fb361df796d5e2c6ebf5486f6f4))
+* **test:** Offizielle Datenbank bei Tests ausschließen. ([a4f9568](https://github.com/pfarr-tools/pfarrplaner/commit/a4f95689ccb7b6d65ffffd920a9c2f5adc45a8f0))
+* **test:** Rollen-Seeder für Dusk-Tests idempotent machen. ([9589f94](https://github.com/pfarr-tools/pfarrplaner/commit/9589f94a82357eccfe17b4209bb63b622f8132ca)), closes [#6](https://github.com/pfarr-tools/pfarrplaner/issues/6)
+
 ### [2026.18.3](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.2...v2026.18.3) (2026-11-02)
 
 
