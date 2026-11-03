@@ -45,7 +45,9 @@ class AddSlugToServices extends Migration
             $table->string('slug')->nullable();
         });
 
-        foreach (\App\Models\Service::all() as $service) {
+        // This migration predates event_class. The current Service model adds a
+        // global scope on that later column, so it must be removed here.
+        foreach (\App\Models\Service::withoutGlobalScope(\App\Models\Scopes\ServicesOnlyScope::class)->get() as $service) {
             $slug = $service->createSlug();
             $service->update(['slug' => $slug]);
             echo 'Created slug '.$slug.' for service #'.$service->id.PHP_EOL;
