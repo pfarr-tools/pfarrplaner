@@ -41,7 +41,7 @@ class QRService
      */
     public static function buildCommand(string $file, string $payloadFile): string
     {
-        return 'qrencode -8 -l M -v 2 -m 4 -M 4 -o '
+        return 'qrencode -8 -l M -v 2 -m 1 -o '
             . escapeshellarg($file)
             . ' -r '
             . escapeshellarg($payloadFile);

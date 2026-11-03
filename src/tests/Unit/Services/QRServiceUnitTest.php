@@ -21,7 +21,8 @@ class QRServiceUnitTest extends TestCase
     {
         $command = QRService::buildCommand('/tmp/qr output.png', '/tmp/payload file.txt');
 
-        $this->assertStringContainsString('qrencode -8 -l M -v 2 -m 4 -M 4 -o', $command);
+        $this->assertStringContainsString('qrencode -8 -l M -v 2 -m 1 -o', $command);
+        $this->assertStringNotContainsString(' -M ', $command);
         $this->assertStringContainsString("'/tmp/qr output.png'", $command);
         $this->assertStringEndsWith(" -r '/tmp/payload file.txt'", $command);
     }
