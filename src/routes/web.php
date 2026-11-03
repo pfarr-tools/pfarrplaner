@@ -58,6 +58,12 @@ Route::get('/__test/500', function (Request $request) {
     return response()->view('errors.500', [], 500);
 })->name('errors.test');
 
+Route::get('/debug-glitchtip', function () {
+    abort_unless(app()->environment(['local', 'testing']), 404);
+
+    throw new \Exception('Test GlitchTip error!');
+})->name('errors.debug-glitchtip');
+
 if (!function_exists('routeNames')) {
     function routeNames($model)
     {

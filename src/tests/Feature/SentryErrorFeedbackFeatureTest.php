@@ -62,6 +62,17 @@ class SentryErrorFeedbackFeatureTest extends TestCase
     }
 
     /**
+     * The GlitchTip debug route deliberately reports an exception in local environments.
+     *
+     * @return void
+     */
+    public function testGlitchTipDebugRouteThrowsAnException(): void
+    {
+        $this->get('/debug-glitchtip')
+            ->assertStatus(500);
+    }
+
+    /**
      * User feedback is sent to the Sentry feedback endpoint.
      *
      * @return void
@@ -103,5 +114,17 @@ class SentryErrorFeedbackFeatureTest extends TestCase
         $this->app->detectEnvironment(fn () => 'production');
 
         $this->get('/__test/500')->assertNotFound();
+    }
+
+    /**
+     * The GlitchTip debug route is unavailable in production.
+     *
+     * @return void
+     */
+    public function testGlitchTipDebugRouteIsUnavailableInProduction(): void
+    {
+        $this->app->detectEnvironment(fn () => 'production');
+
+        $this->assertNotSame(200, $this->get('/debug-glitchtip')->status());
     }
 }
