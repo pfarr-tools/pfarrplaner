@@ -106,9 +106,14 @@ class UserRequest extends FormRequest
     {
         $data = parent::validated();
 
+        // An omitted or empty password means "keep the existing password".
+        // Account removal is handled by UserController::update after this request.
+        if (($data['password'] ?? '') === '') {
+            unset($data['password']);
+        }
+
         // api token
-        $data['password'] = $data['password'] ?? '';
-        if ((($this->user === null) || ($this->user->api_token == '')) && ($data['password'] != '')) {
+        if (isset($data['password']) && (($this->user === null) || ($this->user->api_token == ''))) {
             $data['api_token'] = Str::random(60);
         }
 

@@ -280,7 +280,7 @@ export default {
         VueJsonPretty,
     },
     data() {
-        let myUser = this.user;
+        let myUser = {...this.user};
         myUser.password = null;
 
         myUser.home_cities = this.reduceToIds(myUser.home_cities);
@@ -402,6 +402,7 @@ export default {
                 subscriptions,
             };
             if (this.myUser.id) {
+                if (!this.justCreated) delete record.password;
                 this.$inertia.patch(route('user.update', this.myUser.id), record);
             } else {
                 this.$inertia.post(route('user.store'), record);

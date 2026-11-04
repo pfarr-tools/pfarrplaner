@@ -15,6 +15,7 @@ namespace Tests\Feature;
 use App\Models\People\User;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -77,6 +78,25 @@ class UserWebFeatureTest extends TestCase
                 ->missing('people.0.address')
                 ->missing('people.0.api_token')
             );
+    }
+
+    public function testUpdatingUserProfileWithoutPasswordKeepsExistingPasswordHash(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $target = User::factory()->create(['password' => 'long-term-password']);
+        $passwordHash = $target->getRawOriginal('password');
+
+        $this->actingAs($this->user)
+            ->patch(route('user.update', $target), [
+                'id' => $target->id,
+                'first_name' => $target->first_name,
+                'last_name' => $target->last_name,
+                'email' => $target->email,
+                'password' => null,
+            ])
+            ->assertRedirect(route('users.index'));
+
+        $this->assertSame($passwordHash, $target->fresh()->getRawOriginal('password'));
     }
 
 }
