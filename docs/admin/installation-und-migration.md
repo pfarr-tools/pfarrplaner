@@ -136,6 +136,21 @@ Upload-Verzeichnisse und alle datenbankreferenzierten Dateien geprüft.
 Schlüssel werden nicht umbenannt. Cache, Sessions, Logs und temporäre
 PDF-Dateien werden nicht als langlebige Objekte übernommen.
 
+## Lokale Build-Artefakte nach Releases
+
+`scripts/build-production.sh` bereinigt nach jedem Produktionsbuild den
+Docker-BuildKit-Cache und nicht mehr referenzierte Images. Zusätzlich bleiben
+lokal nur das aktuelle Release-Tag des Pfarrplaner-Produktionsimages sowie die
+aktuellen lokalen und veröffentlichten Image-Namen erhalten. Ältere Releases
+bleiben im konfigurierten Docker-Registry-Repository verfügbar und werden nicht
+aus der Registry gelöscht. Docker-Volumes, Container anderer Projekte und
+Pfarrplaner-Laufzeitdaten werden von dieser Bereinigung nicht verändert.
+
+Die Bereinigung läuft auch nach einem fehlgeschlagenen Build oder Push. Der
+ursprüngliche Fehlercode bleibt dabei erhalten; falls das neue Image nicht
+entstanden ist, bleibt das zuletzt vorhandene Release-Tag als lokaler
+Rückfallpunkt erhalten.
+
 ## Backups und Restore
 
 `./planer backup create` startet einen kurzlebigen Backup-Container. Dieser

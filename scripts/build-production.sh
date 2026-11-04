@@ -22,6 +22,15 @@ restore_checkout() {
 }
 trap restore_checkout EXIT
 
+cleanup_after_build() {
+  local status=$?
+  restore_checkout || status=$?
+  "$ROOT/scripts/cleanup-build-artifacts.sh" --tag "$tag" --repository "$repository" || {
+    echo 'Warnung: Build-Artefakte konnten nicht vollständig bereinigt werden.' >&2
+  }
+  exit "$status"
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --ref) [[ $# -ge 2 ]] || die '--ref benötigt einen Wert'; ref="$2"; shift ;;
@@ -53,6 +62,7 @@ if [[ -z "$tag" ]]; then
 fi
 [[ -n "$tag" ]] || tag='local'
 [[ "$tag" != */* ]] || die "Ungültiger Docker-Tag: $tag"
+trap cleanup_after_build EXIT
 
 local_image="pfarrplaner-app:$tag"
 remote_image="$repository:$tag"
