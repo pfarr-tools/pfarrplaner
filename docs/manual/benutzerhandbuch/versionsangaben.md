@@ -5,10 +5,10 @@
 | Angabe | Wert |
 |---|---|
 | Handbuch | Pfarrplaner Benutzerhandbuch |
-| Programmversion | 2026.18.0 |
+| Programmversion | 2026.18.7 |
 | Umgebung | local |
-| Build-Datum der Anwendung | Montag, 02. November 2026 19:03 |
-| Handbuch erstellt am | 02.11.2026 19:04 |
+| Build-Datum der Anwendung | Dienstag, 03. November 2026 20:04 |
+| Handbuch erstellt am | 04.11.2026 08:16 |
 | Git-Branch | unbekannt |
 | Git-Stand | unbekannt |
 | Lizenz | GNU General Public License, Version 3.0 oder später |
