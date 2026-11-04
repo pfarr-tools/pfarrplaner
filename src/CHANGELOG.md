@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.18.9](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.8...v2026.18.9) (2026-11-04)
+
+
+### Bug Fixes
+
+* **auth:** Autofill-Zugangsdaten beim Login übernehmen. ([1e80abd](https://github.com/pfarr-tools/pfarrplaner/commit/1e80abd5c528ae06edf3aff4350b411b7f5d9bb7)), closes [#21](https://github.com/pfarr-tools/pfarrplaner/issues/21)
+* **users:** Bestehende Passwörter beim Bearbeiten erhalten. ([b4e8ab5](https://github.com/pfarr-tools/pfarrplaner/commit/b4e8ab5207f1210b6c9d574bdf25a9ecced84c33)), closes [#22](https://github.com/pfarr-tools/pfarrplaner/issues/22)
+
 ### [2026.18.8](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.7...v2026.18.8) (2026-11-04)
 
 
