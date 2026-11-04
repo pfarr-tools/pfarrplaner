@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.18.11](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.10...v2026.18.11) (2026-11-04)
+
+
+### Bug Fixes
+
+* **auth:** Klartextpasswörter zuverlässig hashen. Refs [#29](https://github.com/pfarr-tools/pfarrplaner/issues/29) ([e1047b8](https://github.com/pfarr-tools/pfarrplaner/commit/e1047b892bf1369155997e8aca08e97c60b1bc71))
+* **build:** Alte Produktionsartefakte nach Releases bereinigen. Fixes [#26](https://github.com/pfarr-tools/pfarrplaner/issues/26) ([8028535](https://github.com/pfarr-tools/pfarrplaner/commit/802853583623b8357f3a338745fc3babad35e6ae))
+
 ### [2026.18.10](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.9...v2026.18.10) (2026-11-04)
 
 
