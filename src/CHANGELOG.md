@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.18.10](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.9...v2026.18.10) (2026-11-04)
+
+
+### Bug Fixes
+
+* **repo:** Projektverweise auf GitHub umstellen. Fixes [#23](https://github.com/pfarr-tools/pfarrplaner/issues/23) ([3d294f0](https://github.com/pfarr-tools/pfarrplaner/commit/3d294f09794da7f9aa61910a4ea5287f7d1e7aa6))
+
 ### [2026.18.9](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.8...v2026.18.9) (2026-11-04)
 
 
