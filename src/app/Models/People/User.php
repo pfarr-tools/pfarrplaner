@@ -321,7 +321,7 @@ class User extends Authenticatable
         // Laravel's authentication provider may assign an already rehashed
         // password hash to the model after a successful login. Do not hash
         // that hash a second time.
-        $this->attributes['password'] = password_get_info((string) $value)['algo'] !== 0
+        $this->attributes['password'] = password_get_info((string) $value)['algoName'] !== 'unknown'
             ? $value
             : Hash::make($value);
     }

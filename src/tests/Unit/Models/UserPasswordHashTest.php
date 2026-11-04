@@ -12,6 +12,7 @@
 namespace Tests\Unit\Models;
 
 use App\Models\People\User;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class UserPasswordHashTest extends TestCase
@@ -24,5 +25,15 @@ class UserPasswordHashTest extends TestCase
         $user->password = $hash;
 
         $this->assertSame($hash, $user->getAttributes()['password']);
+    }
+
+    public function testAssigningPlainTextPasswordAlwaysHashesIt(): void
+    {
+        $user = User::factory()->make();
+
+        $user->password = 'Wyqi1234';
+
+        $this->assertNotSame('Wyqi1234', $user->getAttributes()['password']);
+        $this->assertTrue(Hash::check('Wyqi1234', $user->getAttributes()['password']));
     }
 }
