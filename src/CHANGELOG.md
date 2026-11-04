@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.18.8](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.7...v2026.18.8) (2026-11-04)
+
+
+### Bug Fixes
+
+* **scheduler:** Telescope-Befehl nur lokal planen. ([0fcc40b](https://github.com/pfarr-tools/pfarrplaner/commit/0fcc40bd334ed1cbfda5e9aa772afd8a992239da)), closes [#19](https://github.com/pfarr-tools/pfarrplaner/issues/19)
+
 ### [2026.18.7](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.6...v2026.18.7) (2026-11-03)
 
 
