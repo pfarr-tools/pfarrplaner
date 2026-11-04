@@ -5,7 +5,7 @@
   - @author Christoph Fischer <chris@toph.de>
   - @copyright (c) Christoph Fischer, https://christoph-fischer.org
   - @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
-  - @link https://codeberg.org/pfarr.tools/pfarrplaner
+  - @link https://github.com/pfarr-tools/pfarrplaner
   - @version git: $Id$
   -
   - Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
@@ -36,11 +36,28 @@
         </div>
         <p v-if="officialServer">Gehostet auf einem Server des <a href="https://wwww.kirchenbezirk-balingen.de/" target="_blank">Evangelischen
             Kirchenbezirks Balingen</a>.</p>
-        <p>Der Quellcode von Pfarrplaner ist als Open Source auf <a href="https://codeberg.org/pfarr.tools/pfarrplaner"
-                                                                    target="_blank">Codeberg</a> verfügbar und steht unter
-            der <a href="https://codeberg.org/pfarr.tools/pfarrplaner/blob/master/LICENSE" target="_blank">GNU General
+        <p>Der Quellcode von Pfarrplaner ist als Open Source auf <a :href="repositoryUrl"
+                                                                    target="_blank">GitHub</a> verfügbar und steht unter
+            der <a :href="repositoryUrl+'/blob/main/LICENSE'" target="_blank">GNU General
                 Public License (GPL) 3.0</a> oder höher.
         </p>
+        <h3>Container und Dienste</h3>
+        <table class="table table-sm">
+            <thead>
+            <tr>
+                <th>Dienst</th>
+                <th>Image</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(service, name) in runtime.services" :key="name">
+                <td>{{ name }}</td>
+                <td><code>{{ service.image }}</code></td>
+                <td>{{ service.status }}</td>
+            </tr>
+            </tbody>
+        </table>
         <donation-notice class="mb-4"/>
         <hr class="my-3"/>
         <vue-markdown class="changelog" :source="changelog"/>
@@ -58,7 +75,7 @@ export default {
     name: "About",
     components: {Card, CardBody, CardHeader, DonationNotice, VueMarkdown},
 
-    props: ['version', 'date', 'changelog', 'env', 'phpVersion', 'laravelVersion', 'appName'],
+    props: ['version', 'date', 'changelog', 'env', 'phpVersion', 'laravelVersion', 'appName', 'repositoryUrl', 'runtime'],
     computed: {
         officialServer() {
             return window.location.href.includes('.pfarrplaner.de');

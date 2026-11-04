@@ -16,7 +16,7 @@ Folgende Schritte sind zur Installation einer eigenen Instanz notwendig:
 ### Pfarrplaner installieren
 
 ````bash
-git clone https://codeberg.org/pfarr.tools/pfarrplaner.git
+git clone https://github.com/pfarr-tools/pfarrplaner.git
 cd pfarrplaner
 mkdir bootstrap/cache
 chmod -R 777 bootstrap/cache
@@ -64,7 +64,7 @@ php artisan optimize
 
 # Updates installieren
 
-Mit dem Artisan-Befehl ````ìnstall:updates```` werden neue Updates aus dem Git-Repository auf Codeberg
+Mit dem Artisan-Befehl ````ìnstall:updates```` werden neue Updates aus dem Git-Repository auf GitHub
 automatisch geladen und die notwendigen Aktionen ausgeführt.
 
 ````bash

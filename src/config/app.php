@@ -6,7 +6,7 @@
  * @author Christoph Fischer <chris@toph.de>
  * @copyright (c) Christoph Fischer, https://christoph-fischer.org
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
- * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
  * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
@@ -35,7 +35,14 @@ return [
     'build_date' => \Carbon\Carbon::parse(env('BUILD_DATE', '')),
     'build_number' => env('BUILD_NUMBER', ''),
     'build_url' => env('BUILD_URL', ''),
-    'build_repository' => env('BUILD_REPOSITORY', 'https://codeberg.org/pfarr.tools/pfarrplaner'),
+    'build_repository' => env('BUILD_REPOSITORY', 'https://github.com/pfarr-tools/pfarrplaner'),
+
+    'container_images' => [
+        'application' => env('PFARRPLANER_IMAGE', 'pfarrtools/pfarrplaner:latest'),
+        'database' => env('PFARRPLANER_MARIADB_IMAGE', 'mariadb:11'),
+        'cache' => env('PFARRPLANER_REDIS_IMAGE', 'redis:7-alpine'),
+        'storage' => env('PFARRPLANER_MINIO_IMAGE', 'ghcr.io/coollabsio/minio:latest'),
+    ],
 
     /*
     |--------------------------------------------------------------------------

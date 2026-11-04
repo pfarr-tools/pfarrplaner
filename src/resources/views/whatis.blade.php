@@ -243,8 +243,8 @@
                                         <a href="https://handbuch.pfarrplaner.de" target="_blank" class="btn btn-outline-primary btn-lg">
                                             <i class="fas fa-book-open me-1"></i>Zum Handbuch
                                         </a>
-                                        <a href="https://codeberg.org/pfarr.tools/pfarrplaner" target="_blank" class="btn btn-outline-secondary btn-lg">
-                                            <i class="fas fa-code-branch me-1"></i>Quellcode auf Codeberg
+                                        <a href="https://github.com/pfarr-tools/pfarrplaner" target="_blank" class="btn btn-outline-secondary btn-lg">
+                                            <i class="fas fa-code-branch me-1"></i>Quellcode auf GitHub
                                         </a>
                                     </div>
                                 </div>
@@ -415,7 +415,7 @@
                                     </p>
                                     <p>
                                         Der vollständige Quellcode ist als Open Source auf
-                                        <a href="https://codeberg.org/pfarr.tools/pfarrplaner" target="_blank">Codeberg</a>
+                                        <a href="https://github.com/pfarr-tools/pfarrplaner" target="_blank">GitHub</a>
                                         verfügbar.
                                     </p>
                                     <p>

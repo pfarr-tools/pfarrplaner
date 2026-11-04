@@ -6,7 +6,7 @@
  * @author Christoph Fischer <chris@toph.de>
  * @copyright (c) Christoph Fischer, https://christoph-fischer.org
  * @license https://www.gnu.org/licenses/gpl-3.0.txt GPL 3.0 or later
- * @link https://codeberg.org/pfarr.tools/pfarrplaner
+ * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
  * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
@@ -40,6 +40,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 /**
@@ -152,11 +154,75 @@ class HomeController extends Controller
         $phpVersion = phpversion();
         $laravelVersion = app()->version();
         $appName = config('app.name');
+        $repositoryUrl = config('app.build_repository');
+        $runtime = $this->runtimeInformation();
 
         return Inertia::render(
             'About',
-            compact('version', 'date', 'changelog', 'env', 'phpVersion', 'laravelVersion', 'appName')
+            compact(
+                'version',
+                'date',
+                'changelog',
+                'env',
+                'phpVersion',
+                'laravelVersion',
+                'appName',
+                'repositoryUrl',
+                'runtime'
+            )
         );
+    }
+
+    /**
+     * Return the configured container images and the current dependency status.
+     *
+     * @return array<string, mixed>
+     */
+    protected function runtimeInformation(): array
+    {
+        $images = config('app.container_images');
+
+        return [
+            'images' => $images,
+            'services' => [
+                'application' => [
+                    'image' => $images['application'],
+                    'status' => 'aktiv',
+                ],
+                'database' => [
+                    'image' => $images['database'],
+                    'status' => $this->checkDependency(fn () => DB::connection()->getPdo()),
+                ],
+                'cache' => [
+                    'image' => $images['cache'],
+                    'status' => $this->checkDependency(fn () => Cache::store()->put(
+                        'about-health-check',
+                        true,
+                        now()->addMinute()
+                    )),
+                ],
+                'storage' => [
+                    'image' => $images['storage'],
+                    'status' => 'konfiguriert',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Execute a dependency check without exposing its exception to the user.
+     *
+     * @param callable(): mixed $check
+     * @return string
+     */
+    protected function checkDependency(callable $check): string
+    {
+        try {
+            $check();
+            return 'verbunden';
+        } catch (\Throwable) {
+            return 'nicht verfügbar';
+        }
     }
 
 

@@ -2,6 +2,11 @@ name: ${COMPOSE_PROJECT_NAME:-pfarrplaner}
 
 x-app: &app
   image: ${PFARRPLANER_IMAGE:-pfarrtools/pfarrplaner:latest}
+  environment:
+    PFARRPLANER_IMAGE: ${PFARRPLANER_IMAGE:-pfarrtools/pfarrplaner:latest}
+    PFARRPLANER_MARIADB_IMAGE: mariadb:11
+    PFARRPLANER_REDIS_IMAGE: redis:7-alpine
+    PFARRPLANER_MINIO_IMAGE: ghcr.io/coollabsio/minio:latest
   working_dir: /var/www/html
   env_file:
     - path: .env

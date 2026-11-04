@@ -21,7 +21,7 @@ Die Seite enthält:
 - **Funktionskarten**: Fassen die wichtigsten Arbeitsbereiche wie Gottesdienste, Kasualien, Liturgie und Zusammenarbeit zusammen.
 - **Screenshots aus dem Handbuch**: Geben einen direkten Einblick in typische Arbeitsbereiche der Anwendung.
 - **Handbuch-Link**: Führt direkt zum vollständigen Pfarrplaner-Handbuch.
-- **Codeberg-Link**: Führt zur offenen Quellcode-Verwaltung des Projekts.
+- **GitHub-Link**: Führt zur offenen Quellcode-Verwaltung des Projekts.
 - **Kontaktbereich**: Zeigt die Kontaktdaten und ein Formular für Nachrichten.
 
 Die Seite enthält keine Video-Tutorials. Sie konzentriert sich auf eine kurze Vorstellung des Programms und auf aktuelle Kontaktmöglichkeiten.

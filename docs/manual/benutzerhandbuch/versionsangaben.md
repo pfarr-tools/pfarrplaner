@@ -1249,37 +1249,37 @@ Die wichtigsten Änderungen der letzten Versionen stehen im Änderungsprotokoll.
 * Zu viele Fehlerreports wegen Spamanfragen ([afcb269](https://github.com/pfarr-tools/pfarrplaner/commit/afcb269480e046e6f3ffd22ec65da8f91396676a))
 * Zusatz "mit Abendmahl" / "mit Taufe" vermeiden, wenn bereits im Titel vorhanden ([a491e1f](https://github.com/pfarr-tools/pfarrplaner/commit/a491e1f63d1a6d60d50b4f52c5fcc9dfc332f39a))
 
-## [2026.15.0](https://codeberg.org/pfarr.tools/pfarrplaner/compare/v2026.12.4...v2026.15.0) (2026-09-05)
+## [2026.15.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.12.4...v2026.15.0) (2026-09-05)
 
 
 ### Features
 
-* Kirchliche Nachrichten ohne Kopfzeilen drucken ([373d377](https://codeberg.org/pfarr.tools/pfarrplaner/commit/373d3771688212724fb69195aa05084859d1d2c6))
-* Lösch-Button aus Kalenderansicht entfernt ([ä75d3c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ä75d3cb73d824c43c702919a9e5a9c3ceca983b))
-* Papierkorb mit Wiederherstellung, Aufbewahrung und Bereinigung ([63894ca](https://codeberg.org/pfarr.tools/pfarrplaner/commit/63894ca12236bda6ee50d35ecf4c29c399f3c5ca)), closes [#438](https://codeberg.org/pfarr.tools/pfarrplaner/issüs/438) [#458](https://codeberg.org/pfarr.tools/pfarrplaner/issüs/458)
-* Papierkorb mit Wiederherstellung, Aufbewahrung und Bereinigung ([70ec6d7](https://codeberg.org/pfarr.tools/pfarrplaner/commit/70ec6d707a56dee14a08d432738a57467137649d)), closes [#438](https://codeberg.org/pfarr.tools/pfarrplaner/issüs/438) [#458](https://codeberg.org/pfarr.tools/pfarrplaner/issüs/458)
-* Uhrzeit-Vorgabe für Seriengottesdienste ([07c72a2](https://codeberg.org/pfarr.tools/pfarrplaner/commit/07c72a22913cfd6c2b082419910aä4b4a912073))
+* Kirchliche Nachrichten ohne Kopfzeilen drucken ([373d377](https://github.com/pfarr-tools/pfarrplaner/commit/373d3771688212724fb69195aa05084859d1d2c6))
+* Lösch-Button aus Kalenderansicht entfernt ([ä75d3c](https://github.com/pfarr-tools/pfarrplaner/commit/ä75d3cb73d824c43c702919a9e5a9c3ceca983b))
+* Papierkorb mit Wiederherstellung, Aufbewahrung und Bereinigung ([63894ca](https://github.com/pfarr-tools/pfarrplaner/commit/63894ca12236bda6ee50d35ecf4c29c399f3c5ca)), closes [#438](https://github.com/pfarr-tools/pfarrplaner/issüs/438) [#458](https://github.com/pfarr-tools/pfarrplaner/issüs/458)
+* Papierkorb mit Wiederherstellung, Aufbewahrung und Bereinigung ([70ec6d7](https://github.com/pfarr-tools/pfarrplaner/commit/70ec6d707a56dee14a08d432738a57467137649d)), closes [#438](https://github.com/pfarr-tools/pfarrplaner/issüs/438) [#458](https://github.com/pfarr-tools/pfarrplaner/issüs/458)
+* Uhrzeit-Vorgabe für Seriengottesdienste ([07c72a2](https://github.com/pfarr-tools/pfarrplaner/commit/07c72a22913cfd6c2b082419910aä4b4a912073))
 
 
 ### Bug Fixes
 
-* Abendmahl erscheint nicht in der Gottesdienstbeschreibung ([ca4bc85](https://codeberg.org/pfarr.tools/pfarrplaner/commit/ca4bc85be1ee2f548360c12c0901797c6556d167))
-* Bereits erteilte Dimissoriale bei Trauungen korrekt erkennen. ([f6d1c4d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/f6d1c4db44a88fc1f2dabe1fbc10596eb5c19f1b))
-* CSRF-Schutz für DAV-Synchronisation ausschließen. ([c98188d](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c98188d23df34091b25c19f9ead6a9ebc1f5217c))
-* Doppelten Menüpunkt für Lieder entfernt. ([abb66f9](https://codeberg.org/pfarr.tools/pfarrplaner/commit/abb66f9eaa5ed984abb7157391a8ac34861952b9))
-* **editor:** TipTap-Editoren vor Vü-Reaktivität schützen. ([6700f25](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6700f25a274f3c40e7c8fb24b38022fa8e3ce7dd))
-* Fehlende Youtube-Links in der Gottesdienstliste ([6e1b6ec](https://codeberg.org/pfarr.tools/pfarrplaner/commit/6e1b6ecc2bfabf157e2ba2d2644bbb4e0a0084b3))
-* Fehler bei der KonfiApp-API ([fb12a99](https://codeberg.org/pfarr.tools/pfarrplaner/commit/fb12a99b2a5f15bcc5b7cf959166493ff0b5db36))
-* Fehler beim Erstellen von QR Codes. ([9455328](https://codeberg.org/pfarr.tools/pfarrplaner/commit/9455328eea3f51985157f4046a5d1bb5dc5183c3))
-* Liederbuch-Auswahl im Liedformular korrigiert. ([25d5a1f](https://codeberg.org/pfarr.tools/pfarrplaner/commit/25d5a1f6329b8edfd11dc4056e7ee96a746021e7))
-* Liederbücher können nicht zu Liedern hinzugefügt werden. ([1c3äfe](https://codeberg.org/pfarr.tools/pfarrplaner/commit/1c3äfe2b5d37286bddcfe284e8a5ca9419340f6))
-* Neü Personen erscheinen nicht in der Auswahlliste ([c2d6df8](https://codeberg.org/pfarr.tools/pfarrplaner/commit/c2d6df8ec513095d84ac04b68e28bd60929943d5))
-* Planungstabelle speichert nicht verlässlich ([d73bbc6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/d73bbc6ed146557b003b16f9b443a33d30559815))
-* Sicherheitsabfragen vor Löschaktionen ergänzen. ([eed7c9c](https://codeberg.org/pfarr.tools/pfarrplaner/commit/eed7c9cb4ä127bb54a7f9b647731082b75e74b8)), closes [#458](https://codeberg.org/pfarr.tools/pfarrplaner/issüs/458)
-* Speichern bei KonfiApp-API-Fehler nicht möglich ([8565049](https://codeberg.org/pfarr.tools/pfarrplaner/commit/8565049bb03e1a442d6f4f699ca1728567a95afe))
-* Suchfilter in der Liederliste funktioniert nicht ([5101758](https://codeberg.org/pfarr.tools/pfarrplaner/commit/51017583d6ce3741cd0f25e72dcb686ee9e4fd82))
-* UserEditor lässt sich nicht öffnen ([2d6f1bf](https://codeberg.org/pfarr.tools/pfarrplaner/commit/2d6f1bf480c2fc24dd4572514ef5fd41f574bf4d))
-* WeeklyVerseReport verwendet obsolete API ([bda40b6](https://codeberg.org/pfarr.tools/pfarrplaner/commit/bda40b66c21e7a3db2780ä580c89f4e3fc279e4))
+* Abendmahl erscheint nicht in der Gottesdienstbeschreibung ([ca4bc85](https://github.com/pfarr-tools/pfarrplaner/commit/ca4bc85be1ee2f548360c12c0901797c6556d167))
+* Bereits erteilte Dimissoriale bei Trauungen korrekt erkennen. ([f6d1c4d](https://github.com/pfarr-tools/pfarrplaner/commit/f6d1c4db44a88fc1f2dabe1fbc10596eb5c19f1b))
+* CSRF-Schutz für DAV-Synchronisation ausschließen. ([c98188d](https://github.com/pfarr-tools/pfarrplaner/commit/c98188d23df34091b25c19f9ead6a9ebc1f5217c))
+* Doppelten Menüpunkt für Lieder entfernt. ([abb66f9](https://github.com/pfarr-tools/pfarrplaner/commit/abb66f9eaa5ed984abb7157391a8ac34861952b9))
+* **editor:** TipTap-Editoren vor Vü-Reaktivität schützen. ([6700f25](https://github.com/pfarr-tools/pfarrplaner/commit/6700f25a274f3c40e7c8fb24b38022fa8e3ce7dd))
+* Fehlende Youtube-Links in der Gottesdienstliste ([6e1b6ec](https://github.com/pfarr-tools/pfarrplaner/commit/6e1b6ecc2bfabf157e2ba2d2644bbb4e0a0084b3))
+* Fehler bei der KonfiApp-API ([fb12a99](https://github.com/pfarr-tools/pfarrplaner/commit/fb12a99b2a5f15bcc5b7cf959166493ff0b5db36))
+* Fehler beim Erstellen von QR Codes. ([9455328](https://github.com/pfarr-tools/pfarrplaner/commit/9455328eea3f51985157f4046a5d1bb5dc5183c3))
+* Liederbuch-Auswahl im Liedformular korrigiert. ([25d5a1f](https://github.com/pfarr-tools/pfarrplaner/commit/25d5a1f6329b8edfd11dc4056e7ee96a746021e7))
+* Liederbücher können nicht zu Liedern hinzugefügt werden. ([1c3äfe](https://github.com/pfarr-tools/pfarrplaner/commit/1c3äfe2b5d37286bddcfe284e8a5ca9419340f6))
+* Neü Personen erscheinen nicht in der Auswahlliste ([c2d6df8](https://github.com/pfarr-tools/pfarrplaner/commit/c2d6df8ec513095d84ac04b68e28bd60929943d5))
+* Planungstabelle speichert nicht verlässlich ([d73bbc6](https://github.com/pfarr-tools/pfarrplaner/commit/d73bbc6ed146557b003b16f9b443a33d30559815))
+* Sicherheitsabfragen vor Löschaktionen ergänzen. ([eed7c9c](https://github.com/pfarr-tools/pfarrplaner/commit/eed7c9cb4ä127bb54a7f9b647731082b75e74b8)), closes [#458](https://github.com/pfarr-tools/pfarrplaner/issüs/458)
+* Speichern bei KonfiApp-API-Fehler nicht möglich ([8565049](https://github.com/pfarr-tools/pfarrplaner/commit/8565049bb03e1a442d6f4f699ca1728567a95afe))
+* Suchfilter in der Liederliste funktioniert nicht ([5101758](https://github.com/pfarr-tools/pfarrplaner/commit/51017583d6ce3741cd0f25e72dcb686ee9e4fd82))
+* UserEditor lässt sich nicht öffnen ([2d6f1bf](https://github.com/pfarr-tools/pfarrplaner/commit/2d6f1bf480c2fc24dd4572514ef5fd41f574bf4d))
+* WeeklyVerseReport verwendet obsolete API ([bda40b6](https://github.com/pfarr-tools/pfarrplaner/commit/bda40b66c21e7a3db2780ä580c89f4e3fc279e4))
 
 Pfarrplaner ist freie Software. Sie dürfen das Programm unter den Bedingungen der GNU General Public License Version 3 oder später weitergeben und verändern.
 
