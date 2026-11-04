@@ -126,13 +126,20 @@ export default {
         };
     },
     methods: {
-        submit() {
+        submit(event) {
             if (this.loggingIn) return;
             this.loggingIn = true;
+            const form = event.currentTarget;
             axios.get(route('csrf.keepalive')).then(response => {
-                this.form._token = response.data.token;
-                this.$inertia.post(route('login'), this.form, {preserveState: false});
-            })
+                const data = new FormData(form);
+                data.set('_token', response.data.token);
+                this.$inertia.post(route('login'), data, {
+                    preserveState: true,
+                    onFinish: () => { this.loggingIn = false; },
+                });
+            }).catch(() => {
+                this.loggingIn = false;
+            });
         }
     },
 

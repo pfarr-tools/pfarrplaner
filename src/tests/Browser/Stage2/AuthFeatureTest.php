@@ -24,11 +24,34 @@ class AuthFeatureTest extends AbstractPageLoadTest
             $browser->visit('/login')
                     ->waitFor('#app', 10)
                     ->type('[name="email"]', $this->superAdminUser->email)
-                    ->type('[name="password"]', 'password')
+                    ->type('[name="password"]', 'secret')
                     ->press('Anmelden')
-                    ->waitFor('#app', 10)
+                    ->waitForLocation('/')
+                    ->assertRouteIs('home')
                     ->assertDontSee('500')
-                    ->assertDontSee('Whoops');
+                    ->assertDontSee('Whoops')
+                    ->visit('/logout');
+        });
+    }
+
+    public function testAutofilledCredentialsAreSubmitted(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->visit('/login')
+                    ->waitFor('#app', 10);
+
+            $browser->script([
+                "document.querySelector('[name=\\\"email\\\"]').value = '" . $this->superAdminUser->email . "';",
+                "document.querySelector('[name=\\\"password\\\"]').value = 'secret';",
+            ]);
+
+            $browser
+                    ->assertInputValue('[name="email"]', $this->superAdminUser->email)
+                    ->assertInputValue('[name="password"]', 'secret')
+                    ->press('Anmelden')
+                    ->waitForLocation('/')
+                    ->assertRouteIs('home')
+                    ->visit('/logout');
         });
     }
 
@@ -42,7 +65,8 @@ class AuthFeatureTest extends AbstractPageLoadTest
                     ->press('Anmelden')
                     ->waitUntilMissing('#nprogress .spinner', 10)
                     ->waitFor('.invalid-feedback', 10)
-                    ->assertSeeIn('.invalid-feedback', 'Diese Kombination aus Zugangsdaten');
+                    ->assertSeeIn('.invalid-feedback', 'Diese Kombination aus Zugangsdaten')
+                    ->assertInputValue('[name="email"]', 'noone@example.com');
         });
     }
 
