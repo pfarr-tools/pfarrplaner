@@ -54,6 +54,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * Class ServiceController
@@ -165,6 +166,8 @@ class ServiceController extends Controller
      */
     public function assign(Request $request, Service $service)
     {
+        Gate::authorize('update', $service);
+
         $data = $request->validate([
             'ministry' => 'required',
             'users.*' => 'required|int|exists:users,id',

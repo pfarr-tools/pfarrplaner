@@ -51,7 +51,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -493,6 +492,10 @@ class UserController extends Controller
         $user = Auth::user();
         Gate::authorize('update', $user);
         $data = $this->validateRequest($request, $user);
+
+        // An omitted or empty password means "keep the existing password".
+        unset($data['password']);
+
         $user->update($data);
 
         // change password?
@@ -535,23 +538,6 @@ class UserController extends Controller
         $data = $request->validated();
 
         $user->update($data);
-        if (($user->email == '') && ($user->password != '')) {
-            // this only works with a raw query!
-            DB::table('users')->where('id', $user->id)->update(['password' => null]);
-            $user->update([
-                'manage_absences' => 0,
-                'needs_replacement' => 0,
-                'show_vacations_with_services' => 0,
-            ]);
-            $user->cities()->sync([]);
-            $user->writableCities()->sync([]);
-            $user->adminCities()->sync([]);
-            $user->roles()->sync([]);
-            $user->permissions()->sync([]);
-            $user->homeCities()->sync([]);
-            $user->vacationAdmins()->sync([]);
-            $user->vacationApprovers()->sync([]);
-        }
         $this->updateUserDataFromRequest($request, $user);
 
         return redirect()->route('users.index')->with('success', 'Die Änderungen wurden gespeichert.');

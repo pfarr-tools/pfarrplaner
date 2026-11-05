@@ -53,7 +53,7 @@ class LiturgyEditorController extends Controller
 
     public function editor(Request $request, Service $service)
     {
-        Gate::authorize('update', $service);
+        Gate::authorize('view', $service);
         $service->load('liturgyBlocks', 'sermon');
         $liturgySheets = LiturgySheets::all();
         $services = [];
@@ -123,7 +123,7 @@ class LiturgyEditorController extends Controller
      */
     public function configureLiturgySheet(Request $request, Service $service, $key)
     {
-        Gate::authorize('update', $service);
+        Gate::authorize('view', $service);
         $class = 'App\\Liturgy\\LiturgySheets\\'.$key.'LiturgySheet';
         if (! class_exists($class)) {
             abort(404);
@@ -149,7 +149,7 @@ class LiturgyEditorController extends Controller
      */
     public function liturgySheetDialogData(Service $service, string $key)
     {
-        Gate::authorize('update', $service);
+        Gate::authorize('view', $service);
         $class = 'App\\Liturgy\\LiturgySheets\\'.$key.'LiturgySheet';
         if (! class_exists($class)) {
             abort(404);
@@ -163,7 +163,7 @@ class LiturgyEditorController extends Controller
 
     public function sources(Service $service)
     {
-        Gate::authorize('update', $service);
+        Gate::authorize('view', $service);
         $services1 = Service::with([])
             ->isNotAgenda()
             ->writable()
@@ -237,7 +237,7 @@ class LiturgyEditorController extends Controller
 
     public function recipients(Service $service)
     {
-        Gate::authorize('update', $service);
+        Gate::authorize('view', $service);
         $recipients = [];
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {

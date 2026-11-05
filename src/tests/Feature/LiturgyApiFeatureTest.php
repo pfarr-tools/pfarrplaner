@@ -25,6 +25,19 @@ class LiturgyApiFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_user_with_read_access_can_read_liturgy_sources(): void
+    {
+        $service = Service::factory()->create();
+        $service->liturgyBlocks()->create(['title' => 'Eröffnung', 'sortable' => 1]);
+        $user = User::factory()->create();
+        $user->cities()->attach($service->city_id, ['permission' => 'r']);
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.liturgy.sources', ['serviceId' => $service->id]));
+
+        $response->assertOk();
+    }
+
     /**
      * @return void
      */

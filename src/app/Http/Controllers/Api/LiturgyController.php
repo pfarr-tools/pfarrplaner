@@ -223,7 +223,7 @@ class LiturgyController extends Controller
     public function sources(int $serviceId)
     {
         $service = Service::findOrFail($serviceId);
-        Gate::authorize('update', $service);
+        Gate::authorize('view', $service);
         $serviceGroups = [
             Service::setEagerLoads([])->with(['location'])
                 ->select(['id', 'title', 'date', 'location_id'])

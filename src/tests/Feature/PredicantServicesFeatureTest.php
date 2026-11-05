@@ -101,4 +101,43 @@ class PredicantServicesFeatureTest extends TestCase
         $this->postJson(route('api.service.claimPredicant', $service))
             ->assertUnprocessable();
     }
+
+    public function test_read_only_user_cannot_assign_a_participant_through_the_generic_endpoint(): void
+    {
+        $city = City::factory()->create();
+        $user = User::factory()->create();
+        $user->cities()->attach($city, ['permission' => 'r']);
+        $service = Service::factory()->create(['city_id' => $city->id]);
+
+        $this->actingAs($user, 'api')
+            ->postJson(route('api.service.assign', $service), [
+                'ministry' => 'P',
+                'users' => [$user->id],
+                'exclusive' => false,
+            ])
+            ->assertForbidden();
+    }
+
+    public function test_predicant_can_claim_a_read_only_service_when_predicant_is_needed(): void
+    {
+        $city = City::factory()->create();
+        $user = User::factory()->create();
+        $user->cities()->attach($city, ['permission' => 'r']);
+        $user->assignRole(RoleService::ROLE_PREDICANT);
+        $service = Service::factory()->create([
+            'city_id' => $city->id,
+            'date' => Carbon::tomorrow(),
+            'need_predicant' => true,
+        ]);
+
+        $this->actingAs($user, 'api')
+            ->postJson(route('api.service.claimPredicant', $service))
+            ->assertOk();
+
+        $this->assertDatabaseHas('service_user', [
+            'service_id' => $service->id,
+            'user_id' => $user->id,
+            'category' => 'P',
+        ]);
+    }
 }

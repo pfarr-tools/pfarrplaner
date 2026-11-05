@@ -41,6 +41,15 @@ class ServicePolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->view($user, $service));
     }
 
+    public function test_assigned_pastor_can_update_without_city_write_permission(): void
+    {
+        $pastor = User::factory()->create();
+        $service = Service::factory()->create();
+        $service->pastors()->attach($pastor->id, ['category' => 'P']);
+
+        $this->assertTrue($this->policy->update($pastor, $service));
+    }
+
     public function test_index_returns_false_without_permission(): void
     {
         $user = User::factory()->create();

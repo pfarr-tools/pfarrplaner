@@ -17,6 +17,7 @@ use App\Models\People\User;
 use App\Services\RoleService;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -98,5 +99,59 @@ class UserWebFeatureTest extends TestCase
             ->assertRedirect(route('users.index'));
 
         $this->assertSame($passwordHash, $target->fresh()->getRawOriginal('password'));
+    }
+
+    public function test_updating_profile_without_email_keeps_existing_password_hash(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $target = User::factory()->create(['email' => null, 'password' => 'long-term-password']);
+        $passwordHash = $target->getRawOriginal('password');
+
+        $this->actingAs($this->user)
+            ->patch(route('user.update', $target), [
+                'id' => $target->id,
+                'first_name' => $target->first_name,
+                'last_name' => $target->last_name,
+                'email' => null,
+                'password' => null,
+            ])
+            ->assertRedirect(route('users.index'));
+
+        $this->assertSame($passwordHash, $target->fresh()->getRawOriginal('password'));
+    }
+
+    public function test_profile_password_change_keeps_current_hash_until_validation(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $this->user->update(['password' => 'testtest', 'must_change_password' => 1]);
+
+        $this->actingAs($this->user)
+            ->patch(route('user.profile.save'), [
+                'first_name' => $this->user->first_name,
+                'last_name' => $this->user->last_name,
+                'email' => $this->user->email,
+                'current_password' => 'testtest',
+                'new_password' => 'Voca1234',
+                'new_password_confirmation' => 'Voca1234',
+            ])
+            ->assertRedirect(route('home'));
+
+        $this->assertTrue(Hash::check('Voca1234', $this->user->fresh()->password));
+    }
+
+    public function test_initial_password_can_be_changed_without_current_password(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $this->user->update(['password' => 'testtest', 'must_change_password' => 1]);
+
+        $this->actingAs($this->user)
+            ->post(route('password.change'), [
+                'new_password' => 'Voca1234',
+                'new_password_confirmation' => 'Voca1234',
+            ])
+            ->assertRedirect(route('home'));
+
+        $this->assertTrue(Hash::check('Voca1234', $this->user->fresh()->password));
+        $this->assertFalse((bool) $this->user->fresh()->must_change_password);
     }
 }
