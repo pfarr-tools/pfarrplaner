@@ -33,6 +33,8 @@ namespace App\Http\Resources\Calendar;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class CalendarMonthServiceResource extends JsonResource
 {
@@ -44,6 +46,10 @@ class CalendarMonthServiceResource extends JsonResource
     public function toArray(Request $request): array
     {
         /** @var Service $this */
+        $service = $this;
+        $gate = Gate::forUser($request->user('api') ?? $request->user() ?? Auth::user());
+        $canUpdate = $gate->allows('update', $service);
+
         return [
             'id' => $this->id,
             'slug' => $this->slug,
@@ -78,6 +84,9 @@ class CalendarMonthServiceResource extends JsonResource
             'need_predicant' => $this->need_predicant,
             'isMine' => $this->isMine,
             'isEditable' => $this->isEditable,
+            'canSelfAssign' => $service->getAttribute('can_self_assign') ?? $gate->allows('selfAssign', $service),
+            'selfAssignViaPredicantClaim' => $service->getAttribute('self_assign_via_predicant_claim')
+                ?? (! $canUpdate && $gate->allows('claimPredicant', $service)),
         ];
     }
 }

@@ -40,6 +40,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class CalendarService
 {
@@ -182,7 +183,7 @@ class CalendarService
         $days = self::initializeMonthDayMap($dates, $date);
 
         $services = self::loadMonthServices($date, $user);
-        self::addServicesToDays($days, $services);
+        self::addServicesToDays($days, $services, $user);
 
         $absences = self::loadMonthAbsences($monthStart, $monthEnd, $user);
         self::addAbsencesToDays($days, $absences, $monthStart, $monthEnd);
@@ -276,7 +277,7 @@ class CalendarService
      * @param  array<string, array<string, mixed>>  $days
      * @param  Collection<int, Service>  $services
      */
-    protected static function addServicesToDays(array &$days, Collection $services): void
+    protected static function addServicesToDays(array &$days, Collection $services, User $user): void
     {
         foreach ($services as $service) {
             $dayKey = $service->date->format('Y-m-d');
@@ -289,6 +290,12 @@ class CalendarService
                 ->unique()
                 ->values();
 
+            $gate = Gate::forUser($user);
+            $service->setAttribute('can_self_assign', $gate->allows('selfAssign', $service));
+            $service->setAttribute(
+                'self_assign_via_predicant_claim',
+                ! $gate->allows('update', $service) && $gate->allows('claimPredicant', $service)
+            );
             $resource = (new CalendarMonthServiceResource($service))->resolve();
 
             foreach ($cityIds as $cityId) {

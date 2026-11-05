@@ -33,6 +33,8 @@ function mountService(props = {}, apiMock = { get: vi.fn(), post: vi.fn(), delet
                 need_predicant: false,
                 isMine: true,
                 isEditable: true,
+                canSelfAssign: true,
+                selfAssignViaPredicantClaim: false,
             },
             targetMode: false,
             target: null,
@@ -87,5 +89,25 @@ describe('Calendar service card', () => {
         expect(wrapper.text()).toContain('Erika Beispiel')
         expect(wrapper.text()).toContain('Chris Helfer')
         expect(wrapper.vm.availableMinistries.map(item => item.id)).toContain('Lektor:in')
+    })
+
+    it('hides self-assignment when the service cannot be self-assigned', async () => {
+        const wrapper = mountService()
+        wrapper.vm.myService.isEditable = false
+        wrapper.vm.myService.canSelfAssign = false
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.find('[title="Mich für diesen Gottesdienst eintragen"]').exists()).toBe(false)
+    })
+
+    it('shows self-assignment for the predicant-needed exception', async () => {
+        const wrapper = mountService()
+        wrapper.vm.myService.isEditable = false
+        wrapper.vm.myService.need_predicant = true
+        wrapper.vm.myService.canSelfAssign = true
+        wrapper.vm.myService.selfAssignViaPredicantClaim = true
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.find('[title="Mich für diesen Gottesdienst eintragen"]').exists()).toBe(true)
     })
 })

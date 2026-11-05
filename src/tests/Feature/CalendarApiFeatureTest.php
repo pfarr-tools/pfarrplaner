@@ -18,6 +18,7 @@ use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\CalendarService;
 use App\Services\LiturgyService;
+use App\Services\RoleService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -94,6 +95,32 @@ class CalendarApiFeatureTest extends TestCase
         $response->assertJsonPath('data.2024-01-14.services.'.$city->id.'.0.participantText.P', $user->name);
         $response->assertJsonPath('data.2024-01-14.services.'.$city->id.'.0.cc_lesson', 'Barmherzigkeit');
         $response->assertJsonMissingPath('data.2024-01-14.services.'.$city->id.'.0.pastors');
+    }
+
+    public function test_month_exposes_self_assignment_capability(): void
+    {
+        $city = City::factory()->create();
+        $user = User::factory()->create();
+        $user->cities()->attach($city->id, ['permission' => 'r']);
+        $user->assignRole(RoleService::ROLE_PREDICANT);
+        $service = Service::factory()->create([
+            'city_id' => $city->id,
+            'date' => Carbon::tomorrow(),
+            'need_predicant' => true,
+        ]);
+
+        $response = $this->actingAs($user, 'api')
+            ->getJson(route('api.calendar.month', ['date' => $service->date->format('Y-m')]))
+            ->assertOk();
+
+        $path = 'data.'.$service->date->format('Y-m-d').'.services.'.$city->id.'.0';
+        $response->assertJsonPath($path.'.canSelfAssign', true);
+        $response->assertJsonPath($path.'.selfAssignViaPredicantClaim', true);
+
+        $service->update(['need_predicant' => false]);
+        $this->getJson(route('api.calendar.service', $service))
+            ->assertJsonPath('data.canSelfAssign', false)
+            ->assertJsonPath('data.selfAssignViaPredicantClaim', false);
     }
 
     /**

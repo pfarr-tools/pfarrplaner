@@ -33,6 +33,7 @@ namespace App\Policies;
 use App\Models\People\User;
 use App\Models\Service;
 use App\Providers\AuthServiceProvider;
+use App\Services\RoleService;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
@@ -98,6 +99,27 @@ class ServicePolicy
         }
 
         return false;
+    }
+
+    public function selfAssign(User $user, Service $service): bool
+    {
+        return $this->update($user, $service) || $this->claimPredicant($user, $service);
+    }
+
+    public function claimPredicant(User $user, Service $service): bool
+    {
+        if (! $user->hasAnyRole([
+            RoleService::ROLE_PREDICANT,
+            'Gottesdienstbearbeiter:in',
+            RoleService::ROLE_PASTOR,
+        ])) {
+            return false;
+        }
+
+        return $service->need_predicant
+            && ! $service->pastors()->exists()
+            && ($service->date?->isToday() || $service->date?->isFuture())
+            && $user->visibleCities()->whereKey($service->city_id)->exists();
     }
 
     /**

@@ -33,6 +33,8 @@ namespace App\Http\Resources\Calendar;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class CalendarServiceResource extends JsonResource
 {
@@ -46,6 +48,10 @@ class CalendarServiceResource extends JsonResource
     public function toArray(Request $request): array
     {
         /** @var Service $this */
+        $service = $this;
+        $gate = Gate::forUser($request->user('api') ?? $request->user() ?? Auth::user());
+        $canUpdate = $gate->allows('update', $service);
+
         return [
             'id' => $this->id,
             'slug' => $this->slug,
@@ -82,6 +88,9 @@ class CalendarServiceResource extends JsonResource
             'sacristans' => CalendarParticipantResource::collection($this->sacristans),
             'isMine' => $this->isMine,
             'isEditable' => $this->isEditable,
+            'canSelfAssign' => $gate->allows('selfAssign', $service),
+            'selfAssignViaPredicantClaim' => ! $canUpdate
+                && $gate->allows('claimPredicant', $service),
             'hasSermon' => $this->sermon_id !== null,
             'hasLiturgy' => $this->liturgyBlocks->count() > 0,
         ];

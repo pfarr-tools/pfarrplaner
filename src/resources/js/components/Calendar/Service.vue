@@ -118,7 +118,7 @@
                            title="Predigt bearbeiten" @click.prevent.stop="editFromButton(myService, 'service.sermon.editor', $event)">
                             <span class="mdi mdi-microphone"></span>
                         </a>
-                        <a href="#" class="btn btn-info mb-1 me-1" role="button"
+                        <a v-if="myService.canSelfAssign" href="#" class="btn btn-info mb-1 me-1" role="button"
                            title="Mich für diesen Gottesdienst eintragen"
                            @click.prevent.stop="selfEntry">
                             <span class="mdi mdi-target-account"></span>
@@ -131,7 +131,7 @@
                            title="Liturgie ansehen" @click.prevent.stop="editFromButton(myService, 'liturgy.editor', $event)">
                             <span class="mdi mdi-view-list"></span>
                         </a>
-                        <a href="#" class="btn btn-info mb-1 me-1" role="button"
+                        <a v-if="myService.canSelfAssign" href="#" class="btn btn-info mb-1 me-1" role="button"
                            title="Mich für diesen Gottesdienst eintragen"
                            @click.prevent.stop="selfEntry">
                             <span class="mdi mdi-target-account"></span>
@@ -289,8 +289,23 @@ export default {
             }
         },
         selfEntry() {
+            if (this.myService.selfAssignViaPredicantClaim) {
+                this.claimPredicant();
+                return;
+            }
             this.selfEntryModalVisible = true;
             this.$forceUpdate();
+        },
+        claimPredicant() {
+            this.loading = true;
+            this.$api().post(route('api.service.claimPredicant', {service: this.myService.id})).then(() => {
+                this.myService.need_predicant = false;
+                this.myService.isMine = true;
+                this.myService.canSelfAssign = false;
+                this.myService.selfAssignViaPredicantClaim = false;
+                this.loading = false;
+                this.$forceUpdate();
+            });
         },
         doSelfEntry() {
             console.log('self-entry', this.selfEntryMinistries);
