@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,10 +35,9 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class CalendarServicesCollectionResource extends ResourceCollection
 {
-
     public $collects = CalendarServiceResource::class;
-    public $preserveKeys = true;
 
+    public $preserveKeys = true;
 
     /**
      * Transform the resource collection into an array.

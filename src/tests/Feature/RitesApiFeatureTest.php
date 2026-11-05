@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,7 +25,7 @@ class RitesApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testQueryReturnsStructuredResults()
+    public function test_query_returns_structured_results()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -40,7 +41,7 @@ class RitesApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testQueryRequiresAuth()
+    public function test_query_requires_auth()
     {
         $response = $this->getJson(route('api.rites.query', ['query' => 'test']));
         $response->assertUnauthorized();

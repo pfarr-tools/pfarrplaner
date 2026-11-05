@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,19 +25,11 @@ class CreateFuneral extends AbstractCreateAction implements CreatesFunerals
 {
     use NormalizesFuneralData;
 
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return '';
     }
 
-    /**
-     * @param User $user
-     * @param array $input
-     * @return Funeral
-     */
     public function create(User $user, array $input): Funeral
     {
         $service = Service::findOrFail($input['service_id'] ?? $input['service'] ?? null);

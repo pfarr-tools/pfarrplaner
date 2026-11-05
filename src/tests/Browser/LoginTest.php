@@ -15,31 +15,31 @@ class LoginTest extends DuskTestCase
     /** @var User */
     protected $testUser;
 
-    /** @var string  */
+    /** @var string */
     protected $password;
 
     /**
      * Test if the login screen is visible and contains the necessary form
      */
-    public function testLoginScreenVisible(): void
+    public function test_login_screen_visible(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                    ->assertSeeIn('h1', config('app.name'))
-                    ->assertSee('E-Mailadresse')
-                    ->assertSee('Passwort')
-                    ->assertSee('Anmelden');
+                ->assertSeeIn('h1', config('app.name'))
+                ->assertSee('E-Mailadresse')
+                ->assertSee('Passwort')
+                ->assertSee('Anmelden');
         });
     }
 
-    public function testLoginWorks(): void
+    public function test_login_works(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
-            ->type('email', $this->testUser->email)
+                ->type('email', $this->testUser->email)
                 ->type('password', $this->password)
                 ->waitForReload(function (Browser $browser) {
-                   $browser->press('Anmelden');
+                    $browser->press('Anmelden');
                 })->assertRouteIs('home');
         });
     }
@@ -51,6 +51,4 @@ class LoginTest extends DuskTestCase
         $this->password = Str::random(16);
         $this->testUser = User::factory()->create(['password' => $this->password]);
     }
-
-
 }

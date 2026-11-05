@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,14 +39,14 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class HomeController
- * @package App\Http\Controllers
  */
 class HomeController extends Controller
 {
@@ -67,7 +67,7 @@ class HomeController extends Controller
      */
     public function index(Request $request, $activeTab = '')
     {
-        if (!Auth::user()) {
+        if (! Auth::user()) {
             return redirect()->route('login');
         }
 
@@ -87,7 +87,6 @@ class HomeController extends Controller
             return redirect()->route(substr($homeScreenSetting, 6));
         }
 
-
         $user = Auth::user()->load(['userSettings', 'roles', 'permissions', 'pools']);
         $user->ensureDefaultSettings();
         $settings = Settings::all($user);
@@ -99,7 +98,7 @@ class HomeController extends Controller
 
         $activeTabIndex = filter_var($activeTab, FILTER_SANITIZE_NUMBER_INT) ?: 0;
         $config = Auth::user()->getSetting('homeScreenTabsConfig') ?? [];
-        //$tab = HomeScreenTabFactory::getOne($config['tabs'][$activeTabIndex], $activeTabIndex);
+        // $tab = HomeScreenTabFactory::getOne($config['tabs'][$activeTabIndex], $activeTabIndex);
         $tab = [];
 
         $tabTitles = HomeScreenTabFactory::getTitles($config['tabs'] ?? []);
@@ -113,34 +112,35 @@ class HomeController extends Controller
     }
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function showChangePassword()
     {
         $originalPassword = Hash::check('testtest', Auth::user()->password);
         $mustChange = Hash::check('testtest', Auth::user()->password) || Auth::user()->must_change_password;
+
         return Inertia::render('Auth/PasswordChanger', compact('originalPassword', 'mustChange'));
     }
 
     /**
-     * @param Request $request
      * @return RedirectResponse
      */
     public function changePassword(Request $request)
     {
         $rules = [
-            'current_password' => 'required|hash:' . Auth::user()->password,
+            'current_password' => 'required|hash:'.Auth::user()->password,
             'new_password' => 'required|string|min:6|confirmed|not_current_password|notIn:testtest',
             'new_password_confirmation' => 'required',
         ];
         $firstPassword = (Hash::check('testtest', Auth::user()->password));
-        if ((!$request->has('current_password')) && $firstPassword) {
+        if ((! $request->has('current_password')) && $firstPassword) {
             unset($rules['current_password']);
         }
         $validatedData = $request->validate($rules);
-        //Change Password
+        // Change Password
         Auth::user()->update(['password' => $validatedData['new_password'], 'must_change_password' => 0]);
-        return redirect()->route('home')->with("success", "Dein Passwort wurde geändert.");
+
+        return redirect()->route('home')->with('success', 'Dein Passwort wurde geändert.');
     }
 
     public function about()
@@ -212,25 +212,25 @@ class HomeController extends Controller
     /**
      * Execute a dependency check without exposing its exception to the user.
      *
-     * @param callable(): mixed $check
-     * @return string
+     * @param  callable(): mixed  $check
      */
     protected function checkDependency(callable $check): string
     {
         try {
             $check();
+
             return 'verbunden';
         } catch (\Throwable) {
             return 'nicht verfügbar';
         }
     }
 
-
     public function tab($tabIndex)
     {
         $user = Auth::user();
         $config = $user->getSetting('homeScreenTabsConfig') ?? [];
         $tab = HomeScreenTabFactory::getOne($config['tabs'][$tabIndex], $tabIndex);
+
         return response()->json($tab);
     }
 }

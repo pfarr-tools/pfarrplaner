@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,20 +30,20 @@
 
 namespace App\StudyHelpers;
 
-use App\StudyHelpers\AbstractStudyHelper;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PfarrerverbandStudyHelper extends AbstractStudyHelper
 {
-
     public $title = 'Predigtimpulse des Pfarrerverbands';
 
     protected $records = [];
 
-    function read(array $data): array
+    public function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('https://www.pfarrerverband.de/pfarrerverand-predigtimpulse'))) return [];
+        if ('' == ($content = $this->getContent('https://www.pfarrerverband.de/pfarrerverand-predigtimpulse'))) {
+            return [];
+        }
 
         try {
 
@@ -55,18 +55,21 @@ class PfarrerverbandStudyHelper extends AbstractStudyHelper
             );
         } catch (\Exception $e) {
             Log::warning('Could not parse Pfarrerverband study helper response.', ['exception' => $e]);
+
             return [];
         }
 
         foreach ($matches[1] as $index => $date) {
             $this->records[$date] = ['[Pfarrerverband] '.$date => 'https://www.pfarrerverband.de'.$matches[2][$index]];
         }
+
         return $this->records;
     }
 
-    function getLinks(array $data): array
+    public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+
         return $data;
     }
 }

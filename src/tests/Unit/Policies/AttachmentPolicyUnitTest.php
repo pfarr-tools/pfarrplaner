@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -30,10 +31,10 @@ class AttachmentPolicyUnitTest extends TestCase
     {
         parent::setUp();
         Permission::findOrCreate('gd-bearbeiten');
-        $this->policy = new AttachmentPolicy();
+        $this->policy = new AttachmentPolicy;
     }
 
-    public function testUserWithoutWritePermissionCannotUpdateAttachment(): void
+    public function test_user_without_write_permission_cannot_update_attachment(): void
     {
         $user = User::factory()->create();
         $attachment = Attachment::factory()->create();
@@ -41,7 +42,7 @@ class AttachmentPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->update($user, $attachment));
     }
 
-    public function testUserWithServiceWritePermissionCanUpdateAttachment(): void
+    public function test_user_with_service_write_permission_can_update_attachment(): void
     {
         $user = User::factory()->create();
         $attachment = Attachment::factory()->create();
@@ -50,10 +51,7 @@ class AttachmentPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->update($user, $attachment));
     }
 
-    /**
-     * @return void
-     */
-    public function testAttachmentOnTrashedParentCannotBeUpdated(): void
+    public function test_attachment_on_trashed_parent_cannot_be_updated(): void
     {
         $user = User::factory()->create();
         $attachment = Attachment::factory()->create();

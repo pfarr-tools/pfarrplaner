@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,20 +30,14 @@
 
 namespace App\Integrations\KonfiApp;
 
-
 use App\Events\ServiceCreated;
 
 class ServiceCreatedListener
 {
-
-    /**
-     * @param ServiceCreated $event
-     */
     public function handle(ServiceCreated $event)
     {
-        if(KonfiAppIntegration::isActive($event->service->city)) {
+        if (KonfiAppIntegration::isActive($event->service->city)) {
             KonfiAppIntegration::get($event->service->city)->handleServiceUpdate($event->service, $event->service->konfiapp_event_type);
         }
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,33 +35,39 @@ use Illuminate\Support\Str;
 
 class LocalEventCalendarFactory
 {
-
-    public static function all(): array {
+    public static function all(): array
+    {
         $classes = [];
         foreach (File::allFiles(app_path('Calendars/LocalEventCalendars')) as $file) {
-            if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract')) && (!Str::contains($file->getPathname(), 'Factory'))) {
-                $classes[] = substr('App\\Calendars\\LocalEventCalendars\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+            if (($file->getExtension() == 'php') && (! Str::contains($file->getPathname(), 'Abstract')) && (! Str::contains($file->getPathname(), 'Factory'))) {
+                $classes[] = substr('App\\Calendars\\LocalEventCalendars\\'.Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
             }
-        };
+        }
+
         return $classes;
     }
 
-    public static function list(): array {
+    public static function list(): array
+    {
         $calendars = [];
         foreach (static::all() as $calendar) {
             $calendars = array_merge($calendars, $calendar::list());
         }
+
         return $calendars;
     }
 
     public static function get($key): AbstractLocalEventCalendar
     {
-        if (!Str::contains($key, ':')) abort(404);
+        if (! Str::contains($key, ':')) {
+            abort(404);
+        }
         $parts = explode(':', $key);
         $class = 'App\\Calendars\\LocalEventCalendars\\'.ucfirst($parts[0]).'LocalEventCalendar';
-        if (!class_exists($class)) abort(404);
+        if (! class_exists($class)) {
+            abort(404);
+        }
+
         return new $class($parts[1]);
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,14 +30,16 @@
 
 namespace App\Liturgy\Replacement;
 
-
 use App\Models\Service;
 
 class Replacement
 {
-    public static function replaceAll($text, Service $service) {
+    public static function replaceAll($text, Service $service)
+    {
         preg_match_all('/\[(\w*)\]/', $text, $replacers);
-        if (!isset($replacers[1])) return $text;
+        if (! isset($replacers[1])) {
+            return $text;
+        }
         foreach ($replacers[1] as $replacer) {
             $replacerClass = 'App\\Liturgy\\Replacement\\'.ucfirst($replacer).'Replacer';
             if (class_exists($replacerClass)) {
@@ -45,23 +47,27 @@ class Replacement
                 $text = $replacer->replace($text);
             }
         }
+
         return $text;
     }
 
-    public static function factory() {
+    public static function factory()
+    {
         $classes = [];
         foreach (glob(app_path('Liturgy/Replacement/*Replacer.php')) as $file) {
             if (substr(basename($file), 0, 8) != 'Abstract') {
                 $className = 'App\\Liturgy\\Replacement\\'.str_replace('.php', '', basename($file));
                 /** @var AbstractReplacer $object */
-                $object = new $className(new Service());
+                $object = new $className(new Service);
                 $classes[$object->getKey()] = $object;
             }
         }
+
         return $classes;
     }
 
-    public static function getList() {
+    public static function getList()
+    {
         $records = [];
         /**
          * @var string $tag
@@ -70,6 +76,7 @@ class Replacement
         foreach (self::factory() as $tag => $replacer) {
             $records[$tag] = $replacer->getDescription();
         }
+
         return $records;
     }
 }

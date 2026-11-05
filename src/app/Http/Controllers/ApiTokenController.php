@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,13 +31,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class ApiTokenController
- * @package App\Http\Controllers
  */
 class ApiTokenController extends Controller
 {
@@ -46,12 +46,10 @@ class ApiTokenController extends Controller
         $this->middleware('auth');
     }
 
-
     /**
      * Update the authenticated user's API token.
      *
-     * @param Request $request
-     * @return \Inertia\Response
+     * @return Response
      */
     public function update(Request $request)
     {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -38,11 +38,9 @@ use Tests\TestCase;
 
 /**
  * Class TagFeatureTest
- * @package Tests\Feature
  */
 class TagFeatureTest extends TestCase
 {
-
     use RefreshDatabase;
 
     /** @var User */
@@ -53,7 +51,7 @@ class TagFeatureTest extends TestCase
      *
      * @return void
      */
-    public function testTagCanBeCreated()
+    public function test_tag_can_be_created()
     {
         $response = $this->actingAs($this->testUser)->post(route('admin.tags.store'), Tag::factory()->raw());
         $response->assertStatus(302);
@@ -66,7 +64,7 @@ class TagFeatureTest extends TestCase
      *
      * @return void
      */
-    public function testTagCannotBeCreatedWithoutName()
+    public function test_tag_cannot_be_created_without_name()
     {
         $response = $this->actingAs($this->testUser)->post(route('admin.tags.store'), Tag::factory()->raw(['name' => null]));
         $response->assertSessionHasErrors(['name'], null, 'createTag');
@@ -78,7 +76,7 @@ class TagFeatureTest extends TestCase
      *
      * @return void
      */
-    public function testTagCanBeUpdated()
+    public function test_tag_can_be_updated()
     {
         $tag = Tag::factory()->create();
         $response = $this->actingAs($this->testUser)->patch(route('admin.tag.update', $tag->id), ['name' => 'cool name']);
@@ -92,7 +90,7 @@ class TagFeatureTest extends TestCase
      *
      * @return void
      */
-    public function testTagCannotBeUpdatedWithoutName()
+    public function test_tag_cannot_be_updated_without_name()
     {
         $tag = Tag::factory()->create(['name' => 'cool name']);
         $response = $this->actingAs($this->testUser)->patch(route('admin.tag.update', $tag->id), ['name' => null]);
@@ -105,7 +103,7 @@ class TagFeatureTest extends TestCase
      *
      * @return void
      */
-    public function testTagCodeIsSlug()
+    public function test_tag_code_is_slug()
     {
         $this->actingAs($this->testUser)->post(route('admin.tags.store'), Tag::factory()->raw(['code' => null]));
         $tag = Tag::first();
@@ -117,7 +115,7 @@ class TagFeatureTest extends TestCase
      *
      * @return void
      */
-    public function testTagCanBeDeleted()
+    public function test_tag_can_be_deleted()
     {
         $tag = Tag::factory()->create();
         $this->assertCount(1, Tag::all());

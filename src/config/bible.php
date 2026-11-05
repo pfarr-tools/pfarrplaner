@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -117,6 +117,6 @@ return [
             'StZuDan' => ['Stücke zu Daniel', '2.Daniel', '2Daniel'],
             'StZuEst' => ['Stücke zu Ester', 'Stücke zu Esther', '2.Esther', '2.Ester', '2Esther', '2Ester'],
             'GebMan' => ['Gebet des Manasse'],
-        ]
-    ]
+        ],
+    ],
 ];

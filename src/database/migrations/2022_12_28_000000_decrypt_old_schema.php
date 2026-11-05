@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -29,10 +29,13 @@
  */
 
 use App\Casts\EncryptedAttribute;
+use App\Casts\EncryptedSerializedAttribute;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -42,7 +45,7 @@ return new class extends Migration {
     {
         $pdo = DB::connection()->getPdo();
 
-        $console = new \Symfony\Component\Console\Output\ConsoleOutput();
+        $console = new ConsoleOutput;
 
         // get the database encrypter
         $encrypter = EncryptedAttribute::getEncrypter();
@@ -59,7 +62,9 @@ return new class extends Migration {
                         if (is_string($value)) {
                             $value = $this->unquote($value);
                         }
-                        if (!is_string($value)) $value = '_____' . serialize($value);
+                        if (! is_string($value)) {
+                            $value = '_____'.serialize($value);
+                        }
                     } else {
                         $value = $this->unquote($value);
                     }
@@ -73,11 +78,21 @@ return new class extends Migration {
 
     }
 
-    private function unquote($value) {
-        while (substr($value, 0, 1) == '\'') $value=substr($value, 1);
-        while (substr($value, -1) == '\'') $value=substr($value, 0, -1);
-        while (substr($value, 0, 2) == '\\'.'\'') $value = substr($value, 2);
-        while (substr($value, -2) == '\\'.'\'') $value = substr($value, 0, -2);
+    private function unquote($value)
+    {
+        while (substr($value, 0, 1) == '\'') {
+            $value = substr($value, 1);
+        }
+        while (substr($value, -1) == '\'') {
+            $value = substr($value, 0, -1);
+        }
+        while (substr($value, 0, 2) == '\\'.'\'') {
+            $value = substr($value, 2);
+        }
+        while (substr($value, -2) == '\\'.'\'') {
+            $value = substr($value, 0, -2);
+        }
+
         return $value;
     }
 
@@ -86,17 +101,14 @@ return new class extends Migration {
      *
      * @return void
      */
-    public function down()
+    public function down() {}
+
+    private function getModels()
     {
-    }
-
-
-
-    private function getModels() {
         $models = [];
         foreach (glob(app_path('*.php')) as $file) {
             $class = 'App\\'.pathinfo($file, PATHINFO_FILENAME);
-            $instance = new $class();
+            $instance = new $class;
             $reflectionClass = new ReflectionClass($class);
             if ($reflectionClass->hasProperty('casts')) {
 
@@ -108,16 +120,17 @@ return new class extends Migration {
 
                 $model['encrypted'] = [];
                 foreach ($reflectionClass->getProperty('casts')->getValue($instance) as $field => $cast) {
-                    if ($cast == EncryptedAttribute::class || $cast == \App\Casts\EncryptedSerializedAttribute::class) {
+                    if ($cast == EncryptedAttribute::class || $cast == EncryptedSerializedAttribute::class) {
                         $model['encrypted'][] = ['field' => $field, 'cast' => $cast];
                     }
                 }
 
-                if (count($model['encrypted'])) $models[] = $model;
+                if (count($model['encrypted'])) {
+                    $models[] = $model;
+                }
             }
         }
+
         return $models;
     }
-
-
 };

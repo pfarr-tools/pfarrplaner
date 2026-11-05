@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -46,22 +46,23 @@ use PhpOffice\PhpWord\Style\Tab;
 
 class SermonHandoutLiturgySheet extends AbstractLiturgySheet
 {
-
     protected $title = 'Begleitblatt (Falzflyer DIN-lang)';
+
     protected $icon = 'fa fa-file-word';
 
-    /** @var Service $service  */
+    /** @var Service */
     protected $service = null;
+
     protected $extension = 'docx';
-//    protected $configurationPage = 'Liturgy/LiturgySheets/A4WordSpecificLiturgySheetConfiguration';
-//    protected $configurationComponent = 'A4WordSpecificLiturgySheetConfiguration';
+    //    protected $configurationPage = 'Liturgy/LiturgySheets/A4WordSpecificLiturgySheetConfiguration';
+    //    protected $configurationComponent = 'A4WordSpecificLiturgySheetConfiguration';
 
     public function render(Service $service)
     {
 
         $this->service = $service;
 
-        $doc = new FoldedFlyerWordDocument();
+        $doc = new FoldedFlyerWordDocument;
         $this->setProperties($doc);
 
         $this->renderColumn1($doc);
@@ -75,8 +76,8 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
 
     }
 
-
-    protected function setProperties (FoldedFlyerWordDocument $doc) {
+    protected function setProperties(FoldedFlyerWordDocument $doc)
+    {
         $properties = $doc->getPhpWord()->getDocInfo();
         $properties->setCreator(Auth::user()->fullName());
         $properties->setCompany(Auth::user()->office ?? '');
@@ -89,8 +90,8 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
 
     protected function title(FoldedFlyerWordDocument $doc, $text, $level = 0)
     {
-        $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][$level+1]);
-        $run->addText($text, $doc->getConfig()['styles']['fonts']['titles'][$level+1]);
+        $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][$level + 1]);
+        $run->addText($text, $doc->getConfig()['styles']['fonts']['titles'][$level + 1]);
         $doc->getSection()->addTitle($run, 0);
     }
 
@@ -98,18 +99,18 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
     {
         $this->title($doc, 'Aus unserer Gemeinde');
         $doc->renderText(Replacement::replaceAll('[termine]', $this->service),
-                         [
-                             'tabs' => [
-                                 new Tab('left', Converter::cmToTwip(1.5)),
-                             ],
-                         ],
-                         ['size' => 9]);
+            [
+                'tabs' => [
+                    new Tab('left', Converter::cmToTwip(1.5)),
+                ],
+            ],
+            ['size' => 9]);
     }
 
     protected function renderColumn2(FoldedFlyerWordDocument $doc)
     {
 
-        $doc->getPhpWord()->addTableStyle('col2TableStyle', ['afterSpacing' => 0, 'Spacing'=> 0, 'cellMargin'=>0]);
+        $doc->getPhpWord()->addTableStyle('col2TableStyle', ['afterSpacing' => 0, 'Spacing' => 0, 'cellMargin' => 0]);
         $table = $doc->getSection()->addTable('col2TableStyle');
         $table->addRow(Converter::cmToTwip(8.87));
         $cell = $table->addCell(Converter::cmToTwip(8), ['valign' => 'top']);
@@ -159,12 +160,12 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         $run->addTextBreak(2);
         if ($this->service->city->official_title) {
             $run->addText(trim(str_replace('Evangelische', '', $this->service->city->official_title)),
-                          ['bold' => true, 'size' => 9]);
+                ['bold' => true, 'size' => 9]);
         } else {
             $run->addText('Kirchengemeinde '.$this->service->city->name, ['bold' => true, 'size' => 9]);
         }
         $run->addText(trim(str_replace('Evangelische', '', $this->service->city->official_title)) ?? 'Kirchengemeinde '.$this->service->city->name,
-        ['bold' => true, 'size' => 9]);
+            ['bold' => true, 'size' => 9]);
 
         foreach ($this->service->pastors as $pastor) {
             $run->addTextBreak(2);
@@ -180,9 +181,13 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
             if ($pastor->phone || $pastor->email || $this->service->city->homepage) {
                 $run->addTextBreak();
                 $parts = [];
-                if ($pastor->phone) $parts[] = 'Fon '.$pastor->phone;
-                if ($pastor->email) $parts[] = $pastor->email;
-                $run->addText(join(' | ', $parts), ['size' => 9]);
+                if ($pastor->phone) {
+                    $parts[] = 'Fon '.$pastor->phone;
+                }
+                if ($pastor->email) {
+                    $parts[] = $pastor->email;
+                }
+                $run->addText(implode(' | ', $parts), ['size' => 9]);
             }
             if ($this->service->city->homepage) {
                 $run->addTextBreak();
@@ -193,8 +198,9 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
 
     }
 
-    protected function renderColumn3(FoldedFlyerWordDocument $doc) {
-        $doc->getPhpWord()->addTableStyle('col3TableStyle', ['afterSpacing' => 0, 'Spacing'=> 0, 'cellMargin'=>0]);
+    protected function renderColumn3(FoldedFlyerWordDocument $doc)
+    {
+        $doc->getPhpWord()->addTableStyle('col3TableStyle', ['afterSpacing' => 0, 'Spacing' => 0, 'cellMargin' => 0]);
         $table = $doc->getSection()->addTable('col3TableStyle');
         $table->addRow(100);
         $table->addCell(Converter::cmToTwip(5.69));
@@ -213,7 +219,7 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         $run->addText($this->service->sermon->title ?? 'Predigttitel', ['name' => 'Sarabun Semibold', 'size' => 20, 'bold' => false, 'color' => '951981']);
         if ($this->service->sermon->subtitle) {
             $run->addTextBreak();
-            $run->addText($this->service->sermon->subtitle , ['name' => 'Sarabun Light', 'size' => 20, 'bold' => false, 'color' => '951981']);
+            $run->addText($this->service->sermon->subtitle, ['name' => 'Sarabun Light', 'size' => 20, 'bold' => false, 'color' => '951981']);
         }
         if ($this->service->sermon->image) {
             $run->addTextBreak();
@@ -240,45 +246,54 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
         $doc->getSection()->addColumnBreak();
     }
 
-    protected function renderColumn4(FoldedFlyerWordDocument $doc) {
+    protected function renderColumn4(FoldedFlyerWordDocument $doc)
+    {
         $this->title($doc, 'Lieder & Texte');
 
         foreach ($this->service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
-                if (method_exists($this, ($method = 'render' . ucfirst($item->data_type . 'Item')))) {
+                if (method_exists($this, ($method = 'render'.ucfirst($item->data_type.'Item')))) {
                     $this->$method($doc, $item);
                 }
             }
         }
 
-
     }
 
-    protected function renderColumn5(FoldedFlyerWordDocument $doc) {
-    }
+    protected function renderColumn5(FoldedFlyerWordDocument $doc) {}
 
-    protected function renderColumn6(FoldedFlyerWordDocument $doc) {
-    }
+    protected function renderColumn6(FoldedFlyerWordDocument $doc) {}
 
-    protected function podcastText($podcast, $fullText = false) {
+    protected function podcastText($podcast, $fullText = false)
+    {
         $sites = [];
-        if ($podcast->own_podcast_itunes) $sites[] = 'iTunes';
-        if ($podcast->own_podcast_spotify) $sites[] = 'Spotify';
+        if ($podcast->own_podcast_itunes) {
+            $sites[] = 'iTunes';
+        }
+        if ($podcast->own_podcast_spotify) {
+            $sites[] = 'Spotify';
+        }
 
         $text = $fullText ? 'Die Aufnahme dieser Predigt wird '.(count($sites) ? 'auf ' : ' im Podcast ') : (count($sites) ? 'Auf ' : 'Im Podcast ');
         if (count($sites)) {
-            $text .= join(' und ', $sites).' unter ';
+            $text .= implode(' und ', $sites).' unter ';
         }
         $text .= '"'.$podcast->own_podcast_title.'"';
-        if ($fullText) $text .= ' veröffentlicht.';
+        if ($fullText) {
+            $text .= ' veröffentlicht.';
+        }
+
         return $text;
     }
 
-
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!isset($item->data['psalm'])) return;
-        if (!$item->data['psalm']['text']) return;
+        if (! isset($item->data['psalm'])) {
+            return;
+        }
+        if (! $item->data['psalm']['text']) {
+            return;
+        }
         /** @var PsalmItemHelper $helper */
         $helper = $item->getHelper();
         $doc->renderNormalText($helper->getTitleText(), ['size' => 9, 'bold' => true]);
@@ -287,8 +302,12 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
 
     protected function renderSongItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!isset($item->data['song'])) return;
-        if (null === $item->data['song']) return;
+        if (! isset($item->data['song'])) {
+            return;
+        }
+        if ($item->data['song'] === null) {
+            return;
+        }
         /** @var SongItemHelper $helper */
         $helper = $item->getHelper();
         $doc->renderNormalText($helper->getTitleText(), ['size' => 9, 'bold' => true]);
@@ -300,19 +319,20 @@ class SermonHandoutLiturgySheet extends AbstractLiturgySheet
             if ($verse['refrain_before']) {
                 $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true, 'size' => 9]);
             }
-            $doc->renderNormalText($verse['number'].'. '.$verse['text'],[ 'size' => 9]);
+            $doc->renderNormalText($verse['number'].'. '.$verse['text'], ['size' => 9]);
             if ($verse['refrain_after']) {
                 $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true, 'size' => 9]);
             }
         }
     }
 
-    protected function renderSermonItem(DefaultWordDocument $doc, Item $item) {
-        if (!$this->service->sermon) return;
+    protected function renderSermonItem(DefaultWordDocument $doc, Item $item)
+    {
+        if (! $this->service->sermon) {
+            return;
+        }
         $doc->renderNormalText('Predigt: '.$this->service->sermon->title, ['size' => 9, 'bold' => true]);
         $doc->renderNormalText($this->service->sermon->reference, ['size' => 8, 'italic' => true]);
         $doc->renderNormalText($this->service->sermon->summary, ['size' => 9]);
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -46,46 +47,47 @@ abstract class AbstractSimpleModelUnitTest extends TestCase
         $reflection = new \ReflectionClass($object);
         $prop = $reflection->getProperty($property);
         $prop->setAccessible(true);
+
         return $prop->getValue($object);
     }
 
     /**
      * Test that the model class exists and is a descendant of Eloquent Model.
      */
-    public function testModelClassExists(): void
+    public function test_model_class_exists(): void
     {
-        $this->assertTrue(class_exists($this->modelClass), 'Model class ' . $this->modelClass . ' does not exist.');
+        $this->assertTrue(class_exists($this->modelClass), 'Model class '.$this->modelClass.' does not exist.');
         $this->assertTrue(
             is_subclass_of($this->modelClass, Model::class),
-            $this->modelClass . ' does not extend ' . Model::class
+            $this->modelClass.' does not extend '.Model::class
         );
     }
 
     /**
      * Test that the model's database table exists.
      */
-    public function testModelTableExists(): void
+    public function test_model_table_exists(): void
     {
         $model = new $this->modelClass;
         $this->assertTrue(
             Schema::hasTable($model->getTable()),
-            'Missing table: ' . $model->getTable()
+            'Missing table: '.$model->getTable()
         );
     }
 
     /**
      * Test that every column listed in $fillable exists in the database table.
      */
-    public function testColumnsFromFillableArePresent(): void
+    public function test_columns_from_fillable_are_present(): void
     {
         $model = new $this->modelClass;
         $table = $model->getTable();
         $fillable = $this->getProtectedProperty($model, 'fillable');
-        $this->assertIsArray($fillable, $this->modelClass . '::$fillable is not an array');
+        $this->assertIsArray($fillable, $this->modelClass.'::$fillable is not an array');
         foreach ($fillable as $column) {
             $this->assertTrue(
                 Schema::hasColumn($table, $column),
-                'Table ' . $table . ' is missing column: ' . $column
+                'Table '.$table.' is missing column: '.$column
             );
         }
     }
@@ -93,17 +95,17 @@ abstract class AbstractSimpleModelUnitTest extends TestCase
     /**
      * Test that a factory exists and can be instantiated (skipped when $hasFactory is false).
      */
-    public function testFactoryExists(): void
+    public function test_factory_exists(): void
     {
-        if (!$this->hasFactory) {
-            $this->markTestSkipped('No factory expected for ' . $this->modelClass);
+        if (! $this->hasFactory) {
+            $this->markTestSkipped('No factory expected for '.$this->modelClass);
         }
 
         $traits = class_uses_recursive($this->modelClass);
         $this->assertContains(
             HasFactory::class,
             $traits,
-            $this->modelClass . ' does not use the HasFactory trait'
+            $this->modelClass.' does not use the HasFactory trait'
         );
 
         $factory = ($this->modelClass)::factory();
@@ -113,13 +115,13 @@ abstract class AbstractSimpleModelUnitTest extends TestCase
     /**
      * Test that a Gate policy is registered for this model (skipped when $hasPolicy is false).
      */
-    public function testPolicyExists(): void
+    public function test_policy_exists(): void
     {
-        if (!$this->hasPolicy) {
-            $this->markTestSkipped('No policy expected for ' . $this->modelClass);
+        if (! $this->hasPolicy) {
+            $this->markTestSkipped('No policy expected for '.$this->modelClass);
         }
 
         $policy = Gate::getPolicyFor($this->modelClass);
-        $this->assertNotNull($policy, 'No registered policy for ' . $this->modelClass);
+        $this->assertNotNull($policy, 'No registered policy for '.$this->modelClass);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,13 +24,11 @@ class UserEditorPage extends Page
         $this->userId = $userId;
     }
 
-    /** @return string */
     public function url(): string
     {
         return route('user.edit', $this->userId);
     }
 
-    /** @param Browser $browser */
     public function assert(Browser $browser): void
     {
         $browser->waitFor('#app', 10)->assertDontSee('500');
@@ -41,7 +40,7 @@ class UserEditorPage extends Page
     public function elements(): array
     {
         return [
-            '@nameInput'  => '[name="name"]',
+            '@nameInput' => '[name="name"]',
             '@emailInput' => '[name="email"]',
             '@saveButton' => 'button[type="submit"], button.btn-primary',
         ];

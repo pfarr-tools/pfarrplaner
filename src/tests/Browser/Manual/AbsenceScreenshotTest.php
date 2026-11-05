@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -21,7 +22,9 @@ use Laravel\Dusk\Browser;
 class AbsenceScreenshotTest extends ManualScreenshotTestCase
 {
     protected Absence $absence;
+
     protected Pool $pool;
+
     protected Poolmaster $poolmaster;
 
     protected function setUp(): void
@@ -55,7 +58,7 @@ class AbsenceScreenshotTest extends ManualScreenshotTestCase
         Absence::factory()->count(2)->create(['user_id' => $this->superAdminUser->id]);
     }
 
-    public function testCaptureAbsencePlanner(): void
+    public function test_capture_absence_planner(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -67,7 +70,7 @@ class AbsenceScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureAbsenceCreateModal(): void
+    public function test_capture_absence_create_modal(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -92,7 +95,7 @@ class AbsenceScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureAbsenceEditorTabs(): void
+    public function test_capture_absence_editor_tabs(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -106,7 +109,7 @@ class AbsenceScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCapturePoolmasterCreateModal(): void
+    public function test_capture_poolmaster_create_modal(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -132,7 +135,7 @@ class AbsenceScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCapturePoolmasterEditor(): void
+    public function test_capture_poolmaster_editor(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -144,14 +147,14 @@ class AbsenceScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCapturePoolPublicPage(): void
+    public function test_capture_pool_public_page(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit(route('pool.public', $this->pool->slug))
-                    ->pause(800)
-                    ->assertSourceHas('<body')
-                    ->assertDontSee('500')
-                    ->assertDontSee('Whoops');
+                ->pause(800)
+                ->assertSourceHas('<body')
+                ->assertDontSee('500')
+                ->assertDontSee('Whoops');
 
             $this->captureCurrentManualScreenshot($browser, 'urlaubsplan-pool-oeffentlich', 800);
         });

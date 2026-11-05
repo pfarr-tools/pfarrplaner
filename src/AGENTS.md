@@ -102,6 +102,22 @@ Every PHP file carries this block comment immediately after `<?php`:
 - All public methods get a docblock with `@param` and `@return`
 - Single-line property annotations: `/** @var string[] cached user settings */`
 - Scopes document the filter logic, not just the signature
+- Jede neue oder geänderte Klasse, jedes Interface, Trait, Enum, jede Funktion
+  und jede Methode erhält einen aussagekräftigen PHPDoc-Block, unabhängig von
+  Sichtbarkeit oder statischem Status.
+- PHPDoc erklärt Zweck, Parameter, Rückgabe, Seiteneffekte und relevante
+  Ausnahmen. Platzhaltertexte und Kommentare ohne Informationswert sind nicht
+  zulässig.
+
+## JavaScript, Vue und JSDoc
+
+- Neue oder geänderte JavaScript-Funktionen, Methoden, Composables,
+  Event-Handler und vergleichbare Deklarationen erhalten aussagekräftige
+  JSDoc-Blöcke.
+- Vue-Komponenten dokumentieren Zweck, Props, Emits und nicht offensichtliche
+  Nebenwirkungen. Fachlogik gehört nicht in Templates.
+- ESLint, eslint-plugin-vue und Prettier sind verbindlich; TypeScript wird in
+  diesem Projekt nicht implizit eingeführt.
 
 ## Tests
 

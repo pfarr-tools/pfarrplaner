@@ -3,8 +3,8 @@
 use App\Models\Service;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
@@ -12,7 +12,6 @@ use Illuminate\Support\Str;
  */
 return new class extends Migration
 {
-
     protected $concernsTables = [
         'absence_user',
         'absences',
@@ -47,7 +46,6 @@ return new class extends Migration
         'weddings',
     ];
 
-
     /**
      * Run the migrations.
      */
@@ -81,18 +79,19 @@ return new class extends Migration
         }
     }
 
-    function isColumnNullable(string $table, string $column): bool
+    public function isColumnNullable(string $table, string $column): bool
     {
         $database = DB::getDatabaseName();
 
         return DB::table('information_schema.COLUMNS')
-                ->where('TABLE_SCHEMA', $database)
-                ->where('TABLE_NAME', $table)
-                ->where('COLUMN_NAME', $column)
-                ->value('IS_NULLABLE') === 'YES';
+            ->where('TABLE_SCHEMA', $database)
+            ->where('TABLE_NAME', $table)
+            ->where('COLUMN_NAME', $column)
+            ->value('IS_NULLABLE') === 'YES';
     }
 
-    protected function migrateIdFieldWithAllConstraints(string $tableName, string $targetType) {
+    protected function migrateIdFieldWithAllConstraints(string $tableName, string $targetType)
+    {
         $constraints = $this->foreignKeyColumnsReferencingTableId($tableName);
         // yields fk_table,fk_column,CONSTRAINT_NAME,DELETE_RULE,UPDATE_RULE
 
@@ -139,8 +138,7 @@ return new class extends Migration
         }
     }
 
-
-    function foreignKeyColumnsReferencingTableId(string $table): array
+    public function foreignKeyColumnsReferencingTableId(string $table): array
     {
         $database = DB::getDatabaseName();
 
@@ -153,16 +151,17 @@ return new class extends Migration
             ->where('kcu.REFERENCED_TABLE_NAME', $table)
             ->where('kcu.REFERENCED_COLUMN_NAME', 'id')
             ->get([
-                      'kcu.TABLE_NAME as fk_table',
-                      'kcu.COLUMN_NAME as fk_column',
-                      'rc.DELETE_RULE',
-                      'rc.UPDATE_RULE',
-                      'rc.CONSTRAINT_NAME',
-                  ])
+                'kcu.TABLE_NAME as fk_table',
+                'kcu.COLUMN_NAME as fk_column',
+                'rc.DELETE_RULE',
+                'rc.UPDATE_RULE',
+                'rc.CONSTRAINT_NAME',
+            ])
             ->toArray();
     }
 
-    function migrateUnconstrainedIdFields(string $tableName, string $targetType): void {
+    public function migrateUnconstrainedIdFields(string $tableName, string $targetType): void
+    {
         $idFieldName = Str::singular($tableName).'_id';
         $fields = $this->findUnconstrainedForeignKeyColumns($idFieldName);
         foreach ($fields as $foreignTable => $foreignColumn) {
@@ -173,7 +172,6 @@ return new class extends Migration
                 ->whereNotNull('f.'.$idFieldName)
                 ->whereNull('t.id')
                 ->delete();
-
 
             Schema::table($foreignTable, function (Blueprint $t) use ($foreignTable, $foreignColumn, $tableName, $targetType) {
                 if ($this->isColumnNullable($foreignTable, $foreignColumn)) {
@@ -188,16 +186,14 @@ return new class extends Migration
 
     /**
      * Find very old foreign key columns without constraints
-     * @param string $columnName
-     * @return array
      */
-    function findUnconstrainedForeignKeyColumns(string $columnName): array
+    public function findUnconstrainedForeignKeyColumns(string $columnName): array
     {
         $database = DB::getDatabaseName();
 
         // Alle Spalten mit diesem Namen finden
         $columns = DB::table('information_schema.COLUMNS as c')
-            ->leftJoin('information_schema.KEY_COLUMN_USAGE as k', function ($join) use ($database) {
+            ->leftJoin('information_schema.KEY_COLUMN_USAGE as k', function ($join) {
                 $join->on('k.TABLE_SCHEMA', '=', 'c.TABLE_SCHEMA')
                     ->on('k.TABLE_NAME', '=', 'c.TABLE_NAME')
                     ->on('k.COLUMN_NAME', '=', 'c.COLUMN_NAME')
@@ -217,6 +213,4 @@ return new class extends Migration
 
         return $result;
     }
-
-
 };

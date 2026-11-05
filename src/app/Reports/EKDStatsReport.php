@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,45 +30,39 @@
 
 namespace App\Reports;
 
-use App\Services\FileNameService;
-use App\Services\LiturgyService;
-use App\Services\MinistryService;
-use App\Models\Calendar\Day;
 use App\Models\Places\City;
 use App\Models\Service;
-use App\Models\People\User;
+use App\Services\FileNameService;
+use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
 use PhpOffice\PhpWord\Shared\Converter;
 
 /**
  * Class ServiceTableReport
- * @package App\Reports
  */
 class EKDStatsReport extends AbstractExcelDocumentReport
 {
     public const FILE_TITLE = 'EKD Statistik';
-    public const FILE_SIGNATURE = '50.0';
 
+    public const FILE_SIGNATURE = '50.0';
 
     /**
      * @var string
      */
     public $title = 'EKD Statistik';
+
     /**
      * @var string
      */
     public $description = 'Gottesdienste für EKD Statistik';
+
     /**
      * @var string
      */
@@ -76,25 +70,24 @@ class EKDStatsReport extends AbstractExcelDocumentReport
 
     protected $inertia = true;
 
-
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
+
         return Inertia::render('Report/EKDStats/Setup', compact('cities'));
     }
 
-
     private function cellAddress($col, $row)
     {
-        return $col . $row;
+        return $col.$row;
     }
 
     /**
-     * @param Request $request
      * @return string|void
+     *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws Exception
      */
@@ -141,7 +134,6 @@ class EKDStatsReport extends AbstractExcelDocumentReport
             }
         }
 
-
         $ctSundays = Service::query()->whereDoesntHave('funerals')
             ->whereDoesntHave('weddings')
             ->whereHas('pastors')
@@ -164,10 +156,9 @@ class EKDStatsReport extends AbstractExcelDocumentReport
             ->whereIn(DB::raw('DATE(date)'), $weekdays)
             ->whereHas('pastors')
             ->get()
-            ->groupBy(function($item) {
+            ->groupBy(function ($item) {
                 return $item->locationTextWithCity;
             });
-
 
         $ctChristmasEve = Service::with([])->between(
             Carbon::createFromDate($data['year'], 12, 24, 0, 0, 0),
@@ -176,7 +167,6 @@ class EKDStatsReport extends AbstractExcelDocumentReport
             ->whereDoesntHave('weddings')
             ->inCities($data['cities'])
             ->count();
-
 
         $ctOnline = Service::query()->with([])->between(
             Carbon::createFromDate($data['year'], 1, 1),
@@ -198,10 +188,7 @@ class EKDStatsReport extends AbstractExcelDocumentReport
             ->where('eucharist', 1)
             ->count();
 
-
         $cities = City::whereIn('id', $data['cities'])->get();
-
-
 
         $columns = [
             'A' => 35,
@@ -209,7 +196,6 @@ class EKDStatsReport extends AbstractExcelDocumentReport
             'C' => 12,
             'D' => 18,
         ];
-
 
         $this->spreadsheet->getDefaultStyle()
             ->getFont()
@@ -228,7 +214,6 @@ class EKDStatsReport extends AbstractExcelDocumentReport
             ->setBottom(Converter::cmToInch(1))
             ->setLeft(Converter::cmToInch(.7))
             ->setRight(Converter::cmToInch(.7));
-
 
         // column width
         foreach ($columns as $column => $width) {
@@ -280,8 +265,6 @@ class EKDStatsReport extends AbstractExcelDocumentReport
         $sheet->setCellValue("B{$row}", $ctEucharist);
         $row += 2;
 
-
-
         // output
         return $this->sendToBrowser(
             FileNameService::make(
@@ -293,8 +276,6 @@ class EKDStatsReport extends AbstractExcelDocumentReport
     }
 
     /**
-     * @param $people
-     * @param $format
      * @return string
      */
     protected function peopleListFormatted($people, $format)
@@ -303,6 +284,7 @@ class EKDStatsReport extends AbstractExcelDocumentReport
         foreach ($people as $person) {
             $recs[] = $person->formattedName($format);
         }
-        return join(', ', $recs);
+
+        return implode(', ', $recs);
     }
 }

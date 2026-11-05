@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,14 +37,12 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
  * Class LocationPolicy
- * @package App\Policies
  */
 class LocationPolicy
 {
     use HandlesAuthorization;
 
     /**
-     * @param User $user
      * @return bool
      */
     public function index(User $user)
@@ -58,14 +56,13 @@ class LocationPolicy
         if (count($user->writableCities)) {
             return true;
         }
+
         return false;
     }
 
     /**
      * Determine whether the user can view the location.
      *
-     * @param User $user
-     * @param Location $location
      * @return mixed
      */
     public function view(User $user, Location $location)
@@ -75,24 +72,19 @@ class LocationPolicy
 
     /**
      * Determine whether the user can create locations.
-     *
-     * @param User $user
-     * @param City|null $city
-     * @return bool
      */
     public function create(User $user, ?City $city = null): bool
     {
-        if (null === $city) {
+        if ($city === null) {
             return count($user->writableCities) > 0;
         }
+
         return $user->writableCities->contains($city);
     }
 
     /**
      * Determine whether the user can update the location.
      *
-     * @param User $user
-     * @param Location $location
      * @return mixed
      */
     public function update(User $user, Location $location)
@@ -103,14 +95,13 @@ class LocationPolicy
         if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {
             return true;
         }
+
         return false;
     }
 
     /**
      * Determine whether the user can delete the location.
      *
-     * @param User $user
-     * @param Location $location
      * @return mixed
      */
     public function delete(User $user, Location $location)
@@ -121,14 +112,13 @@ class LocationPolicy
         if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {
             return true;
         }
+
         return false;
     }
 
     /**
      * Determine whether the user can restore the location.
      *
-     * @param User $user
-     * @param Location $location
      * @return mixed
      */
     public function restore(User $user, Location $location)
@@ -139,14 +129,13 @@ class LocationPolicy
         if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {
             return true;
         }
+
         return false;
     }
 
     /**
      * Determine whether the user can permanently delete the location.
      *
-     * @param User $user
-     * @param Location $location
      * @return mixed
      */
     public function forceDelete(User $user, Location $location)
@@ -157,6 +146,7 @@ class LocationPolicy
         if ($user->can('kirche-bearbeiten') && $user->writableCities->contains($location->city)) {
             return true;
         }
+
         return false;
     }
 }

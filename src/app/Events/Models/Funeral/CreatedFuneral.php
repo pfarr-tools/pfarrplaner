@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,12 +24,9 @@ class CreatedFuneral
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     protected User $user;
+
     protected Funeral $funeral;
 
-    /**
-     * @param User $user
-     * @param Funeral $funeral
-     */
     public function __construct(User $user, Funeral $funeral)
     {
         $this->user = $user;

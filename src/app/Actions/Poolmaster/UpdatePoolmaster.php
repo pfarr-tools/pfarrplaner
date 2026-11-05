@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -41,16 +41,15 @@ use Illuminate\Support\Facades\Validator;
 
 class UpdatePoolmaster extends AbstractUpdateAction implements UpdatesPoolmasters
 {
-
-    /** @var Poolmaster|null  */
+    /** @var Poolmaster|null */
     protected $poolmaster = null;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function redirectTo(): string
     {
-        return route('absences.index', $this->poolmaster ? ['year' => Carbon::parse($this->poolmaster->start)->year, 'month' => Carbon::parse($this->poolmaster->start)->month]: null);
+        return route('absences.index', $this->poolmaster ? ['year' => Carbon::parse($this->poolmaster->start)->year, 'month' => Carbon::parse($this->poolmaster->start)->month] : null);
     }
 
     public function update(User $user, Poolmaster $poolmaster, array $input): Poolmaster
@@ -62,6 +61,7 @@ class UpdatePoolmaster extends AbstractUpdateAction implements UpdatesPoolmaster
         $this->poolmaster = $poolmaster;
         UpdatedPoolmaster::dispatch($user, $poolmaster);
         $this->messages = ['success' => 'Der Einsatz als Poolmaster wurde geändert.'];
+
         return $poolmaster;
     }
 }

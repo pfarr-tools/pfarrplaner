@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -41,10 +41,10 @@ class AddMoreYoutubeFields extends Migration
      */
     public function up()
     {
-        Schema::table('cities', function (Blueprint $table){
+        Schema::table('cities', function (Blueprint $table) {
             $table->boolean('youtube_self_declared_for_children')->nullable()->default(false);
         });
-        Schema::table('services', function (Blueprint $table){
+        Schema::table('services', function (Blueprint $table) {
             $table->text('youtube_prefix_description')->nullable();
             $table->text('youtube_postfix_description')->nullable();
         });

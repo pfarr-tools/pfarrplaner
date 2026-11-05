@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Reports;
 
-
 use App\Models\Leave\Absence;
 use App\Services\FileNameService;
 use Carbon\Carbon;
@@ -41,19 +40,20 @@ use Mpdf\Mpdf;
 
 class LeaveRequestFormReport extends AbstractPDFDocumentReport
 {
-
     public const FILE_SIGNATURE = '21.1';
-    public const FILE_TITLE = 'Urlaubsantrag';
 
+    public const FILE_TITLE = 'Urlaubsantrag';
 
     /**
      * @var string
      */
     public $title = 'Urlaubsantrag';
+
     /**
      * @var string
      */
     public $group = 'Formulare';
+
     /**
      * @var string
      */
@@ -61,10 +61,8 @@ class LeaveRequestFormReport extends AbstractPDFDocumentReport
 
     protected $inertia = true;
 
-
     /**
      * Returns true if the report is active for the current user
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -86,7 +84,7 @@ class LeaveRequestFormReport extends AbstractPDFDocumentReport
         $data = $request->validate(['absence' => 'int|exists:absences,id']);
         $data['absence'] = Absence::find($data['absence']);
 
-        $data['duration'] = $data['absence']->to->diff($data['absence']->from)->days+1;
+        $data['duration'] = $data['absence']->to->diff($data['absence']->from)->days + 1;
 
         $packageConfig = json_decode(file_get_contents(base_path('package.json')), true);
         $data['version'] = $packageConfig['version'];
@@ -101,7 +99,7 @@ class LeaveRequestFormReport extends AbstractPDFDocumentReport
 
         $pdf = $this->renderPDF($data, $config);
 
-        $filename=FileNameService::make(
+        $filename = FileNameService::make(
             self::FILE_TITLE,
             'pdf',
             self::FILE_SIGNATURE,
@@ -112,10 +110,8 @@ class LeaveRequestFormReport extends AbstractPDFDocumentReport
 
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $pdf->save($tempFile);
+
         return response()->download($tempFile, $filename, ['Content-Type', 'application/pdf']);
 
-
     }
-
-
 }

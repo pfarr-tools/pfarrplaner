@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,9 +13,14 @@
 
 namespace Tests\Unit;
 
+use App\Actions\Songbook\CreateSongbook;
+use App\Actions\Songbook\DeleteSongbook;
+use App\Actions\Songbook\UpdateSongbook;
 use App\Events\Models\Songbook\CreatedSongbook;
 use App\Events\Models\Songbook\DeletedSongbook;
 use App\Events\Models\Songbook\UpdatedSongbook;
+use App\Http\Controllers\AbstractCRUDController;
+use App\Http\Controllers\Api\AbstractApiCRUDController;
 use App\Models\AbstractModel;
 use App\Models\Liturgy\Songbook;
 use App\Models\People\User;
@@ -25,38 +31,38 @@ use Tests\TestCase;
 
 class SongbookUnitTest extends TestCase
 {
-    public function testSongbookHasSongsRelationship(): void
+    public function test_songbook_has_songs_relationship(): void
     {
         $songbook = Songbook::factory()->create();
         $this->assertInstanceOf(BelongsToMany::class, $songbook->songs());
     }
 
-    public function testSongbookCanBeCreatedViaFactory(): void
+    public function test_songbook_can_be_created_via_factory(): void
     {
         $songbook = Songbook::factory()->create();
         $this->assertCount(1, Songbook::all());
         $this->assertNotEmpty($songbook->name);
     }
 
-    public function testSongbookExtendsAbstractModel(): void
+    public function test_songbook_extends_abstract_model(): void
     {
         $this->assertTrue(is_subclass_of(Songbook::class, AbstractModel::class));
     }
 
-    public function testSongbookControllerClassesExist(): void
+    public function test_songbook_controller_classes_exist(): void
     {
-        $this->assertTrue(is_subclass_of(Songbook::controllerClass(), \App\Http\Controllers\AbstractCRUDController::class));
-        $this->assertTrue(is_subclass_of(Songbook::apiControllerClass(), \App\Http\Controllers\Api\AbstractApiCRUDController::class));
+        $this->assertTrue(is_subclass_of(Songbook::controllerClass(), AbstractCRUDController::class));
+        $this->assertTrue(is_subclass_of(Songbook::apiControllerClass(), AbstractApiCRUDController::class));
     }
 
-    public function testSongbookContractsResolve(): void
+    public function test_songbook_contracts_resolve(): void
     {
-        $this->assertInstanceOf(\App\Actions\Songbook\CreateSongbook::class, app(Songbook::getContractName('create')));
-        $this->assertInstanceOf(\App\Actions\Songbook\UpdateSongbook::class, app(Songbook::getContractName('update')));
-        $this->assertInstanceOf(\App\Actions\Songbook\DeleteSongbook::class, app(Songbook::getContractName('delete')));
+        $this->assertInstanceOf(CreateSongbook::class, app(Songbook::getContractName('create')));
+        $this->assertInstanceOf(UpdateSongbook::class, app(Songbook::getContractName('update')));
+        $this->assertInstanceOf(DeleteSongbook::class, app(Songbook::getContractName('delete')));
     }
 
-    public function testSongbookCanBeCreatedViaAction(): void
+    public function test_songbook_can_be_created_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -71,7 +77,7 @@ class SongbookUnitTest extends TestCase
         Event::assertDispatched(CreatedSongbook::class);
     }
 
-    public function testSongbookCanBeUpdatedViaAction(): void
+    public function test_songbook_can_be_updated_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -87,7 +93,7 @@ class SongbookUnitTest extends TestCase
         Event::assertDispatched(UpdatedSongbook::class);
     }
 
-    public function testSongbookCanBeDeletedViaAction(): void
+    public function test_songbook_can_be_deleted_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();

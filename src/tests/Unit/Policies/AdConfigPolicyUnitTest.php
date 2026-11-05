@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -29,18 +30,18 @@ class AdConfigPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new AdConfigPolicy();
+        $this->policy = new AdConfigPolicy;
         Permission::findOrCreate('gd-bearbeiten', 'web');
     }
 
-    public function testRegularUserCannotCreateAdConfig(): void
+    public function test_regular_user_cannot_create_ad_config(): void
     {
         $user = User::factory()->create();
         $service = Service::factory()->create();
         $this->assertFalse($this->policy->create($user, $service));
     }
 
-    public function testUserWithServicePermissionCanCreateAdConfig(): void
+    public function test_user_with_service_permission_can_create_ad_config(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('gd-bearbeiten');
@@ -49,14 +50,14 @@ class AdConfigPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->create($user, $service));
     }
 
-    public function testRegularUserCannotUpdateAdConfig(): void
+    public function test_regular_user_cannot_update_ad_config(): void
     {
         $user = User::factory()->create();
         $adConfig = AdConfig::factory()->create();
         $this->assertFalse($this->policy->update($user, $adConfig));
     }
 
-    public function testUserWithServicePermissionCanUpdateAdConfig(): void
+    public function test_user_with_service_permission_can_update_ad_config(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('gd-bearbeiten');
@@ -65,14 +66,14 @@ class AdConfigPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->update($user, $adConfig));
     }
 
-    public function testRegularUserCannotDeleteAdConfig(): void
+    public function test_regular_user_cannot_delete_ad_config(): void
     {
         $user = User::factory()->create();
         $adConfig = AdConfig::factory()->create();
         $this->assertFalse($this->policy->delete($user, $adConfig));
     }
 
-    public function testUserWithServicePermissionCanDeleteAdConfig(): void
+    public function test_user_with_service_permission_can_delete_ad_config(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('gd-bearbeiten');

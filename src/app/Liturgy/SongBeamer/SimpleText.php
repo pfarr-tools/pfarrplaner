@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,16 +30,18 @@
 
 namespace App\Liturgy\SongBeamer;
 
-use Illuminate\Support\Str;
-
 class SimpleText extends AbstractSngFile
 {
-
     protected $title;
+
     protected $text;
+
     protected $scheduleOptions = [];
+
     protected $profileOptions = [];
+
     protected $headerOptions = [];
+
     protected $showTitle = true;
 
     public function __construct(string $title, string $text, array $scheduleOptions = [], array $profileOptions = [], array $headerOptions = [], $showTitle = true)
@@ -53,12 +55,14 @@ class SimpleText extends AbstractSngFile
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function toText()
     {
         $headers = $this->headerOptions;
-        if ($this->showTitle) $headers['Title'] = $this->title;
+        if ($this->showTitle) {
+            $headers['Title'] = $this->title;
+        }
         $this->setHeaders($headers);
 
         $text = $this->headersToText();
@@ -70,28 +74,33 @@ class SimpleText extends AbstractSngFile
             $text .= $this->line($line);
             $ctr++;
         }
+
         return $text;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function toScheduleItem(): array
     {
-        $scheduleItem =  parent::toScheduleItem();
-        if (count($this->scheduleOptions)) $scheduleItem = array_merge($this->scheduleOptions, $scheduleItem);
+        $scheduleItem = parent::toScheduleItem();
+        if (count($this->scheduleOptions)) {
+            $scheduleItem = array_merge($this->scheduleOptions, $scheduleItem);
+        }
+
         return $scheduleItem;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function toProfile(): array
     {
         $profile = parent::toProfile();
-        if (count($this->profileOptions)) $profile = array_merge($this->profileOptions, $profile);
+        if (count($this->profileOptions)) {
+            $profile = array_merge($this->profileOptions, $profile);
+        }
+
         return $profile;
     }
-
-
 }

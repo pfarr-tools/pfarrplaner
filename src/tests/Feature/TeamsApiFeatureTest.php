@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -25,7 +26,7 @@ class TeamsApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testByCityReturnsTeamsForCity()
+    public function test_by_city_returns_teams_for_city()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -41,7 +42,7 @@ class TeamsApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testByCityReturnsEmptyArrayForCityWithNoTeams()
+    public function test_by_city_returns_empty_array_for_city_with_no_teams()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -56,7 +57,7 @@ class TeamsApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testByCityReturns404ForMissingCity()
+    public function test_by_city_returns404_for_missing_city()
     {
         $user = User::factory()->create();
 
@@ -68,7 +69,7 @@ class TeamsApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testByCityRequiresAuth()
+    public function test_by_city_requires_auth()
     {
         $city = City::factory()->create();
 

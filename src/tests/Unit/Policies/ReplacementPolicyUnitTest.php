@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -29,37 +30,37 @@ class ReplacementPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new ReplacementPolicy();
+        $this->policy = new ReplacementPolicy;
         Permission::findOrCreate('fremden-urlaub-bearbeiten', 'web');
     }
 
-    public function testAbsenceOwnerCanCreateReplacement(): void
+    public function test_absence_owner_can_create_replacement(): void
     {
         $absence = Absence::factory()->create();
         $this->assertTrue($this->policy->create($absence->user, $absence));
     }
 
-    public function testUnrelatedUserCannotCreateReplacement(): void
+    public function test_unrelated_user_cannot_create_replacement(): void
     {
         $user = User::factory()->create();
         $absence = Absence::factory()->create();
         $this->assertFalse($this->policy->create($user, $absence));
     }
 
-    public function testAbsenceOwnerCanUpdateReplacement(): void
+    public function test_absence_owner_can_update_replacement(): void
     {
         $replacement = Replacement::factory()->create();
         $this->assertTrue($this->policy->update($replacement->absence->user, $replacement));
     }
 
-    public function testUnrelatedUserCannotUpdateReplacement(): void
+    public function test_unrelated_user_cannot_update_replacement(): void
     {
         $user = User::factory()->create();
         $replacement = Replacement::factory()->create();
         $this->assertFalse($this->policy->update($user, $replacement));
     }
 
-    public function testAbsenceOwnerCanDeleteReplacement(): void
+    public function test_absence_owner_can_delete_replacement(): void
     {
         $replacement = Replacement::factory()->create();
         $this->assertTrue($this->policy->delete($replacement->absence->user, $replacement));

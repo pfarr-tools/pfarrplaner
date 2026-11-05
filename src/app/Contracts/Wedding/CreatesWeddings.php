@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,10 +18,5 @@ use App\Models\Rites\Wedding;
 
 interface CreatesWeddings
 {
-    /**
-     * @param User $user
-     * @param array $input
-     * @return Wedding
-     */
     public function create(User $user, array $input): Wedding;
 }

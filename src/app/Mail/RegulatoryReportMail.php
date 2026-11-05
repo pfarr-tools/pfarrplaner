@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -42,6 +42,7 @@ class RegulatoryReportMail extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     protected $data = [];
+
     protected $user = null;
 
     /**
@@ -67,14 +68,14 @@ class RegulatoryReportMail extends Mailable implements ShouldQueue
         $text = strtr(
             $this->data['template'],
             [
-                '###GOTTESDIENST###' => join(', ',
-                                             [
-                                                 $service->date->format('d.m.Y'),
-                                                 $service->timeText(),
-                                                 $service->city->name,
-                                                 $service->locationText(),
-                                             ]
-                    ).($service->titleText() != 'GD' ? ', '.$service->titleText() : ''),
+                '###GOTTESDIENST###' => implode(', ',
+                    [
+                        $service->date->format('d.m.Y'),
+                        $service->timeText(),
+                        $service->city->name,
+                        $service->locationText(),
+                    ]
+                ).($service->titleText() != 'GD' ? ', '.$service->titleText() : ''),
                 '###TEILNEHMERZAHL###' => $this->data['number'],
                 '###KIRCHENGEMEINDE###' => $sender,
             ]

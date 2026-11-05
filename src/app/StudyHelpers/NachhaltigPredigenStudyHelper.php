@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,19 +30,19 @@
 
 namespace App\StudyHelpers;
 
-use App\StudyHelpers\AbstractStudyHelper;
 use Illuminate\Support\Str;
 
 class NachhaltigPredigenStudyHelper extends AbstractStudyHelper
 {
-
     public $title = 'Nachhaltig predigen';
 
     protected $records = [];
 
-    function read(array $data): array
+    public function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('http://www.nachhaltig-predigen.de/index.php/predigtanregungen/2023-24'))) return [];
+        if ('' == ($content = $this->getContent('http://www.nachhaltig-predigen.de/index.php/predigtanregungen/2023-24'))) {
+            return [];
+        }
         $content = Str::replace("\n", '', $content);
         $content = Str::replace("\r", '', $content);
         preg_match_all('/<li><h4>(?:.*?)href="(.*?)">(?:<span class="mod-articles-category-title "(?: style="font-size: medium;")?>)?(.*?)(?:<\/span>)?<\/a>(?:.*?)<\/h4>/', $content, $matches);
@@ -50,16 +50,20 @@ class NachhaltigPredigenStudyHelper extends AbstractStudyHelper
         foreach ($matches[0] as $index => $match) {
             if (preg_match('/(.*?) \((\d+\.\d+\.\d+)\)/', $matches[2][$index], $parts)) {
                 $date = Str::padLeft($parts[2], 2, '0');
-                if (!isset($this->records[$date])) $this->records[$date] = [];
+                if (! isset($this->records[$date])) {
+                    $this->records[$date] = [];
+                }
                 $this->records[$date]['[Nachhaltig predigen] '.$parts[1].', '.$date] = 'http://www.nachhaltig-predigen.de'.$matches[1][$index];
             }
         }
+
         return $this->records;
     }
 
-    function getLinks(array $data): array
+    public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+
         return $data;
     }
 }

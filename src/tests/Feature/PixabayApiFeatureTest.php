@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -19,7 +20,7 @@ class PixabayApiFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testSearchRequiresAuth(): void
+    public function test_search_requires_auth(): void
     {
         $this->withHeaders(['Accept' => 'application/json'])
             ->get(route('api.pixabay.query', ['query' => 'test']))

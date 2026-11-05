@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,14 +18,14 @@ use Tests\TestCase;
 
 class LoggingConfigurationUnitTest extends TestCase
 {
-    public function testStackUsesStderrByDefault(): void
+    public function test_stack_uses_stderr_by_default(): void
     {
         $channels = config('logging.channels.stack.channels');
 
         $this->assertSame(['stderr'], $channels);
     }
 
-    public function testStackIncludesSentryLogsWhenEnabled(): void
+    public function test_stack_includes_sentry_logs_when_enabled(): void
     {
         Env::getRepository()->set('SENTRY_LOGS', 'true');
 
@@ -40,7 +41,7 @@ class LoggingConfigurationUnitTest extends TestCase
         }
     }
 
-    public function testStackIncludesDailyLogsWhenEnabled(): void
+    public function test_stack_includes_daily_logs_when_enabled(): void
     {
         Env::getRepository()->set('DAILY_LOGS', 'true');
 

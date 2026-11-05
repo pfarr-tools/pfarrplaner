@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,7 +35,6 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
 
 /**
  * Class VerifyCsrfToken
- * @package App\Http\Middleware
  */
 class ForceDomain extends Middleware
 {
@@ -44,11 +43,17 @@ class ForceDomain extends Middleware
      */
     public function handle($request, Closure $next)
     {
-        if (app()->environment(['local', 'testing', 'dusk'])) return $next($request);
+        if (app()->environment(['local', 'testing', 'dusk'])) {
+            return $next($request);
+        }
         $host = parse_url(config('app.url'), PHP_URL_HOST);
-        if ($host == '127.0.0.1') abort(403);
-        if ($host != ($request->server->getHeaders()['HOST'] ?? '')) abort(403);
+        if ($host == '127.0.0.1') {
+            abort(403);
+        }
+        if ($host != ($request->server->getHeaders()['HOST'] ?? '')) {
+            abort(403);
+        }
+
         return $next($request);
     }
-
 }

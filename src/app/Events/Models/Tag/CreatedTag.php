@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,19 +40,15 @@ class CreatedTag
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /** @var User $user */
+    /** @var User */
     protected $user;
 
-    /** @var Tag $tag */
+    /** @var Tag */
     protected $tag;
-
 
     public function __construct(User $user, Tag $tag)
     {
         $this->user = $user;
         $this->tag = $tag;
     }
-
-
-
 }

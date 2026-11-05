@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Reports;
 
-use App\Models\Calendar\Day;
 use App\Models\Location;
 use App\Models\Service;
 use App\Services\FileNameService;
@@ -39,30 +38,30 @@ use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Style\Font;
 use PhpOffice\PhpWord\Style\Section;
 
-
 /**
  * Class QuarterlyEventsReport
- * @package App\Reports
  */
 class QuarterlyEventsReport extends AbstractWordDocumentReport
 {
-
     public const FILE_SIGNATURE = '35.2';
-    public const FILE_TITLE = 'Quartalsprogramm';
 
+    public const FILE_TITLE = 'Quartalsprogramm';
 
     /**
      * @var string
      */
     public $title = 'Quartalsprogramm';
+
     /**
      * @var string
      */
     public $group = 'Listen';
+
     /**
      * @var string
      */
@@ -71,16 +70,16 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
+
         return Inertia::render('Report/QuarterlyEvents/Setup', compact('locations'));
     }
 
     /**
-     * @param Request $request
      * @return string|void
      */
     public function render(Request $request)
@@ -96,7 +95,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         );
 
         $location = Location::findOrFail($data['location']);
-        $title = $data['title'] ?: 'Quartalsprogramm für ' . $location->name;
+        $title = $data['title'] ?: 'Quartalsprogramm für '.$location->name;
         $quarter = Carbon::createFromFormat('Y-m-d', $data['quarter']);
 
         $serviceList = Service::between($quarter, $quarter->copy()->endOfQuarter())
@@ -105,7 +104,6 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
             ->ordered()
             ->get()
             ->groupBy('key_date');
-
 
         $this->wordDocument->setDefaultFontName('Sarabun Light');
         $this->wordDocument->setDefaultFontSize(14);
@@ -119,7 +117,6 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
             ]
         );
 
-
         $section->addText(
             $title,
             [
@@ -129,7 +126,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
         );
         $sectionStyle = $section->getStyle();
 
-        $section->addText('Für das ' . $quarter->quarter . '. Quartal ' . $quarter->year, ['size' => 18]);
+        $section->addText('Für das '.$quarter->quarter.'. Quartal '.$quarter->year, ['size' => 18]);
 
         if (isset($data['notes1'])) {
             $section->addText(str_replace("\n", '<w:br />', $data['notes1']));
@@ -141,7 +138,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
             [
                 'unit' => 'dxa',
                 'width' => $sectionStyle->getPageSizeW() - $sectionStyle->getMarginLeft(
-                    ) - $sectionStyle->getMarginRight(),
+                ) - $sectionStyle->getMarginRight(),
                 'borderSize' => 6,
                 'borderColor' => '000000',
                 'cellMargin' => Converter::cmToTwip('0.2'),
@@ -197,7 +194,7 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
             }
             $data[] = Auth::user()->fullName();
             if ($x = Auth::user()->phone) {
-                $data[] = 'Tel. ' . $x;
+                $data[] = 'Tel. '.$x;
             }
             $data[] = Auth::user()->email;
 
@@ -205,18 +202,17 @@ class QuarterlyEventsReport extends AbstractWordDocumentReport
             $run = $section->addTextRun();
             $run->addText('Weitere Informationen:', ['underline' => Font::UNDERLINE_SINGLE]);
             $run->addText('<w:br />');
-            $run->addText(join(', ', $data));
+            $run->addText(implode(', ', $data));
         }
 
         $section->addText(
-            'Stand: ' . Carbon::now()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y, H:i') . ' Uhr',
+            'Stand: '.Carbon::now()->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y, H:i').' Uhr',
             ['size' => 7]
         );
 
         Auth::user()->setSetting('quarterly_events_report_title', $request->get('title', ''));
         Auth::user()->setSetting('quarterly_events_report_notes1', $request->get('notes1', ''));
         Auth::user()->setSetting('quarterly_events_report_notes2', $request->get('notes2', ''));
-
 
         return $this->sendToBrowser(
             FileNameService::make(

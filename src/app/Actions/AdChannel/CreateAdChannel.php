@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,25 +32,23 @@ namespace App\Actions\AdChannel;
 
 use App\Actions\AbstractCreateAction;
 use App\Contracts\AdChannel\CreatesAdChannels;
-use App\Contracts\AdChannel\CreatesLocations;
 use App\Events\Models\AdChannel\CreatedAdChannel;
 use App\Models\Ads\AdChannel;
 use App\Models\People\User;
 use App\Models\Places\City;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class CreateAdChannel extends AbstractCreateAction implements CreatesAdChannels
 {
-
-    /** @var City $city */
+    /** @var City */
     protected $city;
-
 
     /**
      * Get the return route
-     * @return string
      */
     public function redirectTo(): string
     {
@@ -59,11 +57,11 @@ class CreateAdChannel extends AbstractCreateAction implements CreatesAdChannels
 
     /**
      * Create a new AdChannel
-     * @param User $user
-     * @param array $input
+     *
      * @return AdChannel
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Validation\ValidationException
+     *
+     * @throws AuthorizationException
+     * @throws ValidationException
      */
     public function create(User $user, array $input)
     {
@@ -77,6 +75,7 @@ class CreateAdChannel extends AbstractCreateAction implements CreatesAdChannels
         $adChannel = AdChannel::create($input);
         CreatedAdChannel::dispatch($user, $adChannel);
         $this->messages = ['success' => 'Der neue Werbekanal wurde gespeichert.'];
+
         return $adChannel;
     }
 }

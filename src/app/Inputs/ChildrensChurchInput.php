@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,18 +37,18 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class ChildrensChurchInput
- * @package App\Inputs
  */
 class ChildrensChurchInput extends AbstractInput
 {
-
     /**
      * @var string
      */
     public $title = 'Kinderkirche';
+
     public $description = 'Plan für die Kinderkirche bearbeiten';
 
     public function canEdit(): bool
@@ -57,18 +57,18 @@ class ChildrensChurchInput extends AbstractInput
     }
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup(Request $request)
     {
         $cities = Auth::user()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
+
         return Inertia::render('Inputs/ChildrensChurch/Setup', compact('cities', 'locations'));
     }
 
     /**
-     * @param Request $request
-     * @return \Inertia\Response
+     * @return Response
      */
     public function input(Request $request)
     {
@@ -97,35 +97,36 @@ class ChildrensChurchInput extends AbstractInput
         }
 
         $serviceSlugs = $query->get()->pluck('slug');
+
         return Inertia::render('Inputs/ChildrensChurch/Form', compact('serviceSlugs'));
     }
 
     /**
-     * @param Request $request
      * @return JsonResponse|void
      */
     public function save(Request $request)
     {
         $data = $request->validate([
-                                       'id' => 'required|exists:services,id',
-                                       'cc' => 'nullable|bool',
-                                       'cc_location' => 'nullable|string',
-                                       'cc_alt_time' => 'nullable|string',
-                                       'cc_lesson' => 'nullable|string',
-                                       'cc_staff' => 'nullable|string',
-                                   ]);
+            'id' => 'required|exists:services,id',
+            'cc' => 'nullable|bool',
+            'cc_location' => 'nullable|string',
+            'cc_alt_time' => 'nullable|string',
+            'cc_lesson' => 'nullable|string',
+            'cc_staff' => 'nullable|string',
+        ]);
         $service = Service::find($data['id']);
-        if (!$service) abort (404);
+        if (! $service) {
+            abort(404);
+        }
         unset($data['id']);
-        if (!$data['cc']) {
+        if (! $data['cc']) {
             $data['cc_location'] = '';
             $data['cc_alt_time'] = '';
             $data['cc_lesson'] = '';
             $data['cc_staff'] = '';
         }
         $service->update($data);
+
         return response()->json($service->slug);
     }
-
-
 }

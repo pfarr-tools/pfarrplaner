@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,7 +25,7 @@ class CityApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testKonfiAppTypesReturnsEmptyArrayWhenNotConfigured()
+    public function test_konfi_app_types_returns_empty_array_when_not_configured()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -39,7 +40,7 @@ class CityApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testKonfiAppTypesReturns404ForMissingCity()
+    public function test_konfi_app_types_returns404_for_missing_city()
     {
         $user = User::factory()->create();
 
@@ -52,7 +53,7 @@ class CityApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testKonfiAppTypesRequiresAuth()
+    public function test_konfi_app_types_requires_auth()
     {
         $city = City::factory()->create();
 

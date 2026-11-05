@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,9 +13,14 @@
 
 namespace Tests\Unit;
 
+use App\Actions\Song\CreateSong;
+use App\Actions\Song\DeleteSong;
+use App\Actions\Song\UpdateSong;
 use App\Events\Models\Song\CreatedSong;
 use App\Events\Models\Song\DeletedSong;
 use App\Events\Models\Song\UpdatedSong;
+use App\Http\Controllers\AbstractCRUDController;
+use App\Http\Controllers\Api\AbstractApiCRUDController;
 use App\Models\AbstractModel;
 use App\Models\Liturgy\Song;
 use App\Models\People\User;
@@ -26,44 +32,44 @@ use Tests\TestCase;
 
 class SongUnitTest extends TestCase
 {
-    public function testSongHasVersesRelationship(): void
+    public function test_song_has_verses_relationship(): void
     {
         $song = Song::factory()->create();
         $this->assertInstanceOf(HasMany::class, $song->verses());
     }
 
-    public function testSongHasSongbooksRelationship(): void
+    public function test_song_has_songbooks_relationship(): void
     {
         $song = Song::factory()->create();
         $this->assertInstanceOf(BelongsToMany::class, $song->songbooks());
     }
 
-    public function testSongCanBeCreatedViaFactory(): void
+    public function test_song_can_be_created_via_factory(): void
     {
         $song = Song::factory()->create();
         $this->assertCount(1, Song::all());
         $this->assertNotEmpty($song->title);
     }
 
-    public function testSongExtendsAbstractModel(): void
+    public function test_song_extends_abstract_model(): void
     {
         $this->assertTrue(is_subclass_of(Song::class, AbstractModel::class));
     }
 
-    public function testSongControllerClassesExist(): void
+    public function test_song_controller_classes_exist(): void
     {
-        $this->assertTrue(is_subclass_of(Song::controllerClass(), \App\Http\Controllers\AbstractCRUDController::class));
-        $this->assertTrue(is_subclass_of(Song::apiControllerClass(), \App\Http\Controllers\Api\AbstractApiCRUDController::class));
+        $this->assertTrue(is_subclass_of(Song::controllerClass(), AbstractCRUDController::class));
+        $this->assertTrue(is_subclass_of(Song::apiControllerClass(), AbstractApiCRUDController::class));
     }
 
-    public function testSongContractsResolve(): void
+    public function test_song_contracts_resolve(): void
     {
-        $this->assertInstanceOf(\App\Actions\Song\CreateSong::class, app(Song::getContractName('create')));
-        $this->assertInstanceOf(\App\Actions\Song\UpdateSong::class, app(Song::getContractName('update')));
-        $this->assertInstanceOf(\App\Actions\Song\DeleteSong::class, app(Song::getContractName('delete')));
+        $this->assertInstanceOf(CreateSong::class, app(Song::getContractName('create')));
+        $this->assertInstanceOf(UpdateSong::class, app(Song::getContractName('update')));
+        $this->assertInstanceOf(DeleteSong::class, app(Song::getContractName('delete')));
     }
 
-    public function testSongCanBeCreatedViaAction(): void
+    public function test_song_can_be_created_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -80,7 +86,7 @@ class SongUnitTest extends TestCase
         Event::assertDispatched(CreatedSong::class);
     }
 
-    public function testSongCanBeUpdatedViaAction(): void
+    public function test_song_can_be_updated_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -98,7 +104,7 @@ class SongUnitTest extends TestCase
         Event::assertDispatched(UpdatedSong::class);
     }
 
-    public function testSongCanBeDeletedViaAction(): void
+    public function test_song_can_be_deleted_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();

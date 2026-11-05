@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,29 +36,27 @@ use App\Events\Models\Poolmaster\CreatedPoolmaster;
 use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class CreatePoolmaster extends AbstractCreateAction implements CreatesPoolmasters
 {
-
-    /** @var Poolmaster|null  */
+    /** @var Poolmaster|null */
     protected $poolmaster = null;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function redirectTo(): string
     {
-        return route('absences.index', $this->poolmaster ? ['year' => Carbon::parse($this->poolmaster->start)->year, 'month' => Carbon::parse($this->poolmaster->start)->month]: null);
+        return route('absences.index', $this->poolmaster ? ['year' => Carbon::parse($this->poolmaster->start)->year, 'month' => Carbon::parse($this->poolmaster->start)->month] : null);
     }
 
     /**
-     * @param User $user
-     * @param array $input
-     * @return Poolmaster
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws AuthorizationException
+     * @throws ValidationException
      */
     public function create(User $user, array $input): Poolmaster
     {
@@ -67,6 +65,7 @@ class CreatePoolmaster extends AbstractCreateAction implements CreatesPoolmaster
         $this->poolmaster = Poolmaster::create($input);
         CreatedPoolmaster::dispatch($user, $this->poolmaster);
         $this->messages = ['success' => 'Der Einsatz als Poolmaster:in wurde gespeichert.'];
+
         return $this->poolmaster;
     }
 }

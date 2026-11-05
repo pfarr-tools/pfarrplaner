@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -30,37 +31,37 @@ class ParishPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new ParishPolicy();
+        $this->policy = new ParishPolicy;
         Permission::findOrCreate('pfarramt-bearbeiten', 'web');
     }
 
-    public function testRegularUserCannotIndex(): void
+    public function test_regular_user_cannot_index(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->index($user));
     }
 
-    public function testAdminCanIndex(): void
+    public function test_admin_can_index(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_ADMIN);
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testUserWithPermissionCanIndex(): void
+    public function test_user_with_permission_can_index(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('pfarramt-bearbeiten');
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testRegularUserCannotCreate(): void
+    public function test_regular_user_cannot_create(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testUserWithWriteAccessCanCreate(): void
+    public function test_user_with_write_access_can_create(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
@@ -70,14 +71,14 @@ class ParishPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->create($user, $city));
     }
 
-    public function testRegularUserCannotUpdate(): void
+    public function test_regular_user_cannot_update(): void
     {
         $user = User::factory()->create();
         $parish = Parish::factory()->create();
         $this->assertFalse($this->policy->update($user, $parish));
     }
 
-    public function testUserWithPermissionCanUpdate(): void
+    public function test_user_with_permission_can_update(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('pfarramt-bearbeiten');
@@ -85,14 +86,14 @@ class ParishPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->update($user, $parish));
     }
 
-    public function testRegularUserCannotDelete(): void
+    public function test_regular_user_cannot_delete(): void
     {
         $user = User::factory()->create();
         $parish = Parish::factory()->create();
         $this->assertFalse($this->policy->delete($user, $parish));
     }
 
-    public function testUserWithPermissionCanDelete(): void
+    public function test_user_with_permission_can_delete(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('pfarramt-bearbeiten');

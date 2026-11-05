@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,10 +30,7 @@
 
 namespace App\Console\Commands\Install;
 
-use App\Actions\Setup\CreateSuperAdmin;
-use App\Models\People\User;
 use Illuminate\Console\Command;
-use Illuminate\Console\Command\Install;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -63,11 +60,11 @@ class InstallSetup extends Command
      */
     public function handle()
     {
-        $this->components->info(config('app.name') . ' Setup');
+        $this->components->info(config('app.name').' Setup');
 
         foreach (['roles', 'admin'] as $item) {
-            $this->output->write(str_pad('Setting up initial ' . $item . '... ', 40));
-            $method = Str::camel('setup_' . $item);
+            $this->output->write(str_pad('Setting up initial '.$item.'... ', 40));
+            $method = Str::camel('setup_'.$item);
             if (method_exists($this, $method)) {
                 $result = $this->$method();
             } else {
@@ -164,9 +161,8 @@ class InstallSetup extends Command
                 'ort-bearbeiten',
                 'gd-bearbeiten',
                 'gd-allgemein-bearbeiten',
-            ]
+            ],
         ];
-
 
         foreach ($roleDefinitions as $roleName => $rolePermissions) {
             $role = Role::firstOrCreate(['name' => $roleName]);
@@ -181,7 +177,8 @@ class InstallSetup extends Command
 
     public function setupAdmin()
     {
-        $output = new BufferedOutput();
+        $output = new BufferedOutput;
+
         return Artisan::call('install:admin', [], $this->getOutput());
     }
 }

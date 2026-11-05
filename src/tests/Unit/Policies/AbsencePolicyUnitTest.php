@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -28,33 +29,33 @@ class AbsencePolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new AbsencePolicy();
+        $this->policy = new AbsencePolicy;
         // Create permissions so hasPermissionTo() does not throw
         Permission::findOrCreate('fremden-urlaub-bearbeiten', 'web');
     }
 
-    public function testOwnerCanViewOwnAbsence(): void
+    public function test_owner_can_view_own_absence(): void
     {
         $user = User::factory()->create();
         $absence = Absence::factory()->create(['user_id' => $user->id]);
         $this->assertTrue($this->policy->view($user, $absence));
     }
 
-    public function testOwnerCanUpdateOwnAbsence(): void
+    public function test_owner_can_update_own_absence(): void
     {
         $user = User::factory()->create();
         $absence = Absence::factory()->create(['user_id' => $user->id]);
         $this->assertTrue($this->policy->update($user, $absence));
     }
 
-    public function testOwnerCanDeleteOwnAbsence(): void
+    public function test_owner_can_delete_own_absence(): void
     {
         $user = User::factory()->create();
         $absence = Absence::factory()->create(['user_id' => $user->id]);
         $this->assertTrue($this->policy->delete($user, $absence));
     }
 
-    public function testStrangerCannotUpdateOthersAbsence(): void
+    public function test_stranger_cannot_update_others_absence(): void
     {
         $owner = User::factory()->create();
         $stranger = User::factory()->create();
@@ -62,26 +63,26 @@ class AbsencePolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->update($stranger, $absence));
     }
 
-    public function testManagerWithFlagCanCreateAbsence(): void
+    public function test_manager_with_flag_can_create_absence(): void
     {
         $user = User::factory()->create(['manage_absences' => true]);
         $this->assertTrue($this->policy->create($user));
     }
 
-    public function testRegularUserCannotCreateAbsenceForOthers(): void
+    public function test_regular_user_cannot_create_absence_for_others(): void
     {
         $user = User::factory()->create(['manage_absences' => false]);
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testSelfAdministerReturnsTrueWhenNoAdminsAssigned(): void
+    public function test_self_administer_returns_true_when_no_admins_assigned(): void
     {
         $user = User::factory()->create();
         $absence = Absence::factory()->create(['user_id' => $user->id]);
         $this->assertTrue($this->policy->selfAdminister($user, $absence));
     }
 
-    public function testSelfAdministerReturnsFalseForOthersAbsence(): void
+    public function test_self_administer_returns_false_for_others_absence(): void
     {
         $owner = User::factory()->create();
         $other = User::factory()->create();

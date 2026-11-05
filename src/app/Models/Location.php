@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -33,26 +33,25 @@ namespace App\Models;
 use App\Models\Places\City;
 use App\Models\Seating\SeatingSection;
 use App\Traits\HasCityScopes;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 /**
  * Class Location
- * @package App
  */
 class Location extends AbstractModel
 {
-
-    use HasFactory;
     use HasCityScopes;
+    use HasFactory;
 
     protected static string $prefix = 'ort';
+
     protected static string $prefixPlural = 'orte';
+
     public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
+
     public static array $validationRules = [
         'name' => 'required|max:255',
         'city_id' => 'required|exists:cities,id',
@@ -61,9 +60,8 @@ class Location extends AbstractModel
         'alternate_location_id' => 'nullable|int|exists:locations,id',
         'general_location_name' => 'nullable|string',
         'at_text' => 'nullable|string',
-        'instructions' => 'nullable|string'
+        'instructions' => 'nullable|string',
     ];
-
 
     /**
      * @var string[]
@@ -76,7 +74,7 @@ class Location extends AbstractModel
         'alternate_location_id',
         'general_location_name',
         'at_text',
-        'instructions'
+        'instructions',
     ];
 
     protected $with = ['seatingSections', 'city'];
@@ -115,13 +113,12 @@ class Location extends AbstractModel
         return $this->hasMany(SeatingSection::class);
     }
 
-
     /**
      * @return mixed|string
      */
     public function atText()
     {
-        return $this->at_text ?: '(' . $this->name . ')';
+        return $this->at_text ?: '('.$this->name.')';
     }
 
     /**
@@ -129,14 +126,14 @@ class Location extends AbstractModel
      */
     public function getFullNameAttribute()
     {
-        if (!$this->city) {
+        if (! $this->city) {
             return '';
         }
         $name = $this->name;
-        if (!Str::contains($name, $this->city->name)) {
-            $name .= ' ' . $this->city->name;
+        if (! Str::contains($name, $this->city->name)) {
+            $name .= ' '.$this->city->name;
         }
+
         return $name;
     }
-
 }

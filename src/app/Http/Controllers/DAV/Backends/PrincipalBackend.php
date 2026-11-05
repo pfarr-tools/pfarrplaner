@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,12 +32,12 @@ namespace App\Http\Controllers\DAV\Backends;
 
 use App\Models\People\User;
 use Illuminate\Support\Str;
+use Sabre\DAV\PropPatch;
 use Sabre\DAV\Server;
 use Sabre\DAVACL\PrincipalBackend\BackendInterface;
 
 class PrincipalBackend implements BackendInterface
 {
-
     /**
      * This is the prefix that will be used to generate principal urls.
      *
@@ -45,24 +45,25 @@ class PrincipalBackend implements BackendInterface
      */
     public const PRINCIPAL_PREFIX = 'principals/';
 
-
     public function getPrincipals()
     {
         $principals = [];
         foreach (User::whereHas('calendarConnections')->get() as $user) {
             $principals[] = [
-                'uri'               => static::PRINCIPAL_PREFIX.$user->email,
+                'uri' => static::PRINCIPAL_PREFIX.$user->email,
                 '{DAV:}displayname' => $user->fullName(),
                 '{'.Server::NS_SABREDAV.'}email-address' => $user->email,
                 'read-only' => true,
             ];
         }
+
         return $principals;
     }
 
     public function getPrincipalsByPrefix($prefixPath)
     {
         $prefixPath = Str::finish($prefixPath, '/');
+
         return array_filter($this->getPrincipals(), function ($principal) use ($prefixPath) {
             return ! $prefixPath || strpos($principal['uri'], $prefixPath) == 0;
         });
@@ -79,7 +80,7 @@ class PrincipalBackend implements BackendInterface
         return [];
     }
 
-    public function updatePrincipal($path, \Sabre\DAV\PropPatch $propPatch)
+    public function updatePrincipal($path, PropPatch $propPatch)
     {
         // not implemented
     }

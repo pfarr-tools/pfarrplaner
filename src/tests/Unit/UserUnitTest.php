@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -13,37 +14,37 @@
 namespace Tests\Unit;
 
 use App\Models\People\User;
-use App\Models\Places\City;
-use App\Services\RoleService;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Tests\AbstractSimpleModelUnitTest;
 
 class UserUnitTest extends AbstractSimpleModelUnitTest
 {
     protected string $modelClass = User::class;
+
     protected bool $hasPolicy = true;
+
     protected bool $hasFactory = true;
 
-    public function testUserHasAdminCitiesRelationship(): void
+    public function test_user_has_admin_cities_relationship(): void
     {
         $user = User::factory()->create();
         $this->assertInstanceOf(BelongsToMany::class, $user->adminCities());
     }
 
-    public function testUserHasWritableCitiesRelationship(): void
+    public function test_user_has_writable_cities_relationship(): void
     {
         $user = User::factory()->create();
         $this->assertInstanceOf(BelongsToMany::class, $user->writableCities());
     }
 
-    public function testUserFullNameIncludesFirstAndLastName(): void
+    public function test_user_full_name_includes_first_and_last_name(): void
     {
         $user = User::factory()->create(['first_name' => 'Maria', 'last_name' => 'Muster']);
         $this->assertStringContainsString('Maria', $user->name);
         $this->assertStringContainsString('Muster', $user->name);
     }
 
-    public function testUserCanBeCreatedViaFactory(): void
+    public function test_user_can_be_created_via_factory(): void
     {
         $user = User::factory()->create();
         $this->assertCount(1, User::all());

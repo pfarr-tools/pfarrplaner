@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -18,14 +19,14 @@ use Tests\AbstractPageLoadTest;
 
 class AdminRolesPageLoadTest extends AbstractPageLoadTest
 {
-    public function testRolesIndexLoads(): void
+    public function test_roles_index_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('roles.index'));
         });
     }
 
-    public function testRoleEditorLoads(): void
+    public function test_role_editor_loads(): void
     {
         $role = Role::first();
         $this->browse(function (Browser $browser) use ($role) {
@@ -33,7 +34,7 @@ class AdminRolesPageLoadTest extends AbstractPageLoadTest
         });
     }
 
-    public function testRoleCreateLoads(): void
+    public function test_role_create_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('role.create'));

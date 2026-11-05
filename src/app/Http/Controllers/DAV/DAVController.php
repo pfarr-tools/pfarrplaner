@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,41 +30,40 @@
 
 namespace App\Http\Controllers\DAV;
 
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\DAV\Backends\AuthBackend;
 use App\Http\Controllers\DAV\Backends\CalendarBackend;
 use App\Http\Controllers\DAV\Backends\PrincipalBackend;
 use Sabre\CalDAV\CalendarRoot;
-use Sabre\DAV\Auth\Plugin as AuthPlugin;
 use Sabre\CalDAV\Plugin as CalDAVPlugin;
-use Sabre\DAVACL\Plugin as DAVACLPlugin;
+use Sabre\DAV\Auth\Plugin as AuthPlugin;
 use Sabre\DAV\Browser\Plugin as BrowserPlugin;
 use Sabre\DAV\Server;
+use Sabre\DAVACL\Plugin as DAVACLPlugin;
 use Sabre\DAVACL\PrincipalCollection;
 
-class DAVController extends \App\Http\Controllers\Controller
+class DAVController extends Controller
 {
-
     public function handle()
     {
-        $authBackend = new AuthBackend();
-        $authBackend->setRealm(config('app.name') . ' DAV');
+        $authBackend = new AuthBackend;
+        $authBackend->setRealm(config('app.name').' DAV');
 
-        $principalBackend = new PrincipalBackend();
-        $calendarBackend = new CalendarBackend();
+        $principalBackend = new PrincipalBackend;
+        $calendarBackend = new CalendarBackend;
 
         $server = new Server([
-                                 new PrincipalCollection($principalBackend),
-                                 new CalendarRoot($principalBackend, $calendarBackend),
-                             ]);
+            new PrincipalCollection($principalBackend),
+            new CalendarRoot($principalBackend, $calendarBackend),
+        ]);
 
         $server->setBaseUri('/dav');
 
         $server->addPlugin(new AuthPlugin($authBackend));
-        $server->addPlugin(new CalDAVPlugin());
-        $server->addPlugin(new DAVACLPlugin());
-        $server->addPlugin(new BrowserPlugin());
+        $server->addPlugin(new CalDAVPlugin);
+        $server->addPlugin(new DAVACLPlugin);
+        $server->addPlugin(new BrowserPlugin);
 
         $server->start();
     }
-
 }

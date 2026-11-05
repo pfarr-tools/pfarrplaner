@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,12 +35,11 @@ use Illuminate\Support\Facades\App;
 
 class PackageService
 {
-
     /**
      * Get general app info
-     * @return array
      */
-    public static function info(): array {
+    public static function info(): array
+    {
         $package = [
             'info' => json_decode(file_get_contents(base_path('package.json')), true),
             'date' => (new Carbon(filemtime(base_path('package.json'))))->setTimeZone(
@@ -51,7 +50,7 @@ class PackageService
         $package['buildDateString'] = $package['date']->isoFormat('dddd, DD. MMMM YYYY HH:mm');
         $package['buildVersion'] = $package['info']['version'].'-'.$package['env'];
         $package['versionString'] = $package['buildVersion'].', '.$package['buildDateString'];
+
         return $package;
     }
-
 }

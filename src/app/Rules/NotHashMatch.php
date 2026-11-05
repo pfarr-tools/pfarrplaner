@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -21,12 +22,6 @@ class NotHashMatch implements ValidationRule
     /** @param string $hash The hash to check the value against */
     public function __construct(protected string $hash) {}
 
-    /**
-     * @param string $attribute
-     * @param mixed $value
-     * @param Closure $fail
-     * @return void
-     */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (Hash::check($value, $this->hash)) {

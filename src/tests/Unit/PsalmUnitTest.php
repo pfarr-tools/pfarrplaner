@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,9 +13,14 @@
 
 namespace Tests\Unit;
 
+use App\Actions\Psalm\CreatePsalm;
+use App\Actions\Psalm\DeletePsalm;
+use App\Actions\Psalm\UpdatePsalm;
 use App\Events\Models\Psalm\CreatedPsalm;
 use App\Events\Models\Psalm\DeletedPsalm;
 use App\Events\Models\Psalm\UpdatedPsalm;
+use App\Http\Controllers\AbstractCRUDController;
+use App\Http\Controllers\Api\AbstractApiCRUDController;
 use App\Models\AbstractModel;
 use App\Models\Liturgy\Psalm;
 use App\Models\People\User;
@@ -24,38 +30,38 @@ use Tests\TestCase;
 
 class PsalmUnitTest extends TestCase
 {
-    public function testPsalmCanBeCreatedViaFactory(): void
+    public function test_psalm_can_be_created_via_factory(): void
     {
         $psalm = Psalm::factory()->create();
         $this->assertCount(1, Psalm::all());
         $this->assertNotEmpty($psalm->title);
     }
 
-    public function testPsalmTitleIsRequired(): void
+    public function test_psalm_title_is_required(): void
     {
         $psalm = Psalm::factory()->create(['title' => 'Test Psalm']);
         $this->assertEquals('Test Psalm', $psalm->fresh()->title);
     }
 
-    public function testPsalmExtendsAbstractModel(): void
+    public function test_psalm_extends_abstract_model(): void
     {
         $this->assertTrue(is_subclass_of(Psalm::class, AbstractModel::class));
     }
 
-    public function testPsalmControllerClassesExist(): void
+    public function test_psalm_controller_classes_exist(): void
     {
-        $this->assertTrue(is_subclass_of(Psalm::controllerClass(), \App\Http\Controllers\AbstractCRUDController::class));
-        $this->assertTrue(is_subclass_of(Psalm::apiControllerClass(), \App\Http\Controllers\Api\AbstractApiCRUDController::class));
+        $this->assertTrue(is_subclass_of(Psalm::controllerClass(), AbstractCRUDController::class));
+        $this->assertTrue(is_subclass_of(Psalm::apiControllerClass(), AbstractApiCRUDController::class));
     }
 
-    public function testPsalmContractsResolve(): void
+    public function test_psalm_contracts_resolve(): void
     {
-        $this->assertInstanceOf(\App\Actions\Psalm\CreatePsalm::class, app(Psalm::getContractName('create')));
-        $this->assertInstanceOf(\App\Actions\Psalm\UpdatePsalm::class, app(Psalm::getContractName('update')));
-        $this->assertInstanceOf(\App\Actions\Psalm\DeletePsalm::class, app(Psalm::getContractName('delete')));
+        $this->assertInstanceOf(CreatePsalm::class, app(Psalm::getContractName('create')));
+        $this->assertInstanceOf(UpdatePsalm::class, app(Psalm::getContractName('update')));
+        $this->assertInstanceOf(DeletePsalm::class, app(Psalm::getContractName('delete')));
     }
 
-    public function testPsalmCanBeCreatedViaAction(): void
+    public function test_psalm_can_be_created_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -67,7 +73,7 @@ class PsalmUnitTest extends TestCase
         Event::assertDispatched(CreatedPsalm::class);
     }
 
-    public function testPsalmCanBeUpdatedViaAction(): void
+    public function test_psalm_can_be_updated_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -80,7 +86,7 @@ class PsalmUnitTest extends TestCase
         Event::assertDispatched(UpdatedPsalm::class);
     }
 
-    public function testPsalmCanBeDeletedViaAction(): void
+    public function test_psalm_can_be_deleted_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();

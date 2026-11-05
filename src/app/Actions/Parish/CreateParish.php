@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,17 +36,17 @@ use App\Events\Models\Parish\CreatedParish;
 use App\Models\Parish;
 use App\Models\People\User;
 use App\Models\Places\City;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class CreateParish extends AbstractCreateAction implements CreatesParishes
 {
-    /** @var City $city */
     protected City $city;
 
     /**
      * Get the return route
-     * @return string
      */
     public function redirectTo(): string
     {
@@ -55,11 +55,9 @@ class CreateParish extends AbstractCreateAction implements CreatesParishes
 
     /**
      * Create a new parish
-     * @param User $user
-     * @param array $input
-     * @return Parish
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Validation\ValidationException
+     *
+     * @throws AuthorizationException
+     * @throws ValidationException
      */
     public function create(User $user, array $input): Parish
     {
@@ -69,6 +67,7 @@ class CreateParish extends AbstractCreateAction implements CreatesParishes
         $parish = Parish::create($input);
         CreatedParish::dispatch($user, $parish);
         $this->messages = ['success' => 'Das neue Pfarramt wurde gespeichert.'];
+
         return $parish;
 
     }

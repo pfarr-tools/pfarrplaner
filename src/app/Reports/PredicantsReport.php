@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,14 +30,15 @@
 
 namespace App\Reports;
 
-use App\Models\Places\City;
 use App\Models\Calendar\Day;
+use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Style\Font;
@@ -45,21 +46,23 @@ use PhpOffice\PhpWord\Style\Section;
 
 /**
  * Class PredicantsReport
- * @package App\Reports
  */
 class PredicantsReport extends AbstractWordDocumentReport
 {
     public const FILE_SIGNATURE = '50.0';
+
     public const FILE_TITLE = 'Prädikant_innenanforderung';
 
     /**
      * @var string
      */
     public $title = 'Prädikant:innenanforderung';
+
     /**
      * @var string
      */
     public $group = 'Formulare';
+
     /**
      * @var string
      */
@@ -75,18 +78,19 @@ class PredicantsReport extends AbstractWordDocumentReport
     }
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $maxDate = Day::orderBy('date', 'DESC')->limit(1)->get()->first();
         $cities = Auth::user()->cities;
+
         return Inertia::render('Report/Predicants/Setup', compact('cities'));
     }
 
     /**
-     * @param Request $request
      * @return string|void
+     *
      * @throws Exception
      */
     public function render(Request $request)
@@ -112,7 +116,6 @@ class PredicantsReport extends AbstractWordDocumentReport
             ->get()
             ->groupBy('key_date');
 
-
         $this->wordDocument->setDefaultFontName('Arial');
         $this->wordDocument->setDefaultFontSize(11);
         $section = $this->wordDocument->addSection(
@@ -125,7 +128,6 @@ class PredicantsReport extends AbstractWordDocumentReport
             ]
         );
 
-
         $section->addText(
             'Anforderung von '.config('labels.predicant').'nen bzw. Pfarrer:innen im Ruhestand über das Dekanatamt',
             [
@@ -134,8 +136,8 @@ class PredicantsReport extends AbstractWordDocumentReport
             ],
             [
                 'alignment' => 'center',
-                "borderSize" => 6,
-                "borderColor" => "000000",
+                'borderSize' => 6,
+                'borderColor' => '000000',
                 'spaceAfter' => 0,
             ]
         );
@@ -144,11 +146,11 @@ class PredicantsReport extends AbstractWordDocumentReport
             $section->addText('', [], ['spaceAfter' => 0]);
         }
         $section->addText(
-            'Für ' . $cities->pluck('name')->join(' / '),
+            'Für '.$cities->pluck('name')->join(' / '),
             [],
             [
-                "borderSize" => 6,
-                "borderColor" => "000000",
+                'borderSize' => 6,
+                'borderColor' => '000000',
                 'indentation' => ['right' => Converter::cmToTwip(10.5)],
                 'spaceAfter' => 0,
             ]
@@ -229,5 +231,4 @@ class PredicantsReport extends AbstractWordDocumentReport
 
         return Carbon::parse($date, 'Europe/Berlin');
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@
 
 namespace App\HomeScreens;
 
-
 use App\Models\Leave\Absence;
 use App\Models\Leave\Replacement;
 use Illuminate\Contracts\View\Factory;
@@ -47,30 +46,26 @@ use Illuminate\View\View;
 
 /**
  * Class AbstractHomeScreen
- * @package App\HomeScreens
  */
 abstract class AbstractHomeScreen
 {
-
-    /** @var bool $hasConfiguration true, if this view can be configured in user profile settings */
+    /** @var bool true, if this view can be configured in user profile settings */
     protected $hasConfiguration = false;
 
-
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Render the homescreen
+     *
      * @return mixed
      */
     abstract public function render();
 
-
     /**
      * Called to render a specific blade view
-     * @param $viewName Name of the view to render
-     * @param $data Data passed to the view (absence data will be added)
+     *
+     * @param  $viewName  Name of the view to render
+     * @param  $data  Data passed to the view (absence data will be added)
      * @return Factory|View
      */
     public function renderView($viewName, $data)
@@ -78,11 +73,13 @@ abstract class AbstractHomeScreen
         if (Auth::user()->manage_absences) {
             $data = array_merge($data, $this->getAbsences());
         }
+
         return view($viewName, $data);
     }
 
     /**
      * Get absence data for view
+     *
      * @return array Absence data
      */
     protected function getAbsences()
@@ -99,12 +96,13 @@ abstract class AbstractHomeScreen
             ->orderBy('from')
             ->orderBy('to')
             ->get();
+
         return compact('absences', 'replacements');
     }
 
-
     /**
      * Get a view for configuration setttings
+     *
      * @return string
      */
     public function renderConfigurationView()
@@ -112,13 +110,10 @@ abstract class AbstractHomeScreen
         return 'Für diesen Startbildschirm gibt es nichts zu konfigurieren.';
     }
 
-
     /**
      * Save submitted configuration
-     * @param Request $request Request
+     *
+     * @param  Request  $request  Request
      */
-    public function setConfiguration(Request $request)
-    {
-    }
-
+    public function setConfiguration(Request $request) {}
 }

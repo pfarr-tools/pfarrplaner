@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,17 +39,19 @@ use Illuminate\Support\Facades\Log;
 
 class InstanceRegistryService
 {
-
     /**
      * Pings the central registry for Pfarrplaner instances
      * Note that this is obligatory if you hope to get any kind of help from the developer
      * concerning your instance.
      *
-     * @param bool $debug Debug output?
+     * @param  bool  $debug  Debug output?
      * @return void
      */
-    public static function ping($debug = false) {
-        if (env('NO_PING')) return;
+    public static function ping($debug = false)
+    {
+        if (env('NO_PING')) {
+            return;
+        }
 
         $package = PackageService::info();
 
@@ -59,7 +61,7 @@ class InstanceRegistryService
             'version' => $package['versionString'],
             'buildDate' => $package['buildDateString'],
             'appName' => config('app.name'),
-            'commit' => (new UpdateService())->currentCommit(),
+            'commit' => (new UpdateService)->currentCommit(),
             'churches' => City::count(),
             'people' => User::count(),
             'services' => Service::count(),
@@ -68,12 +70,11 @@ class InstanceRegistryService
         ];
 
         Log::debug('Pinging central registry');
-        $client = new Client();
+        $client = new Client;
         try {
             $client->post('https://instances.pfarrplaner.de/api/ping', ['form_params' => $data]);
         } catch (\Exception $exception) {
             return;
         }
     }
-
 }

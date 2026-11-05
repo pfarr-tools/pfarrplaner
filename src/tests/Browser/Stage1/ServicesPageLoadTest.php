@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -20,6 +21,7 @@ use Tests\AbstractPageLoadTest;
 class ServicesPageLoadTest extends AbstractPageLoadTest
 {
     protected Service $service;
+
     protected Sermon $sermon;
 
     protected function setUp(): void
@@ -30,28 +32,28 @@ class ServicesPageLoadTest extends AbstractPageLoadTest
         $this->service->update(['sermon_id' => $this->sermon->id]);
     }
 
-    public function testServiceEditorLoads(): void
+    public function test_service_editor_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('service.edit', $this->service->slug));
         });
     }
 
-    public function testLiturgyEditorLoads(): void
+    public function test_liturgy_editor_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('liturgy.editor', $this->service->slug));
         });
     }
 
-    public function testSermonEditorLoads(): void
+    public function test_sermon_editor_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('sermon.editor', $this->sermon->id));
         });
     }
 
-    public function testSermonReaderLoads(): void
+    public function test_sermon_reader_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('sermon.reader', $this->sermon->id));

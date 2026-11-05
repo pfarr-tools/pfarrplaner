@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -22,16 +23,13 @@ class GenerateOpenApiSpec extends Command
 
     protected $description = 'Generate OpenAPI spec from PHP attributes in app/Http/Controllers/Api/';
 
-    /**
-     * @return int
-     */
     public function handle(): int
     {
         $output = $this->option('output') ?: public_path('openapi.json');
 
         $this->info('Scanning app/Http/Controllers/Api/ …');
 
-        $openapi = (new Generator())->generate([app_path('Http/Controllers/Api')]);
+        $openapi = (new Generator)->generate([app_path('Http/Controllers/Api')]);
 
         file_put_contents($output, $openapi->toJson(JSON_PRETTY_PRINT));
 

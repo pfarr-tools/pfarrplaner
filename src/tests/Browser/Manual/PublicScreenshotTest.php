@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -22,8 +23,11 @@ use Laravel\Dusk\Browser;
 class PublicScreenshotTest extends ManualScreenshotTestCase
 {
     protected City $city;
+
     protected Service $service;
+
     protected Baptism $baptism;
+
     protected User $pastor;
 
     protected function setUp(): void
@@ -70,7 +74,7 @@ class PublicScreenshotTest extends ManualScreenshotTestCase
         ]);
     }
 
-    public function testCapturePublicChildrensChurch(): void
+    public function test_capture_public_childrens_church(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit(route('cc-public', $this->city->name))
@@ -79,7 +83,7 @@ class PublicScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCapturePublicDimissorial(): void
+    public function test_capture_public_dimissorial(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit(URL::signedRoute('dimissorial.show', ['type' => 'taufe', 'id' => $this->baptism->id]))
@@ -88,13 +92,13 @@ class PublicScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCapturePublicMinistryRequest(): void
+    public function test_capture_public_ministry_request(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit(URL::signedRoute('ministry.request', [
                 'ministry' => 'P',
                 'user' => $this->pastor->id,
-                'services' => (string)$this->service->id,
+                'services' => (string) $this->service->id,
                 'sender' => $this->superAdminUser->id,
             ]))
                 ->pause(800);
@@ -102,7 +106,7 @@ class PublicScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCapturePublicMinistryPlan(): void
+    public function test_capture_public_ministry_plan(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit(route('ministry.plan', ['cityName' => $this->city->name, 'ministry' => 'P']))
@@ -111,7 +115,7 @@ class PublicScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCapturePublicInfoPage(): void
+    public function test_capture_public_info_page(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit(route('what.is'))

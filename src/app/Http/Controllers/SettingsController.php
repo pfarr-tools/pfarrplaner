@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -50,7 +50,7 @@ class SettingsController extends Controller
 
         if ($request->header('x-inertia')) {
             return redirect()->back();
-        } else{
+        } else {
             return response()->json($userSetting->only(['key', 'value']), 200);
         }
     }

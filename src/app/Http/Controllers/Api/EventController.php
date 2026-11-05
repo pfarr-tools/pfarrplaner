@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,14 +40,15 @@ use Illuminate\Support\Str;
 
 class EventController
 {
-
     public function byRange(Request $request, $calendar, $start, $end)
     {
         $start = Carbon::parse(Str::beforeLast($start, '('));
         $end = Carbon::parse(Str::beforeLast($end, '('));
 
         $calendars = explode(',', $calendar);
-        if (!count($calendars)) return new JsonResource([]);
+        if (! count($calendars)) {
+            return new JsonResource([]);
+        }
 
         $occurences = Occurence::with('event')
             ->between($start, $end)
@@ -72,5 +73,4 @@ class EventController
 
         return OccurenceResource::collection($occurences);
     }
-
 }

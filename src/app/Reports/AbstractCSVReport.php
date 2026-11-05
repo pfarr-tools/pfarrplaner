@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,11 +34,11 @@ use Illuminate\Support\Facades\Response;
 
 abstract class AbstractCSVReport extends AbstractReport
 {
-
     /**
      * @var string
      */
     public $group = 'CSV-Datenausgabe';
+
     /**
      * @var string
      */
@@ -50,17 +50,17 @@ abstract class AbstractCSVReport extends AbstractReport
         foreach ($data as $key => $item) {
             $record = [];
             foreach ($options as $recordKey => $option) {
-                if (is_numeric($recordKey)) $recordKey = $option;
+                if (is_numeric($recordKey)) {
+                    $recordKey = $option;
+                }
                 $record[$recordKey] = $option instanceof \Closure ? $option($item, $key) : $this->getPropertyByKey($option, $item);
             }
             $records[] = $record;
         }
 
-
-
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
         ];
 
         $tempFile = tempnam(sys_get_temp_dir(), $fileName);
@@ -70,8 +70,10 @@ abstract class AbstractCSVReport extends AbstractReport
             fputcsv($handle, array_keys($records[0]));
         }
 
-        foreach ($records as $record) fputcsv($handle, array_values($record));
-        fclose ($handle);
+        foreach ($records as $record) {
+            fputcsv($handle, array_values($record));
+        }
+        fclose($handle);
 
         return Response::download($tempFile, $fileName, $headers)->deleteFileAfterSend(true);
 
@@ -79,9 +81,10 @@ abstract class AbstractCSVReport extends AbstractReport
 
     protected function getPropertyByKey($recordKey, $item)
     {
-        if (is_object($item)) return $item->{$recordKey};
+        if (is_object($item)) {
+            return $item->{$recordKey};
+        }
+
         return $item[$recordKey] ?? '';
     }
-
-
 }

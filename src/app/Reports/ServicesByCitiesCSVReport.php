@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,27 +30,26 @@
 
 namespace App\Reports;
 
-use App\Liturgy\Bible\BibleText;
-use App\Liturgy\Bible\ReferenceParser;
-use App\Models\Location;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\FileNameService;
-use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ServicesByCitiesCSVReport extends AbstractCSVReport
 {
     public const FILE_TITLE = 'Gottesdienste';
+
     public const FILE_SIGNATURE = '50.0';
 
     /**
      * @var string
      */
     public $title = 'Gottesdienste nach Kirchengemeinden';
+
     /**
      * @var string
      */
@@ -58,13 +57,13 @@ class ServicesByCitiesCSVReport extends AbstractCSVReport
 
     protected $inertia = true;
 
-
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
+
         return Inertia::render('Report/ServicesByCitiesCSV/Setup', compact('cities'));
     }
 
@@ -95,10 +94,9 @@ class ServicesByCitiesCSVReport extends AbstractCSVReport
                 return $service->date->format('Y-m-d');
             });
 
-
         return $this->csv(
             FileNameService::make(
-                static::FILE_TITLE . ' ' . $cities->pluck('name')->join(' '),
+                static::FILE_TITLE.' '.$cities->pluck('name')->join(' '),
                 null,
                 static::FILE_SIGNATURE,
                 [$start, $end]
@@ -116,10 +114,10 @@ class ServicesByCitiesCSVReport extends AbstractCSVReport
                             .'  '.($data['full_location'] ? $service->locationTextWithCity : $service->locationText())
                             .($service->titleText() != 'GD' ? "\n                ".$service->titleText(false, true) : '');
                     }
-                    return join("\n", $records);
+
+                    return implode("\n", $records);
                 },
             ]
         );
     }
-
 }

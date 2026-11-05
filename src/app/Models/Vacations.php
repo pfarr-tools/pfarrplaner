@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@
 
 namespace App\Models;
 
-
 use App\Date;
 use App\Models\Leave\Absence;
 use App\Models\People\User;
@@ -48,18 +47,18 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Class Vacations
- * @package App
  */
 class Vacations
 {
-
     /**
-     * @param $date Date
+     * @param  $date  Date
      * @return array
      */
     public static function getByDate($date)
     {
-        if (!is_a($date, Carbon::class)) $date = Carbon::parse($date);
+        if (! is_a($date, Carbon::class)) {
+            $date = Carbon::parse($date);
+        }
         $vacationers = [];
         $vacationData = self::getVacationDataFromCache();
 
@@ -79,7 +78,7 @@ class Vacations
      */
     protected static function getVacationDataFromCache()
     {
-        if (!Cache::has('vacationData')) {
+        if (! Cache::has('vacationData')) {
             $vacationData = json_decode(file_get_contents(env('VACATION_URL')), true);
             foreach ($vacationData as $key => $datum) {
                 $vacationData[$key]['start'] = Carbon::createFromTimeString($datum['start']);
@@ -89,13 +88,11 @@ class Vacations
         } else {
             $vacationData = Cache::get('vacationData');
         }
+
         return $vacationData;
     }
 
     /**
-     * @param $start
-     * @param $end
-     * @param User|null $user
      * @return mixed
      */
     public static function getByPeriodAndUser($start, $end, ?User $user)
@@ -104,12 +101,10 @@ class Vacations
     }
 
     /**
-     * @param $lastName
      * @return Builder|Model|object|null
      */
     protected static function findUserByLastName($lastName)
     {
-        return User::with('cities')->where('name', 'like', '%' . $lastName)->first();
+        return User::with('cities')->where('name', 'like', '%'.$lastName)->first();
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -19,32 +20,32 @@ use Tests\TestCase;
 
 class SeatableFixedRuleTest extends TestCase
 {
-    public function testImplementsValidationRuleInterface()
+    public function test_implements_validation_rule_interface()
     {
-        $this->assertInstanceOf(ValidationRule::class, new SeatableFixed());
+        $this->assertInstanceOf(ValidationRule::class, new SeatableFixed);
     }
 
-    public function testImplementsDataAwareRuleInterface()
+    public function test_implements_data_aware_rule_interface()
     {
-        $this->assertInstanceOf(DataAwareRule::class, new SeatableFixed());
+        $this->assertInstanceOf(DataAwareRule::class, new SeatableFixed);
     }
 
-    public function testSetDataReturnsSelf()
+    public function test_set_data_returns_self()
     {
         $rule = new SeatableFixed('booking_id');
         $result = $rule->setData(['service_id' => 1, 'booking_id' => null]);
         $this->assertSame($rule, $result);
     }
 
-    public function testConstructorAcceptsBookingIdKey()
+    public function test_constructor_accepts_booking_id_key()
     {
         $rule = new SeatableFixed('booking_id');
         $this->assertInstanceOf(SeatableFixed::class, $rule);
     }
 
-    public function testConstructorWithoutBookingIdKey()
+    public function test_constructor_without_booking_id_key()
     {
-        $rule = new SeatableFixed();
+        $rule = new SeatableFixed;
         $this->assertInstanceOf(SeatableFixed::class, $rule);
     }
 }

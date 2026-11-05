@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,37 +30,42 @@
 
 namespace App\StudyHelpers;
 
-use App\StudyHelpers\AbstractStudyHelper;
 use Illuminate\Support\Str;
 
 class GPStudyHelper extends AbstractStudyHelper
 {
-
     public $title = 'Göttinger Predigten im Internet';
 
     protected $records = [];
 
-    function read(array $data): array
+    public function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('https://www.theologie.uzh.ch/predigten/category/aktuelle/'))) return [];
+        if ('' == ($content = $this->getContent('https://www.theologie.uzh.ch/predigten/category/aktuelle/'))) {
+            return [];
+        }
         $content = Str::replace("\n", '', $content);
         preg_match_all('/<h3 class="entry-title no-date"><a href="(.*?)">(.*?)<\/a>(?:.*?)<p>(?:.*?)(\d\d.\d\d.\d\d)/', $content, $matches);
 
         foreach ($matches[0] as $index => $match) {
             $date = $this->translateDate($matches[3][$index]);
-            if (!isset($this->records[$date])) $this->records[$date] = [];
+            if (! isset($this->records[$date])) {
+                $this->records[$date] = [];
+            }
             $this->records[$date]['[Göttinger Predigten] '.$date.': '.$matches[2][$index]] = $matches[1][$index];
         }
+
         return $this->records;
     }
 
-    protected function translateDate($date) {
+    protected function translateDate($date)
+    {
         return Str::substr($date, 0, 8).'20'.substr($date, 8, 2);
     }
 
-    function getLinks(array $data): array
+    public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+
         return $data;
     }
 }

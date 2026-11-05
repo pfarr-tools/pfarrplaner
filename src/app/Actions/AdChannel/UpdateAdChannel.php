@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,24 +32,23 @@ namespace App\Actions\AdChannel;
 
 use App\Actions\AbstractUpdateAction;
 use App\Contracts\AdChannel\UpdatesAdChannels;
-use App\Contracts\AdChannel\UpdatesLocations;
 use App\Events\Models\AdChannel\UpdatedAdChannel;
 use App\Models\Ads\AdChannel;
 use App\Models\People\User;
 use App\Models\Places\City;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class UpdateAdChannel extends AbstractUpdateAction implements UpdatesAdChannels
 {
-    /** @var City $city */
+    /** @var City */
     protected $city;
-
 
     /**
      * Get return route
-     * @return string
      */
     public function redirectTo(): string
     {
@@ -58,12 +57,11 @@ class UpdateAdChannel extends AbstractUpdateAction implements UpdatesAdChannels
 
     /**
      * Update a tag
-     * @param User $user
-     * @param AdChannel $adChannel
-     * @param array $input
+     *
      * @return AdChannel
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Validation\ValidationException
+     *
+     * @throws AuthorizationException
+     * @throws ValidationException
      */
     public function update(User $user, AdChannel $adChannel, array $input)
     {
@@ -74,6 +72,7 @@ class UpdateAdChannel extends AbstractUpdateAction implements UpdatesAdChannels
         $adChannel->update($input);
         UpdatedAdChannel::dispatch($user, $adChannel);
         $this->messages = ['success' => 'Der Werbekanal wurde geändert.'];
+
         return $adChannel;
     }
 }

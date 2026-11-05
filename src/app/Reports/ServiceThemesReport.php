@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,44 +30,43 @@
 
 namespace App\Reports;
 
-use App\Services\FileNameService;
-use App\Services\LiturgyService;
-use App\Services\MinistryService;
 use App\Models\Location;
+use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
-use App\Models\People\User;
+use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Exception;
 use PhpOffice\PhpWord\Shared\Converter;
 
 /**
  * Class ServiceTableReport
- * @package App\Reports
  */
 class ServiceThemesReport extends AbstractExcelDocumentReport
 {
     public const FILE_TITLE = 'Themenplan';
-    public const FILE_SIGNATURE = '50.0';
 
+    public const FILE_SIGNATURE = '50.0';
 
     /**
      * @var string
      */
     public $title = 'Thematischer Plan der Gottesdienste';
+
     /**
      * @var string
      */
     public $description = 'Exceltabelle mit Übersicht zu Gottesdiensten und Themen';
+
     /**
      * @var string
      */
@@ -75,26 +74,25 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
 
     protected $inertia = true;
 
-
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
+
         return Inertia::render('Report/ServiceThemes/Setup', compact('cities', 'locations'));
     }
 
-
     private function cellAddress($col, $row)
     {
-        return $col . $row;
+        return $col.$row;
     }
 
     /**
-     * @param Request $request
      * @return string|void
+     *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws Exception
      */
@@ -122,7 +120,6 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
 
         $cities = City::whereIn('id', $data['cities'])->get();
 
-
         $ministries = $data['ministries'] ?? [];
         $nameFormat = $data['name_format'] ?? User::NAME_FORMAT_DEFAULT;
 
@@ -137,7 +134,6 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
             'H' => 16,
             'I' => 12,
         ];
-
 
         $colors = [
             'white' => 'ffffffff',
@@ -188,18 +184,17 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
             ->setFooter(0);
         $sheet->getHeaderFooter()
             ->setOddHeader(
-                '&LEvangelische Kirchengemeinde' . (count($cities) > 1 ? 'n ' : ' ') . $cities->pluck('name')->join(
+                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cities->pluck('name')->join(
                     ', '
-                ) . '&Themenplan ' . $data['year'] . ' - Blatt &P von &N'
+                ).'&Themenplan '.$data['year'].' - Blatt &P von &N'
             )
             ->setEvenHeader(
-                '&LEvangelische Kirchengemeinde' . (count($cities) > 1 ? 'n ' : ' ') . $cities->pluck('name')->join(
+                '&LEvangelische Kirchengemeinde'.(count($cities) > 1 ? 'n ' : ' ').$cities->pluck('name')->join(
                     ', '
-                ) . '&Themenplan für Gottesdienste ' . $data['year'] . ' - Blatt &P von &N'
+                ).'&Themenplan für Gottesdienste '.$data['year'].' - Blatt &P von &N'
             )
             ->setOddFooter('&CAusdruck vom &D, &T')
             ->setEvenFooter('&CAusdruck vom &D, &T');
-
 
         // column width
         foreach ($columns as $column => $width) {
@@ -228,14 +223,14 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
             )->getColor()->setARGB('ff000000');
         }
 
-
-
         // content rows
 
         $row = 2;
         foreach ($serviceList as $myKey => $services) {
             foreach ($services as $service) {
-                if ($service->funerals()->count()) continue;
+                if ($service->funerals()->count()) {
+                    continue;
+                }
                 $row++;
 
                 foreach (array_keys($headers) as $index) {
@@ -251,8 +246,7 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
                     )->getColor()->setARGB('ff000000');
                 }
 
-
-                $richtext = new RichText();
+                $richtext = new RichText;
                 $textrun = $richtext->createTextRun($service->date->isoFormat('dddd, DD.MM.YYYY'));
                 $textrun->getFont()->setName('Arial')->setSize(8)->setBold(true);
                 $sheet->getCell($this->cellAddress('A', $row, $cities))->setValue($richtext);
@@ -269,7 +263,7 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
                 if ($service->liturgicalInfo['perikope'] ?? false) {
                     $sheet->setCellValue(
                         $this->cellAddress('I', $row, $cities),
-                        $service->liturgicalInfo['litTextsPerikope' . $service->liturgicalInfo['perikope']]
+                        $service->liturgicalInfo['litTextsPerikope'.$service->liturgicalInfo['perikope']]
                     );
                 }
 
@@ -280,13 +274,12 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
                 }
 
                 // yellow for special location
-                if (!is_object($service->location)) {
+                if (! is_object($service->location)) {
                     $sheet->getStyle($this->cellAddress('E', $row, $cities))->getFill()->setFillType(Fill::FILL_SOLID)
                         ->getStartColor()->setARGB('ffffff00');
                 }
             }
         }
-
 
         // output
         return $this->sendToBrowser(
@@ -299,8 +292,6 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
     }
 
     /**
-     * @param $people
-     * @param $format
      * @return string
      */
     protected function peopleListFormatted($people, $format)
@@ -309,6 +300,7 @@ class ServiceThemesReport extends AbstractExcelDocumentReport
         foreach ($people as $person) {
             $recs[] = $person->formattedName($format);
         }
-        return join(', ', $recs);
+
+        return implode(', ', $recs);
     }
 }

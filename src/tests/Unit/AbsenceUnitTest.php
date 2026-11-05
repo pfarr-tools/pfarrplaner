@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -13,7 +14,6 @@
 namespace Tests\Unit;
 
 use App\Models\Leave\Absence;
-use App\Models\People\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Tests\AbstractSimpleModelUnitTest;
@@ -21,10 +21,12 @@ use Tests\AbstractSimpleModelUnitTest;
 class AbsenceUnitTest extends AbstractSimpleModelUnitTest
 {
     protected string $modelClass = Absence::class;
+
     protected bool $hasPolicy = true;
+
     protected bool $hasFactory = true;
 
-    public function testAbsenceStatusConstantsAreDefined(): void
+    public function test_absence_status_constants_are_defined(): void
     {
         $this->assertEquals(0, Absence::STATUS_NEW);
         $this->assertEquals(1, Absence::STATUS_CHECKED);
@@ -33,19 +35,19 @@ class AbsenceUnitTest extends AbstractSimpleModelUnitTest
         $this->assertEquals(11, Absence::STATUS_SELF_ADMINISTERED_AND_APPROVED);
     }
 
-    public function testAbsenceHasUserRelationship(): void
+    public function test_absence_has_user_relationship(): void
     {
         $absence = Absence::factory()->create();
         $this->assertInstanceOf(BelongsTo::class, $absence->user());
     }
 
-    public function testAbsenceHasReplacementsRelationship(): void
+    public function test_absence_has_replacements_relationship(): void
     {
         $absence = Absence::factory()->create();
         $this->assertInstanceOf(HasMany::class, $absence->replacements());
     }
 
-    public function testAbsenceCanBeCreatedViaFactory(): void
+    public function test_absence_can_be_created_via_factory(): void
     {
         $absence = Absence::factory()->create();
         $this->assertCount(1, Absence::all());

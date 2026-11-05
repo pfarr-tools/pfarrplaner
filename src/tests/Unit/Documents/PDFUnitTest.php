@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,7 +18,7 @@ use Tests\TestCase;
 
 class PDFUnitTest extends TestCase
 {
-    public function testPdfBrowserUsesChromiumSandboxArgumentsForRootContainers(): void
+    public function test_pdf_browser_uses_chromium_sandbox_arguments_for_root_containers(): void
     {
         $pdf = PDF::html('<html><body>Test</body></html>');
         $noSandbox = (new ReflectionProperty(PDF::class, 'noSandbox'))->getValue($pdf);

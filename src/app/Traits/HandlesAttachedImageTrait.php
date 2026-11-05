@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@ use Illuminate\Support\Str;
 
 trait HandlesAttachedImageTrait
 {
-
     public function attachImage(Request $request, $model, $field = null)
     {
         $modelClass = $this->model ?? $this->modelClass ?? null;
@@ -47,20 +46,22 @@ trait HandlesAttachedImageTrait
         $imageField = $field ?? $modelObject->getImageField();
         if ($request->hasFile('attachments')) {
             $files = $request->file('attachments');
-            foreach($files as $file) {
+            foreach ($files as $file) {
                 $fullPath = $file->store('attachments');
                 $modelObject->update([$imageField => $fullPath]);
                 $path = basename($fullPath);
+
                 return response()->json(['url' => route('image', compact('path')), 'image' => $fullPath,
-                                            'model' => $modelObject, 'id' => $model, 'field' => $imageField]);
+                    'model' => $modelObject, 'id' => $model, 'field' => $imageField]);
             }
         } elseif ($request->has('uploadFromUrl')) {
             $fullPath = 'attachments/'.Str::random(32).'.'.pathinfo($request->get('uploadFromUrl'), PATHINFO_EXTENSION);
             Storage::put($fullPath, file_get_contents($request->get('uploadFromUrl')));
             $modelObject->update([$imageField => $fullPath]);
             $path = basename($fullPath);
+
             return response()->json(['url' => route('image', compact('path')), 'image' => $fullPath,
-                                        'model' => $modelObject, 'id' => $model, 'field' => $imageField]);
+                'model' => $modelObject, 'id' => $model, 'field' => $imageField]);
         }
 
     }
@@ -76,6 +77,7 @@ trait HandlesAttachedImageTrait
             Storage::delete($modelObject->$imageField);
             $modelObject->update([$imageField => '']);
         }
+
         return response()->json();
     }
 }

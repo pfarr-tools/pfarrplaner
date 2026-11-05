@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,17 +18,17 @@ use Tests\AbstractPageLoadTest;
 
 class AuthPageLoadTest extends AbstractPageLoadTest
 {
-    public function testLoginPageLoads(): void
+    public function test_login_page_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
-                    ->waitFor('#app', 10)
-                    ->assertDontSee('500')
-                    ->assertDontSee('Whoops');
+                ->waitFor('#app', 10)
+                ->assertDontSee('500')
+                ->assertDontSee('Whoops');
         });
     }
 
-    public function testPasswordChangerLoads(): void
+    public function test_password_changer_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('password.edit'));

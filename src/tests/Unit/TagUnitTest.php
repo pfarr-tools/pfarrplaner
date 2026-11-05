@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -20,13 +21,13 @@ class TagUnitTest extends AbstractModelUnitTest
     protected $modelClass = Tag::class;
 
     /** Override: Tag policy allows all users, no city sync needed */
-    public function testUpdateViaApi()
+    public function test_update_via_api()
     {
         $existing = $this->factory()->create();
         $this->assertTrue($this->testUser->can('update', $existing));
 
         $data = $this->factory()->raw();
-        $apiRoute = 'api.' . ($this->modelClass)::singularKey() . '.update';
+        $apiRoute = 'api.'.($this->modelClass)::singularKey().'.update';
         $response = $this->actingAs($this->testUser, 'api')
             ->patchJson(route($apiRoute, $existing->id), $data);
         $response->assertStatus(200);

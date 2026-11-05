@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,12 +37,10 @@
 
 namespace App\UI;
 
-
 use Illuminate\Support\Facades\Session;
 
 /**
  * Class FlashMessages
- * @package App\UI
  */
 class FlashMessages
 {
@@ -71,11 +69,11 @@ class FlashMessages
             foreach ($messages as $message) {
                 $msg[] = [
                     'text' => $message,
-                    'class' => $class
+                    'class' => $class,
                 ];
             }
         }
+
         return $msg;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,6 +18,7 @@ use App\Mail\Absence\AbsenceChecked;
 use App\Mail\Absence\AbsenceRejected;
 use App\Mail\Absence\AbsenceRequested;
 use App\Models\Leave\Absence;
+use App\Models\People\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -24,7 +26,7 @@ class AbsenceMailUnitTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testAbsenceApprovedBuilds(): void
+    public function test_absence_approved_builds(): void
     {
         $absence = Absence::factory()->create();
         $mail = new AbsenceApproved($absence);
@@ -33,7 +35,7 @@ class AbsenceMailUnitTest extends TestCase
         $this->assertEquals('Antrag genehmigt', $built->subject);
     }
 
-    public function testAbsenceCheckedBuilds(): void
+    public function test_absence_checked_builds(): void
     {
         $absence = Absence::factory()->create();
         $mail = new AbsenceChecked($absence);
@@ -41,16 +43,16 @@ class AbsenceMailUnitTest extends TestCase
         $this->assertInstanceOf(AbsenceChecked::class, $built);
     }
 
-    public function testAbsenceRejectedBuilds(): void
+    public function test_absence_rejected_builds(): void
     {
         $absence = Absence::factory()->create();
-        $author = \App\Models\People\User::factory()->create();
+        $author = User::factory()->create();
         $mail = new AbsenceRejected($absence, $author);
         $built = $mail->build();
         $this->assertInstanceOf(AbsenceRejected::class, $built);
     }
 
-    public function testAbsenceRequestedBuilds(): void
+    public function test_absence_requested_builds(): void
     {
         $absence = Absence::factory()->create();
         $mail = new AbsenceRequested($absence);

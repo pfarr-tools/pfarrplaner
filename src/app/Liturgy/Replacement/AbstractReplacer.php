@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,12 +30,10 @@
 
 namespace App\Liturgy\Replacement;
 
-
 use App\Models\Service;
 
 abstract class AbstractReplacer
 {
-
     /** @var Service */
     protected $service;
 
@@ -46,14 +44,11 @@ abstract class AbstractReplacer
         $this->service = $service;
     }
 
-    public function getKey() {
+    public function getKey()
+    {
         return lcfirst(strtr(get_called_class(), ['App\\Liturgy\\Replacement\\' => '', 'Replacer' => '']));
     }
 
-    /**
-     * @param string $text
-     * @return string
-     */
     public function replace(string $text): string
     {
         return str_replace('['.$this->getKey().']', $this->getReplacementText(), $text);
@@ -61,17 +56,11 @@ abstract class AbstractReplacer
 
     abstract protected function getReplacementText(): string;
 
-    /**
-     * @return Service
-     */
     public function getService(): Service
     {
         return $this->service;
     }
 
-    /**
-     * @param Service $service
-     */
     public function setService(Service $service): void
     {
         $this->service = $service;
@@ -79,25 +68,16 @@ abstract class AbstractReplacer
 
     protected function renderParagraph($text = '')
     {
-        return $text . PHP_EOL ;
+        return $text.PHP_EOL;
     }
 
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @param string $description
-     */
     public function setDescription(string $description): void
     {
         $this->description = $description;
     }
-
-
-
 }

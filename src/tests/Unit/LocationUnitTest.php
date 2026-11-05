@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -28,27 +29,27 @@ class LocationUnitTest extends AbstractModelUnitTest
     }
 
     /** Override: sync the Location's city for update permission */
-    public function testUpdateViaApi()
+    public function test_update_via_api()
     {
         $existing = $this->factory()->create();
         $this->testUser->adminCities()->sync([$existing->city_id]);
         $this->assertTrue($this->testUser->can('update', $existing));
 
         $data = $this->factory()->raw();
-        $apiRoute = 'api.' . ($this->modelClass)::singularKey() . '.update';
+        $apiRoute = 'api.'.($this->modelClass)::singularKey().'.update';
         $response = $this->actingAs($this->testUser, 'api')
             ->patchJson(route($apiRoute, $existing->id), $data);
         $response->assertStatus(200);
     }
 
     /** Override: sync the Location's city for delete permission */
-    public function testDeleteViaApi()
+    public function test_delete_via_api()
     {
         $existing = $this->factory()->create();
         $this->testUser->adminCities()->sync([$existing->city_id]);
         $this->assertTrue($this->testUser->can('delete', $existing));
 
-        $apiRoute = 'api.' . ($this->modelClass)::singularKey() . '.destroy';
+        $apiRoute = 'api.'.($this->modelClass)::singularKey().'.destroy';
         $response = $this->actingAs($this->testUser, 'api')
             ->delete(route($apiRoute, $existing->id));
         $response->assertStatus(200);

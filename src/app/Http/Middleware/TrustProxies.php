@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,7 +35,6 @@ use Illuminate\Http\Request;
 
 /**
  * Class TrustProxies
- * @package App\Http\Middleware
  */
 class TrustProxies extends Middleware
 {
@@ -52,15 +51,13 @@ class TrustProxies extends Middleware
      * @var int
      */
     protected $headers = Request::HEADER_X_FORWARDED_FOR |
-    Request::HEADER_X_FORWARDED_HOST |
-    Request::HEADER_X_FORWARDED_PORT |
-    Request::HEADER_X_FORWARDED_PROTO |
-    Request::HEADER_X_FORWARDED_AWS_ELB;
+        Request::HEADER_X_FORWARDED_HOST |
+        Request::HEADER_X_FORWARDED_PORT |
+        Request::HEADER_X_FORWARDED_PROTO |
+        Request::HEADER_X_FORWARDED_AWS_ELB;
 
     public function __construct()
     {
         $this->proxies = config('octane.trust_proxies', ['127.0.0.1']);
     }
-
-
 }

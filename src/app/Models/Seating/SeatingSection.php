@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -43,12 +43,16 @@ class SeatingSection extends AbstractModel
     use HasFactory;
 
     protected static string $path = '';
+
     protected static string $prefix = 'bereich';
+
     protected static string $prefixPlural = 'bereiche';
+
     public static array $exceptRoutes = [
         'web' => ['index', 'show', 'create', 'edit', 'store', 'update', 'destroy'],
         'api' => ['show'],
     ];
+
     protected static $routes = [
         'web' => [
             'create' => [['GET', 'HEAD'], 'admin/ort/{location}/bereich'],
@@ -58,6 +62,7 @@ class SeatingSection extends AbstractModel
             'destroy' => [['DELETE'], 'admin/bereich/{modelId}'],
         ],
     ];
+
     public static array $validationRules = [
         'location_id' => 'required|int|exists:locations,id',
         'title' => 'required|string',
@@ -69,6 +74,7 @@ class SeatingSection extends AbstractModel
     protected $fillable = ['location_id', 'title', 'seating_model', 'priority', 'color'];
 
     protected $with = ['seatingRows'];
+
     protected $appends = ['modelClass'];
 
     public static function singularKey(): string
@@ -134,10 +140,9 @@ class SeatingSection extends AbstractModel
 
     public function setSeatingModelAttribute($seatingModel)
     {
-        if (!is_string($seatingModel)) {
+        if (! is_string($seatingModel)) {
             $seatingModel = get_class($seatingModel);
         }
         $this->attributes['seating_model'] = $seatingModel;
     }
-
 }

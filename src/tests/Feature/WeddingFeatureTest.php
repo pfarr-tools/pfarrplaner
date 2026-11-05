@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -31,7 +32,7 @@ class WeddingFeatureTest extends TestCase
     {
         parent::setUp();
         Storage::fake();
-        foreach (range((int)date('Y') - 2, (int)date('Y') + 2) as $year) {
+        foreach (range((int) date('Y') - 2, (int) date('Y') + 2) as $year) {
             Storage::put("liturgy/{$year}.json", '{}');
         }
         Storage::put('liturgy/.json', '{}');
@@ -39,16 +40,16 @@ class WeddingFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $wedding = Wedding::factory()->create();
         $this->actingAs($this->user)
             ->get(route('weddings.edit', $wedding->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Rites/WeddingEditor'));
+            ->assertInertia(fn (Assert $page) => $page->component('Rites/WeddingEditor'));
     }
 
-    public function testCreateRedirectsToEditor(): void
+    public function test_create_redirects_to_editor(): void
     {
         $service = Service::factory()->create();
 

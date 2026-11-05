@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,16 +30,16 @@
 
 namespace App\Reports;
 
-
 use App\Mail\MinistryRequest;
-use App\Services\MinistryService;
 use App\Models\Location;
 use App\Models\People\Team;
-use App\Models\Service;
 use App\Models\People\User;
+use App\Models\Service;
+use App\Services\MinistryService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -47,29 +47,29 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Inertia\Inertia;
 
-
 class MinistryRequestReport extends AbstractReport
 {
-
     /**
      * @var string
      */
     public $title = 'Dienstanfrage senden';
+
     /**
      * @var string
      */
     public $group = 'Dienstplanung';
+
     /**
      * @var string
      */
     public $description = 'Sendet eine Anfrage mit zu belegenden Terminen an alle Teilnehmer eines Dienstes';
+
     /**
      * @var string
      */
     public $icon = 'fa fa-envelope';
 
     protected $inertia = true;
-
 
     /**
      * @return Application|Factory|View
@@ -82,14 +82,14 @@ class MinistryRequestReport extends AbstractReport
         $users = User::visibleFor(Auth::user())->get();
 
         $teams = Team::with('users')->inCities($cities->pluck('id'))->get()->groupBy('city_id');
+
         return Inertia::render('Report/MinistryRequest/Setup', compact('cities', 'locations', 'ministries', 'users', 'teams'));
     }
 
-
     /**
      * Retrieve list of services
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function services(Request $request)
     {
@@ -101,12 +101,12 @@ class MinistryRequestReport extends AbstractReport
             'cities.*' => 'int|exists:cities,id',
             'ministry' => 'nullable|string',
             'only_open' => 'sometimes|boolean',
-                           ]);
+        ]);
 
         $services = Service::whereIn('city_id', $data['cities'])
             ->between(Carbon::parse($data['start']), Carbon::parse($data['end']));
 
-        if (($data['only_open'] ?? false) && !empty($data['ministry'])) {
+        if (($data['only_open'] ?? false) && ! empty($data['ministry'])) {
             $services->havingOpenMinistries([$data['ministry']]);
         }
 
@@ -120,10 +120,10 @@ class MinistryRequestReport extends AbstractReport
     public function recipients(Request $request)
     {
         $data = $request->validate([
-                                       'ministry' => 'string',
-                                       'cities' => 'required|array|min:1',
-                                       'cities.*' => 'int|exists:cities,id',
-                                   ]);
+            'ministry' => 'string',
+            'cities' => 'required|array|min:1',
+            'cities.*' => 'int|exists:cities,id',
+        ]);
 
         $users = User::select('id')->whereHas(
             'services',
@@ -151,9 +151,8 @@ class MinistryRequestReport extends AbstractReport
             ]
         );
 
-
         foreach (($data['address'] ?? []) as $id => $address) {
-            if (!$address) {
+            if (! $address) {
                 unset($data['address'][$id]);
             } else {
                 $user = User::find($id)->update(['email' => $address]);
@@ -164,9 +163,9 @@ class MinistryRequestReport extends AbstractReport
 
         foreach ($data['recipients'] as $user) {
             $address = $data['address'][$user->id] ?? $user->email;
-            if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+            if (! filter_var($address, FILTER_VALIDATE_EMAIL)) {
                 throw ValidationException::withMessages([
-                    'recipients' => 'Für ' . $user->name . ' ist keine gültige E-Mailadresse hinterlegt.',
+                    'recipients' => 'Für '.$user->name.' ist keine gültige E-Mailadresse hinterlegt.',
                 ]);
             }
         }
@@ -177,7 +176,6 @@ class MinistryRequestReport extends AbstractReport
 
         $ministries = MinistryService::all();
 
-
         foreach ($data['recipients'] as $user) {
             $sender = Auth::user();
             Mail::to($data['address'][$user->id] ?? $user->email)->cc($sender)->queue(
@@ -187,5 +185,4 @@ class MinistryRequestReport extends AbstractReport
 
         return redirect()->route('home')->with('success', 'Deine Anfrage wurde gesendet.');
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -29,45 +30,45 @@ class AbsencePlannerFeatureTest extends AbstractPageLoadTest
         ]);
     }
 
-    public function testAbsencePlannerRendersWithoutError(): void
+    public function test_absence_planner_renders_without_error(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new AbsencePlannerPage())
-                    ->assertDontSee('500')
-                    ->assertDontSee('Whoops');
+                ->visit(new AbsencePlannerPage)
+                ->assertDontSee('500')
+                ->assertDontSee('Whoops');
         });
     }
 
-    public function testAbsenceEditorRendersReasonField(): void
+    public function test_absence_editor_renders_reason_field(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('absence.edit', $this->absence->id))
-                    ->waitFor('[name="reason"]', 10)
-                    ->assertPresent('[name="reason"]');
+                ->visit(route('absence.edit', $this->absence->id))
+                ->waitFor('[name="reason"]', 10)
+                ->assertPresent('[name="reason"]');
         });
     }
 
-    public function testAbsenceEditorCanEditReason(): void
+    public function test_absence_editor_can_edit_reason(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('absence.edit', $this->absence->id))
-                    ->waitFor('[name="reason"]', 10)
-                    ->clear('[name="reason"]')
-                    ->type('[name="reason"]', 'Urlaub')
-                    ->assertInputValue('[name="reason"]', 'Urlaub');
+                ->visit(route('absence.edit', $this->absence->id))
+                ->waitFor('[name="reason"]', 10)
+                ->clear('[name="reason"]')
+                ->type('[name="reason"]', 'Urlaub')
+                ->assertInputValue('[name="reason"]', 'Urlaub');
         });
     }
 
-    public function testAbsenceEditorHasSaveButton(): void
+    public function test_absence_editor_has_save_button(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('absence.edit', $this->absence->id))
-                    ->waitFor('#app', 10)
-                    ->assertPresent('.main-header .btn, nav .btn');
+                ->visit(route('absence.edit', $this->absence->id))
+                ->waitFor('#app', 10)
+                ->assertPresent('.main-header .btn, nav .btn');
         });
     }
 }

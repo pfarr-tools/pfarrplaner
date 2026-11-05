@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,18 +37,15 @@
 
 namespace App\Traits;
 
-
 use App\Models\Comment;
 use App\Models\People\User;
 use Illuminate\Support\Facades\Auth;
 
 /**
  * Trait HasCommentsTrait
- * @package App\Traits
  */
 trait HasCommentsTrait
 {
-
     /**
      * @return mixed
      */
@@ -74,7 +71,6 @@ trait HasCommentsTrait
     }
 
     /**
-     * @param User $user
      * @return mixed
      */
     public function commentsForUser(User $user)
@@ -86,6 +82,4 @@ trait HasCommentsTrait
             }
         );
     }
-
-
 }

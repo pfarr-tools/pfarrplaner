@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,9 +32,9 @@ namespace App\Liturgy\SongBeamer;
 
 class SongBeamer
 {
-
     public const LOGO_COLOR = '9582501';
-    public const EG_YELLOW = '';
-    public const EG_PURPLE = '$C8BAF7';
 
+    public const EG_YELLOW = '';
+
+    public const EG_PURPLE = '$C8BAF7';
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,6 +13,7 @@
 
 namespace App\Actions\SeatingSection;
 
+use App\Seating\RowBasedSeatingModel;
 use App\Seating\SeatingModels;
 
 class NormalizesSeatingSectionData
@@ -26,7 +28,7 @@ class NormalizesSeatingSectionData
             $data['color'] = '';
         }
 
-        $data['seating_model'] = $data['seating_model'] ?? \App\Seating\RowBasedSeatingModel::class;
+        $data['seating_model'] = $data['seating_model'] ?? RowBasedSeatingModel::class;
 
         return $data;
     }

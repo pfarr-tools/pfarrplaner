@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,12 +40,16 @@ class SeatingRow extends AbstractModel
     use HasFactory;
 
     protected static string $path = '';
+
     protected static string $prefix = 'reihe';
+
     protected static string $prefixPlural = 'reihen';
+
     public static array $exceptRoutes = [
         'web' => ['index', 'show', 'create', 'edit', 'store', 'update', 'destroy'],
         'api' => ['show'],
     ];
+
     protected static $routes = [
         'web' => [
             'create' => [['GET', 'HEAD'], 'admin/ort/{location}/reihe'],
@@ -55,6 +59,7 @@ class SeatingRow extends AbstractModel
             'destroy' => [['DELETE'], 'admin/reihe/{modelId}'],
         ],
     ];
+
     public static array $validationRules = [
         'seating_section_id' => 'required|int|exists:seating_sections,id',
         'title' => 'required|regex:/[0-9]+/i',
@@ -111,7 +116,6 @@ class SeatingRow extends AbstractModel
         ];
     }
 
-
     /**
      * @return BelongsTo
      */
@@ -122,15 +126,16 @@ class SeatingRow extends AbstractModel
 
     /**
      * Get CSS style for background color
+     *
      * @return mixed|string
      */
     public function getCSS()
     {
         $color = $this->color ?: $this->seatingSection->color ?: '';
         if ($color != '') {
-            $color = 'background-color: ' . $color;
+            $color = 'background-color: '.$color;
         }
+
         return $color;
     }
-
 }

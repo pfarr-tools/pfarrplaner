@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Reports;
 
-use App\Models\Calendar\Day;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\FileNameService;
@@ -39,27 +38,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-
+use Inertia\Response;
 
 /**
  * Class ChildrensChurchReport
- * @package App\Reports
  */
 class ChildrensChurchReport extends AbstractPDFDocumentReport
 {
-
     public const FILE_SIGNATURE = '50.8';
-    public const FILE_TITLE = 'Kinderkirche';
 
+    public const FILE_TITLE = 'Kinderkirche';
 
     /**
      * @var string
      */
     public $title = 'Programm für die Kinderkirche';
+
     /**
      * @var string
      */
     public $group = 'Listen';
+
     /**
      * @var string
      */
@@ -68,16 +67,16 @@ class ChildrensChurchReport extends AbstractPDFDocumentReport
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
+
         return Inertia::render('Report/ChildrensChurch/Setup', compact('cities'));
     }
 
     /**
-     * @param Request $request
      * @return mixed|string
      */
     public function render(Request $request)
@@ -132,5 +131,4 @@ class ChildrensChurchReport extends AbstractPDFDocumentReport
             ['format' => 'A4']
         );
     }
-
 }

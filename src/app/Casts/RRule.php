@@ -15,7 +15,10 @@ class RRule implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        if ($value == '') return null;
+        if ($value == '') {
+            return null;
+        }
+
         return new Rule($value);
     }
 
@@ -26,8 +29,13 @@ class RRule implements CastsAttributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        if (!$value) return '';
-        if (!is_a($value, Rule::class)) return '';
+        if (! $value) {
+            return '';
+        }
+        if (! is_a($value, Rule::class)) {
+            return '';
+        }
+
         /** @var Rule $value */
         return $value->getString();
     }

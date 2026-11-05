@@ -2,20 +2,21 @@
 
 namespace Tests;
 
-use Throwable;
-use Illuminate\Foundation\Testing\RefreshDatabaseState;
-use Illuminate\Support\Collection;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Support\Collection;
 use Laravel\Dusk\TestCase as BaseTestCase;
 use RuntimeException;
+use Throwable;
 
 abstract class DuskTestCase extends BaseTestCase
 {
     use CreatesApplication;
 
     private static bool $databaseResetDone = false;
+
     protected string $downloadDirectory;
 
     protected function setUp(): void
@@ -23,11 +24,11 @@ abstract class DuskTestCase extends BaseTestCase
         parent::setUp();
 
         $this->downloadDirectory = static::downloadDirectory();
-        if (!is_dir($this->downloadDirectory)) {
+        if (! is_dir($this->downloadDirectory)) {
             mkdir($this->downloadDirectory, 0777, true);
         }
 
-        $files = glob($this->downloadDirectory . DIRECTORY_SEPARATOR . '*');
+        $files = glob($this->downloadDirectory.DIRECTORY_SEPARATOR.'*');
         if (is_array($files)) {
             foreach ($files as $file) {
                 if (is_file($file)) {
@@ -54,8 +55,6 @@ abstract class DuskTestCase extends BaseTestCase
 
     /**
      * Start a ChromeDriver process and wait until it accepts WebDriver sessions.
-     *
-     * @return void
      */
     protected static function startLocalChromeDriver(): void
     {
@@ -65,7 +64,7 @@ abstract class DuskTestCase extends BaseTestCase
         }
 
         static::startChromeDriver([
-            '--port=9515'
+            '--port=9515',
         ]);
 
         static::waitForChromeDriver();
@@ -73,8 +72,6 @@ abstract class DuskTestCase extends BaseTestCase
 
     /**
      * Wait for ChromeDriver to listen before Dusk creates the first browser.
-     *
-     * @return void
      */
     protected static function waitForChromeDriver(): void
     {
@@ -84,6 +81,7 @@ abstract class DuskTestCase extends BaseTestCase
             $connection = @fsockopen('127.0.0.1', 9515, $errorCode, $errorMessage, 0.2);
             if (is_resource($connection)) {
                 fclose($connection);
+
                 return;
             }
 
@@ -99,7 +97,7 @@ abstract class DuskTestCase extends BaseTestCase
     protected function driver(): RemoteWebDriver
     {
         $downloadDirectory = static::downloadDirectory();
-        if (!is_dir($downloadDirectory)) {
+        if (! is_dir($downloadDirectory)) {
             mkdir($downloadDirectory, 0777, true);
         }
 
@@ -111,11 +109,11 @@ abstract class DuskTestCase extends BaseTestCase
             '--disable-extensions',
             '--disable-background-networking',
             '--ozone-platform=x11',        ])->unless($this->hasHeadlessDisabled(), function (Collection $items) {
-            return $items->merge([
-                '--disable-gpu',
-                '--headless=new',
-            ]);
-        })->all());
+                return $items->merge([
+                    '--disable-gpu',
+                    '--headless=new',
+                ]);
+            })->all());
         $options->setExperimentalOption('prefs', [
             'download.default_directory' => $downloadDirectory,
             'download.prompt_for_download' => false,
@@ -162,7 +160,7 @@ abstract class DuskTestCase extends BaseTestCase
         }
 
         $database = env('DB_DATABASE');
-        if (!is_string($database) || $database === '') {
+        if (! is_string($database) || $database === '') {
             return;
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,7 +28,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -44,7 +43,7 @@ use App\Http\Controllers\ErrorFeedbackController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-Route::match(['GET','POST'],'/csrf-cookie', fn () => response()->noContent());
+Route::match(['GET', 'POST'], '/csrf-cookie', fn () => response()->noContent());
 
 Route::post('/error-feedback', [ErrorFeedbackController::class, 'store'])
     ->middleware('throttle:5,10')
@@ -61,30 +60,30 @@ Route::get('/__test/500', function (Request $request) {
 Route::get('/debug-glitchtip', function () {
     abort_unless(app()->environment(['local', 'testing']), 404);
 
-    throw new \Exception('Test GlitchTip error!');
+    throw new Exception('Test GlitchTip error!');
 })->name('errors.debug-glitchtip');
 
-if (!function_exists('routeNames')) {
+if (! function_exists('routeNames')) {
     function routeNames($model)
     {
         $routes = [];
         foreach (['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'] as $verb) {
             $routes[$verb] = "{$model}.{$verb}";
         }
+
         return $routes;
     }
 }
 
-
 // auto-register model routes
 foreach (File::allFiles(app_path('Models')) as $file) {
-    if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract'))) {
-        $className = substr('App\\Models\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+    if (($file->getExtension() == 'php') && (! Str::contains($file->getPathname(), 'Abstract'))) {
+        $className = substr('App\\Models\\'.Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
         if (method_exists($className, 'registerRoutes')) {
             $className::registerRoutes();
         }
     }
-};
+}
 
 // import individual route files
 foreach (glob(base_path('routes/web/*.php')) as $file) {

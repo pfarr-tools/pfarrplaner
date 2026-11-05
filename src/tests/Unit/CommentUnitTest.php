@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -16,6 +17,7 @@ use App\Contracts\Comment\CreatesComments;
 use App\Contracts\Comment\DeletesComments;
 use App\Events\Models\Comment\CreatedComment;
 use App\Events\Models\Comment\DeletedComment;
+use App\Models\AbstractModel;
 use App\Models\Comment;
 use App\Models\People\User;
 use App\Models\Service;
@@ -27,23 +29,25 @@ use Tests\AbstractSimpleModelUnitTest;
 class CommentUnitTest extends AbstractSimpleModelUnitTest
 {
     protected string $modelClass = Comment::class;
+
     protected bool $hasPolicy = true;
+
     protected bool $hasFactory = true;
 
-    public function testCommentCanBeCreatedViaFactory(): void
+    public function test_comment_can_be_created_via_factory(): void
     {
         $comment = Comment::factory()->create();
         $this->assertCount(1, Comment::all());
     }
 
-    public function testCommentUsesAbstractModelRouting(): void
+    public function test_comment_uses_abstract_model_routing(): void
     {
-        $this->assertTrue(is_subclass_of(Comment::class, \App\Models\AbstractModel::class));
+        $this->assertTrue(is_subclass_of(Comment::class, AbstractModel::class));
         $this->assertTrue(Route::has('comment.store'));
         $this->assertTrue(Route::has('comment.destroy'));
     }
 
-    public function testCommentCanBeCreatedViaAction(): void
+    public function test_comment_can_be_created_via_action(): void
     {
         Event::fake();
 
@@ -64,7 +68,7 @@ class CommentUnitTest extends AbstractSimpleModelUnitTest
         Event::assertDispatched(CreatedComment::class);
     }
 
-    public function testCommentCanBeDeletedViaAction(): void
+    public function test_comment_can_be_deleted_via_action(): void
     {
         Event::fake();
 

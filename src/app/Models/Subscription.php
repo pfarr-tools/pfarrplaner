@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,7 +32,6 @@ namespace App\Models;
 
 use App\Models\People\User;
 use App\Models\Places\City;
-use App\Models\Service;
 use App\Traits\HasCityScopes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,29 +41,18 @@ use Illuminate\Support\Facades\Mail;
 
 /**
  * Class Subscription
- * @package App
  */
 class Subscription extends Model
 {
     use HasCityScopes;
 
-    /**
-     *
-     */
     public const SUBSCRIBE_TIME_CHANGES = 4;
-    /**
-     *
-     */
-    public const SUBSCRIBE_ALL = 2;
-    /**
-     *
-     */
-    public const SUBSCRIBE_OWN = 1;
-    /**
-     *
-     */
-    public const SUBSCRIBE_NONE = 0;
 
+    public const SUBSCRIBE_ALL = 2;
+
+    public const SUBSCRIBE_OWN = 1;
+
+    public const SUBSCRIBE_NONE = 0;
 
     /**
      * @var string[]
@@ -76,23 +64,23 @@ class Subscription extends Model
     ];
 
     /**
-     * @param Service $service
-     * @param $mailClass
-     * @param array $data
-     * @param null $additionalSubscribers
-     * @param bool $isNew True, if this is a newly created service
+     * @param  array  $data
+     * @param  null  $additionalSubscribers
+     * @param  bool  $isNew  True, if this is a newly created service
      */
     public static function send(Service $service, $mailClass, $data = [], $additionalSubscribers = null, $isNew = false)
     {
         // do not send mail when nothing has changed.
-        if (0 == count($service->changed)) return;
+        if (count($service->changed) == 0) {
+            return;
+        }
 
         $subscribers = User::subscribedTo($service, $isNew)->get();
 
         // add additional subscribers
-        if (!is_null($additionalSubscribers)) {
+        if (! is_null($additionalSubscribers)) {
             foreach ($additionalSubscribers as $subscriber) {
-                if (!$subscribers->contains($subscriber)) {
+                if (! $subscribers->contains($subscriber)) {
                     $subscribers->push($subscriber);
                 }
             }
@@ -100,15 +88,15 @@ class Subscription extends Model
 
         // queue messages
         foreach ($subscribers as $subscriber) {
-            if (!env('THIS_IS_MY_DEV_HOST')) {
+            if (! env('THIS_IS_MY_DEV_HOST')) {
                 if ($subscriber->email && filter_var($subscriber->email, FILTER_VALIDATE_EMAIL)) {
-                    Log::debug('Sending ServiceUpdated to ' . $subscriber->email);
+                    Log::debug('Sending ServiceUpdated to '.$subscriber->email);
                     Mail::to($subscriber)->queue(new $mailClass($subscriber, $service, Auth::user(), $data));
                 } else {
-                    Log::debug('User ' . $subscriber->fullName() . ' has no valid email to send ServiceUpdated.');
+                    Log::debug('User '.$subscriber->fullName().' has no valid email to send ServiceUpdated.');
                 }
             } else {
-                Log::debug('Sending ServiceUpdated to dev@toph.de instead of ' . $subscriber->email);
+                Log::debug('Sending ServiceUpdated to dev@toph.de instead of '.$subscriber->email);
                 $subscriber->email = 'dev@toph.de';
                 Mail::to($subscriber)->queue(new $mailClass($subscriber, $service, Auth::user(), $data));
             }

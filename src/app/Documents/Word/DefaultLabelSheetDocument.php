@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,7 +34,6 @@ use PhpOffice\PhpWord\Shared\Converter;
 
 class DefaultLabelSheetDocument extends DefaultWordDocument
 {
-
     protected function configureLayout($config)
     {
         $this->section = $this->phpWord->addSection(
@@ -59,20 +58,22 @@ class DefaultLabelSheetDocument extends DefaultWordDocument
         $x = 0;
         $index = 0;
 
-        for ($i=0; $i<$skipLabels; $i++) {
-            if ($x == 0) $row = $table->addRow($height);
+        for ($i = 0; $i < $skipLabels; $i++) {
+            if ($x == 0) {
+                $row = $table->addRow($height);
+            }
             $row->addCell($width, $cellStyle)->addText('  ');
-            $x = ($x+1) % $columns;
+            $x = ($x + 1) % $columns;
         }
 
         foreach ($data as $record) {
-            if ($x == 0) $row = $table->addRow($height);
+            if ($x == 0) {
+                $row = $table->addRow($height);
+            }
             $cell = $row->addCell($width, $cellStyle);
             $renderFunction($cell, $record, $index);
             $index++;
-            $x = ($x+1) % $columns;
+            $x = ($x + 1) % $columns;
         }
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -42,11 +42,12 @@ use Inertia\Inertia;
 
 class StreamingTroubleshooterController extends Controller
 {
-
     public function index(Request $request, $city)
     {
         $city = City::where('name', $city)->first();
-        if(!$city) abort(404);
+        if (! $city) {
+            abort(404);
+        }
 
         if (! $request->hasValidSignature()) {
             abort(401);
@@ -56,13 +57,13 @@ class StreamingTroubleshooterController extends Controller
         $inactiveBroadcasts = Broadcast::getInactive($city);
 
         $nextServicesWithStream = Service::inCity($city)
-            ->startingFrom(Carbon::now()->setTime(0,0,0))
+            ->startingFrom(Carbon::now()->setTime(0, 0, 0))
             ->where('youtube_url', '!=', '')
             ->ordered()
             ->get();
 
         $nextServicesWithoutStream = Service::inCity($city)
-            ->startingFrom(Carbon::now()->setTime(0,0,0))
+            ->startingFrom(Carbon::now()->setTime(0, 0, 0))
             ->where(function ($query) {
                 $query->where('youtube_url', '')
                     ->orWhereNull('youtube_url');
@@ -71,29 +72,31 @@ class StreamingTroubleshooterController extends Controller
             ->limit(10)
             ->get();
 
-
-
         return Inertia::render('streaming/troubleshooter', compact('city', 'activeBroadcasts', 'inactiveBroadcasts', 'nextServicesWithStream', 'nextServicesWithoutStream'));
     }
 
     public function activateService(Service $service)
     {
         $broadcast = Broadcast::get($service);
-        if (null === $broadcast) {
+        if ($broadcast === null) {
             $broadcast = Broadcast::create($service);
             $service->update(['youtube_url' => $broadcast->getSharerUrl()]);
         }
         $broadcast->activate();
+
         return redirect(URL::signedRoute('streaming.troubleshooter', strtolower($service->city->name)));
     }
 
     public function activateBroadcast($city, $broadcast)
     {
         $city = City::where('name', $city)->first();
-        if(!$city) abort(404);
+        if (! $city) {
+            abort(404);
+        }
 
         $broadcast = Broadcast::getFromId($broadcast, $city);
         $broadcast->activate();
+
         return redirect(URL::signedRoute('streaming.troubleshooter', strtolower($city->name)));
     }
 
@@ -103,6 +106,7 @@ class StreamingTroubleshooterController extends Controller
         $youtube->liveBroadcasts->delete(YoutubeHelper::getCode($service->youtube_url));
         $broadcast = Broadcast::create($service);
         $service->update(['youtube_url' => $broadcast->getSharerUrl()]);
+
         return redirect(URL::signedRoute('streaming.troubleshooter', strtolower($service->city->name)));
     }
 }

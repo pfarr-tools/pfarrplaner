@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,18 +31,13 @@
 namespace App\Models\People;
 
 use App\Models\Places\City;
-use App\Models\People\User;
 use App\Services\NameService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Shetabit\Visitor\Traits\Visitable;
-use Shetabit\Visitor\Traits\Visitor;
 
 /**
  * Class ListedUser
  * This class helps to retrieve records from the users table without all the role, etc. ... overload
- *
- * @package App
  */
 class ListedPerson extends Model
 {
@@ -50,9 +45,6 @@ class ListedPerson extends Model
 
     protected $appends = ['name'];
 
-    /**
-     * @return string
-     */
     public function getNameAttribute(): string
     {
         return (new NameService($this->first_name ?? '', $this->last_name ?? '', $this->title ?? ''))

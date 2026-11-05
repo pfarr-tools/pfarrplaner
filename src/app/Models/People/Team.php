@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,21 +39,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Team extends AbstractModel
 {
-    use HasFactory, HasCityScopes;
+    use HasCityScopes, HasFactory;
 
     protected static string $prefix = 'team';
+
     protected static string $prefixPlural = 'teams';
+
     public static array $exceptRoutes = [
         'web' => ['show'],
         'api' => ['show'],
     ];
+
     public static array $validationRules = [
         'name' => 'required|string',
         'city_id' => 'required|int|exists:cities,id',
         'users' => 'nullable|array',
         'users.*' => 'nullable|int|exists:users,id',
     ];
+
     public static $relationsForIndex = ['city', 'users'];
+
     public static $relationsForEditor = ['city', 'users'];
 
     protected $fillable = ['name', 'city_id'];
@@ -83,5 +88,4 @@ class Team extends AbstractModel
             'users' => collect(),
         ];
     }
-
 }

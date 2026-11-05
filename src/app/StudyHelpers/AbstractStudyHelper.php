@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,19 +37,17 @@ use Illuminate\Support\Str;
 
 abstract class AbstractStudyHelper
 {
-
     public $title = '';
 
-    /** @var Client|null $client */
+    /** @var Client|null */
     protected $client = null;
 
-    /** @var Command $command */
+    /** @var Command */
     protected $command = null;
-
 
     public function __construct(Command $command)
     {
-        $this->client = new Client();
+        $this->client = new Client;
         $this->command = $command;
     }
 
@@ -63,6 +61,7 @@ abstract class AbstractStudyHelper
         if ($result->getStatusCode() != 200) {
             return '';
         }
+
         return $result->getBody()->getContents();
     }
 
@@ -82,11 +81,11 @@ abstract class AbstractStudyHelper
                 }
             }
         }
+
         return $data;
     }
 
+    abstract public function read(array $data): array;
 
-    abstract function read(array $data): array;
-
-    abstract function getLinks(array $data): array;
+    abstract public function getLinks(array $data): array;
 }

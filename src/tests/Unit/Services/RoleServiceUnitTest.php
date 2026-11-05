@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,7 +18,7 @@ use Tests\TestCase;
 
 class RoleServiceUnitTest extends TestCase
 {
-    public function testRoleConstantsAreDefined(): void
+    public function test_role_constants_are_defined(): void
     {
         $this->assertEquals('Super-Administrator:in', RoleService::ROLE_SUPER_ADMIN);
         $this->assertEquals('Administrator:in', RoleService::ROLE_ADMIN);
@@ -25,7 +26,7 @@ class RoleServiceUnitTest extends TestCase
         $this->assertEquals('Prädikant:in', RoleService::ROLE_PREDICANT);
     }
 
-    public function testRoleConstantsAreStrings(): void
+    public function test_role_constants_are_strings(): void
     {
         $this->assertIsString(RoleService::ROLE_SUPER_ADMIN);
         $this->assertIsString(RoleService::ROLE_ADMIN);
@@ -33,7 +34,7 @@ class RoleServiceUnitTest extends TestCase
         $this->assertIsString(RoleService::ROLE_PREDICANT);
     }
 
-    public function testRoleConstantsAreDistinct(): void
+    public function test_role_constants_are_distinct(): void
     {
         $roles = [
             RoleService::ROLE_SUPER_ADMIN,

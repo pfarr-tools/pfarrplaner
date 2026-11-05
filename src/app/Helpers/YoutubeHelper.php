@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,29 +30,23 @@
 
 namespace App\Helpers;
 
-
 use App\Models\Places\City;
 
 /**
  * Class YoutubeHelper
- * @package App\Helpers
  */
 class YoutubeHelper
 {
-
     /**
-     * @param City $city
-     * @param $url
      * @return string
      */
     public static function getLiveDashboardUrl(City $city, $url)
     {
         return 'https://studio.youtube.com/video/'
-            . self::getCode($url).'/livestreaming';
+            .self::getCode($url).'/livestreaming';
     }
 
     /**
-     * @param $url
      * @return mixed|string
      */
     public static function getChannelId($url)
@@ -62,20 +56,21 @@ class YoutubeHelper
         }
         $tmp = explode('/', $url);
         $code = end($tmp);
+
         return $code;
     }
 
     /**
-     * @param $url
      * @return mixed|string
      */
     public static function getCode($url)
     {
         $code = '';
-        if (false !== strpos($url, 'youtu.be')) {
+        if (strpos($url, 'youtu.be') !== false) {
             $tmp = explode('/', $url);
             $code = end($tmp);
         }
+
         return $code;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -41,7 +41,7 @@ class AddSermonsTable extends Migration
      */
     public function up()
     {
-        Schema::create('sermons', function(Blueprint $table) {
+        Schema::create('sermons', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('title')->nullable()->default('');
             $table->string('subtitle')->nullable()->default('');

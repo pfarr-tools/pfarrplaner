@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,23 +37,23 @@ use App\Traits\HasCityScopes;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Parish
- * @package App
  */
 class Parish extends AbstractModel
 {
-    use HasFactory, HasCityScopes;
-
+    use HasCityScopes, HasFactory;
 
     protected static string $prefix = 'pfarramt';
+
     protected static string $prefixPlural = 'pfarraemter';
+
     public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
+
     public static array $validationRules = [
         'city_id' => 'required|int|exists:cities,id',
         'name' => 'required|string',
@@ -68,8 +68,6 @@ class Parish extends AbstractModel
         'assistant' => 'nullable|string',
         'opening_hours' => 'nullable|string',
     ];
-
-
 
     /**
      * @var string[]
@@ -114,8 +112,8 @@ class Parish extends AbstractModel
     }
 
     /**
-     * @param $csv
      * @return int
+     *
      * @throws Exception
      */
     public function importStreetsFromCSV(User $user, $csv)
@@ -131,7 +129,7 @@ class Parish extends AbstractModel
         foreach (explode("\r\n", $csv) as $line) {
             $records[] = str_getcsv($line, ';');
         }
-        unset ($records[0]);
+        unset($records[0]);
         array_walk(
             $records,
             function (&$record) use (&$ctr) {
@@ -150,18 +148,18 @@ class Parish extends AbstractModel
                 }
             }
         );
+
         return $ctr;
     }
 
     /**
-     * @param Builder $query
-     * @param string $street
-     * @param int $number
+     * @param  string  $street
+     * @param  int  $number
      * @return mixed
      */
     public function scopeByAddress(Builder $query, $street, $number)
     {
-        //if (!is_int($city)) $city = $city->id;
+        // if (!is_int($city)) $city = $city->id;
 
         return $this->whereHas(
             'streetRanges',

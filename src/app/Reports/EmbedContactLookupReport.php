@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@
 
 namespace App\Reports;
 
-
 use App\Models\Parish;
 use App\Models\Places\StreetRange;
 use Illuminate\Contracts\Foundation\Application;
@@ -50,23 +49,24 @@ use Inertia\Inertia;
 
 /**
  * Class EmbedContactLookupReport
- * @package App\Reports
  */
 class EmbedContactLookupReport extends AbstractEmbedReport
 {
-
     /**
      * @var string
      */
     public $title = 'Ansprechpartner finden';
+
     /**
      * @var string
      */
     public $group = 'Website (Gemeindebaukasten)';
+
     /**
      * @var string
      */
     public $description = 'Erzeugt HTML-Code für die Einbindung einer Ansprechpartner-Box in die Website der Gemeinde';
+
     /**
      * @var string
      */
@@ -80,11 +80,11 @@ class EmbedContactLookupReport extends AbstractEmbedReport
     public function setup()
     {
         $cities = Auth::user()->cities;
+
         return Inertia::render('Report/EmbedContactLookup/Setup', compact('cities'));
     }
 
     /**
-     * @param Request $request
      * @return Application|Factory|View|string
      */
     public function render(Request $request)
@@ -96,7 +96,7 @@ class EmbedContactLookupReport extends AbstractEmbedReport
                 'includeCities.*' => 'required|exists:cities,id',
             ]
         );
-        $cities = join(',', $request->get('includeCities'));
+        $cities = implode(',', $request->get('includeCities'));
         $corsOrigin = $request->get('cors-origin');
         $report = $this->getKey();
 
@@ -109,20 +109,20 @@ class EmbedContactLookupReport extends AbstractEmbedReport
         return Inertia::render('Report/EmbedContactLookup/Render', compact('html', 'title'));
     }
 
-
     /**
-     * @param Request $request
      * @return Response|Application|Factory|View|string
      */
     public function embed(Request $request)
     {
         if ($request->has('city')) {
             $cities = [$request->get('city')];
-        } elseif($request->has('resultCities')) {
-             $cities = $request->get('resultCities');
+        } elseif ($request->has('resultCities')) {
+            $cities = $request->get('resultCities');
         } else {
             $cities = $request->get('cities');
-            if(!is_array($cities)) $cities = explode(',', $cities);
+            if (! is_array($cities)) {
+                $cities = explode(',', $cities);
+            }
         }
 
         $street = $request->get('street', '');
@@ -159,12 +159,12 @@ class EmbedContactLookupReport extends AbstractEmbedReport
         $url = route('report.embed', compact('report', 'corsOrigin'));
         $report = $this->getKey();
 
-        if (null === $parish) {
+        if ($parish === null) {
             $randomId = uniqid();
             $corsOrigin = $request->get('cors-origin');
+
             return $this->renderView('render', compact('url', 'randomId'));
         }
-
 
         /** @var Response $response */
         $response = response()
@@ -173,7 +173,7 @@ class EmbedContactLookupReport extends AbstractEmbedReport
                 compact('cities', 'street', 'number', 'streets', 'randomId', 'url', 'parish', 'report')
             );
 
-        if (false !== $parish) {
+        if ($parish !== false) {
             $response->withCookie('parish', $parish->id);
         }
 

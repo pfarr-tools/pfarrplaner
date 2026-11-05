@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -52,7 +52,7 @@ class CalController extends Controller
 
     public function singleDay($day, City $city)
     {
-        $day = Carbon::parse($day)->setTime(0,0,0);
+        $day = Carbon::parse($day)->setTime(0, 0, 0);
         $services = Service::setEagerLoads([])
             ->with(['day', 'baptisms', 'funerals', 'weddings', 'participants'])
             ->whereDate('date', $day)
@@ -64,8 +64,8 @@ class CalController extends Controller
 
         // absences
         $absences = Absence::with('user')->byPeriod($day, $day)
-                ->visibleForUser(Auth::user())
-                ->get();
+            ->visibleForUser(Auth::user())
+            ->get();
 
         return Inertia::render('Calendar/SingleDay', compact('day', 'city', 'services', 'absences', 'canCreate'));
 
@@ -75,10 +75,12 @@ class CalController extends Controller
     {
         RedirectorService::saveCurrentRoute();
         if ($month) {
-            $date .= '-' . $month;
+            $date .= '-'.$month;
         }
-        $date = ($date ? new Carbon ($date . '-01') : Carbon::now())->setTime(0, 0, 0);
-        if ($date->format('Ym') < 201801) abort(404);
+        $date = ($date ? new Carbon($date.'-01') : Carbon::now())->setTime(0, 0, 0);
+        if ($date->format('Ym') < 201801) {
+            abort(404);
+        }
         $monthEnd = $date->copy()->addMonth(1)->subSecond(1);
 
         $yearExpression = DB::connection()->getDriverName() == 'sqlite'
@@ -89,11 +91,11 @@ class CalController extends Controller
             ->orderBy('year', 'ASC')
             ->get()->pluck('year');
 
-
         $user = Auth::user();
         $writableCities = $user->writableCities;
         $cities = array_values($user->getSortedCities()->map(function ($city) {
             $city->childIds = $city->is_org ? $city->children->pluck('id')->toArray() : [];
+
             return $city;
         })->all());
 

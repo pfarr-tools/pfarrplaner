@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,8 +39,6 @@
 |
 */
 
-
-
 use App\Http\Controllers\ServiceController;
 
 Route::get('/mitfeiern/{service:slug}', [ServiceController::class, 'publicLiturgy'])->name('service.publicLiturgy')->middleware([]);
@@ -66,8 +64,6 @@ Route::delete('/veranstaltung/{service:slug}/datei/{attachment}', [ServiceContro
 
 Route::post('/veranstaltung/{service:slug}/qr', [ServiceController::class, 'createQR'])->name('service.createQR');
 
-
-
 // KEEP FOR THE MOMENT (for backwards compatibility)
 
 // multiple services
@@ -88,4 +84,3 @@ Route::post('/gottesdienst/{service:slug}/dateien', [ServiceController::class, '
 Route::delete('/gottesdienst/{service:slug}/datei/{attachment}', [ServiceController::class, 'detach']);
 
 Route::post('/gottesdienst/{service:slug}/qr', [ServiceController::class, 'createQR']);
-

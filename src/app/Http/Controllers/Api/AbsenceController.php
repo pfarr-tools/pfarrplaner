@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Mail\Absence\AbsenceApproved;
 use App\Mail\Absence\AbsenceChecked;
 use App\Models\Leave\Absence;
@@ -39,10 +40,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use OpenApi\Attributes as OA;
 
-class AbsenceController extends \App\Http\Controllers\Controller
+class AbsenceController extends Controller
 {
-
-
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -50,7 +49,8 @@ class AbsenceController extends \App\Http\Controllers\Controller
 
     /**
      * Force checked flag on absence to on
-     * @param Absence $absence Absence
+     *
+     * @param  Absence  $absence  Absence
      * @return JsonResponse
      */
     #[OA\Post(
@@ -68,27 +68,29 @@ class AbsenceController extends \App\Http\Controllers\Controller
     public function setChecked(Absence $absence)
     {
         $absence->update([
-                             'admin_id' => Auth::user()->id,
-                             'checked_at' => Carbon::now(),
-                             'workflow_status' => Absence::STATUS_CHECKED,
-                         ]);
+            'admin_id' => Auth::user()->id,
+            'checked_at' => Carbon::now(),
+            'workflow_status' => Absence::STATUS_CHECKED,
+        ]);
         $absence->refresh();
         Mail::to($absence->user->vacationApprovers)->queue(new AbsenceChecked($absence));
+
         return response()->json($absence);
     }
 
     /**
      * Force approved flag on absence to on
-     * @param Absence $absence Absence
+     *
+     * @param  Absence  $absence  Absence
      * @return JsonResponse
      */
     public function setApproved(Absence $absence)
     {
         $absence->update([
-                             'approver_id' => Auth::user()->id,
-                             'approved_at' => Carbon::now(),
-                             'workflow_status' => Absence::STATUS_APPROVED,
-                         ]);
+            'approver_id' => Auth::user()->id,
+            'approved_at' => Carbon::now(),
+            'workflow_status' => Absence::STATUS_APPROVED,
+        ]);
         $absence->refresh();
         Mail::to(
             collect([$absence->user])
@@ -100,19 +102,21 @@ class AbsenceController extends \App\Http\Controllers\Controller
                 })
         )
             ->queue(new AbsenceApproved($absence));
+
         return response()->json($absence);
     }
 
     /**
      * Delete absence without comment
-     * @param Absence $absence
+     *
      * @return JsonResponse
+     *
      * @throws \Exception
      */
     public function destroy(Absence $absence)
     {
         $absence->delete();
+
         return response()->json();
     }
-
 }

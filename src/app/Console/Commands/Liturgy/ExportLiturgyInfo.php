@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,12 +31,7 @@
 namespace App\Console\Commands\Liturgy;
 
 use App\Models\LiturgyInfo;
-use App\StudyHelpers\AbstractStudyHelper;
-use GuzzleHttp\Client;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
-use Storage;
 
 class ExportLiturgyInfo extends Command
 {
@@ -75,6 +70,4 @@ class ExportLiturgyInfo extends Command
         file_put_contents($fileName, LiturgyInfo::all()->toJson());
         $this->line('Liturgy info exported to '.$fileName);
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,11 +13,11 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\ForceDomain;
 use App\Models\People\User;
 use App\Models\Sermon;
 use App\Models\Service;
 use App\Services\RoleService;
-use App\Http\Middleware\ForceDomain;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -38,7 +39,7 @@ class SermonFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $service = Service::factory()->create();
         $sermon = Sermon::create(['title' => 'Testpredigt']);
@@ -46,10 +47,10 @@ class SermonFeatureTest extends TestCase
         $this->actingAs($this->user)
             ->get(route('sermon.editor', $sermon->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('sermonEditor'));
+            ->assertInertia(fn (Assert $page) => $page->component('sermonEditor'));
     }
 
-    public function testUserWithServicePermissionCanAttachSermonImage(): void
+    public function test_user_with_service_permission_can_attach_sermon_image(): void
     {
         $service = Service::factory()->create();
         $sermon = Sermon::create(['title' => 'Testpredigt']);

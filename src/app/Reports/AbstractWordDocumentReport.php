@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@ use PhpOffice\PhpWord\PhpWord;
 
 /**
  * Class AbstractWordDocumentReport
- * @package App\Reports
  */
 class AbstractWordDocumentReport extends AbstractReport
 {
@@ -46,21 +45,22 @@ class AbstractWordDocumentReport extends AbstractReport
      */
     public $icon = 'fa fa-file-word';
 
-    /** @var PhpWord $wordDocument */
+    /** @var PhpWord */
     protected $wordDocument = null;
 
     // transition: use both PhpWord and DefaultWordDocument
 
     /** @var DefaultWordDocument */
     protected $doc;
+
     protected $useDefaultDocument = false;
 
-    /** @var array  */
+    /** @var array */
     protected $config = [];
 
     public function __construct()
     {
-        $this->wordDocument = new PhpWord();
+        $this->wordDocument = new PhpWord;
         $this->prepareWordDocument();
     }
 
@@ -73,7 +73,6 @@ class AbstractWordDocumentReport extends AbstractReport
     }
 
     /**
-     * @param $filename
      * @throws Exception
      */
     public function sendToBrowser($filename)
@@ -81,6 +80,7 @@ class AbstractWordDocumentReport extends AbstractReport
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $objWriter = IOFactory::createWriter($this->useDefaultDocument ? $this->doc->getPhpWord() : $this->wordDocument, 'Word2007');
         $objWriter->save($tempFile);
+
         return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
             ->deleteFileAfterSend(true);
     }

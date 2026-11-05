@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -20,7 +21,7 @@ class InboxApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testIndexReturnsValidResponse()
+    public function test_index_returns_valid_response()
     {
         $user = User::factory()->create();
 
@@ -36,7 +37,7 @@ class InboxApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testIndexRequiresAuth()
+    public function test_index_requires_auth()
     {
         $response = $this->getJson(route('api.inbox.index'));
 

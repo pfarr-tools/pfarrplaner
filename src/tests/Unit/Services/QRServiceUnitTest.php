@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class QRServiceUnitTest extends TestCase
 {
-    public function testBuildCommandUsesKonfiAppCompatibleQrParameters(): void
+    public function test_build_command_uses_konfi_app_compatible_qr_parameters(): void
     {
         $command = QRService::buildCommand('/tmp/qr output.png', '/tmp/payload file.txt');
 

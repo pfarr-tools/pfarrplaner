@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,19 +34,20 @@ use App\Models\Leave\Absence;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
-use AustinHeap\Database\Encryption\Traits\HasEncryptedAttributes;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class CalendarConnection extends Model
 {
-
     use HasFactory;
 
     public const CONNECTION_TYPE_OWN = 1;
+
     public const CONNECTION_TYPE_ALL = 2;
 
     protected $fillable = [
@@ -59,10 +60,11 @@ class CalendarConnection extends Model
     ];
 
     protected $with = ['user', 'cities'];
+
     protected $appends = ['uri'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
@@ -70,7 +72,7 @@ class CalendarConnection extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function cities()
     {
@@ -79,22 +81,23 @@ class CalendarConnection extends Model
 
     public function getUriAttribute()
     {
-        return url('/dav/calendars/' . $this->user->email . '/' . Str::slug($this->title)) . '/';
+        return url('/dav/calendars/'.$this->user->email.'/'.Str::slug($this->title)).'/';
     }
 
     /**
      * Get all services for a city that should be synced in a full sync
-     * @param City $city
-     * @param false $countOnly
-     * @return \Illuminate\Support\Collection|int
+     *
+     * @param  false  $countOnly
+     * @return Collection|int
      */
     public function getSyncableServicesForCity(City $city, $countOnly = false)
     {
         $cityServices = Service::setEagerLoads([])->with([])->startingFrom(Carbon::now()->subMonths(12));
         switch ($city->pivot->connection_type) {
             case 0:
-                $cityServices = new \Illuminate\Support\Collection();
-                return ($countOnly ? 0 : $cityServices);
+                $cityServices = new Collection;
+
+                return $countOnly ? 0 : $cityServices;
                 break;
             case self::CONNECTION_TYPE_ALL:
                 $cityServices = $cityServices->inCity($city);
@@ -104,7 +107,7 @@ class CalendarConnection extends Model
         }
 
         // exclude hidden service if necessary
-        if (!$this->include_hidden) {
+        if (! $this->include_hidden) {
             $cityServices->notHidden();
         }
 
@@ -113,7 +116,6 @@ class CalendarConnection extends Model
 
     /**
      * Get all services to be synced
-     * @return Collection
      */
     public function getSyncableServices(): Collection
     {
@@ -121,6 +123,7 @@ class CalendarConnection extends Model
         foreach ($this->cities as $city) {
             $services = $services->merge($this->getSyncableServicesForCity($city));
         }
+
         return $services;
     }
 
@@ -159,14 +162,12 @@ class CalendarConnection extends Model
             }
         }
 
-
         return $items;
     }
 
-
     /**
      * Get all CalendarConnections that should be concerned with a service
-     * @param Service $service
+     *
      * @return mixed
      */
     public static function getConnectionsForService(Service $service)
@@ -201,7 +202,7 @@ class CalendarConnection extends Model
 
     public function getSyncableAbsences()
     {
-        if (!$this->include_vacations) {
+        if (! $this->include_vacations) {
             return collect([]);
         }
 
@@ -209,8 +210,8 @@ class CalendarConnection extends Model
             case 1:
                 $own = Absence::where('user_id', $this->user_id)->where('to', '>=', Carbon::now()->subYear(1))->get();
                 $replacing = Absence::userIsReplacement($this->user)->get();
+
                 return $own->merge($replacing);
         }
     }
-
 }

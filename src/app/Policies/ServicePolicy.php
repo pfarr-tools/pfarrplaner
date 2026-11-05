@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,15 +30,13 @@
 
 namespace App\Policies;
 
-use App\Models\Leave\Poolmaster;
+use App\Models\People\User;
 use App\Models\Service;
 use App\Providers\AuthServiceProvider;
-use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
  * Class ServicePolicy
- * @package App\Policies
  */
 class ServicePolicy
 {
@@ -57,8 +55,6 @@ class ServicePolicy
     /**
      * Determine whether the user can view the service.
      *
-     * @param User $user
-     * @param Service $service
      * @return mixed
      */
     public function view(User $user, Service $service)
@@ -69,7 +65,6 @@ class ServicePolicy
     /**
      * Determine whether the user can create services.
      *
-     * @param User $user
      * @return mixed
      */
     public function create(User $user)
@@ -80,15 +75,17 @@ class ServicePolicy
     /**
      * Determine whether the user can update the service.
      *
-     * @param User $user
-     * @param Service $service
      * @return mixed
      */
     public function update(User $user, Service $service)
     {
-        if ($service->isTemplate()) return $user->hasPermissionTo('gd-bearbeiten');
+        if ($service->isTemplate()) {
+            return $user->hasPermissionTo('gd-bearbeiten');
+        }
         $service->load('pastors');
-        if ($service->pastors->contains($user)) return true;
+        if ($service->pastors->contains($user)) {
+            return true;
+        }
         if ($user->hasRole(AuthServiceProvider::ADMIN) && $this->hasCityPermission($user, $service)) {
             return true;
         }
@@ -96,14 +93,14 @@ class ServicePolicy
             return true;
         }
 
-        if ($user->isCurrentlyPoolmasterForCity($service->city)) return true;
+        if ($user->isCurrentlyPoolmasterForCity($service->city)) {
+            return true;
+        }
 
         return false;
     }
 
     /**
-     * @param $user
-     * @param $service
      * @return mixed
      */
     protected function hasCityPermission($user, $service)
@@ -114,8 +111,6 @@ class ServicePolicy
     /**
      * Determine whether the user can delete the service.
      *
-     * @param User $user
-     * @param Service $service
      * @return mixed
      */
     public function delete(User $user, Service $service)
@@ -126,8 +121,6 @@ class ServicePolicy
     /**
      * Determine whether the user can restore the service.
      *
-     * @param User $user
-     * @param Service $service
      * @return mixed
      */
     public function restore(User $user, Service $service)
@@ -138,8 +131,6 @@ class ServicePolicy
     /**
      * Determine whether the user can permanently delete the service.
      *
-     * @param User $user
-     * @param Service $service
      * @return mixed
      */
     public function forceDelete(User $user, Service $service)

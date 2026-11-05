@@ -25,7 +25,7 @@ class EventResource extends JsonResource
             'end' => $this->date->copy()->addHour(1),
             'calendar_id' => $this->city_id,
             'state' => 'Busy',
-            'isReadOnly' => !$this->isEditable,
+            'isReadOnly' => ! $this->isEditable,
         ];
     }
 }

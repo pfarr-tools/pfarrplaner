@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Seating;
 
-
 use App\Models\Seating\Booking;
 use App\Models\Seating\SeatingRow;
 
@@ -38,15 +37,20 @@ class RowBasedSeatingModel extends AbstractSeatingModel
 {
     protected $title = 'Reihenbasiert';
 
-    public function rowCapacity(SeatingRow $row) {
+    public function rowCapacity(SeatingRow $row)
+    {
         // check if we still have space in this row
         if ($x = count($row->bookings)) {
             // all divided seats booked?
-            if ($x >= $row->divides_into) return 0;
+            if ($x >= $row->divides_into) {
+                return 0;
+            }
             // only one booking, but complete row?
-            if ($row->bookings[0]->number > 2) return 0;
+            if ($row->bookings[0]->number > 2) {
+                return 0;
+            }
 
-            return ($row->divides_into-$x)*2;
+            return ($row->divides_into - $x) * 2;
         } else {
             return $row->seats;
         }
@@ -54,21 +58,30 @@ class RowBasedSeatingModel extends AbstractSeatingModel
 
     public function impact(SeatingRow $row, $number)
     {
-        if ($number > $row->seats) return -1;
+        if ($number > $row->seats) {
+            return -1;
+        }
 
         // check if we still have space in this row
         if ($x = count($row->bookings)) {
             // partially booked -> no more than two people possible
-            if ($number > 2) return -1;
+            if ($number > 2) {
+                return -1;
+            }
             // all divided seats booked?
-            if ($x >= $row->divides_into) return -1;
+            if ($x >= $row->divides_into) {
+                return -1;
+            }
             // only one booking, but complete row?
-            if ($row->bookings[0]->number > 2) return -1;
+            if ($row->bookings[0]->number > 2) {
+                return -1;
+            }
         }
 
-        if (($row->divides_into > 1) && ($number <=2)) {
-            $remaining = ($row->divides_into-1)*2;
-            return $row->seats-$remaining;
+        if (($row->divides_into > 1) && ($number <= 2)) {
+            $remaining = ($row->divides_into - 1) * 2;
+
+            return $row->seats - $remaining;
         } else {
             return $row->seats;
         }
@@ -82,17 +95,26 @@ class RowBasedSeatingModel extends AbstractSeatingModel
     public function isAvailable(SeatingRow $row)
     {
         if ($x = count($row->bookings)) {
-            if ($x >= $row->divides_into) return false;
-            if ($row->bookings[0]->number > 2) return false;
+            if ($x >= $row->divides_into) {
+                return false;
+            }
+            if ($row->bookings[0]->number > 2) {
+                return false;
+            }
         }
+
         return true;
     }
 
-    public function remainingSeats(SeatingRow $row) {
-        if (!$this->isAvailable($row)) return 0;
-        if (0 == count($row->bookings)) return $row->seats;
+    public function remainingSeats(SeatingRow $row)
+    {
+        if (! $this->isAvailable($row)) {
+            return 0;
+        }
+        if (count($row->bookings) == 0) {
+            return $row->seats;
+        }
+
         return -1;
     }
-
-
 }

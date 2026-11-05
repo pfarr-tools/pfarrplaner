@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,8 +39,6 @@
 |
 */
 
-
-
 use App\Http\Controllers\SermonController;
 
 // multiple sermons
@@ -57,5 +55,3 @@ Route::delete('/predigt/{model}/bild', [SermonController::class, 'detachImage'])
 Route::get('/gottesdienst/{service:slug}/predigt', [SermonController::class, 'editorByService'])->name('service.sermon.editor');
 Route::get('/gottesdienst/{service:slug}/predigt/leseansicht', [SermonController::class, 'readerByService'])->name('service.sermon.reader');
 Route::post('/gottesdienst/{service:slug}/predigt', [SermonController::class, 'store'])->name('sermon.store');
-
-

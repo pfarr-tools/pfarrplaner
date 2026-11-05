@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -13,6 +14,7 @@
 namespace Tests\Unit\Services;
 
 use App\Services\QueryLogService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
@@ -30,13 +32,13 @@ class QueryLogServiceUnitTest extends TestCase
         parent::tearDown();
     }
 
-    public function testFileReturnsStoragePath(): void
+    public function test_file_returns_storage_path(): void
     {
         $path = QueryLogService::file();
         $this->assertStringContainsString('query.log', $path);
     }
 
-    public function testAllReturnsEmptyArrayWhenNoEntries(): void
+    public function test_all_returns_empty_array_when_no_entries(): void
     {
         File::delete(QueryLogService::file());
         $result = QueryLogService::all();
@@ -44,7 +46,7 @@ class QueryLogServiceUnitTest extends TestCase
         $this->assertCount(0, $result);
     }
 
-    public function testPutAndAllRoundtrip(): void
+    public function test_put_and_all_roundtrip(): void
     {
         QueryLogService::put('INSERT INTO test VALUES (1)');
         $entries = QueryLogService::all();
@@ -52,7 +54,7 @@ class QueryLogServiceUnitTest extends TestCase
         $this->assertEquals('INSERT INTO test VALUES (1)', $entries[0]['query']);
     }
 
-    public function testClearEmptiesLog(): void
+    public function test_clear_empties_log(): void
     {
         QueryLogService::put('INSERT INTO test VALUES (2)');
         QueryLogService::clear();
@@ -60,10 +62,10 @@ class QueryLogServiceUnitTest extends TestCase
         $this->assertCount(0, $entries);
     }
 
-    public function testDateReturnsCarbonInstance(): void
+    public function test_date_returns_carbon_instance(): void
     {
         QueryLogService::clear();
         $date = QueryLogService::date();
-        $this->assertInstanceOf(\Carbon\Carbon::class, $date);
+        $this->assertInstanceOf(Carbon::class, $date);
     }
 }

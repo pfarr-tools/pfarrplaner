@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,7 +24,7 @@ class EventApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testByRangeReturns404ForMalformedCalendarKey()
+    public function test_by_range_returns404_for_malformed_calendar_key()
     {
         $user = User::factory()->create();
 
@@ -31,8 +32,8 @@ class EventApiFeatureTest extends TestCase
         $response = $this->actingAs($user, 'api')
             ->getJson(route('api.events.range', [
                 'calendar' => 'unknown',
-                'start'    => '2024-01-01',
-                'end'      => '2024-01-31',
+                'start' => '2024-01-01',
+                'end' => '2024-01-31',
             ]));
 
         $response->assertNotFound();
@@ -41,12 +42,12 @@ class EventApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testByRangeRequiresAuth()
+    public function test_by_range_requires_auth()
     {
         $response = $this->getJson(route('api.events.range', [
             'calendar' => 'unknown',
-            'start'    => '2024-01-01',
-            'end'      => '2024-01-31',
+            'start' => '2024-01-01',
+            'end' => '2024-01-31',
         ]));
 
         $response->assertUnauthorized();

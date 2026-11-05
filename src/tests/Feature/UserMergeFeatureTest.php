@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -21,7 +22,6 @@ use App\Models\People\Team;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
-use App\Models\Subscription;
 use App\Models\UserSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -31,6 +31,7 @@ class UserMergeFeatureTest extends TestCase
     use RefreshDatabase;
 
     protected User $source;
+
     protected User $target;
 
     protected function setUp(): void
@@ -43,7 +44,7 @@ class UserMergeFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMergeTransfersParticipants()
+    public function test_merge_transfers_participants()
     {
         $city = City::factory()->create();
         $service = Service::factory()->create(['city_id' => $city->id]);
@@ -58,7 +59,7 @@ class UserMergeFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMergeTransfersAbsences()
+    public function test_merge_transfers_absences()
     {
         Absence::create(['user_id' => $this->source->id, 'from' => now(), 'to' => now()->addDay(), 'reason' => 'Urlaub']);
 
@@ -71,7 +72,7 @@ class UserMergeFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMergeTransfersUserSettings()
+    public function test_merge_transfers_user_settings()
     {
         UserSetting::create(['user_id' => $this->source->id, 'key' => 'test_key', 'value' => 'test_value']);
 
@@ -83,9 +84,10 @@ class UserMergeFeatureTest extends TestCase
 
     /**
      * City associations from both users are kept (additive union).
+     *
      * @return void
      */
-    public function testMergeCombinesCities()
+    public function test_merge_combines_cities()
     {
         $cityA = City::factory()->create();
         $cityB = City::factory()->create();
@@ -102,9 +104,10 @@ class UserMergeFeatureTest extends TestCase
 
     /**
      * When both users share a city, the better permission wins.
+     *
      * @return void
      */
-    public function testMergeCitiesKeepsBetterPermission()
+    public function test_merge_cities_keeps_better_permission()
     {
         $city = City::factory()->create();
         $this->source->cities()->attach($city->id, ['permission' => 'a']);
@@ -119,9 +122,10 @@ class UserMergeFeatureTest extends TestCase
 
     /**
      * Target retains its better permission when source has a weaker one.
+     *
      * @return void
      */
-    public function testMergeCitiesDoesNotDowngradePermission()
+    public function test_merge_cities_does_not_downgrade_permission()
     {
         $city = City::factory()->create();
         $this->source->cities()->attach($city->id, ['permission' => 'r']);
@@ -136,9 +140,10 @@ class UserMergeFeatureTest extends TestCase
 
     /**
      * City scopes (person visibility) are merged additively.
+     *
      * @return void
      */
-    public function testMergeCombinesCityScopes()
+    public function test_merge_combines_city_scopes()
     {
         $cityA = City::factory()->create();
         $cityB = City::factory()->create();
@@ -156,7 +161,7 @@ class UserMergeFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMergeTransfersParishes()
+    public function test_merge_transfers_parishes()
     {
         $parish = Parish::factory()->create();
         $this->source->parishes()->attach($parish->id);
@@ -168,9 +173,10 @@ class UserMergeFeatureTest extends TestCase
 
     /**
      * When both users are already in the same parish, the target must appear exactly once after merge.
+     *
      * @return void
      */
-    public function testMergeParishNoDuplicateWhenBothAlreadyMembers()
+    public function test_merge_parish_no_duplicate_when_both_already_members()
     {
         $parish = Parish::factory()->create();
         $this->source->parishes()->attach($parish->id);
@@ -184,7 +190,7 @@ class UserMergeFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMergeTransfersTeams()
+    public function test_merge_transfers_teams()
     {
         $team = Team::factory()->create();
         $this->source->teams()->attach($team->id);
@@ -196,9 +202,10 @@ class UserMergeFeatureTest extends TestCase
 
     /**
      * When both users are already in the same team, the target must appear exactly once after merge.
+     *
      * @return void
      */
-    public function testMergeTeamNoDuplicateWhenBothAlreadyMembers()
+    public function test_merge_team_no_duplicate_when_both_already_members()
     {
         $team = Team::factory()->create();
         $this->source->teams()->attach($team->id);
@@ -212,7 +219,7 @@ class UserMergeFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMergeCombinesHomeCities()
+    public function test_merge_combines_home_cities()
     {
         $cityA = City::factory()->create();
         $cityB = City::factory()->create();
@@ -230,7 +237,7 @@ class UserMergeFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMergeCombinesPools()
+    public function test_merge_combines_pools()
     {
         $poolA = Pool::factory()->create();
         $poolB = Pool::factory()->create();
@@ -247,9 +254,10 @@ class UserMergeFeatureTest extends TestCase
 
     /**
      * Replacement pivot entries (replacement person) are moved from source to target.
+     *
      * @return void
      */
-    public function testMergeTransfersReplacements()
+    public function test_merge_transfers_replacements()
     {
         $absence = Absence::create(['user_id' => $this->target->id, 'from' => now(), 'to' => now()->addDay(), 'reason' => 'Urlaub']);
         $replacement = Replacement::create(['absence_id' => $absence->id, 'from' => now(), 'to' => now()->addDay()]);

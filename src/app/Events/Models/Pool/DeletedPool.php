@@ -4,6 +4,7 @@ namespace App\Events\Models\Pool;
 
 use App\Models\Leave\Pool;
 use App\Models\People\User;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -13,10 +14,10 @@ class DeletedPool
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /** @var User $user */
+    /** @var User */
     protected $user;
 
-    /** @var Pool $pool */
+    /** @var Pool */
     protected $pool;
 
     /**
@@ -31,7 +32,7 @@ class DeletedPool
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
+     * @return array<int, Channel>
      */
     public function broadcastOn(): array
     {

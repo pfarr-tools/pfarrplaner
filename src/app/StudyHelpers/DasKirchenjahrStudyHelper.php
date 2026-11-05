@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,23 +30,19 @@
 
 namespace App\StudyHelpers;
 
-use App\StudyHelpers\AbstractStudyHelper;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class DasKirchenjahrStudyHelper extends AbstractStudyHelper
 {
-
     public $title = 'Das Kirchenjahr';
+
     protected $records = [];
 
-
-
-    function read(array $data): array
+    public function read(array $data): array
     {
         if ('' == ($content = $this->getContent(
-                'https://www.daskirchenjahr.de/'
-            ))) {
+            'https://www.daskirchenjahr.de/'
+        ))) {
             return [];
         }
         preg_match_all('/<A href="tag.php\?name=&zeit=(.*?)&typ=Einfuehrung/', $content, $matches);
@@ -58,9 +54,11 @@ class DasKirchenjahrStudyHelper extends AbstractStudyHelper
         }
 
         $this->records['Ewigkeitssonntag'] = ['[Das Kirchenjahr] Letzter Sonntag im Kirchenjahr' => 'https://www.daskirchenjahr.de/tag.php?name=letzter&zeit=Kirchenjahresende'];
+
         return $this->records;
     }
-    function readPage(string $page): array
+
+    public function readPage(string $page): array
     {
         $records = [];
         $url = 'https://www.daskirchenjahr.de/tag.php?name=&zeit='.$page.'&typ=Einfuehrung';
@@ -70,12 +68,15 @@ class DasKirchenjahrStudyHelper extends AbstractStudyHelper
         $content = Str::replace("\n", '', $content);
         preg_match_all('/<A href="(tag.php\?name=(?:.*?)&zeit=(?:.*?))"(?:.*?)>(.*?)<\/A>/', $content, $matches);
         foreach ($matches[0] as $index => $match) {
-            if (!Str::contains($matches[1][$index], '&typ=')) {
+            if (! Str::contains($matches[1][$index], '&typ=')) {
                 $title = $matches[2][$index];
-                if (Str::contains($title, ' (')) $title = Str::before($title, ' (');
-                $records[$title] = [ '[Das Kirchenjahr] '.$matches[2][$index] => 'https://www.daskirchenjahr.de/'.$matches[1][$index]];
+                if (Str::contains($title, ' (')) {
+                    $title = Str::before($title, ' (');
+                }
+                $records[$title] = ['[Das Kirchenjahr] '.$matches[2][$index] => 'https://www.daskirchenjahr.de/'.$matches[1][$index]];
             }
         }
+
         return $records;
     }
 
@@ -115,15 +116,18 @@ class DasKirchenjahrStudyHelper extends AbstractStudyHelper
         ];
 
         $title = strtr($title, $translations);
-        if ($title == 'Trinitatis') $title = 'Trinitatissonntag';
+        if ($title == 'Trinitatis') {
+            $title = 'Trinitatissonntag';
+        }
+
         return $title;
     }
 
-    function getLinks(array $data): array
+    public function getLinks(array $data): array
     {
         $title = $this->translateTitle($data['title']);
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$title] ?? []);
+
         return $data;
     }
-
 }

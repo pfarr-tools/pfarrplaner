@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -26,35 +27,35 @@ class AdminUsersPageLoadTest extends AbstractPageLoadTest
         $this->targetUser = User::factory()->create();
     }
 
-    public function testUsersIndexLoads(): void
+    public function test_users_index_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('users.index'));
         });
     }
 
-    public function testUserEditorLoads(): void
+    public function test_user_editor_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('user.edit', $this->targetUser->id));
         });
     }
 
-    public function testUserJoinLoads(): void
+    public function test_user_join_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('user.join', $this->targetUser->id));
         });
     }
 
-    public function testDuplicatesWizardLoads(): void
+    public function test_duplicates_wizard_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('users.duplicates'));
         });
     }
 
-    public function testUserCreateLoads(): void
+    public function test_user_create_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('user.create'));

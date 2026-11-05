@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@
 
 namespace App\Reports;
 
-
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
@@ -46,26 +45,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
+use Inertia\Render;
 
 /**
  * Class EmbedStreamingReport
- * @package App\Reports
  */
 class EmbedStreamingReport extends AbstractEmbedReport
 {
-
     /**
      * @var string
      */
     public $title = 'Streaming von Gottesdiensten';
+
     /**
      * @var string
      */
     public $group = 'Website (Gemeindebaukasten)';
+
     /**
      * @var string
      */
     public $description = 'Erzeugt HTML-Code für die Einbindung eines Streaming-Gottesdiensts in die Website der Gemeinde';
+
     /**
      * @var string
      */
@@ -74,16 +75,16 @@ class EmbedStreamingReport extends AbstractEmbedReport
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Render
+     * @return Render
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
+
         return Inertia::render('Report/EmbedStreaming/Setup', compact('cities'));
     }
 
     /**
-     * @param Request $request
      * @return Application|Factory|View|string
      */
     public function render(Request $request)
@@ -98,16 +99,16 @@ class EmbedStreamingReport extends AbstractEmbedReport
         $data['randomId'] = uniqid();
         $html = \Illuminate\Support\Facades\View::make('reports.embedstreaming.render', $data)->render();
         $title = 'HTML-Code für Gottesdienststreams erstellen';
+
         return Inertia::render('Report/EmbedStreaming/Render', compact('html', 'title'));
     }
 
     /**
-     * @param Request $request
      * @return Application|Factory|View
      */
     public function embed(Request $request)
     {
-        if (!$request->has('city')) {
+        if (! $request->has('city')) {
             abort(404);
         }
         $nextService = Service::where('city_id', $request->get('city'))
@@ -126,6 +127,4 @@ class EmbedStreamingReport extends AbstractEmbedReport
 
         return view('reports.embedstreaming.embed', compact('nextService', 'lastServices'));
     }
-
-
 }

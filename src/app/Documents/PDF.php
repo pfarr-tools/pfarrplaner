@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,29 +32,24 @@ namespace App\Documents;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
-use Spatie\Browsershot\ChromiumResult;
 use Spatie\Browsershot\Browsershot;
+use Spatie\Browsershot\ChromiumResult;
+use Spatie\Browsershot\Exceptions\CouldNotTakeBrowsershot;
 use Spatie\Browsershot\Exceptions\ElementNotFound;
 use Spatie\Browsershot\Exceptions\RemoteConnectionException;
 use Spatie\Browsershot\Exceptions\UnsuccessfulResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PDF extends Browsershot
 {
-    /**
-     * @param string $url
-     */
     public function __construct(string $url = '')
     {
         parent::__construct($url);
         $this->noSandbox();
     }
 
-    /**
-     * @return string
-     */
     protected static function getDefaultPdfStyles(): string
     {
         $lightFont = static::getEmbeddedFontDataUri(resource_path('fonts/Sarabun-Light.ttf'));
@@ -89,33 +84,25 @@ class PDF extends Browsershot
 HTML;
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     protected static function getEmbeddedFontDataUri(string $path): string
     {
-        return 'data:font/ttf;base64,' . base64_encode(file_get_contents($path));
+        return 'data:font/ttf;base64,'.base64_encode(file_get_contents($path));
     }
 
-    /**
-     * @param string $html
-     * @return string
-     */
     protected static function applyDefaultPdfStyles(string $html): string
     {
         $styles = static::getDefaultPdfStyles();
 
         if (str_contains($html, '</head>')) {
-            return str_replace('</head>', $styles . '</head>', $html);
+            return str_replace('</head>', $styles.'</head>', $html);
         }
 
-        return $styles . $html;
+        return $styles.$html;
     }
 
     /**
-     * @param string $viewName
-     * @param array $data
+     * @param  string  $viewName
+     * @param  array  $data
      * @return static
      */
     public static function fromView($viewName, $data, $header = '', $footer = '')
@@ -139,9 +126,7 @@ HTML;
     }
 
     /**
-     * @param $filename
-     * @return BinaryFileResponse
-     * @throws \Spatie\Browsershot\Exceptions\CouldNotTakeBrowsershot
+     * @throws CouldNotTakeBrowsershot
      */
     public function download($filename): BinaryFileResponse
     {
@@ -156,9 +141,6 @@ HTML;
     /**
      * Start Browsershot with a guaranteed working directory even if the runtime
      * environment does not provide a valid current directory.
-     *
-     * @param array $command
-     * @return string
      */
     protected function callBrowser(array $command): string
     {

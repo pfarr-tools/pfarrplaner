@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -61,7 +61,7 @@ return new class extends Migration
         $items = Item::where('data_type', 'freetext')->get();
         foreach ($items as $item) {
             $data = $item->data;
-            if (str_contains($data['description'], "</p>")) {
+            if (str_contains($data['description'], '</p>')) {
                 $data['description'] = strtr($data['description'], [
                     '</p>' => "\r\n",
                     '<br>' => "\n",

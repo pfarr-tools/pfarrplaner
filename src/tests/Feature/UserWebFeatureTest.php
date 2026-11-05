@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -14,8 +15,8 @@ namespace Tests\Feature;
 
 use App\Models\People\User;
 use App\Services\RoleService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -32,12 +33,12 @@ class UserWebFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testIndexLoads(): void
+    public function test_index_loads(): void
     {
         $this->actingAs($this->user)
             ->get(route('users.index'))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page
+            ->assertInertia(fn (Assert $page) => $page
                 ->component('Admin/User/Index')
                 ->has('users', 1)
                 ->missing('users.0.address')
@@ -47,13 +48,13 @@ class UserWebFeatureTest extends TestCase
             );
     }
 
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $target = User::factory()->create();
         $this->actingAs($this->user)
             ->get(route('user.edit', $target->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page
+            ->assertInertia(fn (Assert $page) => $page
                 ->component('Admin/User/UserEditor')
                 ->has('users', 2)
                 ->missing('users.0.address')
@@ -64,14 +65,14 @@ class UserWebFeatureTest extends TestCase
             );
     }
 
-    public function testJoinLoadsCompactPeople(): void
+    public function test_join_loads_compact_people(): void
     {
         $target = User::factory()->create();
 
         $this->actingAs($this->user)
             ->get(route('user.join', $target->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page
+            ->assertInertia(fn (Assert $page) => $page
                 ->component('Admin/User/Join')
                 ->has('people', 1)
                 ->missing('user.address')
@@ -80,7 +81,7 @@ class UserWebFeatureTest extends TestCase
             );
     }
 
-    public function testUpdatingUserProfileWithoutPasswordKeepsExistingPasswordHash(): void
+    public function test_updating_user_profile_without_password_keeps_existing_password_hash(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
         $target = User::factory()->create(['password' => 'long-term-password']);
@@ -98,5 +99,4 @@ class UserWebFeatureTest extends TestCase
 
         $this->assertSame($passwordHash, $target->fresh()->getRawOriginal('password'));
     }
-
 }

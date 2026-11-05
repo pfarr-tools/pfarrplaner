@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,25 +13,24 @@
 
 namespace Tests\Feature;
 
+use App\Services\SentryFeedbackService;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use App\Services\SentryFeedbackService;
 use Mockery;
+use RuntimeException;
 use Sentry\SentrySdk;
 use Sentry\State\HubInterface;
-use RuntimeException;
 use Tests\TestCase;
 
 class SentryErrorFeedbackFeatureTest extends TestCase
 {
     /**
      * Unexpected exceptions are reported through Laravel's exception handler.
-     *
-     * @return void
      */
-    public function testUnexpectedExceptionsAreReportedToSentry(): void
+    public function test_unexpected_exceptions_are_reported_to_sentry(): void
     {
         $exception = new RuntimeException('Sentry regression test');
         $originalHub = SentrySdk::getCurrentHub();
@@ -43,7 +43,7 @@ class SentryErrorFeedbackFeatureTest extends TestCase
         SentrySdk::setCurrentHub($hub);
 
         try {
-            app(\Illuminate\Contracts\Debug\ExceptionHandler::class)->report($exception);
+            app(ExceptionHandler::class)->report($exception);
         } finally {
             SentrySdk::setCurrentHub($originalHub);
         }
@@ -51,10 +51,8 @@ class SentryErrorFeedbackFeatureTest extends TestCase
 
     /**
      * Rendered exceptions are logged together with their displayed reference.
-     *
-     * @return void
      */
-    public function testRenderedExceptionsAreLoggedWithTheirErrorReference(): void
+    public function test_rendered_exceptions_are_logged_with_their_error_reference(): void
     {
         $exception = new RuntimeException('Logged exception regression test');
         $request = Request::create('/broken', 'GET');
@@ -67,7 +65,7 @@ class SentryErrorFeedbackFeatureTest extends TestCase
             }
         });
 
-        app(\Illuminate\Contracts\Debug\ExceptionHandler::class)->render($request, $exception);
+        app(ExceptionHandler::class)->render($request, $exception);
 
         $this->assertNotNull($logged);
         $this->assertSame('Unhandled exception rendered', $logged->message);
@@ -77,10 +75,8 @@ class SentryErrorFeedbackFeatureTest extends TestCase
 
     /**
      * The development test route renders the friendly error page.
-     *
-     * @return void
      */
-    public function testErrorTestRouteRendersTheFriendlyErrorPage(): void
+    public function test_error_test_route_renders_the_friendly_error_page(): void
     {
         $response = $this->get('/__test/500');
 
@@ -93,10 +89,8 @@ class SentryErrorFeedbackFeatureTest extends TestCase
 
     /**
      * The GlitchTip debug route deliberately reports an exception in local environments.
-     *
-     * @return void
      */
-    public function testGlitchTipDebugRouteThrowsAnException(): void
+    public function test_glitch_tip_debug_route_throws_an_exception(): void
     {
         $this->get('/debug-glitchtip')
             ->assertStatus(500);
@@ -104,10 +98,8 @@ class SentryErrorFeedbackFeatureTest extends TestCase
 
     /**
      * User feedback is sent to the Sentry feedback endpoint.
-     *
-     * @return void
      */
-    public function testUserFeedbackIsSentToSentry(): void
+    public function test_user_feedback_is_sent_to_sentry(): void
     {
         config()->set('sentry.feedback', [
             'token' => 'feedback-token',
@@ -136,10 +128,8 @@ class SentryErrorFeedbackFeatureTest extends TestCase
 
     /**
      * User feedback uses the DSN host when no API endpoint override is configured.
-     *
-     * @return void
      */
-    public function testUserFeedbackUsesTheDsnHostWithoutAnEndpointOverride(): void
+    public function test_user_feedback_uses_the_dsn_host_without_an_endpoint_override(): void
     {
         config()->set('sentry.dsn', 'https://public@example.invalid/42');
         config()->set('sentry.feedback', [
@@ -163,10 +153,8 @@ class SentryErrorFeedbackFeatureTest extends TestCase
 
     /**
      * The test route is unavailable in production.
-     *
-     * @return void
      */
-    public function testErrorTestRouteIsUnavailableInProduction(): void
+    public function test_error_test_route_is_unavailable_in_production(): void
     {
         $this->app->detectEnvironment(fn () => 'production');
 
@@ -175,10 +163,8 @@ class SentryErrorFeedbackFeatureTest extends TestCase
 
     /**
      * The GlitchTip debug route is unavailable in production.
-     *
-     * @return void
      */
-    public function testGlitchTipDebugRouteIsUnavailableInProduction(): void
+    public function test_glitch_tip_debug_route_is_unavailable_in_production(): void
     {
         $this->app->detectEnvironment(fn () => 'production');
 

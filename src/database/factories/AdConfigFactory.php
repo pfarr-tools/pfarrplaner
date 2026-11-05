@@ -7,7 +7,7 @@ use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Ads\AdConfig>
+ * @extends Factory<AdConfig>
  */
 class AdConfigFactory extends Factory
 {

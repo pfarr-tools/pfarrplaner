@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -18,10 +19,12 @@ use Tests\AbstractSimpleModelUnitTest;
 class DayUnitTest extends AbstractSimpleModelUnitTest
 {
     protected string $modelClass = Day::class;
+
     protected bool $hasPolicy = true;
+
     protected bool $hasFactory = true;
 
-    public function testDayCanBeCreatedViaFactory(): void
+    public function test_day_can_be_created_via_factory(): void
     {
         $day = Day::factory()->create();
         $this->assertCount(1, Day::all());

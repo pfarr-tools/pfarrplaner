@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,7 +28,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 use App\Http\Controllers\Api\CalendarController;
 
 Route::get('/cal/city/{city}/{date}', [CalendarController::class, 'city'])->name('calendar.byCityAndMonth');
@@ -36,4 +35,3 @@ Route::get('/quick-pick/{date}', [CalendarController::class, 'quickPick'])->name
 
 Route::get('/kalender/monat/{date}', [CalendarController::class, 'month'])->name('calendar.month')->middleware('auth:api');
 Route::get('/kalender/gottesdienst/{service}', [CalendarController::class, 'service'])->name('calendar.service')->middleware('auth:api');
-

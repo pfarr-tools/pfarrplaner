@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -16,6 +17,7 @@ use Dotenv\Dotenv;
 use Illuminate\Console\Command;
 use Illuminate\Support\Env;
 use Illuminate\Support\Str;
+use Laravel\Dusk\Console\Concerns\InteractsWithTestingFrameworks;
 use NunoMaduro\Collision\Adapters\Phpunit\Subscribers\EnsurePrinterIsRegisteredSubscriber;
 use PHPUnit\Runner\Version;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -23,12 +25,12 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
-use Laravel\Dusk\Console\Concerns\InteractsWithTestingFrameworks;
 
 #[AsCommand(name: 'dusk:run')]
 class DuskRunCommand extends Command
 {
     use InteractsWithTestingFrameworks;
+
     protected const QUIET_PROGRESS_INTERVAL_SECONDS = 30;
 
     /**
@@ -40,8 +42,6 @@ class DuskRunCommand extends Command
 
     /**
      * Whether the runner created a temporary .env file for this run.
-     *
-     * @var bool
      */
     protected bool $createdEnvironmentFile = false;
 
@@ -155,13 +155,12 @@ class DuskRunCommand extends Command
 
     /**
      * Report whether the frontend build will run for this test pass.
-     *
-     * @return void
      */
     protected function reportBuildPhase(): void
     {
         if ($this->option('without-build')) {
             $this->components->twoColumnDetail('Frontend build', 'übersprungen');
+
             return;
         }
 
@@ -192,10 +191,6 @@ class DuskRunCommand extends Command
 
     /**
      * Run the PHPUnit child process and emit heartbeats during quiet compact runs.
-     *
-     * @param  Process  $process
-     * @param  array  $options
-     * @return int
      */
     protected function runPhpUnitProcess(Process $process, array $options): int
     {
@@ -237,9 +232,6 @@ class DuskRunCommand extends Command
 
     /**
      * Print the active Dusk runtime configuration before the suite starts.
-     *
-     * @param  array  $options
-     * @return void
      */
     protected function reportRunConfiguration(array $options): void
     {
@@ -290,14 +282,12 @@ class DuskRunCommand extends Command
 
     /**
      * Start the Laravel dev server using the current (dusk) environment.
-     *
-     * @return Process
      */
     protected function startTestServer(): Process
     {
         $appUrl = $this->resolvedAppUrl();
-        $host   = parse_url($appUrl, PHP_URL_HOST) ?? '127.0.0.1';
-        $port   = parse_url($appUrl, PHP_URL_PORT) ?? 8000;
+        $host = parse_url($appUrl, PHP_URL_HOST) ?? '127.0.0.1';
+        $port = parse_url($appUrl, PHP_URL_PORT) ?? 8000;
 
         $server = new Process(
             [PHP_BINARY, 'artisan', 'serve', '--no-reload', "--host={$host}", "--port={$port}"],
@@ -443,7 +433,6 @@ class DuskRunCommand extends Command
      * Determine if PHPUnit should render its own human-readable output mode.
      *
      * @param  string[]  $options
-     * @return bool
      */
     protected function wantsPhpUnitOwnOutput(array $options): bool
     {
@@ -460,7 +449,6 @@ class DuskRunCommand extends Command
      * Determine whether compact/default runs should emit quiet heartbeats.
      *
      * @param  string[]  $options
-     * @return bool
      */
     protected function shouldShowQuietProgress(array $options): bool
     {
@@ -469,10 +457,6 @@ class DuskRunCommand extends Command
 
     /**
      * Flush incremental output from the PHPUnit child process.
-     *
-     * @param  Process  $process
-     * @param  float  $lastVisibleOutputAt
-     * @return float
      */
     protected function drainPhpUnitOutput(Process $process, float $lastVisibleOutputAt): float
     {
@@ -513,9 +497,6 @@ class DuskRunCommand extends Command
 
     /**
      * Format elapsed runtime as MM:SS or HH:MM:SS.
-     *
-     * @param  int  $seconds
-     * @return string
      */
     protected function formatElapsedTime(int $seconds): string
     {
@@ -568,8 +549,6 @@ class DuskRunCommand extends Command
 
     /**
      * Force Laravel Vite to use the build during browser tests.
-     *
-     * @return void
      */
     protected function purgeViteHotFile(): void
     {
@@ -680,8 +659,8 @@ class DuskRunCommand extends Command
     /**
      * Ensure browser tests can never use the configured development database.
      *
-     * @param array<string, mixed> $environment
-     * @return void
+     * @param  array<string, mixed>  $environment
+     *
      * @throws \RuntimeException
      */
     protected function validateDuskDatabase(array $environment): void
@@ -701,8 +680,7 @@ class DuskRunCommand extends Command
     /**
      * Make the Dusk environment available to Laravel and child processes.
      *
-     * @param array<string, string> $variables
-     * @return void
+     * @param  array<string, string>  $variables
      */
     protected function applyEnvironment(array $variables): void
     {
@@ -715,8 +693,6 @@ class DuskRunCommand extends Command
 
     /**
      * Create the minimal environment file required by Laravel's test bootstrap.
-     *
-     * @return void
      */
     protected function createTemporaryEnvironmentFile(): void
     {
@@ -726,7 +702,7 @@ class DuskRunCommand extends Command
         }
 
         $contents = collect($this->duskEnvironment)
-            ->map(fn (string $value, string $key): string => $key.'='.str_replace(["\\", "\n", "\r"], ['\\\\', '', ''], $value))
+            ->map(fn (string $value, string $key): string => $key.'='.str_replace(['\\', "\n", "\r"], ['\\\\', '', ''], $value))
             ->implode("\n");
 
         file_put_contents($environmentFile, $contents."\n");
@@ -866,8 +842,6 @@ class DuskRunCommand extends Command
 
     /**
      * Get the Dusk env file that will be loaded for this run.
-     *
-     * @return string
      */
     protected function resolvedDuskFile(): string
     {
@@ -878,8 +852,6 @@ class DuskRunCommand extends Command
 
     /**
      * Resolve the app URL for the current Dusk run.
-     *
-     * @return string
      */
     protected function resolvedAppUrl(): string
     {

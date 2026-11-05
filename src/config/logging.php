@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -69,7 +69,7 @@ return [
                 ['stderr'],
                 env('SENTRY_LOGS', false) ? ['sentry_logs'] : [],
             ),
-            'level' => 'debug'
+            'level' => 'debug',
         ],
 
         'single' => [
@@ -80,7 +80,7 @@ return [
 
         'daily' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/' . php_sapi_name() . '/laravel.log'),
+            'path' => storage_path('logs/'.php_sapi_name().'/laravel.log'),
             'level' => 'debug',
             'days' => 14,
             'permission' => 0664,

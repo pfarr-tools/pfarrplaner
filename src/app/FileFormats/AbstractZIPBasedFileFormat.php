@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,32 +30,34 @@
 
 namespace App\FileFormats;
 
-use \Closure;
-use \ZipArchive;
-use \DOMDocument;
+use Closure;
+use DOMDocument;
+use ZipArchive;
 
 class AbstractZIPBasedFileFormat
 {
-
-    /** @var ZipArchive $zip Output file stream  */
+    /** @var ZipArchive Output file stream */
     protected $zip = null;
-
 
     public function __construct()
     {
-        $this->zip = new ZipArchive();
+        $this->zip = new ZipArchive;
     }
 
     /**
      * Patch an XML file in the ZIP archive
-     * @param string $path Path to the XML file relative to the root of the ZIP archive
-     * @param Closure $callback This will be called with the DOMDocument object of the XML file
+     *
+     * @param  string  $path  Path to the XML file relative to the root of the ZIP archive
+     * @param  Closure  $callback  This will be called with the DOMDocument object of the XML file
      * @return void
      */
-    protected function patchXMLFile(string $path, Closure $callback) {
+    protected function patchXMLFile(string $path, Closure $callback)
+    {
         $xml = $this->zip->getFromName($path);
-        if (empty($xml)) throw new \RuntimeException("Empty XML passed for file $path");
-        $doc = new DOMDocument();
+        if (empty($xml)) {
+            throw new \RuntimeException("Empty XML passed for file $path");
+        }
+        $doc = new DOMDocument;
         $doc->preserveWhiteSpace = false;
         $doc->formatOutput = true;
         $doc->loadXML($xml);
@@ -69,19 +71,18 @@ class AbstractZIPBasedFileFormat
     protected $documentFilePath = '';
 
     /**
-     * @param $documentFilePath
      * @return static
      */
-    public static function fromFile($documentFilePath) {
-        $instance = new static();
+    public static function fromFile($documentFilePath)
+    {
+        $instance = new static;
         $instance->setDocumentFilePath($documentFilePath);
+
         return $instance;
     }
 
     /**
      * Set the path to the PPTX file
-     * @param string $documentFilePath
-     * @return void
      */
     public function setDocumentFilePath(string $documentFilePath): void
     {
@@ -90,9 +91,6 @@ class AbstractZIPBasedFileFormat
 
     /**
      * Create a file in the ZIP archive from a string, deleting old versions of the file if necessary
-     * @param string $path
-     * @param string $content
-     * @return void
      */
     protected function zipWriteString(string $path, string $content): void
     {
@@ -105,11 +103,12 @@ class AbstractZIPBasedFileFormat
     /**
      * Appends CDATA safely, splitting any occurrences of "]]>" into multiple CDATA sections.
      */
-    protected function appendSafeCdata(\DOMDocument $doc, \DOMNode $parent, string $text): void
+    protected function appendSafeCdata(DOMDocument $doc, \DOMNode $parent, string $text): void
     {
         // If there's no CDATA terminator inside, simple:
         if (strpos($text, ']]>') === false) {
-            $parent->appendChild($doc->createCDATASection("\n" . $text . "\n"));
+            $parent->appendChild($doc->createCDATASection("\n".$text."\n"));
+
             return;
         }
 
@@ -132,6 +131,4 @@ class AbstractZIPBasedFileFormat
 
         $parent->appendChild($doc->createTextNode("\n"));
     }
-
-
 }

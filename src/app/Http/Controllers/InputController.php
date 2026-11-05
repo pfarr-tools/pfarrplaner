@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -38,43 +38,38 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class InputController
- * @package App\Http\Controllers
  */
 class InputController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
     }
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function index()
     {
         $inputs = Inputs::all();
+
         return Inertia::render('Inputs/Index', compact('inputs'));
     }
 
     /**
-     * @param Request $request
-     * @param $input
      * @return Application|Factory|View
      */
     public function setup(Request $request, $input)
     {
         $input = $this->getInputClass($input);
+
         return $input->setup($request);
     }
 
-    /**
-     * @param $input
-     * @return AbstractInput
-     */
     protected function getInputClass($input): AbstractInput
     {
         try {
@@ -83,27 +78,21 @@ class InputController extends Controller
             abort(404);
         }
         abort_unless($input->canEdit(), 403);
+
         return $input;
     }
 
-    /**
-     * @param Request $request
-     * @param $input
-     */
     public function input(Request $request, $input)
     {
         $input = $this->getInputClass($input);
+
         return $input->input($request);
     }
 
-    /**
-     * @param Request $request
-     * @param $input
-     */
     public function save(Request $request, $input)
     {
         $input = $this->getInputClass($input);
+
         return $input->save($request);
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,8 +32,6 @@ namespace App\Listeners;
 
 use App\Services\InstanceRegistryService;
 use Illuminate\Auth\Events\Login;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class PingInstancesRegistry
@@ -41,16 +39,12 @@ use Illuminate\Support\Facades\Log;
  * This class takes care of pinging the instances registry on every login. No user data is sent.
  * Note that this is obligatory if you hope to get any kind of help from the developer
  * concerning your instance.
- *
- * @package App\Listeners
  */
 class PingInstancesRegistry
 {
-
     /**
      * Handle the event.
      *
-     * @param Login $event
      * @return void
      */
     public function handle(Login $event)

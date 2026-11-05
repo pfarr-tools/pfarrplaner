@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -38,6 +38,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Settings;
@@ -45,22 +46,23 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 /**
  * Class OfferingAmountsReport
- * @package App\Reports
  */
 class OfferingAmountsReport extends AbstractExcelDocumentReport
 {
     public const FILE_SIGNATURE = '77';
-    public const FILE_TITLE = 'Opfersummen';
 
+    public const FILE_TITLE = 'Opfersummen';
 
     /**
      * @var string
      */
     public $title = 'Übersicht der eingenommenen Opfer';
+
     /**
      * @var string
      */
     public $description = 'Tabelle der Opferbeiträge nach Kategorien';
+
     /**
      * @var string
      */
@@ -68,20 +70,20 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
 
     protected $inertia = true;
 
-
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
+
         return Inertia::render('Report/OfferingAmounts/Setup', compact('cities', 'locations'));
     }
 
     /**
-     * @param Request $request
      * @return string|void
+     *
      * @throws Exception
      */
     public function render(Request $request)
@@ -107,13 +109,13 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
         foreach ($services as $service) {
             $offeringGoal = $service->offeringGoal();
             if ($offeringGoal != '') {
-                if (!isset($offerings[$offeringGoal])) {
+                if (! isset($offerings[$offeringGoal])) {
                     $offerings[$offeringGoal] = ['ct' => 0, 'amount' => 0, 'done' => 0];
                 }
                 $offerings[$offeringGoal]['ct']++;
-                $x = trim(strtr((string)$service->offering_amount, [',' => '.', '€' => '']));
+                $x = trim(strtr((string) $service->offering_amount, [',' => '.', '€' => '']));
                 if (is_numeric($x)) {
-                    $offerings[$offeringGoal]['amount'] += (float)$x;
+                    $offerings[$offeringGoal]['amount'] += (float) $x;
                 }
                 if ($service->date <= Carbon::now()) {
                     $offerings[$offeringGoal]['done']++;
@@ -138,9 +140,9 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
 
         $headers = [
             'Opferzweck',
-            "Geplante Opfer",
+            'Geplante Opfer',
             'Gesammelte Opfer',
-            "Summe",
+            'Summe',
         ];
 
         foreach ($headers as $index => $header) {
@@ -152,7 +154,6 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
         $sheet->getColumnDimensionByColumn(1)->setAutoSize(false);
         $sheet->getColumnDimensionByColumn(1)->setWidth(50);
 
-
         // content rows
 
         $row = 1;
@@ -163,10 +164,10 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
             $sheet->setCellValue("C{$row}", $data2['done']);
             $sheet->setCellValueExplicit(
                 "D{$row}",
-                (float)str_replace(',', '.', (string)$data2['amount']),
+                (float) str_replace(',', '.', (string) $data2['amount']),
                 DataType::TYPE_NUMERIC
             );
-            //$sheet->setCellValue("D{$row}", ));
+            // $sheet->setCellValue("D{$row}", ));
             $sheet->getStyle("D{$row}")->getNumberFormat()->setFormatCode('#,##0.00_-€');
             $sheet->getStyle("D{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
         }
@@ -181,6 +182,4 @@ class OfferingAmountsReport extends AbstractExcelDocumentReport
 
         );
     }
-
-
 }

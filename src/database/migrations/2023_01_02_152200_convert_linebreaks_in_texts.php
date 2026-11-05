@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,7 +31,8 @@
 use App\Models\Liturgy\Text;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -51,16 +52,10 @@ return new class extends Migration {
         }
     }
 
-
     /**
      * Reverse the migrations.
      *
      * @return void
      */
-    public function down()
-    {
-    }
-
-
-
+    public function down() {}
 };

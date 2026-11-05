@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,25 +30,23 @@
 
 namespace App\Actions\Parish;
 
-use App\Actions\AbstractAction;
 use App\Actions\AbstractUpdateAction;
 use App\Contracts\Parish\UpdatesParishes;
 use App\Events\Models\Parish\UpdatedParish;
 use App\Models\Parish;
 use App\Models\People\User;
 use App\Models\Places\City;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class UpdateParish extends AbstractUpdateAction implements UpdatesParishes
 {
-    /** @var City $city */
     protected City $city;
 
     /**
      * Get return route
-     * @return string
      */
     public function redirectTo(): string
     {
@@ -57,12 +55,11 @@ class UpdateParish extends AbstractUpdateAction implements UpdatesParishes
 
     /**
      * Update a parish
-     * @param User $user
-     * @param Parish $parish
-     * @param array $input
+     *
      * @return Parish
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Validation\ValidationException
+     *
+     * @throws AuthorizationException
+     * @throws ValidationException
      */
     public function update(User $user, Parish $parish, array $input)
     {
@@ -78,9 +75,9 @@ class UpdateParish extends AbstractUpdateAction implements UpdatesParishes
             $ctr = $parish->importStreetsFromCSV($user, $csv);
         }
 
-
         $this->messages = ['success' => 'Das Pfarramt wurde geändert. '
-                                        .(isset($ctr) ? $ctr . ' Straßendatensätze wurden importiert.' : '')];
+                                        .(isset($ctr) ? $ctr.' Straßendatensätze wurden importiert.' : '')];
+
         return $parish;
     }
 }

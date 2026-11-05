@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -21,6 +22,7 @@ use Tests\AbstractModelFeatureTest;
 class TeamFeatureTest extends AbstractModelFeatureTest
 {
     protected $modelClass = Team::class;
+
     private City $city;
 
     protected function setUp(): void
@@ -36,7 +38,7 @@ class TeamFeatureTest extends AbstractModelFeatureTest
         return Team::factory()->state(['city_id' => $this->city->id]);
     }
 
-    public function testIndexViewWorks()
+    public function test_index_view_works()
     {
         $this->markTestSkipped('Teams werden im City-Editor als Tab verwaltet.');
     }

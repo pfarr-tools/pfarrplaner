@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,21 +18,21 @@ use Tests\AbstractPageLoadTest;
 
 class CorePageLoadTest extends AbstractPageLoadTest
 {
-    public function testHomePageLoads(): void
+    public function test_home_page_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('home'));
         });
     }
 
-    public function testAboutPageLoads(): void
+    public function test_about_page_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('about'));
         });
     }
 
-    public function testDashPageLoads(): void
+    public function test_dash_page_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, '/home');

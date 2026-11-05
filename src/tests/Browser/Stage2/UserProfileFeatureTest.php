@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,57 +18,57 @@ use Tests\AbstractPageLoadTest;
 
 class UserProfileFeatureTest extends AbstractPageLoadTest
 {
-    public function testProfileEditorRendersWithoutError(): void
+    public function test_profile_editor_renders_without_error(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('user.profile'))
-                    ->waitFor('#app', 10)
-                    ->assertDontSee('500')
-                    ->assertDontSee('Whoops');
+                ->visit(route('user.profile'))
+                ->waitFor('#app', 10)
+                ->assertDontSee('500')
+                ->assertDontSee('Whoops');
         });
     }
 
-    public function testProfileEditorHasSaveButton(): void
+    public function test_profile_editor_has_save_button(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('user.profile'))
-                    ->waitFor('button.btn-primary', 10)
-                    ->assertPresent('button.btn-primary');
+                ->visit(route('user.profile'))
+                ->waitFor('button.btn-primary', 10)
+                ->assertPresent('button.btn-primary');
         });
     }
 
-    public function testProfileTabsAreRendered(): void
+    public function test_profile_tabs_are_rendered(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('user.profile'))
-                    ->waitFor('#app', 10)
-                    ->assertSee('Profil')
-                    ->assertSee('Sicherheit');
+                ->visit(route('user.profile'))
+                ->waitFor('#app', 10)
+                ->assertSee('Profil')
+                ->assertSee('Sicherheit');
         });
     }
 
-    public function testTokenManagementPageRendersWithoutError(): void
+    public function test_token_management_page_renders_without_error(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('tokens.index'))
-                    ->waitFor('#app', 10)
-                    ->assertDontSee('Oops! An Error Occurred')
-                    ->assertDontSee('Whoops');
+                ->visit(route('tokens.index'))
+                ->waitFor('#app', 10)
+                ->assertDontSee('Oops! An Error Occurred')
+                ->assertDontSee('Whoops');
         });
     }
 
-    public function testICalConnectPageRendersWithoutError(): void
+    public function test_i_cal_connect_page_renders_without_error(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('ical.connect'))
-                    ->waitFor('#app', 10)
-                    ->assertDontSee('500')
-                    ->assertDontSee('Whoops');
+                ->visit(route('ical.connect'))
+                ->waitFor('#app', 10)
+                ->assertDontSee('500')
+                ->assertDontSee('Whoops');
         });
     }
 }

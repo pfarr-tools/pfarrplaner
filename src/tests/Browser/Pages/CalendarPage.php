@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,21 +18,20 @@ use Laravel\Dusk\Browser;
 class CalendarPage extends Page
 {
     protected int $year;
+
     protected int $month;
 
     public function __construct(int $year, int $month)
     {
-        $this->year  = $year;
+        $this->year = $year;
         $this->month = $month;
     }
 
-    /** @return string */
     public function url(): string
     {
         return route('calendar', ['date' => sprintf('%04d-%02d', $this->year, $this->month)]);
     }
 
-    /** @param Browser $browser */
     public function assert(Browser $browser): void
     {
         $browser->waitFor('#app', 10)->assertDontSee('500');

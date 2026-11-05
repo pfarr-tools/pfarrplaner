@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,28 +30,24 @@
 
 namespace Database\Factories;
 
-
 use App\Models\Location;
 use App\Models\Places\City;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class LocationFactory extends Factory
 {
-
     protected $model = Location::class;
 
     public function definition()
     {
         $name = fake()->firstName();
         $name2 = fake()->firstName();
+
         return [
-            'name' => $name . (substr($name, -1) == 's' ? '' : 's') . 'kirche',
+            'name' => $name.(substr($name, -1) == 's' ? '' : 's').'kirche',
             'default_time' => '',
-            'cc_default_location' => $name2 . (substr($name2, -1) == 's' ? '' : 's') . 'kirche',
+            'cc_default_location' => $name2.(substr($name2, -1) == 's' ? '' : 's').'kirche',
             'city_id' => City::factory(),
         ];
     }
-
 }
-
-

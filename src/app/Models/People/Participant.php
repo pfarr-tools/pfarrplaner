@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,12 +31,11 @@
 namespace App\Models\People;
 
 use App\Models\Service;
-use App\Models\People\User;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * Class Participant
- * @package App
  */
 class Participant extends Pivot
 {
@@ -44,20 +43,22 @@ class Participant extends Pivot
      * @var bool
      */
     public $incrementing = true;
+
     /**
      * @var string
      */
     protected $table = 'service_user';
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function service() {
+    public function service()
+    {
         return $this->belongsTo(Service::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {

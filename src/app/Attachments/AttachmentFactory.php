@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,13 +34,19 @@ use Illuminate\Support\Str;
 
 class AttachmentFactory
 {
-    public static function getList($type) {
-        if (!in_array($type, ['baptism', 'funeral', 'wedding'])) return [];
-        return collect(glob(app_path('Attachments/' . ucfirst($type) . '/*.php')))
-        ->reject(function ($file) { return Str::startsWith(basename($file), 'Abstract'); })
+    public static function getList($type)
+    {
+        if (! in_array($type, ['baptism', 'funeral', 'wedding'])) {
+            return [];
+        }
+
+        return collect(glob(app_path('Attachments/'.ucfirst($type).'/*.php')))
+            ->reject(function ($file) {
+                return Str::startsWith(basename($file), 'Abstract');
+            })
             ->map(function ($file) {
                 return (static::getClassFromFile($file))::getInfo();
-        });
+            });
 
     }
 
@@ -49,7 +55,10 @@ class AttachmentFactory
         $item = static::getList($type)->first(function ($item) use ($key) {
             return $item['key'] == $key;
         });
-        if (!$item) return null;
+        if (! $item) {
+            return null;
+        }
+
         return ($item['class'])::fromId($id);
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\People\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -49,6 +48,7 @@ class TokenController extends Controller
         Gate::authorize('update', Auth::user());
         $tokens = Auth::user()->tokens;
         $token = null;
+
         return Inertia::render('tokens', compact('tokens', 'token'));
     }
 
@@ -58,6 +58,7 @@ class TokenController extends Controller
         $request->validate(['title' => 'required|string']);
         $token = Auth::user()->createToken($request->get('title'));
         $tokens = Auth::user()->tokens;
+
         return Inertia::render('tokens', compact('tokens', 'token'));
     }
 
@@ -65,6 +66,7 @@ class TokenController extends Controller
     {
         Gate::authorize('update', Auth::user());
         Auth::user()->tokens()->where('id', $token->id)->delete();
+
         return redirect()->route('tokens.index');
     }
 }

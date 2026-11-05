@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -15,6 +16,7 @@ namespace Tests\Feature;
 use App\Models\Parish;
 use App\Models\Places\City;
 use App\Services\RoleService;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Tests\AbstractModelFeatureTest;
 
 class ParishFeatureTest extends AbstractModelFeatureTest
@@ -28,7 +30,7 @@ class ParishFeatureTest extends AbstractModelFeatureTest
         $this->testUser->assignRole(RoleService::ROLE_ADMIN);
     }
 
-    protected function factory(): \Illuminate\Database\Eloquent\Factories\Factory
+    protected function factory(): Factory
     {
         $city = City::factory()->create();
 

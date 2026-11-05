@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,10 +18,5 @@ use App\Models\Rites\Funeral;
 
 interface CreatesFunerals
 {
-    /**
-     * @param User $user
-     * @param array $input
-     * @return Funeral
-     */
     public function create(User $user, array $input): Funeral;
 }

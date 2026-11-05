@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -28,22 +29,22 @@ class TeamPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new TeamPolicy();
+        $this->policy = new TeamPolicy;
     }
 
-    public function testUserWithoutCitiesCannotIndex(): void
+    public function test_user_without_cities_cannot_index(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->index($user));
     }
 
-    public function testUserWithoutCitiesCannotCreate(): void
+    public function test_user_without_cities_cannot_create(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testUserWithWritableCityCanIndex(): void
+    public function test_user_with_writable_city_can_index(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
@@ -51,7 +52,7 @@ class TeamPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testUserWithWritableCityCanCreate(): void
+    public function test_user_with_writable_city_can_create(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
@@ -59,7 +60,7 @@ class TeamPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->create($user));
     }
 
-    public function testUserCannotUpdateTeamFromOtherCity(): void
+    public function test_user_cannot_update_team_from_other_city(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
@@ -67,7 +68,7 @@ class TeamPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->update($user, $team));
     }
 
-    public function testUserCannotDeleteTeamFromOtherCity(): void
+    public function test_user_cannot_delete_team_from_other_city(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
@@ -75,7 +76,7 @@ class TeamPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->delete($user, $team));
     }
 
-    public function testUserWithWritableCityCanUpdateOwnTeam(): void
+    public function test_user_with_writable_city_can_update_own_team(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();

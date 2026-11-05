@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,12 +30,10 @@
 
 namespace App\Liturgy\ItemHelpers;
 
-
 use Illuminate\Support\Str;
 
 class FreetextItemHelper extends AbstractItemHelper
 {
-
     protected $field = 'description';
 
     public function getField(): string
@@ -48,8 +46,11 @@ class FreetextItemHelper extends AbstractItemHelper
         $this->field = $field;
     }
 
-    public function getText($shorten = false) {
-        if(!$this->item->data[$this->field]) return '';
+    public function getText($shorten = false)
+    {
+        if (! $this->item->data[$this->field]) {
+            return '';
+        }
         $s = strtr($this->item->data[$this->field], [
             '</p>' => "\r\n",
             '<br>' => "\n",
@@ -61,7 +62,7 @@ class FreetextItemHelper extends AbstractItemHelper
         if ($shorten) {
             return Str::limit($s, $shorten, '...', true);
         }
+
         return $s;
     }
-
 }

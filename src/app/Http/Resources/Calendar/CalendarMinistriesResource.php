@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -45,8 +45,11 @@ class CalendarMinistriesResource extends JsonResource
         $data = [];
         foreach ($this->participantsWithMinistry->groupBy('pivot.category') as $category => $participants) {
             $data[$category] = [];
-            foreach ($participants as $participant) $data[$category][] = new CalendarParticipantResource($participant);
+            foreach ($participants as $participant) {
+                $data[$category][] = new CalendarParticipantResource($participant);
+            }
         }
+
         return $data;
     }
 }

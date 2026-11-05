@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,44 +30,41 @@
 
 namespace App\Reports;
 
-use App\Models\Liturgy\Text;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\FileNameService;
-use App\Services\LiturgyService;
 use App\Services\NameService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Style\Tab;
 
-
 /**
  * Class BulletinReport
- * @package App\Reports
  */
 class RitesReport extends AbstractWordDocumentReport
 {
-
     public const FILE_TITLE = 'Freud und Leid';
-    public const FILE_SIGNATURE = '91.8';
 
+    public const FILE_SIGNATURE = '91.8';
 
     /**
      * @var string
      */
     public $title = 'Freud & Leid';
+
     /**
      * @var string
      */
     public $group = 'Listen';
+
     /**
      * @var string
      */
@@ -75,21 +72,19 @@ class RitesReport extends AbstractWordDocumentReport
 
     protected $data = [];
 
-
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
+
         return Inertia::render('Report/Rites/Setup', compact('cities'));
     }
 
-
     /**
-     * @param Request $request
      * @return RedirectResponse|string
      */
     public function render(Request $request)
@@ -161,9 +156,8 @@ class RitesReport extends AbstractWordDocumentReport
             )
 
         );
-        return;
-    }
 
+    }
 
     /**
      * @return Section
@@ -180,9 +174,9 @@ class RitesReport extends AbstractWordDocumentReport
                 'marginRight' => Converter::cmToTwip('0.25'),
             ]
         );
+
         return $section;
     }
-
 
     public function heading(Section $section, $title): void
     {
@@ -193,12 +187,12 @@ class RitesReport extends AbstractWordDocumentReport
     public function getListRun(Section $section): TextRun
     {
         return $section->addTextRun([
-                                        'tabs' => [
-                                            new Tab('right', Converter::cmToTwip(6)),
-                                            new Tab('left', Converter::cmToTwip(6.7)),
-                                            new Tab('left', Converter::cmToTwip(7)),
-                                        ],
-                                    ]);
+            'tabs' => [
+                new Tab('right', Converter::cmToTwip(6)),
+                new Tab('left', Converter::cmToTwip(6.7)),
+                new Tab('left', Converter::cmToTwip(7)),
+            ],
+        ]);
     }
 
     public function renderDateColumn(TextRun $run, $service, &$lastDate): void
@@ -210,14 +204,14 @@ class RitesReport extends AbstractWordDocumentReport
         $lastDate = $service->date;
         $run->addText("\t");
         if (count($this->data['includeCities']) > 1) {
-            $run->addText('(' . substr(utf8_decode($service->city->name), 0, 1) . ')');
+            $run->addText('('.substr(utf8_decode($service->city->name), 0, 1).')');
         }
         $run->addText("\t");
     }
 
     public function renderBaptisms(Section $section, Collection $baptisms): void
     {
-        if (!count($baptisms)) {
+        if (! count($baptisms)) {
             return;
         }
         $this->heading($section, 'Getauft wurden:');
@@ -235,7 +229,7 @@ class RitesReport extends AbstractWordDocumentReport
 
     public function renderWeddings(Section $section, Collection $weddings): void
     {
-        if (!count($weddings)) {
+        if (! count($weddings)) {
             return;
         }
         $this->heading($section, 'Kirchlich getraut wurden:');
@@ -248,14 +242,14 @@ class RitesReport extends AbstractWordDocumentReport
 
                 $partners = [];
                 foreach ([1, 2] as $index) {
-                    $nameField = 'spouse' . $index . '_name';
+                    $nameField = 'spouse'.$index.'_name';
                     $name = NameService::fromName($wedding->$nameField);
-                    $nameField = 'spouse' . $index . '_birth_name';
+                    $nameField = 'spouse'.$index.'_birth_name';
                     $birthName = $wedding->$nameField;
 
-                    $partners[] = $name->format(NameService::FIRST_LAST) . ($birthName ? ', geb. ' . $birthName : '');
+                    $partners[] = $name->format(NameService::FIRST_LAST).($birthName ? ', geb. '.$birthName : '');
                 }
-                $run->addText(join(' und ', $partners));
+                $run->addText(implode(' und ', $partners));
                 $run->addTextBreak();
             }
         }
@@ -263,7 +257,7 @@ class RitesReport extends AbstractWordDocumentReport
 
     public function renderBaptismDates(Section $section, Collection $baptismalServices): void
     {
-        if (!count($baptismalServices)) {
+        if (! count($baptismalServices)) {
             return;
         }
         $this->heading($section, 'Nächste Tauftermine:');
@@ -272,22 +266,21 @@ class RitesReport extends AbstractWordDocumentReport
         foreach ($this->data['includeCities'] as $cityId) {
             $city = City::find($cityId);
             $run->addText("\t");
-            $run->addText($city->name . "\t\t");
+            $run->addText($city->name."\t\t");
 
             $dates = [];
             foreach ($baptismalServices[$cityId] as $baptismalService) {
                 /** @var Service $baptismalService */
                 $dates[] = $baptismalService->date->isoFormat('D. MMMM');
             }
-            $run->addText(join(', ', $dates));
+            $run->addText(implode(', ', $dates));
             $run->addTextBreak();
         }
     }
 
-
     public function renderFunerals(Section $section, Collection $funerals): void
     {
-        if (!count($funerals)) {
+        if (! count($funerals)) {
             return;
         }
         $this->heading($section, 'Bestattet wurden:');
@@ -300,12 +293,11 @@ class RitesReport extends AbstractWordDocumentReport
                 $name = NameService::fromName($funeral->buried_name);
                 $run->addText(
                     $name->format(NameService::FIRST_LAST)
-                    . ($funeral->birthName ? ', geb. ' . $funeral->birthName : '')
-                    . ', ' . $funeral->age . ' Jahre'
+                    .($funeral->birthName ? ', geb. '.$funeral->birthName : '')
+                    .', '.$funeral->age.' Jahre'
                 );
                 $run->addTextBreak();
             }
         }
     }
-
 }

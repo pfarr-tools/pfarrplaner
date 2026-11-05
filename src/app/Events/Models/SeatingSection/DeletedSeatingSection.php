@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,6 +24,7 @@ class DeletedSeatingSection
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     protected User $user;
+
     protected SeatingSection $seatingSection;
 
     public function __construct(User $user, SeatingSection $seatingSection)

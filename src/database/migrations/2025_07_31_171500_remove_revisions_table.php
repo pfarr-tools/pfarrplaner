@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -48,7 +48,7 @@ class RemoveRevisionsTable extends Migration
      */
     public function down()
     {
-        if (!Schema::hasTable('revisions')) {
+        if (! Schema::hasTable('revisions')) {
             Schema::create(
                 'revisions',
                 function ($table) {
@@ -61,7 +61,7 @@ class RemoveRevisionsTable extends Migration
                     $table->text('new_value')->nullable();
                     $table->timestamps();
 
-                    $table->index(array('revisionable_id', 'revisionable_type'));
+                    $table->index(['revisionable_id', 'revisionable_type']);
                 }
             );
         }

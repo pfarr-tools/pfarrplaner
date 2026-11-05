@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,43 +30,45 @@
 
 namespace App\Seating;
 
-
-use League\Flysystem\Adapter\AbstractAdapter;
-
 class SeatingModels
 {
-
-
-    public static function all() {
+    public static function all()
+    {
         $seatingModels = [];
-        foreach (glob(app_path('Seating') . '/*SeatingModel.php') as $file) {
+        foreach (glob(app_path('Seating').'/*SeatingModel.php') as $file) {
             if (substr(pathinfo($file, PATHINFO_FILENAME), 0, 8) !== 'Abstract') {
-                $seatingModelClass = 'App\\Seating\\' . pathinfo($file, PATHINFO_FILENAME);
+                $seatingModelClass = 'App\\Seating\\'.pathinfo($file, PATHINFO_FILENAME);
                 if (class_exists($seatingModelClass)) {
                     /** @var AbstractSeatingModel $seatingModel */
-                    $seatingModel = new $seatingModelClass();
+                    $seatingModel = new $seatingModelClass;
                     $seatingModels[$seatingModel->getTitle()] = $seatingModel;
                 }
             }
         }
         ksort($seatingModels);
+
         return $seatingModels;
     }
 
-    public static function select() {
+    public static function select()
+    {
         $seatingModels = [];
         foreach (self::all() as $title => $class) {
             $seatingModels[get_class($class)] = $title;
         }
+
         return $seatingModels;
     }
 
-    public static function byTitle($title) {
+    public static function byTitle($title)
+    {
         /** @var AbstractSeatingModel $class */
         foreach (self::all() as $class) {
-            if ($class->getTitle() == $title) return $class;
+            if ($class->getTitle() == $title) {
+                return $class;
+            }
         }
+
         return null;
     }
-
 }

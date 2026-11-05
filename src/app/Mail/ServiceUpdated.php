@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,23 +30,16 @@
 
 namespace App\Mail;
 
-use App\Models\Service;
 use App\Models\People\User;
+use App\Models\Service;
 
 /**
  * Class ServiceUpdated
- * @package App\Mail
  */
 class ServiceUpdated extends AbstractServiceMailable
 {
-
     /**
      * Create a new message instance.
-     *
-     * @param User $user
-     * @param Service $service
-     * @param User $originatingUser
-     * @param array $data
      */
     public function __construct(User $user, Service $service, User $originatingUser, array $data)
     {
@@ -95,12 +88,13 @@ class ServiceUpdated extends AbstractServiceMailable
             'ical/ical',
             ['services' => [$this->service], 'token' => null, 'action' => null, 'key' => null]
         )->render();
-        $icsTitle = 'GD ' . $this->service->date->format('Ymd') . ' ' . $this->service->timeText(
-                false
-            ) . ' ' . $this->service->locationText() . '.ics';
+        $icsTitle = 'GD '.$this->service->date->format('Ymd').' '.$this->service->timeText(
+            false
+        ).' '.$this->service->locationText().'.ics';
+
         return $this->subject(
-            'Änderungen am einem Gottesdienst vom ' . $this->service->dateText() . ', ' . $this->service->timeText(
-            ) . ' (' . $this->service->locationText() . ')'
+            'Änderungen am einem Gottesdienst vom '.$this->service->dateText().', '.$this->service->timeText(
+            ).' ('.$this->service->locationText().')'
         )
             ->view('mail.notifications.service-update')->with(
                 [

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,37 +30,35 @@
 
 namespace App\StudyHelpers;
 
-use App\StudyHelpers\AbstractStudyHelper;
-use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class PMWueStudyHelper extends AbstractStudyHelper
 {
-
     public $title = 'Predigtmeditation aus Württemberg';
 
-    function read(array $data): array
+    public function read(array $data): array
     {
         return [];
     }
 
-    function getLinks(array $data): array
+    public function getLinks(array $data): array
     {
         $myRecords = $this->getPMWueLinks($this->getDaySlug($data));
         $data['links'] = array_merge($data['links'] ?? [], $myRecords ?? []);
+
         return $data;
     }
 
-
     protected function getDaySlug($data): string
     {
-        if (!isset($data['title'])) {
+        if (! isset($data['title'])) {
             return '';
         }
         $title = Str::contains($data['title'], '(') ? trim(Str::before($data['title'], '(')) : trim($data['title']);
         $title = Str::replace('So.', 'Sonntag', $title);
         $title = Str::replace('. Advent', '. Sonntag im Advent', $title);
+
         return Str::slug($title);
     }
 
@@ -69,10 +67,12 @@ class PMWueStudyHelper extends AbstractStudyHelper
         if (Cache::has('pmwue-'.$slug)) {
             return Cache::get('pmwue-'.$slug);
         } else {
-            if ('' == ($content = $this->getContent('https://www.fachstelle-gottesdienst.de/predigt/predigtmeditationen-aus-wuerttemberg/' . $slug))) return [];
+            if ('' == ($content = $this->getContent('https://www.fachstelle-gottesdienst.de/predigt/predigtmeditationen-aus-wuerttemberg/'.$slug))) {
+                return [];
+            }
             $links = [];
 
-            $doc = new \DOMDocument();
+            $doc = new \DOMDocument;
             $doc->loadHTML(
                 utf8_decode(Str::between($content, '<!--TYPO3SEARCH_begin-->', '<!--TYPO3SEARCH_end-->'))
             );
@@ -86,15 +86,17 @@ class PMWueStudyHelper extends AbstractStudyHelper
                     }
                     foreach ($section->getElementsByTagName('a') as $link) {
                         $url = $link->getAttribute('href');
-                        if (!Str::startsWith($url, 'http')) $url = 'https://www.fachstelle-gottesdienst.de/'.$url;
-                        $links['[' . $sectionTitle . '] ' . trim($link->nodeValue)] = $url;
+                        if (! Str::startsWith($url, 'http')) {
+                            $url = 'https://www.fachstelle-gottesdienst.de/'.$url;
+                        }
+                        $links['['.$sectionTitle.'] '.trim($link->nodeValue)] = $url;
                     }
                 }
                 $sectionIdx++;
             }
             Cache::put('pmwue-'.$slug, $links);
+
             return $links;
         }
     }
-
 }

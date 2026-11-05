@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,14 +30,11 @@
 
 namespace App\HomeScreen\Tabs;
 
-
 class HomeScreenTabFactory
 {
-
     /**
      * Get homescreen tabs
-     * @param array $config
-     * @param array $filter
+     *
      * @return array
      */
     public static function get(array $config, array $filter = [])
@@ -46,11 +43,15 @@ class HomeScreenTabFactory
         foreach ((glob(app_path('HomeScreen/Tabs/*HomeScreenTab.php'))) as $file) {
             if (basename($file, 'HomeScreenTab.php') != 'Abstract') {
                 $key = lcfirst(basename($file, 'HomeScreenTab.php'));
-                if (!isset($config[$key])) $config[$key] = [];
-                $class = 'App\\HomeScreen\\Tabs\\' . basename($file, '.php');
+                if (! isset($config[$key])) {
+                    $config[$key] = [];
+                }
+                $class = 'App\\HomeScreen\\Tabs\\'.basename($file, '.php');
                 /** @var AbstractHomeScreenTab $object */
                 $object = new $class($config);
-                if ($object->isAvailable()) $homeScreenTabs[$object->getTitle()] = $object;
+                if ($object->isAvailable()) {
+                    $homeScreenTabs[$object->getTitle()] = $object;
+                }
             }
         }
         ksort($homeScreenTabs);
@@ -62,22 +63,28 @@ class HomeScreenTabFactory
             $allTabs = $tabs;
             $tabs = [];
             foreach ($filter as $tab) {
-                if (isset($allTabs[$tab])) $tabs[$tab] = $allTabs[$tab];
+                if (isset($allTabs[$tab])) {
+                    $tabs[$tab] = $allTabs[$tab];
+                }
             }
         }
+
         return $tabs;
     }
 
     /**
      * Get a single tab with contents
-     * @param $tab
+     *
      * @throws \Exception
      */
-    public static function getOne($tab, $tabIndex) {
-        $class = 'App\\HomeScreen\\Tabs\\' . ucfirst($tab['type'].'HomeScreenTab');
+    public static function getOne($tab, $tabIndex)
+    {
+        $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tab['type'].'HomeScreenTab');
         if (class_exists($class)) {
             $tabObject = new $class($tab['config']);
-            if (!$tabObject->isAvailable()) return null;
+            if (! $tabObject->isAvailable()) {
+                return null;
+            }
         } else {
             throw new \Exception('Class not found: '.$class);
         }
@@ -86,29 +93,34 @@ class HomeScreenTabFactory
         $result['config'] = $tab['config'];
         $result['key'] = $result['type'].$tabIndex;
         $result['index'] = $tabIndex;
+
         return $result;
     }
 
     /**
      * Get an item count for a single tab
-     * @param $tab
+     *
      * @throws \Exception
      */
-    public static function getCount($tab, $tabIndex) {
-        $class = 'App\\HomeScreen\\Tabs\\' . ucfirst($tab['type'].'HomeScreenTab');
+    public static function getCount($tab, $tabIndex)
+    {
+        $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tab['type'].'HomeScreenTab');
         if (class_exists($class)) {
             /** @var AbstractHomeScreenTab $tabObject */
             $tabObject = new $class($tab['config']);
-            if (!$tabObject->isAvailable()) return null;
+            if (! $tabObject->isAvailable()) {
+                return null;
+            }
         } else {
             throw new \Exception('Class not found: '.$class);
         }
+
         return $tabObject->getCount();
     }
 
     /**
      * Get all homescreen tabs
-     * @param array $config
+     *
      * @return array
      */
     public static function all(array $config)
@@ -116,23 +128,25 @@ class HomeScreenTabFactory
         return self::get($config, []);
     }
 
-    public static function available() {
+    public static function available()
+    {
         $tabs = self::get([]);
         $available = [];
         /**
-         * @var  $key
+         * @var $key
          * @var AbstractHomeScreenTab $tab
          */
-        foreach ($tabs as $key =>$tab) {
+        foreach ($tabs as $key => $tab) {
             if ($tab->isAvailable()) {
                 $available[$key] = [
-                    'type' =>  $key,
+                    'type' => $key,
                     'title' => $tab->getTitle(),
                     'description' => $tab->getDescription(),
                     'config' => $tab->getConfig(),
                 ];
             }
         }
+
         return $available;
     }
 
@@ -140,7 +154,7 @@ class HomeScreenTabFactory
     {
         $titles = [];
         foreach ($tabsConfig as $tabIndex => $tab) {
-            $class = 'App\\HomeScreen\\Tabs\\' . ucfirst($tab['type'].'HomeScreenTab');
+            $class = 'App\\HomeScreen\\Tabs\\'.ucfirst($tab['type'].'HomeScreenTab');
             if (class_exists($class)) {
                 $tabObject = new $class($tab['config']);
                 $titles[$tabIndex] = $tabObject->getTitle();
@@ -149,7 +163,7 @@ class HomeScreenTabFactory
             }
 
         }
+
         return $titles;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,24 +37,21 @@
 
 namespace App\Tools;
 
-
 use Carbon\Carbon;
 
 /**
  * Class StringTool
- * @package App\Tools
  */
 class StringTool
 {
     /**
-     * @param $s
-     * @param bool $clockText
-     * @param string $separator
+     * @param  bool  $clockText
+     * @param  string  $separator
      * @return string
      */
     public static function timeString($s, $clockText = true, $separator = ':')
     {
-        return Carbon::createFromTimeString($s)->isoFormat('HH' . $separator . 'mm') . ($clockText ? ' Uhr' : '');
+        return Carbon::createFromTimeString($s)->isoFormat('HH'.$separator.'mm').($clockText ? ' Uhr' : '');
     }
 
     public static function durationText(Carbon $from, Carbon $to): string
@@ -62,18 +59,16 @@ class StringTool
         if ($from == $to) {
             return $from->format('d.m.Y');
         } elseif ($from->year == $to->year) {
-            return $from->format('d.m.') . ' - ' . $to->format('d.m.Y');
+            return $from->format('d.m.').' - '.$to->format('d.m.Y');
         } else {
-            return $from->format('d.m.Y') . ' - ' . $to->format('d.m.Y');
+            return $from->format('d.m.Y').' - '.$to->format('d.m.Y');
         }
+
         return '';
     }
 
     /**
-     * @param $count
-     * @param $singular
-     * @param $plural
-     * @param string $zeroString
+     * @param  string  $zeroString
      * @return string
      */
     public static function pluralString($count, $singular, $plural, $zeroString = '')
@@ -81,30 +76,29 @@ class StringTool
         if ($count == 0) {
             return $zeroString ?: $plural;
         }
+
         return ($count == 1) ? $singular : $plural;
     }
 
     /**
-     * @param $s
-     * @param $maxLength
      * @return string
      */
     public static function trimToLen($s, $maxLength)
     {
         if (strlen($s) > $maxLength) {
             $offset = ($maxLength - 3) - strlen($s);
-            $s = substr($s, 0, strrpos($s, ' ', $offset)) . '...';
+            $s = substr($s, 0, strrpos($s, ' ', $offset)).'...';
         }
+
         return $s;
     }
 
     /**
-     * @param $time
-     * @param bool $uhr
-     * @param string $separator
-     * @param bool $skipMinutes
-     * @param bool $nbsp
-     * @param bool $leadingZero
+     * @param  bool  $uhr
+     * @param  string  $separator
+     * @param  bool  $skipMinutes
+     * @param  bool  $nbsp
+     * @param  bool  $leadingZero
      * @return string
      */
     public static function timeText(
@@ -115,20 +109,20 @@ class StringTool
         $nbsp = false,
         $leadingZero = false
     ) {
-        if (!is_numeric($time)) {
+        if (! is_numeric($time)) {
             $time = strtotime($time);
         }
-        $format = ($leadingZero ? '%H' : '%k') . $separator . '%M';
+        $format = ($leadingZero ? '%H' : '%k').$separator.'%M';
         if ($skipMinutes) {
-            if ((int)strftime('%M', $time) == 0) {
+            if ((int) strftime('%M', $time) == 0) {
                 $format = '%H';
             }
         }
-        return trim(strftime($format, $time) . ($uhr ? ($nbsp ? '&nbsp;' : ' ') . 'Uhr' : ''));
+
+        return trim(strftime($format, $time).($uhr ? ($nbsp ? '&nbsp;' : ' ').'Uhr' : ''));
     }
 
     /**
-     * @param $text
      * @return string
      */
     public static function indent($text)
@@ -144,13 +138,10 @@ class StringTool
             }
             $lines[$index] = str_pad($line, 4 * $indent, ' ', STR_PAD_LEFT);
         }
-        return join("\n", $lines);
+
+        return implode("\n", $lines);
     }
 
-    /**
-     * @param string $s
-     * @return string
-     */
     public static function sanitizeXMLString(string $s): string
     {
         return htmlspecialchars($s, ENT_XML1 | ENT_COMPAT, 'UTF-8');

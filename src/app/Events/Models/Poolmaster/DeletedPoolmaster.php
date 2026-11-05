@@ -4,6 +4,7 @@ namespace App\Events\Models\Poolmaster;
 
 use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -13,12 +14,11 @@ class DeletedPoolmaster
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /** @var User $user */
+    /** @var User */
     protected $user;
 
-    /** @var Poolmaster $poolmaster */
+    /** @var Poolmaster */
     protected $poolmaster;
-
 
     public function __construct(User $user, Poolmaster $poolmaster)
     {
@@ -29,7 +29,7 @@ class DeletedPoolmaster
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
+     * @return array<int, Channel>
      */
     public function broadcastOn(): array
     {

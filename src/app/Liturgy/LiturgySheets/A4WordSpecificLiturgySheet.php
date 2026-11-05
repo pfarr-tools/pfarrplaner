@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,10 +30,7 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
 use App\Documents\Word\DefaultWordDocument;
-use App\Liturgy\Bible\BibleText;
-use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
@@ -50,13 +47,18 @@ use PhpOffice\PhpWord\SimpleType\JcTable;
 class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Ablaufplan und Texte (DIN A4)';
+
     protected $icon = 'fa fa-file-word';
 
-    /** @var Service $service  */
+    /** @var Service */
     protected $service = null;
+
     protected $extension = 'docx';
+
     protected $configurationPage = 'Liturgy/LiturgySheets/A4WordSpecificLiturgySheetConfiguration';
+
     protected $configurationComponent = 'A4WordSpecificLiturgySheetConfiguration';
+
     protected $currentRecipient = '';
 
     protected $defaultConfig = [
@@ -76,7 +78,7 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
     public function render(Service $service)
     {
-        if (!$this->config['includeTexts']) {
+        if (! $this->config['includeTexts']) {
             $this->config['includeAllTexts']
                 = $this->config['includeAdditionalHeaders']
                 = $this->config['includeSongTexts']
@@ -90,7 +92,7 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
         $this->service = $service;
 
-        $doc = new DefaultWordDocument();
+        $doc = new DefaultWordDocument;
         $this->setProperties($doc);
         $doc->getPhpWord()->addTableStyle('Ablauf', ['borderSize' => 6, 'borderColor' => '444444', 'cellMargin' => 80, 'alignment' => JcTable::START]);
 
@@ -99,7 +101,9 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
             foreach ($this->config['recipients'] as $recipient) {
                 $this->currentRecipient = $recipient;
                 $doc->setRecipient($recipient);
-                if (!$first) $doc->getSection()->addPageBreak();
+                if (! $first) {
+                    $doc->getSection()->addPageBreak();
+                }
                 $first = false;
                 $this->renderLiturgyTable($doc, $recipient);
 
@@ -110,11 +114,11 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
                     foreach ($this->service->liturgyBlocks as $block) {
                         foreach ($block->items as $item) {
                             if ($this->config['includeAllTexts'] || in_array(
-                                    $recipient,
-                                    $item->recipients()
-                                ) || $this->config['includeAdditionalHeaders']) {
-                                if (!$hasHeader) {
-                                    $doc->getSection()->addTitle('Texte für ' . $recipient, 1);
+                                $recipient,
+                                $item->recipients()
+                            ) || $this->config['includeAdditionalHeaders']) {
+                                if (! $hasHeader) {
+                                    $doc->getSection()->addTitle('Texte für '.$recipient, 1);
                                     $hasHeader = true;
                                 }
                                 $doc->getSection()->addTitle($item->title, 2);
@@ -125,8 +129,8 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
                             if ($this->config['includeAllTexts']
                                 || in_array($recipient, $item->recipients())
                                 || ($this->config['includeSongTexts'] && (in_array($item->data_type, ['song', 'psalm']
-                                    )))) {
-                                if (method_exists($this, ($method = 'render' . ucfirst($item->data_type . 'Item')))) {
+                                )))) {
+                                if (method_exists($this, ($method = 'render'.ucfirst($item->data_type.'Item')))) {
                                     $this->$method($doc, $item);
                                 }
                             }
@@ -142,7 +146,8 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         return $doc->sendToBrowser($this->getFileName($service));
     }
 
-    protected function renderLiturgyTable(DefaultWordDocument $doc, $recipient = '') {
+    protected function renderLiturgyTable(DefaultWordDocument $doc, $recipient = '')
+    {
         $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][1]);
         $run->addText($this->service->titleText(false), $doc->getConfig()['styles']['fonts']['titles'][1]);
         $run->addTextBreak();
@@ -150,7 +155,9 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
                       .$this->service->locationText(), $doc->getConfig()['styles']['fonts']['titles'][1]);
         $doc->getSection()->addTitle($run, 0);
 
-        if (!$this->config['includeTable']) return;
+        if (! $this->config['includeTable']) {
+            return;
+        }
 
         if ($recipient) {
             $doc->renderNormalText('Ablaufplan für '.$recipient, ['italic' => true], true);
@@ -161,7 +168,7 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
             $table = $doc->getSection()->addTable('Ablauf');
             foreach ($block->items as $item) {
-                if (method_exists($this, ($method = 'render' . ucfirst($item->data_type . 'ItemRow')))) {
+                if (method_exists($this, ($method = 'render'.ucfirst($item->data_type.'ItemRow')))) {
                     $table->addRow();
                     $this->$method($doc, $table, $item);
                 }
@@ -170,7 +177,8 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
     }
 
-    protected function setProperties (DefaultWordDocument $doc) {
+    protected function setProperties(DefaultWordDocument $doc)
+    {
         $properties = $doc->getPhpWord()->getDocInfo();
         $properties->setCreator(Auth::user()->fullName());
         $properties->setCompany(Auth::user()->office ?? '');
@@ -183,38 +191,37 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
     public function getFileTitle(): string
     {
-        return 'Gottesdienst' . (($this->service) && ($this->service->sermon) ? ' - ' . $this->service->sermon->title : '');
+        return 'Gottesdienst'.(($this->service) && ($this->service->sermon) ? ' - '.$this->service->sermon->title : '');
     }
 
-    protected function renderRow(Table $table, Item $item, $text) {
+    protected function renderRow(Table $table, Item $item, $text)
+    {
         $table->addCell(Converter::cmToTwip(4.3))->addText($item->title, ['bold' => true]);
         $table->addCell(Converter::cmToTwip(8.5))->addText($text);
         $this->renderRecipients($table, $item);
 
     }
 
-    protected function renderRecipients(Table $table, Item $item) {
+    protected function renderRecipients(Table $table, Item $item)
+    {
         $cell = $table->addCell(Converter::cmToTwip(4.3));
         $run = $cell->addTextRun();
         $first = true;
         foreach ($item->recipients() as $recipient) {
-            if (!$first) $run->addText(', ');
+            if (! $first) {
+                $run->addText(', ');
+            }
             $run->addText($recipient, $recipient == $this->currentRecipient ? ['fgColor' => 'yellow'] : []);
             $first = false;
         }
     }
 
-    /**
-     * @param DefaultWordDocument $doc
-     * @param Table $table
-     * @param Item $item
-     */
     protected function renderFreetextItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         $text = '';
         if ($item->data['description']) {
             $text = Replacement::replaceAll($item->getHelper()->getText(), $this->service);
-            $text = (false !== strpos($text, "\n")) ? explode("\n", $text)[0] : substr($text, 0, 80).'...';
+            $text = (strpos($text, "\n") !== false) ? explode("\n", $text)[0] : substr($text, 0, 80).'...';
         }
         $this->renderRow($table, $item, $text);
     }
@@ -233,7 +240,9 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
     protected function renderSongItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
-        if (!isset($item->data['song'])) return;
+        if (! isset($item->data['song'])) {
+            return;
+        }
         /** @var SongItemHelper $helper */
         $helper = $item->getHelper();
         $this->renderRow($table, $item, $helper->getTitleText());
@@ -246,23 +255,27 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
     protected function renderFreetextItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!$item->data['description']) return;
+        if (! $item->data['description']) {
+            return;
+        }
         $doc->renderNormalText(Replacement::replaceAll($item->getHelper()->getText(), $this->service));
     }
 
     protected function renderSermonItem(DefaultWordDocument $doc, Item $item)
     {
-        if (null === $this->service->sermon) {
+        if ($this->service->sermon === null) {
             $doc->renderNormalText('Für diesen Gottesdienst wurde noch keine Predigt angelegt.', ['italic' => true]);
         } else {
-            if (!$this->service->sermon->text) return;
+            if (! $this->service->sermon->text) {
+                return;
+            }
             $text = strtr($this->service->sermon->text, [
                 '<h1>' => '<h3>', '</h1>' => '</h3>',
                 '<h2>' => '<h4>', '</h2>' => '</h4>',
             ]);
             $dom = DefaultWordDocument::createDomDocumentFromHtml($text);
             $body = $dom->getElementsByTagName('body')->item(0);
-            if (!$body) {
+            if (! $body) {
                 return;
             }
             $nodes = [];
@@ -285,19 +298,23 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!$item->data['psalm']['text']) return;
+        if (! $item->data['psalm']['text']) {
+            return;
+        }
         /** @var PsalmItemHelper $helper */
         $helper = $item->getHelper();
-        $doc->getSection()->addTitle($helper->getTitleText(),3);
+        $doc->getSection()->addTitle($helper->getTitleText(), 3);
         $doc->renderNormalText($item->data['psalm']['text']);
     }
 
     protected function renderSongItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!isset($item->data['song'])) return;
+        if (! isset($item->data['song'])) {
+            return;
+        }
         /** @var SongItemHelper $helper */
         $helper = $item->getHelper();
-        $doc->getSection()->addTitle($helper->getTitleText(),3);
+        $doc->getSection()->addTitle($helper->getTitleText(), 3);
         if (isset($item->data['song'])) {
             if (isset($item->data['song']['song']['copyrights'])) {
                 if ($item->data['song']['song']['copyrights']) {
@@ -305,7 +322,9 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
                 }
             }
         }
-        if (!$this->config['includeSongTexts']) return;
+        if (! $this->config['includeSongTexts']) {
+            return;
+        }
 
         foreach ($helper->getActiveVerses() as $verse) {
             if ($verse['refrain_before']) {
@@ -320,12 +339,10 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
     protected function renderReadingItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!$item->data['reference']) {
+        if (! $item->data['reference']) {
             return;
         }
         $helper = new ReadingItemHelper($item);
         $helper->renderToWordDocument($doc, $this->config['includeFullReadings']);
     }
-
-
 }

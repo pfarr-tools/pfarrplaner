@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,32 +30,38 @@
 
 namespace App\Liturgy\ItemHelpers;
 
-
 class PsalmItemHelper extends AbstractItemHelper
 {
-
     public function getCodeText()
     {
-        if (!isset($this->item->data['psalm'])) return '';
+        if (! isset($this->item->data['psalm'])) {
+            return '';
+        }
         $codeText = $this->item->data['psalm']['code'] ?? $this->item->data['psalm']['songbook_abbreviation'] ?? '';
         $codeText .= ' '.($this->item->data['psalm']['reference'] ?? '')
             .(isset($this->item->data['psalm']['alt_eg']) ? ' (EG '.$this->item->data['psalm']['alt_eg'].')' : '');
+
         return $codeText;
     }
 
     public function getTitleText()
     {
-        if (!isset($this->item->data['psalm'])) return '';
+        if (! isset($this->item->data['psalm'])) {
+            return '';
+        }
+
         return $this->item->data['psalm']['name'] ?? '';
     }
 
     public function getVerses()
     {
-        if (!isset($this->item->data['psalm'])) return [];
+        if (! isset($this->item->data['psalm'])) {
+            return [];
+        }
         $verses = [];
         $verse = [];
         $indent = false;
-        foreach(explode("\n", $this->item->data['psalm']['text']) as $line) {
+        foreach (explode("\n", $this->item->data['psalm']['text']) as $line) {
             if ($indent && (substr($line, 0, 1) != "\t")) {
                 $indent = false;
                 $verses[] = $verse;
@@ -65,7 +71,10 @@ class PsalmItemHelper extends AbstractItemHelper
                 $indent = (substr($line, 0, 1) == "\t");
             }
         }
-        if (count($verse)) $verses[] = $verse;
+        if (count($verse)) {
+            $verses[] = $verse;
+        }
+
         return $verses;
     }
 
@@ -74,12 +83,14 @@ class PsalmItemHelper extends AbstractItemHelper
         $verses = $this->getVerses();
         $stop = min($number, count($verses));
         $text = '';
-        for ($i=count($verses)-1; $i>=count($verses)-$stop; $i--) {
+        for ($i = count($verses) - 1; $i >= count($verses) - $stop; $i--) {
             $thisVerse = '';
-            foreach ($verses[$i] as $line) $thisVerse .= $line.PHP_EOL;
+            foreach ($verses[$i] as $line) {
+                $thisVerse .= $line.PHP_EOL;
+            }
             $text = $thisVerse.$text;
         }
+
         return $text;
     }
-
 }

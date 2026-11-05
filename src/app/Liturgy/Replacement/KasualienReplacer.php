@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Liturgy\Replacement;
 
-
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
@@ -44,8 +43,8 @@ class KasualienReplacer extends AbstractReplacer
     protected function getReplacementText(): string
     {
         $service = $this->service;
-        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d') . ' 0:00:00 last Sunday');
-        $nextWeek = Carbon::createFromTimeString($service->date->format('Y-m-d') . ' 0:00:00 next Sunday');
+        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 last Sunday');
+        $nextWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 next Sunday');
 
         $funerals = Funeral::where('announcement', $service->date->format('Y-m-d'))
             ->whereHas(
@@ -102,18 +101,18 @@ class KasualienReplacer extends AbstractReplacer
                 if ($baptism->service->id != $service->id) {
                     $text .= $this->renderParagraph();
                     if ($baptism->service->trueDate() == $service->trueDate()) {
-                        $text .= $this->renderParagraph('Im Gottesdienst heute ' . $baptism->service->atText() . ' ' . (count(
-                                        $baptisms
-                                    ) > 1 ? 'werden' : 'wird') . ' getauft:');
+                        $text .= $this->renderParagraph('Im Gottesdienst heute '.$baptism->service->atText().' '.(count(
+                            $baptisms
+                        ) > 1 ? 'werden' : 'wird').' getauft:');
                     } else {
-                        $text .= $this->renderParagraph('Im Gottesdienst am ' . $baptism->service->date->format(
-                                        'd.m.Y'
-                                    ) . ' ' . $baptism->service->atText() . ' ' . (count(
-                                        $baptisms
-                                    ) > 1 ? 'werden' : 'wird') . ' getauft:');
+                        $text .= $this->renderParagraph('Im Gottesdienst am '.$baptism->service->date->format(
+                            'd.m.Y'
+                        ).' '.$baptism->service->atText().' '.(count(
+                            $baptisms
+                        ) > 1 ? 'werden' : 'wird').' getauft:');
                     }
                     foreach ($baptisms as $baptism) {
-                        $text.=$this->renderParagraph($this->renderName($baptism->candidate_name) . ', ' . $baptism->candidate_address);
+                        $text .= $this->renderParagraph($this->renderName($baptism->candidate_name).', '.$baptism->candidate_address);
                     }
                 }
             }
@@ -134,16 +133,16 @@ class KasualienReplacer extends AbstractReplacer
                 if ($wedding->service->id != $service->id) {
                     $text .= $this->renderParagraph();
                     if ($wedding->service->trueDate() == $service->trueDate()) {
-                        $text .= $this->renderParagraph('Im Gottesdienst heute ' . $wedding->service->atText(
-                                    ) . ' werden kirchlich getraut:');
+                        $text .= $this->renderParagraph('Im Gottesdienst heute '.$wedding->service->atText(
+                        ).' werden kirchlich getraut:');
                     } else {
-                        $text .= $this->renderParagraph('Im Gottesdienst am ' . $wedding->service->date->format(
-                                        'd.m.Y'
-                                    ) . ' ' . $wedding->service->atText() . ' werden kirchlich getraut:');
+                        $text .= $this->renderParagraph('Im Gottesdienst am '.$wedding->service->date->format(
+                            'd.m.Y'
+                        ).' '.$wedding->service->atText().' werden kirchlich getraut:');
                     }
                     foreach ($weddings as $wedding) {
-                        $text .= $this->renderParagraph($this->renderName($wedding->spouse1_name) . ' &amp; ' . $this->renderName(
-                                        $wedding->spouse2_name));
+                        $text .= $this->renderParagraph($this->renderName($wedding->spouse1_name).' &amp; '.$this->renderName(
+                            $wedding->spouse2_name));
                     }
                 }
             }
@@ -162,19 +161,19 @@ class KasualienReplacer extends AbstractReplacer
 
             if (count($funeralArray['past'])) {
                 ksort($funeralArray['past']);
-                $text .= $this->renderParagraph('Aus unserer Gemeinde ' . StringTool::pluralString(
-                                count($funeralArray['past']),
-                                'ist',
-                                'sind'
-                            ) . ' verstorben und '
-                            . StringTool::pluralString(
+                $text .= $this->renderParagraph('Aus unserer Gemeinde '.StringTool::pluralString(
+                    count($funeralArray['past']),
+                    'ist',
+                    'sind'
+                ).' verstorben und '
+                            .StringTool::pluralString(
                                 count($funeralArray['past']),
                                 'wurde',
                                 'wurden'
-                            ) . ' kirchlich bestattet:',);
+                            ).' kirchlich bestattet:', );
                 foreach ($funeralArray['past'] as $funeral) {
-                    $text .= $this->renderParagraph($this->renderName($funeral->buried_name) . ', ' . $funeral->buried_address
-                                . ($funeral->age() ? ', ' . $funeral->age() . ' Jahre' : '') . '.');
+                    $text .= $this->renderParagraph($this->renderName($funeral->buried_name).', '.$funeral->buried_address
+                                .($funeral->age() ? ', '.$funeral->age().' Jahre' : '').'.');
                 }
                 if (count($funeralArray['future'])) {
                     $text .= $this->renderParagraph();
@@ -183,27 +182,26 @@ class KasualienReplacer extends AbstractReplacer
 
             if (count($funeralArray['future'])) {
                 ksort($funeralArray['future']);
-                $text .= $this->renderParagraph('Aus unserer Gemeinde ' . StringTool::pluralString(
-                                count($funeralArray['future']),
-                                'ist',
-                                'sind'
-                            ) . ' verstorben:');
+                $text .= $this->renderParagraph('Aus unserer Gemeinde '.StringTool::pluralString(
+                    count($funeralArray['future']),
+                    'ist',
+                    'sind'
+                ).' verstorben:');
                 foreach ($funeralArray['future'] as $funeral) {
                     $mode = $funeral->type;
                     if ($mode == 'Erdbestattung') {
                         $mode = 'Bestattung';
                     }
-                    $text .= $this->renderParagraph($this->renderName($funeral->buried_name) . ', '
-                                . $funeral->buried_address
-                                . ($funeral->age() ? ', ' . $funeral->age() . ' Jahre' : '')
-                                . '. Die ' . $mode . ' findet am ' . $funeral->service->date->isoFormat(
+                    $text .= $this->renderParagraph($this->renderName($funeral->buried_name).', '
+                                .$funeral->buried_address
+                                .($funeral->age() ? ', '.$funeral->age().' Jahre' : '')
+                                .'. Die '.$mode.' findet am '.$funeral->service->date->isoFormat(
                                     'dddd, DD. MMMM'
                                 )
-                                . ' um ' . $funeral->service->timeText(true, '.')
-                                . ' ' . $funeral->service->atText() . ' statt.');
+                                .' um '.$funeral->service->timeText(true, '.')
+                                .' '.$funeral->service->atText().' statt.');
                 }
             }
-
 
             $text .= $this->renderParagraph();
             $text .= $this->renderParagraph(
@@ -222,17 +220,15 @@ class KasualienReplacer extends AbstractReplacer
     }
 
     /**
-     * @param $s
      * @return string
      */
     protected function renderName($s)
     {
-        if (false !== strpos($s, ',')) {
+        if (strpos($s, ',') !== false) {
             $t = explode(',', $s);
-            $s = trim($t[1]) . ' ' . trim($t[0]);
+            $s = trim($t[1]).' '.trim($t[0]);
         }
+
         return $s;
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -50,9 +51,6 @@ class PapierkorbController extends Controller
         $this->middleware('auth');
     }
 
-    /**
-     * @return \Inertia\Response
-     */
     public function index(Request $request): Response
     {
         abort_unless(self::hasAdminModuleAccess($request->user()), 403);
@@ -71,11 +69,6 @@ class PapierkorbController extends Controller
         ]);
     }
 
-    /**
-     * @param string $type
-     * @param int $id
-     * @return RedirectResponse
-     */
     public function restore(Request $request, string $type, int $id): RedirectResponse
     {
         $model = $this->loadTrashedModel($type, $id);
@@ -98,11 +91,6 @@ class PapierkorbController extends Controller
         return redirect()->route('admin.trash.index')->with('success', $this->restoreMessage($type));
     }
 
-    /**
-     * @param string $type
-     * @param int $id
-     * @return RedirectResponse
-     */
     public function destroy(Request $request, string $type, int $id): RedirectResponse
     {
         $model = $this->loadTrashedModel($type, $id);
@@ -118,7 +106,7 @@ class PapierkorbController extends Controller
     public static function getAdminModuleConfig()
     {
         $user = auth()->user();
-        if (!$user || !self::hasAdminModuleAccess($user)) {
+        if (! $user || ! self::hasAdminModuleAccess($user)) {
             return false;
         }
 
@@ -132,17 +120,12 @@ class PapierkorbController extends Controller
         ];
     }
 
-    /**
-     * @param User $user
-     * @return bool
-     */
     public static function hasAdminModuleAccess(User $user): bool
     {
         return $user->writableCities->count() > 0;
     }
 
     /**
-     * @param User $user
      * @return Collection<int, array<string, mixed>>
      */
     protected function trashedRecordsForUser(User $user): Collection
@@ -160,20 +143,12 @@ class PapierkorbController extends Controller
         return $records->sortByDesc('deletedAt')->values();
     }
 
-    /**
-     * @param string $type
-     * @param int $id
-     * @return Model
-     */
     protected function loadTrashedModel(string $type, int $id): Model
     {
         return self::baseQueryForType($type)->whereKey($id)->firstOrFail();
     }
 
     /**
-     * @param string $type
-     * @param Model $model
-     * @param User $user
      * @return array<string, mixed>
      */
     protected function mapRecord(string $type, Model $model, User $user): array
@@ -187,8 +162,8 @@ class PapierkorbController extends Controller
         };
 
         $label = match ($type) {
-            'service' => trim($model->titleText(false) . ' (' . $model->date?->setTimezone('Europe/Berlin')->format('d.m.Y') . ')'),
-            'absence' => trim(($model->user?->fullName() ?: 'Abwesenheit') . ' (' . $model->durationText() . ')'),
+            'service' => trim($model->titleText(false).' ('.$model->date?->setTimezone('Europe/Berlin')->format('d.m.Y').')'),
+            'absence' => trim(($model->user?->fullName() ?: 'Abwesenheit').' ('.$model->durationText().')'),
             default => $model->label,
         };
 
@@ -204,7 +179,7 @@ class PapierkorbController extends Controller
             'label' => $label,
             'cityName' => $cityName,
             'deletedAt' => optional($model->deleted_at)->toISOString(),
-            'deletedAtText' => $model->deleted_at?->setTimezone('Europe/Berlin')->format('d.m.Y, H:i') . ' Uhr',
+            'deletedAtText' => $model->deleted_at?->setTimezone('Europe/Berlin')->format('d.m.Y, H:i').' Uhr',
             'deletedByName' => $model->deletedBy?->fullName(),
             'canRestore' => Gate::forUser($user)->allows('restore', $model),
             'canForceDelete' => Gate::forUser($user)->allows('forceDelete', $model),
@@ -214,10 +189,6 @@ class PapierkorbController extends Controller
         ];
     }
 
-    /**
-     * @param string $type
-     * @return Builder
-     */
     protected static function baseQueryForType(string $type): Builder
     {
         abort_unless(isset(self::SUPPORTED_TYPES[$type]), 404);
@@ -237,15 +208,10 @@ class PapierkorbController extends Controller
                 'deletedBy',
                 'service' => fn ($query) => $query->withTrashed()->with('city'),
             ]),
-            default => throw new \InvalidArgumentException('Unsupported trash type: ' . $type),
+            default => throw new \InvalidArgumentException('Unsupported trash type: '.$type),
         };
     }
 
-    /**
-     * @param User $user
-     * @param Model $model
-     * @return bool
-     */
     protected static function canAccessRecord(User $user, Model $model): bool
     {
         return Gate::forUser($user)->allows('restore', $model)
@@ -255,11 +221,6 @@ class PapierkorbController extends Controller
             || Gate::forUser($user)->allows('view', $model);
     }
 
-
-    /**
-     * @param string $type
-     * @return string
-     */
     protected function restoreMessage(string $type): string
     {
         return match ($type) {
@@ -272,10 +233,6 @@ class PapierkorbController extends Controller
         };
     }
 
-    /**
-     * @param string $type
-     * @return string
-     */
     protected function forceDeleteMessage(string $type): string
     {
         return match ($type) {
@@ -288,35 +245,22 @@ class PapierkorbController extends Controller
         };
     }
 
-    /**
-     * @return string
-     */
     protected static function indexUrl(): string
     {
         return Route::has('admin.trash.index') ? route('admin.trash.index') : URL::to('/admin/papierkorb');
     }
 
-    /**
-     * @param string $type
-     * @param int $id
-     * @return string
-     */
     protected static function restoreUrl(string $type, int $id): string
     {
         return Route::has('admin.trash.restore')
             ? route('admin.trash.restore', ['type' => $type, 'id' => $id])
-            : URL::to('/admin/papierkorb/' . $type . '/' . $id . '/restore');
+            : URL::to('/admin/papierkorb/'.$type.'/'.$id.'/restore');
     }
 
-    /**
-     * @param string $type
-     * @param int $id
-     * @return string
-     */
     protected static function destroyUrl(string $type, int $id): string
     {
         return Route::has('admin.trash.destroy')
             ? route('admin.trash.destroy', ['type' => $type, 'id' => $id])
-            : URL::to('/admin/papierkorb/' . $type . '/' . $id);
+            : URL::to('/admin/papierkorb/'.$type.'/'.$id);
     }
 }

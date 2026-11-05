@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,20 +32,19 @@ namespace App\Actions\Tag;
 
 use App\Actions\AbstractUpdateAction;
 use App\Contracts\Tag\UpdatesTags;
-use App\Events\Models\Tag\UpdatedLocation;
 use App\Events\Models\Tag\UpdatedTag;
 use App\Models\People\User;
 use App\Models\Tag;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class UpdateTag extends AbstractUpdateAction implements UpdatesTags
 {
-
     /**
      * Get return route
-     * @return string
      */
     public function redirectTo(): string
     {
@@ -54,21 +53,23 @@ class UpdateTag extends AbstractUpdateAction implements UpdatesTags
 
     /**
      * Update a tag
-     * @param User $user
-     * @param Tag $tag
-     * @param array $input
+     *
      * @return Tag
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Validation\ValidationException
+     *
+     * @throws AuthorizationException
+     * @throws ValidationException
      */
     public function update(User $user, Tag $tag, array $input)
     {
         Gate::forUser($user)->authorize('update', $tag);
         $input = Validator::make($input, Tag::$validationRules)->validateWithBag('updateTag');
-        if (empty($input['code'] ?? '')) $input['code'] = Str::slug($input['name']);
+        if (empty($input['code'] ?? '')) {
+            $input['code'] = Str::slug($input['name']);
+        }
         $tag->update($input);
         UpdatedTag::dispatch($user, $tag);
         $this->messages = ['success' => 'Die Kennzeichnung wurde geändert.'];
+
         return $tag;
     }
 }

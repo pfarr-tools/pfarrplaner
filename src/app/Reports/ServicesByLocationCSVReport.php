@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,26 +30,26 @@
 
 namespace App\Reports;
 
-use App\Liturgy\Bible\BibleText;
-use App\Liturgy\Bible\ReferenceParser;
 use App\Models\Location;
 use App\Models\Service;
 use App\Services\FileNameService;
-use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ServicesByLocationCSVReport extends AbstractCSVReport
 {
     public const FILE_TITLE = 'Gottesdienste';
+
     public const FILE_SIGNATURE = '50.0';
 
     /**
      * @var string
      */
     public $title = 'Gottesdienste nach Ort';
+
     /**
      * @var string
      */
@@ -57,13 +57,13 @@ class ServicesByLocationCSVReport extends AbstractCSVReport
 
     protected $inertia = true;
 
-
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
+
         return Inertia::render('Report/ServicesByLocationCSV/Setup', compact('locations'));
     }
 
@@ -87,7 +87,7 @@ class ServicesByLocationCSVReport extends AbstractCSVReport
 
         return $this->csv(
             FileNameService::make(
-                static::FILE_TITLE . ' ' . $location->name,
+                static::FILE_TITLE.' '.$location->name,
                 null,
                 static::FILE_SIGNATURE,
                 [$start, $end]
@@ -98,16 +98,16 @@ class ServicesByLocationCSVReport extends AbstractCSVReport
                     return $item->date->setTimezone('Europe/Berlin')->isoFormat('dddd, DD. MMMM');
                 },
                 'Uhrzeit' => function ($item, $key) {
-                    return $item->date->setTimezone('Europe/Berlin')->format('H:i') . ' Uhr';
+                    return $item->date->setTimezone('Europe/Berlin')->format('H:i').' Uhr';
                 },
                 'Titel' => function ($item, $key) {
                     if ($item->titleText() == 'GD') {
                         return '';
                     }
+
                     return $item->titleText(false);
                 },
             ]
         );
     }
-
 }

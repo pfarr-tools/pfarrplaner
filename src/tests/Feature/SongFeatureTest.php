@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -33,24 +34,24 @@ class SongFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testIndexLoads(): void
+    public function test_index_loads(): void
     {
         $this->actingAs($this->user)
             ->get(route('admin.songs.index'))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Admin/Song/Index'));
+            ->assertInertia(fn (Assert $page) => $page->component('Admin/Song/Index'));
     }
 
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $song = Song::factory()->create();
         $this->actingAs($this->user)
             ->get(route('admin.song.edit', $song->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Admin/Song/SongEditor'));
+            ->assertInertia(fn (Assert $page) => $page->component('Admin/Song/SongEditor'));
     }
 
-    public function testCreateSong(): void
+    public function test_create_song(): void
     {
         $this->actingAs($this->user)
             ->post(route('admin.songs.store'), [
@@ -62,7 +63,7 @@ class SongFeatureTest extends TestCase
         $this->assertTrue(Song::where('title', 'Testlied')->exists());
     }
 
-    public function testCreateSongIgnoresEmptySongbookRows(): void
+    public function test_create_song_ignores_empty_songbook_rows(): void
     {
         $songbook = Songbook::factory()->create();
 

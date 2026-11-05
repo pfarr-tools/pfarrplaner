@@ -1,4 +1,15 @@
 <?php
+
+use App\UI\Modules\AbsencesModule;
+use App\UI\Modules\AdminModule;
+use App\UI\Modules\CalendarModule;
+use App\UI\Modules\ExportsModule;
+use App\UI\Modules\InfoModule;
+use App\UI\Modules\InputsModule;
+use App\UI\Modules\OutlookExportModule;
+use App\UI\Modules\PapierkorbModule;
+use App\UI\Modules\RitesModule;
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +20,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,27 +38,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 return [
     'groups' => [
         'default' => [
-            \App\UI\Modules\CalendarModule::class,
-            \App\UI\Modules\RitesModule::class,
-            \App\UI\Modules\AbsencesModule::class,
+            CalendarModule::class,
+            RitesModule::class,
+            AbsencesModule::class,
         ],
         'Eingabe' => [
-            \App\UI\Modules\InputsModule::class,
+            InputsModule::class,
         ],
         'Ausgabe' => [
-            \App\UI\Modules\ExportsModule::class,
-            \App\UI\Modules\OutlookExportModule::class,
+            ExportsModule::class,
+            OutlookExportModule::class,
         ],
         'Administration' => [
-            \App\UI\Modules\AdminModule::class,
-            \App\UI\Modules\PapierkorbModule::class,
+            AdminModule::class,
+            PapierkorbModule::class,
         ],
         'Information' => [
-            \App\UI\Modules\InfoModule::class,
+            InfoModule::class,
         ],
     ],
 ];

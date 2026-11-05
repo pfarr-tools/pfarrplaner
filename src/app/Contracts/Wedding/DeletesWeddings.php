@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,10 +18,5 @@ use App\Models\Rites\Wedding;
 
 interface DeletesWeddings
 {
-    /**
-     * @param User $user
-     * @param Wedding $wedding
-     * @return bool|null
-     */
     public function delete(User $user, Wedding $wedding): ?bool;
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,16 +36,15 @@ use App\Events\Models\Parish\DeletedParish;
 use App\Models\Parish;
 use App\Models\People\User;
 use App\Models\Places\City;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 
 class DeleteParish extends AbstractDeleteAction implements DeletesParishes
 {
-    /** @var City $city */
     protected City $city;
 
     /**
      * Get return route
-     * @return string
      */
     public function redirectTo(): string
     {
@@ -54,10 +53,10 @@ class DeleteParish extends AbstractDeleteAction implements DeletesParishes
 
     /**
      * Delete a parish
-     * @param User $user
-     * @param Parish $parish
+     *
      * @return Parish|bool|null
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     *
+     * @throws AuthorizationException
      */
     public function delete(User $user, Parish $parish)
     {
@@ -65,8 +64,8 @@ class DeleteParish extends AbstractDeleteAction implements DeletesParishes
         $this->city = $parish->owningCity;
         DeletedParish::dispatch($user, $parish);
         $this->messages = ['success' => 'Das Pfarramt wurde gelöscht.'];
+
         return $parish->delete();
 
     }
-
 }

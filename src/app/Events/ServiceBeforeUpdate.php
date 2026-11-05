@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -49,7 +49,6 @@ class ServiceBeforeUpdate
     /**
      * Create a new event instance.
      *
-     * @param Service $service
      * @param array data
      * @return void
      */
@@ -59,5 +58,4 @@ class ServiceBeforeUpdate
         $this->service = $service;
         $this->data = $data;
     }
-
 }

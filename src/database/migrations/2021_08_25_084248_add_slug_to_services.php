@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,6 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use App\Models\Scopes\ServicesOnlyScope;
+use App\Models\Service;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -47,7 +49,7 @@ class AddSlugToServices extends Migration
 
         // This migration predates event_class. The current Service model adds a
         // global scope on that later column, so it must be removed here.
-        foreach (\App\Models\Service::withoutGlobalScope(\App\Models\Scopes\ServicesOnlyScope::class)->get() as $service) {
+        foreach (Service::withoutGlobalScope(ServicesOnlyScope::class)->get() as $service) {
             $slug = $service->createSlug();
             $service->update(['slug' => $slug]);
             echo 'Created slug '.$slug.' for service #'.$service->id.PHP_EOL;

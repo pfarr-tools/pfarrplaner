@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
  * Class ParishPolicy
- * @package App\Policies
  */
 class ParishPolicy
 {
@@ -54,7 +53,6 @@ class ParishPolicy
     }
 
     /**
-     * @param User $user
      * @return bool
      */
     public function index(User $user)
@@ -62,26 +60,23 @@ class ParishPolicy
         if ($user->hasRole('Administrator:in')) {
             return true;
         }
-        if ($user->isLocalAdmin) return true;
+        if ($user->isLocalAdmin) {
+            return true;
+        }
+
         return $user->hasPermissionTo('pfarramt-bearbeiten');
     }
 
-    /**
-     * @param User $user
-     * @param City|null $city
-     * @return bool
-     */
     public function create(User $user, ?City $city = null): bool
     {
-        if (null === $city) {
+        if ($city === null) {
             return count($user->writableCities) > 0;
         }
+
         return $user->writableCities->contains($city);
     }
 
     /**
-     * @param User $user
-     * @param Parish $model
      * @return bool
      */
     public function update(User $user, Parish $model)
@@ -89,12 +84,11 @@ class ParishPolicy
         if ($user->adminCities->contains($model->owningCity)) {
             return true;
         }
+
         return $user->hasPermissionTo('pfarramt-bearbeiten');
     }
 
     /**
-     * @param User $user
-     * @param Parish $model
      * @return bool
      */
     public function delete(User $user, Parish $model)
@@ -102,12 +96,11 @@ class ParishPolicy
         if ($user->adminCities->contains($model->owningCity)) {
             return true;
         }
+
         return $user->hasPermissionTo('pfarramt-bearbeiten');
     }
 
     /**
-     * @param User $user
-     * @param Parish $model
      * @return bool
      */
     public function restore(User $user, Parish $model)
@@ -116,8 +109,6 @@ class ParishPolicy
     }
 
     /**
-     * @param User $user
-     * @param Parish $model
      * @return bool
      */
     public function forceDelete(User $user, Parish $model)

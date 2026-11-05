@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -20,51 +21,33 @@ use Spatie\Permission\PermissionRegistrar;
 
 class FirstRunInstallerService
 {
-    /**
-     * @param string $template
-     * @param array $values
-     * @return string
-     */
     public function buildEnvironmentFile(string $template, array $values): string
     {
         foreach ($values as $key => $value) {
             $template = $this->replaceEnvironmentValue($template, $key, $value);
         }
 
-        return rtrim($template) . PHP_EOL;
+        return rtrim($template).PHP_EOL;
     }
 
-    /**
-     * @param string $path
-     * @param string $contents
-     * @return bool
-     */
     public function writeEnvironmentFile(string $path, string $contents): bool
     {
-        return false !== @file_put_contents($path, $contents);
+        return @file_put_contents($path, $contents) !== false;
     }
 
-    /**
-     * @param string $path
-     * @return void
-     */
     public function ensureSqliteDatabaseExists(string $path): void
     {
         $directory = dirname($path);
 
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             mkdir($directory, 0775, true);
         }
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             touch($path);
         }
     }
 
-    /**
-     * @param array $values
-     * @return void
-     */
     public function applyRuntimeConfiguration(array $values): void
     {
         foreach ($values as $key => $value) {
@@ -124,10 +107,6 @@ class FirstRunInstallerService
         DB::purge();
     }
 
-    /**
-     * @param array $data
-     * @return User
-     */
     public function createOrUpdateAdminUser(array $data): User
     {
         $this->ensureRoleExists(RoleService::ROLE_SUPER_ADMIN);
@@ -152,10 +131,6 @@ class FirstRunInstallerService
         return $user;
     }
 
-    /**
-     * @param string $name
-     * @return void
-     */
     protected function ensureRoleExists(string $name): void
     {
         Role::query()->firstOrCreate([
@@ -164,65 +139,46 @@ class FirstRunInstallerService
         ]);
     }
 
-    /**
-     * @param string $template
-     * @param string $key
-     * @param mixed $value
-     * @return string
-     */
     protected function replaceEnvironmentValue(string $template, string $key, mixed $value): string
     {
-        $line = $key . '=' . $this->formatEnvironmentValue($value);
-        $pattern = '/^' . preg_quote($key, '/') . '=.*$/m';
+        $line = $key.'='.$this->formatEnvironmentValue($value);
+        $pattern = '/^'.preg_quote($key, '/').'=.*$/m';
 
         if (preg_match($pattern, $template)) {
             return preg_replace($pattern, $line, $template, 1);
         }
 
-        return rtrim($template) . PHP_EOL . $line . PHP_EOL;
+        return rtrim($template).PHP_EOL.$line.PHP_EOL;
     }
 
-    /**
-     * @param mixed $value
-     * @return string
-     */
     protected function formatEnvironmentValue(mixed $value): string
     {
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
 
-        $value = (string)$value;
+        $value = (string) $value;
 
         if ($value === '') {
             return '';
         }
 
         if (preg_match('/[\s#"\']/', $value)) {
-            return '"' . addcslashes($value, "\\\"") . '"';
+            return '"'.addcslashes($value, '\\"').'"';
         }
 
         return $value;
     }
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @return void
-     */
     protected function setEnvironmentValue(string $key, mixed $value): void
     {
-        $stringValue = is_bool($value) ? ($value ? 'true' : 'false') : (string)$value;
+        $stringValue = is_bool($value) ? ($value ? 'true' : 'false') : (string) $value;
 
-        putenv($key . '=' . $stringValue);
+        putenv($key.'='.$stringValue);
         $_ENV[$key] = $stringValue;
         $_SERVER[$key] = $stringValue;
     }
 
-    /**
-     * @param mixed $value
-     * @return bool
-     */
     protected function toBoolean(mixed $value): bool
     {
         return filter_var($value, FILTER_VALIDATE_BOOL);

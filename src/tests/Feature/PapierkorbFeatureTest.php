@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -29,7 +30,7 @@ class PapierkorbFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testTrashModuleIsAvailableForAccessibleSoftDeletedRecords()
+    public function test_trash_module_is_available_for_accessible_soft_deleted_records()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -52,7 +53,7 @@ class PapierkorbFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testTrashRestoreForBaptismAlsoRestoresDeletedParentService()
+    public function test_trash_restore_for_baptism_also_restores_deleted_parent_service()
     {
         $this->withoutMiddleware();
 
@@ -93,7 +94,7 @@ class PapierkorbFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testTrashForceDeleteRemovesAbsenceAndReplacementPermanently()
+    public function test_trash_force_delete_removes_absence_and_replacement_permanently()
     {
         $this->withoutMiddleware();
 
@@ -124,7 +125,7 @@ class PapierkorbFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testTrashUiReceivesRetentionPolicy()
+    public function test_trash_ui_receives_retention_policy()
     {
         $this->withoutMiddleware();
 
@@ -141,13 +142,13 @@ class PapierkorbFeatureTest extends TestCase
             ->get(route('admin.trash.index'));
 
         $response->assertOk();
-        $response->assertSee('"retentionDays":' . PapierkorbController::RETENTION_DAYS, false);
+        $response->assertSee('"retentionDays":'.PapierkorbController::RETENTION_DAYS, false);
     }
 
     /**
      * @return void
      */
-    public function testOldTrashEntriesArePrunedAfterRetentionPeriod()
+    public function test_old_trash_entries_are_pruned_after_retention_period()
     {
         Storage::fake();
         Carbon::setTestNow('2026-08-12 12:00:00');

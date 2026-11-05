@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,48 +30,57 @@
 
 namespace App\Liturgy\PronounSets;
 
-
 class PronounSets
 {
-
-    public static function all() {
+    public static function all()
+    {
         $items = [];
         foreach (glob(app_path('Liturgy/PronounSets/*PronounSet.php')) as $file) {
             $short = pathinfo($file, PATHINFO_FILENAME);
             if (substr($short, 0, 8) != 'Abstract') {
                 $class = '\\App\\Liturgy\\PronounSets\\'.$short;
-                $items[] = new $class();
+                $items[] = new $class;
             }
         }
+
         return $items;
     }
 
-    public static function items() {
+    public static function items()
+    {
         $items = [];
         /** @var AbstractPronounSet $item */
         foreach (self::all() as $item) {
             $items[$item->getLabel()] = $item->getKey();
         }
+
         return $items;
     }
 
-    public static function get($key) {
-        if (empty($key)) $key = 'er'; // fallback pronoun set
+    public static function get($key)
+    {
+        if (empty($key)) {
+            $key = 'er';
+        } // fallback pronoun set
         $class = '\\App\\Liturgy\\PronounSets\\'.ucfirst($key).'PronounSet';
-        if (!class_exists($class)) return null;
-        return new $class();
+        if (! class_exists($class)) {
+            return null;
+        }
+
+        return new $class;
     }
 
     /**
      * @return array
      */
-    public static function toArray() {
+    public static function toArray()
+    {
         $pronounSets = [];
         /** @var AbstractPronounSet $pronounSet */
         foreach (self::all() as $pronounSet) {
             $pronounSets[] = ['key' => $pronounSet->getKey(), 'label' => $pronounSet->getLabel()];
-        };
+        }
+
         return $pronounSets;
     }
-
 }

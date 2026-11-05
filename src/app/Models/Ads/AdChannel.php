@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,21 +32,24 @@ namespace App\Models\Ads;
 
 use App\Models\AbstractModel;
 use App\Models\Places\City;
+use Database\Factories\AdChannelFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class AdChannel extends AbstractModel
 {
-    /** @use HasFactory<\Database\Factories\AdChannelFactory> */
+    /** @use HasFactory<AdChannelFactory> */
     use HasFactory;
 
     protected static string $prefix = 'werbekanal';
+
     protected static string $prefixPlural = 'werbekanaele';
+
     public static array $exceptRoutes = ['web' => ['index', 'show'], 'api' => ['show']];
+
     public static array $validationRules = [
         'name' => 'required|max:255',
         'city_id' => 'required|exists:cities,id',
     ];
-
 
     protected $fillable = ['name', 'slug', 'city_id'];
 

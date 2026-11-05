@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -33,7 +33,9 @@ namespace App\Services;
 class PasswordService
 {
     private const VOWELS = 'aeiouy';
+
     private const CONSONANTS = 'bcdfghjklmnpqrstvwxz';
+
     private const NUMBERS = '0123456789';
 
     public static function randomPassword()
@@ -46,11 +48,13 @@ class PasswordService
 
     }
 
-    private static function randomCharsFromString($template, $number = 1) {
+    private static function randomCharsFromString($template, $number = 1)
+    {
         $s = '';
-        for ($i=0; $i<$number; $i++) {
-            $s .= $template[rand(0, strlen($template)-1)];
+        for ($i = 0; $i < $number; $i++) {
+            $s .= $template[rand(0, strlen($template) - 1)];
         }
+
         return $s;
     }
 }

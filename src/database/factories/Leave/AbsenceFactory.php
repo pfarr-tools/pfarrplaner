@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,20 +31,20 @@
 namespace Database\Factories\Leave;
 
 use App\Models\Leave\Absence;
+use App\Models\People\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-
-class AbsenceFactory extends Factory {
-
+class AbsenceFactory extends Factory
+{
     protected $model = Absence::class;
+
     public function definition(): array
     {
         return [
             'from' => fake()->dateTimeBetween('now', '+1 month')->format('Y-m-d'),
             'to' => fake()->dateTimeBetween('+1 month', '+2 months')->format('Y-m-d'),
-            'user_id' => \App\Models\People\User::factory(),
+            'user_id' => User::factory(),
             'reason' => fake()->sentence(),
         ];
     }
-
 }

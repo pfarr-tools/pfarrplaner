@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -33,6 +33,8 @@ namespace App\Liturgy\LiturgySheets;
 class A3SongListLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Liedanzeiger (A3)';
+
     protected $layout = ['format' => 'A3-L'];
+
     protected $fileTitle = 'Liedanzeiger';
 }

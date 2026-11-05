@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,7 +35,6 @@ use Illuminate\Support\Str;
 
 abstract class AbstractLocalEventCalendar
 {
-
     protected static $group = '';
 
     protected $id;
@@ -61,12 +60,11 @@ abstract class AbstractLocalEventCalendar
 
     /**
      * Preset the data from the chosen local calendar for a new event
-     * @param array $data
-     * @return array
      */
-    public function presetData(array $data): array {
+    public function presetData(array $data): array
+    {
         $data['event_class'] = 'event';
+
         return $data;
     }
-
 }

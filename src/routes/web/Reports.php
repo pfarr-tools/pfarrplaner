@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,8 +39,6 @@
 |
 */
 
-
-
 use App\Http\Controllers\ReportsController;
 
 Route::get('/reports', [ReportsController::class, 'list'])->name('reports.list');
@@ -49,4 +47,3 @@ Route::get('/reports/render/{report}', [ReportsController::class, 'render'])->na
 Route::get('/report/{report}', [ReportsController::class, 'setup'])->name('reports.setup');
 Route::get('/report/{report}/embed', [ReportsController::class, 'embed'])->name('report.embed')->middleware('cors');
 Route::match(['GET', 'POST'], '/report/{report}/{step}', [ReportsController::class, 'step'])->name('report.step');
-

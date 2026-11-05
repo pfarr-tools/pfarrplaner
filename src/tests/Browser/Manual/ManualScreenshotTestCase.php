@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -32,7 +33,7 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
     {
         parent::setUp();
         $this->screenshotDir = config('manual.root').'/media/images';
-        if (!is_dir($this->screenshotDir)) {
+        if (! is_dir($this->screenshotDir)) {
             mkdir($this->screenshotDir, 0755, true);
         }
 
@@ -55,25 +56,24 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
      * Navigate to $url, wait for the app to render, take a screenshot and
      * copy it to the configured manual media directory.
      *
-     * @param Browser $browser       Already-authenticated browser instance
-     * @param string  $url           URL to navigate to
-     * @param string  $filename      Base name for the output file (without .png)
-     * @param int     $pauseMs       Optional pause after page load (ms) for animations to settle
-     * @return Browser
+     * @param  Browser  $browser  Already-authenticated browser instance
+     * @param  string  $url  URL to navigate to
+     * @param  string  $filename  Base name for the output file (without .png)
+     * @param  int  $pauseMs  Optional pause after page load (ms) for animations to settle
      */
     protected function captureManualScreenshot(
         Browser $browser,
-        string  $url,
-        string  $filename,
-        int     $pauseMs = 500
+        string $url,
+        string $filename,
+        int $pauseMs = 500
     ): Browser {
         try {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->assertAuthenticated('web')
-                    ->visit($url)
-                    ->waitFor('#app', self::APP_RENDER_TIMEOUT_SECONDS)
-                    ->assertDontSee('500')
-                    ->assertDontSee('Whoops');
+                ->assertAuthenticated('web')
+                ->visit($url)
+                ->waitFor('#app', self::APP_RENDER_TIMEOUT_SECONDS)
+                ->assertDontSee('500')
+                ->assertDontSee('Whoops');
         } catch (\Throwable $exception) {
             $this->captureFailureArtifacts($browser, $filename);
             throw $exception;
@@ -93,7 +93,7 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
      */
     protected function captureFailureArtifacts(Browser $browser, string $filename): void
     {
-        $failureName = 'manual-failure-' . $filename;
+        $failureName = 'manual-failure-'.$filename;
         try {
             $browser->screenshot($failureName);
         } catch (\Throwable) {
@@ -102,11 +102,11 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
         }
 
         $sourceDir = base_path('tests/Browser/source');
-        if (!is_dir($sourceDir)) {
+        if (! is_dir($sourceDir)) {
             mkdir($sourceDir, 0755, true);
         }
         try {
-            file_put_contents($sourceDir . '/' . $failureName . '.html', $browser->driver->getPageSource());
+            file_put_contents($sourceDir.'/'.$failureName.'.html', $browser->driver->getPageSource());
         } catch (\Throwable) {
             // The screenshot and source are best-effort diagnostics only.
         }
@@ -121,11 +121,11 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
             $browser->pause($pauseMs);
         }
 
-        $duskName = 'manual-' . $filename;
+        $duskName = 'manual-'.$filename;
         $browser->screenshot($duskName);
 
-        $src = base_path('tests/Browser/screenshots/' . $duskName . '.png');
-        $dst = $this->screenshotDir . '/' . $filename . '.png';
+        $src = base_path('tests/Browser/screenshots/'.$duskName.'.png');
+        $dst = $this->screenshotDir.'/'.$filename.'.png';
         if (file_exists($src)) {
             copy($src, $dst);
         }
@@ -136,17 +136,16 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
     /**
      * Capture a single page element for manual screenshots.
      *
-     * @param Browser $browser  Already-authenticated browser instance
-     * @param string  $selector CSS selector for the visible element
-     * @param string  $filename Base name for the output file (without .png)
-     * @param int     $pauseMs  Optional pause before capture (ms)
-     * @return Browser
+     * @param  Browser  $browser  Already-authenticated browser instance
+     * @param  string  $selector  CSS selector for the visible element
+     * @param  string  $filename  Base name for the output file (without .png)
+     * @param  int  $pauseMs  Optional pause before capture (ms)
      */
     protected function captureCurrentManualElementScreenshot(
         Browser $browser,
-        string  $selector,
-        string  $filename,
-        int     $pauseMs = 300
+        string $selector,
+        string $filename,
+        int $pauseMs = 300
     ): Browser {
         if ($pauseMs > 0) {
             $browser->pause($pauseMs);
@@ -155,11 +154,11 @@ abstract class ManualScreenshotTestCase extends AbstractPageLoadTest
         $browser->script("document.querySelector('$selector')?.scrollIntoView({block: 'start', inline: 'nearest'});");
         $browser->pause(100);
 
-        $duskName = 'manual-' . $filename;
+        $duskName = 'manual-'.$filename;
         $browser->screenshotElement($selector, $duskName);
 
-        $src = base_path('tests/Browser/screenshots/' . $duskName . '.png');
-        $dst = $this->screenshotDir . '/' . $filename . '.png';
+        $src = base_path('tests/Browser/screenshots/'.$duskName.'.png');
+        $dst = $this->screenshotDir.'/'.$filename.'.png';
         if (file_exists($src)) {
             copy($src, $dst);
         }

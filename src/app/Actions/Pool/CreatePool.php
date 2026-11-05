@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,15 +35,15 @@ use App\Contracts\Pool\CreatesPools;
 use App\Events\Models\Pool\CreatedPool;
 use App\Models\Leave\Pool;
 use App\Models\People\User;
-use App\Models\Places\City;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class CreatePool extends AbstractCreateAction implements CreatesPools
 {
-
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function redirectTo(): string
     {
@@ -51,11 +51,8 @@ class CreatePool extends AbstractCreateAction implements CreatesPools
     }
 
     /**
-     * @param User $user
-     * @param array $input
-     * @return Pool
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws AuthorizationException
+     * @throws ValidationException
      */
     public function create(User $user, array $input): Pool
     {
@@ -66,6 +63,7 @@ class CreatePool extends AbstractCreateAction implements CreatesPools
         $pool->users()->sync($input['users'] ?? []);
         CreatedPool::dispatch($user, $pool);
         $this->messages = ['success' => 'Der neue Pool wurde gespeichert.'];
+
         return $pool;
     }
 }

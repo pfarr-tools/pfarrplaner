@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,6 +24,7 @@ class CreatedSeatingRow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     protected User $user;
+
     protected SeatingRow $seatingRow;
 
     public function __construct(User $user, SeatingRow $seatingRow)

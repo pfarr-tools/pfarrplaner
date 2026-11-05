@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,6 +30,6 @@
 
 use App\Http\Controllers\SongController;
 
-Route::post('/lied/{song}/split/{reference}',[SongController::class, 'split'])->name('song.songbook.split');
+Route::post('/lied/{song}/split/{reference}', [SongController::class, 'split'])->name('song.songbook.split');
 
 Route::get('/lied/{song}/noten-editor', [SongController::class, 'musicEditor'])->name('liturgy.song.musiceditor');

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -32,24 +33,24 @@ class RoleFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testIndexLoads(): void
+    public function test_index_loads(): void
     {
         $this->actingAs($this->user)
             ->get(route('roles.index'))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Admin/Role/Index'));
+            ->assertInertia(fn (Assert $page) => $page->component('Admin/Role/Index'));
     }
 
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $role = Role::create(['name' => 'Testrole', 'guard_name' => 'web']);
         $this->actingAs($this->user)
             ->get(route('role.edit', $role->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Admin/Role/RoleEditor'));
+            ->assertInertia(fn (Assert $page) => $page->component('Admin/Role/RoleEditor'));
     }
 
-    public function testCreateRole(): void
+    public function test_create_role(): void
     {
         $this->actingAs($this->user)
             ->post(route('role.store'), ['name' => 'Neue Rolle', 'permissions' => []])
@@ -57,7 +58,7 @@ class RoleFeatureTest extends TestCase
         $this->assertTrue(Role::where('name', 'Neue Rolle')->exists());
     }
 
-    public function testUpdateRole(): void
+    public function test_update_role(): void
     {
         $role = Role::create(['name' => 'AlteRolle', 'guard_name' => 'web']);
         $this->actingAs($this->user)

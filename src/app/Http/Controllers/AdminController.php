@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,28 +30,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\People\User;
 use App\Models\Places\City;
 use App\Services\RoleService;
 use App\UI\Modules\AdminModule;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class AdminController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
     }
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function index()
     {
         $modules = collect(AdminModule::modules())->sortBy(['group', 'text'])
-            ->reject(fn($module) => empty($module['group']))
+            ->reject(fn ($module) => empty($module['group']))
             ->groupBy('group');
 
         if (Auth::user()->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
@@ -63,13 +62,13 @@ class AdminController extends Controller
             $modules['Orte'] = collect();
             foreach ($cities->sortBy('name') as $city) {
                 $modules['Orte']->push([
-                                           'text' => $city->name,
-                                           'group' => 'Orte',
-                                           'icon' => 'mdi mdi-church',
-                                           'url' => route('admin.city.edit', $city),
-                                           'active' => false,
-                                           'inertia' => true,
-                                       ]);
+                    'text' => $city->name,
+                    'group' => 'Orte',
+                    'icon' => 'mdi mdi-church',
+                    'url' => route('admin.city.edit', $city),
+                    'active' => false,
+                    'inertia' => true,
+                ]);
             }
         } else {
             unset($modules['Orte']);

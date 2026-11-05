@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -29,6 +29,7 @@
  */
 
 use Illuminate\Support\Facades\Schedule;
+use Laravel\Telescope\Telescope;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +42,7 @@ use Illuminate\Support\Facades\Schedule;
 |
 */
 
-if (app()->environment('local') && class_exists(\Laravel\Telescope\Telescope::class)) {
+if (app()->environment('local') && class_exists(Telescope::class)) {
     Schedule::command('telescope:prune --hours=48')->daily();
 }
 Schedule::command('liturgy:get')->daily();
@@ -51,9 +52,9 @@ Schedule::command('cache:prune-stale-tags')->hourly();
 // Integration schedules
 foreach (glob(app_path('Integrations/*')) as $folder) {
     if (is_dir($folder)) {
-        $cls = 'App\\Integrations\\' . basename($folder) . '\\' . basename($folder) . 'Integration';
+        $cls = 'App\\Integrations\\'.basename($folder).'\\'.basename($folder).'Integration';
         if (class_exists($cls) && method_exists($cls, 'schedule')) {
-            $cls::schedule(app(\Illuminate\Console\Scheduling\Schedule::class));
+            $cls::schedule(app(Illuminate\Console\Scheduling\Schedule::class));
         }
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,15 +13,15 @@
 
 namespace Tests\Feature;
 
-use App\Models\People\User;
 use App\Http\Middleware\ForceDomain;
+use App\Models\People\User;
 use App\Services\InterstitialService;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Tests\TestCase;
 
 class InterstitialFeatureTest extends TestCase
 {
-    public function testDismissStoresUserSetting(): void
+    public function test_dismiss_stores_user_setting(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
         $this->withoutMiddleware(ForceDomain::class);
@@ -50,7 +51,7 @@ class InterstitialFeatureTest extends TestCase
         );
     }
 
-    public function testLaterStoresUserSettingForFutureLogins(): void
+    public function test_later_stores_user_setting_for_future_logins(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
         $this->withoutMiddleware(ForceDomain::class);

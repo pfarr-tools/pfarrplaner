@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,18 +37,15 @@
 
 namespace App\CalendarLinks;
 
-
 use App\Models\People\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Str;
 
 /**
  * Class AbstractCalendarLink
- * @package App\CalendarLinks
  */
 class AbstractCalendarLink
 {
@@ -56,6 +53,7 @@ class AbstractCalendarLink
      * @var string
      */
     protected $title = '';
+
     /**
      * @var string
      */
@@ -65,22 +63,24 @@ class AbstractCalendarLink
      * @var array
      */
     protected $data = [];
+
     /**
      * @var string
      */
     protected $viewName = 'ical';
 
-    /** @var User $user */
+    /** @var User */
     protected $user = null;
 
     protected $needs = [];
 
-
     public function __construct()
     {
         $this->data['key'] = $this->getKey();
-        if ($x = request()->get('includeHidden', 0)) $this->data['includeHidden'] = $x;
-        if (null !== Auth::user()) {
+        if ($x = request()->get('includeHidden', 0)) {
+            $this->data['includeHidden'] = $x;
+        }
+        if (Auth::user() !== null) {
             $this->user = Auth::user();
             $this->data['token'] = Auth::user()->getToken();
             $this->data['user'] = Auth::user()->id;
@@ -92,17 +92,11 @@ class AbstractCalendarLink
         return lcfirst(strtr(get_class($this), ['CalendarLink' => '', 'App\\s\\' => '', 'App\\CalendarLinks\\' => '']));
     }
 
-    /**
-     * @return string
-     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;
@@ -116,17 +110,11 @@ class AbstractCalendarLink
         return route('ical.setup', ['key' => $this->getKey(), 'includeHidden' => request()->get('includeHidden', 0)]);
     }
 
-    /**
-     * @return array
-     */
     public function getData(): array
     {
         return $this->data;
     }
 
-    /**
-     * @param array $data
-     */
     public function setData(array $data): void
     {
         $this->data = $data;
@@ -139,6 +127,7 @@ class AbstractCalendarLink
     {
         $data = $this->setupData();
         $data['calendarLink'] = $this;
+
         return view($this->getSetupViewName(), $data);
     }
 
@@ -155,7 +144,7 @@ class AbstractCalendarLink
      */
     public function getSetupViewName()
     {
-        return 'ical.' . $this->getKey() . '.setup';
+        return 'ical.'.$this->getKey().'.setup';
     }
 
     /**
@@ -166,24 +155,25 @@ class AbstractCalendarLink
         return route('ical.export', $this->data);
     }
 
-    public function wrap($s) {
-        return join("\n ", str_split($s, 32));
+    public function wrap($s)
+    {
+        return implode("\n ", str_split($s, 32));
     }
 
     /**
      * Convert line endings to CR+LF and remove empty lines
-     * @param $s
+     *
      * @return array|string|string[]
      */
-    protected function normalizeLineEndings($s) {
+    protected function normalizeLineEndings($s)
+    {
         $s = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $s);
         $s = str_replace("\n", "\r\n", $s);
+
         return $s;
     }
 
     /**
-     * @param Request $request
-     * @param User $user
      * @return string|string[]|null
      */
     public function export(Request $request, User $user)
@@ -192,20 +182,13 @@ class AbstractCalendarLink
         $this->setUser($user);
         $data = $this->getRenderData($request, $user);
         $calendarLink = $this;
-        $raw = View::make('ical.export.' . $this->viewName, compact('calendarLink', 'data'));
+        $raw = View::make('ical.export.'.$this->viewName, compact('calendarLink', 'data'));
+
         return $this->normalizeLineEndings($raw);
     }
 
-    /**
-     * @param Request $request
-     */
-    public function setDataFromRequest(Request $request)
-    {
-    }
+    public function setDataFromRequest(Request $request) {}
 
-    /**
-     * @param User $user
-     */
     public function setUser(User $user): void
     {
         $this->user = $user;
@@ -214,8 +197,6 @@ class AbstractCalendarLink
     }
 
     /**
-     * @param Request $request
-     * @param User $user
      * @return array
      */
     public function getRenderData(Request $request, User $user)
@@ -225,6 +206,7 @@ class AbstractCalendarLink
 
     /**
      * Convert into array for vue
+     *
      * @return string[]
      */
     public function toArray()
@@ -239,7 +221,6 @@ class AbstractCalendarLink
 
     public function filename()
     {
-        return join('-', [$this->data['user']->id, $this->getKey()]).'.ics';
+        return implode('-', [$this->data['user']->id, $this->getKey()]).'.ics';
     }
-
 }

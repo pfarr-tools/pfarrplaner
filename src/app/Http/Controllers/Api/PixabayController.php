@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,28 +31,27 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Response;
 
 /**
  * Class PixabayController
- * @package App\Http\Controllers
  */
 class PixabayController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth:api');
     }
 
     /**
-     * @param string $query
-     * @param int $page
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return Application|ResponseFactory|Response
      */
     public function query(string $query, int $page = 1)
     {
         $url = 'https://pixabay.com/api/?key='.config('pixabay.api_key').'&image_type=photo&page='.$page.'&q='.urlencode($query);
+
         return response(file_get_contents($url));
     }
-
 }

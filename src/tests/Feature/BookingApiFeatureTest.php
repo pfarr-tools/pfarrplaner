@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -25,7 +26,7 @@ class BookingApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testDestroyDeletesBooking()
+    public function test_destroy_deletes_booking()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -42,7 +43,7 @@ class BookingApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testDestroyRequiresAuth()
+    public function test_destroy_requires_auth()
     {
         $booking = Booking::factory()->create();
 
@@ -53,7 +54,7 @@ class BookingApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testDestroyReturns404ForMissingBooking()
+    public function test_destroy_returns404_for_missing_booking()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);

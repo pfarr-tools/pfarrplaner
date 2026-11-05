@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,33 +32,32 @@ namespace App\Services;
 
 class AmazonService
 {
-
     public static function getInfoForISBN($isbn)
     {
         $ItemId = $_GET['isbn'];
         $ResponseGroup = 'Offers';
         $Timestamp = gmdate("Y-m-d\TH:i:s\Z");
         $AWSAccessKeyId = '/'.config('amazon.id').'/';
-        $Version = "2013-08-01";
-        $str = "Service=AWSECommerceService&Operation=ItemLookup&ResponseGroup=" . $ResponseGroup . "&IdType=ASIN&ItemId=" . urlencode(
-                $ItemId
-            ) . "&AWSAccessKeyId=" . $AWSAccessKeyId . "&Timestamp=" . urlencode(
-                $Timestamp
-            );
+        $Version = '2013-08-01';
+        $str = 'Service=AWSECommerceService&Operation=ItemLookup&ResponseGroup='.$ResponseGroup.'&IdType=ASIN&ItemId='.urlencode(
+            $ItemId
+        ).'&AWSAccessKeyId='.$AWSAccessKeyId.'&Timestamp='.urlencode(
+            $Timestamp
+        );
 
-        $ar = explode("&", $str);
+        $ar = explode('&', $str);
         natsort($ar);
-        $str = "GET webservices.amazon.com /onca/xml";
-        $str .= implode("&", $ar);
-        $str = urlencode(base64_encode(hash_hmac("sha256", $str, '/your secret/', true)));
-        $url = "http://webservices.amazon.com/onca/xml?Service=AWSECommerceService&Operation=ItemLookup&ResponseGroup=Offers&IdType=ASIN&ItemId=" . $ItemId . "&AssociateTag=your-tag&AWSAccessKeyId=" . $AWSAccessKeyId . "&Timestamp=" . urlencode(
-                $Timestamp
-            ) . "&Signature=" . $str;
+        $str = 'GET webservices.amazon.com /onca/xml';
+        $str .= implode('&', $ar);
+        $str = urlencode(base64_encode(hash_hmac('sha256', $str, '/your secret/', true)));
+        $url = 'http://webservices.amazon.com/onca/xml?Service=AWSECommerceService&Operation=ItemLookup&ResponseGroup=Offers&IdType=ASIN&ItemId='.$ItemId.'&AssociateTag=your-tag&AWSAccessKeyId='.$AWSAccessKeyId.'&Timestamp='.urlencode(
+            $Timestamp
+        ).'&Signature='.$str;
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $result = curl_exec($ch);
         curl_close($ch);
+
         return simplexml_load_string($result) ?: null;
     }
-
 }

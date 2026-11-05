@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -21,80 +22,46 @@ class WeddingPolicy
 {
     use HandlesAuthorization;
 
-    /**
-     * @param User $user
-     * @return bool
-     */
     public function index(User $user): bool
     {
         return $this->create($user);
     }
 
-    /**
-     * @param User $user
-     * @param Service|null $service
-     * @return bool
-     */
     protected function hasServicePermission(User $user, ?Service $service): bool
     {
-        if (null === $service) {
+        if ($service === null) {
             return false;
         }
 
         return $user->isAdmin || $user->writableCities->pluck('id')->contains($service->city_id);
     }
 
-    /**
-     * @param User $user
-     * @param Service|null $service
-     * @return bool
-     */
     public function create(User $user, ?Service $service = null): bool
     {
-        if (!$user->hasPermissionTo('gd-bearbeiten')) {
+        if (! $user->hasPermissionTo('gd-bearbeiten')) {
             return false;
         }
 
-        return (null === $service) || $this->hasServicePermission($user, $service);
+        return ($service === null) || $this->hasServicePermission($user, $service);
     }
 
-    /**
-     * @param User $user
-     * @param Wedding|null $wedding
-     * @return bool
-     */
     public function update(User $user, ?Wedding $wedding = null): bool
     {
         return $user->hasPermissionTo('gd-bearbeiten')
-            && (null !== $wedding)
+            && ($wedding !== null)
             && $this->hasServicePermission($user, $wedding->service);
     }
 
-    /**
-     * @param User $user
-     * @param Wedding|null $wedding
-     * @return bool
-     */
     public function delete(User $user, ?Wedding $wedding = null): bool
     {
         return $this->update($user, $wedding);
     }
 
-    /**
-     * @param User $user
-     * @param Wedding|null $wedding
-     * @return bool
-     */
     public function restore(User $user, ?Wedding $wedding = null): bool
     {
         return $this->delete($user, $wedding);
     }
 
-    /**
-     * @param User $user
-     * @param Wedding|null $wedding
-     * @return bool
-     */
     public function forceDelete(User $user, ?Wedding $wedding = null): bool
     {
         return $this->delete($user, $wedding);

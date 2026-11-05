@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,14 +32,15 @@ namespace App\Reports;
 
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
-use App\Services\FileNameService;
-use App\Services\LiturgyService;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\FileNameService;
+use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Shared\Converter;
@@ -48,40 +49,33 @@ use PhpOffice\PhpWord\Style\Tab;
 
 /**
  * Class EventListReport
- * @package App\Reports
  */
 class EventListReport extends AbstractWordDocumentReport
 {
-    /**
-     *
-     */
     protected const BOLD = ['bold' => true];
-    /**
-     *
-     */
+
     protected const UNDERLINE = ['underline' => Font::UNDERLINE_SINGLE];
-    /**
-     *
-     */
+
     protected const BOLD_UNDERLINE = ['bold' => true, 'underline' => Font::UNDERLINE_SINGLE];
+
     protected const DEFAULT = 'Gottesdienste';
-    /**
-     *
-     */
+
     protected const LIST2 = 'Termine';
 
-
     public const FILE_SIGNATURE = '91.8';
+
     public const FILE_TITLE = 'Terminliste';
 
     /**
      * @var string
      */
     public $title = 'Terminliste';
+
     /**
      * @var string
      */
     public $group = 'Veröffentlichungen';
+
     /**
      * @var string
      */
@@ -93,16 +87,16 @@ class EventListReport extends AbstractWordDocumentReport
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
+
         return Inertia::render('Report/EventList/Setup', compact('cities'));
     }
 
     /**
-     * @param Request $request
      * @return string|void
      */
     public function render(Request $request)
@@ -117,10 +111,9 @@ class EventListReport extends AbstractWordDocumentReport
             ]
         );
 
-        $start = Carbon::parse( $data['start']);
-        $end = Carbon::parse( $data['end']);
+        $start = Carbon::parse($data['start']);
+        $end = Carbon::parse($data['end']);
         $city = City::findOrFail($request->get('city'));
-
 
         $services = Service::with(['location'])
             ->regularForCity($city)
@@ -158,7 +151,7 @@ class EventListReport extends AbstractWordDocumentReport
 
         $this->wordDocument->addParagraphStyle(
             self::DEFAULT,
-            array(
+            [
                 'indentation' => [
                     'left' => Converter::cmToTwip(1.3),
                     'hanging' => Converter::cmToTwip(0),
@@ -170,12 +163,12 @@ class EventListReport extends AbstractWordDocumentReport
                     new Tab('left', Converter::cmToTwip(15.0)),
                 ],
                 'spaceAfter' => 0,
-            )
+            ]
         );
 
         $this->wordDocument->addParagraphStyle(
             self::LIST2,
-            array(
+            [
                 'indentation' => [
                     'left' => Converter::cmToTwip(1.3),
                     'hanging' => Converter::cmToTwip(0),
@@ -187,7 +180,7 @@ class EventListReport extends AbstractWordDocumentReport
                     new Tab('left', Converter::cmToTwip(5.4)),
                 ],
                 'spaceAfter' => 0,
-            )
+            ]
         );
 
         $this->renderParagraph(
@@ -198,7 +191,6 @@ class EventListReport extends AbstractWordDocumentReport
             1
         );
 
-
         // render services
         foreach ($events as $theseEvents) {
             foreach ($theseEvents as $event) {
@@ -207,7 +199,7 @@ class EventListReport extends AbstractWordDocumentReport
                     // only services this time
 
                     $liturgy = LiturgyService::getLiturgyInfoByDate($event->day)[0] ?? [];
-                    $pericope = (isset($liturgy['perikope']) ? $liturgy['litTextsPerikope' . $liturgy['perikope']] : '');
+                    $pericope = (isset($liturgy['perikope']) ? $liturgy['litTextsPerikope'.$liturgy['perikope']] : '');
 
                     // remove optional verses
                     if ($pericope) {
@@ -221,8 +213,8 @@ class EventListReport extends AbstractWordDocumentReport
                     $run = $this->renderParagraph(
                         self::DEFAULT,
                         [
-                            [$event->date->format('d.m.Y') . "\t", []],
-                            [$event->timeText(true) . "\t", []],
+                            [$event->date->format('d.m.Y')."\t", []],
+                            [$event->timeText(true)."\t", []],
                         ],
                         0
                     );
@@ -231,7 +223,7 @@ class EventListReport extends AbstractWordDocumentReport
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                [$liturgy['Bezeichnung'] . ' – ', []],
+                                [$liturgy['Bezeichnung'].' – ', []],
                             ],
                             0,
                             $run
@@ -250,7 +242,7 @@ class EventListReport extends AbstractWordDocumentReport
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                [$title . ' mit ' . $p, []],
+                                [$title.' mit '.$p, []],
                             ],
                             0,
                             $run
@@ -260,12 +252,11 @@ class EventListReport extends AbstractWordDocumentReport
                     $this->renderParagraph(
                         self::DEFAULT,
                         [
-                            ["\t" . $pericope, []],
+                            ["\t".$pericope, []],
                         ],
                         0,
                         $run
                     );
-
 
                     if ($description = $event->description) {
                         if (strlen($description) > 25) {
@@ -276,7 +267,7 @@ class EventListReport extends AbstractWordDocumentReport
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                ["<w:br />\t\t" . $description, []],
+                                ["<w:br />\t\t".$description, []],
                             ],
                             0,
                             $run
@@ -285,7 +276,7 @@ class EventListReport extends AbstractWordDocumentReport
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                ["<w:br />\t\t" . $liturgy['Bezeichnung'], []],
+                                ["<w:br />\t\t".$liturgy['Bezeichnung'], []],
                             ],
                             0,
                             $run
@@ -296,7 +287,7 @@ class EventListReport extends AbstractWordDocumentReport
                         $this->renderParagraph(
                             self::DEFAULT,
                             [
-                                ["<w:br />\t\tOpfer: " . $event->offeringGoal(), []],
+                                ["<w:br />\t\tOpfer: ".$event->offeringGoal(), []],
                             ],
                             0,
                             $run
@@ -308,10 +299,10 @@ class EventListReport extends AbstractWordDocumentReport
                             self::DEFAULT,
                             [
                                 [
-                                    "<w:br />\t\tKinderkirche: " . $event->ccTimeText(
+                                    "<w:br />\t\tKinderkirche: ".$event->ccTimeText(
                                         false
-                                    ) . ', ' . $event->ccLocationText(),
-                                    []
+                                    ).', '.$event->ccLocationText(),
+                                    [],
                                 ],
                             ],
                             0,
@@ -341,24 +332,22 @@ class EventListReport extends AbstractWordDocumentReport
             1
         );
 
-
         // render other events
         foreach ($events as $theseEvents) {
             foreach ($theseEvents as $event) {
-                if (!is_object(($event))) {
+                if (! is_object(($event))) {
                     $run = $this->renderParagraph(
                         self::LIST2,
                         [
                             [$event['start']->isoFormat('dd.'), []],
-                            ["\t" . $event['start']->format('d.m.'), []],
-                            ["\t" . $event['start']->format('H:i') . ' Uhr', []],
-                            ["\t" . $event['title'], []],
+                            ["\t".$event['start']->format('d.m.'), []],
+                            ["\t".$event['start']->format('H:i').' Uhr', []],
+                            ["\t".$event['title'], []],
                         ]
                     );
                 }
             }
         }
-
 
         return $this->sendToBrowser(
             FileNameService::make(
@@ -369,12 +358,10 @@ class EventListReport extends AbstractWordDocumentReport
         );
     }
 
-
     /**
-     * @param string $template
-     * @param array $blocks
-     * @param int $emptyParagraphsAfter
-     * @param null $existingTextRun
+     * @param  string  $template
+     * @param  int  $emptyParagraphsAfter
+     * @param  null  $existingTextRun
      * @return TextRun|null
      */
     protected function renderParagraph(
@@ -390,16 +377,13 @@ class EventListReport extends AbstractWordDocumentReport
         for ($i = 0; $i < $emptyParagraphsAfter; $i++) {
             $textRun = $this->section->addTextRun($template);
         }
+
         return $textRun;
     }
 
-
-    /**
-     * @param $text
-     */
     protected function renderLiteral($text)
     {
-        if (!is_array($text)) {
+        if (! is_array($text)) {
             $text = [$text];
         }
         foreach ($text as $paragraph) {
@@ -420,7 +404,7 @@ class EventListReport extends AbstractWordDocumentReport
                     $paragraph,
                     [
                         "\r" => '',
-                        "\n" => '<w:br />'
+                        "\n" => '<w:br />',
                     ]
                 )
             );

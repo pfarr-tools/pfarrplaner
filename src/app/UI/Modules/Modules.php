@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,15 +32,15 @@ namespace App\UI\Modules;
 
 class Modules
 {
-
     /**
      * Get all available modules
      */
-    public static function tree() {
+    public static function tree()
+    {
         $tree = [];
         foreach (config('modules.groups') as $title => $group) {
             $tree[$title] = [];
-            foreach($group as $class) {
+            foreach ($group as $class) {
                 /** @var AbstractModule $module */
                 $module = new $class([]);
                 $tree[$title][] = [
@@ -52,20 +52,22 @@ class Modules
                 ];
             }
         }
+
         return $tree;
     }
 
-    public static function defaultConfig() {
+    public static function defaultConfig()
+    {
         $config = [];
         foreach (config('modules.groups') as $title => $group) {
-            foreach($group as $class) {
+            foreach ($group as $class) {
                 /** @var AbstractModule $module */
                 $module = new $class([]);
                 $config[$module->getKey()] = 1;
             }
         }
+
         return $config;
 
     }
-
 }

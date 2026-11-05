@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -27,7 +28,7 @@ class CalendarPageLoadTest extends AbstractPageLoadTest
         $this->city = City::factory()->create();
     }
 
-    public function testCalendarLoads(): void
+    public function test_calendar_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('calendar', [
@@ -37,7 +38,7 @@ class CalendarPageLoadTest extends AbstractPageLoadTest
         });
     }
 
-    public function testSingleDayLoads(): void
+    public function test_single_day_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('calendar.day', [

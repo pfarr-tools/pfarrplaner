@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,50 +30,41 @@
 
 namespace App\Http\Controllers;
 
-use App\Attachments\AbstractAttachment;
 use App\Attachments\AttachmentFactory;
 use App\Helpers\FileHelper;
 use App\Models\Attachment;
-use App\Models\Service;
 use App\Services\QRService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Class DownloadController
- * @package App\Http\Controllers
  */
 class DownloadController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth')->except(['storage', 'file', 'image', 'qr']);
     }
 
     /**
-     * @param Request $request
-     * @param $storage
-     * @param $code
-     * @param string $prettyName
+     * @param  string  $prettyName
      * @return StreamedResponse
      */
     public function download(Request $request, $storage, $code, $prettyName = '')
     {
         $prettyName = $prettyName ?: '';
+
         return Storage::download(
-            'public/' . $storage . '/' . $code . '.' . pathinfo($prettyName, PATHINFO_EXTENSION),
+            'public/'.$storage.'/'.$code.'.'.pathinfo($prettyName, PATHINFO_EXTENSION),
             FileHelper::normalizeFilename($prettyName)
         );
     }
 
     /**
-     * @param Request $request
-     * @param $attachment
-     * @param string $prettyName
+     * @param  string  $prettyName
      * @return StreamedResponse
      */
     public function attachment(Request $request, Attachment $attachment, $prettyName = '')
@@ -81,65 +72,63 @@ class DownloadController extends Controller
         $this->authorize('update', $attachment);
 
         $prettyName = $prettyName ? FileHelper::normalizeFilename($prettyName) :
-            (FileHelper::normalizeFilename($attachment->title) ?? $attachment->id) . '.' . pathinfo(
+            (FileHelper::normalizeFilename($attachment->title) ?? $attachment->id).'.'.pathinfo(
                 $attachment->file,
                 PATHINFO_EXTENSION
             );
+
         return Storage::download($attachment->file, $prettyName);
     }
 
     /**
-     * @param $path
-     * @param string $prettyName
+     * @param  string  $prettyName
      * @return StreamedResponse
      */
     public function storage($path, $prettyName = '')
     {
-        if (!Auth::check() && !request()->hasValidSignature()) {
+        if (! Auth::check() && ! request()->hasValidSignature()) {
             abort(401);
         }
         if ((pathinfo($path, PATHINFO_EXTENSION) == '') && (pathinfo($prettyName, PATHINFO_EXTENSION) != '')) {
-            $path .= '.' . pathinfo($prettyName, PATHINFO_EXTENSION);
+            $path .= '.'.pathinfo($prettyName, PATHINFO_EXTENSION);
         }
         $prettyName = $prettyName ? FileHelper::normalizeFilename($prettyName) : basename($path);
-        if (Storage::exists('attachments/' . $path)) {
-            return Storage::download('attachments/' . $path, $prettyName);
+        if (Storage::exists('attachments/'.$path)) {
+            return Storage::download('attachments/'.$path, $prettyName);
         }
         abort(404);
     }
 
-
     /**
-     * @param Request $request
-     * @param $path
-     * @param string $prettyName
+     * @param  string  $prettyName
      * @return StreamedResponse
      */
     public function image(Request $request, $path, $prettyName = '')
     {
-        if (substr($path, 0, 12) == 'attachments/') $path = substr($path, 12);
+        if (substr($path, 0, 12) == 'attachments/') {
+            $path = substr($path, 12);
+        }
         if ((pathinfo($path, PATHINFO_EXTENSION) == '') && (pathinfo($prettyName, PATHINFO_EXTENSION) != '')) {
-            $path .= '.' . pathinfo($prettyName, PATHINFO_EXTENSION);
+            $path .= '.'.pathinfo($prettyName, PATHINFO_EXTENSION);
         }
         $prettyName = $prettyName ? FileHelper::normalizeFilename($prettyName) : basename($path);
-        if (Storage::exists('attachments/' . $path)) {
-            return $request->get('download', false ) ? Storage::download('attachments/'.$path) : Storage::response('attachments/' . $path);
+        if (Storage::exists('attachments/'.$path)) {
+            return $request->get('download', false) ? Storage::download('attachments/'.$path) : Storage::response('attachments/'.$path);
         }
         abort(404);
     }
 
-
     /**
-     * @param $value
-     * @param string $prettyName
+     * @param  string  $prettyName
      */
-    public function qr($value, $prettyName = '') {
+    public function qr($value, $prettyName = '')
+    {
         $file = QRService::generate($value);
         $png = file_get_contents($file);
         unlink($file);
+
         return response($png)->header('Content-Type', 'image/png');
     }
-
 
     public function autoAttachment($type, $attachable, $attachment)
     {

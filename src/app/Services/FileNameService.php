@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,17 +36,23 @@ use Illuminate\Support\Str;
 
 class FileNameService
 {
-
-    public static function make($title, $extension='', $callSign = '', $dates = null, $withTime = false, $person = null, $forceDateFormat = null): string {
-        if ((!empty($extension)) && (substr($extension, 0, 1) != '.')) $extension = '.' . $extension;
+    public static function make($title, $extension = '', $callSign = '', $dates = null, $withTime = false, $person = null, $forceDateFormat = null): string
+    {
+        if ((! empty($extension)) && (substr($extension, 0, 1) != '.')) {
+            $extension = '.'.$extension;
+        }
         if ($dates) {
-            if (!is_array($dates)) $dates = [$dates];
+            if (! is_array($dates)) {
+                $dates = [$dates];
+            }
             foreach ($dates as $index => $date) {
-                if (!is_a($date, Carbon::class)) $date = Carbon::parse($date);
-                $dateFormat = $forceDateFormat ?? ($withTime ? 'Ymd-Hi': 'Ymd');
+                if (! is_a($date, Carbon::class)) {
+                    $date = Carbon::parse($date);
+                }
+                $dateFormat = $forceDateFormat ?? ($withTime ? 'Ymd-Hi' : 'Ymd');
                 $dates[$index] = $date->setTimezone('Europe/Berlin')->format($dateFormat);
             }
-            $date = join('-', $dates).' ';
+            $date = implode('-', $dates).' ';
         }
 
         if ($person) {
@@ -55,7 +61,6 @@ class FileNameService
             $name = '';
         }
 
-
         $title = Str::replace(' /', ',', $title);
         $title = Str::replace('/', ',', $title);
 
@@ -63,5 +68,4 @@ class FileNameService
             .($date ?? ' ').$name.$title.($extension ?: '');
 
     }
-
 }

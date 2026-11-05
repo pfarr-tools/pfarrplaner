@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -41,7 +41,7 @@ class RefactorLiturgyItems extends Migration
      */
     public function up()
     {
-        Schema::table('liturgy_items', function(Blueprint $table){
+        Schema::table('liturgy_items', function (Blueprint $table) {
             $table->dropColumn('data_id');
             $table->text('serialized_data')->nullable();
             $table->unsignedBigInteger('sortable')->nullable()->default(0);
@@ -57,7 +57,7 @@ class RefactorLiturgyItems extends Migration
      */
     public function down()
     {
-        Schema::table('liturgy_items', function(Blueprint $table){
+        Schema::table('liturgy_items', function (Blueprint $table) {
             $table->unsignedBigInteger('data_id');
             $table->dropColumn(['serialized_data', 'sortable']);
         });

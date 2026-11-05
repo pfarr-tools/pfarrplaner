@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -22,13 +23,21 @@ class PhoneNumberRuleTest extends TestCase
         $failed = false;
         $fail = function () use (&$failed) {
             $failed = true;
-            return new class { public function translate(): string { return ''; } };
+
+            return new class
+            {
+                public function translate(): string
+                {
+                    return '';
+                }
+            };
         };
-        (new PhoneNumber())->validate('phone', $value, $fail);
-        return !$failed;
+        (new PhoneNumber)->validate('phone', $value, $fail);
+
+        return ! $failed;
     }
 
-    public function testValidPhoneNumbers()
+    public function test_valid_phone_numbers()
     {
         $this->assertTrue($this->runRule('+49 7433 12345'));
         $this->assertTrue($this->runRule('07433/12345'));
@@ -36,7 +45,7 @@ class PhoneNumberRuleTest extends TestCase
         $this->assertTrue($this->runRule('(07433) 12345'));
     }
 
-    public function testInvalidPhoneNumbers()
+    public function test_invalid_phone_numbers()
     {
         $this->assertFalse($this->runRule('abc'));
         $this->assertFalse($this->runRule('123'));

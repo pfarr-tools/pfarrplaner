@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,12 +24,9 @@ class UpdatedWedding
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     protected User $user;
+
     protected Wedding $wedding;
 
-    /**
-     * @param User $user
-     * @param Wedding $wedding
-     */
     public function __construct(User $user, Wedding $wedding)
     {
         $this->user = $user;

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@ use Sabre\VObject\Component\VCalendar;
 
 class DAVCalendarItem
 {
-
     public const AUTO_WARNING = '<p><small>Bitte beachte: Dies ist ein automatisch vom Pfarrplaner erzeugter Eintrag. Änderungen können jederzeit ohne Vorwarnungen vom Pfarrplaner überschrieben werden.</small></p>';
 
     /** @var Model */
@@ -46,10 +45,10 @@ class DAVCalendarItem
     /** @var VCalendar */
     protected $vObject;
 
-    /** @var string $key */
+    /** @var string */
     protected $key = '';
 
-    /** @var array $config Config */
+    /** @var array Config */
     protected $config = [];
 
     public function __construct(
@@ -69,7 +68,7 @@ class DAVCalendarItem
 
         $categories = array_merge(['Pfarrplaner'], $categories);
 
-        $this->vObject = new VCalendar();
+        $this->vObject = new VCalendar;
         $vEvent = $this->vObject->create('VEVENT');
         $vEvent->UID = $this->objectId(true);
         if ($config['allDay'] ?? false) {
@@ -88,7 +87,7 @@ class DAVCalendarItem
         $vEvent->DESCRIPTION = $body;
         $vEvent->TRANSP = ($config['busy'] ?? 'true') ? 'OPAQUE' : 'TRANSPARENT';
         $vEvent->{'X-MICROSOFT-CDO-BUSYSTATUS'} = $config['busyStatus'] ?? 'BUSY';
-        $vEvent->CATEGORIES = join(',', $categories);
+        $vEvent->CATEGORIES = implode(',', $categories);
         $vEvent->SEQUENCE = ($object->created_at == $object->updated_at) ? 1 : $object->updated_at->timestamp;
         $this->vObject->add($vEvent);
     }
@@ -100,25 +99,25 @@ class DAVCalendarItem
 
     /**
      * Get a calendarItem via it's URI
-     * @param $uri
-     * @return DAVCalendarItem|null
+     *
      * @throws \ErrorException
      */
-    public static function fromUri($uri): DAVCalendarItem|null
+    public static function fromUri($uri): ?DAVCalendarItem
     {
         $uri = Str::replace('.ics', '', $uri);
         $tmp = explode('--', $uri);
         $class = Str::replace('-', '\\', $tmp[0]);
-        if (!is_subclass_of($class, Model::class)) {
-            throw new \ErrorException($class . ' is not a model class');
+        if (! is_subclass_of($class, Model::class)) {
+            throw new \ErrorException($class.' is not a model class');
         }
         $object = $class::find($tmp[1]);
-        if (!$object) {
+        if (! $object) {
             return null;
         }
-        if (!$object instanceof HasDAVCalendarItems) {
-            throw new \ErrorException($class . ' does not implement the HasDAVCalendarItems interface');
+        if (! $object instanceof HasDAVCalendarItems) {
+            throw new \ErrorException($class.' does not implement the HasDAVCalendarItems interface');
         }
+
         return $object->getCalendarItem($tmp[2] ?? '');
     }
 
@@ -132,22 +131,21 @@ class DAVCalendarItem
 
     protected function objectId($withDomain = false)
     {
-        return Str::replace('\\', '-', get_class($this->object)) . '--' . $this->object->id
-            . (empty($this->key) ? '' : '--' . $this->key)
-            . ($withDomain ? '@' . $this->getDomain() : '');
+        return Str::replace('\\', '-', get_class($this->object)).'--'.$this->object->id
+            .(empty($this->key) ? '' : '--'.$this->key)
+            .($withDomain ? '@'.$this->getDomain() : '');
     }
 
     public function toCalendarObject(): array
     {
         $calData = $this->getVObject()->serialize();
+
         return [
             'id' => $this->objectId(),
-            'uri' => $this->objectId() . '.ics',
+            'uri' => $this->objectId().'.ics',
             'calendardata' => $calData,
-            'etag' => '"' . sha1($calData) . '"',
+            'etag' => '"'.sha1($calData).'"',
             'lastmodified' => $this->object->updated_at->timestamp,
         ];
     }
-
-
 }

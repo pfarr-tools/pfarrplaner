@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,7 +18,7 @@ use Tests\TestCase;
 
 class DefaultWordDocumentUnitTest extends TestCase
 {
-    public function testCreateDomDocumentFromHtmlPreservesUtf8SpecialCharacters(): void
+    public function test_create_dom_document_from_html_preserves_utf8_special_characters(): void
     {
         $dom = DefaultWordDocument::createDomDocumentFromHtml('<p>Text — mit … „Sonderzeichen“ &amp; Akzenten é</p>');
         $body = $dom->getElementsByTagName('body')->item(0);

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -45,9 +46,6 @@ class TestCommand extends Command
         $this->ignoreValidationErrors();
     }
 
-    /**
-     * @return int
-     */
     public function handle(): int
     {
         $exitCode = 0;
@@ -71,8 +69,6 @@ class TestCommand extends Command
      *
      * PHPUnit may recreate the mounted file as root with the default 0644 mode.
      * The web container's PHP-FPM worker must still be able to append to it.
-     *
-     * @return void
      */
     protected function repairQueryLogPermissions(): void
     {
@@ -85,8 +81,6 @@ class TestCommand extends Command
 
     /**
      * Remove env vars loaded from .env so phpunit.xml <env> entries are not blocked by inherited values.
-     *
-     * @return void
      */
     protected function clearEnv(): void
     {
@@ -103,8 +97,6 @@ class TestCommand extends Command
     }
 
     /**
-     * @param string $path
-     * @param string $file
      * @return string[]
      */
     protected function envVarsFromFile(string $path, string $file): array
@@ -125,9 +117,6 @@ class TestCommand extends Command
         );
     }
 
-    /**
-     * @return int
-     */
     protected function runPhpUnit(): int
     {
         $this->newLine();
@@ -164,9 +153,6 @@ class TestCommand extends Command
         }
     }
 
-    /**
-     * @return int
-     */
     protected function runVitest(): int
     {
         $this->newLine();
@@ -195,9 +181,6 @@ class TestCommand extends Command
         }
     }
 
-    /**
-     * @return int
-     */
     protected function runDusk(): int
     {
         $this->newLine();

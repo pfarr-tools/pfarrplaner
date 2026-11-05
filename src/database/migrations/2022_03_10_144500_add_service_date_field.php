@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,12 +28,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -41,14 +43,14 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::table('services', function(Blueprint $table) {
+        Schema::table('services', function (Blueprint $table) {
             $table->datetime('date')->nullable();
             $table->unsignedInteger('day_id')->nullable()->change();
         });
 
         // event_class is introduced later, but the current Service model scopes
         // every query by that column.
-        foreach (Service::withoutGlobalScope(\App\Models\Scopes\ServicesOnlyScope::class)->get() as $service) {
+        foreach (Service::withoutGlobalScope(ServicesOnlyScope::class)->get() as $service) {
             $date = $service->day->date->format('Y-m-d');
             if ($service->time) {
                 $date .= ' '.trim($service->time);

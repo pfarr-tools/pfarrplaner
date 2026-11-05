@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,9 +40,8 @@ use Inertia\Inertia;
 
 class SermonController extends Controller
 {
-
-    use HandlesAttachmentsTrait;
     use HandlesAttachedImageTrait;
+    use HandlesAttachmentsTrait;
 
     protected $model = Sermon::class;
 
@@ -60,6 +59,7 @@ class SermonController extends Controller
         } else {
             $services = collect([$service]);
         }
+
         return Inertia::render('sermonEditor', compact('services', 'sermon', 'service'));
     }
 
@@ -68,6 +68,7 @@ class SermonController extends Controller
         $this->authorizeSermonUpdate($sermon);
         $services = $sermon->services;
         $service = $services->first();
+
         return Inertia::render('sermonEditor', compact('services', 'sermon', 'service'));
     }
 
@@ -77,10 +78,12 @@ class SermonController extends Controller
         $data = $this->validateRequest($request);
         $sermon = Sermon::create($data);
         $this->handleIndividualAttachment($request, $sermon, 'image');
-        if (null !== $sermon) {
+        if ($sermon !== null) {
             $service->update(['sermon_id' => $sermon->id]);
+
             return redirect()->route('sermon.editor', $sermon->id);
         }
+
         return redirect()->back();
     }
 
@@ -90,19 +93,23 @@ class SermonController extends Controller
         $data = $this->validateRequest($request);
         $sermon->update($data);
         $this->handleIndividualAttachment($request, $sermon, 'image');
+
         return redirect()->route('sermon.editor', $sermon);
     }
 
     public function uncouple(Request $request, Service $service)
     {
         Gate::authorize('update', $service);
-        if (null === $service->sermon) abort(404);
+        if ($service->sermon === null) {
+            abort(404);
+        }
         /** @var Sermon $sermon */
         $sermon = $service->sermon;
         $service->update(['sermon_id' => null]);
         $sermon->refresh();
         if (count($sermon->services) == 0) {
             $sermon->delete();
+
             return redirect()->route('liturgy.editor', $service->slug);
         } else {
             return redirect()->route('sermon.editor', $sermon->id);
@@ -112,20 +119,28 @@ class SermonController extends Controller
     public function reader(Sermon $sermon)
     {
         $this->authorizeSermonUpdate($sermon);
+
         return Inertia::render('Sermon/Reader', compact('sermon'));
     }
 
     public function readerByService(Service $service)
     {
         Gate::authorize('update', $service);
-        if (!$service->sermon_id) abort(404);
+        if (! $service->sermon_id) {
+            abort(404);
+        }
+
         return $this->reader($service->sermon);
     }
 
-    protected function handleCheckBoxes($data, $keys) {
+    protected function handleCheckBoxes($data, $keys)
+    {
         foreach ($keys as $key) {
-            if (null !== $data[$key]) $data[$key] = (bool)$data[$key];
+            if ($data[$key] !== null) {
+                $data[$key] = (bool) $data[$key];
+            }
         }
+
         return $data;
     }
 
@@ -151,6 +166,7 @@ class SermonController extends Controller
             ]
         );
         $data = $this->handleCheckBoxes($data, ['cc_license', 'permit_handouts']);
+
         return $data;
     }
 

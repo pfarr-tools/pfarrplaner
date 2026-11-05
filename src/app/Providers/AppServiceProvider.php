@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,10 +30,13 @@
 
 namespace App\Providers;
 
+use App\Exceptions\Handler;
 use App\Seating\SeatingValidators;
 use App\Services\QueryLogService;
 use Carbon\Carbon;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Mail\MailManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
@@ -44,10 +47,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Laravel\Telescope\TelescopeServiceProvider;
 
 /**
  * Class AppServiceProvider
- * @package App\Providers
  */
 class AppServiceProvider extends ServiceProvider
 {
@@ -65,7 +68,6 @@ class AppServiceProvider extends ServiceProvider
         Factory::guessFactoryNamesUsing(function (string $modelName) {
             return Str::replace('App\\Models\\', '\\Database\\Factories\\', $modelName).'Factory';
         });
-
 
         Blade::withoutComponentTags();
         Blade::aliasComponent('partials.form.tabheader', 'tabheader');
@@ -87,13 +89,11 @@ class AppServiceProvider extends ServiceProvider
         Blade::include('partials.form.radiogroup', 'radiogroup');
         Blade::include('partials.string.badges', 'badges');
 
-
-
         Validator::extend('phone_number', fn ($a, $v) => (bool) preg_match('/^([0-9s(+][0-9\.-\/ ()]{7,})$/i', $v));
         Validator::extend('zip', fn ($a, $v) => (bool) preg_match('/^([0]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{3}$/i', $v));
         Validator::extend('hash', fn ($a, $v, $p) => Hash::check($v, $p[0]));
-        Validator::extend('not_hash', fn ($a, $v, $p) => !Hash::check($v, $p[0]));
-        Validator::extend('not_current_password', fn ($a, $v) => !Hash::check($v, Auth::user()->password));
+        Validator::extend('not_hash', fn ($a, $v, $p) => ! Hash::check($v, $p[0]));
+        Validator::extend('not_current_password', fn ($a, $v) => ! Hash::check($v, Auth::user()->password));
 
         SeatingValidators::register();
 
@@ -105,10 +105,14 @@ class AppServiceProvider extends ServiceProvider
          * Pass array or string of key column names to remove
          */
         Collection::macro('removeCols', function ($except) {
-            if (!is_array($except)) $except = (array)$except;
+            if (! is_array($except)) {
+                $except = (array) $except;
+            }
 
             // Single Dimensional arrays
-            if (!is_array($this->first()) && !is_object($this->first())) return $this->except($except);
+            if (! is_array($this->first()) && ! is_object($this->first())) {
+                return $this->except($except);
+            }
 
             // Multi Dimensional arrays
             $out = $this->map(function ($item) use ($except) {
@@ -120,7 +124,7 @@ class AppServiceProvider extends ServiceProvider
 
         $tmpPath = storage_path('app/tmp');
 
-        if (!is_dir($tmpPath)) {
+        if (! is_dir($tmpPath)) {
             mkdir($tmpPath, 0755, true);
         }
 
@@ -137,16 +141,16 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(
-            \Illuminate\Contracts\Debug\ExceptionHandler::class,
-            \App\Exceptions\Handler::class
+            ExceptionHandler::class,
+            Handler::class
         );
 
-        $this->app->alias('mail.manager', \Illuminate\Mail\MailManager::class);
+        $this->app->alias('mail.manager', MailManager::class);
 
         // DEV dependencies:
         if ($this->app->environment('local')) {
-            if (class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
-                $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+            if (class_exists(TelescopeServiceProvider::class)) {
+                $this->app->register(TelescopeServiceProvider::class);
             }
         }
     }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,14 +34,20 @@ use Illuminate\Support\Str;
 
 abstract class AbstractAttachment
 {
-
     protected static $title = '';
+
     protected static $description = '';
+
     protected static $icon = '';
+
     protected static $extension = '';
+
     protected static $mimeType = '';
+
     protected static $callSign = '';
+
     protected static $fileTitle = '';
+
     protected static $hasSetup = false;
 
     public static function getKey()
@@ -69,5 +75,6 @@ abstract class AbstractAttachment
     }
 
     abstract public function download();
+
     abstract public static function fromId($id);
 }

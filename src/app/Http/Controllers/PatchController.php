@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,13 +30,11 @@
 
 namespace App\Http\Controllers;
 
-
-use Illuminate\Http\Request;
 use App\Providers\AuthServiceProvider;
+use Illuminate\Http\Request;
 
 class PatchController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
@@ -52,9 +50,8 @@ class PatchController extends Controller
 
         $patchClass = '\\App\\Maintenance\\Patches\\'.ucfirst($patch).'Patch';
         if (class_exists($patchClass)) {
-            $patch = new $patchClass();
+            $patch = new $patchClass;
             $patch->patch($request);
         }
     }
-
 }

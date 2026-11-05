@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,9 +28,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use App\Models\People\User;
+use App\UI\Modules\Modules;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -38,12 +41,14 @@ return new class extends Migration {
      */
     public function up()
     {
-        $new = \App\UI\Modules\Modules::defaultConfig();
+        $new = Modules::defaultConfig();
         $old = $new;
         unset($old['rites']);
 
-        foreach (\App\Models\People\User::all() as $user) {
-            if ($user->getSetting('modules', []) == $old) $user->setSetting('modules', $new);
+        foreach (User::all() as $user) {
+            if ($user->getSetting('modules', []) == $old) {
+                $user->setSetting('modules', $new);
+            }
         }
 
     }
@@ -55,13 +60,14 @@ return new class extends Migration {
      */
     public function down()
     {
-        $old = \App\UI\Modules\Modules::defaultConfig();
+        $old = Modules::defaultConfig();
         $new = $old;
         unset($new['rites']);
 
-        foreach (\App\Models\People\User::all() as $user) {
-            if ($user->getSetting('modules', []) == $old) $user->setSetting('modules', $new);
+        foreach (User::all() as $user) {
+            if ($user->getSetting('modules', []) == $old) {
+                $user->setSetting('modules', $new);
+            }
         }
     }
-
 };

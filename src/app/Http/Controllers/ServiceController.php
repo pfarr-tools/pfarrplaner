@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,14 +35,13 @@ use App\Events\ServiceBeforeDelete;
 use App\Events\ServiceBeforeUpdate;
 use App\Events\ServiceUpdated;
 use App\Http\Requests\ServiceRequest;
-use App\Http\Resources\ServiceResource;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Liturgy\LiturgySheets\LiturgySheets;
 use App\Models\Attachment;
-use App\Models\Places\City;
 use App\Models\Calendar\Day;
 use App\Models\LiturgyInfo;
 use App\Models\Location;
+use App\Models\Places\City;
 use App\Models\Service;
 use App\Models\ServiceGroup;
 use App\Models\Tag;
@@ -61,14 +60,11 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 
-
 /**
  * Class ServiceController
- * @package App\Http\Controllers
  */
 class ServiceController extends Controller
 {
-
     use HandlesAttachmentsTrait;
 
     public function __construct()
@@ -76,10 +72,6 @@ class ServiceController extends Controller
         $this->middleware('auth')->except(['publicLiturgy']);
     }
 
-    /**
-     * @param ServiceRequest $request
-     * @param Service $service
-     */
     protected function updateFromRequest(ServiceRequest $request, Service $service): void
     {
         $service->associateParticipants($request, $service);
@@ -91,15 +83,17 @@ class ServiceController extends Controller
         $service->setAdConfigFromRequest($request);
     }
 
-    protected function presetDataForNewService($date = null, City $city = null): Array {
+    protected function presetDataForNewService($date = null, ?City $city = null): array
+    {
         $data = [];
         $location = $city ? $city->locations->first() : null;
         $date = $date ? Carbon::parse($date) : Carbon::parse('next Sunday');
         if ($location && $location->default_time) {
-            $date = Carbon::parse($date->format('Y-m-d') . ' ' . $location->default_time, 'Europe/Berlin');
+            $date = Carbon::parse($date->format('Y-m-d').' '.$location->default_time, 'Europe/Berlin');
         } else {
-            $date = Carbon::parse($date->format('Y-m-d') . ' 10:00:00', 'Europe/Berlin');
+            $date = Carbon::parse($date->format('Y-m-d').' 10:00:00', 'Europe/Berlin');
         }
+
         return [
             'city_id' => $city ? $city->id : null,
             'date' => $date->setTimezone('UTC'),
@@ -111,6 +105,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('create', Service::class);
         $service = Service::create($this->presetDataForNewService($date, $city));
+
         return redirect()->route('service.edit', $service->slug);
     }
 
@@ -119,15 +114,14 @@ class ServiceController extends Controller
         Gate::authorize('create', Service::class);
         $localCalendar = LocalEventCalendarFactory::get($filter);
         $service = Service::create($localCalendar->presetData($this->presetDataForNewService($date, null)));
+
         return redirect()->route('service.edit', $service->slug);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param Request $request
-     * @param Service $service
-     * @param string $tab optional tab name
+     * @param  string  $tab  optional tab name
      * @return Response
      */
     public function edit(Request $request, Service $service, $tab = 'home')
@@ -203,8 +197,6 @@ class ServiceController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param ServiceRequest $request
-     * @param Service $service
      * @return Response
      */
     public function update(ServiceRequest $request, Service $service)
@@ -240,7 +232,6 @@ class ServiceController extends Controller
             return \response()->json($service);
         }
 
-
         $closeAfterSaving = $request->get('closeAfterSaving', 1);
         if ($closeAfterSaving) {
             $route = $request->get('routeBack') ?: '';
@@ -250,6 +241,7 @@ class ServiceController extends Controller
                 if (RedirectorService::backRoute() == route('calendar')) {
                     RedirectorService::setReturnRoute(route('calendar', ['date' => $service->date->format('Y-m')]));
                 }
+
                 return RedirectorService::back();
             }
         } else {
@@ -260,7 +252,6 @@ class ServiceController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Service $service
      * @return Response
      */
     public function destroy(Service $service)
@@ -272,13 +263,12 @@ class ServiceController extends Controller
         event(new ServiceBeforeDelete($service));
 
         $service->delete();
+
         return redirect()->route('calendar', $date)
             ->with('success', 'Die Veranstaltung wurde gelöscht.');
     }
 
     /**
-     * @param $date
-     * @param $city
      * @return Application|Factory|\Illuminate\View\View
      */
     public function add($date, City $city)
@@ -298,12 +288,14 @@ class ServiceController extends Controller
 
         $service = Service::create($data);
         $service->update(['slug' => $service->createSlug()]);
+
         return redirect()->route('service.edit', $service->slug);
     }
 
     /**
      * Export a service as ical
-     * @param $service Service
+     *
+     * @param  $service  Service
      */
     public function ical(Service $service)
     {
@@ -315,11 +307,12 @@ class ServiceController extends Controller
             "\r\n",
             str_replace('@@@@', "\r\n", str_replace("\n", "\r\n", str_replace("\r\n", '@@@@', $raw)))
         );
+
         return response($raw, 200)
             ->header('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
             ->header('Expires', '0')
             ->header('Content-Type', 'text/calendar')
-            ->header('Content-Disposition', 'inline; filename=' . $service->slug . '.ics');
+            ->header('Content-Disposition', 'inline; filename='.$service->slug.'.ics');
     }
 
     /**
@@ -348,7 +341,7 @@ class ServiceController extends Controller
                 'year' => $service->date->format('Y'),
                 'month' => $service->date->format('m'),
                 'highlight' => $service->id,
-                'slave' => 1
+                'slave' => 1,
             ]
         );
 
@@ -361,7 +354,7 @@ class ServiceController extends Controller
                 [
                     'year' => Auth::user()->getSetting('display-year', date('Y')),
                     'month' => Auth::user()->getSetting('display-month', date('m')),
-                    'slave' => 1
+                    'slave' => 1,
                 ]
             );
         }
@@ -372,22 +365,19 @@ class ServiceController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param Service $service
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function attach(Request $request, Service $service)
     {
         Gate::authorize('update', $service);
         $this->handleAttachments($request, $service);
+
         return response()->json($service->attachments);
     }
 
     /**
-     * @param Request $request
-     * @param Service $service
-     * @param Attachment $attachment
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     *
      * @throws \Exception
      */
     public function detach(Request $request, Service $service, Attachment $attachment)
@@ -397,24 +387,28 @@ class ServiceController extends Controller
         Storage::delete($attachment->file);
         $service->attachments()->where('id', $attachment->id)->delete();
         $attachment->delete();
+
         return response()->json($service->attachments);
     }
 
     /**
-     * @param Request $request
-     * @param $key
      * @return array|mixed|string[]
      */
-    private function arrayFromRequest(Request $request, $key) {
-        if (!$request->has($key)) return [];
+    private function arrayFromRequest(Request $request, $key)
+    {
+        if (! $request->has($key)) {
+            return [];
+        }
         $value = $request->get($key);
-        if (!is_array($value)) $value = explode(',', $value);
+        if (! is_array($value)) {
+            $value = explode(',', $value);
+        }
+
         return $value;
     }
 
     /**
-     * @param int $service
-     * @param Request $request
+     * @param  int  $service
      * @return JsonResponse
      */
     public function data(Request $request, $service)
@@ -430,15 +424,25 @@ class ServiceController extends Controller
 
         if ($request->has('fields')) {
             $fields = $this->arrayFromRequest($request, 'fields');
-            if (!in_array('id', $fields)) $fields[] = 'id';
-            if (!in_array('date', $fields)) $fields[] = 'date';
+            if (! in_array('id', $fields)) {
+                $fields[] = 'id';
+            }
+            if (! in_array('date', $fields)) {
+                $fields[] = 'date';
+            }
             $serviceQuery->select($fields);
         }
         $service = $serviceQuery->first();
-        if (!$service) return response()->json(null);
+        if (! $service) {
+            return response()->json(null);
+        }
         Gate::authorize('view', $service);
-        if ($request->has('append')) $service->setAppends($appends);
-        foreach ($load as $l) $service->load($l);
+        if ($request->has('append')) {
+            $service->setAppends($appends);
+        }
+        foreach ($load as $l) {
+            $service->load($l);
+        }
 
         // NOTE: This overrides buggy JSON conversion in JsonResponse
         return response($service->toJson())->withHeaders(['Content-Type' => 'application/json']);
@@ -446,8 +450,7 @@ class ServiceController extends Controller
 
     /**
      * Set the sermon for a service
-     * @param Request $request
-     * @param Service $service
+     *
      * @return JsonResponse
      */
     public function setSermon(Request $request, Service $service)
@@ -455,16 +458,21 @@ class ServiceController extends Controller
         Gate::authorize('update', $service);
         $data = $request->validate(['sermon_id' => 'int|nullable|exists:sermons,id']);
         $service->update(['sermon_id' => $data['sermon_id']]);
+
         return response()->json($service);
     }
 
     public function createQR(Request $request, Service $service)
     {
         Gate::authorize('update', $service);
-        if (!$service->city->konfiapp_apikey) abort(404);
+        if (! $service->city->konfiapp_apikey) {
+            abort(404);
+        }
 
-        $type = $request->validate(['type' => 'nullable|int'])['type'] ?? $service->city->konfiapp_default_type ?? null;;
-        if (!$type) abort(403);
+        $type = $request->validate(['type' => 'nullable|int'])['type'] ?? $service->city->konfiapp_default_type ?? null;
+        if (! $type) {
+            abort(403);
+        }
 
         $konfiApp = new KonfiAppIntegration($service->city());
         $service->konfiapp_event_type = $type;
@@ -476,16 +484,19 @@ class ServiceController extends Controller
 
     /**
      * Return a EPC code for donations
+     *
      * @return void
      */
     public function epc(Service $service)
     {
-        if (!$service->city->iban) abort(404);
+        if (! $service->city->iban) {
+            abort(404);
+        }
 
         $purpose = $service->offeringGoal() ?: 'Allgemeine Gemeindearbeit';
 
         return redirect()->route('qrcode', GiroCodeService::codeValue(
-             $service->city->official_name ?: 'Evang. Kirchengemeinde '.$service->city->name,
+            $service->city->official_name ?: 'Evang. Kirchengemeinde '.$service->city->name,
             $service->city->iban,
             null, // empty amount
             'Spende: '.$purpose,
@@ -493,14 +504,8 @@ class ServiceController extends Controller
         ));
     }
 
-
-    /**
-     *
-     */
     public function publicLiturgy(Service $service)
     {
         return view('services.public.liturgy', compact('service'));
     }
-
-
 }

@@ -22,6 +22,7 @@ class NextServicesTabResource extends JsonResource
     {
         $data = $this->resource;
         $data['services'] = CalendarServiceResource::collection($data['services']);
+
         return $data;
     }
 }

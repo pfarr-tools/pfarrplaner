@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,15 +37,16 @@ use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Occurence extends Model
 {
-
     protected $guarded = [];
+
     protected $casts = ['start' => 'datetime', 'end' => 'datetime'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function service()
     {
@@ -53,7 +54,7 @@ class Occurence extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function event()
     {
@@ -61,9 +62,6 @@ class Occurence extends Model
     }
 
     /**
-     * @param Builder $query
-     * @param Carbon $start
-     * @param Carbon $end
      * @return Builder
      */
     public function scopeBetween(Builder $query, Carbon $start, Carbon $end)
@@ -75,25 +73,27 @@ class Occurence extends Model
     /**
      * Find occurences which have a specific ad running at a specific date
      *
-     * @param Builder $query
-     * @param string $adChannelSlug Slug of the ad channel to be used
-     * @param Carbon $adDate Date of the ad
-     * @param bool $exactDate If true, the ad date must match exactly, otherwise the ad date is used as lower bound
-     * @param bool $includeEnded If true, ended occurences are included
+     * @param  string  $adChannelSlug  Slug of the ad channel to be used
+     * @param  Carbon  $adDate  Date of the ad
+     * @param  bool  $exactDate  If true, the ad date must match exactly, otherwise the ad date is used as lower bound
+     * @param  bool  $includeEnded  If true, ended occurences are included
      * @return Builder
      */
     public function scopeAdRunningAt(Builder $query, string $adChannelSlug, Carbon $adDate, bool $exactDate = false, bool $includeEnded = false)
     {
-        if (!$includeEnded) $query->where('end', '>=', $adDate);
+        if (! $includeEnded) {
+            $query->where('end', '>=', $adDate);
+        }
         $query->whereHas('service', function ($query2) use ($adChannelSlug, $adDate, $exactDate) {
             $query2->whereHas('adConfigs', function ($query3) use ($adChannelSlug, $adDate, $exactDate) {
                 $query3->where('ad_configs.slug', $adChannelSlug)
-                     ->whereRaw('DATE_SUB(DATE(services.date), INTERVAL ad_configs.offset DAY) '
-                                .($exactDate ? '=' : '<=').' ?',
-                                [$adDate->toDateString()]
-                        );
-                });
+                    ->whereRaw('DATE_SUB(DATE(services.date), INTERVAL ad_configs.offset DAY) '
+                               .($exactDate ? '=' : '<=').' ?',
+                        [$adDate->toDateString()]
+                    );
+            });
         });
+
         return $query;
     }
 
@@ -101,12 +101,11 @@ class Occurence extends Model
     {
         $adConfig = $this->getAdConfig($adChannelSlug);
         $adStart = $this->start->copy()->subDays($adConfig->offset);
+
         return $exactDate ? $adStart->toDateString() == $adDate->toDateString() : $adStart <= $adDate;
     }
 
     /**
-     * @param Builder $query
-     * @param Carbon $start
      * @return Builder
      */
     public function scopeStartingFrom(Builder $query, Carbon $start)
@@ -116,28 +115,29 @@ class Occurence extends Model
 
     public function getLiturgicalInfoAttribute()
     {
-        if (!$this->event) return [];
-        if ($this->event->isAlternateProprium) return $this->event->liturgicalInfo;
+        if (! $this->event) {
+            return [];
+        }
+        if ($this->event->isAlternateProprium) {
+            return $this->event->liturgicalInfo;
+        }
         $info = LiturgyService::getLiturgyInfoByDate($this->start);
+
         return $info[0] ?? [];
     }
 
-
     /**
      * Get the ad config for a specific ad channel
-     * @param string $adChannelKey
-     * @return AdConfig|null
      */
-    public function getAdConfig(string $adChannelKey): AdConfig|null
+    public function getAdConfig(string $adChannelKey): ?AdConfig
     {
         return $this->event->adConfigs->firstWhere('slug', $adChannelKey);
     }
 
     /**
      * Get the ad text for a specific ad channel
-     * @param string $adChannelKey
-     * @param string $defaultTo Default text to be used if no ad text is configured
-     * @return string
+     *
+     * @param  string  $defaultTo  Default text to be used if no ad text is configured
      */
     public function getAdText(string $adChannelKey, string $defaultTo = ''): string
     {
@@ -145,6 +145,7 @@ class Occurence extends Model
         if ($adConfig) {
             $adText = $adConfig->ad_text ?? '';
         }
+
         return ($adText ?? '') ?: $defaultTo ?: $this->service->ad_text ?: $this->service->descriptionText();
     }
 }

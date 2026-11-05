@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -15,7 +16,6 @@ namespace Tests\Feature;
 use App\Models\Liturgy\Text;
 use App\Models\People\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class LiturgicalTextsApiFeatureTest extends TestCase
@@ -25,7 +25,7 @@ class LiturgicalTextsApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testListReturnsAllTexts()
+    public function test_list_returns_all_texts()
     {
         $user = User::factory()->create();
         Text::factory()->count(2)->create();
@@ -40,7 +40,7 @@ class LiturgicalTextsApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testListRequiresAuth()
+    public function test_list_requires_auth()
     {
         $response = $this->getJson(route('api.liturgy.text.list'));
         $response->assertUnauthorized();
@@ -49,7 +49,7 @@ class LiturgicalTextsApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testImportFromWordReturnsEmptyStringWhenNoFileProvided()
+    public function test_import_from_word_returns_empty_string_when_no_file_provided()
     {
         $user = User::factory()->create();
 
@@ -63,7 +63,7 @@ class LiturgicalTextsApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testImportRequiresAuth()
+    public function test_import_requires_auth()
     {
         $response = $this->postJson(route('api.liturgy.text.import'));
         $response->assertUnauthorized();

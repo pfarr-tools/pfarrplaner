@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -13,6 +14,7 @@
 namespace Tests\Feature;
 
 use App\Models\Location;
+use App\Models\People\User;
 use App\Models\Seating\SeatingSection;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,13 +26,14 @@ class SeatingSectionFeatureTest extends TestCase
     use RefreshDatabase;
 
     protected SeatingSection $seatingSection;
+
     protected Location $location;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->user = \App\Models\People\User::factory()->create();
+        $this->user = User::factory()->create();
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $this->location = Location::factory()->create();
         $this->seatingSection = SeatingSection::factory()->create([
@@ -38,15 +41,15 @@ class SeatingSectionFeatureTest extends TestCase
         ]);
     }
 
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $this->actingAs($this->user)
             ->get(route('seatingSection.edit', $this->seatingSection->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Admin/Location/SeatingSectionEditor'));
+            ->assertInertia(fn (Assert $page) => $page->component('Admin/Location/SeatingSectionEditor'));
     }
 
-    public function testCreateViaFrontend(): void
+    public function test_create_via_frontend(): void
     {
         $data = SeatingSection::factory()->raw([
             'location_id' => $this->location->id,

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -29,7 +29,6 @@
  */
 
 namespace App\Liturgy\PronounSets;
-
 
 class AbstractPronounSet
 {
@@ -51,40 +50,32 @@ class AbstractPronounSet
     }
 
     /**
-     * @param mixed $label
+     * @param  mixed  $label
      */
     public function setLabel($label): void
     {
         $this->label = $label;
     }
 
-
     public function replacePronouns($text, $prefix)
     {
         foreach ($this->pronouns as $pronoun => $replacement) {
             $text = strtr($text, [
-                '[' . $prefix . ':' . ucfirst($pronoun) . ']' => ucfirst($replacement),
-                '[' . $prefix . ':' .$pronoun . ']' => $replacement,
-                ]);
+                '['.$prefix.':'.ucfirst($pronoun).']' => ucfirst($replacement),
+                '['.$prefix.':'.$pronoun.']' => $replacement,
+            ]);
         }
+
         return $text;
     }
 
-    /**
-     * @return array
-     */
     public function getPronouns(): array
     {
         return $this->pronouns;
     }
 
-    /**
-     * @param array $pronouns
-     */
     public function setPronouns(array $pronouns): void
     {
         $this->pronouns = $pronouns;
     }
-
-
 }

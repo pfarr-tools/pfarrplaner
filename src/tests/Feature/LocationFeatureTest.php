@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,15 +31,12 @@
 namespace Tests\Feature;
 
 use App\Models\Location;
-use App\Models\Places\City;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
 use Tests\AbstractModelFeatureTest;
 
 /**
  * Class LocationFeatureTest
- * @package Tests\Feature
  */
 class LocationFeatureTest extends AbstractModelFeatureTest
 {
@@ -52,11 +49,9 @@ class LocationFeatureTest extends AbstractModelFeatureTest
         return route('admin.city.edit', ['modelId' => $model->city_id, 'tab' => 'locations']);
     }
 
-
     protected function setUp(): void
     {
         parent::setUp();
         $this->testUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
-
 }

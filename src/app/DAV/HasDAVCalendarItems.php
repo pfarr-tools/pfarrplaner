@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,21 +32,17 @@ namespace App\DAV;
 
 interface HasDAVCalendarItems
 {
-
     /**
      * Get all calendar items related to this service for CalDAV
-     * @param bool $includeAlternate Include alternate calendar items
-     * @param bool $includeRiteAnniversaries Include one-year anniversary for rites
+     *
+     * @param  bool  $includeAlternate  Include alternate calendar items
+     * @param  bool  $includeRiteAnniversaries  Include one-year anniversary for rites
      * @return DAVCalendarItem[]
      */
     public function getCalendarItems(bool $includeAlternate, bool $includeRiteAnniversaries): array;
 
     /**
      * Get a single calendar item related to this service for CalDAV
-     * @param string $itemType
-     * @return DAVCalendarItem
      */
     public function getCalendarItem(string $itemType): DAVCalendarItem;
-
-
 }

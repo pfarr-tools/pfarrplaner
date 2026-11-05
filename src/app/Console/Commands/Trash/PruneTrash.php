@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,7 +13,6 @@
 
 namespace App\Console\Commands\Trash;
 
-use App\Http\Controllers\PapierkorbController;
 use App\Models\Leave\Absence;
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
@@ -34,9 +34,6 @@ class PruneTrash extends Command
      */
     protected $description = 'Permanently delete trash entries older than the retention period';
 
-    /**
-     * @return int
-     */
     public function handle(): int
     {
         $days = (int) $this->option('days');
@@ -55,11 +52,11 @@ class PruneTrash extends Command
             }
 
             if ($records->count() > 0) {
-                $this->line($label . ': ' . $records->count() . ' Einträge endgültig gelöscht.');
+                $this->line($label.': '.$records->count().' Einträge endgültig gelöscht.');
             }
         }
 
-        $this->info('Papierkorb bereinigt, insgesamt ' . $pruned . ' Einträge gelöscht.');
+        $this->info('Papierkorb bereinigt, insgesamt '.$pruned.' Einträge gelöscht.');
 
         return self::SUCCESS;
     }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -43,10 +43,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Session;
 
-
 /**
  * Class GoogleApiController
- * @package App\Http\Controllers
  */
 class GoogleApiController extends Controller
 {
@@ -56,15 +54,15 @@ class GoogleApiController extends Controller
     }
 
     /**
-     * @param Request $request
      * @return Application|RedirectResponse|Redirector
+     *
      * @throws Google_Exception
      */
     public function auth(Request $request)
     {
         if ($request->has('state')) {
             $state = json_decode($request->get('state'), true);
-            if (!isset($state['city'])) {
+            if (! isset($state['city'])) {
                 abort(404);
             }
             $city = City::findOrFail($state['city']);
@@ -76,7 +74,7 @@ class GoogleApiController extends Controller
             abort(404);
         }
 
-        $client = new Google_Client();
+        $client = new Google_Client;
         $client->setAuthConfig(base_path('config/client_secret.json'));
         $client->addScope(Google_Service_YouTube::YOUTUBE);
         $client->setRedirectUri(route('google-auth'));
@@ -84,15 +82,17 @@ class GoogleApiController extends Controller
         $client->setState(json_encode(['city' => $city->id, 'nextStep' => $nextStep]));
         $client->setIncludeGrantedScopes(true);
 
-        if (!$request->has('code')) {
+        if (! $request->has('code')) {
             if (($city->google_access_token != '') && ($city->google_refresh_token != '')) {
                 $client->setAccessToken($city->google_access_token);
                 $client->refreshToken($city->google_refresh_token);
                 $city->update(['google_access_token' => $client->getAccessToken()['access_token']]);
+
                 return redirect($nextStep);
             }
-            if (!$client->getAccessToken()) {
+            if (! $client->getAccessToken()) {
                 $auth_url = $client->createAuthUrl();
+
                 return redirect($auth_url);
             }
         } else {
@@ -108,16 +108,15 @@ class GoogleApiController extends Controller
                 $data['google_refresh_token'] = $token['refresh_token'];
             }
             $city->update($data);
+
             return redirect($nextStep);
         }
     }
 
     /**
-     * @param Request $request
-     * @param Service $service
      * @return JsonResponse
      */
-    function createBroadcast(Request $request, Service $service)
+    public function createBroadcast(Request $request, Service $service)
     {
         $broadcast = Broadcast::create($service);
         $service->update(['youtube_url' => $broadcast->getSharerUrl()]);
@@ -130,14 +129,18 @@ class GoogleApiController extends Controller
         }
     }
 
-    function deleteBroadcast(Service $service) {
+    public function deleteBroadcast(Service $service)
+    {
         Broadcast::delete($service);
+
         return redirect()->back();
     }
 
-    function refreshBroadcast(Service $service) {
+    public function refreshBroadcast(Service $service)
+    {
         $broadcast = Broadcast::get($service);
         $broadcast->update();
+
         return redirect()->back()->with('success', 'Die Beschreibung des Gottesdiensts auf YouTube wurde angepasst.');
     }
 }

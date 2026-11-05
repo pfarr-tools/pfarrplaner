@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,11 +36,9 @@ use PhpOffice\PhpSpreadsheet\Writer\Exception;
 
 /**
  * Class AbstractExcelDocumentReport
- * @package App\Reports
  */
 class AbstractExcelDocumentReport extends AbstractReport
 {
-
     /**
      * @var string
      */
@@ -51,11 +49,10 @@ class AbstractExcelDocumentReport extends AbstractReport
 
     public function __construct()
     {
-        $this->spreadsheet = new Spreadsheet();
+        $this->spreadsheet = new Spreadsheet;
     }
 
     /**
-     * @param $filename
      * @throws Exception
      */
     public function sendToBrowser($filename)
@@ -63,8 +60,8 @@ class AbstractExcelDocumentReport extends AbstractReport
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $writer = IOFactory::createWriter($this->spreadsheet, 'Xlsx');
         $writer->save($tempFile);
+
         return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
             ->deleteFileAfterSend(true);
     }
-
 }

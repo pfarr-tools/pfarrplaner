@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,10 +30,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Places\City;
 use App\Models\People\Team;
 use App\Models\People\User;
+use App\Models\Places\City;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class TeamController extends AbstractCRUDController
@@ -43,15 +45,17 @@ class TeamController extends AbstractCRUDController
     /**
      * Prepare the collection of models for the index view.
      */
-    protected function getModelsForIndex(): \Illuminate\Support\Collection
+    protected function getModelsForIndex(): Collection
     {
         $writableCityIds = Auth::user()->writableCities->pluck('id');
+
         return Team::with(Team::$relationsForIndex)
             ->inCities(Auth::user()->cities->pluck('id'))
             ->orderBy('name')
             ->get()
             ->map(function ($item) use ($writableCityIds) {
                 $item->writable = $writableCityIds->contains($item->city_id);
+
                 return $item;
             });
     }
@@ -75,18 +79,18 @@ class TeamController extends AbstractCRUDController
         $counter = Team::inCities(Auth::user()->cities->pluck('id'))->count() + 1;
 
         return [
-            'name' => 'Neues Team #' . $counter,
+            'name' => 'Neues Team #'.$counter,
             'city_id' => Auth::user()->cities->pluck('id')->first(),
         ];
     }
 
     /**
-     * @param City $city
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function byCity(City $city)
     {
         $teams = Team::with('users')->where('city_id', $city->id)->orderBy('name')->get();
+
         return response()->json($teams);
     }
 }

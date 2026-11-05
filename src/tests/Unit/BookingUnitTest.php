@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,9 +13,14 @@
 
 namespace Tests\Unit;
 
+use App\Actions\Booking\CreateBooking;
+use App\Actions\Booking\DeleteBooking;
+use App\Actions\Booking\UpdateBooking;
 use App\Events\Models\Booking\CreatedBooking;
 use App\Events\Models\Booking\DeletedBooking;
 use App\Events\Models\Booking\UpdatedBooking;
+use App\Http\Controllers\AbstractCRUDController;
+use App\Http\Controllers\Api\AbstractApiCRUDController;
 use App\Models\AbstractModel;
 use App\Models\People\User;
 use App\Models\Seating\Booking;
@@ -27,31 +33,31 @@ class BookingUnitTest extends TestCase
 {
     private User $user;
 
-    public function testBookingCanBeCreatedViaFactory(): void
+    public function test_booking_can_be_created_via_factory(): void
     {
         $booking = Booking::factory()->create();
         $this->assertCount(1, Booking::all());
     }
 
-    public function testBookingExtendsAbstractModel(): void
+    public function test_booking_extends_abstract_model(): void
     {
         $this->assertTrue(is_subclass_of(Booking::class, AbstractModel::class));
     }
 
-    public function testBookingControllerClassesExist(): void
+    public function test_booking_controller_classes_exist(): void
     {
-        $this->assertTrue(is_subclass_of(Booking::controllerClass(), \App\Http\Controllers\AbstractCRUDController::class));
-        $this->assertTrue(is_subclass_of(Booking::apiControllerClass(), \App\Http\Controllers\Api\AbstractApiCRUDController::class));
+        $this->assertTrue(is_subclass_of(Booking::controllerClass(), AbstractCRUDController::class));
+        $this->assertTrue(is_subclass_of(Booking::apiControllerClass(), AbstractApiCRUDController::class));
     }
 
-    public function testBookingContractsResolve(): void
+    public function test_booking_contracts_resolve(): void
     {
-        $this->assertInstanceOf(\App\Actions\Booking\CreateBooking::class, app(Booking::getContractName('create')));
-        $this->assertInstanceOf(\App\Actions\Booking\UpdateBooking::class, app(Booking::getContractName('update')));
-        $this->assertInstanceOf(\App\Actions\Booking\DeleteBooking::class, app(Booking::getContractName('delete')));
+        $this->assertInstanceOf(CreateBooking::class, app(Booking::getContractName('create')));
+        $this->assertInstanceOf(UpdateBooking::class, app(Booking::getContractName('update')));
+        $this->assertInstanceOf(DeleteBooking::class, app(Booking::getContractName('delete')));
     }
 
-    public function testBookingCanBeCreatedViaAction(): void
+    public function test_booking_can_be_created_via_action(): void
     {
         Event::fake();
 
@@ -72,7 +78,7 @@ class BookingUnitTest extends TestCase
         Event::assertDispatched(CreatedBooking::class);
     }
 
-    public function testBookingCanBeUpdatedViaAction(): void
+    public function test_booking_can_be_updated_via_action(): void
     {
         Event::fake();
 
@@ -92,7 +98,7 @@ class BookingUnitTest extends TestCase
         Event::assertDispatched(UpdatedBooking::class);
     }
 
-    public function testBookingCanBeDeletedViaAction(): void
+    public function test_booking_can_be_deleted_via_action(): void
     {
         Event::fake();
 

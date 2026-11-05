@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,7 +18,7 @@ use Tests\AbstractPageLoadTest;
 
 class InputsPageLoadTest extends AbstractPageLoadTest
 {
-    public function testInputsIndexLoads(): void
+    public function test_inputs_index_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('inputs.index'));

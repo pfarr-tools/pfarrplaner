@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,17 +30,15 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Liturgy\Block;
-use App\Models\Liturgy\Item;
 use App\Models\Service;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 
 class LiturgyBlockController extends Controller
 {
-
     /**
      * LiturgyBlockController constructor.
      */
@@ -49,11 +47,8 @@ class LiturgyBlockController extends Controller
         $this->middleware('auth');
     }
 
-
     /**
-     * @param Request $request
-     * @param Service $service
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(Request $request, Service $service)
     {
@@ -62,14 +57,12 @@ class LiturgyBlockController extends Controller
         $data['service_id'] = $service->id;
         $data['sortable'] = count($service->liturgyBlocks);
         $block = Block::create($data);
+
         return Redirect::route('liturgy.editor', ['service' => $service, 'autoFocusBlock' => $block->id]);
     }
 
     /**
-     * @param Request $request
-     * @param Service $service
-     * @param Block $block
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(Request $request, Service $service, Block $block)
     {
@@ -77,42 +70,36 @@ class LiturgyBlockController extends Controller
         abort_unless((int) $block->service_id === (int) $service->id, 404);
         $data = $this->validateRequest($request);
         $block->update($data);
+
         return Redirect::route('liturgy.editor', $service);
     }
 
     /**
-     * @param Request $request
-     * @param Service $service
-     * @param Block $block
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function destroy(Request $request, Service $service, Block $block)
     {
         Gate::authorize('update', $service);
         abort_unless((int) $block->service_id === (int) $service->id, 404);
         $block->delete();
+
         return Redirect::route('liturgy.editor', $service);
     }
 
     /**
-     * @param Request $request
-     * @param Service $service
-     * @param Block $block
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function sync(Request $request, Service $service, Block $block) {
+    public function sync(Request $request, Service $service, Block $block)
+    {
         Gate::authorize('update', $service);
         abort_unless((int) $block->service_id === (int) $service->id, 404);
         foreach ($request->all() as $item) {
             $block->items()->findOrFail($item['id'])->update(['sortable' => $item['sortable']]);
         }
+
         return redirect()->back();
     }
 
-    /**
-     * @param Request $request
-     * @return array
-     */
     protected function validateRequest(Request $request): array
     {
         return $request->validate(

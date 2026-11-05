@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -27,6 +27,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace App\Http\Controllers\DAV\Backends;
 
 use App\DAV\DAVCalendarItem;
@@ -40,8 +41,8 @@ use Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet;
 
 class CalendarBackend extends AbstractBackend implements SyncSupport
 {
-
-    protected function getUser($principalUri) {
+    protected function getUser($principalUri)
+    {
         return User::where('email', Str::after($principalUri, PrincipalBackend::PRINCIPAL_PREFIX))->first();
     }
 
@@ -59,6 +60,7 @@ class CalendarBackend extends AbstractBackend implements SyncSupport
                 'read-only' => true,
             ];
         }
+
         return $calendars;
     }
 
@@ -78,7 +80,9 @@ class CalendarBackend extends AbstractBackend implements SyncSupport
         $calendarConnection = CalendarConnection::findOrFail($calendarId);
 
         $objects = [];
-        foreach ($calendarConnection->getCalendarItems() as $item) $objects[] = $item->toCalendarObject();
+        foreach ($calendarConnection->getCalendarItems() as $item) {
+            $objects[] = $item->toCalendarObject();
+        }
 
         return $objects;
     }
@@ -102,7 +106,6 @@ class CalendarBackend extends AbstractBackend implements SyncSupport
     {
         // not implemented
     }
-
 
     public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null)
     {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -27,56 +28,56 @@ class SongPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new SongPolicy();
+        $this->policy = new SongPolicy;
     }
 
-    public function testViewAnyAlwaysReturnsTrue(): void
+    public function test_view_any_always_returns_true(): void
     {
         $user = User::factory()->create();
         $this->assertTrue($this->policy->viewAny($user));
     }
 
-    public function testIndexAlwaysReturnsTrue(): void
+    public function test_index_always_returns_true(): void
     {
         $user = User::factory()->create();
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testViewAlwaysReturnsTrue(): void
+    public function test_view_always_returns_true(): void
     {
         $user = User::factory()->create();
         $song = Song::factory()->create();
         $this->assertTrue($this->policy->view($user, $song));
     }
 
-    public function testCreateAlwaysReturnsTrue(): void
+    public function test_create_always_returns_true(): void
     {
         $user = User::factory()->create();
         $this->assertTrue($this->policy->create($user));
     }
 
-    public function testUpdateAlwaysReturnsTrue(): void
+    public function test_update_always_returns_true(): void
     {
         $user = User::factory()->create();
         $song = Song::factory()->create();
         $this->assertTrue($this->policy->update($user, $song));
     }
 
-    public function testDeleteAlwaysReturnsTrue(): void
+    public function test_delete_always_returns_true(): void
     {
         $user = User::factory()->create();
         $song = Song::factory()->create();
         $this->assertTrue($this->policy->delete($user, $song));
     }
 
-    public function testRestoreAlwaysReturnsTrue(): void
+    public function test_restore_always_returns_true(): void
     {
         $user = User::factory()->create();
         $song = Song::factory()->create();
         $this->assertTrue($this->policy->restore($user, $song));
     }
 
-    public function testForceDeleteAlwaysReturnsTrue(): void
+    public function test_force_delete_always_returns_true(): void
     {
         $user = User::factory()->create();
         $song = Song::factory()->create();

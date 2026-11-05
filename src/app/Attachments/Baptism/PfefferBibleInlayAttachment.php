@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,34 +31,38 @@
 namespace App\Attachments\Baptism;
 
 use App\Documents\Word\DefaultWordDocument;
-use App\Models\Rites\Baptism;
 use App\Services\ColorService;
 use App\Services\NameService;
-use Faker\Provider\Color;
-use Illuminate\Support\Str;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Shared\Converter;
 
 class PfefferBibleInlayAttachment extends AbstractBaptismAttachment
 {
-
     protected static $title = 'Bibeleinleger';
+
     protected static $description = 'Einlegeblatt für "Die bunte Kinderbibel"';
+
     protected static $extension = 'docx';
+
     protected static $icon = 'mdi mdi-file-word';
+
     protected static $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
     protected const FONT18 = ['name' => 'Lucida Handwriting', 'size' => 18, 'bold' => true];
+
     protected const FONT20 = ['name' => 'Lucida Handwriting', 'size' => 20, 'bold' => true];
+
     protected const FONT34 = ['name' => 'Lucida Handwriting', 'size' => 34, 'bold' => true];
+
     protected const PARAGRAPH = [
         'align' => 'center',
         'spaceAfter' => 0,
     ];
+
     protected const PARAGRAPH_SPC_TOP = [
         'align' => 'center',
         'spaceAfter' => 0,
-        'spaceBefore' => 120
+        'spaceBefore' => 120,
     ];
 
     protected const PARAGRAPH_SPC_BOTTOM = [
@@ -74,17 +78,17 @@ class PfefferBibleInlayAttachment extends AbstractBaptismAttachment
     public function download()
     {
         $doc = new DefaultWordDocument([
-                                           'layout' => [
-                                               'orientation' => 'portrait',
-                                               'pageSizeH' => Converter::cmToTwip(21),
-                                               'pageSizeW' => Converter::cmToTwip(19.7),
-                                               'marginTop' => Converter::cmToTwip(1.5),
-                                               'marginBottom' => Converter::cmToTwip(2),
-                                               'marginLeft' => Converter::cmToTwip(1),
-                                               'marginRight' => Converter::cmToTwip(2.95),
-                                           ],
-                                           'defaultFontSize' => 20,
-                                       ]);
+            'layout' => [
+                'orientation' => 'portrait',
+                'pageSizeH' => Converter::cmToTwip(21),
+                'pageSizeW' => Converter::cmToTwip(19.7),
+                'marginTop' => Converter::cmToTwip(1.5),
+                'marginBottom' => Converter::cmToTwip(2),
+                'marginLeft' => Converter::cmToTwip(1),
+                'marginRight' => Converter::cmToTwip(2.95),
+            ],
+            'defaultFontSize' => 20,
+        ]);
         $doc->getSection()->addText('Dieses Buch gehört', static::FONT20, static::PARAGRAPH_SPC_BOTTOM);
         $this->coloredText(
             $doc->getSection(),
@@ -104,7 +108,7 @@ class PfefferBibleInlayAttachment extends AbstractBaptismAttachment
         );
         $doc->getSection()->addTextBreak(1);
         $doc->getSection()->addText(
-            'am ' . $this->baptism->service->date->isoFormat('DD. MMMM YYYY'),
+            'am '.$this->baptism->service->date->isoFormat('DD. MMMM YYYY'),
             static::FONT18,
             static::PARAGRAPH
         );
@@ -116,7 +120,8 @@ class PfefferBibleInlayAttachment extends AbstractBaptismAttachment
         return $doc->sendToBrowser(static::getFileName());
     }
 
-    protected function coloredText(Section $section, $text, $fontStyle, $paragraphStyle) {
+    protected function coloredText(Section $section, $text, $fontStyle, $paragraphStyle)
+    {
         $run = $section->addTextRun($paragraphStyle);
 
         $colors = ColorService::rainbowTextArray($text);

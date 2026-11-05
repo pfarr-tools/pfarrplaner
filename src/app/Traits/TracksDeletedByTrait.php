@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -18,9 +19,6 @@ use Illuminate\Support\Facades\Auth;
 
 trait TracksDeletedByTrait
 {
-    /**
-     * @return void
-     */
     public static function bootTracksDeletedByTrait(): void
     {
         static::deleted(function ($model) {
@@ -29,7 +27,7 @@ trait TracksDeletedByTrait
             }
 
             $deletedBy = Auth::id();
-            if (!$deletedBy) {
+            if (! $deletedBy) {
                 return;
             }
 
@@ -47,9 +45,6 @@ trait TracksDeletedByTrait
         });
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function deletedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'deleted_by');

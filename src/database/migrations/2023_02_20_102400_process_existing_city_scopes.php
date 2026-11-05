@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -29,9 +29,11 @@
  */
 
 use App\Models\People\User;
+use App\Models\Places\City;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -40,23 +42,17 @@ return new class extends Migration {
     public function up()
     {
         foreach (User::all() as $user) {
-            $cityIds = \App\Models\Places\City::whereHas('services', function ($q) use ($user) {
+            $cityIds = City::whereHas('services', function ($q) use ($user) {
                 $q->userParticipates($user);
             })->get()->pluck('id');
             $user->cityScopes()->sync($cityIds);
         }
     }
 
-
     /**
      * Reverse the migrations.
      *
      * @return void
      */
-    public function down()
-    {
-    }
-
-
-
+    public function down() {}
 };

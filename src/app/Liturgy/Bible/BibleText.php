@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,50 +30,60 @@
 
 namespace App\Liturgy\Bible;
 
-use App\Liturgy\Bible\ReferenceParser;
-
 class BibleText
 {
-
     protected $version = '';
+
     protected $text = [];
+
     protected $renderedVerses = [];
 
     public function __construct($version = 'LUT17')
     {
-        $this->version=$version;
+        $this->version = $version;
         $textFile = config('bible.versions')[$version] ?? null;
-        if (!$textFile) throw new \Exception('Bibeltextdatei für '.$version.' nicht gefunden.');
-        if (!file_exists($textFile)) throw new \Exception('Bibeltextdatei für '.$version.' nicht gefunden.');
+        if (! $textFile) {
+            throw new \Exception('Bibeltextdatei für '.$version.' nicht gefunden.');
+        }
+        if (! file_exists($textFile)) {
+            throw new \Exception('Bibeltextdatei für '.$version.' nicht gefunden.');
+        }
         $this->text = explode("\n", file_get_contents($textFile));
     }
 
-    public function get(array $reference): array {
+    public function get(array $reference): array
+    {
         $result = [];
         $this->renderedVerses = [];
         foreach ($reference['parsed'] as $section) {
             $section['text'] = $this->getSection($section['range']);
             $result[] = $section;
         }
+
         return $result;
     }
 
-    public function getSection(array $reference): array {
+    public function getSection(array $reference): array
+    {
         $copy = false;
         $output = [];
         foreach ($this->text as $line) {
-            if ($this->matches($line, $reference[0])) $copy = true;
-            if ($reference[1]['verse']=='') {
-                if ($copy && (!$this->matches($line, $reference[1]))) return $output;
+            if ($this->matches($line, $reference[0])) {
+                $copy = true;
+            }
+            if ($reference[1]['verse'] == '') {
+                if ($copy && (! $this->matches($line, $reference[1]))) {
+                    return $output;
+                }
                 if ($data = $this->parse($line)) {
-                    if ($copy && (!isset($this->renderedVerses[$data['referenceKey']]))) {
+                    if ($copy && (! isset($this->renderedVerses[$data['referenceKey']]))) {
                         $output[$data['referenceKey']] = $data;
                         $this->renderedVerses[$data['referenceKey']] = $data;
                     }
                 }
             } else {
                 if ($data = $this->parse($line)) {
-                    if ($copy && (!isset($this->renderedVerses[$data['referenceKey']]))) {
+                    if ($copy && (! isset($this->renderedVerses[$data['referenceKey']]))) {
                         $output[$data['referenceKey']] = $data;
                         $this->renderedVerses[$data['referenceKey']] = $data;
                     }
@@ -83,16 +93,21 @@ class BibleText
                 }
             }
         }
+
         return $output;
     }
 
-    protected function parse(string $line) {
+    protected function parse(string $line)
+    {
         $tmp = explode(' ', $line);
         $book = $tmp[0];
-        if (!isset($tmp[1])) return;
-        list($chapter, $verse) = explode(':',$tmp[1]);
+        if (! isset($tmp[1])) {
+            return;
+        }
+        [$chapter, $verse] = explode(':', $tmp[1]);
         $slug = $book.' '.$chapter.':'.$verse;
         $bookTitle = ReferenceParser::getInstance()->getBookTitle($book);
+
         return [
             'book' => $book,
             'bookTitle' => $bookTitle,
@@ -105,9 +120,10 @@ class BibleText
         ];
     }
 
-    protected function matches(string $line, array $reference): bool {
+    protected function matches(string $line, array $reference): bool
+    {
         $ref = $reference['book'].' '.$reference['chapter'].':'.$reference['verse'];
-        return (strtolower(substr($line, 0, strlen($ref))) == strtolower($ref));
-    }
 
+        return strtolower(substr($line, 0, strlen($ref))) == strtolower($ref);
+    }
 }

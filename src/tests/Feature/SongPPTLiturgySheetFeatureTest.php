@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -19,14 +20,11 @@ use Tests\TestCase;
 
 class SongPPTLiturgySheetFeatureTest extends TestCase
 {
-    /**
-     * @return void
-     */
-    public function testLongEventListsAreSplitAcrossMultipleSlides(): void
+    public function test_long_event_lists_are_split_across_multiple_slides(): void
     {
-        $sheet = new class extends SongPPTLiturgySheet {
+        $sheet = new class extends SongPPTLiturgySheet
+        {
             /**
-             * @param Collection $events
              * @return array<int, Collection>
              */
             public function paginateSlidesForTest(Collection $events): array
@@ -35,8 +33,7 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
             }
 
             /**
-             * @param array<string, array<int, Collection>> $pagesByDate
-             * @param iterable $highlightedEventsByDate
+             * @param  array<string, array<int, Collection>>  $pagesByDate
              * @return array<string, array<int, Collection>>
              */
             public function suppressHighlightedOnlySlidesForTest(array $pagesByDate, iterable $highlightedEventsByDate): array
@@ -50,20 +47,17 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
         ]);
 
         $events = collect(range(1, 8))->map(function (int $index) {
-            $service = new class {
+            $service = new class
+            {
                 public string $locationTextWithCity = 'Musterkirche, Musterstadt';
 
-                /**
-                 * @return string
-                 */
                 public function timeText(): string
                 {
                     return '10:00';
                 }
 
                 /**
-                 * @param bool $short
-                 * @return string
+                 * @param  bool  $short
                  */
                 public function titleText($short = true): string
                 {
@@ -71,21 +65,22 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
                 }
             };
 
-            $eventMeta = new class {
+            $eventMeta = new class
+            {
                 public bool $is_allday = false;
 
-                /**
-                 * @return string
-                 */
                 public function descriptionText(): string
                 {
                     return 'Eine ausführliche Veranstaltungsbeschreibung für den Folienumbruch';
                 }
             };
 
-            return new class($index, $service, $eventMeta) {
+            return new class($index, $service, $eventMeta)
+            {
                 public object $service;
+
                 public object $event;
+
                 private int $index;
 
                 public function __construct(int $index, object $service, object $event)
@@ -95,16 +90,11 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
                     $this->event = $event;
                 }
 
-                /**
-                 * @param string $adChannelKey
-                 * @param string $defaultTo
-                 * @return string
-                 */
                 public function getAdText(string $adChannelKey, string $defaultTo = ''): string
                 {
-                    return 'Sehr lange Veranstaltungsbeschreibung Nummer ' . $this->index
-                        . ' mit vielen Zusatzworten fuer den Umbruch auf mehreren Zeilen'
-                        . ' und noch mehr Text fuer die Hoehenberechnung im Folienlayout';
+                    return 'Sehr lange Veranstaltungsbeschreibung Nummer '.$this->index
+                        .' mit vielen Zusatzworten fuer den Umbruch auf mehreren Zeilen'
+                        .' und noch mehr Text fuer die Hoehenberechnung im Folienlayout';
                 }
             };
         });
@@ -118,15 +108,12 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
         }));
     }
 
-    /**
-     * @return void
-     */
-    public function testEventListSlidesContainingOnlyHighlightedEventsAreSuppressed(): void
+    public function test_event_list_slides_containing_only_highlighted_events_are_suppressed(): void
     {
-        $sheet = new class extends SongPPTLiturgySheet {
+        $sheet = new class extends SongPPTLiturgySheet
+        {
             /**
-             * @param array<string, array<int, Collection>> $pagesByDate
-             * @param iterable $highlightedEventsByDate
+             * @param  array<string, array<int, Collection>>  $pagesByDate
              * @return array<string, array<int, Collection>>
              */
             public function suppressHighlightedOnlySlidesForTest(array $pagesByDate, iterable $highlightedEventsByDate): array
@@ -153,14 +140,12 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
         $this->assertSame([1, 2], $filteredPages['2026-05-24'][0]->pluck('id')->all());
     }
 
-    /**
-     * @param int $id
-     * @return object
-     */
     protected function fakeAdEvent(int $id): object
     {
-        $service = new class($id) {
+        $service = new class($id)
+        {
             public int $id;
+
             public string $locationTextWithCity = 'Musterkirche, Musterstadt';
 
             public function __construct(int $id)
@@ -168,17 +153,13 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
                 $this->id = $id;
             }
 
-            /**
-             * @return string
-             */
             public function timeText(): string
             {
                 return '10:00';
             }
 
             /**
-             * @param bool $short
-             * @return string
+             * @param  bool  $short
              */
             public function titleText($short = true): string
             {
@@ -186,14 +167,19 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
             }
         };
 
-        $eventMeta = new class {
+        $eventMeta = new class
+        {
             public bool $is_allday = false;
         };
 
-        return new class($id, $service, $eventMeta) {
+        return new class($id, $service, $eventMeta)
+        {
             public int $id;
+
             public object $service;
+
             public object $event;
+
             public Carbon $start;
 
             public function __construct(int $id, object $service, object $event)
@@ -204,14 +190,9 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
                 $this->start = Carbon::parse('2026-05-24 10:00:00');
             }
 
-            /**
-             * @param string $adChannelKey
-             * @param string $defaultTo
-             * @return string
-             */
             public function getAdText(string $adChannelKey, string $defaultTo = ''): string
             {
-                return 'Veranstaltung ' . $this->id;
+                return 'Veranstaltung '.$this->id;
             }
         };
     }

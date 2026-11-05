@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
@@ -39,12 +38,16 @@ use Inertia\Inertia;
 
 class SongMailLiturgySheet extends AbstractLiturgySheet
 {
-
     protected $title = 'E-Mail mit Liederliste';
+
     protected $icon = 'fa fa-envelope';
+
     protected $isNotAFile = true;
+
     protected $configurationComponent = 'SongMailLiturgySheetDialog';
+
     protected $configurationCloseOnly = true;
+
     protected $privileged = true;
 
     public function render(Service $service)
@@ -63,7 +66,7 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
         }
 
         return redirect(
-            'mailto:' . join(',', $recipients) . '?subject=' . rawurlencode($subject) . '&body=' . rawurlencode($body)
+            'mailto:'.implode(',', $recipients).'?subject='.rawurlencode($subject).'&body='.rawurlencode($body)
         );
     }
 
@@ -78,30 +81,30 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
 
     protected function buildSubject(Service $service): string
     {
-        return $service->titleText(false) . ' am ' . $service->date->isoFormat(
-                'dddd, DD.MM.YYYY'
-            ) . ', ' . $service->timeText() . ', ' . $service->locationText();
+        return $service->titleText(false).' am '.$service->date->isoFormat(
+            'dddd, DD.MM.YYYY'
+        ).', '.$service->timeText().', '.$service->locationText();
     }
 
     protected function buildBody(Service $service): string
     {
-        $body = 'Sehr geehrte Mitwirkende am Gottesdienst' . ' am ' . $service->date->isoFormat(
-                'dddd, DD. MMMM YYYY'
-            )
-            . ', ' . $service->timeText() .
-            (($service->location && $service->location->at_text) ? ' ' . $service->location->at_text : ', ' . $service->locationText())
-            . ',' . PHP_EOL . PHP_EOL.'Hier der geplante Ablauf für den Gottesdienst:'.PHP_EOL.PHP_EOL;
+        $body = 'Sehr geehrte Mitwirkende am Gottesdienst'.' am '.$service->date->isoFormat(
+            'dddd, DD. MMMM YYYY'
+        )
+            .', '.$service->timeText().
+            (($service->location && $service->location->at_text) ? ' '.$service->location->at_text : ', '.$service->locationText())
+            .','.PHP_EOL.PHP_EOL.'Hier der geplante Ablauf für den Gottesdienst:'.PHP_EOL.PHP_EOL;
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
 
                 if (isset($item->data['responsible'])) {
                     $concernsOrganists = in_array('ministry:organists', $item->data['responsible']);
-                    if (!$concernsOrganists) {
+                    if (! $concernsOrganists) {
                         foreach ($service->organists as $organist) {
                             $concernsOrganists = $concernsOrganists || in_array(
-                                    'user:' . $organist->id,
-                                    $item->data['responsible']
-                                );
+                                'user:'.$organist->id,
+                                $item->data['responsible']
+                            );
                         }
                     }
                 } else {
@@ -112,39 +115,39 @@ class SongMailLiturgySheet extends AbstractLiturgySheet
                     $helper = new SongItemHelper($item);
                     $verseCount = $helper->getActiveVerseCount(true, true);
 
-                    $body .= '  -> ' . $item->title . ': '
-                        . ($item->data[$item->data_type]['code'] ?? $item->data[$item->data_type]['songbook']['name'] ?? '')
-                        . ' '
-                        . $item->data[$item->data_type]['reference'] . ' '
-                        . (isset($item->data[$item->data_type]['altEG']) ? '(EG ' . $item->data[$item->data_type]['altEG'] . ') ' : '')
-                        . ($item->data[$item->data_type]['song']['title'] ?? '')
-                        . $helper->forceVerseString(', ')
-                        . ($verseCount ? ' (' . $verseCount . ')' : '')
-                        . PHP_EOL;
+                    $body .= '  -> '.$item->title.': '
+                        .($item->data[$item->data_type]['code'] ?? $item->data[$item->data_type]['songbook']['name'] ?? '')
+                        .' '
+                        .$item->data[$item->data_type]['reference'].' '
+                        .(isset($item->data[$item->data_type]['altEG']) ? '(EG '.$item->data[$item->data_type]['altEG'].') ' : '')
+                        .($item->data[$item->data_type]['song']['title'] ?? '')
+                        .$helper->forceVerseString(', ')
+                        .($verseCount ? ' ('.$verseCount.')' : '')
+                        .PHP_EOL;
                 } elseif ($item->data_type == 'psalm') {
                     if (isset($item->data['psalm'])) {
-                        $body .= '  -> ' . $item->title . ': '
-                            . ($item->data[$item->data_type]['songbook_abbreviation'] ?? $item->data[$item->data_type]['songbook'] ?? '')
-                            . ' '
-                            . $item->data[$item->data_type]['reference'] . ' '
-                            . ($item->data[$item->data_type]['title'] ?? '')
-                            . (isset($item->data['verses']) && ($item->data['verses'] != '') ? ', ' . $item->data['verses'] : '')
-                            . PHP_EOL;
+                        $body .= '  -> '.$item->title.': '
+                            .($item->data[$item->data_type]['songbook_abbreviation'] ?? $item->data[$item->data_type]['songbook'] ?? '')
+                            .' '
+                            .$item->data[$item->data_type]['reference'].' '
+                            .($item->data[$item->data_type]['title'] ?? '')
+                            .(isset($item->data['verses']) && ($item->data['verses'] != '') ? ', '.$item->data['verses'] : '')
+                            .PHP_EOL;
                     }
                 } elseif ($item->data_type == 'reading') {
-                    $body .= ($concernsOrganists ? '  -> ' : '       ') . $item->title . ': ' . ($item->data['reference'] ?? '--') . PHP_EOL;
+                    $body .= ($concernsOrganists ? '  -> ' : '       ').$item->title.': '.($item->data['reference'] ?? '--').PHP_EOL;
                 } else {
-                    $body .= ($concernsOrganists ? '  -> ' : '       ') . $item->title  . PHP_EOL;
+                    $body .= ($concernsOrganists ? '  -> ' : '       ').$item->title.PHP_EOL;
                 }
             }
         }
 
-        return $body . PHP_EOL
-            . 'Der komplette Ablauf kann hier in einem druckbaren Format heruntergeladen werden:' . PHP_EOL
-            . URL::temporarySignedRoute('liturgy.download', now()->addDays(14), ['service' => $service->slug, 'key' => 'A4']) . PHP_EOL . PHP_EOL
-            . 'Außerdem gibt es den Ablauf in einem druckbaren, für Organist:innen optimierten Format hier:' . PHP_EOL
-            . URL::temporarySignedRoute('liturgy.download', now()->addDays(14), ['service' => $service->slug, 'key' => 'Organist']) . PHP_EOL
-            . PHP_EOL . 'Freundliche Grüße, ' . PHP_EOL . Auth::user()->fullName();
+        return $body.PHP_EOL
+            .'Der komplette Ablauf kann hier in einem druckbaren Format heruntergeladen werden:'.PHP_EOL
+            .URL::temporarySignedRoute('liturgy.download', now()->addDays(14), ['service' => $service->slug, 'key' => 'A4']).PHP_EOL.PHP_EOL
+            .'Außerdem gibt es den Ablauf in einem druckbaren, für Organist:innen optimierten Format hier:'.PHP_EOL
+            .URL::temporarySignedRoute('liturgy.download', now()->addDays(14), ['service' => $service->slug, 'key' => 'Organist']).PHP_EOL
+            .PHP_EOL.'Freundliche Grüße, '.PHP_EOL.Auth::user()->fullName();
     }
 
     protected function getRecipients(Service $service): array

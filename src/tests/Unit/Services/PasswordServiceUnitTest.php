@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,26 +18,26 @@ use Tests\TestCase;
 
 class PasswordServiceUnitTest extends TestCase
 {
-    public function testRandomPasswordReturnsString(): void
+    public function test_random_password_returns_string(): void
     {
         $this->assertIsString(PasswordService::randomPassword());
     }
 
-    public function testRandomPasswordHasMinimumLength(): void
+    public function test_random_password_has_minimum_length(): void
     {
         // Pattern: consonant + vowel + consonant + vowel + 4 digits = 8 chars minimum
         $this->assertGreaterThanOrEqual(8, strlen(PasswordService::randomPassword()));
     }
 
-    public function testRandomPasswordContainsDigits(): void
+    public function test_random_password_contains_digits(): void
     {
         $password = PasswordService::randomPassword();
         $this->assertMatchesRegularExpression('/\d{4}$/', $password);
     }
 
-    public function testRandomPasswordIsNonDeterministic(): void
+    public function test_random_password_is_non_deterministic(): void
     {
-        $passwords = array_map(fn() => PasswordService::randomPassword(), range(1, 10));
+        $passwords = array_map(fn () => PasswordService::randomPassword(), range(1, 10));
         // At least 2 distinct values in 10 attempts
         $this->assertGreaterThan(1, count(array_unique($passwords)));
     }

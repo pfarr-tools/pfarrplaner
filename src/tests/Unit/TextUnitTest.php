@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -18,10 +19,12 @@ use Tests\AbstractSimpleModelUnitTest;
 class TextUnitTest extends AbstractSimpleModelUnitTest
 {
     protected string $modelClass = Text::class;
+
     protected bool $hasPolicy = true;
+
     protected bool $hasFactory = true;
 
-    public function testTextCanBeCreatedViaFactory(): void
+    public function test_text_can_be_created_via_factory(): void
     {
         $text = Text::factory()->create();
         $this->assertCount(1, Text::all());

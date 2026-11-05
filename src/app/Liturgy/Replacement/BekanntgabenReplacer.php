@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Liturgy\Replacement;
 
-
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
 use App\Models\Service;
@@ -44,8 +43,8 @@ class BekanntgabenReplacer extends AbstractReplacer
     protected function getReplacementText(): string
     {
         $service = $this->service;
-        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d') . ' 0:00:00 last Sunday');
-        $nextWeek = Carbon::createFromTimeString($service->date->format('Y-m-d') . ' 0:00:00 next Sunday');
+        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 last Sunday');
+        $nextWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 next Sunday');
         $lastServices = Service::select('*')
             ->endingAt($service->date->copy()->subSecond(1))
             ->where('offering_amount', '!=', '')
@@ -62,9 +61,9 @@ class BekanntgabenReplacer extends AbstractReplacer
             if ($lastServiceDate != $lastService->date) {
                 continue;
             }
-            $x = trim(strtr((string)$lastService->offering_amount, [',' => '.', '€' => '']));
+            $x = trim(strtr((string) $lastService->offering_amount, [',' => '.', '€' => '']));
             if (is_numeric($x)) {
-                $offeringAmount += (float)$x;
+                $offeringAmount += (float) $x;
             }
         }
 
@@ -91,16 +90,14 @@ class BekanntgabenReplacer extends AbstractReplacer
         $op = new OPEventsImport($service->city);
         $events = $op->mix($events, $service->date, $nextWeek);
 
-
         $fmt = new \NumberFormatter('de_DE', \NumberFormatter::CURRENCY);
 
-
         $text = 'Herzlichen Dank für das Opfer der Gottesdienste vom '
-            . $lastServiceDate->format('d.m.Y') . ' in Höhe von '
-            . $fmt->formatCurrency($offeringAmount, 'EUR') . '.'
-            . PHP_EOL . PHP_EOL;
+            .$lastServiceDate->format('d.m.Y').' in Höhe von '
+            .$fmt->formatCurrency($offeringAmount, 'EUR').'.'
+            .PHP_EOL.PHP_EOL;
 
-        $text .= 'Das heutige Opfer ist für folgenden Zweck bestimmt: ' . $service->offeringGoal() . PHP_EOL ;
+        $text .= 'Das heutige Opfer ist für folgenden Zweck bestimmt: '.$service->offeringGoal().PHP_EOL;
 
         $ctr = 0;
         $lastDay = $nextWeek->format('Ymd');
@@ -119,7 +116,7 @@ class BekanntgabenReplacer extends AbstractReplacer
                     }
                 }
 
-                if (!$done) {
+                if (! $done) {
                     if ($lastDay != $eventStart->format('Ymd')) {
                         $text .= $this->renderParagraph();
                         if ($nextWeek->format('Ymd') == $eventStart->format('Ymd')) {
@@ -135,22 +132,22 @@ class BekanntgabenReplacer extends AbstractReplacer
                     if (is_array($event)) {
                         $text .= $this->renderParagraph(
                             (isset($event['allDay']) && $event['allDay']) ? '' : strftime(
-                                    '%H.%M Uhr',
-                                    $eventStart->getTimestamp()
-                                ) . "\t" . trim(
-                                    StringTool::sanitizeXMLString(
-                                        $event['title']
-                                    ) . ' (' . StringTool::sanitizeXMLString($event['place']) . ')'
-                                )
+                                '%H.%M Uhr',
+                                $eventStart->getTimestamp()
+                            )."\t".trim(
+                                StringTool::sanitizeXMLString(
+                                    $event['title']
+                                ).' ('.StringTool::sanitizeXMLString($event['place']).')'
+                            )
                         );
                     } else {
                         $description = $event->descriptionText();
-                        $description = $description ? ' mit ' . $description : '';
+                        $description = $description ? ' mit '.$description : '';
                         // take care of ampersands
                         $description = preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
                         $text .= $this->renderParagraph(
-                            $event->timeText(true, '.') . "\t" . trim(
-                                ($event->title ?: 'Gottesdienst') . $description . ' (' . $event->locationText() . ')'
+                            $event->timeText(true, '.')."\t".trim(
+                                ($event->title ?: 'Gottesdienst').$description.' ('.$event->locationText().')'
                             )
                         );
 
@@ -161,14 +158,13 @@ class BekanntgabenReplacer extends AbstractReplacer
                                     'Y-m-d H:i',
                                     $event->date->format(
                                         'Y-m-d'
-                                    ) . ' ' . ($event->cc_alt_time ?? $event->time)
+                                    ).' '.($event->cc_alt_time ?? $event->time)
                                 )->isoFormat(
                                     'HH.mm \U\h\r'
-                                ) . "\t" . 'Kinderkirche' . ' (' . ($event->cc_location ?? $event->locationText()) . ')'
+                                )."\t".'Kinderkirche'.' ('.($event->cc_location ?? $event->locationText()).')'
                             );
                         }
                     }
-
 
                     if ((isset($event['allDay']) && $event['allDay'])) {
                         $text .= $this->renderParagraph();
@@ -183,5 +179,4 @@ class BekanntgabenReplacer extends AbstractReplacer
 
         return $text;
     }
-
 }

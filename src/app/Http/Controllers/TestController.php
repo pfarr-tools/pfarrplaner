@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Mail\TestMail;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -40,19 +39,17 @@ use Illuminate\Support\Facades\Mail;
 
 /**
  * Class TestController
- * @package App\Http\Controllers
  */
 class TestController extends Controller
 {
-
     /**
-     * @param $address
      * @return Application|ResponseFactory|Response
      */
     public function mail($address)
     {
-        Log::debug('Sending test mail to ' . $address);
-        Mail::to($address)->bcc('dev@toph.de')->queue(new TestMail());
-        return response('Testnachricht an ' . $address . ' versendet.', 200);
+        Log::debug('Sending test mail to '.$address);
+        Mail::to($address)->bcc('dev@toph.de')->queue(new TestMail);
+
+        return response('Testnachricht an '.$address.' versendet.', 200);
     }
 }

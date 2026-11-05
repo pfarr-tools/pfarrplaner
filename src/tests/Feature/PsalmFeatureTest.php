@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -32,7 +33,7 @@ class PsalmFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testIndexLoads(): void
+    public function test_index_loads(): void
     {
         $this->actingAs($this->user)
             ->get(route('admin.psalms.index'))
@@ -40,7 +41,7 @@ class PsalmFeatureTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page->component('Admin/Psalm/Index'));
     }
 
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $psalm = Psalm::factory()->create();
         $this->actingAs($this->user)
@@ -49,7 +50,7 @@ class PsalmFeatureTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page->component('Admin/Psalm/PsalmEditor'));
     }
 
-    public function testCreatePsalm(): void
+    public function test_create_psalm(): void
     {
         $this->actingAs($this->user)
             ->post(route('admin.psalms.store'), ['title' => 'Psalm 24'])

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -30,21 +31,21 @@ class PublicPageLoadTest extends AbstractPageLoadTest
     /**
      * The QR page is public (no auth middleware) — visit without loginAs.
      */
-    public function testCityQrLoads(): void
+    public function test_city_qr_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit(route('qr', $this->city->name))
-                    ->waitFor('#app', 10)
-                    ->assertSee($this->city->name)
-                    ->assertDontSee('Oops! An Error Occurred')
-                    ->assertDontSee('Whoops');
+                ->waitFor('#app', 10)
+                ->assertSee($this->city->name)
+                ->assertDontSee('Oops! An Error Occurred')
+                ->assertDontSee('Whoops');
         });
     }
 
     /**
      * Streaming troubleshooter requires a signed URL — generate one for the test.
      */
-    public function testStreamingTroubleshooterLoads(): void
+    public function test_streaming_troubleshooter_loads(): void
     {
         $signedUrl = URL::signedRoute('streaming.troubleshooter', ['city' => $this->city->name]);
 

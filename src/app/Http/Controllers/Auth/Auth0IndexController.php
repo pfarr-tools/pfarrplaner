@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@ use Redirect;
 
 /**
  * Class Auth0IndexController
- * @package App\Http\Controllers\Auth
  */
 class Auth0IndexController extends Controller
 {
@@ -59,6 +58,7 @@ class Auth0IndexController extends Controller
     public function logout()
     {
         Auth::logout();
+
         return Redirect::intended('/');
     }
 }

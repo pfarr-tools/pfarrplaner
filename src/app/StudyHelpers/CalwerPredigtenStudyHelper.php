@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,40 +30,43 @@
 
 namespace App\StudyHelpers;
 
-use GuzzleHttp\Client;
 use Illuminate\Support\Str;
 
 class CalwerPredigtenStudyHelper extends AbstractStudyHelper
 {
-
     public $title = 'Calwer Predigten';
 
     protected $records = [];
 
-    function read(array $data): array
+    public function read(array $data): array
     {
-        for ($i=0; $i<=90; $i+=10) {
+        for ($i = 0; $i <= 90; $i += 10) {
             $this->records = array_merge($this->records ?? [], $this->readSinglePage('https://www.calwer-stiftung.com/calwer-predigten-online.365730.202264.htm?id=365730&md=202264&skip='.$i));
         }
+
         return $this->records;
     }
 
-    protected function readSinglePage($url) {
-        if ('' == ($content = $this->getContent($url))) return [];
+    protected function readSinglePage($url)
+    {
+        if ('' == ($content = $this->getContent($url))) {
+            return [];
+        }
         $content = utf8_decode(Str::replace('–', '-', Str::betweenFirst($content, '<ul id="ajax_list_li" class="sermonlist resultlist">', '</ul>')));
-        $doc = new \DOMDocument();
+        $doc = new \DOMDocument;
         $doc->loadHTML($content);
-
 
         $records = [];
         /** @var \DOMNode $li */
-        foreach($doc->getElementsByTagName('li') as $li) {
+        foreach ($doc->getElementsByTagName('li') as $li) {
             foreach ($li->getElementsByTagName('div') as $div) {
                 if ($div->getAttribute('class') == 'list-headline') {
                     $recordTitle = Str::replace("\n", '', $div->nodeValue);
-                    $recordTitle = Str::replace("(", ', ', $recordTitle);
-                    $recordTitle = Str::replace(")", '', $recordTitle);
-                    while (Str::contains($recordTitle, '  ')) $recordTitle = Str::replace('  ', ' ', $recordTitle);
+                    $recordTitle = Str::replace('(', ', ', $recordTitle);
+                    $recordTitle = Str::replace(')', '', $recordTitle);
+                    while (Str::contains($recordTitle, '  ')) {
+                        $recordTitle = Str::replace('  ', ' ', $recordTitle);
+                    }
                     $recordTitle = trim(Str::replace(' ,', ',', $recordTitle));
                     $recordDate = substr($recordTitle, 0, 10);
                     $recordTitle = '[Calwer Predigten] '.$recordTitle;
@@ -77,12 +80,14 @@ class CalwerPredigtenStudyHelper extends AbstractStudyHelper
             }
             $records[$recordDate] = [$recordTitle => $recordUrl];
         }
+
         return $records;
     }
 
-    function getLinks(array $data): array
+    public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+
         return $data;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,6 +31,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\InterstitialService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class InterstitialController extends Controller
@@ -43,15 +45,12 @@ class InterstitialController extends Controller
     /**
      * Store the current user's response for a configured interstitial.
      *
-     * @param Request $request
-     * @param InterstitialService $interstitialService
-     * @param string $key
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function update(Request $request, InterstitialService $interstitialService, string $key)
     {
         $data = $request->validate([
-            'action' => 'required|string|in:' . implode(',', [
+            'action' => 'required|string|in:'.implode(',', [
                 InterstitialService::ACTION_DISMISS,
                 InterstitialService::ACTION_LATER,
             ]),

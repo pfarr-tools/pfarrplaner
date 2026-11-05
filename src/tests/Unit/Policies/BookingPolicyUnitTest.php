@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -29,18 +30,18 @@ class BookingPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new BookingPolicy();
+        $this->policy = new BookingPolicy;
         Permission::findOrCreate('gd-bearbeiten', 'web');
     }
 
-    public function testRegularUserCannotCreateBooking(): void
+    public function test_regular_user_cannot_create_booking(): void
     {
         $user = User::factory()->create();
         $service = Service::factory()->create();
         $this->assertFalse($this->policy->create($user, $service));
     }
 
-    public function testUserWithServicePermissionCanCreateBooking(): void
+    public function test_user_with_service_permission_can_create_booking(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('gd-bearbeiten');
@@ -49,14 +50,14 @@ class BookingPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->create($user, $service));
     }
 
-    public function testRegularUserCannotUpdateBooking(): void
+    public function test_regular_user_cannot_update_booking(): void
     {
         $user = User::factory()->create();
         $booking = Booking::factory()->create();
         $this->assertFalse($this->policy->update($user, $booking));
     }
 
-    public function testUserWithServicePermissionCanUpdateBooking(): void
+    public function test_user_with_service_permission_can_update_booking(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('gd-bearbeiten');
@@ -65,7 +66,7 @@ class BookingPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->update($user, $booking));
     }
 
-    public function testUserWithServicePermissionCanDeleteBooking(): void
+    public function test_user_with_service_permission_can_delete_booking(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('gd-bearbeiten');

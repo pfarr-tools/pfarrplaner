@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -21,10 +22,12 @@ use Tests\AbstractSimpleModelUnitTest;
 class BlockUnitTest extends AbstractSimpleModelUnitTest
 {
     protected string $modelClass = Block::class;
+
     protected bool $hasPolicy = false;
+
     protected bool $hasFactory = false;
 
-    public function testBlockCanBeCreatedDirectly(): void
+    public function test_block_can_be_created_directly(): void
     {
         $service = Service::factory()->create();
         $block = Block::create(['title' => 'Test Block', 'service_id' => $service->id, 'sortable' => 1]);
@@ -32,14 +35,14 @@ class BlockUnitTest extends AbstractSimpleModelUnitTest
         $this->assertEquals('Test Block', Block::first()->title);
     }
 
-    public function testBlockHasServiceRelationship(): void
+    public function test_block_has_service_relationship(): void
     {
         $service = Service::factory()->create();
         $block = Block::create(['title' => 'Test Block', 'service_id' => $service->id, 'sortable' => 1]);
         $this->assertInstanceOf(BelongsTo::class, $block->service());
     }
 
-    public function testBlockHasItemsRelationship(): void
+    public function test_block_has_items_relationship(): void
     {
         $service = Service::factory()->create();
         $block = Block::create(['title' => 'Test Block', 'service_id' => $service->id, 'sortable' => 1]);

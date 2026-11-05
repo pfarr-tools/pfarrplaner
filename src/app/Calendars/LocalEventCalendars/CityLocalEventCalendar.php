@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Calendars\LocalEventCalendars;
 
-use App\Calendars\LocalEventCalendars\AbstractLocalEventCalendar;
 use App\Models\Places\City;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,7 +37,6 @@ use Illuminate\Support\Facades\Auth;
 
 class CityLocalEventCalendar extends AbstractLocalEventCalendar
 {
-
     protected static $group = 'Kirchengemeinden';
 
     public static function list(): array
@@ -47,6 +45,7 @@ class CityLocalEventCalendar extends AbstractLocalEventCalendar
         foreach (Auth::user()->cities as $city) {
             $calendars[] = static::getEntry($city->id, $city->name);
         }
+
         return $calendars;
     }
 
@@ -60,23 +59,25 @@ class CityLocalEventCalendar extends AbstractLocalEventCalendar
         $data = parent::presetData($data);
 
         $city = City::find($this->id);
-        if (!$city) return $data;
+        if (! $city) {
+            return $data;
+        }
         $data['city_id'] = $this->id;
 
         $location = $city->locations->first();
-        if (!$location) return $data;
+        if (! $location) {
+            return $data;
+        }
 
         $data['location_id'] = $location->id;
 
         $date = $data['date'] ?? Carbon::parse('next Sunday');
         if ($location && $location->default_time) {
-            $data['date'] ??= Carbon::parse($date->format('Y-m-d') . ' ' . $location->default_time, 'Europe/Berlin');
+            $data['date'] ??= Carbon::parse($date->format('Y-m-d').' '.$location->default_time, 'Europe/Berlin');
         } else {
-            $data['date'] ??= Carbon::parse($date->format('Y-m-d') . ' 10:00:00', 'Europe/Berlin');
+            $data['date'] ??= Carbon::parse($date->format('Y-m-d').' 10:00:00', 'Europe/Berlin');
         }
 
         return $data;
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,7 +36,6 @@ use App\Models\AbstractModel;
 use App\Models\People\User;
 use App\Services\RoleService;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -44,16 +43,15 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Inertia\Testing\AssertableInertia as Assert;
 use Tests\Traits\TestsClasses;
 
 abstract class AbstractModelUnitTest extends TestCase
 {
-
-    use TestsClasses;
     use RefreshDatabase;
+    use TestsClasses;
 
     protected $modelName;
+
     protected $modelClass = '';
 
     /** @var User */
@@ -67,108 +65,113 @@ abstract class AbstractModelUnitTest extends TestCase
         $reflectedClass = new \ReflectionClass($object);
         $reflection = $reflectedClass->getProperty($property);
         $reflection->setAccessible(true);
+
         return $reflection->getValue($object);
     }
 
-
     /**
      * Test if model class exists and is a descendant of AbstractModel
+     *
      * @return void
      */
-    public function testModelClassExistsAndIsDescendant()
+    public function test_model_class_exists_and_is_descendant()
     {
         $this->assertTrue(
             class_exists($this->modelClass),
-            'Model class ' . $this->modelClass . ' does not exist.'
+            'Model class '.$this->modelClass.' does not exist.'
         );
         $this->assertTrue(
             is_subclass_of($this->modelClass, AbstractModel::class),
-            'Model class ' . $this->modelClass . ' is not a descendant of ' . AbstractModel::class,
+            'Model class '.$this->modelClass.' is not a descendant of '.AbstractModel::class,
         );
     }
 
     /**
      * Test if the model table is present
+     *
      * @return void
      */
-    public function testModelTableExists()
+    public function test_model_table_exists()
     {
         $model = (new $this->modelClass);
         $table = $model->getTable();
-        $this->assertTrue(Schema::hasTable($table), 'Missing table ' . $table);
+        $this->assertTrue(Schema::hasTable($table), 'Missing table '.$table);
     }
 
     /**
      * Test if columns from fillable are present
+     *
      * @return void
      */
-    public function testColumnsFromFillableArePresent()
+    public function test_columns_from_fillable_are_present()
     {
         $model = (new $this->modelClass);
         $table = $model->getTable();
         $fillable = $this->getProtectedProperty($model, 'fillable');
         $this->assertIsArray(
             $fillable,
-            $this->modelClass . '::$fillable is not an array'
+            $this->modelClass.'::$fillable is not an array'
         );
         foreach ($fillable as $column) {
             $this->assertTrue(
                 Schema::hasColumn($table, $column),
-                'Table ' . $table . ' is missing column ' . $column
+                'Table '.$table.' is missing column '.$column
             );
         }
     }
 
     /**
      * test if controller is present and descendent of AbstractCRUDController
+     *
      * @return void
      */
-    public function testControllerClassIsPresentAndDescendant()
+    public function test_controller_class_is_present_and_descendant()
     {
         $this->assertTrue(class_exists(($this->modelClass)::controllerClass()));
         $this->assertTrue(
             is_subclass_of(($this->modelClass)::controllerClass(), AbstractCRUDController::class),
-            ($this->modelClass)::controllerClass() . ' is not a descendant of ' . AbstractCRUDController::class
+            ($this->modelClass)::controllerClass().' is not a descendant of '.AbstractCRUDController::class
         );
     }
 
     /**
      * test if API controller is present and descendent of AbstractCRUDController
+     *
      * @return void
      */
-    public function testApiControllerClassIsPresentAndDescendant()
+    public function test_api_controller_class_is_present_and_descendant()
     {
         $this->assertTrue(class_exists(($this->modelClass)::apiControllerClass()));
         $this->assertTrue(
             is_subclass_of(($this->modelClass)::apiControllerClass(), AbstractApiCRUDController::class),
-            ($this->modelClass)::apiControllerClass() . ' is not a descendant of ' . AbstractApiCRUDController::class
+            ($this->modelClass)::apiControllerClass().' is not a descendant of '.AbstractApiCRUDController::class
         );
     }
 
-
     /**
      * Test if controller methods are present
+     *
      * @return void
      */
-    public function testControllerMethodsArePresent()
+    public function test_controller_methods_are_present()
     {
         $routes = ($this->modelClass)::getRoutes();
         foreach (['web' => ($this->modelClass)::controllerClass(), 'api' => ($this->modelClass)::apiControllerClass()] as $routeClass => $controllerClass) {
             foreach ($routes[$routeClass] ?? [] as $routeData) {
                 $this->assertTrue(
                     method_exists($controllerClass, $routeData['verb']),
-                    'Controller method missing: ' . $controllerClass . '::' . $routeData['verb'] . '()'
+                    'Controller method missing: '.$controllerClass.'::'.$routeData['verb'].'()'
                 );
             }
         }
     }
 
-
     /**
      * Test if all the defined routes for the model are present
+     *
      * @return void
      */
-    public function testRoutesArePresent()
+    public function test_routes_are_present()
     {
         foreach (($this->modelClass)::getRoutes() as $routeClass => $routes) {
             foreach (array_keys($routes) as $routeKey) {
@@ -177,12 +180,12 @@ abstract class AbstractModelUnitTest extends TestCase
         }
     }
 
-
     /**
      * Test if the contract interfaces exist
+     *
      * @return void
      */
-    public function testContractsExists()
+    public function test_contracts_exists()
     {
         foreach (['create', 'update', 'delete'] as $verb) {
             $this->assertInterfaceExists(($this->modelClass)::getContractName($verb));
@@ -191,9 +194,10 @@ abstract class AbstractModelUnitTest extends TestCase
 
     /**
      * Test if the contract resolve to a concrete action
+     *
      * @return void
      */
-    public function testContractsResolve()
+    public function test_contracts_resolve()
     {
         foreach (['create', 'update', 'delete'] as $verb) {
             $this->assertInstanceOf(
@@ -203,29 +207,29 @@ abstract class AbstractModelUnitTest extends TestCase
         }
     }
 
-
     /**
      * Test if factory can be instantiated
+     *
      * @return void
      */
-    public function testFactoryExists()
+    public function test_factory_exists()
     {
         $factory = $this->factory();
         $this->assertIsObject($factory, 'Factory class does not exist');
         $this->assertIsA(
-            Str::replace('App\\Models\\', 'Database\\Factories\\', $this->modelClass . 'Factory'),
+            Str::replace('App\\Models\\', 'Database\\Factories\\', $this->modelClass.'Factory'),
             $factory
         );
     }
-
 
     // test with contracted actions
 
     /**
      * Test if model can be created via action
+     *
      * @return void
      */
-    public function testCreateViaAction()
+    public function test_create_via_action()
     {
         Event::fake();
 
@@ -248,9 +252,10 @@ abstract class AbstractModelUnitTest extends TestCase
 
     /**
      * Test if model can be updated via action
+     *
      * @return void
      */
-    public function testUpdateViaAction()
+    public function test_update_via_action()
     {
         Event::fake();
 
@@ -275,9 +280,10 @@ abstract class AbstractModelUnitTest extends TestCase
 
     /**
      * Test if model can be deleted via action
+     *
      * @return void
      */
-    public function testDeleteViaAction()
+    public function test_delete_via_action()
     {
         Event::fake();
 
@@ -295,57 +301,59 @@ abstract class AbstractModelUnitTest extends TestCase
 
     /**
      * Test if model index can be retrieved via API call
+     *
      * @return void
      */
-    public function testIndexViaApi()
+    public function test_index_via_api()
     {
         $existing = $this->factory()->create();
 
-        $apiRoute = 'api.' . ($this->modelClass)::pluralKey() . '.index';
+        $apiRoute = 'api.'.($this->modelClass)::pluralKey().'.index';
         $response = $this->actingAs($this->testUser, 'api')
             ->getJson(route($apiRoute));
 
         $response->assertStatus(200);
-        $response->assertJson(fn(AssertableJson $json) => $json->has(1)
-            ->first(fn(AssertableJson $json) =>
-                $json->where('id', $existing->id)
-                    ->etc()
+        $response->assertJson(fn (AssertableJson $json) => $json->has(1)
+            ->first(fn (AssertableJson $json) => $json->where('id', $existing->id)
+                ->etc()
             )
         );
     }
 
     /**
      * Test if model can be retrieved via API call
+     *
      * @return void
      */
-    public function testShowViaApi()
+    public function test_show_via_api()
     {
         if (in_array('show', ($this->modelClass)::$exceptRoutes['api'] ?? [])) {
             $this->assertTrue(true);
+
             return;
         }
         $existing = $this->factory()->create();
 
-        $apiRoute = 'api.' . ($this->modelClass)::pluralKey() . '.show';
+        $apiRoute = 'api.'.($this->modelClass)::pluralKey().'.show';
         $response = $this->actingAs($this->testUser, 'api')
             ->getJson(route($apiRoute));
 
         $response->assertStatus(200);
-        $response->assertJson(fn(AssertableJson $json) => $json
+        $response->assertJson(fn (AssertableJson $json) => $json
             ->where('id', $existing->id)
         );
     }
 
-
     /**
      * Test if model can be created via API call
+     *
      * @return void
      */
-    public function testCreateViaApi()
+    public function test_create_via_api()
     {
         $data = $this->factory()->raw();
 
-        $apiRoute = 'api.' . ($this->modelClass)::pluralKey() . '.store';
+        $apiRoute = 'api.'.($this->modelClass)::pluralKey().'.store';
         $response = $this->actingAs($this->testUser, 'api')
             ->postJson(route($apiRoute), $data);
 
@@ -357,9 +365,10 @@ abstract class AbstractModelUnitTest extends TestCase
 
     /**
      * Test if model can be updated via API call
+     *
      * @return void
      */
-    public function testUpdateViaApi()
+    public function test_update_via_api()
     {
         $existing = $this->factory()->create();
         $this->testUser->adminCities()->sync([$existing->id]);
@@ -367,7 +376,7 @@ abstract class AbstractModelUnitTest extends TestCase
 
         $data = $this->factory()->raw();
 
-        $apiRoute = 'api.' . ($this->modelClass)::singularKey() . '.update';
+        $apiRoute = 'api.'.($this->modelClass)::singularKey().'.update';
         $response = $this->actingAs($this->testUser, 'api')
             ->patchJson(route($apiRoute, $existing->id), $data);
 
@@ -378,17 +387,17 @@ abstract class AbstractModelUnitTest extends TestCase
         $this->testUser->adminCities()->sync([]);
     }
 
-
     /**
      * Test if model can be deleted via API call
+     *
      * @return void
      */
-    public function testDeleteViaApi()
+    public function test_delete_via_api()
     {
         $existing = $this->factory()->create();
         $this->assertTrue($this->testUser->can('delete', $existing));
 
-        $apiRoute = 'api.' . ($this->modelClass)::singularKey() . '.destroy';
+        $apiRoute = 'api.'.($this->modelClass)::singularKey().'.destroy';
         $response = $this->actingAs($this->testUser, 'api')
             ->delete(route($apiRoute, $existing->id));
 
@@ -399,24 +408,19 @@ abstract class AbstractModelUnitTest extends TestCase
 
     /**
      * Checks if a policy class exists for the model
+     *
      * @return void
      */
-    public function testPolicyExists()
+    public function test_policy_exists()
     {
         $policy = Gate::getPolicyFor($this->modelClass);
         $this->assertNotNull($policy, 'There is no registered policy for '.$this->modelClass);
     }
 
-
-    /**
-     * @return Factory
-     */
-    protected function factory(): Factory {
+    protected function factory(): Factory
+    {
         return ($this->modelClass)::factory();
     }
-
-
-
 
     protected function setUp(): void
     {
@@ -428,6 +432,4 @@ abstract class AbstractModelUnitTest extends TestCase
         $this->testUser = User::factory()->create();
         $this->testUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
-
-
 }

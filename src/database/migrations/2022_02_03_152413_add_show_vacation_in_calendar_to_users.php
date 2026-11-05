@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -48,8 +48,9 @@ class AddShowVacationInCalendarToUsers extends Migration
             $table->boolean('needs_replacement')->nullable()->default(false);
         });
 
-        if (Role::where('name', 'Pfarrer:in')->count() > 0)
+        if (Role::where('name', 'Pfarrer:in')->count() > 0) {
             User::role('Pfarrer:in')->update(['show_vacations_with_services' => 1, 'needs_replacement' => 1]);
+        }
     }
 
     /**

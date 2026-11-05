@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,10 +34,10 @@ use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Encryption\Encrypter;
 
-
 class GenerateDatabaseKey extends Command
 {
     use ConfirmableTrait;
+
     /**
      * The name and signature of the console command.
      *
@@ -87,8 +87,8 @@ class GenerateDatabaseKey extends Command
     protected function generateRandomKey()
     {
         return 'base64:'.base64_encode(
-                Encrypter::generateKey($this->laravel['config']['database.cipher'])
-            );
+            Encrypter::generateKey($this->laravel['config']['database.cipher'])
+        );
     }
 
     /**
@@ -126,19 +126,19 @@ class GenerateDatabaseKey extends Command
      */
     protected function writeNewEnvironmentFileWith($key)
     {
-        if($this->environmentFileWithExists()) {
+        if ($this->environmentFileWithExists()) {
             file_put_contents($this->laravel->environmentFilePath(), preg_replace(
                 $this->keyReplacementPattern(),
-                'DATABASE_KEY=' . $key,
+                'DATABASE_KEY='.$key,
                 file_get_contents($this->laravel->environmentFilePath())
             ));
 
             return;
         }
         file_put_contents($this->laravel->environmentFilePath(),
-                          file_get_contents($this->laravel->environmentFilePath()) . PHP_EOL .
-                          '# You should backup this key in a safe secure place' . PHP_EOL .
-                          'DATABASE_KEY=' . $key . PHP_EOL
+            file_get_contents($this->laravel->environmentFilePath()).PHP_EOL.
+            '# You should backup this key in a safe secure place'.PHP_EOL.
+            'DATABASE_KEY='.$key.PHP_EOL
         );
     }
 

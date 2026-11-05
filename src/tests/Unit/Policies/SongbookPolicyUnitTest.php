@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -29,58 +30,58 @@ class SongbookPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new SongbookPolicy();
+        $this->policy = new SongbookPolicy;
         Permission::findOrCreate('liederbuecher-bearbeiten', 'web');
     }
 
-    public function testRegularUserCannotViewAny(): void
+    public function test_regular_user_cannot_view_any(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->viewAny($user));
     }
 
-    public function testIndexDelegatesToViewAny(): void
+    public function test_index_delegates_to_view_any(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('liederbuecher-bearbeiten');
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testAdminCanViewAny(): void
+    public function test_admin_can_view_any(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $this->assertTrue($this->policy->viewAny($user));
     }
 
-    public function testUserWithPermissionCanViewAny(): void
+    public function test_user_with_permission_can_view_any(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('liederbuecher-bearbeiten');
         $this->assertTrue($this->policy->viewAny($user));
     }
 
-    public function testRegularUserCannotCreate(): void
+    public function test_regular_user_cannot_create(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testUserWithPermissionCanCreate(): void
+    public function test_user_with_permission_can_create(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('liederbuecher-bearbeiten');
         $this->assertTrue($this->policy->create($user));
     }
 
-    public function testRegularUserCannotUpdate(): void
+    public function test_regular_user_cannot_update(): void
     {
         $user = User::factory()->create();
         $songbook = Songbook::factory()->create();
         $this->assertFalse($this->policy->update($user, $songbook));
     }
 
-    public function testUserWithPermissionCanUpdate(): void
+    public function test_user_with_permission_can_update(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('liederbuecher-bearbeiten');
@@ -88,14 +89,14 @@ class SongbookPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->update($user, $songbook));
     }
 
-    public function testRegularUserCannotDelete(): void
+    public function test_regular_user_cannot_delete(): void
     {
         $user = User::factory()->create();
         $songbook = Songbook::factory()->create();
         $this->assertFalse($this->policy->delete($user, $songbook));
     }
 
-    public function testUserWithPermissionCanDelete(): void
+    public function test_user_with_permission_can_delete(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('liederbuecher-bearbeiten');

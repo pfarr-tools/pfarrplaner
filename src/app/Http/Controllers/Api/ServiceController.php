@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,7 @@
 
 namespace App\Http\Controllers\Api;
 
-
+use App\Events\ServiceUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ServiceRequest;
 use App\Http\Resources\Calendar\CalendarServicesCollectionResource;
@@ -57,20 +57,14 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Class ServiceController
- * @package App\Http\Controllers\Api
  */
 class ServiceController extends Controller
 {
-
     use HandlesAttachmentsTrait;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
-     * @param Day $day
-     * @param City $city
      * @return mixed
      */
     public function byDayAndCity(Day $day, City $city)
@@ -84,7 +78,6 @@ class ServiceController extends Controller
     }
 
     /**
-     * @param Service $service
      * @return JsonResponse
      */
     public function show(Service $service)
@@ -96,21 +89,21 @@ class ServiceController extends Controller
         if (isset($service->liturgy['Bezeichnung']) && ($service->day->name == '')) {
             $service->day->name = $service->liturgy['title'];
         }
+
         return response()->json($service);
     }
-
 
     public function byMonth($date, $cities)
     {
         $date = Carbon::parse($date);
-        $start = $date->copy()->firstOfMonth()->setTime(0,0,0);
+        $start = $date->copy()->firstOfMonth()->setTime(0, 0, 0);
         $end = $start->copy()->addMonth(1)->subSecond(1);
         $services = Service::inCities(explode(',', $cities))->between($start, $end)->ordered()->get();
+
         return new CalendarServicesCollectionResource($services);
     }
 
     /**
-     * @param User $user
      * @return JsonResponse
      */
     public function byUser(User $user)
@@ -126,17 +119,18 @@ class ServiceController extends Controller
             ->ordered()
             ->get();
 
-
         foreach ($services as $service) {
             $service->liturgy = LiturgyService::getLiturgyInfoByDate($service->day);
         }
+
         return response()->json(compact('services'))->header('Access-Control-Allow-Origin', '*');
     }
 
     /**
      * Update a service
-     * @param ServiceRequest $request Request with validated data
-     * @param Service $service Service model
+     *
+     * @param  ServiceRequest  $request  Request with validated data
+     * @param  Service  $service  Service model
      * @return JsonResponse Response with new service data
      */
     public function update(ServiceRequest $request, Service $service)
@@ -160,32 +154,29 @@ class ServiceController extends Controller
 
         if ($service->isChanged()) {
             $service->storeDiff();
-            event(new \App\Events\ServiceUpdated($service, $originalParticipants));
+            event(new ServiceUpdated($service, $originalParticipants));
         }
 
         return response()->json(compact('service'));
     }
 
-
     /**
      * Assign users to a service
-     * @param Request $request
-     * @param Service $service
      */
     public function assign(Request $request, Service $service)
     {
         $data = $request->validate([
-                                       'ministry' => 'required',
-                                       'users.*' => 'required|int|exists:users,id',
-                                       'exclusive' => 'required|bool',
-                                       'no-toggle' => 'nullable|bool',
-                                   ]);
+            'ministry' => 'required',
+            'users.*' => 'required|int|exists:users,id',
+            'exclusive' => 'required|bool',
+            'no-toggle' => 'nullable|bool',
+        ]);
         $participants = $service->getSyncableParticipantsArray();
-        if (!is_array($data['ministry'])) {
+        if (! is_array($data['ministry'])) {
             $data['ministry'] = [$data['ministry']];
         }
         foreach ($data['ministry'] as $ministry) {
-            if (!isset($participants[$ministry])) {
+            if (! isset($participants[$ministry])) {
                 $participants[$ministry] = [];
             }
             $existing = $participants[$ministry];
@@ -193,7 +184,7 @@ class ServiceController extends Controller
                 $participants[$ministry] = [];
             }
             foreach ($data['users'] as $userId) {
-                if (!($data['no-toggle'] ?? false)) {
+                if (! ($data['no-toggle'] ?? false)) {
                     if (isset($existing[$userId])) {
                         unset($participants[$ministry][$userId]);
                     } else {
@@ -207,6 +198,7 @@ class ServiceController extends Controller
         $service->syncParticipantsFromArray($participants);
         $service->refresh();
         $service->load(['baptisms', 'funerals', 'weddings', 'participants']);
+
         return response()->json(compact('service'));
     }
 
@@ -230,7 +222,7 @@ class ServiceController extends Controller
         DB::transaction(function () use ($service, $user) {
             $service = Service::query()->lockForUpdate()->findOrFail($service->id);
             abort_unless($service->date?->isToday() || $service->date?->isFuture(), 422);
-            abort_unless($service->need_predicant && !$service->pastors()->exists(), 422);
+            abort_unless($service->need_predicant && ! $service->pastors()->exists(), 422);
 
             $service->pastors()->attach($user->id, ['category' => 'P']);
             $service->update(['need_predicant' => false]);
@@ -240,13 +232,12 @@ class ServiceController extends Controller
     }
 
     /**
-     * @param Service $service
      * @return JsonResponse
      */
     public function destroy(Service $service)
     {
         $service->delete();
+
         return response()->json([]);
     }
-
 }

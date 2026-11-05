@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,8 +30,8 @@
 
 namespace App\Mail;
 
-use App\Services\MinistryService;
 use App\Models\People\User;
+use App\Services\MinistryService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -41,12 +41,14 @@ class MinistryRequestFilled extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    /** @var User $user */
+    /** @var User */
     protected $user;
-    /** @var User $sender */
+
+    /** @var User */
     protected $sender;
 
     protected $services;
+
     protected $ministry;
 
     /**
@@ -72,7 +74,7 @@ class MinistryRequestFilled extends Mailable implements ShouldQueue
 
         $ministryTitle = MinistryService::all(true)[$this->ministry];
 
-        return $this->subject('Zusage: ' . $ministryTitle . ' im Gottesdienst')->markdown('mail.ministry.filled')->with(
+        return $this->subject('Zusage: '.$ministryTitle.' im Gottesdienst')->markdown('mail.ministry.filled')->with(
             [
                 'user' => $this->user,
                 'sender' => $this->sender,
@@ -80,4 +82,5 @@ class MinistryRequestFilled extends Mailable implements ShouldQueue
                 'services' => $this->services,
             ]
         );
-    }}
+    }
+}

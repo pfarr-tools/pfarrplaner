@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,7 +32,6 @@ namespace App\Actions\Baptism;
 
 use App\Models\People\User;
 use App\Models\Places\City;
-use App\Models\Rites\Baptism;
 use App\Models\Service;
 use Carbon\Carbon;
 use DateTimeInterface;
@@ -40,17 +39,13 @@ use Illuminate\Validation\ValidationException;
 
 trait NormalizesBaptismData
 {
-    /**
-     * @param array $input
-     * @return array
-     */
     protected function prepareInputForValidation(array $input): array
     {
-        if (isset($input['service']) && !isset($input['service_id'])) {
+        if (isset($input['service']) && ! isset($input['service_id'])) {
             $input['service_id'] = $input['service'];
         }
 
-        if (!isset($input['city_id']) && !empty($input['service_id'])) {
+        if (! isset($input['city_id']) && ! empty($input['service_id'])) {
             $service = Service::find($input['service_id']);
             if ($service) {
                 $input['city_id'] = $service->city_id;
@@ -83,7 +78,7 @@ trait NormalizesBaptismData
     }
 
     /**
-     * @param mixed $value
+     * @param  mixed  $value
      * @return mixed
      */
     protected function formatDateForValidation($value)
@@ -96,7 +91,7 @@ trait NormalizesBaptismData
     }
 
     /**
-     * @param mixed $value
+     * @param  mixed  $value
      * @return mixed
      */
     protected function formatDateTimeForValidation($value)
@@ -109,25 +104,18 @@ trait NormalizesBaptismData
     }
 
     /**
-     * @param User $user
-     * @param int|string|null $cityId
-     * @return void
      * @throws ValidationException
      */
     protected function authorizeCityWriteAccess(User $user, int|string|null $cityId): void
     {
-        if (!empty($cityId) && !$user->isAdmin) {
+        if (! empty($cityId) && ! $user->isAdmin) {
             $allowed = $user->writableCities->pluck('id')->contains((int) $cityId);
-            if (!$allowed) {
+            if (! $allowed) {
                 throw ValidationException::withMessages(['city_id' => 'Für diese Kirchengemeinde fehlen Schreibrechte.']);
             }
         }
     }
 
-    /**
-     * @param array $input
-     * @return array
-     */
     protected function normalizeValidatedInput(array $input): array
     {
         $input['dob'] = $this->parseDate($input['dob'] ?? null);
@@ -140,12 +128,11 @@ trait NormalizesBaptismData
     }
 
     /**
-     * @param mixed $value
-     * @return Carbon|null
+     * @param  mixed  $value
      */
     protected function parseDate($value): ?Carbon
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
         if ($value instanceof Carbon) {
@@ -154,16 +141,16 @@ trait NormalizesBaptismData
         if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', (string) $value)) {
             return Carbon::createFromFormat('d.m.Y', $value);
         }
+
         return Carbon::parse($value);
     }
 
     /**
-     * @param mixed $value
-     * @return Carbon|null
+     * @param  mixed  $value
      */
     protected function parseDateTime($value): ?Carbon
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
         if ($value instanceof Carbon) {
@@ -172,14 +159,10 @@ trait NormalizesBaptismData
         if (preg_match('/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/', (string) $value)) {
             return Carbon::createFromFormat('d.m.Y H:i', $value, 'Europe/Berlin')->setTimezone('UTC');
         }
+
         return Carbon::parse($value, 'Europe/Berlin')->setTimezone('UTC');
     }
 
-    /**
-     * @param User $user
-     * @param Service|null $service
-     * @return array
-     */
     protected function draftDefaults(User $user, ?Service $service): array
     {
         $draftCityId = $service?->city_id ?: $user->writableCities->first()?->id ?: City::query()->value('id');

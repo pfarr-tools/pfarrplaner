@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,7 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-return array(
+return [
 
     /*
     |--------------------------------------------------------------------------
@@ -93,9 +93,9 @@ return array(
 
     'include_helpers' => false,
 
-    'helper_files' => array(
-        base_path() . '/vendor/laravel/framework/src/Illuminate/Support/helpers.php',
-    ),
+    'helper_files' => [
+        base_path().'/vendor/laravel/framework/src/Illuminate/Support/helpers.php',
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -107,10 +107,9 @@ return array(
     |
     */
 
-    'model_locations' => array(
+    'model_locations' => [
         'app',
-    ),
-
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -121,13 +120,13 @@ return array(
     |
     */
 
-    'extra' => array(
-        'Eloquent' => array('Illuminate\Database\Eloquent\Builder', 'Illuminate\Database\Query\Builder'),
-        'Session' => array('Illuminate\Session\Store'),
-    ),
+    'extra' => [
+        'Eloquent' => ['Illuminate\Database\Eloquent\Builder', 'Illuminate\Database\Query\Builder'],
+        'Session' => ['Illuminate\Session\Store'],
+    ],
 
-    'magic' => array(
-        'Log' => array(
+    'magic' => [
+        'Log' => [
             'debug' => 'Monolog\Logger::addDebug',
             'info' => 'Monolog\Logger::addInfo',
             'notice' => 'Monolog\Logger::addNotice',
@@ -136,8 +135,8 @@ return array(
             'critical' => 'Monolog\Logger::addCritical',
             'alert' => 'Monolog\Logger::addAlert',
             'emergency' => 'Monolog\Logger::addEmergency',
-        )
-    ),
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -149,7 +148,7 @@ return array(
     |
     */
 
-    'interfaces' => array(),
+    'interfaces' => [],
 
     /*
     |--------------------------------------------------------------------------
@@ -177,7 +176,7 @@ return array(
     |  ),
     |
     */
-    'custom_db_types' => array(),
+    'custom_db_types' => [],
 
     /*
      |--------------------------------------------------------------------------
@@ -213,10 +212,10 @@ return array(
     | Cast the given "real type" to the given "type".
     |
     */
-    'type_overrides' => array(
+    'type_overrides' => [
         'integer' => 'int',
         'boolean' => 'bool',
-    ),
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -229,4 +228,4 @@ return array(
     */
     'include_class_docblocks' => false,
 
-);
+];

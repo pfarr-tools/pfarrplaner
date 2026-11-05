@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,7 +31,6 @@
 namespace App\Reports;
 
 use App\Models\Places\City;
-use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Services\FileNameService;
 use App\Services\LiturgyService;
@@ -41,28 +40,30 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpWord\Element\Section;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Style\Tab;
 
-
 /**
  * Class BulletinReport
- * @package App\Reports
  */
 class BulletinReport extends AbstractWordDocumentReport
 {
     public const FILE_SIGNATURE = '91.8';
+
     public const FILE_TITLE = 'Gottesdienstliste Gemeindebrief';
 
     /**
      * @var string
      */
     public $title = 'Gemeindebrief';
+
     /**
      * @var string
      */
     public $group = 'Listen';
+
     /**
      * @var string
      */
@@ -75,22 +76,20 @@ class BulletinReport extends AbstractWordDocumentReport
 
     public $cities = [];
 
-
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
         $formats = $this->formats;
+
         return Inertia::render('Report/Bulletin/Setup', compact('cities', 'formats'));
     }
 
-
     /**
-     * @param Request $request
      * @return RedirectResponse|string
      */
     public function render(Request $request)
@@ -105,7 +104,6 @@ class BulletinReport extends AbstractWordDocumentReport
             ]
         );
 
-
         $cities = City::whereIn('id', $data['includeCities'])->get();
 
         $start = Carbon::parse($data['start']);
@@ -119,7 +117,6 @@ class BulletinReport extends AbstractWordDocumentReport
 
         $this->cities = $data['includeCities'];
 
-
         $format = ucfirst(Str::slug($data['format'] ?? $this->formats[0]));
 
         $renderMethod = "render{$format}Format";
@@ -131,8 +128,7 @@ class BulletinReport extends AbstractWordDocumentReport
     }
 
     /**
-     * @param $days
-     * @param $serviceList
+     * @param  $days
      */
     public function renderTailfingenFormat($serviceList)
     {
@@ -151,15 +147,15 @@ class BulletinReport extends AbstractWordDocumentReport
                     $textRun->addText(htmlspecialchars(LiturgyService::getLiturgyInfoByDate($service->date)['Bezeichnung'] ?? ''));
                 }
                 $textRun->addText("\t");
-                $textRun->addText($service->timeText() . "\t");
-                if (!is_object($service->location)) {
-                    $textRun->addText(htmlspecialchars($service->special_location) . "\t");
+                $textRun->addText($service->timeText()."\t");
+                if (! is_object($service->location)) {
+                    $textRun->addText(htmlspecialchars($service->special_location)."\t");
                 } else {
-                    $textRun->addText(htmlspecialchars($service->location->name) . "\t");
+                    $textRun->addText(htmlspecialchars($service->location->name)."\t");
                 }
                 $textRun->addText(htmlspecialchars($service->participantsText('P', false, false)));
                 if ($x = $service->titleAndDescriptionCombinedText()) {
-                    $textRun->addText(' - ' . htmlspecialchars($x));
+                    $textRun->addText(' - '.htmlspecialchars($x));
                 }
             }
             $textRun = $section->addTextRun('list');
@@ -200,12 +196,12 @@ class BulletinReport extends AbstractWordDocumentReport
                 'marginRight' => Converter::cmToTwip('0.25'),
             ]
         );
+
         return $section;
     }
 
     /**
-     * @param $days
-     * @param $serviceList
+     * @param  $days
      */
     public function renderTruchtelfingenFormat($serviceList)
     {
@@ -228,7 +224,7 @@ class BulletinReport extends AbstractWordDocumentReport
                     isset($liturgy[0]['Predigt']) ? $liturgy[0]['Predigt']['Bibelstelle'] : ''
                 );
                 $table->addCell(Converter::cmToTwip(2.5))->addText(
-                    $service->offeringGoal() ? 'Opfer für ' . $service->offeringGoal() : ''
+                    $service->offeringGoal() ? 'Opfer für '.$service->offeringGoal() : ''
                 );
                 $first = false;
             }
@@ -243,7 +239,6 @@ class BulletinReport extends AbstractWordDocumentReport
         );
 
     }
-
 
     public function renderGaufeldenFormat($serviceList)
     {
@@ -262,9 +257,9 @@ class BulletinReport extends AbstractWordDocumentReport
 
                 $run->addText(
                     substr($dayDate->getTranslatedDayName(), 0, 2)
-                    . '., '
-                    . $dayDate->format('d. ')
-                    . $dayDate->getTranslatedMonthName(),
+                    .'., '
+                    .$dayDate->format('d. ')
+                    .$dayDate->getTranslatedMonthName(),
                     ['name' => 'Lora', 'bold' => true, 'size' => 10]
                 );
                 if (count($liturgy)) {
@@ -272,36 +267,35 @@ class BulletinReport extends AbstractWordDocumentReport
                 }
             }
 
-
             $index = 0;
             foreach ($services as $service) {
-                $run = $section->addTextRun(            [
-                                                            'tabs' => [
-                                                                new Tab('left', Converter::cmToTwip(2)),
-                                                                new Tab('left', Converter::cmToTwip(4.5)),
-                                                                new Tab('left', Converter::cmToTwip(8.5)),
-                                                            ],
-                                                            'indentation' => [
-                                                                'left' => Converter::cmToTwip(8.5),
-                                                                'hanging' => Converter::cmToTwip(8.5),
-                                                            ],
-                                                            'spaceAfter' => 0,
-                                                        ]
+                $run = $section->addTextRun([
+                    'tabs' => [
+                        new Tab('left', Converter::cmToTwip(2)),
+                        new Tab('left', Converter::cmToTwip(4.5)),
+                        new Tab('left', Converter::cmToTwip(8.5)),
+                    ],
+                    'indentation' => [
+                        'left' => Converter::cmToTwip(8.5),
+                        'hanging' => Converter::cmToTwip(8.5),
+                    ],
+                    'spaceAfter' => 0,
+                ]
                 );
                 $run->addText($service->timeText()."\t", ['name' => 'Lora']);
 
                 $location = $service->locationText();
-                //if (!Str::contains($location, $service->city->name)) $location .= ' '.$service->city->name;
+                // if (!Str::contains($location, $service->city->name)) $location .= ' '.$service->city->name;
                 $run->addText($service->city->name."\t", ['name' => 'Lora', 'bold' => true, 'size' => 10, 'color' => 'a1a1a1']);
                 $run->addText($location."\t", ['name' => 'Lora', 'bold' => false, 'size' => 10]);
 
-                if ($service->description && (substr($service->description,0,1)=='"')) {
+                if ($service->description && (substr($service->description, 0, 1) == '"')) {
                     $run->addText($service->description."\t", ['name' => 'Lora']);
                 }
 
                 $run->addText(
-                    $service->titleText(false) . ' mit '
-                    . $service->participantsText('P', true),
+                    $service->titleText(false).' mit '
+                    .$service->participantsText('P', true),
                     ['name' => 'Lora']
                 );
 
@@ -319,5 +313,4 @@ class BulletinReport extends AbstractWordDocumentReport
                 $service->date)
         );
     }
-
 }

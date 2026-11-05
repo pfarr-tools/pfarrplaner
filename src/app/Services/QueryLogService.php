@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,8 +30,8 @@
 
 namespace App\Services;
 
-
 use Carbon\Carbon;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -39,17 +39,16 @@ use Illuminate\Support\Str;
 
 /**
  * Class QueryLogService
- * @package App
  */
 class QueryLogService
 {
-
     public const SEPARATOR = PHP_EOL;
 
     protected static $logFile = '';
 
     /**
      * Get the path to the query log
+     *
      * @return string
      */
     public static function file($log = '')
@@ -59,26 +58,28 @@ class QueryLogService
         } else {
             $file = self::$logFile = storage_path('/logs/query.log'.($log ? '.'.$log : ''));
         }
+
         return $file;
     }
 
     /**
      * Put a query into the query log
-     * @param $query
      */
     public static function put($query)
     {
-        File::append(self::file(), time() . '|||||||' . Crypt::encryptString($query) . self::SEPARATOR);
+        File::append(self::file(), time().'|||||||'.Crypt::encryptString($query).self::SEPARATOR);
     }
 
     /**
      * Get all stored queries
+     *
      * @return array
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     *
+     * @throws FileNotFoundException
      */
     public static function all($log = '')
     {
-        if (!File::exists(self::file($log))) {
+        if (! File::exists(self::file($log))) {
             return [];
         }
 
@@ -89,10 +90,11 @@ class QueryLogService
                 $t = explode('|||||||', $line);
                 $queries[] = [
                     'time' => Carbon::createFromTimestamp($t[0]),
-                    'query' => Crypt::decryptString($t[1])
+                    'query' => Crypt::decryptString($t[1]),
                 ];
             }
         }
+
         return $queries;
     }
 
@@ -116,7 +118,8 @@ class QueryLogService
                         if (is_object($binding) && method_exists($binding, '__toString')) {
                             return '"'.$binding->__toString().'"';
                         }
-                        return is_string($binding) ? '"' . $binding . '"' : $binding;
+
+                        return is_string($binding) ? '"'.$binding.'"' : $binding;
                     },
                     $bindings
                 );
@@ -140,11 +143,11 @@ class QueryLogService
 
     /**
      * Get the date of the last query
+     *
      * @return Carbon
      */
     public static function date()
     {
         return Carbon::createFromTimestamp(filemtime(self::file()));
     }
-
 }

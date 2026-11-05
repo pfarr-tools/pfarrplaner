@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,13 +30,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Calendar\Occurence;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 
-class OccurenceController extends \App\Http\Controllers\Controller
+class OccurenceController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -45,13 +45,13 @@ class OccurenceController extends \App\Http\Controllers\Controller
     /**
      * Delete a single occurrence from a recurring event.
      *
-     * @param Occurence $occurence
      * @return JsonResponse
      */
     public function destroy(Occurence $occurence)
     {
         Gate::authorize('update', $occurence->event);
         $occurence->delete();
+
         return response()->json([]);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,11 +37,9 @@
 
 namespace App\Reports;
 
-
 use App\Models\Calendar\Occurence;
 use App\Models\Location;
 use App\Models\Scopes\ServicesOnlyScope;
-use App\Models\Service;
 use App\Models\Tag;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
@@ -50,31 +48,32 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\View\View;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\URL;
 
 /**
  * Class EmbedServiceTableReport
- * @package App\Reports
  */
 class EmbedWebBuilderReport extends AbstractEmbedReport
 {
-
     /**
      * @var string
      */
     public $title = 'Veranstaltungswerbung';
+
     /**
      * @var string
      */
     public $group = 'Website (Gemeindebaukasten)';
+
     /**
      * @var string
      */
     public $description = 'Erzeugt HTML-Code für Veranstaltungswerbung auf der  Website der Gemeinde';
+
     /**
      * @var string
      */
@@ -94,7 +93,8 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         'adChannelCode' => 'nullable|string',
     ];
 
-    protected function getAvailableLayouts(): array {
+    protected function getAvailableLayouts(): array
+    {
         $allConfiguredLayouts = config('webbuilder.layouts');
 
         $layouts = [];
@@ -112,6 +112,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
                 $layouts[] = $configuredLayout;
             }
         }
+
         return $layouts;
     }
 
@@ -125,11 +126,11 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         $layouts = $this->getAvailableLayouts();
 
         $tags = Tag::all();
+
         return Inertia::render('Report/EmbedWebBuilder/Setup', compact('layouts', 'cities', 'locations', 'tags'));
     }
 
     /**
-     * @param Request $request
      * @return Application|Factory|View|string
      */
     public function render(Request $request)
@@ -148,22 +149,25 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         $randomId = uniqid();
 
         $html = ViewFacade::make('reports.embedservicetable.render', compact('url', 'randomId'))->render();
-        $title= 'HTML-Code für Veranstaltungswerbung erstellen';
-        //return Inertia::render('Report/EmbedServiceTable/Render', compact('html', 'title'));
+        $title = 'HTML-Code für Veranstaltungswerbung erstellen';
+        // return Inertia::render('Report/EmbedServiceTable/Render', compact('html', 'title'));
 
         return response()->json(['html' => $html, 'url' => $url, 'randomId' => $randomId]);
     }
 
-
-    protected function getFullValidationRules(Request $request, bool $addOptions = false): array {
+    protected function getFullValidationRules(Request $request, bool $addOptions = false): array
+    {
         $validationRules = $this->validationRules;
         if ($request->has('template')) {
             $layouts = collect($this->getAvailableLayouts())->keyBy('id')->toArray();
-            list($thisLayout, $thisTemplate) = explode('.', $request->get('template'));
+            [$thisLayout, $thisTemplate] = explode('.', $request->get('template'));
             foreach (Arr::get($layouts, $thisLayout.'.templates.'.$thisTemplate.'.fields', []) as $fieldKey => $field) {
-                if ($field['rules'] ?? false) $validationRules[($addOptions ? 'options.' : '').$fieldKey] = $field['rules'];
+                if ($field['rules'] ?? false) {
+                    $validationRules[($addOptions ? 'options.' : '').$fieldKey] = $field['rules'];
+                }
             }
         }
+
         return $validationRules;
     }
 
@@ -174,15 +178,16 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
         }
 
         $validator = Validator::make($request->all(), $this->getFullValidationRules($request));
-        if ($validator->fails()) abort(404);
+        if ($validator->fails()) {
+            abort(404);
+        }
         $data = $validator->validated();
 
         $data['maxDays'] ??= 730;
 
         $start = Carbon::now();
-        $end = $start->copy()->addDays((int)$data['maxDays']);
+        $end = $start->copy()->addDays((int) $data['maxDays']);
         $randomId = uniqid();
-
 
         $eventQuery = Occurence::with('event')
             ->between($start, $end)
@@ -190,7 +195,7 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
                 $query
                     ->notHidden()
                     ->inCities($data['cities']);
-                switch($data['eventClass']) {
+                switch ($data['eventClass']) {
                     case '*':
                         $query->withoutGlobalScope(ServicesOnlyScope::class);
                         break;
@@ -220,22 +225,23 @@ class EmbedWebBuilderReport extends AbstractEmbedReport
 
                 if (count($data['locations'] ??= []) > 0) {
                     $query->whereHas('location', function ($query) use ($data) {
-                       $query->whereIn('location_id', $data['locations']);
+                        $query->whereIn('location_id', $data['locations']);
                     });
                 }
                 if (count($data['tags'] ??= []) > 0) {
                     $query->whereHas('tags', function ($query) use ($data) {
-                       $query->whereIn('tags.id', $data['tags']);
+                        $query->whereIn('tags.id', $data['tags']);
                     });
                 }
             })->orderBy('start');
 
-        if ($data['limit'] ?? null) $eventQuery->limit($data['limit']);
+        if ($data['limit'] ?? null) {
+            $eventQuery->limit($data['limit']);
+        }
         if ($data['adChannelCode'] ?? false) {
             $eventQuery->adRunningAt($data['adChannelCode'], $start);
         }
 
         return view('embed.webbuilder.'.$data['template'], ['options' => $data, 'occurences' => $eventQuery->get(), 'randomId' => $randomId]);
     }
-
 }

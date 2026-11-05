@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -41,7 +41,7 @@ class AbsenceChecked extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    /** @var Absence $absence  */
+    /** @var Absence */
     protected $absence = null;
 
     /**
@@ -62,6 +62,7 @@ class AbsenceChecked extends Mailable implements ShouldQueue
     public function build()
     {
         Log::debug('AbsenceChecked mailing: build');
+
         return $this->subject('Abwesenheitsantrag: Bitte um Genehmigung')
             ->markdown('absences.mail.checked', ['absence' => $this->absence]);
     }

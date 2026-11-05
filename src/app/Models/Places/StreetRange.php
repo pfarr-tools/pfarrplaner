@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,19 +37,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class StreetRange
- * @package App
  */
 class StreetRange extends AbstractModel
 {
     use HasFactory;
 
     protected static string $prefix = 'streetrange';
+
     protected static string $prefixPlural = 'streetranges';
+
     protected static string $path = '';
+
     public static array $exceptRoutes = [
         'web' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
         'api' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
     ];
+
     public static array $validationRules = [
         'parish_id' => 'required|integer|exists:parishes,id',
         'name' => 'required|string|max:255',
@@ -68,12 +71,9 @@ class StreetRange extends AbstractModel
         'odd_start',
         'odd_end',
         'even_start',
-        'even_end'
+        'even_end',
     ];
 
-    /**
-     * @return BelongsTo
-     */
     public function parish(): BelongsTo
     {
         return $this->belongsTo(Parish::class);

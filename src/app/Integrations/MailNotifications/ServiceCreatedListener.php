@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,21 +30,15 @@
 
 namespace App\Integrations\MailNotifications;
 
-
 use App\Events\ServiceCreated;
 use App\Models\Subscription;
 use Illuminate\Support\Facades\Log;
 
 class ServiceCreatedListener
 {
-
-    /**
-     * @param ServiceCreated $event
-     */
     public function handle(ServiceCreated $event)
     {
         Log::debug('Preparing to send ServiceCreated notifications for service #'.$event->service->id);
         Subscription::send($event->service, \App\Mail\ServiceCreated::class, [], null, true);
     }
-
 }

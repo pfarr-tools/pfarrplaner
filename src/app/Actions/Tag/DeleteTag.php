@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,18 +32,16 @@ namespace App\Actions\Tag;
 
 use App\Actions\AbstractDeleteAction;
 use App\Contracts\Tag\DeletesTags;
-use App\Events\Models\Tag\DeletedLocation;
 use App\Events\Models\Tag\DeletedTag;
 use App\Models\People\User;
 use App\Models\Tag;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 
 class DeleteTag extends AbstractDeleteAction implements DeletesTags
 {
-
     /**
      * Get return route
-     * @return string
      */
     public function redirectTo(): string
     {
@@ -52,18 +50,18 @@ class DeleteTag extends AbstractDeleteAction implements DeletesTags
 
     /**
      * Delete a tag
-     * @param User $user
-     * @param Tag $tag
+     *
      * @return Tag|bool|null
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     *
+     * @throws AuthorizationException
      */
     public function delete(User $user, Tag $tag)
     {
         Gate::forUser($user)->authorize('delete', $tag);
         DeletedTag::dispatch($user, $tag);
         $this->messages = ['success' => 'Die Kennzeichnung wurde gelöscht.'];
+
         return $tag->delete();
 
     }
-
 }

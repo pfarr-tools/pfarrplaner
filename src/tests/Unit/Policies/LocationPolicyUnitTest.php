@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -30,26 +31,26 @@ class LocationPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new LocationPolicy();
+        $this->policy = new LocationPolicy;
         Permission::findOrCreate('ort-bearbeiten', 'web');
         Permission::findOrCreate('gd-opfer-bearbeiten', 'web');
         Permission::findOrCreate('kirche-bearbeiten', 'web');
     }
 
-    public function testViewAlwaysReturnsTrue(): void
+    public function test_view_always_returns_true(): void
     {
         $user = User::factory()->create();
         $location = Location::factory()->create();
         $this->assertTrue($this->policy->view($user, $location));
     }
 
-    public function testRegularUserCannotCreate(): void
+    public function test_regular_user_cannot_create(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testUserWithWriteAccessCanCreate(): void
+    public function test_user_with_write_access_can_create(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
@@ -59,34 +60,34 @@ class LocationPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->create($user, $city));
     }
 
-    public function testRegularUserCannotIndex(): void
+    public function test_regular_user_cannot_index(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->index($user));
     }
 
-    public function testAdminCanIndex(): void
+    public function test_admin_can_index(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_ADMIN);
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testUserWithPermissionCanIndex(): void
+    public function test_user_with_permission_can_index(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('ort-bearbeiten');
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testRegularUserCannotUpdate(): void
+    public function test_regular_user_cannot_update(): void
     {
         $user = User::factory()->create();
         $location = Location::factory()->create();
         $this->assertFalse($this->policy->update($user, $location));
     }
 
-    public function testRegularUserCannotDelete(): void
+    public function test_regular_user_cannot_delete(): void
     {
         $user = User::factory()->create();
         $location = Location::factory()->create();

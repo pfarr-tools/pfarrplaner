@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,9 +30,7 @@
 
 namespace App\Documents\Word;
 
-
 use App\Models\Service;
-use Illuminate\Support\Facades\Response;
 use DOMDocument;
 use DOMNode;
 use PhpOffice\PhpWord\Element\Section;
@@ -51,18 +49,26 @@ class DefaultWordDocument
 {
     /** @var PhpWord|null */
     protected $phpWord = null;
+
     /** @var Section */
     protected $section = null;
 
     protected $instructionsFontStyle = ['size' => 8, 'italic' => true];
+
     protected $instructionsParagraphStyle = [];
+
     protected $recipient = null;
 
     public const NORMAL = 'Standard';
+
     public const BLOCKQUOTE = 'Zitat';
+
     public const INSTRUCTIONS = 'Standard mit Anweisungen';
+
     public const BOLD = ['bold' => true];
+
     public const UNDERLINE = ['underline' => Font::UNDERLINE_SINGLE];
+
     public const BOLD_UNDERLINE = ['bold' => true, 'underline' => Font::UNDERLINE_SINGLE];
 
     protected $config = [];
@@ -72,9 +78,9 @@ class DefaultWordDocument
 
         $this->config = array_replace_recursive($this->getBaseConfig(), $this->config, $config);
         Settings::setOutputEscapingEnabled(true);
-        $this->phpWord = new PhpWord();
+        $this->phpWord = new PhpWord;
         $this->phpWord->getSettings()->setThemeFontLang(new Language(Language::DE_DE));
-        $this->configureLayout($config['layout'] ?? []);;
+        $this->configureLayout($config['layout'] ?? []);
         $this->setDefaultDocumentStyles($config);
     }
 
@@ -106,6 +112,7 @@ class DefaultWordDocument
                 }
             }
         }
+
         return $baseConfig;
     }
 
@@ -138,46 +145,32 @@ class DefaultWordDocument
 
     }
 
-// SETTERS
+    // SETTERS
 
-    /**
-     * @return PhpWord|null
-     */
     public function getPhpWord(): ?PhpWord
     {
         return $this->phpWord;
     }
 
-    /**
-     * @param PhpWord|null $phpWord
-     */
     public function setPhpWord(?PhpWord $phpWord): void
     {
         $this->phpWord = $phpWord;
     }
 
-    /**
-     * @return Section
-     */
     public function getSection(): ?Section
     {
         return $this->section;
     }
 
-    /**
-     * @param Section $section
-     */
     public function setSection(?Section $section): void
     {
         $this->section = $section;
     }
 
-
     /**
-     * @param string $template
-     * @param array $blocks
-     * @param int $emptyParagraphsAfter
-     * @param null $existingTextRun
+     * @param  string  $template
+     * @param  int  $emptyParagraphsAfter
+     * @param  null  $existingTextRun
      * @return TextRun|null
      */
     public function renderParagraph(
@@ -188,10 +181,12 @@ class DefaultWordDocument
     ) {
         $textRun = $existingTextRun ?: $this->section->addTextRun($template);
         foreach ($blocks as $block) {
-            if (null !== $block[0]) {
+            if ($block[0] !== null) {
                 $ct = 0;
                 foreach (explode("\n", $block[0]) as $item) {
-                    if ($ct > 0) $textRun->addTextBreak();
+                    if ($ct > 0) {
+                        $textRun->addTextBreak();
+                    }
                     $textRun->addText($item, $block[1] ?? []);
                     $ct++;
                 }
@@ -203,12 +198,11 @@ class DefaultWordDocument
         for ($i = 0; $i < $emptyParagraphsAfter; $i++) {
             $textRun = $this->section->addTextRun($template);
         }
+
         return $textRun;
     }
 
-
     /**
-     * @param $filename
      * @throws Exception
      */
     public function sendToBrowser($filename)
@@ -216,19 +210,17 @@ class DefaultWordDocument
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $objWriter = IOFactory::createWriter($this->phpWord, 'Word2007');
         $objWriter->save($tempFile);
+
         return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
             ->deleteFileAfterSend(true);
     }
 
     /**
      * Create a DOM document from HTML while preserving UTF-8 characters for Word exports.
-     *
-     * @param string $html
-     * @return DOMDocument
      */
     public static function createDomDocumentFromHtml(string $html): DOMDocument
     {
-        $dom = new DOMDocument();
+        $dom = new DOMDocument;
         $dom->loadHTML(
             mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'),
             LIBXML_NOERROR | LIBXML_NOWARNING
@@ -239,9 +231,6 @@ class DefaultWordDocument
 
     /**
      * Convert a DOM node to plain text while preserving paragraph and line breaks.
-     *
-     * @param DOMNode $node
-     * @return string
      */
     public static function getTextWithBreaksFromDomNode(DOMNode $node): string
     {
@@ -253,9 +242,10 @@ class DefaultWordDocument
 
     /**
      * Render some text with default formatting
-     * @param $text Text
-     * @param array $fontOption Font options
-     * @param false $breakAfter Text break at the end?
+     *
+     * @param  $text  Text
+     * @param  array  $fontOption  Font options
+     * @param  false  $breakAfter  Text break at the end?
      */
     public function renderNormalText($text, $fontOption = [], $breakAfter = false)
     {
@@ -264,10 +254,11 @@ class DefaultWordDocument
 
     /**
      * Render some text with specific paragraph style
-     * @param $text Text
-     * @param array|string $paragraphOption Font options
-     * @param array $fontOption Font options
-     * @param false $breakAfter Text break at the end?
+     *
+     * @param  $text  Text
+     * @param  array|string  $paragraphOption  Font options
+     * @param  array  $fontOption  Font options
+     * @param  false  $breakAfter  Text break at the end?
      */
     public function renderText($text, $paragraphOption = [], $fontOption = [], $breakAfter = false)
     {
@@ -290,23 +281,23 @@ class DefaultWordDocument
                 $keyWord = '';
                 if (count($matches)) {
                     $keyWord = $matches[1];
-                    $paragraph = trim(str_replace('[' . $keyWord . ']', '', $paragraph));
+                    $paragraph = trim(str_replace('['.$keyWord.']', '', $paragraph));
                     $paragraph = strtr($paragraph, ["\r" => '', "\n" => '', '>>' => "\t"]);
                 }
                 if (trim($keyWord) && ($keyWord == $this->recipient)) {
                     // highlight for current recipient
                     $textRun->addText(
-                        $keyWord . "\t",
+                        $keyWord."\t",
                         array_merge(['size' => 8, 'italic' => true, 'bold' => false], ['fgColor' => 'yellow'])
                     );
                 } else {
-                    $textRun->addText($keyWord . "\t", ['size' => 8, 'italic' => true, 'bold' => false]);
+                    $textRun->addText($keyWord."\t", ['size' => 8, 'italic' => true, 'bold' => false]);
                 }
                 if (trim($paragraph)) {
                     $this->renderWithLineBreaks($textRun, $paragraph, $fontOption);
                 }
             }
-            if ((!$instructionMode) && (($ct < count($paragraphs)) || $breakAfter)) {
+            if ((! $instructionMode) && (($ct < count($paragraphs)) || $breakAfter)) {
                 $textRun->addTextBreak();
             }
             if ($instructionMode) {
@@ -317,7 +308,7 @@ class DefaultWordDocument
 
     protected function renderWithLineBreaks(TextRun $textRun, $text, $fontOption)
     {
-        $lines = explode("\n", str_replace("|", "\n", $text));
+        $lines = explode("\n", str_replace('|', "\n", $text));
         $ct = 0;
         foreach ($lines as $line) {
             $ct++;
@@ -330,9 +321,6 @@ class DefaultWordDocument
 
     /**
      * Recursively extract text content from a DOM node while keeping semantic breaks.
-     *
-     * @param DOMNode $node
-     * @return string
      */
     protected static function extractTextWithBreaksFromDomNode(DOMNode $node): string
     {
@@ -355,19 +343,15 @@ class DefaultWordDocument
                 return '';
             }
 
-            return $text . "\n\n";
+            return $text."\n\n";
         }
 
         return $text;
     }
 
-
-    /**
-     * @param string $text
-     */
     public function renderLiteral(string $text)
     {
-        if (!is_array($text)) {
+        if (! is_array($text)) {
             $text = [$text];
         }
         foreach ($text as $paragraph) {
@@ -388,14 +372,13 @@ class DefaultWordDocument
                     $paragraph,
                     [
                         "\r" => '',
-                        "\n" => '<w:br />'
+                        "\n" => '<w:br />',
                     ]
                 )
             );
             $this->renderParagraph(self::NO_INDENT, [[$paragraph, $format]], 1);
         }
     }
-
 
     public function getParagraphStyle($style)
     {
@@ -426,13 +409,12 @@ class DefaultWordDocument
         $run->addText($service->titleText(false), $this->config['styles']['fonts']['titles'][1]);
         $run->addTextBreak();
         $run->addText(
-            $service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr' . ', '
-            . $service->locationText(),
+            $service->date->setTimeZone('Europe/Berlin')->isoFormat('DD.MM.YYYY, HH:mm').' Uhr'.', '
+            .$service->locationText(),
             $this->config['styles']['fonts']['titles'][1]
         );
         $this->getSection()->addTitle($run, 0);
     }
-
 
     /**
      * @return null
@@ -443,7 +425,7 @@ class DefaultWordDocument
     }
 
     /**
-     * @param null $recipient
+     * @param  null  $recipient
      */
     public function setRecipient($recipient): void
     {
@@ -459,9 +441,4 @@ class DefaultWordDocument
     {
         $this->config = $config;
     }
-
-
-
-
 }
-

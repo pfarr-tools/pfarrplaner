@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -19,16 +20,18 @@ use Tests\AbstractSimpleModelUnitTest;
 class SermonUnitTest extends AbstractSimpleModelUnitTest
 {
     protected string $modelClass = Sermon::class;
+
     protected bool $hasPolicy = false;
+
     protected bool $hasFactory = false;
 
-    public function testSermonHasServicesRelationship(): void
+    public function test_sermon_has_services_relationship(): void
     {
         $sermon = Sermon::create(['title' => 'Test Predigt']);
         $this->assertInstanceOf(HasMany::class, $sermon->services());
     }
 
-    public function testSermonCanBeCreatedDirectly(): void
+    public function test_sermon_can_be_created_directly(): void
     {
         $sermon = Sermon::create(['title' => 'Test Predigt', 'reference' => 'Johannes 3,16']);
         $this->assertCount(1, Sermon::all());

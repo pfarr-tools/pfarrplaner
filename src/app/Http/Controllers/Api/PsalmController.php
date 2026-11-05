@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -29,7 +29,6 @@
  */
 
 namespace App\Http\Controllers\Api;
-
 
 use App\Models\Liturgy\Psalm;
 use Illuminate\Http\Request;
@@ -56,6 +55,7 @@ class PsalmController extends AbstractApiCRUDController
         $creator = app(($this->modelClass)::getContractName('create'));
         $psalm = $creator->create($request->user(), $request->all());
         $psalms = Psalm::all();
+
         return response()->json(compact('psalm', 'psalms'));
     }
 
@@ -66,6 +66,7 @@ class PsalmController extends AbstractApiCRUDController
         $psalm = $updater->update($request->user(), $psalm, $request->all());
         $psalm->refresh();
         $psalms = Psalm::all();
+
         return response()->json(compact('psalm', 'psalms'));
     }
 }

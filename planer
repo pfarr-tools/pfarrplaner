@@ -34,6 +34,7 @@ Entwicklung:
   ./planer dev composer <Befehl>
   ./planer dev npm <Befehl>
   ./planer dev pint <Optionen>
+  ./planer dev format|format:check|analyse|docs:check|lint|quality
   ./planer dev fresh --force
   ./planer dev manual build|dusk|site|all|deploy|source-publish
   ./planer dev manual:build|manual:dusk|manual:site|manual:all|manual:deploy|manual:source-publish
@@ -89,6 +90,38 @@ EOF
     composer) compose exec app composer "$@" ;;
     npm) compose run --rm vite npm "$@" ;;
     pint) compose exec app ./vendor/bin/pint "$@" ;;
+    format) compose exec app composer format; compose run --rm vite npm run format ;;
+    format:check)
+      compose exec app composer format:check
+      compose run --rm vite npm run format:check
+      ;;
+    analyse) compose exec app composer analyse ;;
+    docs:check)
+      compose exec app composer docs:check
+      compose run --rm vite npm run docs:check
+      ;;
+    lint) compose run --rm vite npm run lint ;;
+    quality)
+      local quality_files=''
+      quality_files="$(git diff --name-only "${QUALITY_BASE_REF:-origin/main}...HEAD" 2>/dev/null || git diff --name-only HEAD~1)"
+      quality_files+=$'\n'"$(git diff --name-only HEAD)"
+      quality_files="$(printf '%s\n' "$quality_files" | sed '/^$/d; s#^src/##' | sort -u)"
+      local js_quality_files=''
+      js_quality_files="$(git diff --numstat "${QUALITY_BASE_REF:-origin/main}...HEAD" 2>/dev/null || git diff --numstat HEAD~1)"
+      js_quality_files+=$'\n'"$(git diff --numstat HEAD)"
+      js_quality_files="$(printf '%s\n' "$js_quality_files" | awk '$1 != 0 || $1 == "-" {print $3}' | sed 's#^src/##')"
+      js_quality_files+=$'\n'"$(git ls-files --others --exclude-standard | sed 's#^src/##')"
+      js_quality_files="$(printf '%s\n' "$js_quality_files" | sed -n '/\.(js\|mjs\|vue)$/p' | sort -u)"
+      QUALITY_FILES="$js_quality_files" run_dev format:check
+      run_dev analyse
+      QUALITY_FILES="$js_quality_files" run_dev docs:check
+      QUALITY_FILES="$js_quality_files" run_dev lint
+      run_dev complexity:check
+      run_dev test --no-browser --no-js
+      compose run --rm vite npm run test:js:run
+      compose run --rm vite npm run build
+      ;;
+    complexity:check) compose exec app composer complexity:check ;;
     manual) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" "${1:-help}" "${@:2}" ;;
     manual:build) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" build "$@" ;;
     manual:dusk) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" dusk "$@" ;;
@@ -131,7 +164,7 @@ run_production() {
       ;;
     bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
     help|--help|-h) usage ;;
-    test|composer|npm|pint|fresh)
+  test|composer|npm|pint|format|format:check|analyse|docs:check|lint|quality|complexity:check|fresh)
       echo "Fehler: '$command' ist ein Entwicklungsbefehl. Verwende ./planer dev $command ..." >&2
       exit 2
       ;;

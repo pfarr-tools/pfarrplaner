@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,6 +32,7 @@ namespace App\Listeners;
 
 use App\Events\AbsenceUpdated;
 use App\Events\OrderShipped;
+use App\Mail\Absence\AbsenceApproved;
 use App\Mail\Absence\AbsenceChecked;
 use App\Mail\Absence\AbsenceRequested;
 use App\Models\Leave\Absence;
@@ -40,7 +41,6 @@ use Illuminate\Support\Facades\Mail;
 
 /**
  * Class SendApprovalNotification
- * @package App\Listeners
  */
 class SendAbsenceWorkflowNotification
 {
@@ -57,19 +57,18 @@ class SendAbsenceWorkflowNotification
     /**
      * Handle the event.
      *
-     * @param OrderShipped $event
+     * @param  OrderShipped  $event
      * @return void
      */
     public function handle(AbsenceUpdated $event)
     {
         Log::debug('SendAbsenceWorkflowNotification::handle()');
         // do nothing, if no workflow is defined
-        if ((!$event->absence->user->vacationAdmins->count()) && !$event->absence->user->vacationApprovers->count()) {
+        if ((! $event->absence->user->vacationAdmins->count()) && ! $event->absence->user->vacationApprovers->count()) {
             Log::debug('SendAbsenceWorkflowNotification abgebrochen, weil kein Workflow definiert ist.');
+
             return;
         }
-
-
 
         // check workflow status and send appropriate notifications
         $message = null;
@@ -96,22 +95,20 @@ class SendAbsenceWorkflowNotification
                         // filter out users without email address
                         return empty($user->email);
                     });
-                $message = new \App\Mail\Absence\AbsenceApproved($event->absence);
+                $message = new AbsenceApproved($event->absence);
                 break;
         }
 
         Log::debug('SendAbsenceWorkflowNotification hat '.$recipients->count().' Empfänger');
 
+        // dd($recipients, $event->absence, $event->absence->user->vacationAdmins);
 
-        //dd($recipients, $event->absence, $event->absence->user->vacationAdmins);
-
-        if ($recipients->count() && (null !== $message)) {
+        if ($recipients->count() && ($message !== null)) {
             Log::debug('SendAbsenceWorkflowNotification: Sende Workflow-Update ('
                        .get_class($message)
-                       .') an ' . $recipients->pluck('email')->unique()->join(', '));
+                       .') an '.$recipients->pluck('email')->unique()->join(', '));
             Mail::to($recipients)->queue($message);
         }
-
 
     }
 }

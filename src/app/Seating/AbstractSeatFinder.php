@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Seating;
 
-
 use App\Models\Seating\Booking;
 use App\Models\Service;
 use Illuminate\Support\Collection;
@@ -41,15 +40,15 @@ class AbstractSeatFinder
 
     public $hasSeats = true;
 
-    /** @var Service $service  */
+    /** @var Service */
     protected $service = null;
-    protected $errors = [];
 
+    protected $errors = [];
 
     /**
      * SeatFinder constructor.
-     * @param Service $service
-     * @param bool $preloadExistingBookings Optional: Preload existing bookings?
+     *
+     * @param  bool  $preloadExistingBookings  Optional: Preload existing bookings?
      */
     public function __construct(Service $service, $preloadExistingBookings = true)
     {
@@ -58,71 +57,58 @@ class AbstractSeatFinder
 
     /**
      * Check if a specified number of people can still be seated in the location
-     * @param $number Number of people
-     * @param string $fixedSeat Desired fixed seating position
-     * @param string $overrideSeats Override the default maximum number of seats for a fixed position
-     * @param string $overrideSplit Override the default splitting configuration for a fixed position
-     * @param Collection $bookings Existing bookings used for the check
+     *
+     * @param  $number  Number of people
+     * @param  string  $fixedSeat  Desired fixed seating position
+     * @param  string  $overrideSeats  Override the default maximum number of seats for a fixed position
+     * @param  string  $overrideSplit  Override the default splitting configuration for a fixed position
+     * @param  Collection  $bookings  Existing bookings used for the check
      * @return bool True if this booking can be added
      */
-    public function find($number, $fixedSeat = '', $overrideSeats = '', $overrideSplit = '', $bookings = null)
-    {
-    }
+    public function find($number, $fixedSeat = '', $overrideSeats = '', $overrideSplit = '', $bookings = null) {}
 
     /**
      * Check if seating is still possible after proposed changes to a booking
-     * @param Booking $booking
-     * @param array $data
+     *
      * @return bool True if this booking can be changed
      */
     public function checkIfBookingCanBeChanged(Booking $booking, array $data): bool
     {
+        return false;
     }
 
-    public function finalList()
-    {
-    }
-
+    public function finalList() {}
 
     /**
      * Get all rows available for seating
+     *
      * @return array
      */
-    public function getAllRows()
-    {
-    }
+    public function getAllRows() {}
 
     /**
      * Get the maximum seating capacity of the venue
+     *
      * @return int Number of seats
      */
-    public function maximumCapacity()
-    {
-    }
+    public function maximumCapacity() {}
 
-    public function remainingCapacity($bookings = null)
-    {
-    }
+    public function remainingCapacity($bookings = null) {}
 
     /**
      * Get the full row record, even for a partial row
-     * @param $key
+     *
      * @return mixed
      */
-    public function getFullRow($key)
-    {
-    }
+    public function getFullRow($key) {}
 
-    /**
-     * @return array
-     */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
     /**
-     * @param string $errors
+     * @param  string  $errors
      */
     public function setErrors(array $errors): void
     {
@@ -131,30 +117,36 @@ class AbstractSeatFinder
 
     /**
      * Add an error message
-     * @param string $error
      */
-    protected function setError(string $key, string $error): void {
+    protected function setError(string $key, string $error): void
+    {
         $this->errors[$key] = $error;
     }
 
     /**
      * Get the free seats text (usually something like "remaining / max")
+     *
      * @return string
      */
-    public function freeSeatsText() {
+    public function freeSeatsText()
+    {
         return $this->remainingCapacity().' / '.$this->maximumCapacity();
     }
 
     /**
      * Get a seating table arranged by booking codes
-     * @return array
      */
-    public function getSeatingTable(): array {
+    public function getSeatingTable(): array
+    {
         return [];
     }
 
-    public function remainingCapacityText($format = ''): string {
-        if ($format == '') return $this->remainingCapacity();
+    public function remainingCapacityText($format = ''): string
+    {
+        if ($format == '') {
+            return $this->remainingCapacity();
+        }
+
         return sprintf($format, $this->remainingCapacity());
     }
 }

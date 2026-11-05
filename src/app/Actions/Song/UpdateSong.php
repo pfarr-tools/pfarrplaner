@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,20 +40,11 @@ use Illuminate\Support\Facades\Validator;
 
 class UpdateSong extends AbstractUpdateAction implements UpdatesSongs
 {
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return route('admin.songs.index');
     }
 
-    /**
-     * @param User $user
-     * @param Song $song
-     * @param array $input
-     * @return Song
-     */
     public function update(User $user, Song $song, array $input): Song
     {
         Gate::forUser($user)->authorize('update', $song);

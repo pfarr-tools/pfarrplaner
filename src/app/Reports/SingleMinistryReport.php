@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,60 +32,59 @@ namespace App\Reports;
 
 use App\Models\Location;
 use App\Models\People\Participant;
-use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpWord\Shared\Converter;
 
-
 /**
  * Class PersonReport
- * @package App\Reports
  */
 class SingleMinistryReport extends AbstractPDFDocumentReport
 {
-
     public const FILE_TITLE = 'Dienstplan';
-    public const FILE_SIGNATURE = '50.0';
 
+    public const FILE_SIGNATURE = '50.0';
 
     /**
      * @var string
      */
     public $title = 'Dienstplan für einen bestimmten Dienst';
+
     /**
      * @var string
      */
     public $group = 'Listen';
+
     /**
      * @var string
      */
     public $description = 'Liste mit allen eingeteilten Personen für bestimmte Dienste (PDF oder Excel)';
-    public $icon = 'fa fa-file';
 
+    public $icon = 'fa fa-file';
 
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
         $ministries = $this->getAvailableMinistries();
+
         return Inertia::render('Report/SingleMinistry/Setup', compact('cities', 'locations', 'ministries'));
     }
 
     /**
-     * @param Request $request
      * @return mixed|string
      */
     public function render(Request $request)
@@ -119,7 +118,7 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
             ->ordered()
             ->get();
 
-        $methodName = 'renderDataTo' . strtoupper($data['file_format']);
+        $methodName = 'renderDataTo'.strtoupper($data['file_format']);
         if (method_exists($this, $methodName)) {
             return $this->$methodName($data, $services);
         }
@@ -130,7 +129,7 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
     {
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE . ' ' . join(',', $data['ministries']),
+                static::FILE_TITLE.' '.implode(',', $data['ministries']),
                 'pdf',
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']]
@@ -141,7 +140,7 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
                 'services' => $services,
                 'ministries' => $data['ministries'],
                 'cities' => $data['cities'],
-                'includeHeader' => $data['includeHeader']
+                'includeHeader' => $data['includeHeader'],
             ],
             ['format' => 'A4']
         );
@@ -149,14 +148,13 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
 
     public function renderDataToXLSX($data, $services)
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $spreadsheet->getDefaultStyle()
             ->getFont()
             ->setName('Arial')
             ->setSize(11);
         $spreadsheet->setActiveSheetIndex(0);
         $sheet = $spreadsheet->getActiveSheet();
-
 
         $sheet->getPageSetup()
             ->setOrientation(PageSetup::ORIENTATION_PORTRAIT)
@@ -171,10 +169,10 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
             ->setFooter(0);
         $sheet->getHeaderFooter()
             ->setOddHeader(
-                '&LDienstplan ' . join(',', $data['ministries']) . ' &RBlatt &P von &N'
+                '&LDienstplan '.implode(',', $data['ministries']).' &RBlatt &P von &N'
             )
             ->setEvenHeader(
-                '&LDienstplan ' . join(',', $data['ministries']) . ' &RBlatt &P von &N'
+                '&LDienstplan '.implode(',', $data['ministries']).' &RBlatt &P von &N'
             )
             ->setOddFooter('&CAusdruck vom &D, &T')
             ->setEvenFooter('&CAusdruck vom &D, &T');
@@ -183,18 +181,18 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         if ($data['includeHeader']) {
             // title row
             $sheet->getRowDimension('1')->setRowHeight(21);
-            $sheet->setCellValue('A1', 'Dienstplan für ' . join(', ', $data['ministries']))
+            $sheet->setCellValue('A1', 'Dienstplan für '.implode(', ', $data['ministries']))
                 ->getStyle('A1')
                 ->getFont()->setBold(true)->setSize(16);
-            $sheet->setCellValue('A2', 'Von ' . $data['start'] . ' bis ' . $data['end'])
+            $sheet->setCellValue('A2', 'Von '.$data['start'].' bis '.$data['end'])
                 ->getStyle('A2')
                 ->getFont()->setBold(true);
             $sheet->setCellValue(
                 'A3',
-                \Carbon\Carbon::now()
+                Carbon::now()
                     ->setTimezone('Europe/Berlin')
                     ->format('d.m.Y H:i')
-                . ' Uhr. Immer aktuell auf www.pfarrplaner.de'
+                .' Uhr. Immer aktuell auf www.pfarrplaner.de'
             );
             $row = 5;
         }
@@ -217,31 +215,31 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
             $c++;
             $sheet->getColumnDimension(chr($c))->setWidth($size);
             if ($header != '-') {
-                $sheet->setCellValue(chr($c) . $row, $header)->getStyle(chr($c) . $row)
+                $sheet->setCellValue(chr($c).$row, $header)->getStyle(chr($c).$row)
                     ->getFont()->setBold(true);
             }
         }
         $row++;
 
         foreach ($services as $service) {
-            $sheet->setCellValue('A' . $row, $service->date->format('d.m.Y'));
-            $sheet->setCellValue('B' . $row, $service->timeText());
+            $sheet->setCellValue('A'.$row, $service->date->format('d.m.Y'));
+            $sheet->setCellValue('B'.$row, $service->timeText());
             $c = 67;
             if (count($data['cities']) > 1) {
-                $sheet->setCellValue('C' . $row, $service->city->name);
+                $sheet->setCellValue('C'.$row, $service->city->name);
                 $c = 68;
             }
-            $sheet->setCellValue(chr($c) . $row, $service->locationText());
+            $sheet->setCellValue(chr($c).$row, $service->locationText());
             foreach ($data['ministries'] as $ministryKey => $ministry) {
                 $c++;
-                $sheet->setCellValue(chr($c) . $row, $service->participantsText($ministryKey));
+                $sheet->setCellValue(chr($c).$row, $service->participantsText($ministryKey));
             }
 
             $row++;
         }
 
         return $this->sendXlsxToBrowser($fileName = FileNameService::make(
-            static::FILE_TITLE . ' ' . join(',', $data['ministries']),
+            static::FILE_TITLE.' '.implode(',', $data['ministries']),
             'xlsx',
             static::FILE_SIGNATURE,
             [$data['start'], $data['end']]
@@ -288,15 +286,13 @@ class SingleMinistryReport extends AbstractPDFDocumentReport
         return $ministries;
     }
 
-
-
     public function sendXlsxToBrowser($filename, $spreadsheet)
     {
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save($tempFile);
+
         return response()->download($tempFile, $filename, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
             ->deleteFileAfterSend(true);
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -61,7 +61,7 @@ class CreateBooking extends AbstractCreateAction implements CreatesBookings
         CreatedBooking::dispatch($user, $booking);
         $this->messages = ['success' => (($input['number'] ?? 1) == 1)
             ? 'Der Platz wurde reserviert.'
-            : $input['number'] . ' zusammenhängende Plätze wurden reserviert.'];
+            : $input['number'].' zusammenhängende Plätze wurden reserviert.'];
 
         return $booking;
     }
@@ -74,7 +74,7 @@ class CreateBooking extends AbstractCreateAction implements CreatesBookings
 
         $input = Validator::make($input, $rules)->validateWithBag('createBooking');
         $input['fixed_seat'] = strtoupper($input['fixed_seat'] ?? '');
-        $input['override_seats'] = strtoupper((string)($input['override_seats'] ?? ''));
+        $input['override_seats'] = strtoupper((string) ($input['override_seats'] ?? ''));
         $input['override_split'] = strtoupper($input['override_split'] ?? '');
 
         return $input;

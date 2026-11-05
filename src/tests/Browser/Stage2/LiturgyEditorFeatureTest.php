@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -55,62 +56,62 @@ class LiturgyEditorFeatureTest extends AbstractPageLoadTest
         $this->createPredigtgottesdienstLiturgy($this->service);
     }
 
-    public function testLiturgyEditorRendersWithoutError(): void
+    public function test_liturgy_editor_renders_without_error(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new LiturgyEditorPage($this->service->slug))
-                    ->assertDontSee('500')
-                    ->assertDontSee('Whoops');
+                ->visit(new LiturgyEditorPage($this->service->slug))
+                ->assertDontSee('500')
+                ->assertDontSee('Whoops');
         });
     }
 
-    public function testLiturgyEditorLinksBackToServiceEditor(): void
+    public function test_liturgy_editor_links_back_to_service_editor(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new LiturgyEditorPage($this->service->slug))
-                    ->waitFor('#app', 10)
-                    ->assertPresent('a[title="Gottesdienst bearbeiten"]');
+                ->visit(new LiturgyEditorPage($this->service->slug))
+                ->waitFor('#app', 10)
+                ->assertPresent('a[title="Gottesdienst bearbeiten"]');
         });
     }
 
-    public function testPdfLinkIsRendered(): void
+    public function test_pdf_link_is_rendered(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new LiturgyEditorPage($this->service->slug))
-                    ->waitFor('#app', 10)
-                    ->assertPresent('button[title="Dokumente herunterladen"]');
+                ->visit(new LiturgyEditorPage($this->service->slug))
+                ->waitFor('#app', 10)
+                ->assertPresent('button[title="Dokumente herunterladen"]');
         });
     }
 
-    public function testSettingsRoundedTimesTogglePresent(): void
+    public function test_settings_rounded_times_toggle_present(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new LiturgyEditorPage($this->service->slug))
-                    ->waitFor('#app', 10)
-                    ->click('button[title="Seiteneinstellungen"]')
-                    ->waitFor('.dropdown-menu.show', 5)
-                    ->assertSee('Zeitangaben runden');
+                ->visit(new LiturgyEditorPage($this->service->slug))
+                ->waitFor('#app', 10)
+                ->click('button[title="Seiteneinstellungen"]')
+                ->waitFor('.dropdown-menu.show', 5)
+                ->assertSee('Zeitangaben runden');
         });
     }
 
-    public function testEveryDownloadableLiturgySheetIsAvailableFromTheDropdown(): void
+    public function test_every_downloadable_liturgy_sheet_is_available_from_the_dropdown(): void
     {
         $downloadableSheets = collect(LiturgySheets::all())
-            ->filter(fn (array $sheet) => !($sheet['isNotAFile'] ?? false))
+            ->filter(fn (array $sheet) => ! ($sheet['isNotAFile'] ?? false))
             ->values()
             ->all();
 
         $this->browse(function (Browser $browser) use ($downloadableSheets) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new LiturgyEditorPage($this->service->slug))
-                    ->waitFor('#app', 10)
-                    ->waitFor('button[title="Dokumente herunterladen"]', 10)
-                    ->click('button[title="Dokumente herunterladen"]')
-                    ->waitFor('.dropdown-menu.show', 5);
+                ->visit(new LiturgyEditorPage($this->service->slug))
+                ->waitFor('#app', 10)
+                ->waitFor('button[title="Dokumente herunterladen"]', 10)
+                ->click('button[title="Dokumente herunterladen"]')
+                ->waitFor('.dropdown-menu.show', 5);
 
             foreach ($downloadableSheets as $sheet) {
                 $browser->assertSee($sheet['title']);

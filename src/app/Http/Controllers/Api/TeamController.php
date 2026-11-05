@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,13 +31,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\People\Team;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class TeamController extends AbstractApiCRUDController
 {
     protected string $modelClass = Team::class;
 
-    protected function getModelsForIndex(): \Illuminate\Support\Collection
+    protected function getModelsForIndex(): Collection
     {
         return Team::with(Team::$relationsForIndex)
             ->inCities(Auth::user()->cities->pluck('id'))

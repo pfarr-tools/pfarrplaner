@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,12 +30,10 @@
 
 namespace App\Liturgy\ItemHelpers;
 
-
 use App\Models\Liturgy\Item;
 
 class AbstractItemHelper
 {
-
     protected $item;
 
     public function __construct(Item $item)
@@ -43,21 +41,13 @@ class AbstractItemHelper
         $this->item = $item;
     }
 
-    /**
-     * @return Item
-     */
     public function getItem(): Item
     {
         return $this->item;
     }
 
-    /**
-     * @param Item $item
-     */
     public function setItem(Item $item): void
     {
         $this->item = $item;
     }
-
-
 }

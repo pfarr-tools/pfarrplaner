@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
 use App\Documents\Word\DefaultWordDocument;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\ReadingItemHelper;
@@ -41,24 +40,26 @@ use App\Models\Liturgy\Item;
 use App\Models\Liturgy\Song;
 use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
-use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Shared\Converter;
 
 class SongSheetLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Liedblatt';
+
     protected $icon = 'fa fa-file-word';
+
     protected $service = null;
+
     protected $extension = 'docx';
 
     protected $configurationPage = 'Liturgy/LiturgySheets/SongSheetConfiguration';
+
     protected $configurationComponent = 'SongSheetLiturgySheetConfiguration';
 
     protected $defaultConfig = [
         'renderMusic' => false,
         'mergeVerses' => false,
     ];
-
 
     public function __construct()
     {
@@ -69,22 +70,24 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
     {
         $this->service = $service;
 
-        $doc = new DefaultWordDocument();
+        $doc = new DefaultWordDocument;
         $this->setProperties($doc);
 
         $doc->renderServiceTitleHeading($service);
 
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
-                if (method_exists($this, ($method = 'render' . ucfirst($item->data_type . 'Item')))) {
+                if (method_exists($this, ($method = 'render'.ucfirst($item->data_type.'Item')))) {
                     $this->$method($doc, $item);
                 }
             }
         }
+
         return $doc->sendToBrowser($this->getFileName($service));
     }
 
-    protected function setProperties (DefaultWordDocument $doc) {
+    protected function setProperties(DefaultWordDocument $doc)
+    {
         $properties = $doc->getPhpWord()->getDocInfo();
         $properties->setCreator(Auth::user()->fullName());
         $properties->setCompany(Auth::user()->office ?? '');
@@ -95,8 +98,6 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
         $properties->setSubject('Liedblatt');
     }
 
-
-
     public function getFileTitle(): string
     {
         return 'Liedblatt';
@@ -104,43 +105,57 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
 
     protected function renderFreeTextItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!($item->data['handoutText'] ?? false)) {
+        if (! ($item->data['handoutText'] ?? false)) {
             return;
         }
         $helper = $item->getHelper();
         $helper->setField('handoutText');
-        if (!($item->data['handoutSuppressTitle'] ?? false)) {
-            $doc->getSection()->addTitle($item->title,3);
+        if (! ($item->data['handoutSuppressTitle'] ?? false)) {
+            $doc->getSection()->addTitle($item->title, 3);
         }
         $doc->renderNormalText(Replacement::replaceAll($helper->getText(), $this->service));
     }
 
     protected function renderReadingItem(DefaultWordDocument $doc, Item $item)
     {
-        if(!isset($item->data['reference'])) return;
-        if(!($item->data['showInHandouts'] ?? false)) return;
+        if (! isset($item->data['reference'])) {
+            return;
+        }
+        if (! ($item->data['showInHandouts'] ?? false)) {
+            return;
+        }
         $helper = new ReadingItemHelper($item);
         $helper->renderToWordDocument($doc, true);
     }
 
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!isset($item->data['psalm'])) return;
-        if (!$item->data['psalm']['text']) return;
+        if (! isset($item->data['psalm'])) {
+            return;
+        }
+        if (! $item->data['psalm']['text']) {
+            return;
+        }
         /** @var PsalmItemHelper $helper */
         $helper = $item->getHelper();
-        $doc->getSection()->addTitle($helper->getTitleText(),3);
+        $doc->getSection()->addTitle($helper->getTitleText(), 3);
         $doc->renderNormalText($item->data['psalm']['text']);
     }
 
     protected function renderSongItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!isset($item->data['song'])) return;
-        if (null === $item->data['song']) return;
-        if ($item->data['song']['id'] == -1) return;
+        if (! isset($item->data['song'])) {
+            return;
+        }
+        if ($item->data['song'] === null) {
+            return;
+        }
+        if ($item->data['song']['id'] == -1) {
+            return;
+        }
         /** @var SongItemHelper $helper */
         $helper = $item->getHelper();
-        $doc->getSection()->addTitle($helper->getTitleText(),3);
+        $doc->getSection()->addTitle($helper->getTitleText(), 3);
         if ($item->data['song']['song']['copyrights'] ?? '') {
             $doc->renderNormalText($item->data['song']['song']['copyrights'], ['size' => 8]);
         }
@@ -164,5 +179,4 @@ class SongSheetLiturgySheet extends AbstractLiturgySheet
         }
 
     }
-
 }

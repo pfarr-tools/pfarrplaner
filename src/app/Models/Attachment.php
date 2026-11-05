@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -38,19 +38,22 @@ use Illuminate\Support\Facades\Storage;
 
 /**
  * Class Attachment
- * @package App
  */
 class Attachment extends AbstractModel
 {
     use HasFactory;
 
     protected static string $prefix = 'attachment';
+
     protected static string $prefixPlural = 'attachments';
+
     protected static string $path = '';
+
     public static array $exceptRoutes = [
         'web' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
         'api' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
     ];
+
     protected static $routes = [
         'web' => [
             'update' => [['POST', 'PATCH'], '###/{modelId}'],
@@ -64,20 +67,14 @@ class Attachment extends AbstractModel
 
     protected $appends = ['size', 'mimeType', 'icon', 'extension', 'hasFile', 'errorMessage'];
 
-    /**
-     * @return MorphTo
-     */
     public function attachable(): MorphTo
     {
         return $this->morphTo();
     }
 
-    /**
-     * @return Model|null
-     */
     public function resolveAttachableIncludingTrashed(): ?Model
     {
-        if (!$this->attachable_type || !$this->attachable_id || !class_exists($this->attachable_type)) {
+        if (! $this->attachable_type || ! $this->attachable_id || ! class_exists($this->attachable_type)) {
             return null;
         }
 
@@ -89,25 +86,16 @@ class Attachment extends AbstractModel
         return $query->find($this->attachable_id);
     }
 
-    /**
-     * @return string
-     */
     public function getLabelAttribute(): string
     {
         return (string) ($this->title ?? basename((string) $this->file));
     }
 
-    /**
-     * @return bool
-     */
     public function getHasFileAttribute(): bool
     {
         return $this->file && Storage::exists($this->file);
     }
 
-    /**
-     * @return int|null
-     */
     public function getSizeAttribute(): ?int
     {
         if (! $this->hasFile) {
@@ -117,9 +105,6 @@ class Attachment extends AbstractModel
         return Storage::size($this->file);
     }
 
-    /**
-     * @return string
-     */
     public function getMimeTypeAttribute(): string
     {
         if (! $this->hasFile) {
@@ -132,7 +117,6 @@ class Attachment extends AbstractModel
     /**
      * Get correct file icon by mime type
      *
-     * @return string
      * @source https://gist.github.com/colemanw/9c9a12aae16a4bfe2678de86b661d922
      */
     public function getIconAttribute(): string
@@ -170,20 +154,15 @@ class Attachment extends AbstractModel
                 return $icon;
             }
         }
+
         return 'fa-file';
     }
 
-    /**
-     * @return string
-     */
     public function getExtensionAttribute(): string
     {
         return (string) pathinfo((string) $this->file, PATHINFO_EXTENSION);
     }
 
-    /**
-     * @return string|null
-     */
     public function getErrorMessageAttribute(): ?string
     {
         if ($this->hasFile) {
@@ -192,5 +171,4 @@ class Attachment extends AbstractModel
 
         return 'Die gespeicherte Datei wurde nicht gefunden.';
     }
-
 }

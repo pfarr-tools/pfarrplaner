@@ -6,7 +6,7 @@ use App\Models\Leave\Pool;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Leave\Pool>
+ * @extends Factory<Pool>
  */
 class PoolFactory extends Factory
 {

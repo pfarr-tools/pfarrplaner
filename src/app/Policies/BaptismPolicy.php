@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -38,85 +38,48 @@ class BaptismPolicy
 {
     use HandlesAuthorization;
 
-    /**
-     * @param User $user
-     * @return bool
-     */
     public function index(User $user): bool
     {
         return $this->create($user);
     }
 
-    /**
-     * @param User $user
-     * @param Baptism $baptism
-     * @return bool
-     */
     protected function hasCityPermission(User $user, Baptism $baptism): bool
     {
         return $user->writableCities->pluck('id')->contains($baptism->city_id);
     }
 
-    /**
-     * @param User $user
-     * @param Baptism|null $baptism
-     * @return bool
-     */
-    protected function mayChange(User $user, Baptism $baptism = null): bool
+    protected function mayChange(User $user, ?Baptism $baptism = null): bool
     {
-        if (!$user->hasPermissionTo('gd-bearbeiten')) {
+        if (! $user->hasPermissionTo('gd-bearbeiten')) {
             return false;
         }
-        if (null === $baptism) {
+        if ($baptism === null) {
             return true;
         }
+
         return $this->hasCityPermission($user, $baptism);
     }
 
-    /**
-     * @param User $user
-     * @return bool
-     */
     public function create(User $user): bool
     {
         return $user->hasPermissionTo('gd-bearbeiten');
     }
 
-    /**
-     * @param User $user
-     * @param Baptism|null $baptism
-     * @return bool
-     */
-    public function update(User $user, Baptism $baptism = null): bool
+    public function update(User $user, ?Baptism $baptism = null): bool
     {
-        return $this->mayChange($user, $baptism) || (null !== $baptism && null === $baptism->city_id && $this->create($user));
+        return $this->mayChange($user, $baptism) || ($baptism !== null && $baptism->city_id === null && $this->create($user));
     }
 
-    /**
-     * @param User $user
-     * @param Baptism|null $baptism
-     * @return bool
-     */
-    public function delete(User $user, Baptism $baptism = null): bool
+    public function delete(User $user, ?Baptism $baptism = null): bool
     {
         return $this->update($user, $baptism);
     }
 
-    /**
-     * @param User $user
-     * @param Baptism $baptism
-     * @return bool
-     */
     public function restore(User $user, Baptism $baptism): bool
     {
         return $this->delete($user, $baptism);
     }
 
-    /**
-     * @param User $user
-     * @param Baptism $baptism
-     * @return bool
-     */
     public function forceDelete(User $user, Baptism $baptism): bool
     {
         return $this->delete($user, $baptism);

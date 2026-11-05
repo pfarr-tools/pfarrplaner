@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,23 +31,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Parish;
-use App\Models\People\User;
 use App\Models\Places\City;
-use App\Models\Places\StreetRange;
-use App\Services\RoleService;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
 
 /**
  * Class ParishController
- * @package App\Http\Controllers
  */
 class ParishController extends AbstractCRUDController
 {
-
     protected string $modelClass = Parish::class;
 
     /**
@@ -59,7 +50,7 @@ class ParishController extends AbstractCRUDController
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function preFillNewModel(Request $request): array
     {
@@ -67,6 +58,7 @@ class ParishController extends AbstractCRUDController
         $city = City::findOrFail($request->get('city', -1));
         $data['city_id'] = $city->id;
         $data['name'] = 'Pfarramt '.$city->name;
+
         return $data;
     }
 }

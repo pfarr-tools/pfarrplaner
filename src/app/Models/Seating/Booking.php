@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -42,12 +42,16 @@ class Booking extends AbstractModel
     use HasFactory;
 
     protected static string $path = '';
+
     protected static string $prefix = 'booking';
+
     protected static string $prefixPlural = 'bookings';
+
     public static array $exceptRoutes = [
         'web' => ['index', 'create', 'show', 'store', 'edit', 'update', 'destroy'],
         'api' => ['index', 'show', 'store', 'update', 'destroy'],
     ];
+
     protected static $routes = [
         'web' => [
             'store' => [['POST'], 'anmeldung'],
@@ -59,6 +63,7 @@ class Booking extends AbstractModel
             'destroy' => [['DELETE'], 'booking/{modelId}'],
         ],
     ];
+
     public static array $validationRules = [
         'service_id' => 'required|int|exists:services,id',
         'code' => 'nullable|string',
@@ -73,6 +78,7 @@ class Booking extends AbstractModel
     ];
 
     protected $guarded = [];
+
     protected $fillable = [
         'service_id',
         'code',
@@ -98,20 +104,20 @@ class Booking extends AbstractModel
      *
      * @return void
      */
-    protected static function boot() {
+    protected static function boot()
+    {
         parent::boot();
         static::addGlobalScope('order', function (Builder $builder) {
             $builder->orderBy('number', 'desc');
         });
     }
 
-
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function getLabelAttribute(): string
     {
-        return trim(($this->name ?? '') . (($this->first_name ?? '') ? ', ' . $this->first_name : ''));
+        return trim(($this->name ?? '').(($this->first_name ?? '') ? ', '.$this->first_name : ''));
     }
 
     public function fillDefaults(): array
@@ -145,5 +151,4 @@ class Booking extends AbstractModel
     {
         return str_pad(dechex(rand(0x100000, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
     }
-
 }

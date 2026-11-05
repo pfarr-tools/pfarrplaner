@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,7 +28,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+use App\Http\Controllers\DAV\DAVController;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 
@@ -50,21 +51,20 @@ $verbs = [
     'REPORT',
 ];
 
-
 Router::$verbs = array_merge(Router::$verbs, $verbs);
 
 Route::permanentRedirect('/.well-known/caldav', '/dav/')->withoutMiddleware([
     'auth',
     'csrf',
-    \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+    PreventRequestForgery::class,
 ]);
 
-Route::any('/dav/{any?}', [\App\Http\Controllers\DAV\DAVController::class, 'handle'])
+Route::any('/dav/{any?}', [DAVController::class, 'handle'])
     ->where('any', '.*')
     ->middleware('auth.basic')
     ->withoutMiddleware([
         'auth',
         'csrf',
-        \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+        PreventRequestForgery::class,
     ])
     ->name('sabre.dav');

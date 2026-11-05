@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,17 +30,14 @@
 
 namespace App\Models\Calendar\External;
 
-
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class CalendarConnectionEntry
- * @package App
  */
 class CalendarConnectionEntry extends Model
 {
-
     protected $fillable = ['calendar_connection_id', 'service_id', 'alternate_key', 'foreign_id'];
 
     public function calendarConnection()

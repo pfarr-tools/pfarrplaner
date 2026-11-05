@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,49 +18,49 @@ use Tests\TestCase;
 
 class GiroCodeServiceUnitTest extends TestCase
 {
-    public function testCodeValueStartsWithBcd(): void
+    public function test_code_value_starts_with_bcd(): void
     {
         $result = GiroCodeService::codeValue('Kirchengemeinde', 'DE89370400440532013000');
         $this->assertStringStartsWith('BCD', $result);
     }
 
-    public function testCodeValueContainsName(): void
+    public function test_code_value_contains_name(): void
     {
         $result = GiroCodeService::codeValue('Kirchengemeinde Muster', 'DE89370400440532013000');
         $this->assertStringContainsString('Kirchengemeinde Muster', $result);
     }
 
-    public function testCodeValueNormalizesIban(): void
+    public function test_code_value_normalizes_iban(): void
     {
         $result = GiroCodeService::codeValue('Test', 'de89 3704 0044 0532 0130 00');
         $this->assertStringContainsString('DE89370400440532013000', $result);
     }
 
-    public function testCodeValueIncludesAmountWhenProvided(): void
+    public function test_code_value_includes_amount_when_provided(): void
     {
         $result = GiroCodeService::codeValue('Test', 'DE89370400440532013000', 50.0);
         $this->assertStringContainsString('EUR50.00', $result);
     }
 
-    public function testCodeValueOmitsAmountLineWhenNull(): void
+    public function test_code_value_omits_amount_line_when_null(): void
     {
         $result = GiroCodeService::codeValue('Test', 'DE89370400440532013000', null);
         $this->assertStringNotContainsString('EUR', $result);
     }
 
-    public function testCodeValueIncludesPurpose(): void
+    public function test_code_value_includes_purpose(): void
     {
         $result = GiroCodeService::codeValue('Test', 'DE89370400440532013000', null, 'Kollekte');
         $this->assertStringContainsString('Kollekte', $result);
     }
 
-    public function testCodeValueIncludesBicWhenProvided(): void
+    public function test_code_value_includes_bic_when_provided(): void
     {
         $result = GiroCodeService::codeValue('Test', 'DE89370400440532013000', null, '', 'COBADEFFXXX');
         $this->assertStringContainsString('COBADEFFXXX', $result);
     }
 
-    public function testCodeValueReturnsSctLine(): void
+    public function test_code_value_returns_sct_line(): void
     {
         $result = GiroCodeService::codeValue('Test', 'DE89370400440532013000');
         $this->assertStringContainsString('SCT', $result);

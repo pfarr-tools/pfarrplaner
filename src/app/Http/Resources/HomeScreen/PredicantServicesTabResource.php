@@ -16,6 +16,7 @@ class PredicantServicesTabResource extends JsonResource
             'id' => $city->id,
             'name' => $city->name,
         ]);
+
         return $data;
     }
 }

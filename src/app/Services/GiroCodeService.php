@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,20 +32,17 @@ namespace App\Services;
 
 class GiroCodeService
 {
-
-
     /**
      * Generates the text payload for an EPC GiroCode (SEPA Credit Transfer).
      *
      * The returned string can be passed directly to a QR code generator
      * (e.g. `qrencode`) to create a banking-compatible EPC QR code.
      *
-     * @param string      $name    Name of the payment recipient.
-     * @param string      $iban    IBAN of the payment recipient.
-     * @param float|null  $amount  Payment amount in EUR (optional).
-     * @param string      $purpose Payment reference / purpose (optional).
-     * @param string|null $bic     BIC of the recipient bank (optional, may be empty).
-     *
+     * @param  string  $name  Name of the payment recipient.
+     * @param  string  $iban  IBAN of the payment recipient.
+     * @param  float|null  $amount  Payment amount in EUR (optional).
+     * @param  string  $purpose  Payment reference / purpose (optional).
+     * @param  string|null  $bic  BIC of the recipient bank (optional, may be empty).
      * @return string EPC-compliant text payload for a GiroCode QR code.
      */
     public static function codeValue(
@@ -57,12 +54,12 @@ class GiroCodeService
     ): string {
         // Grundvalidierungen
         $iban = strtoupper(str_replace(' ', '', $iban));
-        $bic  = $bic ? strtoupper(trim($bic)) : '';
+        $bic = $bic ? strtoupper(trim($bic)) : '';
 
         // Betrag formatieren (falls vorhanden)
         $amountLine = '';
         if ($amount !== null) {
-            $amountLine = 'EUR' . number_format($amount, 2, '.', '');
+            $amountLine = 'EUR'.number_format($amount, 2, '.', '');
         }
 
         // EPC-Zeilen laut Standard
@@ -76,15 +73,14 @@ class GiroCodeService
             $iban,          // IBAN
             $amountLine,    // Betrag (optional)
             '',
-            trim($purpose) // Verwendungszweck (optional)
+            trim($purpose), // Verwendungszweck (optional)
         ];
 
         // Leere Zeilen am Ende entfernen (EPC-konform)
-        while (!empty($lines) && trim(end($lines)) === '') {
+        while (! empty($lines) && trim(end($lines)) === '') {
             array_pop($lines);
         }
 
         return implode("\n", $lines);
     }
-
 }

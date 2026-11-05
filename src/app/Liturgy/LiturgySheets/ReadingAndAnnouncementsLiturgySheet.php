@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,30 +30,28 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
 use App\Documents\Word\DefaultWordDocument;
-use App\Liturgy\Bible\BibleText;
-use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Replacement\Replacement;
 use App\Models\Liturgy\Item;
-use App\Services\MinistryService;
 use App\Models\Service;
+use App\Services\MinistryService;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\Element\Table;
-use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\SimpleType\JcTable;
 
 class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Schriftlesung und Abkündigungen';
+
     protected $icon = 'fa fa-file-word';
 
-    /** @var Service $service */
+    /** @var Service */
     protected $service = null;
+
     protected $extension = 'docx';
 
     protected $defaultConfig = [
@@ -68,7 +66,7 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
     {
         $this->service = $service;
 
-        $doc = new DefaultWordDocument();
+        $doc = new DefaultWordDocument;
         $this->setProperties($doc);
         $doc->getPhpWord()->addTableStyle(
             'Ablauf',
@@ -76,7 +74,7 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
                 'borderSize' => 6,
                 'borderColor' => '444444',
                 'cellMargin' => 80,
-                'alignment' => JcTable::START
+                'alignment' => JcTable::START,
             ]
         );
 
@@ -89,13 +87,12 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
             }
         }
 
-
         $this->renderLiturgyTable($doc);
         // collect items for this user
         foreach ($this->service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
                 if (in_array($item->data_type, ['reading', 'freeText'])) {
-                    if (method_exists($this, ($method = 'render' . ucfirst($item->data_type . 'Item')))) {
+                    if (method_exists($this, ($method = 'render'.ucfirst($item->data_type.'Item')))) {
                         $this->$method($doc, $item);
                     }
                 }
@@ -108,10 +105,12 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
     public function renderParticipantRow($category)
     {
         $p = [];
-        foreach ($this->service->participantsByCategory($category) as $person) $p[] = $person->name;
-        return join(', ', $p);
-    }
+        foreach ($this->service->participantsByCategory($category) as $person) {
+            $p[] = $person->name;
+        }
 
+        return implode(', ', $p);
+    }
 
     protected function renderLiturgyTable(DefaultWordDocument $doc, $recipient = '')
     {
@@ -120,7 +119,7 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
 
             $table = $doc->getSection()->addTable('Ablauf');
             foreach ($block->items as $item) {
-                if (method_exists($this, ($method = 'render' . ucfirst($item->data_type . 'ItemRow')))) {
+                if (method_exists($this, ($method = 'render'.ucfirst($item->data_type.'ItemRow')))) {
                     $table->addRow();
                     $this->$method($doc, $table, $item);
                 }
@@ -134,7 +133,7 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
         $properties->setCreator(Auth::user()->fullName());
         $properties->setCompany(Auth::user()->office ?? '');
         $properties->setTitle($this->getFileTitle());
-        $properties->setDescription($this->getFileTitle() . ' (' . $this->title . ')');
+        $properties->setDescription($this->getFileTitle().' ('.$this->title.')');
         $properties->setCategory('Gottesdienste');
         $properties->setLastModifiedBy(Auth::user()->fullName());
         $properties->setSubject('Ablauf und Texte');
@@ -142,7 +141,7 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
 
     public function getFileTitle(): string
     {
-        return 'Gottesdienst' . (($this->service) && ($this->service->sermon) ? ' - ' . $this->service->sermon->title : '');
+        return 'Gottesdienst'.(($this->service) && ($this->service->sermon) ? ' - '.$this->service->sermon->title : '');
     }
 
     protected function renderRow(Table $table, Item $item, $text)
@@ -158,24 +157,19 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
         $run = $cell->addTextRun();
         $first = true;
         foreach ($item->recipients() as $recipient) {
-            if (!$first) {
+            if (! $first) {
                 $run->addText(', ');
             }
             $first = false;
         }
     }
 
-    /**
-     * @param DefaultWordDocument $doc
-     * @param Table $table
-     * @param Item $item
-     */
     protected function renderFreetextItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         $text = '';
         if ($item->data['description']) {
             $text = Replacement::replaceAll($item->getHelper()->getText(), $this->service);
-            $text = (false !== strpos($text, "\n")) ? explode("\n", $text)[0] : substr($text, 0, 80) . '...';
+            $text = (strpos($text, "\n") !== false) ? explode("\n", $text)[0] : substr($text, 0, 80).'...';
         }
         $this->renderRow($table, $item, $text);
     }
@@ -194,7 +188,7 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
 
     protected function renderSongItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
-        if (!isset($item->data['song'])) {
+        if (! isset($item->data['song'])) {
             return;
         }
         /** @var SongItemHelper $helper */
@@ -209,35 +203,29 @@ class ReadingAndAnnouncementsLiturgySheet extends AbstractLiturgySheet
 
     protected function renderFreetextItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!$item->data['description']) {
+        if (! $item->data['description']) {
             return;
         }
-        if ((!str_contains(strtolower($item->title), 'bekanntgabe')) && (!str_contains(strtolower($item->title), 'abkündigung'))) return;
+        if ((! str_contains(strtolower($item->title), 'bekanntgabe')) && (! str_contains(strtolower($item->title), 'abkündigung'))) {
+            return;
+        }
         $doc->getSection()->addTitle($item->title, 2);
         $doc->renderNormalText(Replacement::replaceAll($item->getHelper()->getText(), $this->service));
     }
 
-    protected function renderSermonItem(DefaultWordDocument $doc, Item $item)
-    {
-    }
+    protected function renderSermonItem(DefaultWordDocument $doc, Item $item) {}
 
-    protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
-    {
-    }
+    protected function renderPsalmItem(DefaultWordDocument $doc, Item $item) {}
 
-    protected function renderSongItem(DefaultWordDocument $doc, Item $item)
-    {
-    }
+    protected function renderSongItem(DefaultWordDocument $doc, Item $item) {}
 
     protected function renderReadingItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!$item->data['reference']) {
+        if (! $item->data['reference']) {
             return;
         }
 
         $helper = new ReadingItemHelper($item);
         $helper->renderToWordDocument($doc, true);
     }
-
-
 }

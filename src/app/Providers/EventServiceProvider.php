@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -41,7 +41,6 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 
 /**
  * Class EventServiceProvider
- * @package App\Providers
  */
 class EventServiceProvider extends ServiceProvider
 {
@@ -55,19 +54,19 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         'App\Events\AbsenceDemanded' => [
-            'App\Listeners\SendApprovalNotification'
+            'App\Listeners\SendApprovalNotification',
         ],
         'App\Events\AbsenceApproved' => [
-            'App\Listeners\SendApprovalNotification'
+            'App\Listeners\SendApprovalNotification',
         ],
         'App\Events\AbsenceRejected' => [
-            'App\Listeners\SendRejectionNotification'
+            'App\Listeners\SendRejectionNotification',
         ],
         AbsenceUpdated::class => [
         ],
         Login::class => [
             PingInstancesRegistry::class,
-        ]
+        ],
     ];
 
     protected $subscribe = [
@@ -101,5 +100,4 @@ class EventServiceProvider extends ServiceProvider
             $this->app->path('Calendars/Listeners'),
         ];
     }
-
 }

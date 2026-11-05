@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,16 +31,13 @@
 namespace App\Http\Controllers;
 
 use App\Integrations\KonfiApp\KonfiAppIntegration;
-use App\Integrations\Youtube\YoutubeIntegration;
 use App\Models\AbstractModel;
-use App\Services\MinistryService;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Traits\HandlesAttachedImageTrait;
 use App\Traits\HandlesAttachmentsTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -55,11 +52,11 @@ use Inertia\Inertia;
  */
 class CityController extends AbstractCRUDController
 {
-
-    use HandlesAttachmentsTrait;
     use HandlesAttachedImageTrait;
+    use HandlesAttachmentsTrait;
 
     protected string $modelClass = City::class;
+
     protected $model = City::class;
 
     /**
@@ -72,11 +69,11 @@ class CityController extends AbstractCRUDController
         $this->middleware('auth')->except('qr');
     }
 
-
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    protected function getModelsForIndex(): Collection {
+    protected function getModelsForIndex(): Collection
+    {
         $user = Auth::user();
         if ($user->isAdmin) {
             return ($this->modelClass)::all();
@@ -85,9 +82,8 @@ class CityController extends AbstractCRUDController
         }
     }
 
-
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function getSingleModel(Request $request, $modelId = null, $relations = []): AbstractModel
     {
@@ -106,30 +102,30 @@ class CityController extends AbstractCRUDController
             ->sortBy('name');
         $data['streams'] = [];
         $data['activeTab'] = 'home';
+
         return $data;
     }
 
-
     /**
      * Show QR codes
-     * @param Request $request
-     * @param string $city
+     *
+     * @param  string  $city
      * @return \Inertia\Response
      */
-    public function qr(Request $request, $city) {
-        $city = City::where('name', 'like', '%' . Str::replace(['-', 'ae', 'oe', 'ue'], [' ', 'ä', 'ö', 'ü'], $city) . '%')->first();
+    public function qr(Request $request, $city)
+    {
+        $city = City::where('name', 'like', '%'.Str::replace(['-', 'ae', 'oe', 'ue'], [' ', 'ä', 'ö', 'ü'], $city).'%')->first();
         abort_unless($city, 404);
 
-        $services = Service::where('city_id', $city->id)->whereDate('date', Carbon::now()->setTime(0,0,0))
+        $services = Service::where('city_id', $city->id)->whereDate('date', Carbon::now()->setTime(0, 0, 0))
             ->whereNotNull('konfiapp_event_qr')->get();
         $types = KonfiAppIntegration::isActive($city)
             ? KonfiAppIntegration::get($city)->listEventTypes()
             : collect();
 
-        $servicesWithoutQR = Service::where('city_id', $city->id)->whereDate('date', Carbon::now()->setTime(0,0,0))
+        $servicesWithoutQR = Service::where('city_id', $city->id)->whereDate('date', Carbon::now()->setTime(0, 0, 0))
             ->whereNull('konfiapp_event_qr')->get();
 
         return Inertia::render('Public/City/QR', compact('services', 'city', 'types', 'servicesWithoutQR'));
     }
-
 }

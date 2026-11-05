@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -25,7 +26,7 @@ class SongbookApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testIndexReturnsSongbooks()
+    public function test_index_returns_songbooks()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -41,7 +42,7 @@ class SongbookApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testIndexRequiresAuth()
+    public function test_index_requires_auth()
     {
         $response = $this->getJson(route('api.songbooks.index'));
         $response->assertUnauthorized();
@@ -50,7 +51,7 @@ class SongbookApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testColorsReturnsColorList()
+    public function test_colors_returns_color_list()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -65,7 +66,7 @@ class SongbookApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testStoreCreatesSongbook()
+    public function test_store_creates_songbook()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -84,7 +85,7 @@ class SongbookApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testStoreRequiresNameAndCode()
+    public function test_store_requires_name_and_code()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);

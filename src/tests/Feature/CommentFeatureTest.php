@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -32,7 +33,7 @@ class CommentFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testCommentCanBeCreatedViaWebRoute(): void
+    public function test_comment_can_be_created_via_web_route(): void
     {
         $service = Service::factory()->create();
 
@@ -53,7 +54,7 @@ class CommentFeatureTest extends TestCase
         $this->assertSame(1, Comment::count());
     }
 
-    public function testCommentCanBeDeletedViaWebRoute(): void
+    public function test_comment_can_be_deleted_via_web_route(): void
     {
         $comment = Comment::factory()->create(['user_id' => $this->user->id]);
 

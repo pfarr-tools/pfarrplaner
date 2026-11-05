@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,12 +24,11 @@ use Tests\TestCase;
 class PublicDimissorialFeatureTest extends TestCase
 {
     protected City $city;
+
     protected Service $service;
+
     protected User $pastor;
 
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -51,10 +51,7 @@ class PublicDimissorialFeatureTest extends TestCase
         $this->service->participants()->attach($this->pastor->id, ['category' => 'P']);
     }
 
-    /**
-     * @return void
-     */
-    public function testPublicBaptismDimissorialCanBeShownAndGranted(): void
+    public function test_public_baptism_dimissorial_can_be_shown_and_granted(): void
     {
         $baptism = Baptism::factory()->create([
             'service_id' => $this->service->id,
@@ -83,10 +80,7 @@ class PublicDimissorialFeatureTest extends TestCase
         $this->assertNotNull($baptism->fresh()->dimissorial_received);
     }
 
-    /**
-     * @return void
-     */
-    public function testPublicWeddingDimissorialShowsAlreadyGrantedStateForSignedSpouse(): void
+    public function test_public_wedding_dimissorial_shows_already_granted_state_for_signed_spouse(): void
     {
         $wedding = Wedding::factory()->create([
             'service_id' => $this->service->id,

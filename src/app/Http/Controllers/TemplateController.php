@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,9 +30,6 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Liturgy\Agenda;
-use App\Models\Calendar\Day;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -40,30 +37,30 @@ use Inertia\Inertia;
 
 class TemplateController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
         $this->authorizeResource(Service::class, 'template');
     }
 
-
     public function index()
     {
         $templates = Service::orderBy('title')->isTemplate()->get();
+
         return Inertia::render('Liturgy/Template/Index', compact('templates'));
     }
 
     public function create()
     {
         $template = Service::create([
-                                      'date' => Carbon::parse('1978-03-05 0:00:00'),
-                                      'title' => 'Neue Vorlage',
-                                      'description' => '',
-                                      'special_location' => '',
-                                  ]
+            'date' => Carbon::parse('1978-03-05 0:00:00'),
+            'title' => 'Neue Vorlage',
+            'description' => '',
+            'special_location' => '',
+        ]
         );
         $template->update(['slug' => $template->createSlug()]);
+
         return redirect()->route('liturgy.editor', $template->slug);
     }
 
@@ -71,12 +68,14 @@ class TemplateController extends Controller
     {
         $template = Service::create($this->validateRequest($request));
         $template->update(['slug' => $template->createSlug()]);
+
         return redirect()->route('liturgy.editor', $template->slug);
     }
 
     public function update(Request $request, Service $template)
     {
         $template->update($this->validateRequest($request));
+
         return redirect()->route('template.index');
     }
 
@@ -84,9 +83,9 @@ class TemplateController extends Controller
     {
         $this->authorize('create', Service::class);
         $template = Service::create([
-            'date'             => Carbon::parse('1978-03-05 0:00:00'),
-            'title'            => $service->title ?: 'Neue Vorlage',
-            'description'      => '',
+            'date' => Carbon::parse('1978-03-05 0:00:00'),
+            'title' => $service->title ?: 'Neue Vorlage',
+            'description' => '',
             'special_location' => '',
         ]);
         $template->update(['slug' => $template->createSlug()]);
@@ -116,9 +115,9 @@ class TemplateController extends Controller
     {
         $this->authorize('create', Service::class);
         $newTemplate = Service::create([
-            'date'             => Carbon::parse('1978-03-05 0:00:00'),
-            'title'            => $template->title . ' (Kopie)',
-            'description'      => $template->description,
+            'date' => Carbon::parse('1978-03-05 0:00:00'),
+            'title' => $template->title.' (Kopie)',
+            'description' => $template->description,
             'special_location' => $template->special_location,
             'internal_remarks' => $template->internal_remarks,
         ]);
@@ -148,6 +147,7 @@ class TemplateController extends Controller
     public function delete(Service $template)
     {
         $template->delete();
+
         return redirect()->route('template.index')->with('success', 'Die Vorlage wurde gelöscht.');
     }
 
@@ -162,6 +162,7 @@ class TemplateController extends Controller
             ]
         );
         $data['date'] = Carbon::parse('1978-03-05 0:00:00');
+
         return $data;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,9 +13,14 @@
 
 namespace Tests\Unit;
 
+use App\Actions\ServiceGroup\CreateServiceGroup;
+use App\Actions\ServiceGroup\DeleteServiceGroup;
+use App\Actions\ServiceGroup\UpdateServiceGroup;
 use App\Events\Models\ServiceGroup\CreatedServiceGroup;
 use App\Events\Models\ServiceGroup\DeletedServiceGroup;
 use App\Events\Models\ServiceGroup\UpdatedServiceGroup;
+use App\Http\Controllers\AbstractCRUDController;
+use App\Http\Controllers\Api\AbstractApiCRUDController;
 use App\Models\AbstractModel;
 use App\Models\People\User;
 use App\Models\ServiceGroup;
@@ -26,31 +32,31 @@ class ServiceGroupUnitTest extends TestCase
 {
     private User $user;
 
-    public function testServiceGroupCanBeCreatedViaFactory(): void
+    public function test_service_group_can_be_created_via_factory(): void
     {
         $group = ServiceGroup::factory()->create();
         $this->assertCount(1, ServiceGroup::all());
     }
 
-    public function testServiceGroupExtendsAbstractModel(): void
+    public function test_service_group_extends_abstract_model(): void
     {
         $this->assertTrue(is_subclass_of(ServiceGroup::class, AbstractModel::class));
     }
 
-    public function testServiceGroupControllerClassesExist(): void
+    public function test_service_group_controller_classes_exist(): void
     {
-        $this->assertTrue(is_subclass_of(ServiceGroup::controllerClass(), \App\Http\Controllers\AbstractCRUDController::class));
-        $this->assertTrue(is_subclass_of(ServiceGroup::apiControllerClass(), \App\Http\Controllers\Api\AbstractApiCRUDController::class));
+        $this->assertTrue(is_subclass_of(ServiceGroup::controllerClass(), AbstractCRUDController::class));
+        $this->assertTrue(is_subclass_of(ServiceGroup::apiControllerClass(), AbstractApiCRUDController::class));
     }
 
-    public function testServiceGroupContractsResolve(): void
+    public function test_service_group_contracts_resolve(): void
     {
-        $this->assertInstanceOf(\App\Actions\ServiceGroup\CreateServiceGroup::class, app(ServiceGroup::getContractName('create')));
-        $this->assertInstanceOf(\App\Actions\ServiceGroup\UpdateServiceGroup::class, app(ServiceGroup::getContractName('update')));
-        $this->assertInstanceOf(\App\Actions\ServiceGroup\DeleteServiceGroup::class, app(ServiceGroup::getContractName('delete')));
+        $this->assertInstanceOf(CreateServiceGroup::class, app(ServiceGroup::getContractName('create')));
+        $this->assertInstanceOf(UpdateServiceGroup::class, app(ServiceGroup::getContractName('update')));
+        $this->assertInstanceOf(DeleteServiceGroup::class, app(ServiceGroup::getContractName('delete')));
     }
 
-    public function testServiceGroupCanBeCreatedViaAction(): void
+    public function test_service_group_can_be_created_via_action(): void
     {
         Event::fake();
 
@@ -61,7 +67,7 @@ class ServiceGroupUnitTest extends TestCase
         Event::assertDispatched(CreatedServiceGroup::class);
     }
 
-    public function testServiceGroupCanBeUpdatedViaAction(): void
+    public function test_service_group_can_be_updated_via_action(): void
     {
         Event::fake();
 
@@ -72,7 +78,7 @@ class ServiceGroupUnitTest extends TestCase
         Event::assertDispatched(UpdatedServiceGroup::class);
     }
 
-    public function testServiceGroupCanBeDeletedViaAction(): void
+    public function test_service_group_can_be_deleted_via_action(): void
     {
         Event::fake();
 
@@ -84,7 +90,7 @@ class ServiceGroupUnitTest extends TestCase
         Event::assertDispatched(DeletedServiceGroup::class);
     }
 
-    public function testCreateIfMissingReusesExistingGroup(): void
+    public function test_create_if_missing_reuses_existing_group(): void
     {
         $group = ServiceGroup::factory()->create(['name' => 'Lektor:innen']);
 

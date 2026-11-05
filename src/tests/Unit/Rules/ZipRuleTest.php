@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -22,20 +23,28 @@ class ZipRuleTest extends TestCase
         $failed = false;
         $fail = function () use (&$failed) {
             $failed = true;
-            return new class { public function translate(): string { return ''; } };
+
+            return new class
+            {
+                public function translate(): string
+                {
+                    return '';
+                }
+            };
         };
-        (new Zip())->validate('zip', $value, $fail);
-        return !$failed;
+        (new Zip)->validate('zip', $value, $fail);
+
+        return ! $failed;
     }
 
-    public function testValidZipCodes()
+    public function test_valid_zip_codes()
     {
         $this->assertTrue($this->runRule('72336'));
         $this->assertTrue($this->runRule('01234'));
         $this->assertTrue($this->runRule('99999'));
     }
 
-    public function testInvalidZipCodes()
+    public function test_invalid_zip_codes()
     {
         $this->assertFalse($this->runRule('1234'));
         $this->assertFalse($this->runRule('123456'));

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -14,36 +15,37 @@ namespace Tests\Unit\Services;
 
 use App\Services\CalendarService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Tests\TestCase;
 
 class CalendarServiceUnitTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testInitializeMonthReturnsSundaysOnly(): void
+    public function test_initialize_month_returns_sundays_only(): void
     {
         $days = CalendarService::initializeMonth(2025, 1);
         $this->assertNotEmpty($days);
         foreach ($days as $day) {
             // date is cast as datetime, returns Carbon directly
-            $this->assertEquals(0, $day->date->dayOfWeek, "Expected Sunday, got " . $day->date->format('l'));
+            $this->assertEquals(0, $day->date->dayOfWeek, 'Expected Sunday, got '.$day->date->format('l'));
         }
     }
 
-    public function testInitializeMonthCountIsCorrect(): void
+    public function test_initialize_month_count_is_correct(): void
     {
         // January 2025 has 4 Sundays (5, 12, 19, 26)
         $days = CalendarService::initializeMonth(2025, 1);
         $this->assertCount(4, $days);
     }
 
-    public function testInitializeMonthReturnsCollection(): void
+    public function test_initialize_month_returns_collection(): void
     {
         $days = CalendarService::initializeMonth(2025, 6);
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $days);
+        $this->assertInstanceOf(Collection::class, $days);
     }
 
-    public function testInitializeMonthPersistsDays(): void
+    public function test_initialize_month_persists_days(): void
     {
         CalendarService::initializeMonth(2025, 1);
         $this->assertDatabaseCount('days', 4);

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,19 +36,14 @@ use Illuminate\Support\Str;
 
 class Psalm extends AbstractSngFile
 {
-
     /** @var Item */
     protected $item;
 
     protected $fileName = '';
 
-    /** @var PsalmItemHelper $helper */
+    /** @var PsalmItemHelper */
     protected $helper;
 
-
-    /**
-     * @param Item $item
-     */
     public function __construct(Item $item)
     {
         $this->item = $item;
@@ -65,8 +60,7 @@ class Psalm extends AbstractSngFile
             'Songbook' => $this->helper->getCodeText(),
             'CCLI' => '-',
             'Rights' => $this->helper->getTitleText(),
-                          ]);
-
+        ]);
 
         $text = $this->headersToText();
 
@@ -74,36 +68,31 @@ class Psalm extends AbstractSngFile
             $text .= $this->line('---');
             foreach ($verse as $line) {
                 $indent = Str::startsWith($line, "\t") ? 4 : 0;
-                $text .= utf8_decode($this->wordWrap(str_replace("\t",'', $line), $indent));
+                $text .= utf8_decode($this->wordWrap(str_replace("\t", '', $line), $indent));
             }
         }
+
         return $text;
 
     }
 
     /**
      * Get the data for the song profile
-     * @return array
      */
     public function toProfile(): array
     {
         $profile = parent::toProfile();
         $profile['Lang1Style'] = '?L';
         $profile['UseSongProfile'] = '@@True';
+
         return $profile;
     }
 
-    /**
-     * @return Item
-     */
     public function getItem(): Item
     {
         return $this->item;
     }
 
-    /**
-     * @param Item $item
-     */
     public function setItem(Item $item): void
     {
         $this->item = $item;
@@ -113,6 +102,4 @@ class Psalm extends AbstractSngFile
     {
         return $this->item->title.': '.$this->getTitle();
     }
-
-
 }

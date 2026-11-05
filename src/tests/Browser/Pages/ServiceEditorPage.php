@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,13 +24,11 @@ class ServiceEditorPage extends Page
         $this->slug = $slug;
     }
 
-    /** @return string */
     public function url(): string
     {
         return route('service.edit', $this->slug);
     }
 
-    /** @param Browser $browser */
     public function assert(Browser $browser): void
     {
         $browser->waitFor('#app', 10)->assertDontSee('500');
@@ -41,8 +40,8 @@ class ServiceEditorPage extends Page
     public function elements(): array
     {
         return [
-            '@saveButton'  => 'button.btn-primary',
-            '@form'        => '#serviceEditorForm',
+            '@saveButton' => 'button.btn-primary',
+            '@form' => '#serviceEditorForm',
             '@deleteButton' => 'button.btn-danger',
             '@dateInput' => '.home-tab .dp__input',
         ];
@@ -50,10 +49,6 @@ class ServiceEditorPage extends Page
 
     /**
      * Set the main service date/time input via the VueDatePicker text field.
-     *
-     * @param Browser $browser
-     * @param string $value
-     * @return void
      */
     public function setDateTime(Browser $browser, string $value): void
     {

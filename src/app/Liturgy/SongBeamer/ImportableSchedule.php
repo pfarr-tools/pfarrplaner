@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,21 +36,18 @@ use ZipArchive;
 
 class ImportableSchedule
 {
-
     /** @var Schedule */
     protected $schedule;
 
     protected $files = [];
+
     protected $imports = [];
 
     protected $profiles;
 
-    /**
-     *
-     */
     public function __construct()
     {
-        $this->schedule = new Schedule();
+        $this->schedule = new Schedule;
 
         $this->profiles = new ObjectFile('SngProfilesCollection', 'TSngProfilesCollection', []);
         $this->profiles->setPathInZip('BGSngProfiles.cfg');
@@ -61,7 +58,7 @@ class ImportableSchedule
 
     /**
      * Add a song
-     * @param Item $item
+     *
      * @return void
      */
     public function addSongItem(Item $item)
@@ -82,19 +79,23 @@ class ImportableSchedule
 
     public function addImport(string $title, string $file, bool $importFile = true)
     {
-        if (!file_exists($file)) return;
-        if ($importFile) $this->imports[] = $file;
+        if (! file_exists($file)) {
+            return;
+        }
+        if ($importFile) {
+            $this->imports[] = $file;
+        }
         $this->schedule->addItem([
             'Caption' => utf8_decode($title),
             'Color' => SongBeamer::LOGO_COLOR,
             'FileName' => 'imports://'.basename($file),
             'Props' => [],
-                                 ]);
+        ]);
     }
 
     /**
      * Add a psalm
-     * @param Item $item
+     *
      * @return void
      */
     public function addPsalmItem(Item $item)
@@ -107,64 +108,66 @@ class ImportableSchedule
 
     /**
      * Add a colored section title
-     * @param $title
+     *
      * @return void
      */
     public function addSectionTitle($title)
     {
         $this->schedule->addItem([
-                                     'Caption' => utf8_decode($title),
-                                     'Color' => '@@clWhite',
-                                     'BGColor' => SongBeamer::LOGO_COLOR,
-                                     'Props' => [],
-                                 ]);
+            'Caption' => utf8_decode($title),
+            'Color' => '@@clWhite',
+            'BGColor' => SongBeamer::LOGO_COLOR,
+            'Props' => [],
+        ]);
     }
 
     /**
      * Add an item simply as a greyed-out note
-     * @param Item|string $item
+     *
+     * @param  Item|string  $item
      * @return void
      */
     public function addGeneralItem($item)
     {
         $title = is_string($item) ? $item : $item->title;
         $this->schedule->addItem([
-                                     'Caption' => utf8_decode($title),
-                                     'Color' => '@@clGray',
-                                     'Props' => [],
-                                 ]);
+            'Caption' => utf8_decode($title),
+            'Color' => '@@clGray',
+            'Props' => [],
+        ]);
     }
 
     /**
      * Add a scripture reading
-     * @param Item $item
+     *
      * @return void
      */
     public function addReadingItem(Item $item)
     {
         $this->schedule->addItem([
-                                     'Caption' => utf8_decode(
-                                         $item['title']
-                                         . (isset($item->data['reference']) ? ': '.str_replace('–', '-', $item->data['reference']) : '')
-                                     ),
-                                     'Color' => '@@clGray',
-                                     'Props' => [],
-                                 ]);
+            'Caption' => utf8_decode(
+                $item['title']
+                .(isset($item->data['reference']) ? ': '.str_replace('–', '-', $item->data['reference']) : '')
+            ),
+            'Color' => '@@clGray',
+            'Props' => [],
+        ]);
     }
-
 
     /**
      * Create temporary ZIP file and dump contents to browser before deleting it
+     *
      * @return void
+     *
      * @throws ErrorException
      */
     public function toZip()
     {
         $zipPath = tempnam(sys_get_temp_dir(), 'pp_sb_');
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         $res = $zip->open($zipPath, ZipArchive::CREATE);
-        if (!$res) {
-            throw new ErrorException('Could not create ZIP file at ' . $zipPath);
+        if (! $res) {
+            throw new ErrorException('Could not create ZIP file at '.$zipPath);
         }
 
         // add static files
@@ -182,56 +185,37 @@ class ImportableSchedule
         }
 
         $zip->close();
+
         return $zipPath;
     }
 
-    /**
-     * @return Schedule
-     */
     public function getSchedule(): Schedule
     {
         return $this->schedule;
     }
 
-    /**
-     * @param Schedule $schedule
-     */
     public function setSchedule(Schedule $schedule): void
     {
         $this->schedule = $schedule;
     }
 
-    /**
-     * @return array
-     */
     public function getFiles(): array
     {
         return $this->files;
     }
 
-    /**
-     * @param array $files
-     */
     public function setFiles(array $files): void
     {
         $this->files = $files;
     }
 
-    /**
-     * @return array
-     */
     public function getImports(): array
     {
         return $this->imports;
     }
 
-    /**
-     * @param array $imports
-     */
     public function setImports(array $imports): void
     {
         $this->imports = $imports;
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,18 +30,17 @@
 
 namespace App\StudyHelpers;
 
-use GuzzleHttp\Client;
-
 class EFPStudyHelper extends AbstractStudyHelper
 {
     public $title = 'Exegese für die Predigt';
 
     protected $records = [];
 
-
-    function read(array $data): array
+    public function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('https://www.die-bibel.de/efp'))) return [];
+        if ('' == ($content = $this->getContent('https://www.die-bibel.de/efp'))) {
+            return [];
+        }
 
         $content = preg_replace(
             '~</?\s*ibep-[a-z0-9-]+(?:\s+[^<>]*?)?\s*/?>~i',
@@ -56,9 +55,10 @@ class EFPStudyHelper extends AbstractStudyHelper
 
         $table = preg_match('/<table(.*)<\/table>/m', $content, $matches);
         try {
-            $doc = new \DOMDocument();
+            $doc = new \DOMDocument;
             $doc->loadHTML('$matches[0]', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-        } catch (\Throwable $th) {}
+        } catch (\Throwable $th) {
+        }
 
         $records = [];
         foreach ($doc->getElementsByTagName('tr') as $tr) {
@@ -67,7 +67,7 @@ class EFPStudyHelper extends AbstractStudyHelper
             foreach ($tr->getElementsByTagName('td') as $td) {
                 switch ($colIdx) {
                     case 0:
-                        $record['url'] = 'https://www.die-bibel.de' . $td->childNodes[0]->getAttribute('href');
+                        $record['url'] = 'https://www.die-bibel.de'.$td->childNodes[0]->getAttribute('href');
                         break;
                     case 1:
                         $record['date'] = $td->nodeValue;
@@ -79,16 +79,18 @@ class EFPStudyHelper extends AbstractStudyHelper
                 $colIdx++;
             }
             if ($record['date']) {
-                $records[$record['date']] = ['[Exegese für die Predigt] '.$record['date'].': '. $record['ref'] => $record['url']];
+                $records[$record['date']] = ['[Exegese für die Predigt] '.$record['date'].': '.$record['ref'] => $record['url']];
             }
         }
         $this->records = $records;
+
         return $records;
     }
 
-    function getLinks(array $data): array
+    public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+
         return $data;
     }
 }

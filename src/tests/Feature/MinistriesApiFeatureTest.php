@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,7 +24,7 @@ class MinistriesApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testListReturnsMinistries()
+    public function test_list_returns_ministries()
     {
         $user = User::factory()->create();
 
@@ -37,7 +38,7 @@ class MinistriesApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testListRequiresAuth()
+    public function test_list_requires_auth()
     {
         $response = $this->getJson(route('api.ministries.list'));
         $response->assertUnauthorized();

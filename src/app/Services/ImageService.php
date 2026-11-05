@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,21 +32,15 @@ namespace App\Services;
 
 class ImageService
 {
-
     /**
      * Sample average RGB color in a region of a JPEG image
-     * @param string $jpgPath
-     * @param int $x
-     * @param int $y
-     * @param int $w
-     * @param int $h
-     * @param int $step
+     *
      * @return int[]
      */
     public static function sampleAverageRgb(string $jpgPath, int $x, int $y, int $w, int $h, int $step = 6): array
     {
         $im = imagecreatefromjpeg($jpgPath);
-        if (!$im) {
+        if (! $im) {
             throw new RuntimeException("Cannot load jpg: $jpgPath");
         }
 
@@ -79,24 +73,20 @@ class ImageService
         imagedestroy($im);
 
         return [
-            'r' => (int)round($rSum / max(1, $count)),
-            'g' => (int)round($gSum / max(1, $count)),
-            'b' => (int)round($bSum / max(1, $count)),
+            'r' => (int) round($rSum / max(1, $count)),
+            'g' => (int) round($gSum / max(1, $count)),
+            'b' => (int) round($bSum / max(1, $count)),
         ];
     }
 
-
     /**
      * Get the relative luminance of a color
-     * @param int $r
-     * @param int $g
-     * @param int $b
-     * @return float
      */
     protected static function relativeLuminance(int $r, int $g, int $b): float
     {
         $toLinear = function (int $c): float {
             $s = $c / 255;
+
             return ($s <= 0.04045) ? ($s / 12.92) : pow(($s + 0.055) / 1.055, 2.4);
         };
 
@@ -106,7 +96,6 @@ class ImageService
 
         return 0.2126 * $R + 0.7152 * $G + 0.0722 * $B;
     }
-
 
     /***
      * Get a clamped value between 0 and 255
@@ -120,11 +109,7 @@ class ImageService
 
     /**
      * Get an ARGB color string for a tinted overlay on a background color
-     * @param array $avgRgb
-     * @param float $opacity
-     * @return string
      */
-
     public static function tintedOverlayArgb(array $avgRgb, float $opacity = 0.75): string
     {
         $lum = static::relativeLuminance($avgRgb['r'], $avgRgb['g'], $avgRgb['b']);
@@ -132,21 +117,21 @@ class ImageService
         // If background is bright, make overlay darker; if background is dark, make overlay lighter
         $factor = ($lum > 0.5) ? 0.35 : 1.65;
 
-        $r = static::clamp((int)round($avgRgb['r'] * $factor));
-        $g = static::clamp((int)round($avgRgb['g'] * $factor));
-        $b = static::clamp((int)round($avgRgb['b'] * $factor));
+        $r = static::clamp((int) round($avgRgb['r'] * $factor));
+        $g = static::clamp((int) round($avgRgb['g'] * $factor));
+        $b = static::clamp((int) round($avgRgb['b'] * $factor));
 
-        $a = (int)round(max(0, min(1, $opacity)) * 255);
+        $a = (int) round(max(0, min(1, $opacity)) * 255);
+
         return sprintf('%02X%02X%02X%02X', $a, $r, $g, $b); // AARRGGBB
     }
-
 
     /**
      * Decide whether black or white text has better contrast
      * against a semi-transparent ARGB overlay.
      *
-     * @param string $argb AARRGGBB
-     * @param array  $bgRgb ['r'=>0..255,'g'=>0..255,'b'=>0..255] average background
+     * @param  string  $argb  AARRGGBB
+     * @param  array  $bgRgb  ['r'=>0..255,'g'=>0..255,'b'=>0..255] average background
      * @return string 'black' or 'white'
      */
     public static function bestTextColorForOverlay(string $argb, array $bgRgb): string
@@ -169,11 +154,6 @@ class ImageService
         return $lum > 0.5 ? 'black' : 'white';
     }
 
-    /**
-     * @param string $argb
-     * @param float $threshold
-     * @return string
-     */
     public static function blackOrWhiteForArgb(string $argb, float $threshold = 0.82): string
     {
         $r = hexdec(substr($argb, 2, 2));
@@ -181,7 +161,7 @@ class ImageService
         $b = hexdec(substr($argb, 6, 2));
 
         $lum = static::relativeLuminance($r, $g, $b);
-        return ($lum >= 0.82 ? 'FF000000' : 'FFFFFFFF');
-    }
 
+        return $lum >= 0.82 ? 'FF000000' : 'FFFFFFFF';
+    }
 }

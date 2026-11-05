@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,23 +37,31 @@ use Illuminate\Support\Str;
 class NameService
 {
     public const LAST_COMMA_FIRST = 1;
+
     public const FIRST_LAST = 2;
+
     public const LAST_FIRST = 3;
+
     public const LAST_FIRST_ARRAY = 4;
+
     public const TITLE_FIRST_LAST = 5;
 
     public const IDENTIFIED_USER = 'user';
+
     public const IDENTIFIED_NAME = 'name';
+
     public const UNIDENTIFIED = 'unidentified';
 
     protected $firstName = '';
+
     protected $lastName = '';
+
     protected $title = '';
 
     /**
-     * @param string $firstName
-     * @param string $lastName
-     * @param string $title
+     * @param  string  $firstName
+     * @param  string  $lastName
+     * @param  string  $title
      */
     public function __construct($firstName, $lastName, $title = '')
     {
@@ -63,9 +71,8 @@ class NameService
     }
 
     /**
-     * @param string $name
-     * @param string $title
-     * @return NameService
+     * @param  string  $name
+     * @param  string  $title
      */
     public static function fromName($name, $title = ''): NameService
     {
@@ -74,20 +81,11 @@ class NameService
         return new self($parts['first_name'], $parts['last_name'], $parts['title']);
     }
 
-    /**
-     * @param User $user
-     * @return NameService
-     */
     public static function fromUser(User $user): NameService
     {
         return new self($user->first_name ?? '', $user->last_name ?? '', $user->title ?? '');
     }
 
-    /**
-     * @param array $names
-     * @param Collection|null $users
-     * @return array
-     */
     public static function identifyPeople(array $names, ?Collection $users = null): array
     {
         $users = $users ?: self::loadUsersForIdentification();
@@ -100,7 +98,7 @@ class NameService
         $contextCandidates = self::buildContextCandidates($results, $users);
 
         foreach ($results as $key => $result) {
-            if (($result['status'] !== self::UNIDENTIFIED) && !self::needsContextCompletion($result)) {
+            if (($result['status'] !== self::UNIDENTIFIED) && ! self::needsContextCompletion($result)) {
                 continue;
             }
 
@@ -120,11 +118,6 @@ class NameService
         return self::groupIdentificationResults($results);
     }
 
-    /**
-     * @param string $name
-     * @param Collection|null $users
-     * @return array
-     */
     public static function identifyPerson(string $name, ?Collection $users = null): array
     {
         $users = $users ?: self::loadUsersForIdentification();
@@ -154,56 +147,42 @@ class NameService
     }
 
     /**
-     * @param int $format
+     * @param  int  $format
      * @return array|string
      */
     public function format($format = self::LAST_COMMA_FIRST)
     {
         switch ($format) {
             case self::LAST_COMMA_FIRST:
-                return $this->lastName . ', ' . $this->firstName;
+                return $this->lastName.', '.$this->firstName;
             case self::FIRST_LAST:
-                return trim($this->firstName . ' ' . $this->lastName);
+                return trim($this->firstName.' '.$this->lastName);
             case self::LAST_FIRST:
-                return strtoupper($this->lastName) . ' ' . $this->firstName;
+                return strtoupper($this->lastName).' '.$this->firstName;
             case self::LAST_FIRST_ARRAY:
                 return [$this->lastName, $this->firstName];
             case self::TITLE_FIRST_LAST:
-                return trim($this->title . ' ' . $this->firstName . ' ' . $this->lastName);
+                return trim($this->title.' '.$this->firstName.' '.$this->lastName);
         }
 
-        return trim($this->firstName . ' ' . $this->lastName);
+        return trim($this->firstName.' '.$this->lastName);
     }
 
-    /**
-     * @return string
-     */
     public function getFirstName(): string
     {
         return $this->firstName;
     }
 
-    /**
-     * @return string
-     */
     public function getLastName(): string
     {
         return $this->lastName;
     }
 
-    /**
-     * @return string
-     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * @param string $input
-     * @param array $parsed
-     * @return array
-     */
     protected static function buildNameResult(string $input, array $parsed): array
     {
         return [
@@ -216,10 +195,6 @@ class NameService
         ];
     }
 
-    /**
-     * @param string $input
-     * @return array
-     */
     protected static function buildUnidentifiedResult(string $input): array
     {
         return [
@@ -232,11 +207,6 @@ class NameService
         ];
     }
 
-    /**
-     * @param string $input
-     * @param User $user
-     * @return array
-     */
     protected static function buildUserResult(string $input, User $user): array
     {
         $name = self::fromUser($user);
@@ -251,11 +221,6 @@ class NameService
         ];
     }
 
-    /**
-     * @param Collection $users
-     * @param string $normalizedInput
-     * @return Collection
-     */
     protected static function findUsersByExactVariant(Collection $users, string $normalizedInput): Collection
     {
         return $users->filter(function (User $user) use ($normalizedInput) {
@@ -263,11 +228,6 @@ class NameService
         })->values();
     }
 
-    /**
-     * @param Collection $users
-     * @param array $parsed
-     * @return Collection
-     */
     protected static function findUsersByNameParts(Collection $users, array $parsed): Collection
     {
         return $users->filter(function (User $user) use ($parsed) {
@@ -276,27 +236,16 @@ class NameService
         })->values();
     }
 
-    /**
-     * @return Collection
-     */
     protected static function loadUsersForIdentification(): Collection
     {
         return User::query()->get(['id', 'first_name', 'last_name', 'title']);
     }
 
-    /**
-     * @param string $name
-     * @return string
-     */
     protected static function normalizeName(string $name): string
     {
         return mb_strtolower(Str::squish(str_replace("\xc2\xa0", ' ', $name)));
     }
 
-    /**
-     * @param string $name
-     * @return string
-     */
     protected static function cleanInputName(string $name): string
     {
         $name = trim(Str::squish($name));
@@ -307,11 +256,6 @@ class NameService
         return trim(Str::squish($name));
     }
 
-    /**
-     * @param string $name
-     * @param string $title
-     * @return array
-     */
     protected static function splitNameParts(string $name, string $title = ''): array
     {
         $name = self::cleanInputName($name);
@@ -353,17 +297,13 @@ class NameService
         ];
     }
 
-    /**
-     * @param array $parts
-     * @return array
-     */
     protected static function extractTitleParts(array $parts): array
     {
         $title = [];
 
         while (count($parts) > 1) {
             $candidate = $parts[0];
-            if (!preg_match('/\.$/u', $candidate)) {
+            if (! preg_match('/\.$/u', $candidate)) {
                 break;
             }
             $title[] = array_shift($parts);
@@ -375,10 +315,6 @@ class NameService
         ];
     }
 
-    /**
-     * @param User $user
-     * @return array
-     */
     protected static function userVariants(User $user): array
     {
         $name = self::fromUser($user);
@@ -391,10 +327,6 @@ class NameService
         ])));
     }
 
-    /**
-     * @param array $results
-     * @return array
-     */
     protected static function groupIdentificationResults(array $results): array
     {
         $identifiedUsers = [];
@@ -422,11 +354,6 @@ class NameService
         ];
     }
 
-    /**
-     * @param array $results
-     * @param Collection $users
-     * @return array
-     */
     protected static function buildContextCandidates(array $results, Collection $users): array
     {
         $candidates = [];
@@ -465,11 +392,6 @@ class NameService
         return array_values($candidates);
     }
 
-    /**
-     * @param string $input
-     * @param array $candidates
-     * @return array|null
-     */
     protected static function identifyFromContext(string $input, array $candidates): ?array
     {
         $cleanedInput = self::cleanInputName($input);
@@ -478,7 +400,7 @@ class NameService
         }
 
         $matchedCandidate = self::matchContextCandidate($cleanedInput, $candidates);
-        if (!$matchedCandidate) {
+        if (! $matchedCandidate) {
             return null;
         }
 
@@ -489,11 +411,6 @@ class NameService
         return self::buildNameResult($input, $matchedCandidate);
     }
 
-    /**
-     * @param string $input
-     * @param array $candidates
-     * @return array|null
-     */
     protected static function matchContextCandidate(string $input, array $candidates): ?array
     {
         $matches = self::findExactContextMatches($input, $candidates);
@@ -520,7 +437,7 @@ class NameService
         }
 
         $scoredMatches = self::findScoredContextMatches($input, $parsed, $candidates);
-        if (!$scoredMatches) {
+        if (! $scoredMatches) {
             return null;
         }
 
@@ -535,11 +452,6 @@ class NameService
         return $scoredMatches[0]['candidate'];
     }
 
-    /**
-     * @param string $input
-     * @param array $candidates
-     * @return array
-     */
     protected static function findExactContextMatches(string $input, array $candidates): array
     {
         $normalizedInput = self::normalizeName($input);
@@ -549,16 +461,11 @@ class NameService
         }));
     }
 
-    /**
-     * @param string $input
-     * @param array $candidates
-     * @return array
-     */
     protected static function findInitialMatches(string $input, array $candidates): array
     {
         $normalized = self::normalizeName($input);
         $parts = preg_split('/\s+/u', $normalized);
-        if (!$parts || (count($parts) > 2)) {
+        if (! $parts || (count($parts) > 2)) {
             return [];
         }
 
@@ -589,11 +496,6 @@ class NameService
         }));
     }
 
-    /**
-     * @param string $input
-     * @param array $candidates
-     * @return array
-     */
     protected static function findSingleTokenFirstNameMatches(string $input, array $candidates): array
     {
         $normalized = self::normalizeName($input);
@@ -606,12 +508,6 @@ class NameService
         }));
     }
 
-    /**
-     * @param string $input
-     * @param array $parsed
-     * @param array $candidates
-     * @return array
-     */
     protected static function findScoredContextMatches(string $input, array $parsed, array $candidates): array
     {
         $normalizedInput = self::normalizeName($input);
@@ -660,11 +556,6 @@ class NameService
         return $scores;
     }
 
-    /**
-     * @param string $input
-     * @param string $candidate
-     * @return bool
-     */
     protected static function matchesNamePrefix(string $input, string $candidate): bool
     {
         if (($input === '') || ($candidate === '')) {
@@ -674,11 +565,6 @@ class NameService
         return (mb_strlen($input) >= 3) && str_starts_with($candidate, $input);
     }
 
-    /**
-     * @param string $input
-     * @param string $candidate
-     * @return bool
-     */
     protected static function matchesInitial(string $input, string $candidate): bool
     {
         if (($input === '') || ($candidate === '')) {
@@ -689,11 +575,6 @@ class NameService
             && (mb_substr($input, 0, 1) === mb_substr($candidate, 0, 1));
     }
 
-    /**
-     * @param string $input
-     * @param string $candidate
-     * @return bool
-     */
     protected static function isSmallTypo(string $input, string $candidate): bool
     {
         if (($input === '') || ($candidate === '')) {
@@ -711,10 +592,6 @@ class NameService
         return levenshtein($input, $candidate) <= 2;
     }
 
-    /**
-     * @param string $input
-     * @return bool
-     */
     protected static function looksLikeCommentOrMeta(string $input): bool
     {
         $normalized = self::normalizeName($input);
@@ -729,10 +606,6 @@ class NameService
             || str_contains($normalized, 'familienzentrum');
     }
 
-    /**
-     * @param array $candidate
-     * @return string
-     */
     protected static function candidateKey(array $candidate): string
     {
         return implode('|', [
@@ -742,10 +615,6 @@ class NameService
         ]);
     }
 
-    /**
-     * @param array $candidate
-     * @return array
-     */
     protected static function candidateVariants(array $candidate): array
     {
         $name = new self($candidate['first_name'], $candidate['last_name'], $candidate['title'] ?? '');
@@ -759,10 +628,6 @@ class NameService
         ])));
     }
 
-    /**
-     * @param array $result
-     * @return bool
-     */
     protected static function needsContextCompletion(array $result): bool
     {
         if ($result['status'] !== self::IDENTIFIED_NAME) {

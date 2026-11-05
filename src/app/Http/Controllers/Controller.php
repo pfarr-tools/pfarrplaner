@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,12 +39,10 @@ use Illuminate\Support\Str;
 
 /**
  * Class Controller
- * @package App\Http\Controllers
  */
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-
 
     public static function defaultRoutes($prefix = '')
     {
@@ -57,46 +55,44 @@ class Controller extends BaseController
         $localizedKey = Str::replace('routes.', '', __('routes.'.$key));
         $localizedPlural = Str::replace('routes.', '', __('routes.'.$plural));
 
-
         // default routes
         if (method_exists($class, 'index')) {
-            Route::get(($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedPlural, $className . '@index')->name(
-                ($prefix ? $prefix . '.' : '') . $key . '.index'
+            Route::get(($urlPrefix ? '/'.$urlPrefix : '').'/'.$localizedPlural, $className.'@index')->name(
+                ($prefix ? $prefix.'.' : '').$key.'.index'
             );
         }
         if (method_exists($class, 'create')) {
-            Route::get(($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedKey.'/neu', $className . '@create')->name(
-                ($prefix ? $prefix . '.' : '') . $key . '.create'
+            Route::get(($urlPrefix ? '/'.$urlPrefix : '').'/'.$localizedKey.'/neu', $className.'@create')->name(
+                ($prefix ? $prefix.'.' : '').$key.'.create'
             );
         }
         if (method_exists($class, 'store')) {
-            Route::post(($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedPlural, $className . '@store')->name(
-                ($prefix ? $prefix . '.' : '') . $key . '.store'
+            Route::post(($urlPrefix ? '/'.$urlPrefix : '').'/'.$localizedPlural, $className.'@store')->name(
+                ($prefix ? $prefix.'.' : '').$key.'.store'
             );
         }
         if (method_exists($class, 'show')) {
-            Route::get(($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedKey . '/{' . $key . '}', $className . '@show')->name(
-                ($prefix ? $prefix . '.' : '') . $key . '.show'
+            Route::get(($urlPrefix ? '/'.$urlPrefix : '').'/'.$localizedKey.'/{'.$key.'}', $className.'@show')->name(
+                ($prefix ? $prefix.'.' : '').$key.'.show'
             );
         }
         if (method_exists($class, 'edit')) {
             Route::get(
-                ($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedKey . '/{' . $key . '}/edit',
-                $className . '@edit'
-            )->name(($prefix ? $prefix . '.' : '') . $key . '.edit');
+                ($urlPrefix ? '/'.$urlPrefix : '').'/'.$localizedKey.'/{'.$key.'}/edit',
+                $className.'@edit'
+            )->name(($prefix ? $prefix.'.' : '').$key.'.edit');
         }
         if (method_exists($class, 'update')) {
             Route::patch(
-                ($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedKey . '/{' . $key . '}',
-                $className . '@update'
-            )->name(($prefix ? $prefix . '.' : '') . $key . '.update');
+                ($urlPrefix ? '/'.$urlPrefix : '').'/'.$localizedKey.'/{'.$key.'}',
+                $className.'@update'
+            )->name(($prefix ? $prefix.'.' : '').$key.'.update');
         }
         if (method_exists($class, 'delete')) {
             Route::delete(
-                ($urlPrefix ? '/' . $urlPrefix : '') . '/' . $localizedKey . '/{' . $key . '}',
-                $className . '@destroy'
-            )->name(($prefix ? $prefix . '.' : '') . $key . '.destroy');
+                ($urlPrefix ? '/'.$urlPrefix : '').'/'.$localizedKey.'/{'.$key.'}',
+                $className.'@destroy'
+            )->name(($prefix ? $prefix.'.' : '').$key.'.destroy');
         }
     }
-
 }

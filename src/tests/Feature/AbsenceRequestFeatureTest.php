@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -31,7 +32,7 @@ class AbsenceRequestFeatureTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    public function testInvalidFromDateFormatFailsValidation(): void
+    public function test_invalid_from_date_format_fails_validation(): void
     {
         $absence = Absence::factory()->create(['user_id' => $this->user->id]);
         $request = $this->makeRequest([
@@ -47,7 +48,7 @@ class AbsenceRequestFeatureTest extends TestCase
         $this->assertArrayHasKey('from', $validator->errors()->toArray());
     }
 
-    public function testIsoDatesCanBeSaved(): void
+    public function test_iso_dates_can_be_saved(): void
     {
         $absence = Absence::factory()->create(['user_id' => $this->user->id]);
         $request = $this->makeRequest([
@@ -68,7 +69,7 @@ class AbsenceRequestFeatureTest extends TestCase
         $this->assertSame('2026-06-04', $absence->getRawOriginal('to'));
     }
 
-    public function testNaiveBerlinDatetimeStringsStayOnSameCalendarDay(): void
+    public function test_naive_berlin_datetime_strings_stay_on_same_calendar_day(): void
     {
         $absence = Absence::factory()->create(['user_id' => $this->user->id]);
         $request = $this->makeRequest([
@@ -89,7 +90,7 @@ class AbsenceRequestFeatureTest extends TestCase
         $this->assertSame('2026-08-03', $absence->getRawOriginal('to'));
     }
 
-    public function testStoreRulesRequireUserId(): void
+    public function test_store_rules_require_user_id(): void
     {
         $request = AbsenceRequest::create('/urlaub', 'POST', [
             'from' => '2026-05-31T22:00:00.000Z',
@@ -98,7 +99,8 @@ class AbsenceRequestFeatureTest extends TestCase
         ]);
         $request->setContainer($this->app)->setRedirector($this->app->make('redirect'));
         $request->setUserResolver(fn () => $this->user);
-        $request->setRouteResolver(fn () => new class {
+        $request->setRouteResolver(fn () => new class
+        {
             public function getName(): string
             {
                 return 'absence.store';
@@ -111,7 +113,7 @@ class AbsenceRequestFeatureTest extends TestCase
         $this->assertArrayHasKey('user_id', $validator->errors()->toArray());
     }
 
-    public function testIsoReplacementDatesAreNormalizedToAbsencePeriod(): void
+    public function test_iso_replacement_dates_are_normalized_to_absence_period(): void
     {
         $absence = Absence::factory()->create([
             'user_id' => $this->user->id,
@@ -149,7 +151,7 @@ class AbsenceRequestFeatureTest extends TestCase
         $this->assertSame('2026-06-04', $replacement->getRawOriginal('to'));
     }
 
-    public function testNaiveReplacementDatesAreNormalizedToSameBerlinCalendarDays(): void
+    public function test_naive_replacement_dates_are_normalized_to_same_berlin_calendar_days(): void
     {
         $absence = Absence::factory()->create([
             'user_id' => $this->user->id,
@@ -187,7 +189,7 @@ class AbsenceRequestFeatureTest extends TestCase
         $this->assertSame('2026-08-03', $replacement->getRawOriginal('to'));
     }
 
-    public function testMissingFromFieldFailsValidation(): void
+    public function test_missing_from_field_fails_validation(): void
     {
         $absence = Absence::factory()->create(['user_id' => $this->user->id]);
         $request = $this->makeRequest([
@@ -202,7 +204,7 @@ class AbsenceRequestFeatureTest extends TestCase
         $this->assertArrayHasKey('from', $validator->errors()->toArray());
     }
 
-    public function testMissingReasonFailsValidation(): void
+    public function test_missing_reason_fails_validation(): void
     {
         $absence = Absence::factory()->create(['user_id' => $this->user->id]);
         $request = $this->makeRequest([
@@ -222,7 +224,8 @@ class AbsenceRequestFeatureTest extends TestCase
         $request = AbsenceRequest::create('/urlaub/'.$absence->id, 'PATCH', $data);
         $request->setContainer($this->app)->setRedirector($this->app->make('redirect'));
         $request->setUserResolver(fn () => $this->user);
-        $request->setRouteResolver(fn () => new class {
+        $request->setRouteResolver(fn () => new class
+        {
             public function getName(): string
             {
                 return 'absence.update';

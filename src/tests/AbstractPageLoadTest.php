@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,6 +25,7 @@ abstract class AbstractPageLoadTest extends DuskTestCase
     use DatabaseTruncation;
 
     protected string $seeder = RoleSeeder::class;
+
     protected User $superAdminUser;
 
     /**
@@ -34,8 +36,8 @@ abstract class AbstractPageLoadTest extends DuskTestCase
         return [
             '--drop-views' => $this->shouldDropViews(),
             '--drop-types' => $this->shouldDropTypes(),
-            '--seed'       => true,
-            '--seeder'     => RoleSeeder::class,
+            '--seed' => true,
+            '--seeder' => RoleSeeder::class,
         ];
     }
 
@@ -51,10 +53,6 @@ abstract class AbstractPageLoadTest extends DuskTestCase
 
     /**
      * Assert that a page loads and optionally contains a visible heading.
-     *
-     * @param Browser $browser
-     * @param string $url
-     * @param string|null $expectedHeading
      */
     protected function assertPageLoads(
         Browser $browser,
@@ -62,10 +60,10 @@ abstract class AbstractPageLoadTest extends DuskTestCase
         ?string $expectedHeading = null
     ): void {
         $browser->loginAs($this->superAdminUser, 'web')
-                ->visit($url)
-                ->waitFor('#app', 10)
-                ->assertDontSee('Oops! An Error Occurred')
-                ->assertDontSee('Whoops');
+            ->visit($url)
+            ->waitFor('#app', 10)
+            ->assertDontSee('Oops! An Error Occurred')
+            ->assertDontSee('Whoops');
 
         if ($expectedHeading !== null) {
             $browser->assertSee($expectedHeading);

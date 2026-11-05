@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -75,7 +75,9 @@ class ExpireRegistrations extends Command
             $expiryDate = $service->date->copy()->addWeeks(5);
             if ($expiryDate < $now) {
                 $bookingCount = count($service->bookings);
-                foreach ($service->bookings->pluck('id') as $bookingId) Booking::find($bookingId)->delete();
+                foreach ($service->bookings->pluck('id') as $bookingId) {
+                    Booking::find($bookingId)->delete();
+                }
                 $this->line('Service #'.$service->id.' ('.$service->date->format('d.m.Y').' '.$service->timeText(false).') has '
                             .$bookingCount.' bookings which expired on '.$expiryDate->format('d.m.Y').' --> deleted');
             } else {

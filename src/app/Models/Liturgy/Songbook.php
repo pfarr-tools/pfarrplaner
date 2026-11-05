@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,11 +39,14 @@ class Songbook extends AbstractModel
     use HasFactory;
 
     protected static string $prefix = 'liederbuch';
+
     protected static string $prefixPlural = 'liederbuecher';
+
     public static array $exceptRoutes = [
         'web' => ['show'],
         'api' => ['show', 'update', 'destroy'],
     ];
+
     public static array $validationRules = [
         'name' => 'required|string',
         'code' => 'required|string',
@@ -51,14 +54,16 @@ class Songbook extends AbstractModel
         'description' => 'nullable|string',
         'image' => 'nullable|string',
     ];
+
     public static $adminTitle = 'Liederbücher';
+
     public static $adminIcon = 'mdi mdi-book-music-outline';
+
     public static $adminGroup = 'Liturgie';
 
     protected $fillable = ['name', 'code', 'description', 'isbn', 'image'];
 
     /**
-     * @param string $page
      * @return string
      */
     public static function getVuePath(string $page)
@@ -69,9 +74,6 @@ class Songbook extends AbstractModel
         };
     }
 
-    /**
-     * @return BelongsToMany
-     */
     public function songs(): BelongsToMany
     {
         return $this->belongsToMany(Song::class)->withPivot(['id', 'reference']);

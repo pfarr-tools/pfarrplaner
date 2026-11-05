@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,22 +24,25 @@ class ICalFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testIcalExportKeepsWhitespaceForFoldedLinesStartingWithComma()
+    public function test_ical_export_keeps_whitespace_for_folded_lines_starting_with_comma()
     {
-        $calendarLink = new class extends AbstractCalendarLink {
+        $calendarLink = new class extends AbstractCalendarLink
+        {
             protected $viewName = 'ical';
 
             /**
-             * @param Request $request
-             * @param User $user
              * @return array
              */
             public function getRenderData(Request $request, User $user)
             {
-                $service = new class {
+                $service = new class
+                {
                     public $id = 9947;
+
                     public $description = 'Sommerkonzert Orgel Plus Gitarre: Silvia Elvers, Orgel / Christian Gruber, Gitarre';
+
                     public $date;
+
                     public $updated_at;
 
                     public function __construct()
@@ -64,7 +68,7 @@ class ICalFeatureTest extends TestCase
                     }
 
                     /**
-                     * @param string $role
+                     * @param  string  $role
                      * @return string
                      */
                     public function participantsText($role)
@@ -86,7 +90,7 @@ class ICalFeatureTest extends TestCase
                     }
 
                     /**
-                     * @param bool $withSeparator
+                     * @param  bool  $withSeparator
                      * @return string
                      */
                     public function timeText($withSeparator = true)

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,18 +35,16 @@ use Illuminate\Support\Facades\View;
 
 /**
  * Class AbstractPDFDocumentReport
- * @package App\Reports
  */
 class AbstractPDFDocumentReport extends AbstractReport
 {
-
-    /** @var bool  */
+    /** @var bool */
     protected $landscape = false;
 
-    /** @var string  */
+    /** @var string */
     protected $header = '';
 
-    /** @var string  */
+    /** @var string */
     protected $footer = '';
 
     /**
@@ -55,9 +53,6 @@ class AbstractPDFDocumentReport extends AbstractReport
     public $icon = 'fa fa-file-pdf';
 
     /**
-     * @param $filename
-     * @param $data
-     * @param $layout
      * @return mixed
      */
     public function sendToBrowser($filename, $data, $layout)
@@ -66,7 +61,6 @@ class AbstractPDFDocumentReport extends AbstractReport
     }
 
     /**
-     * @param $data
      * @return string
      */
     public function renderPDF($data)
@@ -75,9 +69,6 @@ class AbstractPDFDocumentReport extends AbstractReport
     }
 
     /**
-     * @param $filename
-     * @param $data
-     * @param $layout
      * @return mixed
      */
     public function sendToFile($filename, $data, $layout)
@@ -124,7 +115,4 @@ class AbstractPDFDocumentReport extends AbstractReport
     {
         $this->icon = $icon;
     }
-
-
-
 }

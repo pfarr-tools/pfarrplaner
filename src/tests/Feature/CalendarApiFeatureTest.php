@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,6 +18,7 @@ use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\CalendarService;
 use App\Services\LiturgyService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
@@ -31,7 +33,7 @@ class CalendarApiFeatureTest extends TestCase
         parent::setUp();
         // LiturgyService fetches liturgical calendar from storage; fake the disk to avoid external HTTP calls.
         Storage::fake();
-        foreach (range((int)date('Y') - 2, (int)date('Y') + 2) as $year) {
+        foreach (range((int) date('Y') - 2, (int) date('Y') + 2) as $year) {
             Storage::put("liturgy/{$year}.json", json_encode(['Tage' => []]));
         }
         Storage::put('liturgy/.json', json_encode(['Tage' => []]));
@@ -48,7 +50,7 @@ class CalendarApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMonthReturnsCalendarData()
+    public function test_month_returns_calendar_data()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -63,7 +65,7 @@ class CalendarApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMonthEmbedsCompactServiceDataForVisibleCities()
+    public function test_month_embeds_compact_service_data_for_visible_cities()
     {
         $city = City::factory()->create(['name' => 'Musterstadt']);
         $relatedCity = City::factory()->create(['name' => 'Tochtergemeinde']);
@@ -97,7 +99,7 @@ class CalendarApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMonthRequiresAuth()
+    public function test_month_requires_auth()
     {
         $response = $this->getJson(route('api.calendar.month', ['date' => '2024-01']));
         $response->assertUnauthorized();
@@ -106,7 +108,7 @@ class CalendarApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testServiceRequiresAuth()
+    public function test_service_requires_auth()
     {
         $service = Service::factory()->create();
 
@@ -117,7 +119,7 @@ class CalendarApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testQuickPickReturnsServices()
+    public function test_quick_pick_returns_services()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -132,7 +134,7 @@ class CalendarApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testQuickPickRequiresAuth()
+    public function test_quick_pick_requires_auth()
     {
         $response = $this->getJson(route('api.calendar.quick-pick', ['date' => '01.01.2024']));
 
@@ -142,7 +144,7 @@ class CalendarApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testBuildMonthPayloadContainsEmbeddedCalendarData()
+    public function test_build_month_payload_contains_embedded_calendar_data()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -152,7 +154,7 @@ class CalendarApiFeatureTest extends TestCase
             'date' => '2024-01-21 09:30:00',
         ]);
 
-        $payload = CalendarService::buildMonthPayload(\Carbon\Carbon::parse('2024-01-01 00:00:00'), $user);
+        $payload = CalendarService::buildMonthPayload(Carbon::parse('2024-01-01 00:00:00'), $user);
 
         $this->assertSame('2024-01', $payload['loadedDate']);
         $this->assertArrayHasKey('2024-01-21', $payload['data']);
@@ -162,7 +164,7 @@ class CalendarApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMonthOnlyReturnsServiceEvents()
+    public function test_month_only_returns_service_events()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();

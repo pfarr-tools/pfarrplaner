@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -25,7 +26,7 @@ class AbsenceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSetCheckedUpdatesWorkflowStatus()
+    public function test_set_checked_updates_workflow_status()
     {
         Mail::fake();
 
@@ -42,7 +43,7 @@ class AbsenceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSetCheckedRequiresAuth()
+    public function test_set_checked_requires_auth()
     {
         $user = User::factory()->create();
         $absence = Absence::factory()->create(['user_id' => $user->id]);
@@ -54,7 +55,7 @@ class AbsenceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSetApprovedUpdatesWorkflowStatus()
+    public function test_set_approved_updates_workflow_status()
     {
         Mail::fake();
 
@@ -71,7 +72,7 @@ class AbsenceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSetApprovedRequiresAuth()
+    public function test_set_approved_requires_auth()
     {
         $user = User::factory()->create();
         $absence = Absence::factory()->create(['user_id' => $user->id]);
@@ -83,7 +84,7 @@ class AbsenceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testDestroyDeletesAbsence()
+    public function test_destroy_deletes_absence()
     {
         $user = User::factory()->create();
         $absence = Absence::factory()->create(['user_id' => $user->id]);
@@ -99,7 +100,7 @@ class AbsenceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testDestroyRequiresAuth()
+    public function test_destroy_requires_auth()
     {
         $user = User::factory()->create();
         $absence = Absence::factory()->create(['user_id' => $user->id]);
@@ -111,7 +112,7 @@ class AbsenceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testDestroyReturns404ForMissingAbsence()
+    public function test_destroy_returns404_for_missing_absence()
     {
         $user = User::factory()->create();
 

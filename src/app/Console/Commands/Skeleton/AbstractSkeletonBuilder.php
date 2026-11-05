@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -38,36 +38,35 @@ use Symfony\Component\Finder\Finder;
 
 abstract class AbstractSkeletonBuilder extends GeneratorCommand
 {
-
-    /** @var string $verb Verb (like "creates") */
+    /** @var string Verb (like "creates") */
     protected $verb = '';
 
-    /** @var array $namespaceAdditions */
+    /** @var array */
     protected $namespaceAdditions = [];
 
     /**
      * Resolve the fully-qualified path to the stub.
      *
-     * @param string $stub
+     * @param  string  $stub
      * @return string
      */
     protected function resolveStubPath($stub)
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
-            : __DIR__ . $stub;
+            : __DIR__.$stub;
     }
 
     /**
      * Get the default namespace for the class.
      *
-     * @param string $rootNamespace
+     * @param  string  $rootNamespace
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace . '\\'.Str::studly(Str::plural($this->type)).'\\'
-            .(count($this->namespaceAdditions) ? implode('\\', $this->namespaceAdditions) . '\\' : '')
+        return $rootNamespace.'\\'.Str::studly(Str::plural($this->type)).'\\'
+            .(count($this->namespaceAdditions) ? implode('\\', $this->namespaceAdditions).'\\' : '')
             .str_replace(Str::studly($this->verb), '', $this->getBaseName($this->getNameInput()));
     }
 
@@ -85,8 +84,9 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
 
     protected function buildReplacement($replacements, $key, $value)
     {
-        $replacements['{{ ' . $key . ' }}'] = $value;
-        $replacements['{{' . $key . '}}'] = $value;
+        $replacements['{{ '.$key.' }}'] = $value;
+        $replacements['{{'.$key.'}}'] = $value;
+
         return $replacements;
     }
 
@@ -94,7 +94,7 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
     {
         return Str::singular(
             str_replace(
-                Str::studly($this->verb) . ' ',
+                Str::studly($this->verb).' ',
                 '',
                 basename(
                     str_replace(
@@ -117,17 +117,15 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
         return $this->resolveStubPath('/stubs/'.strtolower(Str::plural($this->type)).'.'.strtolower($this->verb).'.stub');
     }
 
-
-
     protected function guessModel($name)
     {
         $basename = str_replace(Str::studly($this->verb), '', $this->getBaseName($name));
         $modelPath = is_dir(app_path('Models')) ? app_path('Models') : app_path();
 
         return new Collection(Finder::create()->files()->depth('< 2')->in($modelPath))
-            ->reject(fn($file) => $file->getBasename('.php') != $basename)
+            ->reject(fn ($file) => $file->getBasename('.php') != $basename)
             ->map(
-                fn($file) => str_replace(
+                fn ($file) => str_replace(
                     '.php',
                     '',
                     str_replace('/', '\\', str_replace($modelPath, 'App/Models', $file->getPathName()))
@@ -149,6 +147,7 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
         $replace = $this->buildReplacement($replace, 'modelBasePluralLower', Str::lower(Str::plural($modelBase)));
         $replace = $this->buildReplacement($replace, 'modelVarName', Str::camel($modelBase));
         $replace = $this->buildReplacement($replace, 'modelVarNamePlural', Str::camel(Str::plural($modelBase)));
+
         return str_replace(
             array_keys($replace),
             array_values($replace),
@@ -156,11 +155,8 @@ abstract class AbstractSkeletonBuilder extends GeneratorCommand
         );
     }
 
-
     protected function possibleModels()
     {
         $modelPath = is_dir(app_path('Models')) ? app_path('Models') : app_path();
     }
-
-
 }

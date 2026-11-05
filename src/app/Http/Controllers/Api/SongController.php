@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,11 +30,11 @@
 
 namespace App\Http\Controllers\Api;
 
-
 use App\Liturgy\Music\ABCMusic;
 use App\Models\Liturgy\Psalm;
 use App\Models\Liturgy\Song;
 use App\Models\Liturgy\SongReference;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SongController extends AbstractApiCRUDController
@@ -50,7 +50,7 @@ class SongController extends AbstractApiCRUDController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
@@ -58,20 +58,20 @@ class SongController extends AbstractApiCRUDController
         $songsWithoutSongBook = Song::whereDoesntHave('songbooks')->orderBy('title')->get();
         foreach ($songsWithoutSongBook as $song) {
             $listed->push([
-                              'id' => 1000000 + $song->id, // fake an id
-                              'song_id' => $song->id,
-                              'song' => $song,
-                              'code' => '',
-                              'reference' => '',
-                              'songbook' => null,
-                          ]);
+                'id' => 1000000 + $song->id, // fake an id
+                'song_id' => $song->id,
+                'song' => $song,
+                'code' => '',
+                'reference' => '',
+                'songbook' => null,
+            ]);
         }
+
         return response()->json($listed);
     }
 
     /**
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function select()
     {
@@ -80,17 +80,19 @@ class SongController extends AbstractApiCRUDController
         foreach ($songs as $song) {
             if (count($song->songbooks)) {
                 $alt_eg = $song->alt_eg;
-                if (!$alt_eg) {
+                if (! $alt_eg) {
                     foreach ($song->songbooks as $songbook) {
-                        if ($songbook->code == 'EG') $alt_eg = $songbook->pivot->reference;
+                        if ($songbook->code == 'EG') {
+                            $alt_eg = $songbook->pivot->reference;
+                        }
                     }
                 }
                 foreach ($song->songbooks as $songbook) {
                     $listed[] = [
                         'id' => $songbook->pivot->id,
-                        'name' => ($songbook->code ?: $songbook->name) . ' ' . $songbook->pivot->reference . ' '
-                            . (($alt_eg && ($songbook->code != 'EG')) ? '(EG '.$alt_eg.') ' : '')
-                            . $song->title,
+                        'name' => ($songbook->code ?: $songbook->name).' '.$songbook->pivot->reference.' '
+                            .(($alt_eg && ($songbook->code != 'EG')) ? '(EG '.$alt_eg.') ' : '')
+                            .$song->title,
                     ];
                 }
             } else {
@@ -103,18 +105,20 @@ class SongController extends AbstractApiCRUDController
         usort($listed, function ($a, $b) {
             return $a['name'] <=> $b['name'];
         });
+
         return response()->json($listed);
     }
 
     /**
      * Retrieve data for a single song
-     * @param int $songReferenceId
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @param  int  $songReferenceId
+     * @return JsonResponse
      */
     public function single($songReferenceId)
     {
         $songReference = SongReference::find($songReferenceId);
-        if (!$songReference) {
+        if (! $songReference) {
             $song = Song::findOrFail($songReferenceId - 1000000);
             $songReference = [
                 'id' => 1000000 + $song->id, // fake an id
@@ -125,11 +129,12 @@ class SongController extends AbstractApiCRUDController
                 'songbook' => null,
             ];
         }
+
         return response()->json($songReference);
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function songbooks()
     {
@@ -137,33 +142,33 @@ class SongController extends AbstractApiCRUDController
         foreach (Song::all() as $song) {
             $songbooks[$song->songbook_abbreviation] = [
                 'title' => $song->songbook,
-                'abbreviation' => $song->songbook_abbreviation
+                'abbreviation' => $song->songbook_abbreviation,
             ];
         }
         foreach (Psalm::all() as $song) {
             $songbooks[$song->songbook_abbreviation] = [
                 'title' => $song->songbook,
-                'abbreviation' => $song->songbook_abbreviation
+                'abbreviation' => $song->songbook_abbreviation,
             ];
         }
+
         return response()->json($songbooks);
     }
 
     /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function store(Request $request)
     {
         $data = $this->validateRequest($request)['song'];
         $creator = app(Song::getContractName('create'));
         $song = $creator->create($request->user(), $data);
+
         return response()->json($song);
     }
 
     /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(Request $request, $modelId)
     {
@@ -180,7 +185,7 @@ class SongController extends AbstractApiCRUDController
             $songReference = SongReference::where('song_id', $song->id)->where('songbook_id', $request->get('songbook')['id'])->first();
             $listEntry = [
                 'id' => $songReference->id,
-                'name' => ($songReference->songbook->code ?: $songReference->songbook->name) . ' ' . $songReference->reference . ' ' . $song->title,
+                'name' => ($songReference->songbook->code ?: $songReference->songbook->name).' '.$songReference->reference.' '.$song->title,
             ];
             $id = $songReference->id;
         } else {
@@ -194,7 +199,6 @@ class SongController extends AbstractApiCRUDController
     }
 
     /**
-     * @param Request $request
      * @return array
      */
     protected function validateRequest(Request $request)
@@ -227,6 +231,4 @@ class SongController extends AbstractApiCRUDController
     {
         return response()->file(ABCMusic::renderToFile($song, $verses, ABCMusic::make($song, $verses, $lineNumber)));
     }
-
-
 }

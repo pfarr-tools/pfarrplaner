@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
 use App\Documents\PDF;
 use App\Models\Service;
 use App\Services\FileNameService;
@@ -42,31 +41,37 @@ class AbstractLiturgySheet
     protected $title = '';
 
     protected $icon = 'fa fa-file';
+
     protected $layout = ['format' => 'A4'];
+
     protected $fileTitle = 'Liturgie';
+
     protected $extension = 'pdf';
+
     protected $isNotAFile = false;
+
     protected $configurationPage = null;
+
     protected $configurationComponent = null;
+
     protected $configurationCloseOnly = false;
+
     protected $defaultConfig = [];
+
     protected $config = [];
 
     protected $privileged = false;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->config = $this->getConfiguration();
     }
-
 
     protected function getData(Service $service)
     {
         return [];
     }
 
-    /**
-     * @param Service $service
-     */
     public function render(Service $service)
     {
 
@@ -75,7 +80,7 @@ class AbstractLiturgySheet
             .' – Seite <span class="pageNumber"></span> / <span class="totalPages"></span></div>';
 
         return PDF::fromView($this->getRenderViewName(),
-                                            array_merge(compact('service'), $this->getData($service)))
+            array_merge(compact('service'), $this->getData($service)))
             ->format($this->layout['format'])
             ->margins(15, 15, 15, 15)
             ->showBrowserHeaderAndFooter()
@@ -86,9 +91,6 @@ class AbstractLiturgySheet
 
     /**
      * Provide additional data for configuration dialogs that do not submit a download form.
-     *
-     * @param Service $service
-     * @return array
      */
     public function getDialogData(Service $service): array
     {
@@ -106,13 +108,18 @@ class AbstractLiturgySheet
 
     protected function getRenderViewName()
     {
-        return 'liturgy.sheets.' . strtolower($this->getKey() . '.render');
+        return 'liturgy.sheets.'.strtolower($this->getKey().'.render');
     }
 
     public function getFileSignature(Service $service)
     {
-        if ($service->funerals->count()) return '51.6';
-        if ($service->weddings->count()) return '51.5';
+        if ($service->funerals->count()) {
+            return '51.6';
+        }
+        if ($service->weddings->count()) {
+            return '51.5';
+        }
+
         return '50.0';
     }
 
@@ -141,33 +148,21 @@ class AbstractLiturgySheet
         );
     }
 
-    /**
-     * @return string
-     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * @param string $title
-     */
     public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
-    /**
-     * @return string
-     */
     public function getIcon(): string
     {
         return $this->icon;
     }
 
-    /**
-     * @param string $icon
-     */
     public function setIcon(string $icon): void
     {
         $this->icon = $icon;
@@ -182,56 +177,38 @@ class AbstractLiturgySheet
     }
 
     /**
-     * @param string[] $layout
+     * @param  string[]  $layout
      */
     public function setLayout(array $layout): void
     {
         $this->layout = $layout;
     }
 
-    /**
-     * @return string
-     */
     public function getFileTitle(): string
     {
         return $this->fileTitle;
     }
 
-    /**
-     * @param string $fileTitle
-     */
     public function setFileTitle(string $fileTitle): void
     {
         $this->fileTitle = $fileTitle;
     }
 
-    /**
-     * @return string
-     */
     public function getExtension(): string
     {
         return $this->extension;
     }
 
-    /**
-     * @param string $extension
-     */
     public function setExtension(string $extension): void
     {
         $this->extension = $extension;
     }
 
-    /**
-     * @return bool
-     */
     public function isNotAFile(): bool
     {
         return $this->isNotAFile;
     }
 
-    /**
-     * @param bool $isNotAFile
-     */
     public function setIsNotAFile(bool $isNotAFile): void
     {
         $this->isNotAFile = $isNotAFile;
@@ -246,37 +223,41 @@ class AbstractLiturgySheet
     }
 
     /**
-     * @param null $configurationPage
+     * @param  null  $configurationPage
      */
     public function setConfigurationPage($configurationPage): void
     {
         $this->configurationPage = $configurationPage;
     }
 
-
     /**
      * Get a configuration array combined from defaults and user settings
+     *
      * @return array
      */
     public function getConfiguration()
     {
-	    if (Auth::guest()) return $this->defaultConfig;
+        if (Auth::guest()) {
+            return $this->defaultConfig;
+        }
+
         return $this->config = array_replace_recursive(
             $this->defaultConfig,
-            Auth::user()->getSetting('liturgySheetConfig_' . $this->getKey()) ?: []
+            Auth::user()->getSetting('liturgySheetConfig_'.$this->getKey()) ?: []
         );
     }
 
     /**
      * Save configuration array to user settings, merging in any missing values from defaults
-     * @param array $data
      */
     public function setConfiguration(array $data)
     {
         $this->config = array_replace_recursive($this->defaultConfig, $data);
-	if (Auth::guest()) return;
+        if (Auth::guest()) {
+            return;
+        }
         Auth::user()->setSetting(
-            'liturgySheetConfig_' . $this->getKey(),
+            'liturgySheetConfig_'.$this->getKey(),
             $this->config,
         );
     }
@@ -290,25 +271,18 @@ class AbstractLiturgySheet
     }
 
     /**
-     * @param null $configurationComponent
+     * @param  null  $configurationComponent
      */
     public function setConfigurationComponent($configurationComponent): void
     {
         $this->configurationComponent = $configurationComponent;
     }
 
-    /**
-     * @return bool
-     */
     public function isConfigurationCloseOnly(): bool
     {
         return $this->configurationCloseOnly;
     }
 
-    /**
-     * @param bool $configurationCloseOnly
-     * @return void
-     */
     public function setConfigurationCloseOnly(bool $configurationCloseOnly): void
     {
         $this->configurationCloseOnly = $configurationCloseOnly;
@@ -323,9 +297,4 @@ class AbstractLiturgySheet
     {
         $this->privileged = $privileged;
     }
-
-
-
-
-
 }

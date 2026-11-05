@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -25,7 +26,8 @@ class ServiceTimezoneSubmissionFeatureTest extends TestCase
     protected function makeRequest(Service $service, User $user, array $payload): ServiceRequest
     {
         $baseRequest = ServiceRequest::create(route('service.update', $service->slug), 'PATCH', $payload);
-        $request = new class extends ServiceRequest {
+        $request = new class extends ServiceRequest
+        {
             public function authorize()
             {
                 return true;
@@ -48,7 +50,7 @@ class ServiceTimezoneSubmissionFeatureTest extends TestCase
         return $request;
     }
 
-    public function testSummerTimeSubmissionKeepsBerlinTimeAndComputesUtcEnd(): void
+    public function test_summer_time_submission_keeps_berlin_time_and_computes_utc_end(): void
     {
         $city = City::factory()->create();
         $location = Location::factory()->create(['city_id' => $city->id]);
@@ -70,7 +72,7 @@ class ServiceTimezoneSubmissionFeatureTest extends TestCase
         $this->assertSame('2026-07-29 07:00:00', $validated['end']->copy()->setTimezone('UTC')->format('Y-m-d H:i:s'));
     }
 
-    public function testWinterTimeSubmissionKeepsBerlinTimeAndComputesUtcEnd(): void
+    public function test_winter_time_submission_keeps_berlin_time_and_computes_utc_end(): void
     {
         $city = City::factory()->create();
         $location = Location::factory()->create(['city_id' => $city->id]);

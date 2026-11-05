@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\CustomAdChannel;
 use App\Models\People\User;
-use Illuminate\Auth\Access\Response;
 
 class CustomAdChannelPolicy
 {
@@ -13,7 +12,7 @@ class CustomAdChannelPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -21,7 +20,7 @@ class CustomAdChannelPolicy
      */
     public function view(User $user, CustomAdChannel $customAdChannel): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -29,7 +28,7 @@ class CustomAdChannelPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -37,7 +36,7 @@ class CustomAdChannelPolicy
      */
     public function update(User $user, CustomAdChannel $customAdChannel): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -45,7 +44,7 @@ class CustomAdChannelPolicy
      */
     public function delete(User $user, CustomAdChannel $customAdChannel): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -53,7 +52,7 @@ class CustomAdChannelPolicy
      */
     public function restore(User $user, CustomAdChannel $customAdChannel): bool
     {
-        //
+        return false;
     }
 
     /**
@@ -61,6 +60,6 @@ class CustomAdChannelPolicy
      */
     public function forceDelete(User $user, CustomAdChannel $customAdChannel): bool
     {
-        //
+        return false;
     }
 }

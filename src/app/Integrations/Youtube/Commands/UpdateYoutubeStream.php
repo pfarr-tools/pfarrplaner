@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -64,7 +64,8 @@ class UpdateYoutubeStream extends Command
         parent::__construct();
     }
 
-    protected function output($s) {
+    protected function output($s)
+    {
         $this->line($s);
         Log::info($s);
     }
@@ -79,15 +80,17 @@ class UpdateYoutubeStream extends Command
         Log::info('Running youtube:update command');
         $cities = City::where('google_access_token', '!=', '')->get();
         foreach ($cities as $city) {
-            $this->output('Checking livestreams for "' . $city->name . '"');
+            $this->output('Checking livestreams for "'.$city->name.'"');
 
             if ($city->youtube_active_stream_id == '') {
-                $this->output('No active stream key defined for "' . $city->name . '".');
+                $this->output('No active stream key defined for "'.$city->name.'".');
+
                 continue;
             }
 
             if ($city->youtube_passive_stream_id == '') {
-                $this->output('No passive stream key defined for "' . $city->name . '".');
+                $this->output('No passive stream key defined for "'.$city->name.'".');
+
                 continue;
             }
             $this->output('Keys: '.$city->youtube_active_stream_id.' (active) / '.$city->youtube_passive_stream_id.' (passive)');
@@ -104,23 +107,23 @@ class UpdateYoutubeStream extends Command
                     $last = $service;
                 } else {
                     $status = 'future';
-                    if (null === $current) {
+                    if ($current === null) {
                         $current = $service;
 
                         // check status
                         /** @var \Google_Service_YouTube_Video $video */
                         $lastVideo = $youtube->getVideo(YoutubeHelper::getCode($last->youtube_url));
-                        if (null !== $lastVideo) {
+                        if ($lastVideo !== null) {
                             if ($this->videoHasEnded($lastVideo)) {
-                                $this->output('Last service #' . $last->id . ' (' . $last->formatTime('YYYY-MM-DD HH:mm') . ') has ended.');
+                                $this->output('Last service #'.$last->id.' ('.$last->formatTime('YYYY-MM-DD HH:mm').') has ended.');
                             }
 
-                            $this->output('Next Service #' . $service->id . ' (' . $service->formatTime('YYYY-MM-DD HH:mm') . ')...');
+                            $this->output('Next Service #'.$service->id.' ('.$service->formatTime('YYYY-MM-DD HH:mm').')...');
                             $this->setBroadcastOptions($service, true);
                         }
 
                     } else {
-                        $this->output('Future Service #' . $service->id . ' (' . $service->formatTime('YYYY-MM-DD HH:mm') . ')...');
+                        $this->output('Future Service #'.$service->id.' ('.$service->formatTime('YYYY-MM-DD HH:mm').')...');
                         $this->setBroadcastOptions($service, false);
                     }
                 }
@@ -131,19 +134,22 @@ class UpdateYoutubeStream extends Command
 
     /**
      * Check if video has stopped streaming already
-     * @param \Google_Service_YouTube_Video $video
+     *
      * @return bool
      */
-    private function videoHasEnded(\Google_Service_YouTube_Video $video) {
-        return (null !== $video->getLiveStreamingDetails()->actualEndTime);
+    private function videoHasEnded(\Google_Service_YouTube_Video $video)
+    {
+        return $video->getLiveStreamingDetails()->actualEndTime !== null;
     }
 
     /**
      * Configure the broadcast for a service with specific options
-     * @param Service $service Service
-     * @param bool $active Set active or inactive
+     *
+     * @param  Service  $service  Service
+     * @param  bool  $active  Set active or inactive
      */
-    private function setBroadcastOptions(Service $service, $active = true) {
+    private function setBroadcastOptions(Service $service, $active = true)
+    {
         $autoStartStop = $active;
         $youtube = YoutubeIntegration::get($service->city);
         $broadcasts = $youtube->getYoutube()->liveBroadcasts->listLiveBroadcasts(
@@ -156,7 +162,7 @@ class UpdateYoutubeStream extends Command
             $contentDetails = $broadcast->getContentDetails();
 
             if (($contentDetails->getBoundStreamId() == ($active ? $service->city->youtube_passive_stream_id : $service->city_youtube_active_stream_id))
-                || (null === $contentDetails->getBoundStreamId())) {
+                || ($contentDetails->getBoundStreamId() === null)) {
                 $this->output('Setting '.($active ? 'active' : 'passive').' stream key for service #'.$service->id);
                 $youtube->getYoutube()->liveBroadcasts->bind($broadcast->getId(), 'id,snippet,status', ['streamId' => ($active ? $service->city->youtube_active_stream_id : $service->city_youtube_passive_stream_id)]);
             } else {
@@ -174,5 +180,4 @@ class UpdateYoutubeStream extends Command
         }
 
     }
-
 }

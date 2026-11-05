@@ -4,6 +4,7 @@ namespace App\Events\Models\Tag;
 
 use App\Models\People\User;
 use App\Models\Tag;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -13,10 +14,10 @@ class DeletedTag
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /** @var User $user */
+    /** @var User */
     protected $user;
 
-    /** @var Tag $tag */
+    /** @var Tag */
     protected $tag;
 
     /**
@@ -31,7 +32,7 @@ class DeletedTag
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
+     * @return array<int, Channel>
      */
     public function broadcastOn(): array
     {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,11 +37,9 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * Class RitesController
- * @package App\Http\Controllers\Api
  */
 class RitesController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -69,8 +67,8 @@ class RitesController extends Controller
                 'Wedding' => ['spouse1_name', 'spouse2_name'],
             ] as $riteType => $queryFields
         ) {
-            $key = strtolower($riteType) . 's';
-            $riteType = 'App\\Models\\Rites\\' . $riteType;
+            $key = strtolower($riteType).'s';
+            $riteType = 'App\\Models\\Rites\\'.$riteType;
             $ids = [];
 
             $selectFields = array_merge(['id'], $queryFields);
@@ -94,5 +92,4 @@ class RitesController extends Controller
 
         return response()->json($results);
     }
-
 }

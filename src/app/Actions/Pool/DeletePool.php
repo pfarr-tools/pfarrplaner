@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,36 +35,31 @@ use App\Contracts\Pool\DeletesPools;
 use App\Events\Models\Pool\DeletedPool;
 use App\Models\Leave\Pool;
 use App\Models\People\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 
 class DeletePool extends AbstractDeleteAction implements DeletesPools
 {
-
     /**
      * Get return route
-     * @return string
      */
     public function redirectTo(): string
     {
         return route('admin.pools.index');
     }
 
-
-
     /**
      * Delete a pool
-     * @param User $user
-     * @param Pool $pool
-     * @return bool
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     *
+     * @throws AuthorizationException
      */
     public function delete(User $user, Pool $pool): bool
     {
         Gate::forUser($user)->authorize('delete', $pool);
         DeletedPool::dispatch($user, $pool);
         $this->messages = ['success' => 'Der Pool wurde gelöscht.'];
+
         return $pool->delete();
 
     }
-
 }

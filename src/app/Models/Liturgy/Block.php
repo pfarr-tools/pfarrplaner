@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Models\Liturgy;
 
-
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -41,8 +40,7 @@ class Block extends Model
 
     protected $table = 'liturgy_blocks';
 
-    protected $fillable= ['title', 'instructions', 'service_id', 'sortable'];
-
+    protected $fillable = ['title', 'instructions', 'service_id', 'sortable'];
 
     protected static function boot()
     {
@@ -54,12 +52,13 @@ class Block extends Model
         });
     }
 
-    public function service() {
+    public function service()
+    {
         return $this->belongsTo(Service::class);
     }
 
-    public function items() {
+    public function items()
+    {
         return $this->hasMany(Item::class, 'liturgy_block_id');
     }
-
 }

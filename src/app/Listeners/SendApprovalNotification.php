@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@ use Illuminate\Support\Facades\Mail;
 
 /**
  * Class SendApprovalNotification
- * @package App\Listeners
  */
 class SendApprovalNotification
 {
@@ -54,7 +53,7 @@ class SendApprovalNotification
     /**
      * Handle the event.
      *
-     * @param OrderShipped $event
+     * @param  OrderShipped  $event
      * @return void
      */
     public function handle(AbsenceApproved $event)
@@ -68,7 +67,7 @@ class SendApprovalNotification
             }
         }
 
-        Log::debug('AbsenceApproved listener: Sende AbsenceApproved an ' . $users->pluck('email')->unique->join(', '));
+        Log::debug('AbsenceApproved listener: Sende AbsenceApproved an '.$users->pluck('email')->unique->join(', '));
         Mail::to($users)->queue(new \App\Mail\AbsenceApproved($event->absence, $event->approval));
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,6 +30,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -37,12 +38,13 @@ class UserResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)
     {
         $sortedCities = $this->getSortedCities()->pluck('id');
+
         return [
             'id' => $this->id,
             'name' => $this->fullName(),
@@ -53,7 +55,7 @@ class UserResource extends JsonResource
             'cities' => $this->cities->pluck('id'),
             'sortedCities' => $this->sortedCities,
             'writableCities' => $this->writableCities->pluck('id'),
-            'hiddenCities' => $this->cities->reject(function($item) use ($sortedCities) {
+            'hiddenCities' => $this->cities->reject(function ($item) use ($sortedCities) {
                 return $sortedCities->contains($item->id);
             }),
             'isOfficialUser' => $this->isOfficialUser,

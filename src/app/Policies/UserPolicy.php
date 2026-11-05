@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,21 +30,19 @@
 
 namespace App\Policies;
 
+use App\Models\People\User;
 use App\Providers\AuthServiceProvider;
 use App\Services\RoleService;
-use App\Models\People\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
  * Class UserPolicy
- * @package App\Policies
  */
 class UserPolicy
 {
     use HandlesAuthorization;
 
     /**
-     * @param User $user
      * @return bool
      */
     public function index(User $user)
@@ -58,14 +56,13 @@ class UserPolicy
         if ($user->adminCities->count() > 0) {
             return true;
         }
+
         return $user->hasPermissionTo('benutzerliste-lokal-sehen') || $user->hasPermissionTo('benutzer-bearbeiten');
     }
 
     /**
      * Determine whether the user can view the model.
      *
-     * @param User $user
-     * @param User $model
      * @return mixed
      */
     public function view(User $user, User $model)
@@ -76,7 +73,6 @@ class UserPolicy
     /**
      * Determine whether the user can create models.
      *
-     * @param User $user
      * @return mixed
      */
     public function create(User $user)
@@ -84,14 +80,13 @@ class UserPolicy
         if (count($user->adminCities)) {
             return true;
         }
+
         return $user->hasPermissionTo('benutzer-bearbeiten');
     }
 
     /**
      * Determine whether the user can update the model.
      *
-     * @param User $user
-     * @param User $model
      * @return mixed
      */
     public function update(User $user, User $model)
@@ -115,14 +110,13 @@ class UserPolicy
                 }
             }
         }
+
         return false;
     }
 
     /**
      * Determine whether the user can delete the model.
      *
-     * @param User $user
-     * @param User $model
      * @return mixed
      */
     public function delete(User $user, User $model)
@@ -137,14 +131,13 @@ class UserPolicy
                 }
             }
         }
+
         return false;
     }
 
     /**
      * Determine whether the user can restore the model.
      *
-     * @param User $user
-     * @param User $model
      * @return mixed
      */
     public function restore(User $user, User $model)
@@ -155,8 +148,6 @@ class UserPolicy
     /**
      * Determine whether the user can permanently delete the model.
      *
-     * @param User $user
-     * @param User $model
      * @return mixed
      */
     public function forceDelete(User $user, User $model)
@@ -167,8 +158,6 @@ class UserPolicy
     /**
      * Determine whether the user can choose another user to merge the two
      *
-     * @param User $user
-     * @param User $model
      * @return mixed
      */
     public function join(User $user, User $model)
@@ -183,9 +172,6 @@ class UserPolicy
 
     /**
      * Determine whether the user can search for duplicate person entries.
-     *
-     * @param User $user
-     * @return bool
      */
     public function findDuplicates(User $user): bool
     {
@@ -194,9 +180,6 @@ class UserPolicy
 
     /**
      * Determine whether the user can batch-merge duplicate person entries.
-     *
-     * @param User $user
-     * @return bool
      */
     public function fixDuplicates(User $user): bool
     {
@@ -206,10 +189,6 @@ class UserPolicy
     /**
      * Determine whether the user can merge another user into a third one.
      * Requires (super)admin or local admin of at least one city the subject user belongs to.
-     *
-     * @param User $user
-     * @param User $model
-     * @return bool
      */
     public function merge(User $user, User $model): bool
     {
@@ -219,6 +198,7 @@ class UserPolicy
         if ($user->hasRole(AuthServiceProvider::ADMIN)) {
             return true;
         }
+
         return $user->adminCities->intersect($model->cities)->isNotEmpty()
             || $user->adminCities->intersect($model->homeCities)->isNotEmpty();
     }
@@ -240,8 +220,6 @@ class UserPolicy
     /**
      * Determine whether the user can merge this user into another one
      *
-     * @param User $user
-     * @param User $model
      * @return mixed
      */
     public function doJoin(User $user, User $model)
@@ -249,11 +227,8 @@ class UserPolicy
         return true;
     }
 
-
     /**
      * Determine wether the user can edit another users absences
-     * @param User $user
-     * @param User $model
      */
     public function editAbsences(User $user, User $model)
     {
@@ -261,13 +236,13 @@ class UserPolicy
             return true;
         }
         if ($user->hasPermissionTo('fremden-urlaub-bearbeiten') || ($user->hasRole(AuthServiceProvider::ADMIN))) {
-            if (!$model->hasRole('Pfarrer:in')) {
+            if (! $model->hasRole('Pfarrer:in')) {
                 if (count($user->writableCities->intersect($model->homeCities))) {
                     return true;
                 }
             }
         }
+
         return false;
     }
-
 }

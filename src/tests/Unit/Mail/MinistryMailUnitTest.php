@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,7 +24,7 @@ class MinistryMailUnitTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testMinistryRequestBuilds(): void
+    public function test_ministry_request_builds(): void
     {
         $user = User::factory()->create();
         $sender = User::factory()->create();
@@ -34,7 +35,7 @@ class MinistryMailUnitTest extends TestCase
         $this->assertStringContainsString('Anfrage', $built->subject);
     }
 
-    public function testMinistryRequestFilledBuilds(): void
+    public function test_ministry_request_filled_builds(): void
     {
         $user = User::factory()->create();
         $sender = User::factory()->create();

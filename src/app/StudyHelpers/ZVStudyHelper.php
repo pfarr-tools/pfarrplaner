@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,18 +30,19 @@
 
 namespace App\StudyHelpers;
 
-use App\StudyHelpers\AbstractStudyHelper;
 use Illuminate\Support\Str;
 
 class ZVStudyHelper extends AbstractStudyHelper
 {
-
     public $title = 'Zentrum Verkündigung, Predigtvorschläge';
+
     protected $records = [];
 
-    function read(array $data): array
+    public function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('https://www.zentrum-verkuendigung.de/service/predigten/aktuell/'))) return [];
+        if ('' == ($content = $this->getContent('https://www.zentrum-verkuendigung.de/service/predigten/aktuell/'))) {
+            return [];
+        }
         $content = Str::replace("\n", '', $content);
         preg_match_all('/<li>(.*?)<\/li>/', $content, $matches);
 
@@ -50,26 +51,32 @@ class ZVStudyHelper extends AbstractStudyHelper
         foreach ($matches[1] as $index => $li) {
             if (Str::substr($li, 0, 2) == '<a') {
                 if (preg_match('/href="(.*?)">(.*?)<\/a> \| (\d\d\.\d\d\.\d\d\d\d) \| (.*)/', $li, $parts)) {
-                    if (!isset($this->records[$parts[3]])) $this->records[$parts[3]] = [];
+                    if (! isset($this->records[$parts[3]])) {
+                        $this->records[$parts[3]] = [];
+                    }
                     $this->records[$parts[3]]['[Zentrum Verkündigung] '.$parts[2].', '.$parts[3].': '.$parts[4]] = 'https://www.zentrum-verkuendigung.de'.Str::before($parts[1], '"');
                     $lastMatch = [
-                            'date' => $parts[3],
-                            'title' => $parts[2].', '.$parts[3].': '.$parts[4],
+                        'date' => $parts[3],
+                        'title' => $parts[2].', '.$parts[3].': '.$parts[4],
                     ];
                 } else {
                     preg_match('/href="(.*?)">(.*?)</', $li, $newParts);
                     if (Str::substr($newParts[1], 0, 2) == '/f') {
-                        if (!isset($this->records[$lastMatch['date']])) $this->records[$lastMatch['date']] = [];
+                        if (! isset($this->records[$lastMatch['date']])) {
+                            $this->records[$lastMatch['date']] = [];
+                        }
                         $this->records[$lastMatch['date']]['[Zentrum Verkündigung] '.$lastMatch['title'].' '.$newParts[2]] = 'https://www.zentrum-verkuendigung.de'.Str::before($newParts[1], '"');
                     }
                 }
 
             } else {
                 preg_match('/(.*?) \| (\d\d\.\d\d\.\d\d\d\d) \| (.*)<ul(?:.*?)href="(.*?)"/', $li, $parts);
-                if (!isset($parts[2], $parts[4])) {
+                if (! isset($parts[2], $parts[4])) {
                     continue;
                 }
-                if (!isset($this->records[$parts[2]])) $this->records[$parts[2]] = [];
+                if (! isset($this->records[$parts[2]])) {
+                    $this->records[$parts[2]] = [];
+                }
                 $this->records[$parts[2]]['[Zentrum Verkündigung] '.$parts[1].', '.$parts[2].': '.$parts[3]] = 'https://www.zentrum-verkuendigung.de'.Str::before($parts[4], '"');
                 $lastMatch = [
                     'date' => $parts[2],
@@ -78,13 +85,14 @@ class ZVStudyHelper extends AbstractStudyHelper
             }
 
         }
+
         return $this->records;
     }
 
-    function getLinks(array $data): array
+    public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+
         return $data;
     }
-
 }

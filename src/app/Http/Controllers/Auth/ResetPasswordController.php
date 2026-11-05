@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,11 +31,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 
 /**
  * Class ResetPasswordController
- * @package App\Http\Controllers\Auth
  */
 class ResetPasswordController extends Controller
 {
@@ -56,15 +56,14 @@ class ResetPasswordController extends Controller
      * Set the user's password.
      * This overrides ResetPasswords::setUserPassword, which uses hashing
      *
-     * @param \Illuminate\Contracts\Auth\CanResetPassword $user
-     * @param string $password
+     * @param  CanResetPassword  $user
+     * @param  string  $password
      * @return void
      */
     protected function setUserPassword($user, $password)
     {
         $user->password = $password;
     }
-
 
     /**
      * Where to redirect users after resetting their password.

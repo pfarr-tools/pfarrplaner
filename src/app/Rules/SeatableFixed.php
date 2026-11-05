@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -18,31 +19,22 @@ use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-class SeatableFixed implements ValidationRule, DataAwareRule
+class SeatableFixed implements DataAwareRule, ValidationRule
 {
     protected array $data = [];
 
     /**
-     * @param string|null $bookingIdKey Form field name that holds the existing booking ID (null for new bookings)
+     * @param  string|null  $bookingIdKey  Form field name that holds the existing booking ID (null for new bookings)
      */
     public function __construct(protected ?string $bookingIdKey = null) {}
 
-    /**
-     * @param array $data
-     * @return static
-     */
     public function setData(array $data): static
     {
         $this->data = $data;
+
         return $this;
     }
 
-    /**
-     * @param string $attribute
-     * @param mixed $value
-     * @param Closure $fail
-     * @return void
-     */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $data = $this->data;
@@ -64,7 +56,7 @@ class SeatableFixed implements ValidationRule, DataAwareRule
             );
         }
 
-        if (!$success) {
+        if (! $success) {
             $fail('validation.seatable_fixed')->translate();
         }
     }

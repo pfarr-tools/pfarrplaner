@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,12 +30,11 @@
 
 namespace App\Models\Liturgy;
 
-
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
-class SongVerse extends \Illuminate\Database\Eloquent\Model
+class SongVerse extends Model
 {
-
     protected $fillable = ['song_id', 'number', 'text', 'refrain_before', 'refrain_after', 'notation'];
 
     protected static function boot()
@@ -52,5 +51,4 @@ class SongVerse extends \Illuminate\Database\Eloquent\Model
     {
         $this->belongsTo(Song::class);
     }
-
 }

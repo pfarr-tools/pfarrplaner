@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Models\Liturgy;
 
-
 use App\Liturgy\Bible\BibleText;
 use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\ItemHelpers\AbstractItemHelper;
@@ -42,7 +41,6 @@ use Illuminate\Support\Str;
 
 class Item extends Model
 {
-
     protected $appends = ['data'];
 
     protected $table = 'liturgy_items';
@@ -63,7 +61,6 @@ class Item extends Model
             }
         );
     }
-
 
     public function block()
     {
@@ -90,7 +87,8 @@ class Item extends Model
      *
      * @return array
      */
-    public function recipients() {
+    public function recipients()
+    {
         $list = (isset($this->data['responsible']) ? $this->data['responsible'] : []);
         $p = [];
         foreach ($list as $participant) {
@@ -105,7 +103,9 @@ class Item extends Model
                     $type = 'free';
                 }
             }
-            if ((!$type) || (!$id)) continue;
+            if ((! $type) || (! $id)) {
+                continue;
+            }
             if ($type == 'ministry') {
                 $id = isset(self::replacement[$id]) ? self::replacement[$id] : $id;
                 foreach ($this->block->service->participantsByCategory($id) as $user) {
@@ -117,14 +117,15 @@ class Item extends Model
                 $p[] = $id;
             }
         }
+
         return array_unique($p);
     }
 
     /**
-     * @return AbstractItemHelper
      * @throws ItemHelperNotFoundException
      */
-    public function getHelper(): AbstractItemHelper {
+    public function getHelper(): AbstractItemHelper
+    {
         if (class_exists($class = 'App\\Liturgy\\ItemHelpers\\'.ucfirst($this->data_type).'ItemHelper')) {
             return new $class($this);
         }
@@ -141,9 +142,11 @@ class Item extends Model
      */
     public function addBibleText()
     {
-        if ($this->data_type != 'reading') return;
+        if ($this->data_type != 'reading') {
+            return;
+        }
         $data = $this->data;
-        $bible = new BibleText();
+        $bible = new BibleText;
         $bibleText = $this->data['reference'] ? $bible->get(ReferenceParser::getInstance()->parse($this->data['reference'])) : [];
         $text = '';
         foreach ($bibleText as $textSection) {
@@ -170,5 +173,4 @@ class Item extends Model
     {
         $this->addBibleText();
     }
-
 }

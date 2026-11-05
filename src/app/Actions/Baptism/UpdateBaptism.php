@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -46,20 +46,11 @@ class UpdateBaptism extends AbstractUpdateAction implements UpdatesBaptisms
 
     protected string $redirectUrl = '';
 
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return $this->redirectUrl ?: route('home');
     }
 
-    /**
-     * @param User $user
-     * @param Baptism $baptism
-     * @param array $input
-     * @return Baptism
-     */
     public function update(User $user, Baptism $baptism, array $input): Baptism
     {
         Gate::forUser($user)->authorize('update', $baptism);
@@ -82,10 +73,6 @@ class UpdateBaptism extends AbstractUpdateAction implements UpdatesBaptisms
         return $baptism;
     }
 
-    /**
-     * @param Service $service
-     * @return string
-     */
     protected function getServiceSlug(Service $service): string
     {
         return $service->slug ?: $service->createSlug();

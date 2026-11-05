@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,14 +31,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
-class TabController extends \App\Http\Controllers\Controller
+class TabController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -46,7 +45,8 @@ class TabController extends \App\Http\Controllers\Controller
 
     /**
      * Retrieve data for a single tab
-     * @param $tab Tab key
+     *
+     * @param  $tab  Tab key
      * @return JsonResponse|JsonResource
      */
     public function tab($tab)
@@ -54,19 +54,21 @@ class TabController extends \App\Http\Controllers\Controller
         $config = Auth::user()->getSetting('homeScreenTabsConfig') ?? [];
         $tabIndex = filter_var($tab, FILTER_SANITIZE_NUMBER_INT);
         $tab = HomeScreenTabFactory::getOne($config['tabs'][$tabIndex], $tabIndex);
+
         return is_a($tab, JsonResource::class) ? $tab : response()->json(['data' => $tab]);
     }
 
     /**
      * Retrieve item count for a single tab
-     * @param $tab Tab key
+     *
+     * @param  $tab  Tab key
      * @return JsonResponse
      */
     public function tabCount($tab)
     {
         $config = Auth::user()->getSetting('homeScreenTabsConfig') ?? [];
         $tabIndex = filter_var($tab, FILTER_SANITIZE_NUMBER_INT);
+
         return response()->json(['key' => $tab, 'count' => HomeScreenTabFactory::getCount($config['tabs'][$tabIndex], $tabIndex)]);
     }
-
 }

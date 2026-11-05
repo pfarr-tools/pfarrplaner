@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,6 +36,7 @@ use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\TrustProxies;
 use App\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
@@ -44,12 +45,11 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Sentry\Laravel\Integration;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Validation\ValidationException;
 
 setlocale(LC_ALL, 'de_DE.utf8');
 
@@ -92,12 +92,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Middleware aliases
         $middleware->alias([
-            'auth'     => Authenticate::class,
-            'can'      => Authorize::class,
-            'guest'    => RedirectIfAuthenticated::class,
+            'auth' => Authenticate::class,
+            'can' => Authorize::class,
+            'guest' => RedirectIfAuthenticated::class,
             'verified' => EnsureEmailIsVerified::class,
-            'cors'     => Cors::class,
-            'csrf'     => VerifyCsrfToken::class,
+            'cors' => Cors::class,
+            'csrf' => VerifyCsrfToken::class,
         ]);
 
         // Middleware execution priority

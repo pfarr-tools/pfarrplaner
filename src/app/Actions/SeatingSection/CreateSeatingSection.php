@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -18,7 +19,6 @@ use App\Events\Models\SeatingSection\CreatedSeatingSection;
 use App\Models\Location;
 use App\Models\People\User;
 use App\Models\Seating\SeatingSection;
-use App\Seating\SeatingModels;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 

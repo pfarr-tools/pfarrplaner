@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,13 +24,11 @@ class LiturgyEditorPage extends Page
         $this->slug = $slug;
     }
 
-    /** @return string */
     public function url(): string
     {
         return route('liturgy.editor', $this->slug);
     }
 
-    /** @param Browser $browser */
     public function assert(Browser $browser): void
     {
         $browser->waitFor('#app', 10)->assertDontSee('500');
@@ -41,7 +40,7 @@ class LiturgyEditorPage extends Page
     public function elements(): array
     {
         return [
-            '@toolbar'      => '.btn-toolbar',
+            '@toolbar' => '.btn-toolbar',
             '@saveTemplate' => 'button.btn-primary',
         ];
     }

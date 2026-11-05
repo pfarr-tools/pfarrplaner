@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,8 +30,6 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
-use App\Documents\Word\DefaultA5WordDocument;
 use App\Documents\Word\DefaultFoldedBooklet;
 use App\Documents\Word\DefaultWordDocument;
 use App\Models\Liturgy\Item;
@@ -43,11 +41,14 @@ use PhpOffice\PhpWord\Shared\Html;
 class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Erinnerung an die Trauerfeier';
+
     protected $icon = 'fa fa-file-word';
 
-    /** @var Service $service */
+    /** @var Service */
     protected $service = null;
+
     protected $extension = 'docx';
+
     protected $privileged = true;
 
     public function __construct()
@@ -55,15 +56,14 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
         parent::__construct();
     }
 
-
     public function render(Service $service)
     {
         $this->service = $service;
-        if (!count($service->funerals)) {
+        if (! count($service->funerals)) {
             return;
         }
 
-        $doc = new DefaultFoldedBooklet();
+        $doc = new DefaultFoldedBooklet;
         $this->setProperties($doc);
 
         $names = collect();
@@ -77,14 +77,14 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
             $names->push($name);
             $doc->getSection()->addText($name, ['size' => 24], ['align' => 'center']);
             $doc->getSection()->addText(
-                $funeral->dob->format('d.m.Y') . ' - ' . $funeral->dod->format('d.m.Y'),
+                $funeral->dob->format('d.m.Y').' - '.$funeral->dod->format('d.m.Y'),
                 ['size' => 12],
                 ['align' => 'center']
             );
         }
         $doc->getSection()->addTextBreak(4);
         $doc->getSection()->addText(
-            'Trauerfeier am ' . $service->date->format('d.m.Y'),
+            'Trauerfeier am '.$service->date->format('d.m.Y'),
             ['size' => 12],
             ['align' => 'center']
         );
@@ -117,14 +117,14 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
         $doc->getSection()->addText('Sehr geehrte Angehörige,');
         $doc->getSection()->addText(
             'Es war '
-            . ($service->pastors->count() == 1 ? 'mir' : 'uns')
-            . ' ein großes Vorrecht, Sie beim Abschied von '
-            . $names->join(', ', ' und ')
-            . ' begleiten zu dürfen. Gerne '
-            . ($service->pastors->count() == 1 ? 'bin ich' : 'sind wir')
-            . ' auch weiterhin für Sie da. Nehmen Sie dazu jederzeit Kontakt mit '
-            . ($service->pastors->count() == 1 ? 'mir' : 'uns')
-            . ' auf.'
+            .($service->pastors->count() == 1 ? 'mir' : 'uns')
+            .' ein großes Vorrecht, Sie beim Abschied von '
+            .$names->join(', ', ' und ')
+            .' begleiten zu dürfen. Gerne '
+            .($service->pastors->count() == 1 ? 'bin ich' : 'sind wir')
+            .' auch weiterhin für Sie da. Nehmen Sie dazu jederzeit Kontakt mit '
+            .($service->pastors->count() == 1 ? 'mir' : 'uns')
+            .' auf.'
         );
         $doc->getSection()->addText('Bleiben Sie behütet!');
         $doc->getSection()->addTextBreak(2);
@@ -136,18 +136,18 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
                 [NameService::fromUser($pastor)->format(NameService::TITLE_FIRST_LAST), ['bold' => true], true],
                 [$pastor->office ?: null, [], true],
                 [$pastor->address ?: null, [], true],
-                [$pastor->phone ? 'Telefon ' . $pastor->phone : null, [], true],
-                [$pastor->email ? 'E-Mail ' . $pastor->email : null, [], true],
+                [$pastor->phone ? 'Telefon '.$pastor->phone : null, [], true],
+                [$pastor->email ? 'E-Mail '.$pastor->email : null, [], true],
             ]);
         }
 
         return $doc->sendToBrowser(
             $this->getFileName(
                 $service,
-                (($this->service) && ($this->service->sermon) ? ' - Trauerfeier für ' . $names->join(
-                        ', ',
-                        ' und '
-                    ) : '')
+                (($this->service) && ($this->service->sermon) ? ' - Trauerfeier für '.$names->join(
+                    ', ',
+                    ' und '
+                ) : '')
             )
         );
     }
@@ -158,21 +158,20 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
         $properties->setCreator(Auth::user()->fullName());
         $properties->setCompany(Auth::user()->office ?? '');
         $properties->setTitle(
-            $this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi') . ' ' . $this->getFileTitle()
+            $this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi').' '.$this->getFileTitle()
         );
-        $properties->setDescription($this->getFileTitle() . ' (' . $this->title . ')');
+        $properties->setDescription($this->getFileTitle().' ('.$this->title.')');
         $properties->setCategory('Gottesdienste');
         $properties->setLastModifiedBy(Auth::user()->fullName());
         $properties->setSubject('Komplette Liturgie');
     }
 
-
     protected function renderSermonItem(DefaultWordDocument $doc, Item $item)
     {
-        if (null === $this->service->sermon) {
+        if ($this->service->sermon === null) {
             $doc->renderNormalText('Für diesen Gottesdienst wurde noch keine Predigt angelegt.', ['italic' => true]);
         } else {
-            if (!$this->service->sermon->text) {
+            if (! $this->service->sermon->text) {
                 return;
             }
             $text = strtr($this->service->sermon->text, [
@@ -183,7 +182,7 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
             ]);
             $dom = DefaultWordDocument::createDomDocumentFromHtml($text);
             $body = $dom->getElementsByTagName('body')->item(0);
-            if (!$body) {
+            if (! $body) {
                 return;
             }
             $nodes = [];
@@ -199,13 +198,11 @@ class FuneralSermonTextLiturgySheet extends AbstractLiturgySheet
                 } else {
                     Html::addHtml(
                         $doc->getSection(),
-                        '<body>' . str_replace('<br>', '<br />', $dom->saveHTML($node)) . '</body>'
+                        '<body>'.str_replace('<br>', '<br />', $dom->saveHTML($node)).'</body>'
                     );
                 }
-                $nodes[] = $node->nodeName . ' -> ' . $node->nodeValue;
+                $nodes[] = $node->nodeName.' -> '.$node->nodeValue;
             }
         }
     }
-
-
 }

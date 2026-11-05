@@ -20,14 +20,14 @@ class AutoModelsProvider extends ServiceProvider
      */
     public function boot(): void
     {
-// auto-register model routes
+        // auto-register model routes
         foreach (\File::allFiles(app_path('Models')) as $file) {
-            if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract'))) {
-                $className = substr('App\\Models\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+            if (($file->getExtension() == 'php') && (! Str::contains($file->getPathname(), 'Abstract'))) {
+                $className = substr('App\\Models\\'.Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
                 if (method_exists($className, 'registerContracts')) {
                     $className::registerContracts($this->app);
                 }
             }
-        };
+        }
     }
 }

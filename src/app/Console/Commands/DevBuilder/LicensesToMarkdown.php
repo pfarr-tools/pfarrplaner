@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -67,13 +67,12 @@ class LicensesToMarkdown extends Command
     {
         $output = "Dependency licenses\n===================\n\nPfarrplaner uses the following open-source libraries:\n\n";
 
-
         if (file_exists(base_path('.composer-licenses'))) {
             $output .= "## Composer packages\n\n";
             $data = json_decode(file_get_contents(base_path('.composer-licenses')), true);
             foreach ($data['dependencies'] as $packageName => $record) {
                 if (is_array($record['license'])) {
-                    $licenseInfo = join(' / ', $record['license']).' '.(count($record['license']) > 1 ? 'licenses' : 'license');
+                    $licenseInfo = implode(' / ', $record['license']).' '.(count($record['license']) > 1 ? 'licenses' : 'license');
                 } else {
                     $licenseInfo = $record['license'].' license';
                 }
@@ -88,9 +87,9 @@ class LicensesToMarkdown extends Command
             $output .= "## Node packages\n\n";
             $data = json_decode(file_get_contents(base_path('.npm-licenses')), true);
             foreach ($data as $package => $record) {
-                list($packageName, $version) = explode('@', $package);
+                [$packageName, $version] = explode('@', $package);
                 if (is_array($record['licenses'])) {
-                    $licenseInfo = join(' / ', $record['licenses']).' '.(count($record['licenses']) > 1 ? 'licenses' : 'license');
+                    $licenseInfo = implode(' / ', $record['licenses']).' '.(count($record['licenses']) > 1 ? 'licenses' : 'license');
                 } else {
                     $licenseInfo = $record['licenses'].' license';
                 }
@@ -104,7 +103,7 @@ class LicensesToMarkdown extends Command
                     if (isset($record['email'])) {
                         $output .= ' ('.$record['email'].')';
                     }
-                    $output.= "\n";
+                    $output .= "\n";
                 }
                 $output .= '    under the '.$licenseInfo."\n\n";
             }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -20,10 +21,6 @@ class ErrorFeedbackController extends Controller
 {
     /**
      * Store feedback for a Sentry event.
-     *
-     * @param Request $request
-     * @param SentryFeedbackService $feedback
-     * @return RedirectResponse
      */
     public function store(Request $request, SentryFeedbackService $feedback): RedirectResponse
     {

@@ -15,7 +15,7 @@ class PredicantServicesFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testTabShowsOnlyOpenFutureServicesInVisibleCities(): void
+    public function test_tab_shows_only_open_future_services_in_visible_cities(): void
     {
         $visibleCity = City::factory()->create();
         $otherCity = City::factory()->create();
@@ -50,7 +50,7 @@ class PredicantServicesFeatureTest extends TestCase
         $this->assertSame([$openService->id], $tab->buildQuery()->pluck('id')->all());
     }
 
-    public function testClaimAssignsCurrentUserAndClearsPredicantFlag(): void
+    public function test_claim_assigns_current_user_and_clears_predicant_flag(): void
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -77,7 +77,7 @@ class PredicantServicesFeatureTest extends TestCase
         ]);
     }
 
-    public function testClaimCannotBeUsedForInvisibleOrAlreadyAssignedServices(): void
+    public function test_claim_cannot_be_used_for_invisible_or_already_assigned_services(): void
     {
         $visibleCity = City::factory()->create();
         $otherCity = City::factory()->create();

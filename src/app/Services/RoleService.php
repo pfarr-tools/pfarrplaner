@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,12 +32,11 @@ namespace App\Services;
 
 class RoleService
 {
-
     public const ROLE_SUPER_ADMIN = 'Super-Administrator:in';
+
     public const ROLE_ADMIN = 'Administrator:in';
 
     public const ROLE_PASTOR = 'Pfarrer:in';
 
     public const ROLE_PREDICANT = 'Prädikant:in';
-
 }

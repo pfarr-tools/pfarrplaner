@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,12 +39,11 @@ use Carbon\Carbon;
 
 class PoolController extends AbstractApiCRUDController
 {
-
     protected string $modelClass = Pool::class;
 
     public function poolmasters(Pool $pool, $date)
     {
-        $start = Carbon::parse($date . '-01')->startOfDay();
+        $start = Carbon::parse($date.'-01')->startOfDay();
         $end = $start->copy()->endOfMonth();
         $days = Absence::getDaysForPlanner($start->copy());
 
@@ -63,7 +62,6 @@ class PoolController extends AbstractApiCRUDController
             $days[$dayKey]['busy'] = false;
             $days[$dayKey]['services'] = 0;
         }
-
 
         return response()->json($days);
     }
@@ -84,25 +82,25 @@ class PoolController extends AbstractApiCRUDController
         $users = [];
         foreach ($mastered as $poolmaster) {
             foreach ($poolmaster->pool->users as $user) {
-                if (!isset($users[$user->id])) {
+                if (! isset($users[$user->id])) {
                     $users[$user->id] = [
                         'absent' => Absence::where('user_id', $user->id)
-                                ->where('from', '<=', $date)
-                                ->where('to', '>=', $date)
-                                ->count() > 0,
+                            ->where('from', '<=', $date)
+                            ->where('to', '>=', $date)
+                            ->count() > 0,
                         'services' => Service::userParticipates($user)
                             ->between($startOfRelevantPeriod, $endOfRelevantPeriod)
                             ->ordered()
                             ->get(),
                         'absences' => Absence::where('user_id', $user->id)
-                                ->where('from', '<=', $endOfRelevantPeriod)
-                                ->where('to', '>=', $startOfRelevantPeriod)
-                                ->get(),
+                            ->where('from', '<=', $endOfRelevantPeriod)
+                            ->where('to', '>=', $startOfRelevantPeriod)
+                            ->get(),
                     ];
                 }
             }
         }
-        return response()->json(compact( 'users', 'period'));
-    }
 
+        return response()->json(compact('users', 'period'));
+    }
 }

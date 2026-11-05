@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,16 +28,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 return [
     'images' => [
         'cuts' => [
             'Bildschirm (4x3)' => [1024, 768],
             'Bildschirm (16x9)' => [1920, 1080],
-            'CommuniApp' => [550,275],
+            'CommuniApp' => [550, 275],
             'Quadratisch' => [1024, 1024],
             'Story' => [1080, 1920],
-        ]
+        ],
     ],
     'channels' => [
         'bekanntgaben' => [
@@ -55,6 +54,6 @@ return [
         ],
         'story' => [
             'name' => 'Als Story posten',
-        ]
+        ],
     ],
 ];

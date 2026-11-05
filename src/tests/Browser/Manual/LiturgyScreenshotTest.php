@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -118,7 +119,7 @@ class LiturgyScreenshotTest extends ManualScreenshotTestCase
         }
     }
 
-    public function testCaptureLiturgyEditor(): void
+    public function test_capture_liturgy_editor(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -130,7 +131,7 @@ class LiturgyScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureLiturgyTemplateList(): void
+    public function test_capture_liturgy_template_list(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -142,7 +143,7 @@ class LiturgyScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureLiturgySheetConfigurations(): void
+    public function test_capture_liturgy_sheet_configurations(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -166,7 +167,7 @@ class LiturgyScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCapturePowerPointConfigurationTabs(): void
+    public function test_capture_power_point_configuration_tabs(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(

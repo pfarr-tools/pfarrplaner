@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,24 +35,20 @@ use App\CalendarLinks\CalendarLinks;
 use App\Models\Leave\Absence;
 use App\Models\People\User;
 use App\Models\Service;
-use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Class ICalController
- * @package App\Http\Controllers
  */
 class ICalController extends Controller
 {
-    /** @var User $user */
+    /** @var User */
     protected $user = null;
 
     public function private($name, $token)
@@ -61,9 +57,9 @@ class ICalController extends Controller
         $services = Service::with(['location'])
             ->where(
                 function ($query) use ($name) {
-                    $query->where('pastor', 'like', '%' . $name . '%')
-                        ->orWhere('organist', 'like', '%' . $name . '%')
-                        ->orWhere('sacristan', 'like', '%' . $name . '%');
+                    $query->where('pastor', 'like', '%'.$name.'%')
+                        ->orWhere('organist', 'like', '%'.$name.'%')
+                        ->orWhere('sacristan', 'like', '%'.$name.'%');
                 }
             )->get();
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -79,25 +75,18 @@ class ICalController extends Controller
             "\r\n",
             str_replace('@@@@', "\r\n", str_replace("\n", "\r\n", str_replace("\r\n", '@@@@', $raw)))
         );
-        die ($raw);
+        exit($raw);
     }
 
-    /**
-     * @param $token
-     */
     protected function checkToken($token)
     {
         $tokenUser = User::where('api_token', $token)->first();
-        if (!$tokenUser) {
+        if (! $tokenUser) {
             abort(401);
         }
         $this->user = $tokenUser;
     }
 
-    /**
-     * @param $locationIds
-     * @param $token
-     */
     public function byLocation($locationIds, $token)
     {
         $this->checkToken($token);
@@ -117,18 +106,12 @@ class ICalController extends Controller
             "\r\n",
             str_replace('@@@@', "\r\n", str_replace("\n", "\r\n", str_replace("\r\n", '@@@@', $raw)))
         );
-        die ($raw);
+        exit($raw);
     }
-
-
 
     /*
      * Export absences as ical
      *
-     */
-    /**
-     * @param User $user
-     * @param $token
      */
     public function absences(User $user, $token)
     {
@@ -157,9 +140,8 @@ class ICalController extends Controller
             "\r\n",
             str_replace('@@@@', "\r\n", str_replace("\n", "\r\n", str_replace("\r\n", '@@@@', $raw)))
         );
-        die($raw);
+        exit($raw);
     }
-
 
     /**
      * @return \Inertia\Response
@@ -168,25 +150,21 @@ class ICalController extends Controller
     {
         $calendarLinks = CalendarLinks::all();
         $cities = Auth::user()->cities;
+
         return Inertia::render('OutlookExport/Connect', compact('calendarLinks', 'cities'));
     }
 
-
     /**
-     * @param $key
      * @return mixed
      */
     public function setup($key)
     {
         $calendarLink = CalendarLinks::findKey($key);
+
         return $calendarLink->setupView();
     }
 
     /**
-     * @param Request $request
-     * @param User $user
-     * @param $token
-     * @param $key
      * @return Application|ResponseFactory|StreamedResponse|void
      */
     public function export(Request $request, User $user, $token, $key)

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -13,39 +14,38 @@
 namespace Tests\Unit\Rules;
 
 use App\Rules\Seatable;
-use App\Rules\SeatableFixed;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Tests\TestCase;
 
 class SeatableRuleTest extends TestCase
 {
-    public function testImplementsValidationRuleInterface()
+    public function test_implements_validation_rule_interface()
     {
-        $this->assertInstanceOf(ValidationRule::class, new Seatable());
+        $this->assertInstanceOf(ValidationRule::class, new Seatable);
     }
 
-    public function testImplementsDataAwareRuleInterface()
+    public function test_implements_data_aware_rule_interface()
     {
-        $this->assertInstanceOf(DataAwareRule::class, new Seatable());
+        $this->assertInstanceOf(DataAwareRule::class, new Seatable);
     }
 
-    public function testSetDataReturnsSelf()
+    public function test_set_data_returns_self()
     {
         $rule = new Seatable('booking_id');
         $result = $rule->setData(['service_id' => 1, 'booking_id' => null]);
         $this->assertSame($rule, $result);
     }
 
-    public function testConstructorAcceptsBookingIdKey()
+    public function test_constructor_accepts_booking_id_key()
     {
         $rule = new Seatable('booking_id');
         $this->assertInstanceOf(Seatable::class, $rule);
     }
 
-    public function testConstructorWithoutBookingIdKey()
+    public function test_constructor_without_booking_id_key()
     {
-        $rule = new Seatable();
+        $rule = new Seatable;
         $this->assertInstanceOf(Seatable::class, $rule);
     }
 }

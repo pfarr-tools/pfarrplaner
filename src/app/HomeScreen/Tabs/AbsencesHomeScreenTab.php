@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,19 +30,23 @@
 
 namespace App\HomeScreen\Tabs;
 
-
 use App\Models\Leave\Absence;
 use App\Models\Leave\Poolmaster;
 use App\Models\Leave\Replacement;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class AbsencesHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Mein Urlaub';
+
     protected $description = 'Zeigt den eigenen Urlaub und andere Abwesenheiten';
+
     protected $absenceQuery;
+
     protected $replacementQuery;
+
     protected $poolmasterQuery;
 
     public function __construct($config = [])
@@ -61,6 +65,7 @@ class AbsencesHomeScreenTab extends AbstractHomeScreenTab
         $data['absences'] = $this->absenceQuery->get();
         $data['replacements'] = $this->replacementQuery->get();
         $data['masteredPools'] = $this->poolmasterQuery->get();
+
         return parent::getContent($data);
     }
 
@@ -70,14 +75,17 @@ class AbsencesHomeScreenTab extends AbstractHomeScreenTab
         $data['replacements'] = $this->replacementQuery->get();
         $data['masteredPools'] = $this->poolmasterQuery->get();
         $data['count'] = count($data['absences']) + count($data['replacements']) + count($data['masteredPools']);
+
         return parent::toArray($data);
     }
 
     /**
      * Build the queries
-     * @return \Illuminate\Database\Eloquent\Builder
+     *
+     * @return Builder
      */
-    public function buildQueries() {
+    public function buildQueries()
+    {
         $start = Carbon::now()->setTime(0, 0, 0);
         $end = Carbon::now()->addMonth(2);
 
@@ -93,11 +101,8 @@ class AbsencesHomeScreenTab extends AbstractHomeScreenTab
             ->orderBy('from')
             ->orderBy('to');
 
-
         $this->poolmasterQuery = Poolmaster::where('user_id', Auth::user()->id)
             ->where('end', '>=', now())
             ->orderBy('start');
     }
-
-
 }

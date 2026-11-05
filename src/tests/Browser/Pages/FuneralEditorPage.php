@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,13 +24,11 @@ class FuneralEditorPage extends Page
         $this->funeralId = $funeralId;
     }
 
-    /** @return string */
     public function url(): string
     {
         return route('funerals.edit', $this->funeralId);
     }
 
-    /** @param Browser $browser */
     public function assert(Browser $browser): void
     {
         $browser->waitFor('#app', 10)->assertDontSee('500');
@@ -42,7 +41,7 @@ class FuneralEditorPage extends Page
     {
         return [
             '@buriedNameInput' => '[name="buried_name"]',
-            '@saveButton'      => 'button.btn-primary',
+            '@saveButton' => 'button.btn-primary',
         ];
     }
 }

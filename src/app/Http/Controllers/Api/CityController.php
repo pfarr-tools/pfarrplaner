@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,24 +30,18 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\AbstractCRUDController;
-use App\Http\Controllers\Controller;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
 use App\Models\Places\City;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 /**
  * Class CityController
- * @package App\Http\Controllers\Api
  */
 class CityController extends AbstractApiCRUDController
 {
-
     protected string $modelClass = City::class;
-
 
     public function index(Request $request)
     {
@@ -56,19 +50,20 @@ class CityController extends AbstractApiCRUDController
         if ($user->isAdmin) {
             return response()->json(City::all());
         }
+
         return response()->json($user->cities()->get());
     }
 
     /**
-     * @param City $city
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     *
      * @throws \Exception
      */
     public function konfiAppTypes(City $city)
     {
         $types = KonfiAppIntegration::isActive($city) ?
             KonfiAppIntegration::get($city)->listEventTypes() : [];
+
         return response()->json($types);
     }
-
 }

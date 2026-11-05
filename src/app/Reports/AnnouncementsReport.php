@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,67 +30,47 @@
 
 namespace App\Reports;
 
-use App\Imports\EventCalendarImport;
-use App\Imports\OPEventsImport;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
-use App\Liturgy\Bible\BibleText;
-use App\Liturgy\Bible\ReferenceParser;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\ReadingItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Models\Announcements;
-use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
-use App\Models\Rites\Baptism;
-use App\Models\Rites\Funeral;
-use App\Models\Rites\Wedding;
-use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use App\Services\FileNameService;
 use App\Services\NameService;
-use App\Tools\StringTool;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpWord\Element\Section;
-use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\Style\Font;
-use PhpOffice\PhpWord\Style\Tab;
 
 /**
  * Class AnnouncementsReport
- * @package App\Reports
  */
 class AnnouncementsReport extends AbstractWordDocumentReport
 {
-    /**
-     *
-     */
     protected const BOLD = ['bold' => true];
-    /**
-     *
-     */
+
     protected const UNDERLINE = ['underline' => Font::UNDERLINE_SINGLE];
-    /**
-     *
-     */
+
     protected const BOLD_UNDERLINE = ['bold' => true, 'underline' => Font::UNDERLINE_SINGLE];
-    /**
-     *
-     */
+
     protected const INDENT = 'Bekanntgaben';
-    /**
-     *
-     */
+
     protected const NO_INDENT = 'Bekanntgaben ohne Einrückung';
 
     public const FILE_TITLE = 'Bekanntgaben';
+
     public const FILE_SIGNATURE = '91.8';
+
     protected $config = [
         'layout' => [
             'orientation' => 'landscape',
@@ -137,10 +117,12 @@ class AnnouncementsReport extends AbstractWordDocumentReport
      * @var string
      */
     public $title = 'Bekanntgaben';
+
     /**
      * @var string
      */
     public $group = 'Veröffentlichungen';
+
     /**
      * @var string
      */
@@ -152,18 +134,17 @@ class AnnouncementsReport extends AbstractWordDocumentReport
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities->load('parent');
+
         return Inertia::render('Report/Announcements/Setup', compact('cities'));
     }
 
-
     /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function services(Request $request)
     {
@@ -180,25 +161,24 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         foreach ($serviceList as $service) {
             $services[] = [
                 'id' => $service->id,
-                'name' => $service->date->format('d.m.Y') . ' ' . $service->timeText() . ', ' . $service->locationText
+                'name' => $service->date->format('d.m.Y').' '.$service->timeText().', '.$service->locationText,
             ];
         }
 
         return response()->json([
-                                    'services' => $services,
-                                ]);
+            'services' => $services,
+        ]);
     }
 
     /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function lastServiceDays(Request $request)
     {
         $data = $request->validate([
-                                       'city' => 'required|int|exists:cities,id',
-                                       'service' => 'required|int|exists:services,id'
-                                   ]);
+            'city' => 'required|int|exists:cities,id',
+            'service' => 'required|int|exists:services,id',
+        ]);
 
         $city = City::findOrFail($data['city']);
         $service = Service::findOrFail($data['service']);
@@ -220,31 +200,29 @@ class AnnouncementsReport extends AbstractWordDocumentReport
     }
 
     /**
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function offerings(Request $request)
     {
         $data = $request->validate([
-                                       'city' => 'required|int|exists:cities,id',
-                                       'day' => 'required|date'
-                                   ]);
+            'city' => 'required|int|exists:cities,id',
+            'day' => 'required|date',
+        ]);
         $services = Service::whereDate('date', Carbon::parse($data['day']))
             ->where('city_id', $data['city'])
             ->get();
 
         $amount = 0;
         foreach ($services as $service) {
-            $amount += (float)strtr($service->offering_amount, [' ' => '', '€' => '']);
+            $amount += (float) strtr($service->offering_amount, [' ' => '', '€' => '']);
         }
 
         return response()->json($amount);
     }
 
-
     public function auto(Request $request)
     {
-        if (!$request->has('service')) {
+        if (! $request->has('service')) {
             abort(404);
         }
         $service = Service::findOrFail($request->get('service'));
@@ -252,14 +230,15 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             ->endingAt($service->dateTime)
             ->orderedDesc()
             ->first();
+
         return $this->renderReport([
-                                'lastService' => $lastService->date->format('d.m.Y'),
-                                'offerings' => $lastService->offering_amount,
-                                'offering_text' => $service->offering_text,
-                                'service' => $service->id,
-                                'excludeRegularWeekly' => true,
-                                'city' => $service->city_id,
-                            ]);
+            'lastService' => $lastService->date->format('d.m.Y'),
+            'offerings' => $lastService->offering_amount,
+            'offering_text' => $service->offering_text,
+            'service' => $service->id,
+            'excludeRegularWeekly' => true,
+            'city' => $service->city_id,
+        ]);
     }
 
     public function renderReport($data)
@@ -283,19 +262,19 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $events = $announcements->getEvents();
         $featuredEvents = $announcements->getFeaturedEvents();
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////
+        // //////////////////////////////////////////////////////////////////////////////////////////////
 
         $this->doc->getPhpWord()->getSettings()->setBookFoldPrinting(true);
 
         $textRun = $this->doc->getSection()->addTextRun('Bekanntgaben');
         $textRun->addText(
             $service->date->isoFormat('DD. MMMM YYYY')
-            . (($service->liturgicalInfo['title'] ?? false) ? ' - ' . $service->liturgicalInfo['title'] : ''),
+            .(($service->liturgicalInfo['title'] ?? false) ? ' - '.$service->liturgicalInfo['title'] : ''),
             ['bold' => true]
         );
 
         $textRun = $this->doc->getSection()->addTextRun('Bekanntgaben');
-        $textRun->addText($service->timeText() . ' ' . $service->locationText());
+        $textRun->addText($service->timeText().' '.$service->locationText());
 
         $this->doc->getSection()->addTextBreak();
 
@@ -314,7 +293,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
 
         if ($service->offeringGoal()) {
             $this->doc->renderParagraph(self::INDENT, [
-                ["Opfer:\t{$service->offeringGoal()}", []]
+                ["Opfer:\t{$service->offeringGoal()}", []],
             ]);
         }
 
@@ -330,14 +309,14 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         // ANNOUNCEMENTS
 
         $announcements->setUseTabs(true);
-        //dd($announcements->render($lastService, $offerings, null, "\n", ['last_offerings', 'final_song']));
+        // dd($announcements->render($lastService, $offerings, null, "\n", ['last_offerings', 'final_song']));
         $announcements->render($lastService, $offerings, function ($key, $items) {
             if ($key == 'events') {
                 foreach ($items as $item) {
                     if (Str::contains($item, "\t")) {
-                        $this->doc->renderParagraph(self::INDENT, [[ $item, [] ]]);
+                        $this->doc->renderParagraph(self::INDENT, [[$item, []]]);
                     } else {
-                        $this->doc->renderParagraph(self::NO_INDENT, [[ $item, ['bold' => true] ]]);
+                        $this->doc->renderParagraph(self::NO_INDENT, [[$item, ['bold' => true]]]);
                     }
                 }
             } else {
@@ -346,10 +325,9 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             $this->doc->getSection()->addTextBreak();
         });
 
-        if (!empty($service->konfiapp_event_qr)) {
+        if (! empty($service->konfiapp_event_qr)) {
             $this->renderKonfiAppQR($service);
         }
-
 
         return $this->sendToBrowser(
             FileNameService::make(
@@ -362,8 +340,8 @@ class AnnouncementsReport extends AbstractWordDocumentReport
     }
 
     /**
-     * @param Request $request
      * @return string|void
+     *
      * @throws Exception
      */
     public function render(Request $request)
@@ -383,15 +361,15 @@ class AnnouncementsReport extends AbstractWordDocumentReport
     }
 
     /**
-     * @param $s
      * @return string
      */
     protected function renderName($s)
     {
-        if (false !== strpos($s, ',')) {
+        if (strpos($s, ',') !== false) {
             $t = explode(',', $s);
-            $s = trim($t[1]) . ' ' . trim($t[0]);
+            $s = trim($t[1]).' '.trim($t[0]);
         }
+
         return $s;
     }
 
@@ -401,19 +379,20 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         foreach ($people as $person) {
             $names->push(NameService::fromUser($person)->format(NameService::TITLE_FIRST_LAST));
         }
+
         return $names->join(', ', $and);
     }
 
     protected function renderMinistryLine($ministry, $people)
     {
         $this->doc->renderParagraph(self::INDENT, [
-            [$ministry . ":\t" . $this->getNameListLine($people), []]
+            [$ministry.":\t".$this->getNameListLine($people), []],
         ]);
     }
 
     protected function renderLiturgy(Service $service)
     {
-        if (!count($service->liturgyBlocks)) {
+        if (! count($service->liturgyBlocks)) {
             return;
         }
         $this->doc->getSection()->addTextBreak(1);
@@ -425,19 +404,19 @@ class AnnouncementsReport extends AbstractWordDocumentReport
                 $title = '';
                 if ($item->data_type == 'song') {
                     $helper = new SongItemHelper($item);
-                    $title = ': ' . $helper->getTitleText(
-                        ) . (($item->data['verses'] ?? '') ? ', ' . $item->data['verses'] : '');
+                    $title = ': '.$helper->getTitleText(
+                    ).(($item->data['verses'] ?? '') ? ', '.$item->data['verses'] : '');
                 }
                 if ($item->data_type == 'psalm') {
                     $helper = new PsalmItemHelper($item);
-                    $title = ': ' . $helper->getTitleText();
+                    $title = ': '.$helper->getTitleText();
                 }
                 if ($item->data_type == 'reading') {
-                    $title = ': ' . $item->data['reference'] ?? '';
+                    $title = ': '.$item->data['reference'] ?? '';
                 }
 
                 $this->doc->renderParagraph(self::NO_INDENT, [
-                    [Str::replace('&', '&amp;', $item->title . trim($title)), []]
+                    [Str::replace('&', '&amp;', $item->title.trim($title)), []],
                 ]);
             }
         }
@@ -449,7 +428,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             foreach ($block->items as $item) {
                 if ($item->data_type == 'reading') {
                     if ($item->data['reference']) {
-                        $title = 'Schriftlesung aus ' . $item->data['reference'];
+                        $title = 'Schriftlesung aus '.$item->data['reference'];
 
                         /** @var ReadingItemHelper $helper */
                         $helper = $item->getHelper();
@@ -458,7 +437,7 @@ class AnnouncementsReport extends AbstractWordDocumentReport
                         $this->doc->renderParagraph(self::NO_INDENT, [], 1);
                         $this->doc->renderParagraph(self::NO_INDENT, [
                             ['Der Herr segne sein Wort an uns. Amen.', ['italic' => true]],
-                        ],                          1);
+                        ], 1);
                     }
                 }
             }
@@ -468,15 +447,13 @@ class AnnouncementsReport extends AbstractWordDocumentReport
     protected function renderParagraphArray($paragraphs, $pStyle = self::NO_INDENT)
     {
         foreach ($paragraphs as $paragraph) {
-            if ($paragraph == "") {
+            if ($paragraph == '') {
                 $this->doc->getSection()->addTextBreak();
             } else {
                 $this->doc->renderParagraph($pStyle, [[$paragraph, [], true]]);
             }
         }
     }
-
-
 
     public function renderKonfiAppQR(Service $service)
     {
@@ -486,13 +463,13 @@ class AnnouncementsReport extends AbstractWordDocumentReport
         $text = '';
         foreach ($types as $type) {
             if ($type->id == $service->konfiapp_event_type) {
-                $text = $type->punktzahl . ' ' . ($type->punktzahl == 1 ? 'Punkt' : 'Punkte') . ' in der Kategorie "' . $type->name . '". ';
+                $text = $type->punktzahl.' '.($type->punktzahl == 1 ? 'Punkt' : 'Punkte').' in der Kategorie "'.$type->name.'". ';
             }
         }
         $this->doc->renderNormalText(
-            $text . 'Gültig nur am ' . $service->date->isoFormat('dddd, DD. MMMM YYYY')
-            . ' von ' . $service->date->setTimezone('Europe/Berlin')->format('H:i')
-            . ' bis ' . $service->date->setTimezone('Europe/Berlin')->copy()->addHours(3)->format('H:i') . ' Uhr.',
+            $text.'Gültig nur am '.$service->date->isoFormat('dddd, DD. MMMM YYYY')
+            .' von '.$service->date->setTimezone('Europe/Berlin')->format('H:i')
+            .' bis '.$service->date->setTimezone('Europe/Berlin')->copy()->addHours(3)->format('H:i').' Uhr.',
             ['size' => 8],
             true
         );
@@ -501,5 +478,4 @@ class AnnouncementsReport extends AbstractWordDocumentReport
             ['width' => Converter::cmToPoint(4)]
         );
     }
-
 }

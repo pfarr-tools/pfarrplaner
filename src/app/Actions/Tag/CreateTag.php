@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,20 +32,19 @@ namespace App\Actions\Tag;
 
 use App\Actions\AbstractCreateAction;
 use App\Contracts\Tag\CreatesTags;
-use App\Events\Models\Tag\CreatedLocation;
 use App\Events\Models\Tag\CreatedTag;
 use App\Models\People\User;
 use App\Models\Tag;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class CreateTag extends AbstractCreateAction implements CreatesTags
 {
-
     /**
      * Get the return route
-     * @return string
      */
     public function redirectTo(): string
     {
@@ -54,20 +53,23 @@ class CreateTag extends AbstractCreateAction implements CreatesTags
 
     /**
      * Create a new tag
-     * @param User $user
-     * @param array $input
+     *
      * @return Tag
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Validation\ValidationException
+     *
+     * @throws AuthorizationException
+     * @throws ValidationException
      */
     public function create(User $user, array $input)
     {
         Gate::forUser($user)->authorize('create', Tag::class);
         $input = Validator::make($input, Tag::$validationRules)->validateWithBag('createTag');
-        if (empty($input['code'] ?? '')) $input['code'] = Str::slug($input['name']);
+        if (empty($input['code'] ?? '')) {
+            $input['code'] = Str::slug($input['name']);
+        }
         $tag = Tag::create($input);
         CreatedTag::dispatch($user, $tag);
         $this->messages = ['success' => 'Die neue Kennzeichnung wurde gespeichert.'];
+
         return $tag;
 
     }

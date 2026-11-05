@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,10 +30,8 @@
 
 namespace App\Liturgy\PronounSets;
 
-
 class SiePronounSet extends AbstractPronounSet
 {
-
     protected $label = 'sie/ihr/ihr/sie';
 
     protected $pronouns = [
@@ -69,7 +67,4 @@ class SiePronounSet extends AbstractPronounSet
         'dem Verstorbenen' => 'der Verstorbenen',
         'den Verstorbenen' => 'die Verstorbene',
     ];
-
-
-
 }

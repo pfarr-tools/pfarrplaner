@@ -52,6 +52,8 @@ services:
     build: {context: ., dockerfile: Dockerfile, target: node}
     working_dir: /app
     entrypoint: ["/usr/local/bin/pfarrplaner-vite-entrypoint"]
+    environment:
+      QUALITY_FILES: ${QUALITY_FILES:-}
     env_file:
       - path: .env
         required: false

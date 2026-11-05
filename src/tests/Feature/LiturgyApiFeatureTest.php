@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -27,7 +28,7 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testStoreBlockCreatesBlock()
+    public function test_store_block_creates_block()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -46,7 +47,7 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testStoreBlockRequiresTitle()
+    public function test_store_block_requires_title()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -61,7 +62,7 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testStoreBlockRequiresAuth()
+    public function test_store_block_requires_auth()
     {
         $service = Service::factory()->create();
 
@@ -72,7 +73,7 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testUpdateBlockModifiesBlock()
+    public function test_update_block_modifies_block()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -91,7 +92,7 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testDestroyBlockDeletesBlock()
+    public function test_destroy_block_deletes_block()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -109,7 +110,7 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testStoreItemCreatesItem()
+    public function test_store_item_creates_item()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -130,7 +131,7 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testStoreItemRequiresAuth()
+    public function test_store_item_requires_auth()
     {
         $service = Service::factory()->create();
         $block = Block::create(['title' => 'Block', 'service_id' => $service->id, 'sortable' => 1]);
@@ -142,7 +143,7 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testDestroyItemDeletesItem()
+    public function test_destroy_item_deletes_item()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -166,7 +167,7 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSaveTreeStateUpdatesBlockOrder()
+    public function test_save_tree_state_updates_block_order()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -188,7 +189,7 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSaveTreeStateMovesItemsBetweenBlocks()
+    public function test_save_tree_state_moves_items_between_blocks()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -223,7 +224,7 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSourcesReturnsImportableSourcesForServiceIdRouteParameter()
+    public function test_sources_returns_importable_sources_for_service_id_route_parameter()
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -18,7 +19,7 @@ use Tests\TestCase;
 
 class AboutFeatureTest extends TestCase
 {
-    public function testAboutPageSharesRepositoryAndRuntimeInformation(): void
+    public function test_about_page_shares_repository_and_runtime_information(): void
     {
         $user = User::factory()->create();
 

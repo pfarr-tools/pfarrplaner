@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -15,9 +16,6 @@ class StoragePath
     /**
      * Return a local pathname for a stored object, materializing remote disks
      * into the framework cache when necessary.
-     *
-     * @param string $path
-     * @return string
      */
     public static function for(string $path): string
     {
@@ -36,6 +34,7 @@ class StoragePath
         if (! is_file($localPath)) {
             file_put_contents($localPath, $disk->get($path), LOCK_EX);
         }
+
         return $localPath;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,7 +36,6 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
  * Class AbsencePolicy
- * @package App\Policies
  */
 class AbsencePolicy
 {
@@ -53,27 +52,26 @@ class AbsencePolicy
     }
 
     /**
-     * @param User $user
-     * @param Absence $absence
      * @return bool
      */
-    public function view(User $user, Absence $absence) {
+    public function view(User $user, Absence $absence)
+    {
         return $this->update($user, $absence);
     }
 
     /**
-     * @param User $user
      * @return bool
      */
-    public function create(User $user, Absence $absence = null)
+    public function create(User $user, ?Absence $absence = null)
     {
-        if ((null !== $absence) && $this->update($user, $absence)) return true;
+        if (($absence !== null) && $this->update($user, $absence)) {
+            return true;
+        }
+
         return $user->manage_absences || $user->hasPermissionTo('fremden-urlaub-bearbeiten');
     }
 
     /**
-     * @param User $user
-     * @param Absence $absence
      * @return bool
      */
     public function update(User $user, Absence $absence)
@@ -86,22 +84,24 @@ class AbsencePolicy
         if ($user->hasPermissionTo('fremden-urlaub-bearbeiten')) {
             $cityIds = $absence->user->homeCities->pluck('id');
             foreach ($user->writableCities as $city) {
-                if ($cityIds->contains($city->id) && (!$absence->user->hasRole('Pfarrer:in'))) {
+                if ($cityIds->contains($city->id) && (! $absence->user->hasRole('Pfarrer:in'))) {
                     return true;
                 }
             }
         }
 
         // via workflow
-        if ($absence->user->vacationAdmins->pluck('id')->contains($user->id)) return true;
-        if (($absence->workflow_status > 0) && $absence->user->vacationApprovers->pluck('id')->contains($user->id)) return true;
+        if ($absence->user->vacationAdmins->pluck('id')->contains($user->id)) {
+            return true;
+        }
+        if (($absence->workflow_status > 0) && $absence->user->vacationApprovers->pluck('id')->contains($user->id)) {
+            return true;
+        }
 
         return false;
     }
 
     /**
-     * @param User $user
-     * @param Absence $absence
      * @return bool
      */
     public function delete(User $user, Absence $absence)
@@ -110,8 +110,6 @@ class AbsencePolicy
     }
 
     /**
-     * @param User $user
-     * @param Absence $absence
      * @return bool
      */
     public function restore(User $user, Absence $absence)
@@ -120,8 +118,6 @@ class AbsencePolicy
     }
 
     /**
-     * @param User $user
-     * @param Absence $absence
      * @return bool
      */
     public function forceDelete(User $user, Absence $absence)
@@ -129,19 +125,17 @@ class AbsencePolicy
         return $this->delete($user, $absence);
     }
 
-
     /**
      * Check if the user can manage his own vacation entries
-     * @param User $user
+     *
      * @return bool
      */
-    public function selfAdminister(User $user, Absence $absence = null)
+    public function selfAdminister(User $user, ?Absence $absence = null)
     {
-        if ((null !== $absence) && ($absence->user->id != $user->id)) return false;
-        return ((0 == $user->vacationAdmins->count()) && (0 == $user->vacationApprovers->count()));
+        if (($absence !== null) && ($absence->user->id != $user->id)) {
+            return false;
+        }
+
+        return ($user->vacationAdmins->count() == 0) && ($user->vacationApprovers->count() == 0);
     }
-
-
-
-
 }

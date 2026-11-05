@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -16,13 +17,11 @@ use Laravel\Dusk\Browser;
 
 class AbsencePlannerPage extends Page
 {
-    /** @return string */
     public function url(): string
     {
         return route('absences.index');
     }
 
-    /** @param Browser $browser */
     public function assert(Browser $browser): void
     {
         $browser->waitFor('#app', 10)->assertDontSee('500');

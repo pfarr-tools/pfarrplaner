@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -30,11 +31,11 @@ class PoolmasterUnitTest extends AbstractModelUnitTest
     }
 
     /** Override: date fields are serialized as ISO 8601 in JSON but factory produces Y-m-d strings */
-    public function testCreateViaApi()
+    public function test_create_via_api()
     {
         $data = $this->factory()->raw();
 
-        $apiRoute = 'api.' . ($this->modelClass)::pluralKey() . '.store';
+        $apiRoute = 'api.'.($this->modelClass)::pluralKey().'.store';
         $response = $this->actingAs($this->testUser, 'api')
             ->postJson(route($apiRoute), $data);
 
@@ -42,8 +43,8 @@ class PoolmasterUnitTest extends AbstractModelUnitTest
         $dateFields = array_keys(($this->modelClass)::make()->getCasts());
         foreach ($data as $key => $value) {
             if (in_array($key, $dateFields)) {
-                $response->assertJson(fn(AssertableJson $json) => $json
-                    ->where($key, fn($jsonValue) => str_starts_with($jsonValue, $value))
+                $response->assertJson(fn (AssertableJson $json) => $json
+                    ->where($key, fn ($jsonValue) => str_starts_with($jsonValue, $value))
                     ->etc()
                 );
             } else {
@@ -53,20 +54,20 @@ class PoolmasterUnitTest extends AbstractModelUnitTest
     }
 
     /** Override: Poolmaster policy uses role checks, no city sync needed */
-    public function testUpdateViaApi()
+    public function test_update_via_api()
     {
         $existing = $this->factory()->create();
         $this->assertTrue($this->testUser->can('update', $existing));
 
         $data = $this->factory()->raw();
-        $apiRoute = 'api.' . ($this->modelClass)::singularKey() . '.update';
+        $apiRoute = 'api.'.($this->modelClass)::singularKey().'.update';
         $response = $this->actingAs($this->testUser, 'api')
             ->patchJson(route($apiRoute, $existing->id), $data);
         $response->assertStatus(200);
     }
 
     /** Override: compare date fields by string representation since model casts to Carbon */
-    public function testCreateViaAction()
+    public function test_create_via_action()
     {
         Event::fake();
 
@@ -89,7 +90,7 @@ class PoolmasterUnitTest extends AbstractModelUnitTest
     }
 
     /** Override: compare date fields by string representation since model casts to Carbon */
-    public function testUpdateViaAction()
+    public function test_update_via_action()
     {
         Event::fake();
 

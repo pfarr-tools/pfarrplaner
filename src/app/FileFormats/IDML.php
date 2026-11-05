@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\FileFormats;
 
-
 use Illuminate\Support\Str;
 use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\Shared\ZipArchive;
@@ -41,7 +40,6 @@ use SplFileInfo;
 
 /**
  * Class IDML
- * @package App\FileFormats
  */
 class IDML
 {
@@ -49,6 +47,7 @@ class IDML
      * @var false|string
      */
     protected $tempFolder = '';
+
     /**
      * @var string
      */
@@ -56,14 +55,13 @@ class IDML
 
     /**
      * IDML constructor.
-     * @param $fileName
-     * @param $prefix
+     *
      * @throws Exception
      */
     public function __construct($fileName, $prefix)
     {
         $this->tempFolder = $this->tempdir();
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         if ($zip->open($fileName)) {
             $zip->extractTo($this->tempFolder);
             $zip->close();
@@ -90,7 +88,6 @@ class IDML
     }
 
     /**
-     * @param $mm
      * @return float
      */
     public static function mmToPoint($mm)
@@ -99,7 +96,6 @@ class IDML
     }
 
     /**
-     * @param $pt
      * @return float
      */
     public static function pointToMm($pt)
@@ -114,7 +110,7 @@ class IDML
         $tempFile = tempnam(sys_get_temp_dir(), 'IDML_build_');
 
         // Initialize archive object
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         $zip->open($tempFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
         // Create recursive directory iterator
@@ -127,7 +123,7 @@ class IDML
         $added = [];
         foreach ($files as $name => $file) {
             // Skip directories (they would be added automatically)
-            if (!$file->isDir()) {
+            if (! $file->isDir()) {
                 // Get real and relative path for current file
                 $filePath = $file->getRealPath();
                 $relativePath = substr($filePath, strlen($rootPath) + 1);
@@ -138,7 +134,6 @@ class IDML
             }
         }
 
-
         // Zip archive will be created only after closing object
         $zip->close();
 
@@ -146,7 +141,7 @@ class IDML
         $this->forceDownload(
             $tempFile,
             'application/vnd.adobe.indesign-idml-package',
-            "build-ev3_" . now()->format('YmdHis') . ".idml"
+            'build-ev3_'.now()->format('YmdHis').'.idml'
         );
         unlink($tempFile);
         exit;
@@ -154,9 +149,9 @@ class IDML
 
     /**
      * Force the browser to download a file
-     * @param $file
-     * @param string $mimeType
-     * @param string $fileName
+     *
+     * @param  string  $mimeType
+     * @param  string  $fileName
      */
     public function forceDownload($file, $mimeType = 'application/vnd.adobe.indesign-idml-package', $fileName = '')
     {
@@ -164,28 +159,26 @@ class IDML
             $fileName = pathinfo($file, PATHINFO_BASENAME);
         }
         header('Content-Type: application/vnd.adobe.indesign-idml-package');
-        header("Content-Transfer-Encoding: Binary");
-        header("Content-disposition: attachment; filename=\"" . $fileName . "\"");
-        if (!file_exists($file) && file_exists($this->tempPath($file))) {
+        header('Content-Transfer-Encoding: Binary');
+        header('Content-disposition: attachment; filename="'.$fileName.'"');
+        if (! file_exists($file) && file_exists($this->tempPath($file))) {
             $file = $this->tempPath($file);
         }
         readfile($file);
         exit;
     }
 
-
     /**
      * Get the full path from a relative path in the temp folder
-     * @param $file
+     *
      * @return string
      */
     public function tempPath($file)
     {
-        return $this->tempFolder . '/' . $file;
+        return $this->tempFolder.'/'.$file;
     }
 
     /**
-     * @param $file
      * @return SimpleXMLElement
      */
     public function getXML($file)
@@ -193,10 +186,6 @@ class IDML
         return simplexml_load_file($this->tempPath($file));
     }
 
-    /**
-     * @param $file
-     * @param SimpleXMLElement $xml
-     */
     public function setXML($file, SimpleXMLElement $xml)
     {
         $this->renderToFile($file, $xml->__toString());
@@ -204,8 +193,9 @@ class IDML
 
     /**
      * Write text to a file in the temp directory
-     * @param string $filePath a relative path in the temp folder
-     * @param string $code contents
+     *
+     * @param  string  $filePath  a relative path in the temp folder
+     * @param  string  $code  contents
      */
     public function renderToFile($filePath, $code)
     {
@@ -214,7 +204,6 @@ class IDML
 
     /**
      * Remove a file from the temp directory
-     * @param $filePath
      */
     public function removeFile($filePath)
     {
@@ -225,11 +214,12 @@ class IDML
 
     /**
      * Get a unique identifier
+     *
      * @return string
      */
     public function getUID($type = '')
     {
-        return $this->prefix . '_' . ($type ?: '') . '_' . Str::random(16);
+        return $this->prefix.'_'.($type ?: '').'_'.Str::random(16);
     }
 
     /**
@@ -242,7 +232,7 @@ class IDML
 
     /**
      * Delete a folder from the disk
-     * @param $dirname
+     *
      * @return bool
      */
     protected function deleteFolder($dirname)
@@ -250,20 +240,21 @@ class IDML
         if (is_dir($dirname)) {
             $dir_handle = opendir($dirname);
         }
-        if (!$dir_handle) {
+        if (! $dir_handle) {
             return false;
         }
         while ($file = readdir($dir_handle)) {
-            if ($file != "." && $file != "..") {
-                if (!is_dir($dirname . "/" . $file)) {
-                    unlink($dirname . "/" . $file);
+            if ($file != '.' && $file != '..') {
+                if (! is_dir($dirname.'/'.$file)) {
+                    unlink($dirname.'/'.$file);
                 } else {
-                    $this->deleteFolder($dirname . '/' . $file);
+                    $this->deleteFolder($dirname.'/'.$file);
                 }
             }
         }
         closedir($dir_handle);
         rmdir($dirname);
+
         return true;
     }
 
@@ -272,8 +263,6 @@ class IDML
      */
     public function BR()
     {
-        return chr(0xE2) . chr(0x80) . chr(0xA8);
+        return chr(0xE2).chr(0x80).chr(0xA8);
     }
-
-
 }

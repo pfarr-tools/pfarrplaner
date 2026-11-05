@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -47,19 +47,11 @@ class DeleteBaptism extends AbstractDeleteAction implements DeletesBaptisms
 {
     protected string $redirectUrl = '';
 
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return $this->redirectUrl ?: route('home');
     }
 
-    /**
-     * @param User $user
-     * @param Baptism $baptism
-     * @return bool|null
-     */
     public function delete(User $user, Baptism $baptism): ?bool
     {
         Gate::forUser($user)->authorize('delete', $baptism);
@@ -76,10 +68,6 @@ class DeleteBaptism extends AbstractDeleteAction implements DeletesBaptisms
         return $result;
     }
 
-    /**
-     * @param Service $service
-     * @return string
-     */
     protected function getServiceSlug(Service $service): string
     {
         return $service->slug ?: $service->createSlug();

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
 use App\Documents\Word\DefaultA5WordDocument;
 use App\Documents\Word\DefaultWordDocument;
 use App\Liturgy\ItemHelpers\PsalmItemHelper;
@@ -40,39 +39,45 @@ use App\Models\Service;
 class PsalmLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Psalm';
-    protected $fileTitle = 'Psalm';
-    protected $icon = 'fa fa-file-word';
-    protected $service = null;
-    protected $extension = 'docx';
-    protected $fileName = '';
 
+    protected $fileTitle = 'Psalm';
+
+    protected $icon = 'fa fa-file-word';
+
+    protected $service = null;
+
+    protected $extension = 'docx';
+
+    protected $fileName = '';
 
     public function render(Service $service)
     {
         $this->service = $service;
 
-        $doc = new DefaultA5WordDocument();
+        $doc = new DefaultA5WordDocument;
 
         foreach ($service->liturgyBlocks as $block) {
             foreach ($block->items as $item) {
-                if (method_exists($this, ($method = 'render' . ucfirst($item->data_type . 'Item')))) {
+                if (method_exists($this, ($method = 'render'.ucfirst($item->data_type.'Item')))) {
                     $this->$method($doc, $item);
                     $doc->getSection()->addPageBreak();
                     $this->$method($doc, $item);
                 }
             }
         }
+
         return $doc->sendToBrowser($this->getFileName($service));
     }
 
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!$item->data['psalm']['text']) return;
+        if (! $item->data['psalm']['text']) {
+            return;
+        }
         /** @var PsalmItemHelper $helper */
         $helper = $item->getHelper();
-        $doc->getSection()->addTitle($item->data['psalm']['title'],1);
+        $doc->getSection()->addTitle($item->data['psalm']['title'], 1);
         $doc->renderNormalText($item->data['psalm']['text']);
         $this->fileName = $item->data['psalm']['title'];
     }
-
 }

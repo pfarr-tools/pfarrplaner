@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -33,10 +33,12 @@ namespace App\UI\Modules;
 class AbsencesModule extends AbstractModule
 {
     protected $title = 'Urlaub';
-    protected $icon = 'mdi mdi-earth';
-    protected $color = '#dc9018';
-    protected $defaultRoute = 'absences.index';
 
+    protected $icon = 'mdi mdi-earth';
+
+    protected $color = '#dc9018';
+
+    protected $defaultRoute = 'absences.index';
 
     public function addItems(array $items): array
     {
@@ -48,7 +50,7 @@ class AbsencesModule extends AbstractModule
             'active' => request()->is(['absences*', 'approvals*']),
             'inertia' => true,
         ];
+
         return $items;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -18,20 +19,17 @@ use ZipArchive;
 
 class ODPUnitTest extends TestCase
 {
-    /**
-     * @return void
-     */
-    public function testTextEntitiesAreDecodedInContentXml(): void
+    public function test_text_entities_are_decoded_in_content_xml(): void
     {
         $tempFile = tempnam(sys_get_temp_dir(), 'odp-test-');
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         $zip->open($tempFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
         $zip->addFromString(
             'content.xml',
             '<?xml version="1.0" encoding="UTF-8"?>'
-            . '<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">'
-            . '<office:body><office:presentation><text:p>Psalm &#8211; &amp;Auml;hre &#169;</text:p></office:presentation></office:body>'
-            . '</office:document-content>'
+            .'<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">'
+            .'<office:body><office:presentation><text:p>Psalm &#8211; &amp;Auml;hre &#169;</text:p></office:presentation></office:body>'
+            .'</office:document-content>'
         );
         $zip->close();
 

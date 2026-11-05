@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,9 +13,13 @@
 
 namespace Tests\Unit;
 
+use App\Actions\Wedding\CreateWedding;
+use App\Actions\Wedding\DeleteWedding;
+use App\Actions\Wedding\UpdateWedding;
 use App\Events\Models\Wedding\CreatedWedding;
 use App\Events\Models\Wedding\DeletedWedding;
 use App\Events\Models\Wedding\UpdatedWedding;
+use App\Http\Controllers\AbstractCRUDController;
 use App\Models\AbstractModel;
 use App\Models\People\User;
 use App\Models\Rites\Wedding;
@@ -26,37 +31,37 @@ use Tests\TestCase;
 
 class WeddingUnitTest extends TestCase
 {
-    public function testWeddingHasServiceRelationship(): void
+    public function test_wedding_has_service_relationship(): void
     {
         $wedding = Wedding::factory()->create();
         $this->assertInstanceOf(BelongsTo::class, $wedding->service());
     }
 
-    public function testWeddingCanBeCreatedViaFactory(): void
+    public function test_wedding_can_be_created_via_factory(): void
     {
         $wedding = Wedding::factory()->create();
         $this->assertCount(1, Wedding::all());
         $this->assertNotNull($wedding->service_id);
     }
 
-    public function testWeddingExtendsAbstractModel(): void
+    public function test_wedding_extends_abstract_model(): void
     {
         $this->assertTrue(is_subclass_of(Wedding::class, AbstractModel::class));
     }
 
-    public function testWeddingControllerClassExists(): void
+    public function test_wedding_controller_class_exists(): void
     {
-        $this->assertTrue(is_subclass_of(Wedding::controllerClass(), \App\Http\Controllers\AbstractCRUDController::class));
+        $this->assertTrue(is_subclass_of(Wedding::controllerClass(), AbstractCRUDController::class));
     }
 
-    public function testWeddingContractsResolve(): void
+    public function test_wedding_contracts_resolve(): void
     {
-        $this->assertInstanceOf(\App\Actions\Wedding\CreateWedding::class, app(Wedding::getContractName('create')));
-        $this->assertInstanceOf(\App\Actions\Wedding\UpdateWedding::class, app(Wedding::getContractName('update')));
-        $this->assertInstanceOf(\App\Actions\Wedding\DeleteWedding::class, app(Wedding::getContractName('delete')));
+        $this->assertInstanceOf(CreateWedding::class, app(Wedding::getContractName('create')));
+        $this->assertInstanceOf(UpdateWedding::class, app(Wedding::getContractName('update')));
+        $this->assertInstanceOf(DeleteWedding::class, app(Wedding::getContractName('delete')));
     }
 
-    public function testWeddingCanBeCreatedViaAction(): void
+    public function test_wedding_can_be_created_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -70,7 +75,7 @@ class WeddingUnitTest extends TestCase
         Event::assertDispatched(CreatedWedding::class);
     }
 
-    public function testWeddingCanBeUpdatedViaAction(): void
+    public function test_wedding_can_be_updated_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -87,7 +92,7 @@ class WeddingUnitTest extends TestCase
         Event::assertDispatched(UpdatedWedding::class);
     }
 
-    public function testWeddingCanBeDeletedViaAction(): void
+    public function test_wedding_can_be_deleted_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();

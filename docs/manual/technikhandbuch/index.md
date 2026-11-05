@@ -10,6 +10,7 @@ Dieses Handbuch beschreibt die technische Seite von Pfarrplaner: Architektur, Ve
 - [Architektur und Domänen](architektur.md)
 - [Dateien und Verzeichnisse](dateien-und-verzeichnisse.md)
 - [Laufzeit, Build und Hintergrundprozesse](laufzeit-und-build.md)
+- [Codequalität und Entwicklungsworkflow](codequalitaet-und-workflow.md)
 - [Deployment und Betrieb](deployment.md)
 - [Sicherheitsaudit und Härtung](sicherheitsaudit.md)
 - [API-Authentifizierung](api-authentifizierung.md)

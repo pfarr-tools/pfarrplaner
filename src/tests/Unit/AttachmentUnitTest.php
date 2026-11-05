@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,14 +30,12 @@
 
 namespace Tests\Unit;
 
-use App\Models\Attachment;
-use App\Models\Location;
-use App\Models\Places\City;
-use App\Models\Rites\Funeral;
-use App\Models\Service;
-use App\Models\People\User;
 use App\Contracts\Attachment\UpdatesAttachments;
 use App\Events\Models\Attachment\UpdatedAttachment;
+use App\Models\Attachment;
+use App\Models\People\User;
+use App\Models\Rites\Funeral;
+use App\Models\Service;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -48,11 +46,9 @@ use Tests\AbstractSimpleModelUnitTest;
 
 /**
  * Class AttachmentUnitTest
- * @package Tests\Unit
  */
 class AttachmentUnitTest extends AbstractSimpleModelUnitTest
 {
-
     use RefreshDatabase;
 
     protected string $modelClass = Attachment::class;
@@ -62,7 +58,7 @@ class AttachmentUnitTest extends AbstractSimpleModelUnitTest
      *
      * @return void
      */
-    public function testAttachmentCanBeCreated()
+    public function test_attachment_can_be_created()
     {
         $attachment = Attachment::create(['title' => 'cool title', 'file' => 'file.txt']);
         $this->assertCount(1, Attachment::all());
@@ -73,7 +69,7 @@ class AttachmentUnitTest extends AbstractSimpleModelUnitTest
      *
      * @return void
      */
-    public function testAttachmentCanBeCreatedForFuneral()
+    public function test_attachment_can_be_created_for_funeral()
     {
         $funeral = Funeral::factory()->for(Service::factory(), 'service')->create();
         $this->assertCount(1, Funeral::all());
@@ -81,12 +77,12 @@ class AttachmentUnitTest extends AbstractSimpleModelUnitTest
         $this->assertCount(1, Funeral::first()->attachments);
     }
 
-    public function testAttachmentUpdateRouteExists(): void
+    public function test_attachment_update_route_exists(): void
     {
         $this->assertTrue(Route::has('attachment.update'));
     }
 
-    public function testAttachmentCanBeUpdatedViaAction(): void
+    public function test_attachment_can_be_updated_via_action(): void
     {
         Storage::fake();
         Event::fake();

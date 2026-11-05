@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -58,7 +58,7 @@ class AttachmentFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testAttachmentCanBeUpdatedViaWebRoute(): void
+    public function test_attachment_can_be_updated_via_web_route(): void
     {
         $attachment = Attachment::factory()->create();
 
@@ -75,7 +75,7 @@ class AttachmentFeatureTest extends TestCase
         $this->assertCount(1, $response->json());
     }
 
-    public function testMissingAttachmentFileStillSerializes(): void
+    public function test_missing_attachment_file_still_serializes(): void
     {
         $attachment = Attachment::factory()->create([
             'title' => 'Fehlende Datei',
@@ -92,10 +92,7 @@ class AttachmentFeatureTest extends TestCase
         $this->assertSame('Die gespeicherte Datei wurde nicht gefunden.', $data['errorMessage']);
     }
 
-    /**
-     * @return void
-     */
-    public function testAttachmentDownloadIsForbiddenWhenParentServiceIsTrashed(): void
+    public function test_attachment_download_is_forbidden_when_parent_service_is_trashed(): void
     {
         $city = City::factory()->create();
         $service = Service::factory()->create(['city_id' => $city->id]);

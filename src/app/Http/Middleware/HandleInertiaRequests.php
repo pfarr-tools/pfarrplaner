@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,14 +32,13 @@ namespace App\Http\Middleware;
 
 use App\Facades\Settings;
 use App\Http\Resources\UserResource;
-use App\Services\PackageService;
 use App\Services\InterstitialService;
+use App\Services\PackageService;
 use App\UI\MenuBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
-use Inertia\Inertia;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -48,6 +47,7 @@ class HandleInertiaRequests extends Middleware
      * The root template that's loaded on the first page visit.
      *
      * @see https://inertiajs.com/server-side-setup#root-template
+     *
      * @var string
      */
     protected $rootView = 'app';
@@ -56,7 +56,7 @@ class HandleInertiaRequests extends Middleware
      * Determines the current asset version.
      *
      * @see https://inertiajs.com/asset-versioning
-     * @param  \Illuminate\Http\Request  $request
+     *
      * @return string|null
      */
     public function version(Request $request)
@@ -68,7 +68,7 @@ class HandleInertiaRequests extends Middleware
      * Defines the props that are shared by default.
      *
      * @see https://inertiajs.com/shared-data
-     * @param  \Illuminate\Http\Request  $request
+     *
      * @return array
      */
     public function share(Request $request)
@@ -87,30 +87,30 @@ class HandleInertiaRequests extends Middleware
                 'warning' => fn () => $request->session()->get('warning'),
                 'error' => fn () => $request->session()->get('error'),
             ],
-            'dev' => config('app.dev') ? true:  false,
+            'dev' => config('app.dev') ? true : false,
             'demo' => config('app.demo_mode'),
-            'package' =>  fn() => PackageService::info(),
-            'route' => fn() => Route::currentRouteName(),
-            'currentRoute' => fn() => Route::currentRouteName(),
-            'helpPage'     => fn() => $this->resolveHelpPage(Route::currentRouteName()),
+            'package' => fn () => PackageService::info(),
+            'route' => fn () => Route::currentRouteName(),
+            'currentRoute' => fn () => Route::currentRouteName(),
+            'helpPage' => fn () => $this->resolveHelpPage(Route::currentRouteName()),
             'manualBaseUrl' => config('app.manual_url'),
             'version' => $version,
             'activeTab' => request()->get('tab', 'home'),
-            'labels' => fn() => config('labels'),
-            'bible' => fN() => [
+            'labels' => fn () => config('labels'),
+            'bible' => fn () => [
                 'versions' => array_keys(config('bible.versions', [])),
             ],
         ]);
 
-        if (!Auth::guest()) {
+        if (! Auth::guest()) {
             $data = array_merge($data, [
                 'currentUser' => fn () => $request->user()
                     ? new UserResource($request->user())
                     : null,
-                'sessionId' => fn() => $request->session()->getId(),
-                'menu' => fn() => MenuBuilder::sidebar(),
-                'settings' => fn() => Settings::all(Auth::user()),
-                'interstitials' => fn() => app(InterstitialService::class)->forUser(Auth::user()),
+                'sessionId' => fn () => $request->session()->getId(),
+                'menu' => fn () => MenuBuilder::sidebar(),
+                'settings' => fn () => Settings::all(Auth::user()),
+                'interstitials' => fn () => app(InterstitialService::class)->forUser(Auth::user()),
                 'adminUserSwitchBack' => Session::has('adminUserSwitchBack'),
                 'appName' => config('app.name'),
             ]);
@@ -120,16 +120,16 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * @param string|null $routeName Current Laravel route name
+     * @param  string|null  $routeName  Current Laravel route name
      * @return string Chapter slug for the manual help page
      */
     private function resolveHelpPage(?string $routeName): string
     {
-        if (!$routeName) {
+        if (! $routeName) {
             return 'benutzerhandbuch';
         }
         foreach (config('manual', []) as $chapter => $prefixes) {
-            if (!is_array($prefixes)) {
+            if (! is_array($prefixes)) {
                 continue;
             }
 
@@ -139,17 +139,20 @@ class HandleInertiaRequests extends Middleware
                 $prefixes = $prefixes['prefixes'];
             }
 
-            if (!is_array($prefixes)) {
+            if (! is_array($prefixes)) {
                 continue;
             }
 
             foreach ($prefixes as $prefix) {
-                if (is_array($prefix)) return 'benutzerhandbuch';
+                if (is_array($prefix)) {
+                    return 'benutzerhandbuch';
+                }
                 if (str_starts_with($routeName, $prefix) || $routeName === $prefix) {
                     return trim($manual.'/'.$chapter, '/');
                 }
             }
         }
+
         return 'benutzerhandbuch';
     }
 }

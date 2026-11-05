@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -32,7 +33,7 @@ class CommentPolicyUnitTest extends TestCase
     {
         parent::setUp();
         Permission::findOrCreate('gd-bearbeiten');
-        $this->policy = new CommentPolicy();
+        $this->policy = new CommentPolicy;
     }
 
     protected function createServiceForPolicyTest(): Service
@@ -46,7 +47,7 @@ class CommentPolicyUnitTest extends TestCase
         ]);
     }
 
-    public function testUserWithoutServiceWritePermissionCannotCreateComment(): void
+    public function test_user_without_service_write_permission_cannot_create_comment(): void
     {
         $user = User::factory()->create();
         $service = $this->createServiceForPolicyTest();
@@ -54,7 +55,7 @@ class CommentPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->create($user, $service));
     }
 
-    public function testUserWithServiceWritePermissionCanCreateComment(): void
+    public function test_user_with_service_write_permission_can_create_comment(): void
     {
         $user = User::factory()->create();
         $service = $this->createServiceForPolicyTest();
@@ -64,7 +65,7 @@ class CommentPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->create($user, $service));
     }
 
-    public function testUserWithoutServiceWritePermissionCannotDeleteComment(): void
+    public function test_user_without_service_write_permission_cannot_delete_comment(): void
     {
         $user = User::factory()->create();
         $service = $this->createServiceForPolicyTest();
@@ -76,7 +77,7 @@ class CommentPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->delete($user, $comment));
     }
 
-    public function testUserWithServiceWritePermissionCanDeleteComment(): void
+    public function test_user_with_service_write_permission_can_delete_comment(): void
     {
         $user = User::factory()->create();
         $service = $this->createServiceForPolicyTest();

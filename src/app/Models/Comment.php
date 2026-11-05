@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,20 +37,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Comment
- * @package App
  */
 class Comment extends AbstractModel
 {
-
     use HasFactory;
 
     protected static string $prefix = 'kommentar';
+
     protected static string $prefixPlural = 'kommentare';
+
     protected static string $path = '';
+
     public static array $exceptRoutes = [
         'web' => ['index', 'create', 'show', 'edit', 'update', 'destroy', 'store'],
         'api' => ['index', 'create', 'show', 'edit', 'update', 'destroy', 'store'],
     ];
+
     protected static $routes = [
         'web' => [
             'store' => [['POST'], '###'],
@@ -86,9 +88,6 @@ class Comment extends AbstractModel
         return $this->morphTo();
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -98,5 +97,4 @@ class Comment extends AbstractModel
     {
         return (string) ($this->body ?? '');
     }
-
 }

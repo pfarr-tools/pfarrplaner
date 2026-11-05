@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -30,7 +31,7 @@ class SoftDeleteFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testServiceSoftDeleteCascadesToRitesAndAdConfigsAndRestoreRebuildsOccurrences()
+    public function test_service_soft_delete_cascades_to_rites_and_ad_configs_and_restore_rebuilds_occurrences()
     {
         Storage::fake();
 
@@ -92,7 +93,7 @@ class SoftDeleteFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testAbsenceSoftDeleteCascadesToReplacementAndRestoreKeepsAssignedUsers()
+    public function test_absence_soft_delete_cascades_to_replacement_and_restore_keeps_assigned_users()
     {
         $actingUser = User::factory()->create();
         $absence = Absence::factory()->create();
@@ -127,7 +128,7 @@ class SoftDeleteFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testServiceForceDeleteRemovesAttachmentsAndStoredFiles()
+    public function test_service_force_delete_removes_attachments_and_stored_files()
     {
         Storage::fake();
 

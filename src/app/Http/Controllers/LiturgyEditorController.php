@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -33,18 +33,16 @@ namespace App\Http\Controllers;
 use App\Liturgy\LiturgySheets\AbstractLiturgySheet;
 use App\Liturgy\LiturgySheets\LiturgySheets;
 use App\Liturgy\Replacement\Replacement;
-use App\Liturgy\Resources\BlockResourceCollection;
-use App\Models\Liturgy\Block;
-use App\Models\Liturgy\Item;
-use App\Models\LiturgyInfo;
 use App\Models\People\Participant;
 use App\Models\Sermon;
 use App\Models\Service;
-use App\Services\LiturgyService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class LiturgyEditorController extends Controller
 {
@@ -63,6 +61,7 @@ class LiturgyEditorController extends Controller
         $autoFocusItem = $request->get('autoFocusItem', null);
         $ministries = $this->getAvailableMinistries();
         $markers = Replacement::getList();
+
         return Inertia::render(
             'liturgyEditor',
             compact('service', 'liturgySheets', 'autoFocusBlock', 'autoFocusItem', 'ministries', 'markers')
@@ -84,55 +83,53 @@ class LiturgyEditorController extends Controller
                 );
             }
         }
+
         return redirect()->back();
     }
 
     /**
      * Download a rendered LiturgySheet
-     * @param Request $request
-     * @param Service $service
-     * @param $key
-     * @return \Illuminate\Http\RedirectResponse
+     *
+     * @return RedirectResponse
      */
     public function download(Request $request, Service $service, $key)
     {
-        if (!Auth::check() && !$request->hasValidSignature()) {
+        if (! Auth::check() && ! $request->hasValidSignature()) {
             abort(401);
         }
 
-        $class = 'App\\Liturgy\\LiturgySheets\\' . $key . 'LiturgySheet';
-        if (!class_exists($class)) {
+        $class = 'App\\Liturgy\\LiturgySheets\\'.$key.'LiturgySheet';
+        if (! class_exists($class)) {
             abort(404);
         }
 
         /** @var AbstractLiturgySheet $sheet */
-        $sheet = new $class();
-        if ((null !== $sheet->getConfigurationPage()) && (!$request->has('config'))) {
+        $sheet = new $class;
+        if (($sheet->getConfigurationPage() !== null) && (! $request->has('config'))) {
             return redirect()->route('liturgy.configure', ['service' => $service->slug, 'key' => $key]);
         }
 
-        if (null !== $sheet->getConfigurationPage()) {
+        if ($sheet->getConfigurationPage() !== null) {
             $sheet->setConfiguration($request->get('config', []));
         }
+
         return $sheet->render($service);
     }
 
     /**
      * Show the configuration page for a LiturgySheet
-     * @param Request $request
-     * @param Service $service
-     * @param $key
-     * @return \Inertia\Response
+     *
+     * @return Response
      */
     public function configureLiturgySheet(Request $request, Service $service, $key)
     {
         Gate::authorize('update', $service);
-        $class = 'App\\Liturgy\\LiturgySheets\\' . $key . 'LiturgySheet';
-        if (!class_exists($class)) {
+        $class = 'App\\Liturgy\\LiturgySheets\\'.$key.'LiturgySheet';
+        if (! class_exists($class)) {
             abort(404);
         }
         /** @var AbstractLiturgySheet $sheet */
-        $sheet = new $class();
+        $sheet = new $class;
 
         $sheetConfig = [
             'key' => $sheet->getKey(),
@@ -148,20 +145,18 @@ class LiturgyEditorController extends Controller
     /**
      * Return content data for a liturgy sheet dialog.
      *
-     * @param Service $service
-     * @param string $key
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function liturgySheetDialogData(Service $service, string $key)
     {
         Gate::authorize('update', $service);
-        $class = 'App\\Liturgy\\LiturgySheets\\' . $key . 'LiturgySheet';
-        if (!class_exists($class)) {
+        $class = 'App\\Liturgy\\LiturgySheets\\'.$key.'LiturgySheet';
+        if (! class_exists($class)) {
             abort(404);
         }
 
         /** @var AbstractLiturgySheet $sheet */
-        $sheet = new $class();
+        $sheet = new $class;
 
         return response()->json($sheet->getDialogData($service));
     }
@@ -183,11 +178,12 @@ class LiturgyEditorController extends Controller
         $services = [];
         foreach ($services3 as $service) {
             $service->load(['day', 'location']);
-            if (!$service->day == null)
-            $services[$service->dateTime->timestamp . $service->id] = [
-                'id' => $service->id,
-                'text' => trim(($service->day ? $service->date->format('d.m.Y') : '').' '.$service->timeText().' '.$service->titleText().' ('.$service->locationText.')'),
-            ];
+            if (! $service->day == null) {
+                $services[$service->dateTime->timestamp.$service->id] = [
+                    'id' => $service->id,
+                    'text' => trim(($service->day ? $service->date->format('d.m.Y') : '').' '.$service->timeText().' '.$service->titleText().' ('.$service->locationText.')'),
+                ];
+            }
         }
         krsort($services);
         $agendas1 = Service::with(['day'])->isTemplate()->get();
@@ -195,9 +191,10 @@ class LiturgyEditorController extends Controller
         foreach ($agendas1 as $agenda) {
             $agendas[] = [
                 'id' => $agenda->id,
-                'text' => $agenda->title.($agenda->source ? ' ('.$agenda->source.')' : '')
+                'text' => $agenda->title.($agenda->source ? ' ('.$agenda->source.')' : ''),
             ];
         }
+
         return response()->json(compact('services', 'agendas'));
     }
 
@@ -234,6 +231,7 @@ class LiturgyEditorController extends Controller
                 $newItem->save();
             }
         }
+
         return redirect()->route('liturgy.editor', $service->slug);
     }
 
@@ -250,11 +248,12 @@ class LiturgyEditorController extends Controller
         }
         ksort($recipients);
         $recipients = array_values($recipients);
+
         return response()->json(compact('recipients'));
     }
 
     /**
-     * @param $reqMinistries
+     * @param  $reqMinistries
      * @return array
      */
     protected function getAvailableMinistries()
@@ -271,10 +270,7 @@ class LiturgyEditorController extends Controller
                     $ministries[$ministry] = $ministry;
             }
         }
+
         return $ministries;
     }
-
-
-
-
 }

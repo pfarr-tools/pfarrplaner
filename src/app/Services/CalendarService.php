@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,11 +30,10 @@
 
 namespace App\Services;
 
-
 use App\Http\Resources\Calendar\CalendarAbsenceResource;
 use App\Http\Resources\Calendar\CalendarMonthServiceResource;
-use App\Models\Leave\Absence;
 use App\Models\Calendar\Day;
+use App\Models\Leave\Absence;
 use App\Models\People\User;
 use App\Models\Service;
 use Carbon\Carbon;
@@ -44,10 +43,7 @@ use Illuminate\Support\Facades\DB;
 
 class CalendarService
 {
-
     /**
-     * @param $year
-     * @param $month
      * @return Collection
      */
     public static function initializeMonth($year, $month)
@@ -67,20 +63,16 @@ class CalendarService
             }
             $today->addDay(1);
         }
+
         return $days;
     }
 
-
     /**
      * Get the location filter either from request or from a user setting
-     * @param Request $request
-     * @param $possibleLocations
-     * @param $user
-     * @return array
      */
     public static function getLocationsFilter(Request $request, $possibleLocations, $user): array
     {
-        if (!$user->hasSetting('calendar_filter_locations')) {
+        if (! $user->hasSetting('calendar_filter_locations')) {
             $user->setSetting('calendar_filter_locations', '');
         }
         if ($request->has('filter_location')) {
@@ -93,32 +85,31 @@ class CalendarService
                     }
                 )->pluck('id')->toArray();
             }
-            $user->setSetting('calendar_filter_locations', join(',', $filteredLocations));
+            $user->setSetting('calendar_filter_locations', implode(',', $filteredLocations));
         } else {
-            if ('' === $user->getSetting('calendar_filter_locations', '')) {
+            if ($user->getSetting('calendar_filter_locations', '') === '') {
                 return [];
             }
             $filteredLocations = explode(',', $user->getSetting('calendar_filter_locations', []));
         }
+
         return $filteredLocations;
     }
 
-
     /**
-     * @param Carbon $start
-     * @param Carbon $end
      * @return array
+     *
      * @throws Exception
      */
     public static function getHolidays(Carbon $start, Carbon $end)
     {
         try {
             $url = 'https://openholidaysapi.org/SchoolHolidays?countryIsoCode=DE&subdivisionCode=DE-'
-                . config('calendar.vacation_state')
-                . '&languageIsoCode=DE&validFrom='
-                . $start->format('Y-m-d')
-                . '&validTo='
-                . $end->format('Y-m-d');
+                .config('calendar.vacation_state')
+                .'&languageIsoCode=DE&validFrom='
+                .$start->format('Y-m-d')
+                .'&validTo='
+                .$end->format('Y-m-d');
 
             $raw = json_decode(file_get_contents($url), true);
         } catch (\ErrorException $e) {
@@ -132,13 +123,15 @@ class CalendarService
                 'name' => $holiday['name'][0]['text'],
             ];
         }
+
         return $holidays;
     }
 
     /**
      * Get the start of a year or month as Carbon object
-     * @param Carbon|int $year Year
-     * @param null|int $month Month
+     *
+     * @param  Carbon|int  $year  Year
+     * @param  null|int  $month  Month
      * @return Carbon Start of year/month
      */
     public static function getStartOfPeriod($year, $month = null)
@@ -146,12 +139,12 @@ class CalendarService
         if (is_a($year, Carbon::class)) {
             return $year->setDay(1)->setTime(0, 0, 0);
         }
-        if (!$month) {
-            list($year, $month) = explode('-', $year);
+        if (! $month) {
+            [$year, $month] = explode('-', $year);
         }
-        return new Carbon($year . '-' . $month . '-01 0:00:00');
-    }
 
+        return new Carbon($year.'-'.$month.'-01 0:00:00');
+    }
 
     public static function addMissingDefaultDays($date, $days)
     {
@@ -163,14 +156,13 @@ class CalendarService
             }
             $currentDate->addDay(1);
         }
+
         return $days->unique()->sort();
     }
 
     /**
      * Build the compact month payload for the calendar view.
      *
-     * @param Carbon $date
-     * @param User $user
      * @return array<string, mixed>
      */
     public static function buildMonthPayload(Carbon $date, User $user): array
@@ -205,8 +197,6 @@ class CalendarService
     /**
      * Initialize the day map for a calendar month.
      *
-     * @param Collection $dates
-     * @param Carbon $date
      * @return array<string, array<string, mixed>>
      */
     protected static function initializeMonthDayMap(Collection $dates, Carbon $date): array
@@ -240,8 +230,6 @@ class CalendarService
     /**
      * Load the services needed for the month view in one batch.
      *
-     * @param Carbon $date
-     * @param User $user
      * @return Collection<int, Service>
      */
     protected static function loadMonthServices(Carbon $date, User $user): Collection
@@ -270,9 +258,6 @@ class CalendarService
     /**
      * Load the absences shown in the month header.
      *
-     * @param Carbon $start
-     * @param Carbon $end
-     * @param User $user
      * @return Collection<int, Absence>
      */
     protected static function loadMonthAbsences(Carbon $start, Carbon $end, User $user): Collection
@@ -288,15 +273,14 @@ class CalendarService
     /**
      * Attach service data to the day map keyed by visible city.
      *
-     * @param array<string, array<string, mixed>> $days
-     * @param Collection<int, Service> $services
-     * @return void
+     * @param  array<string, array<string, mixed>>  $days
+     * @param  Collection<int, Service>  $services
      */
     protected static function addServicesToDays(array &$days, Collection $services): void
     {
         foreach ($services as $service) {
             $dayKey = $service->date->format('Y-m-d');
-            if (!isset($days[$dayKey])) {
+            if (! isset($days[$dayKey])) {
                 continue;
             }
 
@@ -308,7 +292,7 @@ class CalendarService
             $resource = (new CalendarMonthServiceResource($service))->resolve();
 
             foreach ($cityIds as $cityId) {
-                if (!isset($days[$dayKey]['services'][$cityId])) {
+                if (! isset($days[$dayKey]['services'][$cityId])) {
                     $days[$dayKey]['services'][$cityId] = [];
                 }
                 $days[$dayKey]['services'][$cityId][] = $resource;
@@ -319,11 +303,8 @@ class CalendarService
     /**
      * Attach absences to all affected days inside the month.
      *
-     * @param array<string, array<string, mixed>> $days
-     * @param Collection<int, Absence> $absences
-     * @param Carbon $monthStart
-     * @param Carbon $monthEnd
-     * @return void
+     * @param  array<string, array<string, mixed>>  $days
+     * @param  Collection<int, Absence>  $absences
      */
     protected static function addAbsencesToDays(array &$days, Collection $absences, Carbon $monthStart, Carbon $monthEnd): void
     {
@@ -345,7 +326,6 @@ class CalendarService
     /**
      * Build compact participant strings for a month service card.
      *
-     * @param Service $service
      * @return array<string, string>
      */
     protected static function buildParticipantText(Service $service): array
@@ -354,7 +334,7 @@ class CalendarService
 
         foreach ($service->participants->groupBy('pivot.category') as $category => $participants) {
             $result[$category] = $participants->map(function ($participant) {
-                return trim(join(' ', array_filter([
+                return trim(implode(' ', array_filter([
                     $participant->title,
                     $participant->first_name,
                     $participant->last_name,
@@ -364,5 +344,4 @@ class CalendarService
 
         return $result;
     }
-
 }

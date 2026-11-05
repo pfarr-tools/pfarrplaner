@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,15 +39,12 @@
 |
 */
 
-
-
 use App\Http\Controllers\WeddingController;
 
 Route::post('/wedding/done/{wedding}', [WeddingController::class, 'done'])->name('wedding.done');
 Route::post('weddings/{wedding}/attachment', [WeddingController::class, 'attach'])->name('wedding.attach');
 Route::delete('weddings/{wedding}/attachment/{attachment}', [WeddingController::class, 'detach'])->name('wedding.detach');
 Route::get('/wedding/add/{service}', [WeddingController::class, 'add'])->name('wedding.add')->middleware('auth');
-
 
 // Wizard
 Route::get('/wedding/wizard', [WeddingController::class, 'wizard'])->name('weddings.wizard');

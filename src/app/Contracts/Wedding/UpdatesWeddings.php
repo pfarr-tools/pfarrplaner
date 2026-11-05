@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,11 +18,5 @@ use App\Models\Rites\Wedding;
 
 interface UpdatesWeddings
 {
-    /**
-     * @param User $user
-     * @param Wedding $wedding
-     * @param array $input
-     * @return Wedding
-     */
     public function update(User $user, Wedding $wedding, array $input): Wedding;
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
 use App\Documents\Word\DefaultWordDocument;
 use App\Models\Liturgy\Item;
 use App\Models\Service;
@@ -40,11 +39,14 @@ use PhpOffice\PhpWord\Shared\Html;
 class SermonTextLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Text der Predigt';
+
     protected $icon = 'fa fa-file-word';
 
-    /** @var Service $service */
+    /** @var Service */
     protected $service = null;
+
     protected $extension = 'docx';
+
     protected $privileged = true;
 
     public function __construct()
@@ -56,16 +58,16 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
     {
         $this->service = $service;
 
-        $doc = new DefaultWordDocument();
+        $doc = new DefaultWordDocument;
         $this->setProperties($doc);
-
 
         // heading
 
-
         if (($this->service) && ($this->service->sermon)) {
             $doc->getSection()->addTitle($this->service->sermon->title, 1);
-            if ($this->service->sermon->subtitle) $doc->getSection()->addTitle($this->service->sermon->subtitle, 2);
+            if ($this->service->sermon->subtitle) {
+                $doc->getSection()->addTitle($this->service->sermon->subtitle, 2);
+            }
             $doc->getSection()->addTextBreak();
         }
 
@@ -77,7 +79,7 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
             }
         }
 
-        return $doc->sendToBrowser($this->getFileName($service, (($this->service) && ($this->service->sermon) ? ' - ' . $this->service->sermon->title : '')));
+        return $doc->sendToBrowser($this->getFileName($service, (($this->service) && ($this->service->sermon) ? ' - '.$this->service->sermon->title : '')));
     }
 
     protected function setProperties(DefaultWordDocument $doc)
@@ -85,20 +87,19 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
         $properties = $doc->getPhpWord()->getDocInfo();
         $properties->setCreator(Auth::user()->fullName());
         $properties->setCompany(Auth::user()->office ?? '');
-        $properties->setTitle($this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi') . ' ' . $this->getFileTitle());
-        $properties->setDescription($this->getFileTitle() . ' (' . $this->title . ')');
+        $properties->setTitle($this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi').' '.$this->getFileTitle());
+        $properties->setDescription($this->getFileTitle().' ('.$this->title.')');
         $properties->setCategory('Gottesdienste');
         $properties->setLastModifiedBy(Auth::user()->fullName());
         $properties->setSubject('Komplette Liturgie');
     }
 
-
     protected function renderSermonItem(DefaultWordDocument $doc, Item $item)
     {
-        if (null === $this->service->sermon) {
+        if ($this->service->sermon === null) {
             $doc->renderNormalText('Für diesen Gottesdienst wurde noch keine Predigt angelegt.', ['italic' => true]);
         } else {
-            if (!$this->service->sermon->text) {
+            if (! $this->service->sermon->text) {
                 return;
             }
             $text = strtr($this->service->sermon->text, [
@@ -109,7 +110,7 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
             ]);
             $dom = DefaultWordDocument::createDomDocumentFromHtml($text);
             $body = $dom->getElementsByTagName('body')->item(0);
-            if (!$body) {
+            if (! $body) {
                 return;
             }
             $nodes = [];
@@ -125,13 +126,11 @@ class SermonTextLiturgySheet extends AbstractLiturgySheet
                 } else {
                     Html::addHtml(
                         $doc->getSection(),
-                        '<body>' . str_replace('<br>', '<br />', $dom->saveHTML($node)) . '</body>'
+                        '<body>'.str_replace('<br>', '<br />', $dom->saveHTML($node)).'</body>'
                     );
                 }
-                $nodes[] = $node->nodeName . ' -> ' . $node->nodeValue;
+                $nodes[] = $node->nodeName.' -> '.$node->nodeValue;
             }
         }
     }
-
-
 }

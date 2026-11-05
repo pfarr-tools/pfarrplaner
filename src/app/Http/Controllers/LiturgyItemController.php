@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,16 +30,15 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Liturgy\Block;
 use App\Models\Liturgy\Item;
 use App\Models\Service;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class LiturgyItemController extends Controller
 {
-
     /**
      * LiturgyItemController constructor.
      */
@@ -49,10 +48,7 @@ class LiturgyItemController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param Service $service
-     * @param Block $block
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(Request $request, Service $service, Block $block)
     {
@@ -68,15 +64,12 @@ class LiturgyItemController extends Controller
             $item->performTypeSpecificActionsOnCreate();
             $item->save();
         }
+
         return redirect()->route('liturgy.editor', ['service' => $service->slug, 'autoFocusBlock' => $block->id, 'autoFocusItem' => $item->id]);
     }
 
     /**
-     * @param Request $request
-     * @param Service $service
-     * @param Block $block
-     * @param Item $item
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(Request $request, Service $service, Block $block, Item $item)
     {
@@ -90,15 +83,12 @@ class LiturgyItemController extends Controller
             $item->performTypeSpecificActionsOnUpdate();
             $item->save();
         }
+
         return redirect()->route('liturgy.editor', $service->slug);
     }
 
     /**
-     * @param Request $request
-     * @param Service $service
-     * @param Block $block
-     * @param Item $item
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function destroy(Request $request, Service $service, Block $block, Item $item)
     {
@@ -106,13 +96,12 @@ class LiturgyItemController extends Controller
         abort_unless((int) $block->service_id === (int) $service->id, 404);
         abort_unless((int) $item->liturgy_block_id === (int) $block->id, 404);
         $item->delete();
+
         return redirect()->route('liturgy.editor', $service->slug);
     }
 
     /**
      * Validate the request
-     * @param Request $request
-     * @return array
      */
     protected function validateRequest(Request $request): array
     {
@@ -126,5 +115,4 @@ class LiturgyItemController extends Controller
             ]
         );
     }
-
 }

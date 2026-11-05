@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,13 +37,7 @@
 
 namespace App\Reports;
 
-
-use App\Imports\EventCalendarImport;
-use App\Imports\OPEventsImport;
 use App\Models\Calendar\Occurence;
-use App\Models\Places\City;
-use App\Models\Service;
-use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -51,26 +45,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class EmbedEventsTableReport
- * @package App\Reports
  */
 class EmbedEventsTableReport extends AbstractEmbedReport
 {
-
     /**
      * @var string
      */
     public $title = 'Liste von aktuellen Veranstaltungen';
+
     /**
      * @var string
      */
     public $group = 'Website (Gemeindebaukasten)';
+
     /**
      * @var string
      */
     public $description = 'Erzeugt HTML-Code für die Einbindung einer Veranstaltungsliste in die Website der Gemeinde';
+
     /**
      * @var string
      */
@@ -79,16 +75,16 @@ class EmbedEventsTableReport extends AbstractEmbedReport
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
+
         return Inertia::render('Report/EmbedEventsTable/Setup', compact('cities'));
     }
 
     /**
-     * @param Request $request
      * @return Application|Factory|View|string
      */
     public function render(Request $request)
@@ -101,7 +97,7 @@ class EmbedEventsTableReport extends AbstractEmbedReport
             ]
         );
 
-            $cities = $data['cities'];
+        $cities = $data['cities'];
         $days = $request->get('numDays');
         $corsOrigin = $request->get('cors-origin');
         $report = $this->getKey();
@@ -116,25 +112,25 @@ class EmbedEventsTableReport extends AbstractEmbedReport
         return Inertia::render('Report/EmbedEventsTable/Render', compact('html', 'title'));
     }
 
-
     /**
-     * @param Request $request
      * @return Application|Factory|View
      */
     public function embed(Request $request)
     {
 
         $cityIds = $request->get('cities', [$request->get('city')]);
-        if (empty($cityIds)) abort(404);
+        if (empty($cityIds)) {
+            abort(404);
+        }
 
         $days = $request->get('days', 8);
 
         $start = Carbon::now('Europe/Berlin')->startOfDay();
-        $end = $start->copy()->addDays((int)$days)->endOfDay();
+        $end = $start->copy()->addDays((int) $days)->endOfDay();
 
         $events = Occurence::with('event')
             ->between($start, $end)
-            ->whereHas('service', function($query) use ($cityIds) {
+            ->whereHas('service', function ($query) use ($cityIds) {
                 $query->inCities($cityIds)->displayable();
             })
             ->orderBy('start')

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -42,19 +42,11 @@ class CreateBaptism extends AbstractCreateAction implements CreatesBaptisms
 {
     use NormalizesBaptismData;
 
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return '';
     }
 
-    /**
-     * @param User $user
-     * @param array $input
-     * @return Baptism
-     */
     public function create(User $user, array $input): Baptism
     {
         Gate::forUser($user)->authorize('create', Baptism::class);

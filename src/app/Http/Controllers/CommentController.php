@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,7 +39,6 @@ use Illuminate\Http\Response;
 
 /**
  * Class CommentController
- * @package App\Http\Controllers
  */
 class CommentController extends Controller
 {
@@ -51,7 +50,6 @@ class CommentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
      * @return Response
      */
     public function store(Request $request)
@@ -59,23 +57,23 @@ class CommentController extends Controller
         try {
             $creator = app(CreatesComments::class);
             $comment = $creator->create($request->user(), $request->all());
+
             return response()->json($comment);
         } catch (AuthorizationException $exception) {
             return response()->json(['message' => $exception->getMessage()], 401);
         }
     }
 
-
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $modelId
      * @return Response
      */
     public function destroy(int $modelId)
     {
         $comment = Comment::findOrFail($modelId);
         app(DeletesComments::class)->delete(request()->user(), $comment);
+
         return '<div class="alert alert-success alert-dismissible alertCommentDeleted"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Der Kommentar wurde gelöscht.</div>';
     }
 }

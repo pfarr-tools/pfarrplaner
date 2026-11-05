@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,8 +30,8 @@
 
 namespace App\Events\Models\Location;
 
-use App\Models\People\User;
 use App\Models\Location;
+use App\Models\People\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -40,19 +40,15 @@ class CreatedLocation
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /** @var User $user */
+    /** @var User */
     protected $user;
 
-    /** @var Location $location */
+    /** @var Location */
     protected $location;
-
 
     public function __construct(User $user, Location $location)
     {
         $this->user = $user;
         $this->location = $location;
     }
-
-
-
 }

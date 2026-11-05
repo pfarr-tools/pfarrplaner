@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -14,14 +15,12 @@ namespace App\Liturgy\Bible;
 
 class ReferenceParser extends \Peregrinus\BibleReferenceParser\ReferenceParser
 {
-    /**
-     * @return ReferenceParser
-     */
     public static function getInstance(): ReferenceParser
     {
-        if (null === static::$instance) {
-            static::$instance = new self();
+        if (static::$instance === null) {
+            static::$instance = new self;
         }
+
         return static::$instance;
     }
 

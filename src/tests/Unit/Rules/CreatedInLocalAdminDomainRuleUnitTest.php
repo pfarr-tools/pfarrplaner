@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -22,20 +23,20 @@ class CreatedInLocalAdminDomainRuleUnitTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testRuleInstantiates(): void
+    public function test_rule_instantiates(): void
     {
-        $rule = new CreatedInLocalAdminDomainRule();
+        $rule = new CreatedInLocalAdminDomainRule;
         $this->assertInstanceOf(CreatedInLocalAdminDomainRule::class, $rule);
     }
 
-    public function testMessageReturnsString(): void
+    public function test_message_returns_string(): void
     {
-        $rule = new CreatedInLocalAdminDomainRule();
+        $rule = new CreatedInLocalAdminDomainRule;
         $this->assertIsString($rule->message());
         $this->assertNotEmpty($rule->message());
     }
 
-    public function testPassesReturnsFalseWhenNoAdminCityHasPermission(): void
+    public function test_passes_returns_false_when_no_admin_city_has_permission(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
@@ -43,13 +44,13 @@ class CreatedInLocalAdminDomainRuleUnitTest extends TestCase
         $user->cities()->attach($city->id, ['permission' => 'a']);
         $this->actingAs($user);
 
-        $rule = new CreatedInLocalAdminDomainRule();
+        $rule = new CreatedInLocalAdminDomainRule;
         // Value where city has 'n' permission → should fail
         $value = [$city->id => ['permission' => 'n']];
         $this->assertFalse($rule->passes('cities', $value));
     }
 
-    public function testPassesReturnsTrueWhenAdminCityHasPermission(): void
+    public function test_passes_returns_true_when_admin_city_has_permission(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
@@ -57,7 +58,7 @@ class CreatedInLocalAdminDomainRuleUnitTest extends TestCase
         $user->cities()->attach($city->id, ['permission' => 'a']);
         $this->actingAs($user);
 
-        $rule = new CreatedInLocalAdminDomainRule();
+        $rule = new CreatedInLocalAdminDomainRule;
         $value = [$city->id => ['permission' => 'write']];
         $this->assertTrue($rule->passes('cities', $value));
     }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@
 
 namespace App\Imports;
 
-
 use App\Models\Places\City;
 use Carbon\Carbon;
 use Exception;
@@ -48,17 +47,14 @@ use Psr\Http\Message\StreamInterface;
 
 /**
  * Class OPEventsImport
- * @package App\Imports
  */
 class OPEventsImport
 {
-
     /** @var City city */
     protected $city = null;
 
     /**
      * OPEventsImport constructor.
-     * @param City $city
      */
     public function __construct(City $city)
     {
@@ -66,25 +62,24 @@ class OPEventsImport
     }
 
     /**
-     * @param $events
-     * @param Carbon $start
-     * @param Carbon $end
-     * @param bool $removeMatching
+     * @param  bool  $removeMatching
      * @return mixed
      */
     public function mix($events, Carbon $start, Carbon $end, $removeMatching = false)
     {
-        if (empty($this->city->op_customer_token.$this->city->op_customer_key)) return $events;
+        if (empty($this->city->op_customer_token.$this->city->op_customer_key)) {
+            return $events;
+        }
 
         $myEvents = $this->getEvents();
         foreach ($myEvents as $myEvent) {
             $myEvent['record_type'] = 'OP_Event';
             $this->fixTimeAndDates($myEvent);
-            if (($myEvent['start']) <= $end && ((!isset($myEvent['end']) || ($myEvent['end'] >= $start)))) {
+            if (($myEvent['start']) <= $end && ((! isset($myEvent['end']) || ($myEvent['end'] >= $start)))) {
                 foreach ($myEvent['event_dates'] as $key => $date) {
                     $this->fixTimeAndDates($myEvent['event_dates'][$key]);
                 }
-                $myEvent['place'] = $myEvent['locationtitle'] . ($myEvent['locationlocation'] ? ', ' . $myEvent['locationlocation'] : '');
+                $myEvent['place'] = $myEvent['locationtitle'].($myEvent['locationlocation'] ? ', '.$myEvent['locationlocation'] : '');
 
                 // check for existing events
                 if ($removeMatching) {
@@ -105,65 +100,70 @@ class OPEventsImport
         }
 
         ksort($events);
+
         return $events;
     }
 
     /**
      * @return mixed
+     *
      * @throws GuzzleException
      */
     public function getEvents()
     {
-        if (empty($this->city->op_customer_token.$this->city->op_customer_key)) return [];
-        $url = 'https://backend.online-geplant.de/public/event/' . $this->city->op_customer_token . '/' . $this->city->op_customer_key;
-        $cacheKey = 'OPEventsImport_' . $url;
+        if (empty($this->city->op_customer_token.$this->city->op_customer_key)) {
+            return [];
+        }
+        $url = 'https://backend.online-geplant.de/public/event/'.$this->city->op_customer_token.'/'.$this->city->op_customer_key;
+        $cacheKey = 'OPEventsImport_'.$url;
         if (Cache::has($cacheKey)) {
             $events = Cache::get($cacheKey);
         } else {
             $events = $this->getUrl($url);
             Cache::put($cacheKey, $events, 900);
         }
+
         return $events;
     }
 
     /**
-     * @param $url
      * @return StreamInterface
+     *
      * @throws GuzzleException
      */
     public function getUrl($url)
     {
         // temporarily disabled:
         return [];
-        $client = new Client();
+        $client = new Client;
         $response = $client->request(
             'GET',
             $url,
             [
                 'headers' => [
-                    'Origin' => 'https://' . $this->city->op_domain,
-                    'Referer' => 'https://' . $this->city->op_domain,
-                ]
+                    'Origin' => 'https://'.$this->city->op_domain,
+                    'Referer' => 'https://'.$this->city->op_domain,
+                ],
             ]
         );
         $body = json_decode($response->getBody(), true);
+
         return $body['data'] ?? [];
     }
 
     /**
-     * @param $event
      * @throws Exception
      */
     protected function fixTimeAndDates(&$event)
     {
         $event['start'] = new Carbon($event['startdate'], 'Europe/Berlin');
-        if (null !== $event['timestart']) {
+        if ($event['timestart'] !== null) {
             $event['start']->setTimeFromTimeString($event['timestart']);
         }
         if ($event['enddate']) {
             $event['end'] = new Carbon($event['enddate'], 'Europe/Berlin');
         }
-        if (null !== $event['timeend']) {
+        if ($event['timeend'] !== null) {
             $event['end']->setTimeFromTimeString($event['timeend']);
         } else {
             unset($event['end']);

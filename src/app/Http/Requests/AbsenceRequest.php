@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,10 +39,8 @@ use Illuminate\Support\Facades\Gate;
 
 class AbsenceRequest extends FormRequest
 {
-
     /** @var Absence absence */
     protected $absence = null;
-
 
     /**
      * Determine if the user is authorized to make this request.
@@ -54,11 +52,11 @@ class AbsenceRequest extends FormRequest
         $routeName = $this->route() ? $this->route()->getName() : null;
         $absence = $this->resolveAbsence();
 
-        if (null === $absence) {
+        if ($absence === null) {
             return false;
         }
 
-        if ('absence.store' === $routeName) {
+        if ($routeName === 'absence.store') {
             return Gate::forUser($this->user())->check('create', [Absence::class, $absence]);
         }
 
@@ -77,7 +75,7 @@ class AbsenceRequest extends FormRequest
             'to' => ['required', $this->dateValueRule()],
             'reason' => 'required|string',
             'replacement_notes' => 'nullable|string',
-            'workflow_status' => 'int|in:' . Absence::STATUS_NEW,
+            'workflow_status' => 'int|in:'.Absence::STATUS_NEW,
             'sick_days' => 'nullable|bool',
             'internal_notes' => 'nullable|string',
         ];
@@ -86,49 +84,51 @@ class AbsenceRequest extends FormRequest
         }
 
         $this->resolveAbsence();
-        if (null === $this->absence) {
+        if ($this->absence === null) {
             return $rules;
         }
 
         // self-administrator?
         if ($this->user()->can('selfAdminister', $this->absence)) {
-            $rules['workflow_status'] = 'nullable|int|in:' . join(
-                    ',',
-                    [
-                        Absence::STATUS_SELF_ADMINISTERED,
-                        Absence::STATUS_SELF_ADMINISTERED_AND_APPROVED
-                    ]
-                );
+            $rules['workflow_status'] = 'nullable|int|in:'.implode(
+                ',',
+                [
+                    Absence::STATUS_SELF_ADMINISTERED,
+                    Absence::STATUS_SELF_ADMINISTERED_AND_APPROVED,
+                ]
+            );
             $rules['approved_at'] = 'nullable|date_format:d.m.Y';
         } else {
             $mayCheck = $this->absence->user->vacationAdmins->pluck('id')->contains($this->user()->id);
             $mayApprove = $this->absence->user->vacationApprovers->pluck('id')->contains($this->user()->id);
             if ($mayCheck) {
-                $rules['workflow_status'] = 'nullable|int|in:' . join(
-                        ',',
-                        [Absence::STATUS_NEW, Absence::STATUS_CHECKED]
-                    );
+                $rules['workflow_status'] = 'nullable|int|in:'.implode(
+                    ',',
+                    [Absence::STATUS_NEW, Absence::STATUS_CHECKED]
+                );
                 $rules['admin_notes'] = 'nullable|string';
                 $rules['admin_id'] = 'nullable|int|exists:users,id';
             }
             if ($mayApprove) {
-                $rules['workflow_status'] = 'nullable|int|in:' . join(
-                        ',',
-                        [
-                            Absence::STATUS_NEW,
-                            Absence::STATUS_CHECKED,
-                            Absence::STATUS_APPROVED
-                        ]
-                    );
+                $rules['workflow_status'] = 'nullable|int|in:'.implode(
+                    ',',
+                    [
+                        Absence::STATUS_NEW,
+                        Absence::STATUS_CHECKED,
+                        Absence::STATUS_APPROVED,
+                    ]
+                );
                 $rules['approver_notes'] = 'nullable|string';
                 $rules['approver_id'] = 'nullable|int|exists:users,id';
             }
         }
+
         return $rules;
     }
 
     /**
      * Get the validated data
+     *
      * @return array|void
      */
     public function validated($key = null, $default = null)
@@ -139,7 +139,9 @@ class AbsenceRequest extends FormRequest
         $data['to'] = $this->normalizePlannerDate($data['to'], true);
 
         if (isset($data['approved_at'])) {
-            if (strlen($data['approved_at']) == 10) $data['approved_at'] .= ' 0:00:00';
+            if (strlen($data['approved_at']) == 10) {
+                $data['approved_at'] .= ' 0:00:00';
+            }
             $data['approved_at'] = Carbon::parse($data['approved_at']);
         }
 
@@ -151,31 +153,31 @@ class AbsenceRequest extends FormRequest
                 $data['checked_at'] = null;
                 $data['approved_at'] = null;
             }
-            if ($data['workflow_status'] >= Absence::STATUS_CHECKED && (null === $this->absence->admin_id)) {
+            if ($data['workflow_status'] >= Absence::STATUS_CHECKED && ($this->absence->admin_id === null)) {
                 $data['admin_id'] = $this->user()->id;
                 $data['checked_at'] = Carbon::now();
             }
-            if ($data['workflow_status'] == Absence::STATUS_APPROVED && (null === $this->absence->approver_id)) {
+            if ($data['workflow_status'] == Absence::STATUS_APPROVED && ($this->absence->approver_id === null)) {
                 $data['approver_id'] = $this->user()->id;
                 $data['approved_at'] = Carbon::now();
             }
         }
+
         return $data;
     }
 
     /**
      * Resolve the absence that is being stored or updated.
-     *
-     * @return Absence|null
      */
     protected function resolveAbsence(): ?Absence
     {
-        if (null !== $this->absence) {
+        if ($this->absence !== null) {
             return $this->absence;
         }
 
         if ($this->has('id')) {
             $this->absence = Absence::find($this->get('id'));
+
             return $this->absence;
         }
 
@@ -184,7 +186,7 @@ class AbsenceRequest extends FormRequest
         }
 
         $user = User::find($this->get('user_id'));
-        if (null === $user) {
+        if ($user === null) {
             return null;
         }
 
@@ -199,13 +201,11 @@ class AbsenceRequest extends FormRequest
 
     /**
      * Validate a planner date value in ISO or legacy d.m.Y format.
-     *
-     * @return Closure
      */
     protected function dateValueRule(): Closure
     {
         return function (string $attribute, mixed $value, Closure $fail): void {
-            if (null === $this->parsePlannerDate($value)) {
+            if ($this->parsePlannerDate($value) === null) {
                 $fail('Das Feld '.$attribute.' muss ein gueltiges Datum sein.');
             }
         };
@@ -213,13 +213,10 @@ class AbsenceRequest extends FormRequest
 
     /**
      * Normalize a planner date to a UTC calendar day.
-     *
-     * @param mixed $value
-     * @return Carbon|null
      */
     protected function normalizePlannerDate(mixed $value, bool $endOfDay = false): ?Carbon
     {
-        if (!is_string($value) || '' === trim($value)) {
+        if (! is_string($value) || trim($value) === '') {
             return null;
         }
 
@@ -230,7 +227,7 @@ class AbsenceRequest extends FormRequest
         }
 
         $date = $this->parsePlannerDate($value);
-        if (null === $date) {
+        if ($date === null) {
             return null;
         }
 
@@ -243,13 +240,10 @@ class AbsenceRequest extends FormRequest
 
     /**
      * Parse a planner date from ISO or legacy d.m.Y input.
-     *
-     * @param mixed $value
-     * @return Carbon|null
      */
     protected function parsePlannerDate(mixed $value): ?Carbon
     {
-        if (!is_string($value) || '' === trim($value)) {
+        if (! is_string($value) || trim($value) === '') {
             return null;
         }
 
@@ -273,21 +267,13 @@ class AbsenceRequest extends FormRequest
         }
     }
 
-    /**
-     * @return Absence
-     */
     public function getAbsence(): ?Absence
     {
         return $this->absence;
     }
 
-    /**
-     * @param Absence $absence
-     */
     public function setAbsence(?Absence $absence): void
     {
         $this->absence = $absence;
     }
-
-
 }

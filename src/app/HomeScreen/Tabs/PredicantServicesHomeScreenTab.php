@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Auth;
 class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Offene Gottesdienste';
+
     protected $description = 'Zeigt Gottesdienste mit Bedarf an Prädikant:innen';
+
     protected $query = null;
 
     public function __construct($config = [])
@@ -38,6 +40,7 @@ class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
     public function getContent($data = [])
     {
         $data['services'] = $this->query->get();
+
         return parent::getContent($data);
     }
 
@@ -46,6 +49,7 @@ class PredicantServicesHomeScreenTab extends AbstractHomeScreenTab
         $data['services'] = $this->query->get();
         $data['count'] = count($data['services']);
         $data['cities'] = Auth::user()->visibleCities()->get();
+
         return new PredicantServicesTabResource(parent::toArray($data));
     }
 

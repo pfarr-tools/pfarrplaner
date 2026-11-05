@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,15 +36,14 @@ use App\Models\Places\City;
 use App\Models\Service;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 /**
  * Class ServiceFeatureTest
- * @package Tests\Feature
  */
 class ServiceFeatureTest extends TestCase
 {
-
     /** @var City */
     protected $city;
 
@@ -53,7 +52,7 @@ class ServiceFeatureTest extends TestCase
      *
      * @return void
      */
-    public function testServiceCanBeCreated()
+    public function test_service_can_be_created()
     {
         // this test is currently empty, since service creation is done via update method
         $this->assertTrue(true);
@@ -64,7 +63,7 @@ class ServiceFeatureTest extends TestCase
      *
      * @return void
      */
-    public function testServiceCanBeUpdated()
+    public function test_service_can_be_updated()
     {
         $city = (City::class)::factory()->create();
         $service = Service::factory()->create(['city_id' => $city]);
@@ -83,7 +82,7 @@ class ServiceFeatureTest extends TestCase
      *
      * @return void
      */
-    public function testServiceCannotBeUpdatedForCityWithoutWritePermissions()
+    public function test_service_cannot_be_updated_for_city_without_write_permissions()
     {
         $city = (City::class)::factory()->create();
         $service = Service::factory()->create(['city_id' => $city->id]);
@@ -102,7 +101,7 @@ class ServiceFeatureTest extends TestCase
      *
      * @return void
      */
-    public function testServiceCanBeDeleted()
+    public function test_service_can_be_deleted()
     {
         $service = Service::factory()->create(['city_id' => $this->city]);
         $this->assertCount(1, Service::all());
@@ -118,7 +117,7 @@ class ServiceFeatureTest extends TestCase
         Storage::fake('fake');
 
         $this->withoutMiddleware(Authenticate::class);
-        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        $this->app->make(PermissionRegistrar::class)->forgetCachedPermissions();
 
         Permission::firstOrCreate(['name' => 'gd-bearbeiten']);
         Permission::firstOrCreate(['name' => 'gd-allgemein-bearbeiten']);
@@ -131,5 +130,4 @@ class ServiceFeatureTest extends TestCase
         $this->user->givePermissionTo('gd-allgemein-bearbeiten');
         $this->user->writableCities()->attach($this->city);
     }
-
 }

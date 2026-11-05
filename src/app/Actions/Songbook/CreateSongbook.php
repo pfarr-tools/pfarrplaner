@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,19 +40,11 @@ use Illuminate\Support\Facades\Validator;
 
 class CreateSongbook extends AbstractCreateAction implements CreatesSongbooks
 {
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return route('admin.songbooks.index');
     }
 
-    /**
-     * @param User $user
-     * @param array $input
-     * @return Songbook
-     */
     public function create(User $user, array $input): Songbook
     {
         Gate::forUser($user)->authorize('create', Songbook::class);

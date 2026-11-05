@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,30 +28,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use App\Models\People\User;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 class MigrateHomescreentabsSetting extends Migration
 {
-
-    protected function migrateHomeScreenTabConfig($config) {
-        if (isset($config['migrated'])) return $config;
+    protected function migrateHomeScreenTabConfig($config)
+    {
+        if (isset($config['migrated'])) {
+            return $config;
+        }
         $newConfig = [];
         foreach ($config as $tabKey => $tab) {
-            $newConfig['tabs'][] = ['type' => $tabKey, 'config' => $tab ];
+            $newConfig['tabs'][] = ['type' => $tabKey, 'config' => $tab];
         }
         $newConfig['migrated'] = true;
+
         return $newConfig;
     }
 
-
-    protected function migrateBack($config) {
-        if (!isset($config['migrated'])) return $config;
+    protected function migrateBack($config)
+    {
+        if (! isset($config['migrated'])) {
+            return $config;
+        }
         $newConfig = [];
         foreach ($config as $tabKey => $tab) {
             $newConfig[$tab['type']] = $tab['config'];
         }
+
         return $newConfig;
     }
 
@@ -62,10 +67,10 @@ class MigrateHomescreentabsSetting extends Migration
      */
     public function up()
     {
-        foreach (\App\Models\People\User::all() as $user) {
+        foreach (User::all() as $user) {
             $setting = $user->getSetting('homeScreenTabsConfig', null);
             if ($setting) {
-                if (!isset($setting['migrated'])) {
+                if (! isset($setting['migrated'])) {
                     echo 'Migrating User #'.$user->id.'... ';
                     $user->setSetting('homeScreenTabsConfig', $this->migrateHomeScreenTabConfig($setting));
                     echo 'Done.'.PHP_EOL;
@@ -81,7 +86,7 @@ class MigrateHomescreentabsSetting extends Migration
      */
     public function down()
     {
-        foreach (\App\Models\People\User::all() as $user) {
+        foreach (User::all() as $user) {
             $setting = $user->getSetting('homeScreenTabsConfig', null);
             if ($setting) {
                 if (isset($setting['migrated'])) {

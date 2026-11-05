@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,7 +35,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Class FuneralStoreRequest
- * @package App\Http\Requests
  */
 class FuneralStoreRequest extends FormRequest
 {
@@ -105,13 +104,13 @@ class FuneralStoreRequest extends FormRequest
                 'baptism_date',
                 'confirmation_date',
                 'wedding_date',
-                'dod_spouse'
+                'dod_spouse',
             ] as $dateField
         ) {
-            if(isset($data[$dateField]) && (!empty($data[$dateField]))) {
+            if (isset($data[$dateField]) && (! empty($data[$dateField]))) {
                 $data[$dateField] = Carbon::createFromFormat(
-                'd.m.Y',
-                $data[$dateField]);
+                    'd.m.Y',
+                    $data[$dateField]);
             } else {
                 $data[$dateField] = null;
             }
@@ -125,7 +124,6 @@ class FuneralStoreRequest extends FormRequest
 
         return $data;
     }
-
 
     /**
      * Get the validation rules that apply to the request.

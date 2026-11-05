@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\AbstractCRUDController;
 use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
 use Carbon\Carbon;
@@ -43,18 +42,17 @@ class PoolmasterController extends AbstractCRUDController
     protected function getResourcesForEditor(Request $request, $model = null): array
     {
         $user = $request->get('user', $model ? $model->user_id : null);
-        if (!$user) abort (404);
+        if (! $user) {
+            abort(404);
+        }
 
         $user = User::findOrFail($user);
         $pools = $user->pools;
 
         $year = $request->get('year', Carbon::now()->year);
         $month = $request->get('month', Carbon::now()->month);
-        $date = Carbon::parse($year . '-' . $month . '-01')->startOfMonth();
-
+        $date = Carbon::parse($year.'-'.$month.'-01')->startOfMonth();
 
         return compact('date', 'user', 'pools');
     }
-
-
 }

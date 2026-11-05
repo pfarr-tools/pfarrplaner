@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,6 +32,7 @@ namespace App\Console\Commands\DevBuilder;
 
 use App\Services\PackageService;
 use Illuminate\Console\Command;
+
 class BuildManualPages extends Command
 {
     /**
@@ -122,8 +123,6 @@ class BuildManualPages extends Command
 
     /**
      * Write the license chapter with project license text and dependency licenses.
-     *
-     * @return void
      */
     protected function writeLicensePage(): void
     {
@@ -189,11 +188,11 @@ class BuildManualPages extends Command
             }
         }
 
-        if (!count($rows)) {
+        if (! count($rows)) {
             return 'Die Paketliste konnte nicht automatisch aus den Lizenzdateien gelesen werden. Erzeugen Sie sie mit `npm run licenses:update` neu.';
         }
 
-        usort($rows, fn($left, $right) => [$left[0], $left[1]] <=> [$right[0], $right[1]]);
+        usort($rows, fn ($left, $right) => [$left[0], $left[1]] <=> [$right[0], $right[1]]);
 
         $markdown = [
             '| Bereich | Paket | Version | Lizenz |',
@@ -201,7 +200,7 @@ class BuildManualPages extends Command
         ];
 
         foreach ($rows as $row) {
-            $markdown[] = '| '.implode(' | ', array_map(fn($value) => str_replace('|', '\\|', $value), $row)).' |';
+            $markdown[] = '| '.implode(' | ', array_map(fn ($value) => str_replace('|', '\\|', $value), $row)).' |';
         }
 
         return implode(PHP_EOL, $markdown);
@@ -213,7 +212,7 @@ class BuildManualPages extends Command
     protected function getRecentChanges(): string
     {
         $file = base_path('CHANGELOG.md');
-        if (!file_exists($file)) {
+        if (! file_exists($file)) {
             return 'Für diese Version liegt kein Änderungsprotokoll vor.';
         }
 
@@ -260,7 +259,8 @@ class BuildManualPages extends Command
         );
     }
 
-    protected function getTOC() {
+    protected function getTOC()
+    {
         $toc = [];
         foreach ($this->getAllPages() as $file) {
             $page = file_get_contents($file);
@@ -281,10 +281,11 @@ class BuildManualPages extends Command
         usort($toc, function ($a, $b) {
             return version_compare($a['number'], $b['number']);
         });
+
         return $toc;
     }
 
-    protected function outputTOCLevel($data, $level = 0, $prefix='')
+    protected function outputTOCLevel($data, $level = 0, $prefix = '')
     {
         $o = '';
         foreach ($data as $item) {
@@ -293,6 +294,7 @@ class BuildManualPages extends Command
                 : $item['number'].'. '.$item['title'];
             $o .= '* ['.$label.']('.$item['file'].')'.PHP_EOL;
         }
+
         return $o;
     }
 
@@ -310,5 +312,4 @@ class BuildManualPages extends Command
     {
         return $this->manualRoot().'/benutzerhandbuch';
     }
-
 }

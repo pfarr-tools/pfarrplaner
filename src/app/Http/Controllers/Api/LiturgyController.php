@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,25 +30,22 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Liturgy\Block;
 use App\Models\Liturgy\Item;
 use App\Models\Service;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
-class LiturgyController extends \App\Http\Controllers\Controller
+class LiturgyController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth:api');
     }
 
-    /**
-     * @param Request $request
-     * @param Service $service
-     */
     public function saveTreeState(Request $request, Service $service)
     {
         Gate::authorize('update', $service);
@@ -67,9 +64,9 @@ class LiturgyController extends \App\Http\Controllers\Controller
         }
         $service->refresh();
         $tree = $service->liturgyBlocks;
+
         return response()->json(compact('tree'));
     }
-
 
     public function importToTree(Request $request, Service $service, Service $source)
     {
@@ -97,15 +94,14 @@ class LiturgyController extends \App\Http\Controllers\Controller
             }
         }
         $service->refresh();
+
         return response()->json(['tree' => $service->liturgyBlocks]);
     }
 
-
     /**
      * Store a new block
-     * @param Request $request
-     * @param Service $service
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function storeBlock(Request $request, Service $service)
     {
@@ -114,39 +110,41 @@ class LiturgyController extends \App\Http\Controllers\Controller
         $data['service_id'] = $service->id;
         $data['sortable'] = count($service->liturgyBlocks);
         $block = Block::create($data);
+
         return response()->json($block);
     }
 
     /**
      * Update a block
-     * @param Request $request
-     * @param Service $service
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @param  Service  $service
+     * @return JsonResponse
      */
     public function updateBlock(Request $request, Block $block)
     {
         Gate::authorize('update', $block->service);
         $block->update($this->validateBlockRequest($request));
+
         return response()->json($block);
     }
 
     /**
      * Delete a block
-     * @param Block $block
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function destroyBlock(Block $block)
     {
         Gate::authorize('update', $block->service);
         $block->delete();
+
         return response()->json();
     }
 
     /**
      * Store a new item
-     * @param Request $request
-     * @param Block $block
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function storeItem(Request $request, Block $block)
     {
@@ -154,7 +152,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
         $data = $this->validateItemRequest($request);
         $data['liturgy_block_id'] = $block->id;
         $data['sortable'] = count($block->items);
-        if (!isset($data['responsible'])) {
+        if (! isset($data['responsible'])) {
             $data['responsible'] = [];
         }
 
@@ -165,19 +163,20 @@ class LiturgyController extends \App\Http\Controllers\Controller
             $item->save();
         }
         $item->refresh();
+
         return response()->json(
             [
                 'item' => $item,
                 'focusBlock' => $block->id,
-                'focusItem' => $item->id
+                'focusItem' => $item->id,
             ]
         );
     }
 
     /**
      * Assign responsible people to item
-     * @param Item $item
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function assignToItem(Request $request, Item $item)
     {
@@ -187,14 +186,14 @@ class LiturgyController extends \App\Http\Controllers\Controller
         unset($data['responsible']['api_token']);
         $item->data = $data;
         $item->save();
+
         return response()->json($item->data);
     }
 
     /**
      * Update an item
-     * @param Request $request
-     * @param Item $item
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function updateItem(Request $request, Item $item)
     {
@@ -204,6 +203,7 @@ class LiturgyController extends \App\Http\Controllers\Controller
         $item->data = $data['data'];
         $item->save();
         $item->refresh();
+
         return response()->json(compact('item'));
     }
 
@@ -211,15 +211,14 @@ class LiturgyController extends \App\Http\Controllers\Controller
     {
         Gate::authorize('update', $item->liturgyBlock->service);
         $item->delete();
+
         return response()->json();
     }
-
 
     /**
      * Return all import sources for a service.
      *
-     * @param int $serviceId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function sources(int $serviceId)
     {
@@ -258,24 +257,20 @@ class LiturgyController extends \App\Http\Controllers\Controller
                     $sources[] = [
                         'id' => $service->id,
                         'date' => $service->date->format('YmdHi'),
-                        'name' => $service->date->setTimezone('Europe/Berlin')->isoFormat('L, LT') . ' Uhr, ' . $service->locationText(),
+                        'name' => $service->date->setTimezone('Europe/Berlin')->isoFormat('L, LT').' Uhr, '.$service->locationText(),
                         'group' => 'Gottesdienste',
                     ];
                 }
             }
         }
 
-        usort($sources, function($a, $b) {
+        usort($sources, function ($a, $b) {
             return $a['date'] <=> $b['date'];
         });
 
         return response()->json($sources);
     }
 
-    /**
-     * @param Request $request
-     * @return array
-     */
     protected function validateItemRequest(Request $request): array
     {
         return $request->validate(
@@ -289,10 +284,6 @@ class LiturgyController extends \App\Http\Controllers\Controller
         );
     }
 
-    /**
-     * @param Request $request
-     * @return array
-     */
     protected function validateBlockRequest(Request $request): array
     {
         return $request->validate(
@@ -303,6 +294,4 @@ class LiturgyController extends \App\Http\Controllers\Controller
             ]
         );
     }
-
-
 }

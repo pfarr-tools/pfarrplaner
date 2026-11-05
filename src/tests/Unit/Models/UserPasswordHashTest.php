@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,7 +18,7 @@ use Tests\TestCase;
 
 class UserPasswordHashTest extends TestCase
 {
-    public function testAssigningAnExistingPasswordHashDoesNotHashItAgain(): void
+    public function test_assigning_an_existing_password_hash_does_not_hash_it_again(): void
     {
         $user = User::factory()->create();
         $hash = $user->getRawOriginal('password');
@@ -27,7 +28,7 @@ class UserPasswordHashTest extends TestCase
         $this->assertSame($hash, $user->getAttributes()['password']);
     }
 
-    public function testAssigningPlainTextPasswordAlwaysHashesIt(): void
+    public function test_assigning_plain_text_password_always_hashes_it(): void
     {
         $user = User::factory()->make();
 

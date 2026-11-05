@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,26 +36,19 @@ use Illuminate\Http\Request;
 
 /**
  * Class AttachmentController
- * @package App\Http\Controllers
  */
 class AttachmentController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-
-    /**
-     * @param Request $request
-     * @param int $modelId
-     */
     public function update(Request $request, int $modelId)
     {
         $attachment = Attachment::findOrFail($modelId);
         $attachment = app(UpdatesAttachments::class)->update($request->user(), $attachment, $request->all());
+
         return response()->json($attachment->attachable->attachments);
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -39,31 +40,31 @@ class AbsenceWebFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testIndexLoads(): void
+    public function test_index_loads(): void
     {
         $this->actingAs($this->user)
             ->get(route('absences.index', ['year' => date('Y'), 'month' => date('m')]))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Absences/Planner'));
+            ->assertInertia(fn (Assert $page) => $page->component('Absences/Planner'));
     }
 
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $absence = Absence::factory()->create(['user_id' => $this->user->id]);
         $this->actingAs($this->user)
             ->get(route('absence.edit', $absence->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Absences/AbsenceEditor'));
+            ->assertInertia(fn (Assert $page) => $page->component('Absences/AbsenceEditor'));
     }
 
-    public function testCreatePersistsSingleDayAbsenceAndRedirectsToEditor(): void
+    public function test_create_persists_single_day_absence_and_redirects_to_editor(): void
     {
         $this->actingAs($this->user);
 
         /** @var AbsenceController $controller */
         $controller = app(AbsenceController::class);
         $request = Request::create('/absences/2026/8/'.$this->user->id.'/2/create', 'GET');
-        $request->setUserResolver(fn() => $this->user);
+        $request->setUserResolver(fn () => $this->user);
 
         $response = $controller->create($request, 2026, 8, $this->user, 2);
 
@@ -78,7 +79,7 @@ class AbsenceWebFeatureTest extends TestCase
         $this->assertSame(route('absence.edit', $absence->id), $response->getTargetUrl());
     }
 
-    public function testCreatePersistsSelectedDateRangeInUtcAndRedirectsToEditor(): void
+    public function test_create_persists_selected_date_range_in_utc_and_redirects_to_editor(): void
     {
         $this->actingAs($this->user);
 
@@ -88,7 +89,7 @@ class AbsenceWebFeatureTest extends TestCase
             'fromDate' => '2026-08-02',
             'toDate' => '2026-08-03',
         ]);
-        $request->setUserResolver(fn() => $this->user);
+        $request->setUserResolver(fn () => $this->user);
 
         $response = $controller->create($request, 2026, 8, $this->user, 2);
 
@@ -101,7 +102,7 @@ class AbsenceWebFeatureTest extends TestCase
         $this->assertSame(route('absence.edit', $absence->id), $response->getTargetUrl());
     }
 
-    public function testPlannerDaysLimitsMultiMonthAbsenceToVisibleMonth(): void
+    public function test_planner_days_limits_multi_month_absence_to_visible_month(): void
     {
         $city = City::factory()->create();
         $this->user->update(['manage_absences' => 1]);
@@ -131,7 +132,7 @@ class AbsenceWebFeatureTest extends TestCase
         $this->assertFalse($septemberPayload[12]['show']);
     }
 
-    public function testPlannerPrefersRealAbsenceOverOverlappingPoolmasterEntry(): void
+    public function test_planner_prefers_real_absence_over_overlapping_poolmaster_entry(): void
     {
         $city = City::factory()->create();
         $pool = Pool::factory()->create(['name' => 'Oberes Gaeu']);
@@ -164,7 +165,7 @@ class AbsenceWebFeatureTest extends TestCase
         $this->assertArrayNotHasKey('poolmaster', $augustPayload[22]['absence']);
     }
 
-    public function testPlannerSplitsPoolmasterEntryAroundRealAbsence(): void
+    public function test_planner_splits_poolmaster_entry_around_real_absence(): void
     {
         $city = City::factory()->create();
         $pool = Pool::factory()->create(['name' => 'Oberes Gaeu']);
@@ -198,7 +199,7 @@ class AbsenceWebFeatureTest extends TestCase
         $this->assertSame(10, $augustPayload[22]['duration']);
     }
 
-    public function testReplacementTextSkipsAbsentUserAsPoolmaster(): void
+    public function test_replacement_text_skips_absent_user_as_poolmaster(): void
     {
         $pool = Pool::factory()->create(['name' => 'Oberes Gaeu']);
         $otherUser = User::factory()->create(['first_name' => 'Rainer', 'last_name' => 'Holweger']);
@@ -236,7 +237,7 @@ class AbsenceWebFeatureTest extends TestCase
         $this->assertStringNotContainsString('Thomas Cornelius', $text);
     }
 
-    public function testReplacementTextDoesNotLazyLoadAbsenceRelation(): void
+    public function test_replacement_text_does_not_lazy_load_absence_relation(): void
     {
         $pool = Pool::factory()->create(['name' => 'Oberes Gaeu']);
         $absence = Absence::factory()->create([

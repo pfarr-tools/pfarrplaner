@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,10 +25,6 @@ class SermonPolicy
      * Determine whether the user can update the sermon.
      *
      * A sermon is editable when the user may update each linked service.
-     *
-     * @param User $user
-     * @param Sermon $sermon
-     * @return bool
      */
     public function update(User $user, Sermon $sermon): bool
     {
@@ -38,7 +35,7 @@ class SermonPolicy
         }
 
         foreach ($sermon->services as $service) {
-            if (!$user->can('update', $service)) {
+            if (! $user->can('update', $service)) {
                 return false;
             }
         }

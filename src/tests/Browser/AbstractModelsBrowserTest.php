@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,6 +13,7 @@
 
 namespace Tests\Browser;
 
+use App\Models\AbstractModel;
 use Laravel\Dusk\Browser;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\AbstractModelBrowserTest;
@@ -19,7 +21,7 @@ use Tests\AbstractModelBrowserTest;
 class AbstractModelsBrowserTest extends AbstractModelBrowserTest
 {
     /**
-     * @return array<int, array{0: class-string<\App\Models\AbstractModel>}>
+     * @return array<int, array{0: class-string<AbstractModel>}>
      */
     public static function modelProvider(): array
     {
@@ -27,10 +29,11 @@ class AbstractModelsBrowserTest extends AbstractModelBrowserTest
     }
 
     #[DataProvider('modelProvider')]
-    public function testIndexRouteShowsModelContent(string $modelClass): void
+    public function test_index_route_shows_model_content(string $modelClass): void
     {
-        if (!static::hasGetRouteVerb($modelClass, 'index')) {
+        if (! static::hasGetRouteVerb($modelClass, 'index')) {
             $this->assertTrue(true);
+
             return;
         }
 
@@ -43,10 +46,11 @@ class AbstractModelsBrowserTest extends AbstractModelBrowserTest
     }
 
     #[DataProvider('modelProvider')]
-    public function testCreateRouteLoads(string $modelClass): void
+    public function test_create_route_loads(string $modelClass): void
     {
-        if (!static::hasGetRouteVerb($modelClass, 'create')) {
+        if (! static::hasGetRouteVerb($modelClass, 'create')) {
             $this->assertTrue(true);
+
             return;
         }
 
@@ -64,10 +68,11 @@ class AbstractModelsBrowserTest extends AbstractModelBrowserTest
     }
 
     #[DataProvider('modelProvider')]
-    public function testEditRouteShowsModelContent(string $modelClass): void
+    public function test_edit_route_shows_model_content(string $modelClass): void
     {
-        if (!static::hasGetRouteVerb($modelClass, 'edit')) {
+        if (! static::hasGetRouteVerb($modelClass, 'edit')) {
             $this->assertTrue(true);
+
             return;
         }
 
@@ -84,10 +89,11 @@ class AbstractModelsBrowserTest extends AbstractModelBrowserTest
     }
 
     #[DataProvider('modelProvider')]
-    public function testAdminModuleRouteIsVisible(string $modelClass): void
+    public function test_admin_module_route_is_visible(string $modelClass): void
     {
-        if (!static::shouldCheckAdminModule($modelClass)) {
+        if (! static::shouldCheckAdminModule($modelClass)) {
             $this->assertTrue(true);
+
             return;
         }
 
@@ -95,8 +101,9 @@ class AbstractModelsBrowserTest extends AbstractModelBrowserTest
         $config = $modelClass::getAdminModuleConfig();
         auth()->logout();
 
-        if (!$config) {
+        if (! $config) {
             $this->assertTrue(true);
+
             return;
         }
 

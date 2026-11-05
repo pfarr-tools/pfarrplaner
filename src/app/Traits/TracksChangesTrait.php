@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,16 +30,14 @@
 
 namespace App\Traits;
 
-
 /**
  * Trait TracksChangesTrait
- * @package App\Traits
  */
 trait TracksChangesTrait
 {
-
-    /** @var array $dataBeforeChanges Snapshot with original data */
+    /** @var array Snapshot with original data */
     public $dataBeforeChanges = [];
+
     /**
      * @var array
      */
@@ -47,6 +45,7 @@ trait TracksChangesTrait
 
     /**
      * Start tracking changed
+     *
      * @return void
      */
     public function trackChanges()
@@ -65,16 +64,16 @@ trait TracksChangesTrait
         $snapshot = $this->removeTimestamps(json_decode(json_encode($this), true));
         if (property_exists($this, 'appendsToTracking') && is_array($this->appendsToTracking)) {
             foreach ($this->appendsToTracking as $attribute) {
-                if (!isset($snapshot[$attribute])) {
+                if (! isset($snapshot[$attribute])) {
                     $snapshot[$attribute] = $this->$attribute;
                 }
             }
         }
+
         return $snapshot;
     }
 
     /**
-     * @param $array
      * @return mixed
      */
     protected function removeTimestamps($array)
@@ -88,6 +87,7 @@ trait TracksChangesTrait
                 unset($array[$key]);
             }
         }
+
         return $array;
     }
 
@@ -100,7 +100,8 @@ trait TracksChangesTrait
         $original = $this->dataBeforeChanges;
         unset($original['updated_at']);
         unset($snapshot['updated_at']);
-        return (json_encode($snapshot) != json_encode($original));
+
+        return json_encode($snapshot) != json_encode($original);
     }
 
     public function storeDiff()
@@ -110,6 +111,7 @@ trait TracksChangesTrait
 
     /**
      * Return all changed attributes and relations
+     *
      * @return array
      */
     public function diff()
@@ -122,14 +124,14 @@ trait TracksChangesTrait
 
         // set previously unset keys
         foreach ($snapshot as $key => $value) {
-            if (!isset($original[$key])) {
+            if (! isset($original[$key])) {
                 $original[$key] = '';
             }
         }
 
         foreach ($original as $key => $value) {
             // reset unset keys
-            if (!isset($snapshot[$key])) {
+            if (! isset($snapshot[$key])) {
                 $snapshot[$key] = '';
             }
             if (print_r($value, 1) != print_r($snapshot[$key], 1)) {
@@ -142,5 +144,4 @@ trait TracksChangesTrait
 
         return $diff;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,10 +24,7 @@ class MinistryRequestReportFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @return void
-     */
-    public function testServicesCanExcludeServicesWithAnExistingEntryForTheSelectedMinistry(): void
+    public function test_services_can_exclude_services_with_an_existing_entry_for_the_selected_ministry(): void
     {
         $city = City::factory()->create();
         $participant = User::factory()->create();
@@ -48,7 +46,7 @@ class MinistryRequestReportFeatureTest extends TestCase
             'only_open' => true,
         ]);
 
-        $response = (new MinistryRequestReport())->services($request);
+        $response = (new MinistryRequestReport)->services($request);
 
         $this->assertSame([$openService->id], collect($response->getData())->pluck('id')->all());
     }

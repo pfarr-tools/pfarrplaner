@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -16,7 +17,7 @@ use Laravel\Dusk\Browser;
 
 class InputsScreenshotTest extends ManualScreenshotTestCase
 {
-    public function testCaptureInputsIndex(): void
+    public function test_capture_inputs_index(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(

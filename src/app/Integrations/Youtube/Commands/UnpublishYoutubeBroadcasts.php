@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -65,7 +65,8 @@ class UnpublishYoutubeBroadcasts extends Command
         parent::__construct();
     }
 
-    protected function output($s) {
+    protected function output($s)
+    {
         $this->line($s);
         Log::info($s);
     }
@@ -80,7 +81,7 @@ class UnpublishYoutubeBroadcasts extends Command
         $cities = City::where('youtube_channel_url', '!=', '')->where('youtube_cutoff_days', '>', 0)->get();
         foreach ($cities as $city) {
 
-            $this->output('Checking videos for "' . $city->name . '"');
+            $this->output('Checking videos for "'.$city->name.'"');
             $youtube = YoutubeIntegration::get($city);
             $channelId = YoutubeHelper::getChannelId($city->youtube_channel_url);
 
@@ -103,8 +104,8 @@ class UnpublishYoutubeBroadcasts extends Command
                     $pubDate = (new Carbon($broadcast->getSnippet()->getScheduledStartTime()))
                         ->shiftTimezone('UTC')->setTimezone('Europe/Berlin');
                     if ($broadcast->getStatus()->getPrivacyStatus() == 'public') {
-                        $this->output('Unpublishing broadcast id ' . $broadcast->getId()
-                                      . ' (' . $pubDate->format('Y-m-d H:i:s').')'
+                        $this->output('Unpublishing broadcast id '.$broadcast->getId()
+                                      .' ('.$pubDate->format('Y-m-d H:i:s').')'
                         );
 
                         $status = $broadcast->getStatus();
@@ -113,8 +114,8 @@ class UnpublishYoutubeBroadcasts extends Command
 
                         $youtube->getYoutube()->liveBroadcasts->update('snippet,status,contentDetails', $broadcast);
                     } else {
-                        $this->output('Broadcast id ' . $broadcast->getId()
-                                      . ' (' . $pubDate->format('Y-m-d H:i:s').') is already unpublished.'
+                        $this->output('Broadcast id '.$broadcast->getId()
+                                      .' ('.$pubDate->format('Y-m-d H:i:s').') is already unpublished.'
                         );
                     }
                 } else {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -62,6 +62,7 @@ class OrphanKiller extends Command
      * @var string
      */
     protected $description = 'Remove orphaned records';
+
     protected $orphans = 0;
 
     /**
@@ -74,10 +75,11 @@ class OrphanKiller extends Command
         parent::__construct();
     }
 
-    public function findOrphans($class, $relatedClass) {
+    public function findOrphans($class, $relatedClass)
+    {
         $missingIds = $class::whereDoesntHave($relatedClass)->get()->pluck('id');
         foreach ($missingIds as $missingId) {
-            $this->line($class.' #'.$missingId.' doesn\'t have a parent record ('.$relatedClass.')' );
+            $this->line($class.' #'.$missingId.' doesn\'t have a parent record ('.$relatedClass.')');
             $class::find($missingId)->delete();
             $this->orphans++;
         }
@@ -113,7 +115,7 @@ class OrphanKiller extends Command
         $this->findOrphans(Parish::class, 'owningCity');
 
         // Participant
-        //$this->findOrphans(Participant::class, 'service');
+        // $this->findOrphans(Participant::class, 'service');
 
         // Replacement
         $this->findOrphans(Replacement::class, 'absence');
@@ -136,7 +138,6 @@ class OrphanKiller extends Command
 
         // UserSetting
         $this->findOrphans(UserSetting::class, 'user');
-
 
         // morphables: attachment, comment
 

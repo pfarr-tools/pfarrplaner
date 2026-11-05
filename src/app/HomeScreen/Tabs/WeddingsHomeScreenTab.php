@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,15 +30,17 @@
 
 namespace App\HomeScreen\Tabs;
 
-
 use App\Models\Rites\Wedding;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class WeddingsHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Trauungen';
+
     protected $description = 'Zeigt die anstehenden Trauungen';
+
     protected $query = null;
 
     public function __construct($config = [])
@@ -50,7 +52,10 @@ class WeddingsHomeScreenTab extends AbstractHomeScreenTab
 
     public function getTitle(): string
     {
-        if ($this->config['mine']) return 'Meine Trauungen';
+        if ($this->config['mine']) {
+            return 'Meine Trauungen';
+        }
+
         return parent::getTitle();
     }
 
@@ -62,6 +67,7 @@ class WeddingsHomeScreenTab extends AbstractHomeScreenTab
     public function getContent($data = [])
     {
         $data['weddings'] = $this->query->get();
+
         return parent::getContent($data);
     }
 
@@ -69,25 +75,27 @@ class WeddingsHomeScreenTab extends AbstractHomeScreenTab
     {
         $data['weddings'] = $this->query->get();
         $data['count'] = count($data['weddings']);
+
         return parent::toArray($data);
     }
 
-
     /**
      * Build the query
-     * @return \Illuminate\Database\Eloquent\Builder
+     *
+     * @return Builder
      */
-    public function buildQuery() {
+    public function buildQuery()
+    {
         $start = Carbon::now()->setTime(0, 0, 0);
         $end = Carbon::now()->addMonth(2);
 
         $order = $this->config['newestFirst'] ? 'DESC' : 'ASC';
 
-        $query =  Wedding::with(['service'])
+        $query = Wedding::with(['service'])
             ->select('weddings.*')
             ->join('services', 'weddings.service_id', 'services.id')
-            ->whereHas('service', function($service) {
-                if (!$this->config['excludeProcessed']) {
+            ->whereHas('service', function ($service) {
+                if (! $this->config['excludeProcessed']) {
                     $service->startingFrom(Carbon::now()->subWeeks(2));
                 } else {
                     $service->where(function ($q) {
@@ -107,10 +115,10 @@ class WeddingsHomeScreenTab extends AbstractHomeScreenTab
                 }
             })->orderBy('services.date', $order);
 
-        if ($this->config['excludeProcessed']) $query->where('processed', '!=', 1);
+        if ($this->config['excludeProcessed']) {
+            $query->where('processed', '!=', 1);
+        }
 
         return $query;
     }
-
-
 }

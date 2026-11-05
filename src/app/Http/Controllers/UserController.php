@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -33,7 +33,6 @@ namespace App\Http\Controllers;
 use App\Facades\Settings;
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
 use App\Http\Requests\UserRequest;
-use App\Services\MinistryService;
 use App\Models\Calendar\External\CalendarConnection;
 use App\Models\Location;
 use App\Models\Parish;
@@ -42,6 +41,7 @@ use App\Models\Places\City;
 use App\Models\Subscription;
 use App\Providers\AuthServiceProvider;
 use App\Rules\CreatedInLocalAdminDomainRule;
+use App\Services\MinistryService;
 use App\Traits\HandlesAttachedImageTrait;
 use App\Traits\HandlesAttachmentsTrait;
 use App\UI\Modules\Modules;
@@ -60,16 +60,13 @@ use Spatie\Permission\Models\Role;
 
 /**
  * Class UserController
- * @package App\Http\Controllers
  */
 class UserController extends Controller
 {
-
-    use HandlesAttachmentsTrait;
     use HandlesAttachedImageTrait;
+    use HandlesAttachmentsTrait;
 
     protected $model = User::class;
-
 
     public function __construct()
     {
@@ -97,15 +94,15 @@ class UserController extends Controller
             ->orderBy('first_name')
             ->orderBy('email');
 
-        if (!Auth::user()->isAdmin) {
+        if (! Auth::user()->isAdmin) {
             if (Auth::user()->adminCities->count()) {
                 // Local admin: can see anyone from his/her admin'd cities and people without homeCities
-                $userQuery->where(function($q) {
+                $userQuery->where(function ($q) {
                     $q->whereHas('homeCities', function ($q2) {
                         $q2->whereIn('cities.id', Auth::user()->homeCities->pluck('id'));
                     });
                 })->orWhere(function ($q) {
-                   $q->whereDoesntHave('homeCities');
+                    $q->whereDoesntHave('homeCities');
                 });
             } elseif (Auth::user()->can('benutzer-bearbeiten')) {
                 // Clerk: Can only see users
@@ -139,16 +136,16 @@ class UserController extends Controller
     public function create()
     {
         Gate::authorize('create', User::class);
-        $user = (new User())->load([
-                                       'homeCities',
-                                       'parishes',
-                                       'roles',
-                                       'cities',
-                                       'writableCities',
-                                       'adminCities',
-                                       'vacationAdmins',
-                                       'vacationApprovers',
-                                   ]);
+        $user = (new User)->load([
+            'homeCities',
+            'parishes',
+            'roles',
+            'cities',
+            'writableCities',
+            'adminCities',
+            'vacationAdmins',
+            'vacationApprovers',
+        ]);
 
         $cities = City::query()->select(['id', 'name'])->orderBy('name')->get();
 
@@ -189,13 +186,13 @@ class UserController extends Controller
         } else {
             $roles = Role::where('name', '!=', 'Super-Administrator:in')->get();
         }
+
         return $roles->sortBy('name');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param UserRequest $request
      * @return Response
      */
     public function store(UserRequest $request)
@@ -211,22 +208,21 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param User $user
      * @return \Inertia\Response
      */
     public function edit(User $user, Request $request)
     {
         Gate::authorize('update', $user);
         $user->load([
-                        'homeCities',
-                        'parishes',
-                        'roles',
-                        'cities',
-                        'writableCities',
-                        'adminCities',
-                        'vacationAdmins',
-                        'vacationApprovers',
-                    ]);
+            'homeCities',
+            'parishes',
+            'roles',
+            'cities',
+            'writableCities',
+            'adminCities',
+            'vacationAdmins',
+            'vacationApprovers',
+        ]);
         $cities = City::query()->select(['id', 'name'])->orderBy('name')->get();
         $adminCities = [];
         $adminCityIds = [];
@@ -239,7 +235,9 @@ class UserController extends Controller
 
         $cities = $user->homeCities->merge(collect($adminCities));
 
-        $roles = Role::all()->sortBy('name')->reject(function ($item) { return $item->name == 'Super-Administrator:in'; });
+        $roles = Role::all()->sortBy('name')->reject(function ($item) {
+            return $item->name == 'Super-Administrator:in';
+        });
 
         $parishes = Parish::inCities(Auth::user()->adminCities->pluck('id'))->get();
         $homescreen = $user->getSetting('homeScreen', 'route:calendar');
@@ -260,7 +258,6 @@ class UserController extends Controller
         $adminCities = $this->compactOptions($adminCities);
         $roles = $this->compactRoles($roles);
         $parishes = $this->compactOptions($parishes);
-
 
         $activeTab = $request->get('tab', 'home');
 
@@ -288,8 +285,6 @@ class UserController extends Controller
     /**
      * Build the small representation needed by the user overview.
      *
-     * @param User $user
-     * @param Collection $allCities
      * @return array<string, mixed>
      */
     protected function compactIndexUser(User $user, Collection $allCities): array
@@ -321,7 +316,6 @@ class UserController extends Controller
     /**
      * Build the representation needed by the user editor without serializing the model.
      *
-     * @param User $user
      * @return array<string, mixed>
      */
     protected function compactEditorUser(User $user): array
@@ -377,7 +371,6 @@ class UserController extends Controller
     /**
      * Convert a person to the fields used by person selectors.
      *
-     * @param User $user
      * @return array<string, mixed>
      */
     protected function compactPerson(User $user): array
@@ -396,7 +389,6 @@ class UserController extends Controller
     /**
      * Convert option models to the fields used by form select components.
      *
-     * @param iterable $options
      * @return array<int, array<string, mixed>>
      */
     protected function compactOptions(iterable $options): array
@@ -410,7 +402,6 @@ class UserController extends Controller
     /**
      * Convert relation models to their IDs.
      *
-     * @param iterable $records
      * @return array<int, int|string>
      */
     protected function compactIds(iterable $records): array
@@ -421,7 +412,6 @@ class UserController extends Controller
     /**
      * Convert roles and permissions to the fields used by the user interface.
      *
-     * @param iterable $roles
      * @return array<int, array<string, mixed>>
      */
     protected function compactRoles(iterable $roles): array
@@ -441,8 +431,6 @@ class UserController extends Controller
 
     /**
      * Load only the location fields needed for home-screen configuration.
-     *
-     * @return Collection
      */
     protected function locationsForUser(): Collection
     {
@@ -453,9 +441,7 @@ class UserController extends Controller
             ->get();
     }
 
-
     /**
-     * @param Request $request
      * @return \Inertia\Response
      */
     public function profile(Request $request)
@@ -500,7 +486,6 @@ class UserController extends Controller
     }
 
     /**
-     * @param Request $request
      * @return RedirectResponse
      */
     public function profileSave(Request $request)
@@ -513,10 +498,10 @@ class UserController extends Controller
         // change password?
         if ($request->has('new_password')) {
             $passwordData = $request->validate([
-                                                   'current_password' => 'required|hash:' . Auth::user()->password,
-                                                   'new_password' => 'required|string|min:6|confirmed|not_current_password|notIn:testtest',
-                                                   'new_password_confirmation' => 'required',
-                                               ]);
+                'current_password' => 'required|hash:'.Auth::user()->password,
+                'new_password' => 'required|string|min:6|confirmed|not_current_password|notIn:testtest',
+                'new_password_confirmation' => 'required',
+            ]);
             $user->update(['password' => $passwordData['new_password']]);
         }
 
@@ -534,16 +519,14 @@ class UserController extends Controller
             $user->setSetting('homeScreenTabsConfig', $request->get('homeScreenTabsConfig'));
         }
 
-
         return redirect()->route('home')->with('success', 'Die Änderungen wurden gespeichert.');
     }
-
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param int $id
+     * @param  Request  $request
+     * @param  int  $id
      * @return Response
      */
     public function update(UserRequest $request, User $user)
@@ -554,12 +537,12 @@ class UserController extends Controller
         $user->update($data);
         if (($user->email == '') && ($user->password != '')) {
             // this only works with a raw query!
-            DB::table('users')->where('id',$user->id)->update(['password' => null]);
+            DB::table('users')->where('id', $user->id)->update(['password' => null]);
             $user->update([
                 'manage_absences' => 0,
                 'needs_replacement' => 0,
                 'show_vacations_with_services' => 0,
-                          ]);
+            ]);
             $user->cities()->sync([]);
             $user->writableCities()->sync([]);
             $user->adminCities()->sync([]);
@@ -576,13 +559,11 @@ class UserController extends Controller
 
     /**
      * Update all user record relations from the request data
-     * @param UserRequest $request
-     * @param User $user
      */
     protected function updateUserDataFromRequest(UserRequest $request, User $user)
     {
-        $user->homeCities()->sync(collect($request->getRelationIdsForSync('home_cities', 'cities'))->reject(function ($item) use ($user, $request) {
-            return !((($user->homeCities ?? collect())->pluck('id')->contains($item)) || (Auth::user()->adminCities->pluck('id')->contains($item)));
+        $user->homeCities()->sync(collect($request->getRelationIdsForSync('home_cities', 'cities'))->reject(function ($item) use ($user) {
+            return ! ((($user->homeCities ?? collect())->pluck('id')->contains($item)) || (Auth::user()->adminCities->pluck('id')->contains($item)));
         }));
         $user->parishes()->sync($request->getRelationIdsForSync('parishes'));
         $user->syncRelatedUsers(
@@ -611,24 +592,23 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param User $user
      * @return Response
      */
     public function destroy(User $user)
     {
         Gate::authorize('delete', $user);
         $user->delete();
+
         return redirect()->route('users.index')->with('success', 'Der Benutzer wurde gelöscht.');
     }
 
-
     /**
-     * @param User $user
      * @return \Inertia\Response
      */
     public function join(User $user)
     {
         Gate::authorize('join', $user);
+
         return Inertia::render('Admin/User/Join', [
             'user' => $this->compactPerson($user),
             'people' => $this->compactPeople($user->id),
@@ -636,10 +616,8 @@ class UserController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param User $user1
-     * @param User $user2
      * @return RedirectResponse
+     *
      * @throws AuthorizationException
      */
     public function doJoin(Request $request, User $user1, User $user2)
@@ -647,7 +625,7 @@ class UserController extends Controller
         $this->authorize('merge', $user1);
         $this->authorize('merge', $user2);
 
-        if (null === $user1 || null === $user2) {
+        if ($user1 === null || $user2 === null) {
             return redirect()->route('home')->with('error', 'Ein Fehler ist aufgetreten.');
         }
 
@@ -659,9 +637,7 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Die Benutzer wurden zusammengeführt.');
     }
 
-
     /**
-     * @param User $user
      * @return RedirectResponse
      */
     public function switch(Request $request, User $user)
@@ -674,13 +650,16 @@ class UserController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
         Session::put('adminUserSwitchBack', $adminId);
+
         // save switch in session!
         return $this->switchRedirectResponse($request);
     }
 
     public function switchBack(Request $request)
     {
-        if (!Session::has('adminUserSwitchBack')) abort(403);
+        if (! Session::has('adminUserSwitchBack')) {
+            abort(403);
+        }
         $user = User::findOrFail(Session::get('adminUserSwitchBack'));
         Auth::logout();
         $request->session()->invalidate();
@@ -688,13 +667,13 @@ class UserController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
         Session::remove('adminUserSwitchBack');
+
         return $this->switchRedirectResponse($request);
     }
 
     /**
      * Force a full frontend reload after an impersonation change.
      *
-     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function switchRedirectResponse(Request $request)
@@ -718,21 +697,18 @@ class UserController extends Controller
         return redirect()->route('login');
     }
 
-
     /**
      * Check if the user is a local admin and has set city permissions
-     * @param Request $request
      */
     protected function validateCityPermissions(Request $request)
     {
         // Kept for backward compatibility with older call sites.
     }
 
-
     /**
      * Validate submitted data
-     * @param Request $request
-     * @param User|null $user
+     *
+     * @param  User|null  $user
      * @return array
      */
     protected function validateRequest(Request $request, $user = null, $withCity = false)
@@ -741,7 +717,7 @@ class UserController extends Controller
             'first_name' => 'nullable|string',
             'last_name' => 'required|string|max:255',
             'title' => 'nullable|string',
-            'email' => 'nullable|string|email|max:255|unique:users,email' . ($user ? ',' . $user->id : ''),
+            'email' => 'nullable|string|email|max:255|unique:users,email'.($user ? ','.$user->id : ''),
             'password' => 'nullable|string',
             'office' => 'nullable|string',
             'address' => 'nullable|string',
@@ -768,7 +744,7 @@ class UserController extends Controller
             // on create:
             if ($request->route()->getName() == 'user.store') {
                 // check if at least one permission is set
-                $rules['cityPermission'] = [new CreatedInLocalAdminDomainRule()];
+                $rules['cityPermission'] = [new CreatedInLocalAdminDomainRule];
 
                 // force setting a password
                 $rules['email'] = 'required|email';
@@ -819,7 +795,7 @@ class UserController extends Controller
         $keyIndex = [];
         foreach ($allUsers as $user) {
             if ($user->first_name && $user->last_name) {
-                $keyIndex['fl:' . mb_strtolower(trim($user->first_name)) . '|' . mb_strtolower(trim($user->last_name))][] = $user->id;
+                $keyIndex['fl:'.mb_strtolower(trim($user->first_name)).'|'.mb_strtolower(trim($user->last_name))][] = $user->id;
             }
         }
 
@@ -830,6 +806,7 @@ class UserController extends Controller
                 $parent[$x] = $parent[$parent[$x]];
                 $x = $parent[$x];
             }
+
             return $x;
         };
 
@@ -867,16 +844,18 @@ class UserController extends Controller
                 $user->duplicates = collect();
                 $user->fullNameText = $user->fullName(true);
                 $withoutDuplicates[] = $user;
+
                 continue;
             }
 
             // Official users (with accounts) are preferred as the keeper
-            $sorted = $group->sortByDesc(fn($u) => (int) $u->isOfficialUser)->values();
+            $sorted = $group->sortByDesc(fn ($u) => (int) $u->isOfficialUser)->values();
             $keeper = $sorted[0];
             $keeper->fullNameText = $keeper->fullName(true);
             $keeper->duplicates = $sorted->slice(1)->map(function ($u) {
                 $u->fullNameText = $u->fullName(true);
                 $u->duplicates = collect();
+
                 return $u;
             })->values();
             $possibleDuplicates[] = $keeper;
@@ -902,10 +881,12 @@ class UserController extends Controller
 
         foreach ($request->input('groups', []) as $group) {
             $target = User::find($group['target_id']);
-            if (!$target) continue;
+            if (! $target) {
+                continue;
+            }
 
-            if (!empty($group['name_update'])) {
-                $target->fill(array_filter($group['name_update'], fn($v) => $v !== null))->save();
+            if (! empty($group['name_update'])) {
+                $target->fill(array_filter($group['name_update'], fn ($v) => $v !== null))->save();
             }
 
             foreach ($group['source_ids'] as $sourceId) {
@@ -924,6 +905,7 @@ class UserController extends Controller
     {
         Gate::authorize('resetPassword', $user);
         $user->resetAccount();
+
         return redirect()->route('users.index')->with('success', 'Das Benutzerpasswort für '.$user->fullName().' wurde zurückgesetzt. Eine E-Mail mit neuen Zugangsdaten wurde an '.$user->email.' versandt.');
     }
 }

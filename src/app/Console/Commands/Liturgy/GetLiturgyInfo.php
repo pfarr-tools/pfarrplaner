@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,12 +30,9 @@
 
 namespace App\Console\Commands\Liturgy;
 
-use App\Models\LiturgyInfo;
 use App\Models\Service;
 use App\StudyHelpers\AbstractStudyHelper;
-use GuzzleHttp\Client;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Storage;
 
@@ -75,13 +72,13 @@ class GetLiturgyInfo extends Command
         // get StudyHelper providers
         $studyHelperProviders = [];
         foreach (\File::allFiles(app_path('StudyHelpers')) as $file) {
-            if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract'))) {
-                $className = substr('App\\StudyHelpers\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+            if (($file->getExtension() == 'php') && (! Str::contains($file->getPathname(), 'Abstract'))) {
+                $className = substr('App\\StudyHelpers\\'.Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
                 /** @var AbstractStudyHelper $studyHelperProvider */
                 $studyHelperProvider = new $className($this);
                 $studyHelperProviders[$studyHelperProvider->getKey()] = $studyHelperProvider;
             }
-        };
+        }
 
         $only = $this->option('only') ? explode(',', $this->option('only')) : [];
 
@@ -107,7 +104,7 @@ class GetLiturgyInfo extends Command
         foreach ($studyHelperProviders as $key => $studyHelperProvider) {
             if (empty($only) || in_array($key, $only)) {
                 $this->processItem($studyHelperProvider->title, function () use ($studyHelperProvider, &$data) {
-                   $data = $studyHelperProvider->assign($data);
+                    $data = $studyHelperProvider->assign($data);
                 });
             }
         }
@@ -120,8 +117,8 @@ class GetLiturgyInfo extends Command
         $this->line('Der liturgische Kalender wurde aktualisiert.');
     }
 
-
-    protected function processItem($title, $callback) {
+    protected function processItem($title, $callback)
+    {
         $this->getOutput()->write(Str::padRight($title, 75));
         $success = true;
         try {
@@ -130,6 +127,7 @@ class GetLiturgyInfo extends Command
             $success = false;
         }
         $this->getOutput()->writeln($success ? '[<info>OK</info>]' : '[<error>FAILED</error>]');
+
         return $result ?? null;
     }
 }

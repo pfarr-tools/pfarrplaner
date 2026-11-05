@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -69,18 +69,18 @@ class EventRecurrenceObserver
         }
         */
 
-//        if ($service->getOriginal('rrule') != $service->rrule) {
-            Occurence::where('service_id', $service->id)->delete();
-//        }
+        //        if ($service->getOriginal('rrule') != $service->rrule) {
+        Occurence::where('service_id', $service->id)->delete();
+        //        }
 
         // create default occurence
         Occurence::create([
             'service_id' => $service->id,
             'start' => $service->date,
             'end' => $service->date->copy()->addMinutes($service->duration),
-                          ]);
+        ]);
 
-//        if (($service->rrule) && ($service->getOriginal('rrule') != $service->rrule)) {
+        //        if (($service->rrule) && ($service->getOriginal('rrule') != $service->rrule)) {
         if ($service->rrule) {
             try {
                 $rrule = new Rule($service->rrule);
@@ -93,20 +93,20 @@ class EventRecurrenceObserver
             $rrule->setEndDate($service->date->copy()->setTimezone('Europe/Berlin')->addMinutes($service->duration)->toDateTime());
 
             // sanity check: no more than 5 years, no more than 5000 occurrences
-            if ((!$rrule->getCount()) && (!$rrule->getUntil())) {
+            if ((! $rrule->getCount()) && (! $rrule->getUntil())) {
                 $rrule->setUntil(Carbon::now()->startOfYear()->addYears(5));
             }
 
-            $transformer = new ArrayTransformer((new ArrayTransformerConfig())->setVirtualLimit(5000));
+            $transformer = new ArrayTransformer((new ArrayTransformerConfig)->setVirtualLimit(5000));
             $recurrences = $transformer->transform($rrule);
 
             foreach ($recurrences as $recurrence) {
-                if (!($recurrence->getStart() == $service->date)) {
+                if (! ($recurrence->getStart() == $service->date)) {
                     Occurence::create([
-                                          'service_id' => $service->id,
-                                          'start' => Carbon::instance($recurrence->getStart())->setTimezone('UTC'),
-                                          'end' => Carbon::instance($recurrence->getEnd())->setTimezone('UTC'),
-                                      ]);
+                        'service_id' => $service->id,
+                        'start' => Carbon::instance($recurrence->getStart())->setTimezone('UTC'),
+                        'end' => Carbon::instance($recurrence->getEnd())->setTimezone('UTC'),
+                    ]);
                 }
             }
         }

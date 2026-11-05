@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,32 +30,34 @@
 
 namespace App\Reports;
 
-use App\Models\Calendar\Day;
-use App\Services\FileNameService;
-use App\Services\MinistryService;
 use App\Models\Places\City;
 use App\Models\Service;
+use App\Services\FileNameService;
+use App\Services\MinistryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class MinistrySignupSheetReport extends AbstractPDFDocumentReport
 {
-
     public const FILE_SIGNATURE = '50.0';
-    public const FILE_TITLE = 'Leerer Dienstplan';
-    protected $landscape = true;
 
+    public const FILE_TITLE = 'Leerer Dienstplan';
+
+    protected $landscape = true;
 
     /**
      * @var string
      */
     public $title = 'Leerer Dienstplan';
+
     /**
      * @var string
      */
     public $group = 'Listen';
+
     /**
      * @var string
      */
@@ -64,36 +66,37 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->writableCities;
         $ministries = MinistryService::selectList();
+
         return Inertia::render('Report/MinistrySignupSheet/Setup', compact('cities', 'ministries'));
     }
 
     public function render(Request $request)
     {
         $data = $request->validate([
-                                       'cities.*' => 'required|int|exists:cities,id',
-                                       'ministries.*' => 'string',
-                                       'start' => 'required|date_format:d.m.Y',
-                                       'end' => 'required|date_format:d.m.Y',
-                                   ]);
+            'cities.*' => 'required|int|exists:cities,id',
+            'ministries.*' => 'string',
+            'start' => 'required|date_format:d.m.Y',
+            'end' => 'required|date_format:d.m.Y',
+        ]);
 
         foreach ($data['cities'] as $key => $id) {
             $data['cities'][$key] = City::find($id);
         }
         $data['cities'] = collect($data['cities']);
-        $data['start'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['start'] . ' 0:00:00');
-        $data['end'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['end'] . ' 23:59:00');
+        $data['start'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['start'].' 0:00:00');
+        $data['end'] = Carbon::createFromFormat('d.m.Y H:i:s', $data['end'].' 23:59:00');
         $data['services'] = Service::between($data['start'], $data['end'])
             ->inCities($data['cities']->pluck('id'))->ordered()->get();
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE . ' ' . join(', ', $data['ministries']),
+                static::FILE_TITLE.' '.implode(', ', $data['ministries']),
                 'pdf',
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']]
@@ -102,6 +105,4 @@ class MinistrySignupSheetReport extends AbstractPDFDocumentReport
             null
         );
     }
-
-
 }

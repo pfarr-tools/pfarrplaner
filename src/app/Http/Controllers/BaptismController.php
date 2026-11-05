@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,21 +39,20 @@ use App\Traits\HandlesAttachmentsTrait;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
-use Inertia\Inertia;
 
 /**
  * Class BaptismController
- * @package App\Http\Controllers
  */
 class BaptismController extends AbstractCRUDController
 {
-
     use HandlesAttachmentsTrait;
 
     protected string $modelClass = Baptism::class;
@@ -63,11 +62,10 @@ class BaptismController extends AbstractCRUDController
         $this->middleware('auth');
     }
 
-
     /**
      * Show the form for creating a new resource.
      *
-     * @param int $serviceId Service Id
+     * @param  int  $serviceId  Service Id
      * @return Response
      */
     public function create(Request $request)
@@ -79,21 +77,22 @@ class BaptismController extends AbstractCRUDController
         }
         $creator = app(Baptism::getContractName('create'));
         $baptism = $creator->create($request->user(), $request->all());
+
         return redirect()->route('baptisms.edit', $baptism->id);
     }
 
     /**
-     * @param Service $service
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function add(Service $service)
     {
         Gate::authorize('update', $service);
+
         return redirect()->route('baptisms.create', ['service_id' => $service->id]);
     }
 
     /**
-     * @param int $baptismFlag
+     * @param  int  $baptismFlag
      * @return mixed
      */
     protected function getBaptismalServices($baptismFlag = 1)
@@ -111,7 +110,7 @@ class BaptismController extends AbstractCRUDController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param Baptism $baptism
+     * @param  Baptism  $baptism
      * @return Response
      */
     protected function getResourcesForEditor(Request $request, $baptism = null): array
@@ -123,7 +122,7 @@ class BaptismController extends AbstractCRUDController
             ->startingFrom(Carbon::now())
             ->ordered();
         if ($baptism?->service_id) {
-            $baptismalServicesQuery->orWhere('services.id', (int)$baptism->service_id);
+            $baptismalServicesQuery->orWhere('services.id', (int) $baptism->service_id);
         }
         $baptismalServices = $baptismalServicesQuery->get();
 
@@ -138,18 +137,18 @@ class BaptismController extends AbstractCRUDController
         foreach (
             [
                 'Taufgottesdienste' => $baptismalServices,
-                'Andere Gottesdienste' => $otherServices
+                'Andere Gottesdienste' => $otherServices,
             ] as $category => $theseServices
         ) {
             foreach ($theseServices as $service) {
                 $services[] = [
                     'id' => $service->id,
                     'name' => $service->dateTime->setTimeZone('Europe/Berlin')->format(
-                            'd.m.Y, H:i'
-                        ) . ' Uhr (' . $service->locationText() . '), '
-                        . ($service->titleText() == 'GD' ? '' : $service->titleText(false) . ', ')
-                        . $service->participantsText('P')
-                        . (count($service->baptisms) ? ' [bisherige Taufen: ' . count($service->baptisms) . ']' : ''),
+                        'd.m.Y, H:i'
+                    ).' Uhr ('.$service->locationText().'), '
+                        .($service->titleText() == 'GD' ? '' : $service->titleText(false).', ')
+                        .$service->participantsText('P')
+                        .(count($service->baptisms) ? ' [bisherige Taufen: '.count($service->baptisms).']' : ''),
                     'category' => $category,
                 ];
             }
@@ -159,11 +158,9 @@ class BaptismController extends AbstractCRUDController
     }
 
     /**
-     * @param Baptism $baptism
      * @return Application|ResponseFactory|Response
      */
-    public
-    function appointmentIcal(
+    public function appointmentIcal(
         Baptism $baptism
     ) {
         Gate::authorize('update', $baptism);
@@ -174,50 +171,45 @@ class BaptismController extends AbstractCRUDController
             "\r\n",
             str_replace('@@@@', "\r\n", str_replace("\n", "\r\n", str_replace("\r\n", '@@@@', $raw)))
         );
+
         return response($raw, 200)
             ->header('Cache-Control', 'must-revalidate, post-check=0, pre-check=0')
             ->header('Expires', '0')
             ->header('Content-Type', 'text/calendar')
-            ->header('Content-Disposition', 'inline; filename=Taufgespraech-' . $baptism->id . '.ics');
+            ->header('Content-Disposition', 'inline; filename=Taufgespraech-'.$baptism->id.'.ics');
     }
 
     /**
-     * @param Baptism $baptism
      * @return false|string
      */
-    public
-    function done(
+    public function done(
         Baptism $baptism
     ) {
         Gate::authorize('update', $baptism);
         $baptism->done = true;
         $baptism->save();
+
         return json_encode(true);
     }
 
-
     /**
-     * @param Request $request
-     * @param Baptism $baptism
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function attach(Request $request, Baptism $baptism)
     {
         Gate::authorize('update', $baptism);
         $this->handleAttachments($request, $baptism);
         $baptism->refresh();
+
         return response()->json($baptism->attachments);
     }
 
     /**
-     * @param Request $request
-     * @param Baptism $baptism
-     * @param Attachment $attachment
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     *
      * @throws \Exception
      */
-    public
-    function detach(
+    public function detach(
         Request $request,
         Baptism $baptism,
         Attachment $attachment
@@ -229,6 +221,7 @@ class BaptismController extends AbstractCRUDController
         Storage::delete($file);
         $attachment->delete();
         $baptism->refresh();
+
         return response()->json($baptism->attachments);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,15 +28,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use Illuminate\Contracts\Console\Kernel;
 use Laravel\Octane\RoadRunner\Worker;
 use Spiral\RoadRunner\Worker as RoadRunnerWorker;
 
 require __DIR__.'/vendor/autoload.php';
 
-$worker = new Worker(new RoadRunnerWorker());
+$worker = new Worker(new RoadRunnerWorker);
 
 $app = require __DIR__.'/bootstrap/app.php';
 
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 
 $worker->start($app);

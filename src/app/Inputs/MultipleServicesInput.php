@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,18 +40,18 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class MultipleServicesInput
- * @package App\Inputs
  */
 class MultipleServicesInput extends AbstractInput
 {
-
     /**
      * @var string
      */
     public $title = 'Mehrere Gottesdienste';
+
     public $description = 'Eine ganze Reihe von Gottesdiensten auf einmal anlegen';
 
     public function canEdit(): bool
@@ -60,8 +60,7 @@ class MultipleServicesInput extends AbstractInput
     }
 
     /**
-     * @param Request $request
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup(Request $request)
     {
@@ -72,17 +71,16 @@ class MultipleServicesInput extends AbstractInput
                 $eventTypes[$city->id] = [
                     'types' => $konfiApp->listEventTypes(),
                     'default' => $city->konfiapp_default_type,
-                    ];
+                ];
             }
         }
 
         $locations = Location::inCities(Auth::user()->writableCities->pluck('id'))->get();
+
         return Inertia::render('Inputs/MultipleServices/Setup', compact('locations', 'eventTypes'));
     }
 
-
     /**
-     * @param Request $request
      * @return RedirectResponse
      */
     public function input(Request $request)
@@ -91,7 +89,6 @@ class MultipleServicesInput extends AbstractInput
     }
 
     /**
-     * @param Request $request
      * @return RedirectResponse|void
      */
     public function save(Request $request)
@@ -102,7 +99,7 @@ class MultipleServicesInput extends AbstractInput
             'services.*.time' => 'date_format:H:i',
             'services.*.location' => 'int|exists:locations,id',
             'eventType' => 'nullable|int',
-                                   ]);
+        ]);
         $serviceRecords = [];
         $ctrExisting = $ctrAdded = 0;
 
@@ -122,9 +119,9 @@ class MultipleServicesInput extends AbstractInput
                 ->first();
 
             $service = null;
-            if (!$existing) {
+            if (! $existing) {
                 $service = [
-                    'date' =>  $date,
+                    'date' => $date,
                     'location_id' => $serviceData['location'],
                     'city_id' => $location->city_id,
                     'description' => '',
@@ -164,7 +161,6 @@ class MultipleServicesInput extends AbstractInput
         $service = reset($serviceRecords);
         Subscription::send($service, ServiceCreatedMultiple::class, ['services' => $serviceRecords]);
 
-
         if ($ctrExisting) {
             return redirect()->route('calendar')->with(
                 'warning',
@@ -181,6 +177,4 @@ class MultipleServicesInput extends AbstractInput
             );
         }
     }
-
-
 }

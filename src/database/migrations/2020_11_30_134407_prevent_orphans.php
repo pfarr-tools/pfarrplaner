@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,27 +34,28 @@ use Illuminate\Support\Facades\Schema;
 
 class PreventOrphans extends Migration
 {
-
-    protected function getColumnType($table, $column) {
+    protected function getColumnType($table, $column)
+    {
         $columns = Schema::getColumns($table);
 
         $col = collect($columns)->firstWhere('name', $column);
 
         if (! $col) {
-            throw new \InvalidArgumentException("Column {$column} not found on table {$table}");
+            throw new InvalidArgumentException("Column {$column} not found on table {$table}");
         }
 
         $isUnsigned = str_contains(strtolower($col['type'] ?? ''), 'unsigned');
 
-        return $col['type_name'] . ($isUnsigned ? 'Unsigned' : 'Signed');
+        return $col['type_name'].($isUnsigned ? 'Unsigned' : 'Signed');
     }
 
-    public function createCascadingDelete($tableName, $foreignKey, $foreignTableName) {
+    public function createCascadingDelete($tableName, $foreignKey, $foreignTableName)
+    {
         $existingConstraints = $this->listTableForeignKeys($tableName);
         $constraint = $tableName.'_'.$foreignKey.'_foreign';
         if (in_array($constraint, $existingConstraints)) {
             // drop existing foreign key constraint
-            Schema::table($tableName, function(Blueprint $table) use ($constraint) {
+            Schema::table($tableName, function (Blueprint $table) use ($constraint) {
                 $table->dropForeign($constraint);
             });
         }
@@ -71,11 +72,10 @@ class PreventOrphans extends Migration
                 }
             });
         }
-        Schema::table($tableName, function(Blueprint $table) use ($foreignKey, $foreignTableName, $keyType) {
+        Schema::table($tableName, function (Blueprint $table) use ($foreignKey, $foreignTableName) {
             $table->foreign($foreignKey)->references('id')->on($foreignTableName)->onDelete('cascade');
         });
     }
-
 
     public function listTableForeignKeys($table)
     {
@@ -91,10 +91,10 @@ class PreventOrphans extends Migration
      */
     public function up()
     {
-        Schema::table('services', function(Blueprint $table){
+        Schema::table('services', function (Blueprint $table) {
             $table->unsignedInteger('location_id')->change();
         });
-        Schema::table('locations', function(Blueprint $table){
+        Schema::table('locations', function (Blueprint $table) {
             $table->increments('id')->change();
         });
         $this->createCascadingDelete('services', 'day_id', 'days');
@@ -130,7 +130,6 @@ class PreventOrphans extends Migration
         $this->createCascadingDelete('replacement_user', 'replacement_id', 'replacements');
         $this->createCascadingDelete('replacement_user', 'user_id', 'users');
         $this->createCascadingDelete('service_service_group', 'service_id', 'services');
-
 
     }
 

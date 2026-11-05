@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,23 +32,20 @@ namespace App\CalendarLinks;
 
 /**
  * Class CalendarLinks
- * @package App\CalendarLinks
  */
 class CalendarLinks
 {
-
     /**
-     * @param $key
      * @return mixed
      */
     public static function findKey($key)
     {
-        foreach (glob(app_path('CalendarLinks') . '/*CalendarLink.php') as $file) {
+        foreach (glob(app_path('CalendarLinks').'/*CalendarLink.php') as $file) {
             if (substr(pathinfo($file, PATHINFO_FILENAME), 0, 8) !== 'Abstract') {
-                $calendarLinkClass = 'App\\CalendarLinks\\' . pathinfo($file, PATHINFO_FILENAME);
+                $calendarLinkClass = 'App\\CalendarLinks\\'.pathinfo($file, PATHINFO_FILENAME);
                 if (class_exists($calendarLinkClass)) {
                     /** @var AbstractCalendarLink $calendarLink */
-                    $calendarLink = new $calendarLinkClass();
+                    $calendarLink = new $calendarLinkClass;
                     if ($calendarLink->getKey() == $key) {
                         return $calendarLink;
                     }
@@ -63,17 +60,18 @@ class CalendarLinks
     public static function all()
     {
         $calendarLinks = [];
-        foreach (glob(app_path('CalendarLinks') . '/*CalendarLink.php') as $file) {
+        foreach (glob(app_path('CalendarLinks').'/*CalendarLink.php') as $file) {
             if (substr(pathinfo($file, PATHINFO_FILENAME), 0, 8) !== 'Abstract') {
-                $calendarLinkClass = 'App\\CalendarLinks\\' . pathinfo($file, PATHINFO_FILENAME);
+                $calendarLinkClass = 'App\\CalendarLinks\\'.pathinfo($file, PATHINFO_FILENAME);
                 if (class_exists($calendarLinkClass)) {
                     /** @var AbstractCalendarLink $calendarLink */
-                    $calendarLink = new $calendarLinkClass();
+                    $calendarLink = new $calendarLinkClass;
                     $calendarLinks[] = $calendarLink->toArray();
                 }
             }
         }
         ksort($calendarLinks);
+
         return $calendarLinks;
     }
 }

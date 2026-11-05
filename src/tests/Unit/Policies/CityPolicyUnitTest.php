@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -29,45 +30,45 @@ class CityPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new CityPolicy();
+        $this->policy = new CityPolicy;
         Permission::findOrCreate('ort-bearbeiten', 'web');
         Permission::findOrCreate('gd-opfer-bearbeiten', 'web');
     }
 
-    public function testViewAlwaysReturnsTrue(): void
+    public function test_view_always_returns_true(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
         $this->assertTrue($this->policy->view($user, $city));
     }
 
-    public function testViewAnyAlwaysReturnsTrue(): void
+    public function test_view_any_always_returns_true(): void
     {
         $user = User::factory()->create();
         $this->assertTrue($this->policy->viewAny($user));
     }
 
-    public function testRegularUserCannotCreate(): void
+    public function test_regular_user_cannot_create(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testAdminCanCreate(): void
+    public function test_admin_can_create(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $this->assertTrue($this->policy->create($user));
     }
 
-    public function testRegularUserCannotDelete(): void
+    public function test_regular_user_cannot_delete(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
         $this->assertFalse($this->policy->delete($user, $city));
     }
 
-    public function testSuperAdminCanDelete(): void
+    public function test_super_admin_can_delete(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
@@ -75,27 +76,27 @@ class CityPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->delete($user, $city));
     }
 
-    public function testRegularUserCannotIndex(): void
+    public function test_regular_user_cannot_index(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->index($user));
     }
 
-    public function testUserWithOrtBearbeitenPermissionCanIndex(): void
+    public function test_user_with_ort_bearbeiten_permission_can_index(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('ort-bearbeiten');
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testRestoreAlwaysReturnsFalse(): void
+    public function test_restore_always_returns_false(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
         $this->assertFalse($this->policy->restore($user, $city));
     }
 
-    public function testForceDeleteAlwaysReturnsFalse(): void
+    public function test_force_delete_always_returns_false(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();

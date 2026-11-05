@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,33 +31,41 @@
 namespace App\Attachments\Baptism;
 
 use App\Documents\Word\DefaultAddressLabelSheetDocument;
-use App\Models\Rites\Baptism;
 use App\Services\NameService;
 use Inertia\Inertia;
 use PhpOffice\PhpWord\Element\Cell;
-use PhpOffice\PhpWord\Shared\Converter;
 
 class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
 {
     protected static $title = 'Adressetiketten für Taufbriefe';
+
     protected static $description = 'Für die Taufjubiläen im 1.-9. Jahr nach der Taufe';
+
     protected static $fileTitle = 'Adressetiketten für Taufbriefe';
+
     protected static $extension = 'docx';
+
     protected static $icon = 'mdi mdi-file-word';
+
     protected static $mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
     protected static $hasSetup = true;
 
     protected const FONT18 = ['name' => 'Lucida Handwriting', 'size' => 18, 'bold' => true];
+
     protected const FONT20 = ['name' => 'Lucida Handwriting', 'size' => 20, 'bold' => true];
+
     protected const FONT34 = ['name' => 'Lucida Handwriting', 'size' => 34, 'bold' => true];
+
     protected const PARAGRAPH = [
         'align' => 'center',
         'spaceAfter' => 0,
     ];
+
     protected const PARAGRAPH_SPC_TOP = [
         'align' => 'center',
         'spaceAfter' => 0,
-        'spaceBefore' => 120
+        'spaceBefore' => 120,
     ];
 
     protected const PARAGRAPH_SPC_BOTTOM = [
@@ -78,26 +86,25 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
         '#ff92bb',
     ];
 
-
     public function download()
     {
         $config = array_merge([
-                                  'size' => 3.7,
-                                  'years' => 9,
-                                  'skipLabels' => 0,
-                              ],
-                              request()->validate([
-                                                      'size' => 'nullable|numeric',
-                                                      'years' => 'nullable|int|min:1',
-                                                      'skipLabels' => 'nullable|int',
-                                                  ]));
+            'size' => 3.7,
+            'years' => 9,
+            'skipLabels' => 0,
+        ],
+            request()->validate([
+                'size' => 'nullable|numeric',
+                'years' => 'nullable|int|min:1',
+                'skipLabels' => 'nullable|int',
+            ]));
 
         $doc = new DefaultAddressLabelSheetDocument([
             'label' => [
                 'height' => $config['size'],
             ],
             'skipLabels' => $config['skipLabels'],
-                                                    ]);
+        ]);
 
         $data = [];
         for ($i = 1; $i <= $config['years']; $i++) {
@@ -106,7 +113,7 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
                 'address' => $this->baptism->candidate_address,
                 'zip' => $this->baptism->candidate_zip,
                 'city' => $this->baptism->candidate_city,
-                'info' => $this->baptism->service->date->copy()->addYears($i)->format('d.m.Y') . ' / #' . $i,
+                'info' => $this->baptism->service->date->copy()->addYears($i)->format('d.m.Y').' / #'.$i,
             ];
         }
 
@@ -117,12 +124,11 @@ class BaptismLettersAddressLabelsAttachment extends AbstractBaptismAttachment
 
     public function renderCell(Cell $cell, $record, $index)
     {
-        $cell->addText($record . ' | ' . $index);
+        $cell->addText($record.' | '.$index);
     }
 
     public function setup()
     {
         return Inertia::render('Attachments/Baptism/BaptismLettersAddressLabels/Setup', ['baptism' => $this->baptism]);
     }
-
 }

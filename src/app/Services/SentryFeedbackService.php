@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -21,12 +22,6 @@ class SentryFeedbackService
 {
     /**
      * Send user feedback for an existing Sentry event.
-     *
-     * @param string $eventId
-     * @param string|null $name
-     * @param string|null $email
-     * @param string $comments
-     * @return bool
      */
     public function send(string $eventId, ?string $name, ?string $email, string $comments): bool
     {
@@ -80,9 +75,6 @@ class SentryFeedbackService
 
     /**
      * Resolve the feedback API endpoint from an explicit override or the Sentry DSN.
-     *
-     * @param string|null $configuredEndpoint
-     * @return string
      */
     private function endpoint(?string $configuredEndpoint): string
     {

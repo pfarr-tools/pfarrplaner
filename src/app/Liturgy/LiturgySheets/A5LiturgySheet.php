@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,12 +30,11 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
 class A5LiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Ablaufplan (DIN A5)';
+
     protected $icon = 'fa fa-file-pdf';
 
     protected $layout = ['format' => 'A5'];
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,7 +25,7 @@ class PoolApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testPoolmastersReturnsDayMap()
+    public function test_poolmasters_returns_day_map()
     {
         $pool = Pool::factory()->create();
         $user = User::factory()->create();
@@ -39,7 +40,7 @@ class PoolApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testPoolmastersReturns404ForMissingPool()
+    public function test_poolmasters_returns404_for_missing_pool()
     {
         $user = User::factory()->create();
 
@@ -51,7 +52,7 @@ class PoolApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMasteredReturnsUserData()
+    public function test_mastered_returns_user_data()
     {
         $user = User::factory()->create();
 
@@ -65,7 +66,7 @@ class PoolApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMasteredReturns404ForMissingUser()
+    public function test_mastered_returns404_for_missing_user()
     {
         $user = User::factory()->create();
 
@@ -77,7 +78,7 @@ class PoolApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testPoolmastersRequiresAuth()
+    public function test_poolmasters_requires_auth()
     {
         $pool = Pool::factory()->create();
 
@@ -89,7 +90,7 @@ class PoolApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testMasteredRequiresAuth()
+    public function test_mastered_requires_auth()
     {
         $user = User::factory()->create();
 

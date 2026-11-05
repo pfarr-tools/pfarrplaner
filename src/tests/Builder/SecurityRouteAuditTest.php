@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,14 +30,15 @@
 
 namespace Tests\Builder;
 
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class SecurityRouteAuditTest extends TestCase
 {
-    public function testDebugRoutesAreNotRegistered(): void
+    public function test_debug_routes_are_not_registered(): void
     {
         $uris = collect(Route::getRoutes()->getRoutes())->map(fn ($route) => $route->uri())->values();
 
@@ -50,7 +51,7 @@ class SecurityRouteAuditTest extends TestCase
         $this->assertFalse($uris->contains('ping/update'));
     }
 
-    public function testBoostAndTelescopeRoutesStayDisabledByDefault(): void
+    public function test_boost_and_telescope_routes_stay_disabled_by_default(): void
     {
         $uris = collect(Route::getRoutes()->getRoutes())->map(fn ($route) => $route->uri())->values();
 
@@ -58,7 +59,7 @@ class SecurityRouteAuditTest extends TestCase
         $this->assertCount(0, $uris->filter(fn ($uri) => str_starts_with($uri, 'telescope')));
     }
 
-    public function testOnlyApprovedPublicMutationRoutesExist(): void
+    public function test_only_approved_public_mutation_routes_exist(): void
     {
         $allowed = collect([
             '.well-known/caldav',
@@ -81,7 +82,7 @@ class SecurityRouteAuditTest extends TestCase
                     return false;
                 }
 
-                return !$this->hasAuthenticationMiddleware(collect($route['middleware'] ?? []));
+                return ! $this->hasAuthenticationMiddleware(collect($route['middleware'] ?? []));
             })
             ->map(fn ($route) => $route['uri'])
             ->unique()
@@ -92,7 +93,7 @@ class SecurityRouteAuditTest extends TestCase
         $this->assertSame($allowed, $actual);
     }
 
-    public function testSensitiveStateChangesAreNotExposedViaGetRoutes(): void
+    public function test_sensitive_state_changes_are_not_exposed_via_get_routes(): void
     {
         Artisan::call('route:list', ['--json' => true]);
         $routes = collect(json_decode(Artisan::output(), true));
@@ -117,7 +118,7 @@ class SecurityRouteAuditTest extends TestCase
         $this->assertSame([], $violations);
     }
 
-    public function testVacationEmbedRequiresAuthentication(): void
+    public function test_vacation_embed_requires_authentication(): void
     {
         Artisan::call('route:list', ['--json' => true]);
         $routes = collect(json_decode(Artisan::output(), true));
@@ -128,13 +129,13 @@ class SecurityRouteAuditTest extends TestCase
         $this->assertTrue($this->hasAuthenticationMiddleware(collect($route['middleware'] ?? [])));
     }
 
-    public function testDavRoutesDoNotUseCsrfProtection(): void
+    public function test_dav_routes_do_not_use_csrf_protection(): void
     {
         $route = Route::getRoutes()->getByName('sabre.dav');
 
         $this->assertNotNull($route);
         $this->assertContains(
-            \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+            PreventRequestForgery::class,
             $route->excludedMiddleware()
         );
     }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,40 +18,40 @@ use Tests\TestCase;
 
 class NameServiceUnitTest extends TestCase
 {
-    public function testFromNameWithComma(): void
+    public function test_from_name_with_comma(): void
     {
         $ns = NameService::fromName('Müller, Hans');
         $this->assertEquals('Hans', trim($ns->getFirstName()));
         $this->assertEquals('Müller', trim($ns->getLastName()));
     }
 
-    public function testFromNameWithSpace(): void
+    public function test_from_name_with_space(): void
     {
         $ns = NameService::fromName('Hans Müller');
         $this->assertEquals('Hans', trim($ns->getFirstName()));
         $this->assertEquals('Müller', trim($ns->getLastName()));
     }
 
-    public function testFormatLastCommaFirst(): void
+    public function test_format_last_comma_first(): void
     {
         $ns = new NameService('Hans', 'Müller');
         $this->assertEquals('Müller, Hans', $ns->format(NameService::LAST_COMMA_FIRST));
     }
 
-    public function testFormatFirstLast(): void
+    public function test_format_first_last(): void
     {
         $ns = new NameService('Hans', 'Müller');
         $this->assertEquals('Hans Müller', $ns->format(NameService::FIRST_LAST));
     }
 
-    public function testFormatLastFirst(): void
+    public function test_format_last_first(): void
     {
         $ns = new NameService('Hans', 'Müller');
         // strtoupper is not multibyte-safe; ü stays lowercase in PHP's strtoupper
         $this->assertEquals('MüLLER Hans', $ns->format(NameService::LAST_FIRST));
     }
 
-    public function testFormatLastFirstArray(): void
+    public function test_format_last_first_array(): void
     {
         $ns = new NameService('Hans', 'Müller');
         $result = $ns->format(NameService::LAST_FIRST_ARRAY);
@@ -59,19 +60,19 @@ class NameServiceUnitTest extends TestCase
         $this->assertEquals('Hans', $result[1]);
     }
 
-    public function testFormatTitleFirstLast(): void
+    public function test_format_title_first_last(): void
     {
         $ns = new NameService('Hans', 'Müller', 'Dr.');
         $this->assertEquals('Dr. Hans Müller', $ns->format(NameService::TITLE_FIRST_LAST));
     }
 
-    public function testGetTitle(): void
+    public function test_get_title(): void
     {
         $ns = new NameService('Hans', 'Müller', 'Prof.');
         $this->assertEquals('Prof.', $ns->getTitle());
     }
 
-    public function testFromNameWithTitle(): void
+    public function test_from_name_with_title(): void
     {
         $ns = NameService::fromName('Dr. Eva Lehmann');
         $this->assertSame('Dr.', $ns->getTitle());
@@ -79,7 +80,7 @@ class NameServiceUnitTest extends TestCase
         $this->assertSame('Lehmann', $ns->getLastName());
     }
 
-    public function testFromNameWithCommaAndTitle(): void
+    public function test_from_name_with_comma_and_title(): void
     {
         $ns = NameService::fromName('Lehmann, Dr. Eva');
         $this->assertSame('Dr.', $ns->getTitle());

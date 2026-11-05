@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -38,19 +38,23 @@ use App\Models\Parish;
 use App\Models\People\User;
 use App\Models\Service;
 use App\Services\RoleService;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Collection;
 
 /**
  * Class City
- * @package App
  */
 class City extends AbstractModel
 {
-
     protected static string $prefix = 'kirchengemeinde';
+
     protected static string $prefixPlural = 'kirchengemeinden';
+
     public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
+
     public static array $validationRules = [
         'name' => 'required|max:255',
         'public_events_calendar_url' => 'nullable',
@@ -76,15 +80,15 @@ class City extends AbstractModel
         'konfiapp_apikey' => 'nullable|string',
         'youtube_active_stream_id' => 'nullable|string',
         'youtube_passive_stream_id' => 'nullable|string',
-        'youtube_auto_startstop'=> 'nullable|int',
-        'youtube_cutoff_days'=> 'nullable|int',
+        'youtube_auto_startstop' => 'nullable|int',
+        'youtube_cutoff_days' => 'nullable|int',
         'default_offering_url' => 'nullable|string',
-        'youtube_self_declared_for_children'=> 'nullable|int',
+        'youtube_self_declared_for_children' => 'nullable|int',
         'communiapp_url' => 'nullable|string',
         'communiapp_token' => 'nullable|string',
-        'communiapp_default_group_id'=> 'nullable|int',
-        'communiapp_use_outlook'=> 'nullable|int',
-        'communiapp_use_op'=> 'nullable|int',
+        'communiapp_default_group_id' => 'nullable|int',
+        'communiapp_use_outlook' => 'nullable|int',
+        'communiapp_use_op' => 'nullable|int',
         'konfiapp_default_type' => 'nullable|string',
         'official_name' => 'nullable|string',
         'default_ministries' => 'nullable',
@@ -97,9 +101,8 @@ class City extends AbstractModel
     ];
 
     public static $adminIcon = 'mdi mdi-church';
+
     public static $adminGroup = 'Orte';
-
-
 
     /**
      * @var string[]
@@ -152,6 +155,7 @@ class City extends AbstractModel
      * @var string
      */
     protected $orderBy = 'name';
+
     /**
      * @var string
      */
@@ -166,7 +170,7 @@ class City extends AbstractModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function pools()
     {
@@ -189,7 +193,6 @@ class City extends AbstractModel
         return $this->hasMany(Parish::class);
     }
 
-
     public function pastors()
     {
         return $this->belongsToMany(User::class, 'user_home')->role('Pfarrer:in');
@@ -204,7 +207,7 @@ class City extends AbstractModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function parent()
     {
@@ -214,14 +217,15 @@ class City extends AbstractModel
     /**
      * @return HasMany
      */
-    public function children() {
+    public function children()
+    {
         return $this->hasMany(self::class, 'parent_id');
     }
 
-
     /**
      * Check if this city is administered by a particular use
-     * @param User $user User
+     *
+     * @param  User  $user  User
      * @return bool True if user has admin rights here
      */
     public function administeredBy(User $user)
@@ -233,12 +237,14 @@ class City extends AbstractModel
         if ($city && ($city->pivot->permission == 'a')) {
             return true;
         }
+
         return false;
     }
 
     /**
      * Get the default ad channels for this city
-     * @return \Illuminate\Support\Collection
+     *
+     * @return Collection
      */
     public function getDefaultAdChannels()
     {
@@ -249,11 +255,14 @@ class City extends AbstractModel
                     some adChannels have a dependency on a specific property of the City model
                     e.g. a CommuniApp AdChannel will only be shown if the city has a communiapp_token
                 */
-                if ($this->{$channelConfig['depends_on']}) $channels[$key] = $channelConfig;
+                if ($this->{$channelConfig['depends_on']}) {
+                    $channels[$key] = $channelConfig;
+                }
             } else {
                 $channels[$key] = $channelConfig;
             }
         }
+
         return collect($channels);
     }
 
@@ -265,9 +274,8 @@ class City extends AbstractModel
 
     }
 
-
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function scopedUsers()
     {
@@ -276,6 +284,7 @@ class City extends AbstractModel
 
     /**
      * Check if this city has any locations where seating is defined
+     *
      * @return bool True if such locations exist
      */
     public function hasRegistrableLocations()
@@ -292,11 +301,11 @@ class City extends AbstractModel
     }
 
     /**
-     * @param string[] $ministries
+     * @param  string[]  $ministries
      */
     public function setDefaultMinistriesAttribute(array $ministries)
     {
-        $this->attributes['default_ministries'] = join('||', $ministries ?? []);
+        $this->attributes['default_ministries'] = implode('||', $ministries ?? []);
     }
 
     public function fillDefaults(): array
@@ -307,7 +316,7 @@ class City extends AbstractModel
     /**
      * Updates the children relationship for the current model based on the provided input.
      *
-     * @param array $input An associative array containing child IDs in the 'childIds' key.
+     * @param  array  $input  An associative array containing child IDs in the 'childIds' key.
      * @return void
      */
     public function setChildrenFromInput(array $input)
@@ -318,5 +327,4 @@ class City extends AbstractModel
         }
 
     }
-
 }

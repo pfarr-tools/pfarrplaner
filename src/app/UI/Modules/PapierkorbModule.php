@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,8 +18,11 @@ use App\Http\Controllers\PapierkorbController;
 class PapierkorbModule extends AbstractModule
 {
     protected $title = 'Papierkorb';
+
     protected $icon = 'mdi mdi-delete-restore';
+
     protected $color = '#b02a37';
+
     protected $defaultRoute = 'admin.trash.index';
 
     public function isActive(): bool

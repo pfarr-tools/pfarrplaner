@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,15 +30,11 @@
 
 namespace App\UI\Modules;
 
-use App\Inputs\AbstractInput;
-use App\Inputs\Inputs;
-
 class InputsModule extends AbstractModule
 {
-
     protected $title = 'Assistenten';
-    protected $icon = 'mdi mdi-keyboard';
 
+    protected $icon = 'mdi mdi-keyboard';
 
     public function addItems(array $items): array
     {
@@ -52,5 +48,4 @@ class InputsModule extends AbstractModule
 
         return $items;
     }
-
 }

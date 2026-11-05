@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,9 +40,6 @@ class SongbookPolicy
 
     /**
      * Determine whether the user can view the songbook index.
-     *
-     * @param User $user
-     * @return bool
      */
     public function index(User $user): bool
     {
@@ -62,7 +59,6 @@ class SongbookPolicy
     /**
      * Determine whether the user can view the index of all songbooks.
      *
-     * @param User $user
      * @return mixed
      */
     public function viewAny(User $user): bool
@@ -70,12 +66,9 @@ class SongbookPolicy
         return $user->isAdmin || $user->isLocalAdmin || $user->hasPermissionTo('liederbuecher-bearbeiten');
     }
 
-
     /**
      * Determine whether the user can view the songbook.
      *
-     * @param User $user
-     * @param Songbook $songbook
      * @return mixed
      */
     public function view(User $user, Songbook $songbook): bool
@@ -86,7 +79,6 @@ class SongbookPolicy
     /**
      * Determine whether the user can create services.
      *
-     * @param User $user
      * @return mixed
      */
     public function create(User $user): bool
@@ -97,8 +89,6 @@ class SongbookPolicy
     /**
      * Determine whether the user can update the songbook.
      *
-     * @param User $user
-     * @param Songbook $songbook
      * @return mixed
      */
     public function update(User $user, Songbook $songbook): bool
@@ -109,8 +99,6 @@ class SongbookPolicy
     /**
      * Determine whether the user can delete the songbook.
      *
-     * @param User $user
-     * @param Songbook $songbook
      * @return mixed
      */
     public function delete(User $user, Songbook $songbook): bool
@@ -121,8 +109,6 @@ class SongbookPolicy
     /**
      * Determine whether the user can restore the songbook.
      *
-     * @param User $user
-     * @param Songbook $songbook
      * @return mixed
      */
     public function restore(User $user, Songbook $songbook): bool
@@ -133,13 +119,10 @@ class SongbookPolicy
     /**
      * Determine whether the user can permanently delete the songbook.
      *
-     * @param User $user
-     * @param Songbook $songbook
      * @return mixed
      */
     public function forceDelete(User $user, Songbook $songbook): bool
     {
         return $user->isAdmin || $user->isLocalAdmin || $user->hasPermissionTo('liederbuecher-bearbeiten');
     }
-
 }

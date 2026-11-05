@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,16 +30,17 @@
 
 namespace App\Seating;
 
-
 use App\Models\Seating\Booking;
 use App\Models\Service;
+use Illuminate\Validation\Validator;
 
 class SeatingValidators
 {
     public static function register(): void {}
 
-    public static function seatable($attribute, $value, $parameters, $validator) {
-        /** @var \Illuminate\Validation\Validator $data */
+    public static function seatable($attribute, $value, $parameters, $validator)
+    {
+        /** @var Validator $data */
         $data = $validator->getData();
         if ($attribute == 'number') {
             $data['fixed_seat'] = '';
@@ -65,6 +66,7 @@ class SeatingValidators
                 $data['override_split']
             );
         }
+
         return $success;
     }
 }

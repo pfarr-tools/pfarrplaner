@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Integrations\Youtube;
 
-
 use App\Integrations\AbstractIntegration;
 use App\Models\Places\City;
 use Google_Client;
@@ -42,21 +41,18 @@ use Google_Service_YouTube_LiveChatTextMessageDetails;
 
 /**
  * Class YoutubeIntegration
- * @package App\Integrations\Youtube
  */
 class YoutubeIntegration extends AbstractIntegration
 {
-
     /** @var Google_Client */
     protected $client = null;
 
     /** @var Google_Service_YouTube */
     protected $youtube = null;
 
-
     public function __construct()
     {
-        $client = new Google_Client();
+        $client = new Google_Client;
         $client->setAuthConfig(base_path('config/client_secret.json'));
         $client->addScope(Google_Service_YouTube::YOUTUBE);
         $this->setClient($client);
@@ -66,19 +62,16 @@ class YoutubeIntegration extends AbstractIntegration
     }
 
     /**
-     * @param City $city
      * @return YoutubeIntegration
      */
     public static function get(City $city)
     {
-        $instance = (new self());
+        $instance = (new self);
         $instance->authenticate($city);
+
         return $instance;
     }
 
-    /**
-     * @param City $city
-     */
     public function authenticate(City $city)
     {
         $this->client->setAccessToken($city->google_access_token);
@@ -90,17 +83,13 @@ class YoutubeIntegration extends AbstractIntegration
      * Returns true if youtube integration is active for a particular city.
      *
      * This is the case when a youtube channel is specified.
-     *
-     * @param City $city
-     * @return bool
      */
     public static function isActive(City $city): bool
     {
-        return ($city->youtube_channel_url != '');
+        return $city->youtube_channel_url != '';
     }
 
     /**
-     * @param $id
      * @return mixed|null
      */
     public function getVideo($id)
@@ -109,8 +98,7 @@ class YoutubeIntegration extends AbstractIntegration
     }
 
     /**
-     * @param $id
-     * @param array $data
+     * @param  array  $data
      * @return Google_Service_YouTube_LiveChatMessageListResponse
      */
     public function getLiveChat($id, $data = [])
@@ -118,55 +106,38 @@ class YoutubeIntegration extends AbstractIntegration
         return $this->getYoutube()->liveChatMessages->listLiveChatMessages($id, 'id,snippet,authorDetails', $data);
     }
 
-    /**
-     * @return Google_Service_YouTube
-     */
     public function getYoutube(): Google_Service_YouTube
     {
         return $this->youtube;
     }
 
-    /**
-     * @param Google_Service_YouTube $youtube
-     */
     public function setYoutube(Google_Service_YouTube $youtube): void
     {
         $this->youtube = $youtube;
     }
 
-    /**
-     * @param $liveChatId
-     * @param $author
-     * @param $message
-     */
     public function sendLiveChatMessage($liveChatId, $author, $message)
     {
-        $snippet = new Google_Service_YouTube_LiveChatMessageSnippet();
-        $messageDetails = new Google_Service_YouTube_LiveChatTextMessageDetails();
+        $snippet = new Google_Service_YouTube_LiveChatMessageSnippet;
+        $messageDetails = new Google_Service_YouTube_LiveChatTextMessageDetails;
         $messageDetails->setMessageText(
-            $author . ' hat über die Homepage folgende Nachricht eingegeben: ' . PHP_EOL . PHP_EOL . $message
+            $author.' hat über die Homepage folgende Nachricht eingegeben: '.PHP_EOL.PHP_EOL.$message
         );
         $snippet->setTextMessageDetails($messageDetails);
         $snippet->setLiveChatId($liveChatId);
         $snippet->setType('textMessageEvent');
 
-        $liveChatInsert = new Google_Service_YouTube_LiveChatMessage();
+        $liveChatInsert = new Google_Service_YouTube_LiveChatMessage;
         $liveChatInsert->setSnippet($snippet);
 
         $this->getYoutube()->liveChatMessages->insert('snippet', $liveChatInsert);
     }
 
-    /**
-     * @return Google_Client
-     */
     public function getClient(): Google_Client
     {
         return $this->client;
     }
 
-    /**
-     * @param Google_Client $client
-     */
     public function setClient(Google_Client $client): void
     {
         $this->client = $client;
@@ -174,9 +145,11 @@ class YoutubeIntegration extends AbstractIntegration
 
     /**
      * Get all streams (ids) for a city
+     *
      * @return array Streams
      */
-    public function getAllStreams() {
+    public function getAllStreams()
+    {
         $streams = [];
         $allStreams = $this->getYoutube()->liveStreams->listLiveStreams('id,snippet', ['mine' => 'true', 'maxResults' => 50]);
         foreach ($allStreams as $stream) {
@@ -184,8 +157,7 @@ class YoutubeIntegration extends AbstractIntegration
             $streams[$stream->getId()] = $stream->getSnippet()->getTitle();
         }
         asort($streams);
+
         return $streams;
     }
-
-
 }

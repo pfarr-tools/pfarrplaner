@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,18 +39,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AdConfig extends AbstractModel
 {
-    /** @use HasFactory<\Database\Factories\AdConfigFactory> */
+    /** @use HasFactory<AdConfigFactory> */
     use HasFactory;
-    use TracksDeletedByTrait;
+
     use SoftDeletes;
+    use TracksDeletedByTrait;
 
     protected static string $prefix = 'adconfig';
+
     protected static string $prefixPlural = 'adconfigs';
+
     protected static string $path = '';
+
     public static array $exceptRoutes = [
         'web' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
         'api' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
     ];
+
     public static array $validationRules = [
         'service_id' => 'required|integer|exists:services,id',
         'slug' => 'required|string|max:255',

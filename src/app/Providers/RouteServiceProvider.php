@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@ use Illuminate\Support\Str;
 
 /**
  * Class RouteServiceProvider
- * @package App\Providers
  */
 class RouteServiceProvider extends ServiceProvider
 {
@@ -80,8 +79,8 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::middleware('api')->group(function () {
             foreach (\File::allFiles(app_path('Models')) as $file) {
-                if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract'))) {
-                    $className = substr('App\\Models\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+                if (($file->getExtension() == 'php') && (! Str::contains($file->getPathname(), 'Abstract'))) {
+                    $className = substr('App\\Models\\'.Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
                     if (method_exists($className, 'registerApiRoutes')) {
                         $className::registerApiRoutes();
                     }

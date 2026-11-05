@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,12 +31,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Class Tag
- * @package App
  */
 class Tag extends AbstractModel
 {
@@ -48,17 +46,21 @@ class Tag extends AbstractModel
     protected $fillable = ['code', 'name'];
 
     protected static string $prefix = 'kennzeichnung';
+
     protected static string $prefixPlural = 'kennzeichnungen';
+
     public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
+
     public static array $validationRules = [
         'name' => 'required|max:255',
         'code' => 'nullable|max:255',
     ];
 
     public static $adminIcon = 'mdi mdi-tag';
-    public static $adminGroup = 'Veranstaltungen';
-    public static $adminTitle = 'Tags';
 
+    public static $adminGroup = 'Veranstaltungen';
+
+    public static $adminTitle = 'Tags';
 
     /**
      * @return BelongsToMany

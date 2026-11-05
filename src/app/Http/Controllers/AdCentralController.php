@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Calendar\Occurence;
 use App\Models\Scopes\ServicesOnlyScope;
 use Carbon\Carbon;
@@ -38,12 +37,13 @@ use Illuminate\Http\Request;
 
 class AdCentralController extends Controller
 {
-
     public function stories(Request $request)
     {
         $userId = null;
-        if (!$request->user()) {
-            if ($request->has('user')) $userId = $request->get('user');
+        if (! $request->user()) {
+            if ($request->has('user')) {
+                $userId = $request->get('user');
+            }
         } else {
             $userId = $request->user()->id;
         }
@@ -53,14 +53,13 @@ class AdCentralController extends Controller
             ->adRunningAt('story', Carbon::now())
             ->get();
 
-
-        $events->map(function($item) {
-            $item->service->adConfigs->filter(fn($item) => $item->slug == 'story');
+        $events->map(function ($item) {
+            $item->service->adConfigs->filter(fn ($item) => $item->slug == 'story');
             $item->adStart = $item->start->copy()->subDays($item->service->adConfigs[0]->offset)->startOfDay();
+
             return $item;
         });
 
         return view('adcentral.stories', compact('events'));
     }
-
 }

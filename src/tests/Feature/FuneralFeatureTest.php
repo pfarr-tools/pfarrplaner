@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -41,7 +41,6 @@ use Tests\TestCase;
 
 /**
  * Class FuneralFeatureTest
- * @package Tests\Feature
  */
 class FuneralFeatureTest extends TestCase
 {
@@ -53,7 +52,7 @@ class FuneralFeatureTest extends TestCase
     {
         parent::setUp();
         Storage::fake();
-        foreach (range((int)date('Y') - 2, (int)date('Y') + 2) as $year) {
+        foreach (range((int) date('Y') - 2, (int) date('Y') + 2) as $year) {
             Storage::put("liturgy/{$year}.json", '{}');
         }
         Storage::put('liturgy/.json', '{}');
@@ -61,22 +60,16 @@ class FuneralFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    /**
-     * @return void
-     */
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $funeral = Funeral::factory()->create();
         $this->actingAs($this->user)
             ->get(route('funerals.edit', $funeral->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Rites/FuneralEditor'));
+            ->assertInertia(fn (Assert $page) => $page->component('Rites/FuneralEditor'));
     }
 
-    /**
-     * @return void
-     */
-    public function testCreateRedirectsToEditor(): void
+    public function test_create_redirects_to_editor(): void
     {
         $service = Service::factory()->create();
 
@@ -87,7 +80,7 @@ class FuneralFeatureTest extends TestCase
         $this->assertCount(1, Funeral::all());
     }
 
-    public function testFuneralCanBeUpdated(): void
+    public function test_funeral_can_be_updated(): void
     {
         $funeral = Funeral::factory()->create();
         $raw = [

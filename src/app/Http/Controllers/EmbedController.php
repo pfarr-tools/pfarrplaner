@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,8 +37,6 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Models\Calendar\Occurence;
 use App\Models\Leave\Absence;
 use App\Models\People\User;
 use App\Models\Service;
@@ -46,48 +44,47 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 /**
  * Class EmbedController
- * @package App\Http\Controllers
  */
 class EmbedController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('cors');
         $this->middleware('auth')->only('embedUserVacations');
     }
 
-
     /**
      * Return a table of services for specific locations
-     * @param Request $request Request
-     * @param string $ids comma-separated location ids
-     * @param int $limit Limit (optional)
+     *
+     * @param  Request  $request  Request
+     * @param  string  $ids  comma-separated location ids
+     * @param  int  $limit  Limit (optional)
      */
     public function embedByLocations(Request $request, $ids, $limit = 10)
     {
         $ids = explode(',', $ids);
         $title = $request->has('title') ? $request->get('title') : '';
         $services = Service::with('location')
-            ->startingFrom(Carbon::now()->setTime(0,0,0))
+            ->startingFrom(Carbon::now()->setTime(0, 0, 0))
             ->whereIn('location_id', $ids)
             ->where('hidden', '!=', 1)
             ->ordered()
             ->limit($limit)
             ->get();
+
         return view('embed.services.table', compact('services', 'ids', 'title'));
     }
 
     /**
      * Return a table of services for specific cities
-     * @param Request $request Request
-     * @param string $ids comma-separated location ids
-     * @param int $limit Limit (optional)
+     *
+     * @param  Request  $request  Request
+     * @param  string  $ids  comma-separated location ids
+     * @param  int  $limit  Limit (optional)
      */
     public function embedByCities(Request $request, $ids, $limit = 10)
     {
@@ -98,7 +95,7 @@ class EmbedController extends Controller
             ->where('event_class', 'service')
             ->inCities($ids)
             ->notHidden()
-            ->startingFrom(Carbon::now()->setTime(0,0,0))
+            ->startingFrom(Carbon::now()->setTime(0, 0, 0))
             ->doesntHave('funerals')
             ->doesntHave('weddings')
             ->ordered()
@@ -112,9 +109,10 @@ class EmbedController extends Controller
 
     /**
      * Return a table of childrens-church services for specific cities
-     * @param Request $request Request
-     * @param string $ids comma-separated location ids
-     * @param int $limit Limit (optional)
+     *
+     * @param  Request  $request  Request
+     * @param  string  $ids  comma-separated location ids
+     * @param  int  $limit  Limit (optional)
      */
     public function embedCCByCities(Request $request, $ids, $limit = 5)
     {
@@ -122,7 +120,7 @@ class EmbedController extends Controller
         $title = $request->has('title') ? $request->get('title') : '';
         $services = Service::with('location', 'baptisms')
             ->notHidden()
-            ->startingFrom(Carbon::now('Europe/Berlin')->setTime(0,0,0))
+            ->startingFrom(Carbon::now('Europe/Berlin')->setTime(0, 0, 0))
             ->where('cc', true)
             ->inCities($ids)
             ->ordered()
@@ -133,31 +131,26 @@ class EmbedController extends Controller
             ->view('embed.services.ccTable', compact('services', 'ids', 'title'));
     }
 
-
     /**
      * Return a table of upcoming vacations and replacements for a specific user
-     * @param Request $request
-     * @param User $user
-     * @param $userId
+     *
+     * @param  $userId
      */
     public function embedUserVacations(Request $request, User $user)
     {
         abort_unless($request->user()->can('editAbsences', $user), 403);
         $start = Carbon::now();
         $end = (clone $start)->addWeek(2);
-        //$vacations = Vacations::getByPeriodAndUser($start, $end, $user);
+        // $vacations = Vacations::getByPeriodAndUser($start, $end, $user);
         $vacations = Absence::with('replacements')->byUserAndPeriod($user, $start, $end)->get();
+
         return response()
             ->view('embed.user.vacations', compact('user', 'vacations'));
     }
 
-
     /**
-     * @param Request $request
-     * @param User $user
-     * @param $ids
-     * @param int $limit
-     * @param int $maxBaptisms
+     * @param  int  $limit
+     * @param  int  $maxBaptisms
      * @return Application|Factory|View
      */
     public function embedByBaptismalServices(Request $request, User $user, $ids, $limit = 10, $maxBaptisms = 0)
@@ -165,7 +158,7 @@ class EmbedController extends Controller
         $ids = explode(',', $ids);
         $title = $request->has('title') ? $request->get('title') : '';
         $services = Service::with('location', 'baptisms')
-            ->startingFrom(Carbon::now('Europe/Berlin')->setTime(0,0,0))
+            ->startingFrom(Carbon::now('Europe/Berlin')->setTime(0, 0, 0))
             ->where('baptism', true)
             ->inCities($ids)
             ->ordered()
@@ -176,18 +169,16 @@ class EmbedController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param $report
      * @return mixed
      */
     public function embedReport(Request $request, $report)
     {
-        $reportClass = 'App\\Reports\\Embed' . ucfirst($report) . 'Report';
-        if (!class_exists($reportClass)) {
+        $reportClass = 'App\\Reports\\Embed'.ucfirst($report).'Report';
+        if (! class_exists($reportClass)) {
             abort(404);
         }
-        $reportObject = new $reportClass();
+        $reportObject = new $reportClass;
+
         return $reportObject->embed($request);
     }
-
 }

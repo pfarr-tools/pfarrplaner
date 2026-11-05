@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Http\Controllers\Extranet;
 
-
 use App\Http\Controllers\Controller;
 use App\Models\Sermon;
 use App\Models\Service;
@@ -40,15 +39,15 @@ use Illuminate\Support\Facades\Auth;
 
 class SermonController extends Controller
 {
-
-    protected function transformSermon(Sermon $sermon, $includePreview = false) {
+    protected function transformSermon(Sermon $sermon, $includePreview = false)
+    {
         $services = [];
         $isPrivate = false;
         foreach ($sermon->services as $service) {
             $isPrivate = $isPrivate || (count($service->funerals) || count($service->weddings));
             if (($service->date <= Carbon::now()) || ($includePreview)) {
                 $services[] = [
-                    /** @var \App\Models\Service $service */
+                    /** @var Service $service */
                     'date' => $service->dateTime,
                     'time' => $service->timeText(),
                     'title' => $service->titleText(false),
@@ -60,6 +59,7 @@ class SermonController extends Controller
         }
         $sermon->events = $services;
         $sermon->isPrivate = $isPrivate;
+
         return $sermon;
     }
 
@@ -70,7 +70,7 @@ class SermonController extends Controller
         $services = Service::with('sermon')->userParticipates($user, 'P')->whereHas('sermon')->orderedDesc()->get();
         $sermons = [];
         foreach ($services as $service) {
-            if (!isset($sermons[$service->sermon_id])) {
+            if (! isset($sermons[$service->sermon_id])) {
                 $sermons[$service->sermon_id] = [
                     'title' => $service->sermon->fullTitle,
                     'date' => $service->date->format('c'),
@@ -81,6 +81,7 @@ class SermonController extends Controller
                 ];
             }
         }
+
         return response()->json(array_values($sermons));
     }
 
@@ -103,8 +104,12 @@ class SermonController extends Controller
         foreach ($tmpSermons as $sermon) {
             $key = $sermon->latestService();
             $sermon = $this->transformSermon($sermon, false);
-            if (!$includeText) $sermon->text = '';
-            if (count($sermon->services)) $sermons[$key] = $sermon;
+            if (! $includeText) {
+                $sermon->text = '';
+            }
+            if (count($sermon->services)) {
+                $sermons[$key] = $sermon;
+            }
             unset($sermon->services);
         }
         krsort($sermons);
@@ -119,7 +124,7 @@ class SermonController extends Controller
         } else {
             $sermon = Sermon::where('slug', $sermonId)->first() or abort(404);
         }
+
         return response()->json($this->transformSermon($sermon, true));
     }
-
 }

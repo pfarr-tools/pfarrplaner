@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,8 +30,8 @@
 
 namespace Tests\Unit;
 
-use App\Models\Location;
 use App\Http\Requests\ServiceRequest;
+use App\Models\Location;
 use App\Models\Places\City;
 use App\Models\Service;
 use Carbon\Carbon;
@@ -40,19 +40,17 @@ use Tests\TestCase;
 
 /**
  * Class ServiceUnitTest
- * @package Tests\Unit
  */
 class ServiceUnitTest extends TestCase
 {
     use RefreshDatabase;
-
 
     /**
      * Test that a service can be created
      *
      * @return void
      */
-    public function testServiceCanBeCreated()
+    public function test_service_can_be_created()
     {
         Service::factory()->create();
         $this->assertCount(1, Service::all());
@@ -63,7 +61,7 @@ class ServiceUnitTest extends TestCase
      *
      * @return void
      */
-    public function testServiceCanBeUpdated()
+    public function test_service_can_be_updated()
     {
         $service = Service::factory()->create();
         $this->assertCount(1, Service::all());
@@ -76,7 +74,7 @@ class ServiceUnitTest extends TestCase
      *
      * @return void
      */
-    public function testServiceCanBeDeleted()
+    public function test_service_can_be_deleted()
     {
         $service = Service::factory()->create();
         $this->assertCount(1, Service::all());
@@ -89,10 +87,10 @@ class ServiceUnitTest extends TestCase
      *
      * @return void
      */
-    public function testCheckBoxesCanBeSetAndUnset()
+    public function test_check_boxes_can_be_set_and_unset()
     {
         $service = Service::factory()->raw(['need_predicant' => 1]);
-        $rules = (new ServiceRequest())->rules();
+        $rules = (new ServiceRequest)->rules();
         $validator = app('validator')->make($service, $rules);
         $this->assertTrue($validator->passes());
         $data = $validator->validate();
@@ -103,13 +101,12 @@ class ServiceUnitTest extends TestCase
         $this->assertArrayNotHasKey('need_predicant', $data);
     }
 
-
     /**
      * Test that a service can have a title
      *
      * @return void
      */
-    public function testServiceCanHaveTitle()
+    public function test_service_can_have_title()
     {
         $data = Service::factory()->raw();
         $data['title'] = 'Cool title';
@@ -118,10 +115,7 @@ class ServiceUnitTest extends TestCase
         $this->assertEquals('Cool title', Service::first()->title);
     }
 
-    /**
-     * @return void
-     */
-    public function testServiceHasCityRelationship(): void
+    public function test_service_has_city_relationship(): void
     {
         $city = City::factory()->create();
         $service = Service::factory()->create(['city_id' => $city->id]);
@@ -129,28 +123,19 @@ class ServiceUnitTest extends TestCase
         $this->assertEquals($city->id, $service->city->id);
     }
 
-    /**
-     * @return void
-     */
-    public function testServiceHasParticipantsRelationship(): void
+    public function test_service_has_participants_relationship(): void
     {
         $service = Service::factory()->create();
         $this->assertNotNull($service->participants());
     }
 
-    /**
-     * @return void
-     */
-    public function testServiceHasCommentsRelationship(): void
+    public function test_service_has_comments_relationship(): void
     {
         $service = Service::factory()->create();
         $this->assertNotNull($service->comments());
     }
 
-    /**
-     * @return void
-     */
-    public function testScopeAtDateFiltersCorrectly(): void
+    public function test_scope_at_date_filters_correctly(): void
     {
         $date = Carbon::today();
         $service = Service::factory()->create(['date' => $date]);
@@ -160,10 +145,7 @@ class ServiceUnitTest extends TestCase
         $this->assertEquals($service->id, $results->first()->id);
     }
 
-    /**
-     * @return void
-     */
-    public function testScopeInCitiesAndLocationsFiltersByCityAndLocation(): void
+    public function test_scope_in_cities_and_locations_filters_by_city_and_location(): void
     {
         $cityA = City::factory()->create();
         $cityB = City::factory()->create();
@@ -190,10 +172,7 @@ class ServiceUnitTest extends TestCase
         $this->assertEquals($matching->id, $results->first()->id);
     }
 
-    /**
-     * @return void
-     */
-    public function testScopeInCitiesAndLocationsBehavesLikeInCitiesWhenLocationsAreEmpty(): void
+    public function test_scope_in_cities_and_locations_behaves_like_in_cities_when_locations_are_empty(): void
     {
         $city = City::factory()->create();
         $otherCity = City::factory()->create();
@@ -219,6 +198,4 @@ class ServiceUnitTest extends TestCase
 
         $this->assertEquals($cityOnlyResults, $cityAndEmptyLocationsResults);
     }
-
-
 }

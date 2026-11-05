@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,9 +13,14 @@
 
 namespace Tests\Unit;
 
+use App\Actions\Replacement\CreateReplacement;
+use App\Actions\Replacement\DeleteReplacement;
+use App\Actions\Replacement\UpdateReplacement;
 use App\Events\Models\Replacement\CreatedReplacement;
 use App\Events\Models\Replacement\DeletedReplacement;
 use App\Events\Models\Replacement\UpdatedReplacement;
+use App\Http\Controllers\AbstractCRUDController;
+use App\Http\Controllers\Api\AbstractApiCRUDController;
 use App\Models\AbstractModel;
 use App\Models\Leave\Absence;
 use App\Models\Leave\Replacement;
@@ -24,37 +30,37 @@ use Tests\TestCase;
 
 class ReplacementUnitTest extends TestCase
 {
-    public function testReplacementCanBeCreatedViaFactory(): void
+    public function test_replacement_can_be_created_via_factory(): void
     {
         $replacement = Replacement::factory()->create();
         $this->assertCount(1, Replacement::all());
     }
 
-    public function testReplacementExtendsAbstractModel(): void
+    public function test_replacement_extends_abstract_model(): void
     {
         $this->assertTrue(is_subclass_of(Replacement::class, AbstractModel::class));
     }
 
-    public function testReplacementControllerClassesExist(): void
+    public function test_replacement_controller_classes_exist(): void
     {
-        $this->assertTrue(is_subclass_of(Replacement::controllerClass(), \App\Http\Controllers\AbstractCRUDController::class));
-        $this->assertTrue(is_subclass_of(Replacement::apiControllerClass(), \App\Http\Controllers\Api\AbstractApiCRUDController::class));
+        $this->assertTrue(is_subclass_of(Replacement::controllerClass(), AbstractCRUDController::class));
+        $this->assertTrue(is_subclass_of(Replacement::apiControllerClass(), AbstractApiCRUDController::class));
     }
 
-    public function testReplacementContractsResolve(): void
+    public function test_replacement_contracts_resolve(): void
     {
-        $this->assertInstanceOf(\App\Actions\Replacement\CreateReplacement::class, app(Replacement::getContractName('create')));
-        $this->assertInstanceOf(\App\Actions\Replacement\UpdateReplacement::class, app(Replacement::getContractName('update')));
-        $this->assertInstanceOf(\App\Actions\Replacement\DeleteReplacement::class, app(Replacement::getContractName('delete')));
+        $this->assertInstanceOf(CreateReplacement::class, app(Replacement::getContractName('create')));
+        $this->assertInstanceOf(UpdateReplacement::class, app(Replacement::getContractName('update')));
+        $this->assertInstanceOf(DeleteReplacement::class, app(Replacement::getContractName('delete')));
     }
 
-    public function testReplacementHasAbsenceRelationship(): void
+    public function test_replacement_has_absence_relationship(): void
     {
         $replacement = Replacement::factory()->create();
         $this->assertInstanceOf(BelongsTo::class, $replacement->absence());
     }
 
-    public function testReplacementCanBeCreatedViaAction(): void
+    public function test_replacement_can_be_created_via_action(): void
     {
         Event::fake();
 
@@ -70,7 +76,7 @@ class ReplacementUnitTest extends TestCase
         Event::assertDispatched(CreatedReplacement::class);
     }
 
-    public function testReplacementCanBeUpdatedViaAction(): void
+    public function test_replacement_can_be_updated_via_action(): void
     {
         Event::fake();
 
@@ -86,7 +92,7 @@ class ReplacementUnitTest extends TestCase
         Event::assertDispatched(UpdatedReplacement::class);
     }
 
-    public function testReplacementCanBeDeletedViaAction(): void
+    public function test_replacement_can_be_deleted_via_action(): void
     {
         Event::fake();
 

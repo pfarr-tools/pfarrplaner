@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,19 +37,20 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class OfferingsInput
- * @package App\Inputs
  */
 class OfferingsInput extends AbstractInput
 {
-
     /**
      * @var string
      */
     public $title = 'Opferplan';
+
     public $description = 'Opferzwecke für ein ganzes Jahr bearbeiten';
+
     /**
      * @var string
      */
@@ -61,20 +62,18 @@ class OfferingsInput extends AbstractInput
     }
 
     /**
-     * @param Request $request
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup(Request $request)
     {
         $cities = Auth::user()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
+
         return Inertia::render('Inputs/Offerings/Setup', compact('cities', 'locations'));
     }
 
-
     /**
-     * @param Request $request
-     * @return \Inertia\Response
+     * @return Response
      */
     public function input(Request $request)
     {
@@ -103,31 +102,31 @@ class OfferingsInput extends AbstractInput
         }
 
         $serviceSlugs = $query->get()->pluck('slug');
+
         return Inertia::render('Inputs/Offerings/Form', compact('serviceSlugs'));
     }
 
     /**
-     * @param Request $request
      * @return JsonResponse|void
      */
     public function save(Request $request)
     {
         $data = $request->validate([
-                                       'id' => 'required|exists:services,id',
-                                       'offering_goal' => 'nullable|string',
-                                       'offering_type' => 'nullable|string',
-                                       'offering_description' => 'nullable|string',
-                                       'offerings_counter1' => 'nullable|string',
-                                       'offerings_counter2' => 'nullable|string',
-                                       'offering_amount' => 'nullable|string',
-                                   ]);
+            'id' => 'required|exists:services,id',
+            'offering_goal' => 'nullable|string',
+            'offering_type' => 'nullable|string',
+            'offering_description' => 'nullable|string',
+            'offerings_counter1' => 'nullable|string',
+            'offerings_counter2' => 'nullable|string',
+            'offering_amount' => 'nullable|string',
+        ]);
         $service = Service::find($data['id']);
-        if (!$service) {
+        if (! $service) {
             abort(404);
         }
         unset($data['id']);
         $service->update($data);
+
         return response()->json($service->slug);
     }
-
 }

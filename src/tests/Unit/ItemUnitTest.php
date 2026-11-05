@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,6 +18,7 @@ use App\Models\Liturgy\Item;
 use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class ItemUnitTest extends TestCase
@@ -35,12 +37,12 @@ class ItemUnitTest extends TestCase
         ]);
     }
 
-    public function testItemTableExists(): void
+    public function test_item_table_exists(): void
     {
-        $this->assertTrue(\Illuminate\Support\Facades\Schema::hasTable('liturgy_items'));
+        $this->assertTrue(Schema::hasTable('liturgy_items'));
     }
 
-    public function testItemCanBeCreated(): void
+    public function test_item_can_be_created(): void
     {
         $item = Item::create([
             'liturgy_block_id' => $this->block->id,
@@ -51,7 +53,7 @@ class ItemUnitTest extends TestCase
         $this->assertNotNull($item->id);
     }
 
-    public function testItemHasBlockRelationship(): void
+    public function test_item_has_block_relationship(): void
     {
         $item = Item::create([
             'liturgy_block_id' => $this->block->id,
@@ -63,7 +65,7 @@ class ItemUnitTest extends TestCase
         $this->assertEquals($this->block->id, $item->block->id);
     }
 
-    public function testDataAttributeRoundTrips(): void
+    public function test_data_attribute_round_trips(): void
     {
         $data = ['key' => 'value', 'num' => 42];
         $item = Item::create([
@@ -79,7 +81,7 @@ class ItemUnitTest extends TestCase
         $this->assertEquals($data, $fresh->data);
     }
 
-    public function testDataAttributeReturnsEmptyArrayWhenSerializedEmpty(): void
+    public function test_data_attribute_returns_empty_array_when_serialized_empty(): void
     {
         $item = Item::create([
             'liturgy_block_id' => $this->block->id,
@@ -93,7 +95,7 @@ class ItemUnitTest extends TestCase
         $this->assertEmpty($fresh->data);
     }
 
-    public function testRecipientsResolveCustomMinistryContainingColon(): void
+    public function test_recipients_resolve_custom_ministry_containing_colon(): void
     {
         $user = User::factory()->create([
             'first_name' => 'Alex',

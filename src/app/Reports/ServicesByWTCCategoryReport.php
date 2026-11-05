@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,40 +40,45 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Settings;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Conditional;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
 class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
 {
-
     public const FILE_TITLE = 'AZE-Statistik';
-    public const FILE_SIGNATURE = '39.4';
 
+    public const FILE_SIGNATURE = '39.4';
 
     /**
      * @var string
      */
     public $group = 'Personal';
+
     protected $inertia = true;
+
     public $title = 'Gottesdienste nach AZE-Kategorie';
+
     public $description = 'Gottesdienste von hauptamtlichen Mitarbeitern in einem bestimmten Zeitraum mit AZE-Kategorie';
 
-
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
         $people = User::visibleFor(Auth::user())->get();
+
         return Inertia::render('Report/ServicesByWTCCategory/Setup', compact('cities', 'people'));
     }
 
-
     /**
-     * @param Request $request
      * @return string|void
+     *
      * @throws Exception
      */
     public function render(Request $request)
@@ -124,7 +129,6 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
             }
         }
 
-
         Settings::setLocale('de');
         setlocale(LC_ALL, 'en_US.utf8');
         $this->spreadsheet->getDefaultStyle()
@@ -136,22 +140,21 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
 
         $sheet->getPageSetup()->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
 
-        $conditionalPositive = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
-        $conditionalPositive->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_CELLIS);
-        $conditionalPositive->setOperatorType(\PhpOffice\PhpSpreadsheet\Style\Conditional::OPERATOR_GREATERTHANOREQUAL);
+        $conditionalPositive = new Conditional;
+        $conditionalPositive->setConditionType(Conditional::CONDITION_CELLIS);
+        $conditionalPositive->setOperatorType(Conditional::OPERATOR_GREATERTHANOREQUAL);
         $conditionalPositive->addCondition(0);
-        $conditionalPositive->getStyle()->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_DARKGREEN);
-        $conditionalPositive->getStyle()->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
-        $conditionalPositive->getStyle()->getFill()->getStartColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_GREEN);
+        $conditionalPositive->getStyle()->getFont()->getColor()->setARGB(Color::COLOR_DARKGREEN);
+        $conditionalPositive->getStyle()->getFill()->setFillType(Fill::FILL_SOLID);
+        $conditionalPositive->getStyle()->getFill()->getStartColor()->setARGB(Color::COLOR_GREEN);
 
-        $conditionalNegative = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
-        $conditionalNegative->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_CELLIS);
-        $conditionalNegative->setOperatorType(\PhpOffice\PhpSpreadsheet\Style\Conditional::OPERATOR_LESSTHAN);
+        $conditionalNegative = new Conditional;
+        $conditionalNegative->setConditionType(Conditional::CONDITION_CELLIS);
+        $conditionalNegative->setOperatorType(Conditional::OPERATOR_LESSTHAN);
         $conditionalNegative->addCondition(0);
-        $conditionalNegative->getStyle()->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED);
-        $conditionalNegative->getStyle()->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
-        $conditionalNegative->getStyle()->getFill()->getStartColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED);
-
+        $conditionalNegative->getStyle()->getFont()->getColor()->setARGB(Color::COLOR_RED);
+        $conditionalNegative->getStyle()->getFill()->setFillType(Fill::FILL_SOLID);
+        $conditionalNegative->getStyle()->getFill()->getStartColor()->setARGB(Color::COLOR_RED);
 
         $headers = [
             'Person',
@@ -170,26 +173,25 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
             'Summe',
         ];
 
-        $sheet->setCellValue("A1", 'AZE-Statistik vom '.$data['start']->format('d.m.Y').' bis '.$data['end']->format('d.m.Y'));
-        $sheet->getStyle("A1")->getFont()->setBold(true);
-        $sheet->getStyle("A1")->getFont()->setSize(16);
-
+        $sheet->setCellValue('A1', 'AZE-Statistik vom '.$data['start']->format('d.m.Y').' bis '.$data['end']->format('d.m.Y'));
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        $sheet->getStyle('A1')->getFont()->setSize(16);
 
         foreach ($headers as $index => $header) {
             $column = chr(65 + $index);
             $sheet->setCellValue("{$column}4", $header);
             $sheet->getStyle("{$column}4")->getFont()->setBold(true);
         }
-        $sheet->setCellValue("C3", 'Geleistet');
-        $sheet->getStyle("C3")->getFont()->setBold(true);
-        $sheet->setCellValue("G3", 'Laut AZE');
-        $sheet->getStyle("G3")->getFont()->setBold(true);
-        $sheet->setCellValue("K3", 'Saldo');
-        $sheet->getStyle("K3")->getFont()->setBold(true);
+        $sheet->setCellValue('C3', 'Geleistet');
+        $sheet->getStyle('C3')->getFont()->setBold(true);
+        $sheet->setCellValue('G3', 'Laut AZE');
+        $sheet->getStyle('G3')->getFont()->setBold(true);
+        $sheet->setCellValue('K3', 'Saldo');
+        $sheet->getStyle('K3')->getFont()->setBold(true);
 
         $sheet->getColumnDimensionByColumn(1)->setAutoSize(false);
         $sheet->getColumnDimensionByColumn(1)->setWidth(40);
-        for($i=2; $i<=14; $i++) {
+        for ($i = 2; $i <= 14; $i++) {
             $sheet->getColumnDimensionByColumn($i)->setAutoSize(true);
         }
 
@@ -199,10 +201,18 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
             $sheet->getStyle("A{$rowCtr}")->getFont()->setBold(true);
             foreach ($record['categories'] as $key => $categoryData) {
                 $title = $key;
-                if ($title == 'P') $title = config('labels.pastor');
-                if ($title == 'O') $title = config('labels.organist');
-                if ($title == 'M') $title = config('labels.sacristan');
-                if ($title == 'A') $title = 'Sonstige';
+                if ($title == 'P') {
+                    $title = config('labels.pastor');
+                }
+                if ($title == 'O') {
+                    $title = config('labels.organist');
+                }
+                if ($title == 'M') {
+                    $title = config('labels.sacristan');
+                }
+                if ($title == 'A') {
+                    $title = 'Sonstige';
+                }
                 $sheet->setCellValue("B{$rowCtr}", $title);
                 $sheet->setCellValue("C{$rowCtr}", $categoryData['HG']);
                 $sheet->setCellValue("D{$rowCtr}", $categoryData['WG']);
@@ -224,14 +234,16 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
                 $sheet->getStyle("K{$rowCtr}:N{$rowCtr}")->setConditionalStyles([$conditionalNegative, $conditionalPositive]);
                 $rowCtr++;
             }
-            if (!count($record['categories'])) $rowCtr++;
+            if (! count($record['categories'])) {
+                $rowCtr++;
+            }
         }
 
-
         // output
-        $filename = 'AZE-Statistik von ' . Carbon::parse($data['start'])->format('Y-m-d') . ' bis ' . Carbon::parse($data['end'])->format(
-                'Y-m-d'
-            ) . ' -- ' . $cities->pluck('name')->join(', ');
+        $filename = 'AZE-Statistik von '.Carbon::parse($data['start'])->format('Y-m-d').' bis '.Carbon::parse($data['end'])->format(
+            'Y-m-d'
+        ).' -- '.$cities->pluck('name')->join(', ');
+
         return $this->sendToBrowser(
             FileNameService::make(
                 static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
@@ -240,7 +252,5 @@ class ServicesByWTCCategoryReport extends AbstractExcelDocumentReport
                 [$data['start'], $data['end']]),
         );
 
-
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,7 +39,6 @@ Route::get('urlaubsplan/neu/{year}/{month}/{user}/{day?}', [AbsenceController::c
 Route::post('urlaub', [AbsenceController::class, 'store'])
     ->name('absence.store');
 
-
 Route::get('urlaub/{absence}', [AbsenceController::class, 'edit'])
     ->name('absence.edit')
     ->middleware('can:update,absence');
@@ -53,11 +52,7 @@ Route::delete('urlaub/{absence}', [AbsenceController::class, 'destroy'])
 Route::post('urlaub/{absence}/attachment', [AbsenceController::class, 'attach'])->name('absence.attach');
 Route::delete('urlaub/{absence}/attachment/{attachment}', [AbsenceController::class, 'detach'])->name('absence.detach');
 
-
 Route::get('planner/users', [AbsenceController::class, 'users'])
     ->name('planner.users');
 Route::get('planner/days/{date}/{user}', [AbsenceController::class, 'days'])
     ->name('planner.days');
-
-
-

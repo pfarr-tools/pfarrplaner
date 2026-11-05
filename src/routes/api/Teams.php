@@ -1,4 +1,7 @@
 <?php
+
+use App\Http\Controllers\TeamController;
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +12,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,4 +30,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-Route::get('teams/by-city/{city}', [\App\Http\Controllers\TeamController::class, 'byCity'])->name('teams.byCity');
+Route::get('teams/by-city/{city}', [TeamController::class, 'byCity'])->name('teams.byCity');

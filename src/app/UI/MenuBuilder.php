@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,20 +37,18 @@
 
 namespace App\UI;
 
-
 use App\UI\Modules\Modules;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /**
  * Class MenuBuilder
- * @package App\UI
  */
 class MenuBuilder
 {
-
     /**
      * Build the sidebar configuration
+     *
      * @return array
      */
     public static function sidebar()
@@ -58,10 +56,8 @@ class MenuBuilder
         return self::configure();
     }
 
-
     /**
      * Build the menu configuration from module config
-     * @return array
      */
     protected static function configure(): array
     {
@@ -79,13 +75,20 @@ class MenuBuilder
             $items = [];
             foreach ($modulesGroup as $moduleClass) {
                 $module = new $moduleClass($modulesConfig);
-                if ($module->isActive()) $items = $module->addItems($items);
+                if ($module->isActive()) {
+                    $items = $module->addItems($items);
+                }
             }
             if (count($items)) {
-                if ($groupTitle != 'default') $menu[] = $groupTitle;
-                foreach ($items as $item) $menu[] = $item;
+                if ($groupTitle != 'default') {
+                    $menu[] = $groupTitle;
+                }
+                foreach ($items as $item) {
+                    $menu[] = $item;
+                }
             }
         }
+
         return $menu;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -41,11 +41,14 @@ class Song extends AbstractModel
     use HasFactory;
 
     protected static string $prefix = 'lied';
+
     protected static string $prefixPlural = 'lieder';
+
     public static array $exceptRoutes = [
         'web' => ['show'],
         'api' => ['index', 'show', 'store', 'update', 'destroy'],
     ];
+
     public static array $validationRules = [
         'title' => 'required|string',
         'refrain' => 'nullable|string',
@@ -67,9 +70,13 @@ class Song extends AbstractModel
         'songbooks.*.pivot.color' => 'nullable|string',
         'alt_eg' => 'nullable|string',
     ];
+
     public static $relationsForEditor = ['verses', 'songbooks'];
+
     public static $adminTitle = 'Lieder';
+
     public static $adminIcon = 'mdi mdi-music';
+
     public static $adminGroup = 'Liturgie';
 
     public static function getAdminModuleConfig()
@@ -93,10 +100,10 @@ class Song extends AbstractModel
         'refrain_text_notation',
         'alt_eg',
     ];
+
     protected $with = ['verses', 'songbooks'];
 
     /**
-     * @param string $page
      * @return string
      */
     public static function getVuePath(string $page)
@@ -107,21 +114,16 @@ class Song extends AbstractModel
         };
     }
 
-    /**
-     * @return AbstractModel
-     */
     public static function getEmptyModel(): AbstractModel
     {
         /** @var Song $model */
         $model = parent::getEmptyModel();
-        $model->verses = new Collection();
-        $model->songbooks = new Collection();
+        $model->verses = new Collection;
+        $model->songbooks = new Collection;
+
         return $model;
     }
 
-    /**
-     * @return array
-     */
     public function fillDefaults(): array
     {
         return [
@@ -139,34 +141,21 @@ class Song extends AbstractModel
         ];
     }
 
-    /**
-     * @return string
-     */
     public function getLabelAttribute(): string
     {
         return $this->title ?: '';
     }
 
-    /**
-     * @return HasMany
-     */
     public function verses(): HasMany
     {
         return $this->hasMany(SongVerse::class);
     }
 
-    /**
-     * @return BelongsToMany
-     */
     public function songbooks(): BelongsToMany
     {
         return $this->belongsToMany(Songbook::class)->withPivot(['id', 'reference', 'code', 'color']);
     }
 
-    /**
-     * @param array $data
-     * @return void
-     */
     public function syncVersesFromRequest(array $data): void
     {
         $this->verses()->delete();
@@ -176,20 +165,16 @@ class Song extends AbstractModel
         }
     }
 
-    /**
-     * @param array $data
-     * @return void
-     */
     public function syncSongbooksFromRequest(array $data): void
     {
-        if (!isset($data['songbooks'])) {
+        if (! isset($data['songbooks'])) {
             return;
         }
 
         $sync = [];
         foreach ($data['songbooks'] as $item) {
             $songbookId = $item['pivot']['songbook_id'] ?? null;
-            if (!$songbookId) {
+            if (! $songbookId) {
                 continue;
             }
 
@@ -202,5 +187,4 @@ class Song extends AbstractModel
 
         $this->songbooks()->sync($sync, true);
     }
-
 }

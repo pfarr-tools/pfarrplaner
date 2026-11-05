@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,19 +30,14 @@
 
 namespace App\Traits;
 
-
 use App\Models\Attachment;
 use Illuminate\Support\Facades\Storage;
 
 /**
  * Trait HasAttachmentsTrait
- * @package App\Traits
  */
 trait HasAttachmentsTrait
 {
-    /**
-     * @return void
-     */
     public static function bootHasAttachmentsTrait(): void
     {
         static::forceDeleted(function ($model) {
@@ -58,9 +53,6 @@ trait HasAttachmentsTrait
         return $this->morphMany(Attachment::class, 'attachable');
     }
 
-    /**
-     * @return void
-     */
     protected function purgeAttachments(): void
     {
         /** @var Attachment $attachment */
@@ -72,5 +64,4 @@ trait HasAttachmentsTrait
             $attachment->delete();
         }
     }
-
 }

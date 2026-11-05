@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,17 +30,15 @@
 
 namespace Tests\Builder;
 
-
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class TestCoverageTest extends TestCase
 {
-
     /**
      * Tests whether there is a test for every route
      */
-    public function testAllRoutesHaveTests()
+    public function test_all_routes_have_tests()
     {
         $routes = Route::getRoutes()->getRoutesByName();
         ksort($routes);
@@ -49,27 +47,30 @@ class TestCoverageTest extends TestCase
             preg_match_all('/route\(\'(.*?)\'/', file_get_contents($test), $matches);
             if (is_array($matches)) {
                 foreach ($matches[1] as $match) {
-                    if (isset($routes[$match])) unset($routes[$match]);
+                    if (isset($routes[$match])) {
+                        unset($routes[$match]);
+                    }
                 }
             }
         }
         if (count($routes)) {
             $this->output('');
             $this->output('WARNING: The following routes have no test coverage:');
-            $this->output(join(', ', array_keys($routes)));
+            $this->output(implode(', ', array_keys($routes)));
             $this->output('');
         }
         $this->assertCount(0, $routes);
     }
 
-    protected function getAllTests($path = false) {
+    protected function getAllTests($path = false)
+    {
         $tests = [];
         foreach (['Unit', 'Feature'] as $testType) {
             foreach (glob(base_path('tests/'.$testType.'/*Test.php')) as $item) {
                 $tests[] = $item;
             }
         }
+
         return $tests;
     }
-
 }

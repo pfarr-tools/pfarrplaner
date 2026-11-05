@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,10 +28,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use App\Models\Scopes\ServicesOnlyScope;
 use App\Models\Service;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -41,7 +43,7 @@ return new class extends Migration {
     {
         // event_class is introduced later, but the current Service model scopes
         // every query by that column.
-        foreach (Service::withoutGlobalScope(\App\Models\Scopes\ServicesOnlyScope::class)->get() as $service) {
+        foreach (Service::withoutGlobalScope(ServicesOnlyScope::class)->get() as $service) {
             $service->update(['slug' => $service->createSlug()]);
         }
     }
@@ -51,7 +53,5 @@ return new class extends Migration {
      *
      * @return void
      */
-    public function down()
-    {
-    }
+    public function down() {}
 };

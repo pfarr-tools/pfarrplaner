@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,13 +30,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Liturgy\Text;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use PhpOffice\PhpWord\IOFactory;
 
-class LiturgicalTextsController extends \App\Http\Controllers\Controller
+class LiturgicalTextsController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -44,6 +45,7 @@ class LiturgicalTextsController extends \App\Http\Controllers\Controller
 
     /**
      * Get a list of all liturgical texts
+     *
      * @return mixed
      */
     public function list()
@@ -53,15 +55,15 @@ class LiturgicalTextsController extends \App\Http\Controllers\Controller
 
     /**
      * Import text from Word document
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function importFromWord(Request $request)
     {
-        if (!$request->hasFile('import')) {
+        if (! $request->hasFile('import')) {
             return response()->json('');
         }
-        if (!file_exists($request->file('import')->getRealPath())) {
+        if (! file_exists($request->file('import')->getRealPath())) {
             return response()->json('');
         }
 
@@ -89,7 +91,10 @@ class LiturgicalTextsController extends \App\Http\Controllers\Controller
             }
 
             unlink($request->file('import')->getRealPath());
-            while (str_contains($text, "\n\n\n")) $text = str_replace("\n\n\n", "\n\n", $text);
+            while (str_contains($text, "\n\n\n")) {
+                $text = str_replace("\n\n\n", "\n\n", $text);
+            }
+
             return response()->json(html_entity_decode(trim($text)));
         }
     }

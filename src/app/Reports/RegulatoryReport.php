@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Reports;
 
-
 use App\Mail\RegulatoryReportMail;
 use App\Models\Service;
 use Carbon\Carbon;
@@ -44,13 +43,14 @@ use Illuminate\Support\Facades\View;
 
 class RegulatoryReport extends AbstractReport
 {
-
     /** @var string */
     public $title = 'Meldung an das Ordnungsamt';
+
     /**
      * @var string
      */
     public $group = 'Formulare';
+
     /**
      * @var string
      */
@@ -73,6 +73,7 @@ class RegulatoryReport extends AbstractReport
         $recipient = Auth::user()->getSetting('regulatory_email_address', '');
         $template = Auth::user()->getSetting('regulatory_email_text', '') ?: View::make('reports.regulatory.template');
         Session::put('back', request()->headers->get('referer'));
+
         return $this->renderSetupView(compact('services', 'recipient', 'template', 'preselectedService'));
     }
 
@@ -88,7 +89,7 @@ class RegulatoryReport extends AbstractReport
         );
         $user = Auth::user();
         $service = Service::findOrFail($data['service']);
-        if (!$user->can('update', $service)) {
+        if (! $user->can('update', $service)) {
             abort('401');
         }
         $user->setSetting('regulatory_email_address', $data['email']);
@@ -105,6 +106,4 @@ class RegulatoryReport extends AbstractReport
     {
         return false; // This report is currently not needed and therefore disabled.
     }
-
-
 }

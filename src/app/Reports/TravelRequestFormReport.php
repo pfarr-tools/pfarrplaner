@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Reports;
 
-
 use App\Models\Leave\Absence;
 use App\Services\FileNameService;
 use Carbon\Carbon;
@@ -42,17 +41,19 @@ use Mpdf\Mpdf;
 class TravelRequestFormReport extends AbstractPDFDocumentReport
 {
     public const FILE_SIGNATURE = '21.3';
-    public const FILE_TITLE = 'Dienstreiseantrag';
 
+    public const FILE_TITLE = 'Dienstreiseantrag';
 
     /**
      * @var string
      */
     public $title = 'Dienstreiseantrag';
+
     /**
      * @var string
      */
     public $group = 'Formulare';
+
     /**
      * @var string
      */
@@ -60,10 +61,8 @@ class TravelRequestFormReport extends AbstractPDFDocumentReport
 
     protected $inertia = true;
 
-
     /**
      * Returns true if the report is active for the current user
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -86,11 +85,10 @@ class TravelRequestFormReport extends AbstractPDFDocumentReport
 
         $data['absence'] = Absence::find($data['absence']);
 
-        $data['duration'] = $data['absence']->to->diff($data['absence']->from)->days+1;
+        $data['duration'] = $data['absence']->to->diff($data['absence']->from)->days + 1;
 
         $packageConfig = json_decode(file_get_contents(base_path('package.json')), true);
         $data['version'] = $packageConfig['version'];
-
 
         $config = [
             'instanceConfigurator' => function ($mpdf) {
@@ -113,9 +111,8 @@ class TravelRequestFormReport extends AbstractPDFDocumentReport
         );
         $tempFile = tempnam(sys_get_temp_dir(), $filename);
         $pdf->save($tempFile);
+
         return response()->download($tempFile, $filename, ['Content-Type', 'application/pdf']);
 
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,15 +30,13 @@
 
 namespace App\Documents\Word;
 
-
 use PhpOffice\PhpWord\Shared\Converter;
-use PhpOffice\PhpWord\Style\Paper;
 use PhpOffice\PhpWord\Style\Section;
 
 class DefaultFoldedBooklet extends DefaultWordDocument
 {
-
-    protected function configureLayout($config) {
+    protected function configureLayout($config)
+    {
         $this->getPhpWord()->getSettings()->setBookFoldPrinting(true);
         $this->section = $this->phpWord->addSection(
             [
@@ -52,7 +50,4 @@ class DefaultFoldedBooklet extends DefaultWordDocument
             ]
         );
     }
-
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,11 +36,9 @@ use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Class StoreBaptismRequest
- * @package App\Http\Requests
  */
 class StoreBaptismRequest extends FormRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -68,9 +66,9 @@ class StoreBaptismRequest extends FormRequest
             'candidate_city' => 'nullable|string',
             'candidate_phone' => 'nullable|phone_number',
             'pronoun_set' => 'nullable|string',
-            'city_id' => 'required|integer|exists:cities,id|in:' . $this->user()->writableCities->pluck('id')->implode(
-                    ','
-                ),
+            'city_id' => 'required|integer|exists:cities,id|in:'.$this->user()->writableCities->pluck('id')->implode(
+                ','
+            ),
             'first_contact_on' => 'nullable|date_format:d.m.Y',
             'first_contact_with' => 'nullable|string',
             'appointment' => 'nullable|date_format:d.m.Y H:i',

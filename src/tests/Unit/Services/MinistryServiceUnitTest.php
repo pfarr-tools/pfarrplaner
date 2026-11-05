@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,7 +18,7 @@ use Tests\TestCase;
 
 class MinistryServiceUnitTest extends TestCase
 {
-    public function testPomaReturnsFourEntries(): void
+    public function test_poma_returns_four_entries(): void
     {
         $poma = MinistryService::POMA();
         $this->assertArrayHasKey('P', $poma);
@@ -26,33 +27,33 @@ class MinistryServiceUnitTest extends TestCase
         $this->assertArrayHasKey('A', $poma);
     }
 
-    public function testTitleForP(): void
+    public function test_title_for_p(): void
     {
         $this->assertIsString(MinistryService::title('P'));
         $this->assertNotEmpty(MinistryService::title('P'));
     }
 
-    public function testTitleForO(): void
+    public function test_title_for_o(): void
     {
         $this->assertIsString(MinistryService::title('O'));
     }
 
-    public function testTitleForM(): void
+    public function test_title_for_m(): void
     {
         $this->assertIsString(MinistryService::title('M'));
     }
 
-    public function testTitleForA(): void
+    public function test_title_for_a(): void
     {
         $this->assertEquals('Weitere Beteiligte', MinistryService::title('A'));
     }
 
-    public function testTitlePassthroughForCustomMinistry(): void
+    public function test_title_passthrough_for_custom_ministry(): void
     {
         $this->assertEquals('Lektor', MinistryService::title('Lektor'));
     }
 
-    public function testPomaValuesAreStrings(): void
+    public function test_poma_values_are_strings(): void
     {
         foreach (MinistryService::POMA() as $value) {
             $this->assertIsString($value);

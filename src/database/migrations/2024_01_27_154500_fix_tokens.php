@@ -2,8 +2,6 @@
 
 use App\Models\People\User;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\PersonalAccessToken;
 
 return new class extends Migration
@@ -21,5 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        PersonalAccessToken::where('tokenable_type', User::class)->update(['tokenable_type' => 'App\\User']);    }
+        PersonalAccessToken::where('tokenable_type', User::class)->update(['tokenable_type' => 'App\\User']);
+    }
 };

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -29,18 +30,18 @@ class StreetRangePolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new StreetRangePolicy();
+        $this->policy = new StreetRangePolicy;
         Permission::findOrCreate('pfarramt-bearbeiten', 'web');
     }
 
-    public function testRegularUserCannotCreateStreetRange(): void
+    public function test_regular_user_cannot_create_street_range(): void
     {
         $user = User::factory()->create();
         $parish = Parish::factory()->create();
         $this->assertFalse($this->policy->create($user, $parish));
     }
 
-    public function testUserWithParishPermissionCanCreateStreetRange(): void
+    public function test_user_with_parish_permission_can_create_street_range(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('pfarramt-bearbeiten');
@@ -48,14 +49,14 @@ class StreetRangePolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->create($user, $parish));
     }
 
-    public function testRegularUserCannotUpdateStreetRange(): void
+    public function test_regular_user_cannot_update_street_range(): void
     {
         $user = User::factory()->create();
         $streetRange = StreetRange::factory()->create();
         $this->assertFalse($this->policy->update($user, $streetRange));
     }
 
-    public function testUserWithParishPermissionCanUpdateStreetRange(): void
+    public function test_user_with_parish_permission_can_update_street_range(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('pfarramt-bearbeiten');
@@ -63,14 +64,14 @@ class StreetRangePolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->update($user, $streetRange));
     }
 
-    public function testRegularUserCannotDeleteStreetRange(): void
+    public function test_regular_user_cannot_delete_street_range(): void
     {
         $user = User::factory()->create();
         $streetRange = StreetRange::factory()->create();
         $this->assertFalse($this->policy->delete($user, $streetRange));
     }
 
-    public function testUserWithParishPermissionCanDeleteStreetRange(): void
+    public function test_user_with_parish_permission_can_delete_street_range(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('pfarramt-bearbeiten');

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
 use App\Documents\Word\DefaultA5WordDocument;
 use App\Documents\Word\DefaultWordDocument;
 use App\Integrations\KonfiApp\KonfiAppIntegration;
@@ -50,13 +49,18 @@ use PhpOffice\PhpWord\Style\Tab;
 class FullTextLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Volltext';
+
     protected $icon = 'fa fa-file-word';
 
-    /** @var Service $service */
+    /** @var Service */
     protected $service = null;
+
     protected $extension = 'docx';
+
     protected $configurationPage = 'Liturgy/LiturgySheets/FullTextSongSheetConfiguration';
+
     protected $configurationComponent = 'FullTextLiturgySheetConfiguration';
+
     protected $privileged = true;
 
     protected $defaultConfig = [
@@ -84,11 +88,11 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                             'tabs' => [
                                 new Tab('right', Converter::cmToTwip(12)),
                             ],
-                        ]
-                    ]
-                ]
-            ]
-                                         ]);
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
         $this->setProperties($doc);
 
@@ -100,7 +104,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                 '{PAGE}',
                 [
                     'size' => 8,
-                    'name' => 'Sarabun Light'
+                    'name' => 'Sarabun Light',
                 ],
                 [
                     'align' => 'right',
@@ -111,7 +115,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                 '{PAGE}',
                 [
                     'size' => 8,
-                    'name' => 'Sarabun Light'
+                    'name' => 'Sarabun Light',
                 ],
                 [
                     'align' => 'left',
@@ -129,35 +133,35 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                 $run->addText($item->title, $doc->getConfig()['styles']['fonts']['titles'][2]);
                 if ($this->config['includeRecipients']) {
                     $run->addText(
-                        "\t".join(', ', $item->recipients()),
+                        "\t".implode(', ', $item->recipients()),
                         ['name' => 'Sarabun Light', 'size' => 8, 'bold' => false, 'italic' => true]
                     );
                 }
 
                 $doc->getSection()->addTitle($run, 2);
-                if (method_exists($this, ($method = 'render' . ucfirst($item->data_type . 'Item')))) {
+                if (method_exists($this, ($method = 'render'.ucfirst($item->data_type.'Item')))) {
                     $this->$method($doc, $item);
                 }
             }
         }
 
-        if ($this->config['includeQR'] && (!empty($this->service->konfiapp_event_qr))) {
+        if ($this->config['includeQR'] && (! empty($this->service->konfiapp_event_qr))) {
             $doc->getSection()->addPageBreak();
             $doc->getSection()->addTitle('QR-Code für die KonfiApp', 1);
             $types = KonfiAppIntegration::get($service->city)->listEventTypes();
             $text = '';
             foreach ($types as $type) {
                 if ($type->id == $service->konfiapp_event_type) {
-                    $text = $type->punktzahl . ' ' . ($type->punktzahl == 1 ? 'Punkt' : 'Punkte') . ' in der Kategorie "' . $type->name . '"';
+                    $text = $type->punktzahl.' '.($type->punktzahl == 1 ? 'Punkt' : 'Punkte').' in der Kategorie "'.$type->name.'"';
                 }
             }
             if ($text) {
                 $doc->renderNormalText($text);
             }
             $doc->renderNormalText(
-                'Gültig nur am ' . $service->dateTime->isoFormat('dddd, DD. MMMM YYYY')
-                . ' von ' . $service->date->setTimezone('Europe/Berlin')->format('H:i')
-                . ' bis ' . $service->date->setTimezone('Europe/Berlin')->copy()->addHours(3)->format('H:i') . ' Uhr.'
+                'Gültig nur am '.$service->dateTime->isoFormat('dddd, DD. MMMM YYYY')
+                .' von '.$service->date->setTimezone('Europe/Berlin')->format('H:i')
+                .' bis '.$service->date->setTimezone('Europe/Berlin')->copy()->addHours(3)->format('H:i').' Uhr.'
             );
             $doc->getSection()->addImage(
                 route('qrcode', $this->service->konfiapp_event_qr),
@@ -173,8 +177,8 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
         $properties = $doc->getPhpWord()->getDocInfo();
         $properties->setCreator(Auth::user()->fullName());
         $properties->setCompany(Auth::user()->office ?? '');
-        $properties->setTitle($this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi') . ' ' . $this->getFileTitle());
-        $properties->setDescription($this->getFileTitle() . ' (' . $this->title . ')');
+        $properties->setTitle($this->service->date->setTimeZone('Europe/Berlin')->format('Ymd-Hi').' '.$this->getFileTitle());
+        $properties->setDescription($this->getFileTitle().' ('.$this->title.')');
         $properties->setCategory('Gottesdienste');
         $properties->setLastModifiedBy(Auth::user()->fullName());
         $properties->setSubject('Komplette Liturgie');
@@ -182,18 +186,18 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
 
     public function getFileTitle(): string
     {
-        if (!$this->service) {
+        if (! $this->service) {
             return 'Volltext';
         }
 
         return $this->service->titleText(
-                false
-            ) . ($this->service->sermon ? ' - ' . $this->service->sermon->title : '');
+            false
+        ).($this->service->sermon ? ' - '.$this->service->sermon->title : '');
     }
 
     protected function renderFreetextItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!$item->data['description']) {
+        if (! $item->data['description']) {
             return;
         }
         $doc->renderNormalText(Replacement::replaceAll($item->getHelper()->getText(), $this->service));
@@ -201,10 +205,10 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
 
     protected function renderSermonItem(DefaultWordDocument $doc, Item $item)
     {
-        if (null === $this->service->sermon) {
+        if ($this->service->sermon === null) {
             $doc->renderNormalText('Für diesen Gottesdienst wurde noch keine Predigt angelegt.', ['italic' => true]);
         } else {
-            if (!$this->service->sermon->text) {
+            if (! $this->service->sermon->text) {
                 return;
             }
             $text = strtr($this->service->sermon->text, [
@@ -215,7 +219,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
             ]);
             $dom = DefaultWordDocument::createDomDocumentFromHtml($text);
             $body = $dom->getElementsByTagName('body')->item(0);
-            if (!$body) {
+            if (! $body) {
                 return;
             }
             $nodes = [];
@@ -231,20 +235,20 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                 } else {
                     Html::addHtml(
                         $doc->getSection(),
-                        '<body>' . str_replace('<br>', '<br />', $dom->saveHTML($node)) . '</body>'
+                        '<body>'.str_replace('<br>', '<br />', $dom->saveHTML($node)).'</body>'
                     );
                 }
-                $nodes[] = $node->nodeName . ' -> ' . $node->nodeValue;
+                $nodes[] = $node->nodeName.' -> '.$node->nodeValue;
             }
         }
     }
 
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!isset($item->data['psalm'])) {
+        if (! isset($item->data['psalm'])) {
             return;
         }
-        if (!$item->data['psalm']['text']) {
+        if (! $item->data['psalm']['text']) {
             return;
         }
         /** @var PsalmItemHelper $helper */
@@ -255,7 +259,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
 
     protected function renderSongItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!isset($item->data['song'])) {
+        if (! isset($item->data['song'])) {
             return;
         }
         /** @var SongItemHelper $helper */
@@ -268,7 +272,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
                 }
             }
         }
-        if (!$this->config['includeSongTexts']) {
+        if (! $this->config['includeSongTexts']) {
             return;
         }
 
@@ -276,7 +280,7 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
             if ($verse['refrain_before']) {
                 $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true]);
             }
-            $doc->renderNormalText($verse['number'] . '. ' . $verse['text']);
+            $doc->renderNormalText($verse['number'].'. '.$verse['text']);
             if ($verse['refrain_after']) {
                 $doc->renderNormalText($item->data['song']['song']['refrain'], ['italic' => true]);
             }
@@ -285,12 +289,11 @@ class FullTextLiturgySheet extends AbstractLiturgySheet
 
     protected function renderReadingItem(DefaultWordDocument $doc, Item $item)
     {
-        if (!$item->data['reference']) {
+        if (! $item->data['reference']) {
             return;
         }
 
         $helper = new ReadingItemHelper($item);
         $helper->renderToWordDocument($doc, $this->config['includeFullReadings'], true);
     }
-
 }

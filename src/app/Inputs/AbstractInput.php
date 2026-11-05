@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,7 +40,6 @@ use Illuminate\View\View;
 
 /**
  * Class AbstractInput
- * @package App\Inputs
  */
 class AbstractInput
 {
@@ -70,12 +69,11 @@ class AbstractInput
     }
 
     /**
-     * @param $viewName
      * @return string
      */
     public function getViewName($viewName)
     {
-        return 'inputs.' . strtolower($this->getKey()) . '.' . $viewName;
+        return 'inputs.'.strtolower($this->getKey()).'.'.$viewName;
     }
 
     /**
@@ -95,8 +93,6 @@ class AbstractInput
     }
 
     /**
-     * @param City $city
-     * @param $days
      * @return array
      */
     public function getValues(City $city, $days)
@@ -105,7 +101,6 @@ class AbstractInput
     }
 
     /**
-     * @param Request $request
      * @return Application|Factory|View
      */
     public function setup(Request $request)
@@ -125,18 +120,7 @@ class AbstractInput
         );
     }
 
-    /**
-     * @param Request $request
-     */
-    public function input(Request $request)
-    {
-    }
+    public function input(Request $request) {}
 
-    /**
-     * @param Request $request
-     */
-    public function save(Request $request)
-    {
-    }
-
+    public function save(Request $request) {}
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -16,7 +17,7 @@ use Laravel\Dusk\Browser;
 
 class ReportsScreenshotTest extends ManualScreenshotTestCase
 {
-    public function testCaptureReportsIndex(): void
+    public function test_capture_reports_index(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -28,7 +29,7 @@ class ReportsScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureServiceTableReportSetup(): void
+    public function test_capture_service_table_report_setup(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -40,7 +41,7 @@ class ReportsScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureServiceExcelTableReportSetup(): void
+    public function test_capture_service_excel_table_report_setup(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(

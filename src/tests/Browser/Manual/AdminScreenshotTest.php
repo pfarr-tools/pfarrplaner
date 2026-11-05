@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -153,7 +154,7 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
                 'zip' => '70173',
                 'city' => 'Musterstadt',
                 'phone' => '0711 123456',
-                'email' => strtolower($code) . '@musterstadt.example',
+                'email' => strtolower($code).'@musterstadt.example',
                 'assistant' => 'Gemeindebüro',
                 'opening_hours' => 'Mo-Fr 09:00-12:00 Uhr',
             ]);
@@ -194,7 +195,7 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
     }
 
     /**
-     * @param City[] $cities
+     * @param  City[]  $cities
      */
     protected function createManualUsers(array $cities): void
     {
@@ -224,7 +225,7 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
         }
     }
 
-    public function testCaptureAdminIndex(): void
+    public function test_capture_admin_index(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -236,7 +237,7 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureUserList(): void
+    public function test_capture_user_list(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -248,7 +249,7 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureRoleList(): void
+    public function test_capture_role_list(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -260,7 +261,7 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureUserEditorTabs(): void
+    public function test_capture_user_editor_tabs(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -277,7 +278,7 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCapturePoolAdministration(): void
+    public function test_capture_pool_administration(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot($browser, route('admin.pools.index'), 'admin-pools-uebersicht', 800);
@@ -290,7 +291,7 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureTrashAdministration(): void
+    public function test_capture_trash_administration(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -302,7 +303,7 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureCityAdministration(): void
+    public function test_capture_city_administration(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -319,7 +320,7 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureLocationAdministration(): void
+    public function test_capture_location_administration(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(

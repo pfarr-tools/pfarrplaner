@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -74,8 +74,10 @@ class DevTranslateFieldNames extends Command
             foreach ($schema->listTableColumns($tableName) as $attribute => $data) {
                 $attribute = str_replace('`', '', $attribute);
                 $key = 'validation.attributes.'.$attribute;
-                if (!in_array($attribute, ['id', 'created_at', 'updated_at'])) {
-                    if (__($key) == $key) $missingFields[$attribute] = $attribute;
+                if (! in_array($attribute, ['id', 'created_at', 'updated_at'])) {
+                    if (__($key) == $key) {
+                        $missingFields[$attribute] = $attribute;
+                    }
                 }
             }
         }

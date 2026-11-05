@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -19,12 +20,6 @@ use Illuminate\Support\Facades\Hash;
 
 class NotCurrentPassword implements ValidationRule
 {
-    /**
-     * @param string $attribute
-     * @param mixed $value
-     * @param Closure $fail
-     * @return void
-     */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (Hash::check($value, Auth::user()->password)) {

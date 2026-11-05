@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,34 +30,34 @@
 
 namespace App\Reports;
 
-use App\Models\Calendar\Day;
-use App\Models\Service;
 use App\Models\People\User;
+use App\Models\Service;
 use App\Services\FileNameService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-
+use Inertia\Response;
 
 /**
  * Class PersonReport
- * @package App\Reports
  */
 class PersonReport extends AbstractPDFDocumentReport
 {
-
     public const FILE_SIGNATURE = '50.0';
+
     public const FILE_TITLE = 'Gottesdienstliste';
 
     /**
      * @var string
      */
     public $title = 'Alle Gottesdienste einer Person';
+
     /**
      * @var string
      */
     public $group = 'Listen';
+
     /**
      * @var string
      */
@@ -66,16 +66,16 @@ class PersonReport extends AbstractPDFDocumentReport
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $users = User::visibleFor(Auth::user())->get();
-        return Inertia::render('Report/Person/Setup', compact( 'users'));
+
+        return Inertia::render('Report/Person/Setup', compact('users'));
     }
 
     /**
-     * @param Request $request
      * @return mixed|string
      */
     public function render(Request $request)
@@ -103,7 +103,7 @@ class PersonReport extends AbstractPDFDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE.' '. $request->get('highlight'),
+                static::FILE_TITLE.' '.$request->get('highlight'),
                 'pdf',
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']]),
@@ -116,5 +116,4 @@ class PersonReport extends AbstractPDFDocumentReport
             ['format' => 'A4']
         );
     }
-
 }

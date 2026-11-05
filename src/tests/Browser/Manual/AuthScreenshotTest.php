@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -16,24 +17,24 @@ use Laravel\Dusk\Browser;
 
 class AuthScreenshotTest extends ManualScreenshotTestCase
 {
-    public function testCaptureLoginPage(): void
+    public function test_capture_login_page(): void
     {
         $this->browse(function (Browser $browser) {
             // Visit as unauthenticated user
             $browser->visit(route('login'))
-                    ->waitFor('#app', 10)
-                    ->pause(500);
+                ->waitFor('#app', 10)
+                ->pause(500);
 
             $duskName = 'manual-login';
             $browser->screenshot($duskName);
-            $src = base_path('tests/Browser/screenshots/' . $duskName . '.png');
+            $src = base_path('tests/Browser/screenshots/'.$duskName.'.png');
             if (file_exists($src)) {
-                copy($src, $this->screenshotDir . '/login.png');
+                copy($src, $this->screenshotDir.'/login.png');
             }
         });
     }
 
-    public function testCapturePasswordChangePage(): void
+    public function test_capture_password_change_page(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(

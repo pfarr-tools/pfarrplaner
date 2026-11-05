@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,7 +25,7 @@ class TabApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testTabRequiresAuth()
+    public function test_tab_requires_auth()
     {
         $response = $this->getJson(route('api.tab', ['tab' => '0']));
         $response->assertUnauthorized();
@@ -33,7 +34,7 @@ class TabApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testTabCountRequiresAuth()
+    public function test_tab_count_requires_auth()
     {
         $response = $this->getJson(route('api.tab.count', ['tab' => '0']));
         $response->assertUnauthorized();
@@ -42,7 +43,7 @@ class TabApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testTabCountReturnsStructuredResponse()
+    public function test_tab_count_returns_structured_response()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();

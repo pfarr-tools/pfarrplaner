@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,9 +13,13 @@
 
 namespace Tests\Unit;
 
+use App\Actions\Baptism\CreateBaptism;
+use App\Actions\Baptism\DeleteBaptism;
+use App\Actions\Baptism\UpdateBaptism;
 use App\Events\Models\Baptism\CreatedBaptism;
 use App\Events\Models\Baptism\DeletedBaptism;
 use App\Events\Models\Baptism\UpdatedBaptism;
+use App\Http\Controllers\AbstractCRUDController;
 use App\Models\AbstractModel;
 use App\Models\People\User;
 use App\Models\Rites\Baptism;
@@ -25,37 +30,37 @@ use Tests\TestCase;
 
 class BaptismUnitTest extends TestCase
 {
-    public function testBaptismHasServiceRelationship(): void
+    public function test_baptism_has_service_relationship(): void
     {
         $baptism = Baptism::factory()->create();
         $this->assertInstanceOf(BelongsTo::class, $baptism->service());
     }
 
-    public function testBaptismCanBeCreatedViaFactory(): void
+    public function test_baptism_can_be_created_via_factory(): void
     {
         $baptism = Baptism::factory()->create();
         $this->assertCount(1, Baptism::all());
         $this->assertNotNull($baptism->service_id);
     }
 
-    public function testBaptismExtendsAbstractModel(): void
+    public function test_baptism_extends_abstract_model(): void
     {
         $this->assertTrue(is_subclass_of(Baptism::class, AbstractModel::class));
     }
 
-    public function testBaptismControllerClassExists(): void
+    public function test_baptism_controller_class_exists(): void
     {
-        $this->assertTrue(is_subclass_of(Baptism::controllerClass(), \App\Http\Controllers\AbstractCRUDController::class));
+        $this->assertTrue(is_subclass_of(Baptism::controllerClass(), AbstractCRUDController::class));
     }
 
-    public function testBaptismContractsResolve(): void
+    public function test_baptism_contracts_resolve(): void
     {
-        $this->assertInstanceOf(\App\Actions\Baptism\CreateBaptism::class, app(Baptism::getContractName('create')));
-        $this->assertInstanceOf(\App\Actions\Baptism\UpdateBaptism::class, app(Baptism::getContractName('update')));
-        $this->assertInstanceOf(\App\Actions\Baptism\DeleteBaptism::class, app(Baptism::getContractName('delete')));
+        $this->assertInstanceOf(CreateBaptism::class, app(Baptism::getContractName('create')));
+        $this->assertInstanceOf(UpdateBaptism::class, app(Baptism::getContractName('update')));
+        $this->assertInstanceOf(DeleteBaptism::class, app(Baptism::getContractName('delete')));
     }
 
-    public function testBaptismCanBeCreatedViaAction(): void
+    public function test_baptism_can_be_created_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -67,7 +72,7 @@ class BaptismUnitTest extends TestCase
         Event::assertDispatched(CreatedBaptism::class);
     }
 
-    public function testBaptismCanBeUpdatedViaAction(): void
+    public function test_baptism_can_be_updated_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -84,7 +89,7 @@ class BaptismUnitTest extends TestCase
         Event::assertDispatched(UpdatedBaptism::class);
     }
 
-    public function testBaptismCanBeDeletedViaAction(): void
+    public function test_baptism_can_be_deleted_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();

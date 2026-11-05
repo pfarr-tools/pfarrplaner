@@ -1,4 +1,8 @@
 <?php
+
+use Shetabit\Visitor\Drivers\JenssegersAgent;
+use Shetabit\Visitor\Drivers\UAParser;
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +13,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -53,7 +56,7 @@ return [
     |
     */
     'drivers' => [
-        'jenssegers' => \Shetabit\Visitor\Drivers\JenssegersAgent::class,
-        'UAParser' => \Shetabit\Visitor\Drivers\UAParser::class,
-    ]
+        'jenssegers' => JenssegersAgent::class,
+        'UAParser' => UAParser::class,
+    ],
 ];

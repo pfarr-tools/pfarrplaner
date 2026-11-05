@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,23 +30,21 @@
 
 namespace App\StudyHelpers;
 
-use App\StudyHelpers\AbstractStudyHelper;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
 {
-
     public $title = 'Liturgischer Wegweiser';
 
     protected $records = [];
 
-    function read(array $data): array
+    public function read(array $data): array
     {
         // "Weitere Sonntage in der Trinitatiszeit
         if ('' == ($content = $this->getContent(
-                'https://www.liturgischer-wegweiser.de/gebete-und-lieder/trinitatiszeit/weitere-sonntage-in-der-trinitatiszeit/'
-            ))) {
+            'https://www.liturgischer-wegweiser.de/gebete-und-lieder/trinitatiszeit/weitere-sonntage-in-der-trinitatiszeit/'
+        ))) {
             return [];
         }
         $content = Str::replace("\n", '', $content);
@@ -57,7 +55,7 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
             if (preg_match('/(?:.*?)\– (.*)/', $title, $parts)) {
                 $title = $parts[1];
             }
-            $this->records[$title] = ['[Liturgischer Wegweiser] ' . $matches[2][$index] => 'https://www.liturgischer-wegweiser.de' . $matches[1][$index]];
+            $this->records[$title] = ['[Liturgischer Wegweiser] '.$matches[2][$index] => 'https://www.liturgischer-wegweiser.de'.$matches[1][$index]];
         }
 
         $content = Str::betweenFirst(
@@ -71,8 +69,9 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
             if (preg_match('/^([^–]+?)+/', $title, $parts)) {
                 $title = trim($parts[0]);
             }
-            $this->records[$title] = ['[Liturgischer Wegweiser] ' . $matches[2][$index] => 'https://www.liturgischer-wegweiser.de' . $matches[1][$index]];
+            $this->records[$title] = ['[Liturgischer Wegweiser] '.$matches[2][$index] => 'https://www.liturgischer-wegweiser.de'.$matches[1][$index]];
         }
+
         return $this->records;
     }
 
@@ -124,6 +123,7 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
         ];
 
         $title = strtr($title, $translations);
+
         return $title;
     }
 
@@ -134,21 +134,23 @@ class LiturgischerWegweiserStudyHelper extends AbstractStudyHelper
         $lastInTrinityPeriod = '';
         foreach ($list as $item) {
             if (substr($item['date'], -4) == $year) {
-                if (Str::contains($item['title'], 'n. Trinitatis')) $lastInTrinityPeriod = $item['title'];
+                if (Str::contains($item['title'], 'n. Trinitatis')) {
+                    $lastInTrinityPeriod = $item['title'];
+                }
             }
         }
 
-        return $this->translateTitle((((int)Str::before($lastInTrinityPeriod, '.'))+1).'. So. n. Trinitatis');
+        return $this->translateTitle((((int) Str::before($lastInTrinityPeriod, '.')) + 1).'. So. n. Trinitatis');
     }
 
-    function getLinks(array $data): array
+    public function getLinks(array $data): array
     {
         $title = $this->translateTitle($data['title']);
         if ($title == 'Vorletzter Sonntag d. Kj.') {
             $title = $this->findSecondToLastSunday($data['date']);
         }
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$title] ?? []);
+
         return $data;
     }
-
 }

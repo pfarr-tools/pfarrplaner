@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -22,7 +23,7 @@ class UserNameFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testNameServiceFromUserUsesFirstAndLastName()
+    public function test_name_service_from_user_uses_first_and_last_name()
     {
         $user = User::factory()->make(['first_name' => 'Anna', 'last_name' => 'Müller', 'title' => '']);
         $ns = NameService::fromUser($user);
@@ -30,7 +31,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame('Müller', $ns->getLastName());
     }
 
-    public function testNameServiceFromUserHandlesNullNames()
+    public function test_name_service_from_user_handles_null_names()
     {
         $user = User::factory()->make(['first_name' => null, 'last_name' => 'Admin', 'title' => null]);
         $ns = NameService::fromUser($user);
@@ -38,7 +39,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame('Admin', $ns->getLastName());
     }
 
-    public function testNameServiceFromUserIncludesTitle()
+    public function test_name_service_from_user_includes_title()
     {
         $user = User::factory()->make(['first_name' => 'Paul', 'last_name' => 'Fischer', 'title' => 'Dr.']);
         $ns = NameService::fromUser($user);
@@ -46,32 +47,32 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame('Dr. Paul Fischer', $ns->format(NameService::TITLE_FIRST_LAST));
     }
 
-    public function testFullNameReturnsTrimmedFirstLast()
+    public function test_full_name_returns_trimmed_first_last()
     {
         $user = User::factory()->make(['first_name' => 'Maria', 'last_name' => 'Schmidt']);
         $this->assertSame('Maria Schmidt', $user->fullName());
     }
 
-    public function testFullNameWithTitleReturnsTitleFirstLast()
+    public function test_full_name_with_title_returns_title_first_last()
     {
         $user = User::factory()->make(['first_name' => 'Hans', 'last_name' => 'Weber', 'title' => 'Pfarrer']);
         $this->assertSame('Pfarrer Hans Weber', $user->fullName(true));
     }
 
-    public function testFullNameWithOnlyLastName()
+    public function test_full_name_with_only_last_name()
     {
         $user = User::factory()->make(['first_name' => null, 'last_name' => 'Admin']);
         $this->assertSame('Admin', $user->fullName());
     }
 
-    public function testUserResourceNameFieldUsesFullName()
+    public function test_user_resource_name_field_uses_full_name()
     {
         $user = User::factory()->create(['first_name' => 'Lena', 'last_name' => 'Bauer']);
         $resource = (new UserResource($user))->resolve();
         $this->assertSame('Lena Bauer', $resource['name']);
     }
 
-    public function testCreateIfNotExistsDoesNotSetName()
+    public function test_create_if_not_exists_does_not_set_name()
     {
         $id = User::createIfNotExists('Max Mustermann');
         $user = User::find($id);
@@ -80,7 +81,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame('Mustermann', $user->last_name);
     }
 
-    public function testCreateIfNotExistsSingleWordGoesToLastName()
+    public function test_create_if_not_exists_single_word_goes_to_last_name()
     {
         $id = User::createIfNotExists('Mustermann');
         $user = User::find($id);
@@ -88,7 +89,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame('', $user->first_name);
     }
 
-    public function testCreateIfNotExistsTitleFirstLast()
+    public function test_create_if_not_exists_title_first_last()
     {
         $id = User::createIfNotExists('Dr. Eva Lehmann');
         $user = User::find($id);
@@ -97,7 +98,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame('Lehmann', $user->last_name);
     }
 
-    public function testIdentifyPersonFindsExistingUserByExactName()
+    public function test_identify_person_finds_existing_user_by_exact_name()
     {
         $user = User::factory()->create(['first_name' => 'Eva', 'last_name' => 'Lehmann']);
 
@@ -107,7 +108,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame($user->id, $result['user']->id);
     }
 
-    public function testIdentifyPersonFindsExistingUserByCommaNameWithTitle()
+    public function test_identify_person_finds_existing_user_by_comma_name_with_title()
     {
         $user = User::factory()->create(['first_name' => 'Eva', 'last_name' => 'Lehmann', 'title' => 'Dr.']);
 
@@ -117,7 +118,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame($user->id, $result['user']->id);
     }
 
-    public function testIdentifyPersonFallsBackToNamePairForUnknownPerson()
+    public function test_identify_person_falls_back_to_name_pair_for_unknown_person()
     {
         $result = NameService::identifyPerson('Petra Beispiel');
 
@@ -127,7 +128,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertNull($result['user']);
     }
 
-    public function testIdentifyPersonFallsBackToNamePairForDuplicateUsers()
+    public function test_identify_person_falls_back_to_name_pair_for_duplicate_users()
     {
         User::factory()->create(['first_name' => 'Max', 'last_name' => 'Mustermann']);
         User::factory()->create(['first_name' => 'Max', 'last_name' => 'Mustermann']);
@@ -140,7 +141,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertNull($result['user']);
     }
 
-    public function testIdentifyPersonMarksSingleWordAsUnidentified()
+    public function test_identify_person_marks_single_word_as_unidentified()
     {
         $result = NameService::identifyPerson('Küsterdienst');
 
@@ -150,7 +151,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertNull($result['user']);
     }
 
-    public function testIdentifyPeopleGroupsResultsByStatus()
+    public function test_identify_people_groups_results_by_status()
     {
         $user = User::factory()->create(['first_name' => 'Anna', 'last_name' => 'Müller']);
 
@@ -168,7 +169,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame('Küsterdienst', $result['unidentified'][0]['input']);
     }
 
-    public function testIdentifyPeopleUsesContextForSurnameOnlyEntries()
+    public function test_identify_people_uses_context_for_surname_only_entries()
     {
         $result = NameService::identifyPeople([
             'Wolfgang Amann',
@@ -180,7 +181,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame('Amann', $result['identified_names'][1]['last_name']);
     }
 
-    public function testIdentifyPeopleUsesContextForInitialAndSurname()
+    public function test_identify_people_uses_context_for_initial_and_surname()
     {
         $result = NameService::identifyPeople([
             'Thomas Will',
@@ -192,7 +193,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame('Will', $result['identified_names'][1]['last_name']);
     }
 
-    public function testIdentifyPeopleUsesContextForFirstNameOnlyEntries()
+    public function test_identify_people_uses_context_for_first_name_only_entries()
     {
         $result = NameService::identifyPeople([
             'Sonja Plaumann',
@@ -204,7 +205,7 @@ class UserNameFeatureTest extends TestCase
         $this->assertSame('Plaumann', $result['identified_names'][1]['last_name']);
     }
 
-    public function testIdentifyPeopleRejectsCommentEntries()
+    public function test_identify_people_rejects_comment_entries()
     {
         $result = NameService::identifyPeople([
             'Wolfgang Amann',

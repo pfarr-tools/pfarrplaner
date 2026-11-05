@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,9 +30,9 @@
 
 namespace App\Providers;
 
-use App\Models\Calendar\Day;
 use App\Models\Ads\AdConfig;
 use App\Models\Attachment;
+use App\Models\Calendar\Day;
 use App\Models\Comment;
 use App\Models\Leave\Absence;
 use App\Models\Leave\Replacement;
@@ -42,34 +42,34 @@ use App\Models\Liturgy\Songbook;
 use App\Models\Location;
 use App\Models\People\Team;
 use App\Models\People\User;
-use App\Models\Places\StreetRange;
 use App\Models\Places\City;
+use App\Models\Places\StreetRange;
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
+use App\Models\Seating\Booking;
 use App\Models\Sermon;
 use App\Models\ServiceGroup;
-use App\Models\Seating\Booking;
 use App\Models\Tag;
 use App\Policies\AbsencePolicy;
+use App\Policies\AdConfigPolicy;
+use App\Policies\AttachmentPolicy;
+use App\Policies\BaptismPolicy;
+use App\Policies\BookingPolicy;
 use App\Policies\CityPolicy;
 use App\Policies\CommentPolicy;
 use App\Policies\DayPolicy;
 use App\Policies\FuneralPolicy;
-use App\Policies\AttachmentPolicy;
-use App\Policies\AdConfigPolicy;
-use App\Policies\BaptismPolicy;
-use App\Policies\BookingPolicy;
 use App\Policies\LocationPolicy;
 use App\Policies\ParishPolicy;
 use App\Policies\PsalmPolicy;
-use App\Policies\SongPolicy;
-use App\Policies\SongbookPolicy;
-use App\Policies\RolePolicy;
 use App\Policies\ReplacementPolicy;
+use App\Policies\RolePolicy;
 use App\Policies\SermonPolicy;
-use App\Policies\ServicePolicy;
 use App\Policies\ServiceGroupPolicy;
+use App\Policies\ServicePolicy;
+use App\Policies\SongbookPolicy;
+use App\Policies\SongPolicy;
 use App\Policies\StreetRangePolicy;
 use App\Policies\TagPolicy;
 use App\Policies\TeamPolicy;
@@ -81,18 +81,11 @@ use Spatie\Permission\Models\Role;
 
 /**
  * Class AuthServiceProvider
- * @package App\Providers
  */
 class AuthServiceProvider extends ServiceProvider
 {
-
-    /**
-     *
-     */
     public const SUPER = 'Super-Administrator:in';
-    /**
-     *
-     */
+
     public const ADMIN = 'Administrator:in';
 
     /**
@@ -105,7 +98,7 @@ class AuthServiceProvider extends ServiceProvider
         Booking::class => BookingPolicy::class,
         Location::class => LocationPolicy::class,
         City::class => CityPolicy::class,
-        //Service::class => ServicePolicy::class,
+        // Service::class => ServicePolicy::class,
         '\App\Models\Service' => ServicePolicy::class,
         'App\Models\Service' => ServicePolicy::class,
         Day::class => DayPolicy::class,

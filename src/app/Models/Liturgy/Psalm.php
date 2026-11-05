@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Models\Liturgy;
 
-
 use App\Models\AbstractModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -40,11 +39,14 @@ class Psalm extends AbstractModel
     use HasFactory;
 
     protected static string $prefix = 'psalm';
+
     protected static string $prefixPlural = 'psalms';
+
     public static array $exceptRoutes = [
         'web' => ['show'],
         'api' => ['show', 'destroy'],
     ];
+
     protected static $routes = [
         'api' => [
             'index' => [['GET', 'HEAD'], 'liturgy/#p#'],
@@ -52,6 +54,7 @@ class Psalm extends AbstractModel
             'update' => [['PATCH', 'PUT'], 'liturgy/#p#/{modelId}'],
         ],
     ];
+
     public static array $validationRules = [
         'title' => 'required|string',
         'intro' => 'nullable|string',
@@ -74,7 +77,7 @@ class Psalm extends AbstractModel
 
     public function getLabelAttribute(): string
     {
-        return trim((($this->songbook_abbreviation ?: $this->songbook ?: '') . ' ' . ($this->reference ?: '') . ' ' . $this->title));
+        return trim((($this->songbook_abbreviation ?: $this->songbook ?: '').' '.($this->reference ?: '').' '.$this->title));
     }
 
     protected static function boot()
@@ -88,5 +91,4 @@ class Psalm extends AbstractModel
             $builder->orderBy('title', 'asc');
         });
     }
-
 }

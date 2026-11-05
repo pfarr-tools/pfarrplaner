@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -74,7 +74,7 @@ class CreatePermissionTables extends Migration
 
                 $table->string('model_type');
                 $table->unsignedBigInteger($columnNames['model_morph_key']);
-                $table->index([$columnNames['model_morph_key'], 'model_type',]);
+                $table->index([$columnNames['model_morph_key'], 'model_type']);
 
                 $table->foreign('permission_id')
                     ->references('id')
@@ -95,7 +95,7 @@ class CreatePermissionTables extends Migration
 
                 $table->string('model_type');
                 $table->unsignedBigInteger($columnNames['model_morph_key']);
-                $table->index([$columnNames['model_morph_key'], 'model_type',]);
+                $table->index([$columnNames['model_morph_key'], 'model_type']);
 
                 $table->foreign('role_id')
                     ->references('id')

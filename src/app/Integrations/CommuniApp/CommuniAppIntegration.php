@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,21 +30,22 @@
 
 namespace App\Integrations\CommuniApp;
 
-
 use App\Integrations\AbstractIntegration;
 use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
 use App\Models\Service;
-use Carbon\Carbon;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Console\Scheduling\Schedule;
+use Psr\Http\Message\ResponseInterface;
 
 class CommuniAppIntegration extends AbstractIntegration
 {
     const AUTH_HEADER = 'X-Authorization';
-    const COMMUNI_API_URL = 'https://api.communiapp.de';
-    const ROUTE_EVENT = '/rest/event';
 
+    const COMMUNI_API_URL = 'https://api.communiapp.de';
+
+    const ROUTE_EVENT = '/rest/event';
 
     /** @var Client */
     protected $client = null;
@@ -54,7 +55,7 @@ class CommuniAppIntegration extends AbstractIntegration
 
     /**
      * Schedule the push to CommuniApp to be run daily
-     * @param Schedule $schedule
+     *
      * @return void
      */
     public static function schedule(Schedule $schedule)
@@ -62,11 +63,8 @@ class CommuniAppIntegration extends AbstractIntegration
         $schedule->command('communiapp:push')->timezone('Europe/Berlin')->dailyAt('08:00');
     }
 
-
     /**
      * Check if this integration is active for a particular city
-     * @param City $city
-     * @return bool
      */
     public static function isActive(City $city): bool
     {
@@ -75,8 +73,6 @@ class CommuniAppIntegration extends AbstractIntegration
 
     /**
      * Get an instance of this integration for a particular city
-     * @param City $city
-     * @return CommuniAppIntegration
      */
     public static function get(City $city): CommuniAppIntegration
     {
@@ -85,7 +81,6 @@ class CommuniAppIntegration extends AbstractIntegration
 
     /**
      * CommuniAppIntegration constructor.
-     * @param City $city
      */
     public function __construct(City $city)
     {
@@ -103,16 +98,17 @@ class CommuniAppIntegration extends AbstractIntegration
 
     /**
      * Create a new service on CommuniApp
-     * @param Service $service
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @throws GuzzleException
      */
     public function handleServiceCreated(Service $service) {}
 
     /**
      * Create a new service on CommuniApp (only here for reference)
-     * @param Service $service
-     * @return \Psr\Http\Message\ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return ResponseInterface
+     *
+     * @throws GuzzleException
      */
     private function createService(Service $service)
     {
@@ -128,21 +124,22 @@ class CommuniAppIntegration extends AbstractIntegration
 
     /**
      * Update an existing service on CommuniApp (only here for reference)
-     * @param Service $service
-     * @return \Psr\Http\Message\ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return ResponseInterface
+     *
+     * @throws GuzzleException
      */
-    private function updateService(Service $service) {
+    private function updateService(Service $service)
+    {
         return $this->client->put(sprintf('%s/%s', self::ROUTE_EVENT, $service->communiapp_id),
-                                       ['body' => json_encode($this->getServiceArray($service))]);
+            ['body' => json_encode($this->getServiceArray($service))]);
     }
 
     /**
      * Convert a service to a dataset array for CommuniApp
-     * @param Service $service
-     * @return array
      */
-    protected function getServiceArray(Service $service): array {
+    protected function getServiceArray(Service $service): array
+    {
         return [
             'dateTime' => $service->dateTime->setTimezone('Europe/Berlin')->format('Y-m-d H:i:s'),
             'isOfficial' => true,
@@ -155,10 +152,9 @@ class CommuniAppIntegration extends AbstractIntegration
 
     /**
      * Convert an event to a dataset array for CommuniApp
-     * @param Occurence $event
-     * @return array
      */
-    protected function getEventArray(Occurence $event): array {
+    protected function getEventArray(Occurence $event): array
+    {
         return [
             'dateTime' => $event->start->setTimezone('Europe/Berlin')->format('Y-m-d H:i:s'),
             'isOfficial' => true,
@@ -170,23 +166,20 @@ class CommuniAppIntegration extends AbstractIntegration
         ];
     }
 
-
-
     /**
      * Delete a service from CommuniApp
-     * @param Service $service
      */
     public function handleserviceDeleted(Service $service) {}
 
     /**
      * Delete a service from CommuniApp (only here for reference)
-     * @param Service $service
-     * @return \Psr\Http\Message\ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return ResponseInterface
+     *
+     * @throws GuzzleException
      */
     public function deleteService(Service $service)
     {
         return $this->client->delete(sprintf('%s/%s', self::ROUTE_EVENT, $service->communiapp_id));
     }
-
 }

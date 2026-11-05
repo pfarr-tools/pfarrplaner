@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,14 +35,15 @@ use Illuminate\Support\Facades\Auth;
 class AdminBackupHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Backups';
+
     protected $description = 'Übersicht über den Status der Backups';
+
     protected $config = [];
 
     public function isAvailable(): bool
     {
         return Auth::user()->isAdmin;
     }
-
 
     public function toArray($data = [])
     {
@@ -51,5 +52,8 @@ class AdminBackupHomeScreenTab extends AbstractHomeScreenTab
         return parent::toArray($data);
     }
 
-    protected function getBackups() { return []; }
+    protected function getBackups()
+    {
+        return [];
+    }
 }

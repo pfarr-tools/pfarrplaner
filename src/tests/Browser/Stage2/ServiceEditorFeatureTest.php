@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -16,8 +17,8 @@ use App\Liturgy\LiturgySheets\LiturgySheets;
 use App\Models\Liturgy\Block;
 use App\Models\Location;
 use App\Models\Places\City;
-use App\Models\Service;
 use App\Models\Sermon;
+use App\Models\Service;
 use Carbon\Carbon;
 use Laravel\Dusk\Browser;
 use Tests\AbstractPageLoadTest;
@@ -27,8 +28,11 @@ use Tests\Browser\Pages\ServiceEditorPage;
 class ServiceEditorFeatureTest extends AbstractPageLoadTest
 {
     protected Service $service;
+
     protected Sermon $sermon;
+
     protected City $city;
+
     protected Location $location;
 
     protected function setUp(): void
@@ -55,81 +59,81 @@ class ServiceEditorFeatureTest extends AbstractPageLoadTest
             'instructions' => '',
             'sortable' => 0,
         ]);
-        $this->sermon  = Sermon::create(['title' => 'Testpredigt']);
+        $this->sermon = Sermon::create(['title' => 'Testpredigt']);
         $this->service->update(['sermon_id' => $this->sermon->id]);
     }
 
-    public function testServiceEditorRendersForm(): void
+    public function test_service_editor_renders_form(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new ServiceEditorPage($this->service->slug))
-                    ->assertPresent('#serviceEditorForm');
+                ->visit(new ServiceEditorPage($this->service->slug))
+                ->assertPresent('#serviceEditorForm');
         });
     }
 
-    public function testDescriptionFieldCanBeEdited(): void
+    public function test_description_field_can_be_edited(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new ServiceEditorPage($this->service->slug))
-                    ->waitFor('[name="description"]', 10)
-                    ->type('[name="description"]', 'Neue Testbeschreibung')
-                    ->assertInputValue('[name="description"]', 'Neue Testbeschreibung');
+                ->visit(new ServiceEditorPage($this->service->slug))
+                ->waitFor('[name="description"]', 10)
+                ->type('[name="description"]', 'Neue Testbeschreibung')
+                ->assertInputValue('[name="description"]', 'Neue Testbeschreibung');
         });
     }
 
-    public function testSaveButtonIsPresent(): void
+    public function test_save_button_is_present(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new ServiceEditorPage($this->service->slug))
-                    ->assertPresent('button.btn-primary');
+                ->visit(new ServiceEditorPage($this->service->slug))
+                ->assertPresent('button.btn-primary');
         });
     }
 
-    public function testInternalRemarksCanBeEdited(): void
+    public function test_internal_remarks_can_be_edited(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new ServiceEditorPage($this->service->slug))
-                    ->waitFor('[name="internal_remarks"]', 10)
-                    ->type('[name="internal_remarks"]', 'Interne Anmerkung')
-                    ->assertInputValue('[name="internal_remarks"]', 'Interne Anmerkung');
+                ->visit(new ServiceEditorPage($this->service->slug))
+                ->waitFor('[name="internal_remarks"]', 10)
+                ->type('[name="internal_remarks"]', 'Interne Anmerkung')
+                ->assertInputValue('[name="internal_remarks"]', 'Interne Anmerkung');
         });
     }
 
-    public function testSaveServiceNavigatesOrShowsNoError(): void
+    public function test_save_service_navigates_or_shows_no_error(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new ServiceEditorPage($this->service->slug))
-                    ->waitFor('button.btn-primary', 10)
-                    ->click('button.btn-primary')
-                    ->pause(1000)
-                    ->assertDontSee('Whoops')
-                    ->assertDontSee('500');
+                ->visit(new ServiceEditorPage($this->service->slug))
+                ->waitFor('button.btn-primary', 10)
+                ->click('button.btn-primary')
+                ->pause(1000)
+                ->assertDontSee('Whoops')
+                ->assertDontSee('500');
         });
     }
 
-    public function testAttachmentsTabShowsAutoAttachmentsForServicesWithLiturgyBlocks(): void
+    public function test_attachments_tab_shows_auto_attachments_for_services_with_liturgy_blocks(): void
     {
         $firstDownloadableSheet = collect(LiturgySheets::all())
-            ->first(fn (array $sheet) => !($sheet['isNotAFile'] ?? false));
+            ->first(fn (array $sheet) => ! ($sheet['isNotAFile'] ?? false));
 
         $this->assertNotNull($firstDownloadableSheet);
 
         $this->browse(function (Browser $browser) use ($firstDownloadableSheet) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new ServiceEditorPage($this->service->slug))
-                    ->waitFor('#attachmentsTab a', 10)
-                    ->click('#attachmentsTab a')
-                    ->waitFor('#attachments', 10)
-                    ->assertSee($firstDownloadableSheet['title']);
+                ->visit(new ServiceEditorPage($this->service->slug))
+                ->waitFor('#attachmentsTab a', 10)
+                ->click('#attachmentsTab a')
+                ->waitFor('#attachments', 10)
+                ->assertSee($firstDownloadableSheet['title']);
         });
     }
 
-    public function testSummerTimeChangeIsSavedInUtcAndShownCorrectlyInCalendar(): void
+    public function test_summer_time_change_is_saved_in_utc_and_shown_correctly_in_calendar(): void
     {
         $this->browse(function (Browser $browser) {
             $page = new ServiceEditorPage($this->service->slug);

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -26,14 +27,14 @@ class AbsencesPageLoadTest extends AbstractPageLoadTest
         $this->absence = Absence::factory()->create(['user_id' => $this->superAdminUser->id]);
     }
 
-    public function testAbsencePlannerLoads(): void
+    public function test_absence_planner_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('absences.index'));
         });
     }
 
-    public function testAbsenceEditorLoads(): void
+    public function test_absence_editor_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('absence.edit', $this->absence->id));

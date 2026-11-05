@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -33,44 +34,44 @@ class ServiceRequestFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testRulesMethodReturnsArray(): void
+    public function test_rules_method_returns_array(): void
     {
-        $request = new ServiceRequest();
+        $request = new ServiceRequest;
         $rules = $request->rules();
         $this->assertIsArray($rules);
         $this->assertArrayHasKey('time', $rules);
     }
 
-    public function testValidTimeFormatPasses(): void
+    public function test_valid_time_format_passes(): void
     {
-        $request = new ServiceRequest();
+        $request = new ServiceRequest;
         $validator = Validator::make(['time' => '10:00'], $request->rules());
         $this->assertTrue($validator->passes());
     }
 
-    public function testInvalidTimeFormatFails(): void
+    public function test_invalid_time_format_fails(): void
     {
-        $request = new ServiceRequest();
+        $request = new ServiceRequest;
         $validator = Validator::make(['time' => '25:00'], $request->rules());
         $this->assertFalse($validator->passes());
         $this->assertArrayHasKey('time', $validator->errors()->toArray());
     }
 
-    public function testValidOfferingTypePasses(): void
+    public function test_valid_offering_type_passes(): void
     {
-        $request = new ServiceRequest();
+        $request = new ServiceRequest;
         $validator = Validator::make(['offering_type' => 'eO'], $request->rules());
         $this->assertTrue($validator->passes());
     }
 
-    public function testInvalidOfferingTypeFails(): void
+    public function test_invalid_offering_type_fails(): void
     {
-        $request = new ServiceRequest();
+        $request = new ServiceRequest;
         $validator = Validator::make(['offering_type' => 'invalid'], $request->rules());
         $this->assertFalse($validator->passes());
     }
 
-    public function testUpdateWithValidDataSucceeds(): void
+    public function test_update_with_valid_data_succeeds(): void
     {
         $service = Service::factory()->create();
         $this->actingAs($this->user)

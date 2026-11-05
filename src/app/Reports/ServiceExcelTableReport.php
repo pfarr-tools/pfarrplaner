@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,6 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -32,13 +34,13 @@ use PhpOffice\PhpSpreadsheet\Writer\Exception;
 
 /**
  * Class ServiceExcelTableReport
- *
- * @package Pfarrplaner
  */
 class ServiceExcelTableReport extends AbstractExcelDocumentReport
 {
     public const FILE_TITLE = 'Veranstaltungstabelle';
+
     public const FILE_SIGNATURE = '50.1';
+
     public const SETTINGS_KEY = 'report.service_excel_table';
 
     /**
@@ -59,7 +61,7 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
@@ -69,8 +71,8 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         $ministries = MinistryService::selectList();
         $settings = $user->getSetting(static::SETTINGS_KEY, []);
         $savedMinistries = is_array($settings['ministries'] ?? null) ? $settings['ministries'] : [];
-        $readableHeaders = (int)($settings['readable_headers'] ?? 0);
-        $servicesOnly = (int)($settings['services_only'] ?? 1);
+        $readableHeaders = (int) ($settings['readable_headers'] ?? 0);
+        $servicesOnly = (int) ($settings['services_only'] ?? 1);
         $start = Carbon::now()->addMonth()->startOfMonth()->format('Y-m-d');
         $end = Carbon::now()->addMonths(2)->endOfMonth()->format('Y-m-d');
 
@@ -90,8 +92,8 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
     }
 
     /**
-     * @param Request $request
      * @return mixed
+     *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws Exception
      */
@@ -113,8 +115,8 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
 
         $user = Auth::user();
         $ministries = array_values(array_unique($data['ministries'] ?? []));
-        $readableHeaders = (bool)($data['readable_headers'] ?? false);
-        $servicesOnly = (bool)($data['services_only'] ?? true);
+        $readableHeaders = (bool) ($data['readable_headers'] ?? false);
+        $servicesOnly = (bool) ($data['services_only'] ?? true);
         $user->setSetting(
             static::SETTINGS_KEY,
             [
@@ -132,7 +134,7 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
             ->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
             ->ordered();
 
-        if (!$servicesOnly) {
+        if (! $servicesOnly) {
             $query->includeAllEventTypes();
         }
 
@@ -230,7 +232,7 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
 
         return $this->sendToBrowser(
             FileNameService::make(
-                static::FILE_TITLE . ' ' . $cities->pluck('name')->join(', '),
+                static::FILE_TITLE.' '.$cities->pluck('name')->join(', '),
                 'xlsx',
                 static::FILE_SIGNATURE,
                 [$data['start'], $data['end']]
@@ -238,12 +240,6 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         );
     }
 
-    /**
-     * @param array $ministries
-     * @param bool $readableHeaders
-     * @param bool $servicesOnly
-     * @return array
-     */
     protected function buildColumns(array $ministries, bool $readableHeaders, bool $servicesOnly): array
     {
         $pastorLabel = MinistryService::title('P');
@@ -266,21 +262,21 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
             [
                 'key' => 'pastors',
                 'label' => $readableHeaders ? $pastorLabel : $this->toPascalCaseHeading($pastorLabel),
-                'width' => 24
+                'width' => 24,
             ],
             [
                 'key' => 'organists',
                 'label' => $readableHeaders ? $organistLabel : $this->toPascalCaseHeading($organistLabel),
-                'width' => 24
+                'width' => 24,
             ],
             [
                 'key' => 'sacristans',
                 'label' => $readableHeaders ? $sacristanLabel : $this->toPascalCaseHeading($sacristanLabel),
-                'width' => 24
+                'width' => 24,
             ],
         ];
 
-        if (!$servicesOnly) {
+        if (! $servicesOnly) {
             array_splice(
                 $columns,
                 10,
@@ -292,7 +288,7 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         foreach ($ministries as $ministry) {
             $title = MinistryService::title($ministry);
             $columns[] = [
-                'key' => 'ministry:' . $ministry,
+                'key' => 'ministry:'.$ministry,
                 'label' => $readableHeaders ? $title : $this->toPascalCaseHeading($title),
                 'width' => 24,
             ];
@@ -310,33 +306,20 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         );
     }
 
-    /**
-     * @param string $pascalCaseLabel
-     * @param string $readableLabel
-     * @param bool $readableHeaders
-     * @return string
-     */
     protected function headerLabel(string $pascalCaseLabel, string $readableLabel, bool $readableHeaders): string
     {
         return $readableHeaders ? $readableLabel : $pascalCaseLabel;
     }
 
-    /**
-     * @param string $value
-     * @return string
-     */
     protected function toPascalCaseHeading(string $value): string
     {
         $words = preg_split('/[^[:alnum:]]+/u', $value) ?: [];
         $words = array_filter($words, fn ($word) => $word !== '');
+
         return implode('', array_map(fn ($word) => mb_convert_case($word, MB_CASE_TITLE, 'UTF-8'), $words));
     }
 
     /**
-     * @param Service $service
-     * @param string $key
-     * @param array $ministries
-     * @param Carbon $localDate
      * @return mixed
      */
     protected function resolveColumnValue(
@@ -344,13 +327,13 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         string $key,
         array $ministries,
         Carbon $localDate
-    )
-    {
+    ) {
         if (str_starts_with($key, 'ministry:')) {
             $category = substr($key, 9);
-            if (!in_array($category, $ministries, true)) {
+            if (! in_array($category, $ministries, true)) {
                 return '';
             }
+
             return $this->peopleListFormatted($service->participantsByCategory($category));
         }
 
@@ -362,31 +345,26 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
             'baptism' => $service->baptism ? 'X' : '',
             'eucharist' => $service->eucharist ? 'X' : '',
             'title' => $service->titleText(false, false),
-            'description' => (string)$service->description,
+            'description' => (string) $service->description,
             'location' => $service->locationText(),
             'city' => $service->city->name ?? '',
             'event_class' => $this->eventClassLabel($service->event_class),
-            'internal_remarks' => (string)$service->internal_remarks,
-            'announcements' => (string)$service->announcements,
+            'internal_remarks' => (string) $service->internal_remarks,
+            'announcements' => (string) $service->announcements,
             'pastors' => $this->peopleListFormatted($service->pastors),
             'organists' => $this->peopleListFormatted($service->organists),
             'sacristans' => $this->peopleListFormatted($service->sacristans),
-            'offerings_counter1' => (string)$service->offerings_counter1,
-            'offerings_counter2' => (string)$service->offerings_counter2,
+            'offerings_counter1' => (string) $service->offerings_counter1,
+            'offerings_counter2' => (string) $service->offerings_counter2,
             'offering_goal' => $service->offeringGoal(),
             'offering_description' => $service->offeringDescription(),
-            'offering_amount' => is_numeric(str_replace(',', '.', (string)$service->offering_amount))
-                ? (float)str_replace(',', '.', (string)$service->offering_amount)
-                : (string)$service->offering_amount,
+            'offering_amount' => is_numeric(str_replace(',', '.', (string) $service->offering_amount))
+                ? (float) str_replace(',', '.', (string) $service->offering_amount)
+                : (string) $service->offering_amount,
             default => '',
         };
     }
 
-    /**
-     * @param Service $service
-     * @param array $liturgy
-     * @return string
-     */
     protected function resolveLiturgicalColor(Service $service, array $liturgy): string
     {
         $colors = [
@@ -404,23 +382,15 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
         return $colors[$liturgy['CSS-Farbe'] ?? 'white'] ?? $colors['white'];
     }
 
-    /**
-     * @param string|null $eventClass
-     * @return string
-     */
     protected function eventClassLabel(?string $eventClass): string
     {
         return match ($eventClass) {
             'service' => 'Gottesdienst',
             'event' => 'Andere Veranstaltung',
-            default => (string)$eventClass,
+            default => (string) $eventClass,
         };
     }
 
-    /**
-     * @param Collection $people
-     * @return string
-     */
     protected function peopleListFormatted(Collection $people): string
     {
         $recs = [];
@@ -429,29 +399,22 @@ class ServiceExcelTableReport extends AbstractExcelDocumentReport
                 $recs[] = $person->formattedName(User::NAME_FORMAT_FIRST_AND_LAST);
             }
         }
-        return join(', ', $recs);
+
+        return implode(', ', $recs);
     }
 
-    /**
-     * @param int $index
-     * @return string
-     */
     protected function columnLetter(int $index): string
     {
         $letter = '';
         while ($index > 0) {
             $index--;
-            $letter = chr(65 + ($index % 26)) . $letter;
+            $letter = chr(65 + ($index % 26)).$letter;
             $index = intdiv($index, 26);
         }
+
         return $letter;
     }
 
-    /**
-     * @param array $columns
-     * @param string $key
-     * @return int
-     */
     protected function findColumnIndex(array $columns, string $key): int
     {
         foreach ($columns as $index => $column) {

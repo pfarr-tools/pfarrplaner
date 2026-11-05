@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,13 +30,12 @@
 
 namespace App\Policies;
 
-use App\Models\Tag;
 use App\Models\People\User;
+use App\Models\Tag;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
  * Class TagPolicy
- * @package App\Policies
  */
 class TagPolicy
 {
@@ -52,18 +51,12 @@ class TagPolicy
         //
     }
 
-
-    /**
-     * @param User $user
-     * @return bool
-     */
     public function viewAny(User $user): bool
     {
         return true;
     }
 
     /**
-     * @param User $user
      * @return bool
      */
     public function index(User $user)
@@ -72,7 +65,6 @@ class TagPolicy
     }
 
     /**
-     * @param User $user
      * @return bool
      */
     public function create(User $user)
@@ -81,8 +73,6 @@ class TagPolicy
     }
 
     /**
-     * @param User $user
-     * @param Tag $model
      * @return bool
      */
     public function update(User $user, Tag $model)
@@ -91,8 +81,6 @@ class TagPolicy
     }
 
     /**
-     * @param User $user
-     * @param Tag $model
      * @return bool
      */
     public function delete(User $user, Tag $model)
@@ -101,8 +89,6 @@ class TagPolicy
     }
 
     /**
-     * @param User $user
-     * @param Tag $model
      * @return bool
      */
     public function forceDelete(User $user, Tag $model)
@@ -111,8 +97,6 @@ class TagPolicy
     }
 
     /**
-     * @param User $user
-     * @param Tag $model
      * @return bool
      */
     public function restore(User $user, Tag $model)

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,13 +34,9 @@ use App\Http\Controllers\PapierkorbController;
 use App\Models\Liturgy\Psalm;
 use App\Models\Liturgy\Song;
 use App\Models\Liturgy\Text;
-use App\Models\Location;
-use App\Models\Parish;
 use App\Models\People\Team;
 use App\Models\People\User;
-use App\Models\Places\City;
 use App\Models\Service;
-use App\Models\Tag;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -49,6 +45,7 @@ use Spatie\Permission\Models\Role;
 class AdminModule extends AbstractModule
 {
     protected $title = 'Administration';
+
     protected $icon = 'mdi mdi-account-tie-hat';
 
     public function addItems(array $items): array
@@ -62,23 +59,27 @@ class AdminModule extends AbstractModule
                 'inertia' => true,
             ];
         }
+
         return $items;
     }
 
-    public static function modules() {
+    public static function modules()
+    {
         $adminMenu = [];
         $user = Auth::user();
         $route = Route::currentRouteName();
 
         // auto-register model routes
         foreach (\File::allFiles(app_path('Models')) as $file) {
-            if (($file->getExtension() == 'php') && (!Str::contains($file->getPathname(), 'Abstract'))) {
-                $className = substr('App\\Models\\' . Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
+            if (($file->getExtension() == 'php') && (! Str::contains($file->getPathname(), 'Abstract'))) {
+                $className = substr('App\\Models\\'.Str::replace('/', '\\', $file->getRelativePathname()), 0, -4);
                 if (method_exists($className, 'getAdminModuleConfig')) {
-                    if ($config = $className::getAdminModuleConfig()) $adminMenu[] = $config;
+                    if ($config = $className::getAdminModuleConfig()) {
+                        $adminMenu[] = $config;
+                    }
                 }
             }
-        };
+        }
 
         if ($user->can('index', User::class)) {
             $adminMenu[] = [
@@ -153,7 +154,7 @@ class AdminModule extends AbstractModule
         if ($config = PapierkorbController::getAdminModuleConfig()) {
             $adminMenu[] = $config;
         }
+
         return array_values(collect($adminMenu)->sortBy('text')->toArray());
     }
-
 }

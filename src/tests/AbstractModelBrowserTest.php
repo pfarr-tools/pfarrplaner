@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,7 +31,15 @@
 namespace Tests;
 
 use App\Models\AbstractModel as BaseAbstractModel;
+use App\Models\Ads\AdConfig;
+use App\Models\Attachment;
+use App\Models\Comment;
+use App\Models\Occurence;
 use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Replacement;
+use App\Models\ServiceGroup;
+use App\Models\StreetRange;
 use App\Services\RoleService;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Database\Eloquent\Model;
@@ -41,11 +49,12 @@ use Laravel\Dusk\Browser;
 
 abstract class AbstractModelBrowserTest extends DuskTestCase
 {
-
     use DatabaseTruncation;
 
     protected $modelclass;
+
     protected $seeder = RoleSeeder::class;
+
     protected const MODEL_FIELD_CANDIDATES = [
         'name',
         'title',
@@ -55,27 +64,32 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
         'text',
         'code',
     ];
+
     protected const EXCLUDED_MODEL_CLASSES = [
-        \App\Models\Ads\AdConfig::class,
-        \App\Models\Attachment::class,
-        \App\Models\Comment::class,
-        \App\Models\Occurence::class,
-        \App\Models\Replacement::class,
-        \App\Models\ServiceGroup::class,
-        \App\Models\StreetRange::class,
+        AdConfig::class,
+        Attachment::class,
+        Comment::class,
+        Occurence::class,
+        Replacement::class,
+        ServiceGroup::class,
+        StreetRange::class,
     ];
 
     /**
      * Test, if an Admin module is present
+     *
      * @return void
      */
-    public function testHasAdminModule()
+    public function test_has_admin_module()
     {
         if (empty($this->modelClass)) {
             $this->assertTrue(true);
+
             return;
         }
-        if ($this->skipTestIfNoAdminModule()) return;
+        if ($this->skipTestIfNoAdminModule()) {
+            return;
+        }
         auth()->login($this->testUser);
         $config = ($this->modelClass)::getAdminModuleConfig();
         auth()->logout();
@@ -100,13 +114,16 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
     /**
      * @return void
      */
-    public function testNewRecordIsVisibleInIndex()
+    public function test_new_record_is_visible_in_index()
     {
         if (empty($this->modelClass)) {
             $this->assertTrue(true);
+
             return;
         }
-        if ($this->skipTestIfNoAdminModule()) return;
+        if ($this->skipTestIfNoAdminModule()) {
+            return;
+        }
         $existing = $this->createBrowserModel($this->modelClass);
         $this->assertTrue($this->testUser->can('update', $existing));
         $this->browse(function (Browser $browser) use ($existing) {
@@ -123,18 +140,18 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
     protected static function browserModelProvider(): array
     {
         $models = [];
-        $directory = new \RecursiveDirectoryIterator(dirname(__DIR__) . '/app/Models');
+        $directory = new \RecursiveDirectoryIterator(dirname(__DIR__).'/app/Models');
         $iterator = new \RecursiveIteratorIterator($directory);
 
         foreach ($iterator as $file) {
-            if ((!$file->isFile()) || ($file->getExtension() !== 'php') || Str::contains($file->getPathname(), 'Abstract')) {
+            if ((! $file->isFile()) || ($file->getExtension() !== 'php') || Str::contains($file->getPathname(), 'Abstract')) {
                 continue;
             }
 
-            $relativePath = Str::after($file->getPathname(), dirname(__DIR__) . '/app/Models/');
-            $className = substr('App\\Models\\' . Str::replace(DIRECTORY_SEPARATOR, '\\', $relativePath), 0, -4);
-            if (!class_exists($className)
-                || !is_subclass_of($className, BaseAbstractModel::class)
+            $relativePath = Str::after($file->getPathname(), dirname(__DIR__).'/app/Models/');
+            $className = substr('App\\Models\\'.Str::replace(DIRECTORY_SEPARATOR, '\\', $relativePath), 0, -4);
+            if (! class_exists($className)
+                || ! is_subclass_of($className, BaseAbstractModel::class)
                 || in_array($className, static::EXCLUDED_MODEL_CLASSES, true)
             ) {
                 continue;
@@ -147,13 +164,13 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
             $models[] = [$className];
         }
 
-        usort($models, fn(array $left, array $right) => strcmp($left[0], $right[0]));
+        usort($models, fn (array $left, array $right) => strcmp($left[0], $right[0]));
 
         return $models;
     }
 
     /**
-     * @param class-string<BaseAbstractModel> $modelClass
+     * @param  class-string<BaseAbstractModel>  $modelClass
      * @return string[]
      */
     protected static function getGetRouteVerbs(string $modelClass): array
@@ -169,9 +186,7 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
     }
 
     /**
-     * @param class-string<BaseAbstractModel> $modelClass
-     * @param string $verb
-     * @return bool
+     * @param  class-string<BaseAbstractModel>  $modelClass
      */
     protected static function hasGetRouteVerb(string $modelClass, string $verb): bool
     {
@@ -179,20 +194,19 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
     }
 
     /**
-     * @param class-string<BaseAbstractModel> $modelClass
-     * @return bool
+     * @param  class-string<BaseAbstractModel>  $modelClass
      */
     protected static function shouldCheckAdminModule(string $modelClass): bool
     {
-        if ($modelClass === \App\Models\Places\City::class) {
+        if ($modelClass === City::class) {
             return false;
         }
 
-        return !empty($modelClass::$adminIcon ?? null);
+        return ! empty($modelClass::$adminIcon ?? null);
     }
 
     /**
-     * @param class-string<BaseAbstractModel> $modelClass
+     * @param  class-string<BaseAbstractModel>  $modelClass
      * @return Model&BaseAbstractModel
      */
     protected function createBrowserModel(string $modelClass): Model
@@ -215,12 +229,11 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
     /**
      * Ensure the browser user can see city-scoped models created by factories.
      *
-     * @param Model&BaseAbstractModel $model
-     * @return void
+     * @param  Model&BaseAbstractModel  $model
      */
     protected function prepareBrowserAccessForModel(Model $model): void
     {
-        if (!$model->getAttribute('city_id')) {
+        if (! $model->getAttribute('city_id')) {
             return;
         }
 
@@ -232,9 +245,8 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
     }
 
     /**
-     * @param class-string<BaseAbstractModel> $modelClass
-     * @param Model&BaseAbstractModel $model
-     * @return string|null
+     * @param  class-string<BaseAbstractModel>  $modelClass
+     * @param  Model&BaseAbstractModel  $model
      */
     protected function browserFieldName(string $modelClass, Model $model): ?string
     {
@@ -248,49 +260,44 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
     }
 
     /**
-     * @param class-string<BaseAbstractModel> $modelClass
-     * @param string $field
-     * @return string|null
+     * @param  class-string<BaseAbstractModel>  $modelClass
      */
     protected function browserTextSeed(string $modelClass, string $field): ?string
     {
         $basename = Str::of(class_basename($modelClass))->headline()->replace(' ', '');
         $suffix = match ($field) {
-            'code' => 'BT' . strtoupper(substr($basename, 0, 1)),
-            default => 'Browser Test ' . $basename,
+            'code' => 'BT'.strtoupper(substr($basename, 0, 1)),
+            default => 'Browser Test '.$basename,
         };
 
         return $suffix;
     }
 
     /**
-     * @param class-string<BaseAbstractModel> $modelClass
-     * @param Model&BaseAbstractModel|null $model
-     * @return string
+     * @param  class-string<BaseAbstractModel>  $modelClass
+     * @param  Model&BaseAbstractModel|null  $model
      */
     protected function expectedBrowserText(string $modelClass, ?Model $model = null): string
     {
         if ($model) {
             $field = $this->browserFieldName($modelClass, $model);
             if ($field && filled($model->{$field})) {
-                return (string)$model->{$field};
+                return (string) $model->{$field};
             }
 
             if (filled($model->label ?? null)) {
-                return (string)$model->label;
+                return (string) $model->label;
             }
 
-            return (string)$model->getKey();
+            return (string) $model->getKey();
         }
 
         return class_basename($modelClass);
     }
 
     /**
-     * @param class-string<BaseAbstractModel> $modelClass
-     * @param string $verb
-     * @param Model&BaseAbstractModel|null $model
-     * @return string
+     * @param  class-string<BaseAbstractModel>  $modelClass
+     * @param  Model&BaseAbstractModel|null  $model
      */
     protected function routeForVerb(string $modelClass, string $verb, ?Model $model = null): string
     {
@@ -300,12 +307,6 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
         return route($routeName, $parameters);
     }
 
-    /**
-     * @param Browser $browser
-     * @param string $url
-     * @param string|null $expectedText
-     * @return void
-     */
     protected function assertPageLoadsWithContent(Browser $browser, string $url, ?string $expectedText = null): void
     {
         $browser->loginAs($this->testUser, 'web')
@@ -320,20 +321,21 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
         }
     }
 
-
     /**
      * Skip the test, if this model has no separate admin module
-     * @return bool
      */
-    protected function skipTestIfNoAdminModule(): bool {
+    protected function skipTestIfNoAdminModule(): bool
+    {
         if (empty($this->modelClass)) {
             return true;
         }
         $config = ($this->modelClass)::getAdminModuleConfig();
         if (($config === false) || ($config === []) || ($config === null)) {
             $this->assertTrue();
+
             return true;
         }
+
         return false;
     }
 
@@ -343,8 +345,4 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
         $this->testUser = User::factory()->create();
         $this->testUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
-
-
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,8 +13,8 @@
 
 namespace Tests\Browser\Manual;
 
-use App\Models\Places\City;
 use App\Models\Location;
+use App\Models\Places\City;
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
@@ -23,8 +24,11 @@ use Laravel\Dusk\Browser;
 class RitesScreenshotTest extends ManualScreenshotTestCase
 {
     protected Baptism $baptism;
+
     protected Funeral $funeral;
+
     protected Wedding $wedding;
+
     protected Service $service;
 
     protected function setUp(): void
@@ -80,7 +84,7 @@ class RitesScreenshotTest extends ManualScreenshotTestCase
         ]);
     }
 
-    public function testCaptureRitesIndex(): void
+    public function test_capture_rites_index(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -96,7 +100,7 @@ class RitesScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureFuneralEditor(): void
+    public function test_capture_funeral_editor(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -112,7 +116,7 @@ class RitesScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureBaptismEditor(): void
+    public function test_capture_baptism_editor(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -126,7 +130,7 @@ class RitesScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureWeddingEditor(): void
+    public function test_capture_wedding_editor(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -140,7 +144,7 @@ class RitesScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureRiteWizards(): void
+    public function test_capture_rite_wizards(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot($browser, route('baptism.add', $this->service->id), 'taufe-anlegen', 800);

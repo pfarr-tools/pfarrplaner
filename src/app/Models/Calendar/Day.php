@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -43,51 +43,46 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Day
- * @package App
  */
 class Day extends Model
 {
-
     use HasFactory;
 
-    /**
-     *
-     */
     public const DAY_TYPE_DEFAULT = 0;
-    /**
-     *
-     */
+
     public const DAY_TYPE_LIMITED = 1;
 
     /**
      * @var string[]
      */
     protected $fillable = ['date', 'name', 'description', 'day_type'];
+
     /**
      * @var string[]
      */
     protected $casts = ['date' => 'datetime'];
+
     /**
      * @var string[]
      */
     protected $appends = ['liturgy'];
 
-// ACCESSORS
+    // ACCESSORS
 
     /**
      * Add liturgy attribute
-     * @return array
      */
     public function getLiturgyAttribute(): array
     {
         return LiturgyService::getLiturgyInfoByDate($this->date);
     }
-// END ACCESSORS
+    // END ACCESSORS
 
-// MUTATORS
+    // MUTATORS
     /**
      * Accept a d.m.Y-formatted string as date attribute
-     * @param string $date
+     *
+     * @param  string  $date
      */
     public function setDateAttribute($date)
     {
@@ -97,12 +92,13 @@ class Day extends Model
             $this->attributes['date'] = Carbon::createFromFormat('d.m.Y', $date);
         }
     }
-// END MUTATORS
+    // END MUTATORS
 
-// SCOPES
+    // SCOPES
     public function scopeInMonth(Builder $query, Carbon $date)
     {
         $date->setTime(0, 0, 0)->setDay(1);
+
         return $query->where('date', '>=', $date)
             ->where('date', '<=', $date->copy()->addMonth(1)->subSecond(1));
     }
@@ -112,6 +108,7 @@ class Day extends Model
         if (count($cities) && isset($cities->first()->id)) {
             $cities = $cities->pluck('id');
         }
+
         return $query->where(
             function ($q) use ($cities) {
                 $q->where('day_type', self::DAY_TYPE_DEFAULT)
@@ -134,20 +131,21 @@ class Day extends Model
     {
         return $query->where('date', '<=', $date);
     }
-// END SCOPES
+    // END SCOPES
 
-// SETTERS
-// SETTERS
+    // SETTERS
+    // SETTERS
     /**
-     * @param string $date Date (Y-m-d)
+     * @param  string  $date  Date (Y-m-d)
      * @return bool|Day False if not found, Day if found
      */
     public static function existsForDate($date)
     {
         $day = Day::where('date', $date)->first();
-        if (null === $day) {
+        if ($day === null) {
             return false;
         }
+
         return $day;
     }
 
@@ -162,15 +160,16 @@ class Day extends Model
     public static function getAgendaDay()
     {
         $day = Day::where('date', '1978-03-05')->first();
-        if (null === $day) {
+        if ($day === null) {
             $day = Day::create(
                 [
                     'date' => Carbon::create(1978, 3, 5, 0, 0, 0),
                     'name' => '__AgendaDay',
-                    'description' => 'Hier werden alle Vorlagen angelegt.'
+                    'description' => 'Hier werden alle Vorlagen angelegt.',
                 ]
             );
         }
+
         return $day;
     }
 
@@ -195,6 +194,4 @@ class Day extends Model
     {
         return $this->belongsToMany(City::class);
     }
-
-
 }

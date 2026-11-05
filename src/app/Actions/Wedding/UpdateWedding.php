@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -28,20 +29,11 @@ class UpdateWedding extends AbstractUpdateAction implements UpdatesWeddings
 
     protected string $redirectUrl = '';
 
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return $this->redirectUrl ?: route('home');
     }
 
-    /**
-     * @param User $user
-     * @param Wedding $wedding
-     * @param array $input
-     * @return Wedding
-     */
     public function update(User $user, Wedding $wedding, array $input): Wedding
     {
         Gate::forUser($user)->authorize('update', $wedding);
@@ -66,10 +58,6 @@ class UpdateWedding extends AbstractUpdateAction implements UpdatesWeddings
         return $wedding;
     }
 
-    /**
-     * @param Service $service
-     * @return string
-     */
     protected function getServiceSlug(Service $service): string
     {
         return $service->slug ?: $service->createSlug();

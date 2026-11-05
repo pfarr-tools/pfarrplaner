@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,14 +37,12 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
  * Class CityPolicy
- * @package App\Policies
  */
 class CityPolicy
 {
     use HandlesAuthorization;
 
     /**
-     * @param User $user
      * @return bool
      */
     public function index(User $user)
@@ -52,15 +50,16 @@ class CityPolicy
         if ($user->isAdmin || $user->isLocalAdmin) {
             return true;
         }
-        if ($user->can('ort-bearbeiten')) return true;
+        if ($user->can('ort-bearbeiten')) {
+            return true;
+        }
+
         return false;
     }
 
     /**
      * Determine whether the user can view the city.
      *
-     * @param User $user
-     * @param City $city
      * @return mixed
      */
     public function view(User $user, City $city)
@@ -71,8 +70,7 @@ class CityPolicy
     /**
      * Determine whether the user can view the city.
      *
-     * @param User $user
-     * @param City $city
+     * @param  City  $city
      * @return mixed
      */
     public function viewAny(User $user)
@@ -83,7 +81,6 @@ class CityPolicy
     /**
      * Determine whether the user can create cities.
      *
-     * @param User $user
      * @return mixed
      */
     public function create(User $user)
@@ -94,28 +91,25 @@ class CityPolicy
     /**
      * Determine whether the user can update the city.
      *
-     * @param User $user
-     * @param City $city
      * @return mixed
      */
     public function update(User $user, City $city)
     {
         if (($user->can('gd-opfer-bearbeiten') || $user->can('ort-bearbeiten')) && $user->writableCities->contains(
-                $city
-            )) {
+            $city
+        )) {
             return true;
         }
         if ($user->isAdmin && $user->adminCities->contains($city)) {
             return true;
         }
+
         return false;
     }
 
     /**
      * Determine whether the user can delete the city.
      *
-     * @param User $user
-     * @param City $city
      * @return mixed
      */
     public function delete(User $user, City $city)
@@ -126,8 +120,6 @@ class CityPolicy
     /**
      * Determine whether the user can restore the city.
      *
-     * @param User $user
-     * @param City $city
      * @return mixed
      */
     public function restore(User $user, City $city)
@@ -138,8 +130,6 @@ class CityPolicy
     /**
      * Determine whether the user can permanently delete the city.
      *
-     * @param User $user
-     * @param City $city
      * @return mixed
      */
     public function forceDelete(User $user, City $city)

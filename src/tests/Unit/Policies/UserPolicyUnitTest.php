@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -28,40 +29,40 @@ class UserPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new UserPolicy();
+        $this->policy = new UserPolicy;
         Permission::findOrCreate('benutzer-bearbeiten', 'web');
         Permission::findOrCreate('benutzerliste-lokal-sehen', 'web');
         Permission::findOrCreate('fremden-urlaub-bearbeiten', 'web');
     }
 
-    public function testSuperAdminCanIndex(): void
+    public function test_super_admin_can_index(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testAdminCanIndex(): void
+    public function test_admin_can_index(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_ADMIN);
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testRegularUserCannotIndex(): void
+    public function test_regular_user_cannot_index(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->index($user));
     }
 
-    public function testViewReturnsFalseWithoutPermission(): void
+    public function test_view_returns_false_without_permission(): void
     {
         $actor = User::factory()->create();
         $subject = User::factory()->create();
         $this->assertFalse($this->policy->view($actor, $subject));
     }
 
-    public function testSuperAdminCannotBeUpdatedByAdmin(): void
+    public function test_super_admin_cannot_be_updated_by_admin(): void
     {
         $admin = User::factory()->create();
         $admin->assignRole(RoleService::ROLE_ADMIN);
@@ -70,7 +71,7 @@ class UserPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->update($admin, $superAdmin));
     }
 
-    public function testSuperAdminCannotBeDeletedByAdmin(): void
+    public function test_super_admin_cannot_be_deleted_by_admin(): void
     {
         $admin = User::factory()->create();
         $admin->assignRole(RoleService::ROLE_ADMIN);
@@ -79,7 +80,7 @@ class UserPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->delete($admin, $superAdmin));
     }
 
-    public function testFindDuplicatesRequiresSuperAdmin(): void
+    public function test_find_duplicates_requires_super_admin(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->findDuplicates($user));
@@ -87,7 +88,7 @@ class UserPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->findDuplicates($user));
     }
 
-    public function testFixDuplicatesRequiresSuperAdmin(): void
+    public function test_fix_duplicates_requires_super_admin(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->fixDuplicates($user));
@@ -95,14 +96,14 @@ class UserPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->fixDuplicates($user));
     }
 
-    public function testDoJoinAlwaysReturnsTrue(): void
+    public function test_do_join_always_returns_true(): void
     {
         $actor = User::factory()->create();
         $subject = User::factory()->create();
         $this->assertTrue($this->policy->doJoin($actor, $subject));
     }
 
-    public function testEditAbsencesAllowsSelfEdit(): void
+    public function test_edit_absences_allows_self_edit(): void
     {
         $user = User::factory()->create();
         $this->assertTrue($this->policy->editAbsences($user, $user));

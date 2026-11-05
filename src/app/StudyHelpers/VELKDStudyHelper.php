@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,31 +30,34 @@
 
 namespace App\StudyHelpers;
 
-use App\StudyHelpers\AbstractStudyHelper;
 use Illuminate\Support\Str;
 
 class VELKDStudyHelper extends AbstractStudyHelper
 {
-
     public $title = 'VELKD Lesepredigt';
+
     protected $records = [];
 
-    function read(array $data): array
+    public function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('https://www.velkd.de/schwerpunkte/liturgie/lesepredigt'))) return [];
+        if ('' == ($content = $this->getContent('https://www.velkd.de/schwerpunkte/liturgie/lesepredigt'))) {
+            return [];
+        }
         $content = Str::replace("\n", '', $content);
 
-        //https://www.velkd.de/fileadmin/user_upload/VELKD/PDF/Lesepredigt/Lesepredigt-01-02-2026.pdf
+        // https://www.velkd.de/fileadmin/user_upload/VELKD/PDF/Lesepredigt/Lesepredigt-01-02-2026.pdf
         preg_match('/Lesepredigt-(\d\d\-\d\d\-\d\d\d\d)/', $content, $matches);
 
         $myDate = Str::replace('-', '.', $matches[1]);
         $this->records[$myDate] = ['[VELKD] Lesepredigt für den '.$myDate => 'https://www.velkd.de/fileadmin/user_upload/VELKD/PDF/Lesepredigt/Lesepredigt-'.$matches[1].'.pdf'];
+
         return $this->records;
     }
 
-    function getLinks(array $data): array
+    public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+
         return $data;
     }
 }

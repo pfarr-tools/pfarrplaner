@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,6 +31,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AbstractModel;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
@@ -41,13 +42,10 @@ use Inertia\Inertia;
 
 class AbstractCRUDController extends Controller
 {
-
-    /** @var string $modelClass */
     protected string $modelClass;
 
     /**
      * Get the model name derived from the controller name
-     * @return string
      */
     protected function modelName(): string
     {
@@ -56,7 +54,6 @@ class AbstractCRUDController extends Controller
 
     /**
      * Prepare the collection of models for the index view
-     * @return Collection
      */
     protected function getModelsForIndex(): Collection
     {
@@ -65,8 +62,6 @@ class AbstractCRUDController extends Controller
 
     /**
      * Add rights and routes to a collection of models
-     * @param Collection $collection
-     * @return Collection
      */
     protected function addRightsToModelCollection(Collection $collection): Collection
     {
@@ -81,33 +76,35 @@ class AbstractCRUDController extends Controller
                 ($this->modelClass)::getSingleRouteName('web', 'destroy'),
                 $item->id
             ) : null;
+
             return $item;
         });
     }
 
     /**
      * Get a single model instance, optionally with relations
-     * @param Request $request
-     * @param mixed $modelId
-     * @param array $relations
-     * @return AbstractModel
+     *
+     * @param  mixed  $modelId
+     * @param  array  $relations
      */
     protected function getSingleModel(Request $request, $modelId = null, $relations = []): AbstractModel
     {
-        if (!($id = $modelId)) {
-            if (!$request->has($this->modelName())) {
+        if (! ($id = $modelId)) {
+            if (! $request->has($this->modelName())) {
                 abort(404);
             }
             $id = $request->get($this->modelName());
         }
+
         return ($this->modelClass)::with($relations)->findOrFail($id);
     }
 
     /**
      * Redirect after an action and include status messages
-     * @param mixed $action
-     * @param mixed $result
-     * @return \Illuminate\Http\RedirectResponse
+     *
+     * @param  mixed  $action
+     * @param  mixed  $result
+     * @return RedirectResponse
      */
     protected function returnResult($action, $result = null)
     {
@@ -123,6 +120,7 @@ class AbstractCRUDController extends Controller
     {
         Gate::authorize('index', $this->modelClass);
         $records = $this->addRightsToModelCollection($this->getModelsForIndex());
+
         return Inertia::render(($this->modelClass)::getVuePath('index'), [
             ($this->modelClass)::pluralKey() => $records,
             'canCreate' => $request->user()->can('create', $this->modelClass),
@@ -131,9 +129,6 @@ class AbstractCRUDController extends Controller
 
     /**
      * Get additional resources needed to display the editor component
-     * @param Request $request
-     * @param $model
-     * @return array
      */
     protected function getResourcesForEditor(Request $request, $model = null): array
     {
@@ -152,7 +147,10 @@ class AbstractCRUDController extends Controller
         $newModel = ($this->modelClass)::getEmptyModel();
         $newModel->fill($this->preFillNewModel($request));
         $data[($this->modelClass)::propKey()] = $newModel;
-        if ($request->has('tab')) $data['tab'] = $request->get('tab');
+        if ($request->has('tab')) {
+            $data['tab'] = $request->get('tab');
+        }
+
         return Inertia::render(($this->modelClass)::getVuePath('editor'), $data);
     }
 
@@ -165,6 +163,7 @@ class AbstractCRUDController extends Controller
     {
         $creator = app(($this->modelClass)::getContractName('create'));
         $model = $creator->create($request->user(), $request->all());
+
         return $this->returnResult($creator, $model);
     }
 
@@ -178,7 +177,10 @@ class AbstractCRUDController extends Controller
         $model = $this->getSingleModel($request, $modelId, ($this->modelClass)::$relationsForEditor);
         Gate::authorize('update', $model);
         $data = $this->getResourcesForEditor($request, $model);
-        if ($request->has('tab')) $data['tab'] = $request->get('tab');
+        if ($request->has('tab')) {
+            $data['tab'] = $request->get('tab');
+        }
+
         return Inertia::render(($this->modelClass)::getVuePath('editor'),
             array_merge([($this->modelClass)::propKey() => $model], $data)
         );
@@ -194,6 +196,7 @@ class AbstractCRUDController extends Controller
         $model = $this->getSingleModel($request, $modelId);
         $updater = $model->getContractedAction('update');
         $model = $updater->update($request->user(), $model, $request->all());
+
         return $this->returnResult($updater, $model);
     }
 
@@ -207,16 +210,15 @@ class AbstractCRUDController extends Controller
         $model = $this->getSingleModel($request, $modelId);
         $deleter = $model->getContractedAction('delete');
         $result = $deleter->delete($request->user(), $model);
+
         return $this->returnResult($deleter, $result);
     }
 
     /**
      * Get data to pre-fill a new model with
-     * @param Request $request
-     * @return array
      */
-    protected function preFillNewModel(Request $request): array {
-       return [];
+    protected function preFillNewModel(Request $request): array
+    {
+        return [];
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,33 +30,36 @@
 
 namespace App\FileFormats;
 
-use Closure;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
-use PhpOffice\PhpPresentation\Shape\Drawing\ZipFile;
-use \ZipArchive;
 
 class PowerPoint extends AbstractZIPBasedFileFormat
 {
-
     protected const VBA_REL_TYPE = 'http://schemas.microsoft.com/office/2006/relationships/vbaProject';
-    protected const CT_VBA_BIN   = 'application/vnd.ms-office.vbaProject';
-    protected const CT_PPTM_MAIN = 'application/vnd.ms-powerpoint.presentation.macroEnabled.main+xml';
-    protected const CUSTOM_UI = '<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="StartLoopListener"><ribbon /></customUI>';
 
+    protected const CT_VBA_BIN = 'application/vnd.ms-office.vbaProject';
+
+    protected const CT_PPTM_MAIN = 'application/vnd.ms-powerpoint.presentation.macroEnabled.main+xml';
+
+    protected const CUSTOM_UI = '<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="StartLoopListener"><ribbon /></customUI>';
 
     /**
      * Patch the PPTM file to enable VBA macros and custom UI
-     * @param string $vbaProjectPath Path to the VBA project file
-     * @param bool $customUI Add a custom UI to the presentation
+     *
+     * @param  string  $vbaProjectPath  Path to the VBA project file
+     * @param  bool  $customUI  Add a custom UI to the presentation
      * @return void
+     *
      * @throws \DOMException
      */
-    public function patchPPTM($vbaProjectPath, $customUI = true) {
+    public function patchPPTM($vbaProjectPath, $customUI = true)
+    {
         $this->zip->open($this->documentFilePath);
         $this->addVBAProject($vbaProjectPath);
-        if ($customUI) $this->addCustomUI();
+        if ($customUI) {
+            $this->addCustomUI();
+        }
         $this->zip->close();
 
     }
@@ -65,12 +68,14 @@ class PowerPoint extends AbstractZIPBasedFileFormat
      * Add the VBA project to the presentation
      *
      * This will add a precompiled vbaProject.bin and register the necessary content types.
-     * @param string $vbaProjectPath Path to the VBA project file
+     *
+     * @param  string  $vbaProjectPath  Path to the VBA project file
      * @return void
      */
-    protected function addVBAProject($vbaProjectPath) {
+    protected function addVBAProject($vbaProjectPath)
+    {
         $this->zip->addFromString('ppt/vbaProject.bin', file_get_contents($vbaProjectPath));
-        $this->patchXMLFile('[Content_Types].xml', function(DOMDocument $doc) {
+        $this->patchXMLFile('[Content_Types].xml', function (DOMDocument $doc) {
             $types = $doc->documentElement;
             $hasBinDefault = false;
             foreach ($types->getElementsByTagName('Default') as $def) {
@@ -85,7 +90,7 @@ class PowerPoint extends AbstractZIPBasedFileFormat
                 }
             }
 
-            if (!$hasBinDefault) {
+            if (! $hasBinDefault) {
                 $newDef = $doc->createElement('Default');
                 $newDef->setAttribute('Extension', 'bin');
                 $newDef->setAttribute('ContentType', static::CT_VBA_BIN);
@@ -105,7 +110,7 @@ class PowerPoint extends AbstractZIPBasedFileFormat
                 }
             }
 
-            if (!$hasPresentationOverride) {
+            if (! $hasPresentationOverride) {
                 $newOvr = $doc->createElement('Override');
                 $newOvr->setAttribute('PartName', '/ppt/presentation.xml');
                 $newOvr->setAttribute('ContentType', static::CT_PPTM_MAIN);
@@ -123,16 +128,17 @@ class PowerPoint extends AbstractZIPBasedFileFormat
                 }
             }
 
-            if (!$hasCustomUIOverride) {
+            if (! $hasCustomUIOverride) {
                 $newOvr = $doc->createElement('Override');
                 $newOvr->setAttribute('PartName', '/customUI/customUI.xml');
                 $newOvr->setAttribute('ContentType', 'application/xml');
                 $types->appendChild($newOvr);
             }
+
             return $doc;
         });
 
-        $this->patchXMLFile('ppt/_rels/presentation.xml.rels', function(DOMDocument $doc) {
+        $this->patchXMLFile('ppt/_rels/presentation.xml.rels', function (DOMDocument $doc) {
             $relsRoot = $doc->documentElement; // <Relationships ...>
 
             // Falls schon vorhanden: nichts doppelt anlegen
@@ -146,12 +152,12 @@ class PowerPoint extends AbstractZIPBasedFileFormat
                 }
                 $id = $rel->getAttribute('Id'); // rIdN
                 if (preg_match('/^rId(\d+)$/', $id, $m)) {
-                    $maxId = max($maxId, (int)$m[1]);
+                    $maxId = max($maxId, (int) $m[1]);
                 }
             }
 
-            if (!$already) {
-                $newId = 'rId' . ($maxId + 1);
+            if (! $already) {
+                $newId = 'rId'.($maxId + 1);
 
                 $newRel = $doc->createElement('Relationship');
                 $newRel->setAttribute('Id', $newId);
@@ -160,6 +166,7 @@ class PowerPoint extends AbstractZIPBasedFileFormat
 
                 $relsRoot->appendChild($newRel);
             }
+
             return $doc;
         });
     }
@@ -169,18 +176,21 @@ class PowerPoint extends AbstractZIPBasedFileFormat
      *
      * Add a custom UI with an onLoad event to launch the initial listeners. This is necessary because PowerPoint does
      * not support auto_open() in .pptm files
+     *
      * @return void
+     *
      * @throws \DOMException
      */
     protected function addCustomUI()
     {
-        $this->patchXMLFile('_rels/.rels', function(DOMDocument $doc) {
+        $this->patchXMLFile('_rels/.rels', function (DOMDocument $doc) {
             $relsRoot = $doc->documentElement;
             $newDef = $doc->createElement('Relationship');
             $newDef->setAttribute('Id', 'rIdCustomUI');
             $newDef->setAttribute('Type', 'http://schemas.microsoft.com/office/2006/relationships/ui/extensibility');
             $newDef->setAttribute('Target', 'customUI/customUI.xml');
             $relsRoot->appendChild($newDef);
+
             return $doc;
         });
 
@@ -192,12 +202,13 @@ class PowerPoint extends AbstractZIPBasedFileFormat
      *
      * This is necessary because of a bug in the current version of PHPPresentation, where the SVG content type
      * is registered twice. This patch will remove the first of these registrations.
+     *
      * @return void
      */
     public function applySVGFix()
     {
         $this->zip->open($this->documentFilePath);
-        $this->patchXMLFile('[Content_Types].xml', function(DOMDocument $doc) {
+        $this->patchXMLFile('[Content_Types].xml', function (DOMDocument $doc) {
             $types = $doc->documentElement;
             foreach ($types->getElementsByTagName('Default') as $type) {
                 if (strtolower($type->getAttribute('Extension')) === 'svg') {
@@ -205,27 +216,28 @@ class PowerPoint extends AbstractZIPBasedFileFormat
                     break;
                 }
             }
+
             return $doc;
         });
         $this->zip->close();
     }
-
 
     /**
      * Apply a workaround for slide names in PowerPoint
      *
      * This is necessary to fix a bug in the current version of PHPPresentation, where slide names are
      * not written to the presentation file.
-     * @param array $slideNames
+     *
      * @return void
      */
     public function applySlideNameFix(array $slideNames)
     {
         $this->zip->open($this->documentFilePath);
         foreach ($slideNames as $slideIndex => $name) {
-            $this->patchXMLFile('ppt/slides/slide' . $slideIndex . '.xml', function(DOMDocument $doc) use ($name) {
+            $this->patchXMLFile('ppt/slides/slide'.$slideIndex.'.xml', function (DOMDocument $doc) use ($name) {
                 $slide = $doc->documentElement;
                 $slide->getElementsByTagName('cSld')->item(0)->setAttribute('name', $name);
+
                 return $doc;
             });
         }
@@ -235,7 +247,6 @@ class PowerPoint extends AbstractZIPBasedFileFormat
     /**
      * Decode HTML entities in slide text runs so PowerPoint shows Unicode characters instead of entity strings.
      *
-     * @return void
      * @throws \DOMException
      */
     public function applyTextEntityDecodingFix(): void
@@ -266,5 +277,4 @@ class PowerPoint extends AbstractZIPBasedFileFormat
         }
         $this->zip->close();
     }
-
 }

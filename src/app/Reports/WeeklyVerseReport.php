@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,18 +37,19 @@ use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class WeeklyVerseReport extends AbstractCSVReport
 {
-
     public const FILE_TITLE = 'Wochensprueche';
-    public const FILE_SIGNATURE = '50.1';
 
+    public const FILE_SIGNATURE = '50.1';
 
     /**
      * @var string
      */
     public $title = 'Liste aller Wochensprüche';
+
     /**
      * @var string
      */
@@ -56,9 +57,8 @@ class WeeklyVerseReport extends AbstractCSVReport
 
     protected $inertia = true;
 
-
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
@@ -74,20 +74,20 @@ class WeeklyVerseReport extends AbstractCSVReport
             ]
         );
 
-        $start = Carbon::parse( $data['start']);
-        $end = Carbon::parse( $data['end']);
+        $start = Carbon::parse($data['start']);
+        $end = Carbon::parse($data['end']);
 
         $records = [];
         $currentDate = $start->copy();
         do {
-            $dayData =  LiturgyService::getLiturgyInfoByDate($currentDate)[0] ?? [];
+            $dayData = LiturgyService::getLiturgyInfoByDate($currentDate)[0] ?? [];
             if (count($dayData)) {
                 $records[$currentDate->format('Y-m-d')] = $dayData;
             }
             $currentDate->addDay(1);
-        } while($currentDate <= $end);
+        } while ($currentDate <= $end);
 
-        $bible = new BibleText();
+        $bible = new BibleText;
 
         return $this->csv(
             FileNameService::make(
@@ -98,27 +98,28 @@ class WeeklyVerseReport extends AbstractCSVReport
             ),
             $records,
             [
-            'Datum' => function($item, $key) { return $key; },
-            'Titel des Tages' => function($item, $key) {
-                return strtr($item['Bezeichnung'], [
-                    'So. n.' => 'Sonntag nach',
-                    'So n.' => 'Sonntag nach',
-                    'Drittl.S.d.Kj.' => 'Drittletzter Sonntag des Kirchenjahres',
-                    'd. Kj.' => 'des Kirchenjahres',
-                    'So. ' => 'Sonntag ',
-                ]);
-            },
-            'Überschrift' => function($item, $key) {
-                return (Carbon::parse($key)->weekday()) ? 'Für diesen besonderen Tag' : 'Für die neue Woche';
-            },
-            'Wochenspruch' => function($item, $key) {
-                return $item['Wochenspruch']['Text'];
-            },
-            'Bibelstelle' => function($item, $key) use ($bible) {
-                return (ReferenceParser::getInstance()->beautify($item['Wochenspruch']['Bibelstelle'], []));
-            },
-        ]);
+                'Datum' => function ($item, $key) {
+                    return $key;
+                },
+                'Titel des Tages' => function ($item, $key) {
+                    return strtr($item['Bezeichnung'], [
+                        'So. n.' => 'Sonntag nach',
+                        'So n.' => 'Sonntag nach',
+                        'Drittl.S.d.Kj.' => 'Drittletzter Sonntag des Kirchenjahres',
+                        'd. Kj.' => 'des Kirchenjahres',
+                        'So. ' => 'Sonntag ',
+                    ]);
+                },
+                'Überschrift' => function ($item, $key) {
+                    return (Carbon::parse($key)->weekday()) ? 'Für diesen besonderen Tag' : 'Für die neue Woche';
+                },
+                'Wochenspruch' => function ($item, $key) {
+                    return $item['Wochenspruch']['Text'];
+                },
+                'Bibelstelle' => function ($item, $key) {
+                    return ReferenceParser::getInstance()->beautify($item['Wochenspruch']['Bibelstelle'], []);
+                },
+            ]);
 
     }
-
 }

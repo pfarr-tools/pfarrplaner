@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -53,23 +53,24 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * Class Absence
- * @package App
  */
 class Absence extends Model implements HasDAVCalendarItems
 {
-
     use HasFactory;
-    use TracksDeletedByTrait;
     use SoftDeletes;
+    use TracksDeletedByTrait;
 
     public const STATUS_NEW = 0;
+
     public const STATUS_CHECKED = 1;
+
     public const STATUS_APPROVED = 2;
+
     public const STATUS_SELF_ADMINISTERED = 10;
+
     public const STATUS_SELF_ADMINISTERED_AND_APPROVED = 11;
 
     use HasAttachmentsTrait;
-
 
     /**
      * @var string[]
@@ -103,13 +104,13 @@ class Absence extends Model implements HasDAVCalendarItems
 
     protected $appends = [
         'durationText',
-        'replacementText'
+        'replacementText',
     ];
 
     protected $with = [
         'user',
         'replacements',
-        'attachments'
+        'attachments',
     ];
 
     protected static function boot()
@@ -119,6 +120,7 @@ class Absence extends Model implements HasDAVCalendarItems
         static::deleting(function (Absence $absence) {
             if ($absence->isForceDeleting()) {
                 $absence->replacements()->withTrashed()->get()->each->forceDelete();
+
                 return;
             }
 
@@ -130,7 +132,7 @@ class Absence extends Model implements HasDAVCalendarItems
         });
     }
 
-// ACCESSORS
+    // ACCESSORS
     public function getDurationTextAttribute()
     {
         return $this->durationText();
@@ -150,22 +152,23 @@ class Absence extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @param string $prefix
+     * @param  string  $prefix
      * @return string
      */
     public function replacementText($prefix = '')
     {
-        $prefix = $prefix ? $prefix . ' ' : '';
+        $prefix = $prefix ? $prefix.' ' : '';
         $r = [];
         /** @var Replacement $replacement */
         foreach ($this->replacements as $replacement) {
             $r[] = $replacement->toText();
         }
-        return $prefix . join('; ', $r);
-    }
-// END ACCESSORS
 
-// MUTATORS
+        return $prefix.implode('; ', $r);
+    }
+    // END ACCESSORS
+
+    // MUTATORS
     public function setFromAttribute($value): void
     {
         $this->attributes['from'] = $this->normalizeDateAttribute($value);
@@ -175,13 +178,10 @@ class Absence extends Model implements HasDAVCalendarItems
     {
         $this->attributes['to'] = $this->normalizeDateAttribute($value);
     }
-// END MUTATORS
+    // END MUTATORS
 
-// SCOPES
+    // SCOPES
     /**
-     * @param Builder $query
-     * @param Carbon $start
-     * @param Carbon $end
      * @return Builder
      */
     public function scopeByPeriod(Builder $query, Carbon $start, Carbon $end)
@@ -191,10 +191,6 @@ class Absence extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @param Builder $query
-     * @param User $user
-     * @param Carbon $start
-     * @param Carbon $end
      * @return mixed
      */
     public function scopeByUserAndPeriod(Builder $query, User $user, Carbon $start, Carbon $end)
@@ -205,7 +201,6 @@ class Absence extends Model implements HasDAVCalendarItems
     }
 
     /**
-     * @param Builder $query
      * @return Builder
      */
     public function scopeShowInCalendar(Builder $query)
@@ -224,10 +219,7 @@ class Absence extends Model implements HasDAVCalendarItems
         });
     }
 
-
     /**
-     * @param $query
-     * @param $user
      * @return mixed
      */
     public function scopeVisibleForUser($query, $user)
@@ -247,15 +239,16 @@ class Absence extends Model implements HasDAVCalendarItems
                 }
             );
     }
-// END SCOPES
+    // END SCOPES
 
-// SETTERS
-// SETTERS
-// SETTERS
+    // SETTERS
+    // SETTERS
+    // SETTERS
     /**
      * Get all absences keyed by days
-     * @param Collection|\Illuminate\Database\Eloquent\Collection $absences
-     * @param Collection|\Illuminate\Database\Eloquent\Collection $days
+     *
+     * @param  Collection|\Illuminate\Database\Eloquent\Collection  $absences
+     * @param  Collection|\Illuminate\Database\Eloquent\Collection  $days
      */
     public static function getByDays($absences, $days)
     {
@@ -268,12 +261,14 @@ class Absence extends Model implements HasDAVCalendarItems
                 }
             }
         }
+
         return $dayAbsences;
     }
 
     /**
      * Get an array of displayable dates for the AbsencePlanner
-     * @param Carbon $start Start of displayed month
+     *
+     * @param  Carbon  $start  Start of displayed month
      * @return array Day data
      */
     public static function getDaysForPlanner(Carbon $start)
@@ -289,6 +284,7 @@ class Absence extends Model implements HasDAVCalendarItems
             $days[$start->day] = $day;
             $start->addDay(1);
         }
+
         return $days;
     }
 
@@ -307,11 +303,13 @@ class Absence extends Model implements HasDAVCalendarItems
         if (is_string($date)) {
             $date = Carbon::parse($date);
         }
+
         return ($date >= $this->from) && ($date <= $this->to);
     }
 
     /**
      * @return bool|null
+     *
      * @throws Exception
      */
     public function delete()
@@ -326,14 +324,12 @@ class Absence extends Model implements HasDAVCalendarItems
     {
         $t = $this->replacementText();
         if ($t) {
-            $t = ' [V: ' . $t . ']';
+            $t = ' [V: '.$t.']';
         }
-        return $this->user->fullName() . ' (' . $this->reason . ')' . $t;
+
+        return $this->user->fullName().' ('.$this->reason.')'.$t;
     }
 
-    /**
-     * @return Collection
-     */
     public function getReplacingUserIds(): Collection
     {
         $ids = [];
@@ -344,7 +340,8 @@ class Absence extends Model implements HasDAVCalendarItems
                 }
             }
         }
-        return (new Collection(array_unique($ids)));
+
+        return new Collection(array_unique($ids));
     }
 
     /**
@@ -355,9 +352,6 @@ class Absence extends Model implements HasDAVCalendarItems
         return $this->hasMany(Replacement::class);
     }
 
-    /**
-     * @param $data
-     */
     public function setupReplacements(User $user, $data)
     {
         $this->load('replacements');
@@ -380,9 +374,6 @@ class Absence extends Model implements HasDAVCalendarItems
 
     /**
      * Normalize ISO or legacy d.m.Y input to a UTC calendar date.
-     *
-     * @param mixed $value
-     * @return Carbon
      */
     protected function normalizePlannerDateValue(mixed $value, bool $endOfDay = false): Carbon
     {
@@ -418,14 +409,16 @@ class Absence extends Model implements HasDAVCalendarItems
     /**
      * Calculate, how many days of this absence fall into a certain period
      * This is used for the colspans in calendar view
-     * @param Carbon $start Start date
-     * @param Carbon $end End date
+     *
+     * @param  Carbon  $start  Start date
+     * @param  Carbon  $end  End date
      */
     public function showableDays($start, $end)
     {
         $myFrom = max($start, $this->from);
         $myTo = min($end, $this->to);
-        return abs((int)$myTo->diffInDays($myFrom)) + 1;
+
+        return abs((int) $myTo->diffInDays($myFrom)) + 1;
     }
 
     /**
@@ -442,7 +435,7 @@ class Absence extends Model implements HasDAVCalendarItems
         $categories = ['Pfarrplaner', ($replacing ? 'Vertretung' : 'Urlaub')];
         $status = AbstractCalendarItem::STATUS_FREE;
 
-        if (!$replacing) {
+        if (! $replacing) {
             $statusTexts = [
                 self::STATUS_NEW => ['Noch nicht genehmigt'],
                 self::STATUS_CHECKED => ['Überprüft', 'Noch nicht genehmigt'],
@@ -457,37 +450,35 @@ class Absence extends Model implements HasDAVCalendarItems
             $title = $this->reason;
             $status = $status = AbstractCalendarItem::STATUS_OUT_OF_OFFICE;
         } else {
-            $title = 'Vertretung für ' . NameService::fromUser($this->user)->format(
-                    NameService::FIRST_LAST
-                ) . ' (' . $this->reason . ')';
+            $title = 'Vertretung für '.NameService::fromUser($this->user)->format(
+                NameService::FIRST_LAST
+            ).' ('.$this->reason.')';
         }
 
         $title .= $this->replacementText(' V: ');
 
-
         return [
-            'absence_' . $this->id => [
+            'absence_'.$this->id => [
                 'startDate' => $this->from,
                 'endDate' => $this->to,
                 'title' => $title,
-                'description' => '<p><b>Vertretungsregelung:</b><br /> ' . $this->replacementText() . '</p>',
+                'description' => '<p><b>Vertretungsregelung:</b><br /> '.$this->replacementText().'</p>',
                 'categories' => $categories,
                 'location' => '',
                 'isAllDayEvent' => true,
                 'freeBusy' => $status,
-            ]
+            ],
         ];
     }
 
     protected function normalizeDateAttribute($value): ?string
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
 
         return Carbon::parse($value)->setTimezone('Europe/Berlin')->toDateString();
     }
-
 
     public function getConcernedCalendars()
     {
@@ -511,7 +502,6 @@ class Absence extends Model implements HasDAVCalendarItems
         return $calendars;
     }
 
-
     public function getCalendarItems(bool $includeAlternate, bool $includeRiteAnniversaries): array
     {
         return [
@@ -526,7 +516,7 @@ class Absence extends Model implements HasDAVCalendarItems
         $status = 'FREE';
         $busy = false;
 
-        if (!$replacing) {
+        if (! $replacing) {
             $statusTexts = [
                 self::STATUS_NEW => ['Noch nicht genehmigt'],
                 self::STATUS_CHECKED => ['Überprüft', 'Noch nicht genehmigt'],
@@ -542,9 +532,9 @@ class Absence extends Model implements HasDAVCalendarItems
             $busy = true;
             $status = 'OOF';
         } else {
-            $title = 'Vertretung für ' . NameService::fromUser($this->user)->format(
-                    NameService::FIRST_LAST
-                ) . ' (' . $this->reason . ')';
+            $title = 'Vertretung für '.NameService::fromUser($this->user)->format(
+                NameService::FIRST_LAST
+            ).' ('.$this->reason.')';
         }
 
         $title .= $this->replacementText(' V: ');
@@ -555,7 +545,7 @@ class Absence extends Model implements HasDAVCalendarItems
             $this->from,
             $this->to->addDay(1)->startOfDay(),
             '',
-            'Vertretungsregelung: ' . $this->replacementText(),
+            'Vertretungsregelung: '.$this->replacementText(),
             '',
             ['busy' => $busy, 'busyStatus' => $status, 'allDay' => true],
             $categories,
@@ -565,20 +555,21 @@ class Absence extends Model implements HasDAVCalendarItems
     protected function periodText(Carbon $from, Carbon $to)
     {
         if ($from->format('Ymd') == $to->format('Ymd')) {
-            return ' am ' . $from->format('%d. %B');
+            return ' am '.$from->format('%d. %B');
         }
         $format = ($from->month == $to->month) ? 'DD.' : 'DD. MMMM';
         if ($from->year != $to->year) {
             $format = 'DD. MMMM YYYY';
         }
-        return ' vom ' . $from->isoFormat($format) . ' bis '
-            . $to->isoFormat($format == 'DD.' ? 'DD. MMMM' : $format);
+
+        return ' vom '.$from->isoFormat($format).' bis '
+            .$to->isoFormat($format == 'DD.' ? 'DD. MMMM' : $format);
     }
 
     public function getDescriptiveTextAttribute()
     {
-        $line = $this->user->formatName(NameService::TITLE_FIRST_LAST) . ' ist'
-            .$this->periodText($this->from, $this->to). ' abwesend.';
+        $line = $this->user->formatName(NameService::TITLE_FIRST_LAST).' ist'
+            .$this->periodText($this->from, $this->to).' abwesend.';
         $replacements = collect();
         $replaceCtr = 0;
         foreach ($this->replacements as $replacement) {
@@ -586,18 +577,19 @@ class Absence extends Model implements HasDAVCalendarItems
             $replacements->push(
                 (($replacement->from != $this->from) || ($replacement->to != $this->to) ?
                     $this->periodText($replacement->from, $replacement->to) : '')
-                     . ' ' . $replacement->users->map(
-                    function (User $item) {
-                        return trim($item->formatName(NameService::TITLE_FIRST_LAST)
-                                    .($item->phone ? ' (Telefon '.$item->phone.')' : ''));
-                    }
-                )->join(', ', ' und ')
+                     .' '.$replacement->users->map(
+                         function (User $item) {
+                             return trim($item->formatName(NameService::TITLE_FIRST_LAST)
+                                         .($item->phone ? ' (Telefon '.$item->phone.')' : ''));
+                         }
+                     )->join(', ', ' und ')
             );
         }
         if ($replaceCtr) {
-            $line .= ' Die Vertretung ' . ($replaceCtr > 1 ? 'übernehmen' : 'übernimmt') . ' '
-                .trim($replacements->join('; ',' und ')) . '.';
+            $line .= ' Die Vertretung '.($replaceCtr > 1 ? 'übernehmen' : 'übernimmt').' '
+                .trim($replacements->join('; ', ' und ')).'.';
         }
+
         return $line;
     }
 
@@ -606,11 +598,11 @@ class Absence extends Model implements HasDAVCalendarItems
         $records = [];
         foreach ($this->replacements as $replacement) {
             $users = $replacement->toUserArray();
-            if (!$users) {
+            if (! $users) {
             }
             $records = array_merge($users, $records);
         }
-        if (!count($records)) {
+        if (! count($records)) {
             $records = [
                 $this->from->format('Ymd').$this->to->format('Ymd') => [
                     'from' => $this->from,
@@ -618,10 +610,10 @@ class Absence extends Model implements HasDAVCalendarItems
                     'period' => StringTool::durationText($this->from, $this->to),
                     'poolmaster' => false,
                     'user' => null,
-                ]
+                ],
             ];
         }
+
         return $records;
     }
-
 }

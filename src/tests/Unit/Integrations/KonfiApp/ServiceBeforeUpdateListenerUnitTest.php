@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -23,7 +24,7 @@ use Tests\TestCase;
 
 class ServiceBeforeUpdateListenerUnitTest extends TestCase
 {
-    public function testListenerPassesRequestedKonfiAppTypeAndUpdatedDateToIntegration(): void
+    public function test_listener_passes_requested_konfi_app_type_and_updated_date_to_integration(): void
     {
         $city = City::factory()->create(['konfiapp_apikey' => 'demo-key']);
         $service = Service::factory()->create([
@@ -46,10 +47,9 @@ class ServiceBeforeUpdateListenerUnitTest extends TestCase
                 return true;
             });
 
-        $listener = new class($integration) extends ServiceBeforeUpdateListener {
-            public function __construct(private KonfiAppIntegration $integration)
-            {
-            }
+        $listener = new class($integration) extends ServiceBeforeUpdateListener
+        {
+            public function __construct(private KonfiAppIntegration $integration) {}
 
             protected function isIntegrationActive(City $city): bool
             {

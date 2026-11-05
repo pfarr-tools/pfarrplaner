@@ -11,7 +11,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -38,7 +39,6 @@ return new class extends Migration {
             ->update(['commentable_type' => Funeral::class]);
         Comment::where('commentable_type', 'App\\Wedding')
             ->update(['commentable_type' => Wedding::class]);
-
 
         DB::table('model_has_roles')
             ->where('model_type', 'App\\User')

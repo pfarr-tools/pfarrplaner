@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,7 +40,9 @@ class SongReference extends Model
     protected $fillable = ['song_id', 'songbook_id'];
 
     protected $table = 'song_songbook';
+
     protected $with = ['song', 'songbook'];
+
     protected $appends = ['altEG'];
 
     public function song()
@@ -55,11 +57,18 @@ class SongReference extends Model
 
     public function getAltEGAttribute()
     {
-        if ($this->songbook->code == 'EG') return '';
-        if ($this->song->alt_eg) return $this->song->alt_eg;
-        foreach ($this->song->songbooks as $songbook) {
-            if ($songbook->code == 'EG') return $songbook->pivot->reference;
+        if ($this->songbook->code == 'EG') {
+            return '';
         }
+        if ($this->song->alt_eg) {
+            return $this->song->alt_eg;
+        }
+        foreach ($this->song->songbooks as $songbook) {
+            if ($songbook->code == 'EG') {
+                return $songbook->pivot->reference;
+            }
+        }
+
         return '';
     }
 }

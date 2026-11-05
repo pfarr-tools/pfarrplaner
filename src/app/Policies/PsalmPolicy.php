@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -51,7 +51,6 @@ class PsalmPolicy
     /**
      * Determine whether the user can view the index of all psalms.
      *
-     * @param User $user
      * @return mixed
      */
     public function viewAny(User $user)
@@ -64,12 +63,9 @@ class PsalmPolicy
         return $this->viewAny($user);
     }
 
-
     /**
      * Determine whether the user can view the psalm.
      *
-     * @param User $user
-     * @param Psalm $psalm
      * @return mixed
      */
     public function view(User $user, Psalm $psalm)
@@ -80,7 +76,6 @@ class PsalmPolicy
     /**
      * Determine whether the user can create psalms.
      *
-     * @param User $user
      * @return mixed
      */
     public function create(User $user)
@@ -91,8 +86,6 @@ class PsalmPolicy
     /**
      * Determine whether the user can update the psalm.
      *
-     * @param User $user
-     * @param Psalm $psalm
      * @return mixed
      */
     public function update(User $user, Psalm $psalm)
@@ -103,8 +96,6 @@ class PsalmPolicy
     /**
      * Determine whether the user can delete the psalm.
      *
-     * @param User $user
-     * @param Psalm $psalm
      * @return mixed
      */
     public function delete(User $user, Psalm $psalm)
@@ -115,8 +106,6 @@ class PsalmPolicy
     /**
      * Determine whether the user can restore the psalm.
      *
-     * @param User $user
-     * @param Psalm $psalm
      * @return mixed
      */
     public function restore(User $user, Psalm $psalm)
@@ -127,13 +116,10 @@ class PsalmPolicy
     /**
      * Determine whether the user can permanently delete the psalm.
      *
-     * @param User $user
-     * @param Psalm $psalm
      * @return mixed
      */
     public function forceDelete(User $user, Psalm $psalm)
     {
         return true;
     }
-
 }

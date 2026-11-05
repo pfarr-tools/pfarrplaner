@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Integrations\KonfiApp;
 
-
 use App\Integrations\AbstractIntegration;
 use App\Models\Places\City;
 use App\Models\Service;
@@ -44,14 +43,9 @@ use Throwable;
 
 /**
  * Class KonfiAppIntegration
- * @package App\Integrations\KonfiApp
  */
 class KonfiAppIntegration extends AbstractIntegration
 {
-
-    /**
-     *
-     */
     protected const API_URL = 'https://api.konfiapp.de/v2/';
 
     /**
@@ -68,12 +62,11 @@ class KonfiAppIntegration extends AbstractIntegration
     /** @var string last endpoint */
     protected $lastEndpoint = '';
 
-    /** @var string  last request type */
+    /** @var string last request type */
     protected $lastRequestType = '';
 
     /**
      * KonfiAppIntegration constructor.
-     * @param $apiKey
      */
     public function __construct($apiKey)
     {
@@ -87,56 +80,53 @@ class KonfiAppIntegration extends AbstractIntegration
 
     /**
      * Get an instance of this integration for a particular city
-     * @param City $city
-     * @return KonfiAppIntegration
      */
     public static function get(City $city): KonfiAppIntegration
     {
-        return (new self($city->konfiapp_apikey));
+        return new self($city->konfiapp_apikey);
     }
 
     /**
      * Returns true if the integration is active and properly configured to work for a specific city
      *
      * For this integration, this is the case if the konfiapp_apikey is present.
-     *
-     * @param City $city
-     * @return bool
      */
     public static function isActive(City $city): bool
     {
-        return ($city->konfiapp_apikey != '');
+        return $city->konfiapp_apikey != '';
     }
 
     /**
      * Get a collection with all defined event types from KonfiApp
      *
      * @return Collection Event types
+     *
      * @throws Exception when request status is not 200
      */
     public function listEventTypes()
     {
         $response = $this->requestData('verwaltung/veranstaltungen/');
+
         return $response ? collect($response->data->veranstaltungen) : collect();
     }
 
     /**
      * Send a request to the public API for KonfiApp and return the contents of the response's data field
      *
-     * @param $requestType
-     * @param $path
-     * @param array $arguments
-     * @param String $requestType
+     * @param  array  $arguments
+     * @param  string  $requestType
      * @return mixed Response data field
+     *
      * @throws Exception
      */
     protected function requestData($path, $arguments = [], $requestType = 'GET'): stdClass|bool
     {
         $response = $this->request($requestType, $path, $arguments);
-        if ((!$response) || ($response->getStatusCode() != 200)) {
+        if ((! $response) || ($response->getStatusCode() != 200)) {
             return false;
         }
-        return json_decode((string)$response->getBody());
+
+        return json_decode((string) $response->getBody());
     }
 
     /**
@@ -144,15 +134,12 @@ class KonfiAppIntegration extends AbstractIntegration
      *
      * This will automatically add the api key
      *
-     * @param $requestType
-     * @param $path
-     * @param array $arguments
-     * @return ResponseInterface|bool
+     * @param  array  $arguments
      */
     protected function request($requestType, $path, $arguments = []): ResponseInterface|bool
     {
         $this->lastRequest = [
-            'headers' => ['X-Konfiapp-Token' => $this->apiKey]
+            'headers' => ['X-Konfiapp-Token' => $this->apiKey],
         ];
         if (strtoupper($requestType) === 'GET') {
             $this->lastRequest['query'] = $arguments;
@@ -179,10 +166,11 @@ class KonfiAppIntegration extends AbstractIntegration
                 'message' => $exception->getMessage(),
                 'exception' => $exception::class,
             ]);
+
             return false;
         }
 
-        if ((!$response) || $response->getStatusCode() != 200 || (!isset(json_decode($response->getBody(), true)['data']))) {
+        if ((! $response) || $response->getStatusCode() != 200 || (! isset(json_decode($response->getBody(), true)['data']))) {
             Log::debug('KonfiApp: KonfiApp returns error response', [
                 'requestType' => $this->lastRequestType,
                 'endpoint' => $this->lastEndpoint,
@@ -190,6 +178,7 @@ class KonfiAppIntegration extends AbstractIntegration
                 'request' => $this->lastRequest,
                 'response' => $response ? json_decode($response->getBody(), true) : 'false',
             ]);
+
             return false;
         }
 
@@ -201,7 +190,6 @@ class KonfiAppIntegration extends AbstractIntegration
      *
      * This will create a new qr code if the service does not have one yet
      *
-     * @param Service $service
      * @throws Exception
      */
     public function handleServiceUpdate(Service $service, $requestedChange)
@@ -213,6 +201,7 @@ class KonfiAppIntegration extends AbstractIntegration
 
             if ($service->konfiapp_event_qr == '') {
                 $service->konfiapp_event_type = $requestedChange;
+
                 return $this->addQRCodeToService($service);
             }
 
@@ -233,29 +222,29 @@ class KonfiAppIntegration extends AbstractIntegration
 
     /**
      * Add a QR code to a service and save it with the service record
-     * @param Service $service
-     * @return Service
+     *
      * @throws Exception
      */
-    public function addQRCodeToService(Service $service): Service {
+    public function addQRCodeToService(Service $service): Service
+    {
         Log::debug('Updating service #'.$service->id.', no KonfiApp QR set yet.');
         $code = $this->createQRCode($service);
-        if (!$code) {
+        if (! $code) {
             Log::warning('KonfiApp: Kein QR-Code fuer Gottesdienst erzeugt.', ['service' => $service->id]);
+
             return $service;
         }
         Log::debug('Got code '.$code);
         $service->update(['konfiapp_event_qr' => $code]);
         $service->refresh();
         Log::debug('Updated service to code '.$service->konfiapp_event_qr);
+
         return $service;
     }
 
     /**
      * Update a service's existing QR code
-     * @param Service $service
-     * @param $eventType
-     * @return Service
+     *
      * @throws Exception
      */
     public function updateServiceQRCode(Service $service, $eventType = null): Service
@@ -266,11 +255,12 @@ class KonfiAppIntegration extends AbstractIntegration
         Log::debug('Deleting old KonfiApp QR code '.$service->konfiapp_event_qr);
         $this->deleteQRCodeByCode($service->konfiapp_event_qr, $service->konfiapp_event_type);
         $code = $this->createQRCode($service, $eventType);
-        if (!$code) {
+        if (! $code) {
             Log::warning('KonfiApp: QR-Code fuer Gottesdienst nach Typwechsel nicht neu erzeugt.', [
                 'service' => $service->id,
                 'eventType' => $eventType,
             ]);
+
             return $service;
         }
         Log::debug('Got code '.$code);
@@ -279,13 +269,15 @@ class KonfiAppIntegration extends AbstractIntegration
         );
         $service2 = Service::find($service->id);
         Log::debug('Updated service to code '.$service2->konfiapp_event_qr);
+
         return $service2;
     }
 
     /**
      * Create a QR code for a service
-     * @param Service $service
+     *
      * @return mixed
+     *
      * @throws Exception
      */
     public function createQRCode(Service $service, ?int $eventType = null): ?string
@@ -301,15 +293,13 @@ class KonfiAppIntegration extends AbstractIntegration
 
         $response = $this->requestData(
             'verwaltung/veranstaltungen/qr/', $data,
-             'POST'
+            'POST'
         );
 
         return $response->code ?? null;
     }
 
     /**
-     * @param $code
-     * @param $type
      * @throws Exception
      */
     public function deleteQRCodeByCode($code, $type)
@@ -331,7 +321,9 @@ class KonfiAppIntegration extends AbstractIntegration
 
     /**
      * Delete a qr associated with a service
-     * @param string $id Code id
+     *
+     * @param  string  $id  Code id
+     *
      * @throws Exception
      */
     public function deleteQRCode($id)
@@ -345,8 +337,8 @@ class KonfiAppIntegration extends AbstractIntegration
     }
 
     /**
-     * @param Service $service
      * @return Service
+     *
      * @throws Exception
      */
     public function handleServiceDelete(Service $service)
@@ -355,11 +347,13 @@ class KonfiAppIntegration extends AbstractIntegration
             $this->deleteQRCode($service->konfiapp_event_qr);
         }
         $service->update(['konfiapp_event_qr' => '']);
+
         return $service;
     }
 
     /**
      * @return mixed
+     *
      * @throws Exception
      */
     public function listQRCodes()
@@ -367,37 +361,23 @@ class KonfiAppIntegration extends AbstractIntegration
         return $this->requestData('verwaltung/veranstaltungen/qr/list/', ['veranstaltungID' => 682])->detail;
     }
 
-    /**
-     * @return string
-     */
     public function getApiKey(): string
     {
         return $this->apiKey;
     }
 
-    /**
-     * @param string $apiKey
-     */
     public function setApiKey(string $apiKey): void
     {
         $this->apiKey = $apiKey;
     }
 
-    /**
-     * @return Client
-     */
     public function getClient(): Client
     {
         return $this->client;
     }
 
-    /**
-     * @param Client $client
-     */
     public function setClient(Client $client): void
     {
         $this->client = $client;
     }
-
-
 }

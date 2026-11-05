@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -28,7 +29,7 @@ class LiturgyServiceUnitTest extends TestCase
         Storage::fake();
 
         $year = Carbon::today()->year;
-        Storage::put('liturgy/' . $year . '.json', json_encode(['Tage' => []]));
+        Storage::put('liturgy/'.$year.'.json', json_encode(['Tage' => []]));
         Storage::put('liturgy/2024.json', json_encode(['Tage' => []]));
         Storage::put('liturgy/lesejahr-2024.json', json_encode('A'));
 
@@ -46,26 +47,26 @@ class LiturgyServiceUnitTest extends TestCase
         $instanceRef->setValue(null, null);
     }
 
-    public function testGetInstanceReturnsSameInstance(): void
+    public function test_get_instance_returns_same_instance(): void
     {
         $a = LiturgyService::getInstance();
         $b = LiturgyService::getInstance();
         $this->assertSame($a, $b);
     }
 
-    public function testGetLiturgyInfoByDateReturnsArray(): void
+    public function test_get_liturgy_info_by_date_returns_array(): void
     {
         $result = LiturgyService::getLiturgyInfoByDate(Carbon::today());
         $this->assertIsArray($result);
     }
 
-    public function testGetLectionaryYearReturnsValue(): void
+    public function test_get_lectionary_year_returns_value(): void
     {
         $year = LiturgyService::getLectionaryYear(2024);
         $this->assertNotNull($year);
     }
 
-    public function testGetLiturgyByCodeReturnsEmptyForUnknownCode(): void
+    public function test_get_liturgy_by_code_returns_empty_for_unknown_code(): void
     {
         $result = LiturgyService::getLiturgyByCode(2024, 'NONEXISTENT_CODE_12345');
         $this->assertEmpty($result);

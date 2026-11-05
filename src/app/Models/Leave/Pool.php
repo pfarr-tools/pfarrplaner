@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -43,8 +43,11 @@ class Pool extends AbstractModel
     protected $fillable = ['id', 'name', 'slug', 'contact', 'office', 'phone', 'email'];
 
     protected static string $prefix = 'pool';
+
     protected static string $prefixPlural = 'pools';
+
     public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
+
     public static array $validationRules = [
         'name' => 'required|max:255',
         'contact' => 'nullable|string',
@@ -56,14 +59,17 @@ class Pool extends AbstractModel
     ];
 
     public static $adminIcon = 'mdi mdi-pool';
+
     public static $adminGroup = 'Personen';
+
     public static $adminTitle = 'Vertretungs-Pools';
 
     public static $relationsForIndex = ['cities', 'users'];
+
     public static $relationsForEditor = ['cities', 'users'];
 
-
-    public function users() {
+    public function users()
+    {
         return $this->belongsToMany(User::class);
     }
 
@@ -72,14 +78,13 @@ class Pool extends AbstractModel
         return $this->belongsToMany(City::class);
     }
 
-    public function poolmasters() {
+    public function poolmasters()
+    {
         return $this->belongsToMany(User::class, 'poolmasters', 'pool_id', 'user_id');
     }
 
     /**
      * Get an empty model instance with editor relations preloaded.
-     *
-     * @return self
      */
     public static function getEmptyModel(): self
     {
@@ -102,8 +107,4 @@ class Pool extends AbstractModel
             $pool->slug = Str::slug($pool->name, '-', 'de');
         });
     }
-
-
-
-
 }

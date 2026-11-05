@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -28,20 +29,11 @@ class UpdateFuneral extends AbstractUpdateAction implements UpdatesFunerals
 
     protected string $redirectUrl = '';
 
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return $this->redirectUrl ?: route('home');
     }
 
-    /**
-     * @param User $user
-     * @param Funeral $funeral
-     * @param array $input
-     * @return Funeral
-     */
     public function update(User $user, Funeral $funeral, array $input): Funeral
     {
         Gate::forUser($user)->authorize('update', $funeral);
@@ -69,10 +61,6 @@ class UpdateFuneral extends AbstractUpdateAction implements UpdatesFunerals
         return $funeral;
     }
 
-    /**
-     * @param Service $service
-     * @return string
-     */
     protected function getServiceSlug(Service $service): string
     {
         return $service->slug ?: $service->createSlug();

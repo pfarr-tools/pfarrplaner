@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -19,12 +20,12 @@ use RuntimeException;
 
 class DuskRunCommandTest extends TestCase
 {
-    public function testDuskUsesAnIsolatedSqliteEnvironmentWithoutAnEnvFile(): void
+    public function test_dusk_uses_an_isolated_sqlite_environment_without_an_env_file(): void
     {
         $method = new ReflectionMethod(DuskRunCommand::class, 'defaultDuskEnvironment');
         $method->setAccessible(true);
 
-        $environment = $method->invoke(new DuskRunCommand());
+        $environment = $method->invoke(new DuskRunCommand);
 
         self::assertSame('dusk', $environment['APP_ENV']);
         self::assertSame('true', $environment['DUSK_ENABLED']);
@@ -37,7 +38,7 @@ class DuskRunCommandTest extends TestCase
         self::assertSame('sync', $environment['QUEUE_CONNECTION']);
     }
 
-    public function testDuskRejectsTheOfficialDatabase(): void
+    public function test_dusk_rejects_the_official_database(): void
     {
         $method = new ReflectionMethod(DuskRunCommand::class, 'validateDuskDatabase');
         $method->setAccessible(true);
@@ -45,18 +46,18 @@ class DuskRunCommandTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Dusk benötigt die isolierte SQLite-Testdatenbank');
 
-        $method->invoke(new DuskRunCommand(), [
+        $method->invoke(new DuskRunCommand, [
             'DB_CONNECTION' => 'mysql',
             'DB_DATABASE' => 'pfarrplaner',
         ]);
     }
 
-    public function testDuskAcceptsOnlyItsDedicatedSqliteDatabase(): void
+    public function test_dusk_accepts_only_its_dedicated_sqlite_database(): void
     {
         $method = new ReflectionMethod(DuskRunCommand::class, 'validateDuskDatabase');
         $method->setAccessible(true);
 
-        $method->invoke(new DuskRunCommand(), [
+        $method->invoke(new DuskRunCommand, [
             'DB_CONNECTION' => 'sqlite',
             'DB_DATABASE' => dirname(__DIR__, 3).'/database/database.dusk.sqlite',
         ]);

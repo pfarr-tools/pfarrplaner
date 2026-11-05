@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'make:skeleton')]
 class SkeletonMakeCommand extends AbstractSkeletonBuilder
 {
-
     use CreatesMatchingTest;
 
     /**
@@ -68,7 +67,6 @@ class SkeletonMakeCommand extends AbstractSkeletonBuilder
         return $this->resolveStubPath('/stubs/contracts.create.stub');
     }
 
-
     public function handle()
     {
         $basename = Str::studly($this->getNameInput());
@@ -89,5 +87,4 @@ class SkeletonMakeCommand extends AbstractSkeletonBuilder
         $this->call('make:update-action', ['name' => 'Update'.$basename]);
         $this->call('make:delete-action', ['name' => 'Delete'.$basename]);
     }
-
 }

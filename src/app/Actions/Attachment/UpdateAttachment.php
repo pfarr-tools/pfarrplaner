@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -55,17 +55,17 @@ class UpdateAttachment extends AbstractUpdateAction implements UpdatesAttachment
         $cut = $input['cut'] ?? null;
 
         foreach ($files as $file) {
-            if (!($file instanceof UploadedFile)) {
+            if (! ($file instanceof UploadedFile)) {
                 continue;
             }
 
             if ($cut) {
                 $path = $file->storeAs(
                     'attachments',
-                    'zuschnitt-' . $attachment->attachable_id . '-' . $cut . '.' . $file->getClientOriginalExtension()
+                    'zuschnitt-'.$attachment->attachable_id.'-'.$cut.'.'.$file->getClientOriginalExtension()
                 );
             } else {
-                $path = $file->storeAs('attachments', Str::random(32) . '.' . $file->getClientOriginalExtension());
+                $path = $file->storeAs('attachments', Str::random(32).'.'.$file->getClientOriginalExtension());
             }
 
             if (($attachment->file !== $path) && Storage::exists($attachment->file)) {

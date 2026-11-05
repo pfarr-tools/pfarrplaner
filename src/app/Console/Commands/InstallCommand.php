@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -51,22 +52,21 @@ class InstallCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * @return int
-     */
     public function handle(): int
     {
         $templatePath = base_path('.env.example');
-        $envPath = $this->resolveEnvironmentPath((string)$this->option('env-file'));
+        $envPath = $this->resolveEnvironmentPath((string) $this->option('env-file'));
 
-        if (!file_exists($templatePath)) {
+        if (! file_exists($templatePath)) {
             $this->components->error('Die Vorlage .env.example wurde nicht gefunden.');
+
             return Command::FAILURE;
         }
 
-        if (file_exists($envPath) && !$this->option('force')) {
-            if (!$this->confirm('.env ist bereits vorhanden. Soll sie ueberschrieben werden?', false)) {
+        if (file_exists($envPath) && ! $this->option('force')) {
+            if (! $this->confirm('.env ist bereits vorhanden. Soll sie ueberschrieben werden?', false)) {
                 $this->components->warn('Installation abgebrochen.');
+
                 return Command::INVALID;
             }
         }
@@ -78,13 +78,14 @@ class InstallCommand extends Command
         $environment = $this->installer->buildEnvironmentFile($template, $values);
 
         $this->line('');
-        $this->line('Schreibe Konfiguration nach ' . $envPath);
+        $this->line('Schreibe Konfiguration nach '.$envPath);
 
-        if (!$this->installer->writeEnvironmentFile($envPath, $environment)) {
+        if (! $this->installer->writeEnvironmentFile($envPath, $environment)) {
             $this->components->error('Die .env-Datei konnte nicht geschrieben werden.');
-            $this->line('Bitte folgenden Inhalt manuell nach ' . $envPath . ' kopieren und den Befehl danach erneut ausfuehren:');
+            $this->line('Bitte folgenden Inhalt manuell nach '.$envPath.' kopieren und den Befehl danach erneut ausfuehren:');
             $this->newLine();
             $this->line($environment);
+
             return Command::FAILURE;
         }
 
@@ -112,17 +113,13 @@ class InstallCommand extends Command
 
         $this->newLine();
         $this->components->info('Installation abgeschlossen.');
-        $this->line('Admin-Benutzer: ' . $user->email);
+        $this->line('Admin-Benutzer: '.$user->email);
         $this->line('Rolle: Super-Administrator:in');
-        $this->line('Konfiguration: ' . $envPath);
+        $this->line('Konfiguration: '.$envPath);
 
         return Command::SUCCESS;
     }
 
-    /**
-     * @param string $administratorEmail
-     * @return array
-     */
     protected function collectAdminData(string $administratorEmail): array
     {
         $firstName = $this->askRequiredOption('admin-first-name', 'Vorname des ersten Super-Admins');
@@ -143,10 +140,6 @@ class InstallCommand extends Command
         ];
     }
 
-    /**
-     * @param array $defaults
-     * @return array
-     */
     protected function collectEnvironmentValues(array $defaults): array
     {
         $appName = $this->askRequiredOption('app-name', 'Anwendungsname', $defaults['APP_NAME'] ?? 'Pfarrplaner');
@@ -173,11 +166,6 @@ class InstallCommand extends Command
         ], $databaseValues);
     }
 
-    /**
-     * @param string $connection
-     * @param array $defaults
-     * @return array
-     */
     protected function collectDatabaseValues(string $connection, array $defaults): array
     {
         if ($connection === 'sqlite') {
@@ -206,21 +194,11 @@ class InstallCommand extends Command
         ];
     }
 
-    /**
-     * @param string $cipher
-     * @return string
-     */
     protected function generateKey(string $cipher): string
     {
-        return 'base64:' . base64_encode(Encrypter::generateKey($cipher));
+        return 'base64:'.base64_encode(Encrypter::generateKey($cipher));
     }
 
-    /**
-     * @param string $option
-     * @param string $question
-     * @param string $default
-     * @return string
-     */
     protected function askOption(string $option, string $question, string $default = ''): string
     {
         $value = $this->option($option);
@@ -229,19 +207,13 @@ class InstallCommand extends Command
             return $value;
         }
 
-        if (!$this->input->isInteractive()) {
+        if (! $this->input->isInteractive()) {
             return $default;
         }
 
-        return (string)$this->ask($question, $default);
+        return (string) $this->ask($question, $default);
     }
 
-    /**
-     * @param string $option
-     * @param string $question
-     * @param string $default
-     * @return string
-     */
     protected function askRequiredOption(string $option, string $question, string $default = ''): string
     {
         do {
@@ -255,14 +227,9 @@ class InstallCommand extends Command
             $default = '';
         } while ($this->input->isInteractive());
 
-        throw new \RuntimeException('Fehlende Pflichtangabe fuer --' . $option . '.');
+        throw new \RuntimeException('Fehlende Pflichtangabe fuer --'.$option.'.');
     }
 
-    /**
-     * @param string $option
-     * @param string $question
-     * @return string
-     */
     protected function askSecretOption(string $option, string $question): string
     {
         $value = $this->option($option);
@@ -271,13 +238,13 @@ class InstallCommand extends Command
             return $value;
         }
 
-        if (!$this->input->isInteractive()) {
-            throw new \RuntimeException('Fehlende Pflichtangabe fuer --' . $option . '.');
+        if (! $this->input->isInteractive()) {
+            throw new \RuntimeException('Fehlende Pflichtangabe fuer --'.$option.'.');
         }
 
         do {
-            $first = (string)$this->secret($question);
-            $second = (string)$this->secret('Passwort wiederholen');
+            $first = (string) $this->secret($question);
+            $second = (string) $this->secret('Passwort wiederholen');
 
             if (($first !== '') && ($first === $second)) {
                 return $first;
@@ -287,13 +254,6 @@ class InstallCommand extends Command
         } while (true);
     }
 
-    /**
-     * @param string $option
-     * @param string $question
-     * @param array $choices
-     * @param string $default
-     * @return string
-     */
     protected function askChoiceOption(string $option, string $question, array $choices, string $default): string
     {
         $value = $this->option($option);
@@ -302,19 +262,13 @@ class InstallCommand extends Command
             return $value;
         }
 
-        if (!$this->input->isInteractive()) {
+        if (! $this->input->isInteractive()) {
             return $default;
         }
 
-        return (string)$this->choice($question, $choices, $default);
+        return (string) $this->choice($question, $choices, $default);
     }
 
-    /**
-     * @param string $option
-     * @param string $question
-     * @param bool $default
-     * @return bool
-     */
     protected function askBooleanOption(string $option, string $question, bool $default): bool
     {
         $value = $this->option($option);
@@ -323,32 +277,24 @@ class InstallCommand extends Command
             return filter_var($value, FILTER_VALIDATE_BOOL);
         }
 
-        if (!$this->input->isInteractive()) {
+        if (! $this->input->isInteractive()) {
             return $default;
         }
 
         return $this->confirm($question, $default);
     }
 
-    /**
-     * @param string $appUrl
-     * @return string
-     */
     protected function defaultMailFromAddress(string $appUrl): string
     {
         $host = parse_url($appUrl, PHP_URL_HOST);
 
-        if (!$host) {
+        if (! $host) {
             return 'noreply@example.com';
         }
 
-        return 'noreply@' . preg_replace('/^www\./', '', $host);
+        return 'noreply@'.preg_replace('/^www\./', '', $host);
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     protected function resolveEnvironmentPath(string $path): string
     {
         if (Str::startsWith($path, DIRECTORY_SEPARATOR)) {
@@ -358,16 +304,12 @@ class InstallCommand extends Command
         return base_path($path);
     }
 
-    /**
-     * @param string $template
-     * @return array
-     */
     protected function extractDefaults(string $template): array
     {
         $defaults = [];
 
         foreach (preg_split('/\r\n|\r|\n/', $template) as $line) {
-            if ((!$line) || Str::startsWith(trim($line), '#') || !str_contains($line, '=')) {
+            if ((! $line) || Str::startsWith(trim($line), '#') || ! str_contains($line, '=')) {
                 continue;
             }
 

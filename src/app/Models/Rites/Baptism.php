@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -47,19 +47,22 @@ use Illuminate\Support\Facades\URL;
 
 /**
  * Class Baptism
- * @package App
  */
 class Baptism extends AbstractModel implements HasDAVCalendarItems
 {
-    use HasCommentsTrait, HasAttachmentsTrait, HasFactory, HasCityScopes, TracksDeletedByTrait, SoftDeletes;
+    use HasAttachmentsTrait, HasCityScopes, HasCommentsTrait, HasFactory, SoftDeletes, TracksDeletedByTrait;
 
     protected static string $prefix = 'baptism';
+
     protected static string $prefixPlural = 'baptisms';
+
     protected static string $path = '';
+
     public static array $exceptRoutes = [
         'web' => ['index', 'show', 'store', 'create', 'edit', 'update', 'destroy'],
         'api' => ['index', 'show', 'store', 'update', 'destroy'],
     ];
+
     protected static $routes = [
         'web' => [
             'create' => [['GET', 'HEAD'], '#p#/create'],
@@ -68,6 +71,7 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
             'destroy' => [['DELETE'], '#p#/{modelId}'],
         ],
     ];
+
     public static array $validationRules = [
         'service' => 'nullable|exists:services,id',
         'service_id' => 'nullable|exists:services,id',
@@ -96,6 +100,7 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
         'dob' => 'nullable|date_format:d.m.Y',
         'birth_place' => 'nullable|string',
     ];
+
     public static $relationsForEditor = ['attachments'];
 
     /**
@@ -126,7 +131,7 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
         'dimissorial_requested',
         'dimissorial_received',
         'dob',
-        'birth_place'
+        'birth_place',
     ];
 
     /** @var string[] */
@@ -149,7 +154,6 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
     protected $appends = ['hasRegistrationForm', 'dimissorialUrl'];
 
     /**
-     * @param string $page
      * @return string
      */
     public static function getVuePath(string $page)
@@ -160,9 +164,6 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
         };
     }
 
-    /**
-     * @return array
-     */
     public function fillDefaults(): array
     {
         return [
@@ -183,17 +184,11 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
         ];
     }
 
-    /**
-     * @return string
-     */
     public function getLabelAttribute(): string
     {
         return $this->candidate_name ?: '';
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
@@ -208,20 +203,22 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
         foreach ($this->attachments as $attachment) {
             $found = $found || ($attachment->title == 'Anmeldeformular');
         }
+
         return $found;
     }
 
     /**
      * Generate a record for sync'ing to external calendars
+     *
      * @return array[]|null
      */
     public function getAdditionalEvents($config = [])
     {
-        if (!$this->appointment) {
+        if (! $this->appointment) {
             return null;
         }
 
-        $key = 'baptism_prep_' . $this->id;
+        $key = 'baptism_prep_'.$this->id;
 
         $contacts = [];
         if ($this->candidate_phone) {
@@ -234,22 +231,23 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
         $record = [
             'startDate' => $this->appointment->copy(),
             'endDate' => $this->appointment->copy()->addHour(1),
-            'title' => 'Taufgespräch ' . $this->candidate_name,
-            'description' =>
-                '<p>Taufe am ' . $this->service->date->format('d.m.Y') . ' um ' . $this->service->timeText(
-                ) . ' (' . $this->service->locationText() . ')</p>'
-                . '<p><a href="' . route('baptisms.edit', $this->id) . '">Taufe im Pfarrplaner öffnen</a></p>'
-                . (count($contacts) ? '<p>Kontakt: ' . join(', ', $contacts) . '</p>' : '')
-                . AbstractSyncEngine::AUTO_WARNING,
-            'location' => $this->candidate_address . ', ' . $this->candidate_zip . ' ' . $this->candidate_city,
+            'title' => 'Taufgespräch '.$this->candidate_name,
+            'description' => '<p>Taufe am '.$this->service->date->format('d.m.Y').' um '.$this->service->timeText(
+            ).' ('.$this->service->locationText().')</p>'
+                .'<p><a href="'.route('baptisms.edit', $this->id).'">Taufe im Pfarrplaner öffnen</a></p>'
+                .(count($contacts) ? '<p>Kontakt: '.implode(', ', $contacts).'</p>' : '')
+                .AbstractSyncEngine::AUTO_WARNING,
+            'location' => $this->candidate_address.', '.$this->candidate_zip.' '.$this->candidate_city,
             'categories' => ['Pfarrplaner', 'Taufgespräch', 'Amtskalender: Amtshandlungen'],
             'allDay' => true,
         ];
+
         return [$key => $record];
     }
 
     /**
      * Get the signed url for an online dimissorial
+     *
      * @return string
      */
     public function getDimissorialUrlAttribute()
@@ -259,8 +257,9 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
 
     /**
      * Get all calendar items related to this service for CalDAV
-     * @param bool $includeAlternate Include alternate calendar items
-     * @param bool $includeRiteAnniversaries Include one-year anniversary for rites
+     *
+     * @param  bool  $includeAlternate  Include alternate calendar items
+     * @param  bool  $includeRiteAnniversaries  Include one-year anniversary for rites
      * @return DAVCalendarItem[]
      */
     public function getCalendarItems(bool $includeAlternate, bool $includeRiteAnniversaries): array
@@ -272,30 +271,28 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
         if ($includeRiteAnniversaries) {
             $items[] = $this->getCalendarItem('anniv');
         }
+
         return $items;
     }
 
-
     /**
      * Get a single calendar item related to this service for CalDAV
-     * @param string $itemType
-     * @return DAVCalendarItem
      */
     public function getCalendarItem(string $itemType): DAVCalendarItem
     {
-        $description = 'Taufe am ' . $this->service->date->format('d.m.Y') . ' um ' . $this->service->timeText(
-            ) . ' (' . $this->service->locationText() . ")\n\n"
-            . 'Taufe im Pfarrplaner öffnen: '
-            . route('baptisms.edit', $this->id)
-            . "\n\nKontakt:\n"
-            . trim(' - ' . $this->candidate_name . ': ' . $this->candidate_phone . ' ' . $this->candidate_email) . "\n"
-            . "\n\n" . DAVCalendarItem::AUTO_WARNING;
+        $description = 'Taufe am '.$this->service->date->format('d.m.Y').' um '.$this->service->timeText(
+        ).' ('.$this->service->locationText().")\n\n"
+            .'Taufe im Pfarrplaner öffnen: '
+            .route('baptisms.edit', $this->id)
+            ."\n\nKontakt:\n"
+            .trim(' - '.$this->candidate_name.': '.$this->candidate_phone.' '.$this->candidate_email)."\n"
+            ."\n\n".DAVCalendarItem::AUTO_WARNING;
 
         switch ($itemType) {
             case 'prep':
                 return new DAVCalendarItem(
                     $this,
-                    'Taufgespräch ' . $this->candidate_name,
+                    'Taufgespräch '.$this->candidate_name,
                     $this->appointment->copy(),
                     $this->appointment->copy()->addHour(1),
                     $this->appointment_address ?? '',
@@ -308,7 +305,7 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
             case 'anniv':
                 return new DAVCalendarItem(
                     $this,
-                    '1. Jahrestag der Taufe von ' . $this->candidate_name,
+                    '1. Jahrestag der Taufe von '.$this->candidate_name,
                     $this->service->date->copy()->addYear(1),
                     $this->service->date->copy()->addYear(1)->addDay(1)->startOfDay(),
                     $this->candidate_address,
@@ -319,6 +316,7 @@ class Baptism extends AbstractModel implements HasDAVCalendarItems
                 );
                 break;
         }
-    }
 
+        throw new \InvalidArgumentException("Unknown baptism calendar item type: {$itemType}");
+    }
 }

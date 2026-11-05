@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -33,7 +33,6 @@ namespace App\Integrations\CommuniApp\Commands;
 use App\Integrations\CommuniApp\CommuniAppIntegration;
 use App\Models\Calendar\Occurence;
 use App\Models\Places\City;
-use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -77,7 +76,7 @@ class PushToCommuniApp extends Command
 
                 $this->line('Pushing events to CommuniApp for "'.$city->name.'"');
 
-                $events = Occurence::adRunningAt('communiapp', Carbon::now(), !$this->option('force'))
+                $events = Occurence::adRunningAt('communiapp', Carbon::now(), ! $this->option('force'))
                     ->whereHas('service', function ($q) use ($city) {
                         $q->inCity($city)->notHidden()->displayable(Carbon::now());
                     })->get();
@@ -88,7 +87,9 @@ class PushToCommuniApp extends Command
                                     .$event->start->setTimeZone('Europe/Berlin')->format('d.m.Y, H:i')
                                         .', '.$event->service->locationTextWithCity
                                     .') '.$event->service->titleText(false, true));
-                        if (!$this->option('dry-run')) $communiApp->publish($event);
+                        if (! $this->option('dry-run')) {
+                            $communiApp->publish($event);
+                        }
                         $pushCtr++;
                     }
                 }
@@ -103,9 +104,7 @@ class PushToCommuniApp extends Command
 
     public function line($string, $style = null, $verbosity = null)
     {
-        Log::debug ($string);
+        Log::debug($string);
         parent::line($string, $style, $verbosity);
     }
-
-
 }

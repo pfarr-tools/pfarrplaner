@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,61 +30,56 @@
 
 namespace App\Reports;
 
-use App\Imports\EventCalendarImport;
-use App\Imports\OPEventsImport;
 use App\Models\Announcements;
 use App\Models\Calendar\Occurence;
 use App\Models\Location;
-use App\Models\Places\City;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
-
+use Inertia\Response;
 
 /**
  * Class NewsletterReport
- * @package App\Reports
  */
 class NewsletterReport extends AbstractWordDocumentReport
 {
-
     /**
      * @var string
      */
     public $title = 'Newsletter';
+
     /**
      * @var string
      */
     public $group = 'Veröffentlichungen';
+
     /**
      * @var string
      */
     public $description = 'Gottesdienstliste für den Newsletter';
+
     /**
      * @var string
      */
     public $icon = 'fa fa-file-code';
 
-
     protected $inertia = true;
 
-
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
+
         return Inertia::render('Report/Newsletter/Setup', compact('cities', 'locations'));
     }
 
-
     /**
-     * @param Request $request
-     * @return \Inertia\Response
+     * @return Response
      */
     public function render(Request $request)
     {
@@ -95,16 +90,16 @@ class NewsletterReport extends AbstractWordDocumentReport
                 'locations.*' => 'nullable|int|exists:locations,id',
                 'start' => 'required|date',
                 'end' => 'required|date',
-                'includeWeeklyVerse' => 'bool'
+                'includeWeeklyVerse' => 'bool',
             ]
         );
 
-        $start = Carbon::parse($data['start'])->setTime(0,0,0);
-        $end = Carbon::parse($data['end'])->setTime(23,59,59);
+        $start = Carbon::parse($data['start'])->setTime(0, 0, 0);
+        $end = Carbon::parse($data['end'])->setTime(23, 59, 59);
 
         $events = Occurence::with('event')
             ->between($start, $end)
-            ->whereHas('service', function ($query) use ($data, $start, $end) {
+            ->whereHas('service', function ($query) use ($data, $start) {
                 $query->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
                     ->displayable($start)
                     ->notHidden();
@@ -116,10 +111,9 @@ class NewsletterReport extends AbstractWordDocumentReport
                 return $item->start->format('Y-m-d');
             });
 
-
         $featuredEvents = Occurence::with('event')
             ->adRunningAt('newsletter', $start)
-            ->whereHas('service', function ($query) use ($data, $start, $end) {
+            ->whereHas('service', function ($query) use ($data, $start) {
                 $query->inCitiesAndLocations($data['cities'], $data['locations'] ?? null)
                     ->displayable($start)
                     ->notHidden();
@@ -128,12 +122,10 @@ class NewsletterReport extends AbstractWordDocumentReport
             ->get();
 
         $html = View::make('reports.newsletter.html',
-                           compact('events', 'data', 'start', 'end', 'featuredEvents'))
+            compact('events', 'data', 'start', 'end', 'featuredEvents'))
             ->render();
 
         return Inertia::render('Report/Newsletter/Render', compact('html'));
 
     }
-
-
 }

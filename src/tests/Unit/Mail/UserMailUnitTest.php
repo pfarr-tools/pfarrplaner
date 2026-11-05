@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -21,7 +22,7 @@ class UserMailUnitTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testAccountDataBuilds(): void
+    public function test_account_data_builds(): void
     {
         $user = User::factory()->create();
         $author = User::factory()->create();

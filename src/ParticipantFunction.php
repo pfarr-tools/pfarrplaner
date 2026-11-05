@@ -1,4 +1,7 @@
 <?php
+
+use Illuminate\Database\Eloquent\Relations\Pivot;
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +12,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,7 +36,4 @@
  * Date: 17.08.2019
  * Time: 12:03
  */
-class ParticipantFunction extends \Illuminate\Database\Eloquent\Relations\Pivot
-{
-
-}
+class ParticipantFunction extends Pivot {}

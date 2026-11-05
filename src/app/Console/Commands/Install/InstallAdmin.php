@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,10 +30,9 @@
 
 namespace App\Console\Commands\Install;
 
-use App\Services\PasswordService;
 use App\Models\People\User;
+use App\Services\PasswordService;
 use Illuminate\Console\Command;
-use Illuminate\Console\Command\Install;
 use Spatie\Permission\Models\Role;
 
 class InstallAdmin extends Command
@@ -61,6 +60,7 @@ class InstallAdmin extends Command
     {
         if (User::where('last_name', 'Admin')->whereNull('first_name')->count()) {
             $this->line('<error>ERROR</error> Admin user already exists.');
+
             return Command::FAILURE;
         }
 
@@ -72,6 +72,7 @@ class InstallAdmin extends Command
         $user->assignRole($role);
 
         $this->line('<info>SUCCESS</info> Admin user admin@'.$domain.' with password"'.$password.'" created.');
+
         return Command::SUCCESS;
     }
 }

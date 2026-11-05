@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -33,6 +33,7 @@ namespace App\Models;
 use App\Models\Places\City;
 use App\Traits\HasAttachedImage;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -44,13 +45,13 @@ class Sermon extends Model
     protected $imageField = 'image';
 
     protected $guarded = [];
+
     protected $appends = ['fullTitle'];
 
     public function services()
     {
         return $this->hasMany(Service::class);
     }
-
 
     /**
      * Initialize the model class
@@ -59,7 +60,8 @@ class Sermon extends Model
      *
      * @return void
      */
-    public static function boot() {
+    public static function boot()
+    {
         parent::boot();
         static::created(function (Sermon $sermon) {
             $sermon->handleRelatedFunerals();
@@ -71,19 +73,23 @@ class Sermon extends Model
 
     /**
      * Set funeral text for related funerals
+     *
      * @return void
      */
     public function handleRelatedFunerals()
     {
         foreach ($this->services as $service) {
             foreach ($service->funerals as $funeral) {
-                if (empty($funeral->text)) $funeral->update(['text' => $this->reference]);
+                if (empty($funeral->text)) {
+                    $funeral->update(['text' => $this->reference]);
+                }
             }
         }
     }
 
     /**
      * Get all preachers for this sermon
+     *
      * @return array Preachers (by service id)
      */
     public function getPreachersAttribute()
@@ -92,20 +98,26 @@ class Sermon extends Model
         foreach ($this->services as $service) {
             $preachers[$service->id] = $service->preachers;
         }
+
         return $preachers;
     }
 
     /**
      * Get accessible sermons, i.e. those preached in the same city, or by the currently logged-in user
-     * @param City $city
-     * @return Sermon[]|\Illuminate\Database\Eloquent\Collection
+     *
+     * @return Sermon[]|Collection
      */
-    public static function getList(City $city) {
+    public static function getList(City $city)
+    {
         $sermons = self::all()->filter(function ($value, $key) use ($city) {
             foreach ($value->services as $service) {
                 $user = Auth::user();
-                if ($service->city->id == $city->id) return true;
-                if (collect($service->pastors->pluck('id'))->contains(Auth::user()->id)) return true;
+                if ($service->city->id == $city->id) {
+                    return true;
+                }
+                if (collect($service->pastors->pluck('id'))->contains(Auth::user()->id)) {
+                    return true;
+                }
             }
         });
         $list = [];
@@ -119,6 +131,7 @@ class Sermon extends Model
 
         }
         ksort($list);
+
         return $list;
     }
 
@@ -133,26 +146,28 @@ class Sermon extends Model
         $dates = $dates->reject(function ($item) {
             return (new Carbon($item)) > Carbon::now();
         })->all();
-        usort($dates, function($a, $b) {
+        usort($dates, function ($a, $b) {
             return ((new Carbon($a)) < (new Carbon($b))) ? 1 : -1;
         });
-        if (!isset($dates[0])) return null;
-        return (string)$dates[0];
+        if (! isset($dates[0])) {
+            return null;
+        }
+
+        return (string) $dates[0];
     }
 
     public function setTitleAttribute($title)
     {
         $this->attributes['title'] = $title;
 
-        $title = strtr($title, ['Ä' => 'Ae', 'Ö' => 'Oe', 'Ü' => 'Ue', 'ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'ß' => 'ss'  ]);
+        $title = strtr($title, ['Ä' => 'Ae', 'Ö' => 'Oe', 'Ü' => 'Ue', 'ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'ß' => 'ss']);
 
         $slug = $originalSlug = Str::slug($title);
         $index = 1;
-        while (null !== Sermon::where('slug', $slug)->where('id', '!=', $this->id)->first()) {
+        while (Sermon::where('slug', $slug)->where('id', '!=', $this->id)->first() !== null) {
             $slug = $originalSlug.'-'.$index;
             $index++;
         }
         $this->attributes['slug'] = $slug;
     }
-
 }

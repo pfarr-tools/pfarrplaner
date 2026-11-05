@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -18,7 +19,7 @@ use Tests\TestCase;
 
 class RoleSeederUnitTest extends TestCase
 {
-    public function testSeederCreatesCoreRolesWhenAnotherRoleAlreadyExists(): void
+    public function test_seeder_creates_core_roles_when_another_role_already_exists(): void
     {
         Role::query()->delete();
         Role::create(['name' => RoleService::ROLE_PREDICANT]);

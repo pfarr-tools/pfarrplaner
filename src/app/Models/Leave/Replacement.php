@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,7 +31,6 @@
 namespace App\Models\Leave;
 
 use App\Models\AbstractModel;
-use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
 use App\Tools\StringTool;
 use App\Traits\TracksDeletedByTrait;
@@ -40,25 +39,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 
 /**
  * Class Replacement
- * @package App
  */
 class Replacement extends AbstractModel
 {
-
     use HasFactory;
-    use TracksDeletedByTrait;
     use SoftDeletes;
+    use TracksDeletedByTrait;
 
     protected static string $prefix = 'replacement';
+
     protected static string $prefixPlural = 'replacements';
+
     protected static string $path = '';
+
     public static array $exceptRoutes = [
         'web' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
         'api' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
     ];
+
     public static array $validationRules = [
         'absence_id' => 'required|integer|exists:absences,id',
         'from' => 'required|date',
@@ -70,6 +72,7 @@ class Replacement extends AbstractModel
      * @var string[]
      */
     protected $fillable = ['absence_id', 'from', 'to', 'pool_id'];
+
     /**
      * @var string[]
      */
@@ -88,25 +91,16 @@ class Replacement extends AbstractModel
         });
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function absence(): BelongsTo
     {
         return $this->belongsTo(Absence::class);
     }
 
-    /**
-     * @return BelongsToMany
-     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withTimestamps();
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function pool(): BelongsTo
     {
         return $this->belongsTo(Pool::class);
@@ -122,12 +116,12 @@ class Replacement extends AbstractModel
         foreach ($this->users as $user) {
             $u[] = $user->lastName();
         }
-        if (!$this->pool_id) {
-            return join(' | ', $u) . ' (' . StringTool::durationText($this->from, $this->to) . ')';
+        if (! $this->pool_id) {
+            return implode(' | ', $u).' ('.StringTool::durationText($this->from, $this->to).')';
         } else {
             $texts = [];
             if (count($this->users)) {
-                $texts = [join(' | ', $u) . ' (' . StringTool::durationText($this->from, $this->to) . ')'];
+                $texts = [implode(' | ', $u).' ('.StringTool::durationText($this->from, $this->to).')'];
             }
             if ($this->pool->contact) {
                 $texts[] = $this->pool->contact.($this->pool->office ? ', '.$this->pool->office : '').' [Kontakt für Pool "'.$this->pool->name.'"]';
@@ -137,12 +131,12 @@ class Replacement extends AbstractModel
                     $from = max(Carbon::parse($poolmaster->start)->startOfDay(), $this->from);
                     $to = min(Carbon::parse($poolmaster->end)->endOfDay(), $this->to);
 
-                    $texts[] = $poolmaster->user->fullName() . ' [Poolmaster:in "' . $poolmaster->pool->name . '"]'
-                        . ' (' . StringTool::durationText($from, $to) . ')';
+                    $texts[] = $poolmaster->user->fullName().' [Poolmaster:in "'.$poolmaster->pool->name.'"]'
+                        .' ('.StringTool::durationText($from, $to).')';
                 }
             }
 
-            return join(' | ', $texts);
+            return implode(' | ', $texts);
         }
     }
 
@@ -150,7 +144,7 @@ class Replacement extends AbstractModel
     {
         $users = [];
         foreach ($this->users as $user) {
-            $users[$this->from->format('Ymd') . $this->to->format('Ymd') . $user->last_name . $user->id] = [
+            $users[$this->from->format('Ymd').$this->to->format('Ymd').$user->last_name.$user->id] = [
                 'from' => $this->from,
                 'to' => $this->to,
                 'period' => StringTool::durationText($this->from, $this->to),
@@ -160,16 +154,16 @@ class Replacement extends AbstractModel
         }
 
         if ($this->pool && $this->pool->contact) {
-            $users[$this->from->format('Ymd') . $this->to->format('Ymd') . $this->pool->name] = [
+            $users[$this->from->format('Ymd').$this->to->format('Ymd').$this->pool->name] = [
                 'from' => $this->from,
                 'to' => $this->to,
                 'period' => StringTool::durationText($this->from, $this->to),
                 'user' => new User([
-                                       'name' => $this->pool->contact,
-                                       'office' => $this->pool->office,
-                                       'phone' => $this->pool->phone,
-                                       'email' => $this->pool->email,
-                                   ]),
+                    'name' => $this->pool->contact,
+                    'office' => $this->pool->office,
+                    'phone' => $this->pool->phone,
+                    'email' => $this->pool->email,
+                ]),
                 'poolmaster' => $this->pool->name,
             ];
         } else {
@@ -178,9 +172,9 @@ class Replacement extends AbstractModel
                 $from = max(Carbon::parse($poolmaster->start)->startOfDay(), $this->from);
                 $to = min(Carbon::parse($poolmaster->end)->endOfDay(), $this->to);
 
-                $users[$from->format('Ymd') . $to->format(
+                $users[$from->format('Ymd').$to->format(
                     'Ymd'
-                ) . $poolmaster->user->last_name . $poolmaster->user->id] = [
+                ).$poolmaster->user->last_name.$poolmaster->user->id] = [
                     'from' => $from,
                     'to' => $to,
                     'period' => StringTool::durationText($from, $to),
@@ -191,12 +185,12 @@ class Replacement extends AbstractModel
         }
 
         ksort($users);
+
         return $users;
     }
 
     /**
-     * @param mixed $value
-     * @return void
+     * @param  mixed  $value
      */
     public function setFromAttribute($value): void
     {
@@ -204,8 +198,7 @@ class Replacement extends AbstractModel
     }
 
     /**
-     * @param mixed $value
-     * @return void
+     * @param  mixed  $value
      */
     public function setToAttribute($value): void
     {
@@ -213,7 +206,7 @@ class Replacement extends AbstractModel
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, Poolmaster>
+     * @return Collection<int, Poolmaster>
      */
     protected function relevantPoolmasters()
     {
@@ -237,12 +230,11 @@ class Replacement extends AbstractModel
     }
 
     /**
-     * @param mixed $value
-     * @return string|null
+     * @param  mixed  $value
      */
     protected function normalizeDateAttribute($value, bool $endOfDay = false): ?string
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,17 +35,12 @@ use App\Models\Liturgy\Item;
 
 class Song extends AbstractSngFile
 {
-
     /** @var Item */
     protected $item;
 
-    /** @var SongItemHelper $helper */
+    /** @var SongItemHelper */
     protected $helper;
 
-
-    /**
-     * @param Item $item
-     */
     public function __construct(Item $item)
     {
         $this->item = $item;
@@ -61,7 +56,7 @@ class Song extends AbstractSngFile
             'ChurchSongID' => $this->helper->getCodeText(),
             'Songbook' => $this->helper->getCodeText(),
             'CCLI' => '-',
-                          ]);
+        ]);
 
         if ($author = $this->helper->getTextAuthor()) {
             $this->addHeader('Author', $author);
@@ -77,17 +72,16 @@ class Song extends AbstractSngFile
 
         $text = $this->headersToText();
 
-
         if ($this->item->data['song']['song']['refrain'] ?? '') {
             $text .= $this->line('---')
-                . $this->line('Refrain')
-                . $this->wordWrap($this->item->data['song']['song']['refrain'] ?? '');
+                .$this->line('Refrain')
+                .$this->wordWrap($this->item->data['song']['song']['refrain'] ?? '');
         }
 
         foreach ($this->item->data['song']['song']['verses'] ?? [] as $verse) {
             $text .= $this->line('---')
-                . $this->line('Vers ' . $verse['number'] ?? '')
-                . $this->wordWrap($verse['text'] ?? '');
+                .$this->line('Vers '.$verse['number'] ?? '')
+                .$this->wordWrap($verse['text'] ?? '');
         }
 
         return utf8_decode($text);
@@ -95,42 +89,36 @@ class Song extends AbstractSngFile
 
     /**
      * Get the data for the schedule file
-     * @return array
      */
     public function toScheduleItem(): array
     {
         $scheduleItem = parent::toScheduleItem();
         $scheduleItem['VerseOrder'] = $this->getVerseOrder();
+
         return $scheduleItem;
     }
 
-
-
-    /**
-     * @return string
-     */
     public function getVerseOrder(): string
     {
         $order = [];
         foreach ($this->helper->getActiveVerses() as $verse) {
-            if ($verse['refrain_before']) $order[] = 'Refrain';
+            if ($verse['refrain_before']) {
+                $order[] = 'Refrain';
+            }
             $order[] = 'Vers '.$verse['number'];
-            if ($verse['refrain_after']) $order[] = 'Refrain';
+            if ($verse['refrain_after']) {
+                $order[] = 'Refrain';
+            }
         }
-        return join(',', $order);
+
+        return implode(',', $order);
     }
 
-    /**
-     * @return Item
-     */
     public function getItem(): Item
     {
         return $this->item;
     }
 
-    /**
-     * @param Item $item
-     */
     public function setItem(Item $item): void
     {
         $this->item = $item;
@@ -140,6 +128,4 @@ class Song extends AbstractSngFile
     {
         return $this->item->title.': '.$this->getTitle().($this->item->data['verses'] ? ', '.$this->item->data['verses'] : '');
     }
-
-
 }

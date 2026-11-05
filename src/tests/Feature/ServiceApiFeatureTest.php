@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -30,7 +31,7 @@ class ServiceApiFeatureTest extends TestCase
         parent::setUp();
         // LiturgyService reads liturgical calendar from storage; prevent external HTTP calls.
         Storage::fake();
-        foreach (range((int)date('Y') - 2, (int)date('Y') + 2) as $year) {
+        foreach (range((int) date('Y') - 2, (int) date('Y') + 2) as $year) {
             Storage::put("liturgy/{$year}.json", '{}');
         }
         Storage::put('liturgy/.json', '{}');
@@ -44,7 +45,7 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testShowReturnsServiceData()
+    public function test_show_returns_service_data()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -61,7 +62,7 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testShowReturnsEventData()
+    public function test_show_returns_event_data()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -83,7 +84,7 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testShowRequiresAuth()
+    public function test_show_requires_auth()
     {
         $service = Service::factory()->create();
 
@@ -94,7 +95,7 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testShowReturns404ForMissingService()
+    public function test_show_returns404_for_missing_service()
     {
         $user = User::factory()->create();
 
@@ -107,7 +108,7 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testByDayAndCityReturnsServiceIds()
+    public function test_by_day_and_city_returns_service_ids()
     {
         $city = City::factory()->create();
         $day = Day::factory()->create();
@@ -127,7 +128,7 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testByUserReturnsServicesForUser()
+    public function test_by_user_returns_services_for_user()
     {
         $user = User::factory()->create();
 
@@ -141,7 +142,7 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testByDayAndCityRequiresAuth()
+    public function test_by_day_and_city_requires_auth()
     {
         $city = City::factory()->create();
         $day = Day::factory()->create();
@@ -154,7 +155,7 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testByUserRequiresAuth()
+    public function test_by_user_requires_auth()
     {
         $user = User::factory()->create();
 
@@ -166,7 +167,7 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testByMonthReturnsServicesInMonth()
+    public function test_by_month_returns_services_in_month()
     {
         $city = City::factory()->create();
         $user = User::factory()->create();
@@ -184,7 +185,7 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testDestroyDeletesServiceBySlug()
+    public function test_destroy_deletes_service_by_slug()
     {
         $user = User::factory()->create();
         $service = Service::factory()->create();
@@ -201,7 +202,7 @@ class ServiceApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testDestroyRequiresAuth()
+    public function test_destroy_requires_auth()
     {
         $service = Service::factory()->create();
         $service->refresh();

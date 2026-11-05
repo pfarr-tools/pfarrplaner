@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Integrations\MailNotifications;
 
-
 use App\Events\ServiceUpdated;
 use App\Models\Subscription;
 use Carbon\Carbon;
@@ -38,24 +37,21 @@ use Illuminate\Support\Collection;
 
 class ServiceUpdatedListener
 {
-
-    /**
-     * @param ServiceUpdated $event
-     */
     public function handle(ServiceUpdated $event)
     {
         // don't send notifications for past services
-        if ($event->service->date < Carbon::now()) return;
+        if ($event->service->date < Carbon::now()) {
+            return;
+        }
 
         // find participants who have been removed:
-        $removed = new Collection();
+        $removed = new Collection;
         foreach ($event->originalParticipants as $participant) {
-            if (!$event->service->participants->contains($participant)) {
+            if (! $event->service->participants->contains($participant)) {
                 $removed->push($participant);
             }
         }
         Subscription::send($event->service, \App\Mail\ServiceUpdated::class, [], $removed);
 
     }
-
 }

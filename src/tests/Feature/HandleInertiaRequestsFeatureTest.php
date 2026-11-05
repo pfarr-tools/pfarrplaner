@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -15,27 +16,28 @@ namespace Tests\Feature;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\People\User;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
 use Tests\TestCase;
 
 class HandleInertiaRequestsFeatureTest extends TestCase
 {
     /**
      * Resolve shared props directly from the middleware, bypassing HTTP stack.
-     *
-     * @return array
      */
     protected function sharedProps(): array
     {
         $middleware = $this->app->make(HandleInertiaRequests::class);
         $request = request();
         $request->setLaravelSession($this->app->make('session')->driver());
+
         return $middleware->share($request);
     }
 
     /**
      * Shared props always include flash and errors keys, even for guest requests.
      */
-    public function testSharedPropsContainFlashAndErrors()
+    public function test_shared_props_contain_flash_and_errors()
     {
         $props = $this->sharedProps();
 
@@ -46,7 +48,7 @@ class HandleInertiaRequestsFeatureTest extends TestCase
     /**
      * Flash messages stored in the session appear in the shared flash prop.
      */
-    public function testFlashMessagesAreShared()
+    public function test_flash_messages_are_shared()
     {
         Session::put('success', 'Gespeichert');
 
@@ -59,10 +61,10 @@ class HandleInertiaRequestsFeatureTest extends TestCase
     /**
      * Validation errors stored in the session appear in the shared errors prop.
      */
-    public function testValidationErrorsAreShared()
+    public function test_validation_errors_are_shared()
     {
-        $errors = new \Illuminate\Support\MessageBag(['name' => ['Das Feld ist erforderlich.']]);
-        Session::put('errors', new \Illuminate\Support\ViewErrorBag()->put('default', $errors));
+        $errors = new MessageBag(['name' => ['Das Feld ist erforderlich.']]);
+        Session::put('errors', new ViewErrorBag()->put('default', $errors));
 
         $props = $this->sharedProps();
 
@@ -70,7 +72,7 @@ class HandleInertiaRequestsFeatureTest extends TestCase
         $this->assertObjectHasProperty('name', $shared);
     }
 
-    public function testAuthenticatedSharedPropsContainInterstitials()
+    public function test_authenticated_shared_props_contain_interstitials()
     {
         config()->set('interstitials.items', [
             'breaking-change' => [

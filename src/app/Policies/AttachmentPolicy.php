@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,16 +39,11 @@ class AttachmentPolicy
 {
     use HandlesAuthorization;
 
-    /**
-     * @param User $user
-     * @param Attachment $attachment
-     * @return bool
-     */
     public function update(User $user, Attachment $attachment): bool
     {
         $attachable = $attachment->resolveAttachableIncludingTrashed();
 
-        if (!$attachable) {
+        if (! $attachable) {
             return false;
         }
 
@@ -61,7 +56,7 @@ class AttachmentPolicy
             $service = $attachable;
         } elseif (method_exists($attachable, 'service')) {
             $service = $attachable->service;
-            if ((null === $service) && isset($attachable->service_id) && $attachable->service_id) {
+            if (($service === null) && isset($attachable->service_id) && $attachable->service_id) {
                 $service = Service::withTrashed()->find($attachable->service_id);
             }
         }

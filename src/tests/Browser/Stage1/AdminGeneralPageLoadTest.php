@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,7 +18,7 @@ use Tests\AbstractPageLoadTest;
 
 class AdminGeneralPageLoadTest extends AbstractPageLoadTest
 {
-    public function testAdminIndexLoads(): void
+    public function test_admin_index_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('admin.index'));

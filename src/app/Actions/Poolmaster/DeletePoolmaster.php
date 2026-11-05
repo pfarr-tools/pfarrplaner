@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,27 +36,21 @@ use App\Events\Models\Poolmaster\DeletedPoolmaster;
 use App\Models\Leave\Poolmaster;
 use App\Models\People\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 
 class DeletePoolmaster extends AbstractDeleteAction implements DeletesPoolmasters
 {
-
-    /** @var array|null  */
+    /** @var array|null */
     protected $forward = null;
 
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return route('absences.index', $this->forward);
     }
 
     /**
-     * @param User $user
-     * @param Poolmaster $poolmaster
-     * @return bool
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws AuthorizationException
      */
     public function delete(User $user, Poolmaster $poolmaster): bool
     {
@@ -64,8 +58,8 @@ class DeletePoolmaster extends AbstractDeleteAction implements DeletesPoolmaster
         $this->forward = ['year' => Carbon::parse($poolmaster->start)->year, 'month' => Carbon::parse($poolmaster->start)->month];
         DeletedPoolmaster::dispatch($user, $poolmaster);
         $this->messages = ['success' => 'Der Einsatz als Poolmaster:in wurde gelöscht.'];
+
         return $poolmaster->delete();
 
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,23 +31,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Location;
-use App\Models\Places\City;
 use App\Models\Seating\SeatingRow;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
-use Inertia\Inertia;
 
 /**
  * Class LocationController
- * @package App\Http\Controllers
  */
 class LocationController extends AbstractCRUDController
 {
-
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected string $modelClass = Location::class;
 
@@ -63,12 +56,12 @@ class LocationController extends AbstractCRUDController
     {
         $data = parent::preFillNewModel($request);
         $data['city_id'] = $request->get('city') ?? null;
+
         return $data;
     }
 
-
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function getResourcesForEditor(Request $request, $model = null): array
     {
@@ -78,7 +71,7 @@ class LocationController extends AbstractCRUDController
             ->whereHas('seatingSection', function ($q) use ($model) {
                 $q->where('location_id', $model->id);
             })->get() : [];
+
         return $data;
     }
-
 }

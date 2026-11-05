@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,9 +32,10 @@ namespace App\Liturgy\SongBeamer;
 
 class ObjectFile extends AbstractFile
 {
-
     protected $class = '';
+
     protected $type = '';
+
     protected $items = [];
 
     public function __construct($class, $type, $items)
@@ -44,13 +45,22 @@ class ObjectFile extends AbstractFile
         $this->items = $items;
     }
 
-    protected function valueToString($value) {
-        if (is_numeric($value)) return (string)$value;
+    protected function valueToString($value)
+    {
+        if (is_numeric($value)) {
+            return (string) $value;
+        }
         if (is_string($value)) {
-            if (substr($value, 0, 2) == '@@') return substr($value, 2);
+            if (substr($value, 0, 2) == '@@') {
+                return substr($value, 2);
+            }
+
             return "'{$value}'";
-        };
-        if (is_array($value)) return '[]';
+        }
+        if (is_array($value)) {
+            return '[]';
+        }
+
         return "''";
     }
 
@@ -58,9 +68,10 @@ class ObjectFile extends AbstractFile
     {
         $item = $this->line('item', 2);
         foreach ($config as $key => $value) {
-            $item .= $this->line(ucfirst($key) . ' = ' . $this->valueToString($value), 3);
+            $item .= $this->line(ucfirst($key).' = '.$this->valueToString($value), 3);
         }
         $item .= $this->line('end', 2);
+
         return $item;
     }
 
@@ -71,59 +82,42 @@ class ObjectFile extends AbstractFile
             $text .= is_string($item) ? $item : $this->itemToText($item);
         }
         $text .= $this->line('>', 1);
+
         return $text;
     }
 
     public function toText()
     {
-        return $this->line('object ' . $this->class . ': ' . $this->type)
-            . $this->itemsToText($this->items)
-            . $this->line('end');
+        return $this->line('object '.$this->class.': '.$this->type)
+            .$this->itemsToText($this->items)
+            .$this->line('end');
     }
 
-    /**
-     * @return string
-     */
     public function getClass(): string
     {
         return $this->class;
     }
 
-    /**
-     * @param string $class
-     */
     public function setClass(string $class): void
     {
         $this->class = $class;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @param string $type
-     */
     public function setType(string $type): void
     {
         $this->type = $type;
     }
 
-    /**
-     * @return array
-     */
     public function getItems(): array
     {
         return $this->items;
     }
 
-    /**
-     * @param array $items
-     */
     public function setItems(array $items): void
     {
         $this->items = $items;
@@ -133,6 +127,4 @@ class ObjectFile extends AbstractFile
     {
         $this->items[] = $item;
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -26,8 +27,11 @@ class SeatingRowFeatureTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Location $location;
+
     protected SeatingSection $section;
+
     protected SeatingRow $row;
 
     protected function setUp(): void
@@ -45,15 +49,15 @@ class SeatingRowFeatureTest extends TestCase
         ]);
     }
 
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $this->actingAs($this->user)
             ->get(route('seatingRow.edit', $this->row->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Admin/Location/SeatingRowEditor'));
+            ->assertInertia(fn (Assert $page) => $page->component('Admin/Location/SeatingRowEditor'));
     }
 
-    public function testCreateViaFrontend(): void
+    public function test_create_via_frontend(): void
     {
         $data = SeatingRow::factory()->raw([
             'seating_section_id' => $this->section->id,

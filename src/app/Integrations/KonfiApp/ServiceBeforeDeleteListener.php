@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,21 +35,16 @@ use Illuminate\Support\Facades\Log;
 
 class ServiceBeforeDeleteListener
 {
-
-
     /**
      * Handle the ServiceUpdated event
      *
-     * @param ServiceBeforeDelete $event
      * @return void
      */
     public function handle(ServiceBeforeDelete $event)
     {
-        Log::debug('Calling KonfiAppIntegration on deleted service #' . $event->service->id);
+        Log::debug('Calling KonfiAppIntegration on deleted service #'.$event->service->id);
         if (KonfiAppIntegration::isActive($event->service->city)) {
             KonfiAppIntegration::get($event->service->city)->handleServiceDelete($event->service);
         }
     }
-
-
 }

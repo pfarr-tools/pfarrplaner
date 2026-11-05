@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -32,16 +33,16 @@ class BaptismFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $baptism = Baptism::factory()->create();
         $this->actingAs($this->user)
             ->get(route('baptisms.edit', $baptism->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Rites/BaptismEditor'));
+            ->assertInertia(fn (Assert $page) => $page->component('Rites/BaptismEditor'));
     }
 
-    public function testCreateRedirectsToEditor(): void
+    public function test_create_redirects_to_editor(): void
     {
         $this->actingAs($this->user)
             ->get(route('baptisms.create'))

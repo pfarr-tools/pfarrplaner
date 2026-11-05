@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,10 +30,8 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
 class LiturgySheets
 {
-
     public static function all()
     {
         $sheets = [];
@@ -41,7 +39,7 @@ class LiturgySheets
             if (substr(pathinfo($file, PATHINFO_FILENAME), 0, 8) != 'Abstract') {
                 $class = 'App\\Liturgy\\LiturgySheets\\'.pathinfo($file, PATHINFO_FILENAME);
                 /** @var AbstractLiturgySheet $object */
-                $object = new $class();
+                $object = new $class;
                 $sheets[$object->getTitle()] = [
                     'class' => $class,
                     'key' => $object->getKey(),
@@ -57,8 +55,8 @@ class LiturgySheets
                 ];
             }
         }
-        ksort ($sheets);
+        ksort($sheets);
+
         return $sheets;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -34,6 +35,4 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Songbook', description: 'Songbook catalogue')]
 #[OA\Tag(name: 'Tab', description: 'Home screen tab data')]
 #[OA\Tag(name: 'Teams', description: 'Teams by city')]
-class OpenApiSpec
-{
-}
+class OpenApiSpec {}

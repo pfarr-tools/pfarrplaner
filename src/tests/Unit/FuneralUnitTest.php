@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,9 +13,13 @@
 
 namespace Tests\Unit;
 
+use App\Actions\Funeral\CreateFuneral;
+use App\Actions\Funeral\DeleteFuneral;
+use App\Actions\Funeral\UpdateFuneral;
 use App\Events\Models\Funeral\CreatedFuneral;
 use App\Events\Models\Funeral\DeletedFuneral;
 use App\Events\Models\Funeral\UpdatedFuneral;
+use App\Http\Controllers\AbstractCRUDController;
 use App\Models\AbstractModel;
 use App\Models\People\User;
 use App\Models\Rites\Funeral;
@@ -26,37 +31,37 @@ use Tests\TestCase;
 
 class FuneralUnitTest extends TestCase
 {
-    public function testFuneralHasServiceRelationship(): void
+    public function test_funeral_has_service_relationship(): void
     {
         $funeral = Funeral::factory()->create();
         $this->assertInstanceOf(BelongsTo::class, $funeral->service());
     }
 
-    public function testFuneralCanBeCreatedViaFactory(): void
+    public function test_funeral_can_be_created_via_factory(): void
     {
         $funeral = Funeral::factory()->create();
         $this->assertCount(1, Funeral::all());
         $this->assertNotNull($funeral->service_id);
     }
 
-    public function testFuneralExtendsAbstractModel(): void
+    public function test_funeral_extends_abstract_model(): void
     {
         $this->assertTrue(is_subclass_of(Funeral::class, AbstractModel::class));
     }
 
-    public function testFuneralControllerClassExists(): void
+    public function test_funeral_controller_class_exists(): void
     {
-        $this->assertTrue(is_subclass_of(Funeral::controllerClass(), \App\Http\Controllers\AbstractCRUDController::class));
+        $this->assertTrue(is_subclass_of(Funeral::controllerClass(), AbstractCRUDController::class));
     }
 
-    public function testFuneralContractsResolve(): void
+    public function test_funeral_contracts_resolve(): void
     {
-        $this->assertInstanceOf(\App\Actions\Funeral\CreateFuneral::class, app(Funeral::getContractName('create')));
-        $this->assertInstanceOf(\App\Actions\Funeral\UpdateFuneral::class, app(Funeral::getContractName('update')));
-        $this->assertInstanceOf(\App\Actions\Funeral\DeleteFuneral::class, app(Funeral::getContractName('delete')));
+        $this->assertInstanceOf(CreateFuneral::class, app(Funeral::getContractName('create')));
+        $this->assertInstanceOf(UpdateFuneral::class, app(Funeral::getContractName('update')));
+        $this->assertInstanceOf(DeleteFuneral::class, app(Funeral::getContractName('delete')));
     }
 
-    public function testFuneralCanBeCreatedViaAction(): void
+    public function test_funeral_can_be_created_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -70,7 +75,7 @@ class FuneralUnitTest extends TestCase
         Event::assertDispatched(CreatedFuneral::class);
     }
 
-    public function testFuneralCanBeUpdatedViaAction(): void
+    public function test_funeral_can_be_updated_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();
@@ -86,7 +91,7 @@ class FuneralUnitTest extends TestCase
         Event::assertDispatched(UpdatedFuneral::class);
     }
 
-    public function testFuneralCanBeDeletedViaAction(): void
+    public function test_funeral_can_be_deleted_via_action(): void
     {
         Event::fake();
         $user = User::factory()->create();

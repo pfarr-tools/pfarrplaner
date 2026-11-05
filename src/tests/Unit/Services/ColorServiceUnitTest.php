@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,7 +18,7 @@ use Tests\TestCase;
 
 class ColorServiceUnitTest extends TestCase
 {
-    public function testRainbowArrayReturnsColorsForEachKey(): void
+    public function test_rainbow_array_returns_colors_for_each_key(): void
     {
         $keys = ['a', 'b', 'c'];
         $result = ColorService::rainbowArray($keys);
@@ -28,7 +29,7 @@ class ColorServiceUnitTest extends TestCase
         }
     }
 
-    public function testRainbowArrayColorsAreValidHexStrings(): void
+    public function test_rainbow_array_colors_are_valid_hex_strings(): void
     {
         $keys = ['x', 'y'];
         $result = ColorService::rainbowArray($keys);
@@ -37,13 +38,13 @@ class ColorServiceUnitTest extends TestCase
         }
     }
 
-    public function testContrastColorReturnsWhiteForDarkBackground(): void
+    public function test_contrast_color_returns_white_for_dark_background(): void
     {
         $result = ColorService::contrastColor('#000000');
         $this->assertEquals('#ffffff', strtolower($result));
     }
 
-    public function testContrastColorReturnsBlackForLightBackground(): void
+    public function test_contrast_color_returns_black_for_light_background(): void
     {
         $result = ColorService::contrastColor('#ffffff');
         $this->assertEquals('#000000', strtolower($result));

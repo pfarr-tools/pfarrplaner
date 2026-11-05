@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,26 +30,34 @@
 
 namespace App\Traits;
 
-
 use Auth;
 
 trait IncludesPermissionAttributes
 {
+    public function getIsShowableAttribute()
+    {
+        if (Auth::guest()) {
+            return false;
+        }
 
-    public function getIsShowableAttribute() {
-        if (Auth::guest()) return false;
         return Auth::user()->can('show', $this);
     }
 
     public function getIsEditableAttribute()
     {
-        if (Auth::guest()) return false;
+        if (Auth::guest()) {
+            return false;
+        }
+
         return Auth::user()->can('update', $this);
     }
 
-    public function getIsDeletableAttribute() {
-        if (Auth::guest()) return false;
+    public function getIsDeletableAttribute()
+    {
+        if (Auth::guest()) {
+            return false;
+        }
+
         return Auth::user()->can('delete', $this);
     }
-
 }

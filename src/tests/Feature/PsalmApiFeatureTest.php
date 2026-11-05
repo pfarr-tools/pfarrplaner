@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,7 +25,7 @@ class PsalmApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testIndexReturnsPsalms()
+    public function test_index_returns_psalms()
     {
         $user = User::factory()->create();
         Psalm::factory()->count(3)->create();
@@ -39,7 +40,7 @@ class PsalmApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testIndexRequiresAuth()
+    public function test_index_requires_auth()
     {
         $response = $this->getJson(route('api.psalms.index'));
         $response->assertUnauthorized();
@@ -48,7 +49,7 @@ class PsalmApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testStoreCreatesPsalm()
+    public function test_store_creates_psalm()
     {
         $user = User::factory()->create();
 
@@ -66,7 +67,7 @@ class PsalmApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testStoreRequiresTitle()
+    public function test_store_requires_title()
     {
         $user = User::factory()->create();
 
@@ -79,7 +80,7 @@ class PsalmApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testUpdateModifiesPsalm()
+    public function test_update_modifies_psalm()
     {
         $user = User::factory()->create();
         $psalm = Psalm::factory()->create(['title' => 'Alter Titel']);
@@ -96,7 +97,7 @@ class PsalmApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testUpdateReturns404ForMissingPsalm()
+    public function test_update_returns404_for_missing_psalm()
     {
         $user = User::factory()->create();
 

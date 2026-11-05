@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,7 +34,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -50,12 +51,12 @@ return new class extends Migration {
             $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
         });
 
-        foreach (Service::select(['services.id','date','end'])->get() as $service) {
+        foreach (Service::select(['services.id', 'date', 'end'])->get() as $service) {
             Occurence::create([
-                                  'service_id' => $service->id,
-                                  'start' => $service->date,
-                                  'end' => $service->date->copy()->addMinutes(60)
-                              ]);
+                'service_id' => $service->id,
+                'start' => $service->date,
+                'end' => $service->date->copy()->addMinutes(60),
+            ]);
         }
     }
 

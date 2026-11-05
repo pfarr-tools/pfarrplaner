@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,19 +32,21 @@ namespace App\Models\Leave;
 
 use App\Models\AbstractModel;
 use App\Models\People\User;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Poolmaster extends AbstractModel
 {
-
     protected $fillable = ['id',  'pool_id', 'user_id', 'start', 'end'];
+
     protected $casts = ['start' => 'date', 'end' => 'date'];
 
-
     protected static string $prefix = 'poolmaster';
+
     protected static string $prefixPlural = 'poolmaster';
+
     public static array $exceptRoutes = ['web' => ['show'], 'api' => ['show']];
+
     public static array $validationRules = [
         'pool_id' => 'required|integer|exists:pools,id',
         'user_id' => 'required|integer|exists:users,id',
@@ -61,7 +63,6 @@ class Poolmaster extends AbstractModel
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
-
 
     public function currentReplacements(): HasMany
     {
@@ -88,17 +89,15 @@ class Poolmaster extends AbstractModel
      */
     public static function getEmptyModel(): AbstractModel
     {
-        $model = new static();
+        $model = new static;
         $data = array_merge(array_fill_keys($model->getFillable(), null), $model->fillDefaults());
         $model->fill($data);
+
         return $model;
     }
 
-
     /**
      * Mutator for start date, needed to deal with ISO date strings
-     * @param $value
-     * @return void
      */
     public function setStartAttribute($value): void
     {
@@ -107,12 +106,9 @@ class Poolmaster extends AbstractModel
 
     /**
      * Mutator for end date, needed to deal with ISO date strings
-     * @param $value
-     * @return void
      */
     public function setEndAttribute($value): void
     {
         $this->attributes['end'] = $value ? Carbon::parse($value)->toDateString() : null;
     }
-
 }

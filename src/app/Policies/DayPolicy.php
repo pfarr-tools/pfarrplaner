@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,7 +36,6 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
  * Class DayPolicy
- * @package App\Policies
  */
 class DayPolicy
 {
@@ -45,8 +44,6 @@ class DayPolicy
     /**
      * Determine whether the user can view the day.
      *
-     * @param User $user
-     * @param Day $day
      * @return mixed
      */
     public function view(User $user, Day $day)
@@ -57,7 +54,6 @@ class DayPolicy
     /**
      * Determine whether the user can create days.
      *
-     * @param User $user
      * @return mixed
      */
     public function create(User $user)
@@ -68,8 +64,6 @@ class DayPolicy
     /**
      * Determine whether the user can update the day.
      *
-     * @param User $user
-     * @param Day $day
      * @return mixed
      */
     public function update(User $user, Day $day)
@@ -80,8 +74,6 @@ class DayPolicy
     /**
      * Determine whether the user can delete the day.
      *
-     * @param User $user
-     * @param Day $day
      * @return mixed
      */
     public function delete(User $user, Day $day)
@@ -92,8 +84,6 @@ class DayPolicy
     /**
      * Determine whether the user can restore the day.
      *
-     * @param User $user
-     * @param Day $day
      * @return mixed
      */
     public function restore(User $user, Day $day)
@@ -104,8 +94,6 @@ class DayPolicy
     /**
      * Determine whether the user can permanently delete the day.
      *
-     * @param User $user
-     * @param Day $day
      * @return mixed
      */
     public function forceDelete(User $user, Day $day)

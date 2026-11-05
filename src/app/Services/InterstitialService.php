@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,18 +37,16 @@ use Illuminate\Validation\ValidationException;
 class InterstitialService
 {
     public const ACTION_DISMISS = 'dismiss';
+
     public const ACTION_LATER = 'later';
 
     /**
      * Resolve all configured interstitials that should currently be shown.
-     *
-     * @param User $user
-     * @return array
      */
     public function forUser(User $user): array
     {
         // no interstitials in test environment, unless specifically enabled in url by ?show_interstitial=1
-        if ((app()->environment('local', 'dusk')) && (!request()->boolean('show_interstitial'))) {
+        if ((app()->environment('local', 'dusk')) && (! request()->boolean('show_interstitial'))) {
             return [];
         }
 
@@ -56,11 +54,11 @@ class InterstitialService
         $interstitials = [];
 
         foreach (config('interstitials.items', []) as $key => $item) {
-            if (!$this->isEnabled($item)) {
+            if (! $this->isEnabled($item)) {
                 continue;
             }
 
-            if (!$this->matchesAudience($user, $item)) {
+            if (! $this->matchesAudience($user, $item)) {
                 continue;
             }
 
@@ -83,22 +81,18 @@ class InterstitialService
     /**
      * Persist the user's reaction to an interstitial.
      *
-     * @param User $user
-     * @param string $key
-     * @param string $action
-     * @return array
      * @throws ValidationException
      */
     public function remember(User $user, string $key, string $action): array
     {
         $items = config('interstitials.items', []);
-        if (!isset($items[$key])) {
+        if (! isset($items[$key])) {
             throw ValidationException::withMessages([
                 'key' => 'Dieses Interstitial ist nicht definiert.',
             ]);
         }
 
-        if (!in_array($action, [self::ACTION_DISMISS, self::ACTION_LATER])) {
+        if (! in_array($action, [self::ACTION_DISMISS, self::ACTION_LATER])) {
             throw ValidationException::withMessages([
                 'action' => 'Ungültige Interstitial-Aktion.',
             ]);
@@ -116,38 +110,29 @@ class InterstitialService
 
     /**
      * Get the stored interstitial state array for the user.
-     *
-     * @param User $user
-     * @return array
      */
     public function statesForUser(User $user): array
     {
         $states = Settings::get($user, config('interstitials.setting_key', 'interstitials'), []);
+
         return is_array($states) ? $states : [];
     }
 
     /**
      * Determine whether a configured interstitial is enabled.
-     *
-     * @param array $item
-     * @return bool
      */
     public function isEnabled(array $item): bool
     {
-        return (bool)($item['enabled'] ?? false);
+        return (bool) ($item['enabled'] ?? false);
     }
 
     /**
      * Check whether the current user belongs to the configured audience.
-     *
-     * @param User $user
-     * @param array $item
-     * @return bool
      */
     public function matchesAudience(User $user, array $item): bool
     {
         $audience = $item['audience'] ?? 'all';
-        if (!is_array($audience)) {
+        if (! is_array($audience)) {
             $audience = [$audience];
         }
 

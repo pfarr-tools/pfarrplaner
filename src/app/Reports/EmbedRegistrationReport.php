@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@
 
 namespace App\Reports;
 
-
 use App\Http\CORS;
 use App\Models\Seating\Booking;
 use App\Models\Service;
@@ -54,23 +53,24 @@ use Inertia\Inertia;
 
 /**
  * Class EmbedContactLookupReport
- * @package App\Reports
  */
 class EmbedRegistrationReport extends AbstractEmbedReport
 {
-
     /**
      * @var string
      */
     public $title = 'Anmeldung zu Gottesdiensten';
+
     /**
      * @var string
      */
     public $group = 'Website (Gemeindebaukasten)';
+
     /**
      * @var string
      */
     public $description = 'Erzeugt HTML-Code für die Einbindung einer Anmeldebox für Gottesdienste';
+
     /**
      * @var string
      */
@@ -84,11 +84,11 @@ class EmbedRegistrationReport extends AbstractEmbedReport
     public function setup()
     {
         $cities = Auth::user()->cities;
+
         return Inertia::render('Report/EmbedRegistration/Setup', compact('cities'));
     }
 
     /**
-     * @param Request $request
      * @return Application|Factory|View|string
      */
     public function render(Request $request)
@@ -102,12 +102,14 @@ class EmbedRegistrationReport extends AbstractEmbedReport
                 'singleService' => 'nullable|exists:services,id',
             ]
         );
-        $cities = join(',', $request->get('includeCities', []));
+        $cities = implode(',', $request->get('includeCities', []));
         $corsOrigin = CORS::formatUrl($request->get('cors-origin'));
         $report = $this->getKey();
         $singleDay = $request->get('singleDay', '');
         $singleService = $request->get('singleService', '');
-        if ($singleDay != '') $singleDay = Carbon::createFromFormat('d.m.Y', $singleDay)->format('Y-m-d');
+        if ($singleDay != '') {
+            $singleDay = Carbon::createFromFormat('d.m.Y', $singleDay)->format('Y-m-d');
+        }
 
         $url = route('report.embed', compact('report', 'cities', 'corsOrigin', 'singleDay', 'singleService'));
         $randomId = uniqid();
@@ -118,15 +120,13 @@ class EmbedRegistrationReport extends AbstractEmbedReport
         return Inertia::render('Report/EmbedRegistration/Render', compact('html', 'title'));
     }
 
-
     /**
-     * @param Request $request
      * @return Response|Application|Factory|View|string
      */
     public function embed(Request $request)
     {
         $cities = $request->get('cities', []);
-        if (!is_array($cities)) {
+        if (! is_array($cities)) {
             $cities = explode(',', $cities);
         }
 
@@ -135,16 +135,15 @@ class EmbedRegistrationReport extends AbstractEmbedReport
 
         $singleDay = $request->get('singleDay', '');
         if ($singleDay != '') {
-            $start = Carbon::createFromFormat('Y-m-d', $request->get('singleDay'))->setTime(0,0,0);
-            $end = $start->copy()->setTime(23.59,59);
-        }else {
-            $start = Carbon::now()->setTime(0,0,0);
+            $start = Carbon::createFromFormat('Y-m-d', $request->get('singleDay'))->setTime(0, 0, 0);
+            $end = $start->copy()->setTime(23.59, 59);
+        } else {
+            $start = Carbon::now()->setTime(0, 0, 0);
             $end = $start->copy()->addMonth(1);
         }
 
-
-        $errors = new MessageBag();
-        $success = new MessageBag();
+        $errors = new MessageBag;
+        $success = new MessageBag;
 
         if ($request->has('name')) {
             $data = Validator::make(
@@ -155,7 +154,7 @@ class EmbedRegistrationReport extends AbstractEmbedReport
                     'contact' => 'required|string',
                     'email' => 'nullable|email',
                     'number' => 'required|int|min:1',
-                    'service' => 'required|int:exists:services,id'
+                    'service' => 'required|int:exists:services,id',
                 ]
             );
             $errors = $data->errors();
@@ -172,7 +171,7 @@ class EmbedRegistrationReport extends AbstractEmbedReport
                         .'wo genau Sie sitzen.';
                     $success->add('success', $message);
                 } else {
-                    $message = ($data['number'] == 1 ? 'Leider konnte kein Platz für Sie reserviert werden.' : 'Leider konnten keine ' . $data['number'] . ' zusammenhängendende Plätze für Sie reserviert werden.');
+                    $message = ($data['number'] == 1 ? 'Leider konnte kein Platz für Sie reserviert werden.' : 'Leider konnten keine '.$data['number'].' zusammenhängendende Plätze für Sie reserviert werden.');
                     $errors->add('sorry', $message);
                 }
             }
@@ -194,7 +193,6 @@ class EmbedRegistrationReport extends AbstractEmbedReport
             $services[$service->date->format('Ymd')][] = $service;
         }
 
-
         $corsOrigin = $request->get('corsOrigin', '');
         $report = $this->getKey();
         $url = route('report.embed', compact('report', 'corsOrigin', 'singleDay', 'singleService', 'noScript'));
@@ -206,7 +204,6 @@ class EmbedRegistrationReport extends AbstractEmbedReport
                 $this->getViewName('embed'),
                 compact('randomId', 'services', 'url', 'cities', 'errors', 'success', 'singleService', 'noScript')
             );
-
 
         return $response;
     }

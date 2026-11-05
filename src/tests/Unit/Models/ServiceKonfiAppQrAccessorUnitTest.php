@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -19,7 +20,7 @@ use Tests\TestCase;
 
 class ServiceKonfiAppQrAccessorUnitTest extends TestCase
 {
-    public function testAccessorReturnsExistingKonfiAppQrCodeWithoutCallingIntegration(): void
+    public function test_accessor_returns_existing_konfi_app_qr_code_without_calling_integration(): void
     {
         $city = City::factory()->create(['konfiapp_apikey' => 'demo-key']);
         $service = Service::factory()->create([

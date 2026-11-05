@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,9 +37,8 @@
 
 namespace App\Mail;
 
-
-use App\Models\Service;
 use App\Models\People\User;
+use App\Models\Service;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -47,23 +46,21 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Class AbstractServiceMailable
- * @package App\Mail
  */
 class AbstractServiceMailable extends Mailable implements ShouldQueue
 {
-
     use Queueable, SerializesModels;
 
-    /** @var Service $service */
+    /** @var Service */
     protected $service;
 
-    /** @var array $data */
+    /** @var array */
     protected $data = [];
 
-    /** @var User $user */
+    /** @var User */
     protected $user;
 
-    /** @var Service $original */
+    /** @var Service */
     protected $original;
 
     /** @var User */
@@ -76,9 +73,6 @@ class AbstractServiceMailable extends Mailable implements ShouldQueue
 
     /**
      * AbstractServiceMailable constructor.
-     * @param User $user
-     * @param Service $service
-     * @param array $data
      */
     public function __construct(User $user, Service $service, User $originatingUser, array $data)
     {
@@ -89,5 +83,4 @@ class AbstractServiceMailable extends Mailable implements ShouldQueue
         $this->data = $data;
         $this->originatingUser = $originatingUser;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -32,7 +33,7 @@ return new class extends Migration
                 } else {
                     DB::table('users')->where('id', $user->id)->update([
                         'first_name' => $parts[0],
-                        'last_name'  => $parts[1],
+                        'last_name' => $parts[1],
                     ]);
                 }
             });
@@ -50,7 +51,7 @@ return new class extends Migration
 
         // Restore name from first_name + last_name
         DB::table('users')->orderBy('id')->each(function ($user) {
-            $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+            $name = trim(($user->first_name ?? '').' '.($user->last_name ?? ''));
             DB::table('users')->where('id', $user->id)->update(['name' => $name]);
         });
     }

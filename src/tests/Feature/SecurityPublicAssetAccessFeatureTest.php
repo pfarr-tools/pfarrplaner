@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -28,7 +29,7 @@ class SecurityPublicAssetAccessFeatureTest extends TestCase
         Storage::fake(config('filesystems.default'));
     }
 
-    public function testGuestCanAccessImageWithoutSignature(): void
+    public function test_guest_can_access_image_without_signature(): void
     {
         $path = 'security-test-image-'.uniqid().'.png';
         Storage::put('attachments/'.$path, 'test');
@@ -37,7 +38,7 @@ class SecurityPublicAssetAccessFeatureTest extends TestCase
             ->assertOk();
     }
 
-    public function testSignedImageUrlRemainsAccessibleWithoutLogin(): void
+    public function test_signed_image_url_remains_accessible_without_login(): void
     {
         $path = 'security-test-signed-image-'.uniqid().'.png';
         Storage::put('attachments/'.$path, 'test');
@@ -46,7 +47,7 @@ class SecurityPublicAssetAccessFeatureTest extends TestCase
             ->assertOk();
     }
 
-    public function testGuestCannotAccessStorageDownloadWithoutSignature(): void
+    public function test_guest_cannot_access_storage_download_without_signature(): void
     {
         $path = 'security-test-file-'.uniqid().'.pdf';
         Storage::put('attachments/'.$path, 'test');
@@ -55,7 +56,7 @@ class SecurityPublicAssetAccessFeatureTest extends TestCase
             ->assertUnauthorized();
     }
 
-    public function testGuestCannotOpenVacationEmbed(): void
+    public function test_guest_cannot_open_vacation_embed(): void
     {
         $user = User::factory()->create();
 

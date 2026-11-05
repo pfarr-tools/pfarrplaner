@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -25,7 +26,7 @@ class PeopleApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSearchReturnsUsersMatchingName()
+    public function test_search_returns_users_matching_name()
     {
         $city = City::factory()->create();
         $requester = User::factory()->create();
@@ -45,7 +46,7 @@ class PeopleApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSearchExcludesUsersAlreadyInRequesterCity()
+    public function test_search_excludes_users_already_in_requester_city()
     {
         $city = City::factory()->create();
         $requester = User::factory()->create();
@@ -66,7 +67,7 @@ class PeopleApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSearchRequiresAuth()
+    public function test_search_requires_auth()
     {
         $response = $this->postJson(route('api.people.search', ['searchString' => 'test']));
         $response->assertUnauthorized();
@@ -75,7 +76,7 @@ class PeopleApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testActivateAddsUserToCityScope()
+    public function test_activate_adds_user_to_city_scope()
     {
         $city = City::factory()->create();
         $requester = User::factory()->create();
@@ -94,7 +95,7 @@ class PeopleApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testActivateRequiresAuth()
+    public function test_activate_requires_auth()
     {
         $city = City::factory()->create();
         $target = User::factory()->create();

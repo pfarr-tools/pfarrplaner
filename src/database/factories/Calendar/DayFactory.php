@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,7 +36,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DayFactory extends Factory
 {
-
     protected $model = Day::class;
 
     public function definition()
@@ -44,11 +43,10 @@ class DayFactory extends Factory
         return [
             'date' => (new Carbon(fake()->date()))->format('d.m.Y'),
             'day_type' => fake()->randomElement(
-                [\App\Models\Calendar\Day::DAY_TYPE_DEFAULT, \App\Models\Calendar\Day::DAY_TYPE_LIMITED]
+                [Day::DAY_TYPE_DEFAULT, Day::DAY_TYPE_LIMITED]
             ),
             'name' => fake()->randomAscii,
             'description' => fake()->randomAscii,
         ];
     }
-
 }

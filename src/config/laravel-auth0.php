@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -28,7 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-return array(
+return [
 
     /*
     |--------------------------------------------------------------------------
@@ -65,7 +65,7 @@ return array(
      |   'Auth0\Login\Auth0Controller@callback'
      |
      */
-    'redirect_uri' => env('APP_URL') . '/auth0/callback',
+    'redirect_uri' => env('APP_URL').'/auth0/callback',
 
     /*
     |--------------------------------------------------------------------------
@@ -123,4 +123,4 @@ return array(
     |
     */
     // 'guzzle_options' => []
-);
+];

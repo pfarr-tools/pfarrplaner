@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -28,16 +29,16 @@ class AdChannelPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new AdChannelPolicy();
+        $this->policy = new AdChannelPolicy;
     }
 
-    public function testRegularUserCannotCreateWithoutWriteAccess(): void
+    public function test_regular_user_cannot_create_without_write_access(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testUserWithWriteAccessCanCreate(): void
+    public function test_user_with_write_access_can_create(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();
@@ -47,7 +48,7 @@ class AdChannelPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->create($user, $city));
     }
 
-    public function testUserWithWriteAccessCanUpdate(): void
+    public function test_user_with_write_access_can_update(): void
     {
         $user = User::factory()->create();
         $city = City::factory()->create();

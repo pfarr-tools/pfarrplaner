@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@
 
 namespace App\Imports;
 
-
 use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
@@ -46,15 +45,14 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Class EventCalendarImport
- * @package App\Imports
  */
 class EventCalendarImport
 {
-
     /**
      * @var string
      */
     public $timeZone = 'UTC';
+
     /**
      * @var string
      */
@@ -62,28 +60,24 @@ class EventCalendarImport
 
     /**
      * EventCalendarImport constructor.
-     * @param $url
      */
     public function __construct($url)
     {
         $this->url = $url;
     }
 
-    public function getMixedEvents()
-    {
-    }
+    public function getMixedEvents() {}
 
     /**
      * Mix an array of events into another array of events
-     * @param $events
-     * @param Carbon $weekStart
-     * @param Carbon $weekEnd
-     * @param bool $removeServices
-     * @return array
+     *
+     * @param  bool  $removeServices
      */
     public function mix($events, Carbon $weekStart, Carbon $weekEnd, $removeServices = false): array
     {
-        if (empty($this->url)) return $events;
+        if (empty($this->url)) {
+            return $events;
+        }
 
         $theseEvents = $this->getEvents($weekStart, $weekEnd, $removeServices);
         foreach ($theseEvents as $dateCode => $subEvents) {
@@ -93,20 +87,20 @@ class EventCalendarImport
         }
 
         ksort($events);
+
         return $events;
     }
 
     /**
-     * @param Carbon $weekStart
-     * @param Carbon $weekEnd
-     * @param bool $removeServices
-     * @return array
+     * @param  bool  $removeServices
      */
     public function getEvents(Carbon $weekStart, Carbon $weekEnd, $removeServices = false): array
     {
-        if (empty($this->url)) return [];
+        if (empty($this->url)) {
+            return [];
+        }
 
-        $cacheKey = 'EventCalendarImport_' . $this->url;
+        $cacheKey = 'EventCalendarImport_'.$this->url;
         if (Cache::has($cacheKey)) {
             $events = Cache::get($cacheKey);
         } else {
@@ -118,9 +112,10 @@ class EventCalendarImport
             }
         }
 
-
         $filteredEvents = [];
-        if (!is_array($events)) return [];
+        if (! is_array($events)) {
+            return [];
+        }
         foreach ($events as $key => $event) {
             $event['record_type'] = 'Outlook_Event';
             $event['start'] = $this->sanitizeTimeString($event['start']);
@@ -135,14 +130,13 @@ class EventCalendarImport
                 }
             }
 
-            if (!isset($event['place'])) {
+            if (! isset($event['place'])) {
                 $event['place'] = '';
             }
 
-
             if (($event['start'] >= $weekStart) and ($event['start'] <= $weekEnd)) {
-                if (!($event['allDay'] && ($event['place'] == ''))) {
-                    if ((!$removeServices) || ((strtoupper(substr($event['title'], 0, 2)) != 'GD')
+                if (! ($event['allDay'] && ($event['place'] == ''))) {
+                    if ((! $removeServices) || ((strtoupper(substr($event['title'], 0, 2)) != 'GD')
                             && (strtoupper(substr($event['title'], 0, 13)) != 'GOTTESDIENST ')
                             && (strtoupper($event['title']) != 'GOTTESDIENST'))) {
                         $filteredEvents[$event['start']->format('YmdHis')][] = $event;
@@ -151,13 +145,12 @@ class EventCalendarImport
             }
         }
         ksort($filteredEvents);
+
         return $filteredEvents;
     }
 
     /**
      * Wandelt die Zeitangabe in ein DateTime-Objekt um und korrigiert die Zeitzone
-     * @param string $time
-     * @return DateTime
      */
     protected function sanitizeTimeString(string $time): DateTime
     {
@@ -166,16 +159,13 @@ class EventCalendarImport
 
     /**
      * Formatiert den Titel einer Veranstaltung
-     * @param string $title
-     * @param array $event
-     * @return string
      */
     protected function sanitizeTitle(string $title, array &$event): string
     {
         $title = trim($title);
-        //$title = strtr($title, $this->config['events']['sanitize']['title']);
+        // $title = strtr($title, $this->config['events']['sanitize']['title']);
         foreach (['P', 'O', 'M', 'L'] as $function) {
-            $regex = '/' . $function . ':\s?(\w*)/';
+            $regex = '/'.$function.':\s?(\w*)/';
             preg_match($regex, $title, $tmp);
             if (count($tmp)) {
                 $event[$function] = $tmp[1];
@@ -183,23 +173,20 @@ class EventCalendarImport
             }
         }
 
-        while (false !== strpos($title, '  ')) {
+        while (strpos($title, '  ') !== false) {
             $title = str_replace('  ', ' ', $title);
         }
 
         return $title;
     }
 
-
     /**
      * Formatiert die Ortsangabe einer Veranstaltung
-     * @param string $location
-     * @return string
      */
     protected function sanitizeLocation(string $location): string
     {
         $location = trim(str_replace('Ort:', '', $location));
+
         return $location;
     }
-
 }

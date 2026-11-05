@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,27 +32,30 @@ namespace App\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 
 class EncryptedAttribute implements CastsAttributes
 {
-    static $encrypter = null;
+    public static $encrypter = null;
 
     private static function parseKey($key)
     {
         if (Str::startsWith($key, 'base64:')) {
             return base64_decode(Str::after($key, 'base64:'));
         }
+
         return $key;
     }
 
     public static function getEncrypter()
     {
-        if (!self::$encrypter) {
+        if (! self::$encrypter) {
             self::$encrypter = new Encrypter(self::parseKey(config('database.key')), config('database.cipher'));
         }
+
         return self::$encrypter;
     }
 
@@ -63,13 +66,15 @@ class EncryptedAttribute implements CastsAttributes
 
     private function hasObsoleteEncryption($string)
     {
-        $prefix = chr(1) . chr(2) . '__LARAVEL-DATABASE-ENCRYPTED-';
+        $prefix = chr(1).chr(2).'__LARAVEL-DATABASE-ENCRYPTED-';
+
         return substr($string, 0, strlen($prefix)) == $prefix && str_contains($string, chr(4));
     }
 
     private function decryptObsoleteEncryption($string)
     {
         $decrypted = Crypt::decryptString(substr($string, strpos($string, chr(4))));
+
         return @unserialize($decrypted) ?: $decrypted;
     }
 
@@ -87,10 +92,10 @@ class EncryptedAttribute implements CastsAttributes
     /**
      * Cast the given value.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string $key
-     * @param mixed $value
-     * @param array $attributes
+     * @param  Model  $model
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  array  $attributes
      * @return array
      */
     public function get($model, $key, $value, $attributes)
@@ -101,16 +106,17 @@ class EncryptedAttribute implements CastsAttributes
         if ($this->hasObsoleteEncryption($value)) {
             return $this->decryptObsoleteEncryption($value);
         }
+
         return $value;
     }
 
     /**
      * Prepare the given value for storage.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string $key
-     * @param array $value
-     * @param array $attributes
+     * @param  Model  $model
+     * @param  string  $key
+     * @param  array  $value
+     * @param  array  $attributes
      * @return string
      */
     public function set($model, $key, $value, $attributes)
@@ -118,8 +124,12 @@ class EncryptedAttribute implements CastsAttributes
         return self::encrypt($value);
     }
 
-    public static function encrypt($value) {
-        if (!is_string($value) && !is_null($value)) $value = serialize($value);
+    public static function encrypt($value)
+    {
+        if (! is_string($value) && ! is_null($value)) {
+            $value = serialize($value);
+        }
+
         return self::getEncrypter()->encryptString($value);
     }
 }

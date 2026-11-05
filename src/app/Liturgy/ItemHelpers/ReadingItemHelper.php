@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,12 +34,10 @@ use App\Documents\Word\DefaultWordDocument;
 use App\Liturgy\Bible\BibleText;
 use App\Liturgy\Bible\ReferenceParser;
 use App\Models\Liturgy\Item;
-use App\Reports\AbstractWordDocumentReport;
-use Illuminate\Support\Str;
 
 class ReadingItemHelper extends AbstractItemHelper
 {
-    /** @var array  */
+    /** @var array */
     protected $reference;
 
     /**
@@ -60,17 +58,21 @@ class ReadingItemHelper extends AbstractItemHelper
      */
     public function getText()
     {
-        //return (new BibleText('LUT17'))->get($this->reference);
+        // return (new BibleText('LUT17'))->get($this->reference);
         if ($this->reference['version'] == 'Eigener Text') {
             return [
-                ['text' => [['text' => $this->item->data['customText']]]]
+                ['text' => [['text' => $this->item->data['customText']]]],
             ];
         }
+
         return (new BibleText($this->reference['version']))->get($this->reference);
     }
 
-    public function getHtml() {
-        if ($this->reference['version'] == 'Eigener Text') return $item->data->customText();
+    public function getHtml()
+    {
+        if ($this->reference['version'] == 'Eigener Text') {
+            return $item->data->customText();
+        }
         $bibleText = (new BibleText($this->reference['version']))->get($this->reference);
         $text = '';
         foreach ($bibleText as $section) {
@@ -78,14 +80,14 @@ class ReadingItemHelper extends AbstractItemHelper
                 $text .= '<sup>'.$verse['verse'].'</sup> '.$verse['text'];
             }
         }
+
         return $text;
     }
-
 
     public function renderToWordDocument(DefaultWordDocument $doc, bool $includeFullReadings = true, bool $includeIntro = false, string $includeTitle = '', int $depth = 3)
     {
         $doc->getSection()->addTitle($includeTitle ?: $this->reference['correctedReference'], $depth);
-        if (!$includeFullReadings) {
+        if (! $includeFullReadings) {
             return;
         }
         if ($this->reference['versionCopyrights']) {
@@ -105,9 +107,9 @@ class ReadingItemHelper extends AbstractItemHelper
         foreach ($bibleText as $range) {
             foreach ($range['text'] as $verse) {
                 if ($range['verse'] ?? false) {
-                    $run[] = [$verse['verse'] . ' ', ['superScript' => true]];
+                    $run[] = [$verse['verse'].' ', ['superScript' => true]];
                 }
-                $run[] = [$verse['text'] . "\n", []];
+                $run[] = [$verse['text']."\n", []];
             }
         }
 
@@ -124,7 +126,4 @@ class ReadingItemHelper extends AbstractItemHelper
     {
         $this->reference = $reference;
     }
-
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,32 +30,37 @@
 
 namespace App\StudyHelpers;
 
-use App\StudyHelpers\AbstractStudyHelper;
 use Illuminate\Support\Str;
 
 class HPFStudyHelper extends AbstractStudyHelper
 {
-
     public $title = 'Heidelberger Predigtforum';
+
     protected $records = [];
 
-    function read(array $data): array
+    public function read(array $data): array
     {
-        if ('' == ($content = $this->getContent('https://predigtforum.de/'))) return [];
+        if ('' == ($content = $this->getContent('https://predigtforum.de/'))) {
+            return [];
+        }
         $content = Str::replace("\n", '', $content);
         preg_match_all('/<h3>(.*?)<\/h3>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<td>(.*?)<\/td>(?:.*?)<a(?:.*?)href="(.*?)"/', $content, $matches);
 
         foreach ($matches[0] as $index => $match) {
             $date = $matches[4][$index];
-            if (!isset($this->records[$date])) $this->records[$date] = [];
+            if (! isset($this->records[$date])) {
+                $this->records[$date] = [];
+            }
             $this->records[$date]['[Heidelberger Predigtforum] '.$date.': '.$matches[2][$index].' ('.$matches[6][$index].')'] = $matches[7][$index];
         }
+
         return $this->records;
     }
 
-    function getLinks(array $data): array
+    public function getLinks(array $data): array
     {
         $data['links'] = array_merge($data['links'] ?? [], $this->records[$data['date']] ?? []);
+
         return $data;
     }
 }

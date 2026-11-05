@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,12 +30,10 @@
 
 namespace App\Models\Liturgy;
 
-
 use Illuminate\Database\Eloquent\Model;
 
 class FreetextItem extends Model
 {
-
     protected $table = 'liturgy_items_freetext';
 
     protected $fillable = ['description'];
@@ -44,5 +42,4 @@ class FreetextItem extends Model
     {
         return $this->morphOne(Item::class, 'data');
     }
-
 }

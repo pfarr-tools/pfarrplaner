@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,19 +25,11 @@ class CreateWedding extends AbstractCreateAction implements CreatesWeddings
 {
     use NormalizesWeddingData;
 
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return '';
     }
 
-    /**
-     * @param User $user
-     * @param array $input
-     * @return Wedding
-     */
     public function create(User $user, array $input): Wedding
     {
         $serviceId = $input['service_id'] ?? $input['service'] ?? null;

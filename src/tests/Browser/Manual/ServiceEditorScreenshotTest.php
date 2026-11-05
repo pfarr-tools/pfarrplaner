@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,15 +13,16 @@
 
 namespace Tests\Browser\Manual;
 
-use App\Models\Service;
-use App\Models\Sermon;
 use App\Models\Places\City;
+use App\Models\Sermon;
+use App\Models\Service;
 use Carbon\Carbon;
 use Laravel\Dusk\Browser;
 
 class ServiceEditorScreenshotTest extends ManualScreenshotTestCase
 {
     protected Service $service;
+
     protected Service $event;
 
     protected function setUp(): void
@@ -70,7 +72,7 @@ class ServiceEditorScreenshotTest extends ManualScreenshotTestCase
             ->setTimezone('UTC');
     }
 
-    public function testCaptureServiceEditor(): void
+    public function test_capture_service_editor(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(

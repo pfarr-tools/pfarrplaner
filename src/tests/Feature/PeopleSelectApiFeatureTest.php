@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,7 +25,7 @@ class PeopleSelectApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSelectReturnsUsersWithNameField()
+    public function test_select_returns_users_with_name_field()
     {
         $city = City::factory()->create();
         $requester = User::factory()->create();
@@ -49,7 +50,7 @@ class PeopleSelectApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSelectNameFieldUsesNameServiceFirstLastFormat()
+    public function test_select_name_field_uses_name_service_first_last_format()
     {
         $city = City::factory()->create();
         $requester = User::factory()->create();
@@ -71,7 +72,7 @@ class PeopleSelectApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testSelectOnlyReturnsUsersVisibleToRequester()
+    public function test_select_only_returns_users_visible_to_requester()
     {
         $city = City::factory()->create();
         $otherCity = City::factory()->create();

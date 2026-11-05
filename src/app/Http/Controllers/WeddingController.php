@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,7 +32,6 @@ namespace App\Http\Controllers;
 
 use App\Liturgy\PronounSets\PronounSets;
 use App\Models\Attachment;
-use App\Models\Calendar\Day;
 use App\Models\Location;
 use App\Models\People\User;
 use App\Models\Places\City;
@@ -40,22 +39,20 @@ use App\Models\Rites\Wedding;
 use App\Models\Service;
 use App\Traits\HandlesAttachmentsTrait;
 use Carbon\Carbon;
-use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class WeddingController
- * @package App\Http\Controllers
  */
 class WeddingController extends AbstractCRUDController
 {
-
     use HandlesAttachmentsTrait;
 
     protected string $modelClass = Wedding::class;
@@ -67,9 +64,6 @@ class WeddingController extends AbstractCRUDController
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @param Request $request
-     * @return RedirectResponse
      */
     public function create(Request $request): RedirectResponse
     {
@@ -81,20 +75,15 @@ class WeddingController extends AbstractCRUDController
         return redirect()->route('weddings.edit', $wedding->id);
     }
 
-    /**
-     * @param Service $service
-     * @return RedirectResponse
-     */
     public function add(Service $service): RedirectResponse
     {
         Gate::authorize('create', [Wedding::class, $service]);
+
         return redirect()->route('weddings.create', ['service' => $service->id]);
     }
 
     /**
-     * @param Request $request
-     * @param Wedding|null $wedding
-     * @return array
+     * @param  Wedding|null  $wedding
      */
     protected function getResourcesForEditor(Request $request, $wedding = null): array
     {
@@ -102,14 +91,14 @@ class WeddingController extends AbstractCRUDController
             $wedding->service->setAppends(['pastors', 'locationText', 'timeText']);
         }
         $pronounSets = PronounSets::toArray();
+
         return compact('pronounSets');
     }
 
-
     /**
      * Wedding wizard, step 1: select city and date
-     * @param Request $request
-     * @return \Inertia\Response
+     *
+     * @return Response
      */
     public function wizard(Request $request)
     {
@@ -118,6 +107,7 @@ class WeddingController extends AbstractCRUDController
         $locations = Location::inCities($cities->pluck('id'))->get();
         $people = User::visibleFor(Auth::user())->get();
         $user = Auth::user();
+
         return Inertia::render('Rites/WeddingWizard', compact('cities', 'locations', 'people', 'user'));
     }
 
@@ -144,7 +134,7 @@ class WeddingController extends AbstractCRUDController
         abort_unless(Auth::user()->writableCities->pluck('id')->contains($city?->id), 403);
 
         $location = $specialLocation = null;
-        if ((!is_numeric($data['location'])) || (null === Location::find($data['location']))) {
+        if ((! is_numeric($data['location'])) || (Location::find($data['location']) === null)) {
             $specialLocation = $data['location'];
             $data['location'] = 0;
             $time = $data['date']->format('H:i');
@@ -186,14 +176,16 @@ class WeddingController extends AbstractCRUDController
             ]
         );
         $service->update(['slug' => $service->createSlug()]);
-        if (!is_array($data['pastor'])) {
+        if (! is_array($data['pastor'])) {
             if (Auth::user()->hasRole('Pfarrer:in')) {
                 $service->pastors()->sync([Auth::user()->id => ['category' => 'P']]);
             }
         } else {
             $sync = [];
             foreach ($data['pastor'] as $person) {
-                if (null !== $person) $sync[(is_numeric($person) ? $person : $person['id'])] = ['category' => 'P'];
+                if ($person !== null) {
+                    $sync[(is_numeric($person) ? $person : $person['id'])] = ['category' => 'P'];
+                }
 
             }
             $service->pastors()->sync($sync);
@@ -221,12 +213,9 @@ class WeddingController extends AbstractCRUDController
 
         return redirect()->route('weddings.edit', $wedding->id);
 
-
     }
 
-
     /**
-     * @param Wedding $wedding
      * @return false|string
      */
     public function done(Wedding $wedding)
@@ -234,27 +223,25 @@ class WeddingController extends AbstractCRUDController
         Gate::authorize('update', $wedding);
         $wedding->done = true;
         $wedding->save();
+
         return json_encode(true);
     }
 
     /**
-     * @param Request $request
-     * @param Wedding $wedding
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function attach(Request $request, Wedding $wedding)
     {
         Gate::authorize('update', $wedding);
         $this->handleAttachments($request, $wedding);
         $wedding->refresh();
+
         return response()->json($wedding->attachments);
     }
 
     /**
-     * @param Request $request
-     * @param Wedding $wedding
-     * @param Attachment $attachment
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     *
      * @throws \Exception
      */
     public function detach(Request $request, Wedding $wedding, Attachment $attachment)
@@ -266,6 +253,7 @@ class WeddingController extends AbstractCRUDController
         Storage::delete($file);
         $attachment->delete();
         $wedding->refresh();
+
         return response()->json($wedding->attachments);
     }
 }

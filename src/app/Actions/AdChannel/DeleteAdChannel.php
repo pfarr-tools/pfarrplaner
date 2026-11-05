@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,22 +32,20 @@ namespace App\Actions\AdChannel;
 
 use App\Actions\AbstractDeleteAction;
 use App\Contracts\AdChannel\DeletesAdChannels;
-use App\Contracts\AdChannel\DeletesLocations;
 use App\Events\Models\AdChannel\DeletedAdChannel;
 use App\Models\Ads\AdChannel;
 use App\Models\People\User;
 use App\Models\Places\City;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 
 class DeleteAdChannel extends AbstractDeleteAction implements DeletesAdChannels
 {
-
-    /** @var City $city */
+    /** @var City */
     protected $city;
 
     /**
      * Get return route
-     * @return string
      */
     public function redirectTo(): string
     {
@@ -56,10 +54,10 @@ class DeleteAdChannel extends AbstractDeleteAction implements DeletesAdChannels
 
     /**
      * Delete a tag
-     * @param User $user
-     * @param AdChannel $adChannel
+     *
      * @return AdChannel|bool|null
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     *
+     * @throws AuthorizationException
      */
     public function delete(User $user, AdChannel $adChannel)
     {
@@ -67,8 +65,8 @@ class DeleteAdChannel extends AbstractDeleteAction implements DeletesAdChannels
         Gate::forUser($user)->authorize('delete', $adChannel);
         DeletedAdChannel::dispatch($user, $adChannel);
         $this->messages = ['success' => 'Der Werbekanal wurde gelöscht.'];
+
         return $adChannel->delete();
 
     }
-
 }

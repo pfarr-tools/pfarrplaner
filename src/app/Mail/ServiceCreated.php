@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,7 +32,6 @@ namespace App\Mail;
 
 /**
  * Class ServiceCreated
- * @package App\Mail
  */
 class ServiceCreated extends AbstractServiceMailable
 {
@@ -49,13 +48,13 @@ class ServiceCreated extends AbstractServiceMailable
             'ical/ical',
             ['services' => [$this->service], 'token' => null, 'action' => null, 'key' => null]
         )->render();
-        $icsTitle = 'GD ' . $this->service->date->format('Ymd') . ' ' . $this->service->timeText(
-                false
-            ) . ' ' . $this->service->locationText() . '.ics';
+        $icsTitle = 'GD '.$this->service->date->format('Ymd').' '.$this->service->timeText(
+            false
+        ).' '.$this->service->locationText().'.ics';
 
         return $this->subject(
-            'Neuer Gottesdienst am ' . $this->service->date->format('d.m.Y') . ', ' . $this->service->timeText(
-            ) . ' (' . $this->service->locationText() . ')'
+            'Neuer Gottesdienst am '.$this->service->date->format('d.m.Y').', '.$this->service->timeText(
+            ).' ('.$this->service->locationText().')'
         )
             ->view('mail.notifications.service-created')->with(
                 [

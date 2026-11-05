@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,19 +25,11 @@ class DeleteFuneral extends AbstractDeleteAction implements DeletesFunerals
 {
     protected string $redirectUrl = '';
 
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return $this->redirectUrl ?: route('home');
     }
 
-    /**
-     * @param User $user
-     * @param Funeral $funeral
-     * @return bool|null
-     */
     public function delete(User $user, Funeral $funeral): ?bool
     {
         Gate::forUser($user)->authorize('delete', $funeral);
@@ -53,10 +46,6 @@ class DeleteFuneral extends AbstractDeleteAction implements DeletesFunerals
         return $result;
     }
 
-    /**
-     * @param Service $service
-     * @return string
-     */
     protected function getServiceSlug(Service $service): string
     {
         return $service->slug ?: $service->createSlug();

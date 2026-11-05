@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,7 +25,7 @@ class ServiceMailUnitTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testServiceCreatedBuilds(): void
+    public function test_service_created_builds(): void
     {
         $user = User::factory()->create();
         $service = Service::factory()->create();
@@ -35,7 +36,7 @@ class ServiceMailUnitTest extends TestCase
         $this->assertStringContainsString('Neuer Gottesdienst', $built->subject);
     }
 
-    public function testServiceUpdatedBuilds(): void
+    public function test_service_updated_builds(): void
     {
         $user = User::factory()->create();
         $service = Service::factory()->create();
@@ -46,7 +47,7 @@ class ServiceMailUnitTest extends TestCase
         $this->assertStringContainsString('Änderungen', $built->subject);
     }
 
-    public function testServiceCreatedMultipleBuilds(): void
+    public function test_service_created_multiple_builds(): void
     {
         $user = User::factory()->create();
         $service = Service::factory()->create();

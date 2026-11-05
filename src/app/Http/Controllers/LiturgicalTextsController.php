@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,14 +30,12 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Liturgy\Text;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class LiturgicalTextsController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
@@ -47,10 +45,12 @@ class LiturgicalTextsController extends Controller
     public function index()
     {
         $texts = Text::orderBy('title')->get();
+
         return Inertia::render('Admin/LiturgicalTexts/Index', compact('texts'));
     }
 
-    public function edit(Text $text) {
+    public function edit(Text $text)
+    {
         $agendaCodes = Text::select('agenda_code')->orderBy('agenda_code')->get()->pluck('agenda_code')->unique();
         $codes = [];
         foreach ($agendaCodes as $agendaCode) {
@@ -62,25 +62,20 @@ class LiturgicalTextsController extends Controller
 
     public function create()
     {
-        return $this->edit((new Text())->fill(['title' => '', 'text' => '', 'agenda_code' => '', 'source' => '', 'needs_replacement' => '', 'notice' => '']));
+        return $this->edit((new Text)->fill(['title' => '', 'text' => '', 'agenda_code' => '', 'source' => '', 'needs_replacement' => '', 'notice' => '']));
     }
 
-    /**
-     * @param Request $request
-     */
     public function store(Request $request)
     {
         Text::create($this->validateRequest($request));
+
         return redirect()->route('admin.text.index')->with('success', 'Der Text wurde gespeichert.');
     }
 
-    /**
-     * @param Request $request
-     * @param Text $text
-     */
     public function update(Request $request, Text $text)
     {
         $text->update($this->validateRequest($request));
+
         return redirect()->route('admin.text.index')->with('success', 'Der Text wurde gespeichert.');
     }
 
@@ -106,34 +101,36 @@ class LiturgicalTextsController extends Controller
             if ($line == '---') {
                 // insert line breaks
                 foreach (['text', 'notice', 'source'] as $key) {
-                    $record[$key] = join("\n", $record[$key]);
+                    $record[$key] = implode("\n", $record[$key]);
                 }
                 // check if replacement is needed
                 foreach (['funeral' => 'bestattung', 'baptism' => 'taufe', 'wedding' => 'trauung'] as $keyCode => $key) {
-                    if (false !== strpos($record['text'], '['.$key)) $record['needs_replacement'] = $keyCode;
+                    if (strpos($record['text'], '['.$key) !== false) {
+                        $record['needs_replacement'] = $keyCode;
+                    }
                 }
                 if (trim($record['text'])) {
                     $records[] = Text::create($record);
                 }
                 $record = $newRecord;
                 $record['agenda_code'] = $code;
-            } elseif(substr($line, 0, 1) == '#') {
+            } elseif (substr($line, 0, 1) == '#') {
                 $record['agenda_code'] = $code = trim(substr($line, 1));
-            } elseif(substr($line, 0, 2) == 'T:') {
+            } elseif (substr($line, 0, 2) == 'T:') {
                 $record['title'] = trim(substr($line, 2));
-            } elseif(substr($line, 0, 2) == 'Q:') {
+            } elseif (substr($line, 0, 2) == 'Q:') {
                 $record['source'][] = trim(substr($line, 2));
-            } elseif(substr($line, 0, 2) == '//') {
+            } elseif (substr($line, 0, 2) == '//') {
                 $record['notice'][] = trim(substr($line, 2));
             } else {
                 $record['text'][] = $line;
             }
         }
+
         return redirect()->route('liturgy.text.index');
     }
 
     /**
-     * @param Request $request
      * @return mixed
      */
     protected function validateRequest(Request $request)
@@ -153,7 +150,7 @@ class LiturgicalTextsController extends Controller
     public function destroy(Text $text)
     {
         $text->delete();
+
         return redirect()->route('admin.text.index')->with('success', 'Der Text wurde gelöscht.');
     }
-
 }

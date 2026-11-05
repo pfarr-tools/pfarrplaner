@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,38 +32,36 @@ namespace App\Http\Controllers;
 
 use App\Reports\AbstractEmbedReport;
 use App\Reports\AbstractReport;
-use App\Services\ColorService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class ReportsController
- * @package App\Http\Controllers
  */
 class ReportsController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['embed']]);
     }
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function list()
     {
         $reports = collect();
-        foreach (glob(app_path('Reports') . '/*Report.php') as $file) {
+        foreach (glob(app_path('Reports').'/*Report.php') as $file) {
             if (substr(pathinfo($file, PATHINFO_FILENAME), 0, 8) !== 'Abstract') {
-                $reportClass = 'App\\Reports\\' . pathinfo($file, PATHINFO_FILENAME);
+                $reportClass = 'App\\Reports\\'.pathinfo($file, PATHINFO_FILENAME);
                 if (class_exists($reportClass)) {
                     /** @var AbstractReport $report */
-                    $report = new $reportClass();
+                    $report = new $reportClass;
                     if ($report->isActive()) {
                         $reports->push([
                             'title' => $report->title,
@@ -78,13 +76,12 @@ class ReportsController extends Controller
             }
         }
         $reports = $reports
-            ->sortBy(['group','title'])->groupBy('group');
+            ->sortBy(['group', 'title'])->groupBy('group');
 
         return Inertia::render('Reports/Index', compact('reports'));
     }
 
     /**
-     * @param $report
      * @return Application|Factory|RedirectResponse|View
      */
     public function setup($report)
@@ -93,8 +90,6 @@ class ReportsController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param $report
      * @return RedirectResponse|string
      */
     public function render(Request $request, $report)
@@ -103,9 +98,6 @@ class ReportsController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param $report
-     * @param $step
      * @return RedirectResponse
      */
     public function step(Request $request, $report, $step)
@@ -113,7 +105,7 @@ class ReportsController extends Controller
         $report = $this->resolveReport($report);
         abort_unless(
             preg_match('/^[A-Za-z][A-Za-z0-9_]*$/', $step)
-            && !in_array($step, ['setup', 'render', 'embed', 'isActive', 'renderView', 'renderSetupView'], true)
+            && ! in_array($step, ['setup', 'render', 'embed', 'isActive', 'renderView', 'renderSetupView'], true)
             && method_exists($report, $step),
             404
         );
@@ -121,31 +113,30 @@ class ReportsController extends Controller
         return $report->$step($request);
     }
 
-    /**
-     * @param Request $request
-     * @param $report
-     */
     public function embed(Request $request, $report)
     {
         $report = $this->resolveReport($report, true);
         abort_unless(method_exists($report, 'embed'), 404);
+
         return $report->embed($request);
     }
 
     protected function resolveReport(string $report, bool $allowPublicEmbed = false): AbstractReport
     {
-        $reportClass = 'App\\Reports\\' . ucfirst($report) . 'Report';
+        $reportClass = 'App\\Reports\\'.ucfirst($report).'Report';
         abort_unless(class_exists($reportClass), 404);
 
         /** @var AbstractReport $reportInstance */
-        $reportInstance = new $reportClass();
+        $reportInstance = new $reportClass;
 
         if ($allowPublicEmbed) {
             abort_unless($reportInstance instanceof AbstractEmbedReport, 404);
+
             return $reportInstance;
         }
 
         abort_unless($reportInstance->isActive(), 403);
+
         return $reportInstance;
     }
 }

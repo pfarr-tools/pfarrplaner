@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -78,31 +78,31 @@ class AddMoreFieldsToWeddings extends Migration
     {
         Schema::table('weddings', function (Blueprint $table) {
             $table->dropColumn([
-                                    'notes',
-                                    'spouse1_dob',
-                                    'spouse1_address',
-                                    'spouse1_zip',
-                                    'spouse1_city',
-                                    'spouse1_needs_dimissorial',
-                                    'spouse1_dimissorial_issuer',
-                                    'spouse1_dimissorial_requested',
-                                    'spouse1_dimissorial_received',
-                                    'spouse2_dob',
-                                    'spouse2_address',
-                                    'spouse2_zip',
-                                    'spouse2_city',
-                                    'spouse2_needs_dimissorial',
-                                    'spouse2_dimissorial_issuer',
-                                    'spouse2_dimissorial_requested',
-                                    'spouse2_dimissorial_received',
-                                    'needs_permission',
-                                    'permission_requested',
-                                    'permission_received',
-                                    'music',
-                                    'gift',
-                                    'flowers',
-                                    'docs_format',
-                                ]);
+                'notes',
+                'spouse1_dob',
+                'spouse1_address',
+                'spouse1_zip',
+                'spouse1_city',
+                'spouse1_needs_dimissorial',
+                'spouse1_dimissorial_issuer',
+                'spouse1_dimissorial_requested',
+                'spouse1_dimissorial_received',
+                'spouse2_dob',
+                'spouse2_address',
+                'spouse2_zip',
+                'spouse2_city',
+                'spouse2_needs_dimissorial',
+                'spouse2_dimissorial_issuer',
+                'spouse2_dimissorial_requested',
+                'spouse2_dimissorial_received',
+                'needs_permission',
+                'permission_requested',
+                'permission_received',
+                'music',
+                'gift',
+                'flowers',
+                'docs_format',
+            ]);
         });
     }
 }

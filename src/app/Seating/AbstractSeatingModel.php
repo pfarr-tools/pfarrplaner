@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,13 +30,11 @@
 
 namespace App\Seating;
 
-
 use App\Models\Seating\Booking;
 use App\Models\Seating\SeatingRow;
 
 class AbstractSeatingModel
 {
-
     protected $bookings = [];
 
     public function getKey()
@@ -44,31 +42,22 @@ class AbstractSeatingModel
         return str_replace('App\\Seating\\', '', basename(get_called_class()));
     }
 
-    /**
-     * @return string
-     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * @param string $title
-     */
     public function setTitle(string $title): void
     {
         $this->title = $title;
     }
-
 
     public function impact(SeatingRow $row, $number)
     {
         return -1;
     }
 
-    public function book(SeatingRow $row, Booking $booking)
-    {
-    }
+    public function book(SeatingRow $row, Booking $booking) {}
 
     public function isAvailable(SeatingRow $row)
     {

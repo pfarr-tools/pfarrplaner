@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,12 +30,12 @@
 
 namespace App\Liturgy\LiturgySheets;
 
-
 use App\Models\Service;
 
 class OrganistLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Ablaufplan für Organist:innen (DIN A4)';
+
     protected $icon = 'fa fa-file-pdf';
 
     public function __construct()
@@ -44,11 +44,14 @@ class OrganistLiturgySheet extends AbstractLiturgySheet
         $this->title = 'Ablaufplan für '.config('labels.organist').'nen (DIN A4)';
     }
 
-    protected function getData(Service $service) {
+    protected function getData(Service $service)
+    {
         // temporary override:
         return ['recipients' => []];
 
-        if (request()->has('noRecipients')) return ['recipients' => []];
+        if (request()->has('noRecipients')) {
+            return ['recipients' => []];
+        }
 
         $recipients = [];
         foreach ($service->liturgyBlocks as $block) {
@@ -59,9 +62,12 @@ class OrganistLiturgySheet extends AbstractLiturgySheet
         $recipients2 = array_unique($recipients);
         $recipients = [];
         foreach ($recipients2 as $recipient) {
-            if ($recipient != '') $recipients[] = $recipient;
+            if ($recipient != '') {
+                $recipients[] = $recipient;
+            }
         }
         sort($recipients);
+
         return compact('recipients');
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -33,19 +33,17 @@ namespace App\Models;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Str;
-use phpDocumentor\Reflection\Types\Static_;
 
 class AbstractModel extends Model
 {
-
     use HasFactory;
 
     public static array $exceptRoutes = [];
+
     protected static $defaultRoutes = [
         'web' => [
             'index' => [['GET', 'HEAD'], '#p#'],
@@ -64,21 +62,29 @@ class AbstractModel extends Model
             'destroy' => [['DELETE'], '###/{modelId}'],
         ],
     ];
+
     protected static $routes = [
         'web' => [],
         'api' => [],
     ];
+
     protected static $editVerb = 'bearbeiten';
 
-    /** @var array[] $validationRules Default validation rules */
+    /** @var array[] Default validation rules */
     public static array $validationRules = [];
+
     protected static string $prefix = '';
+
     protected static string $prefixPlural = '';
+
     protected static string $path = 'admin';
+
     protected $guarded = [];
 
     public static $adminTitle = '';
+
     public static $adminIcon = '';
+
     public static $adminGroup = '';
 
     protected $appends = ['label'];
@@ -86,6 +92,7 @@ class AbstractModel extends Model
     protected static $modelKeyInRoute = 'id';
 
     public static $relationsForIndex = [];
+
     public static $relationsForEditor = [];
 
     /**
@@ -93,12 +100,13 @@ class AbstractModel extends Model
      */
     public static function getAdminModuleConfig()
     {
-        if (!static::$adminIcon) {
+        if (! static::$adminIcon) {
             return false;
         }
-        if (!Auth::user() || !Auth::user()->can('index', get_called_class())) {
+        if (! Auth::user() || ! Auth::user()->can('index', get_called_class())) {
             return false;
         }
+
         return [
             'text' => static::$adminTitle ?: ucfirst(static::$prefixPlural),
             'group' => static::$adminGroup,
@@ -109,15 +117,14 @@ class AbstractModel extends Model
         ];
     }
 
-
     public static function getContractName(string $verb): string
     {
-        return static::relatedClass('App\\Contracts\\###\\' . ucfirst($verb) . 's#p#');
+        return static::relatedClass('App\\Contracts\\###\\'.ucfirst($verb).'s#p#');
     }
 
     public static function getActionName(string $verb): string
     {
-        return static::relatedClass('App\\Actions\\###\\' . ucfirst($verb) . '###');
+        return static::relatedClass('App\\Actions\\###\\'.ucfirst($verb).'###');
     }
 
     public function getContractedAction(string $verb)
@@ -147,15 +154,14 @@ class AbstractModel extends Model
 
     public static function getEventName(string $verb): string
     {
-        return static::relatedClass('App\\Events\\' . ucfirst($verb) . '###');
+        return static::relatedClass('App\\Events\\'.ucfirst($verb).'###');
     }
 
     public static function getVuePath(string $page)
     {
-        return (static::$path ? Str::ucfirst(static::$path) . '/' : '')
-            . Str::ucfirst(static::relatedName('###/' . Str::ucfirst($page)));
+        return (static::$path ? Str::ucfirst(static::$path).'/' : '')
+            .Str::ucfirst(static::relatedName('###/'.Str::ucfirst($page)));
     }
-
 
     public static function getRoutes()
     {
@@ -167,7 +173,7 @@ class AbstractModel extends Model
         foreach (array_keys($defaultRoutes) as $routeClass) {
             foreach ((static::$exceptRoutes ?? [])[$routeClass] ?? [] as $exception) {
                 if (isset(($defaultRoutes[$routeClass] ?? [])[$exception])) {
-                    unset ($defaultRoutes[$routeClass][$exception]);
+                    unset($defaultRoutes[$routeClass][$exception]);
                 }
             }
         }
@@ -182,18 +188,18 @@ class AbstractModel extends Model
 
             // edit verb exception rule:
             // if "show" is not defined, remove the "edit verb" from the "edit" url
-            if (isset($records['edit']) && (!isset($records['show']))) {
-                $records['edit'][1] = Str::replace('/' . static::$editVerb, '', $records['edit'][1]);
+            if (isset($records['edit']) && (! isset($records['show']))) {
+                $records['edit'][1] = Str::replace('/'.static::$editVerb, '', $records['edit'][1]);
             }
 
             foreach ($records as $routeKey => $routeData) {
                 $routeClassPrefix = $routeClassPrefixes[$routeClass] ?? $routeClass;
-                $keyPrefix = $routeClassPrefix ? str_replace('/', '.', $routeClassPrefix) . '.' : '';
-                $fullRouteName = $keyPrefix . (Str::contains($routeData[1], '#p#') ? static::pluralKey(
-                    ) : static::singularKey()) . '.' . $routeKey;
-                $routeData[1] = '/' . ($routeClassPrefix ? $routeClassPrefix . '/' : '') . static::relatedUrl(
-                        $routeData[1]
-                    );
+                $keyPrefix = $routeClassPrefix ? str_replace('/', '.', $routeClassPrefix).'.' : '';
+                $fullRouteName = $keyPrefix.(Str::contains($routeData[1], '#p#') ? static::pluralKey(
+                ) : static::singularKey()).'.'.$routeKey;
+                $routeData[1] = '/'.($routeClassPrefix ? $routeClassPrefix.'/' : '').static::relatedUrl(
+                    $routeData[1]
+                );
                 $myRoutes[$routeClass][$fullRouteName] = [
                     'verb' => $routeKey,
                     'httpVerbs' => $routeData[0],
@@ -201,13 +207,15 @@ class AbstractModel extends Model
                 ];
             }
         }
+
         return $myRoutes;
     }
 
     /**
      * Get a single route name for this model
-     * @param string $routeClass Class (web, api, ...)
-     * @param string $verb Verb (index, show, ...)
+     *
+     * @param  string  $routeClass  Class (web, api, ...)
+     * @param  string  $verb  Verb (index, show, ...)
      * @return string Route name
      */
     public static function getSingleRouteName(string $routeClass, string $verb): string
@@ -217,18 +225,21 @@ class AbstractModel extends Model
                 return $routeKey;
             }
         }
+
         return '';
     }
 
     /**
      * Get a single route name for this model
-     * @param string $routeClass Class (web, api, ...)
-     * @param string $verb Verb (index, show, ...)
+     *
+     * @param  string  $routeClass  Class (web, api, ...)
+     * @param  string  $verb  Verb (index, show, ...)
      * @return string Route name
      */
     public static function getSingleRoute(string $routeClass, string $verb): string
     {
         $routeName = static::getSingleRouteName($routeClass, $verb);
+
         return $routeName ? route($routeName) : '';
     }
 
@@ -244,14 +255,12 @@ class AbstractModel extends Model
 
     /**
      * Register the models resource routes
-     *
-     * @return void
      */
     public static function registerRoutes(): void
     {
         Route::middleware([
-                              'auth',
-                          ])->group(function () {
+            'auth',
+        ])->group(function () {
             static::registerDefaultRoutes('web', static::controllerClass());
         });
     }
@@ -259,8 +268,8 @@ class AbstractModel extends Model
     public static function registerApiRoutes(): void
     {
         Route::middleware([
-                              'auth:api',
-                          ])->group(function () {
+            'auth:api',
+        ])->group(function () {
             static::registerDefaultRoutes('api', static::apiControllerClass());
         });
     }
@@ -276,23 +285,18 @@ class AbstractModel extends Model
         }
     }
 
-    /**
-     * @return string
-     */
     public static function controllerClass(): string
     {
-        return 'App\\Http\\Controllers\\' . static::modelName() . 'Controller';
+        return 'App\\Http\\Controllers\\'.static::modelName().'Controller';
     }
 
     public static function apiControllerClass(): string
     {
-        return 'App\\Http\\Controllers\\Api\\' . static::modelName() . 'Controller';
+        return 'App\\Http\\Controllers\\Api\\'.static::modelName().'Controller';
     }
 
     /**
      * Get the route key in the plural
-     *
-     * @return string
      */
     public static function pluralKey(): string
     {
@@ -301,8 +305,6 @@ class AbstractModel extends Model
 
     /**
      * Get the route key in the singular
-     *
-     * @return string
      */
     public static function singularKey(): string
     {
@@ -317,14 +319,10 @@ class AbstractModel extends Model
         return Str::camel(static::modelName());
     }
 
-    /**
-     * @return string
-     */
     public function getLabelAttribute(): string
     {
         return $this->name ?? '';
     }
-
 
     /**
      * Get the route key for the model.
@@ -342,15 +340,15 @@ class AbstractModel extends Model
         return [];
     }
 
-
     /**
      * Get an empty model instance
      */
     public static function getEmptyModel(): AbstractModel
     {
-        $model = new static();
+        $model = new static;
         $data = array_merge(array_fill_keys($model->getFillable(), null), $model->fillDefaults(), ['name' => '']);
         $model->fill($data);
+
         return $model;
     }
 }

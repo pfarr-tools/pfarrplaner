@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,10 +39,8 @@
 |
 */
 
-
-
-use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\InterstitialController;
+use App\Http\Controllers\SettingsController;
 
 Route::post('/setting/{user}/{key}', [SettingsController::class, 'set'])->name('setting.set');
 Route::post('/interstitial/{key}', [InterstitialController::class, 'update'])->name('interstitial.update');

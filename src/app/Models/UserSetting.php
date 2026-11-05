@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,18 +37,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class UserSetting
- * @package App
  */
 class UserSetting extends Model
 {
-
     /**
      * @var string[]
      */
     protected $fillable = [
         'user_id',
         'key',
-        'value'
+        'value',
     ];
 
     /**
@@ -70,5 +68,4 @@ class UserSetting extends Model
     {
         return 'key';
     }
-
 }

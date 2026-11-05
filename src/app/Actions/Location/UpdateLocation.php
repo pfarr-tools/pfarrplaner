@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,26 +30,24 @@
 
 namespace App\Actions\Location;
 
-use App\Actions\AbstractAction;
 use App\Actions\AbstractUpdateAction;
 use App\Contracts\Location\UpdatesLocations;
 use App\Events\Models\Location\UpdatedLocation;
-use App\Models\People\User;
 use App\Models\Location;
+use App\Models\People\User;
 use App\Models\Places\City;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class UpdateLocation extends AbstractUpdateAction implements UpdatesLocations
 {
-
-    /** @var City $city */
+    /** @var City */
     protected $city;
 
     /**
      * Get return route
-     * @return string
      */
     public function redirectTo(): string
     {
@@ -58,12 +56,11 @@ class UpdateLocation extends AbstractUpdateAction implements UpdatesLocations
 
     /**
      * Update a location
-     * @param User $user
-     * @param Location $location
-     * @param array $input
+     *
      * @return Location
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Validation\ValidationException
+     *
+     * @throws AuthorizationException
+     * @throws ValidationException
      */
     public function update(User $user, Location $location, array $input)
     {
@@ -73,6 +70,7 @@ class UpdateLocation extends AbstractUpdateAction implements UpdatesLocations
         $location->update($input);
         UpdatedLocation::dispatch($user, $location);
         $this->messages = ['success' => 'Der Ort wurde geändert.'];
+
         return $location;
     }
 }

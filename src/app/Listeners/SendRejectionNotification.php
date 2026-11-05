@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,7 +34,6 @@ use App\Events\AbsenceRejected;
 
 /**
  * Class SendRejectionNotification
- * @package App\Listeners
  */
 class SendRejectionNotification
 {
@@ -51,7 +50,6 @@ class SendRejectionNotification
     /**
      * Handle the event.
      *
-     * @param AbsenceRejected $event
      * @return void
      */
     public function handle(AbsenceRejected $event)

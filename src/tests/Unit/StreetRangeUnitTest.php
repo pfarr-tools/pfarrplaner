@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,9 +13,14 @@
 
 namespace Tests\Unit;
 
+use App\Actions\StreetRange\CreateStreetRange;
+use App\Actions\StreetRange\DeleteStreetRange;
+use App\Actions\StreetRange\UpdateStreetRange;
 use App\Events\Models\StreetRange\CreatedStreetRange;
 use App\Events\Models\StreetRange\DeletedStreetRange;
 use App\Events\Models\StreetRange\UpdatedStreetRange;
+use App\Http\Controllers\AbstractCRUDController;
+use App\Http\Controllers\Api\AbstractApiCRUDController;
 use App\Models\AbstractModel;
 use App\Models\Parish;
 use App\Models\People\User;
@@ -27,31 +33,31 @@ class StreetRangeUnitTest extends TestCase
 {
     private User $user;
 
-    public function testStreetRangeCanBeCreatedViaFactory(): void
+    public function test_street_range_can_be_created_via_factory(): void
     {
         $streetRange = StreetRange::factory()->create();
         $this->assertCount(1, StreetRange::all());
     }
 
-    public function testStreetRangeExtendsAbstractModel(): void
+    public function test_street_range_extends_abstract_model(): void
     {
         $this->assertTrue(is_subclass_of(StreetRange::class, AbstractModel::class));
     }
 
-    public function testStreetRangeControllerClassesExist(): void
+    public function test_street_range_controller_classes_exist(): void
     {
-        $this->assertTrue(is_subclass_of(StreetRange::controllerClass(), \App\Http\Controllers\AbstractCRUDController::class));
-        $this->assertTrue(is_subclass_of(StreetRange::apiControllerClass(), \App\Http\Controllers\Api\AbstractApiCRUDController::class));
+        $this->assertTrue(is_subclass_of(StreetRange::controllerClass(), AbstractCRUDController::class));
+        $this->assertTrue(is_subclass_of(StreetRange::apiControllerClass(), AbstractApiCRUDController::class));
     }
 
-    public function testStreetRangeContractsResolve(): void
+    public function test_street_range_contracts_resolve(): void
     {
-        $this->assertInstanceOf(\App\Actions\StreetRange\CreateStreetRange::class, app(StreetRange::getContractName('create')));
-        $this->assertInstanceOf(\App\Actions\StreetRange\UpdateStreetRange::class, app(StreetRange::getContractName('update')));
-        $this->assertInstanceOf(\App\Actions\StreetRange\DeleteStreetRange::class, app(StreetRange::getContractName('delete')));
+        $this->assertInstanceOf(CreateStreetRange::class, app(StreetRange::getContractName('create')));
+        $this->assertInstanceOf(UpdateStreetRange::class, app(StreetRange::getContractName('update')));
+        $this->assertInstanceOf(DeleteStreetRange::class, app(StreetRange::getContractName('delete')));
     }
 
-    public function testStreetRangeCanBeCreatedViaAction(): void
+    public function test_street_range_can_be_created_via_action(): void
     {
         Event::fake();
 
@@ -70,7 +76,7 @@ class StreetRangeUnitTest extends TestCase
         Event::assertDispatched(CreatedStreetRange::class);
     }
 
-    public function testStreetRangeCanBeUpdatedViaAction(): void
+    public function test_street_range_can_be_updated_via_action(): void
     {
         Event::fake();
 
@@ -87,7 +93,7 @@ class StreetRangeUnitTest extends TestCase
         Event::assertDispatched(UpdatedStreetRange::class);
     }
 
-    public function testStreetRangeCanBeDeletedViaAction(): void
+    public function test_street_range_can_be_deleted_via_action(): void
     {
         Event::fake();
 

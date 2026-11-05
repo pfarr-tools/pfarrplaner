@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -38,7 +38,6 @@ use Illuminate\Validation\Rule;
 
 /**
  * Class ServiceRequest
- * @package App\Http\Requests
  */
 class ServiceRequest extends FormRequest
 {
@@ -79,7 +78,7 @@ class ServiceRequest extends FormRequest
             'offering_description' => 'nullable|string',
             'offering_amount' => 'nullable',
             'offering_type' => [
-                Rule::in(['eO', 'PO', ''])
+                Rule::in(['eO', 'PO', '']),
             ],
             'others' => 'nullable|string',
             'cc' => 'nullable|bool',
@@ -137,14 +136,13 @@ class ServiceRequest extends FormRequest
     {
         $data = parent::validated();
 
-
         if (isset($data['location_id']) || isset($data['special_location'])) {
             // set location
             if ($data['special_location'] ?? false) {
                 $data['location_id'] = null;
             } else {
                 $location = Location::find($data['location_id']);
-                if (null === $location) {
+                if ($location === null) {
                     $data['special_location'] = $data['location_id'];
                     $data['location_id'] = null;
                 }
@@ -168,7 +166,6 @@ class ServiceRequest extends FormRequest
                 }
             }
         }
-
 
         $data['hidden'] = $data['hidden'] ?? 0;
         $data['needs_reservations'] = $data['needs_reservations'] ?? 0;
@@ -203,5 +200,4 @@ class ServiceRequest extends FormRequest
     {
         return Carbon::parse($data, 'Europe/Berlin')->setTimezone('UTC');
     }
-
 }

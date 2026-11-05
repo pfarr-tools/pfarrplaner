@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,17 +31,14 @@
 namespace Tests;
 
 use App\Models\People\User;
-use App\Services\RoleService;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\Models\Role;
-use Tests\TestCase;
 
 abstract class AbstractModelFeatureTest extends TestCase
 {
-
     protected $modelName;
+
     protected $modelClass = '';
 
     /** @var User */
@@ -49,7 +46,7 @@ abstract class AbstractModelFeatureTest extends TestCase
 
     // test via web
 
-    public function testIndexViewWorks()
+    public function test_index_view_works()
     {
         $this->assertEquals(3, Role::count());
 
@@ -57,10 +54,10 @@ abstract class AbstractModelFeatureTest extends TestCase
 
         $response = $this->actingAs($this->testUser)->get(($this->modelClass)::getSingleRoute('web', 'index'));
         $response->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page
+            ->assertInertia(fn (Assert $page) => $page
                 ->component(($this->modelClass)::getVuePath('index'))
                 ->has(($this->modelClass)::pluralKey(), 1)
-                ->has(($this->modelClass)::pluralKey() . '.0', fn(Assert $page) => $page
+                ->has(($this->modelClass)::pluralKey().'.0', fn (Assert $page) => $page
                     ->where('id', $existing->id)
                     ->etc()
                 )
@@ -68,7 +65,7 @@ abstract class AbstractModelFeatureTest extends TestCase
             );
     }
 
-    public function testEditorViewWorks()
+    public function test_editor_view_works()
     {
         $this->assertEquals(3, Role::count());
 
@@ -78,9 +75,9 @@ abstract class AbstractModelFeatureTest extends TestCase
             route(($this->modelClass)::getSingleRouteName('web', 'edit'), $existing->id)
         );
         $response->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page
+            ->assertInertia(fn (Assert $page) => $page
                 ->component(($this->modelClass)::getVuePath('editor'))
-                ->has(($this->modelClass)::singularKey(), fn(Assert $page) => $page
+                ->has(($this->modelClass)::singularKey(), fn (Assert $page) => $page
                     ->where('id', $existing->id)
                     ->etc()
                 )
@@ -88,12 +85,12 @@ abstract class AbstractModelFeatureTest extends TestCase
             );
     }
 
-
     /**
      * Test if model can be created via the frontend
+     *
      * @return void
      */
-    public function testCreateViaFrontend()
+    public function test_create_via_frontend()
     {
         $data = $this->factory()->raw();
 
@@ -112,9 +109,10 @@ abstract class AbstractModelFeatureTest extends TestCase
 
     /**
      * Test if model can be updated via the frontend
+     *
      * @return void
      */
-    public function testUpdateViaFrontend()
+    public function test_update_via_frontend()
     {
         $existing = $this->factory()->create();
         $this->assertTrue($this->testUser->can('update', $existing));
@@ -135,12 +133,12 @@ abstract class AbstractModelFeatureTest extends TestCase
         }
     }
 
-
     /**
      * Test if model can be deleted via the frontend
+     *
      * @return void
      */
-    public function testDeleteFrontend()
+    public function test_delete_frontend()
     {
         $existing = $this->factory()->create();
         $existingClone = clone $existing;
@@ -157,20 +155,16 @@ abstract class AbstractModelFeatureTest extends TestCase
 
     /**
      * Get the expected redirect URL after an action
-     * @return string
      */
-    protected function getActionRedirectUrl($model = null): string {
+    protected function getActionRedirectUrl($model = null): string
+    {
         return ($this->modelClass)::getSingleRoute('web', 'index');
     }
 
-    /**
-     * @return Factory
-     */
     protected function factory(): Factory
     {
         return ($this->modelClass)::factory();
     }
-
 
     protected function setUp(): void
     {
@@ -181,6 +175,4 @@ abstract class AbstractModelFeatureTest extends TestCase
         $this->modelName = $matches[1];
         $this->testUser = User::factory()->create();
     }
-
-
 }

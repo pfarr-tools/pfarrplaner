@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -67,25 +67,19 @@ use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Class User
- * @package App
  */
 class User extends Authenticatable
 {
-    use Notifiable, HasRoles, HasApiTokens, HasFactory;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
-    /**
-     *
-     */
     public const NAME_FORMAT_DEFAULT = 1;
-    /**
-     *
-     */
+
     public const NAME_FORMAT_INITIAL_AND_LAST = 2;
-    /**
-     *
-     */
+
     public const NAME_FORMAT_FIRST_AND_LAST = 3;
+
     public $guard_name = 'web';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -117,12 +111,14 @@ class User extends Authenticatable
         'image',
         'must_change_password',
     ];
+
     /**
      * @var string[]
      */
     protected $casts = [
         'new_features' => 'datetime',
     ];
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -143,10 +139,12 @@ class User extends Authenticatable
         'sortName',
         'name',
     ];
+
     /**
      * @var string
      */
     protected $orderBy = 'last_name';
+
     /**
      * @var string
      */
@@ -155,11 +153,8 @@ class User extends Authenticatable
     /** @var string[] cached user settings */
     protected $settings = [];
 
-// ACCESSORS
+    // ACCESSORS
 
-    /**
-     * @return string
-     */
     public function getNameAttribute(): string
     {
         return $this->nameService()->format(NameService::FIRST_LAST);
@@ -173,6 +168,7 @@ class User extends Authenticatable
         if ($this->hasRole(AuthServiceProvider::SUPER)) {
             return City::all();
         }
+
         return $this->adminCities()->get();
     }
 
@@ -195,6 +191,7 @@ class User extends Authenticatable
                 $permissions[] = $permission->name;
             }
         }
+
         return $permissions;
     }
 
@@ -206,9 +203,6 @@ class User extends Authenticatable
         return $this->hasRole(RoleService::ROLE_ADMIN) || $this->hasRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    /**
-     * @return bool
-     */
     public function getIsSuperAdminAttribute(): bool
     {
         return $this->hasRole(RoleService::ROLE_SUPER_ADMIN);
@@ -219,12 +213,12 @@ class User extends Authenticatable
      */
     public function getIsLocalAdminAttribute()
     {
-        return (!$this->isAdmin) && (count($this->adminCities) > 0);
+        return (! $this->isAdmin) && (count($this->adminCities) > 0);
     }
 
     public function getIsOfficialUserAttribute()
     {
-        return !empty($this->password);
+        return ! empty($this->password);
     }
 
     /**
@@ -244,17 +238,17 @@ class User extends Authenticatable
     }
 
     /**
-     * @param bool $withTitle
+     * @param  bool  $withTitle
      * @return string
      */
     public function lastName($withTitle = false)
     {
-        return ($withTitle ? ($this->title ? $this->title . ' ' : '') : '') . $this->last_name;
+        return ($withTitle ? ($this->title ? $this->title.' ' : '') : '').$this->last_name;
     }
 
     public function getSortNameAttribute()
     {
-        return $this->last_name . ($this->first_name ? ', ' . $this->first_name : '');
+        return $this->last_name.($this->first_name ? ', '.$this->first_name : '');
     }
 
     /**
@@ -262,18 +256,19 @@ class User extends Authenticatable
      */
     public function getWritableCitiesAttribute()
     {
-        if ((!Auth::guest()) && Auth::user()->hasRole(AuthServiceProvider::SUPER)) {
+        if ((! Auth::guest()) && Auth::user()->hasRole(AuthServiceProvider::SUPER)) {
             return City::all();
         }
         $writableCities = $this->writableCities()->get();
         $replacements = $this->currentReplacements();
-        if (null !== $replacements) {
+        if ($replacements !== null) {
             foreach ($replacements as $replacement) {
                 foreach ($replacement->absence->user->writableCities as $city) {
                     $writableCities->push($city);
                 }
             }
         }
+
         return $writableCities->unique();
     }
 
@@ -304,17 +299,17 @@ class User extends Authenticatable
             ->where('end', '>=', Carbon::now())
             ->get();
     }
-// END ACCESSORS
+    // END ACCESSORS
 
-// MUTATORS
+    // MUTATORS
     /**
      * Automatically hash password
-     * @param $value
      */
     public function setPasswordAttribute($value)
     {
         if ($value === null || $value === '') {
             $this->attributes['password'] = $value;
+
             return;
         }
 
@@ -325,9 +320,9 @@ class User extends Authenticatable
             ? $value
             : Hash::make($value);
     }
-// END MUTATORS
+    // END MUTATORS
 
-// SCOPES
+    // SCOPES
     /**
      * Query for users subscribed to a specific service
      *
@@ -335,9 +330,7 @@ class User extends Authenticatable
      * 1) User is subscribed to all services for this city
      * 2) User is subscribed to own services for this city AND is a participant in this service
      *
-     * @param Builder $query
-     * @param Service $service
-     * @param bool $isNew True, if this is a newly created service
+     * @param  bool  $isNew  True, if this is a newly created service
      * @return mixed
      */
     public function scopeSubscribedTo(Builder $query, Service $service, $isNew = false)
@@ -376,8 +369,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param Builder $query
-     * @param User $user
      * @return Builder
      */
     public function scopeVisibleFor(Builder $query, User $user)
@@ -386,19 +377,19 @@ class User extends Authenticatable
             $q->whereIn('city_id', $user->cities->pluck('id'));
         });
     }
-// END SCOPES
-// SETTERS
-// SETTERS
-// SETTERS
+
+    // END SCOPES
+    // SETTERS
+    // SETTERS
+    // SETTERS
     /**
-     * @param $name
      * @return int|mixed|string
      */
     public static function createIfNotExists($name)
     {
-        if ((!is_numeric($name)) || (User::find($name) === false)) {
+        if ((! is_numeric($name)) || (User::find($name) === false)) {
             $title = $firstName = $lastName = '';
-            if (false === strpos($name, '_')) {
+            if (strpos($name, '_') === false) {
                 // split participant name into its parts
                 $tmp = explode(' ', $name);
                 if (count($tmp) == 3) {
@@ -429,6 +420,7 @@ class User extends Authenticatable
             $user->save();
             $name = $user->id;
         }
+
         return $name;
     }
 
@@ -447,6 +439,7 @@ class User extends Authenticatable
     public function absencesToBeApproved()
     {
         $approvableUsers = $this->approvableUsers();
+
         return Absence::whereIn('user_id', $approvableUsers->pluck('id'))
             ->where('status', 'pending')->get();
     }
@@ -457,6 +450,7 @@ class User extends Authenticatable
     public function approvableUsers()
     {
         $id = $this->id;
+
         return User::whereHas(
             'approvers',
             function ($query) use ($id) {
@@ -483,8 +477,9 @@ class User extends Authenticatable
 
     /**
      * Check if the user has at least one of an array of permissions
-     * @param string[] $permissions
-     * @param mixed $data
+     *
+     * @param  string[]  $permissions
+     * @param  mixed  $data
      * @return bool
      */
     public function canAny($permissions, $data = null)
@@ -493,17 +488,18 @@ class User extends Authenticatable
         foreach ($permissions as $permission) {
             $can = $can || $this->can($permission, $data);
         }
+
         return $can;
     }
 
     /**
-     * @param $area
      * @return bool
      */
     public function canEdit($area)
     {
         if (in_array($area, ['general', 'church'])) {
             $property = ucfirst($area);
+
             return $this->isAdmin || $this->$property;
         } else {
             return $this->canEditField($area);
@@ -511,7 +507,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $field
      * @return bool
      */
     public function canEditField($field)
@@ -552,7 +547,7 @@ class User extends Authenticatable
         $settings = Settings::all($this);
         $defaults = config('user-settings.defaults');
         foreach ($defaults as $key => $defaultSetting) {
-            if (!isset($settings[$key])) {
+            if (! isset($settings[$key])) {
                 $settings[$key] = $defaultSetting;
                 Settings::set($this, $key, $defaultSetting);
             } else {
@@ -569,7 +564,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $key
      * @throws Exception
      */
     public function forgetSetting($key)
@@ -581,7 +575,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $key
      * @return bool
      */
     public function hasSetting($key)
@@ -590,10 +583,9 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $key
-     * @param null $default
-     * @param bool $returnObject
-     * @param bool $unserialize
+     * @param  null  $default
+     * @param  bool  $returnObject
+     * @param  bool  $unserialize
      * @return UserSetting|mixed
      */
     public function getSetting($key, $default = null, $returnObject = false, $unserialize = true)
@@ -603,8 +595,9 @@ class User extends Authenticatable
 
     /**
      * Get the user's name in one of the predefined formats
-     * @param int $format
-     * @param bool $withTitle
+     *
+     * @param  int  $format
+     * @param  bool  $withTitle
      * @return string
      */
     public function formattedName($format = self::NAME_FORMAT_DEFAULT, $withTitle = true)
@@ -617,44 +610,47 @@ class User extends Authenticatable
                 return $this->fullName($withTitle);
                 break;
         }
+
         return $this->lastName($withTitle);
     }
 
     /**
-     * @param bool $withTitle
+     * @param  bool  $withTitle
      * @return string
      */
     public function initialedName($withTitle = false)
     {
-        return ($withTitle ? ($this->title ? $this->title . ' ' : '') : '')
-            . ($this->first_name ? substr($this->first_name, 0, 1) . 'app ' : '')
-            . $this->last_name;
+        return ($withTitle ? ($this->title ? $this->title.' ' : '') : '')
+            .($this->first_name ? substr($this->first_name, 0, 1).'app ' : '')
+            .$this->last_name;
     }
 
     /**
-     * @param bool $withTitle
+     * @param  bool  $withTitle
      * @return string
      */
     public function fullName($withTitle = false)
     {
         return $this->nameService()->format(
-            $withTitle ? \App\Services\NameService::TITLE_FIRST_LAST : \App\Services\NameService::FIRST_LAST
+            $withTitle ? NameService::TITLE_FIRST_LAST : NameService::FIRST_LAST
         );
     }
 
     /**
      * Get an instance of the HomeScreen for this user
+     *
      * @return AbstractHomeScreen|null
      */
     public function getHomeScreen()
     {
         $homeScreen = $this->getSetting('homeScreen', 'route:calendar');
         if (substr($homeScreen, 0, 11) == 'homescreen:') {
-            $homeScreenClass = 'App\\HomeScreens\\' . ucfirst(substr($homeScreen, 11)) . 'HomeScreen';
+            $homeScreenClass = 'App\\HomeScreens\\'.ucfirst(substr($homeScreen, 11)).'HomeScreen';
             if (class_exists($homeScreenClass)) {
-                return new $homeScreenClass();
+                return new $homeScreenClass;
             }
         }
+
         return null;
     }
 
@@ -670,6 +666,7 @@ class User extends Authenticatable
     {
         if ($this->hasSetting('sorted_cities')) {
             $ids = explode(',', $this->getSetting('sorted_cities'));
+
             return City::whereIn('id', $ids)->get()->sortBy(
                 function ($model) use ($ids) {
                     return array_search($model->getKey(), $ids);
@@ -678,15 +675,12 @@ class User extends Authenticatable
         } else {
             // default if user preference not set:
             $cities = $this->visibleCities;
-            $this->setSetting('sorted_cities', join(',', $cities->pluck('id')->toArray()));
+            $this->setSetting('sorted_cities', implode(',', $cities->pluck('id')->toArray()));
+
             return $cities;
         }
     }
 
-    /**
-     * @param $key
-     * @param $value
-     */
     public function setSetting($key, $value)
     {
         return Settings::set($this, $key, $value);
@@ -694,12 +688,13 @@ class User extends Authenticatable
 
     /**
      * Get the users subscription for a city
-     * @param $city
+     *
      * @return Subscription
      */
     public function getSubscriptionType($city)
     {
         $subscription = $this->getSubscription($city)->subscription_type;
+
         return $subscription;
     }
 
@@ -708,14 +703,14 @@ class User extends Authenticatable
      *
      * If no subscription is present yet, it will be created with type SUBSCRIBE_NONE
      *
-     * @param int|City $city
+     * @param  int|City  $city
      * @return bool
      */
     public function getSubscription($city)
     {
         $cityId = is_int($city) ? $city : $city->id;
         $subscription = $this->subscriptions()->where('city_id', $cityId)->first();
-        if (null === $subscription) {
+        if ($subscription === null) {
             $subscription = new Subscription(
                 [
                     'user_id' => $this->id,
@@ -725,6 +720,7 @@ class User extends Authenticatable
             );
             $subscription->save();
         }
+
         return $subscription;
     }
 
@@ -755,7 +751,9 @@ class User extends Authenticatable
     public function getViewableAbsenceUsers()
     {
         // (C) Users without the manage_absences flag see nothing at all
-        if (!$this->manage_absences) return new Collection();
+        if (! $this->manage_absences) {
+            return new Collection;
+        }
 
         // always include the user
         $ids = [$this->id];
@@ -811,17 +809,17 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $date
-     * @param bool $returnAbsence
+     * @param  bool  $returnAbsence
      * @return bool|Builder|Model|object|null
+     *
      * @throws Exception
      */
     public function isAbsent($date, $returnAbsence = false)
     {
-        if (!$this->manage_absences) {
-            return ($returnAbsence ? null : false);
+        if (! $this->manage_absences) {
+            return $returnAbsence ? null : false;
         }
-        if (!is_a($date, Carbon::class)) {
+        if (! is_a($date, Carbon::class)) {
             $date = new Carbon($date);
         }
         $absences = Absence::with('user')
@@ -829,12 +827,12 @@ class User extends Authenticatable
             ->where('from', '<=', $date)
             ->where('to', '>=', $date)
             ->first();
-        return (null !== $absences) ? ($returnAbsence ? $absences : null) : ($returnAbsence ? null : false);
+
+        return ($absences !== null) ? ($returnAbsence ? $absences : null) : ($returnAbsence ? null : false);
     }
 
     /**
-     * @param $date
-     * @param bool $returnServices
+     * @param  bool  $returnServices
      * @return bool|null
      */
     public function isBusy($date, $returnServices = false)
@@ -850,33 +848,35 @@ class User extends Authenticatable
                 $query->where('user_id', $this->id);
             }
         )->get();
-        return (count($services) ? ($returnServices ? $services : null) : ($services ? null : false));
+
+        return count($services) ? ($returnServices ? $services : null) : ($services ? null : false);
     }
 
     /**
-     * @param $date
-     * @param bool $returnAbsence
+     * @param  bool  $returnAbsence
      * @return bool|null
+     *
      * @throws Exception
      */
     public function isReplacement($date, $returnAbsence = false)
     {
-        if (!$this->manage_absences) {
-            return ($returnAbsence ? null : false);
+        if (! $this->manage_absences) {
+            return $returnAbsence ? null : false;
         }
-        if (!is_a($date, Carbon::class)) {
+        if (! is_a($date, Carbon::class)) {
             $date = new Carbon($date);
         }
         $absences = Absence::where('replacement', $this->id)
             ->where('from', '<=', $date)
             ->where('to', '>=', $date)
             ->first();
-        return (null !== $absences) ? ($returnAbsence ? $absences : null) : ($returnAbsence ? null : false);
+
+        return ($absences !== null) ? ($returnAbsence ? $absences : null) : ($returnAbsence ? null : false);
     }
 
     public function mergeInto(User $user)
     {
-        if ((!$user->isOfficialUser) && $this->isOfficialUser) {
+        if ((! $user->isOfficialUser) && $this->isOfficialUser) {
             $user->roles()->sync($this->roles->pluck('id'));
             $user->permissions()->sync($this->permissions->pluck('id'));
             $user->update([
@@ -936,6 +936,7 @@ class User extends Authenticatable
 
     /**
      * Cities to which the user has at least read access
+     *
      * @return BelongsToMany
      */
     public function cities()
@@ -953,7 +954,6 @@ class User extends Authenticatable
     }
 
     /**
-     * @param $city
      * @return string
      */
     public function permissionForCity($city)
@@ -961,6 +961,7 @@ class User extends Authenticatable
         if (is_numeric($city)) {
             $city = City::find($city);
         }
+
         /** @var City $city */
         return $this->cities()->where('cities.id', $city->id)->first()->pivot->permission ?? 'n';
     }
@@ -1001,9 +1002,6 @@ class User extends Authenticatable
             ->withPivot('category');
     }
 
-    /**
-     * @param $subscriptions
-     */
     public function setSubscriptionsFromArray($subscriptions)
     {
         foreach ($subscriptions as $city => $type) {
@@ -1013,15 +1011,16 @@ class User extends Authenticatable
 
     /**
      * Set the user's subscription for a city
-     * @param City|int $city City
-     * @param int $type Subscription type
+     *
+     * @param  City|int  $city  City
+     * @param  int  $type  Subscription type
      * @return Subscription
      */
     public function setSubscription($city, int $type)
     {
         $city = is_int($city) ? City::find($city) : $city;
         $subscription = $this->getSubscription($city);
-        if (null === $subscription) {
+        if ($subscription === null) {
             $subscription = new Subscription(
                 [
                     'user_id' => $this->id,
@@ -1031,14 +1030,16 @@ class User extends Authenticatable
         }
         $subscription->subscription_type = $type;
         $subscription->save();
+
         return $subscription;
     }
 
     /**
      * Sync related users list for a specific kind of relation
-     * @param $relation Kind of relation
-     * @param $relationString Relation pivot string
-     * @param $userIds User ids
+     *
+     * @param  $relation  Kind of relation
+     * @param  $relationString  Relation pivot string
+     * @param  $userIds  User ids
      */
     public function syncRelatedUsers($relation, $relationString, $userIds)
     {
@@ -1056,7 +1057,6 @@ class User extends Authenticatable
     /**
      * Update this users permissions from an array
      * Format [ city_id => ['permission' => level]]
-     * @param $permissions
      */
     public function updateCityPermissions($permissions, ?User $actingUser = null)
     {
@@ -1069,14 +1069,14 @@ class User extends Authenticatable
         // check user rights, remove entries for cities without admin rights
         foreach ($permissions as $cityId => $permission) {
             $city = City::find($cityId);
-            if (!$city || !$city->administeredBy($actingUser)) {
+            if (! $city || ! $city->administeredBy($actingUser)) {
                 unset($permissions[$cityId]);
             }
         }
 
         // add missing cities
         foreach ($this->visibleCities as $city) {
-            if (!isset($permissions[$city->id])) {
+            if (! isset($permissions[$city->id])) {
                 $permissions[$city->id] = ['permission' => $city->pivot->permission];
             }
         }
@@ -1090,7 +1090,7 @@ class User extends Authenticatable
 
         // update the user's own sorting (remove cities which are not allowed)
         $thisPref = explode(',', $this->getSetting('sorted_cities', ''));
-        if (!count($thisPref)) {
+        if (! count($thisPref)) {
             $thisPref = $result['attached'];
         } else {
             foreach ($thisPref as $key => $city) {
@@ -1101,7 +1101,7 @@ class User extends Authenticatable
             // make added cities visible without having to edit user preference in profile:
             $thisPref = array_merge($thisPref, $result['attached']);
         }
-        $this->setSetting('sorted_cities', join(',', $thisPref));
+        $this->setSetting('sorted_cities', implode(',', $thisPref));
 
         // update the user's subscriptions (remove cities which are not allowed)
         $subscriptions = $this->subscriptions;
@@ -1115,7 +1115,8 @@ class User extends Authenticatable
     /**
      * Check if another user has admin rights for this user
      * This is the case, if the other user administers one of this users homeCities
-     * @param $user User User to be checked for admin rights
+     *
+     * @param  $user  User User to be checked for admin rights
      * @return bool True if other user has admin rights for this one
      */
     public function administeredBy($user)
@@ -1128,6 +1129,7 @@ class User extends Authenticatable
                 return true;
             }
         }
+
         return false;
     }
 
@@ -1178,16 +1180,12 @@ class User extends Authenticatable
         return $this->belongsToMany(City::class)->withPivot('permission')->wherePivotIn('permission', ['w']);
     }
 
-    /**
-     * @return NameService
-     */
     public function nameService(): NameService
     {
         return NameService::fromUser($this);
     }
 
     /**
-     * @param $format
      * @return array|string|null
      */
     public function formatName($format)
@@ -1204,5 +1202,4 @@ class User extends Authenticatable
                 });
             })->where('start', '<=', now()->endOfDay())->where('end', '>=', now()->startOfDay())->count() > 0;
     }
-
 }

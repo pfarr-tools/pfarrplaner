@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -14,6 +15,7 @@ namespace Tests\Unit\Listeners;
 
 use App\Events\AbsenceUpdated;
 use App\Listeners\SendAbsenceWorkflowNotification;
+use App\Mail\Absence\AbsenceRequested;
 use App\Models\Leave\Absence;
 use App\Models\People\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,13 +26,13 @@ class AbsenceListenerUnitTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testSendAbsenceWorkflowNotificationCanBeInstantiated(): void
+    public function test_send_absence_workflow_notification_can_be_instantiated(): void
     {
-        $listener = new SendAbsenceWorkflowNotification();
+        $listener = new SendAbsenceWorkflowNotification;
         $this->assertInstanceOf(SendAbsenceWorkflowNotification::class, $listener);
     }
 
-    public function testHandleDoesNothingWhenNoWorkflowDefined(): void
+    public function test_handle_does_nothing_when_no_workflow_defined(): void
     {
         Mail::fake();
 
@@ -39,13 +41,13 @@ class AbsenceListenerUnitTest extends TestCase
         // No vacationAdmins or vacationApprovers → workflow not active
 
         $event = new AbsenceUpdated($absence);
-        $listener = new SendAbsenceWorkflowNotification();
+        $listener = new SendAbsenceWorkflowNotification;
         $listener->handle($event);
 
         Mail::assertNothingSent();
     }
 
-    public function testHandleSendsMailForNewAbsenceWithWorkflow(): void
+    public function test_handle_sends_mail_for_new_absence_with_workflow(): void
     {
         Mail::fake();
 
@@ -59,9 +61,9 @@ class AbsenceListenerUnitTest extends TestCase
         $owner->vacationAdmins()->attach($admin->id, ['relation' => 'vacation_admin']);
 
         $event = new AbsenceUpdated($absence);
-        $listener = new SendAbsenceWorkflowNotification();
+        $listener = new SendAbsenceWorkflowNotification;
         $listener->handle($event);
 
-        Mail::assertSent(\App\Mail\Absence\AbsenceRequested::class);
+        Mail::assertSent(AbsenceRequested::class);
     }
 }

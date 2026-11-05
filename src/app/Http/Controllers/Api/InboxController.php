@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,18 +35,20 @@ use Carbon\Carbon;
 
 class InboxController extends Controller
 {
-
     public const ALLOWED_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png'];
 
     public function index()
     {
         $inboxPath = config('inbox.path');
-        if (!$inboxPath) return response()->json(false);
+        if (! $inboxPath) {
+            return response()->json(false);
+        }
 
         $files = collect(glob(storage_path($inboxPath.'/*')))->filter(function ($item) {
             return in_array(pathinfo($item, PATHINFO_EXTENSION), static::ALLOWED_EXTENSIONS);
         })->map(function ($item) {
             $extension = strtolower(pathinfo($item, PATHINFO_EXTENSION));
+
             return [
                 'name' => basename($item),
                 'extension' => $extension,
@@ -55,7 +57,7 @@ class InboxController extends Controller
                 'date' => Carbon::createFromTimestamp(filectime($item))->toIso8601String(),
             ];
         });
+
         return response()->json($files->values()->all());
     }
-
 }

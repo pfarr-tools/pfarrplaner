@@ -1,0 +1,17 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    level: 5
+    paths:
+        - app
+        - routes
+        - database
+    excludePaths:
+        - app/Console/Commands/DevBuilder
+        - storage/*
+        - bootstrap/cache/*
+        - public/build/*
+    tmpDir: /tmp/phpstan
+    treatPhpDocTypesAsCertain: false

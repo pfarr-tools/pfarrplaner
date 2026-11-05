@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,11 +30,10 @@
 
 namespace App\Reports;
 
+use App\Models\Places\City;
+use App\Models\Rites\Funeral;
 use App\Services\FileNameService;
 use App\Services\LiturgyService;
-use App\Models\Places\City;
-use App\Models\Calendar\Day;
-use App\Models\Rites\Funeral;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -46,29 +45,29 @@ use PhpOffice\PhpSpreadsheet\Exception;
 
 /**
  * Class FuneralsRelativesReport
- * @package App\Reports
  */
 class FuneralsRelativesReport extends AbstractExcelDocumentReport
 {
     public const FILE_SIGNATURE = '51.6';
-    public const FILE_TITLE = 'Beerdigungen';
 
+    public const FILE_TITLE = 'Beerdigungen';
 
     /**
      * @var string
      */
     public $title = 'Liste der Angehörigen';
+
     /**
      * @var string
      */
     public $description = 'Adressliste von Angehörigen für die Beerdigungen eines Jahres';
+
     /**
      * @var string
      */
     public $group = 'Kasualien';
 
     protected $inertia = true;
-
 
     /**
      * @return Application|Factory|View
@@ -77,12 +76,13 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
     {
         $cities = Auth::user()->cities;
         $start = LiturgyService::getPropriumDateByCode(now()->year, '1ADV')->subDays(6);
+
         return Inertia::render('Report/FuneralsRelatives/Setup', compact('start', 'cities'));
     }
 
     /**
-     * @param Request $request
      * @return string|void
+     *
      * @throws Exception
      */
     public function render(Request $request)
@@ -94,7 +94,7 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
             ]
         );
 
-        $start = Carbon::parse($data['start'], 'Europe/Berlin')->setTime(0,0,0);
+        $start = Carbon::parse($data['start'], 'Europe/Berlin')->setTime(0, 0, 0);
         $city = City::find($request->get('city'));
 
         $funerals = Funeral::with('service')
@@ -122,16 +122,16 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
 
         $headers = [
             'Datum',
-            "Verstorben_Name",
+            'Verstorben_Name',
             'Verstorben_Adresse',
-            "Verstorben_PLZ",
+            'Verstorben_PLZ',
             'Verstorben_Ort',
             'Predigttext',
             'Pfarrer',
             'Friedhof',
             'Hinterblieben_Name',
             'Hinterblieben_Adresse',
-            "Hinterblieben_PLZ",
+            'Hinterblieben_PLZ',
             'Hinterblieben_Ort',
         ];
 
@@ -169,8 +169,5 @@ class FuneralsRelativesReport extends AbstractExcelDocumentReport
                 now())
         );
 
-
     }
-
-
 }

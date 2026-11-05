@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,7 +31,6 @@
 namespace App\Reports;
 
 use App\Integrations\KonfiApp\KonfiAppIntegration;
-use App\Models\Calendar\Day;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Services\FileNameService;
@@ -45,26 +44,25 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Inertia;
 
-
 /**
  * Class KonfiAppQRReport
- * @package App\Reports
  */
 class KonfiAppQRReport extends AbstractPDFDocumentReport
 {
-
     public const FILE_SIGNATURE = '50';
-    public const FILE_TITLE = 'QR-Codes KonfiApp';
 
+    public const FILE_TITLE = 'QR-Codes KonfiApp';
 
     /**
      * @var string
      */
     public $title = 'QR-Codes für Gottesdienste';
+
     /**
      * @var string
      */
     public $group = 'Konfi';
+
     /**
      * @var string
      */
@@ -74,7 +72,6 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
 
     /**
      * Only active if at least one of the user's cities has KonfiApp integration
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -82,9 +79,9 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
         foreach (Auth::user()->cities as $city) {
             $isActive = $isActive || ($city->konfiapp_apikey != '');
         }
+
         return $isActive;
     }
-
 
     /**
      * @return Application|Factory|View
@@ -94,12 +91,13 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
         $cities = Auth::user()->writableCities->reject(function ($item) {
             return $item->konfiapp_apikey == '';
         });
-        return Inertia::render('Report/KonfiAppQR/Setup', compact( 'cities'));
+
+        return Inertia::render('Report/KonfiAppQR/Setup', compact('cities'));
     }
 
     /**
-     * @param Request $request
      * @return RedirectResponse|mixed|string
+     *
      * @throws Exception
      */
     public function render(Request $request)
@@ -116,9 +114,8 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
         $allServices = Service::where('city_id', $data['city'])
             ->where('konfiapp_event_qr', '!=', '')
             ->between(Carbon::createFromFormat('Y-m-d', $data['start']),
-                      Carbon::createFromFormat('Y-m-d', $data['end'])
+                Carbon::createFromFormat('Y-m-d', $data['end'])
             )->ordered()->get();
-
 
         // group by location
         $services = [];
@@ -127,14 +124,11 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
         }
         ksort($services);
 
-
         if (count($services) == '0') {
             return redirect()->route('reports.setup', 'konfiAppQR');
         }
 
         $types = KonfiAppIntegration::get(City::find($data['city']))->listEventTypes();
-
-
 
         return $this->sendToFile(
             FileNameService::make(
@@ -152,8 +146,8 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
     }
 
     /**
-     * @param Request $request
      * @return mixed
+     *
      * @throws Exception
      */
     public function single(Request $request)
@@ -162,8 +156,9 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
         $services[$service->locationText()][] = $service;
         $types = KonfiAppIntegration::get($service->city)->listEventTypes();
         $copies = $request->get('copies', 1);
+
         return $this->sendToFile(
-            $service->date->format('Ymd') . ' QR-Code.pdf',
+            $service->date->format('Ymd').' QR-Code.pdf',
             [
                 'services' => $services,
                 'types' => $types,
@@ -172,5 +167,4 @@ class KonfiAppQRReport extends AbstractPDFDocumentReport
             ['format' => 'A4-L']
         );
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,21 +30,18 @@
 
 namespace App\Traits;
 
-
 use App\Http\Middleware\Authenticate;
-use App\Models\Places\City;
 use App\Models\People\User;
+use App\Models\Places\City;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
 /**
  * Trait TestWithCredentialsTrait
- * @package App\Traits
  */
 trait TestWithCredentialsTrait
 {
-
     /** @var City */
     protected $city;
 
@@ -64,6 +61,4 @@ trait TestWithCredentialsTrait
         $this->user->givePermissionTo('gd-bearbeiten');
         $this->user->writableCities()->attach($this->city);
     }
-
-
 }

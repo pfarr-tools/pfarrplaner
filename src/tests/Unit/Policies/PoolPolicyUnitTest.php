@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -28,37 +29,37 @@ class PoolPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new PoolPolicy();
+        $this->policy = new PoolPolicy;
     }
 
-    public function testRegularUserCannotViewAny(): void
+    public function test_regular_user_cannot_view_any(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->viewAny($user));
     }
 
-    public function testPastorCanViewAny(): void
+    public function test_pastor_can_view_any(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_PASTOR);
         $this->assertTrue($this->policy->viewAny($user));
     }
 
-    public function testAdminCanViewAny(): void
+    public function test_admin_can_view_any(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
         $this->assertTrue($this->policy->viewAny($user));
     }
 
-    public function testRegularUserCannotView(): void
+    public function test_regular_user_cannot_view(): void
     {
         $user = User::factory()->create();
         $pool = Pool::factory()->create();
         $this->assertFalse($this->policy->view($user, $pool));
     }
 
-    public function testPastorCanView(): void
+    public function test_pastor_can_view(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_PASTOR);
@@ -66,27 +67,27 @@ class PoolPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->view($user, $pool));
     }
 
-    public function testRegularUserCannotCreate(): void
+    public function test_regular_user_cannot_create(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testPastorCanCreate(): void
+    public function test_pastor_can_create(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_PASTOR);
         $this->assertTrue($this->policy->create($user));
     }
 
-    public function testRegularUserCannotDelete(): void
+    public function test_regular_user_cannot_delete(): void
     {
         $user = User::factory()->create();
         $pool = Pool::factory()->create();
         $this->assertFalse($this->policy->delete($user, $pool));
     }
 
-    public function testPastorCanDelete(): void
+    public function test_pastor_can_delete(): void
     {
         $user = User::factory()->create();
         $user->assignRole(RoleService::ROLE_PASTOR);

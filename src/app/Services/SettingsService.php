@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,39 +30,38 @@
 
 namespace App\Services;
 
-
-use App\Models\UserSetting;
 use App\Models\People\User;
+use App\Models\UserSetting;
 
 class SettingsService
 {
-
     protected $settings = [];
 
-    protected function cacheSettings (User $user) {
+    protected function cacheSettings(User $user)
+    {
         // cache all settings, if not done yet
-        if (!is_array($this->settings) || (!isset($this->settings[$user->id])) || (count($this->settings[$user->id]) == 0)) {
-            $this->settings[$user->id] = UserSetting::where('user_id', $user->id)->get()->mapWithKeys(function($item){
+        if (! is_array($this->settings) || (! isset($this->settings[$user->id])) || (count($this->settings[$user->id]) == 0)) {
+            $this->settings[$user->id] = UserSetting::where('user_id', $user->id)->get()->mapWithKeys(function ($item) {
                 return [$item['key'] => $item];
             });
         }
     }
 
     /**
-     * @param string $key
-     * @param null $default
-     * @param bool $returnObject
-     * @param bool $unserialize
+     * @param  null  $default
+     * @param  bool  $returnObject
+     * @param  bool  $unserialize
      * @return UserSetting|mixed
      */
-    public function get(User $user, string $key, $default = null, $returnObject = false) {
+    public function get(User $user, string $key, $default = null, $returnObject = false)
+    {
         // need to trick error reporting or else this will fail with an E_NOTICE
         $err = error_reporting();
         error_reporting(0);
 
         $this->cacheSettings($user);
 
-        if (!isset($this->settings[$user->id][$key])) {
+        if (! isset($this->settings[$user->id][$key])) {
             $setting = new UserSetting(
                 [
                     'user_id' => $user->id,
@@ -75,18 +74,24 @@ class SettingsService
         }
         $return = ($returnObject ? $setting : $setting->value);
         error_reporting($err);
+
         return $return;
 
     }
 
-    public function has(User $user, string $key): bool {
+    public function has(User $user, string $key): bool
+    {
         $this->cacheSettings($user);
+
         return isset($this->settings[$user->id][$key]);
     }
 
-    public function set(User $user, string $key, $value): UserSetting {
+    public function set(User $user, string $key, $value): UserSetting
+    {
         $this->cacheSettings($user);
-        if (is_array($value)) $value = '_____'.serialize($value);
+        if (is_array($value)) {
+            $value = '_____'.serialize($value);
+        }
         if ($this->has($user, $key)) {
             $setting = $this->get($user, $key, null, true);
             $setting->value = $value;
@@ -100,17 +105,19 @@ class SettingsService
                 ]
             );
         }
+
         return $setting;
     }
 
     public function all(User $user, $forceReload = false)
     {
-        if ($forceReload) unset($this->settings[$user->id]);
+        if ($forceReload) {
+            unset($this->settings[$user->id]);
+        }
         $this->cacheSettings($user);
-        return $this->settings[$user->id] ? $this->settings[$user->id]->map(function($item){
+
+        return $this->settings[$user->id] ? $this->settings[$user->id]->map(function ($item) {
             return $item->value;
         }) : [];
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -21,6 +22,7 @@ use Tests\TestCase;
 class HashMatchRuleTest extends TestCase
 {
     private string $plain = 'secret123';
+
     private string $hash;
 
     protected function setUp(): void
@@ -33,7 +35,14 @@ class HashMatchRuleTest extends TestCase
     {
         return function () use (&$failed) {
             $failed = true;
-            return new class { public function translate(): string { return ''; } };
+
+            return new class
+            {
+                public function translate(): string
+                {
+                    return '';
+                }
+            };
         };
     }
 
@@ -41,32 +50,34 @@ class HashMatchRuleTest extends TestCase
     {
         $failed = false;
         (new HashMatch($this->hash))->validate('field', $value, $this->makeFail($failed));
-        return !$failed;
+
+        return ! $failed;
     }
 
     private function runNotHashMatch(mixed $value): bool
     {
         $failed = false;
         (new NotHashMatch($this->hash))->validate('field', $value, $this->makeFail($failed));
-        return !$failed;
+
+        return ! $failed;
     }
 
-    public function testHashMatchPassesForMatchingValue()
+    public function test_hash_match_passes_for_matching_value()
     {
         $this->assertTrue($this->runHashMatch($this->plain));
     }
 
-    public function testHashMatchFailsForWrongValue()
+    public function test_hash_match_fails_for_wrong_value()
     {
         $this->assertFalse($this->runHashMatch('wrong'));
     }
 
-    public function testNotHashMatchPassesForDifferentValue()
+    public function test_not_hash_match_passes_for_different_value()
     {
         $this->assertTrue($this->runNotHashMatch('different'));
     }
 
-    public function testNotHashMatchFailsForMatchingValue()
+    public function test_not_hash_match_fails_for_matching_value()
     {
         $this->assertFalse($this->runNotHashMatch($this->plain));
     }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,8 +30,6 @@
 
 namespace App\Reports;
 
-use App\Services\FileNameService;
-use App\Services\MinistryService;
 use App\Models\People\ListedPerson;
 use App\Models\People\Participant;
 use App\Models\People\Team;
@@ -40,31 +38,33 @@ use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
 use App\Models\Rites\Wedding;
 use App\Models\Service;
+use App\Services\FileNameService;
+use App\Services\MinistryService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-
+use Inertia\Response;
 
 /**
  * Class PersonReport
- * @package App\Reports
  */
 class ReplaceableServicesReport extends AbstractPDFDocumentReport
 {
-
     public const FILE_TITLE = 'Gottesdienstvertretung';
-    public const FILE_SIGNATURE = '50.0';
 
+    public const FILE_SIGNATURE = '50.0';
 
     /**
      * @var string
      */
     public $title = 'Zu vertretende Dienste';
+
     /**
      * @var string
      */
     public $group = 'Listen';
+
     /**
      * @var string
      */
@@ -73,16 +73,16 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $users = User::visibleFor(Auth::user())->get();
+
         return Inertia::render('Report/ReplaceableServices/Setup', compact('users'));
     }
 
     /**
-     * @param Request $request
      * @return mixed|string
      */
     public function render(Request $request)
@@ -104,7 +104,6 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
             ->whereDoesntHave('weddings')
             ->ordered()
             ->get();
-
 
         $weddings = Wedding::join('services', 'service_id', 'services.id')
             ->select(['weddings.*', 'services.date'])
@@ -160,7 +159,7 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
         );
 
         $user = User::find($data['person']);
-        $people =  ListedPerson::select(['id', 'name'])
+        $people = ListedPerson::select(['id', 'name'])
             ->visibleFor(Auth::user())
             ->get();
         $teams = Team::with('users')->get();
@@ -170,12 +169,11 @@ class ReplaceableServicesReport extends AbstractPDFDocumentReport
             ->select('services.date', 'service_user.*')
             ->whereHas('service', function ($query) use ($data) {
                 $query->between(Carbon::parse($data['start']), Carbon::parse($data['end']));
-                })
+            })
             ->where('user_id', $user->id)->orderBy('date')->get();
 
         $ministries = MinistryService::POMA();
+
         return Inertia::render('Report/ReplaceableServices/Wizard', compact('user', 'people', 'services', 'ministries', 'teams'));
     }
-
-
 }

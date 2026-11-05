@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -20,57 +21,58 @@ use Tests\AbstractPageLoadTest;
 class SermonEditorFeatureTest extends AbstractPageLoadTest
 {
     protected Service $service;
+
     protected Sermon $sermon;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->service = Service::factory()->create();
-        $this->sermon  = Sermon::create(['title' => 'Testpredigt']);
+        $this->sermon = Sermon::create(['title' => 'Testpredigt']);
         $this->service->update(['sermon_id' => $this->sermon->id]);
     }
 
-    public function testSermonEditorRendersForm(): void
+    public function test_sermon_editor_renders_form(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('sermon.editor', $this->sermon->id))
-                    ->waitFor('#formSermon', 10)
-                    ->assertDontSee('500');
+                ->visit(route('sermon.editor', $this->sermon->id))
+                ->waitFor('#formSermon', 10)
+                ->assertDontSee('500');
         });
     }
 
-    public function testSermonEditorHasSaveButton(): void
+    public function test_sermon_editor_has_save_button(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('sermon.editor', $this->sermon->id))
-                    ->waitFor('#app', 10)
-                    ->assertSee('Speichern');
+                ->visit(route('sermon.editor', $this->sermon->id))
+                ->waitFor('#app', 10)
+                ->assertSee('Speichern');
         });
     }
 
-    public function testSermonReaderShowsTitle(): void
+    public function test_sermon_reader_shows_title(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('sermon.reader', $this->sermon->id))
-                    ->waitFor('#app', 10)
-                    ->assertDontSee('500')
-                    ->assertSee('Testpredigt');
+                ->visit(route('sermon.reader', $this->sermon->id))
+                ->waitFor('#app', 10)
+                ->assertDontSee('500')
+                ->assertSee('Testpredigt');
         });
     }
 
-    public function testSermonSaveNavigatesOrShowsNoError(): void
+    public function test_sermon_save_navigates_or_shows_no_error(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(route('sermon.editor', $this->sermon->id))
-                    ->waitFor('button.btn-primary', 10)
-                    ->click('button.btn-primary')
-                    ->pause(1000)
-                    ->assertDontSee('Whoops')
-                    ->assertDontSee('500');
+                ->visit(route('sermon.editor', $this->sermon->id))
+                ->waitFor('button.btn-primary', 10)
+                ->click('button.btn-primary')
+                ->pause(1000)
+                ->assertDontSee('Whoops')
+                ->assertDontSee('500');
         });
     }
 }

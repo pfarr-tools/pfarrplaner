@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,11 +18,5 @@ use App\Models\Rites\Funeral;
 
 interface UpdatesFunerals
 {
-    /**
-     * @param User $user
-     * @param Funeral $funeral
-     * @param array $input
-     * @return Funeral
-     */
     public function update(User $user, Funeral $funeral, array $input): Funeral;
 }

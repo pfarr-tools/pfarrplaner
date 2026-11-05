@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -19,7 +20,7 @@ use Tests\TestCase;
 
 class FirstRunInstallerServiceUnitTest extends TestCase
 {
-    public function testBuildEnvironmentFileReplacesConfiguredValues(): void
+    public function test_build_environment_file_replaces_configured_values(): void
     {
         $service = app(FirstRunInstallerService::class);
         $template = "APP_NAME=\"Pfarrplaner\"\nAPP_KEY=\nAPP_DEBUG=false\nDB_CONNECTION=mysql\n";
@@ -39,7 +40,7 @@ class FirstRunInstallerServiceUnitTest extends TestCase
         $this->assertStringContainsString('DB_DATABASE=/tmp/pfarrplaner.sqlite', $result);
     }
 
-    public function testCreateOrUpdateAdminUserCreatesSuperAdmin(): void
+    public function test_create_or_update_admin_user_creates_super_admin(): void
     {
         $service = app(FirstRunInstallerService::class);
 
@@ -56,7 +57,7 @@ class FirstRunInstallerServiceUnitTest extends TestCase
         $this->assertSame('admin@example.com', $user->email);
         $this->assertSame('Chris', $user->first_name);
         $this->assertSame('Fischer', $user->last_name);
-        $this->assertTrue((bool)$user->must_change_password);
+        $this->assertTrue((bool) $user->must_change_password);
         $this->assertTrue($user->hasRole(RoleService::ROLE_SUPER_ADMIN));
         $this->assertNotSame('geheim123', $user->getRawOriginal('password'));
     }

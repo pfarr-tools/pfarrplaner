@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -19,7 +20,7 @@ class HealthApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testHealthReturnsOkStatus()
+    public function test_health_returns_ok_status()
     {
         $response = $this->getJson(route('api.health'));
 
@@ -30,7 +31,7 @@ class HealthApiFeatureTest extends TestCase
     /**
      * @return void
      */
-    public function testHealthReturnsDatabaseStatus()
+    public function test_health_returns_database_status()
     {
         $response = $this->getJson(route('api.health'));
 

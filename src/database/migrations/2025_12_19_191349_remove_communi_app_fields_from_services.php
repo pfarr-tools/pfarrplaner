@@ -16,13 +16,13 @@ return new class extends Migration
         foreach (Service::whereNotNull('communiapp_listing_start')->get() as $service) {
             $date = is_object($service->date) ? $service->date : Carbon\Carbon::parse($service->date);
             $listStart = is_object($service->communiapp_listing_start) ? $service->communiapp_listing_start : Carbon\Carbon::parse($service->communiapp_listing_start);
-            $diff = (int)($listStart->diffInDays($date));
+            $diff = (int) ($listStart->diffInDays($date));
             if ($diff) {
                 AdConfig::updateOrCreate(['service_id' => $service->id, 'slug' => 'communiapp'], [
                     'service_id' => $service->id,
                     'slug' => 'communiapp',
                     'offset' => $diff,
-                    'ad_text' => ''
+                    'ad_text' => '',
                 ]);
             }
         }

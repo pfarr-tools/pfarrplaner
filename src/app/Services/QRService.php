@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,25 +35,26 @@ class QRService
     /**
      * Build the qrencode command for a payload file.
      *
-     * @param string $file Output PNG path
-     * @param string $payloadFile Input payload path
+     * @param  string  $file  Output PNG path
+     * @param  string  $payloadFile  Input payload path
      * @return string qrencode command
      */
     public static function buildCommand(string $file, string $payloadFile): string
     {
         return 'qrencode -8 -l M -v 2 -m 1 -o '
-            . escapeshellarg($file)
-            . ' -r '
-            . escapeshellarg($payloadFile);
+            .escapeshellarg($file)
+            .' -r '
+            .escapeshellarg($payloadFile);
     }
 
     /**
      * Generate a QR code PNG for a value.
      *
-     * @param string $value QR code payload
+     * @param  string  $value  QR code payload
      * @return string Temporary PNG path
      */
-    public static function generate($value) {
+    public static function generate($value)
+    {
         $file = tempnam('/tmp', 'pfp-qr').'.png';
 
         // Wichtig: kein Leerraum am Ende, keine extra Leerzeile

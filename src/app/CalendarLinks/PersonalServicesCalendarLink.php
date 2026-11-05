@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,15 +37,13 @@
 
 namespace App\CalendarLinks;
 
-
-use App\Models\Service;
 use App\Models\People\User;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /**
  * Class PersonalServicesCalendarLink
- * @package App\CalendarLinks
  */
 class PersonalServicesCalendarLink extends AbstractCalendarLink
 {
@@ -53,6 +51,7 @@ class PersonalServicesCalendarLink extends AbstractCalendarLink
      * @var string
      */
     protected $title = 'Eigene Gottesdienste';
+
     /**
      * @var string
      */
@@ -66,19 +65,14 @@ class PersonalServicesCalendarLink extends AbstractCalendarLink
         return route('ical.link', ['key' => $this->getKey(), 'includeHidden' => request()->get('includeHidden', 0)]);
     }
 
-    /**
-     * @param Request $request
-     */
     public function setDataFromRequest(Request $request)
     {
-        if (null !== Auth::user()) {
+        if (Auth::user() !== null) {
             $this->data['user'] = Auth::user()->id;
         }
     }
 
     /**
-     * @param Request $request
-     * @param User $user
      * @return array
      */
     public function getRenderData(Request $request, User $user)
@@ -86,8 +80,7 @@ class PersonalServicesCalendarLink extends AbstractCalendarLink
         $servicesQuery = Service::setEagerLoads([])->with('location')
             ->userParticipates($user)
             ->ordered();
+
         return $servicesQuery->get();
     }
-
-
 }

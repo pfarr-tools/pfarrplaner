@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -32,24 +33,24 @@ class SongbookFeatureTest extends TestCase
         $this->user->assignRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
-    public function testIndexLoads(): void
+    public function test_index_loads(): void
     {
         $this->actingAs($this->user)
             ->get(route('admin.songbooks.index'))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Admin/Songbook/Index'));
+            ->assertInertia(fn (Assert $page) => $page->component('Admin/Songbook/Index'));
     }
 
-    public function testEditorLoads(): void
+    public function test_editor_loads(): void
     {
         $songbook = Songbook::factory()->create();
         $this->actingAs($this->user)
             ->get(route('admin.songbook.edit', $songbook->id))
             ->assertStatus(200)
-            ->assertInertia(fn(Assert $page) => $page->component('Admin/Songbook/SongbookEditor'));
+            ->assertInertia(fn (Assert $page) => $page->component('Admin/Songbook/SongbookEditor'));
     }
 
-    public function testCreateSongbook(): void
+    public function test_create_songbook(): void
     {
         $this->actingAs($this->user)
             ->post(route('admin.songbooks.store'), ['name' => 'Testgesangbuch', 'code' => 'TG'])

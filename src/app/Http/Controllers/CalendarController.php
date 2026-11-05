@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -47,24 +47,14 @@ use Illuminate\View\View;
 
 /**
  * Class CalendarController
- * @package App\Http\Controllers
  */
 class CalendarController extends Controller
 {
-
-    /**
-     *
-     */
     public const NAME_FORMAT_DEFAULT = 1;
-    /**
-     *
-     */
-    public const NAME_FORMAT_INITIAL_AND_LAST = 2;
-    /**
-     *
-     */
-    public const NAME_FORMAT_FIRST_AND_LAST = 3;
 
+    public const NAME_FORMAT_INITIAL_AND_LAST = 2;
+
+    public const NAME_FORMAT_FIRST_AND_LAST = 3;
 
     public function __construct()
     {
@@ -72,15 +62,14 @@ class CalendarController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param int $year
-     * @param int $month
+     * @param  int  $year
+     * @param  int  $month
      * @return bool|Application|Factory|RedirectResponse|View
      */
     public function month(Request $request, $year = null, $month = null)
     {
-        if (!is_null($year) && is_null($month)) {
-            list($year, $month) = explode('-', $year);
+        if (! is_null($year) && is_null($month)) {
+            [$year, $month] = explode('-', $year);
         }
 
         $month ??= Auth::user()->getSetting('display-month') ?: date('m');
@@ -89,12 +78,11 @@ class CalendarController extends Controller
         $monthStart = Carbon::create($year, $month, 1);
         $monthEnd = $monthStart->copy()->addMonth(1)->subSecond(1);
 
-        if (!Session::has('showLimitedDays')) {
+        if (! Session::has('showLimitedDays')) {
             Session::put('showLimitedDays', false);
         }
 
         $user = Auth::user();
-
 
         // city sorting
         if ($request->has('sort')) {
@@ -108,10 +96,12 @@ class CalendarController extends Controller
             ->visibleForCities($cities)
             ->get();
 
-        if (!count($days)) $days = CalendarService::initializeMonth($year, $month);
+        if (! count($days)) {
+            $days = CalendarService::initializeMonth($year, $month);
+        }
 
         $nextDay = Day::inMonth(Carbon::create($year, $month, 1))
-            ->whereBetween('date', [Carbon::now()->setTime(0,0,0), Carbon::create($year, $month, 1)->addMonth(1)->subSecond(1)])
+            ->whereBetween('date', [Carbon::now()->setTime(0, 0, 0), Carbon::create($year, $month, 1)->addMonth(1)->subSecond(1)])
             ->first() ?? new Day(['date' => now()]);
 
         // name_format parameter
@@ -137,7 +127,6 @@ class CalendarController extends Controller
         $orientation = $request->get('orientation', $defaultOrientation);
         $user->setSetting('calendar_view', $orientation);
 
-
         // all possible locations
         $possibleLocations = Location::inCities($user->cities->pluck('id'))->get();
         $filteredLocations = CalendarService::getLocationsFilter($request, $possibleLocations, $user);
@@ -162,7 +151,7 @@ class CalendarController extends Controller
         $highlight = $request->get('highlight', 0);
 
         // save current display settings for slave displays to follow
-        if (!$slave) {
+        if (! $slave) {
             $user = Auth::user();
             $currentDisplayMonth = $user->getSetting('display-month', 999);
             $currentDisplayYear = $user->getSetting('display-year', 999);
@@ -198,10 +187,6 @@ class CalendarController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param $route
-     * @param $year
-     * @param $month
      * @return bool|RedirectResponse
      */
     protected function redirectIfMissingParameters(Request $request, $route, $year, $month)
@@ -212,7 +197,6 @@ class CalendarController extends Controller
         $initialYear = $year;
         $initialMonth = $month;
 
-
         if ($month == 13) {
             $year++;
             $month = 1;
@@ -222,7 +206,7 @@ class CalendarController extends Controller
             $month = 12;
         }
 
-        if ((!$year) || (!$month) || (!is_numeric($month)) || (!is_numeric($year)) || (!checkdate($month, 1, $year))) {
+        if ((! $year) || (! $month) || (! is_numeric($month)) || (! is_numeric($year)) || (! checkdate($month, 1, $year))) {
             $year = $defaultYear;
             $month = $defaultMonth;
         }
@@ -240,15 +224,13 @@ class CalendarController extends Controller
         return redirect()->route($route, $data);
     }
 
-
-
     /**
-     * @param bool $switch
      * @return false|string
      */
     public function showLimitedColumns(bool $switch)
     {
-        Session::put('showLimitedDays', (bool)$switch);
+        Session::put('showLimitedDays', (bool) $switch);
+
         return json_encode(['showLimitedDays', Session::get('showLimitedDays')]);
     }
 }

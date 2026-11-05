@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,21 +18,21 @@ use Tests\AbstractPageLoadTest;
 
 class UserPageLoadTest extends AbstractPageLoadTest
 {
-    public function testTokensPageLoads(): void
+    public function test_tokens_page_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('tokens.index'));
         });
     }
 
-    public function testICalConnectLoads(): void
+    public function test_i_cal_connect_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('ical.connect'));
         });
     }
 
-    public function testProfileEditorLoads(): void
+    public function test_profile_editor_loads(): void
     {
         $this->browse(function (Browser $browser) {
             $this->assertPageLoads($browser, route('user.profile'));

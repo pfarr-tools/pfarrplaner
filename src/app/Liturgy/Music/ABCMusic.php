@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,46 +35,53 @@ use Illuminate\Support\Facades\Storage;
 
 class ABCMusic
 {
-
     public const COLORS_NORMAL = 1;
+
     public const COLORS_INVERTED = 2;
+
     public const COLORS_GREENSCREEN = 3;
 
     /**
      * Get printable verses from a verse range string
-     * @param Song $song Song
-     * @param $rangeString Verse range string
+     *
+     * @param  Song  $song  Song
+     * @param  $rangeString  Verse range string
      * @return array List of verse numbers
      */
     public static function getVerses(Song $song, $rangeString)
     {
-        if ('refrain' == $rangeString) return [$rangeString];
-        if (is_array($rangeString)) return $rangeString;
+        if ($rangeString == 'refrain') {
+            return [$rangeString];
+        }
+        if (is_array($rangeString)) {
+            return $rangeString;
+        }
         $verseRefs = [];
         if (empty($rangeString)) {
             foreach ($song->verses as $verse) {
-                $verseRefs[] = (int)$verse['number'];
+                $verseRefs[] = (int) $verse['number'];
             }
         } else {
             foreach (explode('+', $rangeString) as $range) {
                 $subRange = explode('-', $range);
-                if (!is_array($subRange)) {
+                if (! is_array($subRange)) {
                     $verseRefs[] = $subRange;
                 } else {
                     if (count($subRange) == 1) {
-                        $verseRefs[] = (int)$subRange[0];
+                        $verseRefs[] = (int) $subRange[0];
                     } else {
                         if (is_numeric($subRange[0]) && is_numeric($subRange[1]) && ($subRange[0] < $subRange[1])) {
                             for ($i = $subRange[0]; $i <= $subRange[1]; $i++) {
-                                $verseRefs[] = (int)$i;
+                                $verseRefs[] = (int) $i;
                             }
                         } else {
-                            $verseRefs[] = (int)$range;
+                            $verseRefs[] = (int) $range;
                         }
                     }
                 }
             }
         }
+
         return $verseRefs;
     }
 
@@ -83,13 +90,14 @@ class ABCMusic
         $music = self::makeHeaders($song, $lineNumber);
         $verses = self::getVerses($song, $verses);
 
-        if (null !== $lineNumber) {
+        if ($lineNumber !== null) {
             $music .= self::makeSingleLine($song, $verses, $lineNumber);
         } else {
             for ($lineCtr = 0; $lineCtr < count(explode("\n", $song->notation)); $lineCtr++) {
                 $music .= self::makeSingleLine($song, $verses, $lineCtr);
             }
         }
+
         return $music;
     }
 
@@ -105,20 +113,21 @@ class ABCMusic
         }
 
         foreach ($headers as $key => $header) {
-            $music .= $key . ':' . $header . "\n";
+            $music .= $key.':'.$header."\n";
         }
         if ($song->prolog) {
-            $music .= trim($song->prolog) . "\n";
+            $music .= trim($song->prolog)."\n";
         }
-        $music .= 'K:' . $song->key . "\n";
+        $music .= 'K:'.$song->key."\n";
+
         return $music;
     }
 
     public static function makeSingleLine(Song $song, $verses, $lineNumber, $showLineNumber = true, $textOnly = false)
     {
         $musicLines = explode("\n", $song->notation);
-        $music = $textOnly ? '' : ($musicLines[$lineNumber] ?? '') . "\n";
-        if (!is_array($verses)) {
+        $music = $textOnly ? '' : ($musicLines[$lineNumber] ?? '')."\n";
+        if (! is_array($verses)) {
             $verses = [$verses];
         }
         foreach ($verses as $verseNumber) {
@@ -126,29 +135,32 @@ class ABCMusic
             $textLines = explode("\n", $verse->notation);
             if (isset($textLines[$lineNumber])) {
                 $music .= 'w:'
-                    . ($showLineNumber ? $verse->number . '.~' : '')
-                    . $textLines[$lineNumber] . "\n";
+                    .($showLineNumber ? $verse->number.'.~' : '')
+                    .$textLines[$lineNumber]."\n";
             }
         }
 
         return $music;
     }
 
-    protected static function cachedFilePath(Song $song, $verses, $music, $colors, $lineNumber = null, $wildCard = false) {
+    protected static function cachedFilePath(Song $song, $verses, $music, $colors, $lineNumber = null, $wildCard = false)
+    {
         $parts = [
             $song->songbook_abbreviation,
             $song->reference,
-            join('+', self::getVerses($song, $verses)),
+            implode('+', self::getVerses($song, $verses)),
             $colors,
-            (null !== $lineNumber) ? $lineNumber : 'X',
+            ($lineNumber !== null) ? $lineNumber : 'X',
             $wildCard ? '*' : md5($music),
         ];
+
         return storage_path(
-            'app/music/abc/' . join('--', $parts).'.jpg'
+            'app/music/abc/'.implode('--', $parts).'.jpg'
         );
     }
 
-    protected static function clearCache(Song $song, $verses, $colors, $lineNumber = null) {
+    protected static function clearCache(Song $song, $verses, $colors, $lineNumber = null)
+    {
         exec('rm '.self::cachedFilePath($song, $verses, '', $colors, $lineNumber, true));
     }
 
@@ -157,23 +169,24 @@ class ABCMusic
         Storage::makeDirectory('music/abc/');
 
         $cachedFileName = self::cachedFilePath($song, $verses, $music, $colors, $lineNumber);
-        if (file_exists($cachedFileName)) return $cachedFileName;
+        if (file_exists($cachedFileName)) {
+            return $cachedFileName;
+        }
         self::clearCache($song, $verses, $colors, $lineNumber);
 
-
         $temp = tempnam(sys_get_temp_dir(), 'pfp-abc-');
-        $tempABC = $temp . '.abc';
-        $tempPS = $temp . '.ps';
-        $tempJPG = $temp . '.jpg';
+        $tempABC = $temp.'.abc';
+        $tempPS = $temp.'.ps';
+        $tempJPG = $temp.'.jpg';
 
         // build ABC
         file_put_contents($tempABC, $music);
 
         // build PS
-        exec('abcm2ps -O ' . $tempPS . ' ' . $tempABC);
+        exec('abcm2ps -O '.$tempPS.' '.$tempABC);
         unlink($tempABC);
 
-        exec('gs -sDEVICE=jpeg -dJPEGQ=100 -dNOPAUSE -dBATCH -dSAFER -r300 -sOutputFile=' . $tempJPG . ' ' . $tempPS);
+        exec('gs -sDEVICE=jpeg -dJPEGQ=100 -dNOPAUSE -dBATCH -dSAFER -r300 -sOutputFile='.$tempJPG.' '.$tempPS);
         unlink($tempPS);
 
         $params = ['-trim'];
@@ -191,7 +204,7 @@ class ABCMusic
                 break;
         }
 
-        exec('convert ' . $tempJPG . ' ' . join(' ', $params) . ' ' . $cachedFileName);
+        exec('convert '.$tempJPG.' '.implode(' ', $params).' '.$cachedFileName);
 
         return $cachedFileName;
     }
@@ -207,7 +220,9 @@ class ABCMusic
 
     public static function images(Song $song, $verses, $colors = self::COLORS_NORMAL, $mergeVerses = true)
     {
-        if ($mergeVerses) return self::imagesMerged($song, $verses, $colors);
+        if ($mergeVerses) {
+            return self::imagesMerged($song, $verses, $colors);
+        }
         $images = [];
 
         $verses = self::getVerses($song, $verses);
@@ -219,8 +234,8 @@ class ABCMusic
             }
 
             for ($i = 0; $i < count(explode("\n", $verse->notation)); $i++) {
-                $music = self::makeHeaders($song, $i) . self::makeSingleLine($song, $verseNumber, $i, ($i == 0));
-                $images[$verseNumber . '-' . $i] = self::renderToFile($song, $verse->number, $music, $colors, $i);
+                $music = self::makeHeaders($song, $i).self::makeSingleLine($song, $verseNumber, $i, ($i == 0));
+                $images[$verseNumber.'-'.$i] = self::renderToFile($song, $verse->number, $music, $colors, $i);
             }
 
             if ($verse->refrain_after) {
@@ -228,6 +243,7 @@ class ABCMusic
             }
 
         }
+
         return $images;
     }
 
@@ -237,8 +253,9 @@ class ABCMusic
         $refrainText = explode("\n", $song->refrain_text_notation);
         for ($i = 0; $i < count($refrainLines); $i++) {
             $music = self::makeHeaders($song, $i).$refrainLines[$i]."\n".($refrainText[$i] ? 'w:'.$refrainText[$i]."\n" : '');
-            $images['refrain-'.$tag.'-'.$verseNumber.'-' . $i] = self::renderToFile($song, 'refrain', $music, $colors, $i);
+            $images['refrain-'.$tag.'-'.$verseNumber.'-'.$i] = self::renderToFile($song, 'refrain', $music, $colors, $i);
         }
+
         return $images;
     }
 
@@ -266,16 +283,16 @@ class ABCMusic
             $music = self::makeHeaders($song, $i);
             $first = true;
             foreach ($verseNumbers as $verseNumber) {
-                $music .= self::makeSingleLine($song, $verseNumber, $i, true, !$first);
+                $music .= self::makeSingleLine($song, $verseNumber, $i, true, ! $first);
                 $first = false;
             }
-            $images[$verseNumber . '-' . $i] = self::renderToFile($song, $verseDesignation, $music, $colors, $i);
+            $images[$verseNumber.'-'.$i] = self::renderToFile($song, $verseDesignation, $music, $colors, $i);
         }
 
         if ($refrainAfter) {
-            $images = self::makeRefrain($song, $images, $verseNumber[0], $colors. 'after');
+            $images = self::makeRefrain($song, $images, $verseNumber[0], $colors.'after');
         }
+
         return $images;
     }
-
 }

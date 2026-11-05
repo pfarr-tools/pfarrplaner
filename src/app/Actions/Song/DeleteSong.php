@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -39,19 +39,11 @@ use Illuminate\Support\Facades\Gate;
 
 class DeleteSong extends AbstractDeleteAction implements DeletesSongs
 {
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return route('admin.songs.index');
     }
 
-    /**
-     * @param User $user
-     * @param Song $song
-     * @return bool|null
-     */
     public function delete(User $user, Song $song): ?bool
     {
         Gate::forUser($user)->authorize('delete', $song);

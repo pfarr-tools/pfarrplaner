@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Traits;
 
-
 use App\Models\Attachment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -38,15 +37,9 @@ use Illuminate\Support\Str;
 
 /**
  * Trait HandlesAttachmentsTrait
- * @package App\Traits
  */
 trait HandlesAttachmentsTrait
 {
-
-    /**
-     * @param Request $request
-     * @param $object
-     */
     protected function handleAttachments(Request $request, $object)
     {
         if ($request->hasFile('attachments')) {
@@ -78,10 +71,6 @@ trait HandlesAttachmentsTrait
         $this->removeAttachments($request, $object);
     }
 
-    /**
-     * @param Request $request
-     * @param $object
-     */
     protected function removeAttachments(Request $request, $object)
     {
         if ($request->has('remove_attachment')) {
@@ -96,11 +85,6 @@ trait HandlesAttachmentsTrait
         }
     }
 
-    /**
-     * @param Request $request
-     * @param $object
-     * @param $key
-     */
     protected function handleIndividualAttachment(Request $request, $object, $key)
     {
         if ($request->hasFile($key)) {
@@ -116,19 +100,13 @@ trait HandlesAttachmentsTrait
         $this->removeIndividualAttachment($request, $object, $key);
     }
 
-    /**
-     * @param Request $request
-     * @param $object
-     * @param $key
-     */
     protected function removeIndividualAttachment(Request $request, $object, $key)
     {
-        if ($request->has('remove_' . $key)) {
+        if ($request->has('remove_'.$key)) {
             if (Storage::exists($object->$key)) {
                 Storage::delete($object->$key);
             }
             $object->update([$key => '']);
         }
     }
-
 }

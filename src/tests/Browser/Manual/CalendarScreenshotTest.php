@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -20,6 +21,7 @@ use Laravel\Dusk\Browser;
 class CalendarScreenshotTest extends ManualScreenshotTestCase
 {
     protected Service $service;
+
     protected Service $event;
 
     protected function setUp(): void
@@ -75,7 +77,7 @@ class CalendarScreenshotTest extends ManualScreenshotTestCase
             ->setTimezone('UTC');
     }
 
-    public function testCaptureCalendarOverview(): void
+    public function test_capture_calendar_overview(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -87,7 +89,7 @@ class CalendarScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureEventsCalendar(): void
+    public function test_capture_events_calendar(): void
     {
         $this->superAdminUser->setSetting('calendar_mode', 'events');
 
@@ -101,7 +103,7 @@ class CalendarScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureCalendarElementScreenshots(): void
+    public function test_capture_calendar_element_screenshots(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(
@@ -143,7 +145,7 @@ class CalendarScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function testCaptureEventsCalendarPopup(): void
+    public function test_capture_events_calendar_popup(): void
     {
         $this->superAdminUser->setSetting('calendar_mode', 'events');
 

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,34 +35,26 @@ use App\Contracts\City\DeletesCities;
 use App\Events\Models\City\DeletedCity;
 use App\Models\People\User;
 use App\Models\Places\City;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 
 class DeleteCity extends AbstractDeleteAction implements DeletesCities
 {
-
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return City::getSingleRoute('web', 'index');
     }
 
-
-
     /**
-     * @param User $user
-     * @param City $city
-     * @return bool
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws AuthorizationException
      */
     public function delete(User $user, City $city): bool
     {
         Gate::forUser($user)->authorize('delete', $city);
         DeletedCity::dispatch($user, $city);
         $this->messages = ['success' => 'Die Kirchengemeinde wurde gelöscht.'];
+
         return $city->delete();
 
     }
-
 }

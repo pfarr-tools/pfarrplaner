@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Liturgy\Replacement;
 
-
 use App\Imports\EventCalendarImport;
 use App\Imports\OPEventsImport;
 use App\Models\Service;
@@ -44,8 +43,8 @@ class TermineReplacer extends AbstractReplacer
     protected function getReplacementText(): string
     {
         $service = $this->service;
-        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d') . ' 0:00:00 last Sunday');
-        $nextWeek = Carbon::createFromTimeString($service->date->format('Y-m-d') . ' 0:00:00 next Sunday');
+        $lastWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 last Sunday');
+        $nextWeek = Carbon::createFromTimeString($service->date->format('Y-m-d').' 0:00:00 next Sunday');
 
         $services = Service::with(['day', 'location'])
             ->displayable()
@@ -90,7 +89,7 @@ class TermineReplacer extends AbstractReplacer
                     }
                 }
 
-                if (!$done) {
+                if (! $done) {
                     if ($lastDay != $eventStart->format('Ymd')) {
                         $text .= $this->renderParagraph();
                         if ($nextWeek->format('Ymd') == $eventStart->format('Ymd')) {
@@ -106,22 +105,22 @@ class TermineReplacer extends AbstractReplacer
                     if (is_array($event)) {
                         $text .= $this->renderParagraph(
                             (isset($event['allDay']) && $event['allDay']) ? '' : strftime(
-                                    '%H.%M Uhr',
-                                    $eventStart->getTimestamp()
-                                ) . "\t" . trim(
-                                    StringTool::sanitizeXMLString(
-                                        $event['title']
-                                    ) . ' (' . StringTool::sanitizeXMLString($event['place']) . ')'
-                                )
+                                '%H.%M Uhr',
+                                $eventStart->getTimestamp()
+                            )."\t".trim(
+                                StringTool::sanitizeXMLString(
+                                    $event['title']
+                                ).' ('.StringTool::sanitizeXMLString($event['place']).')'
+                            )
                         );
                     } else {
                         $description = $event->descriptionText();
-                        $description = $description ? ' mit ' . $description : '';
+                        $description = $description ? ' mit '.$description : '';
                         // take care of ampersands
                         $description = preg_replace('/&(?![A-Za-z0-9#]{1,7};)/', '&amp;', $description);
                         $text .= $this->renderParagraph(
-                            $event->timeText(true, '.') . "\t" . trim(
-                                ($event->title ?: 'Gottesdienst') . $description . ' (' . $event->locationText() . ')'
+                            $event->timeText(true, '.')."\t".trim(
+                                ($event->title ?: 'Gottesdienst').$description.' ('.$event->locationText().')'
                             )
                         );
 
@@ -132,14 +131,13 @@ class TermineReplacer extends AbstractReplacer
                                     'Y-m-d H:i',
                                     $event->date->format(
                                         'Y-m-d'
-                                    ) . ' ' . ($event->cc_alt_time ?? $event->time)
+                                    ).' '.($event->cc_alt_time ?? $event->time)
                                 )->isoFormat(
                                     'HH.mm \U\h\r'
-                                ) . "\t" . 'Kinderkirche' . ' (' . ($event->cc_location ?? $event->locationText()) . ')'
+                                )."\t".'Kinderkirche'.' ('.($event->cc_location ?? $event->locationText()).')'
                             );
                         }
                     }
-
 
                     if ((isset($event['allDay']) && $event['allDay'])) {
                         $text .= $this->renderParagraph();
@@ -154,5 +152,4 @@ class TermineReplacer extends AbstractReplacer
 
         return $text;
     }
-
 }

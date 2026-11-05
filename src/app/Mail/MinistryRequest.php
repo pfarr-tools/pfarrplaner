@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,8 +30,8 @@
 
 namespace App\Mail;
 
-use App\Services\MinistryService;
 use App\Models\People\User;
+use App\Services\MinistryService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -42,13 +42,16 @@ class MinistryRequest extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    /** @var User $user */
+    /** @var User */
     protected $user;
-    /** @var User $sender */
+
+    /** @var User */
     protected $sender;
 
     protected $services;
+
     protected $ministry;
+
     protected $text = '';
 
     /**
@@ -75,7 +78,7 @@ class MinistryRequest extends Mailable implements ShouldQueue
 
         $urlData = [
             'ministry' => $this->ministry,
-            'user' => (string)$this->user->id,
+            'user' => (string) $this->user->id,
             'services' => $this->services->pluck('id')->join(','),
             'sender' => $this->sender->id,
         ];
@@ -83,8 +86,7 @@ class MinistryRequest extends Mailable implements ShouldQueue
 
         $ministryTitle = MinistryService::all(true)[$this->ministry];
 
-
-        return $this->subject('Anfrage: ' . $ministryTitle . ' im Gottesdienst')->markdown('mail.ministry.request')->with(
+        return $this->subject('Anfrage: '.$ministryTitle.' im Gottesdienst')->markdown('mail.ministry.request')->with(
             [
                 'user' => $this->user,
                 'sender' => $this->sender,

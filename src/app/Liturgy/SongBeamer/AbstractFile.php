@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,11 +32,8 @@ namespace App\Liturgy\SongBeamer;
 
 use ZipArchive;
 
-use function PHPUnit\Framework\isEmpty;
-
 abstract class AbstractFile
 {
-
     protected $pathInZip = '';
 
     public function __construct($pathInZip)
@@ -46,31 +43,23 @@ abstract class AbstractFile
 
     protected function line($text, $indent = 0)
     {
-        return str_repeat(' ', $indent*2).$text."\r\n";
+        return str_repeat(' ', $indent * 2).$text."\r\n";
     }
 
-    abstract function toText();
+    abstract public function toText();
 
-    public function addToZipFile(ZipArchive &$zipArchive) {
+    public function addToZipFile(ZipArchive &$zipArchive)
+    {
         $zipArchive->addFromString($this->pathInZip, $this->toText(), ZipArchive::FL_OVERWRITE);
     }
 
-    /**
-     * @return string
-     */
     public function getPathInZip(): string
     {
         return $this->pathInZip;
     }
 
-    /**
-     * @param string $pathInZip
-     */
     public function setPathInZip(string $pathInZip): void
     {
         $this->pathInZip = $pathInZip;
     }
-
-
-
 }

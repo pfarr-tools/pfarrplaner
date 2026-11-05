@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -15,6 +16,8 @@ namespace Tests\Feature;
 use App\Models\Leave\Absence;
 use App\Models\People\Participant;
 use App\Models\People\User;
+use App\Models\Places\City;
+use App\Models\Service;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -24,6 +27,7 @@ class UserDuplicatesFeatureTest extends TestCase
     use RefreshDatabase;
 
     protected User $superAdmin;
+
     protected User $regularUser;
 
     protected function setUp(): void
@@ -35,19 +39,19 @@ class UserDuplicatesFeatureTest extends TestCase
         $this->regularUser = User::factory()->create();
     }
 
-    public function testSuperAdminCanAccessFindDuplicates()
+    public function test_super_admin_can_access_find_duplicates()
     {
         $response = $this->actingAs($this->superAdmin)->get(route('users.duplicates'));
         $response->assertStatus(200);
     }
 
-    public function testNonSuperAdminCannotAccessFindDuplicates()
+    public function test_non_super_admin_cannot_access_find_duplicates()
     {
         $response = $this->actingAs($this->regularUser)->get(route('users.duplicates'));
         $response->assertStatus(403);
     }
 
-    public function testSuperAdminCanPostFixDuplicates()
+    public function test_super_admin_can_post_fix_duplicates()
     {
         $source = User::factory()->create();
         $target = User::factory()->create();
@@ -58,7 +62,7 @@ class UserDuplicatesFeatureTest extends TestCase
         $response->assertRedirect(route('users.index'));
     }
 
-    public function testNonSuperAdminCannotPostFixDuplicates()
+    public function test_non_super_admin_cannot_post_fix_duplicates()
     {
         $source = User::factory()->create();
         $target = User::factory()->create();
@@ -69,7 +73,7 @@ class UserDuplicatesFeatureTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function testFixDuplicatesMergesUsersAndDeletesSource()
+    public function test_fix_duplicates_merges_users_and_deletes_source()
     {
         $source = User::factory()->create(['first_name' => 'Max', 'last_name' => 'Mustermann']);
         $target = User::factory()->create(['first_name' => 'Max', 'last_name' => 'Mustermann']);
@@ -82,13 +86,13 @@ class UserDuplicatesFeatureTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $target->id]);
     }
 
-    public function testFixDuplicatesTransfersParticipants()
+    public function test_fix_duplicates_transfers_participants()
     {
         $source = User::factory()->create();
         $target = User::factory()->create();
 
-        $service = \App\Models\Service::factory()->create([
-            'city_id' => \App\Models\Places\City::factory()->create()->id,
+        $service = Service::factory()->create([
+            'city_id' => City::factory()->create()->id,
         ]);
         $source->services()->attach($service->id, ['category' => 'P']);
 
@@ -99,7 +103,7 @@ class UserDuplicatesFeatureTest extends TestCase
         $this->assertEquals(0, Participant::where('user_id', $source->id)->count());
     }
 
-    public function testFixDuplicatesTransfersAbsences()
+    public function test_fix_duplicates_transfers_absences()
     {
         $source = User::factory()->create();
         $target = User::factory()->create();
@@ -113,7 +117,7 @@ class UserDuplicatesFeatureTest extends TestCase
         $this->assertEquals(0, Absence::where('user_id', $source->id)->count());
     }
 
-    public function testFixDuplicatesHandlesNonExistentSourceGracefully()
+    public function test_fix_duplicates_handles_non_existent_source_gracefully()
     {
         $target = User::factory()->create();
         $nonExistentId = 99999;
@@ -125,7 +129,7 @@ class UserDuplicatesFeatureTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $target->id]);
     }
 
-    public function testFixDuplicatesHandlesNonExistentTargetGracefully()
+    public function test_fix_duplicates_handles_non_existent_target_gracefully()
     {
         $source = User::factory()->create();
         $nonExistentTargetId = 99999;
@@ -137,7 +141,7 @@ class UserDuplicatesFeatureTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $source->id]);
     }
 
-    public function testFixDuplicatesSkipsSelfMerge()
+    public function test_fix_duplicates_skips_self_merge()
     {
         $user = User::factory()->create();
 
@@ -148,7 +152,7 @@ class UserDuplicatesFeatureTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $user->id]);
     }
 
-    public function testFixDuplicatesMergesMultipleSourcesIntoOneTarget()
+    public function test_fix_duplicates_merges_multiple_sources_into_one_target()
     {
         $target = User::factory()->create();
         $sourceA = User::factory()->create();
@@ -162,7 +166,7 @@ class UserDuplicatesFeatureTest extends TestCase
         $this->assertDatabaseMissing('users', ['id' => $sourceB->id]);
     }
 
-    public function testFindDuplicatesGroupsUsersWithSameName()
+    public function test_find_duplicates_groups_users_with_same_name()
     {
         User::factory()->create(['first_name' => 'Erika', 'last_name' => 'Musterfrau']);
         User::factory()->create(['first_name' => 'Erika', 'last_name' => 'Musterfrau']);

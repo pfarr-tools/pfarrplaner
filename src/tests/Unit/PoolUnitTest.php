@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -27,25 +28,25 @@ class PoolUnitTest extends AbstractModelUnitTest
     }
 
     /** Override: Pool policy uses role checks, no city sync needed */
-    public function testUpdateViaApi()
+    public function test_update_via_api()
     {
         $existing = $this->factory()->create();
         $this->assertTrue($this->testUser->can('update', $existing));
 
         $data = $this->factory()->raw();
-        $apiRoute = 'api.' . ($this->modelClass)::singularKey() . '.update';
+        $apiRoute = 'api.'.($this->modelClass)::singularKey().'.update';
         $response = $this->actingAs($this->testUser, 'api')
             ->patchJson(route($apiRoute, $existing->id), $data);
         $response->assertStatus(200);
     }
 
     /** Override: Pool policy uses role checks, no city sync needed */
-    public function testDeleteViaApi()
+    public function test_delete_via_api()
     {
         $existing = $this->factory()->create();
         $this->assertTrue($this->testUser->can('delete', $existing));
 
-        $apiRoute = 'api.' . ($this->modelClass)::singularKey() . '.destroy';
+        $apiRoute = 'api.'.($this->modelClass)::singularKey().'.destroy';
         $response = $this->actingAs($this->testUser, 'api')
             ->delete(route($apiRoute, $existing->id));
         $response->assertStatus(200);

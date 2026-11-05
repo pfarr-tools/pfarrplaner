@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,17 +30,14 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\CreatedInLocalAdminDomainRule;
-use App\Services\RoleService;
 use App\Models\People\User;
+use App\Services\RoleService;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class UserRequest extends FormRequest
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -76,7 +73,7 @@ class UserRequest extends FormRequest
             'last_name' => 'required|string',
             'title' => 'nullable|string',
             // add an exception to "unique" when an existing user account is updated
-            'email' => 'nullable|string|email|max:255|unique:users,email' . (($user && $user->id) ? ',' . $user->id : ''),
+            'email' => 'nullable|string|email|max:255|unique:users,email'.(($user && $user->id) ? ','.$user->id : ''),
             'password' => 'nullable|string',
             'office' => 'nullable|string',
             'address' => 'nullable|string',
@@ -120,37 +117,39 @@ class UserRequest extends FormRequest
         return $data;
     }
 
-
     public function getRelationIdsForSync($key, $table = null, $tableKey = 'id')
     {
         $table ??= $key;
-        return $this->validate([$key => 'nullable|exists:' . $table . ',' . $tableKey])[$key] ?? [];
-    }
 
+        return $this->validate([$key => 'nullable|exists:'.$table.','.$tableKey])[$key] ?? [];
+    }
 
     public function getRoles()
     {
-        $superAdminRole = Role::where('name',RoleService::ROLE_SUPER_ADMIN)->first()->id;
+        $superAdminRole = Role::where('name', RoleService::ROLE_SUPER_ADMIN)->first()->id;
         $adminRole = Role::where('name', RoleService::ROLE_ADMIN)->first()->id;
 
         $roles = collect($this->getRelationIdsForSync('roles'));
-        if (!count($roles)) {
+        if (! count($roles)) {
             return [];
         }
 
-        if (!$this->user) return $roles->toArray();
+        if (! $this->user) {
+            return $roles->toArray();
+        }
 
-        if (!$this->user->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
-            $roles = $roles->reject(function ($item) use ($superAdminRole) { return $item == $superAdminRole; });
+        if (! $this->user->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
+            $roles = $roles->reject(function ($item) use ($superAdminRole) {
+                return $item == $superAdminRole;
+            });
         }
-        if (!$this->user->hasRole(RoleService::ROLE_SUPER_ADMIN)
+        if (! $this->user->hasRole(RoleService::ROLE_SUPER_ADMIN)
             || $this->user()->hasRole(RoleService::ROLE_ADMIN)) {
-            $roles = $roles->reject(function ($item) use ($adminRole) { return $item == $adminRole; });
+            $roles = $roles->reject(function ($item) use ($adminRole) {
+                return $item == $adminRole;
+            });
         }
+
         return $roles->toArray();
     }
-
-
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,19 +35,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Class ServiceGroup
- * @package App
  */
 class ServiceGroup extends AbstractModel
 {
     use HasFactory;
 
     protected static string $prefix = 'servicegroup';
+
     protected static string $prefixPlural = 'servicegroups';
+
     protected static string $path = '';
+
     public static array $exceptRoutes = [
         'web' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
         'api' => ['index', 'create', 'show', 'edit', 'store', 'update', 'destroy'],
     ];
+
     public static array $validationRules = [
         'name' => 'required|string|max:255',
     ];
@@ -58,7 +61,6 @@ class ServiceGroup extends AbstractModel
     protected $fillable = ['name'];
 
     /**
-     * @param $list
      * @return array
      */
     public static function createIfMissing($list)
@@ -72,12 +74,10 @@ class ServiceGroup extends AbstractModel
                 $result[] = $sg->id;
             }
         }
+
         return $result;
     }
 
-    /**
-     * @return BelongsToMany
-     */
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class);

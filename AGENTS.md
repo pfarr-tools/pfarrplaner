@@ -122,6 +122,21 @@ Bezeichnern, Dateinamen, URLs und CLI-Optionen vorbehalten.
 - Committen oder pushen nur auf ausdrücklichen Auftrag. Ein solcher Auftrag
   liegt für den aktuellen Repository-Aufbau ausdrücklich vor.
 
+### Qualitätsprüfung
+
+- Neue oder geänderte PHP-Deklarationen erhalten aussagekräftige PHPDoc-Blöcke;
+  neue oder geänderte JavaScript-/Vue-Deklarationen erhalten JSDoc.
+- Qualitätswerkzeuge laufen ausschließlich über Docker: `./planer dev format`,
+  `./planer dev format:check`, `./planer dev analyse`, `./planer dev lint`,
+  `./planer dev docs:check` und `./planer dev quality`.
+- `./planer dev quality` ist schreibgeschützt. Automatische Korrekturen werden
+  nur mit den ausdrücklich dafür vorgesehenen Formatierungsbefehlen ausgeführt.
+- Baselines dokumentieren nur bestehende Altlasten. Neue Verstöße dürfen nicht
+  durch Ignore-Regeln oder pauschale Unterdrückungen verborgen werden.
+- Weiche Komplexitätshinweise (50 Zeilen je Funktion, 400 je Klasse bzw.
+  Komponente, höchstens 5 Parameter, Verschachtelung 3, Zyklomatik 10) sind
+  Review-Hinweise und keine automatische fachliche Zerlegungspflicht.
+
 ## Issues und Arbeitsgrundlage
 
 - Jede neue Aufgabe arbeitet auf einem vorhandenen GitHub-Issue auf. Wenn

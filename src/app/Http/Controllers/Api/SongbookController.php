@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,6 +31,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Liturgy\Songbook;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SongbookController extends AbstractApiCRUDController
@@ -45,7 +46,7 @@ class SongbookController extends AbstractApiCRUDController
     /**
      * Get a list of all songbooks
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index(Request $request)
     {
@@ -54,7 +55,8 @@ class SongbookController extends AbstractApiCRUDController
 
     /**
      * Get default colors for songbooks
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function colors()
     {
@@ -62,7 +64,7 @@ class SongbookController extends AbstractApiCRUDController
         foreach (config('colors.songbooks', []) as $name => $color) {
             $data[] = ['name' => $name, 'id' => $color];
         }
+
         return response()->json($data);
     }
-
 }

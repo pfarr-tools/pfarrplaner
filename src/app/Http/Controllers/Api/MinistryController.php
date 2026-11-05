@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,11 +30,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Services\MinistryService;
+use Illuminate\Http\JsonResponse;
 
-class MinistryController extends \App\Http\Controllers\Controller
+class MinistryController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -42,7 +43,8 @@ class MinistryController extends \App\Http\Controllers\Controller
 
     /**
      * Get a list of all ministries
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function list()
     {
@@ -50,7 +52,7 @@ class MinistryController extends \App\Http\Controllers\Controller
         foreach (MinistryService::all() as $ministry) {
             $ministries[] = ['category' => $ministry];
         }
+
         return response()->json($ministries);
     }
-
 }

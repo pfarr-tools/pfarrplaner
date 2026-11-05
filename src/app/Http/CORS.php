@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,13 +30,12 @@
 
 namespace App\Http;
 
-
 class CORS
 {
-
     /**
      * Format CORS url (remove trailing slash)
-     * @param string $url
+     *
+     * @param  string  $url
      * @return string $url
      */
     public static function formatUrl($url)
@@ -44,7 +43,7 @@ class CORS
         if (substr($url, -1) == '/') {
             $url = substr($url, 0, -1);
         }
+
         return $url;
     }
-
 }

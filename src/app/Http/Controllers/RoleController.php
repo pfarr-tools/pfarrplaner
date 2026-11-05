@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -38,11 +38,9 @@ use Spatie\Permission\Models\Role;
 
 /**
  * Class RoleController
- * @package App\Http\Controllers
  */
 class RoleController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
@@ -57,6 +55,7 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::with('permissions')->orderBy('name', 'ASC')->get();
+
         return Inertia::render('Admin/Role/Index', compact('roles'));
     }
 
@@ -68,14 +67,14 @@ class RoleController extends Controller
     public function create()
     {
         $permissions = Permission::all()->sortBy('name');
-        $role = new Role();
+        $role = new Role;
+
         return Inertia::render('Admin/Role/RoleEditor', compact('role', 'permissions'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
      * @return Response
      */
     public function store(Request $request)
@@ -91,27 +90,26 @@ class RoleController extends Controller
             $permission = Permission::findOrCreate($permissionName);
         }
         $role->syncPermissions($permissions);
+
         return redirect()->route('roles.index')->with('success', 'Die Benutzerrolle wurde angelegt.');
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param Role $role
      * @return \Inertia\Response
      */
     public function edit(Role $role)
     {
         $role->load('permissions');
         $permissions = Permission::all()->sortBy('name');
-        return Inertia::render('Admin/Role/RoleEditor',  compact('role', 'permissions'));
+
+        return Inertia::render('Admin/Role/RoleEditor', compact('role', 'permissions'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param Role $role
      * @return Response
      */
     public function update(Request $request, Role $role)
@@ -127,18 +125,19 @@ class RoleController extends Controller
             $permission = Permission::findOrCreate($permissionName);
         }
         $role->syncPermissions($permissions);
+
         return redirect()->route('roles.index')->with('success', 'Die Benutzerrolle wurde geändert.');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Role $role
      * @return Response
      */
     public function destroy(Role $role)
     {
         $role->delete();
+
         return redirect()->route('roles.index')->with('success', 'Die Benutzerrolle wurde gelöscht.');
     }
 }

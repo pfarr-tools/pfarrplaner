@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,7 +18,7 @@ use Tests\TestCase;
 
 class KonfiAppIntegrationUnitTest extends TestCase
 {
-    public function testApiClientUsesIpv4ForContainerNetworking(): void
+    public function test_api_client_uses_ipv4_for_container_networking(): void
     {
         $integration = new KonfiAppIntegration('test-token');
         $client = (new ReflectionProperty(KonfiAppIntegration::class, 'client'))->getValue($integration);

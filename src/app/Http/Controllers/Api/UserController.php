@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,17 +30,25 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\People\ListedPerson;
 use App\Models\People\Team;
 use App\Models\People\User;
 use App\Models\Places\City;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use App\Providers\AuthServiceProvider;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
-class UserController extends \App\Http\Controllers\Controller
+/**
+ * Provides API endpoints for user and people administration.
+ */
+class UserController extends Controller
 {
-
+    /**
+     * Apply authentication middleware to all actions.
+     */
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -48,7 +56,8 @@ class UserController extends \App\Http\Controllers\Controller
 
     /**
      * Get all people records for PeopleSelect
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function select()
     {
@@ -58,24 +67,28 @@ class UserController extends \App\Http\Controllers\Controller
             ->orderBy('first_name')
             ->get();
         $teams = Team::with('users')->get();
+
         return response()->json(compact('users', 'teams'));
     }
 
-
     /**
      * Search for people to add from other cities
-     * @param $searchString
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function search($searchString)
     {
         Gate::authorize('create', User::class);
-        if (empty($searchString)) return response()->json([]);
+        if (empty($searchString)) {
+            return response()->json([]);
+        }
+        $nameExpression = DB::connection()->getDriverName() === 'sqlite'
+            ? "TRIM(first_name || ' ' || last_name)"
+            : "TRIM(CONCAT(first_name, ' ', last_name))";
+
         $users = User::with('cityScopes')
-            ->whereRaw(
-                "TRIM(CONCAT(first_name, ' ', last_name)) LIKE ?",
-                ['%' . $searchString . '%']
-            )->whereDoesntHave('cityScopes', function($q) {
+            ->whereRaw($nameExpression.' LIKE ?', ['%'.$searchString.'%'])
+            ->whereDoesntHave('cityScopes', function ($q) {
                 return $q->whereIn('city_id', Auth::user()->cities->pluck('id'));
             })
             ->orderBy('last_name')
@@ -87,8 +100,7 @@ class UserController extends \App\Http\Controllers\Controller
 
     /**
      * Activate a user within a certain city scope
-     * @param User $user
-     * @param City $city
+     *
      * @return void
      */
     public function activate(User $user, City $city)
@@ -101,6 +113,7 @@ class UserController extends \App\Http\Controllers\Controller
             403
         );
         $user->cityScopes()->attach($city->id);
+
         return response()->json(true);
     }
 }

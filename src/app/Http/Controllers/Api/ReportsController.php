@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -36,7 +36,6 @@ use Illuminate\Http\Request;
 
 class ReportsController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -44,12 +43,16 @@ class ReportsController extends Controller
 
     public function step(Request $request, $report, $step)
     {
-        $reportClass = 'App\\Reports\\' . ucfirst($report) . 'Report';
-        if (!class_exists($reportClass)) abort(404);
+        $reportClass = 'App\\Reports\\'.ucfirst($report).'Report';
+        if (! class_exists($reportClass)) {
+            abort(404);
+        }
         /** @var AbstractReport $report */
-        $report = new $reportClass();
-        if (!method_exists($report, $step)) abort(404);
+        $report = new $reportClass;
+        if (! method_exists($report, $step)) {
+            abort(404);
+        }
+
         return $report->$step($request);
     }
-
 }

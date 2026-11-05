@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,20 +35,23 @@ use PhpOffice\PhpSpreadsheet\Shared\Drawing;
 class PPTUnitsHelper
 {
     const UNIT_EMU = 'emu';
-    const UNIT_CENTIMETER = 'cm';
-    const UNIT_INCH = 'in';
-    const UNIT_MILLIMETER = 'mm';
-    const UNIT_PIXEL = 'px';
-    const UNIT_POINT = 'pt';
 
+    const UNIT_CENTIMETER = 'cm';
+
+    const UNIT_INCH = 'in';
+
+    const UNIT_MILLIMETER = 'mm';
+
+    const UNIT_PIXEL = 'px';
+
+    const UNIT_POINT = 'pt';
 
     /**
      * Convert specified value from one to another units
      *
-     * @param mixed  $value     value at fromUnit units
-     * @param string $fromUnit units of value (from units)
-     * @param string $toUnit   result units (to units)
-     *
+     * @param  mixed  $value  value at fromUnit units
+     * @param  string  $fromUnit  units of value (from units)
+     * @param  string  $toUnit  result units (to units)
      * @return mixed value value at toUnit units
      */
     public static function convert(
@@ -103,9 +106,9 @@ class PPTUnitsHelper
             default:
                 // no changes
         }
+
         return $value;
     }
-
 
     /**
      * Estimate wrapped lines based on actual font metrics (TTF) and max pixel width.
@@ -128,10 +131,11 @@ class PPTUnitsHelper
         $currentLine = '';
 
         foreach ($words as $word) {
-            $testLine = ($currentLine === '') ? $word : ($currentLine . ' ' . $word);
+            $testLine = ($currentLine === '') ? $word : ($currentLine.' '.$word);
 
             if (static::textPixelWidth($testLine, $ttfPath, $fontSizePx) <= $maxWidthPx) {
                 $currentLine = $testLine;
+
                 continue;
             }
 
@@ -139,6 +143,7 @@ class PPTUnitsHelper
             if ($currentLine === '') {
                 $lines = array_merge($lines, static::hardSplitWordByPixelWidth($word, $ttfPath, $fontSizePx, $maxWidthPx));
                 $currentLine = '';
+
                 continue;
             }
 
@@ -162,6 +167,7 @@ class PPTUnitsHelper
             // Fallback: rough estimate if GD/FreeType unavailable
             return (int) (mb_strlen($text) * ($fontSizePx * 0.55));
         }
+
         return (int) abs($box[2] - $box[0]);
     }
 
@@ -177,7 +183,7 @@ class PPTUnitsHelper
         $current = '';
 
         foreach ($chars as $ch) {
-            $test = $current . $ch;
+            $test = $current.$ch;
             if (static::textPixelWidth($test, $ttfPath, $fontSizePx) <= $maxWidthPx) {
                 $current = $test;
             } else {
@@ -194,7 +200,6 @@ class PPTUnitsHelper
 
         return $parts ?: [''];
     }
-
 
     /**
      * Return true if the text (array of lines) fits into the text area height.
@@ -217,7 +222,7 @@ class PPTUnitsHelper
         $totalLines = 0;
 
         foreach ($lines as $line) {
-            $line = (string)$line;
+            $line = (string) $line;
 
             // Handle your "\t" indent convention
             $isIndented = (mb_substr($line, 0, 1) === "\t");
@@ -247,6 +252,7 @@ class PPTUnitsHelper
 
         // Height = lines * lineHeight + gaps between paragraphs
         $paragraphCount = count($lines);
+
         return (int) round(($totalLines * $lineHeightPx) + max(0, $paragraphCount - 1) * $paragraphGapPx);
     }
 
@@ -261,6 +267,7 @@ class PPTUnitsHelper
             return (int) round($fontSizePx * 1.25);
         }
         $height = abs($box[7] - $box[1]); // y coords
+
         // Add a little leading
         return (int) max(1, round($height * 1.15));
     }
@@ -291,7 +298,7 @@ class PPTUnitsHelper
         $part1 = '';
         $lastGoodPart1 = '';
         foreach ($chunks as $chunk) {
-            $test = $part1 . $chunk;
+            $test = $part1.$chunk;
             $testLines = explode("\n", $test);
 
             if (static::textFitsOnSlide($testLines, $fontSizePx, $maxWidthPx, $maxHeightPx, $ttfPath)) {
@@ -331,6 +338,7 @@ class PPTUnitsHelper
         // Example chunk ends with ". " or "\n"
         $pattern = '/(.+?(?:[\.!\?][\s]+|[,:;:][\s]+|\n+|$))/su';
         preg_match_all($pattern, $text, $matches);
+
         return $matches[1] ?: [$text];
     }
 
@@ -348,7 +356,7 @@ class PPTUnitsHelper
                 $candidates[] = $pos + 1;
             }
         }
-        if (!$candidates) {
+        if (! $candidates) {
             foreach ($secondary as $p) {
                 $pos = mb_strrpos($text, $p);
                 if ($pos !== false) {
@@ -357,7 +365,7 @@ class PPTUnitsHelper
             }
         }
 
-        if (!$candidates) {
+        if (! $candidates) {
             return null;
         }
 
@@ -368,7 +376,7 @@ class PPTUnitsHelper
         $len = mb_strlen($text);
         while ($splitPos < $len) {
             $ch = mb_substr($text, $splitPos, 1);
-            if (!preg_match('/\s/u', $ch)) {
+            if (! preg_match('/\s/u', $ch)) {
                 break;
             }
             $splitPos++;
@@ -382,15 +390,13 @@ class PPTUnitsHelper
      */
     public static function fallbackSplitByWords(string $text): array
     {
-        $normalized = preg_replace("/\n+/u", " ", $text);
+        $normalized = preg_replace("/\n+/u", ' ', $text);
         $words = preg_split('/\s+/u', trim($normalized));
         $half = (int) floor(count($words) / 2);
 
         $part1 = implode(' ', array_slice($words, 0, max(1, $half)));
         $part2 = implode(' ', array_slice($words, max(1, $half)));
 
-        return [[ $part1 ], [ $part2 ]];
+        return [[$part1], [$part2]];
     }
-
-
 }

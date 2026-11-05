@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -29,45 +30,45 @@ class BaptismPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new BaptismPolicy();
+        $this->policy = new BaptismPolicy;
         Permission::findOrCreate('gd-bearbeiten', 'web');
     }
 
-    public function testRegularUserCannotCreate(): void
+    public function test_regular_user_cannot_create(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testIndexUsesCreatePermission(): void
+    public function test_index_uses_create_permission(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('gd-bearbeiten');
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testUserWithPermissionCanCreate(): void
+    public function test_user_with_permission_can_create(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('gd-bearbeiten');
         $this->assertTrue($this->policy->create($user));
     }
 
-    public function testRegularUserCannotUpdate(): void
+    public function test_regular_user_cannot_update(): void
     {
         $user = User::factory()->create();
         $baptism = Baptism::factory()->create();
         $this->assertFalse($this->policy->update($user, $baptism));
     }
 
-    public function testRegularUserCannotDelete(): void
+    public function test_regular_user_cannot_delete(): void
     {
         $user = User::factory()->create();
         $baptism = Baptism::factory()->create();
         $this->assertFalse($this->policy->delete($user, $baptism));
     }
 
-    public function testUserWithPermissionAndCityCanUpdate(): void
+    public function test_user_with_permission_and_city_can_update(): void
     {
         $city = City::factory()->create();
         $user = User::factory()->create();

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,21 +35,23 @@ use Illuminate\Support\Facades\Session;
 
 class RedirectorService
 {
-
-    public static function saveCurrentRoute() {
+    public static function saveCurrentRoute()
+    {
         self::setReturnRoute(Request::url());
     }
 
-    public static function setReturnRoute($route) {
+    public static function setReturnRoute($route)
+    {
         Session::put('returnRoute', $route);
     }
 
-    public static function back() {
+    public static function back()
+    {
         return redirect(self::backRoute());
     }
 
-    public static function backRoute() {
+    public static function backRoute()
+    {
         return Session::get('returnRoute', route('home'));
     }
-
 }

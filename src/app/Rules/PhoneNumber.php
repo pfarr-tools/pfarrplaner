@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -17,15 +18,9 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class PhoneNumber implements ValidationRule
 {
-    /**
-     * @param string $attribute
-     * @param mixed $value
-     * @param Closure $fail
-     * @return void
-     */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!preg_match('/^([0-9s(+][0-9\.-\/ ()]{7,})$/i', $value)) {
+        if (! preg_match('/^([0-9s(+][0-9\.-\/ ()]{7,})$/i', $value)) {
             $fail('validation.phone_number')->translate();
         }
     }

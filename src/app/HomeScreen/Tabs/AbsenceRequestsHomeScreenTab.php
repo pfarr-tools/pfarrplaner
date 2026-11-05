@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,16 +30,19 @@
 
 namespace App\HomeScreen\Tabs;
 
-
 use App\Models\Leave\Absence;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class AbsenceRequestsHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Urlaubsanträge';
+
     protected $description = 'Zeigt zu bearbeitende Urlaubsanträge';
+
     protected $checkQuery;
+
     protected $approveQuery;
 
     public function __construct($config = [])
@@ -57,6 +60,7 @@ class AbsenceRequestsHomeScreenTab extends AbstractHomeScreenTab
     {
         $data['check'] = $this->checkQuery->get();
         $data['approve'] = $this->approveQuery->get();
+
         return parent::getContent($data);
     }
 
@@ -65,29 +69,30 @@ class AbsenceRequestsHomeScreenTab extends AbstractHomeScreenTab
         $data['check'] = $this->checkQuery->get();
         $data['approve'] = $this->approveQuery->get();
         $data['count'] = count($data['check']) + count($data['approve']);
+
         return parent::toArray($data);
     }
 
     /**
      * Build the queries
-     * @return \Illuminate\Database\Eloquent\Builder
+     *
+     * @return Builder
      */
-    public function buildQueries() {
+    public function buildQueries()
+    {
         $start = Carbon::now()->setTime(0, 0, 0);
         $end = Carbon::now()->addMonth(2);
 
-        $this->checkQuery = Absence::whereHas('user', function($query) {
+        $this->checkQuery = Absence::whereHas('user', function ($query) {
             $query->whereHas('vacationAdmins', function ($query2) {
                 $query2->where('related_user_id', Auth::user()->id);
             })->where('workflow_status', 0);
         });
         $this->approveQuery = Absence::with(['checkedBy'])
-            ->whereHas('user', function($query) {
-            $query->whereHas('vacationApprovers', function ($query2) {
-                $query2->where('related_user_id', Auth::user()->id);
-            })->where('workflow_status', 1);
-        });
+            ->whereHas('user', function ($query) {
+                $query->whereHas('vacationApprovers', function ($query2) {
+                    $query2->where('related_user_id', Auth::user()->id);
+                })->where('workflow_status', 1);
+            });
     }
-
-
 }

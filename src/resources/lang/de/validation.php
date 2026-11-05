@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -151,11 +151,9 @@ return [
     'seatable' => 'Die gewünschte Anzahl zusammenhängender Plätze (:input) ist in diesem Gottesdienst nicht verfügbar.',
     'seatable_fixed' => 'Der gewünschte Platz :input ist in diesem Gottesdienst nicht verfügbar.',
 
-
     // seatable validators
     'seatable' => 'Die gewünschte Anzahl zusammenhängender Plätze (:input) ist in diesem Gottesdienst nicht verfügbar.',
     'seatable_fixed' => 'Der gewünschte Platz :input ist in diesem Gottesdienst nicht verfügbar.',
-
 
     /*
     |--------------------------------------------------------------------------
@@ -419,9 +417,8 @@ return [
         'visitor_id' => 'visitor_id',
         'spouse1_birth_name' => 'spouse1_birth_name',
         'spouse2_birth_name' => 'spouse2_birth_name',
-        'contact' => 'Kontaktdaten'
+        'contact' => 'Kontaktdaten',
 
-
-//===AUTO_INSERTED_ATTRIBUTES===//
+        // ===AUTO_INSERTED_ATTRIBUTES===//
     ],
 ];

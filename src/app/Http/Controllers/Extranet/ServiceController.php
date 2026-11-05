@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,7 +30,6 @@
 
 namespace App\Http\Controllers\Extranet;
 
-
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use Carbon\Carbon;
@@ -38,7 +37,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ServiceController extends Controller
 {
-
     public function next()
     {
         $user = Auth::user();
@@ -66,13 +64,13 @@ class ServiceController extends Controller
     {
         $user = Auth::user();
         $query = Service::orderedDesc()
-            ->whereHas('participants', function($query) use ($user) {
+            ->whereHas('participants', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
             ->notHidden()
             ->whereHas('sermon');
         $services = $query->get()->groupBy('sermon_id');
+
         return response()->json(compact('user', 'services', 'query'));
     }
-
 }

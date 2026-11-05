@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,19 +34,25 @@ use Illuminate\Support\Str;
 
 class EncryptedSerializedAttribute extends EncryptedAttribute
 {
-
     public function get($model, $key, $value, $attributes)
     {
         $decrypted = parent::get($model, $key, $value, $attributes);
-        if (is_string($decrypted) && Str::startsWith($decrypted, '_____')) $decrypted = substr($decrypted, 5);
+        if (is_string($decrypted) && Str::startsWith($decrypted, '_____')) {
+            $decrypted = substr($decrypted, 5);
+        }
         while (is_string($decrypted)) {
             $unserialized = @unserialize($decrypted);
             // unserialize() returns false both on failure and for a serialized false value;
             // only stop if it actually failed (i.e. input wasn't the serialization of false)
-            if ($unserialized === false && $decrypted !== 'b:0;') break;
+            if ($unserialized === false && $decrypted !== 'b:0;') {
+                break;
+            }
             $decrypted = $unserialized;
-            if (is_string($decrypted) && Str::startsWith($decrypted, '_____')) $decrypted = substr($decrypted, 5);
+            if (is_string($decrypted) && Str::startsWith($decrypted, '_____')) {
+                $decrypted = substr($decrypted, 5);
+            }
         }
+
         return $decrypted;
     }
 
@@ -54,5 +60,4 @@ class EncryptedSerializedAttribute extends EncryptedAttribute
     {
         return parent::encrypt(serialize($value));
     }
-
 }

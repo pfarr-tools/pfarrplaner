@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,7 +13,6 @@
 
 namespace Tests\Browser\Manual;
 
-use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Rites\Baptism;
 use App\Models\Rites\Funeral;
@@ -97,14 +97,14 @@ class HomeScreenScreenshotTest extends ManualScreenshotTestCase
         Funeral::factory()->create(['service_id' => $service->id]);
     }
 
-    public function testCaptureHomeScreenOverview(): void
+    public function test_capture_home_screen_overview(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot($browser, route('home'), 'startseite-uebersicht', 1200);
         });
     }
 
-    public function testCaptureHomeScreenTabs(): void
+    public function test_capture_home_screen_tabs(): void
     {
         $tabs = [
             'nextServices0' => 'startseite-reiter-naechste-gottesdienste',

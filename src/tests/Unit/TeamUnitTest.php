@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -22,6 +23,7 @@ use Tests\AbstractModelUnitTest;
 class TeamUnitTest extends AbstractModelUnitTest
 {
     protected $modelClass = Team::class;
+
     private City $city;
 
     protected function setUp(): void
@@ -36,19 +38,19 @@ class TeamUnitTest extends AbstractModelUnitTest
         return Team::factory()->state(['city_id' => $this->city->id]);
     }
 
-    public function testTeamHasCityRelationship(): void
+    public function test_team_has_city_relationship(): void
     {
         $team = Team::factory()->create();
         $this->assertInstanceOf(BelongsTo::class, $team->city());
     }
 
-    public function testTeamHasUsersRelationship(): void
+    public function test_team_has_users_relationship(): void
     {
         $team = Team::factory()->create();
         $this->assertInstanceOf(BelongsToMany::class, $team->users());
     }
 
-    public function testTeamCanBeCreatedViaFactory(): void
+    public function test_team_can_be_created_via_factory(): void
     {
         $team = Team::factory()->create();
         $this->assertCount(1, Team::all());

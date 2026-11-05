@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,9 +37,8 @@
 
 namespace App\CalendarLinks;
 
-
-use App\Models\Service;
 use App\Models\People\User;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -48,15 +47,14 @@ use Illuminate\Support\Facades\Auth;
 
 /**
  * Class AllServicesCalendarLink
- * @package App\CalendarLinks
  */
 class AllServicesCalendarLink extends AbstractCalendarLink
 {
-
     /**
      * @var string
      */
     protected $title = 'Gottesdienste nach Kirchengemeinden';
+
     /**
      * @var string
      */
@@ -70,20 +68,16 @@ class AllServicesCalendarLink extends AbstractCalendarLink
     public function setupData()
     {
         $cities = Auth::user()->cities;
+
         return compact('cities');
     }
 
-    /**
-     * @param Request $request
-     */
     public function setDataFromRequest(Request $request)
     {
-        $this->data['cities'] = join('-', $request->get('includeCities') ?: []);
+        $this->data['cities'] = implode('-', $request->get('includeCities') ?: []);
     }
 
     /**
-     * @param Request $request
-     * @param User $user
      * @return array|Builder[]|Collection
      */
     public function getRenderData(Request $request, User $user)
@@ -91,9 +85,10 @@ class AllServicesCalendarLink extends AbstractCalendarLink
         $cityIds = explode('-', $request->get('cities', ''));
         $serviceQuery = Service::with(['location'])
             ->inCities($cityIds)->startingFrom(Carbon::now()->subYears(1)->startOfYear());
-        if (!$request->get('includeHidden', 0)) $serviceQuery->notHidden();
+        if (! $request->get('includeHidden', 0)) {
+            $serviceQuery->notHidden();
+        }
+
         return $serviceQuery->get();
     }
-
-
 }

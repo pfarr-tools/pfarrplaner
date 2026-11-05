@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,13 +32,13 @@ namespace App\Exceptions;
 
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Sentry\SentrySdk;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Session\TokenMismatchException;
-use Illuminate\Support\Str;
-use Sentry\SentrySdk;
 
 class Handler extends ExceptionHandler
 {
@@ -66,13 +66,8 @@ class Handler extends ExceptionHandler
 
     /**
      * Register the exception handling callbacks for the application.
-     *
-     * @return void
      */
-    public function register(): void
-    {
-
-    }
+    public function register(): void {}
 
     public function render($request, Throwable $e)
     {
@@ -121,8 +116,7 @@ class Handler extends ExceptionHandler
                     // Cookie/Header presence (keine Werte!)
                     'cookie_session_present' => $request->cookies->has(config('session.cookie')),
                     'cookie_xsrf_present' => $request->cookies->has('XSRF-TOKEN'),
-                    'xsrf_header_present' =>
-                        $request->headers->has('X-XSRF-TOKEN') || $request->headers->has('X-CSRF-TOKEN'),
+                    'xsrf_header_present' => $request->headers->has('X-XSRF-TOKEN') || $request->headers->has('X-CSRF-TOKEN'),
 
                     // HTTPS/Proxy hints
                     'is_secure' => $request->isSecure(),
@@ -138,11 +132,10 @@ class Handler extends ExceptionHandler
         } catch (Throwable $logError) {
             // Logging darf nie das Rendern kaputtmachen
             Log::error('Failed to write csrf419 log in Handler::render', [
-                'logger_error' => get_class($logError) . ': ' . $logError->getMessage(),
+                'logger_error' => get_class($logError).': '.$logError->getMessage(),
             ]);
         }
 
         return $response;
     }
-
 }

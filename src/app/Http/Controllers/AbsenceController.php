@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -33,6 +33,7 @@ namespace App\Http\Controllers;
 use App\Events\AbsenceBeforeDelete;
 use App\Events\AbsenceUpdated;
 use App\Http\Requests\AbsenceRequest;
+use App\Mail\Absence\AbsenceRejected;
 use App\Models\Attachment;
 use App\Models\Leave\Absence;
 use App\Models\Leave\Poolmaster;
@@ -46,6 +47,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -55,7 +57,6 @@ use Inertia\Inertia;
 
 /**
  * Class AbsenceController
- * @package App\Http\Controllers
  */
 class AbsenceController extends Controller
 {
@@ -89,7 +90,7 @@ class AbsenceController extends Controller
         $pools = Auth::user()->pools;
 
         return Inertia::render('Absences/Planner',
-                               compact('start', 'days', 'year', 'month', 'years', 'pinList', 'sectionConfig', 'pools'));
+            compact('start', 'days', 'year', 'month', 'years', 'pinList', 'sectionConfig', 'pools'));
     }
 
     /**
@@ -107,7 +108,7 @@ class AbsenceController extends Controller
 
         Gate::authorize('create', $absence);
 
-        [$from, $to] = $this->resolveCreateRange($request, (int)$year, (int)$month, (int)$day);
+        [$from, $to] = $this->resolveCreateRange($request, (int) $year, (int) $month, (int) $day);
         $workflowStatus = Absence::STATUS_NEW;
         if ((Auth::user()->id == $user->id) && Auth::user()->can('selfAdminister', $absence)) {
             $workflowStatus = Absence::STATUS_SELF_ADMINISTERED;
@@ -132,7 +133,6 @@ class AbsenceController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param AbsenceRequest $request
      * @return JsonResponse|RedirectResponse
      */
     public function store(AbsenceRequest $request)
@@ -145,6 +145,7 @@ class AbsenceController extends Controller
         if ($request->get('noRedirect', false)) {
             $absence->refresh();
             $absence->load(['replacements', 'attachments', 'user', 'checkedBy', 'approvedBy']);
+
             return response()->json([
                 'absence' => $absence,
                 'editUrl' => route('absence.edit', $absence->id),
@@ -158,10 +159,10 @@ class AbsenceController extends Controller
         return redirect()->route('absence.edit', $absence->id);
     }
 
-
     /**
      * Get user data for absence planner (api)
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @return JsonResponse
      */
     public function users()
     {
@@ -170,20 +171,22 @@ class AbsenceController extends Controller
             $user->canEdit = false;
             if (($user->id == Auth::user()->id)
                 || (Auth::user()->hasPermissionTo('fremden-urlaub-bearbeiten')
-                    && (!$user->hasRole('Pfarrer:in'))
+                    && (! $user->hasRole('Pfarrer:in'))
                     && (count(Auth::user()->writableCities->intersect($user->homeCities))))
             ) {
                 $user->canEdit = true;
             }
         }
+
         return response()->json($users);
     }
 
     /**
      * Get displayable days for absence planner (api)
-     * @param $start Start date
-     * @param User $user User to be displayed
-     * @return \Illuminate\Http\JsonResponse
+     *
+     * @param  $start  Start date
+     * @param  User  $user  User to be displayed
+     * @return JsonResponse
      */
     public function days($start, User $user)
     {
@@ -237,7 +240,6 @@ class AbsenceController extends Controller
             $days[$index]['show'] = true;
         }
 
-
         foreach ($absences as $absence) {
             $absenceStart = $this->plannerDay($absence->from);
             $absenceEnd = $this->plannerDay($absence->to);
@@ -259,9 +261,7 @@ class AbsenceController extends Controller
     }
 
     /**
-     * @param Poolmaster $poolmaster
-     * @param User $user
-     * @param \Illuminate\Support\Collection<int, Absence> $realAbsences
+     * @param  Collection<int, Absence>  $realAbsences
      * @return array<int, Absence>
      */
     protected function buildPoolmasterPlannerAbsences(Poolmaster $poolmaster, User $user, $realAbsences): array
@@ -279,6 +279,7 @@ class AbsenceController extends Controller
             foreach ($segments as $segment) {
                 if (($absenceEnd < $segment['from']) || ($absenceStart > $segment['to'])) {
                     $updatedSegments[] = $segment;
+
                     continue;
                 }
 
@@ -298,7 +299,7 @@ class AbsenceController extends Controller
             }
 
             $segments = $updatedSegments;
-            if (!$segments) {
+            if (! $segments) {
                 break;
             }
         }
@@ -322,8 +323,7 @@ class AbsenceController extends Controller
     /**
      * Normalize a stored timestamp to the rendered Berlin calendar day.
      *
-     * @param mixed $value
-     * @return Carbon
+     * @param  mixed  $value
      */
     protected function plannerDay($value): Carbon
     {
@@ -337,7 +337,6 @@ class AbsenceController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param Absence $absence
      * @return \Inertia\Response
      */
     public function edit(Request $request, Absence $absence)
@@ -348,8 +347,6 @@ class AbsenceController extends Controller
     /**
      * Render the absence editor.
      *
-     * @param Absence $absence
-     * @param Request $request
      * @return \Inertia\Response
      */
     protected function renderEditor(Absence $absence, Request $request)
@@ -363,15 +360,14 @@ class AbsenceController extends Controller
         $mayApprove = $absenceUser->vacationApprovers->pluck('id')->contains(Auth::user()->id);
         $maySelfAdminister = Auth::user()->can('selfAdminister', $absence);
 
-
         $year = $month = null;
         if ($request->has('startMonth')) {
-            list($month, $year) = explode('-', $request->get('startMonth'));
+            [$month, $year] = explode('-', $request->get('startMonth'));
         }
-        if (!$year) {
+        if (! $year) {
             $year = date('Y');
         }
-        if (!$month) {
+        if (! $month) {
             $year = date('m');
         }
         $users = User::visibleFor(Auth::user())->get();
@@ -383,10 +379,6 @@ class AbsenceController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param int $year
-     * @param int $month
-     * @param int $day
      * @return array{0: Carbon, 1: Carbon}
      */
     protected function resolveCreateRange(Request $request, int $year, int $month, int $day): array
@@ -412,8 +404,7 @@ class AbsenceController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param Absence $absence
+     * @param  Request  $request
      * @return JsonResponse|RedirectResponse
      */
     public function update(AbsenceRequest $request, Absence $absence)
@@ -421,14 +412,15 @@ class AbsenceController extends Controller
         $absence->update($request->validated());
         $absence->setupReplacements($request->user(), $request->get('replacements') ?: []);
 
-
-
         event(new AbsenceUpdated($absence));
 
-        if ($request->get('noRedirect', false)) return response()->json();
+        if ($request->get('noRedirect', false)) {
+            return response()->json();
+        }
         if ($url = $request->get('redirectTo', false)) {
             return Inertia::location($url);
         }
+
         return redirect()->route(
             'absences.index',
             ['month' => $absence->from->format('m'), 'year' => $absence->from->format('Y')]
@@ -438,7 +430,6 @@ class AbsenceController extends Controller
     /**
      * Remove the specified resource from storage. Send rejection notice if necessary.
      *
-     * @param Absence $absence
      * @return Response
      */
     public function destroy(Request $request, Absence $absence)
@@ -452,25 +443,24 @@ class AbsenceController extends Controller
                 $recipients = $recipients->merge($absence->user->vacationApprovers);
             }
             // filter out users without email address
-            $recipients->reject(function ($user) { return empty($user->email); });
-            Mail::to($recipients)->queue(new \App\Mail\Absence\AbsenceRejected($absence, Auth::user()));
+            $recipients->reject(function ($user) {
+                return empty($user->email);
+            });
+            Mail::to($recipients)->queue(new AbsenceRejected($absence, Auth::user()));
         }
 
         $absence->delete();
+
         return redirect()->route(
             'absences.index',
             [
                 'month' => $request->get('month', Carbon::now()->month),
-                'year' => $request->get('year', Carbon::now()->year)
+                'year' => $request->get('year', Carbon::now()->year),
             ]
         );
     }
 
     /**
-     * @param Request $request
-     * @param $route
-     * @param $year
-     * @param $month
      * @return bool|RedirectResponse
      */
     protected function redirectIfMissingParameters(Request $request, $route, $year, $month)
@@ -481,7 +471,6 @@ class AbsenceController extends Controller
         $initialYear = $year;
         $initialMonth = $month;
 
-
         if ($month == 13) {
             $year++;
             $month = 1;
@@ -491,7 +480,7 @@ class AbsenceController extends Controller
             $month = 12;
         }
 
-        if ((!$year) || (!$month) || (!is_numeric($month)) || (!is_numeric($year)) || (!checkdate($month, 1, $year))) {
+        if ((! $year) || (! $month) || (! is_numeric($month)) || (! is_numeric($year)) || (! checkdate($month, 1, $year))) {
             $year = $defaultYear;
             $month = $defaultMonth;
         }
@@ -509,25 +498,21 @@ class AbsenceController extends Controller
         return redirect()->route($route, $data);
     }
 
-
     /**
-     * @param Request $request
-     * @param Absence $absence
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function attach(Request $request, Absence $absence)
     {
         Gate::authorize('update', $absence);
         $this->handleAttachments($request, $absence);
         $absence->refresh();
+
         return response()->json($absence->attachments);
     }
 
     /**
-     * @param Request $request
-     * @param Absence $absence
-     * @param Attachment $attachment
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     *
      * @throws \Exception
      */
     public function detach(Request $request, Absence $absence, Attachment $attachment)
@@ -539,8 +524,7 @@ class AbsenceController extends Controller
         Storage::delete($file);
         $attachment->delete();
         $absence->refresh();
+
         return response()->json($absence->attachments);
     }
-
-
 }

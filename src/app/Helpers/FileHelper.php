@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,17 +30,14 @@
 
 namespace App\Helpers;
 
-
 use Illuminate\Support\Facades\Storage;
 
 /**
  * Class FileHelper
- * @package App\Helpers
  */
 class FileHelper
 {
     /**
-     * @param $bytes
      * @return string
      */
     public static function bytesToHuman($bytes)
@@ -51,11 +48,10 @@ class FileHelper
             $bytes /= 1024;
         }
 
-        return round($bytes, 2) . ' ' . $units[$i];
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**
-     * @param $path
      * @return string
      */
     public static function icon($path)
@@ -63,11 +59,12 @@ class FileHelper
         $icons = [
             'application/pdf' => 'fa-file-pdf',
         ];
+
         return $icons[Storage::mimeType($path)] ?? 'fa-file';
     }
 
     /**
-     * @param string $str
+     * @param  string  $str
      * @return string|string[]
      */
     public static function normalizeFilename($str = '')
@@ -77,15 +74,14 @@ class FileHelper
         $str = preg_replace('/[\"\*\/\:\<\>\?\'\|]+/', ' ', $str);
         $str = strtr($str, ['Ä' => 'Ae', 'ä' => 'ae', 'Ö' => 'Oe', 'ö' => 'oe', 'Ü' => 'Ue', 'ü' => 'ue', 'ß' => 'ss']);
 
-        $str = html_entity_decode($str, ENT_QUOTES, "utf-8");
-        $str = htmlentities($str, ENT_QUOTES, "utf-8");
-        $str = preg_replace("/(&)([a-z])([a-z]+;)/i", '$2', $str);
+        $str = html_entity_decode($str, ENT_QUOTES, 'utf-8');
+        $str = htmlentities($str, ENT_QUOTES, 'utf-8');
+        $str = preg_replace('/(&)([a-z])([a-z]+;)/i', '$2', $str);
         $str = str_replace(' ', '_____', $str);
         $str = rawurlencode($str);
         $str = str_replace('%', '-', $str);
         $str = str_replace('_____', ' ', $str);
+
         return $str;
     }
-
-
 }

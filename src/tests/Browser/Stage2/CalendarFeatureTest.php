@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -28,51 +29,51 @@ class CalendarFeatureTest extends AbstractPageLoadTest
         $this->superAdminUser->writableCities()->attach($this->city->id);
     }
 
-    public function testCalendarRendersWithoutError(): void
+    public function test_calendar_renders_without_error(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new CalendarPage(2025, 1))
-                    ->assertDontSee('500')
-                    ->assertDontSee('Whoops');
+                ->visit(new CalendarPage(2025, 1))
+                ->assertDontSee('500')
+                ->assertDontSee('Whoops');
         });
     }
 
-    public function testPrevMonthButtonNavigates(): void
+    public function test_prev_month_button_navigates(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new CalendarPage(2025, 6))
-                    ->waitFor('.mdi-chevron-left', 10)
-                    ->click('button .mdi-chevron-left')
-                    ->pause(500)
-                    ->assertDontSee('500')
-                    ->assertDontSee('Whoops');
+                ->visit(new CalendarPage(2025, 6))
+                ->waitFor('.mdi-chevron-left', 10)
+                ->click('button .mdi-chevron-left')
+                ->pause(500)
+                ->assertDontSee('500')
+                ->assertDontSee('Whoops');
         });
     }
 
-    public function testNextMonthButtonNavigates(): void
+    public function test_next_month_button_navigates(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new CalendarPage(2025, 6))
-                    ->waitFor('.mdi-chevron-right', 10)
-                    ->click('button .mdi-chevron-right')
-                    ->pause(500)
-                    ->assertDontSee('500')
-                    ->assertDontSee('Whoops');
+                ->visit(new CalendarPage(2025, 6))
+                ->waitFor('.mdi-chevron-right', 10)
+                ->click('button .mdi-chevron-right')
+                ->pause(500)
+                ->assertDontSee('500')
+                ->assertDontSee('Whoops');
         });
     }
 
-    public function testMonthDropdownShowsMonthNames(): void
+    public function test_month_dropdown_shows_month_names(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->loginAs($this->superAdminUser, 'web')
-                    ->visit(new CalendarPage(2025, 6))
-                    ->waitFor('#app', 10)
-                    ->click('#btnGroupDrop1')
-                    ->waitFor('.dropdown-menu.show', 5)
-                    ->assertSee('Januar');
+                ->visit(new CalendarPage(2025, 6))
+                ->waitFor('#app', 10)
+                ->click('#btnGroupDrop1')
+                ->waitFor('.dropdown-menu.show', 5)
+                ->assertSee('Januar');
         });
     }
 }

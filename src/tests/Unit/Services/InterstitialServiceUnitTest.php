@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -31,7 +32,7 @@ class InterstitialServiceUnitTest extends TestCase
         $this->service = app(InterstitialService::class);
     }
 
-    public function testReturnsInterstitialForAllUsers(): void
+    public function test_returns_interstitial_for_all_users(): void
     {
         config()->set('interstitials.items', [
             'general-change' => [
@@ -50,7 +51,7 @@ class InterstitialServiceUnitTest extends TestCase
         $this->assertSame('general-change', $result[0]['key']);
     }
 
-    public function testAdminAudienceMatchesLocalAdmins(): void
+    public function test_admin_audience_matches_local_admins(): void
     {
         config()->set('interstitials.items', [
             'admin-change' => [
@@ -70,7 +71,7 @@ class InterstitialServiceUnitTest extends TestCase
         $this->assertSame('admin-change', $result[0]['key']);
     }
 
-    public function testWriterAudienceRequiresWritableCity(): void
+    public function test_writer_audience_requires_writable_city(): void
     {
         config()->set('interstitials.items', [
             'writer-change' => [
@@ -90,7 +91,7 @@ class InterstitialServiceUnitTest extends TestCase
         $this->assertSame('writer-change', $result[0]['key']);
     }
 
-    public function testDismissedInterstitialIsNotReturned(): void
+    public function test_dismissed_interstitial_is_not_returned(): void
     {
         config()->set('interstitials.items', [
             'dismissable-change' => [
@@ -108,7 +109,7 @@ class InterstitialServiceUnitTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testSuperAdminMatchesAdminAudience(): void
+    public function test_super_admin_matches_admin_audience(): void
     {
         config()->set('interstitials.items', [
             'admin-change' => [

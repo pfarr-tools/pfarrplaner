@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,7 +34,7 @@ use App\Helpers\YoutubeHelper;
 use App\Integrations\Youtube\YoutubeIntegration;
 use App\Models\Places\City;
 use App\Models\Service;
-use App\Services\LiturgyService;
+use Google\Service\Exception;
 use Google_Client;
 use Google_Exception;
 use Google_Service_YouTube;
@@ -43,7 +43,6 @@ use Google_Service_YouTube_LiveBroadcastStatus;
 
 /**
  * Class Broadcast
- * @package App
  */
 class Broadcast
 {
@@ -64,15 +63,21 @@ class Broadcast
 
     /**
      * Broadcast constructor.
-     * @param null $service
+     *
+     * @param  null  $service
+     *
      * @throws Google_Exception
      */
     public function __construct($service = null)
     {
-        if (!file_exists(base_path('config/client_secret.json'))) return;
-        if (null !== $service) $this->setService($service);
+        if (! file_exists(base_path('config/client_secret.json'))) {
+            return;
+        }
+        if ($service !== null) {
+            $this->setService($service);
+        }
 
-        $client = new Google_Client();
+        $client = new Google_Client;
         $client->setAuthConfig(base_path('config/client_secret.json'));
         $client->addScope(Google_Service_YouTube::YOUTUBE);
         $this->setClient($client);
@@ -81,8 +86,9 @@ class Broadcast
         $this->setYoutube($youtube);
     }
 
-    public static function getFromId($id, $city) {
-        $instance = new Broadcast();
+    public static function getFromId($id, $city)
+    {
+        $instance = new Broadcast;
         $instance->authenticate($city);
         $broadcastsResponse = $instance->getYoutube()->liveBroadcasts->listLiveBroadcasts(
             'id,snippet,contentDetails,status',
@@ -92,13 +98,15 @@ class Broadcast
             $instance->setLiveBroadcast($broadcastsResponse['items'][0]);
             $broadcast = $broadcastsResponse['items'][0];
             $service = Service::where('youtube_url', 'https://youtu.be/'.$id)->first();
-            if (null !== $service) $instance->setService($service);
+            if ($service !== null) {
+                $instance->setService($service);
+            }
         }
+
         return $broadcast ? $instance : null;
     }
 
     /**
-     * @param Service $service
      * @return Broadcast|null
      */
     public static function get(Service $service)
@@ -120,41 +128,32 @@ class Broadcast
         return $broadcast ? $instance : null;
     }
 
-    /**
-     * @param City $city
-     */
     public function authenticate(City $city)
     {
-        if ($this->getCity() != $city) $this->setCity($city);
+        if ($this->getCity() != $city) {
+            $this->setCity($city);
+        }
         $this->client->setAccessToken($city->google_access_token);
         $token = $this->client->refreshToken($city->google_refresh_token);
         $this->client->setAccessToken($token);
     }
 
     /**
-     * @param Service $service
+     * @param  Service  $service
      * @return string
-     */
-
-    /**
-     * @return Google_Service_YouTube
      */
     public function getYoutube(): Google_Service_YouTube
     {
         return $this->youtube;
     }
 
-    /**
-     * @param Google_Service_YouTube $youtube
-     */
     public function setYoutube(Google_Service_YouTube $youtube): void
     {
         $this->youtube = $youtube;
     }
 
     /**
-     * @param Service $service
-     * @param string $statusString
+     * @param  string  $statusString
      * @return Broadcast
      */
     public static function create(Service $service, $statusString = 'public')
@@ -168,17 +167,17 @@ class Broadcast
 
         // Create an object for the liveBroadcast resource's status, and set the
         // broadcast's status to "private".
-        $status = new Google_Service_YouTube_LiveBroadcastStatus();
+        $status = new Google_Service_YouTube_LiveBroadcastStatus;
         $status->setPrivacyStatus($statusString);
         $status->setSelfDeclaredMadeForKids('false');
 
-        $contentDetails = new \Google_Service_YouTube_LiveBroadcastContentDetails();
+        $contentDetails = new \Google_Service_YouTube_LiveBroadcastContentDetails;
         if ($service->city->youtube_passive_stream_id) {
             $contentDetails->setBoundStreamId($service->city->youtube_passive_stream_id);
         }
 
         // Create the API request that inserts the liveBroadcast resource.
-        $broadcastInsert = new Google_Service_YouTube_LiveBroadcast();
+        $broadcastInsert = new Google_Service_YouTube_LiveBroadcast;
         $broadcastInsert->setSnippet($service->getBroadcastSnippet());
         $broadcastInsert->setStatus($status);
         $broadcastInsert->setContentDetails($contentDetails);
@@ -193,10 +192,10 @@ class Broadcast
         );
         $instance->setLiveBroadcast($broadcastsResponse);
 
-        $video = new \Google_Service_YouTube_Video();
+        $video = new \Google_Service_YouTube_Video;
         $video->setId($broadcastsResponse->id);
         $video->setSnippet($service->getVideoSnippet());
-        $videoStatus = new \Google_Service_YouTube_VideoStatus();
+        $videoStatus = new \Google_Service_YouTube_VideoStatus;
         $videoStatus->setSelfDeclaredMadeForKids($service->city->youtube_self_declared_for_children == 1);
         $video->setStatus($videoStatus);
 
@@ -212,7 +211,8 @@ class Broadcast
         $service->update(['youtube_url' => '']);
     }
 
-    public function update() {
+    public function update()
+    {
         $broadcast = $this->getLiveBroadcast();
         $broadcast->setSnippet($this->service->getBroadcastSnippet());
         $this->getYoutube()->liveBroadcasts->update('id,snippet,contentDetails,status', $broadcast);
@@ -223,7 +223,7 @@ class Broadcast
      */
     public function getSharerUrl()
     {
-        return $this->liveBroadcast ? 'https://youtu.be/' . $this->liveBroadcast['id'] : '';
+        return $this->liveBroadcast ? 'https://youtu.be/'.$this->liveBroadcast['id'] : '';
     }
 
     /**
@@ -232,69 +232,49 @@ class Broadcast
     public function getLiveDashboardUrl()
     {
         return $this->liveBroadcast ? 'https://studio.youtube.com/video/'
-            . $this->liveBroadcast->getId()
-            . '/livestreaming' : '';
+            .$this->liveBroadcast->getId()
+            .'/livestreaming' : '';
     }
 
-    /**
-     * @return Service
-     */
     public function getService(): Service
     {
         return $this->service;
     }
 
-    /**
-     * @param Service $service
-     */
     public function setService(Service $service): void
     {
         $this->service = $service;
     }
 
-    /**
-     * @return Google_Client
-     */
     public function getClient(): Google_Client
     {
         return $this->client;
     }
 
-    /**
-     * @param Google_Client $client
-     */
     public function setClient(Google_Client $client): void
     {
         $this->client = $client;
     }
 
-    /**
-     * @return Google_Service_YouTube_LiveBroadcast
-     */
     public function getLiveBroadcast(): Google_Service_YouTube_LiveBroadcast
     {
         return $this->liveBroadcast;
     }
 
-    /**
-     * @param Google_Service_YouTube_LiveBroadcast $liveBroadcast
-     */
     public function setLiveBroadcast(Google_Service_YouTube_LiveBroadcast $liveBroadcast): void
     {
         $this->liveBroadcast = $liveBroadcast;
     }
 
-
     /**
      * Get the currently active broadcast for a city
-     * @param City $city
      */
     public static function getActive(City $city)
     {
-        if (!$city->youtube_active_stream_id) {
+        if (! $city->youtube_active_stream_id) {
             return [];
         }
-        $instance = new Broadcast();
+        $instance = new Broadcast;
         $instance->authenticate($city);
         $broadcasts = [];
 
@@ -311,15 +291,16 @@ class Broadcast
 
             }
         }
+
         return $broadcasts;
     }
 
     public static function getInactive(City $city)
     {
-        if (!$city->youtube_active_stream_id) {
+        if (! $city->youtube_active_stream_id) {
             return [];
         }
-        $instance = new Broadcast();
+        $instance = new Broadcast;
         $instance->authenticate($city);
         $broadcasts = [];
 
@@ -335,6 +316,7 @@ class Broadcast
 
             }
         }
+
         return $broadcasts;
 
     }
@@ -354,7 +336,7 @@ class Broadcast
 
         if ($this->getCity()->youtube_auto_startstop) {
             $contentDetails = $broadcast->getContentDetails();
-            if ((!$contentDetails->getEnableAutoStart()) || (!$contentDetails->getEnableAutoStop())) {
+            if ((! $contentDetails->getEnableAutoStart()) || (! $contentDetails->getEnableAutoStop())) {
                 $contentDetails->setEnableAutoStart('true');
                 $contentDetails->setEnableAutoStop('true');
                 $broadcast->setContentDetails($contentDetails);
@@ -373,31 +355,21 @@ class Broadcast
                 && ($item->getContentDetails()->getBoundStreamId() == $this->getCity()->youtube_active_stream_id)) {
                 try {
                     $this->getYoutube()->liveBroadcasts->bind($item->getId(), 'id,snippet,status', ['streamId' => $this->getCity()->youtube_passive_stream_id]);
-                } catch (\Google\Service\Exception $e) {
+                } catch (Exception $e) {
                     report($e);
                 }
             }
         }
 
-
     }
 
-    /**
-     * @return City
-     */
     public function getCity(): ?City
     {
         return $this->city;
     }
 
-    /**
-     * @param City $city
-     */
     public function setCity(?City $city): void
     {
         $this->city = $city;
     }
-
-
-
 }

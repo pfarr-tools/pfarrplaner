@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,14 +30,12 @@
 
 namespace Tests\Builder;
 
-
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class HelpCoverageTest extends TestCase
 {
-
-    public function testAllGetRoutesHaveHelpFile()
+    public function test_all_get_routes_have_help_file()
     {
         $routes = Route::getRoutes()->getRoutesByMethod();
         $routeKeys = [];
@@ -46,13 +44,15 @@ class HelpCoverageTest extends TestCase
         foreach ($routes['GET'] as $route) {
             $routeKey = $route->getAction('as');
             if ($routeKey) {
-                if (!file_exists(config('manual.root').'/benutzerhandbuch/'.$routeKey.'.md')) $routeKeys[] = $routeKey;
+                if (! file_exists(config('manual.root').'/benutzerhandbuch/'.$routeKey.'.md')) {
+                    $routeKeys[] = $routeKey;
+                }
             }
         }
         if (count($routeKeys)) {
             $this->output('');
             $this->output('WARNING: The following routes have no associated page in the manual:');
-            $this->output(join(', ', $routeKeys));
+            $this->output(implode(', ', $routeKeys));
             $this->output('');
         }
         $this->assertCount(0, $routeKeys);

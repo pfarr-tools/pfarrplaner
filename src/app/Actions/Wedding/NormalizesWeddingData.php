@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -20,13 +21,9 @@ use Illuminate\Validation\ValidationException;
 
 trait NormalizesWeddingData
 {
-    /**
-     * @param array $input
-     * @return array
-     */
     protected function prepareInputForValidation(array $input): array
     {
-        if (isset($input['service']) && !isset($input['service_id'])) {
+        if (isset($input['service']) && ! isset($input['service_id'])) {
             $input['service_id'] = $input['service'];
         }
 
@@ -48,26 +45,19 @@ trait NormalizesWeddingData
     }
 
     /**
-     * @param User $user
-     * @param int|string|null $serviceId
-     * @return void
      * @throws ValidationException
      */
     protected function authorizeServiceWriteAccess(User $user, int|string|null $serviceId): void
     {
-        if (!empty($serviceId) && !$user->isAdmin) {
+        if (! empty($serviceId) && ! $user->isAdmin) {
             $service = Service::find($serviceId);
-            $allowed = $service && $user->writableCities->pluck('id')->contains((int)$service->city_id);
-            if (!$allowed) {
+            $allowed = $service && $user->writableCities->pluck('id')->contains((int) $service->city_id);
+            if (! $allowed) {
                 throw ValidationException::withMessages(['service_id' => 'Für diesen Gottesdienst fehlen Schreibrechte.']);
             }
         }
     }
 
-    /**
-     * @param array $input
-     * @return array
-     */
     protected function normalizeValidatedInput(array $input): array
     {
         $input['appointment'] = $this->parseDateTime($input['appointment'] ?? null);
@@ -84,18 +74,17 @@ trait NormalizesWeddingData
     }
 
     /**
-     * @param mixed $value
-     * @return Carbon|null
+     * @param  mixed  $value
      */
     protected function parseDate($value): ?Carbon
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
         if ($value instanceof Carbon) {
             return $value;
         }
-        if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', (string)$value)) {
+        if (preg_match('/^\d{2}\.\d{2}\.\d{4}$/', (string) $value)) {
             return Carbon::createFromFormat('d.m.Y', $value);
         }
 
@@ -103,31 +92,26 @@ trait NormalizesWeddingData
     }
 
     /**
-     * @param mixed $value
-     * @return Carbon|null
+     * @param  mixed  $value
      */
     protected function parseDateTime($value): ?Carbon
     {
-        if (!$value) {
+        if (! $value) {
             return null;
         }
         if ($value instanceof Carbon) {
             return $value;
         }
-        if (preg_match('/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/', (string)$value)) {
+        if (preg_match('/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/', (string) $value)) {
             return Carbon::createFromFormat('d.m.Y H:i', $value, 'Europe/Berlin')->setTimezone('UTC');
         }
 
         return Carbon::parse($value, 'Europe/Berlin')->setTimezone('UTC');
     }
 
-    /**
-     * @param Service $service
-     * @return array
-     */
     protected function draftDefaults(Service $service): array
     {
-        return array_merge((new Wedding())->fillDefaults(), [
+        return array_merge((new Wedding)->fillDefaults(), [
             'service_id' => $service->id,
         ]);
     }

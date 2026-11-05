@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -41,11 +41,11 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Class AbstractSyncEngine
- * @package App\Calendars\SyncEngines
  */
 abstract class AbstractSyncEngine
 {
     public static $prefix = '';
+
     public const AUTO_WARNING = '<p><small>Bitte beachte: Dies ist ein automatisch vom Pfarrplaner erzeugter Eintrag. Änderungen können jederzeit ohne Vorwarnungen vom Pfarrplaner überschrieben werden.</small></p>';
 
     /** @var CalendarConnection */
@@ -59,49 +59,31 @@ abstract class AbstractSyncEngine
         $this->setCalendarConnection($calendarConnection);
     }
 
-    /**
-     * @return string
-     */
     public static function getPrefix(): string
     {
         return self::$prefix;
     }
 
-    /**
-     * @param string $prefix
-     */
     public function setPrefix(string $prefix): void
     {
         $this->prefix = $prefix;
     }
 
-    /**
-     * @return CalendarConnection
-     */
     public function getCalendarConnection(): ?CalendarConnection
     {
         return $this->calendarConnection;
     }
 
-    /**
-     * @param CalendarConnection $calendarConnection
-     */
     public function setCalendarConnection(?CalendarConnection $calendarConnection): void
     {
         $this->calendarConnection = $calendarConnection;
     }
 
-    /**
-     * @return AbstractCalendar
-     */
     public function getCalendar(): ?AbstractCalendar
     {
         return $this->calendar;
     }
 
-    /**
-     * @param AbstractCalendar $calendar
-     */
     public function setCalendar(?AbstractCalendar $calendar): void
     {
         $this->calendar = $calendar;
@@ -109,7 +91,6 @@ abstract class AbstractSyncEngine
 
     /**
      * Sync a collection of services
-     * @param Collection $services
      */
     public function syncServices(Collection $services)
     {
@@ -121,7 +102,6 @@ abstract class AbstractSyncEngine
 
     /**
      * Sync a single service
-     * @param Service $service
      */
     public function syncSingleService(Service $service)
     {
@@ -131,11 +111,11 @@ abstract class AbstractSyncEngine
             'title' => $service->titleTextWithParticipants(),
             'location' => $service->locationText(),
             'description' => '<p><a href="'
-                . route('service.edit', $service->slug) . '">'
-                . 'Im Pfarrplaner ansehen'
-                . '</a></p><p></p>'
-                . self::AUTO_WARNING,
-            'categories' => ['Pfarrplaner','Gottesdienst'],
+                .route('service.edit', $service->slug).'">'
+                .'Im Pfarrplaner ansehen'
+                .'</a></p><p></p>'
+                .self::AUTO_WARNING,
+            'categories' => ['Pfarrplaner', 'Gottesdienst'],
         ];
 
         if (count($service->funerals)) {
@@ -149,24 +129,24 @@ abstract class AbstractSyncEngine
             'calendar_connection_id',
             $this->calendarConnection->id
         )->first()) {
-            Log::debug('Found entry reference #' . $entry->id . ' --> external calendar event #' . $entry->foreign_id);
+            Log::debug('Found entry reference #'.$entry->id.' --> external calendar event #'.$entry->foreign_id);
             $item = $this->calendar->find($entry->foreign_id);
         }
 
         /** @var AbstractCalendarItem $item */
         if ($item) {
-            Log::debug('Updating existing external calendar event #' . $item->getID(), [$item]);
+            Log::debug('Updating existing external calendar event #'.$item->getID(), [$item]);
             $item->update($record);
         } else {
             // obsolete entry? (there's no associated item on the server)
             if ($entry) {
                 Log::error(
-                    'Existing external calendar event #' . $entry->foreign_id . ' not found, deleting reference'
+                    'Existing external calendar event #'.$entry->foreign_id.' not found, deleting reference'
                 );
                 $entry->delete();
             }
             Log::debug(
-                'Creating new calendar item for service #' . $service->id . ' on CalendarConnection #' . $this->calendarConnection->id
+                'Creating new calendar item for service #'.$service->id.' on CalendarConnection #'.$this->calendarConnection->id
             );
             $item = $this->calendar->create($record);
             if ($item) {
@@ -177,11 +157,11 @@ abstract class AbstractSyncEngine
                         'foreign_id' => $item->getID(),
                     ]
                 );
-                Log::debug('Calendar item created with #' . $item->getID() . ', local reference entry #' . $entry->id);
+                Log::debug('Calendar item created with #'.$item->getID().', local reference entry #'.$entry->id);
             } else {
                 Log::error(
-                    'Failed to create calendar item for service #' . $service->id
-                    . ' on CalendarConnection #' . $this->calendarConnection->id,
+                    'Failed to create calendar item for service #'.$service->id
+                    .' on CalendarConnection #'.$this->calendarConnection->id,
                     [$record, $this->calendar->getLastError()]
                 );
             }
@@ -194,7 +174,7 @@ abstract class AbstractSyncEngine
                     foreach ($collection as $collectionItem) {
                         $result = $collectionItem->getAdditionalEvents([
                             'include_rite_anniversaries' => $this->calendarConnection->include_rite_anniversaries,
-                                                                       ]);
+                        ]);
                         if ($result) {
                             foreach ($result as $prepKey => $prepEvent) {
                                 $this->syncSingleAlternateEvent($prepKey, $prepEvent);
@@ -208,8 +188,9 @@ abstract class AbstractSyncEngine
 
     /**
      * Sync a single alterante event
-     * @param $key Event key
-     * @param $record Event data
+     *
+     * @param  $key  Event key
+     * @param  $record  Event data
      */
     public function syncSingleAlternateEvent($key, $record)
     {
@@ -223,13 +204,13 @@ abstract class AbstractSyncEngine
         if ($item) {
             $item->update($record);
             Log::debug(
-                'Updated record #' . $item->getID(
-                ) . ' for alternate event #' . $key . ' on CalendarConnection ' . $this->calendarConnection->id
+                'Updated record #'.$item->getID(
+                ).' for alternate event #'.$key.' on CalendarConnection '.$this->calendarConnection->id
             );
         } else {
             if ($entry) {
                 Log::error(
-                    'Existing external calendar event #' . $entry->foreign_id . ' not found, deleting reference'
+                    'Existing external calendar event #'.$entry->foreign_id.' not found, deleting reference'
                 );
                 $entry->delete();
             }
@@ -245,12 +226,12 @@ abstract class AbstractSyncEngine
                     ]
                 );
                 Log::debug(
-                    'Created record #' . $item->getID(
-                    ) . ' for alternate event #' . $key . ' on CalendarConnection ' . $this->calendarConnection->id
+                    'Created record #'.$item->getID(
+                    ).' for alternate event #'.$key.' on CalendarConnection '.$this->calendarConnection->id
                 );
             } else {
                 Log::error(
-                    'Failed to create record for alternate event #' . $key . ' on CalendarConnection ' . $this->calendarConnection->id,
+                    'Failed to create record for alternate event #'.$key.' on CalendarConnection '.$this->calendarConnection->id,
                     [$this->calendar->getLastError()],
                 );
             }
@@ -259,7 +240,6 @@ abstract class AbstractSyncEngine
 
     /**
      * Delete a single event by its connection entry
-     * @param CalendarConnectionEntry $entry
      */
     public function deleteSingleEntry(CalendarConnectionEntry $entry)
     {
@@ -272,29 +252,28 @@ abstract class AbstractSyncEngine
 
     /**
      * Remove a single service from the external calendar
-     * @param Service $service
      */
     public function deleteSingleService(Service $service)
     {
         Log::debug(
-            'Trying to delete service #' . $service->id . ' on CalendarConnection #' . $this->calendarConnection->id
+            'Trying to delete service #'.$service->id.' on CalendarConnection #'.$this->calendarConnection->id
         );
         if ($entry = CalendarConnectionEntry::where('service_id', $service->id)->where(
             'calendar_connection_id',
             $this->calendarConnection->id
         )->first()) {
             Log::debug(
-                'Found entry reference #' . $entry->id . ' --> external calendar event #' . $entry->foreign_id
+                'Found entry reference #'.$entry->id.' --> external calendar event #'.$entry->foreign_id
             );
             /** @var AbstractCalendarItem $item */
             $item = $this->calendar->find($entry->foreign_id);
             if ($item) {
-                Log::debug('Deleting existing external calendar event #' . $entry->foreign_id);
+                Log::debug('Deleting existing external calendar event #'.$entry->foreign_id);
                 $item->delete();
                 $entry->delete();
             } else {
                 Log::error(
-                    'Existing external calendar event #' . $entry->foreign_id . ' not found, deleting reference'
+                    'Existing external calendar event #'.$entry->foreign_id.' not found, deleting reference'
                 );
                 $entry->delete();
             }
@@ -319,10 +298,8 @@ abstract class AbstractSyncEngine
         }
     }
 
-
     /**
      * Remove a single alternate event by its key
-     * @param $key
      */
     public function deleteSingleAlternateEvent($key)
     {
@@ -331,7 +308,6 @@ abstract class AbstractSyncEngine
             $this->calendar->delete($entry->foreign_id);
         }
     }
-
 
     public function syncSingleAbsence(Absence $absence)
     {

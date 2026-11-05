@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,23 +30,25 @@
 
 namespace App\Documents\Word;
 
-use App\Services\NameService;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpWord\Element\Cell;
 use PhpOffice\PhpWord\Shared\Converter;
 
 class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
 {
-
     protected $fromAddress = '';
 
     public const FONT6 = ['name' => 'Arial', 'size' => 6];
+
     public const FONT8 = ['name' => 'Arial', 'size' => 8];
+
     public const FONT10 = ['name' => 'Arial', 'size' => 10];
 
     public function __construct($config = [])
     {
-        if (!isset($config['label'])) $config['label'] = [];
+        if (! isset($config['label'])) {
+            $config['label'] = [];
+        }
         parent::__construct($config);
     }
 
@@ -55,13 +57,19 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
 
         $user = Auth::user();
         $fromParts = collect();
-        if ($x = $fromAddress['office'] ?? $user->office) $fromParts->push($x);
+        if ($x = $fromAddress['office'] ?? $user->office) {
+            $fromParts->push($x);
+        }
         if (isset($fromAddress['address'])) {
             $fromParts->push($fromAddress['address']);
-            if ($x = trim(($fromAddress['zip'] ?? '').' '.($fromAddress['city'] ?? ''))) $fromParts->push($x);
+            if ($x = trim(($fromAddress['zip'] ?? '').' '.($fromAddress['city'] ?? ''))) {
+                $fromParts->push($x);
+            }
         } else {
             if ($user->address) {
-                foreach (explode("\n", $user->address) as $x) $fromParts->push(trim($x));
+                foreach (explode("\n", $user->address) as $x) {
+                    $fromParts->push(trim($x));
+                }
             }
         }
 
@@ -80,7 +88,8 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
         );
     }
 
-    public function renderAddress(Cell $cell, $address, $index) {
+    public function renderAddress(Cell $cell, $address, $index)
+    {
 
         $pStyle = [
             'indentation' => [
@@ -101,12 +110,12 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
         if (isset($address['info'])) {
             $cell->addText($address['info'], static::FONT6, array_merge($pStyle, [
                 'align' => 'right',
-                'spaceBefore' => $this->fromAddress ? 0: Converter::cmToTwip(0.7),
+                'spaceBefore' => $this->fromAddress ? 0 : Converter::cmToTwip(0.7),
             ]));
         }
 
         $run = $cell->addTextRun(array_merge($pStyle, [
-            'spaceBefore' => $this->fromAddress || isset($address['info']) ? 0: Converter::cmToTwip(0.7),
+            'spaceBefore' => $this->fromAddress || isset($address['info']) ? 0 : Converter::cmToTwip(0.7),
         ]));
         $run->addText($address['name'], static::FONT10);
         $run->addTextBreak();
@@ -114,6 +123,4 @@ class DefaultAddressLabelSheetDocument extends DefaultLabelSheetDocument
         $run->addTextBreak();
         $run->addText(trim($address['zip'].' '.$address['city']), static::FONT10);
     }
-
-
 }

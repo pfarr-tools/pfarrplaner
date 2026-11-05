@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,37 +30,52 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Service;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OccurenceResource extends JsonResource
 {
-
-    protected function getBackgroundColor() {
-        if ($this->event->hidden) return 'lightgray';
+    protected function getBackgroundColor()
+    {
+        if ($this->event->hidden) {
+            return 'lightgray';
+        }
         if ($this->event->event_class != 'service') {
-            if ($this->event->is_allday) return 'white';
+            if ($this->event->is_allday) {
+                return 'white';
+            }
+
             return 'burlywood';
         }
         if (count($this->event->funerals)) {
-            if ($this->event->isMine) return 'seagreen';
+            if ($this->event->isMine) {
+                return 'seagreen';
+            }
+
             return 'darkgray';
         }
-        if ($this->event->isMine) return 'lightgreen';
+        if ($this->event->isMine) {
+            return 'lightgreen';
+        }
+
         return 'lightblue';
     }
 
     protected function getColor()
     {
-        if (count($this->event->funerals)) return 'white';
+        if (count($this->event->funerals)) {
+            return 'white';
+        }
+
         return 'black';
     }
 
     protected function getBorderColor()
     {
-        if (count($this->event->funerals) && $this->event->isMine) return 'rgb(19, 185, 85)';
+        if (count($this->event->funerals) && $this->event->isMine) {
+            return 'rgb(19, 185, 85)';
+        }
+
         return '';
     }
 
@@ -81,8 +96,8 @@ class OccurenceResource extends JsonResource
             'end' => $this->end->setTimezone('Europe/Berlin')->format('Y-m-d H:i:s'),
             'calendar_id' => $this->event->city_id,
             'state' => 'Busy',
-            'isReadOnly' => !$this->event->isEditable,
-            'isAllday' => (bool)$this->event->is_allday,
+            'isReadOnly' => ! $this->event->isEditable,
+            'isAllday' => (bool) $this->event->is_allday,
             'category' => $this->event->is_allday ? 'allday' : 'time',
             'customStyle' => [
                 'color' => $this->getColor(),
@@ -98,9 +113,7 @@ class OccurenceResource extends JsonResource
                 'event_slug' => $this->event->slug,
                 'event_class' => $this->event->event_class,
                 'description' => $this->event->descriptionText(),
-            ]
+            ],
         ];
     }
-
-
 }

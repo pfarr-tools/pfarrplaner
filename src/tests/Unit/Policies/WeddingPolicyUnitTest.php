@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -30,24 +31,24 @@ class WeddingPolicyUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->policy = new WeddingPolicy();
+        $this->policy = new WeddingPolicy;
         Permission::findOrCreate('gd-bearbeiten', 'web');
     }
 
-    public function testRegularUserCannotCreate(): void
+    public function test_regular_user_cannot_create(): void
     {
         $user = User::factory()->create();
         $this->assertFalse($this->policy->create($user));
     }
 
-    public function testIndexUsesCreatePermission(): void
+    public function test_index_uses_create_permission(): void
     {
         $user = User::factory()->create();
         $user->givePermissionTo('gd-bearbeiten');
         $this->assertTrue($this->policy->index($user));
     }
 
-    public function testUserWithPermissionCanCreateForWritableService(): void
+    public function test_user_with_permission_can_create_for_writable_service(): void
     {
         $city = City::factory()->create();
         $service = Service::factory()->create(['city_id' => $city->id]);
@@ -58,14 +59,14 @@ class WeddingPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->create($user, $service));
     }
 
-    public function testRegularUserCannotUpdate(): void
+    public function test_regular_user_cannot_update(): void
     {
         $user = User::factory()->create();
         $wedding = Wedding::factory()->create();
         $this->assertFalse($this->policy->update($user, $wedding));
     }
 
-    public function testUserWithPermissionAndServiceCityCanUpdate(): void
+    public function test_user_with_permission_and_service_city_can_update(): void
     {
         $city = City::factory()->create();
         $service = Service::factory()->create(['city_id' => $city->id]);

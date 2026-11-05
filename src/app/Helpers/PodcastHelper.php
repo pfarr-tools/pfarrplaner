@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,16 +30,12 @@
 
 namespace App\Helpers;
 
-
 /**
  * Class PodcastHelper
- * @package App\Helpers
  */
 class PodcastHelper
 {
-
     /**
-     * @param $url
      * @return mixed
      */
     public static function getFileSize($url)
@@ -50,6 +46,7 @@ class PodcastHelper
         curl_setopt($curl, CURLOPT_HEADER, true);
         curl_setopt($curl, CURLOPT_NOBODY, true);
         curl_exec($curl);
+
         return curl_getinfo($curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
     }
 }

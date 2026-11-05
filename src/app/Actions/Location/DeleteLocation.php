@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -33,19 +33,19 @@ namespace App\Actions\Location;
 use App\Actions\AbstractDeleteAction;
 use App\Contracts\Location\DeletesLocations;
 use App\Events\Models\Location\DeletedLocation;
-use App\Models\People\User;
 use App\Models\Location;
+use App\Models\People\User;
 use App\Models\Places\City;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 
 class DeleteLocation extends AbstractDeleteAction implements DeletesLocations
 {
-    /** @var City $city */
+    /** @var City */
     protected $city;
 
     /**
      * Get return route
-     * @return string
      */
     public function redirectTo(): string
     {
@@ -54,10 +54,10 @@ class DeleteLocation extends AbstractDeleteAction implements DeletesLocations
 
     /**
      * Delete a location
-     * @param User $user
-     * @param Location $location
+     *
      * @return Location|bool|null
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     *
+     * @throws AuthorizationException
      */
     public function delete(User $user, Location $location)
     {
@@ -65,8 +65,8 @@ class DeleteLocation extends AbstractDeleteAction implements DeletesLocations
         $this->city = $location->city;
         DeletedLocation::dispatch($user, $location);
         $this->messages = ['success' => 'Der Ort wurde gelöscht.'];
+
         return $location->delete();
 
     }
-
 }

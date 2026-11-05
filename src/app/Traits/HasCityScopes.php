@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,19 +35,19 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait HasCityScopes
 {
-
     /**
      * Scope a query to filter by given cities.
      *
      * If a city has is_org=true, child cities will be included
      *
-     * @param Builder $query
-     * @param mixed $cities An array or collection of cities, each having an id property.
+     * @param  mixed  $cities  An array or collection of cities, each having an id property.
      * @return Builder
      */
     public function scopeInCities(Builder $query, $cities)
     {
-        if (is_string($cities)) $cities = [$cities];
+        if (is_string($cities)) {
+            $cities = [$cities];
+        }
         $cityIds = collect();
         foreach ($cities as $key => $city) {
             $cities[$key] = $city = ($city instanceof City ? $city : City::query()->findOrFail($city));
@@ -56,6 +56,7 @@ trait HasCityScopes
                 $cityIds = $cityIds->merge($city->children->pluck('id'));
             }
         }
+
         return $query->whereIn('city_id', $cityIds);
     }
 
@@ -64,8 +65,7 @@ trait HasCityScopes
      *
      * If the city has is_org=true, child cities will be included
      *
-     * @param Builder $query
-     * @param $city A city object or id
+     * @param  $city  A city object or id
      * @return Builder
      */
     public function scopeInCity(Builder $query, $city)
@@ -74,8 +74,7 @@ trait HasCityScopes
         if ($city->is_org) {
             return $this->scopeInCities($query, [$city->id]);
         }
+
         return $query->where('city_id', $city->id);
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,14 +34,11 @@ use App\Http\Controllers\Controller;
 use App\Models\People\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Class LoginController
- * @package App\Http\Controllers\Auth
  */
 class LoginController extends Controller
 {
@@ -76,8 +73,7 @@ class LoginController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @return \Inertia\Response
+     * @return Response
      */
     public function showLoginForm(Request $request)
     {
@@ -85,21 +81,17 @@ class LoginController extends Controller
         $demo = config('app.demo_mode');
         $users = $demo ? User::with('roles', 'homeCities')->where('password', '!=', '')->orderBy('id')->get() : [];
 
-
         if ($demo) {
-            return Inertia::render('Auth/DemoLogin', compact('users' ));
+            return Inertia::render('Auth/DemoLogin', compact('users'));
         } else {
             return Inertia::render('Auth/Login');
         }
     }
 
-    public function setInitialPassword()
-    {
-    }
+    public function setInitialPassword() {}
 
     public function keepTokenAlive()
     {
         return response()->json(['token' => csrf_token()]);
     }
-
 }

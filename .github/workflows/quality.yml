@@ -1,0 +1,45 @@
+name: Qualität
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Docker-Qualitätsprüfung
+    runs-on: ubuntu-latest
+    env:
+      QUALITY_BASE_REF: origin/${{ github.base_ref }}
+    steps:
+      - name: Quelltext auschecken
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Docker-Builder-Cache einrichten
+        uses: docker/setup-buildx-action@v4
+
+      - name: Abhängigkeiten und Qualitätsprüfung
+        uses: docker/bake-action@v7
+        with:
+          files: compose.yaml
+          targets: app vite
+          set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max
+
+      - name: Entwicklungsumgebung starten
+        run: ./planer dev up -d
+
+      - name: Qualitätsgates ausführen
+        run: ./planer dev quality
+
+      - name: Umgebung beenden
+        if: always()
+        run: ./planer dev down -v

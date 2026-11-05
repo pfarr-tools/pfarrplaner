@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,43 +34,23 @@ use PHPUnit\Framework\Assert;
 
 trait TestsClasses
 {
-
-    /**
-     * @param $class
-     * @return void
-     */
     public function assertClassExists($class): void
     {
         Assert::assertTrue(class_exists($class), 'Class '.$class.' does not exist');
     }
 
-    /**
-     * @param $interface
-     * @return void
-     */
     public function assertInterfaceExists($interface): void
     {
         Assert::assertTrue(interface_exists($interface), 'Interface '.$interface.' does not exist');
     }
 
-    /**
-     * @param $expectedClass
-     * @param $actualClass
-     * @return void
-     */
     public function assertIsSubClassOf($expectedClass, $actualClass): void
     {
         Assert::assertTrue(is_subclass_of($actualClass, $expectedClass));
     }
 
-    /**
-     * @param $expectedClass
-     * @param $actualClass
-     * @return void
-     */
     public function assertIsA($expectedClass, $actualClass): void
     {
         Assert::assertTrue(is_a($actualClass, $expectedClass), (is_string($expectedClass) ? $expectedClass : get_class($actualClass)).' is not a '.$expectedClass);
     }
-
 }

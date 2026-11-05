@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -59,7 +60,7 @@ class SettingsScreenshotTest extends ManualScreenshotTestCase
         }
     }
 
-    public function testCaptureProfilePage(): void
+    public function test_capture_profile_page(): void
     {
         $this->browse(function (Browser $browser) {
             $this->captureManualScreenshot(

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,14 +30,15 @@
 
 namespace App\HomeScreen\Tabs;
 
-
 use App\Models\Rites\Funeral;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class FuneralsHomeScreenTab extends AbstractHomeScreenTab
 {
     protected $title = 'Beerdigungen';
+
     protected $description = 'Zeigt die anstehenden Beerdigungen';
 
     public function __construct($config = [])
@@ -49,7 +50,10 @@ class FuneralsHomeScreenTab extends AbstractHomeScreenTab
 
     public function getTitle(): string
     {
-        if ($this->config['mine']) return 'Meine Beerdigungen';
+        if ($this->config['mine']) {
+            return 'Meine Beerdigungen';
+        }
+
         return parent::getTitle();
     }
 
@@ -61,6 +65,7 @@ class FuneralsHomeScreenTab extends AbstractHomeScreenTab
     public function getContent($data = [])
     {
         $data['funerals'] = $this->query->get();
+
         return parent::getContent($data);
     }
 
@@ -68,25 +73,27 @@ class FuneralsHomeScreenTab extends AbstractHomeScreenTab
     {
         $data['funerals'] = $this->query->get();
         $data['count'] = count($data['funerals']);
+
         return parent::toArray($data);
     }
 
-
     /**
      * Build the query
-     * @return \Illuminate\Database\Eloquent\Builder
+     *
+     * @return Builder
      */
-    public function buildQuery() {
+    public function buildQuery()
+    {
         $start = Carbon::now()->setTime(0, 0, 0);
         $end = Carbon::now()->addMonth(2);
 
         $order = $this->config['newestFirst'] ? 'DESC' : 'ASC';
 
-        $query =  Funeral::with(['service'])
+        $query = Funeral::with(['service'])
             ->select('funerals.*')
             ->join('services', 'funerals.service_id', 'services.id')
-            ->whereHas('service', function($service) {
-                if (!$this->config['excludeProcessed']) {
+            ->whereHas('service', function ($service) {
+                if (! $this->config['excludeProcessed']) {
                     $service->startingFrom(Carbon::now()->subWeeks(2));
                 } else {
                     $service->where(function ($q) {
@@ -105,8 +112,7 @@ class FuneralsHomeScreenTab extends AbstractHomeScreenTab
                     $service->inCities(Auth::user()->writableCities->pluck('id'));
                 }
             })->orderBy('services.date', $order);
+
         return $query;
     }
-
-
 }

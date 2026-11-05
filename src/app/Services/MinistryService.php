@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,20 +30,17 @@
 
 namespace App\Services;
 
-
 use App\Models\People\Participant;
 
 /**
  * Class Ministry
- * @package App
  */
 class MinistryService
 {
     /**
      * Get all available ministries
      *
-     * @param bool $includeBasicMinistries Include P/O/M/A ?
-     * @return array
+     * @param  bool  $includeBasicMinistries  Include P/O/M/A ?
      */
     public static function all(bool $includeBasicMinistries = false): array
     {
@@ -64,10 +61,6 @@ class MinistryService
         return $m;
     }
 
-    /**
-     * @param $title
-     * @return string
-     */
     public static function title($title): string
     {
         if ($title == 'P') {
@@ -82,20 +75,15 @@ class MinistryService
         if ($title == 'A') {
             return 'Weitere Beteiligte';
         }
+
         return $title;
     }
 
-    /**
-     * @return array
-     */
     public static function POMA(): array
     {
         return ['P' => config('labels.pastor'), 'O' => config('labels.organist'), 'M' => config('labels.sacristan'), 'A' => 'Weitere Beteiligte'];
     }
 
-    /**
-     * @return array
-     */
     public static function selectList(): array
     {
         $ministries = [];
@@ -105,6 +93,7 @@ class MinistryService
                 'name' => self::POMA()[$ministry] ?? $ministry,
             ];
         }
+
         return $ministries;
     }
 }

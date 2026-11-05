@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -12,9 +13,14 @@
 
 namespace Tests\Unit;
 
+use App\Actions\AdConfig\CreateAdConfig;
+use App\Actions\AdConfig\DeleteAdConfig;
+use App\Actions\AdConfig\UpdateAdConfig;
 use App\Events\Models\AdConfig\CreatedAdConfig;
 use App\Events\Models\AdConfig\DeletedAdConfig;
 use App\Events\Models\AdConfig\UpdatedAdConfig;
+use App\Http\Controllers\AbstractCRUDController;
+use App\Http\Controllers\Api\AbstractApiCRUDController;
 use App\Models\AbstractModel;
 use App\Models\Ads\AdConfig;
 use App\Models\People\User;
@@ -27,31 +33,31 @@ class AdConfigUnitTest extends TestCase
 {
     private User $user;
 
-    public function testAdConfigCanBeCreatedViaFactory(): void
+    public function test_ad_config_can_be_created_via_factory(): void
     {
         $config = AdConfig::factory()->create();
         $this->assertCount(1, AdConfig::all());
     }
 
-    public function testAdConfigExtendsAbstractModel(): void
+    public function test_ad_config_extends_abstract_model(): void
     {
         $this->assertTrue(is_subclass_of(AdConfig::class, AbstractModel::class));
     }
 
-    public function testAdConfigControllerClassesExist(): void
+    public function test_ad_config_controller_classes_exist(): void
     {
-        $this->assertTrue(is_subclass_of(AdConfig::controllerClass(), \App\Http\Controllers\AbstractCRUDController::class));
-        $this->assertTrue(is_subclass_of(AdConfig::apiControllerClass(), \App\Http\Controllers\Api\AbstractApiCRUDController::class));
+        $this->assertTrue(is_subclass_of(AdConfig::controllerClass(), AbstractCRUDController::class));
+        $this->assertTrue(is_subclass_of(AdConfig::apiControllerClass(), AbstractApiCRUDController::class));
     }
 
-    public function testAdConfigContractsResolve(): void
+    public function test_ad_config_contracts_resolve(): void
     {
-        $this->assertInstanceOf(\App\Actions\AdConfig\CreateAdConfig::class, app(AdConfig::getContractName('create')));
-        $this->assertInstanceOf(\App\Actions\AdConfig\UpdateAdConfig::class, app(AdConfig::getContractName('update')));
-        $this->assertInstanceOf(\App\Actions\AdConfig\DeleteAdConfig::class, app(AdConfig::getContractName('delete')));
+        $this->assertInstanceOf(CreateAdConfig::class, app(AdConfig::getContractName('create')));
+        $this->assertInstanceOf(UpdateAdConfig::class, app(AdConfig::getContractName('update')));
+        $this->assertInstanceOf(DeleteAdConfig::class, app(AdConfig::getContractName('delete')));
     }
 
-    public function testAdConfigCanBeCreatedViaAction(): void
+    public function test_ad_config_can_be_created_via_action(): void
     {
         Event::fake();
 
@@ -68,7 +74,7 @@ class AdConfigUnitTest extends TestCase
         Event::assertDispatched(CreatedAdConfig::class);
     }
 
-    public function testAdConfigCanBeUpdatedViaAction(): void
+    public function test_ad_config_can_be_updated_via_action(): void
     {
         Event::fake();
 
@@ -84,7 +90,7 @@ class AdConfigUnitTest extends TestCase
         Event::assertDispatched(UpdatedAdConfig::class);
     }
 
-    public function testAdConfigCanBeDeletedViaAction(): void
+    public function test_ad_config_can_be_deleted_via_action(): void
     {
         Event::fake();
 

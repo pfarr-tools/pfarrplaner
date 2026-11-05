@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -41,8 +41,8 @@ return [
     */
 
     'password' => 'Passwörter müssen mindestens 8 Zeichen lang sein und korrekt bestätigt werden.',
-    'reset'    => 'Das Passwort wurde zurückgesetzt!',
-    'sent'     => 'Passworterinnerung wurde gesendet!',
-    'token'    => 'Der Passwort-Wiederherstellungs-Schlüssel ist ungültig oder abgelaufen.',
-    'user'     => 'Es konnte leider kein Nutzer mit dieser E-Mail-Adresse gefunden werden.',
+    'reset' => 'Das Passwort wurde zurückgesetzt!',
+    'sent' => 'Passworterinnerung wurde gesendet!',
+    'token' => 'Der Passwort-Wiederherstellungs-Schlüssel ist ungültig oder abgelaufen.',
+    'user' => 'Es konnte leider kein Nutzer mit dieser E-Mail-Adresse gefunden werden.',
 ];

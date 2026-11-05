@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -40,9 +40,8 @@ use Illuminate\Support\Facades\Validator;
 
 class UpdatePool extends AbstractUpdateAction implements UpdatesPools
 {
-
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function redirectTo(): string
     {
@@ -59,6 +58,7 @@ class UpdatePool extends AbstractUpdateAction implements UpdatesPools
         $pool->refresh();
         UpdatedPool::dispatch($user, $pool);
         $this->messages = ['success' => 'Der Pool wurde geändert.'];
+
         return $pool;
     }
 }

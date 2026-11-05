@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -38,25 +38,27 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-
+use Inertia\Response;
 
 /**
  * Class OfferingPlanReport
- * @package App\Reports
  */
 class OfferingPlanReport extends AbstractPDFDocumentReport
 {
     public const FILE_SIGNATURE = '77';
+
     public const FILE_TITLE = 'Opferplan';
 
     /**
      * @var string
      */
     public $title = 'Opferplan';
+
     /**
      * @var string
      */
     public $group = 'Opfer';
+
     /**
      * @var string
      */
@@ -65,17 +67,17 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
     protected $inertia = true;
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function setup()
     {
         $cities = Auth::user()->cities;
         $locations = Location::inCities($cities->pluck('id'))->get();
+
         return Inertia::render('Report/OfferingPlan/Setup', compact('cities', 'locations'));
     }
 
     /**
-     * @param Request $request
      * @return mixed|string
      */
     public function render(Request $request)
@@ -100,18 +102,17 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
         })->orderBy('start')->get();
         $data['cities'] = City::whereIn('id', $data['cities'])->get();
 
-
         $this->setHeader('');
         $this->setFooter(
             '<div style="width: 100%; font-size: 8px; color: #666; padding: 0 10mm;">'
-            . '<span style="float: left;">Stand: ' . Carbon::now()->setTimezone('Europe/Berlin')->format('d.m.Y H:i') . ' Uhr</span>'
-            . '<span style="float: right;">Seite <span class="pageNumber"></span> / <span class="totalPages"></span></span>'
-            . '</div>'
+            .'<span style="float: left;">Stand: '.Carbon::now()->setTimezone('Europe/Berlin')->format('d.m.Y H:i').' Uhr</span>'
+            .'<span style="float: right;">Seite <span class="pageNumber"></span> / <span class="totalPages"></span></span>'
+            .'</div>'
         );
 
         return $this->sendToFile(
             FileNameService::make(
-                static::FILE_TITLE. ' '.$data['cities']->pluck('name')->join(' '),
+                static::FILE_TITLE.' '.$data['cities']->pluck('name')->join(' '),
                 'pdf',
                 static::FILE_SIGNATURE,
                 $data['year'].'-01-01',
@@ -123,5 +124,4 @@ class OfferingPlanReport extends AbstractPDFDocumentReport
             ['format' => 'A4']
         );
     }
-
 }

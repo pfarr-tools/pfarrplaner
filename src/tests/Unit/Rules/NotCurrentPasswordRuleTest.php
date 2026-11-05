@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -24,13 +25,21 @@ class NotCurrentPasswordRuleTest extends TestCase
         $failed = false;
         $fail = function () use (&$failed) {
             $failed = true;
-            return new class { public function translate(): string { return ''; } };
+
+            return new class
+            {
+                public function translate(): string
+                {
+                    return '';
+                }
+            };
         };
-        (new NotCurrentPassword())->validate('password', $value, $fail);
-        return !$failed;
+        (new NotCurrentPassword)->validate('password', $value, $fail);
+
+        return ! $failed;
     }
 
-    public function testPassesForNewPassword()
+    public function test_passes_for_new_password()
     {
         // Plain text — User model mutator hashes it, so Hash::check('oldpassword', ...) works
         $user = User::factory()->create(['password' => 'oldpassword']);
@@ -39,7 +48,7 @@ class NotCurrentPasswordRuleTest extends TestCase
         $this->assertTrue($this->runRule('newpassword'));
     }
 
-    public function testFailsForCurrentPassword()
+    public function test_fails_for_current_password()
     {
         $user = User::factory()->create(['password' => 'oldpassword']);
         Auth::login($user);

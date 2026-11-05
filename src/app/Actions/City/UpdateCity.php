@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -35,28 +35,21 @@ use App\Contracts\City\UpdatesCities;
 use App\Events\Models\City\UpdatedCity;
 use App\Models\People\User;
 use App\Models\Places\City;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class UpdateCity extends AbstractUpdateAction implements UpdatesCities
 {
-
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return City::getSingleRoute('web', 'index');
     }
 
-
     /**
-     * @param User $user
-     * @param City $city
-     * @param array $input
-     * @return City
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws AuthorizationException
+     * @throws ValidationException
      */
     public function update(User $user, City $city, array $input): City
     {
@@ -67,8 +60,8 @@ class UpdateCity extends AbstractUpdateAction implements UpdatesCities
         $city->refresh();
         UpdatedCity::dispatch($user, $city);
         $this->messages = ['success' => 'Die Kirchengemeinde wurde geändert.'];
+
         return $city;
 
     }
-
 }

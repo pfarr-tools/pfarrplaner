@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,21 +30,16 @@
 
 namespace App\Integrations;
 
-
 use App\Models\Places\City;
 use Illuminate\Console\Scheduling\Schedule;
 
 /**
  * Class AbstractIntegration
- * @package App\Integrations
  */
 class AbstractIntegration
 {
-
     /**
      * Returns true if the integration is active and properly configured to work for a specific city
-     * @param City $city
-     * @return bool
      */
     public static function isActive(City $city): bool
     {
@@ -53,9 +48,8 @@ class AbstractIntegration
 
     /**
      * This is a hook to schedule tasks for this integration.
-     * @param Schedule $schedule
+     *
      * @return void
      */
     public static function schedule(Schedule $schedule) {}
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -34,8 +34,8 @@ use App\Events\ServiceUpdated;
 use App\Models\Location;
 use App\Models\People\Participant;
 use App\Models\People\Team;
-use App\Models\Service;
 use App\Models\People\User;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -47,15 +47,14 @@ use Inertia\Inertia;
 
 /**
  * Class PlanningInput
- * @package App\Inputs
  */
 class PlanningInput extends AbstractInput
 {
-
     /**
      * @var string
      */
     public $title = 'Planungstabelle';
+
     public $description = 'Beliebige Dienste für einen bestimmten Zeitraum eintragen';
 
     public function canEdit(): bool
@@ -67,7 +66,6 @@ class PlanningInput extends AbstractInput
     }
 
     /**
-     * @param Request $request
      * @return Application|Factory|View
      */
     public function setup(Request $request)
@@ -85,7 +83,6 @@ class PlanningInput extends AbstractInput
     }
 
     /**
-     * @param $reqMinistries
      * @return array
      */
     protected function getAvailableMinistries($reqMinistries)
@@ -115,17 +112,17 @@ class PlanningInput extends AbstractInput
                     break;
                 default:
                     if (Auth::user()->can('gd-allgemein-bearbeiten') || Auth::user()->can(
-                            'gd-freie-dienste-bearbeiten'
-                        )) {
+                        'gd-freie-dienste-bearbeiten'
+                    )) {
                         $ministries[$ministry] = $ministry;
                     }
             }
         }
+
         return $ministries;
     }
 
     /**
-     * @param Request $request
      * @return Application|Factory|View|void
      */
     public function input(Request $request)
@@ -163,7 +160,6 @@ class PlanningInput extends AbstractInput
 
         $ministries = $this->getAvailableMinistries($setup['ministries'] ?: []);
 
-
         $input = $this;
 
         return Inertia::render(
@@ -173,15 +169,14 @@ class PlanningInput extends AbstractInput
     }
 
     /**
-     * @param Request $request
      * @return RedirectResponse|void
      */
     public function save(Request $request)
     {
         $data = $request->validate([
-                                       'slug' => 'required|string|exists:services,slug',
-                                       'ministries' => 'required',
-                                   ]);
+            'slug' => 'required|string|exists:services,slug',
+            'ministries' => 'required',
+        ]);
 
         $service = Service::where('slug', $data['slug'])->first();
         $service->trackChanges();

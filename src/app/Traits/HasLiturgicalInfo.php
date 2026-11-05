@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -31,26 +31,28 @@
 namespace App\Traits;
 
 use App\Services\LiturgyService;
-use App\Models\LiturgyInfo;
 
 trait HasLiturgicalInfo
 {
-
     protected $cachedLiturgicalInfo = null;
 
     /**
      * Add liturgy attribute
-     * @return array
      */
     public function getLiturgicalInfoAttribute(): array
     {
-        if (null !== $this->cachedLiturgicalInfo) return $this->cachedLiturgicalInfo;
-        if (!$this->isAlternateProprium) {
+        if ($this->cachedLiturgicalInfo !== null) {
+            return $this->cachedLiturgicalInfo;
+        }
+        if (! $this->isAlternateProprium) {
             $litInfo = ((LiturgyService::getLiturgyInfoByDate($this->date) ?? [])[0] ?? []);
         } else {
             $litInfo = (LiturgyService::getLiturgyByAltPropriumCode($this->alt_proprium) ?? []);
         }
-        if (($litInfo) && ($litInfo !== [])) $this->cachedLiturgicalInfo = $litInfo;
+        if (($litInfo) && ($litInfo !== [])) {
+            $this->cachedLiturgicalInfo = $litInfo;
+        }
+
         return $litInfo;
     }
 
@@ -61,7 +63,6 @@ trait HasLiturgicalInfo
 
     public function getIsAlternatePropriumAttribute(): bool
     {
-        return null !== $this->alt_proprium;
+        return $this->alt_proprium !== null;
     }
-
 }

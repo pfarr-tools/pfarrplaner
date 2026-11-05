@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -32,20 +32,24 @@ namespace App\UI\Modules;
 
 class AbstractModule
 {
-
     protected $title = '';
+
     protected $icon = 'puzzle';
+
     protected $color = 'black';
+
     protected $config = [];
+
     protected $defaultRoute = '';
 
-    public function __construct(array $config) {
+    public function __construct(array $config)
+    {
         $this->config = $config;
     }
 
     public function isActive(): bool
     {
-        return (bool)($this->config[$this->getKey()] ?? false);
+        return (bool) ($this->config[$this->getKey()] ?? false);
     }
 
     /**
@@ -56,49 +60,31 @@ class AbstractModule
         return $items;
     }
 
-    /**
-     * @return string
-     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * @param string $title
-     */
     public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
-    /**
-     * @return string
-     */
     public function getIcon(): string
     {
         return $this->icon;
     }
 
-    /**
-     * @param string $icon
-     */
     public function setIcon(string $icon): void
     {
         $this->icon = $icon;
     }
 
-    /**
-     * @return string
-     */
     public function getColor(): string
     {
         return $this->color;
     }
 
-    /**
-     * @param string $color
-     */
     public function setColor(string $color): void
     {
         $this->color = $color;
@@ -109,37 +95,23 @@ class AbstractModule
         return strtolower(str_replace('App\\UI\\s\\', '', str_replace('Module', '', get_called_class())));
     }
 
-    /**
-     * @return array
-     */
     public function getConfig(): array
     {
         return $this->config;
     }
 
-    /**
-     * @param array $config
-     */
     public function setConfig(array $config): void
     {
         $this->config = $config;
     }
 
-    /**
-     * @return string
-     */
     public function getDefaultRoute(): string
     {
         return $this->defaultRoute;
     }
 
-    /**
-     * @param string $defaultRoute
-     */
     public function setDefaultRoute(string $defaultRoute): void
     {
         $this->defaultRoute = $defaultRoute;
     }
-
-
 }

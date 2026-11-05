@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,23 +37,24 @@ use Illuminate\View\View;
 
 /**
  * Class AbstractReport
- * @package App\Reports
  */
 class AbstractReport
 {
-
     /**
      * @var string
      */
     public $icon = 'fa fa-file';
+
     /**
      * @var string
      */
     public $title = '';
+
     /**
      * @var string
      */
     public $group = '';
+
     /**
      * @var string
      */
@@ -62,10 +63,8 @@ class AbstractReport
     /** @var bool */
     protected $inertia = false;
 
-
     /**
      * Returns true if the report is active for the current user
-     * @return bool
      */
     public function isActive(): bool
     {
@@ -81,12 +80,11 @@ class AbstractReport
     }
 
     /**
-     * @param $view
      * @return string
      */
     public function getViewName($view)
     {
-        return 'reports.' . strtolower($this->getKey() . '.' . strtolower($view));
+        return 'reports.'.strtolower($this->getKey().'.'.strtolower($view));
     }
 
     /**
@@ -106,7 +104,6 @@ class AbstractReport
     }
 
     /**
-     * @param Request $request
      * @return string
      */
     public function render(Request $request)
@@ -115,12 +112,13 @@ class AbstractReport
     }
 
     /**
-     * @param array $data
+     * @param  array  $data
      * @return Application|Factory|View
      */
     public function renderSetupView($data = [])
     {
         $data = array_merge(['report' => $this->getKey()], $data);
+
         return view($this->getSetupViewName(), $data);
     }
 
@@ -141,31 +139,23 @@ class AbstractReport
     }
 
     /**
-     * @param $view
-     * @param array $data
+     * @param  array  $data
      * @return Application|Factory|View
      */
     public function renderView($view, $data = [])
     {
         $data = array_merge(['report' => $this->getKey()], $data);
+
         return view($this->getViewName($view), $data);
     }
 
-    /**
-     * @return bool
-     */
     public function isInertia(): bool
     {
         return $this->inertia;
     }
 
-    /**
-     * @param bool $inertia
-     */
     public function setInertia(bool $inertia): void
     {
         $this->inertia = $inertia;
     }
-
-
 }

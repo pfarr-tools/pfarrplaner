@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -69,6 +69,7 @@ class AccountData extends Mailable implements ShouldQueue
     public function build()
     {
         Log::debug('AbsenceRequested mailing: build');
+
         return $this->subject('Deine Zugangsdaten für den Pfarrplaner')
             ->markdown('users.mail.account-data', ['user' => $this->user, 'author' => $this->author, 'password' => $this->password]);
     }

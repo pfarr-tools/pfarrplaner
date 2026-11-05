@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -30,24 +30,19 @@
 
 namespace App\FileFormats;
 
-use Closure;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
-use PhpOffice\PhpPresentation\Shape\Drawing\ZipFile;
 use RuntimeException;
-use \ZipArchive;
 
 class ODP extends AbstractZIPBasedFileFormat
 {
-
-
     /**
      * Apply a workaround for slide names in PowerPoint
      *
      * This is necessary to fix a bug in the current version of PHPPresentation, where slide names are
      * not written to the presentation file.
-     * @param array $slideNames
+     *
      * @return void
      */
     public function applySlideNameFix(array $slideNames)
@@ -62,7 +57,6 @@ class ODP extends AbstractZIPBasedFileFormat
             $xp->registerNamespace('office', 'urn:oasis:names:tc:opendocument:xmlns:office:1.0');
             $xp->registerNamespace('draw', 'urn:oasis:names:tc:opendocument:xmlns:drawing:1.0');
 
-
             // Robust: unabhängig von Prefixen im Dokument
             $pages = $xp->query("//*[local-name()='presentation']/*[local-name()='page']");
             $p7 = $pages->item(7);
@@ -73,26 +67,26 @@ class ODP extends AbstractZIPBasedFileFormat
             );
 
             // Fallback, falls die Struktur anders ist
-            if (!$pages || $pages->length === 0) {
+            if (! $pages || $pages->length === 0) {
                 $pages = $xp->query(
                     "//*[local-name()='page' and namespace-uri()='urn:oasis:names:tc:opendocument:xmlns:drawing:1.0']"
                 );
             }
 
-            if (!$pages->count()) {
+            if (! $pages->count()) {
                 return;
             }
 
             $count = $pages->count();
 
             foreach ($slideNames as $slideIndex => $name) {
-                $slideIndex = (int)$slideIndex;
+                $slideIndex = (int) $slideIndex;
                 if ($slideIndex < 0 || $slideIndex >= $count) {
                     continue;
                 }
 
                 $page = $pages->item($slideIndex);
-                if (!$page) {
+                if (! $page) {
                     continue;
                 }
 
@@ -100,19 +94,19 @@ class ODP extends AbstractZIPBasedFileFormat
                 $page->setAttributeNS(
                     'urn:oasis:names:tc:opendocument:xmlns:drawing:1.0',
                     'draw:name',
-                    (string)$name
+                    (string) $name
                 );
             }
+
             return $doc;
         });
         $this->zip->close();
     }
 
-
     public function injectBasicMacroFromBas(
         string $basPath
     ): void {
-        if (!is_file($basPath)) {
+        if (! is_file($basPath)) {
             throw new RuntimeException("BAS file not found: {$basPath}");
         }
 
@@ -126,8 +120,8 @@ class ODP extends AbstractZIPBasedFileFormat
         // Remove any remaining invalid sequences (belt + suspenders)
         $basicCode = iconv('UTF-8', 'UTF-8//IGNORE', $basicCode);
         $basicCode = preg_replace('/^\xEF\xBB\xBF/', '', $basicCode);
-        if (!mb_check_encoding($basicCode, 'UTF-8')) {
-            throw new \RuntimeException("LoopListener.xml not valid UTF-8");
+        if (! mb_check_encoding($basicCode, 'UTF-8')) {
+            throw new RuntimeException('LoopListener.xml not valid UTF-8');
         }
 
         $moduleName = pathinfo($basPath, PATHINFO_FILENAME);
@@ -144,17 +138,17 @@ class ODP extends AbstractZIPBasedFileFormat
         $this->zipWriteString($xlbPath, $this->buildScriptXlb($libraryName, [$moduleName]));
 
         // 3) Write libraries index (script.xlb)
-        $xlcPath = "Basic/script-lc.xml";
+        $xlcPath = 'Basic/script-lc.xml';
         $this->zipWriteString($xlcPath, $this->buildScriptLc([$libraryName]));
 
         // 4) Ensure manifest contains entries for our new files
         $this->ensureManifestEntries([
-                                         'Basic/' => 'application/vnd.sun.star.basic-library',
-                                         'Basic/script-lc.xml' => 'application/vnd.sun.star.basic-library',
-                                         "Basic/{$libraryName}/" => 'application/vnd.sun.star.basic-library',
-                                         "Basic/{$libraryName}/script-lb.xml" => 'application/vnd.sun.star.basic-library',
-                                         "Basic/{$libraryName}/{$moduleName}.xba" => 'application/vnd.sun.star.basic',
-                                     ]);
+            'Basic/' => 'application/vnd.sun.star.basic-library',
+            'Basic/script-lc.xml' => 'application/vnd.sun.star.basic-library',
+            "Basic/{$libraryName}/" => 'application/vnd.sun.star.basic-library',
+            "Basic/{$libraryName}/script-lb.xml" => 'application/vnd.sun.star.basic-library',
+            "Basic/{$libraryName}/{$moduleName}.xba" => 'application/vnd.sun.star.basic',
+        ]);
 
         $this->zip->close();
         $this->registerContentXmlEvent('dom:load',
@@ -166,7 +160,7 @@ class ODP extends AbstractZIPBasedFileFormat
         // Normalize line endings (LO is tolerant, but consistent is nice)
         $basicCode = str_replace(["\r\n", "\r"], "\n", $basicCode);
 
-        $doc = new \DOMDocument('1.0', 'UTF-8');
+        $doc = new DOMDocument('1.0', 'UTF-8');
         $doc->preserveWhiteSpace = false;
         $doc->formatOutput = true;
 
@@ -189,14 +183,14 @@ class ODP extends AbstractZIPBasedFileFormat
         $module->setAttributeNS($SCRIPT_NS, 'script:language', 'StarBasic');
 
         // Inhalt als Text (wie in echten .xba; kein CDATA nötig)
-        $module->appendChild($doc->createTextNode("\n" . $basicCode . "\n"));
+        $module->appendChild($doc->createTextNode("\n".$basicCode."\n"));
 
         return $doc->saveXML();
     }
 
     private function buildScriptXlb(string $libraryName, array $moduleNames): string
     {
-        $doc = new \DOMDocument('1.0', 'UTF-8');
+        $doc = new DOMDocument('1.0', 'UTF-8');
         $doc->preserveWhiteSpace = false;
         $doc->formatOutput = true;
 
@@ -213,7 +207,7 @@ class ODP extends AbstractZIPBasedFileFormat
 
         // <library:element library:name="Module1"/>
         foreach ($moduleNames as $m) {
-            $m = (string)$m;
+            $m = (string) $m;
             if ($m === '') {
                 continue;
             }
@@ -227,13 +221,11 @@ class ODP extends AbstractZIPBasedFileFormat
     }
 
     /**
-     * @param array $libraryNames
-     * @return string
      * @throws \DOMException
      */
     private function buildScriptLc(array $libraryNames): string
     {
-        $doc = new \DOMDocument('1.0', 'UTF-8');
+        $doc = new DOMDocument('1.0', 'UTF-8');
         $doc->preserveWhiteSpace = false;
         $doc->formatOutput = true;
 
@@ -248,7 +240,7 @@ class ODP extends AbstractZIPBasedFileFormat
         $root->setAttributeNS($XLINK, 'xlink:type', 'simple');
 
         foreach ($libraryNames as $name) {
-            $name = (string)$name;
+            $name = (string) $name;
             if ($name === '') {
                 continue;
             }
@@ -268,7 +260,7 @@ class ODP extends AbstractZIPBasedFileFormat
     /**
      * Ensure META-INF/manifest.xml contains file-entry elements for given paths.
      *
-     * @param array<string,string> $pathsToMediaTypes
+     * @param  array<string,string>  $pathsToMediaTypes
      */
     private function ensureManifestEntries(array $pathsToMediaTypes): void
     {
@@ -277,14 +269,14 @@ class ODP extends AbstractZIPBasedFileFormat
             $xp->registerNamespace('manifest', 'urn:oasis:names:tc:opendocument:xmlns:manifest:1.0');
 
             $root = $doc->documentElement;
-            if (!$root) {
-                throw new RuntimeException("Invalid manifest.xml (no root)");
+            if (! $root) {
+                throw new RuntimeException('Invalid manifest.xml (no root)');
             }
 
             // Collect existing full-path entries
             $existing = [];
             foreach ($xp->query('//manifest:file-entry') as $node) {
-                /** @var \DOMElement $node */
+                /** @var DOMElement $node */
                 $fullPath = $node->getAttributeNS(
                     'urn:oasis:names:tc:opendocument:xmlns:manifest:1.0',
                     'full-path'
@@ -319,30 +311,29 @@ class ODP extends AbstractZIPBasedFileFormat
         });
     }
 
-
     public function registerContentXmlEvent(string $odfEventName, string $macroUrl): void
     {
         $this->zip->open($this->documentFilePath);
 
-        $this->patchXMLFile('content.xml', function(\DOMDocument $doc) use ($odfEventName, $macroUrl) {
+        $this->patchXMLFile('content.xml', function (DOMDocument $doc) use ($odfEventName, $macroUrl) {
             $OFFICE_NS = 'urn:oasis:names:tc:opendocument:xmlns:office:1.0';
             $SCRIPT_NS = 'urn:oasis:names:tc:opendocument:xmlns:script:1.0';
-            $XLINK_NS  = 'http://www.w3.org/1999/xlink';
+            $XLINK_NS = 'http://www.w3.org/1999/xlink';
 
-            $xp = new \DOMXPath($doc);
+            $xp = new DOMXPath($doc);
             $xp->registerNamespace('office', $OFFICE_NS);
             $xp->registerNamespace('script', $SCRIPT_NS);
-            $xp->registerNamespace('xlink',  $XLINK_NS);
+            $xp->registerNamespace('xlink', $XLINK_NS);
 
             // Root <office:document-content>
             $root = $doc->documentElement;
-            if (!$root || $root->namespaceURI !== $OFFICE_NS || $root->localName !== 'document-content') {
-                throw new \RuntimeException('content.xml: unexpected root element');
+            if (! $root || $root->namespaceURI !== $OFFICE_NS || $root->localName !== 'document-content') {
+                throw new RuntimeException('content.xml: unexpected root element');
             }
 
             // <office:scripts> (direct child of root)
             $scripts = $xp->query('/office:document-content/office:scripts')->item(0);
-            if (!$scripts) {
+            if (! $scripts) {
                 $scripts = $doc->createElementNS($OFFICE_NS, 'office:scripts');
 
                 // Insert scripts early (before office:body if possible)
@@ -356,7 +347,7 @@ class ODP extends AbstractZIPBasedFileFormat
 
             // <office:event-listeners>
             $listeners = $xp->query('./office:event-listeners', $scripts)->item(0);
-            if (!$listeners) {
+            if (! $listeners) {
                 $listeners = $doc->createElementNS($OFFICE_NS, 'office:event-listeners');
                 $scripts->appendChild($listeners);
             }
@@ -385,8 +376,6 @@ class ODP extends AbstractZIPBasedFileFormat
 
     /**
      * Decode HTML entities in ODP body text so LibreOffice shows Unicode characters instead of entity strings.
-     *
-     * @return void
      */
     public function applyTextEntityDecodingFix(): void
     {
@@ -406,5 +395,4 @@ class ODP extends AbstractZIPBasedFileFormat
 
         $this->zip->close();
     }
-
 }

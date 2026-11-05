@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pfarrplaner
  *
@@ -9,7 +10,6 @@
  * @link https://github.com/pfarr-tools/pfarrplaner
  * @version git: $Id$
  *
- * Sponsored by: Evangelischer Kirchenbezirk Balingen, https://www.kirchenbezirk-balingen.de
  *
  * Pfarrplaner is based on the Laravel framework (https://laravel.com).
  * This file may contain code created by Laravel's scaffolding functions.
@@ -37,7 +37,6 @@ use Illuminate\Database\Migrations\Migrator;
 
 /**
  * Class DemoBuilder
- * @package App\Console\Commands
  */
 class Upgrader extends Command
 {
@@ -55,7 +54,6 @@ class Upgrader extends Command
      */
     protected $description = 'Perform all necessary steps for an upgrade';
 
-
     /**
      * The migrator instance.
      *
@@ -69,20 +67,18 @@ class Upgrader extends Command
         $this->migrator = app('migrator');
     }
 
-
     /**
      * Execute the console command.
-     *
      */
     public function handle()
     {
         $this->output->title('Pfarrplaner upgrade');
-        $this->line(str_pad('New Pfarrplaner app version: ', 30) . PackageService::info()['buildVersion']);
-        $this->line(str_pad('Source build date: ', 30) . PackageService::info()['date']->format('Y-m-d H:i'));
-        $this->line(str_pad('Upgrade date: ', 30) . Carbon::now()->format('Y-m-d H:i'));
+        $this->line(str_pad('New Pfarrplaner app version: ', 30).PackageService::info()['buildVersion']);
+        $this->line(str_pad('Source build date: ', 30).PackageService::info()['date']->format('Y-m-d H:i'));
+        $this->line(str_pad('Upgrade date: ', 30).Carbon::now()->format('Y-m-d H:i'));
 
         $this->output->section('Pre-flight checks');
-        if (!$this->checkRequirements()) {
+        if (! $this->checkRequirements()) {
             return;
         }
 
@@ -118,6 +114,7 @@ class Upgrader extends Command
         $this->output->write(str_pad($title, 60), false);
         $result = $resultCallBack();
         $this->output->writeln($result ? '      [<info>OK</info>]' : '  [<error>FAILED</error>]');
+
         return $result;
     }
 
@@ -125,13 +122,14 @@ class Upgrader extends Command
     {
         $this->output->write(str_pad($title, 60), false);
         $this->output->writeln($result ? '      [<info>OK</info>]' : '  [<error>FAILED</error>]');
+
         return $result;
     }
 
     protected function checkRequirement($title, $examinedValue, $compareTo = true, $individualMethod = false)
     {
         return $this->writeResult(
-            'Check: ' . $title . ' => ' . (string)$examinedValue,
+            'Check: '.$title.' => '.(string) $examinedValue,
             ($individualMethod || ($examinedValue == $compareTo))
         );
     }
@@ -145,19 +143,20 @@ class Upgrader extends Command
         );
     }
 
-    protected function hasMigrations() {
+    protected function hasMigrations()
+    {
         $ran = collect($this->migrator->getRepository()->getRan());
         $migrations = collect(
             array_keys(
                 $this->migrator->getMigrationFiles(
                     array_merge(
                         $this->migrator->paths(),
-                        [$this->laravel->databasePath() . DIRECTORY_SEPARATOR . 'migrations']
+                        [$this->laravel->databasePath().DIRECTORY_SEPARATOR.'migrations']
                     )
                 )
             )
         )->diff($ran);
+
         return $migrations->count();
     }
-
 }
