@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.18.12](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.11...v2026.18.12) (2026-11-05)
+
+
+### Features
+
+* **quality:** Verbindliche Qualitätsprüfungen für neue Änderungen einführen ([1ca413f](https://github.com/pfarr-tools/pfarrplaner/commit/1ca413fef9a514e3acf0e5c614cc111e1e0a0583)), closes [#27](https://github.com/pfarr-tools/pfarrplaner/issues/27)
+
+
+### Bug Fixes
+
+* **kalender:** Selbstzuordnung nur bei Berechtigung anzeigen. ([2217e78](https://github.com/pfarr-tools/pfarrplaner/commit/2217e78caeffc9b2673f0907bc5a3dcc7b72587b)), closes [#37](https://github.com/pfarr-tools/pfarrplaner/issues/37)
+* **rechte:** Gottesdienst- und Passwortschutz korrigieren. ([9e42a96](https://github.com/pfarr-tools/pfarrplaner/commit/9e42a9691278ea1b04037e18ab70e1c90dce89a8)), closes [#37](https://github.com/pfarr-tools/pfarrplaner/issues/37)
+
 ### [2026.18.11](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.10...v2026.18.11) (2026-11-04)
 
 
