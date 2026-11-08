@@ -85,12 +85,13 @@ class AbsenceController extends Controller
             : 'YEAR(absences.from)';
         $years = Absence::select(DB::raw($yearExpression.' as year'))->distinct()->get()->pluck('year')->sort();
         $pinList = $request->user()->getSetting('planner_pinned_users', []);
+        $pastorPinList = $request->user()->getSetting('planner_pinned_pastors', null);
         $sectionConfig = $request->user()->getSetting('planner_open_sections', null);
 
         $pools = Auth::user()->pools;
 
         return Inertia::render('Absences/Planner',
-            compact('start', 'days', 'year', 'month', 'years', 'pinList', 'sectionConfig', 'pools'));
+            compact('start', 'days', 'year', 'month', 'years', 'pinList', 'pastorPinList', 'sectionConfig', 'pools'));
     }
 
     /**

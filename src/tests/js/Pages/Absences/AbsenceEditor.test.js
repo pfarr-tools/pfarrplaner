@@ -85,6 +85,33 @@ describe('AbsenceEditor ISO submission', () => {
         expect(mayDelete).toBe(true)
     })
 
+    it('only shows the workflow alert when a workflow is configured', () => {
+        expect(AbsenceEditor.computed.hasApprovalWorkflow.call({
+            form: { user: { vacation_admins: [], vacation_approvers: [] } },
+        })).toBe(false)
+
+        expect(AbsenceEditor.computed.hasApprovalWorkflow.call({
+            form: { user: { vacation_admins: [{ id: 2 }], vacation_approvers: [] } },
+        })).toBe(true)
+    })
+
+    it('submits the persisted absence to the delete endpoint', () => {
+        const deleteRequest = vi.fn()
+        const ctx = {
+            form: { id: 7, from: '2026-08-02T00:00:00.000Z' },
+            $inertia: { delete: deleteRequest },
+        }
+
+        AbsenceEditor.methods.deleteAbsence.call(ctx)
+
+        expect(deleteRequest).toHaveBeenCalledWith(
+            '/absence.destroy',
+            expect.objectContaining({
+                data: expect.objectContaining({ month: expect.any(String), year: expect.any(String) }),
+            }),
+        )
+    })
+
     it('detects unsaved absences by missing id', () => {
         const unsaved = AbsenceEditor.computed.isPersisted.call({
             form: { id: null },

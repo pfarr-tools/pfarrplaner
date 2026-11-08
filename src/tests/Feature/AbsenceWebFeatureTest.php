@@ -57,6 +57,20 @@ class AbsenceWebFeatureTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page->component('Absences/AbsenceEditor'));
     }
 
+    public function test_delete_removes_absence_and_redirects_to_planner(): void
+    {
+        $absence = Absence::factory()->create(['user_id' => $this->user->id]);
+
+        $response = $this->actingAs($this->user)
+            ->delete(route('absence.destroy', $absence), [
+                'month' => 8,
+                'year' => 2026,
+            ]);
+
+        $response->assertRedirect(route('absences.index', ['month' => 8, 'year' => 2026]));
+        $this->assertSoftDeleted($absence);
+    }
+
     public function test_create_persists_single_day_absence_and_redirects_to_editor(): void
     {
         $this->actingAs($this->user);

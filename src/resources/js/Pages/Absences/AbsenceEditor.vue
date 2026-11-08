@@ -80,19 +80,19 @@
                 Ablehnen
             </nav-button>
 
-            <nav-button v-if="mayDelete"
-                        @click="deleteAbsence"
-                        type="danger"
-                        icon="mdi mdi-delete"
-                        class="ms-1"
-                        force-icon>
-                Löschen
-            </nav-button>
+            <button v-if="mayDelete"
+                    type="button"
+                    class="btn btn-danger ms-1"
+                    title="Abwesenheit löschen"
+                    @click.prevent="deleteAbsence">
+                <span class="mdi mdi-delete"></span>
+                <span class="d-none d-md-inline">Löschen</span>
+            </button>
         </template>
 
 
         <template #before-flash>
-            <div v-if="form.workflow_status < 10" class="alert"
+            <div v-if="form.workflow_status < 10 && hasApprovalWorkflow" class="alert"
                  :class="setApproved ? 'alert-success' : 'alert-danger'">
 
                 <checked-process-item  :check="form.workflow_status > 0"
@@ -400,6 +400,14 @@ export default {
                     || this.mayApprove
                 )
             );
+        },
+        /**
+         * Determine whether the absence is part of a configured approval workflow.
+         *
+         * @returns {boolean} True when an administrator or approver is configured.
+         */
+        hasApprovalWorkflow() {
+            return Boolean(this.form.user?.vacation_admins?.length || this.form.user?.vacation_approvers?.length);
         },
         // ✅ bridge for new DateRangeInput
         dateRange: {

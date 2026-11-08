@@ -56,4 +56,41 @@ describe('Absences Planner timezone handling', () => {
             to: '2026-05-07T21:59:59.000Z',
         })
     })
+
+    it('uses a dedicated warning class for unapproved absences', () => {
+        const ctx = {
+            userDays: {
+                30: {
+                    1: {
+                        absence: { workflow_status: 1 },
+                    },
+                },
+            },
+        }
+
+        expect(Planner.methods.absenceStatusClass.call(ctx, ctx.userDays[30][1].absence))
+            .toContain('absence-status-unapproved')
+    })
+
+    it('groups pastor and employee visibility controls separately', () => {
+        const ctx = {
+            toggleableUsers: [
+                { id: 1, isPastor: true },
+                { id: 2, isPastor: false },
+            ],
+            plannerVisibilityUsers: [
+                { id: 1, isPastor: true },
+                { id: 2, isPastor: false },
+            ],
+            $page: { props: { labels: { pastor: 'Pfarrer' } } },
+            pastorPluralLabel: () => 'Pfarrer:innen',
+        }
+
+        const sections = Planner.computed.plannerVisibilitySections.call(ctx)
+
+        expect(sections).toEqual([
+            { label: 'Pfarrer:innen', users: [{ id: 1, isPastor: true }] },
+            { label: 'Mitarbeitende', users: [{ id: 2, isPastor: false }] },
+        ])
+    })
 })

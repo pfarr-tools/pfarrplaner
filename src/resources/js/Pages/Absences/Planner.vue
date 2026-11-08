@@ -48,19 +48,21 @@
                         </span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end planner-visibility-dropdown" aria-labelledby="plannerVisibilityDropdown">
-                        <div class="dropdown-header">Mitarbeitende ein- oder ausblenden</div>
-                        <button
-                            v-for="user in plannerVisibilityUsers"
-                            :key="'toggle-' + user.id"
-                            type="button"
-                            class="dropdown-item planner-visibility-item"
-                            @click.prevent.stop="togglePinned(user)"
-                        >
-                            <span class="planner-visibility-name">{{ formatUserName(user) }}</span>
-                            <span class="badge rounded-pill" :class="user.pinned ? 'bg-success text-dark' : 'bg-secondary'">
-                                {{ user.pinned ? 'An' : 'Aus' }}
-                            </span>
-                        </button>
+                        <template v-for="section in plannerVisibilitySections" :key="section.label">
+                            <div class="dropdown-header">{{ section.label }}</div>
+                            <button
+                                v-for="user in section.users"
+                                :key="'toggle-' + user.id"
+                                type="button"
+                                class="dropdown-item planner-visibility-item"
+                                @click.prevent.stop="togglePinned(user)"
+                            >
+                                <span class="planner-visibility-name">{{ formatUserName(user) }}</span>
+                                <span class="badge rounded-pill" :class="user.pinned ? 'bg-success text-dark' : 'bg-secondary'">
+                                    {{ user.pinned ? 'An' : 'Aus' }}
+                                </span>
+                            </button>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -267,7 +269,7 @@ import { serializePlannerDateToBerlinDateString, serializePlannerDateToUtc } fro
 export default {
     name: "Planner",
     components: {AbsenceNav, Card, CardBody, DateRangeInput, Modal},
-    props: ['start', 'end', 'year', 'month', 'months', 'years', 'now', 'holidays', 'days', 'sectionConfig', 'pinList', 'pools'],
+    props: ['start', 'end', 'year', 'month', 'months', 'years', 'now', 'holidays', 'days', 'sectionConfig', 'pinList', 'pastorPinList', 'pools'],
     mounted() {
         this.loadPlanner();
     },
@@ -275,7 +277,7 @@ export default {
         let mask = {
             'Eigenes Konto': true,
         };
-        mask[this.$page.props.labels.pastor+'nen'] = true;
+        mask[this.pastorPluralLabel()] = true;
         mask['Mitarbeitende'] = true;
 
         return {
@@ -286,6 +288,7 @@ export default {
             sections: [],
             openSections: this.normalizeOpenSections(this.sectionConfig, mask),
             pinnedUsers: this.pinList || [],
+            pinnedPastors: this.pastorPinList === null ? null : (this.pastorPinList || []),
             toggleableUsers: [],
             isPastor: this.$page.props.currentUser.data.isPastor,
             draftAbsenceRanges: {},
@@ -323,6 +326,19 @@ export default {
         plannerVisibilityUsers() {
             return this.toggleableUsers.filter(Boolean);
         },
+        /**
+         * Group visibility controls by pastor and employee category.
+         *
+         * @returns {Array<{label: string, users: Object[]}>} Visibility groups.
+         */
+        plannerVisibilitySections() {
+            const pastorLabel = this.pastorPluralLabel();
+
+            return [
+                {label: pastorLabel, users: this.plannerVisibilityUsers.filter(user => user.isPastor)},
+                {label: 'Mitarbeitende', users: this.plannerVisibilityUsers.filter(user => !user.isPastor)},
+            ].filter(section => section.users.length);
+        },
         activeToggleableUsersCount() {
             return this.plannerVisibilityUsers.filter(user => user.pinned).length;
         },
@@ -334,6 +350,16 @@ export default {
         },
     },
     methods: {
+        /**
+         * Return the configured plural label for pastors.
+         *
+         * @returns {string} Localized plural label.
+         */
+        pastorPluralLabel() {
+            const label = this.$page.props.labels.pastor;
+
+            return label.endsWith(':in') ? label + 'nen' : label + ':innen';
+        },
         plannerDateTime(value) {
             if (!value) return null;
             if (DateTime.isDateTime(value)) {
@@ -496,17 +522,6 @@ export default {
         userRowKey(category, user) {
             return `${category}-${user.id}-${this.openSections[category] ? 'open' : 'closed'}`;
         },
-        addUserToMitarbeitende(user) {
-            if (!this.users['Mitarbeitende']) this.users['Mitarbeitende'] = [];
-            if (!this.users['Mitarbeitende'].find((existingUser) => existingUser.id === user.id)) {
-                this.users['Mitarbeitende'].push(user);
-                this.users['Mitarbeitende'].sort((a, b) => a.sortName < b.sortName ? -1 : 1);
-            }
-        },
-        removeUserFromMitarbeitende(user) {
-            if (!this.users['Mitarbeitende']) return;
-            this.users['Mitarbeitende'] = this.users['Mitarbeitende'].filter((existingUser) => existingUser.id !== user.id);
-        },
         persistPlannerSetting(key, value) {
             axios.post(route('setting.set', {
                 user: this.$page.props.currentUser.data.id,
@@ -604,13 +619,24 @@ export default {
         },
         absenceClass(user, day) {
             const absence = this.userDays[user.id][day.day].absence;
-            let absenceStatus = ' absence-status-' + absence.workflow_status;
+            let absenceStatus = ' ' + this.absenceStatusClass(absence);
             let editable = ' not-editable';
             if (user.canEdit || absence.canEdit) editable = ' editable';
             if (absence.sick_days && (absence.canEdit || user.canEdit)) editable = ' sick editable';
             if (absence.poolmaster) return 'poolmaster' + editable;
             if (absence.replacing) return 'replacing' + editable;
             return 'absent' + absenceStatus + editable;
+        },
+        /**
+         * Return a stable visual status for an absence, including legacy/null values.
+         *
+         * @param {Object} absence Absence data from the planner API.
+         * @returns {string} CSS class for the approval state.
+         */
+        absenceStatusClass(absence) {
+            return [2, 11].includes(Number(absence?.workflow_status))
+                ? 'absence-status-approved'
+                : 'absence-status-unapproved';
         },
         absenceTitle(user, absence) {
             if ((!user.canEdit) && (!absence.canEdit) && (!absence.replacing)) {
@@ -652,14 +678,19 @@ export default {
             });
 
             if (this.$page.props.currentUser.data.isPastor) {
-                sortedUsers[this.$page.props.labels.pastor+'nen'] = [];
-                this.sections.push(this.$page.props.labels.pastor+'nen');
+                sortedUsers[this.pastorPluralLabel()] = [];
+                this.sections.push(this.pastorPluralLabel());
                 users.forEach(user => {
                     if (usedIds.includes(user.id)) return;
                     if (user.isPastor) {
-                        user.pinned = true;
-                        sortedUsers[this.$page.props.labels.pastor+'nen'].push(user);
-                        usedIds.push(user.id);
+                        user.pinned = this.pinnedPastors === null
+                            || this.pinnedPastors.includes(String(user.id))
+                            || this.pinnedPastors.includes(user.id);
+                        allToggleableUsers.push(user);
+                        if (user.pinned) {
+                            sortedUsers[this.pastorPluralLabel()].push(user);
+                            usedIds.push(user.id);
+                        }
                     }
                 });
                 sortedUsers['Mitarbeitende'] = [];
@@ -683,6 +714,7 @@ export default {
 
             users.forEach(user => {
                 if (usedIds.includes(user.id)) return;
+                if (this.isPastor && user.isPastor) return;
                 user.pinned = true;
                 sortedUsers['Mitarbeitende'].push(user);
             });
@@ -697,15 +729,51 @@ export default {
         },
         togglePinned(user) {
             user.pinned = !user.pinned;
-            if (user.pinned) {
-                this.pinnedUsers = [...new Set([...this.pinnedUsers, user.id])];
-                this.addUserToMitarbeitende(user);
+            const settingKey = user.isPastor ? 'planner_pinned_pastors' : 'planner_pinned_users';
+            if (user.isPastor) {
+                this.pinnedPastors = this.pinnedPastors || this.toggleableUsers
+                    .filter(toggleableUser => toggleableUser.isPastor)
+                    .map(pastor => pastor.id);
+                this.pinnedPastors = user.pinned
+                    ? [...new Set([...this.pinnedPastors, user.id])]
+                    : this.pinnedPastors.filter((id) => String(id) !== String(user.id));
             } else {
-                this.removeUserFromMitarbeitende(user);
-                this.pinnedUsers = this.pinnedUsers.filter((x) => String(x) !== String(user.id));
+                this.pinnedUsers = user.pinned
+                    ? [...new Set([...this.pinnedUsers, user.id])]
+                    : this.pinnedUsers.filter((id) => String(id) !== String(user.id));
             }
 
-            this.persistPlannerSetting('planner_pinned_users', this.pinnedUsers);
+            if (user.pinned) {
+                this.addUserToVisibilitySection(user);
+            } else {
+                this.removeUserFromVisibilitySection(user);
+            }
+            this.persistPlannerSetting(settingKey, user.isPastor ? this.pinnedPastors : this.pinnedUsers);
+        },
+        /**
+         * Add a visible user to the correct planner section.
+         *
+         * @param {Object} user User to add.
+         * @returns {void}
+         */
+        addUserToVisibilitySection(user) {
+            const section = user.isPastor ? this.pastorPluralLabel() : 'Mitarbeitende';
+            if (!this.users[section]) this.users[section] = [];
+            if (!this.users[section].find(existingUser => existingUser.id === user.id)) {
+                this.users[section].push(user);
+                this.users[section].sort((a, b) => a.sortName < b.sortName ? -1 : 1);
+            }
+        },
+        /**
+         * Remove a hidden user from the correct planner section.
+         *
+         * @param {Object} user User to remove.
+         * @returns {void}
+         */
+        removeUserFromVisibilitySection(user) {
+            const section = user.isPastor ? this.pastorPluralLabel() : 'Mitarbeitende';
+            if (!this.users[section]) return;
+            this.users[section] = this.users[section].filter(existingUser => existingUser.id !== user.id);
         },
         getUserDay(user, day) {
             if (!user || !day) return null;
@@ -928,9 +996,7 @@ export default {
     border-right-color: theme.elkw-color("orange");
 }
 
-.absence-planner-table .cal-cell.absent.absence-status-0,
-.absence-planner-table .cal-cell.absent.absence-status-1,
-.absence-planner-table .cal-cell.absent.absence-status-10 {
+.absence-planner-table .cal-cell.absent.absence-status-unapproved {
     background-color: tint-color(theme.theme-color("warning"), 50%);
 }
 
