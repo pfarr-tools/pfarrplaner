@@ -101,7 +101,7 @@ return [
                     ],
                     'custom' => [
                         'Zitat' => [
-                            'alignment' => 'both',
+                            'alignment' => 'start',
                             'indentation' => [
                                 'left' => 566.893, // 1cm
                                 'right' => 566.893, // 1cm

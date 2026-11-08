@@ -18,6 +18,16 @@ use Tests\TestCase;
 
 class DefaultWordDocumentUnitTest extends TestCase
 {
+    public function test_blockquote_paragraph_style_is_left_aligned(): void
+    {
+        $document = new DefaultWordDocument;
+
+        $this->assertSame(
+            'start',
+            $document->getConfig()['styles']['paragraphs']['custom'][DefaultWordDocument::BLOCKQUOTE]['alignment']
+        );
+    }
+
     public function test_create_dom_document_from_html_preserves_utf8_special_characters(): void
     {
         $dom = DefaultWordDocument::createDomDocumentFromHtml('<p>Text — mit … „Sonderzeichen“ &amp; Akzenten é</p>');
