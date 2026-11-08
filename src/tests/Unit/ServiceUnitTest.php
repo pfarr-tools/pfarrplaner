@@ -83,6 +83,23 @@ class ServiceUnitTest extends TestCase
     }
 
     /**
+     * Ensure an alternate proprium without liturgical metadata still has a usable date.
+     */
+    public function test_liturgical_info_date_falls_back_to_service_date_when_iso_date_is_missing(): void
+    {
+        /** @var Service $service */
+        $service = Service::factory()->make([
+            'date' => Carbon::parse('2027-01-02 20:20:00'),
+            'alt_proprium' => 'x-',
+        ]);
+
+        $liturgicalInfoDate = $service->getLiturgicalInfoDateAttribute();
+
+        $this->assertInstanceOf(Carbon::class, $liturgicalInfoDate);
+        $this->assertSame('2027-01-02', $liturgicalInfoDate->toDateString());
+    }
+
+    /**
      * Test that checkbox fields can be set and unset
      *
      * @return void

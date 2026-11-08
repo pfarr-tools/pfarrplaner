@@ -56,9 +56,14 @@ trait HasLiturgicalInfo
         return $litInfo;
     }
 
+    /**
+     * Return the liturgical date, falling back to the service date when alternate metadata is incomplete.
+     *
+     * @return mixed
+     */
     public function getLiturgicalInfoDateAttribute()
     {
-        return $this->isAlternateProprium ? $this->liturgical_info['isoDate'] : $this->date;
+        return $this->isAlternateProprium ? ($this->liturgical_info['isoDate'] ?? $this->date) : $this->date;
     }
 
     public function getIsAlternatePropriumAttribute(): bool
