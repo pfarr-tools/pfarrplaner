@@ -42,7 +42,7 @@
                         aria-expanded="false"
                     >
                         <span class="mdi mdi-account-multiple-outline"></span>
-                        <span class="d-none d-md-inline"> Mitarbeitende </span>
+                        <span class="d-none d-md-inline"> Angezeigte Personen </span>
                         <span class="badge rounded-pill bg-secondary ms-1">
                             {{ activeToggleableUsersCount }}/{{ plannerVisibilityUsers.length }}
                         </span>
@@ -697,6 +697,7 @@ export default {
                 this.sections.push('Mitarbeitende');
                 users.forEach(user => {
                     if (usedIds.includes(user.id)) return;
+                    if (this.isPastor && user.isPastor) return;
                     if (!user.show_absences_with_services) {
                         user.pinned = this.pinnedUsers.includes(String(user.id)) || this.pinnedUsers.includes(user.id);
                         allToggleableUsers.push(user);
@@ -997,7 +998,8 @@ export default {
 }
 
 .absence-planner-table .cal-cell.absent.absence-status-unapproved {
-    background-color: tint-color(theme.theme-color("warning"), 50%);
+    background-color: #ffe69c !important;
+    border-right-color: #ffda6a !important;
 }
 
 .replacing {

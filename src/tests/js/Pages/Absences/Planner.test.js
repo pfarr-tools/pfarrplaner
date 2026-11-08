@@ -62,7 +62,7 @@ describe('Absences Planner timezone handling', () => {
             userDays: {
                 30: {
                     1: {
-                        absence: { workflow_status: 1 },
+                        absence: { workflow_status: 10 },
                     },
                 },
             },
@@ -92,5 +92,27 @@ describe('Absences Planner timezone handling', () => {
             { label: 'Pfarrer:innen', users: [{ id: 1, isPastor: true }] },
             { label: 'Mitarbeitende', users: [{ id: 2, isPastor: false }] },
         ])
+    })
+
+    it('does not add pastors to the visibility controls twice', () => {
+        const pastor = { id: 1, isPastor: true, show_absences_with_services: false, sortName: 'Pastor' }
+        const ctx = {
+            isPastor: true,
+            pinnedPastors: null,
+            pinnedUsers: [],
+            sections: [],
+            toggleableUsers: [],
+            $page: {
+                props: {
+                    currentUser: { data: { id: 99, isPastor: true } },
+                    labels: { pastor: 'Pfarrer' },
+                },
+            },
+            pastorPluralLabel: () => 'Pfarrer:innen',
+        }
+
+        Planner.methods.sortUsers.call(ctx, [pastor])
+
+        expect(ctx.toggleableUsers.map(user => user.id)).toEqual([1])
     })
 })
