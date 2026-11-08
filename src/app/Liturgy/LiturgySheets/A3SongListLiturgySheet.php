@@ -32,9 +32,12 @@ namespace App\Liturgy\LiturgySheets;
 
 class A3SongListLiturgySheet extends AbstractLiturgySheet
 {
+    /** @var string Sheet title shown in the liturgy export selection. */
     protected $title = 'Liedanzeiger (A3)';
 
-    protected $layout = ['format' => 'A3-L'];
+    /** @var array{format: string, landscape: bool} Puppeteer-compatible paper layout. */
+    protected $layout = ['format' => 'A3', 'landscape' => true];
 
+    /** @var string Base filename title for generated documents. */
     protected $fileTitle = 'Liedanzeiger';
 }

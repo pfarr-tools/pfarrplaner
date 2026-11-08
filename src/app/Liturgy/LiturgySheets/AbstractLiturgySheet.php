@@ -72,6 +72,12 @@ class AbstractLiturgySheet
         return [];
     }
 
+    /**
+     * Render the sheet as a downloadable PDF for the given service.
+     *
+     * @param  Service  $service  Service whose liturgy is exported.
+     * @return mixed Download response produced by Browsershot.
+     */
     public function render(Service $service)
     {
 
@@ -79,14 +85,19 @@ class AbstractLiturgySheet
             .Carbon::now()->setTimezone('Europe/Berlin')->format('d.m.Y H:i:s')
             .' – Seite <span class="pageNumber"></span> / <span class="totalPages"></span></div>';
 
-        return PDF::fromView($this->getRenderViewName(),
+        $pdf = PDF::fromView($this->getRenderViewName(),
             array_merge(compact('service'), $this->getData($service)))
             ->format($this->layout['format'])
             ->margins(15, 15, 15, 15)
             ->showBrowserHeaderAndFooter()
             ->hideHeader()
-            ->footerHtml($this->getFooter())
-            ->download($this->getFileName($service));
+            ->footerHtml($this->getFooter());
+
+        if ($this->layout['landscape'] ?? false) {
+            $pdf->landscape();
+        }
+
+        return $pdf->download($this->getFileName($service));
     }
 
     /**
@@ -169,7 +180,9 @@ class AbstractLiturgySheet
     }
 
     /**
-     * @return string[]
+     * Return the PDF layout configuration used by the sheet renderer.
+     *
+     * @return array{format: string, landscape?: bool}
      */
     public function getLayout(): array
     {
@@ -177,7 +190,9 @@ class AbstractLiturgySheet
     }
 
     /**
-     * @param  string[]  $layout
+     * Set the PDF layout configuration used by the sheet renderer.
+     *
+     * @param  array{format: string, landscape?: bool}  $layout
      */
     public function setLayout(array $layout): void
     {

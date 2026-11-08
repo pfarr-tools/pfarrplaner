@@ -76,6 +76,12 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         parent::__construct();
     }
 
+    /**
+     * Render the configured Word document for a service and its recipients.
+     *
+     * @param  Service  $service  Service whose liturgy is exported.
+     * @return mixed Download response produced by the Word document.
+     */
     public function render(Service $service)
     {
         if (! $this->config['includeTexts']) {
@@ -96,9 +102,11 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         $this->setProperties($doc);
         $doc->getPhpWord()->addTableStyle('Ablauf', ['borderSize' => 6, 'borderColor' => '444444', 'cellMargin' => 80, 'alignment' => JcTable::START]);
 
-        if (count($this->config['recipients'])) {
+        $recipients = $this->normalizeRecipients($this->config['recipients'] ?? []);
+
+        if (count($recipients)) {
             $first = true;
-            foreach ($this->config['recipients'] as $recipient) {
+            foreach ($recipients as $recipient) {
                 $this->currentRecipient = $recipient;
                 $doc->setRecipient($recipient);
                 if (! $first) {
@@ -144,6 +152,23 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         }
 
         return $doc->sendToBrowser($this->getFileName($service));
+    }
+
+    /**
+     * Convert nested or duplicated form values into unique scalar recipient names.
+     *
+     * @param  array<int, mixed>  $recipients  Values submitted by the configuration form.
+     * @return string[] Unique, non-empty recipient names.
+     */
+    protected function normalizeRecipients(array $recipients): array
+    {
+        return collect($recipients)
+            ->flatten()
+            ->filter(static fn ($recipient): bool => is_string($recipient) && trim($recipient) !== '')
+            ->map(static fn (string $recipient): string => trim($recipient))
+            ->unique()
+            ->values()
+            ->all();
     }
 
     protected function renderLiturgyTable(DefaultWordDocument $doc, $recipient = '')
