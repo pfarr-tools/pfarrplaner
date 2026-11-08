@@ -64,6 +64,10 @@
                         <span class="mdi mdi-microphone me-lg-1"></span>
                         <span class="d-none d-lg-inline">Predigt</span>
                     </inertia-link>
+                    <inertia-link v-if="service.slug && !templateMode" class="btn btn-outline-secondary" :href="route('service.ads', service.slug)" title="Werbung bearbeiten">
+                        <span class="mdi mdi-bullhorn me-lg-1"></span>
+                        <span class="d-none d-lg-inline">Werbung</span>
+                    </inertia-link>
                 </div>
             </div>
         </template>

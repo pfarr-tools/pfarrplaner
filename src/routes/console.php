@@ -28,6 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use App\Services\AttachmentUploadService;
 use Illuminate\Support\Facades\Schedule;
 use Laravel\Telescope\Telescope;
 
@@ -48,6 +49,7 @@ if (app()->environment('local') && class_exists(Telescope::class)) {
 Schedule::command('liturgy:get')->daily();
 Schedule::command('trash:prune --days=30')->daily();
 Schedule::command('cache:prune-stale-tags')->hourly();
+Schedule::call(fn () => app(AttachmentUploadService::class)->cleanup())->hourly();
 
 // Integration schedules
 foreach (glob(app_path('Integrations/*')) as $folder) {

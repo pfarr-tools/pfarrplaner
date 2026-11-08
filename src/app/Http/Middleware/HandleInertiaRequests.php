@@ -95,6 +95,7 @@ class HandleInertiaRequests extends Middleware
             'helpPage' => fn () => $this->resolveHelpPage(Route::currentRouteName()),
             'manualBaseUrl' => config('app.manual_url'),
             'version' => $version,
+            'pixabayEnabled' => filled(config('pixabay.api_key')),
             'activeTab' => request()->get('tab', 'home'),
             'labels' => fn () => config('labels'),
             'bible' => fn () => [

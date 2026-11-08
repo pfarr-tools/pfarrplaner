@@ -28,35 +28,47 @@
 
 <template>
     <div class="pixabay-picker">
-        <form-input name="search" v-model="search" placeholder="Auf Pixabay suchen..." @input="getPage(component, page)"/>
-        <div v-if="results.length > 0" :key="search+page">
-            <div class="mb-1">
-                <button v-if="page > 1" class="btn btn-sm btn-light"  @click.prevent.stop="getPage(component, page-1)">
-                    <span class="mdi mdi-chevron-left"></span>
-                </button>
-                Seite {{ page }} / {{ pages }} ({{ totalHits }} Ergebnisse)
-                <button v-if="page < pages" class="btn btn-sm btn-light" @click.prevent.stop="getPage(component, page+1)">
-                    <span class="mdi mdi-chevron-right"></span>
-                </button>
-            </div>
-            <div :key="search+page">
-                <img class="pixabay-preview img-thumbnail" v-for="(result,resultKey) in results"
-                     :src="result.previewURL" title="Klicken, um dieses Bild auszuwählen"
-                     @click="$emit('input', result)"
-                />
-            </div>
+        <div class="input-group">
+            <input v-model.trim="search" class="form-control" type="search" placeholder="Auf Pixabay suchen..." @keyup.enter.prevent="searchImages(1)" />
+            <button type="button" class="btn btn-primary" :disabled="loading || !search" @click="searchImages(1)">
+                <span class="mdi" :class="loading ? 'mdi-loading mdi-spin' : 'mdi-magnify'" aria-hidden="true"></span> Suchen
+            </button>
         </div>
+        <small class="form-text text-muted">Die Suchergebnisse werden in einem Auswahlfenster angezeigt.</small>
+        <modal v-if="dialogOpen" title="Bild von Pixabay auswählen" max-width="1100px" :allow-close="false" @cancel="dialogOpen = false">
+            <div class="input-group mb-3">
+                <input v-model.trim="search" class="form-control" type="search" aria-label="Pixabay-Suche" @keyup.enter.prevent="searchImages(1)" />
+                <button type="button" class="btn btn-primary" :disabled="loading || !search" @click="searchImages(1)">Suchen</button>
+            </div>
+            <div v-if="loading" class="pixabay-loading"><span class="mdi mdi-loading mdi-spin" aria-hidden="true"></span> Ergebnisse werden geladen …</div>
+            <div v-else-if="error" class="alert alert-danger">{{ error }}</div>
+            <template v-else>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">Seite {{ page }} / {{ pages }} · {{ totalHits }} Ergebnisse</span>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Pixabay-Seiten">
+                        <button type="button" class="btn btn-outline-secondary" :disabled="page <= 1" @click="searchImages(page - 1)"><span class="mdi mdi-chevron-left" aria-hidden="true"></span> Zurück</button>
+                        <button type="button" class="btn btn-outline-secondary" :disabled="page >= pages" @click="searchImages(page + 1)">Weiter <span class="mdi mdi-chevron-right" aria-hidden="true"></span></button>
+                    </div>
+                </div>
+                <div class="pixabay-results">
+                    <button v-for="result in results" :key="result.id" type="button" class="pixabay-result" :title="`Bild von ${result.user || 'Pixabay'} auswählen`" @click="selectResult(result)">
+                        <img :src="result.webformatURL || result.previewURL" :alt="result.tags || 'Pixabay-Bild'" />
+                        <span>{{ result.user || 'Pixabay' }}</span>
+                    </button>
+                </div>
+                <div v-if="!results.length" class="alert alert-info mb-0">Keine Bilder gefunden.</div>
+            </template>
+        </modal>
     </div>
 </template>
 
 <script>
 import FormGroup from "./FormGroup";
-import FormInput from "./FormInput";
-import __ from "lodash";
+import Modal from "../modals/Modal";
 export default {
     name: "FormPixabayPicker",
     emits: ['input'],
-    components: {FormInput, FormGroup},
+    components: {Modal, FormGroup},
     data() {
         return {
             page: 1,
@@ -65,35 +77,50 @@ export default {
             totalHits: 0,
             results: [],
             search: '',
-            component: this,
+            loading: false,
+            error: '',
+            dialogOpen: false,
         }
     },
     methods: {
-        getPage: __.debounce((component, page) => {
-            if (!component.search) {
-                component.result = {};
-                component.totalHits = 0;
-                component.pages = 0;
-                return;
-            }
-            component.page = page;
-            component.$api().get(route('api.pixabay.query', {query: component.search, page}))
+        /** Search Pixabay and open or refresh the paginated result dialog. */
+        searchImages(page = 1) {
+            if (!this.search) return;
+            if (typeof page !== 'number' || !Number.isFinite(page)) page = 1;
+            page = Math.max(1, Math.floor(page));
+            this.loading = true;
+            this.error = '';
+            this.page = page;
+            this.dialogOpen = true;
+            const searchUrl = route('api.pixabay.query', {query: this.search});
+            this.$api().get(`${searchUrl}/${page}`)
                 .then(response => {
-                    component.totalHits = response.data.totalHits;
-                    component.results = response.data.hits;
-                    component.pages = Math.ceil(component.totalHits / 20);
-                });
-        }, 1000),
+                    this.totalHits = response.data.totalHits || 0;
+                    this.results = response.data.hits || [];
+                    this.pages = Math.max(1, Math.ceil(this.totalHits / 20));
+                })
+                .catch(() => {
+                    this.results = [];
+                    this.totalHits = 0;
+                    this.pages = 0;
+                    this.error = 'Die Pixabay-Suche konnte nicht geladen werden.';
+                })
+                .finally(() => { this.loading = false; });
+        },
+        /** Emit the selected Pixabay hit to the shared local upload flow. */
+        selectResult(result) {
+            this.$emit('input', result);
+            this.dialogOpen = false;
+        },
     }
 }
 </script>
 
 <style scoped>
-.pixabay-preview {
-    object-fit: cover;
-    overflow: hidden;
-    height: 100px;
-    width: 100px;
-    float: left;
-}
+.pixabay-loading { padding: 3rem; text-align: center; color: var(--bs-secondary-color); }
+.pixabay-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: .75rem; max-height: 58vh; overflow-y: auto; }
+.pixabay-result { display: flex; flex-direction: column; gap: .35rem; padding: .35rem; border: 1px solid var(--bs-border-color); border-radius: var(--bs-border-radius); background: var(--bs-body-bg); text-align: left; }
+.pixabay-result:hover, .pixabay-result:focus-visible { border-color: var(--bs-primary); box-shadow: 0 0 0 .15rem rgba(var(--bs-primary-rgb), .15); }
+.pixabay-result img { display: block; width: 100%; height: 8rem; object-fit: cover; }
+.pixabay-result span { overflow: hidden; color: var(--bs-secondary-color); font-size: .8rem; text-overflow: ellipsis; white-space: nowrap; }
 </style>

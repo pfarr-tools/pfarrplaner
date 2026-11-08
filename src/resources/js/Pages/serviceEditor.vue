@@ -53,10 +53,10 @@
             </template>
             <template #navbar-right>
                 <div class="btn-group calendar-mode-toggle" role="group" aria-label="Ansicht umschalten" v-if="editedService.event_class == 'service'">
-                    <button type="button" class="btn btn-secondary">
+                    <inertia-link class="btn btn-secondary" :href="route('service.edit', service.slug)">
                         <span class="mdi mdi-pencil me-1"></span>
                         <span class="d-none d-xl-inline">Bearbeiten</span>
-                    </button>
+                    </inertia-link>
                     <inertia-link class="btn btn-outline-secondary" :href="route('liturgy.editor', service.slug)" title="Liturgie anzeigen">
                         <span class="mdi mdi-view-list me-1"></span>
                         <span class="d-none d-xl-inline">Liturgie</span>
@@ -64,6 +64,10 @@
                     <inertia-link class="btn btn-outline-secondary" :href="route('service.sermon.editor', service.slug)" title="Liturgie anzeigen">
                         <span class="mdi mdi-microphone me-1"></span>
                         <span class="d-none d-xl-inline">Predigt</span>
+                    </inertia-link>
+                    <inertia-link class="btn btn-outline-secondary" :href="route('service.ads', service.slug)" title="Werbung bearbeiten">
+                        <span class="mdi mdi-bullhorn me-1"></span>
+                        <span class="d-none d-xl-inline">Werbung</span>
                     </inertia-link>
                 </div>
 
@@ -104,8 +108,6 @@
                                 id="streaming" title="Streaming" :active-tab="activeTab"/>
                     <tab-header id="registrations" title="Anmeldungen" :active-tab="activeTab"
                                 :count="service.seating ? service.seating.count : 0"/>
-                    <tab-header v-if="service.id"
-                                id="ads" title="Werbung" :active-tab="activeTab" />
                     <tab-header v-if="service.id"
                                 id="attachments" title="Dateien" :active-tab="activeTab" :count="countAttachments()"/>
                     <tab-header v-if="service.id"
@@ -153,9 +155,6 @@
                     <tab id="registrations" :active-tab="activeTab">
                         <registrations-tab :service="service"/>
                     </tab>
-                    <tab id="ads" :active-tab="activeTab">
-                        <ads-tab :service="service" :config="adsConfig" :ad-channels="adChannels" />
-                    </tab>
                     <tab id="attachments" :active-tab="activeTab">
                         <attachments-tab :service="service" :liturgy-sheets="liturgySheets" :files="files"/>
                     </tab>
@@ -187,14 +186,12 @@ import CommentsTab from "../components/ServiceEditor/tabs/CommentsTab";
 import RegistrationsTab from "../components/ServiceEditor/tabs/RegistrationsTab";
 import NavButton from "../components/Ui/buttons/NavButton";
 import RecurrenceTab from "../components/ServiceEditor/tabs/RecurrenceTab.vue";
-import AdsTab from "../components/ServiceEditor/tabs/AdsTab.vue";
 import {Link as InertiaLink} from "@inertiajs/vue3";
 
 export default {
     name: "serviceEditor",
     components: {
         InertiaLink,
-        AdsTab,
         RecurrenceTab,
         NavButton,
         RegistrationsTab,

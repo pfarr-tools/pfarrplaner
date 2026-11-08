@@ -271,15 +271,11 @@
                                  delete-route-name="absence.detach"
                                  :parent-object="form"
                                  parent-type="absence"
+                                 :upload-route="route('absence.attach', form.id)"
+                                 chunk-upload-route="/api/attachment-uploads"
+                                 :chunk-target="{target_type: 'App\\Models\\Leave\\Absence', target_id: form.id}"
                                  :key="form.attachments.length"/>
 
-                <hr/>
-
-                <h3>Dateien hinzufügen.</h3>
-
-                <form-file-uploader :parent="form" :no-pixabay="true"
-                                    :upload-route="route('absence.attach', form.id)"
-                                    v-model="form.attachments"/>
             </tab>
 
         </tabs>
@@ -304,7 +300,6 @@ import FakeTable from "../../components/Ui/FakeTable.vue";
 import PeopleSelect from "../../components/Ui/elements/PeopleSelect.vue";
 import FormSelectize from "../../components/Ui/forms/FormSelectize.vue";
 import AttachmentList from "../../components/Ui/elements/AttachmentList.vue";
-import FormFileUploader from "../../components/Ui/forms/FormFileUploader.vue";
 import SaveButton from "../../components/Ui/buttons/SaveButton.vue";
 import { serializePlannerDateToUtc } from "../../helpers/plannerDates";
 
@@ -312,7 +307,6 @@ export default {
     name: "AbsenceEditor",
 
     components: {
-        FormFileUploader,
         AttachmentList,
         FormSelectize,
         PeopleSelect,

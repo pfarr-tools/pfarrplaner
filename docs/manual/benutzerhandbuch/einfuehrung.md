@@ -42,6 +42,7 @@ Pfarrplaner besteht aus mehreren Arbeitsbereichen:
 - **[Kalender](kalender.md)**: Monatsübersicht für Gottesdienste und Veranstaltungen.
 - **[Veranstaltungen und Gottesdienste](veranstaltungen.md)**: Detailansicht für Datum, Ort, Mitwirkende, Opfer, Anmeldungen, Werbung, Dateien und Kommentare.
 - **[Liturgie-Editor](liturgie.md)**: Ablauf eines Gottesdienstes, Lieder, Texte und Liedblätter.
+- **[Werbung](werbung.md)**: Werbebilder, Zuschnitte, Veröffentlichungskanäle und Vorschauen.
 - **[Predigteditor](predigt.md)**: Predigttext, Bibelstellen, Notizen und Leseansicht.
 - **[Kasualien](kasualien.md)**: Taufen, Trauungen und Beerdigungen.
 - **[Urlaubsplan](urlaubsplan.md)**: Abwesenheiten, Vertretungen und Genehmigungen.
@@ -61,7 +62,8 @@ Ein typischer Ablauf:
 3. Tragen Sie im [Editor für Veranstaltungen und Gottesdienste](veranstaltungen.md) Datum, Ort, Beschreibung und Mitwirkende ein.
 4. Bearbeiten Sie bei Bedarf die [Liturgie](liturgie.md) und erstellen Sie ein Liedblatt.
 5. Ergänzen Sie im [Predigteditor](predigt.md) Predigttext und Notizen.
-6. Erstellen Sie später passende [Berichte und Ausgaben](berichte.md), zum Beispiel Gottesdienstlisten oder Dienstpläne.
+6. Bereiten Sie im Bereich [Werbung](werbung.md) Bildzuschnitte und Veröffentlichungen vor.
+7. Erstellen Sie später passende [Berichte und Ausgaben](berichte.md), zum Beispiel Gottesdienstlisten oder Dienstpläne.
 
 ---
 

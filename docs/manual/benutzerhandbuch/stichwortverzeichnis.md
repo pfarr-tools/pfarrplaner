@@ -67,6 +67,13 @@ Dieses Stichwortverzeichnis hilft, einzelne Funktionen schnell zu finden. Die Be
 - **Liturgie**: [Liturgie-Editor](liturgie.md)
 - **Livestream**: [Veranstaltungen und Gottesdienste](veranstaltungen.md), [Startseite](startseite.md)
 
+## W
+
+- **Werbebilder**: [Werbung](werbung.md)
+- **Werbung**: [Werbung](werbung.md), [Administration](administration.md)
+- **Werbekanäle**: [Werbung](werbung.md), [Administration](administration.md)
+- **Zuschnitte**: [Werbung](werbung.md)
+
 ## M
 
 - **Mitwirkende**: [Veranstaltungen und Gottesdienste](veranstaltungen.md), [Kalender](kalender.md)

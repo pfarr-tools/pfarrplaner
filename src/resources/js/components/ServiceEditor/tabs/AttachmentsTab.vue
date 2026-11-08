@@ -29,44 +29,18 @@
 <template>
     <div class="attachments-tab">
         <h3>Angehängte Dateien</h3>
-        <div v-if="hasAutoAttachments || (service.attachments.length > 0)">
-            <div v-if="myService.liturgy_blocks.length > 0">
-                <div
-                    v-for="sheet in downloadableLiturgySheets"
-                    :key="sheet.key"
-                    class="liturgy-sheet btn btn-light"
-                    @click.prevent="sheet.configurationComponent ? openDialog(sheet.key) : downloadSheet(sheet)"
-                >
-                    <b><span :class="sheet.icon"></span> {{ sheet.title }}</b><br/>
-                    <small>.{{ sheet.extension }}, Größe unbekannt</small>
-                    <span class="float-right mdi mdi-download"></span>
-                </div>
-            </div>
-            <div v-if="myService.konfiapp_event_qr">
-                <div class="liturgy-sheet btn btn-light" @click.prevent="downloadQR">
-                    <b><span class="mdi mdi-file-pdf-box"></span> QR-Code für Konfis</b><br/>
-                    <small>.pdf, ca. 50 kB</small>
-                    <span class="float-right mdi mdi-download"></span>
-                </div>
-            </div>
-            <div v-if="!hasAnnouncements" class="liturgy-sheet btn btn-light" @click.prevent="downloadAnnouncements">
-                <b><span class="mdi mdi-file-word-box"></span> Bekanntgaben</b><br/>
-                <small>.docx, ca. 20 kB</small>
-                <span class="float-right mdi mdi-download"></span>
-            </div>
-            <div v-if="service.attachments.length > 0">
-                <attachment v-for="(attachment,key,index) in service.attachments" :key="key" :attachment="attachment"
-                            @delete-attachment="deleteAttachment(attachment, key)" allow-delete />
-            </div>
+        <div>
+            <attachment-list v-model="myService.attachments"
+                             delete-route-name="service.detach"
+                             parent-type="service"
+                             parent-route-key="slug"
+                             :parent-object="myService"
+                             :upload-route="route('service.attach', myService.slug)"
+                             chunk-upload-route="/api/attachment-uploads"
+                             :chunk-target="{target_type: 'App\\Models\\Service', target_id: myService.id}"
+                             :auto-attachments="autoAttachments"
+                             @open-auto-attachment="openAutoAttachment" />
         </div>
-        <div v-else class="alert alert-info">Zu dieser Veranstaltung gibt es keine Dateianhänge.</div>
-        <hr/>
-        <h3>Dateien hinzufügen</h3>
-        <div v-if="uploading">Datei wird hochgeladen... <span class="mdi mdi-spin mdi-loading"></span></div>
-        <form-file-uploader :parent="myService"
-                            :upload-route="route('service.attach', this.myService.slug)"
-                            v-model="myService.attachments"/>
-
         <template v-for="sheet in configurableLiturgySheets" :key="'dlg' + sheet.key">
             <modal
                 v-if="dialogs[sheet.key]"
@@ -84,12 +58,10 @@
 </template>
 
 <script>
-import Attachment from "../../Ui/elements/Attachment";
+import AttachmentList from "../../Ui/elements/AttachmentList.vue";
 import FormInput from "../../Ui/forms/FormInput";
 import FormGroup from "../../Ui/forms/FormGroup";
-import FormFileUpload from "../../Ui/forms/FormFileUpload";
 import Modal from "../../Ui/modals/Modal";
-import FormFileUploader from "../../Ui/forms/FormFileUploader";
 import FullTextLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/FullTextLiturgySheetConfiguration";
 import SongPPTLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/SongPPTLiturgySheetConfiguration";
 import SongSheetLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/SongSheetLiturgySheetConfiguration";
@@ -102,12 +74,10 @@ import AIPromptLiturgySheetDialog from "../../LiturgyEditor/LiturgySheets/AIProm
 export default {
     name: "AttachmentsTab",
     components: {
-        FormFileUploader,
+        AttachmentList,
         Modal,
-        FormFileUpload,
         FormGroup,
         FormInput,
-        Attachment,
         A4WordSpecificLiturgySheetConfiguration,
         FullTextLiturgySheetConfiguration,
         SongPPTLiturgySheetConfiguration,
@@ -143,6 +113,36 @@ export default {
                 found = found || (sheetKey == 'Schriftlesung und Abkündigungen');
             }
             return found;
+        },
+        autoAttachments() {
+            const attachments = [];
+            if (this.myService.liturgy_blocks.length > 0) {
+                this.downloadableLiturgySheets.forEach(sheet => attachments.push({
+                    ...sheet,
+                    size: 'Größe unbekannt',
+                }));
+            }
+            if (this.myService.konfiapp_event_qr) {
+                attachments.push({
+                    key: 'konfiapp-qr',
+                    title: 'QR-Code für Konfis',
+                    extension: 'pdf',
+                    size: 'ca. 50 kB',
+                    icon: 'mdi mdi-file-pdf-box',
+                    type: 'qr',
+                });
+            }
+            if (!this.hasAnnouncements) {
+                attachments.push({
+                    key: 'announcements',
+                    title: 'Bekanntgaben',
+                    extension: 'docx',
+                    size: 'ca. 20 kB',
+                    icon: 'mdi mdi-file-word-box',
+                    type: 'announcements',
+                });
+            }
+            return attachments;
         },
     },
     data() {
@@ -206,6 +206,12 @@ export default {
         },
         downloadAnnouncements() {
             window.location.href = route('report.step', {report: 'Announcements', step: 'auto', service: this.myService.id});
+        },
+        openAutoAttachment(attachment) {
+            if (attachment.type === 'qr') return this.downloadQR();
+            if (attachment.type === 'announcements') return this.downloadAnnouncements();
+            if (attachment.configurationComponent) return this.openDialog(attachment.key);
+            return this.downloadSheet(attachment);
         },
         newRow() {
             this.files.attachment_text.push('');

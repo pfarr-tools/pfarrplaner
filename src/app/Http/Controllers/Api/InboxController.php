@@ -32,11 +32,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/** Provides access to the authenticated upload Inbox. */
 class InboxController extends Controller
 {
     public const ALLOWED_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png'];
 
+    /** Return the list of allowed Inbox files. */
     public function index()
     {
         $inboxPath = config('inbox.path');
@@ -59,5 +62,23 @@ class InboxController extends Controller
         });
 
         return response()->json($files->values()->all());
+    }
+
+    /** Download an allowed Inbox file for local browser processing. */
+    public function download(string $filename): BinaryFileResponse
+    {
+        $inboxPath = config('inbox.path');
+        $directory = $inboxPath ? realpath(storage_path($inboxPath)) : false;
+        $basename = basename($filename);
+        $extension = strtolower(pathinfo($basename, PATHINFO_EXTENSION));
+        $path = $directory ? realpath($directory.'/'.$basename) : false;
+
+        abort_unless(
+            $directory && $path && str_starts_with($path, $directory.DIRECTORY_SEPARATOR)
+                && in_array($extension, static::ALLOWED_EXTENSIONS, true),
+            404
+        );
+
+        return response()->download($path, $basename);
     }
 }

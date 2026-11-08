@@ -30,6 +30,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -46,12 +49,52 @@ class PixabayController extends Controller
     }
 
     /**
+     * Search Pixabay images for the uploader.
+     *
+     * @param string $query Search phrase.
+     * @param string|int $page Requested result page.
      * @return Application|ResponseFactory|Response
      */
-    public function query(string $query, int $page = 1)
+    public function query(string $query, string|int $page = 1)
     {
-        $url = 'https://pixabay.com/api/?key='.config('pixabay.api_key').'&image_type=photo&page='.$page.'&q='.urlencode($query);
+        $page = max(1, (int) $page);
+        $apiKey = config('pixabay.api_key');
 
-        return response(file_get_contents($url));
+        abort_if(! is_string($apiKey) || trim($apiKey) === '', 503, 'Pixabay ist nicht konfiguriert. Bitte PIXABAY_API_KEY setzen.');
+
+        $response = Http::timeout(20)->get('https://pixabay.com/api/', [
+            'key' => $apiKey,
+            'image_type' => 'photo',
+            'page' => $page,
+            'q' => $query,
+        ]);
+
+        if ($response->status() === 401 || $response->status() === 403) {
+            abort(503, 'Der Pixabay-API-Key ist ungültig oder abgelaufen.');
+        }
+
+        if ($response->status() === 429) {
+            abort(503, 'Das Pixabay-Limit ist momentan erreicht. Bitte später erneut versuchen.');
+        }
+
+        abort_unless($response->successful(), 502, 'Pixabay ist derzeit nicht erreichbar.');
+
+        return response()->json($response->json());
+    }
+
+    /** Proxy an approved Pixabay image URL for local cropper processing. */
+    public function image(Request $request)
+    {
+        $url = (string) $request->validate(['url' => 'required|url'])['url'];
+        $host = parse_url($url, PHP_URL_HOST);
+        abort_unless(in_array($host, ['pixabay.com', 'cdn.pixabay.com', 'pixabayusercontent.com'], true), 422, 'Ungültige Pixabay-Bildadresse.');
+
+        $response = Http::timeout(20)->get($url);
+        abort_unless($response->successful(), 502, 'Das Pixabay-Bild konnte nicht geladen werden.');
+
+        return response($response->body(), 200, [
+            'Content-Type' => $response->header('Content-Type', 'application/octet-stream'),
+            'Cache-Control' => 'private, max-age=300',
+        ]);
     }
 }

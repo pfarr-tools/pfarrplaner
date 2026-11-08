@@ -297,39 +297,12 @@ Personenbezogene Daten dürfen nur für den vorgesehenen Zweck verwendet werden.
 
 ---
 
-## Reiter: Werbung und öffentliche Ankündigung
+## Werbung und öffentliche Ankündigung
 
-![Editor für Veranstaltungen und Gottesdienste: Werbung](media/images/veranstaltung-editor-werbung.png)
-
-Falls Ihre Installation Ankündigungskanäle verwendet, steuern Sie hier, wo und wie ein Gottesdienst veröffentlicht wird.
-
-- **Kurzbeschreibung für Werbung**: Text, der für Werbekanäle verwendet wird.
-- **Veröffentlichungen**: Tabelle mit allen verfügbaren Werbekanälen.
-- **Ort**: Name des Werbekanals. Ein Häkchen zeigt, dass der Kanal für diesen Eintrag aktiv ist.
-- **Vorlauf (Tage)**: Zahl, wie viele Tage vor dem Termin der Kanal aktiv werden soll. Bei 0 ist der Kanal für diesen Eintrag deaktiviert.
-- **Abweichender Text**: Eigener Text für diesen Kanal. Das Feld ist gesperrt, solange der Kanal über **Vorlauf (Tage)** deaktiviert ist.
-- **Vorhandene Bilder**: Zeigt hochgeladene Bilder, die als Werbebild genutzt werden können.
-- **Bildzuschnitte**: Je nach Konfiguration gibt es feste Bildformate. Ist ein Zuschnitt vorhanden, wird eine Vorschau angezeigt.
-- **Zuordnung löschen**: Entfernt einen Bildzuschnitt.
-- **Datei hochladen**: Lädt ein Bild für den benötigten Zuschnitt hoch.
-
-Der Vorlauf bedeutet: Pfarrplaner betrachtet die Veranstaltung ab diesem Zeitpunkt als für den Kanal freigegeben. Bei einem Gottesdienst am Sonntag und einem Vorlauf von 7 Tagen kann die Ankündigung also ab dem Sonntag davor erscheinen.
-
-Wenn **Abweichender Text** leer bleibt, verwendet Pfarrplaner zuerst die **Kurzbeschreibung für Werbung**. Ist auch diese leer, wird die normale Beschreibung des Eintrags verwendet.
-
-### Bildzuschnitte für Werbung
-
-| Zuschnitt | Größe | Typische Verwendung |
-|---|---:|---|
-| **Bildschirm (4x3)** | 1024 x 768 px | Klassische Präsentationsfolien |
-| **Bildschirm (16x9)** | 1920 x 1080 px | Breite Bildschirme, Website-Feature, Newsletter-Bild |
-| **CommuniApp** | 550 x 275 px | Bild für CommuniApp-Veranstaltungen |
-| **Quadratisch** | 1024 x 1024 px | Quadratische Kacheln oder Social-Media-ähnliche Formate |
-| **Story** | 1080 x 1920 px | Hochformat für Story-Ausgaben |
-
-Laden Sie möglichst Bilder hoch, die im jeweiligen Format schon gut wirken. Pfarrplaner speichert die Zuschnitte getrennt, damit ein Bild für verschiedene Kanäle passend ausgespielt werden kann.
-
-Prüfen Sie öffentliche Texte vor dem Veröffentlichen besonders sorgfältig.
+Die frühere Werbung-Ansicht war ein Reiter innerhalb dieses Editors. Sie ist
+jetzt als eigener Arbeitsbereich mit mehr Platz für Uploads, Bildzuschnitte,
+Vorschauen und Veröffentlichungen umgesetzt. Öffnen Sie den [Werbung-Editor](werbung.md)
+über die Schaltfläche **Werbung** oben rechts.
 
 ---
 

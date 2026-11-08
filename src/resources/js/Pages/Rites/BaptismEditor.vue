@@ -177,13 +177,13 @@
                                          {type: 'baptism', attachment: attachment.key, attachable:myBaptism.id})" />
                     <attachment-list v-model="myBaptism.attachments" delete-route-name="baptism.detach"
                                      :parent-object="myBaptism" parent-type="baptism"
+                                     :upload-route="route('baptism.attach', myBaptism.id)"
+                                     chunk-upload-route="/api/attachment-uploads"
+                                     :chunk-target="{target_type: 'App\\Models\\Rites\\Baptism', target_id: myBaptism.id}"
                                      :key="myBaptism.attachments.length"/>
                 </fieldset>
                 <fieldset>
-                    <legend>Dateien hinzufügen</legend>
-                    <form-file-uploader :parent="myBaptism"
-                                        :upload-route="route('baptism.attach', this.myBaptism.id)"
-                                        v-model="myBaptism.attachments"/>
+                    <legend>Hinweis</legend>
                     <div class="mt-2"><small>Das Anmeldeformular zur Taufe bitte nicht hier, sondern im Register
                         "Vorbereitung" hochladen.</small></div>
                 </fieldset>
@@ -205,7 +205,6 @@ import Tabs from "../../components/Ui/tabs/tabs";
 import FormCheck from "../../components/Ui/forms/FormCheck";
 import FormSelectize from "../../components/Ui/forms/FormSelectize";
 import AttachmentList from "../../components/Ui/elements/AttachmentList";
-import FormFileUploader from "../../components/Ui/forms/FormFileUploader";
 import CheckedProcessItem from "../../components/Ui/elements/CheckedProcessItem";
 import FormTextarea from "../../components/Ui/forms/FormTextarea";
 import DimissorialFormPart from "../../components/RiteEditors/DimissorialFormPart";
@@ -247,7 +246,6 @@ export default {
         DimissorialFormPart,
         FormTextarea,
         CheckedProcessItem,
-        FormFileUploader,
         AttachmentList,
         FormSelectize,
         FormCheck, Tabs, Tab, FormInput, FormGroup, TabHeader, TabHeaders,

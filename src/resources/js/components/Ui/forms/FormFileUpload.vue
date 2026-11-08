@@ -42,7 +42,7 @@
             <li class="nav-item" v-if="showInbox">
                 <a class="nav-link" :class="{active: showTab == 3}" @click="showTab = 3">Aus der Ablage</a>
             </li>
-            <li class="nav-item" v-if="!noPixabay">
+            <li class="nav-item" v-if="!noPixabay && pixabayEnabled">
                 <a class="nav-link" :class="{active: showTab == 4}" @click="showTab = 4">Von Pixabay</a>
             </li>
         </ul>
@@ -51,7 +51,7 @@
                  @dragover.prevent
                  @dragleave.prevent="dragLeave"
                  @drop.prevent="drop">
-                <input class="form-control-file"
+                <input ref="fileInput" class="form-control-file"
                        type="file" :name="name" @change="handleInput" :multiple="multi"
                        @dragenter="dragEnter" @dragleave="dragLeave" @drop="drop"/>
                 Hier klicken oder {{ multi ? 'Dateien' : 'Datei' }} hierher ziehen... {{ helpText || '' }}
@@ -59,7 +59,6 @@
         </div>
         <div v-if="showTab == 1">
             <form-input label="Url der Datei" v-model="uploadUrl" />
-            <form-input v-if="!noDescription" label="Beschreibung" v-model="description" />
             <nav-button icon="mdi-upload" @click="uploadFromUrl" :disabled="(!uploadUrl)">Von URL laden</nav-button>
         </div>
         <div class="upload-container" v-if="showTab == 2">
@@ -103,11 +102,11 @@ export default {
             multi: this.multiple ? true : false,
             showTab: 0,
             uploadUrl: '',
-            description: '',
             info: null,
             inboxFiles: [],
             showInbox: !this.noInbox,
             tabUpdate: 0,
+            pixabayEnabled: this.$page?.props?.pixabayEnabled !== false,
         }
     },
     mounted() {
@@ -115,14 +114,20 @@ export default {
     },
     methods: {
         handleInput(event) {
-            if (this.multi) {
-                Array.from(event.target.files).forEach(file => {
-                    this.$emit('input', file)
-                });
-            } else {
-                this.$emit('input', event.target.files[0])
-            }
+            this.emitFiles(event.target.files)
+            event.target.value = ''
             this.dragging = false;
+        },
+        /**
+         * Emit selected files once and keep the native input reusable.
+         *
+         * @param {FileList|File[]} files Selected files.
+         * @returns {void}
+         */
+        emitFiles(files) {
+            const selectedFiles = Array.from(files || [])
+            if (!this.multi) selectedFiles.splice(1)
+            selectedFiles.forEach(file => this.$emit('input', file))
         },
         dragEnter(e) {
             this.dragging = true;
@@ -131,17 +136,12 @@ export default {
             this.dragging = false;
         },
         async drop(e) {
-            console.log('drop', e);
             this.dragging = false;
 
             // 1) Dropped file(s)
             const files = e.dataTransfer?.files;
             if (files && files.length) {
-                if (this.multi) {
-                    Array.from(files).forEach(file => this.$emit('input', file));
-                } else {
-                    this.$emit('input', files[0]);
-                }
+                this.emitFiles(files)
                 return;
             }
 
@@ -177,13 +177,26 @@ export default {
             });
         },
         uploadFromUrl() {
-            this.$emit('upload-url', {url: this.uploadUrl, description: this.description, info: this.info});
+            this.$emit('upload-url', {url: this.uploadUrl, info: this.info});
         },
         uploadFromPixabay(e) {
-            if (!this.noDescription) this.description = window.prompt('Bitte gib eine Beschreibung für die Bilddatei an.');
-            this.uploadUrl = e.fullHDURL;
+            const imageUrls = [e.webformatURL, e.largeImageURL, e.fullHDURL, e.previewURL].filter(Boolean);
+            const cdnUrl = imageUrls.find(url => {
+                try {
+                    return new URL(url).hostname === 'cdn.pixabay.com';
+                } catch {
+                    return false;
+                }
+            });
+            const sourceUrl = this.preferredPixabayUrl(cdnUrl || e.previewURL || imageUrls[0] || '');
+            if (!sourceUrl) return;
+            this.uploadUrl = sourceUrl;
             this.info = e;
-            this.uploadFromUrl();
+            this.$emit('upload-url', {url: this.uploadUrl, info: this.info, pixabay: true});
+        },
+        /** Prefer the high-resolution CDN variant while avoiding Pixabay's rate-limited get URLs. */
+        preferredPixabayUrl(url) {
+            return url.replace(/_(?:150|640)\.(?=[a-z0-9]+(?:\?|$))/i, '_1280.');
         },
         uploadFromInbox(e) {
             this.$emit('upload-inbox', e);
@@ -240,7 +253,12 @@ export default {
 }
 
 .nav-pills {
-    font-size: .8em;
+    font-size: 1rem;
+}
+
+.nav-pills .nav-link {
+    padding: .5rem .75rem;
+    cursor: pointer;
 }
 
 .inbox-row:nth-child(odd) {

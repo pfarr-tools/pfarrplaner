@@ -214,13 +214,13 @@
                     <legend>Angehängte Dateien</legend>
                     <attachment-list v-model="myWedding.attachments" delete-route-name="wedding.detach"
                                      :parent-object="myWedding" parent-type="wedding"
+                                     :upload-route="route('wedding.attach', myWedding.id)"
+                                     chunk-upload-route="/api/attachment-uploads"
+                                     :chunk-target="{target_type: 'App\\Models\\Rites\\Wedding', target_id: myWedding.id}"
                                      :key="myWedding.attachments.length"/>
                 </fieldset>
                 <fieldset>
-                    <legend>Dateien hinzufügen</legend>
-                    <form-file-uploader :parent="myWedding"
-                                        :upload-route="route('wedding.attach', this.myWedding.id)"
-                                        v-model="myWedding.attachments"/>
+                    <legend>Hinweis</legend>
                     <div class="mt-2"><small>Das Anmeldeformular zur Trauung bitte nicht hier, sondern im
                         Register
                         "Vorbereitung" hochladen.</small></div>
@@ -240,7 +240,6 @@ import TabHeader from "../../components/Ui/tabs/tabHeader";
 import FormInput from "../../components/Ui/forms/FormInput";
 import FormGroup from "../../components/Ui/forms/FormGroup";
 import AttachmentList from "../../components/Ui/elements/AttachmentList";
-import FormFileUploader from "../../components/Ui/forms/FormFileUploader";
 import FormCheck from "../../components/Ui/forms/FormCheck";
 import FormTextarea from "../../components/Ui/forms/FormTextarea";
 import CheckedProcessItem from "../../components/Ui/elements/CheckedProcessItem";
@@ -299,7 +298,6 @@ export default {
         CheckedProcessItem,
         FormTextarea,
         FormCheck,
-        FormFileUploader,
         AttachmentList, FormGroup, FormInput, Tab,  TabHeader, TabHeaders, Tabs,
     },
     computed: {

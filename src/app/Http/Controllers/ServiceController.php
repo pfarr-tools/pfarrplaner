@@ -126,6 +126,22 @@ class ServiceController extends Controller
      */
     public function edit(Request $request, Service $service, $tab = 'home')
     {
+        if ($request->get('tab') === 'ads') {
+            return redirect()->route('service.ads', $service->slug);
+        }
+
+        return $this->renderEditor($request, $service, 'serviceEditor');
+    }
+
+    /** Show the dedicated advertising editor. */
+    public function ads(Request $request, Service $service)
+    {
+        return $this->renderEditor($request, $service, 'serviceAdEditor');
+    }
+
+    /** Build the shared service-editor data for the requested editor view. */
+    protected function renderEditor(Request $request, Service $service, string $view)
+    {
         Gate::authorize('update', $service);
         $tab = $request->get('tab', 'home');
         $service->load(
@@ -177,7 +193,7 @@ class ServiceController extends Controller
         $adChannels = $service->city->getActiveAdChannels();
 
         return Inertia::render(
-            'serviceEditor',
+            $view,
             compact(
                 'service',
                 'locations',

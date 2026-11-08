@@ -30,6 +30,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\VerifyCsrfToken;
 use App\Models\Attachment;
 use App\Models\People\User;
 use App\Models\Places\City;
@@ -50,7 +51,7 @@ class AttachmentFeatureTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->withoutMiddleware();
+        $this->withoutMiddleware(VerifyCsrfToken::class);
         Storage::fake();
         Permission::findOrCreate('gd-bearbeiten');
         Permission::findOrCreate('gd-allgemein-bearbeiten');
@@ -73,6 +74,59 @@ class AttachmentFeatureTest extends TestCase
         $attachment->refresh();
         $this->assertSame('teaser', $attachment->cut);
         $this->assertCount(1, $response->json());
+    }
+
+    public function test_multiple_uploaded_attachments_keep_their_titles_and_cut(): void
+    {
+        $city = City::factory()->create();
+        $service = Service::factory()->create(['city_id' => $city->id]);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('service.attach', $service->slug), [
+                'attachments' => [
+                    UploadedFile::fake()->image('first.jpg'),
+                    UploadedFile::fake()->create('second.pdf', 10, 'application/pdf'),
+                ],
+                'attachment_text' => ['Erstes Bild', 'Zweites Dokument'],
+                'cut' => 'homepage',
+            ]);
+
+        $response->assertOk();
+        $this->assertSame(
+            ['Erstes Bild', 'Zweites Dokument'],
+            $service->fresh()->attachments->pluck('title')->all()
+        );
+        $this->assertSame(
+            ['homepage', 'homepage'],
+            $service->fresh()->attachments->pluck('cut')->all()
+        );
+    }
+
+    public function test_single_upload_to_an_existing_cut_replaces_that_cut(): void
+    {
+        $city = City::factory()->create();
+        $service = Service::factory()->create(['city_id' => $city->id]);
+        $existing = Attachment::factory()->create([
+            'attachable_id' => $service->id,
+            'attachable_type' => Service::class,
+            'title' => 'Altes Bild',
+            'cut' => 'homepage',
+            'file' => 'attachments/old-homepage.jpg',
+        ]);
+        Storage::put($existing->file, 'old');
+
+        $response = $this->actingAs($this->user)
+            ->post(route('service.attach', $service->slug), [
+                'attachments' => [UploadedFile::fake()->image('new.jpg')],
+                'attachment_text' => ['Neues Bild'],
+                'cut' => 'homepage',
+            ]);
+
+        $response->assertOk();
+        $attachments = $service->fresh()->attachments;
+        $this->assertCount(1, $attachments);
+        $this->assertSame('Neues Bild', $attachments->first()->title);
+        $this->assertFalse(Storage::exists('attachments/old-homepage.jpg'));
     }
 
     public function test_missing_attachment_file_still_serializes(): void

@@ -44,13 +44,24 @@ trait HandlesAttachmentsTrait
     {
         if ($request->hasFile('attachments')) {
             $files = $request->file('attachments');
+            $descriptions = (array) $request->get('attachment_text', []);
+            $cut = $request->get('cut');
+            if (count($files) === 1 && $cut) {
+                $this->replaceAttachmentCut($object, $cut);
+            }
             foreach ($files as $key => $file) {
                 $path = $file->storeAs('attachments', Str::random(32).'.'.$file->getClientOriginalExtension());
-                $description = $request->get('attachment_text')[$key] ?: ucfirst(pathinfo(
+                $description = ($descriptions[$key] ?? null) ?: ucfirst(pathinfo(
                     $file->getClientOriginalName(),
                     PATHINFO_FILENAME
                 ));
-                $object->attachments()->create(['title' => $description, 'file' => $path]);
+                Attachment::create([
+                    'title' => $description,
+                    'file' => $path,
+                    'cut' => $cut,
+                    'attachable_id' => $object->id,
+                    'attachable_type' => $object->getMorphClass(),
+                ]);
             }
         } elseif ($request->has('uploadFromUrl')) {
             $path = 'attachments/'.Str::random(32).'.'.pathinfo($request->get('uploadFromUrl'), PATHINFO_EXTENSION);
@@ -69,8 +80,27 @@ trait HandlesAttachmentsTrait
         }
 
         $this->removeAttachments($request, $object);
+        $object->unsetRelation('attachments');
     }
 
+    /** Replace the single attachment assigned to a target cut. */
+    protected function replaceAttachmentCut($object, string $cut): void
+    {
+        $object->attachments()->where('cut', $cut)->get()->each(function (Attachment $attachment): void {
+            if (Attachment::where('file', $attachment->file)->where('id', '<>', $attachment->id)->doesntExist()) {
+                Storage::delete($attachment->file);
+            }
+            $attachment->delete();
+        });
+    }
+
+    /**
+     * Remove attachments selected by the user and clean up shared storage files.
+     *
+     * @param  Request  $request  Current attachment request.
+     * @param  object  $object  Attachment owner.
+     * @return void
+     */
     protected function removeAttachments(Request $request, $object)
     {
         if ($request->has('remove_attachment')) {
@@ -85,6 +115,14 @@ trait HandlesAttachmentsTrait
         }
     }
 
+    /**
+     * Store or replace an attachment held in a model attribute.
+     *
+     * @param  Request  $request  Current attachment request.
+     * @param  object  $object  Attachment owner.
+     * @param  string  $key  Model attribute containing the stored path.
+     * @return void
+     */
     protected function handleIndividualAttachment(Request $request, $object, $key)
     {
         if ($request->hasFile($key)) {
@@ -100,6 +138,14 @@ trait HandlesAttachmentsTrait
         $this->removeIndividualAttachment($request, $object, $key);
     }
 
+    /**
+     * Remove an attachment held in a model attribute when requested.
+     *
+     * @param  Request  $request  Current attachment request.
+     * @param  object  $object  Attachment owner.
+     * @param  string  $key  Model attribute containing the stored path.
+     * @return void
+     */
     protected function removeIndividualAttachment(Request $request, $object, $key)
     {
         if ($request->has('remove_'.$key)) {

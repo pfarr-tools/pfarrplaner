@@ -27,17 +27,24 @@
   -->
 
 <template>
-    <div class="attachment btn btn-light" @click.prevent="download" :title="tooltipTitle">
-        <b><span class="fa" :class="attachment.icon"></span> {{ attachment.title }}</b><br/>
-        <small v-if="attachment.errorMessage" class="text-danger">{{ attachment.errorMessage }}</small>
-        <small v-else>.{{ attachment.extension }}<span v-if="attachment.size !== null">, {{ fileSize(attachment.size) }}</span></small>
-        <button v-if="allowDelete" class="float-right btn btn-xs btn-danger" title="Anhang löschen"
+    <div class="attachment" @click.prevent="download" :title="tooltipTitle">
+        <div class="attachment-content">
+            <b><span class="fa" :class="attachment.icon"></span> {{ attachment.title }}</b><br/>
+            <small v-if="attachment.errorMessage" class="text-danger">{{ attachment.errorMessage }}</small>
+            <small v-else>.{{ attachment.extension }}<span v-if="attachment.size !== null">, {{ fileSize(attachment.size) }}</span></small>
+        </div>
+        <div class="attachment-actions">
+            <button v-if="allowDelete" class="btn btn-sm btn-outline-danger" title="Anhang löschen"
                 @click.prevent.stop="deleteAttachment($event)">
-            <span class="mdi mdi-delete"></span>
-        </button>
-        <span class="float-right mdi" :class="[downloadIconClass, allowDelete ? 'me-3 mt-1' : '']"></span>
-        <img v-if="isImage" class="float-right preview me-4" :src="imageRoute()" @click.stop="showLightBox = true"/>
-        <div v-if="isImage && showLightBox" class="lightbox-backdrop"
+                <span class="mdi mdi-delete"></span>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" title="Datei herunterladen"
+                    :disabled="!attachment.hasFile" @click.prevent.stop="download">
+                <span class="mdi" :class="downloadIconClass"></span>
+            </button>
+        </div>
+        <img v-if="isImage" class="preview" :src="imageRoute()" @click.stop="openLightbox"/>
+        <div v-if="isImage && showLightBox && inlineLightbox" class="lightbox-backdrop"
              @click.stop="showLightBox = false"
              @keydown.esc="showLightBox = false">
             <div class="btn btn-dark lightbox-close" title="Vorschau schließen"><span class="mdi mdi-close"></span></div>
@@ -55,9 +62,11 @@
 <script>
 export default {
     name: "Attachment",
+    emits: ['delete-attachment', 'show-lightbox'],
     props: {
         attachment: Object,
         allowDelete: Boolean,
+        inlineLightbox: { type: Boolean, default: true },
     },
     data() {
         return {
@@ -101,6 +110,10 @@ export default {
         },
         imageRoute() {
             return route('image', {path: this.attachment.file.replace('attachments/', '')});
+        },
+        openLightbox() {
+            this.$emit('show-lightbox', this.attachment)
+            if (this.inlineLightbox) this.showLightBox = true
         }
     }
 }
@@ -108,26 +121,36 @@ export default {
 
 <style scoped>
 .attachment {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .5rem;
     width: 100%;
     text-align: left;
     margin-bottom: .25rem;
-    vertical-align: middle;
+    padding: .75rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    background: var(--bs-body-bg);
+    box-shadow: var(--bs-box-shadow-sm);
+    cursor: pointer;
 }
 
+.attachment-content { min-width: 0; }
+.attachment-actions { display: flex; align-items: flex-start; gap: .5rem; }
 small {
-    padding-left: 15px;
-}
-
-.btn-danger {
-    margin-top: -.3rem;
-}
-
-.mdi-download {
-    color: gray !important;
+    color: var(--bs-secondary-color);
 }
 
 .preview {
-    max-height: 2em;
+    grid-column: 1 / -1;
+    width: 100%;
+    height: 7rem;
+    margin-top: .25rem;
+    padding: .25rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius-sm);
+    object-fit: contain;
+    background: var(--bs-light-bg-subtle);
     display: block;
 }
 

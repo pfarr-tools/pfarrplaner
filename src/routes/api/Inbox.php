@@ -31,3 +31,4 @@
 use App\Http\Controllers\Api\InboxController;
 
 Route::get('/inbox', [InboxController::class, 'index'])->name('inbox.index');
+Route::get('/inbox/{filename}', [InboxController::class, 'download'])->name('inbox.download');

@@ -345,16 +345,14 @@
                 <h3>Angehängte Dateien</h3>
                 <attachment-list v-model="myFuneral.attachments" delete-route-name="funeral.detach"
                                  :parent-object="myFuneral" parent-type="funeral" :prevent-empty-list-message="true"
+                                 :upload-route="route('funeral.attach', myFuneral.id)"
+                                 chunk-upload-route="/api/attachment-uploads"
+                                 :chunk-target="{target_type: 'App\\Models\\Rites\\Funeral', target_id: myFuneral.id}"
                                  :key="myFuneral.attachments.length"/>
                 <fake-attachment :href="route('funeral.form', {funeral: this.myFuneral.id})"
                                  title="Formular für Kirchenregisteramt" extension="pdf"
                                  icon="mdi mdi-file-pdf-box" size="ca. 135 kB"/>
 
-                <hr/>
-                <h3>Dateien hinzufügen.</h3>
-                <form-file-uploader :parent="myFuneral"
-                                    :upload-route="route('funeral.attach', this.myFuneral.id)"
-                                    v-model="myFuneral.attachments"/>
             </tab>
         </tabs>
     </admin-layout>
@@ -376,7 +374,6 @@ import FormGroup from "../../components/Ui/forms/FormGroup";
 import BasicInfo from "../../components/Service/BasicInfo";
 import FakeTable from "../../components/Ui/FakeTable";
 import FormTextarea from "../../components/Ui/forms/FormTextarea";
-import FormFileUploader from "../../components/Ui/forms/FormFileUploader";
 import Attachment from "../../components/Ui/elements/Attachment";
 import AttachmentList from "../../components/Ui/elements/AttachmentList";
 import ValueCheck from "../../components/Ui/elements/ValueCheck";
@@ -452,7 +449,6 @@ export default {
         ValueCheck,
         AttachmentList,
         Attachment,
-        FormFileUploader,
         FormTextarea,
         FakeTable,
         BasicInfo, FormGroup, FormInput, TabHeader, TabHeaders, Tabs, Tab,

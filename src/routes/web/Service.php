@@ -50,6 +50,7 @@ Route::get('/veranstaltungen/meine/letzte-aktualisierung', [ServiceController::c
 
 // one service
 Route::get('/veranstaltung/{service:slug}', [ServiceController::class, 'edit'])->name('service.edit');
+Route::get('/veranstaltung/{service:slug}/werbung', [ServiceController::class, 'ads'])->name('service.ads');
 Route::patch('/veranstaltung/{service:slug}', [ServiceController::class, 'update'])->name('service.update');
 Route::delete('/veranstaltung/{service:slug}', [ServiceController::class, 'destroy'])->name('service.destroy');
 Route::get('/veranstaltung-daten/{service:slug}', [ServiceController::class, 'data'])->name('service.data');

@@ -30,4 +30,6 @@
 
 use App\Http\Controllers\Api\PixabayController;
 
-Route::get('pixabay/query/{query}/{page?}', [PixabayController::class, 'query'])->name('pixabay.query');
+Route::get('pixabay/query/{query}/{page?}', [PixabayController::class, 'query'])->whereNumber('page')->name('pixabay.query');
+Route::get('pixabay/query/{query}/{page}', [PixabayController::class, 'query'])->whereNumber('page')->name('pixabay.query.page');
+Route::match(['get', 'post'], 'pixabay/image', [PixabayController::class, 'image'])->name('pixabay.image');

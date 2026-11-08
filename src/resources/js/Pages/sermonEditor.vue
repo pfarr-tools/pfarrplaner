@@ -73,6 +73,10 @@
                         <span class="mdi mdi-microphone me-1"></span>
                         <span class="d-none d-xl-inline">Predigt</span>
                     </button>
+                    <inertia-link v-if="currentService?.slug" class="btn btn-outline-secondary" :href="route('service.ads', currentService.slug)" title="Werbung bearbeiten">
+                        <span class="mdi mdi-bullhorn me-1"></span>
+                        <span class="d-none d-xl-inline">Werbung</span>
+                    </inertia-link>
                 </div>
             </template>
             <form @submit.prevent="saveSermon" id="formSermon" class="sermon-editor__form">

@@ -119,6 +119,27 @@ Produktion verlangt `APP_ENV=production`.
 einer Warnung blockiert und akzeptiert nur die exakte interaktive Eingabe `ja`.
 `./planer dev fresh` benötigt zusätzlich `--force`.
 
+### Große Datei-Uploads
+
+Der gemeinsame Uploader verarbeitet Bildbearbeitung und Variantenbildung im
+Browser. Dateien unterhalb der Schwelle werden direkt als Multipart-Upload
+gesendet; größere Dateien verwenden resumierbare Upload-Sessions. Die
+Standardwerte sind 10 MiB Schwelle, 5 MiB Chunk-Größe und 60 Minuten
+Session-Gültigkeit. Sie können über folgende Variablen angepasst werden:
+
+```env
+ATTACHMENT_UPLOAD_THRESHOLD=10485760
+ATTACHMENT_UPLOAD_CHUNK_SIZE=5242880
+ATTACHMENT_UPLOAD_EXPIRY_MINUTES=60
+```
+
+Temporäre Chunks liegen im konfigurierten Laravel-Storage und damit in der
+Pfarrplaner-Installation im verbindlichen MinIO-Objektspeicher. Der Scheduler
+bereinigt abgelaufene Upload-Sessions stündlich. Bei Änderungen an Storage-
+oder Compose-Konfigurationen sind die üblichen Backup- und
+`--force-recreate`-Prüfungen anzuwenden; temporäre Upload-Chunks dürfen nicht
+als dauerhafte Anhangsdaten behandelt werden.
+
 `FILESYSTEM_DRIVER=s3` und `AWS_ENDPOINT` zeigen auf den Live-MinIO-Bucket.
 Die Compose-Dateien beziehen den MinIO-Server als community-gepflegten,
 öffentlichen Build von `ghcr.io/coollabsio`; die offiziellen MinIO-Community-

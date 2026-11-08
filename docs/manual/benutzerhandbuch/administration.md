@@ -313,7 +313,7 @@ Poolmaster-Einsätze erscheinen im Urlaubsplan als eigene Einträge und werden b
 
 ## Werbung / Ankündigungskanäle
 
-Unter **Administration → Kirchengemeinden → Werbung** verwalten Sie zusätzliche Werbekanäle für eine Kirchengemeinde. Solche Kanäle erscheinen später im Reiter **Werbung** im [Editor für Veranstaltungen und Gottesdienste](veranstaltungen.md).
+Unter **Administration → Kirchengemeinden → Werbung** verwalten Sie zusätzliche Werbekanäle für eine Kirchengemeinde. Solche Kanäle erscheinen später im Bereich [Werbung](werbung.md) des jeweiligen Gottesdienstes.
 
 Pfarrplaner kennt außerdem einige feste Kanäle, die automatisch vorhanden sind:
 
