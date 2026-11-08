@@ -150,6 +150,11 @@ Bezeichnern, Dateinamen, URLs und CLI-Optionen vorbehalten.
 
 Produktionsfehler werden über GlitchTip überwacht.
 
+- GlitchTip-Issues werden in GitHub niemals nur mit `#nn` referenziert, weil
+  GitHub solche Verweise als GitHub-Issue interpretiert. Verwende stattdessen
+  immer einen vollständigen, beschrifteten GlitchTip-Link mit dem passenden
+  Titel, zum Beispiel `[GlitchTip: Undefined array key isoDate](https://glitchtip.pfarr.tools/organizations/pfarrtools/issues/30/)`.
+
 - Verwende den `glitchtip`-MCP-Server, um Produktionsfehler zu untersuchen.
 - Ordne Fehler diesem Repository über das passende GlitchTip-Projekt zu.
 - Das Projekt `pfarrplaner-dev` erfasst die lokale Entwicklungsumgebung; das
