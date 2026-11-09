@@ -47,9 +47,9 @@
 </template>
 
 <script>
-import { VueDatePicker } from '@vuepic/vue-datepicker';
-import * as dateFnsLocales from 'date-fns/locale';
-import { DateTime } from 'luxon';
+import { VueDatePicker } from '@vuepic/vue-datepicker'
+import * as dateFnsLocales from 'date-fns/locale'
+import { DateTime } from 'luxon'
 
 export default {
     name: 'DatePickerShim',
@@ -62,31 +62,45 @@ export default {
         isoDate: { type: Boolean, default: false },
     },
     computed: {
-        momentFormat() { return (this.config && this.config.format) || 'DD.MM.YYYY'; },
-        dpFormat() { return this.momentFormat.replace(/DD/g, 'dd').replace(/YYYY/g, 'yyyy'); },
-        localeString() { return (this.config && this.config.locale) || 'de'; },
-        locale() {
-            const key = this.localeString.replace('-', '');
-            return dateFnsLocales[key] || dateFnsLocales[this.localeString] || dateFnsLocales.de;
+        momentFormat() {
+            return (this.config && this.config.format) || 'DD.MM.YYYY'
         },
-        hasTime() { return this.momentFormat.includes('HH'); },
-        showClear() { return !!(this.config && this.config.showClear); },
+        dpFormat() {
+            return this.momentFormat.replace(/DD/g, 'dd').replace(/YYYY/g, 'yyyy')
+        },
+        localeString() {
+            return (this.config && this.config.locale) || 'de'
+        },
+        locale() {
+            const key = this.localeString.replace('-', '')
+            return dateFnsLocales[key] || dateFnsLocales[this.localeString] || dateFnsLocales.de
+        },
+        hasTime() {
+            return this.momentFormat.includes('HH')
+        },
+        showClear() {
+            return !!(this.config && this.config.showClear)
+        },
         textInputConfig() {
             return {
                 format: this.dpFormat,
                 pattern: this.parseTypedInput,
-            };
+            }
         },
     },
     data() {
-        return { internalDate: this.parseInput(this.modelValue) };
+        return { internalDate: this.parseInput(this.modelValue) }
     },
     watch: {
-        modelValue(v) { this.internalDate = this.parseInput(v); },
+        modelValue(v) {
+            this.internalDate = this.parseInput(v)
+        },
     },
     methods: {
         getLuxonFormat() {
-            return ((this.config && this.config.format) || 'DD.MM.YYYY').replace(/DD/g, 'dd').replace(/YYYY/g, 'yyyy');
+            return ((this.config && this.config.format) || 'DD.MM.YYYY')
+                .replace(/DD/g, 'dd')
+                .replace(/YYYY/g, 'yyyy')
         },
         localDateFromParts(dateTime) {
             return new Date(
@@ -96,14 +110,14 @@ export default {
                 dateTime.hour,
                 dateTime.minute,
                 dateTime.second,
-                dateTime.millisecond
-            );
+                dateTime.millisecond,
+            )
         },
         berlinDateTimeFromInput(value) {
-            if (!value) return null;
+            if (!value) return null
 
             if (value instanceof Date) {
-                const local = DateTime.fromJSDate(value);
+                const local = DateTime.fromJSDate(value)
                 return DateTime.fromObject(
                     {
                         year: local.year,
@@ -114,69 +128,71 @@ export default {
                         second: local.second,
                         millisecond: local.millisecond,
                     },
-                    { zone: 'Europe/Berlin' }
-                );
+                    { zone: 'Europe/Berlin' },
+                )
             }
 
             if (typeof value === 'string') {
                 const formatted = DateTime.fromFormat(value, this.getLuxonFormat(), {
                     zone: 'Europe/Berlin',
                     locale: this.localeString,
-                });
-                if (formatted.isValid) return formatted;
+                })
+                if (formatted.isValid) return formatted
 
-                const iso = DateTime.fromISO(value, { zone: 'utc' }).setZone('Europe/Berlin');
-                if (iso.isValid) return iso;
+                const iso = DateTime.fromISO(value, { zone: 'utc' }).setZone('Europe/Berlin')
+                if (iso.isValid) return iso
             }
 
-            return null;
+            return null
         },
         parseTypedInput(value) {
-            if (typeof value !== 'string') return null;
+            if (typeof value !== 'string') return null
 
             const parsed = DateTime.fromFormat(value.trim(), this.getLuxonFormat(), {
                 zone: 'Europe/Berlin',
                 locale: this.localeString,
-            });
+            })
 
-            return parsed.isValid ? this.localDateFromParts(parsed) : null;
+            return parsed.isValid ? this.localDateFromParts(parsed) : null
         },
         parseInput(v) {
-            if (!v) return null;
-            if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
+            if (!v) return null
+            if (v instanceof Date) return isNaN(v.getTime()) ? null : v
             if (this.isoDate) {
-                const berlinTime = this.berlinDateTimeFromInput(v);
-                return berlinTime ? this.localDateFromParts(berlinTime) : null;
+                const berlinTime = this.berlinDateTimeFromInput(v)
+                return berlinTime ? this.localDateFromParts(berlinTime) : null
             }
-            const parsedInput = this.parseTypedInput(v);
-            if (parsedInput) return parsedInput;
+            const parsedInput = this.parseTypedInput(v)
+            if (parsedInput) return parsedInput
 
             if (typeof v === 'string') {
-                const iso = DateTime.fromISO(v, { setZone: true });
+                const iso = DateTime.fromISO(v, { setZone: true })
                 if (iso.isValid) {
-                    return this.localDateFromParts(iso.setZone('Europe/Berlin'));
+                    return this.localDateFromParts(iso.setZone('Europe/Berlin'))
                 }
             }
 
-            return null;
+            return null
         },
         onDateChange(date) {
             if (!date) {
-                this.$emit('update:modelValue', null);
-                this.$emit('input', null);
-                return;
+                this.$emit('update:modelValue', null)
+                this.$emit('input', null)
+                return
             }
             if (this.isoDate) {
-                const berlinTime = this.berlinDateTimeFromInput(date);
-                const formatted = berlinTime ? berlinTime.toFormat(this.getLuxonFormat(), { locale: this.localeString }) : null;
-                this.$emit('update:modelValue', formatted);
-                this.$emit('input', berlinTime ? berlinTime.toUTC().toISO() : null);
+                const berlinTime = this.berlinDateTimeFromInput(date)
+                const formatted = berlinTime
+                    ? berlinTime.toFormat(this.getLuxonFormat(), { locale: this.localeString })
+                    : null
+                this.$emit('update:modelValue', formatted)
+                this.$emit('input', berlinTime ? berlinTime.toUTC().toISO() : null)
             } else {
-                const formatted = window.moment(date).format(this.momentFormat);
-                this.$emit('update:modelValue', formatted);
-                this.$emit('input', formatted);
+                const formatted = window.moment(date).format(this.momentFormat)
+                this.$emit('update:modelValue', formatted)
+                this.$emit('input', formatted)
             }
         },
     },
-};
+}
 </script>

@@ -29,72 +29,105 @@
 <template>
     <admin-layout :title="getTitle()">
         <template #navbar-left>
-            <button class="btn btn-primary" title="Speichern" @click="savePool">
-                <span class="d-inline d-md-none mdi mdi-content-save"></span> <span class="d-none d-md-inline">Speichern</span>
+            <button
+                class="btn btn-primary"
+                title="Speichern"
+                @click="savePool"
+            >
+                <span class="d-inline d-md-none mdi mdi-content-save"></span>
+                <span class="d-none d-md-inline">Speichern</span>
             </button>
         </template>
-        <form-input label="Bezeichnung des Pools" v-model="myPool.name" autofocus />
-        <form-selectize label="Zugehörige Kirchengemeinden" v-model="myPool.cities" :options="cities" multiple />
-        <people-select label="Zugehörige Personen" v-model="myPool.users" :people="people" multiple />
+        <form-input
+            label="Bezeichnung des Pools"
+            v-model="myPool.name"
+            autofocus
+        />
+        <form-selectize
+            label="Zugehörige Kirchengemeinden"
+            v-model="myPool.cities"
+            :options="cities"
+            multiple
+        />
+        <people-select
+            label="Zugehörige Personen"
+            v-model="myPool.users"
+            :people="people"
+            multiple
+        />
         <hr />
-        <p>In besonderen Fällen können für einen Pool feste Kontaktinformationen (z.B. Dekanatamt) hinterlegt werden.
-            Diese sind dann nicht mit einem Benutzer verknüpft.</p>
-        <form-input label="Ansprechperson" v-model="myPool.contact" />
-        <form-input label="Institution/Amt" v-model="myPool.office" />
-        <form-input label="Telefon" v-model="myPool.phone" />
-        <form-input label="E-Mailadresse" v-model="myPool.email" />
+        <p>
+            In besonderen Fällen können für einen Pool feste Kontaktinformationen (z.B. Dekanatamt)
+            hinterlegt werden. Diese sind dann nicht mit einem Benutzer verknüpft.
+        </p>
+        <form-input
+            label="Ansprechperson"
+            v-model="myPool.contact"
+        />
+        <form-input
+            label="Institution/Amt"
+            v-model="myPool.office"
+        />
+        <form-input
+            label="Telefon"
+            v-model="myPool.phone"
+        />
+        <form-input
+            label="E-Mailadresse"
+            v-model="myPool.email"
+        />
     </admin-layout>
 </template>
 
 <script>
-import FormInput from "../../../components/Ui/forms/FormInput.vue";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize.vue";
-import PeopleSelect from "../../../components/Ui/elements/PeopleSelect.vue";
+import FormInput from '../../../components/Ui/forms/FormInput.vue'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize.vue'
+import PeopleSelect from '../../../components/Ui/elements/PeopleSelect.vue'
 
 export default {
-    name: "Editor",
-    components: {PeopleSelect, FormSelectize, FormInput},
+    name: 'Editor',
+    components: { PeopleSelect, FormSelectize, FormInput },
     props: ['pool', 'cities', 'people'],
     data() {
         return {
-            myPool: this.pool ? {
-                ...this.pool,
-                cities: this.pool.cities.map(city => city.id),
-                users: this.pool.users.map(user => user.id),
-            } : {
-                id: null,
-                name: '',
-                contact: '',
-                office: '',
-                phone: '',
-                email: '',
-                cities: [],
-                users: [],
-            }
+            myPool: this.pool
+                ? {
+                      ...this.pool,
+                      cities: this.pool.cities.map((city) => city.id),
+                      users: this.pool.users.map((user) => user.id),
+                  }
+                : {
+                      id: null,
+                      name: '',
+                      contact: '',
+                      office: '',
+                      phone: '',
+                      email: '',
+                      cities: [],
+                      users: [],
+                  },
         }
     },
     methods: {
         getTitle() {
-            if (!this.myPool.id) return 'Neuen Pool anlegen';
-            return 'Pool "' + this.myPool.name + '" bearbeiten';
+            if (!this.myPool.id) return 'Neuen Pool anlegen'
+            return 'Pool "' + this.myPool.name + '" bearbeiten'
         },
         savePool() {
             if (!this.myPool.id) {
                 this.$inertia.post(route('admin.pools.store'), {
                     ...this.myPool,
-                    users: this.myPool.users.map(user => isNaN(user) ? user.id : user)
-                });
+                    users: this.myPool.users.map((user) => (isNaN(user) ? user.id : user)),
+                })
             } else {
-                this.$inertia.patch(route('admin.pool.update', {modelId: this.myPool.id}), {
+                this.$inertia.patch(route('admin.pool.update', { modelId: this.myPool.id }), {
                     ...this.myPool,
-                    users: this.myPool.users.map(user => isNaN(user) ? user.id : user)
-                });
+                    users: this.myPool.users.map((user) => (isNaN(user) ? user.id : user)),
+                })
             }
         },
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

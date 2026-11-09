@@ -29,47 +29,74 @@
 <template>
     <div class="baptisms-tab">
         <h2>{{ title }}</h2>
-        <div v-if="baptisms.length == 0" class="alert alert-info">
-            <span
-                v-if="(config.mine || false)">Zur Zeit hast du keine Taufen geplant.</span>
+        <div
+            v-if="baptisms.length == 0"
+            class="alert alert-info"
+        >
+            <span v-if="config.mine || false">Zur Zeit hast du keine Taufen geplant.</span>
             <span v-else>Zur Zeit sind keine Taufen geplant.</span>
         </div>
         <div v-else>
-            <fake-table :columns="[2,2,4,3,1]" collapsed-header="Taufen"
-                        :headers="['Gottesdienst', 'Täufling', 'Informationen zur Taufe', 'Dokumente', '']">
-                <baptism v-for="(baptism, baptismIndex) in baptisms" :baptism="baptism" :key="baptism.id" :show-service="true"
-                         :show-pastor="true"
-                         class="mb-3 p-1" :class="{'stripe-odd': (baptismIndex % 2 == 0)}"/>
-
+            <fake-table
+                :columns="[2, 2, 4, 3, 1]"
+                collapsed-header="Taufen"
+                :headers="['Gottesdienst', 'Täufling', 'Informationen zur Taufe', 'Dokumente', '']"
+            >
+                <baptism
+                    v-for="(baptism, baptismIndex) in baptisms"
+                    :baptism="baptism"
+                    :key="baptism.id"
+                    :show-service="true"
+                    :show-pastor="true"
+                    class="mb-3 p-1"
+                    :class="{ 'stripe-odd': baptismIndex % 2 == 0 }"
+                />
             </fake-table>
         </div>
 
-        <hr/>
+        <hr />
 
         <h2>Taufanfragen</h2>
-        <div v-if="baptismRequests.length == 0" class="alert alert-info">Zur Zeit gibt es keine offenen Taufanfragen.</div>
+        <div
+            v-if="baptismRequests.length == 0"
+            class="alert alert-info"
+        >
+            Zur Zeit gibt es keine offenen Taufanfragen.
+        </div>
         <div v-else>
-            <fake-table :columns="[2,4,3,1]" collapsed-header="Taufanfragen"
-                        :headers="['Täufling', 'Informationen zur Taufe', 'Dokumente', '']">
-                <baptism  v-for="(baptism, baptismIndex) in baptismRequests" :baptism="baptism" :key="baptism.id"
-                          class="mb-3 p-1" :class="{'stripe-odd': (baptismIndex % 2 == 0)}"/>
+            <fake-table
+                :columns="[2, 4, 3, 1]"
+                collapsed-header="Taufanfragen"
+                :headers="['Täufling', 'Informationen zur Taufe', 'Dokumente', '']"
+            >
+                <baptism
+                    v-for="(baptism, baptismIndex) in baptismRequests"
+                    :baptism="baptism"
+                    :key="baptism.id"
+                    class="mb-3 p-1"
+                    :class="{ 'stripe-odd': baptismIndex % 2 == 0 }"
+                />
             </fake-table>
         </div>
     </div>
 </template>
 
 <script>
-import Baptism from "../ServiceEditor/rites/Baptism";
-import FakeTable from "../Ui/FakeTable";
+import Baptism from '../ServiceEditor/rites/Baptism'
+import FakeTable from '../Ui/FakeTable'
 
 export default {
-    name: "BaptismsTab",
-    components: {FakeTable, Baptism},
+    name: 'BaptismsTab',
+    components: { FakeTable, Baptism },
     props: {
-        title: String, description: String, user: Object, config: Object, baptisms: Array, baptismRequests: Array,
+        title: String,
+        description: String,
+        user: Object,
+        config: Object,
+        baptisms: Array,
+        baptismRequests: Array,
     },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

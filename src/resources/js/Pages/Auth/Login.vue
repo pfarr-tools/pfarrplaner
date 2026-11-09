@@ -27,54 +27,106 @@
   -->
 
 <template>
-    <section style="height: 100vh;">
+    <section style="height: 100vh">
         <div class="container-fluid h-custom">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-md-9 col-lg-6 col-xl-5">
-                    <img src="/img/logo/pfarrplaner.svg" class="img-fluid d-none d-md-inline" alt="Pfarrplaner">
+                    <img
+                        src="/img/logo/pfarrplaner.svg"
+                        class="img-fluid d-none d-md-inline"
+                        alt="Pfarrplaner"
+                    />
                 </div>
                 <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                     <h1 class="ps-0 pl-0 ms-0 ms-0 mb-4">{{ layout.appName }}</h1>
-                    <h2 v-if="layout.appProvider" class="ps-0 pl-0 ms-0 ms-0 mb-4">&mdash; {{ layout.appProvider }} &mdash;</h2>
-                    <form method="POST" id="loginForm" @submit.prevent.stop="submit" novalidate>
+                    <h2
+                        v-if="layout.appProvider"
+                        class="ps-0 pl-0 ms-0 ms-0 mb-4"
+                    >
+                        &mdash; {{ layout.appProvider }} &mdash;
+                    </h2>
+                    <form
+                        method="POST"
+                        id="loginForm"
+                        @submit.prevent.stop="submit"
+                        novalidate
+                    >
                         <form-csrf-token />
                         <!-- Email input -->
                         <div v-if="!demo">
-                            <form-input v-if="!demo"
+                            <form-input
+                                v-if="!demo"
                                 v-model="form.email"
-                                name="email" label="E-Mailadresse" autofocus placeholder="deine@email.de"/>
-                            <form-input class="my-3"
-                                        type="password" name="password" v-model="form.password"
-                                        label="Passwort" />
-                            <form-check v-model="form.remember" label="Angemeldet bleiben" />
-
+                                name="email"
+                                label="E-Mailadresse"
+                                autofocus
+                                placeholder="deine@email.de"
+                            />
+                            <form-input
+                                class="my-3"
+                                type="password"
+                                name="password"
+                                v-model="form.password"
+                                label="Passwort"
+                            />
+                            <form-check
+                                v-model="form.remember"
+                                label="Angemeldet bleiben"
+                            />
                         </div>
 
                         <div v-else>
                             <div class="form-outline mb-4">
-                                <label class="form-label" for="users">E-Mailadresse</label>
-                                <select id="users" name="email" class="form-control" v-model="form.email" aria-describedby="usersHelp">
-                                    <option v-for="user in users" :key="user.email" :value="user.email">
-                                        {{ user.title ? user.title+' ' : ''}}{{ user.name }} ({{ user.email }})
+                                <label
+                                    class="form-label"
+                                    for="users"
+                                    >E-Mailadresse</label
+                                >
+                                <select
+                                    id="users"
+                                    name="email"
+                                    class="form-control"
+                                    v-model="form.email"
+                                    aria-describedby="usersHelp"
+                                >
+                                    <option
+                                        v-for="user in users"
+                                        :key="user.email"
+                                        :value="user.email"
+                                    >
+                                        {{ user.title ? user.title + ' ' : '' }}{{ user.name }} ({{
+                                            user.email
+                                        }})
                                     </option>
                                 </select>
-                                <small id="usersHelp" class="form-text text-muted">Wählen Sie einen Demo-Benutzer aus.</small>
+                                <small
+                                    id="usersHelp"
+                                    class="form-text text-muted"
+                                    >Wählen Sie einen Demo-Benutzer aus.</small
+                                >
                             </div>
                         </div>
-                        <div class="text-end text-lg-start mt-4 pt-2" :key="attempts">
-                            <button type="submit" class="btn btn-primary btn-lg"
-                                     :disabled="loggingIn"
-                                     style="padding-left: 2.5rem; padding-right: 2.5rem;">Anmelden</button>
+                        <div
+                            class="text-end text-lg-start mt-4 pt-2"
+                            :key="attempts"
+                        >
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-lg"
+                                :disabled="loggingIn"
+                                style="padding-left: 2.5rem; padding-right: 2.5rem"
+                            >
+                                Anmelden
+                            </button>
                         </div>
-
-
                     </form>
-                    <donation-notice class="mt-4 pt-3 border-top"/>
+                    <donation-notice class="mt-4 pt-3 border-top" />
                 </div>
             </div>
         </div>
         <div
-            class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+            class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary"
+        >
             <!-- Copyright -->
             <div class="text-white mb-3 mb-md-0">
                 Copyright © <b>Pfarrplaner</b>. All rights reserved.
@@ -83,31 +135,36 @@
 
             <!-- Right -->
             <div>
-                <a class="me-2 me-2 text-white" :href="route('what.is')">Was ist der Pfarrplaner?</a>
-                <a href="https://pfarr.tools" class="text-white">
+                <a
+                    class="me-2 me-2 text-white"
+                    :href="route('what.is')"
+                    >Was ist der Pfarrplaner?</a
+                >
+                <a
+                    href="https://pfarr.tools"
+                    class="text-white"
+                >
                     <i class="fa fa-wrench"></i> pfarr.tools
                 </a>
             </div>
             <!-- Right -->
         </div>
     </section>
-
 </template>
 
-
 <script>
-import FormInput from "../../components/Ui/forms/FormInput.vue";
-import FormCheck from "../../components/Ui/forms/FormCheck.vue";
-import FormCsrfToken from "../../components/Ui/forms/FormCsrfToken.vue";
-import DonationNotice from "../../components/Ui/DonationNotice.vue";
+import FormInput from '../../components/Ui/forms/FormInput.vue'
+import FormCheck from '../../components/Ui/forms/FormCheck.vue'
+import FormCsrfToken from '../../components/Ui/forms/FormCsrfToken.vue'
+import DonationNotice from '../../components/Ui/DonationNotice.vue'
 
 export default {
-    name: "Login",
-    components: {DonationNotice, FormCsrfToken, FormCheck, FormInput},
+    name: 'Login',
+    components: { DonationNotice, FormCsrfToken, FormCheck, FormInput },
     computed: {
         layout() {
-            return this.$page.props;
-        }
+            return this.$page.props
+        },
     },
     data() {
         return {
@@ -121,35 +178,38 @@ export default {
                 email: this.$page.props.users?.[0]?.email || '',
                 password: '',
                 remember: false,
-            }
-        };
+            },
+        }
     },
     methods: {
         submit(event) {
-            if (this.loggingIn) return;
-            this.loggingIn = true;
-            const form = event.currentTarget;
-            axios.get(route('csrf.keepalive')).then(response => {
-                const data = new FormData(form);
-                data.set('_token', response.data.token);
-                this.$inertia.post(route('login'), data, {
-                    preserveState: true,
-                    onFinish: () => { this.loggingIn = false; },
-                });
-            }).catch(() => {
-                this.loggingIn = false;
-            });
-        }
+            if (this.loggingIn) return
+            this.loggingIn = true
+            const form = event.currentTarget
+            axios
+                .get(route('csrf.keepalive'))
+                .then((response) => {
+                    const data = new FormData(form)
+                    data.set('_token', response.data.token)
+                    this.$inertia.post(route('login'), data, {
+                        preserveState: true,
+                        onFinish: () => {
+                            this.loggingIn = false
+                        },
+                    })
+                })
+                .catch(() => {
+                    this.loggingIn = false
+                })
+        },
     },
-
 }
 </script>
-
 
 <style scoped>
 .divider:after,
 .divider:before {
-    content: "";
+    content: '';
     flex: 1;
     height: 1px;
     background: #eee;

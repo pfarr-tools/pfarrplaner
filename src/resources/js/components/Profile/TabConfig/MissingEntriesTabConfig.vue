@@ -28,33 +28,39 @@
 
 <template>
     <div class="cases-tab-config">
-        <form-selectize label="Zeige mir alle Gottesdienste mit leeren Feldern für folgende Dienste" multiple
-                        :options="myMinistries" :settings="{searchField: ['name']}"
-                        v-model="tab.config.ministries" />
-        <form-selectize label="Auf folgende Orte beschränken" multiple
-                        :options="locations" :settings="{searchField: ['name']}"
-                        v-model="tab.config.locations" />
+        <form-selectize
+            label="Zeige mir alle Gottesdienste mit leeren Feldern für folgende Dienste"
+            multiple
+            :options="myMinistries"
+            :settings="{ searchField: ['name'] }"
+            v-model="tab.config.ministries"
+        />
+        <form-selectize
+            label="Auf folgende Orte beschränken"
+            multiple
+            :options="locations"
+            :settings="{ searchField: ['name'] }"
+            v-model="tab.config.locations"
+        />
     </div>
 </template>
 
 <script>
-import FormSelectize from "../../Ui/forms/FormSelectize";
+import FormSelectize from '../../Ui/forms/FormSelectize'
 export default {
-    name: "MissingEntriesTabConfig",
-    components: {FormSelectize},
+    name: 'MissingEntriesTabConfig',
+    components: { FormSelectize },
     props: ['tab', 'ministries', 'locations'],
     data() {
-        var myMinistries = [];
-        Object.entries(this.ministries).forEach(ministry => {
-            myMinistries.push({id: ministry[1], name: ministry[1]})
-        });
+        var myMinistries = []
+        Object.entries(this.ministries).forEach((ministry) => {
+            myMinistries.push({ id: ministry[1], name: ministry[1] })
+        })
         return {
             myMinistries: myMinistries,
-        };
-    }
+        }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

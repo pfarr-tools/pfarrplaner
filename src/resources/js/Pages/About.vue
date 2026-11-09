@@ -27,59 +27,95 @@
   -->
 
 <template>
-    <admin-layout :title="'Über '+appName">
+    <admin-layout :title="'Über ' + appName">
         <div>
-            <h2>{{ appName }}</h2><br/>
-            <span v-if="appName != 'Pfarrplaner'">Pfarrplaner </span>v.{{ version }}-{{ env }} vom {{ moment(date).locale('de').format('LLLL') }}<br/>
+            <h2>{{ appName }}</h2>
+            <br />
+            <span v-if="appName != 'Pfarrplaner'">Pfarrplaner </span>v.{{ version }}-{{ env }} vom
+            {{ moment(date).locale('de').format('LLLL') }}<br />
             Laravel {{ laravelVersion }} auf PHP {{ phpVersion }}
         </div>
-        <p v-if="officialServer">Gehostet auf einem Server des <a href="https://wwww.kirchenbezirk-balingen.de/" target="_blank">Evangelischen
-            Kirchenbezirks Balingen</a>.</p>
-        <p>Der Quellcode von Pfarrplaner ist als Open Source auf <a :href="repositoryUrl"
-                                                                    target="_blank">GitHub</a> verfügbar und steht unter
-            der <a :href="repositoryUrl+'/blob/main/LICENSE'" target="_blank">GNU General
-                Public License (GPL) 3.0</a> oder höher.
+        <p v-if="officialServer">
+            Gehostet auf einem Server des
+            <a
+                href="https://wwww.kirchenbezirk-balingen.de/"
+                target="_blank"
+                >Evangelischen Kirchenbezirks Balingen</a
+            >.
+        </p>
+        <p>
+            Der Quellcode von Pfarrplaner ist als Open Source auf
+            <a
+                :href="repositoryUrl"
+                target="_blank"
+                >GitHub</a
+            >
+            verfügbar und steht unter der
+            <a
+                :href="repositoryUrl + '/blob/main/LICENSE'"
+                target="_blank"
+                >GNU General Public License (GPL) 3.0</a
+            >
+            oder höher.
         </p>
         <h3>Container und Dienste</h3>
         <table class="table table-sm">
             <thead>
-            <tr>
-                <th>Dienst</th>
-                <th>Image</th>
-                <th>Status</th>
-            </tr>
+                <tr>
+                    <th>Dienst</th>
+                    <th>Image</th>
+                    <th>Status</th>
+                </tr>
             </thead>
             <tbody>
-            <tr v-for="(service, name) in runtime.services" :key="name">
-                <td>{{ name }}</td>
-                <td><code>{{ service.image }}</code></td>
-                <td>{{ service.status }}</td>
-            </tr>
+                <tr
+                    v-for="(service, name) in runtime.services"
+                    :key="name"
+                >
+                    <td>{{ name }}</td>
+                    <td>
+                        <code>{{ service.image }}</code>
+                    </td>
+                    <td>{{ service.status }}</td>
+                </tr>
             </tbody>
         </table>
-        <donation-notice class="mb-4"/>
-        <hr class="my-3"/>
-        <vue-markdown class="changelog" :source="changelog"/>
+        <donation-notice class="mb-4" />
+        <hr class="my-3" />
+        <vue-markdown
+            class="changelog"
+            :source="changelog"
+        />
     </admin-layout>
 </template>
 
 <script>
-import CardHeader from "../components/Ui/cards/cardHeader";
-import CardBody from "../components/Ui/cards/cardBody";
-import Card from "../components/Ui/cards/card";
-import DonationNotice from "../components/Ui/DonationNotice.vue";
-import VueMarkdown from 'vue-markdown-render';
+import CardHeader from '../components/Ui/cards/cardHeader'
+import CardBody from '../components/Ui/cards/cardBody'
+import Card from '../components/Ui/cards/card'
+import DonationNotice from '../components/Ui/DonationNotice.vue'
+import VueMarkdown from 'vue-markdown-render'
 
 export default {
-    name: "About",
-    components: {Card, CardBody, CardHeader, DonationNotice, VueMarkdown},
+    name: 'About',
+    components: { Card, CardBody, CardHeader, DonationNotice, VueMarkdown },
 
-    props: ['version', 'date', 'changelog', 'env', 'phpVersion', 'laravelVersion', 'appName', 'repositoryUrl', 'runtime'],
+    props: [
+        'version',
+        'date',
+        'changelog',
+        'env',
+        'phpVersion',
+        'laravelVersion',
+        'appName',
+        'repositoryUrl',
+        'runtime',
+    ],
     computed: {
         officialServer() {
-            return window.location.href.includes('.pfarrplaner.de');
-        }
-    }
+            return window.location.href.includes('.pfarrplaner.de')
+        },
+    },
 }
 </script>
 
@@ -88,7 +124,8 @@ export default {
     font-size: 2rem;
 }
 
-.changelog :deep(h2), .changelog :deep(h3) {
+.changelog :deep(h2),
+.changelog :deep(h3) {
     font-size: 1em;
     font-weight: bold;
 }

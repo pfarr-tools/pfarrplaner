@@ -28,106 +28,180 @@
 
 <template>
     <div class="wedding row">
-        <div class="col-md-2" v-if="showService">
+        <div
+            class="col-md-2"
+            v-if="showService"
+        >
             {{ moment(wedding.service.date).format('DD.MM.YYYY') }}<br />
             {{ wedding.service.timeText }}<br />
             {{ wedding.service.locationText }}
             <div v-if="showPastor">
-                <participants :participants="wedding.service.pastors"/>
+                <participants :participants="wedding.service.pastors" />
             </div>
         </div>
         <div class="col-md-2">
-            <b>{{ wedding.spouse1_name }}</b><br />
-            <small>{{ wedding.spouse1_phone }}<br />{{ wedding.spouse1_email}}</small>
+            <b>{{ wedding.spouse1_name }}</b
+            ><br />
+            <small>{{ wedding.spouse1_phone }}<br />{{ wedding.spouse1_email }}</small>
             <br />
-            <b>{{ wedding.spouse2_name }}</b><br />
-            <small>{{ wedding.spouse2_phone }}<br />{{ wedding.spouse2_email}}</small>
+            <b>{{ wedding.spouse2_name }}</b
+            ><br />
+            <small>{{ wedding.spouse2_phone }}<br />{{ wedding.spouse2_email }}</small>
         </div>
         <div class="col-md-4">
             <div>
-                <checked-process-item :check="(wedding.appointment)" negative="Traugespräch noch nicht vereinbart">
+                <checked-process-item
+                    :check="wedding.appointment"
+                    negative="Traugespräch noch nicht vereinbart"
+                >
                     <template #positive>
-                        Traugespräch am {{ moment(wedding.appointment).locale('de').format('LLLL') }} Uhr
+                        Traugespräch am
+                        {{ moment(wedding.appointment).locale('de').format('LLLL') }} Uhr
                     </template>
                 </checked-process-item>
             </div>
             <div>
-                <checked-process-item :check="hasRegistrationForm" positive="Anmeldeformular erstellt" negative="Anmeldeformular noch nicht erstellt" />
-                <checked-process-item :check="wedding.signed" positive="Anmeldung unterschrieben" negative="Anmeldung noch nicht unterschrieben" />
+                <checked-process-item
+                    :check="hasRegistrationForm"
+                    positive="Anmeldeformular erstellt"
+                    negative="Anmeldeformular noch nicht erstellt"
+                />
+                <checked-process-item
+                    :check="wedding.signed"
+                    positive="Anmeldung unterschrieben"
+                    negative="Anmeldung noch nicht unterschrieben"
+                />
             </div>
-            <checked-process-item :check="wedding.text" positive="Trautext" negative="Trautext noch nicht eingetragen">
+            <checked-process-item
+                :check="wedding.text"
+                positive="Trautext"
+                negative="Trautext noch nicht eingetragen"
+            >
                 <template #positive>
-                    <bible-reference title="Trautext:" :perikope="{ Bibelstelle: wedding.text }" inline="1" />
+                    <bible-reference
+                        title="Trautext:"
+                        :perikope="{ Bibelstelle: wedding.text }"
+                        inline="1"
+                    />
                 </template>
             </checked-process-item>
             <div v-if="wedding.spouse1_needs_dimissorial">
-                <checked-process-item v-if="wedding.spouse1_dimissorial_requested" :check="wedding.spouse1_dimissorial_received"
-                                      :positive="'Dimissoriale für '+spouseName(1)+' erhalten'">
+                <checked-process-item
+                    v-if="wedding.spouse1_dimissorial_requested"
+                    :check="wedding.spouse1_dimissorial_received"
+                    :positive="'Dimissoriale für ' + spouseName(1) + ' erhalten'"
+                >
                     <template #negative>
-                        Dimissoriale für {{ spouseName(1)}} steht noch aus (beantragt am {{ moment(wedding.spouse1_dimissorial_requested).format('DD.MM.YYYY') }})
+                        Dimissoriale für {{ spouseName(1) }} steht noch aus (beantragt am
+                        {{ moment(wedding.spouse1_dimissorial_requested).format('DD.MM.YYYY') }})
                     </template>
                 </checked-process-item>
-                <checked-process-item v-else :check="wedding.spouse1_dimissorial_requested"
-                                      :negative="'Dimissoriale für '+spouseName(1)+' noch nicht beantragt'" positive="" />
+                <checked-process-item
+                    v-else
+                    :check="wedding.spouse1_dimissorial_requested"
+                    :negative="'Dimissoriale für ' + spouseName(1) + ' noch nicht beantragt'"
+                    positive=""
+                />
             </div>
             <div v-if="wedding.spouse2_needs_dimissorial">
-                <checked-process-item v-if="wedding.spouse2_dimissorial_requested" :check="wedding.spouse2_dimissorial_received"
-                                      :positive="'Dimissoriale für '+spouseName(2)+' erhalten'">
+                <checked-process-item
+                    v-if="wedding.spouse2_dimissorial_requested"
+                    :check="wedding.spouse2_dimissorial_received"
+                    :positive="'Dimissoriale für ' + spouseName(2) + ' erhalten'"
+                >
                     <template #negative>
-                        Dimissoriale für {{ spouseName(2)}} steht noch aus (beantragt am {{ moment(wedding.spouse2_dimissorial_requested).format('DD.MM.YYYY') }})
+                        Dimissoriale für {{ spouseName(2) }} steht noch aus (beantragt am
+                        {{ moment(wedding.spouse2_dimissorial_requested).format('DD.MM.YYYY') }})
                     </template>
                 </checked-process-item>
-                <checked-process-item v-else :check="wedding.spouse2_dimissorial_requested"
-                                      :negative="'Dimissoriale für '+spouseName(2)+' noch nicht beantragt'" positive="" />
+                <checked-process-item
+                    v-else
+                    :check="wedding.spouse2_dimissorial_requested"
+                    :negative="'Dimissoriale für ' + spouseName(2) + ' noch nicht beantragt'"
+                    positive=""
+                />
             </div>
             <div v-if="wedding.needs_permission != 0">
-                <checked-process-item v-if="wedding.permission_requested" :check="wedding.permission_received"
-                                      positive="Genehmigung vom Dekanatamt erhalten">
+                <checked-process-item
+                    v-if="wedding.permission_requested"
+                    :check="wedding.permission_received"
+                    positive="Genehmigung vom Dekanatamt erhalten"
+                >
                     <template #negative>
-                        Genehmigung vom Dekanatamt steht noch aus (beantragt am {{ moment(wedding.permission_requested).format('DD.MM.YYYY') }})
+                        Genehmigung vom Dekanatamt steht noch aus (beantragt am
+                        {{ moment(wedding.permission_requested).format('DD.MM.YYYY') }})
                     </template>
                 </checked-process-item>
-                <checked-process-item v-else :check="wedding.permission_requested"
-                                      negative="Genehmigung des Dekanatamts noch nicht beantragt." positive="" />
+                <checked-process-item
+                    v-else
+                    :check="wedding.permission_requested"
+                    negative="Genehmigung des Dekanatamts noch nicht beantragt."
+                    positive=""
+                />
             </div>
             <div>
-                <checked-process-item :check="wedding.docs_ready" positive="Urkunden erstellt" negative="Urkunden noch nicht erstellt">
+                <checked-process-item
+                    :check="wedding.docs_ready"
+                    positive="Urkunden erstellt"
+                    negative="Urkunden noch nicht erstellt"
+                >
                     <template #positive>
-                        Urkunden erstellt<small v-if="wedding.docs_where"><br />Hinterlegt: {{ wedding.docs_where }}</small>
+                        Urkunden erstellt<small v-if="wedding.docs_where"
+                            ><br />Hinterlegt: {{ wedding.docs_where }}</small
+                        >
                     </template>
                 </checked-process-item>
             </div>
             <div>
-                <checked-process-item :check="wedding.processed" positive="Ins Kirchenbuch eingetragen" negative="Noch nicht ins Kirchenbuch eingetragen" />
+                <checked-process-item
+                    :check="wedding.processed"
+                    positive="Ins Kirchenbuch eingetragen"
+                    negative="Noch nicht ins Kirchenbuch eingetragen"
+                />
             </div>
         </div>
         <div class="col-md-3">
-            <file-drag-receiver multi
-                                v-model="myWedding.attachments"
-                                :upload-route="route('wedding.attach', myWedding.id)" :key="Object.keys(myWedding.attachments).length">
-                <attachment  v-for="(attachment,key,index) in wedding.attachments" :key="'attachment'+key" :attachment="attachment" />
+            <file-drag-receiver
+                multi
+                v-model="myWedding.attachments"
+                :upload-route="route('wedding.attach', myWedding.id)"
+                :key="Object.keys(myWedding.attachments).length"
+            >
+                <attachment
+                    v-for="(attachment, key, index) in wedding.attachments"
+                    :key="'attachment' + key"
+                    :attachment="attachment"
+                />
             </file-drag-receiver>
         </div>
         <div class="col-md-1 text-end">
-            <a class="btn btn-sm btn-light" title="Trauung bearbeiten"
-               :href="route('weddings.edit', {modelId: wedding.id})"><span class="mdi mdi-pencil"></span></a>
-            <button class="btn btn-sm btn-danger" title="Trauung löschen"
-                    @click.prevent="deleteWedding"><span class="mdi mdi-delete"></span></button>
+            <a
+                class="btn btn-sm btn-light"
+                title="Trauung bearbeiten"
+                :href="route('weddings.edit', { modelId: wedding.id })"
+                ><span class="mdi mdi-pencil"></span
+            ></a>
+            <button
+                class="btn btn-sm btn-danger"
+                title="Trauung löschen"
+                @click.prevent="deleteWedding"
+            >
+                <span class="mdi mdi-delete"></span>
+            </button>
         </div>
     </div>
-
 </template>
 
 <script>
-import CheckedProcessItem from "../../Ui/elements/CheckedProcessItem";
-import Attachment from "../../Ui/elements/Attachment";
-import DetailsInfo from "../../Service/DetailsInfo";
-import Participants from "../../Calendar/Service/Participants";
-import FileDragReceiver from "../../Ui/elements/FileDragReceiver";
-import BibleReference from "../../LiturgyEditor/Elements/BibleReference";
+import CheckedProcessItem from '../../Ui/elements/CheckedProcessItem'
+import Attachment from '../../Ui/elements/Attachment'
+import DetailsInfo from '../../Service/DetailsInfo'
+import Participants from '../../Calendar/Service/Participants'
+import FileDragReceiver from '../../Ui/elements/FileDragReceiver'
+import BibleReference from '../../LiturgyEditor/Elements/BibleReference'
 
 export default {
-    name: "Wedding",
+    name: 'Wedding',
     components: {
         BibleReference,
         FileDragReceiver,
@@ -138,32 +212,37 @@ export default {
     },
     computed: {
         hasRegistrationForm() {
-            var found = false;
-            this.myWedding.attachments.forEach(attachment => {
-                found = found || (attachment.title == 'Anmeldeformular');
-            });
-            return found;
+            var found = false
+            this.myWedding.attachments.forEach((attachment) => {
+                found = found || attachment.title == 'Anmeldeformular'
+            })
+            return found
         },
     },
     data() {
         return {
             myWedding: this.wedding,
-        };
+        }
     },
     props: ['wedding', 'showService', 'showPastor'],
     methods: {
         deleteWedding() {
-            if (!confirm('Willst du diese Trauung wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.')) return;
-            this.$inertia.delete(route('weddings.destroy', {modelId: this.wedding.id}), {preserveState: false});
+            if (
+                !confirm(
+                    'Willst du diese Trauung wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.',
+                )
+            )
+                return
+            this.$inertia.delete(route('weddings.destroy', { modelId: this.wedding.id }), {
+                preserveState: false,
+            })
         },
         spouseName(index) {
-            var name = this.myWedding['spouse' + index + '_name'].split(', ');
-            return name[1] + ' ' + name[0];
+            var name = this.myWedding['spouse' + index + '_name'].split(', ')
+            return name[1] + ' ' + name[0]
         },
-    }
-
+    },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

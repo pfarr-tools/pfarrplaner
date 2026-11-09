@@ -76,5 +76,5 @@ export function duplicateUploadItem(item, metadata = {}) {
  * @returns {Object[]} The updated queue.
  */
 export function appendFiles(queue, files) {
-    return [...queue, ...Array.from(files || [], file => createUploadItem(file))]
+    return [...queue, ...Array.from(files || [], (file) => createUploadItem(file))]
 }

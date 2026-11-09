@@ -27,31 +27,46 @@
   -->
 
 <template>
-    <modal title="Liturgische Informationen" :allow-cancel="false" close-button-label="Schließen"
-           @close="$emit('close')">
-        <img class="img-fluid" :src="'https://www.kirchenjahr-evangelisch.de/'+liturgy['litDetailsImage']" />
-        <h3>{{ liturgy['title']}}</h3>
-        <h4 v-if="liturgy['litProfileTitle']">{{ liturgy['litProfileTitle']}}</h4>
+    <modal
+        title="Liturgische Informationen"
+        :allow-cancel="false"
+        close-button-label="Schließen"
+        @close="$emit('close')"
+    >
+        <img
+            class="img-fluid"
+            :src="'https://www.kirchenjahr-evangelisch.de/' + liturgy['litDetailsImage']"
+        />
+        <h3>{{ liturgy['title'] }}</h3>
+        <h4 v-if="liturgy['litProfileTitle']">{{ liturgy['litProfileTitle'] }}</h4>
         <h5>Kernaussage</h5>
         <p v-html="liturgy['litProfileGist']" />
         <h5>{{ liturgy['litDetailsHeadline'] }}</h5>
         <p v-html="liturgy['litDetailsTeaser']" />
         <p v-html="liturgy['litDetailsText']" />
-        <h5>{{ liturgy['litRitesTitle']}}</h5>
+        <h5>{{ liturgy['litRitesTitle'] }}</h5>
         <p v-html="liturgy['litRitesTeaser']" />
         <div v-html="liturgy['litRitesText']" />
         <hr />
-        <small>Quelle: <a :href="'https://www.kirchenjahr-evangelisch.de/article.php#'+liturgy['dayId']" target="_blank">kirchenjahr-evangelisch.de</a>
-            <span v-if="liturgy['litDetailsImageCopyright']">, Bild: {{ liturgy['litDetailsImageCopyright']}}</span>
+        <small
+            >Quelle:
+            <a
+                :href="'https://www.kirchenjahr-evangelisch.de/article.php#' + liturgy['dayId']"
+                target="_blank"
+                >kirchenjahr-evangelisch.de</a
+            >
+            <span v-if="liturgy['litDetailsImageCopyright']"
+                >, Bild: {{ liturgy['litDetailsImageCopyright'] }}</span
+            >
         </small>
     </modal>
 </template>
 
 <script>
-import Modal from "../../Ui/modals/Modal";
+import Modal from '../../Ui/modals/Modal'
 export default {
-    name: "InfoWindow",
-    components: {Modal},
+    name: 'InfoWindow',
+    components: { Modal },
     props: ['service'],
     data() {
         return {
@@ -61,6 +76,4 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -27,66 +27,168 @@
   -->
 
 <template>
-    <div class="button-row no-print btn-toolbar" role="toolbar">
-        <div class="btn-group me-2" role="group">
-            <inertia-link class="btn btn-outline-secondary"
-                          v-if="numericDate > 201801"
-                          :href="route('absences.index', { year: moment(date).subtract(1, 'months').format('YYYY'), month: moment(date).subtract(1, 'months').format('MM') })"
-                          title="Einen Monat zurück">
+    <div
+        class="button-row no-print btn-toolbar"
+        role="toolbar"
+    >
+        <div
+            class="btn-group me-2"
+            role="group"
+        >
+            <inertia-link
+                class="btn btn-outline-secondary"
+                v-if="numericDate > 201801"
+                :href="
+                    route('absences.index', {
+                        year: moment(date).subtract(1, 'months').format('YYYY'),
+                        month: moment(date).subtract(1, 'months').format('MM'),
+                    })
+                "
+                title="Einen Monat zurück"
+            >
                 <span class="mdi mdi-chevron-left"></span>
             </inertia-link>
-            <inertia-link class="btn btn-outline-secondary"
-                          :href="route('absences.index', { year: new Date().getFullYear(), month: new Date().getMonth()+1 })"
-                          title="Gehe zum aktuellen Monat">
-                <span class="mdi mdi-calendar-today"></span><span class="d-none d-md-inline"> Gehe zu Heute </span>
+            <inertia-link
+                class="btn btn-outline-secondary"
+                :href="
+                    route('absences.index', {
+                        year: new Date().getFullYear(),
+                        month: new Date().getMonth() + 1,
+                    })
+                "
+                title="Gehe zum aktuellen Monat"
+            >
+                <span class="mdi mdi-calendar-today"></span
+                ><span class="d-none d-md-inline"> Gehe zu Heute </span>
             </inertia-link>
 
             <!-- TODO month / year dropdown -->
-            <div class="btn-group" role="group">
-                <button id="btnGroupDrop1" type="button" class="btn btn-outline-secondary dropdown-toggle"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div
+                class="btn-group"
+                role="group"
+            >
+                <button
+                    id="btnGroupDrop1"
+                    type="button"
+                    class="btn btn-outline-secondary dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                >
                     {{ moment(date).locale('de').format('MMMM') }}
                 </button>
-                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                    <inertia-link class="dropdown-item" :href="monthLink(1)">Januar</inertia-link>
-                    <inertia-link class="dropdown-item" :href="monthLink(2)">Februar</inertia-link>
-                    <inertia-link class="dropdown-item" :href="monthLink(3)">März</inertia-link>
-                    <inertia-link class="dropdown-item" :href="monthLink(4)">April</inertia-link>
-                    <inertia-link class="dropdown-item" :href="monthLink(5)">Mai</inertia-link>
-                    <inertia-link class="dropdown-item" :href="monthLink(6)">Juni</inertia-link>
-                    <inertia-link class="dropdown-item" :href="monthLink(7)">Juli</inertia-link>
-                    <inertia-link class="dropdown-item" :href="monthLink(8)">August</inertia-link>
-                    <inertia-link class="dropdown-item" :href="monthLink(9)">September</inertia-link>
-                    <inertia-link class="dropdown-item" :href="monthLink(10)">Oktober</inertia-link>
-                    <inertia-link class="dropdown-item" :href="monthLink(11)">November</inertia-link>
-                    <inertia-link class="dropdown-item" :href="monthLink(12)">Dezember</inertia-link>
+                <div
+                    class="dropdown-menu"
+                    aria-labelledby="btnGroupDrop1"
+                >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(1)"
+                        >Januar</inertia-link
+                    >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(2)"
+                        >Februar</inertia-link
+                    >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(3)"
+                        >März</inertia-link
+                    >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(4)"
+                        >April</inertia-link
+                    >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(5)"
+                        >Mai</inertia-link
+                    >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(6)"
+                        >Juni</inertia-link
+                    >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(7)"
+                        >Juli</inertia-link
+                    >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(8)"
+                        >August</inertia-link
+                    >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(9)"
+                        >September</inertia-link
+                    >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(10)"
+                        >Oktober</inertia-link
+                    >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(11)"
+                        >November</inertia-link
+                    >
+                    <inertia-link
+                        class="dropdown-item"
+                        :href="monthLink(12)"
+                        >Dezember</inertia-link
+                    >
                 </div>
             </div>
-            <div class="btn-group" role="group">
-                <button id="btnGroupDrop2" type="button" class="btn btn-outline-secondary dropdown-toggle"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div
+                class="btn-group"
+                role="group"
+            >
+                <button
+                    id="btnGroupDrop2"
+                    type="button"
+                    class="btn btn-outline-secondary dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                >
                     {{ moment(date).format('YYYY') }}
                 </button>
-                <div class="dropdown-menu" aria-labelledby="btnGroupDrop2">
-                    <inertia-link v-for="year in years" class="dropdown-item"
-                                  :key="year" :year="year" :href="yearLink(year)">{{ year }}
+                <div
+                    class="dropdown-menu"
+                    aria-labelledby="btnGroupDrop2"
+                >
+                    <inertia-link
+                        v-for="year in years"
+                        class="dropdown-item"
+                        :key="year"
+                        :year="year"
+                        :href="yearLink(year)"
+                        >{{ year }}
                     </inertia-link>
                 </div>
             </div>
 
-
-            <inertia-link class="btn btn-outline-secondary"
-                          :href="route('absences.index', { year: moment(date).add(1, 'months').format('YYYY'), month: moment(date).add(1, 'months').format('MM') })"
-                          title="Einen Monat weiter">
+            <inertia-link
+                class="btn btn-outline-secondary"
+                :href="
+                    route('absences.index', {
+                        year: moment(date).add(1, 'months').format('YYYY'),
+                        month: moment(date).add(1, 'months').format('MM'),
+                    })
+                "
+                title="Einen Monat weiter"
+            >
                 <span class="mdi mdi-chevron-right"></span>
             </inertia-link>
         </div>
     </div>
-
 </template>
 
 <script>
-
 export default {
     name: 'AbsenceNav',
     data() {
@@ -94,25 +196,25 @@ export default {
             slave: false,
             allColumnsOpen: false,
             numericDate: parseInt(moment(this.date).format('YYYYMM')),
-            date: new Date(this.year, this.month-1, 1),
+            date: new Date(this.year, this.month - 1, 1),
         }
     },
     props: ['years', 'year', 'month'],
     methods: {
         monthLink: function (month) {
             return route('absences.index', {
-                year: this.date.getFullYear(), month
-            });
+                year: this.date.getFullYear(),
+                month,
+            })
         },
         yearLink: function (year) {
             return route('absences.index', {
-                year: year, month: this.date.getMonth(),
-            });
+                year: year,
+                month: this.date.getMonth(),
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

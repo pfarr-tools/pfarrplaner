@@ -28,16 +28,29 @@
 
 <template>
     <div class="container pt-3">
-        <div class="alert alert-info" v-if="services.length == 0">
-        Heute gibt es keine Gottesdienste mit QR-Codes in {{ city.name }}.
+        <div
+            class="alert alert-info"
+            v-if="services.length == 0"
+        >
+            Heute gibt es keine Gottesdienste mit QR-Codes in {{ city.name }}.
         </div>
-        <accordion v-else id="servicesAccordion">
-            <accordion-element v-for="(service,serviceIndex,serviceKey) in services"
-                               v-if="service.konfiapp_event_qr"
-                               :title="service.timeText+': '+service.titleText+' ('+service.locationText+')'"
-                               :key="serviceKey">
-                <img :src="route('qrcode', service.konfiapp_event_qr)" class="img-fluid qr" />
-                <div class="text-small">{{getType(service)}}</div>
+        <accordion
+            v-else
+            id="servicesAccordion"
+        >
+            <accordion-element
+                v-for="(service, serviceIndex, serviceKey) in services"
+                v-if="service.konfiapp_event_qr"
+                :title="
+                    service.timeText + ': ' + service.titleText + ' (' + service.locationText + ')'
+                "
+                :key="serviceKey"
+            >
+                <img
+                    :src="route('qrcode', service.konfiapp_event_qr)"
+                    class="img-fluid qr"
+                />
+                <div class="text-small">{{ getType(service) }}</div>
             </accordion-element>
         </accordion>
         <div v-if="servicesWithoutQR">
@@ -48,13 +61,40 @@
             <table class="table table-striped">
                 <thead></thead>
                 <tbody>
-                    <tr v-for="(service,serviceIndex,serviceKey) in myServicesWithoutQR"
-                        :title="service.timeText+': '+service.titleText+' ('+service.locationText+')'"
-                        :key="serviceKey">
-                        <td>{{ service.timeText + ': ' + service.titleText + ' (' + service.locationText + ')' }}</td>
+                    <tr
+                        v-for="(service, serviceIndex, serviceKey) in myServicesWithoutQR"
+                        :title="
+                            service.timeText +
+                            ': ' +
+                            service.titleText +
+                            ' (' +
+                            service.locationText +
+                            ')'
+                        "
+                        :key="serviceKey"
+                    >
+                        <td>
+                            {{
+                                service.timeText +
+                                ': ' +
+                                service.titleText +
+                                ' (' +
+                                service.locationText +
+                                ')'
+                            }}
+                        </td>
                         <td class="text-end">
-                            <form-selectize :options="types" v-model="service.konfiapp_event_type" class="text-start"/>
-                            <button class="btn btn-sm btn-secondary" @click="createQR(service)"><span class="mdi mdi-qrcode"></span> Anlegen</button>
+                            <form-selectize
+                                :options="types"
+                                v-model="service.konfiapp_event_type"
+                                class="text-start"
+                            />
+                            <button
+                                class="btn btn-sm btn-secondary"
+                                @click="createQR(service)"
+                            >
+                                <span class="mdi mdi-qrcode"></span> Anlegen
+                            </button>
                         </td>
                     </tr>
                 </tbody>
@@ -64,18 +104,18 @@
 </template>
 
 <script>
-import Accordion from "../../../components/Ui/accordion/Accordion";
-import AccordionElement from "../../../components/Ui/accordion/AccordionElement";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize.vue";
+import Accordion from '../../../components/Ui/accordion/Accordion'
+import AccordionElement from '../../../components/Ui/accordion/AccordionElement'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize.vue'
 
 export default {
-    name: "QR",
-    components: {FormSelectize, AccordionElement, Accordion},
+    name: 'QR',
+    components: { FormSelectize, AccordionElement, Accordion },
     props: ['services', 'city', 'types', 'servicesWithoutQR'],
     data() {
-        let myServicesWithoutQR = this.servicesWithoutQR;
+        let myServicesWithoutQR = this.servicesWithoutQR
         for (let index in myServicesWithoutQR) {
-            myServicesWithoutQR[index].konfiapp_event_type = this.city.konfiapp_default_type || null;
+            myServicesWithoutQR[index].konfiapp_event_type = this.city.konfiapp_default_type || null
         }
 
         return {
@@ -84,24 +124,29 @@ export default {
     },
     methods: {
         getType(service) {
-            let filtered = this.types.filter(item => {
-                return item.id == service.konfiapp_event_type;
-            });
-            if (filtered.length == 0) return '';
-            return filtered[0]['punktzahl']+(filtered[0]['punktzahl'] == 1 ? ' Punkt' : ' Punkte')+' in der Kategorie '+filtered[0]['name'];
+            let filtered = this.types.filter((item) => {
+                return item.id == service.konfiapp_event_type
+            })
+            if (filtered.length == 0) return ''
+            return (
+                filtered[0]['punktzahl'] +
+                (filtered[0]['punktzahl'] == 1 ? ' Punkt' : ' Punkte') +
+                ' in der Kategorie ' +
+                filtered[0]['name']
+            )
         },
         createQR(service) {
-            if (!service.konfiapp_event_type) return;
+            if (!service.konfiapp_event_type) return
             this.$inertia.post(route('service.createQR', service.slug), {
                 type: service.konfiapp_event_type,
-            });
-        }
-    }
+            })
+        },
+    },
 }
 </script>
 
 <style scoped>
-    .qr {
-        width: 100%;
-    }
+.qr {
+    width: 100%;
+}
 </style>

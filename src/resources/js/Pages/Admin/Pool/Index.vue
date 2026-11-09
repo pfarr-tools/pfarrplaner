@@ -27,39 +27,53 @@
   -->
 
 <template>
-    <model-index-page title="Pools" :records="pools" :can-create="canCreate"
-                      create-label="Neuer Pool" create-route-name="admin.pools.create"
-                      model-label="Pool">
+    <model-index-page
+        title="Pools"
+        :records="pools"
+        :can-create="canCreate"
+        create-label="Neuer Pool"
+        create-route-name="admin.pools.create"
+        model-label="Pool"
+    >
         <template v-slot:table-header-additional-columns>
             <th>Kirchengemeinden</th>
             <th>Teilnehmer</th>
         </template>
         <template v-slot:table-row-additional-columns="data">
-            <td><span class="badge bg-light me-1" v-for="city in data.row.cities">{{ city.name }}</span></td>
-            <td><span class="badge bg-light me-1" v-for="user in data.row.users">{{ user.name }}</span></td>
-
+            <td>
+                <span
+                    class="badge bg-light me-1"
+                    v-for="city in data.row.cities"
+                    >{{ city.name }}</span
+                >
+            </td>
+            <td>
+                <span
+                    class="badge bg-light me-1"
+                    v-for="user in data.row.users"
+                    >{{ user.name }}</span
+                >
+            </td>
         </template>
     </model-index-page>
 </template>
 
 <script>
-import ModelIndexPage from "../../../components/Admin/ModelIndexPage.vue";
-
+import ModelIndexPage from '../../../components/Admin/ModelIndexPage.vue'
 
 export default {
-    name: "Index",
+    name: 'Index',
     components: {
         ModelIndexPage,
     },
     props: ['pools', 'canCreate'],
     methods: {
         logData(data) {
-            console.log(data);
-            return '';
-        }
+            console.log(data)
+            return ''
+        },
     },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -28,37 +28,67 @@
 
 <template>
     <div class="events-month">
-        <div v-if="loading" class="events-grid-wrapper events-loading">
+        <div
+            v-if="loading"
+            class="events-grid-wrapper events-loading"
+        >
             <div class="events-grid-frame">
                 <div class="events-weekdays">
                     <div class="week-header"></div>
-                    <div v-for="weekday in weekdayLabels" :key="'loading_'+weekday" class="weekday-header">
+                    <div
+                        v-for="weekday in weekdayLabels"
+                        :key="'loading_' + weekday"
+                        class="weekday-header"
+                    >
                         {{ weekday }}
                     </div>
                 </div>
                 <div class="events-weeks">
-                    <div v-for="week in 6" :key="'loading_week_'+week" class="events-week-row">
+                    <div
+                        v-for="week in 6"
+                        :key="'loading_week_' + week"
+                        class="events-week-row"
+                    >
                         <div class="week-number-cell skeleton-week-number"></div>
-                        <div v-for="day in 7" :key="'loading_day_'+week+'_'+day" class="day-cell">
+                        <div
+                            v-for="day in 7"
+                            :key="'loading_day_' + week + '_' + day"
+                            class="day-cell"
+                        >
                             <div class="day-shell">
                                 <div class="skeleton-day-number"></div>
-                                <div class="skeleton-event" v-for="eventIndex in 3" :key="'skeleton_event_'+week+'_'+day+'_'+eventIndex"></div>
+                                <div
+                                    class="skeleton-event"
+                                    v-for="eventIndex in 3"
+                                    :key="'skeleton_event_' + week + '_' + day + '_' + eventIndex"
+                                ></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div v-else class="events-grid-wrapper">
+        <div
+            v-else
+            class="events-grid-wrapper"
+        >
             <div class="events-grid-frame">
                 <div class="events-weekdays">
                     <div class="week-header">KW</div>
-                    <div v-for="weekday in weekdayLabels" :key="weekday" class="weekday-header">
+                    <div
+                        v-for="weekday in weekdayLabels"
+                        :key="weekday"
+                        class="weekday-header"
+                    >
                         {{ weekday }}
                     </div>
                 </div>
                 <div class="events-weeks">
-                    <div v-for="week in weeks" :key="'week_'+week.weekNumber+'_'+week.days[0].key" class="events-week-row">
+                    <div
+                        v-for="week in weeks"
+                        :key="'week_' + week.weekNumber + '_' + week.days[0].key"
+                        class="events-week-row"
+                    >
                         <div class="week-number-cell">
                             {{ week.weekNumber }}
                         </div>
@@ -66,7 +96,7 @@
                             <div class="week-day-headers">
                                 <div
                                     v-for="day in week.days"
-                                    :key="'header_'+day.key"
+                                    :key="'header_' + day.key"
                                     class="day-header-cell"
                                     :class="dayCellClasses(day)"
                                     title="Klicken, um hier eine neue Veranstaltung anzulegen"
@@ -74,14 +104,21 @@
                                 >
                                     <div class="day-header">
                                         <span class="day-number">{{ day.label }}</span>
-                                        <span v-if="isToday(day.date)" class="badge text-bg-primary">Heute</span>
+                                        <span
+                                            v-if="isToday(day.date)"
+                                            class="badge text-bg-primary"
+                                            >Heute</span
+                                        >
                                     </div>
                                 </div>
                             </div>
-                            <div v-if="weekSpanRows(week).length" class="week-span-rows">
+                            <div
+                                v-if="weekSpanRows(week).length"
+                                class="week-span-rows"
+                            >
                                 <div
                                     v-for="(spanRow, rowIndex) in weekSpanRows(week)"
-                                    :key="'span_row_'+week.weekNumber+'_'+rowIndex"
+                                    :key="'span_row_' + week.weekNumber + '_' + rowIndex"
                                     class="week-span-row"
                                 >
                                     <button
@@ -95,10 +132,14 @@
                                         @click.stop
                                     >
                                         <span class="event-headline">
-                                            <span class="event-time">{{ eventTimeLabel(event) }}</span>
+                                            <span class="event-time">{{
+                                                eventTimeLabel(event)
+                                            }}</span>
                                             <span class="event-title">{{ event.title }}</span>
                                         </span>
-                                        <span class="event-location">{{ eventLocationLabel(event) }}</span>
+                                        <span class="event-location">{{
+                                            eventLocationLabel(event)
+                                        }}</span>
                                         <div class="event-overlay">
                                             <div class="event-overlay-buttons">
                                                 <button
@@ -115,7 +156,14 @@
                                                     type="button"
                                                     class="btn btn-light btn-sm"
                                                     title="Liturgie bearbeiten"
-                                                    @click.stop="$inertia.get(route('liturgy.editor', event.raw.event_slug))"
+                                                    @click.stop="
+                                                        $inertia.get(
+                                                            route(
+                                                                'liturgy.editor',
+                                                                event.raw.event_slug,
+                                                            ),
+                                                        )
+                                                    "
                                                 >
                                                     <span class="mdi mdi-view-list"></span>
                                                 </button>
@@ -124,7 +172,14 @@
                                                     type="button"
                                                     class="btn btn-light btn-sm"
                                                     title="Predigt bearbeiten"
-                                                    @click.stop="$inertia.get(route('service.sermon.editor', event.raw.event_slug))"
+                                                    @click.stop="
+                                                        $inertia.get(
+                                                            route(
+                                                                'service.sermon.editor',
+                                                                event.raw.event_slug,
+                                                            ),
+                                                        )
+                                                    "
                                                 >
                                                     <span class="mdi mdi-microphone"></span>
                                                 </button>
@@ -191,10 +246,16 @@
                                                 @click.stop
                                             >
                                                 <span class="event-headline">
-                                                    <span class="event-time">{{ eventTimeLabel(event) }}</span>
-                                                    <span class="event-title">{{ event.title }}</span>
+                                                    <span class="event-time">{{
+                                                        eventTimeLabel(event)
+                                                    }}</span>
+                                                    <span class="event-title">{{
+                                                        event.title
+                                                    }}</span>
                                                 </span>
-                                                <span class="event-location">{{ eventLocationLabel(event) }}</span>
+                                                <span class="event-location">{{
+                                                    eventLocationLabel(event)
+                                                }}</span>
                                                 <div class="event-overlay">
                                                     <div class="event-overlay-buttons">
                                                         <button
@@ -207,20 +268,38 @@
                                                             <span class="mdi mdi-pencil"></span>
                                                         </button>
                                                         <button
-                                                            v-if="event.raw.event_class == 'service'"
+                                                            v-if="
+                                                                event.raw.event_class == 'service'
+                                                            "
                                                             type="button"
                                                             class="btn btn-light btn-sm"
                                                             title="Liturgie bearbeiten"
-                                                            @click.stop="$inertia.get(route('liturgy.editor', event.raw.event_slug))"
+                                                            @click.stop="
+                                                                $inertia.get(
+                                                                    route(
+                                                                        'liturgy.editor',
+                                                                        event.raw.event_slug,
+                                                                    ),
+                                                                )
+                                                            "
                                                         >
                                                             <span class="mdi mdi-view-list"></span>
                                                         </button>
                                                         <button
-                                                            v-if="event.raw.event_class == 'service'"
+                                                            v-if="
+                                                                event.raw.event_class == 'service'
+                                                            "
                                                             type="button"
                                                             class="btn btn-light btn-sm"
                                                             title="Predigt bearbeiten"
-                                                            @click.stop="$inertia.get(route('service.sermon.editor', event.raw.event_slug))"
+                                                            @click.stop="
+                                                                $inertia.get(
+                                                                    route(
+                                                                        'service.sermon.editor',
+                                                                        event.raw.event_slug,
+                                                                    ),
+                                                                )
+                                                            "
                                                         >
                                                             <span class="mdi mdi-microphone"></span>
                                                         </button>
@@ -240,7 +319,9 @@
                                                             title="Einzeltermin bearbeiten"
                                                             @click.stop="editOccurence(event)"
                                                         >
-                                                            <span class="mdi mdi-calendar-edit"></span>
+                                                            <span
+                                                                class="mdi mdi-calendar-edit"
+                                                            ></span>
                                                         </button>
                                                         <button
                                                             v-if="event.raw.isRecurring"
@@ -264,7 +345,10 @@
                                                 </div>
                                             </button>
                                         </div>
-                                        <div v-if="dayHasNoEvents(day.key)" class="day-create-hint">
+                                        <div
+                                            v-if="dayHasNoEvents(day.key)"
+                                            class="day-create-hint"
+                                        >
                                             <span class="mdi mdi-plus-circle-outline"></span>
                                             Klicken zum Anlegen
                                         </div>
@@ -302,18 +386,18 @@
 </template>
 
 <script>
-import dayjs from 'dayjs';
-import isoWeek from 'dayjs/plugin/isoWeek';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
-import 'dayjs/locale/de';
-import Modal from "../../Ui/modals/Modal.vue";
+import dayjs from 'dayjs'
+import isoWeek from 'dayjs/plugin/isoWeek'
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import 'dayjs/locale/de'
+import Modal from '../../Ui/modals/Modal.vue'
 
-dayjs.extend(isoWeek);
-dayjs.extend(localizedFormat);
-dayjs.locale('de');
+dayjs.extend(isoWeek)
+dayjs.extend(localizedFormat)
+dayjs.locale('de')
 
 export default {
-    name: "EventsCalendar",
+    name: 'EventsCalendar',
     props: {
         date: String,
         calendar: {
@@ -337,61 +421,66 @@ export default {
         }
     },
     mounted() {
-        this.loadEvents();
+        this.loadEvents()
     },
     watch: {
         date() {
-            this.loadEvents();
+            this.loadEvents()
         },
         calendar() {
-            this.loadEvents();
+            this.loadEvents()
         },
     },
     methods: {
         closeCreateModal() {
-            this.createModalVisible = false;
-            this.selectedCreateDay = null;
+            this.createModalVisible = false
+            this.selectedCreateDay = null
         },
         openCreateModal(dayKey) {
-            if (!this.createCityOptions.length) return;
-            this.selectedCreateDay = dayKey;
-            this.createModalVisible = true;
+            if (!this.createCityOptions.length) return
+            this.selectedCreateDay = dayKey
+            this.createModalVisible = true
         },
         loadEvents() {
-            this.loading = true;
-            this.events = [];
+            this.loading = true
+            this.events = []
 
             if (!this.calendarFilter) {
-                this.loading = false;
-                return;
+                this.loading = false
+                return
             }
 
-            this.$api().get(route('api.events.range', {
-                calendar: this.calendarFilter,
-                start: this.visibleRange.start.format('YYYY-MM-DD HH:mm:ss'),
-                end: this.visibleRange.end.format('YYYY-MM-DD HH:mm:ss'),
-            })).then(response => {
-                this.events = response.data.data || [];
-                this.loading = false;
-            }).catch(() => {
-                this.loading = false;
-            });
+            this.$api()
+                .get(
+                    route('api.events.range', {
+                        calendar: this.calendarFilter,
+                        start: this.visibleRange.start.format('YYYY-MM-DD HH:mm:ss'),
+                        end: this.visibleRange.end.format('YYYY-MM-DD HH:mm:ss'),
+                    }),
+                )
+                .then((response) => {
+                    this.events = response.data.data || []
+                    this.loading = false
+                })
+                .catch(() => {
+                    this.loading = false
+                })
         },
         visibleEvents(dayKey) {
-            return this.singleDayEventsByDay[dayKey] || [];
+            return this.singleDayEventsByDay[dayKey] || []
         },
         dayHasNoEvents(dayKey) {
-            return (this.eventsCoveringDay[dayKey] || []).length === 0;
+            return (this.eventsCoveringDay[dayKey] || []).length === 0
         },
         weekSpanRows(week) {
-            return this.multiDayEventRowsByWeek[week.key] || [];
+            return this.multiDayEventRowsByWeek[week.key] || []
         },
         dayCellClasses(day) {
             return {
                 'outside-month': !day.inMonth,
-                'today': this.isToday(day.date),
+                today: this.isToday(day.date),
                 'has-events': !this.dayHasNoEvents(day.key),
-            };
+            }
         },
         eventCardClasses(event) {
             return {
@@ -399,130 +488,146 @@ export default {
                 'event-multiday': event.segment?.isMultiDay,
                 'event-continues-before': event.segment?.continuesBefore,
                 'event-continues-after': event.segment?.continuesAfter,
-            };
+            }
         },
         isToday(date) {
-            return date.isSame(dayjs(), 'day');
+            return date.isSame(dayjs(), 'day')
         },
         eventStyle(event) {
-            const customStyle = event.customStyle || {};
-            const resolvedBackgroundColor = customStyle.backgroundColor || '#eff3f7';
-            const useAllDayHighlight = event.isAllday && ['#fff', '#ffffff', 'white', 'rgb(255, 255, 255)'].includes(String(resolvedBackgroundColor).trim().toLowerCase());
-            const backgroundColor = useAllDayHighlight ? '#fff3cd' : resolvedBackgroundColor;
-            const borderColor = customStyle.borderColor || (useAllDayHighlight ? '#f0d68f' : backgroundColor);
-            const color = customStyle.color || '#212529';
+            const customStyle = event.customStyle || {}
+            const resolvedBackgroundColor = customStyle.backgroundColor || '#eff3f7'
+            const useAllDayHighlight =
+                event.isAllday &&
+                ['#fff', '#ffffff', 'white', 'rgb(255, 255, 255)'].includes(
+                    String(resolvedBackgroundColor).trim().toLowerCase(),
+                )
+            const backgroundColor = useAllDayHighlight ? '#fff3cd' : resolvedBackgroundColor
+            const borderColor =
+                customStyle.borderColor || (useAllDayHighlight ? '#f0d68f' : backgroundColor)
+            const color = customStyle.color || '#212529'
 
             return {
                 '--event-bg': backgroundColor,
                 '--event-border': borderColor,
                 '--event-color': color,
-            };
+            }
         },
         eventSpanStyle(event) {
             return {
                 ...this.eventStyle(event),
                 gridColumn: `${event.segment.startColumn} / span ${event.segment.columnSpan}`,
-            };
+            }
         },
         eventTooltip(event) {
-            const parts = [event.title];
-            const timeLabel = this.eventRangeLabel(event);
-            if (timeLabel) parts.push(timeLabel);
-            if (event.location) parts.push(event.location);
-            return parts.join(' | ');
+            const parts = [event.title]
+            const timeLabel = this.eventRangeLabel(event)
+            if (timeLabel) parts.push(timeLabel)
+            if (event.location) parts.push(event.location)
+            return parts.join(' | ')
         },
         eventTimeLabel(event) {
             if (event.segment?.isMultiDay) {
                 if (event.isAllday) {
                     if (event.segment.isFirstDay && event.segment.isLastDay) {
-                        return dayjs(event.start).locale('de').format('DD.MM.') + ' - ' + this.eventLastDisplayDay(event).locale('de').format('DD.MM.');
+                        return (
+                            dayjs(event.start).locale('de').format('DD.MM.') +
+                            ' - ' +
+                            this.eventLastDisplayDay(event).locale('de').format('DD.MM.')
+                        )
                     }
-                    if (event.segment.isFirstDay) return 'Beginnt';
-                    if (event.segment.isLastDay) return 'Endet';
-                    return 'Laufend';
+                    if (event.segment.isFirstDay) return 'Beginnt'
+                    if (event.segment.isLastDay) return 'Endet'
+                    return 'Laufend'
                 }
 
-                const start = dayjs(event.start).locale('de');
-                const end = dayjs(event.end).locale('de');
+                const start = dayjs(event.start).locale('de')
+                const end = dayjs(event.end).locale('de')
                 if (event.segment.isFirstDay && event.segment.isLastDay) {
                     if (start.isValid() && end.isValid()) {
-                        return start.format('DD.MM. HH:mm') + ' -> ' + end.format('DD.MM. HH:mm');
+                        return start.format('DD.MM. HH:mm') + ' -> ' + end.format('DD.MM. HH:mm')
                     }
-                    return 'Laufend';
+                    return 'Laufend'
                 }
-                if (event.segment.isFirstDay) return start.isValid() ? start.format('HH:mm') + ' ->' : 'Beginnt';
-                if (event.segment.isLastDay) return end.isValid() ? '-> ' + end.format('HH:mm') : 'Endet';
-                return 'Laufend';
+                if (event.segment.isFirstDay)
+                    return start.isValid() ? start.format('HH:mm') + ' ->' : 'Beginnt'
+                if (event.segment.isLastDay)
+                    return end.isValid() ? '-> ' + end.format('HH:mm') : 'Endet'
+                return 'Laufend'
             }
 
-            if (event.isAllday) return 'Ganztägig';
+            if (event.isAllday) return 'Ganztägig'
 
-            const start = dayjs(event.start).locale('de');
-            if (!start.isValid()) return '';
-            return start.format('HH:mm');
+            const start = dayjs(event.start).locale('de')
+            if (!start.isValid()) return ''
+            return start.format('HH:mm')
         },
         eventRangeLabel(event) {
-            const start = dayjs(event.start).locale('de');
-            const end = dayjs(event.end).locale('de');
-            const lastDisplayDay = this.eventLastDisplayDay(event).locale('de');
+            const start = dayjs(event.start).locale('de')
+            const end = dayjs(event.end).locale('de')
+            const lastDisplayDay = this.eventLastDisplayDay(event).locale('de')
 
-            if (!start.isValid() || !end.isValid()) return '';
+            if (!start.isValid() || !end.isValid()) return ''
 
             if (event.isAllday) {
-                if (lastDisplayDay.isSame(start, 'day')) return 'Ganztägig';
-                return start.format('DD.MM.YYYY') + ' bis ' + lastDisplayDay.format('DD.MM.YYYY');
+                if (lastDisplayDay.isSame(start, 'day')) return 'Ganztägig'
+                return start.format('DD.MM.YYYY') + ' bis ' + lastDisplayDay.format('DD.MM.YYYY')
             }
 
             if (start.isSame(end, 'day')) {
-                return start.format('DD.MM.YYYY HH:mm') + ' bis ' + end.format('HH:mm');
+                return start.format('DD.MM.YYYY HH:mm') + ' bis ' + end.format('HH:mm')
             }
 
-            return start.format('DD.MM.YYYY HH:mm') + ' bis ' + end.format('DD.MM.YYYY HH:mm');
+            return start.format('DD.MM.YYYY HH:mm') + ' bis ' + end.format('DD.MM.YYYY HH:mm')
         },
         eventLastDisplayDay(event) {
-            const start = dayjs(event.start);
-            const end = dayjs(event.end);
+            const start = dayjs(event.start)
+            const end = dayjs(event.end)
 
-            if (!start.isValid()) return start;
-            if (!end.isValid() || !end.isAfter(start)) return start;
+            if (!start.isValid()) return start
+            if (!end.isValid() || !end.isAfter(start)) return start
 
-            return end.startOf('day').isSame(end)
-                ? end.subtract(1, 'millisecond')
-                : end;
+            return end.startOf('day').isSame(end) ? end.subtract(1, 'millisecond') : end
         },
         eventCoverageDays(event) {
-            const start = dayjs(event.start);
-            const lastDisplayMoment = this.eventLastDisplayDay(event);
+            const start = dayjs(event.start)
+            const lastDisplayMoment = this.eventLastDisplayDay(event)
 
-            if (!start.isValid() || !lastDisplayMoment.isValid()) return [];
+            if (!start.isValid() || !lastDisplayMoment.isValid()) return []
 
-            const firstVisibleDay = this.visibleRange.start.startOf('day');
-            const lastVisibleDay = this.visibleRange.end.startOf('day');
-            const firstEventDay = start.startOf('day');
-            const lastEventDay = lastDisplayMoment.startOf('day');
+            const firstVisibleDay = this.visibleRange.start.startOf('day')
+            const lastVisibleDay = this.visibleRange.end.startOf('day')
+            const firstEventDay = start.startOf('day')
+            const lastEventDay = lastDisplayMoment.startOf('day')
 
-            if (lastEventDay.isBefore(firstVisibleDay) || firstEventDay.isAfter(lastVisibleDay)) return [];
+            if (lastEventDay.isBefore(firstVisibleDay) || firstEventDay.isAfter(lastVisibleDay))
+                return []
 
-            const segmentStartDay = firstEventDay.isBefore(firstVisibleDay) ? firstVisibleDay : firstEventDay;
-            const segmentEndDay = lastEventDay.isAfter(lastVisibleDay) ? lastVisibleDay : lastEventDay;
-            const totalDays = segmentEndDay.diff(segmentStartDay, 'day');
+            const segmentStartDay = firstEventDay.isBefore(firstVisibleDay)
+                ? firstVisibleDay
+                : firstEventDay
+            const segmentEndDay = lastEventDay.isAfter(lastVisibleDay)
+                ? lastVisibleDay
+                : lastEventDay
+            const totalDays = segmentEndDay.diff(segmentStartDay, 'day')
 
-            return Array.from({length: totalDays + 1}, (_, index) => segmentStartDay.add(index, 'day'));
+            return Array.from({ length: totalDays + 1 }, (_, index) =>
+                segmentStartDay.add(index, 'day'),
+            )
         },
         createWeekSpanSegment(event, week) {
-            const weekStart = week.days[0].date.startOf('day');
-            const weekEnd = week.days[6].date.startOf('day');
-            const firstEventDay = event.segment.firstEventDay;
-            const lastEventDay = event.segment.lastEventDay;
+            const weekStart = week.days[0].date.startOf('day')
+            const weekEnd = week.days[6].date.startOf('day')
+            const firstEventDay = event.segment.firstEventDay
+            const lastEventDay = event.segment.lastEventDay
 
-            if (lastEventDay.isBefore(weekStart) || firstEventDay.isAfter(weekEnd)) return null;
+            if (lastEventDay.isBefore(weekStart) || firstEventDay.isAfter(weekEnd)) return null
 
-            const segmentStartDay = firstEventDay.isBefore(weekStart) ? weekStart : firstEventDay;
-            const segmentEndDay = lastEventDay.isAfter(weekEnd) ? weekEnd : lastEventDay;
-            const startColumn = segmentStartDay.diff(weekStart, 'day') + 1;
-            const columnSpan = segmentEndDay.diff(segmentStartDay, 'day') + 1;
-            const continuesBefore = segmentStartDay.isAfter(firstEventDay);
-            const continuesAfter = segmentEndDay.isBefore(lastEventDay);
+            const segmentStartDay = firstEventDay.isBefore(weekStart) ? weekStart : firstEventDay
+            const segmentEndDay = lastEventDay.isAfter(weekEnd) ? weekEnd : lastEventDay
+            const startColumn = segmentStartDay.diff(weekStart, 'day') + 1
+            const columnSpan = segmentEndDay.diff(segmentStartDay, 'day') + 1
+            const continuesBefore = segmentStartDay.isAfter(firstEventDay)
+            const continuesAfter = segmentEndDay.isBefore(lastEventDay)
 
             return {
                 ...event,
@@ -536,117 +641,138 @@ export default {
                     isFirstDay: segmentStartDay.isSame(firstEventDay, 'day'),
                     isLastDay: segmentEndDay.isSame(lastEventDay, 'day'),
                 },
-            };
+            }
         },
         eventRowHasCollision(row, spanEvent) {
-            const spanStart = spanEvent.segment.startColumn;
-            const spanEnd = spanStart + spanEvent.segment.columnSpan - 1;
+            const spanStart = spanEvent.segment.startColumn
+            const spanEnd = spanStart + spanEvent.segment.columnSpan - 1
 
-            return row.some(existingEvent => {
-                const existingStart = existingEvent.segment.startColumn;
-                const existingEnd = existingStart + existingEvent.segment.columnSpan - 1;
-                return spanStart <= existingEnd && spanEnd >= existingStart;
-            });
+            return row.some((existingEvent) => {
+                const existingStart = existingEvent.segment.startColumn
+                const existingEnd = existingStart + existingEvent.segment.columnSpan - 1
+                return spanStart <= existingEnd && spanEnd >= existingStart
+            })
         },
         eventLocationLabel(event) {
-            return event.location || '\u00A0';
+            return event.location || '\u00A0'
         },
         editEvent(event) {
-            this.$inertia.get(route('service.edit', {service: event.raw.event_slug}));
+            this.$inertia.get(route('service.edit', { service: event.raw.event_slug }))
         },
         editOccurence(event) {
-            this.$inertia.get(route('occurence.edit', {occurence: event.raw.occurence_id}));
+            this.$inertia.get(route('occurence.edit', { occurence: event.raw.occurence_id }))
         },
         deleteOccurence(event) {
-            if (!confirm('Willst du diesen Einzeltermin wirklich löschen?')) return;
+            if (!confirm('Willst du diesen Einzeltermin wirklich löschen?')) return
 
-            this.$api().delete(route('api.occurence.destroy', {occurence: event.raw.occurence_id})).then(() => {
-                this.events = this.events.filter(item => item.raw?.occurence_id !== event.raw.occurence_id);
-            });
+            this.$api()
+                .delete(route('api.occurence.destroy', { occurence: event.raw.occurence_id }))
+                .then(() => {
+                    this.events = this.events.filter(
+                        (item) => item.raw?.occurence_id !== event.raw.occurence_id,
+                    )
+                })
         },
         deleteEvent(event) {
             if (event.raw?.isRecurring) {
-                this.deleteOccurence(event);
-                return;
+                this.deleteOccurence(event)
+                return
             }
 
-            if (!confirm('Willst du diese Veranstaltung wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.')) return;
+            if (
+                !confirm(
+                    'Willst du diese Veranstaltung wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.',
+                )
+            )
+                return
 
-            this.$api().delete(route('api.service.destroy', {service: event.raw.event_slug})).then(() => {
-                this.events = this.events.filter(item => item.raw?.event_id !== event.raw.event_id);
-            });
+            this.$api()
+                .delete(route('api.service.destroy', { service: event.raw.event_slug }))
+                .then(() => {
+                    this.events = this.events.filter(
+                        (item) => item.raw?.event_id !== event.raw.event_id,
+                    )
+                })
         },
         createEventAtDay(cityId) {
-            if (!cityId || !this.selectedCreateDay) return;
-            this.createModalVisible = false;
-            this.$inertia.get(route('event.create', {
-                filter: 'city:' + cityId,
-                date: this.selectedCreateDay,
-            }));
+            if (!cityId || !this.selectedCreateDay) return
+            this.createModalVisible = false
+            this.$inertia.get(
+                route('event.create', {
+                    filter: 'city:' + cityId,
+                    date: this.selectedCreateDay,
+                }),
+            )
         },
     },
     computed: {
         monthDate() {
-            return dayjs(this.date + '-01').locale('de');
+            return dayjs(this.date + '-01').locale('de')
         },
         calendarFilter() {
-            return this.calendar.filter(Boolean).join(',');
+            return this.calendar.filter(Boolean).join(',')
         },
         createCityOptions() {
             return this.writableCities
-                .filter(city => !city.is_org)
-                .map(city => ({ id: city.id, name: city.name }));
+                .filter((city) => !city.is_org)
+                .map((city) => ({ id: city.id, name: city.name }))
         },
         createModalDateLabel() {
-            if (!this.selectedCreateDay) return '';
-            return dayjs(this.selectedCreateDay).locale('de').format('dddd, DD. MMMM YYYY');
+            if (!this.selectedCreateDay) return ''
+            return dayjs(this.selectedCreateDay).locale('de').format('dddd, DD. MMMM YYYY')
         },
         visibleRange() {
             return {
                 start: this.monthDate.startOf('month').startOf('isoWeek'),
                 end: this.monthDate.endOf('month').endOf('isoWeek'),
-            };
+            }
         },
         weekdayLabels() {
-            const firstDay = dayjs().startOf('isoWeek');
-            return Array.from({length: 7}, (_, index) => firstDay.add(index, 'day').format('dd'));
+            const firstDay = dayjs().startOf('isoWeek')
+            return Array.from({ length: 7 }, (_, index) => firstDay.add(index, 'day').format('dd'))
         },
         weeks() {
-            const days = [];
-            let cursor = this.visibleRange.start;
+            const days = []
+            let cursor = this.visibleRange.start
 
-            while (cursor.isBefore(this.visibleRange.end) || cursor.isSame(this.visibleRange.end, 'day')) {
+            while (
+                cursor.isBefore(this.visibleRange.end) ||
+                cursor.isSame(this.visibleRange.end, 'day')
+            ) {
                 days.push({
                     key: cursor.format('YYYY-MM-DD'),
                     label: cursor.format('D'),
                     date: cursor,
                     inMonth: cursor.month() === this.monthDate.month(),
-                });
-                cursor = cursor.add(1, 'day');
+                })
+                cursor = cursor.add(1, 'day')
             }
 
-            const weeks = [];
+            const weeks = []
             for (let i = 0; i < days.length; i += 7) {
                 weeks.push({
                     key: days[i].key,
                     weekNumber: days[i].date.isoWeek(),
                     days: days.slice(i, i + 7),
-                });
+                })
             }
-            return weeks;
+            return weeks
         },
         normalizedEvents() {
-            return this.events.map(event => {
-                const startMoment = dayjs(event.start);
-                const lastDisplayMoment = this.eventLastDisplayDay(event);
-                const firstEventDay = startMoment.startOf('day');
-                const lastEventDay = lastDisplayMoment.startOf('day');
+            return this.events.map((event) => {
+                const startMoment = dayjs(event.start)
+                const lastDisplayMoment = this.eventLastDisplayDay(event)
+                const firstEventDay = startMoment.startOf('day')
+                const lastEventDay = lastDisplayMoment.startOf('day')
 
                 return {
                     ...event,
                     segmentKey: `${event.id}_${event.start}`,
                     segment: {
-                        isMultiDay: firstEventDay.isValid() && lastEventDay.isValid() && !firstEventDay.isSame(lastEventDay, 'day'),
+                        isMultiDay:
+                            firstEventDay.isValid() &&
+                            lastEventDay.isValid() &&
+                            !firstEventDay.isSame(lastEventDay, 'day'),
                         firstEventDay,
                         lastEventDay,
                         isFirstDay: true,
@@ -654,66 +780,66 @@ export default {
                         continuesBefore: false,
                         continuesAfter: false,
                     },
-                };
-            });
+                }
+            })
         },
         singleDayEventsByDay() {
             return this.normalizedEvents
-                .filter(event => !event.segment.isMultiDay)
+                .filter((event) => !event.segment.isMultiDay)
                 .reduce((result, event) => {
-                    const dayKey = event.segment.firstEventDay.format('YYYY-MM-DD');
-                    if (!result[dayKey]) result[dayKey] = [];
-                    result[dayKey].push(event);
+                    const dayKey = event.segment.firstEventDay.format('YYYY-MM-DD')
+                    if (!result[dayKey]) result[dayKey] = []
+                    result[dayKey].push(event)
                     result[dayKey].sort((a, b) => {
-                        const aStart = dayjs(a.start).valueOf();
-                        const bStart = dayjs(b.start).valueOf();
-                        if (aStart !== bStart) return aStart - bStart;
-                        return a.title.localeCompare(b.title, 'de');
-                    });
-                    return result;
-                }, {});
+                        const aStart = dayjs(a.start).valueOf()
+                        const bStart = dayjs(b.start).valueOf()
+                        if (aStart !== bStart) return aStart - bStart
+                        return a.title.localeCompare(b.title, 'de')
+                    })
+                    return result
+                }, {})
         },
         eventsCoveringDay() {
             return this.normalizedEvents.reduce((result, event) => {
-                this.eventCoverageDays(event).forEach(day => {
-                    const dayKey = day.format('YYYY-MM-DD');
-                    if (!result[dayKey]) result[dayKey] = [];
-                    result[dayKey].push(event);
-                });
-                return result;
-            }, {});
+                this.eventCoverageDays(event).forEach((day) => {
+                    const dayKey = day.format('YYYY-MM-DD')
+                    if (!result[dayKey]) result[dayKey] = []
+                    result[dayKey].push(event)
+                })
+                return result
+            }, {})
         },
         multiDayEventRowsByWeek() {
             return this.weeks.reduce((result, week) => {
                 const spanEvents = this.normalizedEvents
-                    .filter(event => event.segment.isMultiDay)
-                    .map(event => this.createWeekSpanSegment(event, week))
+                    .filter((event) => event.segment.isMultiDay)
+                    .map((event) => this.createWeekSpanSegment(event, week))
                     .filter(Boolean)
                     .sort((a, b) => {
                         if (a.segment.startColumn !== b.segment.startColumn) {
-                            return a.segment.startColumn - b.segment.startColumn;
+                            return a.segment.startColumn - b.segment.startColumn
                         }
                         if (a.segment.columnSpan !== b.segment.columnSpan) {
-                            return b.segment.columnSpan - a.segment.columnSpan;
+                            return b.segment.columnSpan - a.segment.columnSpan
                         }
-                        return a.title.localeCompare(b.title, 'de');
-                    });
+                        return a.title.localeCompare(b.title, 'de')
+                    })
 
-                const rows = [];
-                spanEvents.forEach(event => {
-                    let targetRow = rows.find(row => !this.eventRowHasCollision(row, event));
+                const rows = []
+                spanEvents.forEach((event) => {
+                    let targetRow = rows.find((row) => !this.eventRowHasCollision(row, event))
                     if (!targetRow) {
-                        targetRow = [];
-                        rows.push(targetRow);
+                        targetRow = []
+                        rows.push(targetRow)
                     }
-                    targetRow.push(event);
-                });
+                    targetRow.push(event)
+                })
 
-                result[week.key] = rows;
-                return result;
-            }, {});
+                result[week.key] = rows
+                return result
+            }, {})
         },
-    }
+    },
 }
 </script>
 
@@ -926,7 +1052,9 @@ export default {
     color: var(--event-color);
     text-align: left;
     box-shadow: 0 1px 1px rgb(15 23 42 / 0.04);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
     box-sizing: border-box;
 }
 

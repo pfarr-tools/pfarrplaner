@@ -30,14 +30,24 @@
     <card>
         <card-header>Streaming-Check</card-header>
         <card-body>
-            <div class="alert alert-danger" v-if="activeBroadcasts.length == 0">
+            <div
+                class="alert alert-danger"
+                v-if="activeBroadcasts.length == 0"
+            >
                 <b>Problem:</b> Es ist kein aktiver Stream vorhanden.
             </div>
-            <div v-if="(!activator) && (activeBroadcasts.length == 1)">
-                <active-broadcast :broadcast="activeBroadcasts[0]" @wrong="showActivator=true"/>
+            <div v-if="!activator && activeBroadcasts.length == 1">
+                <active-broadcast
+                    :broadcast="activeBroadcasts[0]"
+                    @wrong="showActivator = true"
+                />
             </div>
-            <div class="alert alert-danger" v-if="activeBroadcasts.length > 1">
-                <b>Problem:</b> Es sind mehrere ({{ activeBroadcasts.length }}) Streams gleichzeitig auf aktiv gesetzt.
+            <div
+                class="alert alert-danger"
+                v-if="activeBroadcasts.length > 1"
+            >
+                <b>Problem:</b> Es sind mehrere ({{ activeBroadcasts.length }}) Streams gleichzeitig
+                auf aktiv gesetzt.
             </div>
             <div v-if="activator">
                 <h2>Lösung:</h2>
@@ -46,54 +56,76 @@
                     <li>Aktiviere den Stream für deinen Gottesdienst (siehe unten).</li>
                     <li>Starte deine Sendung.</li>
                 </ol>
-                <service-activator :services="nextServicesWithStream"
-                                   title="Verfügbare Streams" @close="showActivator = false"/>
-                <button class="btn btn-light" @click="showServicesWithoutStream = true">
+                <service-activator
+                    :services="nextServicesWithStream"
+                    title="Verfügbare Streams"
+                    @close="showActivator = false"
+                />
+                <button
+                    class="btn btn-light"
+                    @click="showServicesWithoutStream = true"
+                >
                     Mein Gottesdienst fehlt in der Liste.
                 </button>
-                <service-activator v-if="showServicesWithoutStream"
-                                   :services="nextServicesWithoutStream"
-                                   title="Gottesdienste ohne bereits angelegten Stream"
-                                   @close="showActivator = false"/>
-                <button class="btn btn-light" @click="showOtherStreams = true">
+                <service-activator
+                    v-if="showServicesWithoutStream"
+                    :services="nextServicesWithoutStream"
+                    title="Gottesdienste ohne bereits angelegten Stream"
+                    @close="showActivator = false"
+                />
+                <button
+                    class="btn btn-light"
+                    @click="showOtherStreams = true"
+                >
                     Mein Stream ist kein Gottesdienst.
                 </button>
-                <stream-activator v-if="showOtherStreams"
-                                  :broadcasts="inactiveBroadcasts" :city="city"
-                                  title="Livestreams ohne Gottesdienst"
-                                  @close="showActivator = false" />
+                <stream-activator
+                    v-if="showOtherStreams"
+                    :broadcasts="inactiveBroadcasts"
+                    :city="city"
+                    title="Livestreams ohne Gottesdienst"
+                    @close="showActivator = false"
+                />
             </div>
         </card-body>
     </card>
 </template>
 
 <script>
-import CardHeader from "../../components/Ui/cards/cardHeader";
-import CardBody from "../../components/Ui/cards/cardBody";
-import Card from "../../components/Ui/cards/card";
-import ServiceActivator from "../../components/Streaming/Troubleshooter/ServiceActivator";
-import StreamActivator from "../../components/Streaming/Troubleshooter/StreamActivator";
-import ActiveBroadcast from "../../components/Streaming/Troubleshooter/ActiveBroadcast";
+import CardHeader from '../../components/Ui/cards/cardHeader'
+import CardBody from '../../components/Ui/cards/cardBody'
+import Card from '../../components/Ui/cards/card'
+import ServiceActivator from '../../components/Streaming/Troubleshooter/ServiceActivator'
+import StreamActivator from '../../components/Streaming/Troubleshooter/StreamActivator'
+import ActiveBroadcast from '../../components/Streaming/Troubleshooter/ActiveBroadcast'
 
 export default {
-    name: "troubleshooter",
-    components: {ActiveBroadcast, StreamActivator, ServiceActivator, Card, CardBody, CardHeader},
-    props: ['activeBroadcasts', 'inactiveBroadcasts', 'nextServicesWithStream', 'nextServicesWithoutStream', 'city'],
+    name: 'troubleshooter',
+    components: { ActiveBroadcast, StreamActivator, ServiceActivator, Card, CardBody, CardHeader },
+    props: [
+        'activeBroadcasts',
+        'inactiveBroadcasts',
+        'nextServicesWithStream',
+        'nextServicesWithoutStream',
+        'city',
+    ],
     computed: {
         activator() {
-            return this.showActivator || (this.activeBroadcasts.length != 1);
-        }
+            return this.showActivator || this.activeBroadcasts.length != 1
+        },
     },
     data() {
         return {
             showActivator: false,
             showServicesWithoutStream: false,
             showOtherStreams: false,
-        };
-    }
+        }
+    },
 }
 </script>
 
 <style scoped>
-    table.table tr { cursor: pointer }
+table.table tr {
+    cursor: pointer;
+}
 </style>

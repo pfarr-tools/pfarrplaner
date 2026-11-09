@@ -27,32 +27,87 @@
   -->
 
 <template>
-    <div class="liturgy-block" :class="{focused: focused}" @click="focus">
+    <div
+        class="liturgy-block"
+        :class="{ focused: focused }"
+        @click="focus"
+    >
         <div class="row">
-            <div class="col-6 liturgy-block-title" @click="changeTitle">{{ block.title }}</div>
+            <div
+                class="col-6 liturgy-block-title"
+                @click="changeTitle"
+            >
+                {{ block.title }}
+            </div>
             <div class="col-6 text-end">
-                <button @click="addItem" class="btn btn-sm btn-light" title="Freitext hinzufügen"><span class="mdi mdi-text"></span>
+                <button
+                    @click="addItem"
+                    class="btn btn-sm btn-light"
+                    title="Freitext hinzufügen"
+                >
+                    <span class="mdi mdi-text"></span>
                 </button>
-                <button @click="addItem" class="btn btn-sm btn-light" title="Psalm hinzufügen"><span class="mdi mdi-hands-pray"></span>
+                <button
+                    @click="addItem"
+                    class="btn btn-sm btn-light"
+                    title="Psalm hinzufügen"
+                >
+                    <span class="mdi mdi-hands-pray"></span>
                 </button>
-                <button @click="addItem" class="btn btn-sm btn-light" title="Schriftlesung hinzufügen"><span class="mdi mdi-book-open-variant"></span>
+                <button
+                    @click="addItem"
+                    class="btn btn-sm btn-light"
+                    title="Schriftlesung hinzufügen"
+                >
+                    <span class="mdi mdi-book-open-variant"></span>
                 </button>
-                <button @click="addItem" class="btn btn-sm btn-light" title="Predigt hinzufügen"><span
-                    class="mdi mdi-microphone"></span></button>
-                <button @click="addItem" class="btn btn-sm btn-light" title="Lied hinzufügen"><span class="mdi mdi-music"></span></button>
-                <button @click="addItem" class="btn btn-sm btn-light" title="Vorderfinierten Text hinzufügen"><span
-                    class="mdi mdi-text-box"></span></button>
-                <button class="btn btn-sm btn-danger" title="Abschnitt löschen"
-                        @click="deleteBlock"><span class="mdi mdi-delete"></span>
+                <button
+                    @click="addItem"
+                    class="btn btn-sm btn-light"
+                    title="Predigt hinzufügen"
+                >
+                    <span class="mdi mdi-microphone"></span>
+                </button>
+                <button
+                    @click="addItem"
+                    class="btn btn-sm btn-light"
+                    title="Lied hinzufügen"
+                >
+                    <span class="mdi mdi-music"></span>
+                </button>
+                <button
+                    @click="addItem"
+                    class="btn btn-sm btn-light"
+                    title="Vorderfinierten Text hinzufügen"
+                >
+                    <span class="mdi mdi-text-box"></span>
+                </button>
+                <button
+                    class="btn btn-sm btn-danger"
+                    title="Abschnitt löschen"
+                    @click="deleteBlock"
+                >
+                    <span class="mdi mdi-delete"></span>
                 </button>
             </div>
         </div>
-        <draggable :list="items" item-key="title" class="liturgy-items-list" group="items" @change="updateBlock">
+        <draggable
+            :list="items"
+            item-key="title"
+            class="liturgy-items-list"
+            group="items"
+            @change="updateBlock"
+        >
             <template #item="{ element: item }">
                 <div class="liturgy-item">
                     <div class="row">
                         <div class="col-8">{{ item.title }}</div>
-                        <div class="col-4"><input type="text" class="form-control" /></div>
+                        <div class="col-4">
+                            <input
+                                type="text"
+                                class="form-control"
+                            />
+                        </div>
                     </div>
                 </div>
             </template>
@@ -61,10 +116,10 @@
 </template>
 
 <script>
-import draggable from "vuedraggable";
+import draggable from 'vuedraggable'
 
 export default {
-    name: "LiturgyBlock",
+    name: 'LiturgyBlock',
     components: {
         draggable,
     },
@@ -78,24 +133,26 @@ export default {
     props: ['block', 'index'],
     methods: {
         focus() {
-            this.focused = !this.focused;
+            this.focused = !this.focused
         },
         deleteBlock() {
-            this.$emit('delete-block');
+            this.$emit('delete-block')
         },
         changeTitle() {
-            this.blockData.title = prompt('Wie soll dieser Abschnitt heißen?', this.blockData.title);
-            this.updateBlock();
+            this.blockData.title = prompt('Wie soll dieser Abschnitt heißen?', this.blockData.title)
+            this.updateBlock()
         },
         addItem() {
-            this.items.push({title: 'Neues Element #'+(this.index+1)+'.'+(this.items.length+1)})
-            this.updateBlock();
+            this.items.push({
+                title: 'Neues Element #' + (this.index + 1) + '.' + (this.items.length + 1),
+            })
+            this.updateBlock()
         },
         updateBlock() {
-            this.blockData.items = this.items;
-            this.$emit('update-block', this.index, this.blockData);
-        }
-    }
+            this.blockData.items = this.items
+            this.$emit('update-block', this.index, this.blockData)
+        },
+    },
 }
 </script>
 

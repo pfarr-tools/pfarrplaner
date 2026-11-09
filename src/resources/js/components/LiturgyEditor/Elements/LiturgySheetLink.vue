@@ -28,34 +28,45 @@
 
 <template>
     <div>
-        <a class="dropdown-item" href="#" @click.prevent="downloadSheet">
-            <span v-if="sheet.icon" :class="sheet.icon"></span> {{ sheet.title }}
+        <a
+            class="dropdown-item"
+            href="#"
+            @click.prevent="downloadSheet"
+        >
+            <span
+                v-if="sheet.icon"
+                :class="sheet.icon"
+            ></span>
+            {{ sheet.title }}
         </a>
     </div>
 </template>
 
 <script>
 export default {
-    name: "LiturgySheetLink",
+    name: 'LiturgySheetLink',
     props: ['service', 'sheet'],
     methods: {
         downloadSheet() {
             if (this.sheet.configurationComponent) {
-                this.$emit('open');
-                return;
+                this.$emit('open')
+                return
             }
 
             if (this.sheet.configurationPage) {
-                this.$inertia.visit(route('liturgy.configure', {service: this.service.slug, key: this.sheet.key}));
-                return;
+                this.$inertia.visit(
+                    route('liturgy.configure', { service: this.service.slug, key: this.sheet.key }),
+                )
+                return
             }
 
-            window.location.href = route('liturgy.download', {service: this.service.slug, key: this.sheet.key});
+            window.location.href = route('liturgy.download', {
+                service: this.service.slug,
+                key: this.sheet.key,
+            })
         },
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

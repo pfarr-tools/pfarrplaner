@@ -27,7 +27,10 @@
   -->
 
 <template>
-    <div class="service-entry service-skeleton" aria-hidden="true">
+    <div
+        class="service-entry service-skeleton"
+        aria-hidden="true"
+    >
         <div class="skeleton-line skeleton-line-short"></div>
         <div class="skeleton-line skeleton-line-medium"></div>
         <div class="skeleton-line skeleton-line-long"></div>

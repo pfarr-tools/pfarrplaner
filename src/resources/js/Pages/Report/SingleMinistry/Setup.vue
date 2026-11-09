@@ -29,9 +29,17 @@
 <template>
     <admin-layout title="Dienstplan für einzelne Dienste erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Dienstplan für einzelne Dienste erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Dienstplan für einzelne Dienste erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'singleMinistry'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'singleMinistry' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
             <city-location-filter
                 :cities="cities"
@@ -42,35 +50,62 @@
                 v-model:city-model-value="myCities"
                 v-model:location-model-value="myLocations"
             />
-            <form-selectize name="ministries[]" label="Dienste" :options="myMinistries"
-                            v-model="mySelectedMinistries" multiple />
-            <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
-            <form-radio-group name="file_format" label="Dateiformat" v-model="myFileFormat" :items="{
-                            'pdf': 'PDF-Datei',
-                            'xlsx': 'Microsoft Excel-Tabelle',
-                        }"/>
-            <form-check name="includeHeader" label="Überschriftenblock mit ausgeben" v-model="includeHeader" />
+            <form-selectize
+                name="ministries[]"
+                label="Dienste"
+                :options="myMinistries"
+                v-model="mySelectedMinistries"
+                multiple
+            />
+            <form-date-range-picker
+                label="Gottesdienste von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
+            <form-radio-group
+                name="file_format"
+                label="Dateiformat"
+                v-model="myFileFormat"
+                :items="{
+                    pdf: 'PDF-Datei',
+                    xlsx: 'Microsoft Excel-Tabelle',
+                }"
+            />
+            <form-check
+                name="includeHeader"
+                label="Überschriftenblock mit ausgeben"
+                v-model="includeHeader"
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import FormRadioGroup from "../../../components/Ui/forms/FormRadioGroup.vue";
-import FormCheck from "../../../components/Ui/forms/FormCheck.vue";
-import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import FormRadioGroup from '../../../components/Ui/forms/FormRadioGroup.vue'
+import FormCheck from '../../../components/Ui/forms/FormCheck.vue'
+import CityLocationFilter from '../../../components/Reports/CityLocationFilter.vue'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'locations', 'ministries'],
-    components: {CityLocationFilter, FormCheck, FormRadioGroup, FormDateRangePicker, FormCsrfToken, FormSelectize, SaveButton},
+    components: {
+        CityLocationFilter,
+        FormCheck,
+        FormRadioGroup,
+        FormDateRangePicker,
+        FormCsrfToken,
+        FormSelectize,
+        SaveButton,
+    },
     data() {
-        let myMinistries = [];
+        let myMinistries = []
         for (let key in this.ministries) {
-            myMinistries.push({ id: key, name: this.ministries[key]});
+            myMinistries.push({ id: key, name: this.ministries[key] })
         }
 
         return {
@@ -87,7 +122,7 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'singleMinistry'}), {
+            submitReportForm(route('reports.render', { report: 'singleMinistry' }), {
                 cities: this.myCities,
                 locations: this.myLocations,
                 ministries: this.mySelectedMinistries,
@@ -95,12 +130,10 @@ export default {
                 end: this.myEnd,
                 file_format: this.myFileFormat,
                 includeHeader: this.includeHeader,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

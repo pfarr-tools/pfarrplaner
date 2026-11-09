@@ -27,41 +27,81 @@
   -->
 
 <template>
-    <admin-layout :title="'Reihe'+(myRow.title ? ' '+myRow.title : '')+' bearbeiten'">
+    <admin-layout :title="'Reihe' + (myRow.title ? ' ' + myRow.title : '') + ' bearbeiten'">
         <template #navbar-left>
-            <save-button @click="saveRow"/>
-            <nav-button @click="deleteRow" title="Reihe löschen"
-                        class="ms-1" type="danger" icon="mdi mdi-delete">Löschen</nav-button>
+            <save-button @click="saveRow" />
+            <nav-button
+                @click="deleteRow"
+                title="Reihe löschen"
+                class="ms-1"
+                type="danger"
+                icon="mdi mdi-delete"
+                >Löschen</nav-button
+            >
         </template>
-        <section-select label="Bereich" value-key="id"
-            :location="location" v-model="seatingRow.seating_section_id" />
-        <form-input name="title" label="Bezeichnung" v-model="myRow.title" />
-        <form-input name="seats" label="Max. Anzahl Sitzplätze" v-model="myRow.seats" />
-        <form-input name="split" label="Teilmöglichkeit" v-model="myRow.split" />
-        <SeatingSplit v-if="myRow.split" v-model="myRow" />
-        <form-group name="color" label="Farbe">
-            <input type="color" v-model="myRow.color" class="form-control form-control-color" />
+        <section-select
+            label="Bereich"
+            value-key="id"
+            :location="location"
+            v-model="seatingRow.seating_section_id"
+        />
+        <form-input
+            name="title"
+            label="Bezeichnung"
+            v-model="myRow.title"
+        />
+        <form-input
+            name="seats"
+            label="Max. Anzahl Sitzplätze"
+            v-model="myRow.seats"
+        />
+        <form-input
+            name="split"
+            label="Teilmöglichkeit"
+            v-model="myRow.split"
+        />
+        <SeatingSplit
+            v-if="myRow.split"
+            v-model="myRow"
+        />
+        <form-group
+            name="color"
+            label="Farbe"
+        >
+            <input
+                type="color"
+                v-model="myRow.color"
+                class="form-control form-control-color"
+            />
         </form-group>
     </admin-layout>
 </template>
 
 <script>
-import FormInput from "../../../components/Ui/forms/FormInput";
-import { fromString } from 'css-color-converter';
-import FormGroup from "../../../components/Ui/forms/FormGroup";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import SeatingLabel from "../../../components/LocationEditor/SeatingLabel";
-import SeatingSplit from "../../../components/LocationEditor/SeatingSplit";
-import SectionSelect from "../../../components/Ui/elements/SectionSelect";
+import FormInput from '../../../components/Ui/forms/FormInput'
+import { fromString } from 'css-color-converter'
+import FormGroup from '../../../components/Ui/forms/FormGroup'
+import NavButton from '../../../components/Ui/buttons/NavButton'
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import SeatingLabel from '../../../components/LocationEditor/SeatingLabel'
+import SeatingSplit from '../../../components/LocationEditor/SeatingSplit'
+import SectionSelect from '../../../components/Ui/elements/SectionSelect'
 
 export default {
-    name: "SeatingRowEditor",
-    components: {SectionSelect, SeatingSplit, SeatingLabel, SaveButton, NavButton, FormGroup, FormInput},
+    name: 'SeatingRowEditor',
+    components: {
+        SectionSelect,
+        SeatingSplit,
+        SeatingLabel,
+        SaveButton,
+        NavButton,
+        FormGroup,
+        FormInput,
+    },
     props: ['seatingRow', 'location'],
     data() {
-        let myRow = this.seatingRow;
-        myRow.color = myRow.color ? fromString(myRow.color).toHexString() : '#000000';
+        let myRow = this.seatingRow
+        myRow.color = myRow.color ? fromString(myRow.color).toHexString() : '#000000'
 
         return {
             myRow,
@@ -70,19 +110,17 @@ export default {
     methods: {
         saveRow() {
             if (this.myRow.id) {
-                this.$inertia.patch(route('seatingRow.update', this.myRow.id), this.myRow);
+                this.$inertia.patch(route('seatingRow.update', this.myRow.id), this.myRow)
             } else {
-                this.$inertia.post(route('seatingRow.store'), this.myRow);
+                this.$inertia.post(route('seatingRow.store'), this.myRow)
             }
         },
         deleteRow() {
-            if (!confirm('Willst du diese Reihe wirklich aus dem Sitzplan löschen?')) return;
-            this.$inertia.delete(route('seatingRow.destroy', this.myRow.id));
-        }
-    }
+            if (!confirm('Willst du diese Reihe wirklich aus dem Sitzplan löschen?')) return
+            this.$inertia.delete(route('seatingRow.destroy', this.myRow.id))
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

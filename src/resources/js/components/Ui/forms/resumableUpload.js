@@ -11,16 +11,16 @@ export async function uploadFileInChunks(file, options) {
     const started = options.session
         ? await options.status(options.session)
         : await options.start({
-        filename: file.name,
-        mime_type: file.type,
-        size: file.size,
-        total_chunks: totalChunks,
-        })
+              filename: file.name,
+              mime_type: file.type,
+              size: file.size,
+              total_chunks: totalChunks,
+          })
     const session = started.session
     options.onSession?.(session)
     const received = new Set(started.received || [])
     let completed = received.size
-    options.onProgress?.(Math.round(completed / totalChunks * 100))
+    options.onProgress?.(Math.round((completed / totalChunks) * 100))
 
     for (let index = 0; index < totalChunks; index++) {
         if (received.has(index)) continue
@@ -39,7 +39,7 @@ export async function uploadFileInChunks(file, options) {
         completed++
         received.add(index)
         options.onChunk?.(index, [...received])
-        options.onProgress?.(Math.round(completed / totalChunks * 100))
+        options.onProgress?.(Math.round((completed / totalChunks) * 100))
     }
 
     return options.complete(session)

@@ -27,26 +27,23 @@
  */
 
 export class NameService {
-
-    first = '';
-    last = '';
-    name = '';
-    split= [];
+    first = ''
+    last = ''
+    name = ''
+    split = []
     constructor(myName, spokenName = null) {
         if (myName.includes(',')) {
             let t = myName.split(',')
-            this.first = t[1].trim();
-            this.last = t[0].trim();
+            this.first = t[1].trim()
+            this.last = t[0].trim()
         } else {
-            let t = myName.split(' ');
-            this.last = t.splice(t.length-1).join(' ');
-            this.first = t.join(' ');
+            let t = myName.split(' ')
+            this.last = t.splice(t.length - 1).join(' ')
+            this.first = t.join(' ')
         }
-        if (spokenName) this.first = spokenName;
-        this.name = this.first+' '+this.last;
-        this.split = [this.last, this.first];
-        return this;
+        if (spokenName) this.first = spokenName
+        this.name = this.first + ' ' + this.last
+        this.split = [this.last, this.first]
+        return this
     }
-
 }
-

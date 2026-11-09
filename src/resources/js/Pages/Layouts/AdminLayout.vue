@@ -46,7 +46,9 @@
             <Sidebar
                 v-if="mobileMenuOpen"
                 class="d-lg-none position-fixed top-0 start-0 w-100 h-100 z-0"
-                :mobile="true" :layout="layout" :package="package"
+                :mobile="true"
+                :layout="layout"
+                :package="package"
                 @close="mobileMenuOpen = false"
                 :appName="layout.appName"
                 :menu="layout.menu"
@@ -54,9 +56,10 @@
         </transition>
 
         <div class="admin-main d-flex flex-column">
-            <Topbar @toggleMobileMenu="toggleMobileMenu"
-                    :mobileMenuOpen = "mobileMenuOpen"
-                    :enableControlSidebar="enableControlSidebar"
+            <Topbar
+                @toggleMobileMenu="toggleMobileMenu"
+                :mobileMenuOpen="mobileMenuOpen"
+                :enableControlSidebar="enableControlSidebar"
             >
                 <template v-slot:navbar-left>
                     <slot name="navbar-left"></slot>
@@ -73,7 +76,13 @@
                 class="d-flex flex-column flex-grow-1 min-vh-0"
                 :class="contentShellClasses"
             >
-                <h1 v-if="title && !noContentHeader" class="m-0 mb-4 text-dark" :key="title">{{ title }}</h1>
+                <h1
+                    v-if="title && !noContentHeader"
+                    class="m-0 mb-4 text-dark"
+                    :key="title"
+                >
+                    {{ title }}
+                </h1>
                 <slot name="before-flash" />
                 <transition name="fade">
                     <FlashMessage
@@ -83,13 +92,19 @@
                     ></FlashMessage>
                 </transition>
                 <slot name="after-flash" />
-                <div v-if="$slots['tab-headers']" class="slot-tab-headers mt-3 mb-0 pb-0">
+                <div
+                    v-if="$slots['tab-headers']"
+                    class="slot-tab-headers mt-3 mb-0 pb-0"
+                >
                     <slot name="tab-headers" />
                 </div>
 
                 <main
                     class="admin-content flex-grow-1 min-vh-0"
-                    :class="[noPadding ? 'p-0' : 'p-3', noContentScroll ? 'overflow-hidden' : 'overflow-auto']"
+                    :class="[
+                        noPadding ? 'p-0' : 'p-3',
+                        noContentScroll ? 'overflow-hidden' : 'overflow-auto',
+                    ]"
                 >
                     <slot></slot>
                 </main>
@@ -111,14 +126,14 @@ export default {
     components: { Sidebar, Topbar, FlashMessage, InterstitialOverlay },
     props: {
         flash: { type: Object, default: () => ({}) },
-        'enableControlSidebar': {
+        enableControlSidebar: {
             type: Boolean,
             default: false,
         },
-        'noNavBar': {
+        noNavBar: {
             default: false,
         },
-        'title': {
+        title: {
             default: '',
         },
         noContentHeader: Boolean,
@@ -131,11 +146,11 @@ export default {
             return [
                 this.noOuterPadding ? 'px-0 pt-0' : 'px-2',
                 !this.noOuterPadding ? (this.noContentHeader ? 'pt-2' : 'pt-4') : '',
-            ];
+            ]
         },
     },
     mounted() {
-        if (this.title != '') document.title = this.title + ' :: ' + this.layout.appName;
+        if (this.title != '') document.title = this.title + ' :: ' + this.layout.appName
     },
     data() {
         return {
@@ -164,8 +179,8 @@ export default {
         },
         toggleMobileMenu() {
             this.mobileMenuOpen = !this.mobileMenuOpen
-        }
-    }
+        },
+    },
 }
 </script>
 

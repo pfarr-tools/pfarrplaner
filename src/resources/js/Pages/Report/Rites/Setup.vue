@@ -29,32 +29,57 @@
 <template>
     <admin-layout title="Freud & Leid für den Gemeindebrief erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Freud & Leid für den Gemeindebrief erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Freud & Leid für den Gemeindebrief erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'rites'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'rites' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="includeCities[]" label="Folgende Kirchengemeinden mit einbeziehen"
-                            v-model="myCities" :options="cities" multiple/>
+            <form-selectize
+                name="includeCities[]"
+                label="Folgende Kirchengemeinden mit einbeziehen"
+                v-model="myCities"
+                :options="cities"
+                multiple
+            />
             <h4>Kausalien</h4>
-            <form-date-range-picker label="Auflisten von" v-model:from="myStart" v-model:to="myEnd" iso-date />
+            <form-date-range-picker
+                label="Auflisten von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
             <hr />
             <h4>Nächste Tauftermine</h4>
-            <form-date-range-picker label="Auflisten von" v-model:from="myBaptismDatesStart" v-model:to="myBaptismDatesEnd" name-from="baptismDatesStart" name-to="baptismDatesEnd" iso-date />
+            <form-date-range-picker
+                label="Auflisten von"
+                v-model:from="myBaptismDatesStart"
+                v-model:to="myBaptismDatesEnd"
+                name-from="baptismDatesStart"
+                name-to="baptismDatesEnd"
+                iso-date
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities'],
-    components: {FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: { FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton },
     data() {
         return {
             myCities: this.cities.length ? [this.cities[0].id] : null,
@@ -66,18 +91,16 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'rites'}), {
+            submitReportForm(route('reports.render', { report: 'rites' }), {
                 includeCities: this.myCities,
                 start: this.myStart,
                 end: this.myEnd,
                 baptismDatesStart: this.myBaptismDatesStart,
                 baptismDatesEnd: this.myBaptismDatesEnd,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -27,10 +27,7 @@
  */
 
 export class CalendarNewOrientationEvent {
-
-    constructor(orientation){
+    constructor(orientation) {
         this.orientation = orientation
     }
-
 }
-

@@ -36,11 +36,9 @@
 
 <script>
 export default {
-    name: "BasicInfo",
-    props: ['service']
+    name: 'BasicInfo',
+    props: ['service'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

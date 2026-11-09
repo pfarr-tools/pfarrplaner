@@ -28,38 +28,66 @@
 
 <template>
     <div class="liturgy-item-reading-editor">
-        <form-input id="readingEditorTitle" v-model="editedElement.title" label="Titel im Ablaufplan" />
-        <form-textarea v-model="editedElement.data.intro" label="Hinführung zur Lesung" class="mb-1" />
-        <form-bible-reference-input v-model="editedElement.data.reference" :sources="textSources" :allow-own-version="true" />
-        <div :key="editedElement.data.reference" v-if="editedElement.data.reference ? editedElement.data.reference.includes('[Eigener Text]') : false">
-            <form-textarea v-model="editedElement.data.customText" label="Eigener Text" />
-            <form-input v-model="editedElement.data.customSource" label="Eigene Quellenangabe" />
+        <form-input
+            id="readingEditorTitle"
+            v-model="editedElement.title"
+            label="Titel im Ablaufplan"
+        />
+        <form-textarea
+            v-model="editedElement.data.intro"
+            label="Hinführung zur Lesung"
+            class="mb-1"
+        />
+        <form-bible-reference-input
+            v-model="editedElement.data.reference"
+            :sources="textSources"
+            :allow-own-version="true"
+        />
+        <div
+            :key="editedElement.data.reference"
+            v-if="
+                editedElement.data.reference
+                    ? editedElement.data.reference.includes('[Eigener Text]')
+                    : false
+            "
+        >
+            <form-textarea
+                v-model="editedElement.data.customText"
+                label="Eigener Text"
+            />
+            <form-input
+                v-model="editedElement.data.customSource"
+                label="Eigene Quellenangabe"
+            />
         </div>
-        <form-check v-model="editedElement.data.showInHandouts" label="Diese Lesung in Liedzetteln usw. mit ausgeben." />
+        <form-check
+            v-model="editedElement.data.showInHandouts"
+            label="Diese Lesung in Liedzetteln usw. mit ausgeben."
+        />
     </div>
 </template>
 
 <script>
-import TimeFields from "./Elements/TimeFields";
-import FormBibleReferenceInput from "../../Ui/forms/FormBibleReferenceInput";
-import FormTextarea from "../../Ui/forms/FormTextarea.vue";
-import FormCheck from "../../Ui/forms/FormCheck.vue";
-import FormInput from "../../Ui/forms/FormInput.vue";
-import {getTextSources} from "../../../libraries/TextSources";
+import TimeFields from './Elements/TimeFields'
+import FormBibleReferenceInput from '../../Ui/forms/FormBibleReferenceInput'
+import FormTextarea from '../../Ui/forms/FormTextarea.vue'
+import FormCheck from '../../Ui/forms/FormCheck.vue'
+import FormInput from '../../Ui/forms/FormInput.vue'
+import { getTextSources } from '../../../libraries/TextSources'
 
 export default {
-    name: "ReadingEditor",
-    components: {FormInput, FormCheck, FormTextarea, FormBibleReferenceInput, TimeFields},
+    name: 'ReadingEditor',
+    components: { FormInput, FormCheck, FormTextarea, FormBibleReferenceInput, TimeFields },
     props: {
         element: Object,
         service: Object,
         agendaMode: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     data() {
-        var e = this.element;
+        var e = this.element
 
         // initialize missing fields
         e.data = {
@@ -70,49 +98,60 @@ export default {
             fullText: '',
             showInHandouts: false,
             ...e.data,
-        };
+        }
 
-
-        let textSources = getTextSources(this.service);
+        let textSources = getTextSources(this.service)
 
         return {
             editedElement: e,
             textSources,
-        };
+        }
     },
     mounted() {
-        if (this.editedElement.data.reference) this.updateFullText();
+        if (this.editedElement.data.reference) this.updateFullText()
     },
     watch: {
-        'editedElement.data.reference'() { this.updateFullText(); },
+        'editedElement.data.reference'() {
+            this.updateFullText()
+        },
         'editedElement.data.customText'(val) {
-            if (this.editedElement.data.reference && this.editedElement.data.reference.includes('[Eigener Text]')) {
-                this.editedElement.data.fullText = val || '';
+            if (
+                this.editedElement.data.reference &&
+                this.editedElement.data.reference.includes('[Eigener Text]')
+            ) {
+                this.editedElement.data.fullText = val || ''
             }
         },
     },
     methods: {
         updateFullText() {
-            const ref = this.editedElement.data.reference;
-            if (!ref) return;
+            const ref = this.editedElement.data.reference
+            if (!ref) return
             if (ref.includes('[Eigener Text]')) {
-                this.editedElement.data.fullText = this.editedElement.data.customText || '';
-                return;
+                this.editedElement.data.fullText = this.editedElement.data.customText || ''
+                return
             }
-            const parts = ref.split('[');
-            const myReference = parts[0].trim();
-            const myVersion = parts.length > 1 ? parts[1].replace(']', '').trim() : '';
-            axios.get(route('bible.text', {reference: myReference, version: myVersion}))
-                .then(result => { this.editedElement.data.fullText = result.data.text; });
+            const parts = ref.split('[')
+            const myReference = parts[0].trim()
+            const myVersion = parts.length > 1 ? parts[1].replace(']', '').trim() : ''
+            axios
+                .get(route('bible.text', { reference: myReference, version: myVersion }))
+                .then((result) => {
+                    this.editedElement.data.fullText = result.data.text
+                })
         },
         save: function () {
-            this.$inertia.patch(route('liturgy.item.update', {
-                service: this.service.id,
-                block: this.element.liturgy_block_id,
-                item: this.element.id,
-            }), this.element, {preserveState: false});
+            this.$inertia.patch(
+                route('liturgy.item.update', {
+                    service: this.service.id,
+                    block: this.element.liturgy_block_id,
+                    item: this.element.id,
+                }),
+                this.element,
+                { preserveState: false },
+            )
         },
-    }
+    },
 }
 </script>
 

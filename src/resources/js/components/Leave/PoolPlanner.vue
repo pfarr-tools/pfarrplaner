@@ -28,7 +28,7 @@
 
 <script>
 export default {
-    name: "PoolPlanner",
+    name: 'PoolPlanner',
     props: ['pools', 'days'],
 }
 </script>
@@ -39,6 +39,4 @@ export default {
     </tr>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

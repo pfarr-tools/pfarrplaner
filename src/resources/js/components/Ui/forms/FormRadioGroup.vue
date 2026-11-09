@@ -27,27 +27,67 @@
   -->
 
 <template>
-    <fieldset class="form-group form-field" :aria-describedby="describedBy || undefined">
-        <legend v-if="label || preLabel" class="control-label form-label mb-2">
-            <span v-if="preLabel"><span :class="preLabel" aria-hidden="true"></span> </span>{{ label }}
+    <fieldset
+        class="form-group form-field"
+        :aria-describedby="describedBy || undefined"
+    >
+        <legend
+            v-if="label || preLabel"
+            class="control-label form-label mb-2"
+        >
+            <span v-if="preLabel"
+                ><span
+                    :class="preLabel"
+                    aria-hidden="true"
+                ></span> </span
+            >{{ label }}
         </legend>
         <div>
-            <div class="form-check" :class="{'form-check-inline': inline}" v-for="(subLabel, subValue, index) in items" :key="subValue">
-                <input :id="`radio${myId}${index}`" class="form-check-input" :class="{'is-invalid': hasError}"
-                       type="radio" :name="name" :value="subValue" :checked="myValue === normalizeValue(subValue)"
-                       :disabled="disabled" :aria-invalid="hasError ? 'true' : 'false'" @input="changed($event)" />
-                <label class="form-check-label" :for="`radio${myId}${index}`">{{ subLabel }}</label>
+            <div
+                class="form-check"
+                :class="{ 'form-check-inline': inline }"
+                v-for="(subLabel, subValue, index) in items"
+                :key="subValue"
+            >
+                <input
+                    :id="`radio${myId}${index}`"
+                    class="form-check-input"
+                    :class="{ 'is-invalid': hasError }"
+                    type="radio"
+                    :name="name"
+                    :value="subValue"
+                    :checked="myValue === normalizeValue(subValue)"
+                    :disabled="disabled"
+                    :aria-invalid="hasError ? 'true' : 'false'"
+                    @input="changed($event)"
+                />
+                <label
+                    class="form-check-label"
+                    :for="`radio${myId}${index}`"
+                    >{{ subLabel }}</label
+                >
             </div>
         </div>
-        <small v-if="help" :id="helpId" class="message form-text text-muted">{{ help }}</small>
-        <div v-if="hasError" :id="errorId" class="message invalid-feedback d-block">{{ errorMessage }}</div>
+        <small
+            v-if="help"
+            :id="helpId"
+            class="message form-text text-muted"
+            >{{ help }}</small
+        >
+        <div
+            v-if="hasError"
+            :id="errorId"
+            class="message invalid-feedback d-block"
+        >
+            {{ errorMessage }}
+        </div>
     </fieldset>
 </template>
 
 <script>
-import { uid } from '../../../libraries/uid';
+import { uid } from '../../../libraries/uid'
 export default {
-    name: "FormRadioGroup",
+    name: 'FormRadioGroup',
     emits: ['input', 'update:modelValue'],
     props: {
         id: String,
@@ -65,38 +105,40 @@ export default {
         inline: {
             type: Boolean,
             default: true,
-        }
+        },
     },
     computed: {
         pageError() {
-            if (!this.name) return null;
-            const errors = this.$page.props.errors || {};
-            if (errors[this.name]) return errors[this.name];
+            if (!this.name) return null
+            const errors = this.$page.props.errors || {}
+            if (errors[this.name]) return errors[this.name]
 
             for (const bag of Object.values(errors)) {
                 if (bag && typeof bag === 'object' && bag[this.name]) {
-                    return bag[this.name];
+                    return bag[this.name]
                 }
             }
 
-            return null;
+            return null
         },
         errorMessage() {
-            const message = this.pageError;
-            if (!message) return '';
-            return Array.isArray(message) ? message.join(' ') : message;
+            const message = this.pageError
+            if (!message) return ''
+            return Array.isArray(message) ? message.join(' ') : message
         },
         hasError() {
-            return this.errorMessage !== '';
+            return this.errorMessage !== ''
         },
         helpId() {
-            return `${this.myId}Help`;
+            return `${this.myId}Help`
         },
         errorId() {
-            return `${this.myId}Error`;
+            return `${this.myId}Error`
         },
         describedBy() {
-            return [this.help ? this.helpId : null, this.hasError ? this.errorId : null].filter(Boolean).join(' ');
+            return [this.help ? this.helpId : null, this.hasError ? this.errorId : null]
+                .filter(Boolean)
+                .join(' ')
         },
     },
     data() {
@@ -106,31 +148,36 @@ export default {
         }
     },
     watch: {
-        modelValue(v) { this.myValue = v; },
-        value(v) { if (this.modelValue === undefined) this.myValue = v; },
+        modelValue(v) {
+            this.myValue = v
+        },
+        value(v) {
+            if (this.modelValue === undefined) this.myValue = v
+        },
     },
     methods: {
         normalizeValue(value) {
-            if (value === '') return '';
-            if (!isNaN(value) && value !== null && value !== false) return parseInt(value);
-            return value;
+            if (value === '') return ''
+            if (!isNaN(value) && value !== null && value !== false) return parseInt(value)
+            return value
         },
         changed(event) {
-            let result = Array.isArray(event.target.value) ? event.target.value[0] : event.target.value;
-            if (result !== '' && !isNaN(result)) result = parseInt(result);
+            let result = Array.isArray(event.target.value)
+                ? event.target.value[0]
+                : event.target.value
+            if (result !== '' && !isNaN(result)) result = parseInt(result)
             if (event.target.checked) {
-                this.myValue = result;
-                this.$emit('input', result);
-                this.$emit('update:modelValue', result);
+                this.myValue = result
+                this.$emit('input', result)
+                this.$emit('update:modelValue', result)
             }
         },
-    }
+    },
 }
 </script>
 
 <style scoped>
 .message {
-    font-size: .8em;
+    font-size: 0.8em;
 }
-
 </style>

@@ -27,30 +27,42 @@
   -->
 
 <template>
-    <div class="tag-select"  :key="tagsUpdated">
-        <form-selectize :name="name" :label="label" :help="help"
-                        :options="tags" :value="myValue"
-                        :item-renderer="renderOption" :option-renderer="renderOption"
-                        @input="handleInput" :settings="mySelectizeSettings"
-                        multiple />
+    <div
+        class="tag-select"
+        :key="tagsUpdated"
+    >
+        <form-selectize
+            :name="name"
+            :label="label"
+            :help="help"
+            :options="tags"
+            :value="myValue"
+            :item-renderer="renderOption"
+            :option-renderer="renderOption"
+            @input="handleInput"
+            :settings="mySelectizeSettings"
+            multiple
+        />
     </div>
 </template>
 
 <script>
-import FormSelectize from "../forms/FormSelectize";
+import FormSelectize from '../forms/FormSelectize'
 export default {
-    name: "TagSelect",
+    name: 'TagSelect',
     emits: ['update:modelValue'],
-    components: {FormSelectize},
+    components: { FormSelectize },
     props: ['tags', 'name', 'label', 'help', 'modelValue', 'return'],
     data() {
-        var myValue = [];
+        var myValue = []
         if (this.modelValue) {
-            this.modelValue.forEach(item => { myValue.push(item.id)});
+            this.modelValue.forEach((item) => {
+                myValue.push(item.id)
+            })
         }
 
-        let myTags = this.tags;
-        let myReturnProperty = this.return || '';
+        let myTags = this.tags
+        let myReturnProperty = this.return || ''
 
         return {
             myValue: myValue,
@@ -59,7 +71,11 @@ export default {
                 create: this.addTag,
                 render: {
                     option_create: function (data, escape) {
-                        return '<div class="create">Neue Kennzeichnung anlegen: <strong>' + escape(data.input) + '</strong>&hellip;</div>';
+                        return (
+                            '<div class="create">Neue Kennzeichnung anlegen: <strong>' +
+                            escape(data.input) +
+                            '</strong>&hellip;</div>'
+                        )
                     },
                 },
             },
@@ -69,33 +85,41 @@ export default {
     },
     methods: {
         renderOption(item, escape) {
-            return '<div class="item" style="padding-left: 3px;"><span class="mdi mdi-tag"></span> '+escape(item.name)+'</div>';
+            return (
+                '<div class="item" style="padding-left: 3px;"><span class="mdi mdi-tag"></span> ' +
+                escape(item.name) +
+                '</div>'
+            )
         },
         handleInput(e) {
-            this.myValue = e;
-            var items = [];
-            const selectedIds = e.map(item => String(item));
+            this.myValue = e
+            var items = []
+            const selectedIds = e.map((item) => String(item))
             if (!this.myReturnProperty) {
-                this.tags.forEach(tag => { if (selectedIds.includes(String(tag.id))) items.push(tag); });
+                this.tags.forEach((tag) => {
+                    if (selectedIds.includes(String(tag.id))) items.push(tag)
+                })
             } else {
-                this.tags.forEach(tag => { if (selectedIds.includes(String(tag.id))) items.push(tag[this.myReturnProperty]); });
+                this.tags.forEach((tag) => {
+                    if (selectedIds.includes(String(tag.id))) items.push(tag[this.myReturnProperty])
+                })
             }
-            this.$emit('update:modelValue', items);
+            this.$emit('update:modelValue', items)
         },
         addTag(e) {
-            this.$api().post(route('api.tags.store'), {name: e}).then(response => {
-                this.mySelectizeSettings.options.push(response.data);
-                this.myValue.push(response.data.id);
-                this.tagsUpdated++;
-                this.$forceUpdate();
-                this.handleInput(this.myValue);
-            });
-            return {name: e};
-        }
-    }
+            this.$api()
+                .post(route('api.tags.store'), { name: e })
+                .then((response) => {
+                    this.mySelectizeSettings.options.push(response.data)
+                    this.myValue.push(response.data.id)
+                    this.tagsUpdated++
+                    this.$forceUpdate()
+                    this.handleInput(this.myValue)
+                })
+            return { name: e }
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

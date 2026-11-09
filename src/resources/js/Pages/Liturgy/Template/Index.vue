@@ -27,24 +27,38 @@
   -->
 
 <template>
-    <admin-layout enable-control-sidebar="true" title="Gottesdienstvorlagen bearbeiten">
+    <admin-layout
+        enable-control-sidebar="true"
+        title="Gottesdienstvorlagen bearbeiten"
+    >
         <template v-slot:navbar-left>
-            <nav-button type="success" @click="createTemplate" icon="mdi mdi-plus">Neue Vorlage anlegen</nav-button>
+            <nav-button
+                type="success"
+                @click="createTemplate"
+                icon="mdi mdi-plus"
+                >Neue Vorlage anlegen</nav-button
+            >
         </template>
-        <dataset v-slot="{ ds }"
-                 :ds-data="templates"
-                 ds-sort-by="title"
-                 :ds-search-in="['title', 'special_location', 'internal_remarks', 'description']">
-            <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus/>
+        <dataset
+            v-slot="{ ds }"
+            :ds-data="templates"
+            ds-sort-by="title"
+            :ds-search-in="['title', 'special_location', 'internal_remarks', 'description']"
+        >
+            <dataset-search
+                ds-search-placeholder="Suchen..."
+                ref="search"
+                autofocus
+            />
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover d-md-table">
                             <thead>
-                            <tr>
-                                <th>Vorlage</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>Vorlage</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <dataset-item tag="tbody">
                                 <template #default="{ row, rowIndex }">
@@ -52,16 +66,41 @@
                                         <td style="width: 80%">
                                             <div class="fw-bold">{{ row.title }}</div>
                                             <div class="mb-2">{{ row.description }}</div>
-                                            <div class="text-muted text-small" v-if="row.internal_remarks">Quelle: {{ row.internal_remarks }}</div>
+                                            <div
+                                                class="text-muted text-small"
+                                                v-if="row.internal_remarks"
+                                            >
+                                                Quelle: {{ row.internal_remarks }}
+                                            </div>
                                         </td>
-                                        <td style="width: 20%" class="text-end">
-                                            <nav-button type="light" icon="mdi mdi-pencil" title="Vorlage bearbeiten"
-                                                        @click="editTemplate(row)" force-icon force-no-text/>
-                                            <nav-button type="light" icon="mdi mdi-content-copy" title="Vorlage duplizieren"
-                                                        @click="duplicateTemplate(row)" force-icon force-no-text/>
-                                            <nav-button type="danger" icon="mdi mdi-delete"
-                                                        title="Vorlage löschen"
-                                                        @click="deleteTemplate(row)" force-icon force-no-text/>
+                                        <td
+                                            style="width: 20%"
+                                            class="text-end"
+                                        >
+                                            <nav-button
+                                                type="light"
+                                                icon="mdi mdi-pencil"
+                                                title="Vorlage bearbeiten"
+                                                @click="editTemplate(row)"
+                                                force-icon
+                                                force-no-text
+                                            />
+                                            <nav-button
+                                                type="light"
+                                                icon="mdi mdi-content-copy"
+                                                title="Vorlage duplizieren"
+                                                @click="duplicateTemplate(row)"
+                                                force-icon
+                                                force-no-text
+                                            />
+                                            <nav-button
+                                                type="danger"
+                                                icon="mdi mdi-delete"
+                                                title="Vorlage löschen"
+                                                @click="deleteTemplate(row)"
+                                                force-icon
+                                                force-no-text
+                                            />
                                         </td>
                                     </tr>
                                 </template>
@@ -70,21 +109,23 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
+            <div
+                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+            >
+                <dataset-info class="mb-2 mb-md-0" />
+                <dataset-pager />
             </div>
         </dataset>
     </admin-layout>
 </template>
 
 <script>
-import dayjs from 'dayjs';
-import {Dataset, DatasetItem, DatasetSearch} from "vue-dataset";
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo.vue";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager.vue";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow.vue";
-import NavButton from "../../../components/Ui/buttons/NavButton.vue";
+import dayjs from 'dayjs'
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../../../components/Ui/dataset/DatasetInfo.vue'
+import DatasetPager from '../../../components/Ui/dataset/DatasetPager.vue'
+import DatasetShow from '../../../components/Ui/dataset/DatasetShow.vue'
+import NavButton from '../../../components/Ui/buttons/NavButton.vue'
 
 export default {
     props: ['templates'],
@@ -95,7 +136,7 @@ export default {
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     data() {
         return {
@@ -106,23 +147,23 @@ export default {
     },
     methods: {
         createTemplate() {
-            this.$inertia.get(route('template.create'));
+            this.$inertia.get(route('template.create'))
         },
         editTemplate(template) {
-            this.$inertia.get(route('liturgy.editor', template.slug));
+            this.$inertia.get(route('liturgy.editor', template.slug))
         },
         duplicateTemplate(template) {
-            this.$inertia.post(route('template.duplicate', template.id));
+            this.$inertia.post(route('template.duplicate', template.id))
         },
         deleteTemplate(template) {
-            if (!confirm('Willst du diese Vorlage wirklich unwiderruflich löschen?')) return;
-            this.$inertia.delete(route('template.destroy', template.id));
-        }
-    }
+            if (!confirm('Willst du diese Vorlage wirklich unwiderruflich löschen?')) return
+            this.$inertia.delete(route('template.destroy', template.id))
+        },
+    },
 }
 </script>
 <style scoped>
-    .text-small {
-        font-size: .7em;
-    }
+.text-small {
+    font-size: 0.7em;
+}
 </style>

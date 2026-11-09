@@ -27,17 +27,29 @@
   -->
 
 <template>
-    <div class="file-drag-receiver" :key="dragging" :class="{dragging: dragging}"
-        @drop.prevent.stop="dropped" @dragenter.prevent="dragging = true" @dragleave.prevent="dragging = false"
-         @dragover.prevent="dragging = true">
+    <div
+        class="file-drag-receiver"
+        :key="dragging"
+        :class="{ dragging: dragging }"
+        @drop.prevent.stop="dropped"
+        @dragenter.prevent="dragging = true"
+        @dragleave.prevent="dragging = false"
+        @dragover.prevent="dragging = true"
+    >
         <slot />
-        <div v-if="dragging" style="width: 100%" class="text-center text-small">Datei(en) hier fallen lassen, um sie hochzuladen</div>
+        <div
+            v-if="dragging"
+            style="width: 100%"
+            class="text-center text-small"
+        >
+            Datei(en) hier fallen lassen, um sie hochzuladen
+        </div>
     </div>
 </template>
 
 <script>
 export default {
-    name: "FileDragReceiver",
+    name: 'FileDragReceiver',
     emits: ['input'],
     props: ['list', 'uploadRoute', 'title', 'multi'],
     data() {
@@ -48,63 +60,64 @@ export default {
     },
     methods: {
         dropped(e) {
-            this.dragging = false;
+            this.dragging = false
             if (e.dataTransfer.files.length > 0) {
                 if (this.multi) {
-                    Array.from(e.dataTransfer.files).forEach(file => {
-                        this.upload(file);
-                    });
+                    Array.from(e.dataTransfer.files).forEach((file) => {
+                        this.upload(file)
+                    })
                 } else {
-                    this.upload(e.dataTransfer.files[0]);
+                    this.upload(e.dataTransfer.files[0])
                 }
             }
         },
         upload(file) {
-            let title = this.title;
-            let fileName = file.name;
+            let title = this.title
+            let fileName = file.name
             if (!title) {
-                title = file.name;
-                title = title.substr(0, title.lastIndexOf('.'));
-                title = title.charAt(0).toUpperCase() + title.slice(1);
-                if (title == 'Brief ans Pfarramt') title = 'Datenblatt';
-                title = window.prompt('Bitte gib eine Beschreibung für die Datei "'+fileName+'" an.', title);
+                title = file.name
+                title = title.substr(0, title.lastIndexOf('.'))
+                title = title.charAt(0).toUpperCase() + title.slice(1)
+                if (title == 'Brief ans Pfarramt') title = 'Datenblatt'
+                title = window.prompt(
+                    'Bitte gib eine Beschreibung für die Datei "' + fileName + '" an.',
+                    title,
+                )
             }
-            if (null == title) return;
+            if (null == title) return
 
+            let fd = new FormData()
+            fd.append('attachment_text[0]', title)
+            fd.append('attachments[0]', file)
 
-            let fd = new FormData();
-            fd.append('attachment_text[0]', title);
-            fd.append('attachments[0]', file);
-
-            this.uploading = true;
-            axios.post(this.uploadRoute, fd, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then(response => {
-                this.$emit('input', response.data);
-                this.$forceUpdate();
-                this.uploading = false;
-            });
-
-        }
-
-    }
+            this.uploading = true
+            axios
+                .post(this.uploadRoute, fd, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                .then((response) => {
+                    this.$emit('input', response.data)
+                    this.$forceUpdate()
+                    this.uploading = false
+                })
+        },
+    },
 }
 </script>
 
 <style scoped>
-    .file-drag-receiver {
-        padding: 3px;
-        padding-bottom: 1em;
-        min-height: 7em;
-    }
+.file-drag-receiver {
+    padding: 3px;
+    padding-bottom: 1em;
+    min-height: 7em;
+}
 
-    .file-drag-receiver.dragging {
-        background-color: #fff;
-        border-color: #80bdff;
-        outline: 0;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-
+.file-drag-receiver.dragging {
+    background-color: #fff;
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
 </style>

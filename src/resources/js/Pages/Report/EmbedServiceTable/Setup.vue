@@ -29,44 +29,82 @@
 <template>
     <admin-layout title="HTML-Code für eine Liste von Gottesdiensten erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="HTML-Code für eine Liste von Gottesdiensten erstellen"
-                         @click="renderReport"/>
+            <save-button
+                label="Erstellen"
+                title="HTML-Code für eine Liste von Gottesdiensten erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form-selectize name="listType" label="Art der Liste" :options="myTables" v-model="myForm.listType"/>
+        <form-selectize
+            name="listType"
+            label="Art der Liste"
+            :options="myTables"
+            v-model="myForm.listType"
+        />
         <div :key="myForm.listType">
-            <form-selectize v-if="myForm.listType != 'table-locations'"
-                            name="cities[]" label="Liste für folgende Kirchengemeinden erstellen"
-                            v-model="myForm.cities" :options="cities" multiple/>
-            <form-selectize v-if="myForm.listType == 'table-locations'"
-                            name="locations[]" label="Liste für folgende Orte erstellen"
-                            v-model="myForm.locations" :options="locations" multiple/>
-            <form-input name="maxBaptisms" label="Maximale Anzahl von Taufen pro Gottesdienst" type="number"
-                        v-model="myForm.maxBaptisms" v-if="myForm.listType == 'table-baptismalservices'"/>
+            <form-selectize
+                v-if="myForm.listType != 'table-locations'"
+                name="cities[]"
+                label="Liste für folgende Kirchengemeinden erstellen"
+                v-model="myForm.cities"
+                :options="cities"
+                multiple
+            />
+            <form-selectize
+                v-if="myForm.listType == 'table-locations'"
+                name="locations[]"
+                label="Liste für folgende Orte erstellen"
+                v-model="myForm.locations"
+                :options="locations"
+                multiple
+            />
+            <form-input
+                name="maxBaptisms"
+                label="Maximale Anzahl von Taufen pro Gottesdienst"
+                type="number"
+                v-model="myForm.maxBaptisms"
+                v-if="myForm.listType == 'table-baptismalservices'"
+            />
         </div>
-        <form-input name="limit" label="Maximale Anzahl der anzuzeigenden Gottesdienste" type="number"
-                    v-model="myForm.limit" />
-        <form-input name="cors-origin" label="Aufrufende Website"
-                    placeholder="z.B. https://www.tailfingen-evangelisch.de"
-                    v-model="myForm['cors-origin']"/>
+        <form-input
+            name="limit"
+            label="Maximale Anzahl der anzuzeigenden Gottesdienste"
+            type="number"
+            v-model="myForm.limit"
+        />
+        <form-input
+            name="cors-origin"
+            label="Aufrufende Website"
+            placeholder="z.B. https://www.tailfingen-evangelisch.de"
+            v-model="myForm['cors-origin']"
+        />
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
-import FormGroup from "../../../components/Ui/forms/FormGroup";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDatePicker from '../../../components/Ui/forms/FormDatePicker'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
+import FormGroup from '../../../components/Ui/forms/FormGroup'
 
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'locations'],
-    components: {FormGroup, FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {
+        FormGroup,
+        FormCheck,
+        FormDatePicker,
+        FormInput,
+        FormCsrfToken,
+        FormSelectize,
+        SaveButton,
+    },
     data() {
-        let myStart = moment();
-        let myEnd = moment().add(7, 'days');
+        let myStart = moment()
+        let myEnd = moment().add(7, 'days')
 
         return {
             myForm: {
@@ -78,21 +116,25 @@ export default {
                 'cors-origin': null,
             },
             myTables: [
-                {id: 'table-cities', name: 'Gottesdienste in einer oder mehreren Kirchengemeinden'},
-                {id: 'table-locations', name: 'Gottesdienste in einer oder mehreren Kirchen'},
-                {id: 'table-baptismalservices', name: 'Taufgottesdienste in einer oder mehreren Kirchengemeinden'},
-                {id: 'table-cc', name: 'Kinderkirche in einer oder mehreren Kirchengemeinden'},
-            ]
+                {
+                    id: 'table-cities',
+                    name: 'Gottesdienste in einer oder mehreren Kirchengemeinden',
+                },
+                { id: 'table-locations', name: 'Gottesdienste in einer oder mehreren Kirchen' },
+                {
+                    id: 'table-baptismalservices',
+                    name: 'Taufgottesdienste in einer oder mehreren Kirchengemeinden',
+                },
+                { id: 'table-cc', name: 'Kinderkirche in einer oder mehreren Kirchengemeinden' },
+            ],
         }
     },
     methods: {
         renderReport() {
-            this.$inertia.post(route('reports.render', 'embedServiceTable'), this.myForm);
+            this.$inertia.post(route('reports.render', 'embedServiceTable'), this.myForm)
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

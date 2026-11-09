@@ -26,13 +26,11 @@
   - along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<template>
-
-</template>
+<template></template>
 
 <script>
 export default {
-    name: "sermonEditor",
+    name: 'sermonEditor',
     props: {
         sermon: {
             type: Object,
@@ -53,12 +51,10 @@ export default {
                 external_url: '',
                 cc_license: false,
                 permit_handouts: false,
-            }
-        }
-    }
+            },
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

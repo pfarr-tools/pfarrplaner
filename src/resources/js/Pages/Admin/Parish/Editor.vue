@@ -27,69 +27,121 @@
   -->
 
 <template>
-    <admin-layout :title="(parish.name || 'Neues Pfarramt')+' bearbeiten'">
+    <admin-layout :title="(parish.name || 'Neues Pfarramt') + ' bearbeiten'">
         <template v-slot:navbar-left>
-            <save-button @click="saveParish"/>
-            <nav-button @click="deleteParish" title="Pfarramt löschen"
-                        class="ms-1" type="danger" icon="mdi mdi-delete">Löschen</nav-button>
-
+            <save-button @click="saveParish" />
+            <nav-button
+                @click="deleteParish"
+                title="Pfarramt löschen"
+                class="ms-1"
+                type="danger"
+                icon="mdi mdi-delete"
+                >Löschen</nav-button
+            >
         </template>
-        <form-input name="name" label="Name" v-model="myParish.name" />
-        <form-input name="code" label="Bezeichnung in DaviP" v-model="myParish.code" />
-        <form-input name="congregation_name" label="Name der Teilkirchengemeinde" v-model="myParish.congregation_name"
-                    placeholder="Leer lassen, wenn keine Teilkirchengemeinde"/>
-        <form-input name="congregation_url" label="Link zur Teilkirchengemeinde" v-model="myParish.congregation_url"
-                    placeholder="Leer lassen, wenn keine Teilkirchengemeinde"/>
-        <form-input name="address" label="Straße" v-model="myParish.address" />
-        <form-input name="zip" label="Postleitzahl" v-model="myParish.zip" />
-        <form-input name="city" label="Ort" v-model="myParish.city" />
-        <form-input name="phone" label="Telefon" v-model="myParish.phone" />
-        <form-input name="email" label="E-Mailadresse" v-model="myParish.email" />
-        <form-input name="assistant" label="Assistenz im Büro" v-model="myParish.assistant" />
-        <form-input name="opening_hours" label="Öffnungszeiten" v-model="myParish.opening_hours" />
-        <form-textarea name="csv" label="CSV-formatierte Straßeneinträge aus DaviP" rows="15" v-model="myParish.csv" />
+        <form-input
+            name="name"
+            label="Name"
+            v-model="myParish.name"
+        />
+        <form-input
+            name="code"
+            label="Bezeichnung in DaviP"
+            v-model="myParish.code"
+        />
+        <form-input
+            name="congregation_name"
+            label="Name der Teilkirchengemeinde"
+            v-model="myParish.congregation_name"
+            placeholder="Leer lassen, wenn keine Teilkirchengemeinde"
+        />
+        <form-input
+            name="congregation_url"
+            label="Link zur Teilkirchengemeinde"
+            v-model="myParish.congregation_url"
+            placeholder="Leer lassen, wenn keine Teilkirchengemeinde"
+        />
+        <form-input
+            name="address"
+            label="Straße"
+            v-model="myParish.address"
+        />
+        <form-input
+            name="zip"
+            label="Postleitzahl"
+            v-model="myParish.zip"
+        />
+        <form-input
+            name="city"
+            label="Ort"
+            v-model="myParish.city"
+        />
+        <form-input
+            name="phone"
+            label="Telefon"
+            v-model="myParish.phone"
+        />
+        <form-input
+            name="email"
+            label="E-Mailadresse"
+            v-model="myParish.email"
+        />
+        <form-input
+            name="assistant"
+            label="Assistenz im Büro"
+            v-model="myParish.assistant"
+        />
+        <form-input
+            name="opening_hours"
+            label="Öffnungszeiten"
+            v-model="myParish.opening_hours"
+        />
+        <form-textarea
+            name="csv"
+            label="CSV-formatierte Straßeneinträge aus DaviP"
+            rows="15"
+            v-model="myParish.csv"
+        />
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormTextarea from "../../../components/Ui/forms/FormTextarea";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import NavButton from '../../../components/Ui/buttons/NavButton'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormTextarea from '../../../components/Ui/forms/FormTextarea'
 export default {
-    name: "ParishEditor",
-    components: {FormTextarea, FormSelectize, FormInput, NavButton, SaveButton},
+    name: 'ParishEditor',
+    components: { FormTextarea, FormSelectize, FormInput, NavButton, SaveButton },
     props: {
         parish: Object,
         cities: Array,
     },
     data() {
-        let myParish = this.parish;
+        let myParish = this.parish
 
-        myParish.owningCity = myParish.city_id;
-        myParish.csv = myParish.csv || '';
+        myParish.owningCity = myParish.city_id
+        myParish.csv = myParish.csv || ''
         return {
-            myParish
+            myParish,
         }
     },
     methods: {
         saveParish() {
-            console.log(this.myParish);
+            console.log(this.myParish)
             if (this.myParish.id) {
-                this.$inertia.patch(route('admin.parish.update', this.myParish.id), this.myParish);
+                this.$inertia.patch(route('admin.parish.update', this.myParish.id), this.myParish)
             } else {
-                this.$inertia.post(route('admin.parishes.store'), this.myParish);
+                this.$inertia.post(route('admin.parishes.store'), this.myParish)
             }
         },
         deleteParish() {
-            if (!confirm('Willst du dieses Pfarramt wirklich löschen?')) return;
-            this.$inertia.delete(route('admin.parish.destroy', this.myParish.id));
-        }
-    }
+            if (!confirm('Willst du dieses Pfarramt wirklich löschen?')) return
+            this.$inertia.delete(route('admin.parish.destroy', this.myParish.id))
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

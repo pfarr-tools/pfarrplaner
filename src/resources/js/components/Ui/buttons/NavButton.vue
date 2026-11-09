@@ -27,15 +27,28 @@
   -->
 
 <template>
-    <a class="btn" :class="'btn-'+type" :title="title" @click.prevent.stop="handleClick" :disabled="disabled">
-        <span v-if="icon" :class="forceIcon ? icon : 'd-inline d-md-none '+icon"></span>
-        <span v-if="!forceNoText" :class="icon ? 'd-none d-md-inline' : ''"><slot /></span>
+    <a
+        class="btn"
+        :class="'btn-' + type"
+        :title="title"
+        @click.prevent.stop="handleClick"
+        :disabled="disabled"
+    >
+        <span
+            v-if="icon"
+            :class="forceIcon ? icon : 'd-inline d-md-none ' + icon"
+        ></span>
+        <span
+            v-if="!forceNoText"
+            :class="icon ? 'd-none d-md-inline' : ''"
+            ><slot
+        /></span>
     </a>
 </template>
 
 <script>
 export default {
-    name: "NavButton",
+    name: 'NavButton',
     emits: ['click'],
     props: {
         type: {
@@ -53,18 +66,16 @@ export default {
         handleClick(event) {
             if (this.href) {
                 if (!event.ctrlKey) {
-                    this.$inertia.get(this.href);
+                    this.$inertia.get(this.href)
                 } else {
-                    window.open(this.href);
+                    window.open(this.href)
                 }
             } else {
-                this.$emit('click');
+                this.$emit('click')
             }
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

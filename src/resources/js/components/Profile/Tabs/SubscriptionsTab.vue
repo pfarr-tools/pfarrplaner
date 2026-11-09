@@ -28,13 +28,23 @@
 
 <template>
     <div class="subscriptions-tab">
-        <fake-table :columns="[4,8]" collapsed-header="Kirchengemeinde"
-                    :headers="['Kirchengemeinde', 'Benachrichtigungseinstellungen']">
-            <div class="row p-2" v-for="(city,cityKey) in cities" :key="cityKey">
+        <fake-table
+            :columns="[4, 8]"
+            collapsed-header="Kirchengemeinde"
+            :headers="['Kirchengemeinde', 'Benachrichtigungseinstellungen']"
+        >
+            <div
+                class="row p-2"
+                v-for="(city, cityKey) in cities"
+                :key="cityKey"
+            >
                 <div class="col-md-4 text-bold">{{ city.name }}</div>
                 <div class="col-md-8">
-                    <form-selectize :options="mySubScriptionOptions" v-model="subscriptions[city.id]"
-                        :settings="{searchField: ['name'], valueField: 'id'}"/>
+                    <form-selectize
+                        :options="mySubScriptionOptions"
+                        v-model="subscriptions[city.id]"
+                        :settings="{ searchField: ['name'], valueField: 'id' }"
+                    />
                 </div>
             </div>
         </fake-table>
@@ -42,25 +52,23 @@
 </template>
 
 <script>
-import FakeTable from "../../Ui/FakeTable";
-import FormSelectize from "../../Ui/forms/FormSelectize";
+import FakeTable from '../../Ui/FakeTable'
+import FormSelectize from '../../Ui/forms/FormSelectize'
 export default {
-    name: "SubscriptionsTab",
-    components: {FormSelectize, FakeTable},
+    name: 'SubscriptionsTab',
+    components: { FormSelectize, FakeTable },
     props: ['subscriptions', 'cities'],
     data() {
         return {
             mySubScriptionOptions: [
-                { id: 0, name: 'keine Benachrichtigungen'},
-                { id: 1, name: 'nur eigene Gottesdienste'},
-                { id: 2, name: 'alle Gottesdienste'},
-                { id: 4, name: 'nur bei Zeit-/Datumsänderungen'},
+                { id: 0, name: 'keine Benachrichtigungen' },
+                { id: 1, name: 'nur eigene Gottesdienste' },
+                { id: 2, name: 'alle Gottesdienste' },
+                { id: 4, name: 'nur bei Zeit-/Datumsänderungen' },
             ],
         }
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

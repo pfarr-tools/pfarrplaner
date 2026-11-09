@@ -28,15 +28,26 @@
 
 <template>
     <div class="seating-split">
-        <table v-if="value" class="table table-bordered">
+        <table
+            v-if="value"
+            class="table table-bordered"
+        >
             <tr>
                 <td :colspan="divisions.length">
-                    <span v-for="index in parseInt(value.seats)" class="mdi mdi-sofa-single"/> ({{ value.seats }})
+                    <span
+                        v-for="index in parseInt(value.seats)"
+                        class="mdi mdi-sofa-single"
+                    />
+                    ({{ value.seats }})
                 </td>
             </tr>
             <tr class="split">
                 <td v-for="division in divisions">
-                    <span v-for="index in parseInt(division)" class="mdi mdi-sofa-single"/> ({{ division }})
+                    <span
+                        v-for="index in parseInt(division)"
+                        class="mdi mdi-sofa-single"
+                    />
+                    ({{ division }})
                 </td>
             </tr>
         </table>
@@ -45,24 +56,24 @@
 
 <script>
 export default {
-    name: "SeatingSplit",
+    name: 'SeatingSplit',
     props: ['value'],
     computed: {
         divisions() {
-            return String(this.value.split).split(',');
-        }
-    }
+            return String(this.value.split).split(',')
+        },
+    },
 }
 </script>
 
 <style scoped>
-    .table-bordered tr td {
-        text-align: center;
-    }
-    .table-bordered tr.split td:last-child {
-        text-align: right;
-    }
-    .table-bordered tr.split td:first-child {
-        text-align: left;
-    }
+.table-bordered tr td {
+    text-align: center;
+}
+.table-bordered tr.split td:last-child {
+    text-align: right;
+}
+.table-bordered tr.split td:first-child {
+    text-align: left;
+}
 </style>

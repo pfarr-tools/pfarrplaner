@@ -29,9 +29,17 @@
 <template>
     <admin-layout title="Themenplan der Gottesdienste erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Themenplan der Gottesdienste erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Themenplan der Gottesdienste erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'serviceThemes'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'serviceThemes' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
             <city-location-filter
                 :cities="cities"
@@ -42,23 +50,27 @@
                 v-model:city-model-value="myCities"
                 v-model:location-model-value="myLocations"
             />
-            <form-input name="year" label="Jahr" v-model="myYear" type="number" />
+            <form-input
+                name="year"
+                label="Jahr"
+                v-model="myYear"
+                type="number"
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import CityLocationFilter from '../../../components/Reports/CityLocationFilter.vue'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'locations'],
-    components: {CityLocationFilter, FormInput, FormCsrfToken, SaveButton},
+    components: { CityLocationFilter, FormInput, FormCsrfToken, SaveButton },
     data() {
-
         return {
             myUser: this.$page.props.currentUser.data.id,
             myCities: this.cities.length > 0 ? [this.cities[0].id] : [],
@@ -68,16 +80,14 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'serviceThemes'}), {
+            submitReportForm(route('reports.render', { report: 'serviceThemes' }), {
                 cities: this.myCities,
                 locations: this.myLocations,
                 year: this.myYear,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

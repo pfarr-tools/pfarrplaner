@@ -29,23 +29,33 @@
 <template>
     <div class="row">
         <div class="col-1">
-            <nav-button type="light btn-sm" icon="mdi mdi-content-copy" force-icon force-no-text
-                        title="In die Zwischenablage kopieren"
-                        @click="copyCode"/>
+            <nav-button
+                type="light btn-sm"
+                icon="mdi mdi-content-copy"
+                force-icon
+                force-no-text
+                title="In die Zwischenablage kopieren"
+                @click="copyCode"
+            />
         </div>
         <div class="col-11">
             <code>{{ content }}</code>
-            <div v-if="copied" class="text-muted text-sm">Inhalt wurde in die Zwischenablage kopiert.</div>
+            <div
+                v-if="copied"
+                class="text-muted text-sm"
+            >
+                Inhalt wurde in die Zwischenablage kopiert.
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-import NavButton from "./buttons/NavButton.vue";
+import NavButton from './buttons/NavButton.vue'
 
 export default {
-    name: "CopyableCode",
-    components: {NavButton},
+    name: 'CopyableCode',
+    components: { NavButton },
     data() {
         return {
             copied: false,
@@ -54,15 +64,13 @@ export default {
     props: ['content'],
     methods: {
         copyCode() {
-            const cb = navigator.clipboard;
-            cb.writeText(this.content).then(result => {
-                this.copied = true;
-            });
-        }
-    }
+            const cb = navigator.clipboard
+            cb.writeText(this.content).then((result) => {
+                this.copied = true
+            })
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -28,25 +28,33 @@
 
 <template>
     <div class="section-select">
-        <form-selectize :value="myValue" :label="label" :help="help" :name="name" @input="handleInput"
-                        :options="myItems" :settings="mySelectizeSettings" title-key="title" :id-key="myValueKey"
-                        :multiple="multiple"
+        <form-selectize
+            :value="myValue"
+            :label="label"
+            :help="help"
+            :name="name"
+            @input="handleInput"
+            :options="myItems"
+            :settings="mySelectizeSettings"
+            title-key="title"
+            :id-key="myValueKey"
+            :multiple="multiple"
         />
     </div>
 </template>
 
 <script>
-import FormSelectize from "../forms/FormSelectize";
+import FormSelectize from '../forms/FormSelectize'
 export default {
-    name: "SectionSelect",
+    name: 'SectionSelect',
     emits: ['update:modelValue', 'input'],
     props: ['location', 'modelValue', 'label', 'help', 'name', 'multiple', 'valueKey'],
-    components: {FormSelectize},
+    components: { FormSelectize },
     computed: {
         myItems() {
-            if (!this.myLocation.seating_sections) this.myLocation.seating_sections = [];
-            return this.myLocation.seating_sections;
-        }
+            if (!this.myLocation.seating_sections) this.myLocation.seating_sections = []
+            return this.myLocation.seating_sections
+        },
     },
     data() {
         return {
@@ -56,20 +64,22 @@ export default {
                 valueField: this.valueKey || 'title',
                 searchField: ['title'],
             },
-            myValue: this.multiple ? (this.modelValue ? this.modelValue.split(',') : []) : this.modelValue,
+            myValue: this.multiple
+                ? this.modelValue
+                    ? this.modelValue.split(',')
+                    : []
+                : this.modelValue,
             myValueKey: this.valueKey || 'title',
         }
     },
     methods: {
         handleInput(e) {
-            const val = this.multiple ? e.join(',') : e;
-            this.$emit('update:modelValue', val);
-            this.$emit('input', val);
-        }
-    }
+            const val = this.multiple ? e.join(',') : e
+            this.$emit('update:modelValue', val)
+            this.$emit('input', val)
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

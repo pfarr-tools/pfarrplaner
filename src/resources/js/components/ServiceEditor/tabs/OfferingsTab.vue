@@ -30,45 +30,79 @@
     <div class="home-tab">
         <div class="row">
             <div class="col-md-6">
-                <form-input name="offerings_counter1" label="Opferzähler*in 1"
-                            v-model="myService.offerings_counter1"/>
+                <form-input
+                    name="offerings_counter1"
+                    label="Opferzähler*in 1"
+                    v-model="myService.offerings_counter1"
+                />
             </div>
             <div class="col-md-6">
-                <form-input name="offerings_counter2" label="Opferzähler*in 2"
-                            v-model="myService.offerings_counter2"/>
+                <form-input
+                    name="offerings_counter2"
+                    label="Opferzähler*in 2"
+                    v-model="myService.offerings_counter2"
+                />
             </div>
         </div>
-        <hr/>
-        <div v-if="hasAnnouncements" class="alert alert-warning"><b>Bitte beachte:</b> Diesem Gottesdienst wurde eine Datei namens "Bekanntgaben" angehängt.
-            Diese überschreibt die automatisch erstellten Bekanntmachungen. Änderungen an den folgenden Feldern werden daher möglicherweise nicht bei den Bekanntgaben berücksichtigt.</div>
+        <hr />
+        <div
+            v-if="hasAnnouncements"
+            class="alert alert-warning"
+        >
+            <b>Bitte beachte:</b> Diesem Gottesdienst wurde eine Datei namens "Bekanntgaben"
+            angehängt. Diese überschreibt die automatisch erstellten Bekanntmachungen. Änderungen an
+            den folgenden Feldern werden daher möglicherweise nicht bei den Bekanntgaben
+            berücksichtigt.
+        </div>
         <div class="row">
             <div class="col-md-6">
-                <form-input name="offering_goal" label="Opferzweck" v-model="myService.offering_goal"/>
-                <form-input name="offering_description" label="Anmerkungen zum Opfer"
-                            v-model="myService.offering_description" help="Anmerkungen für den Opferplan"/>
-                <form-radio-group name="offering_type" label="Opfertyp" v-model="myService.offering_type" :items="{
-                            '': 'eigener Beschluss',
-                            'eO': 'empfohlenes Opfer',
-                            'PO': 'Pflichtopfer',
-                        }"/>
+                <form-input
+                    name="offering_goal"
+                    label="Opferzweck"
+                    v-model="myService.offering_goal"
+                />
+                <form-input
+                    name="offering_description"
+                    label="Anmerkungen zum Opfer"
+                    v-model="myService.offering_description"
+                    help="Anmerkungen für den Opferplan"
+                />
+                <form-radio-group
+                    name="offering_type"
+                    label="Opfertyp"
+                    v-model="myService.offering_type"
+                    :items="{
+                        '': 'eigener Beschluss',
+                        eO: 'empfohlenes Opfer',
+                        PO: 'Pflichtopfer',
+                    }"
+                />
             </div>
             <div class="col-md-6">
-                <form-textarea name="offering_text" label="Text zum Opfer"
-                               placeholder="z.B. Brief des Landesbischofs" v-model="myService.offering_text"/>
+                <form-textarea
+                    name="offering_text"
+                    label="Text zum Opfer"
+                    placeholder="z.B. Brief des Landesbischofs"
+                    v-model="myService.offering_text"
+                />
             </div>
         </div>
-        <hr/>
-        <form-input name="offering_amount" label="Eingegangene Summe" v-model="myService.offering_amount"/>
+        <hr />
+        <form-input
+            name="offering_amount"
+            label="Eingegangene Summe"
+            v-model="myService.offering_amount"
+        />
     </div>
 </template>
 
 <script>
-import FormInput from "../../Ui/forms/FormInput";
-import FormTextarea from "../../Ui/forms/FormTextarea";
-import FormRadioGroup from "../../Ui/forms/FormRadioGroup";
+import FormInput from '../../Ui/forms/FormInput'
+import FormTextarea from '../../Ui/forms/FormTextarea'
+import FormRadioGroup from '../../Ui/forms/FormRadioGroup'
 
 export default {
-    name: "OfferingsTab",
+    name: 'OfferingsTab',
     components: {
         FormRadioGroup,
         FormTextarea,
@@ -79,11 +113,11 @@ export default {
     },
     computed: {
         hasAnnouncements() {
-            let found = false;
-            this.service.attachments.forEach(attachment => {
-                found = found || (attachment.title == 'Bekanntgaben');
-            });
-            return found;
+            let found = false
+            this.service.attachments.forEach((attachment) => {
+                found = found || attachment.title == 'Bekanntgaben'
+            })
+            return found
         },
     },
     data() {
@@ -91,10 +125,8 @@ export default {
             myService: this.service,
         }
     },
-    methods: {}
+    methods: {},
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -10,9 +10,14 @@
   -->
 
 <template>
-    <model-index-page title="Teams" :records="teams" :can-create="canCreate"
-                      create-label="Neues Team" create-route-name="admin.teams.create"
-                      model-label="Team">
+    <model-index-page
+        title="Teams"
+        :records="teams"
+        :can-create="canCreate"
+        create-label="Neues Team"
+        create-route-name="admin.teams.create"
+        model-label="Team"
+    >
         <template #table-header-additional-columns>
             <th>Kirchengemeinde</th>
             <th>Mitglieder</th>
@@ -20,7 +25,11 @@
         <template #table-row-additional-columns="{ row }">
             <td>{{ row.city?.name }}</td>
             <td>
-                <span v-for="user in row.users" :key="user.id" class="badge bg-light me-1">
+                <span
+                    v-for="user in row.users"
+                    :key="user.id"
+                    class="badge bg-light me-1"
+                >
                     {{ user.name }}
                 </span>
             </td>
@@ -29,10 +38,10 @@
 </template>
 
 <script>
-import ModelIndexPage from "../../components/Admin/ModelIndexPage.vue";
+import ModelIndexPage from '../../components/Admin/ModelIndexPage.vue'
 
 export default {
-    name: "Index",
+    name: 'Index',
     components: {
         ModelIndexPage,
     },

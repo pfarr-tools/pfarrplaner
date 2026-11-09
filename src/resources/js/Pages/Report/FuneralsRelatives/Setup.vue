@@ -29,28 +29,50 @@
 <template>
     <admin-layout title="Adressliste der Angehörigen erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Adressliste der Angehörigen erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Adressliste der Angehörigen erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'funeralsRelatives'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'funeralsRelatives' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="city" label="Adressliste für Beerdigungen in folgender Kirchengemeinde erstellen:" v-model="myCity" :options="cities" />
-            <input type="hidden" name="city" v-model="myCity" />
-            <form-date-picker name="start" label="Gottesdienste von" v-model="myStart" iso-date />
+            <form-selectize
+                name="city"
+                label="Adressliste für Beerdigungen in folgender Kirchengemeinde erstellen:"
+                v-model="myCity"
+                :options="cities"
+            />
+            <input
+                type="hidden"
+                name="city"
+                v-model="myCity"
+            />
+            <form-date-picker
+                name="start"
+                label="Gottesdienste von"
+                v-model="myStart"
+                iso-date
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDatePicker from '../../../components/Ui/forms/FormDatePicker'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'start'],
-    components: {FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: { FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton },
     data() {
         return {
             myCity: this.cities.length ? this.cities[0].id : null,
@@ -59,15 +81,13 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'funeralsRelatives'}), {
+            submitReportForm(route('reports.render', { report: 'funeralsRelatives' }), {
                 city: this.myCity,
                 start: this.myStart,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

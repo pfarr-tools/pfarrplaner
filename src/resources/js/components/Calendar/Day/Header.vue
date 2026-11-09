@@ -27,7 +27,8 @@
   -->
 
 <template>
-    <th class="day-header-cell"
+    <th
+        class="day-header-cell"
         v-bind:class="{
             now: false, // TODO: next day
             limited: day.day_type == 1, // DAY_TYPE_LIMITED
@@ -38,7 +39,8 @@
         :ref="scrollToMe ? 'scrollToMe' : null"
         @click="clickHandler()"
         :title="headerTitle"
-        :data-day="day.id">
+        :data-day="day.id"
+    >
         <div class="day-header-panel">
             <div class="day-header-top">
                 <div class="day-header-title">
@@ -52,20 +54,44 @@
                 {{ today.format('dddd, DD.MM.') }}
             </div>
 
-            <div v-if="normalizedLiturgy.perikope || liturgicalDayName" class="liturgy-summary">
-                <div v-if="normalizedLiturgy.perikope" class="liturgy-sermon">
-                    <div :class="normalizedLiturgy.litColor" class="liturgy-color" :title="normalizedLiturgy.feastCircleName"></div>
-                    <bible-reference :perikope="normalizedLiturgy.perikope" title=""/>
+            <div
+                v-if="normalizedLiturgy.perikope || liturgicalDayName"
+                class="liturgy-summary"
+            >
+                <div
+                    v-if="normalizedLiturgy.perikope"
+                    class="liturgy-sermon"
+                >
+                    <div
+                        :class="normalizedLiturgy.litColor"
+                        class="liturgy-color"
+                        :title="normalizedLiturgy.feastCircleName"
+                    ></div>
+                    <bible-reference
+                        :perikope="normalizedLiturgy.perikope"
+                        title=""
+                    />
                 </div>
-                <div v-if="liturgicalDayName" class="day-name" :title="liturgicalDayName">
+                <div
+                    v-if="liturgicalDayName"
+                    class="day-name"
+                    :title="liturgicalDayName"
+                >
                     {{ liturgicalDayName }}
                 </div>
             </div>
         </div>
-        <div v-if="hasPermission('urlaub-lesen')" class="day-absences">
-            <div class="vacation" v-for="(absence,absenceIndex,absenceKey) in day.absences" :absence="absence"
-                 :key="absenceKey"
-                 :title="absence.label">
+        <div
+            v-if="hasPermission('urlaub-lesen')"
+            class="day-absences"
+        >
+            <div
+                class="vacation"
+                v-for="(absence, absenceIndex, absenceKey) in day.absences"
+                :absence="absence"
+                :key="absenceKey"
+                :title="absence.label"
+            >
                 <span class="mdi mdi-earth"></span> {{ absence.name }}
             </div>
         </div>
@@ -73,43 +99,50 @@
 </template>
 
 <script>
-import dayjs from 'dayjs';
-import BibleReference from "../../LiturgyEditor/Elements/BibleReference";
+import dayjs from 'dayjs'
+import BibleReference from '../../LiturgyEditor/Elements/BibleReference'
 
 export default {
     name: 'CalendarDayHeader',
-    components: {BibleReference},
+    components: { BibleReference },
     props: ['day', 'index', 'scrollToDate'],
     computed: {
         today() {
-            return dayjs(this.day.date).locale('de');
+            return dayjs(this.day.date).locale('de')
         },
         normalizedLiturgy() {
             if (Array.isArray(this.day?.liturgy)) {
-                return this.day.liturgy[0] || {};
+                return this.day.liturgy[0] || {}
             }
-            return this.day?.liturgy || {};
+            return this.day?.liturgy || {}
         },
         weekNumber() {
-            return moment(this.day.date).isoWeek();
+            return moment(this.day.date).isoWeek()
         },
         liturgicalDayName() {
-            return this.normalizedLiturgy.title || this.normalizedLiturgy.name || this.normalizedLiturgy.Bezeichnung || '';
+            return (
+                this.normalizedLiturgy.title ||
+                this.normalizedLiturgy.name ||
+                this.normalizedLiturgy.Bezeichnung ||
+                ''
+            )
         },
         headerTitle() {
-            let title = this.today.format('DD.MM.YYYY');
-            if (this.day.day_type == 1) title += ' (eingeschränkter Tag)';
-            return title;
+            let title = this.today.format('DD.MM.YYYY')
+            if (this.day.day_type == 1) title += ' (eingeschränkter Tag)'
+            return title
         },
     },
     data: function () {
-        var scrollToMe = false;
+        var scrollToMe = false
         if (this.scrollToDate) {
-            if (dayjs(this.scrollToDate).format('YYYYMMDD') == dayjs(this.day.date).format('YYYYMMDD')) {
-                scrollToMe = true;
+            if (
+                dayjs(this.scrollToDate).format('YYYYMMDD') ==
+                dayjs(this.day.date).format('YYYYMMDD')
+            ) {
+                scrollToMe = true
             }
         }
-
 
         return {
             limited: this.day.day_type == 1,
@@ -119,8 +152,8 @@ export default {
     },
     methods: {
         clickHandler: function () {
-            this.$emit('collapse', {day: this.day, state: !(this.day.collapsed)});
-            this.$forceUpdate();
+            this.$emit('collapse', { day: this.day, state: !this.day.collapsed })
+            this.$forceUpdate()
         },
     },
 }
@@ -262,7 +295,8 @@ export default {
     border-radius: 50%;
 }
 
-:deep(.bible-reference), :deep(.bible-reference div) {
+:deep(.bible-reference),
+:deep(.bible-reference div) {
     display: inline;
 }
 
@@ -286,5 +320,4 @@ export default {
         font-size: 0.72rem;
     }
 }
-
 </style>

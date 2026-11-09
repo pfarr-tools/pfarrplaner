@@ -27,25 +27,44 @@
   -->
 
 <template>
-    <form-group :id="myId" :input-id="`${myId}Input`" :label="label" :help="help" :name="name"
-                :pre-label="preLabel" :required="required" :value="currentValue" :is-checked-item="isCheckedItem"
-                v-slot="field">
-        <input :id="field.fieldId" :value="currentValue" class="form-control"
-               :class="{'is-invalid': field.error, 'checked-input': isCheckedItem}" :type="type"
-               :placeholder="placeholder" :autofocus="autofocus" :disabled="disabled"
-               :required="required" :aria-required="required ? 'true' : 'false'"
-               :aria-invalid="field.error ? 'true' : 'false'" :aria-describedby="field.describedBy || undefined"
-               :name="name" @input="onInput($event.target.value)"/>
+    <form-group
+        :id="myId"
+        :input-id="`${myId}Input`"
+        :label="label"
+        :help="help"
+        :name="name"
+        :pre-label="preLabel"
+        :required="required"
+        :value="currentValue"
+        :is-checked-item="isCheckedItem"
+        v-slot="field"
+    >
+        <input
+            :id="field.fieldId"
+            :value="currentValue"
+            class="form-control"
+            :class="{ 'is-invalid': field.error, 'checked-input': isCheckedItem }"
+            :type="type"
+            :placeholder="placeholder"
+            :autofocus="autofocus"
+            :disabled="disabled"
+            :required="required"
+            :aria-required="required ? 'true' : 'false'"
+            :aria-invalid="field.error ? 'true' : 'false'"
+            :aria-describedby="field.describedBy || undefined"
+            :name="name"
+            @input="onInput($event.target.value)"
+        />
     </form-group>
 </template>
 
 <script>
-import FormGroup from "./FormGroup";
-import { uid } from '../../../libraries/uid';
+import FormGroup from './FormGroup'
+import { uid } from '../../../libraries/uid'
 
 export default {
-    name: "FormInput",
-    components: {FormGroup},
+    name: 'FormInput',
+    components: { FormGroup },
     emits: ['input', 'update:modelValue'],
     props: {
         label: String,
@@ -77,8 +96,8 @@ export default {
     },
     computed: {
         currentValue() {
-            return this.modelValue !== undefined ? this.modelValue : this.value;
-        }
+            return this.modelValue !== undefined ? this.modelValue : this.value
+        },
     },
     data() {
         return {
@@ -87,12 +106,11 @@ export default {
     },
     methods: {
         onInput(v) {
-            this.$emit('input', v);
-            this.$emit('update:modelValue', v);
-        }
+            this.$emit('input', v)
+            this.$emit('update:modelValue', v)
+        },
     },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

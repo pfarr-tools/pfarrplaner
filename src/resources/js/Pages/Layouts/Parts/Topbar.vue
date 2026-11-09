@@ -1,12 +1,13 @@
 <template>
     <nav class="navbar navbar-light bg-white shadow-sm px-3 sticky-top">
-
-
         <button
             class="btn btn-light-outline d-lg-none me-2"
             @click="$emit('toggleMobileMenu')"
         >
-            <i class="mdi" :class="mobileMenuOpen ? 'mdi-menu-open' : 'mdi-menu'"></i>
+            <i
+                class="mdi"
+                :class="mobileMenuOpen ? 'mdi-menu-open' : 'mdi-menu'"
+            ></i>
         </button>
 
         <!-- left navbar slot -->
@@ -14,88 +15,127 @@
             <slot name="navbar-left"></slot>
         </div>
 
-
-
         <div class="d-flex align-items-center ms-auto">
             <slot name="navbar-right"></slot>
-            <div class="nav-item dropdown" v-if="enableControlSidebar" data-bs-auto-close="outside">
-                <button type="button"
-                        class="btn btn-sm btn-outline-secondary topbar-action-button topbar-dropdown-toggle"
-                        data-bs-toggle="dropdown"
-                        aria-label="Seiteneinstellungen öffnen"
-                        title="Seiteneinstellungen">
+            <div
+                class="nav-item dropdown"
+                v-if="enableControlSidebar"
+                data-bs-auto-close="outside"
+            >
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary topbar-action-button topbar-dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    aria-label="Seiteneinstellungen öffnen"
+                    title="Seiteneinstellungen"
+                >
                     <span class="mdi mdi-cog"></span>
                 </button>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end topbar-settings-menu p-0">
+                <div
+                    class="dropdown-menu dropdown-menu-lg dropdown-menu-end topbar-settings-menu p-0"
+                >
                     <div class="p-2">
                         <slot name="control-sidebar" />
                     </div>
                 </div>
             </div>
 
-            <div v-if="adminUserSwitchBack" class="nav-item">
-                <button type="button" class="btn btn-warning mr-1" @click="$inertia.post(route('user.switchback'))">
+            <div
+                v-if="adminUserSwitchBack"
+                class="nav-item"
+            >
+                <button
+                    type="button"
+                    class="btn btn-warning mr-1"
+                    @click="$inertia.post(route('user.switchback'))"
+                >
                     <i class="mdi mdi-account-switch"></i>
                 </button>
             </div>
 
             <!-- Help button -->
             <div class="nav-item">
-                <a class="btn btn-sm btn-outline-secondary topbar-action-button"
-                   :href="helpUrl"
-                   target="_blank"
-                   rel="noopener"
-                   title="Hilfe öffnen">
+                <a
+                    class="btn btn-sm btn-outline-secondary topbar-action-button"
+                    :href="helpUrl"
+                    target="_blank"
+                    rel="noopener"
+                    title="Hilfe öffnen"
+                >
                     <i class="mdi mdi-help-circle-outline"></i>
                 </a>
             </div>
 
             <!--begin::User Menu Dropdown-->
             <div class="nav-item dropdown user-menu mx-0">
-                <button type="button"
-                        class="btn btn-sm btn-outline-secondary topbar-action-button topbar-dropdown-toggle topbar-user-button"
-                        data-bs-toggle="dropdown"
-                        aria-label="Benutzermenü öffnen"
-                        title="Benutzermenü">
-                    <i v-if="!user.image" class="mdi mdi-account"></i>
-                    <img v-else
-                         class="rounded-circle topbar-user-avatar"
-                         :src="user.image.replace('attachments/', '/image/')"
-                         width="22"
-                         height="22"
-                         :alt="user.name" />
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary topbar-action-button topbar-dropdown-toggle topbar-user-button"
+                    data-bs-toggle="dropdown"
+                    aria-label="Benutzermenü öffnen"
+                    title="Benutzermenü"
+                >
+                    <i
+                        v-if="!user.image"
+                        class="mdi mdi-account"
+                    ></i>
+                    <img
+                        v-else
+                        class="rounded-circle topbar-user-avatar"
+                        :src="user.image.replace('attachments/', '/image/')"
+                        width="22"
+                        height="22"
+                        :alt="user.name"
+                    />
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end profile-menu">
                     <li class="profile-menu-header">
                         <div class="profile-menu-avatar">
-                            <i v-if="!user.image" class="mdi mdi-account"></i>
-                            <img v-else
-                                 class="rounded-circle"
-                                 :src="user.image.replace('attachments/', '/image/')"
-                                 width="56"
-                                 height="56"
-                                 :alt="user.name" />
+                            <i
+                                v-if="!user.image"
+                                class="mdi mdi-account"
+                            ></i>
+                            <img
+                                v-else
+                                class="rounded-circle"
+                                :src="user.image.replace('attachments/', '/image/')"
+                                width="56"
+                                height="56"
+                                :alt="user.name"
+                            />
                         </div>
                         <div class="profile-menu-copy">
                             <div class="profile-menu-name">{{ user.name }}</div>
-                            <div v-if="user.email" class="profile-menu-email">{{ user.email }}</div>
+                            <div
+                                v-if="user.email"
+                                class="profile-menu-email"
+                            >
+                                {{ user.email }}
+                            </div>
                         </div>
                     </li>
                     <li>
-                        <inertia-link :href="route('user.profile')" class="dropdown-item profile-menu-item">
+                        <inertia-link
+                            :href="route('user.profile')"
+                            class="dropdown-item profile-menu-item"
+                        >
                             <span class="profile-menu-item-icon mdi mdi-cog-outline"></span>
                             <span>
-                                <strong>Einstellungen</strong><br>
+                                <strong>Einstellungen</strong><br />
                                 <small>Profil, Sicherheit und persönliche Optionen</small>
                             </span>
                         </inertia-link>
                     </li>
-                    <li><hr class="dropdown-divider"></li>
+                    <li><hr class="dropdown-divider" /></li>
                     <li>
-                        <button type="button" class="dropdown-item profile-menu-item profile-menu-item-danger" @click="$inertia.post(route('logout'))">
+                        <button
+                            type="button"
+                            class="dropdown-item profile-menu-item profile-menu-item-danger"
+                            @click="$inertia.post(route('logout'))"
+                        >
                             <span class="profile-menu-item-icon mdi mdi-logout"></span>
                             <span>
-                                <strong>Abmelden</strong><br>
+                                <strong>Abmelden</strong><br />
                                 <small>Sitzung auf diesem Gerät beenden</small>
                             </span>
                         </button>
@@ -111,32 +151,34 @@ export default {
     name: 'Topbar',
     computed: {
         user() {
-            return this.$page.props.currentUser.data;
+            return this.$page.props.currentUser.data
         },
         adminUserSwitchBack() {
-            return this.$page.props.adminUserSwitchBack;
+            return this.$page.props.adminUserSwitchBack
         },
         helpPage() {
-            return this.$page.props.helpPage ?? 'benutzerhandbuch';
+            return this.$page.props.helpPage ?? 'benutzerhandbuch'
         },
         helpUrl() {
-            const baseUrl = (this.$page.props.manualBaseUrl ?? 'https://handbuch.pfarrplaner.de').replace(/\/+$/, '');
-            const helpPage = String(this.helpPage || '').replace(/^\/+|\/+$/g, '');
-            const suffix = helpPage ? `/${helpPage}/` : '';
+            const baseUrl = (
+                this.$page.props.manualBaseUrl ?? 'https://handbuch.pfarrplaner.de'
+            ).replace(/\/+$/, '')
+            const helpPage = String(this.helpPage || '').replace(/^\/+|\/+$/g, '')
+            const suffix = helpPage ? `/${helpPage}/` : ''
 
-            return `${baseUrl}${suffix}`;
+            return `${baseUrl}${suffix}`
         },
     },
     props: {
         enableControlSidebar: Boolean,
         mobileMenuOpen: Boolean,
-    }
+    },
 }
 </script>
 
 <style scoped>
 .nav-item {
-    margin: 0 .25em;
+    margin: 0 0.25em;
 }
 
 .topbar-action-button {
@@ -177,19 +219,23 @@ export default {
 
 .profile-menu {
     width: min(22rem, calc(100vw - 2rem));
-    padding: .5rem;
+    padding: 0.5rem;
     border: 1px solid var(--bs-border-color);
     border-radius: 0;
-    box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, .12);
+    box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.12);
 }
 
 .profile-menu-header {
     display: flex;
     align-items: center;
-    gap: .875rem;
-    padding: .75rem;
-    margin-bottom: .25rem;
-    background: linear-gradient(135deg, var(--bs-primary-bg-subtle), rgba(var(--bs-white-rgb), .95));
+    gap: 0.875rem;
+    padding: 0.75rem;
+    margin-bottom: 0.25rem;
+    background: linear-gradient(
+        135deg,
+        var(--bs-primary-bg-subtle),
+        rgba(var(--bs-white-rgb), 0.95)
+    );
     border-radius: 0;
 }
 
@@ -202,7 +248,7 @@ export default {
     justify-content: center;
     overflow: hidden;
     border-radius: 999px;
-    background: rgba(var(--bs-primary-rgb), .1);
+    background: rgba(var(--bs-primary-rgb), 0.1);
     color: var(--bs-primary);
 }
 
@@ -227,15 +273,15 @@ export default {
 
 .profile-menu-email {
     color: var(--bs-secondary-color);
-    font-size: .875rem;
+    font-size: 0.875rem;
     overflow-wrap: anywhere;
 }
 
 .profile-menu-item {
     display: flex;
     align-items: flex-start;
-    gap: .75rem;
-    padding: .75rem;
+    gap: 0.75rem;
+    padding: 0.75rem;
     border-radius: 0;
     white-space: normal;
 }
@@ -247,7 +293,7 @@ export default {
 }
 
 .profile-menu-item-icon {
-    margin-top: .125rem;
+    margin-top: 0.125rem;
     font-size: 1.125rem;
     color: var(--bs-primary);
 }

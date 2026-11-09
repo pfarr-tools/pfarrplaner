@@ -27,105 +27,217 @@
   -->
 
 <template>
-    <div class="button-row no-print btn-toolbar" role="toolbar">
-        <div class="btn-group me-2" role="group">
-            <button class="btn btn-sm btn-outline-secondary"
-                    v-if="numericDate > 201801"
-                    @click.prevent.stop="navigate(moment(date).subtract(1, 'months').format('YYYY-MM'))"
-                    title="Einen Monat zurück">
+    <div
+        class="button-row no-print btn-toolbar"
+        role="toolbar"
+    >
+        <div
+            class="btn-group me-2"
+            role="group"
+        >
+            <button
+                class="btn btn-sm btn-outline-secondary"
+                v-if="numericDate > 201801"
+                @click.prevent.stop="navigate(moment(date).subtract(1, 'months').format('YYYY-MM'))"
+                title="Einen Monat zurück"
+            >
                 <span class="mdi mdi-chevron-left"></span>
             </button>
-            <button class="btn btn-sm btn-outline-secondary" @click.prevent.stop="today">
-                <span class="mdi mdi-calendar-today"></span><span class="d-none d-md-inline"> Gehe zu Heute </span>
+            <button
+                class="btn btn-sm btn-outline-secondary"
+                @click.prevent.stop="today"
+            >
+                <span class="mdi mdi-calendar-today"></span
+                ><span class="d-none d-md-inline"> Gehe zu Heute </span>
             </button>
 
             <!-- TODO month / year dropdown -->
-            <div class="btn-group" role="group">
-                <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div
+                class="btn-group"
+                role="group"
+            >
+                <button
+                    id="btnGroupDrop1"
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                >
                     {{ moment(date).format('MMMM') }}
                 </button>
-                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-01')">Januar</a>
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-02')">Februar</a>
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-03')">März</a>
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-04')">April</a>
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-05')">Mai</a>
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-06')">Juni</a>
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-07')">Juli</a>
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-08')">August</a>
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-09')">September</a>
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-10')">Oktober</a>
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-11')">November</a>
-                    <a class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(moment(date).format('YYYY')+'-12')">Dezember</a>
+                <div
+                    class="dropdown-menu"
+                    aria-labelledby="btnGroupDrop1"
+                >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-01')"
+                        >Januar</a
+                    >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-02')"
+                        >Februar</a
+                    >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-03')"
+                        >März</a
+                    >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-04')"
+                        >April</a
+                    >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-05')"
+                        >Mai</a
+                    >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-06')"
+                        >Juni</a
+                    >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-07')"
+                        >Juli</a
+                    >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-08')"
+                        >August</a
+                    >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-09')"
+                        >September</a
+                    >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-10')"
+                        >Oktober</a
+                    >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-11')"
+                        >November</a
+                    >
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(moment(date).format('YYYY') + '-12')"
+                        >Dezember</a
+                    >
                 </div>
             </div>
-            <div class="btn-group" role="group">
-                <button id="btnGroupDrop2" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div
+                class="btn-group"
+                role="group"
+            >
+                <button
+                    id="btnGroupDrop2"
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                >
                     {{ moment(date).format('YYYY') }}
                 </button>
-                <div class="dropdown-menu" aria-labelledby="btnGroupDrop2">
-                    <a v-for="year in years" class="dropdown-item" href="#"
-                       @click.prevent.stop="navigate(year+'-'+moment(date).format('MM'))"
-                       :key="year">{{ year }}
+                <div
+                    class="dropdown-menu"
+                    aria-labelledby="btnGroupDrop2"
+                >
+                    <a
+                        v-for="year in years"
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent.stop="navigate(year + '-' + moment(date).format('MM'))"
+                        :key="year"
+                        >{{ year }}
                     </a>
                 </div>
             </div>
-            <button class="btn btn-sm btn-outline-secondary"
-                    v-if="numericDate > 201801"
-                    @click.prevent.stop="navigate(moment(date).add(1, 'months').format('YYYY-MM'))"
-                    title="Einen Monat weiter">
+            <button
+                class="btn btn-sm btn-outline-secondary"
+                v-if="numericDate > 201801"
+                @click.prevent.stop="navigate(moment(date).add(1, 'months').format('YYYY-MM'))"
+                title="Einen Monat weiter"
+            >
                 <span class="mdi mdi-chevron-right"></span>
             </button>
         </div>
 
-        <create-service-wizard-button v-if="canCreate" type="success"
-                                      :cities="creatableCities" class="ms-2 me-2" :date="date"
-                                      :events="!(calendarMode == 'services')"
-                                      :key="moment(date).toISOString()+calendarMode"/>
+        <create-service-wizard-button
+            v-if="canCreate"
+            type="success"
+            :cities="creatableCities"
+            class="ms-2 me-2"
+            :date="date"
+            :events="!(calendarMode == 'services')"
+            :key="moment(date).toISOString() + calendarMode"
+        />
 
-        <nav-button v-if="(calendarMode == 'services')"
-                    class="me-2"
-                    :type="targetMode ? 'warning' : 'outline-secondary'"
-                    :icon="targetMode ? (target.exclusive ? 'mdi mdi-account-convert-outline': 'mdi mdi-account-arrow-down-outline') : 'mdi mdi-target-account'"
-                    :force-no-text="!targetMode"
-                    force-icon
-                    :title="'Benutzer schnell zuordnen'+(targetMode ? ' ('+targetTitle()+(target.exclusive ? ', überschreiben' : '')+')' : '')"
-                    @click="$emit('toggle-target-mode', !targetMode)">
+        <nav-button
+            v-if="calendarMode == 'services'"
+            class="me-2"
+            :type="targetMode ? 'warning' : 'outline-secondary'"
+            :icon="
+                targetMode
+                    ? target.exclusive
+                        ? 'mdi mdi-account-convert-outline'
+                        : 'mdi mdi-account-arrow-down-outline'
+                    : 'mdi mdi-target-account'
+            "
+            :force-no-text="!targetMode"
+            force-icon
+            :title="
+                'Benutzer schnell zuordnen' +
+                (targetMode
+                    ? ' (' + targetTitle() + (target.exclusive ? ', überschreiben' : '') + ')'
+                    : '')
+            "
+            @click="$emit('toggle-target-mode', !targetMode)"
+        >
             {{ targetTitle() }}
         </nav-button>
 
-        <nav-button type="outline-secondary" icon="mdi mdi-email" force-icon :href="route('reports.setup', {report: 'ministryRequest'})">
+        <nav-button
+            type="outline-secondary"
+            icon="mdi mdi-email"
+            force-icon
+            :href="route('reports.setup', { report: 'ministryRequest' })"
+        >
             Anfrage senden
         </nav-button>
     </div>
-
 </template>
 
 <script>
-import NavButton from "../../Ui/buttons/NavButton";
-import CreateServiceWizardButton from "../../Ui/wizards/CreateServiceWizardButton.vue";
+import NavButton from '../../Ui/buttons/NavButton'
+import CreateServiceWizardButton from '../../Ui/wizards/CreateServiceWizardButton.vue'
 
 export default {
     name: 'CalendarNavTop',
-    components: {CreateServiceWizardButton, NavButton},
+    components: { CreateServiceWizardButton, NavButton },
     data() {
         return {
             numericDate: parseInt(moment(this.date).format('YYYYMM')),
-            creatableCities: this.writableCities.filter(item => !item.is_org),
+            creatableCities: this.writableCities.filter((item) => !item.is_org),
         }
     },
     props: {
@@ -141,38 +253,36 @@ export default {
     methods: {
         monthLink: function (month) {
             return route('calendar', {
-                date: this.date.getFullYear() + '-' + month
-            });
+                date: this.date.getFullYear() + '-' + month,
+            })
         },
         yearLink: function (year) {
             return route('calendar', {
-                date: year + '-' + (this.date.getUTCMonth() + 1)
-            });
+                date: year + '-' + (this.date.getUTCMonth() + 1),
+            })
         },
         today() {
             if (moment(this.date).format('YYYYMM') == moment().format('YYYYMM')) {
-                var el = document.getElementsByClassName('scroll-to-me');
+                var el = document.getElementsByClassName('scroll-to-me')
                 if (el) {
-                    el[0].parentElement.scrollIntoView();
-                    window.scroll(0, window.scrollY - 84);
+                    el[0].parentElement.scrollIntoView()
+                    window.scroll(0, window.scrollY - 84)
                 }
             } else {
-                this.navigate(moment().format('YYYY-MM'));
+                this.navigate(moment().format('YYYY-MM'))
             }
         },
         targetTitle() {
-            if (!this.targetMode) return '';
-            let people = [];
-            this.target.people.forEach(person => people.push(person.name));
-            return this.target.ministry + ': ' + people.join(', ');
+            if (!this.targetMode) return ''
+            let people = []
+            this.target.people.forEach((person) => people.push(person.name))
+            return this.target.ministry + ': ' + people.join(', ')
         },
         navigate(targetDate) {
-            this.$inertia.get(route('calendar', {date: targetDate}));
-        }
-    }
+            this.$inertia.get(route('calendar', { date: targetDate }))
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

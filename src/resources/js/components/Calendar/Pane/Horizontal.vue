@@ -30,26 +30,33 @@
     <div class="calendar-month calendar-horizontal">
         <table class="table table-bordered">
             <thead>
-            <tr>
-                <th class="no-print text-start"></th>
-                <calendar-day-header
-                    v-for="(day,index) in myDays"
-                    :day="day"
-                    :key="'_day_'+index"
-                    :index="index"
-                />
-            </tr>
+                <tr>
+                    <th class="no-print text-start"></th>
+                    <calendar-day-header
+                        v-for="(day, index) in myDays"
+                        :day="day"
+                        :key="'_day_' + index"
+                        :index="index"
+                    />
+                </tr>
             </thead>
             <tbody>
                 <tr v-for="city in cities">
                     <th class="city-title">
-                        <span class="pt-2">{{ city.name }}</span><span class="mdi mdi-arrow-down-circle pt-2"></span>
+                        <span class="pt-2">{{ city.name }}</span
+                        ><span class="mdi mdi-arrow-down-circle pt-2"></span>
                     </th>
-                    <calendar-cell v-for="(day,index) in myDays" :day="day"
-                                   :targetMode="targetMode" :target="target"
-                                   :key="city.loading+'_'+day.date+'_'+city.id"
-                                   :index="index" :services="getServices(city,day)"
-                                   :city="city" :can-create="canCreate" />
+                    <calendar-cell
+                        v-for="(day, index) in myDays"
+                        :day="day"
+                        :targetMode="targetMode"
+                        :target="target"
+                        :key="city.loading + '_' + day.date + '_' + city.id"
+                        :index="index"
+                        :services="getServices(city, day)"
+                        :city="city"
+                        :can-create="canCreate"
+                    />
                 </tr>
             </tbody>
         </table>
@@ -57,19 +64,28 @@
 </template>
 
 <script>
-
-import NavButton from "../../Ui/buttons/NavButton";
-import CalendarDayHeader from "../Day/Header.vue";
-import CalendarCell from "../Cell.vue";
+import NavButton from '../../Ui/buttons/NavButton'
+import CalendarDayHeader from '../Day/Header.vue'
+import CalendarCell from '../Cell.vue'
 export default {
     name: 'CalendarNavHorizontal',
-    components: {CalendarCell, CalendarDayHeader, NavButton},
-    props: ['date', 'days', 'cities', 'services', 'years', 'canCreate','collapseState', 'targetMode', 'target'],
+    components: { CalendarCell, CalendarDayHeader, NavButton },
+    props: [
+        'date',
+        'days',
+        'cities',
+        'services',
+        'years',
+        'canCreate',
+        'collapseState',
+        'targetMode',
+        'target',
+    ],
     data() {
-        var myDays = this.days;
+        var myDays = this.days
 
         for (let dayId in myDays) {
-            myDays[dayId].index = dayId;
+            myDays[dayId].index = dayId
         }
         return {
             myDays: myDays,
@@ -77,34 +93,33 @@ export default {
     },
     methods: {
         title: function (d) {
-            return moment(d).locale('de').format('MMMM YYYY');
+            return moment(d).locale('de').format('MMMM YYYY')
         },
         getServices(city, day) {
-            if (this.services[city.id] == undefined) return [];
-            if (this.services[city.id][day.id] == undefined) return [];
-            return this.services[city.id][day.id];
+            if (this.services[city.id] == undefined) return []
+            if (this.services[city.id][day.id] == undefined) return []
+            return this.services[city.id][day.id]
         },
     },
     computed: {
         serviceCount() {
-            return this.services.length;
-        }
-    }
+            return this.services.length
+        },
+    },
 }
 </script>
 
 <style scoped>
-    table.table thead th {
-        vertical-align: top;
-    }
+table.table thead th {
+    vertical-align: top;
+}
 
-    .city-title {
-        writing-mode: sideways-lr;
-        padding: 1px;
-    }
+.city-title {
+    writing-mode: sideways-lr;
+    padding: 1px;
+}
 
-    .btn-xs.mt-3 {
-        padding: 1em 0.75em;
-    }
-
+.btn-xs.mt-3 {
+    padding: 1em 0.75em;
+}
 </style>

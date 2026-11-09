@@ -26,31 +26,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Quill} from "vue-quill-editor/src";
+import { Quill } from 'vue-quill-editor/src'
 
-const Delta = Quill.import("delta");
-const Break = Quill.import("blots/break");
-const Embed = Quill.import("blots/embed");
+const Delta = Quill.import('delta')
+const Break = Quill.import('blots/break')
+const Embed = Quill.import('blots/embed')
 
 export const lineBreakMatcher = () => {
-    let newDelta = new Delta();
-    newDelta.insert({ break: "" });
-    return newDelta;
-};
+    let newDelta = new Delta()
+    newDelta.insert({ break: '' })
+    return newDelta
+}
 
 export class SmartBreak extends Break {
-    blotName = "break";
-    tagName = "BR";
+    blotName = 'break'
+    tagName = 'BR'
     length() {
-        return 1;
+        return 1
     }
     value() {
-        return "\n";
+        return '\n'
     }
 
     insertInto(parent, ref) {
-        Embed.prototype.insertInto.call(this, parent, ref);
+        Embed.prototype.insertInto.call(this, parent, ref)
     }
-
 }
-

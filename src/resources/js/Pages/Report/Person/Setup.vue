@@ -29,27 +29,45 @@
 <template>
     <admin-layout title="Gottesdienstliste für eine Person erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Gottesdienstliste für eine Person erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Gottesdienstliste für eine Person erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'person'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'person' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="person" label="Nach folgender Person suchen" :options="users" v-model="myUser" />
-            <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
+            <form-selectize
+                name="person"
+                label="Nach folgender Person suchen"
+                :options="users"
+                v-model="myUser"
+            />
+            <form-date-range-picker
+                label="Gottesdienste von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['users'],
-    components: {FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: { FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton },
     data() {
         return {
             myUser: this.$page.props.currentUser.data.id,
@@ -59,16 +77,14 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'person'}), {
+            submitReportForm(route('reports.render', { report: 'person' }), {
                 person: this.myUser,
                 start: this.myStart,
                 end: this.myEnd,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

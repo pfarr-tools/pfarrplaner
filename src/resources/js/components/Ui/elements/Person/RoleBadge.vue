@@ -27,27 +27,28 @@
   -->
 
 <template>
-    <span class="badge bg-info" :title="permissionString">
+    <span
+        class="badge bg-info"
+        :title="permissionString"
+    >
         {{ role.name }}
     </span>
 </template>
 
 <script>
 export default {
-    name: "RoleBadge",
+    name: 'RoleBadge',
     props: ['role'],
     computed: {
         permissionString() {
-            let p = [];
-            this.role.permissions.forEach(permission => {
-                p.push(permission.name);
-            });
-            return p.join(', ');
-        }
-    }
+            let p = []
+            this.role.permissions.forEach((permission) => {
+                p.push(permission.name)
+            })
+            return p.join(', ')
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

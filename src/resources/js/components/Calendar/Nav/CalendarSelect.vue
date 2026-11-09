@@ -42,47 +42,50 @@ export default {
     emits: ['update:modelValue'],
     computed: {
         normalizedValue() {
-            return Array.isArray(this.modelValue) ? this.modelValue : [];
+            return Array.isArray(this.modelValue) ? this.modelValue : []
         },
         selectedCount() {
-            return this.normalizedValue.length;
+            return this.normalizedValue.length
         },
         groupedCalendars() {
-            const groups = {};
+            const groups = {}
             this.calendars.filter(Boolean).forEach((item) => {
-                const groupName = item.group || 'Kalender';
-                if (!groups[groupName]) groups[groupName] = [];
-                groups[groupName].push(item);
-            });
+                const groupName = item.group || 'Kalender'
+                if (!groups[groupName]) groups[groupName] = []
+                groups[groupName].push(item)
+            })
 
             return Object.entries(groups).map(([name, items]) => ({
                 name,
                 items,
-            }));
+            }))
         },
     },
     methods: {
         isSelected(calendarId) {
-            return this.normalizedValue.includes(calendarId);
+            return this.normalizedValue.includes(calendarId)
         },
         toggleCalendar(calendarId) {
-            const current = [...this.normalizedValue];
-            const index = current.indexOf(calendarId);
+            const current = [...this.normalizedValue]
+            const index = current.indexOf(calendarId)
 
             if (index === -1) {
-                current.push(calendarId);
+                current.push(calendarId)
             } else {
-                current.splice(index, 1);
+                current.splice(index, 1)
             }
 
-            this.$emit('update:modelValue', current);
+            this.$emit('update:modelValue', current)
         },
     },
-};
+}
 </script>
 
 <template>
-    <div class="calendar-select dropdown" data-bs-auto-close="outside">
+    <div
+        class="calendar-select dropdown"
+        data-bs-auto-close="outside"
+    >
         <button
             class="btn btn-sm btn-outline-secondary dropdown-toggle calendar-select-trigger"
             type="button"
@@ -95,8 +98,15 @@ export default {
             <span class="badge text-bg-secondary">{{ selectedCount }}</span>
         </button>
         <div class="dropdown-menu dropdown-menu-end p-0 calendar-select-menu">
-            <div class="calendar-select-panel" @click.stop>
-                <div v-for="group in groupedCalendars" :key="group.name" class="calendar-group">
+            <div
+                class="calendar-select-panel"
+                @click.stop
+            >
+                <div
+                    v-for="group in groupedCalendars"
+                    :key="group.name"
+                    class="calendar-group"
+                >
                     <div class="calendar-group-heading">{{ group.name }}</div>
                     <button
                         v-for="calendar in group.items"
@@ -106,8 +116,12 @@ export default {
                         @click="toggleCalendar(calendar.id)"
                     >
                         <span class="calendar-toggle-label">{{ calendar.name }}</span>
-                        <span class="badge rounded-pill"
-                              :class="isSelected(calendar.id) ? 'bg-success text-dark' : 'bg-secondary'">
+                        <span
+                            class="badge rounded-pill"
+                            :class="
+                                isSelected(calendar.id) ? 'bg-success text-dark' : 'bg-secondary'
+                            "
+                        >
                             {{ isSelected(calendar.id) ? 'An' : 'Aus' }}
                         </span>
                     </button>
@@ -161,7 +175,10 @@ export default {
     border: 1px solid #dee2e6;
     border-radius: 0;
     text-align: left;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
     background: #fff;
     color: #212529;
 }

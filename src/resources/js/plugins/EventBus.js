@@ -45,7 +45,10 @@ export default {
 
     /** @param {Function} eventClass  @param {Function} handler */
     listenOnce(eventClass, handler) {
-        const wrapper = e => { handler(e); emitter.off(eventClass.name, wrapper) }
+        const wrapper = (e) => {
+            handler(e)
+            emitter.off(eventClass.name, wrapper)
+        }
         emitter.on(eventClass.name, wrapper)
     },
 

@@ -11,14 +11,14 @@
  * @version git: $Id$
  */
 
-'use strict';
+'use strict'
 
-const fs = require('fs');
-const { spawnSync } = require('child_process');
-const path = require('path');
+const fs = require('fs')
+const { spawnSync } = require('child_process')
+const path = require('path')
 
-const rootDir = path.resolve(__dirname, '..');
-const isDryRun = process.argv.includes('--dry-run');
+const rootDir = path.resolve(__dirname, '..')
+const isDryRun = process.argv.includes('--dry-run')
 
 /**
  * Print a section header.
@@ -27,7 +27,7 @@ const isDryRun = process.argv.includes('--dry-run');
  * @return {void}
  */
 function section(title) {
-    console.log(`\n${title}`);
+    console.log(`\n${title}`)
 }
 
 /**
@@ -41,14 +41,14 @@ function run(command, args) {
     const result = spawnSync(command, args, {
         cwd: rootDir,
         stdio: 'inherit',
-    });
+    })
 
     if (result.error) {
-        throw result.error;
+        throw result.error
     }
 
     if (result.status !== 0) {
-        process.exit(result.status ?? 1);
+        process.exit(result.status ?? 1)
     }
 }
 
@@ -65,22 +65,22 @@ function capture(command, args, allowFailure = false) {
         cwd: rootDir,
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],
-    });
+    })
 
     if (result.error) {
-        throw result.error;
+        throw result.error
     }
 
     if (result.status !== 0) {
         if (allowFailure) {
-            return null;
+            return null
         }
 
-        process.stderr.write(result.stderr || '');
-        process.exit(result.status ?? 1);
+        process.stderr.write(result.stderr || '')
+        process.exit(result.status ?? 1)
     }
 
-    return (result.stdout || '').trim();
+    return (result.stdout || '').trim()
 }
 
 /**
@@ -90,39 +90,39 @@ function capture(command, args, allowFailure = false) {
  * @return {string|null}
  */
 function getDotEnvValue(key) {
-    const envPath = path.join(rootDir, '.env');
+    const envPath = path.join(rootDir, '.env')
     if (!fs.existsSync(envPath)) {
-        return null;
+        return null
     }
 
-    const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+    const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/)
     for (const line of lines) {
-        const trimmed = line.trim();
+        const trimmed = line.trim()
         if (!trimmed || trimmed.startsWith('#')) {
-            continue;
+            continue
         }
 
-        const separatorIndex = trimmed.indexOf('=');
+        const separatorIndex = trimmed.indexOf('=')
         if (separatorIndex === -1) {
-            continue;
+            continue
         }
 
         if (trimmed.slice(0, separatorIndex) !== key) {
-            continue;
+            continue
         }
 
-        const rawValue = trimmed.slice(separatorIndex + 1).trim();
+        const rawValue = trimmed.slice(separatorIndex + 1).trim()
         if (
-            (rawValue.startsWith('"') && rawValue.endsWith('"'))
-            || (rawValue.startsWith('\'') && rawValue.endsWith('\''))
+            (rawValue.startsWith('"') && rawValue.endsWith('"')) ||
+            (rawValue.startsWith("'") && rawValue.endsWith("'"))
         ) {
-            return rawValue.slice(1, -1);
+            return rawValue.slice(1, -1)
         }
 
-        return rawValue;
+        return rawValue
     }
 
-    return null;
+    return null
 }
 
 /**
@@ -131,12 +131,12 @@ function getDotEnvValue(key) {
  * @return {boolean}
  */
 function isOctaneActivated() {
-    const octaneServer = getDotEnvValue('OCTANE_SERVER');
+    const octaneServer = getDotEnvValue('OCTANE_SERVER')
     if (octaneServer === null) {
-        return false;
+        return false
     }
 
-    return !['', 'false', '0', 'off', 'null'].includes(octaneServer.toLowerCase());
+    return !['', 'false', '0', 'off', 'null'].includes(octaneServer.toLowerCase())
 }
 
 /**
@@ -147,7 +147,7 @@ function isOctaneActivated() {
  * @return {string|null}
  */
 function getGitFile(revision, file) {
-    return capture('git', ['show', `${revision}:${file}`], true);
+    return capture('git', ['show', `${revision}:${file}`], true)
 }
 
 /**
@@ -156,7 +156,7 @@ function getGitFile(revision, file) {
  * @return {boolean}
  */
 function hasLocalChanges() {
-    return (capture('git', ['status', '--porcelain']) || '') !== '';
+    return (capture('git', ['status', '--porcelain']) || '') !== ''
 }
 
 /**
@@ -167,15 +167,15 @@ function hasLocalChanges() {
  */
 function normalizeJson(content) {
     if (content === null) {
-        return null;
+        return null
     }
 
-    const parsed = JSON.parse(content);
+    const parsed = JSON.parse(content)
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-        delete parsed.version;
+        delete parsed.version
     }
 
-    return JSON.stringify(sortKeys(parsed));
+    return JSON.stringify(sortKeys(parsed))
 }
 
 /**
@@ -186,19 +186,19 @@ function normalizeJson(content) {
  */
 function sortKeys(value) {
     if (Array.isArray(value)) {
-        return value.map(sortKeys);
+        return value.map(sortKeys)
     }
 
     if (value && typeof value === 'object') {
         return Object.keys(value)
             .sort()
             .reduce((result, key) => {
-                result[key] = sortKeys(value[key]);
-                return result;
-            }, {});
+                result[key] = sortKeys(value[key])
+                return result
+            }, {})
     }
 
-    return value;
+    return value
 }
 
 /**
@@ -210,17 +210,17 @@ function sortKeys(value) {
  * @return {boolean}
  */
 function hasMeaningfulJsonChange(file, beforeRevision, afterRevision) {
-    const beforeContent = getGitFile(beforeRevision, file);
-    const afterContent = getGitFile(afterRevision, file);
+    const beforeContent = getGitFile(beforeRevision, file)
+    const afterContent = getGitFile(afterRevision, file)
 
     if (beforeContent === afterContent) {
-        return false;
+        return false
     }
 
     try {
-        return normalizeJson(beforeContent) !== normalizeJson(afterContent);
+        return normalizeJson(beforeContent) !== normalizeJson(afterContent)
     } catch {
-        return true;
+        return true
     }
 }
 
@@ -232,7 +232,7 @@ function hasMeaningfulJsonChange(file, beforeRevision, afterRevision) {
  * @return {boolean}
  */
 function includesPath(files, prefixes) {
-    return files.some((file) => prefixes.some((prefix) => file.startsWith(prefix)));
+    return files.some((file) => prefixes.some((prefix) => file.startsWith(prefix)))
 }
 
 /**
@@ -245,29 +245,31 @@ function includesPath(files, prefixes) {
  * @return {{composerInstall: boolean, npmInstall: boolean, browserslist: boolean, build: boolean, migrations: boolean, viewCache: boolean, optimize: boolean, queueRestart: boolean, ping: boolean, octaneReload: boolean, messages: string[]}}
  */
 function determineActions(files, beforeRevision, afterRevision, octaneActivated) {
-    const composerJsonChanged = files.includes('composer.json');
-    const composerLockChanged = files.includes('composer.lock');
-    const packageJsonChanged = files.includes('package.json');
-    const packageLockChanged = files.includes('package-lock.json') || files.includes('npm-shrinkwrap.json');
-    const composerInstall = composerLockChanged || (
-        composerJsonChanged
-        && hasMeaningfulJsonChange('composer.json', beforeRevision, afterRevision)
-    );
-    const npmInstall = packageLockChanged || (
-        packageJsonChanged
-        && hasMeaningfulJsonChange('package.json', beforeRevision, afterRevision)
-    );
-    const assetChanges = includesPath(files, ['resources/js/', 'resources/css/'])
-        || files.includes('vite.config.js')
-        || files.includes('vite.config.mjs')
-        || npmInstall;
+    const composerJsonChanged = files.includes('composer.json')
+    const composerLockChanged = files.includes('composer.lock')
+    const packageJsonChanged = files.includes('package.json')
+    const packageLockChanged =
+        files.includes('package-lock.json') || files.includes('npm-shrinkwrap.json')
+    const composerInstall =
+        composerLockChanged ||
+        (composerJsonChanged &&
+            hasMeaningfulJsonChange('composer.json', beforeRevision, afterRevision))
+    const npmInstall =
+        packageLockChanged ||
+        (packageJsonChanged &&
+            hasMeaningfulJsonChange('package.json', beforeRevision, afterRevision))
+    const assetChanges =
+        includesPath(files, ['resources/js/', 'resources/css/']) ||
+        files.includes('vite.config.js') ||
+        files.includes('vite.config.mjs') ||
+        npmInstall
 
-    const messages = [];
+    const messages = []
     if (composerJsonChanged && !composerInstall) {
-        messages.push('Skipping composer install, only the version field changed in composer.json.');
+        messages.push('Skipping composer install, only the version field changed in composer.json.')
     }
     if (packageJsonChanged && !npmInstall) {
-        messages.push('Skipping npm install, only the version field changed in package.json.');
+        messages.push('Skipping npm install, only the version field changed in package.json.')
     }
 
     return {
@@ -282,7 +284,7 @@ function determineActions(files, beforeRevision, afterRevision, octaneActivated)
         ping: true,
         octaneReload: octaneActivated,
         messages,
-    };
+    }
 }
 
 /**
@@ -291,35 +293,42 @@ function determineActions(files, beforeRevision, afterRevision, octaneActivated)
  * @return {{upstream: string, pullArgs: string[]}}
  */
 function getUpdateTarget() {
-    const currentBranch = capture('git', ['branch', '--show-current']);
-    const upstream = capture('git', ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'], true);
+    const currentBranch = capture('git', ['branch', '--show-current'])
+    const upstream = capture(
+        'git',
+        ['rev-parse', '--abbrev-ref', '--symbolic-full-name', '@{u}'],
+        true,
+    )
     if (!upstream) {
-        const matchingRemote = `origin/${currentBranch}`;
+        const matchingRemote = `origin/${currentBranch}`
         if (currentBranch === 'main') {
             return {
                 upstream: 'origin/main',
                 pullArgs: ['origin', 'main'],
-            };
+            }
         }
 
-        if (capture('git', ['show-ref', '--verify', `refs/remotes/${matchingRemote}`], true) !== null) {
+        if (
+            capture('git', ['show-ref', '--verify', `refs/remotes/${matchingRemote}`], true) !==
+            null
+        ) {
             return {
                 upstream: matchingRemote,
                 pullArgs: ['origin', currentBranch],
-            };
+            }
         }
 
         console.error(
-            `No upstream branch is configured for ${currentBranch}. `
-            + 'Configure an upstream branch or switch to a tracked deployment branch before running updates.'
-        );
-        process.exit(1);
+            `No upstream branch is configured for ${currentBranch}. ` +
+                'Configure an upstream branch or switch to a tracked deployment branch before running updates.',
+        )
+        process.exit(1)
     }
 
     return {
         upstream,
         pullArgs: [],
-    };
+    }
 }
 
 /**
@@ -329,13 +338,13 @@ function getUpdateTarget() {
  * @return {{ahead: number, behind: number}}
  */
 function getAheadBehind(upstream) {
-    const counts = capture('git', ['rev-list', '--left-right', '--count', `HEAD...${upstream}`]);
-    const [ahead, behind] = counts.split(/\s+/).map((value) => parseInt(value, 10));
+    const counts = capture('git', ['rev-list', '--left-right', '--count', `HEAD...${upstream}`])
+    const [ahead, behind] = counts.split(/\s+/).map((value) => parseInt(value, 10))
 
     return {
         ahead,
         behind,
-    };
+    }
 }
 
 /**
@@ -345,126 +354,135 @@ function getAheadBehind(upstream) {
  * @return {string[]}
  */
 function actionList(actions) {
-    const list = [];
+    const list = []
 
-    if (actions.composerInstall) list.push('Composer install');
-    if (actions.npmInstall) list.push('NPM install');
-    if (actions.browserslist) list.push('Update Browserslist database');
-    if (actions.build) list.push('Build frontend assets');
-    if (actions.migrations) list.push('Run database migrations');
-    if (actions.viewCache) list.push('Clear and rebuild the view cache');
-    if (actions.optimize) list.push('Refresh Laravel optimizations');
-    if (actions.queueRestart) list.push('Restart queue workers');
-    if (actions.ping) list.push('Ping the instance registry');
-    if (actions.octaneReload) list.push('Reload Octane when available');
+    if (actions.composerInstall) list.push('Composer install')
+    if (actions.npmInstall) list.push('NPM install')
+    if (actions.browserslist) list.push('Update Browserslist database')
+    if (actions.build) list.push('Build frontend assets')
+    if (actions.migrations) list.push('Run database migrations')
+    if (actions.viewCache) list.push('Clear and rebuild the view cache')
+    if (actions.optimize) list.push('Refresh Laravel optimizations')
+    if (actions.queueRestart) list.push('Restart queue workers')
+    if (actions.ping) list.push('Ping the instance registry')
+    if (actions.octaneReload) list.push('Reload Octane when available')
 
-    return list;
+    return list
 }
 
-section('Fetching updates');
-const updateTarget = getUpdateTarget();
-const upstream = updateTarget.upstream;
-const beforeRevision = capture('git', ['rev-parse', 'HEAD']);
-const octaneActivated = isOctaneActivated();
-run('git', ['fetch', '--prune', upstream.split('/')[0]]);
+section('Fetching updates')
+const updateTarget = getUpdateTarget()
+const upstream = updateTarget.upstream
+const beforeRevision = capture('git', ['rev-parse', 'HEAD'])
+const octaneActivated = isOctaneActivated()
+run('git', ['fetch', '--prune', upstream.split('/')[0]])
 
-const { ahead, behind } = getAheadBehind(upstream);
+const { ahead, behind } = getAheadBehind(upstream)
 if (ahead > 0 && behind > 0) {
-    console.error(`The current branch has diverged from ${upstream}. Resolve this manually before running updates.`);
-    process.exit(1);
+    console.error(
+        `The current branch has diverged from ${upstream}. Resolve this manually before running updates.`,
+    )
+    process.exit(1)
 }
 
 if (behind === 0) {
-    console.log(`No updates available from ${upstream}.`);
-    process.exit(0);
+    console.log(`No updates available from ${upstream}.`)
+    process.exit(0)
 }
 
 const pendingFiles = capture('git', ['diff', '--name-only', `HEAD..${upstream}`])
     .split('\n')
     .map((file) => file.trim())
-    .filter(Boolean);
-const actions = determineActions(pendingFiles, beforeRevision, upstream, octaneActivated);
+    .filter(Boolean)
+const actions = determineActions(pendingFiles, beforeRevision, upstream, octaneActivated)
 
-console.log(`Found updates for ${pendingFiles.length} file(s) from ${upstream}.`);
+console.log(`Found updates for ${pendingFiles.length} file(s) from ${upstream}.`)
 
 if (isDryRun) {
-    section('Dry run');
-    console.log('The following files would be updated:');
-    pendingFiles.forEach((file) => console.log(` - ${file}`));
-    console.log('\nThe following actions would run:');
-    actionList(actions).forEach((action) => console.log(` - ${action}`));
-    actions.messages.forEach((message) => console.log(` - ${message}`));
+    section('Dry run')
+    console.log('The following files would be updated:')
+    pendingFiles.forEach((file) => console.log(` - ${file}`))
+    console.log('\nThe following actions would run:')
+    actionList(actions).forEach((action) => console.log(` - ${action}`))
+    actions.messages.forEach((message) => console.log(` - ${message}`))
 
     if (hasLocalChanges()) {
-        console.log(' - Local changes detected: the updater would create a stash and reset the worktree to HEAD before pulling.');
+        console.log(
+            ' - Local changes detected: the updater would create a stash and reset the worktree to HEAD before pulling.',
+        )
     }
 
-    process.exit(0);
+    process.exit(0)
 }
 
 if (hasLocalChanges()) {
-    section('Preparing worktree');
-    const stashName = `install-updates ${new Date().toISOString()}`;
-    console.log('Local changes detected. Stashing tracked and untracked files before pulling.');
-    run('git', ['stash', 'push', '--include-untracked', '--message', stashName]);
-    run('git', ['reset', '--hard', 'HEAD']);
+    section('Preparing worktree')
+    const stashName = `install-updates ${new Date().toISOString()}`
+    console.log('Local changes detected. Stashing tracked and untracked files before pulling.')
+    run('git', ['stash', 'push', '--include-untracked', '--message', stashName])
+    run('git', ['reset', '--hard', 'HEAD'])
 }
 
-section('Pulling updates');
-run('git', ['pull', '--ff-only', ...updateTarget.pullArgs]);
+section('Pulling updates')
+run('git', ['pull', '--ff-only', ...updateTarget.pullArgs])
 
-const afterRevision = capture('git', ['rev-parse', 'HEAD']);
-const installedActions = determineActions(pendingFiles, beforeRevision, afterRevision, octaneActivated);
+const afterRevision = capture('git', ['rev-parse', 'HEAD'])
+const installedActions = determineActions(
+    pendingFiles,
+    beforeRevision,
+    afterRevision,
+    octaneActivated,
+)
 
 if (installedActions.composerInstall) {
-    section('Composer');
-    run('composer', ['install', '--no-interaction']);
+    section('Composer')
+    run('composer', ['install', '--no-interaction'])
 } else if (pendingFiles.includes('composer.json')) {
-    console.log('Skipping composer install, only the version field changed in composer.json.');
+    console.log('Skipping composer install, only the version field changed in composer.json.')
 }
 
 if (installedActions.npmInstall) {
-    section('NPM packages');
-    run('npm', ['install']);
+    section('NPM packages')
+    run('npm', ['install'])
 } else if (pendingFiles.includes('package.json')) {
-    console.log('Skipping npm install, only the version field changed in package.json.');
+    console.log('Skipping npm install, only the version field changed in package.json.')
 }
 
 if (installedActions.browserslist) {
-    section('Browserslist');
-    run('npx', ['--yes', 'update-browserslist-db@latest']);
-    run('npm', ['install', '--save-dev', 'baseline-browser-mapping@latest']);
+    section('Browserslist')
+    run('npx', ['--yes', 'update-browserslist-db@latest'])
+    run('npm', ['install', '--save-dev', 'baseline-browser-mapping@latest'])
 }
 
 if (installedActions.build) {
-    section('Frontend build');
-    run('npm', ['run', 'build']);
+    section('Frontend build')
+    run('npm', ['run', 'build'])
 }
 
 if (installedActions.migrations) {
-    section('Database migrations');
-    run('php', ['artisan', 'migrate', '--force']);
+    section('Database migrations')
+    run('php', ['artisan', 'migrate', '--force'])
 }
 
 if (installedActions.viewCache) {
-    section('View cache');
-    run('php', ['artisan', 'view:clear']);
-    run('php', ['artisan', 'view:cache']);
+    section('View cache')
+    run('php', ['artisan', 'view:clear'])
+    run('php', ['artisan', 'view:cache'])
 }
 
-section('Optimizations');
-run('php', ['artisan', 'optimize']);
+section('Optimizations')
+run('php', ['artisan', 'optimize'])
 
-section('Queue workers');
-run('php', ['artisan', 'queue:restart']);
+section('Queue workers')
+run('php', ['artisan', 'queue:restart'])
 
-section('Instance registry');
-run('php', ['artisan', 'ping']);
+section('Instance registry')
+run('php', ['artisan', 'ping'])
 
-const artisanCommands = capture('php', ['artisan', 'list', '--raw'], true) || '';
+const artisanCommands = capture('php', ['artisan', 'list', '--raw'], true) || ''
 if (installedActions.octaneReload && artisanCommands.split('\n').includes('octane:reload')) {
-    section('Octane');
-    run('php', ['artisan', 'octane:reload']);
+    section('Octane')
+    run('php', ['artisan', 'octane:reload'])
 }
 
-console.log('\nDone installing updates.');
+console.log('\nDone installing updates.')

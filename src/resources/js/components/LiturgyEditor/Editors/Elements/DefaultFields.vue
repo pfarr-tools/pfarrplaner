@@ -28,43 +28,55 @@
 
 <template>
     <div class="default-fields">
-        <form-input id="defaultFieldTitle" label="Titel im Ablaufplan" v-model="element.title" />
-        <form-textarea v-if="agendaMode" id="agendaInstructions" label="Agendarische Hinweise"
-                       v-model="editedElement.data.agenda_instructions" />
-        <div v-else v-if="editedElement.data.agenda_instructions" class="agenda-instructions">
+        <form-input
+            id="defaultFieldTitle"
+            label="Titel im Ablaufplan"
+            v-model="element.title"
+        />
+        <form-textarea
+            v-if="agendaMode"
+            id="agendaInstructions"
+            label="Agendarische Hinweise"
+            v-model="editedElement.data.agenda_instructions"
+        />
+        <div
+            v-else
+            v-if="editedElement.data.agenda_instructions"
+            class="agenda-instructions"
+        >
             {{ editedElement.data.agenda_instructions }}
         </div>
-   </div>
+    </div>
 </template>
 
 <script>
-import FormInput from "../../../Ui/forms/FormInput.vue";
-import FormTextarea from "../../../Ui/forms/FormTextarea.vue";
+import FormInput from '../../../Ui/forms/FormInput.vue'
+import FormTextarea from '../../../Ui/forms/FormTextarea.vue'
 
 export default {
-    name: "DefaultFields",
-    components: {FormTextarea, FormInput},
+    name: 'DefaultFields',
+    components: { FormTextarea, FormInput },
     props: {
         element: Object,
         service: Object,
         agendaMode: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     data() {
-        var e = this.element;
-        if (undefined == e.data) e.data = {};
-        if (undefined == e.data.agenda_instructions) e.data.agenda_instructions = '';
+        var e = this.element
+        if (undefined == e.data) e.data = {}
+        if (undefined == e.data.agenda_instructions) e.data.agenda_instructions = ''
         return {
             editedElement: e,
         }
-    }
+    },
 }
 </script>
 
 <style scoped>
-    .agenda-instructions {
-        font-style: italic;
-    }
+.agenda-instructions {
+    font-style: italic;
+}
 </style>

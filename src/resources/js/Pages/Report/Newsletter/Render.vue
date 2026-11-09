@@ -28,32 +28,39 @@
 
 <template>
     <admin-layout title="Gottesdienstliste für den Newsletter">
-        <form-textarea label="HTML-Code zum Kopieren" v-model="myHtml" rows="20"/>
-        <nav-button type="light" icon="mdi mdi-content-copy" force-icon
-                    @click="copyToClipboard"
-                    title="In die Zwischenablage kopieren">Kopieren</nav-button>
+        <form-textarea
+            label="HTML-Code zum Kopieren"
+            v-model="myHtml"
+            rows="20"
+        />
+        <nav-button
+            type="light"
+            icon="mdi mdi-content-copy"
+            force-icon
+            @click="copyToClipboard"
+            title="In die Zwischenablage kopieren"
+            >Kopieren</nav-button
+        >
     </admin-layout>
 </template>
 
 <script>
-import FormTextarea from "../../../components/Ui/forms/FormTextarea";
-import NavButton from "../../../components/Ui/buttons/NavButton";
+import FormTextarea from '../../../components/Ui/forms/FormTextarea'
+import NavButton from '../../../components/Ui/buttons/NavButton'
 export default {
-    name: "Render",
-    components: {NavButton, FormTextarea},
+    name: 'Render',
+    components: { NavButton, FormTextarea },
     props: ['html'],
     data() {
         return { myHtml: this.html }
     },
     methods: {
         copyToClipboard() {
-            const cb = navigator.clipboard;
-            cb.writeText(this.myHtml).then(result => {});
-        }
+            const cb = navigator.clipboard
+            cb.writeText(this.myHtml).then((result) => {})
+        },
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

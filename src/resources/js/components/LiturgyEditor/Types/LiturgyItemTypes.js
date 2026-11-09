@@ -27,40 +27,39 @@
  */
 
 export function BlockType() {
-    this.title = 'Abschnitt';
-    this.typeDescription = 'Abschnitt';
-    this.type = 'block';
-    this.items = [];
+    this.title = 'Abschnitt'
+    this.typeDescription = 'Abschnitt'
+    this.type = 'block'
+    this.items = []
 }
 
 export function FreetextType() {
-    this.title = 'Freier Text';
-    this.typeDescription = 'Freitext';
-    this.type= 'freetext';
-    this.description = '';
+    this.title = 'Freier Text'
+    this.typeDescription = 'Freitext'
+    this.type = 'freetext'
+    this.description = ''
 }
 
 export function PsalmType() {
-    this.title = 'Psalmgebet';
-    this.typeDescription = 'Psalmgebet';
-    this.type= 'psalm';
+    this.title = 'Psalmgebet'
+    this.typeDescription = 'Psalmgebet'
+    this.type = 'psalm'
 }
 
 export function ReadingType() {
-    this.title = 'Schriftlesung';
-    this.typeDescription = 'Schriftlesung';
-    this.type= 'reading';
+    this.title = 'Schriftlesung'
+    this.typeDescription = 'Schriftlesung'
+    this.type = 'reading'
 }
 
 export function SongType() {
-    this.title = 'Lied';
-    this.typeDescription = 'Lied';
-    this.type= 'song';
+    this.title = 'Lied'
+    this.typeDescription = 'Lied'
+    this.type = 'song'
 }
 
 export function SermonType() {
-    this.title = 'Predigt';
-    this.typeDescription = 'Predigt';
-    this.type= 'sermon';
+    this.title = 'Predigt'
+    this.typeDescription = 'Predigt'
+    this.type = 'sermon'
 }
-

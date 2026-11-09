@@ -28,15 +28,22 @@
 
 <template>
     <div>
-        <span :class="checkClass(check)" :style="{color: check ? colorPositive : colorNegative}"></span>
-        <span v-if="check"><slot name="positive">{{ positive }}</slot></span>
-        <span v-else><slot name="negative">{{ negative }}</slot></span>
+        <span
+            :class="checkClass(check)"
+            :style="{ color: check ? colorPositive : colorNegative }"
+        ></span>
+        <span v-if="check"
+            ><slot name="positive">{{ positive }}</slot></span
+        >
+        <span v-else
+            ><slot name="negative">{{ negative }}</slot></span
+        >
     </div>
 </template>
 
 <script>
 export default {
-    name: "CheckedProcessItem",
+    name: 'CheckedProcessItem',
     props: {
         check: {
             type: null,
@@ -58,15 +65,14 @@ export default {
         colorNegative: {
             type: String,
             default: 'red',
-        }
+        },
     },
     methods: {
         checkClass(criterion) {
-            return criterion ? this.iconPositive : this.iconNegative;
+            return criterion ? this.iconPositive : this.iconNegative
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

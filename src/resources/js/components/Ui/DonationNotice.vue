@@ -29,13 +29,23 @@
 <template>
     <div class="donation-notice text-muted small">
         <p class="mb-2">
-            Pfarrplaner ist ein freies Projekt für Kirchengemeinden.<br>
-            Entwicklung kostet Zeit und Geld.<br>
+            Pfarrplaner ist ein freies Projekt für Kirchengemeinden.<br />
+            Entwicklung kostet Zeit und Geld.<br />
             Wenn dir Pfarrplaner hilft, kannst du das Projekt freiwillig unterstützen.
         </p>
         <div class="d-flex flex-wrap gap-2">
-            <a href="https://paypal.me/potofcoffee" target="_blank" rel="noopener noreferrer">Einmal per PayPal</a>
-            <a href="https://liberapay.com/christoph.fischer" target="_blank" rel="noopener noreferrer">Regelmäßig per Liberapay</a>
+            <a
+                href="https://paypal.me/potofcoffee"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Einmal per PayPal</a
+            >
+            <a
+                href="https://liberapay.com/christoph.fischer"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Regelmäßig per Liberapay</a
+            >
         </div>
     </div>
 </template>

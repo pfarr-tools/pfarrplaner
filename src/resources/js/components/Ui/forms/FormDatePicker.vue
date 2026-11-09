@@ -27,25 +27,44 @@
   -->
 
 <template>
-    <form-group :id="myId" :input-id="`${myId}Input`" :label="label" :help="help" :name="name"
-                :pre-label="preLabel" :required="required" :value="currentValue" :is-checked-item="isCheckedItem"
-                v-slot="field">
-        <date-picker :id="field.fieldId" :name="name" :model-value="currentValue" :config="myDatePickerConfig"
-                     :iso-date="isoDate"
-                     :disabled="disabled" :required="required" :aria-required="required ? 'true' : 'false'"
-                     :aria-invalid="field.error ? 'true' : 'false'" :aria-describedby="field.describedBy || undefined"
-                     @update:modelValue="handleModelUpdate" @input="handleInputEvent" @dp-update="$emit('dp-update', $event)"/>
+    <form-group
+        :id="myId"
+        :input-id="`${myId}Input`"
+        :label="label"
+        :help="help"
+        :name="name"
+        :pre-label="preLabel"
+        :required="required"
+        :value="currentValue"
+        :is-checked-item="isCheckedItem"
+        v-slot="field"
+    >
+        <date-picker
+            :id="field.fieldId"
+            :name="name"
+            :model-value="currentValue"
+            :config="myDatePickerConfig"
+            :iso-date="isoDate"
+            :disabled="disabled"
+            :required="required"
+            :aria-required="required ? 'true' : 'false'"
+            :aria-invalid="field.error ? 'true' : 'false'"
+            :aria-describedby="field.describedBy || undefined"
+            @update:modelValue="handleModelUpdate"
+            @input="handleInputEvent"
+            @dp-update="$emit('dp-update', $event)"
+        />
     </form-group>
 </template>
 
 <script>
-import FormGroup from "./FormGroup";
-import { uid } from '../../../libraries/uid';
-import { DateTime } from 'luxon';
+import FormGroup from './FormGroup'
+import { uid } from '../../../libraries/uid'
+import { DateTime } from 'luxon'
 
 export default {
-    name: "FormDatePicker",
-    components: {FormGroup},
+    name: 'FormDatePicker',
+    components: { FormGroup },
     emits: ['input', 'update:modelValue', 'dp-update'],
     props: {
         label: String,
@@ -79,8 +98,8 @@ export default {
     },
     computed: {
         currentValue() {
-            return this.modelValue !== undefined ? this.modelValue : this.value;
-        }
+            return this.modelValue !== undefined ? this.modelValue : this.value
+        },
     },
     data() {
         return {
@@ -94,9 +113,7 @@ export default {
     },
     methods: {
         toLuxonFormat(format) {
-            return (format || 'DD.MM.YYYY')
-                .replace(/DD/g, 'dd')
-                .replace(/YYYY/g, 'yyyy');
+            return (format || 'DD.MM.YYYY').replace(/DD/g, 'dd').replace(/YYYY/g, 'yyyy')
         },
         berlinFromLocalParts(parts) {
             return DateTime.fromObject(
@@ -112,22 +129,22 @@ export default {
                 {
                     zone: 'Europe/Berlin',
                     locale: this.myDatePickerConfig.locale || 'de',
-                }
-            );
+                },
+            )
         },
         toIsoDate(value) {
-            if (!value) return value;
+            if (!value) return value
 
-            const luxonFormat = this.toLuxonFormat(this.myDatePickerConfig.format);
-            let dateTime = null;
+            const luxonFormat = this.toLuxonFormat(this.myDatePickerConfig.format)
+            let dateTime = null
 
             if (value instanceof Date) {
-                const local = DateTime.fromJSDate(value);
-                dateTime = this.berlinFromLocalParts(local);
+                const local = DateTime.fromJSDate(value)
+                dateTime = this.berlinFromLocalParts(local)
             } else if (typeof value === 'string' && value.includes('T')) {
-                const iso = DateTime.fromISO(value, { setZone: true });
+                const iso = DateTime.fromISO(value, { setZone: true })
                 if (iso.isValid) {
-                    dateTime = this.berlinFromLocalParts(iso);
+                    dateTime = this.berlinFromLocalParts(iso)
                 }
             }
 
@@ -135,34 +152,32 @@ export default {
                 dateTime = DateTime.fromFormat(value, luxonFormat, {
                     zone: 'Europe/Berlin',
                     locale: this.myDatePickerConfig.locale || 'de',
-                });
+                })
             }
 
             if (!dateTime) {
                 dateTime = DateTime.fromFormat(value, luxonFormat, {
                     zone: 'Europe/Berlin',
                     locale: this.myDatePickerConfig.locale || 'de',
-                });
+                })
             }
 
-            return dateTime.isValid ? dateTime.toUTC().toISO() : value;
+            return dateTime.isValid ? dateTime.toUTC().toISO() : value
         },
         handleModelUpdate(value) {
-            this.$emit('update:modelValue', this.isoDate ? this.toIsoDate(value) : value);
+            this.$emit('update:modelValue', this.isoDate ? this.toIsoDate(value) : value)
         },
         handleInputEvent(e) {
-            let out;
+            let out
             if (this.isoDate) {
-                out = this.toIsoDate(e);
+                out = this.toIsoDate(e)
             } else {
-                out = e;
+                out = e
             }
-            this.$emit('input', out);
+            this.$emit('input', out)
         },
-    }
-};
+    },
+}
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

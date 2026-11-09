@@ -27,23 +27,24 @@
   -->
 
 <template>
-    <div class="accordion" :id="id">
-        <slot/>
+    <div
+        class="accordion"
+        :id="id"
+    >
+        <slot />
     </div>
 </template>
 
 <script>
 export default {
-    name: "Accordion",
+    name: 'Accordion',
     props: ['id'],
     provide() {
         return {
             accordionId: this.id,
         }
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

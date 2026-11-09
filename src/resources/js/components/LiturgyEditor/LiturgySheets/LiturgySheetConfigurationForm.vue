@@ -27,22 +27,24 @@
   -->
 
 <template>
-    <form :id="'frm'+sheet.key" method="post" :action="route('liturgy.download', {service: service.slug, key: sheet.key})">
+    <form
+        :id="'frm' + sheet.key"
+        method="post"
+        :action="route('liturgy.download', { service: service.slug, key: sheet.key })"
+    >
         <form-csrf-token />
         <slot />
     </form>
 </template>
 
 <script>
-import FormCsrfToken from "../../Ui/forms/FormCsrfToken.vue";
+import FormCsrfToken from '../../Ui/forms/FormCsrfToken.vue'
 
 export default {
-    name: "LiturgySheetConfigurationForm",
-    components: {FormCsrfToken},
+    name: 'LiturgySheetConfigurationForm',
+    components: { FormCsrfToken },
     props: ['service', 'sheet'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

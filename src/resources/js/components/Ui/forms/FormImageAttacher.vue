@@ -28,69 +28,132 @@
 
 <template>
     <div class="form-image-attacher">
-        <form-group :label="label" :help="help" :is-checked-item="isCheckedItem">
-            <div v-if="uploading">Datei wird hochgeladen... <span class="mdi mdi-spin mdi-loading"></span></div>
+        <form-group
+            :label="label"
+            :help="help"
+            :is-checked-item="isCheckedItem"
+        >
+            <div v-if="uploading">
+                Datei wird hochgeladen... <span class="mdi mdi-spin mdi-loading"></span>
+            </div>
             <div v-else>
                 <div v-if="myValue">
-                    <img class="img-fluid" :src="route('image', myValue.replace('attachments/', ''))"/>
+                    <img
+                        class="img-fluid"
+                        :src="route('image', myValue.replace('attachments/', ''))"
+                    />
                     <div>
-                        <a class="btn btn-light btn-sm" title="Bild herunterladen"
-                           :href="route('image', {path: myValue.replace('attachments/', ''), download: 1})">
+                        <a
+                            class="btn btn-light btn-sm"
+                            title="Bild herunterladen"
+                            :href="
+                                route('image', {
+                                    path: myValue.replace('attachments/', ''),
+                                    download: 1,
+                                })
+                            "
+                        >
                             <span class="mdi mdi-download"></span> Herunterladen
                         </a>
-                        <button class="btn btn-danger btn-sm" title="Bild entfernen" @click="detachImage"><span
-                            class="mdi mdi-delete"></span> Bild entfernen
+                        <button
+                            class="btn btn-danger btn-sm"
+                            title="Bild entfernen"
+                            @click="detachImage"
+                        >
+                            <span class="mdi mdi-delete"></span> Bild entfernen
                         </button>
                     </div>
                 </div>
                 <div v-else>
-                    <form-file-upload @input="upload" @upload-url="uploadUrl" :no-description="true"
-                                      :no-camera="noCamera" :no-pixabay="noPixabay" :no-url="noUrl" no-description="noDescription"
-                                      :helpText="handlePaste ? 'Du kannst das Bild auch einfach mit Strg+V aus der Zwischenablage einfügen.' : ''"/>
+                    <form-file-upload
+                        @input="upload"
+                        @upload-url="uploadUrl"
+                        :no-description="true"
+                        :no-camera="noCamera"
+                        :no-pixabay="noPixabay"
+                        :no-url="noUrl"
+                        no-description="noDescription"
+                        :helpText="
+                            handlePaste
+                                ? 'Du kannst das Bild auch einfach mit Strg+V aus der Zwischenablage einfügen.'
+                                : ''
+                        "
+                    />
                 </div>
             </div>
         </form-group>
-        <modal title="Bild zuschneiden" v-if="modalCropperOpen" min-height="50vh" max-height="80vh"
-               @close="cropImage" @cancel="modalCropperOpen = false;" :allow-cancel="allowNoCropping"
-               close-button-label="Zuschneiden" cancel-button-label="Original verwenden" max-width="800">
+        <modal
+            title="Bild zuschneiden"
+            v-if="modalCropperOpen"
+            min-height="50vh"
+            max-height="80vh"
+            @close="cropImage"
+            @cancel="modalCropperOpen = false"
+            :allow-cancel="allowNoCropping"
+            close-button-label="Zuschneiden"
+            cancel-button-label="Original verwenden"
+            max-width="800"
+        >
             <div style="height: 40vh; !important">
-                <cropper class="cropper" ref="cropper" :src="cropableImage" :canvas="canvasSettings"
-                         :stencil-props="stencilSettings"/>
+                <cropper
+                    class="cropper"
+                    ref="cropper"
+                    :src="cropableImage"
+                    :canvas="canvasSettings"
+                    :stencil-props="stencilSettings"
+                />
             </div>
         </modal>
     </div>
 </template>
 
 <script>
-import FormFileUpload from "./FormFileUpload";
-import FormGroup from "./FormGroup";
-import Modal from "../modals/Modal";
-import {Cropper} from 'vue-advanced-cropper';
-import 'vue-advanced-cropper/dist/style.css';
+import FormFileUpload from './FormFileUpload'
+import FormGroup from './FormGroup'
+import Modal from '../modals/Modal'
+import { Cropper } from 'vue-advanced-cropper'
+import 'vue-advanced-cropper/dist/style.css'
 
 export default {
-    name: "FormImageAttacher",
-    components: {FormGroup, Modal, FormFileUpload, Cropper},
+    name: 'FormImageAttacher',
+    components: { FormGroup, Modal, FormFileUpload, Cropper },
     emits: ['update:modelValue'],
-    props: ['attachRoute', 'detachRoute', 'modelValue', 'label', 'help', 'isCheckedItem', 'handlePaste', 'cropperCanvas', 'cropperStencil', 'width', 'height',
-        'noSource', 'allowUncropped', 'noCamera', 'noUrl', 'noPixabay', 'noDescription'],
+    props: [
+        'attachRoute',
+        'detachRoute',
+        'modelValue',
+        'label',
+        'help',
+        'isCheckedItem',
+        'handlePaste',
+        'cropperCanvas',
+        'cropperStencil',
+        'width',
+        'height',
+        'noSource',
+        'allowUncropped',
+        'noCamera',
+        'noUrl',
+        'noPixabay',
+        'noDescription',
+    ],
     created() {
-        if (this.handlePaste) window.addEventListener('paste', this.attachFromClipboard);
+        if (this.handlePaste) window.addEventListener('paste', this.attachFromClipboard)
     },
     unmounted() {
-        if (this.handlePaste) window.removeEventListener('paste', this.attachFromClipboard);
+        if (this.handlePaste) window.removeEventListener('paste', this.attachFromClipboard)
     },
     data() {
-        let canvasSettings = this.cropperCanvas || {};
-        let stencilSettings = this.cropperStencil || {};
+        let canvasSettings = this.cropperCanvas || {}
+        let stencilSettings = this.cropperStencil || {}
         if (this.width) {
-            canvasSettings['width'] = this.width;
+            canvasSettings['width'] = this.width
         }
         if (this.height) {
-            canvasSettings['height'] = this.height;
+            canvasSettings['height'] = this.height
         }
         if (this.width && this.height) {
-            stencilSettings['aspectRatio'] = this.width / this.height;
+            stencilSettings['aspectRatio'] = this.width / this.height
         }
         return {
             uploading: false,
@@ -101,105 +164,106 @@ export default {
             canvasSettings,
             stencilSettings,
             info: {},
-            allowNoCropping: (undefined == this.allowUncropped) ? true : this.allowUncropped,
+            allowNoCropping: undefined == this.allowUncropped ? true : this.allowUncropped,
         }
     },
     methods: {
         upload(file) {
-            let fd = new FormData();
-            fd.append('attachments[0]', file);
+            let fd = new FormData()
+            fd.append('attachments[0]', file)
 
-            this.uploading = true;
-            axios.post(this.attachRoute, fd, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then(response => {
-                this.myValue = response.data.image;
-                this.$emit('update:modelValue', response.data.image.toString());
-                this.uploading = false;
-                this.allowCropping(response.data);
-            });
-
+            this.uploading = true
+            axios
+                .post(this.attachRoute, fd, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                .then((response) => {
+                    this.myValue = response.data.image
+                    this.$emit('update:modelValue', response.data.image.toString())
+                    this.uploading = false
+                    this.allowCropping(response.data)
+                })
         },
         uploadUrl(data) {
-            this.uploading = true;
-            this.info = data.info;
-            axios.post(this.attachRoute, {uploadFromUrl: data.url, attachment_text: data.description})
-                .then(response => {
-                    this.myValue = response.data.image;
-                    this.$emit('input', response.data.image.toString());
-                    this.$emit('update:modelValue', response.data.image.toString());
-                    this.uploading = false;
-                    this.allowCropping(response.data);
-                });
+            this.uploading = true
+            this.info = data.info
+            axios
+                .post(this.attachRoute, {
+                    uploadFromUrl: data.url,
+                    attachment_text: data.description,
+                })
+                .then((response) => {
+                    this.myValue = response.data.image
+                    this.$emit('input', response.data.image.toString())
+                    this.$emit('update:modelValue', response.data.image.toString())
+                    this.uploading = false
+                    this.allowCropping(response.data)
+                })
         },
         imageRoute(image) {
-            return route('image', {path: image.replace('attachments/', '')});
+            return route('image', { path: image.replace('attachments/', '') })
         },
         allowCropping(data) {
-            this.modalCropperOpen = true;
-            this.cropableImage = this.imageRoute(data.image);
-            this.cropableAttachment = data;
+            this.modalCropperOpen = true
+            this.cropableImage = this.imageRoute(data.image)
+            this.cropableAttachment = data
         },
         detachImage() {
-            if (!confirm('Willst du dieses Bild wirklich löschen?')) return;
-            axios.delete(this.detachRoute).then(response => {
-                this.myValue = '';
-                this.$emit('update:modelValue', '');
+            if (!confirm('Willst du dieses Bild wirklich löschen?')) return
+            axios.delete(this.detachRoute).then((response) => {
+                this.myValue = ''
+                this.$emit('update:modelValue', '')
             })
         },
         attachFromClipboard(event) {
-            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-            let blob = null;
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items
+            let blob = null
 
             for (const item of items) {
                 if (item.type.indexOf('image') === 0) {
-                    blob = item.getAsFile();
+                    blob = item.getAsFile()
                 }
             }
             // upload image if there is a pasted image
             if (blob !== null) {
-                this.upload(blob);
-                event.preventDefault();
+                this.upload(blob)
+                event.preventDefault()
             }
         },
         cropImage() {
-            const {coordinates, canvas,} = this.$refs.cropper.getResult();
+            const { coordinates, canvas } = this.$refs.cropper.getResult()
             if (canvas) {
-                if ((!this.noSource) && (this.info) && (this.info.user)) {
-                    let context = canvas.getContext('2d');
-                    context.save();
-                    context.translate( 10, canvas.height-10 );
-                    context.rotate( 3 * Math.PI / 2 );
-                    context.font = "10px sans-serif";
-                    context.fillStyle = "#ffffff";
-                    context.textAlign = "left";
-                    context.fillText( "Bild: pixabay / "+this.info.user, 0, 0 );
-                    context.restore();
+                if (!this.noSource && this.info && this.info.user) {
+                    let context = canvas.getContext('2d')
+                    context.save()
+                    context.translate(10, canvas.height - 10)
+                    context.rotate((3 * Math.PI) / 2)
+                    context.font = '10px sans-serif'
+                    context.fillStyle = '#ffffff'
+                    context.textAlign = 'left'
+                    context.fillText('Bild: pixabay / ' + this.info.user, 0, 0)
+                    context.restore()
                 }
-                this.modalCropperOpen = false;
-                this.detachImage();
-                const form = new FormData();
-                canvas.toBlob(blob => {
-                    form.append('attachments[0]', blob);
-                    form.append('legalInfo', JSON.stringify(this.info));
-                    axios.post(this.attachRoute, form)
-                        .then(response => {
-                            this.myValue = response.data.image;
-                            this.$emit('input', response.data.image.toString());
-                            this.$emit('update:modelValue', response.data.image.toString());
-                            this.uploading = false;
-                            this.info = null;
-                        });
-                }, 'image/jpeg');
+                this.modalCropperOpen = false
+                this.detachImage()
+                const form = new FormData()
+                canvas.toBlob((blob) => {
+                    form.append('attachments[0]', blob)
+                    form.append('legalInfo', JSON.stringify(this.info))
+                    axios.post(this.attachRoute, form).then((response) => {
+                        this.myValue = response.data.image
+                        this.$emit('input', response.data.image.toString())
+                        this.$emit('update:modelValue', response.data.image.toString())
+                        this.uploading = false
+                        this.info = null
+                    })
+                }, 'image/jpeg')
             }
-        }
-    }
-
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

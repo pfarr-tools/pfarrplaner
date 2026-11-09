@@ -29,44 +29,70 @@
 <template>
     <div class="cc-tab">
         <div class="form-group">
-            <form-check name="cc" label="Parallel findet ein Kindergottesdienst statt." v-model="service.cc"/>
+            <form-check
+                name="cc"
+                label="Parallel findet ein Kindergottesdienst statt."
+                v-model="service.cc"
+            />
         </div>
         <div class="row">
             <div class="col-md-6">
-                <form-input name="cc_alt_time" label="Vom Gottesdienst abweichende Uhrzeit"
-                            :help="'Leer lassen, wenn der Kindergottesdienst zur selben Zeit ('+myService.timeText+') beginnt.'"
-                            placeholder="HH:MM"
-                            v-model="myService.cc_alt_time"
-                            :disabled="disabled"
+                <form-input
+                    name="cc_alt_time"
+                    label="Vom Gottesdienst abweichende Uhrzeit"
+                    :help="
+                        'Leer lassen, wenn der Kindergottesdienst zur selben Zeit (' +
+                        myService.timeText +
+                        ') beginnt.'
+                    "
+                    placeholder="HH:MM"
+                    v-model="myService.cc_alt_time"
+                    :disabled="disabled"
                 />
             </div>
             <div class="col-md-6">
-                <form-input name="cc_location" label="Ort der Kinderkirche"
-                            :help="service.location?.cc_default_location ? 'Leer lassen für: '+ service.location?.cc_default_location : ''"
-                            v-model="myService.cc_location" :disabled="disabled"/>
+                <form-input
+                    name="cc_location"
+                    label="Ort der Kinderkirche"
+                    :help="
+                        service.location?.cc_default_location
+                            ? 'Leer lassen für: ' + service.location?.cc_default_location
+                            : ''
+                    "
+                    v-model="myService.cc_location"
+                    :disabled="disabled"
+                />
             </div>
         </div>
-        <hr/>
+        <hr />
         <div class="form-group">
-            <form-textarea name="cc_lesson" label="Thema des Kindergottesdiensts" v-model="myService.cc_lesson"
-                           :disabled="disabled"/>
+            <form-textarea
+                name="cc_lesson"
+                label="Thema des Kindergottesdiensts"
+                v-model="myService.cc_lesson"
+                :disabled="disabled"
+            />
         </div>
-        <hr/>
+        <hr />
         <div class="form-group">
-            <form-input name="cc_staff" label="Mitarbeitende"
-                        v-model="myService.cc_staff" :disabled="disabled"/>
+            <form-input
+                name="cc_staff"
+                label="Mitarbeitende"
+                v-model="myService.cc_staff"
+                :disabled="disabled"
+            />
         </div>
     </div>
 </template>
 
 <script>
-import FormInput from "../../Ui/forms/FormInput";
-import FormTextarea from "../../Ui/forms/FormTextarea";
-import FormRadioGroup from "../../Ui/forms/FormRadioGroup";
-import FormCheck from "../../Ui/forms/FormCheck";
+import FormInput from '../../Ui/forms/FormInput'
+import FormTextarea from '../../Ui/forms/FormTextarea'
+import FormRadioGroup from '../../Ui/forms/FormRadioGroup'
+import FormCheck from '../../Ui/forms/FormCheck'
 
 export default {
-    name: "CCTab",
+    name: 'CCTab',
     components: {
         FormCheck,
         FormRadioGroup,
@@ -78,22 +104,19 @@ export default {
     },
     computed: {
         disabled() {
-            return (this.myService.cc == false) || (this.myService.cc == 0);
-        }
+            return this.myService.cc == false || this.myService.cc == 0
+        },
     },
     data() {
-        var myService = this.service;
-        myService.cc_alt_time = myService.cc_alt_time ? myService.cc_alt_time.substr(0,5) : null;
-
+        var myService = this.service
+        myService.cc_alt_time = myService.cc_alt_time ? myService.cc_alt_time.substr(0, 5) : null
 
         return {
             myService: myService,
         }
     },
-    methods: {}
+    methods: {},
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -29,60 +29,74 @@
 <template>
     <div>
         <div class="mb-3 d-flex flex-wrap gap-2">
-            <button class="btn btn-primary" @click.prevent="copyToClipboard" :disabled="loading || !prompt">
+            <button
+                class="btn btn-primary"
+                @click.prevent="copyToClipboard"
+                :disabled="loading || !prompt"
+            >
                 <span class="mdi mdi-content-copy me-1"></span>Prompt kopieren
             </button>
         </div>
 
-        <div v-if="loading" class="alert alert-info mb-0">
+        <div
+            v-if="loading"
+            class="alert alert-info mb-0"
+        >
             Prompt wird geladen...
         </div>
-        <div v-else-if="error" class="alert alert-danger mb-0">
+        <div
+            v-else-if="error"
+            class="alert alert-danger mb-0"
+        >
             {{ error }}
         </div>
-        <form-textarea v-else label="Vorgeschlagener Prompt" v-model="prompt" rows="20"/>
+        <form-textarea
+            v-else
+            label="Vorgeschlagener Prompt"
+            v-model="prompt"
+            rows="20"
+        />
     </div>
 </template>
 
 <script>
-import FormTextarea from "../../Ui/forms/FormTextarea.vue";
+import FormTextarea from '../../Ui/forms/FormTextarea.vue'
 
 export default {
-    name: "AIPromptLiturgySheetDialog",
-    components: {FormTextarea},
+    name: 'AIPromptLiturgySheetDialog',
+    components: { FormTextarea },
     props: ['service', 'sheet'],
     data() {
         return {
             loading: true,
             error: null,
             prompt: '',
-        };
+        }
     },
     mounted() {
-        this.loadData();
+        this.loadData()
     },
     methods: {
         loadData() {
-            this.loading = true;
-            this.error = null;
-            axios.get(route('liturgy.dialog', {service: this.service.slug, key: this.sheet.key}))
-                .then(response => {
-                    this.prompt = response.data.prompt || '';
+            this.loading = true
+            this.error = null
+            axios
+                .get(route('liturgy.dialog', { service: this.service.slug, key: this.sheet.key }))
+                .then((response) => {
+                    this.prompt = response.data.prompt || ''
                 })
                 .catch(() => {
-                    this.error = 'Der Prompt konnte nicht geladen werden.';
+                    this.error = 'Der Prompt konnte nicht geladen werden.'
                 })
                 .finally(() => {
-                    this.loading = false;
-                });
+                    this.loading = false
+                })
         },
         copyToClipboard() {
-            navigator.clipboard.writeText(this.prompt);
+            navigator.clipboard.writeText(this.prompt)
         },
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

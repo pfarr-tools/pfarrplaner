@@ -28,39 +28,57 @@
 
 <template>
     <div class="liturgy-item-freetext-editor">
-        <form-input id="freetextEditorTitle" v-model="editedElement.title" label="Titel im Ablaufplan" />
+        <form-input
+            id="freetextEditorTitle"
+            v-model="editedElement.title"
+            label="Titel im Ablaufplan"
+        />
 
-        <liturgy-text-editor v-model="editedElement.data.description" settings="myEditorSettings"
-                             label="Notizen"
-                             :service="service"/>
-        <text-stats :text="editedElement.data.description"/>
+        <liturgy-text-editor
+            v-model="editedElement.data.description"
+            settings="myEditorSettings"
+            label="Notizen"
+            :service="service"
+        />
+        <text-stats :text="editedElement.data.description" />
 
-        <rich-text-editor v-model="editedElement.data.handoutText" label="Text für Liedblätter ,usw."
-                             :settings="myEditorSettings" />
-        <form-check label="Titel in Liedblättern, usw. unterdrücken" v-model="editedElement.data.handoutSuppressTitle" class="mb-1" />
-        <form-textarea v-model="editedElement.data.slideText" label="Text für Folien" class="mb-1" help="--- als Trenner für neue Folie verwenden"/>
-
+        <rich-text-editor
+            v-model="editedElement.data.handoutText"
+            label="Text für Liedblätter ,usw."
+            :settings="myEditorSettings"
+        />
+        <form-check
+            label="Titel in Liedblättern, usw. unterdrücken"
+            v-model="editedElement.data.handoutSuppressTitle"
+            class="mb-1"
+        />
+        <form-textarea
+            v-model="editedElement.data.slideText"
+            label="Text für Folien"
+            class="mb-1"
+            help="--- als Trenner für neue Folie verwenden"
+        />
     </div>
 </template>
 
 <script>
-import TextStats from "../Elements/TextStats";
-import FormInput from "../../Ui/forms/FormInput";
-import FormSelectize from "../../Ui/forms/FormSelectize";
-import NavButton from "../../Ui/buttons/NavButton";
-import FormFileUpload from "../../Ui/forms/FormFileUpload";
-import {romanize} from "@pfarr.tools/romanize";
-import FormBibleReferenceInput from "../../Ui/forms/FormBibleReferenceInput";
-import ReplacementMenu from "./Elements/ReplacementMenu";
-import ReplacementMenuButton from "./Elements/ReplacementMenuButton";
-import RelativeDate from "@pfarr.tools/relative-date";
-import LiturgyTextEditor from "./Elements/LiturgyTextEditor.vue";
-import FormTextarea from "../../Ui/forms/FormTextarea.vue";
-import RichTextEditor from "./Elements/RichTextEditor.vue";
-import FormCheck from "../../Ui/forms/FormCheck.vue";
+import TextStats from '../Elements/TextStats'
+import FormInput from '../../Ui/forms/FormInput'
+import FormSelectize from '../../Ui/forms/FormSelectize'
+import NavButton from '../../Ui/buttons/NavButton'
+import FormFileUpload from '../../Ui/forms/FormFileUpload'
+import { romanize } from '@pfarr.tools/romanize'
+import FormBibleReferenceInput from '../../Ui/forms/FormBibleReferenceInput'
+import ReplacementMenu from './Elements/ReplacementMenu'
+import ReplacementMenuButton from './Elements/ReplacementMenuButton'
+import RelativeDate from '@pfarr.tools/relative-date'
+import LiturgyTextEditor from './Elements/LiturgyTextEditor.vue'
+import FormTextarea from '../../Ui/forms/FormTextarea.vue'
+import RichTextEditor from './Elements/RichTextEditor.vue'
+import FormCheck from '../../Ui/forms/FormCheck.vue'
 
 export default {
-    name: "FreetextEditor",
+    name: 'FreetextEditor',
     components: {
         FormCheck,
         RichTextEditor,
@@ -68,7 +86,12 @@ export default {
         LiturgyTextEditor,
         ReplacementMenuButton,
         ReplacementMenu,
-        FormBibleReferenceInput, FormFileUpload, NavButton, FormSelectize, FormInput, TextStats
+        FormBibleReferenceInput,
+        FormFileUpload,
+        NavButton,
+        FormSelectize,
+        FormInput,
+        TextStats,
     },
     inject: ['lists'],
     props: {
@@ -84,7 +107,7 @@ export default {
         },
     },
     data() {
-        var e = this.element;
+        var e = this.element
 
         e.data = {
             description: '',
@@ -94,32 +117,34 @@ export default {
             ...e.data,
         }
 
-        let replacementMenus = [];
+        let replacementMenus = []
 
-        this.service.baptisms.forEach(baptism => {
-        });
-        this.service.funerals.forEach(funeral => {
-            let items = {};
+        this.service.baptisms.forEach((baptism) => {})
+        this.service.funerals.forEach((funeral) => {
+            let items = {}
             replacementMenus.push({
                 title: funeral.buried_name,
                 icon: 'mdi mdi-grave-stone',
                 show: false,
                 items: {
-                    'Geburtsdatum': moment(funeral.dob).locale('de').format('LL'),
-                    'Sterbedatum': moment(funeral.dod).locale('de').format('LL'),
-                    'Sterbedatum (relativ)': RelativeDate(moment(funeral.dod).format('DD.MM.YYYY'), moment(this.service.date).format('DD.MM.YYYY')),
-                    'Sterbealter': funeral.age,
-                    'Lebenszeit in Tagen': moment(funeral.dod).diff(moment(funeral.dob), 'days').toLocaleString('de-DE'),
-                    'Geburtsort': funeral.birth_place,
-                    'Sterbeort': funeral.death_place,
-                    'Geburtsname': funeral.birth_name,
-                    'Rufname': funeral.spoken_name,
-                }
+                    Geburtsdatum: moment(funeral.dob).locale('de').format('LL'),
+                    Sterbedatum: moment(funeral.dod).locale('de').format('LL'),
+                    'Sterbedatum (relativ)': RelativeDate(
+                        moment(funeral.dod).format('DD.MM.YYYY'),
+                        moment(this.service.date).format('DD.MM.YYYY'),
+                    ),
+                    Sterbealter: funeral.age,
+                    'Lebenszeit in Tagen': moment(funeral.dod)
+                        .diff(moment(funeral.dob), 'days')
+                        .toLocaleString('de-DE'),
+                    Geburtsort: funeral.birth_place,
+                    Sterbeort: funeral.death_place,
+                    Geburtsname: funeral.birth_name,
+                    Rufname: funeral.spoken_name,
+                },
             })
-        });
-        this.service.weddings.forEach(wedding => {
-        });
-
+        })
+        this.service.weddings.forEach((wedding) => {})
 
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
@@ -131,43 +156,44 @@ export default {
             insertBibleReference: '',
             replacementMenus,
             myEditorSettings: {},
-        };
+        }
     },
     methods: {
         insertText(text) {
-            var myField = this.$refs['textEditor'];
+            var myField = this.$refs['textEditor']
 
             if (myField.selectionStart || myField.selectionStart == '0') {
-                var startPos = myField.selectionStart;
-                var endPos = myField.selectionEnd;
-                this.editedElement.data.description = myField.value.substring(0, startPos)
-                    + text
-                    + myField.value.substring(endPos, myField.value.length);
-                myField.focus();
-                myField.selectionStart = myField.selectionEnd = myField.selectionEnd + text.length;
+                var startPos = myField.selectionStart
+                var endPos = myField.selectionEnd
+                this.editedElement.data.description =
+                    myField.value.substring(0, startPos) +
+                    text +
+                    myField.value.substring(endPos, myField.value.length)
+                myField.focus()
+                myField.selectionStart = myField.selectionEnd = myField.selectionEnd + text.length
             } else {
-                this.editedElement.data.description += text;
-                myField.focus();
+                this.editedElement.data.description += text
+                myField.focus()
             }
         },
         toggleTextDropdown() {
-            this.showTextDropdown = !this.showTextDropdown;
-            if (!this.showTextDropdown) this.$refs['textEditor'].focus();
+            this.showTextDropdown = !this.showTextDropdown
+            if (!this.showTextDropdown) this.$refs['textEditor'].focus()
         },
         toggleBibleImportDropdown() {
-            this.showBibleImportDropdown = !this.showBibleImportDropdown;
-            if (!this.showBibleImportDropdown) this.$refs['textEditor'].focus();
+            this.showBibleImportDropdown = !this.showBibleImportDropdown
+            if (!this.showBibleImportDropdown) this.$refs['textEditor'].focus()
         },
         toggleWordImportDropdown() {
-            this.showWordImportDropdown = !this.showWordImportDropdown;
-            if (!this.showWordImportDropdown) this.$refs['textEditor'].focus();
+            this.showWordImportDropdown = !this.showWordImportDropdown
+            if (!this.showWordImportDropdown) this.$refs['textEditor'].focus()
         },
         insertBibleText() {
-            this.insertText(this.insertBibleReference);
-            this.showBibleImportDropdown = false;
-            this.insertBibleReference = '';
-            this.$refs['textEditor'].focus();
-        }
+            this.insertText(this.insertBibleReference)
+            this.showBibleImportDropdown = false
+            this.insertBibleReference = ''
+            this.$refs['textEditor'].focus()
+        },
     },
 }
 </script>
@@ -178,14 +204,14 @@ export default {
 }
 
 .help {
-    margin-top: .5em;
-    margin-bottom: .5em;
-    font-size: .8em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    font-size: 0.8em;
 }
 
 .help-title {
     font-weight: bold;
-    margin-bottom: .25em;
+    margin-bottom: 0.25em;
 }
 
 .dropdown-menu {

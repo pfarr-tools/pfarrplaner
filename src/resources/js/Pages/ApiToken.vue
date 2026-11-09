@@ -32,28 +32,31 @@
         <div>
             <code>{{ token }}</code>
         </div>
-        <nav-button type="light" icon="mdi mdi-clipboard" title="In die Zwischenablage kopieren" @click="copyToClipboard">
+        <nav-button
+            type="light"
+            icon="mdi mdi-clipboard"
+            title="In die Zwischenablage kopieren"
+            @click="copyToClipboard"
+        >
             In die Zwischenablage kopieren
         </nav-button>
     </admin-layout>
 </template>
 
 <script>
-import NavButton from "../components/Ui/buttons/NavButton";
+import NavButton from '../components/Ui/buttons/NavButton'
 
 export default {
-    components: {NavButton},
+    components: { NavButton },
     props: ['token'],
-    name: "ApiToken.vue",
+    name: 'ApiToken.vue',
     methods: {
         copyToClipboard() {
-            const cb = navigator.clipboard;
-            cb.writeText(this.token).then(result => {});
+            const cb = navigator.clipboard
+            cb.writeText(this.token).then((result) => {})
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

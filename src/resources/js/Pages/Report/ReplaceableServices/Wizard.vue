@@ -27,26 +27,36 @@
   -->
 
 <template>
-    <admin-layout :title="'Vertretungen für '+user.name+' bearbeiten'">
+    <admin-layout :title="'Vertretungen für ' + user.name + ' bearbeiten'">
         <template #after-flash>
-            <div v-if="saving" class="alert alert-warning">Änderungen werden gespeichert ... <span
-                class="mdi mdi-spin mdi-loading"></span></div>
-            <div v-if="saved" class="alert alert-success"><span class="mdi mdi-check"></span> Änderungen wurden
-                automatisch gespeichert.
+            <div
+                v-if="saving"
+                class="alert alert-warning"
+            >
+                Änderungen werden gespeichert ... <span class="mdi mdi-spin mdi-loading"></span>
+            </div>
+            <div
+                v-if="saved"
+                class="alert alert-success"
+            >
+                <span class="mdi mdi-check"></span> Änderungen wurden automatisch gespeichert.
             </div>
         </template>
-        <dataset v-slot="{ ds }" ref="ds"
-                 :ds-data="myServices"
-                 ds-sort-by="date">
+        <dataset
+            v-slot="{ ds }"
+            ref="ds"
+            :ds-data="myServices"
+            ds-sort-by="date"
+        >
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover d-md-table">
                             <thead>
-                            <tr>
-                                <th>Gottesdienst</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>Gottesdienst</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <dataset-item tag="tbody">
                                 <template #default="{ row, rowIndex }">
@@ -55,24 +65,41 @@
                                             <div class="pb-1 text-bold">
                                                 {{ row.service.titleText }}
                                             </div>
-                                            {{ moment(row.service.date).format('DD.MM.YYYY') }}, {{
-                                                row.service.timeText
-                                            }} <br/>{{ row.service.locationText }}
+                                            {{ moment(row.service.date).format('DD.MM.YYYY') }},
+                                            {{ row.service.timeText }} <br />{{
+                                                row.service.locationText
+                                            }}
                                         </td>
                                         <td>
-                                            <people-select :label="ministryText(row.category)" :people="people"
-                                                           v-model="row.service.ministries[row.category]"
-                                                           @input="updateService(row.service, row.category)"
-                                                           :teams="teams" :include-teams-from-city="row.service.city"
-                                                           :city="row.service.city"/>
+                                            <people-select
+                                                :label="ministryText(row.category)"
+                                                :people="people"
+                                                v-model="row.service.ministries[row.category]"
+                                                @input="updateService(row.service, row.category)"
+                                                :teams="teams"
+                                                :include-teams-from-city="row.service.city"
+                                                :city="row.service.city"
+                                            />
                                         </td>
                                         <td>
-                                            <nav-button class="btn-sm" type="primary" icon="mdi mdi-pencil"
-                                                        force-no-text force-icon title="Gottesdienst bearbeiten"
-                                                        :href="route('service.edit', row.service)"></nav-button>
-                                            <nav-button class="btn-sm" type="danger" icon="mdi mdi-delete"
-                                                        force-no-text force-icon title="Gottesdienst löschen"
-                                                        @click="deleteService(row, rowIndex)"></nav-button>
+                                            <nav-button
+                                                class="btn-sm"
+                                                type="primary"
+                                                icon="mdi mdi-pencil"
+                                                force-no-text
+                                                force-icon
+                                                title="Gottesdienst bearbeiten"
+                                                :href="route('service.edit', row.service)"
+                                            ></nav-button>
+                                            <nav-button
+                                                class="btn-sm"
+                                                type="danger"
+                                                icon="mdi mdi-delete"
+                                                force-no-text
+                                                force-icon
+                                                title="Gottesdienst löschen"
+                                                @click="deleteService(row, rowIndex)"
+                                            ></nav-button>
                                         </td>
                                     </tr>
                                 </template>
@@ -86,64 +113,77 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-show class="mb-2 mb-md-0" :ds-show-entries="showEntries"/>
-                <dataset-pager/>
+            <div
+                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+            >
+                <dataset-info class="mb-2 mb-md-0" />
+                <dataset-show
+                    class="mb-2 mb-md-0"
+                    :ds-show-entries="showEntries"
+                />
+                <dataset-pager />
             </div>
         </dataset>
     </admin-layout>
 </template>
 
-import FormGroup from "../../../components/Ui/forms/FormGroup";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-import LocationSelect from "../../../components/Ui/elements/LocationSelect";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import {Dataset, DatasetItem, DatasetSearch} from "vue-dataset";
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
-import FormBibleReferenceInput from "../../../components/Ui/forms/FormBibleReferenceInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
-
+import FormGroup from "../../../components/Ui/forms/FormGroup"; import FormSelectize from
+"../../../components/Ui/forms/FormSelectize"; import NavButton from
+"../../../components/Ui/buttons/NavButton"; import LocationSelect from
+"../../../components/Ui/elements/LocationSelect"; import FormInput from
+"../../../components/Ui/forms/FormInput"; import {Dataset, DatasetItem, DatasetSearch} from
+"vue-dataset"; import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo"; import
+DatasetPager from "../../../components/Ui/dataset/DatasetPager"; import DatasetShow from
+"../../../components/Ui/dataset/DatasetShow"; import FormBibleReferenceInput from
+"../../../components/Ui/forms/FormBibleReferenceInput"; import FormDatePicker from
+"../../../components/Ui/forms/FormDatePicker";
 
 <script>
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker.vue";
-import FormBibleReferenceInput from "../../../components/Ui/forms/FormBibleReferenceInput.vue";
-import FormInput from "../../../components/Ui/forms/FormInput.vue";
-import LocationSelect from "../../../components/Ui/elements/LocationSelect.vue";
-import NavButton from "../../../components/Ui/buttons/NavButton.vue";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize.vue";
-import FormGroup from "../../../components/Ui/forms/FormGroup.vue";
-import {Dataset, DatasetItem, DatasetSearch} from "vue-dataset";
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo.vue";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager.vue";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow.vue";
-import PeopleSelect from "../../../components/Ui/elements/PeopleSelect.vue";
+import FormDatePicker from '../../../components/Ui/forms/FormDatePicker.vue'
+import FormBibleReferenceInput from '../../../components/Ui/forms/FormBibleReferenceInput.vue'
+import FormInput from '../../../components/Ui/forms/FormInput.vue'
+import LocationSelect from '../../../components/Ui/elements/LocationSelect.vue'
+import NavButton from '../../../components/Ui/buttons/NavButton.vue'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize.vue'
+import FormGroup from '../../../components/Ui/forms/FormGroup.vue'
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../../../components/Ui/dataset/DatasetInfo.vue'
+import DatasetPager from '../../../components/Ui/dataset/DatasetPager.vue'
+import DatasetShow from '../../../components/Ui/dataset/DatasetShow.vue'
+import PeopleSelect from '../../../components/Ui/elements/PeopleSelect.vue'
 
 export default {
-    name: "Wizard",
+    name: 'Wizard',
     props: ['user', 'services', 'ministries', 'people', 'teams'],
     components: {
         PeopleSelect,
         FormDatePicker,
         FormBibleReferenceInput,
-        FormInput, LocationSelect, NavButton, FormSelectize, FormGroup,
+        FormInput,
+        LocationSelect,
+        NavButton,
+        FormSelectize,
+        FormGroup,
         Dataset,
         DatasetItem,
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     data() {
-        let myMembers = {};
-        let myServices = this.services;
-        let basicMinistryKeys = {P: 'pastors', O: 'organists', M: 'sacristans', A: 'otherParticipants'};
+        let myMembers = {}
+        let myServices = this.services
+        let basicMinistryKeys = {
+            P: 'pastors',
+            O: 'organists',
+            M: 'sacristans',
+            A: 'otherParticipants',
+        }
         for (const myServiceId in myServices) {
-            myServices[myServiceId]['service']['ministries'] = {};
-            myServices[myServiceId]['service']['ministries'][myServices[myServiceId].category] = this.getMembers(myServices[myServiceId]);
+            myServices[myServiceId]['service']['ministries'] = {}
+            myServices[myServiceId]['service']['ministries'][myServices[myServiceId].category] =
+                this.getMembers(myServices[myServiceId])
         }
 
         return {
@@ -157,40 +197,47 @@ export default {
     },
     methods: {
         ministryText(category) {
-            return this.ministries[category] || category;
+            return this.ministries[category] || category
         },
         getMembers(row) {
             switch (row.category) {
                 case 'P':
-                    return row.service.pastors || [];
+                    return row.service.pastors || []
                 case 'O':
-                    return row.service.organists || [];
+                    return row.service.organists || []
                 case 'M':
-                    return row.service.sacristans || [];
+                    return row.service.sacristans || []
             }
-            return row.service.ministriesByCategory[row.category] || [];
+            return row.service.ministriesByCategory[row.category] || []
         },
         updateService(service, category) {
-            axios.post(route('inputs.save', 'planning'), service).then(response => {
-                this.saving = false;
-                this.saved = true;
-                this.$forceUpdate();
-            });
+            axios.post(route('inputs.save', 'planning'), service).then((response) => {
+                this.saving = false
+                this.saved = true
+                this.$forceUpdate()
+            })
         },
         deleteService(row, rowIndex) {
-            if (!confirm('Willst du den gewählten Gottesdienst wirklich in den Papierkorb verschieben? Du kannst ihn dort später wiederherstellen.')) return;
-            this.$api().delete(route('api.service.destroy', {
-                service: row.service.slug,
-            })).then(response => {
-                console.log('rowIndex', rowIndex);
-                this.myServices.splice(rowIndex, 1);
-                this.$forceUpdate();
-            });
-        }
-    }
+            if (
+                !confirm(
+                    'Willst du den gewählten Gottesdienst wirklich in den Papierkorb verschieben? Du kannst ihn dort später wiederherstellen.',
+                )
+            )
+                return
+            this.$api()
+                .delete(
+                    route('api.service.destroy', {
+                        service: row.service.slug,
+                    }),
+                )
+                .then((response) => {
+                    console.log('rowIndex', rowIndex)
+                    this.myServices.splice(rowIndex, 1)
+                    this.$forceUpdate()
+                })
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

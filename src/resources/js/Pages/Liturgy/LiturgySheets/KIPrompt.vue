@@ -29,34 +29,42 @@
 <template>
     <admin-layout title="KI-Prompt">
         <template v-slot:navbar-left>
-            <nav-button type="primary" icon="mdi mdi-copy" @click="copyToClipboard" title="In die Zwischenablage kopieren">Prompt kopieren</nav-button>
+            <nav-button
+                type="primary"
+                icon="mdi mdi-copy"
+                @click="copyToClipboard"
+                title="In die Zwischenablage kopieren"
+                >Prompt kopieren</nav-button
+            >
         </template>
-        <form-textarea label="Vorgeschlagener Prompt" v-model="myBody" rows="20"/>
+        <form-textarea
+            label="Vorgeschlagener Prompt"
+            v-model="myBody"
+            rows="20"
+        />
     </admin-layout>
 </template>
 
 <script>
-import FormTextarea from "../../../components/Ui/forms/FormTextarea.vue";
-import NavButton from "../../../components/Ui/buttons/NavButton.vue";
+import FormTextarea from '../../../components/Ui/forms/FormTextarea.vue'
+import NavButton from '../../../components/Ui/buttons/NavButton.vue'
 
 export default {
-    name: "KIPrompt",
+    name: 'KIPrompt',
     props: ['prompt', 'service'],
     data() {
         return {
             myBody: this.prompt,
         }
     },
-    components: {NavButton, FormTextarea},
+    components: { NavButton, FormTextarea },
     methods: {
         copyToClipboard() {
-            const cb = navigator.clipboard;
-            cb.writeText(this.myBody).then(result => {});
+            const cb = navigator.clipboard
+            cb.writeText(this.myBody).then((result) => {})
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

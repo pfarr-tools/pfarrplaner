@@ -28,29 +28,56 @@
 
 <template>
     <admin-layout title="Mit Outlook verbinden">
-        <form-selectize label="Welche Art von Kalender möchtest du mit Outlook verbinden?"
-                        :options="calendarLinks" v-model="myType"/>
-        <div v-if="link.needs.includes('cities')" :key="link.id">
-            <form-selectize label="Daten für folgende Kirchengemeinden mit einschließen"
-                            :options="cities" v-model="myForm.cities" multiple/>
+        <form-selectize
+            label="Welche Art von Kalender möchtest du mit Outlook verbinden?"
+            :options="calendarLinks"
+            v-model="myType"
+        />
+        <div
+            v-if="link.needs.includes('cities')"
+            :key="link.id"
+        >
+            <form-selectize
+                label="Daten für folgende Kirchengemeinden mit einschließen"
+                :options="cities"
+                v-model="myForm.cities"
+                multiple
+            />
         </div>
-        <div v-if="link.needs.includes('includeHidden')" :key="link.id">
-            <form-check label="Versteckte Gottesdienste mit einbeziehen"
-                        v-model="myForm.includeHidden" />
+        <div
+            v-if="link.needs.includes('includeHidden')"
+            :key="link.id"
+        >
+            <form-check
+                label="Versteckte Gottesdienste mit einbeziehen"
+                v-model="myForm.includeHidden"
+            />
         </div>
         <hr />
         <ol class="steps">
             <li>Öffne Microsoft Outlook und wechsle zur Kalenderansicht.</li>
             <li>Wähle "Start &gt; Kalender öffnen &gt; Aus dem Internet..."</li>
-            <li>Gib als Speicherort folgenden Link ein:<br>
+            <li>
+                Gib als Speicherort folgenden Link ein:<br />
                 <div class="input-group mb-3">
-                    <input id="link" type="text" class="form-control" placeholder="Link zum Kalenderexport"
-                           aria-label="Link zum Kalenderexport" :value="url" readonly>
+                    <input
+                        id="link"
+                        type="text"
+                        class="form-control"
+                        placeholder="Link zum Kalenderexport"
+                        aria-label="Link zum Kalenderexport"
+                        :value="url"
+                        readonly
+                    />
                     <div class="input-group-text p-0">
-                        <button class="btn btn-outline-secondary" type="button"
-                                @click="copyToClipboard"
-                                title="In die Zwischenablage kopieren">
-                            <span class="fa fa-clipboard"></span></button>
+                        <button
+                            class="btn btn-outline-secondary"
+                            type="button"
+                            @click="copyToClipboard"
+                            title="In die Zwischenablage kopieren"
+                        >
+                            <span class="fa fa-clipboard"></span>
+                        </button>
                     </div>
                 </div>
             </li>
@@ -61,33 +88,33 @@
 </template>
 
 <script>
-import FormSelectize from "../../components/Ui/forms/FormSelectize";
-import FormCheck from "../../components/Ui/forms/FormCheck";
+import FormSelectize from '../../components/Ui/forms/FormSelectize'
+import FormCheck from '../../components/Ui/forms/FormCheck'
 
 export default {
-    name: "Connect",
+    name: 'Connect',
     props: ['calendarLinks', 'cities'],
-    components: {FormCheck, FormSelectize},
+    components: { FormCheck, FormSelectize },
     computed: {
         link() {
-            return this.calendarLinks.filter(item => {
+            return this.calendarLinks.filter((item) => {
                 return item.id === this.myType
-            })[0];
+            })[0]
         },
         url() {
             let data = {
                 user: this.$page.props.currentUser.data.id,
                 token: this.$page.props.currentUser.data.api_token,
                 key: this.link.id,
-            };
+            }
             if (this.link.needs.includes('cities')) {
-                data['cities'] = this.myForm.cities.join(',');
+                data['cities'] = this.myForm.cities.join(',')
             }
             if (this.link.needs.includes('includeHidden')) {
-                data['includeHidden'] = this.myForm.includeHidden ? 1: 0;
+                data['includeHidden'] = this.myForm.includeHidden ? 1 : 0
             }
-            return route('ical.export', data);
-        }
+            return route('ical.export', data)
+        },
     },
     data() {
         return {
@@ -95,17 +122,15 @@ export default {
             myForm: {
                 cities: this.cities.length ? [this.cities[0].id] : null,
                 includeHidden: false,
-            }
+            },
         }
     },
     methods: {
         copyToClipboard() {
-            navigator.clipboard?.writeText(this.url).then(() => {});
-        }
+            navigator.clipboard?.writeText(this.url).then(() => {})
+        },
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

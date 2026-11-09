@@ -29,12 +29,12 @@
 export default {
     computed: {
         currentUser() {
-            return window.currentUser.data;
+            return window.currentUser.data
         },
     },
     methods: {
         $can(permission) {
-            return window.Laravel.permissions.indexOf(permission) != -1;
-        }
-    }
-};
+            return window.Laravel.permissions.indexOf(permission) != -1
+        },
+    },
+}

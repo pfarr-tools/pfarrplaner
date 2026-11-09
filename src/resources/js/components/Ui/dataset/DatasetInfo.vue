@@ -27,9 +27,7 @@
   -->
 
 <template>
-    <div>
-        Datensätze {{ showing }} bis {{ showingTo }} von {{ dsResultsNumber }}
-    </div>
+    <div>Datensätze {{ showing }} bis {{ showingTo }} von {{ dsResultsNumber }}</div>
 </template>
 
 <script>
@@ -42,13 +40,15 @@ export default {
         const dsTo = inject('dsTo')
 
         const showing = computed(() => (dsResultsNumber.value !== 0 ? dsFrom.value + 1 : 0))
-        const showingTo = computed(() => (dsTo.value >= dsResultsNumber.value ? dsResultsNumber.value : dsTo.value))
+        const showingTo = computed(() =>
+            dsTo.value >= dsResultsNumber.value ? dsResultsNumber.value : dsTo.value,
+        )
 
         return {
             dsResultsNumber,
             showing,
-            showingTo
+            showingTo,
         }
-    }
+    },
 }
 </script>

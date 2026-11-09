@@ -27,22 +27,25 @@
   -->
 
 <template>
-    <div role="tabpanel" class="tab-pane fade" :class="{
-        active: active || activeTab == id,
-        in: active || activeTab == id,
-        show: active || activeTab == id,
-    }" :id="id">
+    <div
+        role="tabpanel"
+        class="tab-pane fade"
+        :class="{
+            active: active || activeTab == id,
+            in: active || activeTab == id,
+            show: active || activeTab == id,
+        }"
+        :id="id"
+    >
         <slot />
     </div>
 </template>
 
 <script>
 export default {
-    name: "tab",
-    props: ['id', 'active', 'activeTab']
+    name: 'tab',
+    props: ['id', 'active', 'activeTab'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

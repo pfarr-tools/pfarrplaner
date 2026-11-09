@@ -28,39 +28,53 @@
 
 <template>
     <div class="mb-2">
-        <hr/>
+        <hr />
         <small @click="open = !open">
-            <span class="text-bold" :class="open ? 'mdi mdi-chevron-down-circle' : 'mdi mdi-chevron-right-circle'"></span> Zusätzliche Zeitangaben</small>
-        <div v-if="open" class="row">
+            <span
+                class="text-bold"
+                :class="open ? 'mdi mdi-chevron-down-circle' : 'mdi mdi-chevron-right-circle'"
+            ></span>
+            Zusätzliche Zeitangaben</small
+        >
+        <div
+            v-if="open"
+            class="row"
+        >
             <div class="col-sm-6">
-                <form-input label="Benötigte Zeit" v-model="editedElement.data.time" placeholder="MM:SS" />
+                <form-input
+                    label="Benötigte Zeit"
+                    v-model="editedElement.data.time"
+                    placeholder="MM:SS"
+                />
             </div>
             <div class="col-sm-6">
-                <form-input label="Abweichende Geschwindigkeit" help="Worte pro Minute" v-model="editedElement.data.wpm" />
+                <form-input
+                    label="Abweichende Geschwindigkeit"
+                    help="Worte pro Minute"
+                    v-model="editedElement.data.wpm"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import FormInput from "../../../Ui/forms/FormInput";
+import FormInput from '../../../Ui/forms/FormInput'
 export default {
-    name: "TimeFields",
-    components: {FormInput},
+    name: 'TimeFields',
+    components: { FormInput },
     props: ['service', 'element', 'agendaMode'],
     data() {
-        var editedElement = this.element;
-        editedElement.data.time = editedElement.data.time || '';
-        editedElement.data.wpm = editedElement.data.wpm || '';
+        var editedElement = this.element
+        editedElement.data.time = editedElement.data.time || ''
+        editedElement.data.wpm = editedElement.data.wpm || ''
 
         return {
             editedElement: editedElement,
-            open: (editedElement.data.time || editedElement.data.wpm) ? true: false,
-        };
-    }
+            open: editedElement.data.time || editedElement.data.wpm ? true : false,
+        }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

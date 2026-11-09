@@ -27,239 +27,253 @@
   -->
 
 <script>
-const WORD_CHARACTER_REGEXP = /[\p{L}\p{M}\p{N}]/u;
-const PUNCTUATION_CHARACTER_REGEXP = /[.,;:!?'"“”„‚‘()\-[\]{}…]/u;
+const WORD_CHARACTER_REGEXP = /[\p{L}\p{M}\p{N}]/u
+const PUNCTUATION_CHARACTER_REGEXP = /[.,;:!?'"“”„‚‘()\-[\]{}…]/u
 
 export default {
-    name: "Reader",
+    name: 'Reader',
     props: ['sermon'],
     data() {
         return {
             activeHighlightIndex: -1,
             highlightCount: 0,
-        };
+        }
     },
     computed: {
         activeHighlightNumber() {
-            return this.activeHighlightIndex >= 0 ? this.activeHighlightIndex + 1 : 0;
+            return this.activeHighlightIndex >= 0 ? this.activeHighlightIndex + 1 : 0
         },
     },
     methods: {
         clearSelection() {
             if (window.getSelection) {
                 if (window.getSelection().empty) {
-                    window.getSelection().empty();
+                    window.getSelection().empty()
                 } else if (window.getSelection().removeAllRanges) {
-                    window.getSelection().removeAllRanges();
+                    window.getSelection().removeAllRanges()
                 }
             } else if (document.selection) {
-                document.selection.empty();
+                document.selection.empty()
             }
         },
         getHighlights() {
             return this.$refs.reader
                 ? Array.from(this.$refs.reader.querySelectorAll('mark.highlighted-text'))
-                : [];
+                : []
         },
         syncHighlights() {
-            const highlights = this.getHighlights();
-            this.highlightCount = highlights.length;
+            const highlights = this.getHighlights()
+            this.highlightCount = highlights.length
             if (!highlights.length) {
-                this.activeHighlightIndex = -1;
+                this.activeHighlightIndex = -1
             } else if (this.activeHighlightIndex >= highlights.length) {
-                this.activeHighlightIndex = highlights.length - 1;
+                this.activeHighlightIndex = highlights.length - 1
             }
-            return highlights;
+            return highlights
         },
         isWordCharacter(character) {
-            return WORD_CHARACTER_REGEXP.test(character);
+            return WORD_CHARACTER_REGEXP.test(character)
         },
         isPunctuationCharacter(character) {
-            return PUNCTUATION_CHARACTER_REGEXP.test(character);
+            return PUNCTUATION_CHARACTER_REGEXP.test(character)
         },
         isHighlightableCharacter(character) {
-            return this.isWordCharacter(character) || this.isPunctuationCharacter(character);
+            return this.isWordCharacter(character) || this.isPunctuationCharacter(character)
         },
         getCaretPosition(event) {
             if (document.caretPositionFromPoint) {
-                const position = document.caretPositionFromPoint(event.clientX, event.clientY);
+                const position = document.caretPositionFromPoint(event.clientX, event.clientY)
                 if (position) {
                     return {
                         node: position.offsetNode,
                         offset: position.offset,
-                    };
+                    }
                 }
             }
 
             if (document.caretRangeFromPoint) {
-                const range = document.caretRangeFromPoint(event.clientX, event.clientY);
+                const range = document.caretRangeFromPoint(event.clientX, event.clientY)
                 if (range) {
                     return {
                         node: range.startContainer,
                         offset: range.startOffset,
-                    };
+                    }
                 }
             }
 
-            return null;
+            return null
         },
         resolveTextNode(position) {
-            if (!position || !position.node) return null;
+            if (!position || !position.node) return null
 
             if (position.node.nodeType === Node.TEXT_NODE) {
-                return position;
+                return position
             }
 
-            if (!position.node.childNodes.length) return null;
+            if (!position.node.childNodes.length) return null
 
-            const childIndex = Math.min(position.offset, position.node.childNodes.length - 1);
-            const childNode = position.node.childNodes[childIndex];
+            const childIndex = Math.min(position.offset, position.node.childNodes.length - 1)
+            const childNode = position.node.childNodes[childIndex]
             if (childNode && childNode.nodeType === Node.TEXT_NODE) {
                 return {
                     node: childNode,
                     offset: 0,
-                };
+                }
             }
 
-            return null;
+            return null
         },
         getWordRange(position) {
-            const textPosition = this.resolveTextNode(position);
-            if (!textPosition || !textPosition.node?.textContent) return null;
+            const textPosition = this.resolveTextNode(position)
+            if (!textPosition || !textPosition.node?.textContent) return null
 
-            const text = textPosition.node.textContent;
-            const textLength = text.length;
-            if (!textLength) return null;
+            const text = textPosition.node.textContent
+            const textLength = text.length
+            if (!textLength) return null
 
-            let index = Math.min(textPosition.offset, textLength - 1);
-            if (!this.isHighlightableCharacter(text.charAt(index)) && index > 0 && this.isHighlightableCharacter(text.charAt(index - 1))) {
-                index -= 1;
+            let index = Math.min(textPosition.offset, textLength - 1)
+            if (
+                !this.isHighlightableCharacter(text.charAt(index)) &&
+                index > 0 &&
+                this.isHighlightableCharacter(text.charAt(index - 1))
+            ) {
+                index -= 1
             }
 
-            if (!this.isHighlightableCharacter(text.charAt(index))) return null;
+            if (!this.isHighlightableCharacter(text.charAt(index))) return null
 
             if (this.isPunctuationCharacter(text.charAt(index))) {
-                const range = document.createRange();
-                range.setStart(textPosition.node, index);
-                range.setEnd(textPosition.node, index + 1);
-                return range;
+                const range = document.createRange()
+                range.setStart(textPosition.node, index)
+                range.setEnd(textPosition.node, index + 1)
+                return range
             }
 
-            let start = index;
-            let end = index + 1;
+            let start = index
+            let end = index + 1
 
             while (start > 0 && this.isWordCharacter(text.charAt(start - 1))) {
-                start -= 1;
+                start -= 1
             }
 
             while (end < textLength && this.isWordCharacter(text.charAt(end))) {
-                end += 1;
+                end += 1
             }
 
-            const range = document.createRange();
-            range.setStart(textPosition.node, start);
-            range.setEnd(textPosition.node, end);
-            return range;
+            const range = document.createRange()
+            range.setStart(textPosition.node, start)
+            range.setEnd(textPosition.node, end)
+            return range
         },
         setActiveHighlight(index, shouldScroll = true) {
-            const highlights = this.syncHighlights();
+            const highlights = this.syncHighlights()
 
             highlights.forEach((highlight, currentIndex) => {
-                highlight.classList.toggle('highlighted-text--active', currentIndex === index);
-            });
+                highlight.classList.toggle('highlighted-text--active', currentIndex === index)
+            })
 
             if (index < 0 || index >= highlights.length) {
-                this.activeHighlightIndex = -1;
-                return;
+                this.activeHighlightIndex = -1
+                return
             }
 
-            this.activeHighlightIndex = index;
+            this.activeHighlightIndex = index
             if (shouldScroll) {
                 highlights[index].scrollIntoView({
                     behavior: 'smooth',
                     block: 'center',
-                });
+                })
             }
         },
         activateHighlightElement(element, shouldScroll = true) {
-            const highlights = this.syncHighlights();
-            const highlightIndex = highlights.indexOf(element);
-            this.setActiveHighlight(highlightIndex, shouldScroll);
+            const highlights = this.syncHighlights()
+            const highlightIndex = highlights.indexOf(element)
+            this.setActiveHighlight(highlightIndex, shouldScroll)
         },
         createHighlight(range) {
-            const markElement = document.createElement("mark");
-            markElement.className = "highlighted-text";
-            range.surroundContents(markElement);
-            this.activateHighlightElement(markElement);
+            const markElement = document.createElement('mark')
+            markElement.className = 'highlighted-text'
+            range.surroundContents(markElement)
+            this.activateHighlightElement(markElement)
         },
         removeHighlight(element) {
-            const parent = element.parentNode;
-            if (!parent) return;
+            const parent = element.parentNode
+            if (!parent) return
 
             while (element.firstChild) {
-                parent.insertBefore(element.firstChild, element);
+                parent.insertBefore(element.firstChild, element)
             }
 
-            parent.removeChild(element);
-            parent.normalize();
-            this.syncHighlights();
-            this.setActiveHighlight(-1, false);
+            parent.removeChild(element)
+            parent.normalize()
+            this.syncHighlights()
+            this.setActiveHighlight(-1, false)
         },
         highlight(event) {
-            const existingHighlight = event.target.closest('mark.highlighted-text');
+            const existingHighlight = event.target.closest('mark.highlighted-text')
             if (existingHighlight) {
-                this.removeHighlight(existingHighlight);
-                this.clearSelection();
-                return true;
+                this.removeHighlight(existingHighlight)
+                this.clearSelection()
+                return true
             }
 
-            const position = this.getCaretPosition(event);
-            const range = this.getWordRange(position);
-            if (!range || !range.toString().trim()) return true;
+            const position = this.getCaretPosition(event)
+            const range = this.getWordRange(position)
+            if (!range || !range.toString().trim()) return true
 
-            this.createHighlight(range);
-            this.clearSelection();
-            return true;
+            this.createHighlight(range)
+            this.clearSelection()
+            return true
         },
         goToPreviousHighlight() {
-            const highlights = this.syncHighlights();
-            if (!highlights.length) return;
+            const highlights = this.syncHighlights()
+            if (!highlights.length) return
 
-            const newIndex = this.activeHighlightIndex <= 0
-                ? highlights.length - 1
-                : this.activeHighlightIndex - 1;
-            this.setActiveHighlight(newIndex);
+            const newIndex =
+                this.activeHighlightIndex <= 0
+                    ? highlights.length - 1
+                    : this.activeHighlightIndex - 1
+            this.setActiveHighlight(newIndex)
         },
         goToNextHighlight() {
-            const highlights = this.syncHighlights();
-            if (!highlights.length) return;
+            const highlights = this.syncHighlights()
+            if (!highlights.length) return
 
-            const newIndex = this.activeHighlightIndex >= highlights.length - 1
-                ? 0
-                : this.activeHighlightIndex + 1;
-            this.setActiveHighlight(newIndex);
+            const newIndex =
+                this.activeHighlightIndex >= highlights.length - 1
+                    ? 0
+                    : this.activeHighlightIndex + 1
+            this.setActiveHighlight(newIndex)
         },
-    }
+    },
 }
 </script>
 
 <template>
-    <admin-layout :title="sermon.title+' :: Leseansicht'">
+    <admin-layout :title="sermon.title + ' :: Leseansicht'">
         <template #navbar-right>
-            <div class="btn-group" role="group" aria-label="Markierungen">
-                <button class="btn btn-light"
-                        type="button"
-                        title="Zur vorherigen Markierung springen"
-                        :disabled="!highlightCount"
-                        @click.prevent="goToPreviousHighlight">
+            <div
+                class="btn-group"
+                role="group"
+                aria-label="Markierungen"
+            >
+                <button
+                    class="btn btn-light"
+                    type="button"
+                    title="Zur vorherigen Markierung springen"
+                    :disabled="!highlightCount"
+                    @click.prevent="goToPreviousHighlight"
+                >
                     <span class="mdi mdi-chevron-left me-1"></span>
                     Vorherige
                 </button>
-                <button class="btn btn-light"
-                        type="button"
-                        title="Zur nächsten Markierung springen"
-                        :disabled="!highlightCount"
-                        @click.prevent="goToNextHighlight">
+                <button
+                    class="btn btn-light"
+                    type="button"
+                    title="Zur nächsten Markierung springen"
+                    :disabled="!highlightCount"
+                    @click.prevent="goToNextHighlight"
+                >
                     Nächste
                     <span class="mdi mdi-chevron-right ms-1"></span>
                 </button>
@@ -268,7 +282,12 @@ export default {
                 {{ activeHighlightNumber }} / {{ highlightCount }}
             </span>
         </template>
-        <div ref="reader" class="reader" v-html="sermon.text" @click.stop="highlight"/>
+        <div
+            ref="reader"
+            class="reader"
+            v-html="sermon.text"
+            @click.stop="highlight"
+        />
     </admin-layout>
 </template>
 

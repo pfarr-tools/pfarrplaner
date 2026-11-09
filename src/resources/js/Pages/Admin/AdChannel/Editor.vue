@@ -1,4 +1,3 @@
-
 <!--
   - Pfarrplaner
   -
@@ -28,46 +27,57 @@
   -->
 
 <template>
-    <admin-layout :title="myAdChannel.name ? myAdChannel.name+' bearbeiten' : 'Neuer Werbekanal' ">
+    <admin-layout :title="myAdChannel.name ? myAdChannel.name + ' bearbeiten' : 'Neuer Werbekanal'">
         <template v-slot:navbar-left>
             <save-button @click="saveAdChannel" />
-            <nav-button class="ms-1" v-if="myAdChannel.id"
-                        @click="deleteAdChannel" type="danger" title="Werbekanal löschen"
-                        icon="mdi mdi-delete">Löschen</nav-button>
+            <nav-button
+                class="ms-1"
+                v-if="myAdChannel.id"
+                @click="deleteAdChannel"
+                type="danger"
+                title="Werbekanal löschen"
+                icon="mdi mdi-delete"
+                >Löschen</nav-button
+            >
         </template>
-        <form-input name="name" label="Bezeichnung" v-model="myAdChannel.name" />
+        <form-input
+            name="name"
+            label="Bezeichnung"
+            v-model="myAdChannel.name"
+        />
     </admin-layout>
 </template>
 
 <script>
-import FormInput from "../../../components/Ui/forms/FormInput";
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import NavButton from "../../../components/Ui/buttons/NavButton";
+import FormInput from '../../../components/Ui/forms/FormInput'
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import NavButton from '../../../components/Ui/buttons/NavButton'
 export default {
-    name: "Editor",
-    components: {NavButton, SaveButton, FormInput},
+    name: 'Editor',
+    components: { NavButton, SaveButton, FormInput },
     props: ['adChannel', 'city'],
     data() {
         return {
-            myAdChannel: this.adChannel || { name: '', city_id: this.city ? this.city.id : null }
+            myAdChannel: this.adChannel || { name: '', city_id: this.city ? this.city.id : null },
         }
     },
     methods: {
         saveAdChannel() {
             if (this.myAdChannel.id) {
-                this.$inertia.patch(route('admin.adchannel.update', this.myAdChannel.id), this.myAdChannel);
+                this.$inertia.patch(
+                    route('admin.adchannel.update', this.myAdChannel.id),
+                    this.myAdChannel,
+                )
             } else {
-                this.$inertia.post(route('admin.adchannels.store'), this.myAdChannel);
+                this.$inertia.post(route('admin.adchannels.store'), this.myAdChannel)
             }
         },
         deleteAdChannel() {
-            if (!confirm('Willst du diesen Werbekanal wirklich komplett löschen?')) return;
-            this.$inertia.delete(route('admin.adchannel.destroy', this.myAdChannel.id));
+            if (!confirm('Willst du diesen Werbekanal wirklich komplett löschen?')) return
+            this.$inertia.delete(route('admin.adchannel.destroy', this.myAdChannel.id))
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

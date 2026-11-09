@@ -28,24 +28,31 @@
 
 <template>
     <div class="service-group-select">
-        <form-selectize :name="name" :label="label" :help="help"
-                        :options="serviceGroups" :value="myValue"
-                        @input="handleInput"
-                        multiple />
+        <form-selectize
+            :name="name"
+            :label="label"
+            :help="help"
+            :options="serviceGroups"
+            :value="myValue"
+            @input="handleInput"
+            multiple
+        />
     </div>
 </template>
 
 <script>
-import FormSelectize from "../forms/FormSelectize";
+import FormSelectize from '../forms/FormSelectize'
 export default {
-    name: "ServiceGroupSelect",
+    name: 'ServiceGroupSelect',
     emits: ['update:modelValue'],
-    components: {FormSelectize},
+    components: { FormSelectize },
     props: ['serviceGroups', 'name', 'label', 'help', 'modelValue'],
     data() {
-        var myValue = [];
+        var myValue = []
         if (this.modelValue) {
-            this.modelValue.forEach(item => { myValue.push(item.id)});
+            this.modelValue.forEach((item) => {
+                myValue.push(item.id)
+            })
         }
 
         return {
@@ -54,14 +61,14 @@ export default {
     },
     methods: {
         handleInput(e) {
-            var items = [];
-            this.serviceGroups.forEach(group => { if (e.includes(group.id.toString())) items.push(group); });
-            this.$emit('update:modelValue', items);
+            var items = []
+            this.serviceGroups.forEach((group) => {
+                if (e.includes(group.id.toString())) items.push(group)
+            })
+            this.$emit('update:modelValue', items)
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

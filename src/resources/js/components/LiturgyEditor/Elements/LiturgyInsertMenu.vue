@@ -28,26 +28,54 @@
 
 <template>
     <div class="dropdown liturgy-insert-menu">
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle liturgy-insert-menu__button" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false" @click.stop
-                :title="label">
+        <button
+            class="btn btn-sm btn-outline-secondary dropdown-toggle liturgy-insert-menu__button"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            @click.stop
+            :title="label"
+        >
             <span class="mdi mdi-plus"></span>
             <span class="d-none d-md-inline ms-1">{{ label }}</span>
         </button>
-        <div class="dropdown-menu dropdown-menu-end" @click.stop>
-            <button type="button" class="dropdown-item" @click.prevent="insert('Freetext')">
+        <div
+            class="dropdown-menu dropdown-menu-end"
+            @click.stop
+        >
+            <button
+                type="button"
+                class="dropdown-item"
+                @click.prevent="insert('Freetext')"
+            >
                 <span class="mdi mdi-text me-2"></span> Freitext
             </button>
-            <button type="button" class="dropdown-item" @click.prevent="insert('Psalm')">
+            <button
+                type="button"
+                class="dropdown-item"
+                @click.prevent="insert('Psalm')"
+            >
                 <span class="mdi mdi-hands-pray me-2"></span> Psalm
             </button>
-            <button type="button" class="dropdown-item" @click.prevent="insert('Reading')">
+            <button
+                type="button"
+                class="dropdown-item"
+                @click.prevent="insert('Reading')"
+            >
                 <span class="mdi mdi-book-open-variant me-2"></span> Schriftlesung
             </button>
-            <button type="button" class="dropdown-item" @click.prevent="insert('Sermon')">
+            <button
+                type="button"
+                class="dropdown-item"
+                @click.prevent="insert('Sermon')"
+            >
                 <span class="mdi mdi-microphone me-2"></span> Predigt
             </button>
-            <button type="button" class="dropdown-item" @click.prevent="insert('Song')">
+            <button
+                type="button"
+                class="dropdown-item"
+                @click.prevent="insert('Song')"
+            >
                 <span class="mdi mdi-music me-2"></span> Lied
             </button>
         </div>
@@ -56,7 +84,7 @@
 
 <script>
 export default {
-    name: "LiturgyInsertMenu",
+    name: 'LiturgyInsertMenu',
     props: {
         label: {
             type: String,
@@ -66,7 +94,7 @@ export default {
     emits: ['insert'],
     methods: {
         insert(type) {
-            this.$emit('insert', type);
+            this.$emit('insert', type)
         },
     },
 }

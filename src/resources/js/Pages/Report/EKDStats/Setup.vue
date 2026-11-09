@@ -29,29 +29,47 @@
 <template>
     <admin-layout title="EKD-Statistikbericht erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="EKD-Statistikbericht erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="EKD-Statistikbericht erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'eKDStats'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'eKDStats' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="cities[]" label="Themenplan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple/>
-            <form-input name="year" label="Jahr" v-model="myYear" type="number" />
+            <form-selectize
+                name="cities[]"
+                label="Themenplan für folgende Kirchengemeinden erstellen"
+                :options="cities"
+                v-model="myCities"
+                multiple
+            />
+            <form-input
+                name="year"
+                label="Jahr"
+                v-model="myYear"
+                type="number"
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDatePicker from '../../../components/Ui/forms/FormDatePicker'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities'],
-    components: {FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: { FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton },
     data() {
-
         return {
             myUser: this.$page.props.currentUser.data.id,
             myCities: this.cities.length > 0 ? [this.cities[0].id] : [],
@@ -60,15 +78,13 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'eKDStats'}), {
+            submitReportForm(route('reports.render', { report: 'eKDStats' }), {
                 cities: this.myCities,
                 year: this.myYear,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

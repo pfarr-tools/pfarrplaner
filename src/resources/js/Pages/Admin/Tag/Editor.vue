@@ -27,28 +27,38 @@
   -->
 
 <template>
-    <admin-layout :title="myTag.name ? myTag.name+' bearbeiten' : 'Neue Kennzeichnung' ">
+    <admin-layout :title="myTag.name ? myTag.name + ' bearbeiten' : 'Neue Kennzeichnung'">
         <template v-slot:navbar-left>
             <save-button @click="saveTag" />
-            <nav-button class="ms-1" v-if="myTag.id"
-                        @click="deleteTag" type="danger" title="Kennzeichnung löschen"
-                        icon="mdi mdi-delete">Löschen</nav-button>
+            <nav-button
+                class="ms-1"
+                v-if="myTag.id"
+                @click="deleteTag"
+                type="danger"
+                title="Kennzeichnung löschen"
+                icon="mdi mdi-delete"
+                >Löschen</nav-button
+            >
         </template>
-        <form-input name="name" label="Bezeichnung" v-model="myTag.name" />
+        <form-input
+            name="name"
+            label="Bezeichnung"
+            v-model="myTag.name"
+        />
     </admin-layout>
 </template>
 
 <script>
-import FormInput from "../../../components/Ui/forms/FormInput";
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import NavButton from "../../../components/Ui/buttons/NavButton";
+import FormInput from '../../../components/Ui/forms/FormInput'
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import NavButton from '../../../components/Ui/buttons/NavButton'
 export default {
-    name: "Editor",
-    components: {NavButton, SaveButton, FormInput},
+    name: 'Editor',
+    components: { NavButton, SaveButton, FormInput },
     props: ['tag'],
     data() {
-        let myTag = this.tag;
-        if (undefined === myTag) myTag = {id: null, name: '', code: ''};
+        let myTag = this.tag
+        if (undefined === myTag) myTag = { id: null, name: '', code: '' }
 
         return {
             myTag: myTag,
@@ -57,19 +67,17 @@ export default {
     methods: {
         saveTag() {
             if (this.myTag.id) {
-                this.$inertia.patch(route('admin.tag.update', this.myTag.id), this.myTag);
+                this.$inertia.patch(route('admin.tag.update', this.myTag.id), this.myTag)
             } else {
-                this.$inertia.post(route('admin.tags.store'), this.myTag);
+                this.$inertia.post(route('admin.tags.store'), this.myTag)
             }
         },
         deleteTag() {
-            if (!confirm('Willst du diese Kennzeichnung wirklich komplett löschen?')) return;
-            this.$inertia.delete(route('admin.tag.destroy', this.myTag.id));
+            if (!confirm('Willst du diese Kennzeichnung wirklich komplett löschen?')) return
+            this.$inertia.delete(route('admin.tag.destroy', this.myTag.id))
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

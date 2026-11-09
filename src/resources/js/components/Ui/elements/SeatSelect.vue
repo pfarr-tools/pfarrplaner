@@ -28,55 +28,74 @@
 
 <template>
     <div class="seat-select">
-        <form-selectize :label="label" :help="help" :multiple="multiple" :name="name"
-                        title-key="title"
-                        :options="myItems"  :settings="mySelectizeSettings" :item-renderer="renderItem"
-                        :option-renderer="renderItem" :value="myValue"
-                        @input="handleInput"
+        <form-selectize
+            :label="label"
+            :help="help"
+            :multiple="multiple"
+            :name="name"
+            title-key="title"
+            :options="myItems"
+            :settings="mySelectizeSettings"
+            :item-renderer="renderItem"
+            :option-renderer="renderItem"
+            :value="myValue"
+            @input="handleInput"
         />
     </div>
 </template>
 
 <script>
-import FormSelectize from "../forms/FormSelectize";
+import FormSelectize from '../forms/FormSelectize'
 export default {
-    name: "SeatSelect",
+    name: 'SeatSelect',
     emits: ['update:modelValue'],
-    components: {FormSelectize},
+    components: { FormSelectize },
     props: ['location', 'label', 'help', 'multiple', 'name', 'excludeSections', 'modelValue'],
     computed: {
         myItems() {
-            var items = [];
-            if (!this.excludedSections) this.excludedSections = [];
-            this.location.seating_sections.forEach(section => {
+            var items = []
+            if (!this.excludedSections) this.excludedSections = []
+            this.location.seating_sections.forEach((section) => {
                 if (!this.excludedSections.includes(section)) {
-                    var sectionColor = (section.color ? section.color : '#efefef');
-                    section.seating_rows.forEach(row => {
-                        var icon = row.seats > 1 ? 'couch' : 'chair';
-                        items.push({id: row.title, title: row.title, section: section.title, seats: row.seats,
-                            icon: icon, color: row.color ? row.color : sectionColor});
+                    var sectionColor = section.color ? section.color : '#efefef'
+                    section.seating_rows.forEach((row) => {
+                        var icon = row.seats > 1 ? 'couch' : 'chair'
+                        items.push({
+                            id: row.title,
+                            title: row.title,
+                            section: section.title,
+                            seats: row.seats,
+                            icon: icon,
+                            color: row.color ? row.color : sectionColor,
+                        })
                         if (row.split) {
-                            var splitFactor = row.split;
-                            var chrVal = 64;
-                            splitFactor.split(',').forEach(factor => {
-                                var title = row.title+String.fromCharCode(++chrVal);
-                                items.push({id: title, title: title, section: section.title,
-                                    seats: factor, icon: 'chair', color: row.color ? row.color : sectionColor});
-                            });
+                            var splitFactor = row.split
+                            var chrVal = 64
+                            splitFactor.split(',').forEach((factor) => {
+                                var title = row.title + String.fromCharCode(++chrVal)
+                                items.push({
+                                    id: title,
+                                    title: title,
+                                    section: section.title,
+                                    seats: factor,
+                                    icon: 'chair',
+                                    color: row.color ? row.color : sectionColor,
+                                })
+                            })
                         }
-                    });
+                    })
                 }
-            });
-            return items;
-        }
+            })
+            return items
+        },
     },
     data() {
-        var myValue = this.modelValue ? this.modelValue.split(',') : [];
-        myValue.forEach((value,key) => {
-            if ((isNaN(value) && (value.length==2))  || ((!isNaN(value)) && (value.length == 1))) {
-                myValue[key] = '0' + value;
+        var myValue = this.modelValue ? this.modelValue.split(',') : []
+        myValue.forEach((value, key) => {
+            if ((isNaN(value) && value.length == 2) || (!isNaN(value) && value.length == 1)) {
+                myValue[key] = '0' + value
             }
-        });
+        })
         return {
             myLocation: this.location,
             mySelectizeSettings: {
@@ -90,26 +109,34 @@ export default {
     },
     methods: {
         renderItem(item, escape) {
-            var icon = '';
+            var icon = ''
             if (item.icon == 'couch') {
-                icon = '<span class="mdi mdi-sofa"></span>';
+                icon = '<span class="mdi mdi-sofa"></span>'
             } else {
-                for (var i=0; i<item.seats; i++) {
-                    icon += '<span class="mdi mdi-sofa-single"></span>';
+                for (var i = 0; i < item.seats; i++) {
+                    icon += '<span class="mdi mdi-sofa-single"></span>'
                 }
             }
-            return '<div class="item" style="padding-left: 3px; background-color: '+item.color+'"><div>'
-                +icon+' '+escape(item.title)+'</div><span style="font-size: .7em;">'
-                +escape(item.section)+' &middot; '+escape(item.seats.toString())
-                +(item.seats >1 ? ' Plätze' : ' Platz')+'</span></div>';
+            return (
+                '<div class="item" style="padding-left: 3px; background-color: ' +
+                item.color +
+                '"><div>' +
+                icon +
+                ' ' +
+                escape(item.title) +
+                '</div><span style="font-size: .7em;">' +
+                escape(item.section) +
+                ' &middot; ' +
+                escape(item.seats.toString()) +
+                (item.seats > 1 ? ' Plätze' : ' Platz') +
+                '</span></div>'
+            )
         },
         handleInput(e) {
-            this.$emit('update:modelValue', e.join(','));
-        }
-    }
+            this.$emit('update:modelValue', e.join(','))
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

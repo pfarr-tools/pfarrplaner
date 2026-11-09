@@ -31,14 +31,27 @@
         <div class="liturgy-workspace-header__copy">
             <h1 class="liturgy-workspace-header__title mb-0">
                 {{ pageTitle }}
-                <span v-if="service.timeText && !templateMode" class="liturgy-workspace-header__time mx-1">
-                    {{ service.timeText }}
-                </span>&middot;
-                <span v-if="service.locationText && !templateMode" class="liturgy-workspace-header__location">{{ service.locationText }}
+                <span
+                    v-if="service.timeText && !templateMode"
+                    class="liturgy-workspace-header__time mx-1"
+                >
+                    {{ service.timeText }} </span
+                >&middot;
+                <span
+                    v-if="service.locationText && !templateMode"
+                    class="liturgy-workspace-header__location"
+                    >{{ service.locationText }}
                 </span>
             </h1>
-            <div v-if="credits" class="liturgy-workspace-header__credits" v-html="credits"></div>
-            <div v-else-if="liturgicalLabel" class="liturgy-workspace-header__credits">
+            <div
+                v-if="credits"
+                class="liturgy-workspace-header__credits"
+                v-html="credits"
+            ></div>
+            <div
+                v-else-if="liturgicalLabel"
+                class="liturgy-workspace-header__credits"
+            >
                 {{ liturgicalLabel }}
             </div>
         </div>
@@ -46,10 +59,10 @@
 </template>
 
 <script>
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'
 
 export default {
-    name: "LiturgyWorkspaceHeader",
+    name: 'LiturgyWorkspaceHeader',
     props: {
         service: Object,
         templateMode: Boolean,
@@ -61,26 +74,26 @@ export default {
     },
     computed: {
         pageTitle() {
-            if (this.templateMode) return 'Vorlage bearbeiten';
-            return 'Liturgie für ' + dayjs(this.service.date).locale('de').format('DD.MM.YYYY');
+            if (this.templateMode) return 'Vorlage bearbeiten'
+            return 'Liturgie für ' + dayjs(this.service.date).locale('de').format('DD.MM.YYYY')
         },
         liturgicalLabel() {
-            return this.service.liturgicalInfo?.Bezeichnung || '';
+            return this.service.liturgicalInfo?.Bezeichnung || ''
         },
         credits() {
             let ministries = {
-                'P': this.service.pastors,
-                'O': this.service.organists,
-                'M': this.service.sacristans,
+                P: this.service.pastors,
+                O: this.service.organists,
+                M: this.service.sacristans,
                 ...this.service.ministriesByCategory,
-            };
-            let c = [];
-            for (const category in ministries) {
-                let names = [];
-                ministries[category].forEach(person => names.push(person.name));
-                if (names.length) c.push(category + ': ' + names.join(', '));
             }
-            return c.join(' &middot; ');
+            let c = []
+            for (const category in ministries) {
+                let names = []
+                ministries[category].forEach((person) => names.push(person.name))
+                if (names.length) c.push(category + ': ' + names.join(', '))
+            }
+            return c.join(' &middot; ')
         },
     },
 }

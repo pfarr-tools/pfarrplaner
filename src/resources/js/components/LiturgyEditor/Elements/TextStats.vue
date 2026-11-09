@@ -27,49 +27,54 @@
   -->
 
 <template>
-    <div v-if="text && (text.length > 0)">
-        <small class="form-text text-muted"><span v-if="!timeOnly">{{
-                text.length.toLocaleString('de-DE')
-            }} Zeichen &middot;
-            {{ wordCount().toLocaleString('de-DE') }} Wörter &middot;
-            {{ speechTimeLabel || 'Voraussichtliche Redezeit: ' }}</span>{{ calculatedSpeechTime() }}</small>
+    <div v-if="text && text.length > 0">
+        <small class="form-text text-muted"
+            ><span v-if="!timeOnly"
+                >{{ text.length.toLocaleString('de-DE') }} Zeichen &middot;
+                {{ wordCount().toLocaleString('de-DE') }} Wörter &middot;
+                {{ speechTimeLabel || 'Voraussichtliche Redezeit: ' }}</span
+            >{{ calculatedSpeechTime() }}</small
+        >
     </div>
 </template>
 
 <script>
 export default {
-    name: "TextStats",
+    name: 'TextStats',
     props: ['text', 'timeOnly', 'hideHours', 'wpm', 'speechTimeLabel'],
     methods: {
         wordCount() {
-            return this.text.trim().split(/\s+/).length;
+            return this.text.trim().split(/\s+/).length
         },
         formatTime(sec_num) {
-            var hours = Math.floor(sec_num / 3600);
-            var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-            var seconds = sec_num - (hours * 3600) - (minutes * 60);
+            var hours = Math.floor(sec_num / 3600)
+            var minutes = Math.floor((sec_num - hours * 3600) / 60)
+            var seconds = sec_num - hours * 3600 - minutes * 60
 
             if (hours < 10) {
-                var hoursText = "0" + hours;
+                var hoursText = '0' + hours
             }
             if (minutes < 10) {
-                minutes = "0" + minutes;
+                minutes = '0' + minutes
             }
             if (seconds < 10) {
-                seconds = "0" + seconds;
+                seconds = '0' + seconds
             }
-            return (this.hideHours ? (hours > 0 ? hoursText+':' : '') : hoursText+':') + minutes + ':' + seconds;
+            return (
+                (this.hideHours ? (hours > 0 ? hoursText + ':' : '') : hoursText + ':') +
+                minutes +
+                ':' +
+                seconds
+            )
         },
         calculatedSpeechTime() {
-            const defaultWPM = 110;
-            const wpm = this.wpm || defaultWPM;
-            const speechTime = (this.wordCount()) / wpm * 60;
-            return this.formatTime(parseInt(speechTime, 10));
+            const defaultWPM = 110
+            const wpm = this.wpm || defaultWPM
+            const speechTime = (this.wordCount() / wpm) * 60
+            return this.formatTime(parseInt(speechTime, 10))
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

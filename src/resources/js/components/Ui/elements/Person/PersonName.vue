@@ -28,24 +28,27 @@
 
 <template>
     <span>
-        <span v-if="lastFirst"><span :class="lastBold ? 'text-bold' : ''">{{ last }}</span>, {{ first }}</span>
-        <span v-else>{{ first }} <span :class="lastBold ? 'text-bold' : ''">{{ last }}</span></span>
+        <span v-if="lastFirst"
+            ><span :class="lastBold ? 'text-bold' : ''">{{ last }}</span
+            >, {{ first }}</span
+        >
+        <span v-else
+            >{{ first }} <span :class="lastBold ? 'text-bold' : ''">{{ last }}</span></span
+        >
     </span>
 </template>
 
 <script>
 export default {
-    name: "PersonName",
+    name: 'PersonName',
     props: ['person', 'lastFirst', 'lastBold'],
     data() {
         return {
             first: this.person.first_name || this.person.name.split(' ')[0],
-            last: this.person.last_name  || this.person.name.split(' ')[1],
+            last: this.person.last_name || this.person.name.split(' ')[1],
         }
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

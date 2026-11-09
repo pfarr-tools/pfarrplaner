@@ -29,28 +29,39 @@
 <template>
     <admin-layout title="Pfarrämter">
         <template v-slot:navbar-left>
-            <nav-button type="success" icon="mdi mdi-plus" title="Pfarramt hinzufügen" @click="addParish">
+            <nav-button
+                type="success"
+                icon="mdi mdi-plus"
+                title="Pfarramt hinzufügen"
+                @click="addParish"
+            >
                 Neues Pfarramt
             </nav-button>
         </template>
-        <dataset v-slot="{ ds }"
-                 :ds-data="parishes"
-                 ds-sort-by="title"
-                 :ds-search-in="['name', 'owning_city']"
-                 :ds-search-as="{
-                    owning_city: searchAsCity,
-                 }">
-            <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus/>
+        <dataset
+            v-slot="{ ds }"
+            :ds-data="parishes"
+            ds-sort-by="title"
+            :ds-search-in="['name', 'owning_city']"
+            :ds-search-as="{
+                owning_city: searchAsCity,
+            }"
+        >
+            <dataset-search
+                ds-search-placeholder="Suchen..."
+                ref="search"
+                autofocus
+            />
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover d-md-table">
                             <thead>
-                            <tr>
-                                <th>Pfarramt</th>
-                                <th>Kirchengemeinde</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>Pfarramt</th>
+                                    <th>Kirchengemeinde</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <dataset-item tag="tbody">
                                 <template #default="{ row, rowIndex }">
@@ -62,11 +73,22 @@
                                             {{ row.owning_city.name }}
                                         </td>
                                         <td class="text-end">
-                                            <nav-button type="light" icon="mdi mdi-pencil" title="Pfarramt bearbeiten"
-                                                        @click="editParish(row)" force-icon force-no-text/>
-                                            <nav-button type="danger" icon="mdi mdi-delete"
-                                                        title="Pfarramt löschen"
-                                                        @click="deleteParish(row)" force-icon force-no-text/>
+                                            <nav-button
+                                                type="light"
+                                                icon="mdi mdi-pencil"
+                                                title="Pfarramt bearbeiten"
+                                                @click="editParish(row)"
+                                                force-icon
+                                                force-no-text
+                                            />
+                                            <nav-button
+                                                type="danger"
+                                                icon="mdi mdi-delete"
+                                                title="Pfarramt löschen"
+                                                @click="deleteParish(row)"
+                                                force-icon
+                                                force-no-text
+                                            />
                                         </td>
                                     </tr>
                                 </template>
@@ -75,26 +97,25 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
+            <div
+                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+            >
+                <dataset-info class="mb-2 mb-md-0" />
+                <dataset-pager />
             </div>
         </dataset>
     </admin-layout>
 </template>
 
 <script>
-
-import {Dataset, DatasetItem, DatasetSearch} from "vue-dataset";
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-
-
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../../../components/Ui/dataset/DatasetInfo'
+import DatasetPager from '../../../components/Ui/dataset/DatasetPager'
+import DatasetShow from '../../../components/Ui/dataset/DatasetShow'
+import NavButton from '../../../components/Ui/buttons/NavButton'
 
 export default {
-    name: "Index",
+    name: 'Index',
     props: ['parishes'],
     components: {
         NavButton,
@@ -103,29 +124,27 @@ export default {
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     data() {
-        return {};
+        return {}
     },
     methods: {
         addParish() {
-            this.$inertia.get(route('parish.create'));
+            this.$inertia.get(route('parish.create'))
         },
         editParish(parish) {
-            this.$inertia.get(route('parish.edit', parish.id));
+            this.$inertia.get(route('parish.edit', parish.id))
         },
         deleteParish(parish) {
-            if (!confirm('Willst du dieses Pfarramt wirklich löschen?')) return;
-            this.$inertia.delete(route('parish.destroy', parish.id));
+            if (!confirm('Willst du dieses Pfarramt wirklich löschen?')) return
+            this.$inertia.delete(route('parish.destroy', parish.id))
         },
         searchAsCity(value, searchString, rowData) {
-            return rowData.owning_city.name.toLowerCase().includes(searchString);
+            return rowData.owning_city.name.toLowerCase().includes(searchString)
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

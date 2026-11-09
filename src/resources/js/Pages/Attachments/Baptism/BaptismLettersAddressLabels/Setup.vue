@@ -27,20 +27,20 @@
   -->
 
 <script>
-import FormInput from "../../../../components/Ui/forms/FormInput.vue";
-import FormSelectize from "../../../../components/Ui/forms/FormSelectize.vue";
-import FormSkipLabelsInput from "../../../../components/Ui/forms/FormSkipLabelsInput.vue";
-import NavButton from "../../../../components/Ui/buttons/NavButton.vue";
+import FormInput from '../../../../components/Ui/forms/FormInput.vue'
+import FormSelectize from '../../../../components/Ui/forms/FormSelectize.vue'
+import FormSkipLabelsInput from '../../../../components/Ui/forms/FormSkipLabelsInput.vue'
+import NavButton from '../../../../components/Ui/buttons/NavButton.vue'
 
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['baptism'],
-    components: {NavButton, FormSkipLabelsInput, FormSelectize, FormInput},
+    components: { NavButton, FormSkipLabelsInput, FormSelectize, FormInput },
     computed: {
         labels() {
-            if (this.size == 37) return 24;
-            return 21;
-        }
+            if (this.size == 37) return 24
+            return 21
+        },
     },
     data() {
         return {
@@ -52,30 +52,48 @@ export default {
     methods: {
         download() {
             window.location.href = route('auto-attachment', {
-                type: 'baptism', attachment: 'baptismLettersAddressLabels', attachable: this.baptism.id,
-                size: this.size/10, years: this.years, skipLabels: this.skipLabels,
+                type: 'baptism',
+                attachment: 'baptismLettersAddressLabels',
+                attachable: this.baptism.id,
+                size: this.size / 10,
+                years: this.years,
+                skipLabels: this.skipLabels,
             })
-        }
-    }
+        },
+    },
 }
 </script>
 
 <template>
     <admin-layout title="Adressetiketten drucken">
         <template v-slot:navbar-left>
-            <nav-button type="primary" @click="download">Etiketten ausgeben</nav-button>
+            <nav-button
+                type="primary"
+                @click="download"
+                >Etiketten ausgeben</nav-button
+            >
         </template>
-        <form-selectize label="Etikettentyp" v-model="size" :options="[
-            {id: 37, name: '70x37mm'},
-            {id: 41, name: '70x41mm'},
-        ]"/>
-        <form-input label="Für wie viele Jahre sollen Etiketten gedruckt werden?" type="number" v-model="years"/>
-        <form-skip-labels-input label="Wo soll mit dem Druck begonnen werden?"
-                                v-model="skipLabels" :labels="labels" :length="years"
-                                :key="'_labels_'+labels+'_'+'years'"/>
+        <form-selectize
+            label="Etikettentyp"
+            v-model="size"
+            :options="[
+                { id: 37, name: '70x37mm' },
+                { id: 41, name: '70x41mm' },
+            ]"
+        />
+        <form-input
+            label="Für wie viele Jahre sollen Etiketten gedruckt werden?"
+            type="number"
+            v-model="years"
+        />
+        <form-skip-labels-input
+            label="Wo soll mit dem Druck begonnen werden?"
+            v-model="skipLabels"
+            :labels="labels"
+            :length="years"
+            :key="'_labels_' + labels + '_' + 'years'"
+        />
     </admin-layout>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

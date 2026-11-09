@@ -27,22 +27,36 @@
   -->
 
 <template>
-    <liturgy-sheet-configuration-layout :title="sheetConfig.title" :service="service"
-                                        :sheet-config="sheetConfig">
-        <form-check label="Platzhalter für Jingle, Intro, ..." v-model="myConfig.includeJingleAndIntro"
-                    name="config[includeJingleAndIntro]"/>
-        <form-check label="Mitwirkende anzeigen" v-model="myConfig.includeCredits" name="config[includeCredits]"/>
-        <form-check label="Liederliste am Anfang" v-model="myConfig.includeSongList" name="config[includeSongList]"/>
+    <liturgy-sheet-configuration-layout
+        :title="sheetConfig.title"
+        :service="service"
+        :sheet-config="sheetConfig"
+    >
+        <form-check
+            label="Platzhalter für Jingle, Intro, ..."
+            v-model="myConfig.includeJingleAndIntro"
+            name="config[includeJingleAndIntro]"
+        />
+        <form-check
+            label="Mitwirkende anzeigen"
+            v-model="myConfig.includeCredits"
+            name="config[includeCredits]"
+        />
+        <form-check
+            label="Liederliste am Anfang"
+            v-model="myConfig.includeSongList"
+            name="config[includeSongList]"
+        />
     </liturgy-sheet-configuration-layout>
 </template>
 
 <script>
-import LiturgySheetConfigurationLayout from "./LiturgySheetConfigurationLayout";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
+import LiturgySheetConfigurationLayout from './LiturgySheetConfigurationLayout'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
 
 export default {
-    name: "SongBeamerSongSheetConfiguration",
-    components: {FormCheck, LiturgySheetConfigurationLayout},
+    name: 'SongBeamerSongSheetConfiguration',
+    components: { FormCheck, LiturgySheetConfigurationLayout },
     props: ['service', 'sheetConfig', 'config'],
     data() {
         return {
@@ -52,6 +66,4 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

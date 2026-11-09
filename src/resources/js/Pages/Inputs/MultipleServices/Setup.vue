@@ -29,71 +29,123 @@
 <template>
     <admin-layout title="Mehrere Gottesdienste anlegen">
         <template #navbar-left>
-            <nav-button type="primary" title="Gottesdienste anlegen" icon="mdi mdi-table"
-                        @click="createServices">Anlegen
+            <nav-button
+                type="primary"
+                title="Gottesdienste anlegen"
+                icon="mdi mdi-table"
+                @click="createServices"
+                >Anlegen
             </nav-button>
         </template>
         <div class="row">
             <div class="col-md-3">
-                <location-select label="Gottesdienste an folgendem Ort anlegen" :locations="locations"
-                                 v-model="setup.location" @input="serviceList" use-input />
+                <location-select
+                    label="Gottesdienste an folgendem Ort anlegen"
+                    :locations="locations"
+                    v-model="setup.location"
+                    @input="serviceList"
+                    use-input
+                />
             </div>
             <div class="col-md-3">
                 <div v-if="eventTypes[location.city_id]">
-                    <form-selectize label="KonfiApp" :options="eventTypes[location.city_id].types" v-model="setup.eventType"/>
+                    <form-selectize
+                        label="KonfiApp"
+                        :options="eventTypes[location.city_id].types"
+                        v-model="setup.eventType"
+                    />
                 </div>
             </div>
             <div class="col-md-6">
-                <form-input label="Abweichender Titel" v-model="setup.title"  @input="serviceList"/>
+                <form-input
+                    label="Abweichender Titel"
+                    v-model="setup.title"
+                    @input="serviceList"
+                />
             </div>
         </div>
         <div class="row">
             <div class="col-md-3">
-                <date-range-input label="Zeitraum" :model-value="dateRange" @update:modelValue="onDateRangeChange" />
+                <date-range-input
+                    label="Zeitraum"
+                    :model-value="dateRange"
+                    @update:modelValue="onDateRangeChange"
+                />
             </div>
             <div class="col-md-3">
-                <form-input label="Uhrzeit" type="time" v-model="setup.time" />
+                <form-input
+                    label="Uhrzeit"
+                    type="time"
+                    v-model="setup.time"
+                />
             </div>
             <div class="col-md-3">
-                <form-selectize label="Wochentag" :options="weekDays" v-model="setup.weekDay"  @input="serviceList"/>
+                <form-selectize
+                    label="Wochentag"
+                    :options="weekDays"
+                    v-model="setup.weekDay"
+                    @input="serviceList"
+                />
             </div>
             <div class="col-md-3">
                 <form-group label="Rhythmus (jede ... Woche)">
-                    <input class="mx-1 form-control" type="number" v-model="setup.rhythm" size="4"  @input="serviceList"/>
+                    <input
+                        class="mx-1 form-control"
+                        type="number"
+                        v-model="setup.rhythm"
+                        size="4"
+                        @input="serviceList"
+                    />
                 </form-group>
             </div>
         </div>
         <div v-if="!computing">
-            <hr/>
-            <dataset v-slot="{ ds }" ref="ds"
-                     :ds-data="services"
-                     ds-sort-by="date">
+            <hr />
+            <dataset
+                v-slot="{ ds }"
+                ref="ds"
+                :ds-data="services"
+                ds-sort-by="date"
+            >
                 <div class="row">
                     <div class="col-md-12">
                         <div class="table-responsive">
                             <table class="table table-striped table-hover d-md-table">
                                 <thead>
-                                <tr>
-                                    <th>Datum</th>
-                                    <th>Uhrzeit</th>
-                                    <th>Kirche</th>
-                                    <th></th>
-                                </tr>
+                                    <tr>
+                                        <th>Datum</th>
+                                        <th>Uhrzeit</th>
+                                        <th>Kirche</th>
+                                        <th></th>
+                                    </tr>
                                 </thead>
                                 <dataset-item tag="tbody">
                                     <template #default="{ row, rowIndex }">
                                         <tr>
-                                            <td>{{ row.date.format('DD.MM.YYYY') }} (KW {{ String(row.date.isoWeek()).padStart(2, '0') }})</td>
                                             <td>
-                                                <form-input type="time" v-model="row.time" :key="computeCounter" />
+                                                {{ row.date.format('DD.MM.YYYY') }} (KW
+                                                {{ String(row.date.isoWeek()).padStart(2, '0') }})
+                                            </td>
+                                            <td>
+                                                <form-input
+                                                    type="time"
+                                                    v-model="row.time"
+                                                    :key="computeCounter"
+                                                />
                                             </td>
                                             <td>
                                                 {{ row.locationText }}
                                             </td>
                                             <td>
-                                                <nav-button class="btn-sm" type="danger" icon="mdi mdi-delete"
-                                                            force-no-text force-icon title="Reihe löschen"
-                                                            @click="deleteRow(rowIndex)"></nav-button>
+                                                <nav-button
+                                                    class="btn-sm"
+                                                    type="danger"
+                                                    icon="mdi mdi-delete"
+                                                    force-no-text
+                                                    force-icon
+                                                    title="Reihe löschen"
+                                                    @click="deleteRow(rowIndex)"
+                                                ></nav-button>
                                             </td>
                                         </tr>
                                     </template>
@@ -107,10 +159,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                    <dataset-info class="mb-2 mb-md-0"/>
-                    <dataset-show class="mb-2 mb-md-0" :ds-show-entries="showEntries"/>
-                    <dataset-pager/>
+                <div
+                    class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+                >
+                    <dataset-info class="mb-2 mb-md-0" />
+                    <dataset-show
+                        class="mb-2 mb-md-0"
+                        :ds-show-entries="showEntries"
+                    />
+                    <dataset-pager />
                 </div>
             </dataset>
         </div>
@@ -118,52 +175,56 @@
 </template>
 
 <script>
-import FormGroup from "../../../components/Ui/forms/FormGroup";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-import LocationSelect from "../../../components/Ui/elements/LocationSelect";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import {Dataset, DatasetItem, DatasetSearch} from "vue-dataset";
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
-import FormBibleReferenceInput from "../../../components/Ui/forms/FormBibleReferenceInput";
-import DateRangeInput from "../../../components/Ui/elements/DateRangeInput";
+import FormGroup from '../../../components/Ui/forms/FormGroup'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import NavButton from '../../../components/Ui/buttons/NavButton'
+import LocationSelect from '../../../components/Ui/elements/LocationSelect'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../../../components/Ui/dataset/DatasetInfo'
+import DatasetPager from '../../../components/Ui/dataset/DatasetPager'
+import DatasetShow from '../../../components/Ui/dataset/DatasetShow'
+import FormBibleReferenceInput from '../../../components/Ui/forms/FormBibleReferenceInput'
+import DateRangeInput from '../../../components/Ui/elements/DateRangeInput'
 
 export default {
-    name: "Setup",
+    name: 'Setup',
     components: {
         DateRangeInput,
         FormBibleReferenceInput,
-        FormInput, LocationSelect, NavButton, FormSelectize, FormGroup,
+        FormInput,
+        LocationSelect,
+        NavButton,
+        FormSelectize,
+        FormGroup,
         Dataset,
         DatasetItem,
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     props: ['cities', 'locations', 'eventTypes'],
     mounted() {
-        this.serviceList();
+        this.serviceList()
     },
     computed: {
         location() {
-            return this.locations.filter(item => {
-                return item.id==this.setup.location;
-            })[0];
+            return this.locations.filter((item) => {
+                return item.id == this.setup.location
+            })[0]
         },
         startDate() {
-            return moment(this.setup.from);
+            return moment(this.setup.from)
         },
         endDate() {
-            return typeof this.setup.to == 'Object' ? this.setup.to : moment(this.setup.to);
+            return typeof this.setup.to == 'Object' ? this.setup.to : moment(this.setup.to)
         },
         dateRange() {
             return [
                 this.setup.from ? moment(this.setup.from).toDate() : null,
                 this.setup.to ? moment(this.setup.to).toDate() : null,
-            ];
+            ]
         },
     },
     data() {
@@ -180,105 +241,108 @@ export default {
                 from: moment().startOf('year').toISOString(),
                 to: moment().endOf('year').toISOString(),
                 location: this.locations.length ? this.locations[0].id : null,
-                time: this.locations.length && this.locations[0].default_time ? this.locations[0].default_time.substr(0, 5) : '',
+                time:
+                    this.locations.length && this.locations[0].default_time
+                        ? this.locations[0].default_time.substr(0, 5)
+                        : '',
                 title: '',
                 rhythm: 1,
                 weekDay: 0,
                 eventType: this.locations[0].city.konfiapp_default_type || null,
             },
             weekDays: [
-                {id: 0, name: 'Sonntag'},
-                {id: 1, name: 'Montag'},
-                {id: 2, name: 'Dienstag'},
-                {id: 3, name: 'Mittwoch'},
-                {id: 4, name: 'Donnerstag'},
-                {id: 5, name: 'Freitag'},
-                {id: 6, name: 'Samstag'},
+                { id: 0, name: 'Sonntag' },
+                { id: 1, name: 'Montag' },
+                { id: 2, name: 'Dienstag' },
+                { id: 3, name: 'Mittwoch' },
+                { id: 4, name: 'Donnerstag' },
+                { id: 5, name: 'Freitag' },
+                { id: 6, name: 'Samstag' },
             ],
             services: [],
         }
     },
     watch: {
         'setup.location': function (newLocation) {
-            this.setup.time = this.defaultTimeForLocation(newLocation);
-            this.serviceList();
+            this.setup.time = this.defaultTimeForLocation(newLocation)
+            this.serviceList()
         },
         'setup.time': function () {
-            this.serviceList();
+            this.serviceList()
         },
         setup: {
-            handler (newVal, oldVal) {
-                let newCity = this.locations.filter(item => {
-                    return item.id==newVal.location;
-                })[0];
-                let oldCity = this.locations.filter(item => {
-                    return item.id==newVal.location;
-                })[0];
+            handler(newVal, oldVal) {
+                let newCity = this.locations.filter((item) => {
+                    return item.id == newVal.location
+                })[0]
+                let oldCity = this.locations.filter((item) => {
+                    return item.id == newVal.location
+                })[0]
                 if (undefined != this.eventTypes[newVal]) {
                     if (newCity != oldCity) {
-                        this.setup.eventType = newCity.konfiapp_default_type || null;
+                        this.setup.eventType = newCity.konfiapp_default_type || null
                     }
                 } else {
-                    this.setup.eventType = null;
+                    this.setup.eventType = null
                 }
             },
-        }
+        },
     },
     methods: {
         defaultTimeForLocation(locationId = this.setup.location) {
-            const location = this.locations.find(item => item.id == locationId);
+            const location = this.locations.find((item) => item.id == locationId)
 
-            return location && location.default_time ? location.default_time.substr(0, 5) : '';
+            return location && location.default_time ? location.default_time.substr(0, 5) : ''
         },
         onDateRangeChange(val) {
             if (val && val.length === 2 && val[1]) {
-                this.setup.from = moment(val[0]).toISOString();
-                this.setup.to = moment(val[1]).toISOString();
-                this.serviceList();
+                this.setup.from = moment(val[0]).toISOString()
+                this.setup.to = moment(val[1]).toISOString()
+                this.serviceList()
             }
         },
         serviceList() {
-            if (!this.setup.from) return;
-            if (!this.setup.to) return;
-            if (!this.setup.rhythm) return;
-            if (isNaN(this.setup.weekDay)) return;
-            if (this.setup.weekDay < 0) return;
-            if (this.setup.weekDay > 6) return;
+            if (!this.setup.from) return
+            if (!this.setup.to) return
+            if (!this.setup.rhythm) return
+            if (isNaN(this.setup.weekDay)) return
+            if (this.setup.weekDay < 0) return
+            if (this.setup.weekDay > 6) return
 
-            this.computing = true;
-            this.services = [];
+            this.computing = true
+            this.services = []
             // find first instance
-            let current = moment(this.startDate);
-            while (current.format('d') != this.setup.weekDay) current = current.add(1, 'day');
+            let current = moment(this.startDate)
+            while (current.format('d') != this.setup.weekDay) current = current.add(1, 'day')
 
             while (current <= this.endDate) {
-                this.services.push(
-                    {
-                        date: moment(current),
-                        time: this.setup.time || '',
-                        locationText: this.location.name,
-                        location: this.location.id,
-                    }
-                );
-                current = current.add(7 * this.setup.rhythm, 'days');
+                this.services.push({
+                    date: moment(current),
+                    time: this.setup.time || '',
+                    locationText: this.location.name,
+                    location: this.location.id,
+                })
+                current = current.add(7 * this.setup.rhythm, 'days')
             }
-            this.computing = false;
-            this.computeCounter++;
-            this.$forceUpdate();
-            this.$nextTick(function() {
-                if (this.$refs.ds) this.$refs.ds.setActive(1);
-            });
+            this.computing = false
+            this.computeCounter++
+            this.$forceUpdate()
+            this.$nextTick(function () {
+                if (this.$refs.ds) this.$refs.ds.setActive(1)
+            })
         },
         createServices() {
-            this.$inertia.post(route('inputs.save', 'multipleServices'), {services: this.services, title: this.setup.title, eventType: this.setup.eventType});
+            this.$inertia.post(route('inputs.save', 'multipleServices'), {
+                services: this.services,
+                title: this.setup.title,
+                eventType: this.setup.eventType,
+            })
         },
         deleteRow(index) {
-            this.services.splice(index, 1);
-        }
-    }
+            this.services.splice(index, 1)
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

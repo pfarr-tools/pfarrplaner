@@ -29,20 +29,33 @@
 <template>
     <admin-layout title="Psalmen">
         <template v-slot:navbar-left>
-            <nav-button type="success" icon="mdi mdi-plus" title="Psalm hinzufügen"
-                        :href="route('admin.psalms.create')">Neuer Psalm</nav-button>
+            <nav-button
+                type="success"
+                icon="mdi mdi-plus"
+                title="Psalm hinzufügen"
+                :href="route('admin.psalms.create')"
+                >Neuer Psalm</nav-button
+            >
         </template>
-            <dataset
-                 v-slot="{ ds }"
-                 :ds-data="myPsalms"
-                 ds-sort-by="title"
-                 :ds-search-in="['title']"
-                 :ds-search-as="{
-                     title: searchFullTitle,
-                 }">
-            <div class="row mb-3" :data-page-count="ds.dsPagecount">
+        <dataset
+            v-slot="{ ds }"
+            :ds-data="myPsalms"
+            ds-sort-by="title"
+            :ds-search-in="['title']"
+            :ds-search-as="{
+                title: searchFullTitle,
+            }"
+        >
+            <div
+                class="row mb-3"
+                :data-page-count="ds.dsPagecount"
+            >
                 <div class="col-md-6 mb-2 mb-md-0">
-                    <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
+                    <dataset-search
+                        ds-search-placeholder="Suchen..."
+                        ref="search"
+                        autofocus
+                    />
                 </div>
                 <div class="col-md-5 text-end">
                     <dataset-show class="float-right" />
@@ -53,24 +66,46 @@
                     <div class="table-responsive">
                         <table class="table table-striped table-hover d-md-table">
                             <thead>
-                            <tr>
-                                <th>Referenz</th>
-                                <th>Titel</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>Referenz</th>
+                                    <th>Titel</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <dataset-item tag="tbody">
                                 <template #default="{ row, rowIndex }">
                                     <tr>
-                                        <td >{{ String((row.songbook_abbreviation || row.songbook || '')+' '+(row.reference || '')).trim() }}</td>
+                                        <td>
+                                            {{
+                                                String(
+                                                    (row.songbook_abbreviation ||
+                                                        row.songbook ||
+                                                        '') +
+                                                        ' ' +
+                                                        (row.reference || ''),
+                                                ).trim()
+                                            }}
+                                        </td>
                                         <td>{{ row.title }}</td>
                                         <td class="text-end">
-                                            <nav-button class="btn-sm"
-                                                        type="primary" icon="mdi mdi-pencil" title="Psalm bearbeiten"
-                                                        force-icon force-no-text :href="route('admin.psalm.edit', row.id)" />
-                                            <nav-button class="btn-sm"
-                                                        type="danger" icon="mdi mdi-delete" title="Psalm löschen"
-                                                        force-icon force-no-text @click="deletePsalm(row)" />
+                                            <nav-button
+                                                class="btn-sm"
+                                                type="primary"
+                                                icon="mdi mdi-pencil"
+                                                title="Psalm bearbeiten"
+                                                force-icon
+                                                force-no-text
+                                                :href="route('admin.psalm.edit', row.id)"
+                                            />
+                                            <nav-button
+                                                class="btn-sm"
+                                                type="danger"
+                                                icon="mdi mdi-delete"
+                                                title="Psalm löschen"
+                                                force-icon
+                                                force-no-text
+                                                @click="deletePsalm(row)"
+                                            />
                                         </td>
                                     </tr>
                                 </template>
@@ -79,25 +114,25 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
+            <div
+                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+            >
+                <dataset-info class="mb-2 mb-md-0" />
+                <dataset-pager />
             </div>
         </dataset>
     </admin-layout>
 </template>
 
 <script>
-
-import {Dataset, DatasetItem, DatasetSearch,} from 'vue-dataset';
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../../../components/Ui/dataset/DatasetInfo'
+import DatasetShow from '../../../components/Ui/dataset/DatasetShow'
+import DatasetPager from '../../../components/Ui/dataset/DatasetPager'
+import NavButton from '../../../components/Ui/buttons/NavButton'
 
 export default {
-    name: "Index",
+    name: 'Index',
     props: ['psalms'],
     data() {
         return {
@@ -111,21 +146,27 @@ export default {
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     methods: {
         deletePsalm(psalm) {
-            if (!confirm('Willst du wirklich den kompletten Psalm löschen?')) return;
-            this.$inertia.delete(route('admin.psalm.destroy', psalm.id));
+            if (!confirm('Willst du wirklich den kompletten Psalm löschen?')) return
+            this.$inertia.delete(route('admin.psalm.destroy', psalm.id))
         },
         searchFullTitle(value, searchString, rowData) {
-            return String((rowData.songbook_abbreviation || rowData.songbook || '')+' '+(rowData.reference || '')+' '+(rowData.title || ''))
-                .trim().toLowerCase().includes(searchString.toLowerCase());
+            return String(
+                (rowData.songbook_abbreviation || rowData.songbook || '') +
+                    ' ' +
+                    (rowData.reference || '') +
+                    ' ' +
+                    (rowData.title || ''),
+            )
+                .trim()
+                .toLowerCase()
+                .includes(searchString.toLowerCase())
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

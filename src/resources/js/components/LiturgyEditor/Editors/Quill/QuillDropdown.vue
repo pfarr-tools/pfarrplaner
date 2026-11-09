@@ -28,22 +28,39 @@
 
 <template>
     <div class="dropdown d-inline-block">
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
-                :title="title" @click.prevent.stop="toggle">
-            <span v-if="icon" :class="icon"></span>
+        <button
+            class="btn btn-sm btn-outline-secondary dropdown-toggle"
+            type="button"
+            :title="title"
+            @click.prevent.stop="toggle"
+        >
+            <span
+                v-if="icon"
+                :class="icon"
+            ></span>
             {{ myLabel }}
         </button>
-        <div class="dropdown-menu" :class="{'show': t}">
-            <button v-for="(item, itemKey) in items" :key="itemKey" v-if="items[itemKey]"
-                    class="dropdown-item" type="button"
-                    @click.prevent.stop="set(items[itemKey])">{{ itemKey }}</button>
+        <div
+            class="dropdown-menu"
+            :class="{ show: t }"
+        >
+            <button
+                v-for="(item, itemKey) in items"
+                :key="itemKey"
+                v-if="items[itemKey]"
+                class="dropdown-item"
+                type="button"
+                @click.prevent.stop="set(items[itemKey])"
+            >
+                {{ itemKey }}
+            </button>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    name: "QuillDropdown",
+    name: 'QuillDropdown',
     emits: ['input'],
     props: ['title', 'label', 'icon', 'items', 'remember'],
     data() {
@@ -54,12 +71,12 @@ export default {
     },
     methods: {
         toggle() {
-            this.t = !this.t;
+            this.t = !this.t
         },
         set(e) {
-            this.$emit('input', e);
-            if (this.remember) this.myLabel = e;
-            this.t = false;
+            this.$emit('input', e)
+            if (this.remember) this.myLabel = e
+            this.t = false
         },
     },
 }

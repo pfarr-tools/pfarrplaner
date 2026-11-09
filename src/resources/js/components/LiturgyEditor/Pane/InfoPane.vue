@@ -29,38 +29,75 @@
 <template xmlns="http://www.w3.org/1999/html">
     <div class="liturgy-editor-info-pane">
         <div v-if="showable && liturgy['Bezeichnung']">
-            <div v-if="myService.isAlternateProprium" class="alert alert-warning mb-1">
-                In den Gottesdiensteinstellungen wurde ein vom normalen Kalender abweichendes Proprium
-                festgelegt.
+            <div
+                v-if="myService.isAlternateProprium"
+                class="alert alert-warning mb-1"
+            >
+                In den Gottesdiensteinstellungen wurde ein vom normalen Kalender abweichendes
+                Proprium festgelegt.
             </div>
             <div v-if="liturgy['Bezeichnung']">
                 <div class="row">
                     <div class="col-12 col-md-10 fs-3">
-                            <div v-if="liturgy['Bezeichnung']">
-                                <b class="fw-bold me-1">{{ liturgy['Bezeichnung'] }}</b>
-                                <span v-if="liturgy['Festkreis']" class="badge bg-info" :class="'bg-circle-'+liturgy['CSS-Farbe']">{{
-                                        liturgy['Festkreis']
-                                    }} ({{ romanize(liturgy['Lesejahr']) }}) </span>
-                            </div>
+                        <div v-if="liturgy['Bezeichnung']">
+                            <b class="fw-bold me-1">{{ liturgy['Bezeichnung'] }}</b>
+                            <span
+                                v-if="liturgy['Festkreis']"
+                                class="badge bg-info"
+                                :class="'bg-circle-' + liturgy['CSS-Farbe']"
+                                >{{ liturgy['Festkreis'] }} ({{ romanize(liturgy['Lesejahr']) }})
+                            </span>
+                        </div>
                     </div>
                     <div class="col-12 col-md-2 text-md-end">
-                        <div v-if="showMaterialsButton && Object.keys(myService.liturgicalInfo.Links).length > 0" class="dropdown">
-                            <button type="button" id="dropdownLinksMenuButton" data-bs-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false" title="Links zu Predigthilfen"
-                                    class="btn btn-light btn-sm mt-1 dropdown-toggle"><span data-v-5d98b2c4=""
-                                                                                            class="mdi mdi-text"></span>
+                        <div
+                            v-if="
+                                showMaterialsButton &&
+                                Object.keys(myService.liturgicalInfo.Links).length > 0
+                            "
+                            class="dropdown"
+                        >
+                            <button
+                                type="button"
+                                id="dropdownLinksMenuButton"
+                                data-bs-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                                title="Links zu Predigthilfen"
+                                class="btn btn-light btn-sm mt-1 dropdown-toggle"
+                            >
+                                <span
+                                    data-v-5d98b2c4=""
+                                    class="mdi mdi-text"
+                                ></span>
                                 Materialsammlung
                             </button>
-                            <div aria-labelledby="dropdownLinksMenuButton" class="dropdown-menu">
-                                <a v-if="myService.liturgicalInfo.DKJ" target="_blank"
-                                   :href="myService.liturgicalInfo.DKJ.URL" class="dropdown-item">
+                            <div
+                                aria-labelledby="dropdownLinksMenuButton"
+                                class="dropdown-menu"
+                            >
+                                <a
+                                    v-if="myService.liturgicalInfo.DKJ"
+                                    target="_blank"
+                                    :href="myService.liturgicalInfo.DKJ.URL"
+                                    class="dropdown-item"
+                                >
                                     <div class="fw-bold">Das Kirchenjahr</div>
                                     <div>{{ myService.liturgicalInfo.Bezeichnung }}</div>
                                 </a>
-                                <a v-for="(link,linkTitle) in myService.liturgicalInfo.Links" target="_blank"
-                                   :href="link" class="dropdown-item">
-                                    <div class="fw-bold">{{ linkTitle.substring(1, linkTitle.indexOf(']')) }}</div>
-                                    <div v-if="getLinkAuthor(linkTitle)" class="text-small fst-italic">
+                                <a
+                                    v-for="(link, linkTitle) in myService.liturgicalInfo.Links"
+                                    target="_blank"
+                                    :href="link"
+                                    class="dropdown-item"
+                                >
+                                    <div class="fw-bold">
+                                        {{ linkTitle.substring(1, linkTitle.indexOf(']')) }}
+                                    </div>
+                                    <div
+                                        v-if="getLinkAuthor(linkTitle)"
+                                        class="text-small fst-italic"
+                                    >
                                         {{ getLinkAuthor(linkTitle) }}
                                     </div>
                                     <div>{{ getLinkTitle(linkTitle) }}</div>
@@ -71,87 +108,130 @@
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-2">
-                        <bible-reference :perikope="liturgy.Wochenspruch" title="WSp"/>
-                        <bible-reference :perikope="liturgy.Psalm" title="Ps"/>
-                        <bible-reference :perikope="liturgy.Predigt" title="Pr"/>
+                        <bible-reference
+                            :perikope="liturgy.Wochenspruch"
+                            title="WSp"
+                        />
+                        <bible-reference
+                            :perikope="liturgy.Psalm"
+                            title="Ps"
+                        />
+                        <bible-reference
+                            :perikope="liturgy.Predigt"
+                            title="Pr"
+                        />
                     </div>
                     <div class="col-12 col-md-2">
-                        <bible-reference :perikope="liturgy.Perikopen['Altes Testament']" title="AT"/>
-                        <bible-reference :perikope="liturgy.Perikopen['Evangelium']" title="Ev"/>
-                        <bible-reference :perikope="liturgy.Perikopen['Epistel']" title="Ep"/>
+                        <bible-reference
+                            :perikope="liturgy.Perikopen['Altes Testament']"
+                            title="AT"
+                        />
+                        <bible-reference
+                            :perikope="liturgy.Perikopen['Evangelium']"
+                            title="Ev"
+                        />
+                        <bible-reference
+                            :perikope="liturgy.Perikopen['Epistel']"
+                            title="Ep"
+                        />
                     </div>
                     <div class="col-12 col-md-2">
-                        <bible-reference v-for="n in 3" :perikope="liturgy.Perikopen[n]"
-                                         :key="'litTextsPerikope'+n"
-                                         :title="romanize(n)"
-                                         :style="{fontWeight: (n==liturgy['Lesejahr']) ? 'bold' : 'normal' }"/>
+                        <bible-reference
+                            v-for="n in 3"
+                            :perikope="liturgy.Perikopen[n]"
+                            :key="'litTextsPerikope' + n"
+                            :title="romanize(n)"
+                            :style="{ fontWeight: n == liturgy['Lesejahr'] ? 'bold' : 'normal' }"
+                        />
                     </div>
                     <div class="col-12 col-md-2">
-                        <bible-reference v-for="n in 3" :perikope="liturgy.Perikopen[(n+3)]"
-                                         :key="'litTextsPerikope'+(n+3)"
-                                         :title="romanize(n+3)"
-                                         :style="{fontWeight: ((n+3)==liturgy['Lesejahr']) ? 'bold' : 'normal' }"/>
+                        <bible-reference
+                            v-for="n in 3"
+                            :perikope="liturgy.Perikopen[n + 3]"
+                            :key="'litTextsPerikope' + (n + 3)"
+                            :title="romanize(n + 3)"
+                            :style="{
+                                fontWeight: n + 3 == liturgy['Lesejahr'] ? 'bold' : 'normal',
+                            }"
+                        />
                     </div>
                     <div class="col-12 col-md-2">
-                        <bible-reference v-for="pKey in morePericopes" :perikope="liturgy.Perikopen[pKey]"
-                                         :key="'litTextsPerikope'+pKey"
-                                         :title="pKey" />
+                        <bible-reference
+                            v-for="pKey in morePericopes"
+                            :perikope="liturgy.Perikopen[pKey]"
+                            :key="'litTextsPerikope' + pKey"
+                            :title="pKey"
+                        />
                     </div>
                     <div class="col-12 col-md-2">
-                        <div v-if="liturgy['Lieder']" v-for="song in liturgy['Lieder']">
+                        <div
+                            v-if="liturgy['Lieder']"
+                            v-for="song in liturgy['Lieder']"
+                        >
                             {{ song.Buch }} {{ song.Nummer }} {{ song.Titel }}
                         </div>
                     </div>
                 </div>
             </div>
-            <div v-else class="row">
+            <div
+                v-else
+                class="row"
+            >
                 <div class="col-md-8">
-                    Für {{ moment(myService.date).locale('de').format('dddd, DD.MM.YYYY') }} sind keine
-                    liturgischen Informationen vorhanden.
+                    Für {{ moment(myService.date).locale('de').format('dddd, DD.MM.YYYY') }} sind
+                    keine liturgischen Informationen vorhanden.
                 </div>
                 <div class="col-md-4 text-end">
                     <div class="text-start">
-                        <proprium-select label="Proprium auswählen" @update:modelValue="setAlternativeProprium"
-                                         v-model="myService.alt_proprium" />
+                        <proprium-select
+                            label="Proprium auswählen"
+                            @update:modelValue="setAlternativeProprium"
+                            v-model="myService.alt_proprium"
+                        />
                     </div>
                 </div>
             </div>
         </div>
-        <funeral-info-pane v-if="service.isEditable" v-for="funeral in myService.funerals"
-                           :key="'funeral_info_'+funeral.id"
-                           :funeral="funeral" :service="service"/>
+        <funeral-info-pane
+            v-if="service.isEditable"
+            v-for="funeral in myService.funerals"
+            :key="'funeral_info_' + funeral.id"
+            :funeral="funeral"
+            :service="service"
+        />
     </div>
 </template>
 
 <script>
-import BibleReference from "../Elements/BibleReference";
-import FuneralInfoPane from "./FuneralInfoPane";
-import FormDatePicker from "../../Ui/forms/FormDatePicker";
-import PropriumSelect from "../../ServiceEditor/PropriumSelect.vue";
+import BibleReference from '../Elements/BibleReference'
+import FuneralInfoPane from './FuneralInfoPane'
+import FormDatePicker from '../../Ui/forms/FormDatePicker'
+import PropriumSelect from '../../ServiceEditor/PropriumSelect.vue'
 
 export default {
-    name: "InfoPane",
-    components: {PropriumSelect, FormDatePicker, FuneralInfoPane, BibleReference},
+    name: 'InfoPane',
+    components: { PropriumSelect, FormDatePicker, FuneralInfoPane, BibleReference },
     data() {
-        let pKeys = [];
+        let pKeys = []
         for (const key in this.service.liturgicalInfo.Perikopen || []) {
-            if (isNaN(key) && (!(['Altes Testament', 'Evangelium', 'Epistel'].includes(key)))) pKeys.push(key);
+            if (isNaN(key) && !['Altes Testament', 'Evangelium', 'Epistel'].includes(key))
+                pKeys.push(key)
         }
 
-        let myService = this.service;
-        if (undefined === myService.liturgicalInfo.Links) myService.liturgicalInfo.Links = [];
+        let myService = this.service
+        if (undefined === myService.liturgicalInfo.Links) myService.liturgicalInfo.Links = []
 
         return {
             myService,
             liturgy: this.service.liturgicalInfo,
             morePericopes: pKeys,
             originalAltDate: this.service.alt_liturgy_date,
-        };
+        }
     },
     computed: {
         showable() {
-            if ((!this.liturgy['title']) && (this.myService.funerals.length > 0)) return false;
-            return true;
+            if (!this.liturgy['title'] && this.myService.funerals.length > 0) return false
+            return true
         },
     },
     props: {
@@ -168,38 +248,69 @@ export default {
          * @returns {string|number}
          */
         romanize(num) {
-            if (isNaN(num))
-                return NaN;
-            var digits = String(+num).split(""),
-                key = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM",
-                    "", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC",
-                    "", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"],
-                roman = "",
-                i = 3;
-            while (i--)
-                roman = (key[+digits.pop() + (i * 10)] || "") + roman;
-            return Array(+digits.join("") + 1).join("M") + roman;
+            if (isNaN(num)) return NaN
+            var digits = String(+num).split(''),
+                key = [
+                    '',
+                    'C',
+                    'CC',
+                    'CCC',
+                    'CD',
+                    'D',
+                    'DC',
+                    'DCC',
+                    'DCCC',
+                    'CM',
+                    '',
+                    'X',
+                    'XX',
+                    'XXX',
+                    'XL',
+                    'L',
+                    'LX',
+                    'LXX',
+                    'LXXX',
+                    'XC',
+                    '',
+                    'I',
+                    'II',
+                    'III',
+                    'IV',
+                    'V',
+                    'VI',
+                    'VII',
+                    'VIII',
+                    'IX',
+                ],
+                roman = '',
+                i = 3
+            while (i--) roman = (key[+digits.pop() + i * 10] || '') + roman
+            return Array(+digits.join('') + 1).join('M') + roman
         },
         setAlternativeProprium(e) {
-            let record = this.myService;
-            delete record.participants;
-            axios.patch(route('service.update', {service: this.myService.slug, format: 'json'}), record)
-                .then(response => {
-                    window.location.reload();
-                });
+            let record = this.myService
+            delete record.participants
+            axios
+                .patch(
+                    route('service.update', { service: this.myService.slug, format: 'json' }),
+                    record,
+                )
+                .then((response) => {
+                    window.location.reload()
+                })
         },
         getLinkTitle(link) {
-            if (link.includes(']')) link = link.substring(link.indexOf(']') + 1).trim();
-            if (link.includes('(')) link = link.substring(0, link.indexOf('(')).trim();
-            return link;
+            if (link.includes(']')) link = link.substring(link.indexOf(']') + 1).trim()
+            if (link.includes('(')) link = link.substring(0, link.indexOf('(')).trim()
+            return link
         },
         getLinkAuthor(link) {
-            if (!link.includes('(')) return '';
-            link = (link.substring(link.indexOf('(') + 1, link.indexOf(')')));
-            if (isNaN(link.substring(0, 1))) return link;
-            return '';
-        }
-    }
+            if (!link.includes('(')) return ''
+            link = link.substring(link.indexOf('(') + 1, link.indexOf(')'))
+            if (isNaN(link.substring(0, 1))) return link
+            return ''
+        },
+    },
 }
 </script>
 
@@ -238,9 +349,7 @@ export default {
     color: white !important;
 }
 
-
-
 .text-small {
-    font-size: .8em;
+    font-size: 0.8em;
 }
 </style>

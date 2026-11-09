@@ -27,24 +27,47 @@
   -->
 
 <template>
-        <span class="ql-formats quill-dropdown-form">
-            <span class="ql-picker" :class="{'ql-expanded': t}">
-                <span class="ql-picker-label" :data-label="title" :title="title" @click.prevent.stop="toggle($event)">
-                    <span v-if="icon" :class="icon"></span>
-                    <span style="margin-right: 15px;" :key="myLabel">{{ myLabel }}</span>
-                    <svg viewBox="0 0 18 18">
-                        <polygon class="ql-stroke" points="7 11 9 13 11 11 7 11"></polygon> <polygon class="ql-stroke" points="7 7 9 5 11 7 7 7"></polygon> </svg>
-                </span>
-                <span class="ql-picker-options">
-                    <slot />
-                </span>
+    <span class="ql-formats quill-dropdown-form">
+        <span
+            class="ql-picker"
+            :class="{ 'ql-expanded': t }"
+        >
+            <span
+                class="ql-picker-label"
+                :data-label="title"
+                :title="title"
+                @click.prevent.stop="toggle($event)"
+            >
+                <span
+                    v-if="icon"
+                    :class="icon"
+                ></span>
+                <span
+                    style="margin-right: 15px"
+                    :key="myLabel"
+                    >{{ myLabel }}</span
+                >
+                <svg viewBox="0 0 18 18">
+                    <polygon
+                        class="ql-stroke"
+                        points="7 11 9 13 11 11 7 11"
+                    ></polygon>
+                    <polygon
+                        class="ql-stroke"
+                        points="7 7 9 5 11 7 7 7"
+                    ></polygon>
+                </svg>
+            </span>
+            <span class="ql-picker-options">
+                <slot />
             </span>
         </span>
+    </span>
 </template>
 
 <script>
 export default {
-    name: "QuillDropdownForm",
+    name: 'QuillDropdownForm',
     emits: ['input'],
     props: ['title', 'label', 'icon', 'items', 'remember'],
     data() {
@@ -55,19 +78,17 @@ export default {
     },
     methods: {
         toggle(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.t = !this.t;
+            e.preventDefault()
+            e.stopPropagation()
+            this.t = !this.t
         },
         set(e) {
-            this.$emit('input', e);
-            if (this.remember) this.myLabel = e;
-            this.t = false;
+            this.$emit('input', e)
+            if (this.remember) this.myLabel = e
+            this.t = false
         },
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -29,48 +29,98 @@
 <template>
     <div class="rich-text-editor form-group">
         <label>{{ myLabel }}</label>
-        <div class="tiptap-toolbar btn-toolbar mb-1" v-if="editor">
-            <button v-if="mySettings.toolbar.bold" class="btn btn-sm btn-outline-secondary me-1"
-                    @click.prevent="editor.chain().focus().toggleBold().run()"
-                    :class="{active: editor.isActive('bold')}" title="Fett"><b>B</b></button>
-            <button v-if="mySettings.toolbar.italic" class="btn btn-sm btn-outline-secondary me-1"
-                    @click.prevent="editor.chain().focus().toggleItalic().run()"
-                    :class="{active: editor.isActive('italic')}" title="Kursiv"><i>I</i></button>
-            <button v-if="mySettings.toolbar.underline" class="btn btn-sm btn-outline-secondary me-2"
-                    @click.prevent="editor.chain().focus().toggleUnderline().run()"
-                    :class="{active: editor.isActive('underline')}" title="Unterstrichen"><u>U</u></button>
-            <button v-if="mySettings.toolbar.header" class="btn btn-sm btn-outline-secondary me-1"
-                    @click.prevent="editor.chain().focus().toggleHeading({level:1}).run()"
-                    :class="{active: editor.isActive('heading',{level:1})}" title="Überschrift">H1</button>
-            <button v-if="mySettings.toolbar.blockquote" class="btn btn-sm btn-outline-secondary me-2"
-                    @click.prevent="editor.chain().focus().toggleBlockquote().run()"
-                    :class="{active: editor.isActive('blockquote')}" title="Zitat">&ldquo;</button>
+        <div
+            class="tiptap-toolbar btn-toolbar mb-1"
+            v-if="editor"
+        >
+            <button
+                v-if="mySettings.toolbar.bold"
+                class="btn btn-sm btn-outline-secondary me-1"
+                @click.prevent="editor.chain().focus().toggleBold().run()"
+                :class="{ active: editor.isActive('bold') }"
+                title="Fett"
+            >
+                <b>B</b>
+            </button>
+            <button
+                v-if="mySettings.toolbar.italic"
+                class="btn btn-sm btn-outline-secondary me-1"
+                @click.prevent="editor.chain().focus().toggleItalic().run()"
+                :class="{ active: editor.isActive('italic') }"
+                title="Kursiv"
+            >
+                <i>I</i>
+            </button>
+            <button
+                v-if="mySettings.toolbar.underline"
+                class="btn btn-sm btn-outline-secondary me-2"
+                @click.prevent="editor.chain().focus().toggleUnderline().run()"
+                :class="{ active: editor.isActive('underline') }"
+                title="Unterstrichen"
+            >
+                <u>U</u>
+            </button>
+            <button
+                v-if="mySettings.toolbar.header"
+                class="btn btn-sm btn-outline-secondary me-1"
+                @click.prevent="editor.chain().focus().toggleHeading({ level: 1 }).run()"
+                :class="{ active: editor.isActive('heading', { level: 1 }) }"
+                title="Überschrift"
+            >
+                H1
+            </button>
+            <button
+                v-if="mySettings.toolbar.blockquote"
+                class="btn btn-sm btn-outline-secondary me-2"
+                @click.prevent="editor.chain().focus().toggleBlockquote().run()"
+                :class="{ active: editor.isActive('blockquote') }"
+                title="Zitat"
+            >
+                &ldquo;
+            </button>
             <template v-if="mySettings.toolbar.formats && mySettings.toolbar.formats.length > 0">
-                <button class="btn btn-sm btn-outline-secondary me-1"
-                        @click.prevent="editor.chain().focus().toggleOrderedList().run()"
-                        :class="{active: editor.isActive('orderedList')}" title="Nummerierte Liste">1.</button>
-                <button class="btn btn-sm btn-outline-secondary me-2"
-                        @click.prevent="editor.chain().focus().toggleBulletList().run()"
-                        :class="{active: editor.isActive('bulletList')}" title="Aufzählung">&bull;</button>
+                <button
+                    class="btn btn-sm btn-outline-secondary me-1"
+                    @click.prevent="editor.chain().focus().toggleOrderedList().run()"
+                    :class="{ active: editor.isActive('orderedList') }"
+                    title="Nummerierte Liste"
+                >
+                    1.
+                </button>
+                <button
+                    class="btn btn-sm btn-outline-secondary me-2"
+                    @click.prevent="editor.chain().focus().toggleBulletList().run()"
+                    :class="{ active: editor.isActive('bulletList') }"
+                    title="Aufzählung"
+                >
+                    &bull;
+                </button>
             </template>
-            <button v-if="mySettings.toolbar.clean" class="btn btn-sm btn-outline-secondary"
-                    @click.prevent="editor.chain().focus().unsetAllMarks().clearNodes().run()"
-                    title="Formatierung entfernen">&#10005;</button>
+            <button
+                v-if="mySettings.toolbar.clean"
+                class="btn btn-sm btn-outline-secondary"
+                @click.prevent="editor.chain().focus().unsetAllMarks().clearNodes().run()"
+                title="Formatierung entfernen"
+            >
+                &#10005;
+            </button>
         </div>
-        <editor-content :editor="editor" class="form-control tiptap-editor" />
+        <editor-content
+            :editor="editor"
+            class="form-control tiptap-editor"
+        />
     </div>
 </template>
 
-
 <script>
-import { markRaw } from 'vue';
-import { Editor, EditorContent } from '@tiptap/vue-3';
-import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-import Placeholder from '@tiptap/extension-placeholder';
+import { markRaw } from 'vue'
+import { Editor, EditorContent } from '@tiptap/vue-3'
+import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
+import Placeholder from '@tiptap/extension-placeholder'
 
 export default {
-    name: "RichTextEditor",
+    name: 'RichTextEditor',
     emits: ['update:modelValue'],
     components: { EditorContent },
     props: ['modelValue', 'settings', 'label'],
@@ -85,44 +135,46 @@ export default {
                 blockquote: false,
                 formats: {},
             },
-        };
-        let mySettings = { ...defaultSettings, ...this.settings };
-        const initContent = this.modelValue || '';
+        }
+        let mySettings = { ...defaultSettings, ...this.settings }
+        const initContent = this.modelValue || ''
 
         return {
             myLabel: this.label || 'Inhalt',
             mySettings,
-            editor: markRaw(new Editor({
-                content: initContent,
-                extensions: [
-                    StarterKit,
-                    Underline,
-                    Placeholder.configure({ placeholder: 'Hier Text eingeben...' }),
-                ],
-                onUpdate: ({ editor }) => {
-                    this.$emit('update:modelValue', editor.getHTML());
-                },
-            })),
+            editor: markRaw(
+                new Editor({
+                    content: initContent,
+                    extensions: [
+                        StarterKit,
+                        Underline,
+                        Placeholder.configure({ placeholder: 'Hier Text eingeben...' }),
+                    ],
+                    onUpdate: ({ editor }) => {
+                        this.$emit('update:modelValue', editor.getHTML())
+                    },
+                }),
+            ),
         }
     },
     watch: {
         modelValue(v) {
-            if (v !== this.editor.getHTML()) this.editor.commands.setContent(v || '');
+            if (v !== this.editor.getHTML()) this.editor.commands.setContent(v || '')
         },
     },
     beforeUnmount() {
-        this.editor.destroy();
+        this.editor.destroy()
     },
     methods: {
         insertText(value, withHtml = false) {
-            if (!value) return;
+            if (!value) return
             if (withHtml) {
-                this.editor.chain().focus().insertContent(String(value)).run();
+                this.editor.chain().focus().insertContent(String(value)).run()
             } else {
-                this.editor.chain().focus().insertContent(String(value)).run();
+                this.editor.chain().focus().insertContent(String(value)).run()
             }
         },
-    }
+    },
 }
 </script>
 

@@ -28,21 +28,23 @@
 
 <template>
     <div class="cases-tab-config">
-        <form-selectize label="Folgende Kirchen/GD-Orte als Streamingstandorte anzeigen" multiple
-                        :options="locations" :settings="{searchField: ['name']}"
-                        v-model="tab.config.locations" />
+        <form-selectize
+            label="Folgende Kirchen/GD-Orte als Streamingstandorte anzeigen"
+            multiple
+            :options="locations"
+            :settings="{ searchField: ['name'] }"
+            v-model="tab.config.locations"
+        />
     </div>
 </template>
 
 <script>
-import FormSelectize from "../../Ui/forms/FormSelectize";
+import FormSelectize from '../../Ui/forms/FormSelectize'
 export default {
-    name: "StreamingTabConfig",
-    components: {FormSelectize},
+    name: 'StreamingTabConfig',
+    components: { FormSelectize },
     props: ['tab', 'locations'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

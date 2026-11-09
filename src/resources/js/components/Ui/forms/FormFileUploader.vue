@@ -28,78 +28,215 @@
 
 <template>
     <div class="form-file-uploader">
-        <div v-if="uploading" class="upload-summary" aria-live="polite">
+        <div
+            v-if="uploading"
+            class="upload-summary"
+            aria-live="polite"
+        >
             {{ totalProgress }}% hochgeladen
-            <span class="mdi mdi-spin mdi-loading" aria-hidden="true"></span>
+            <span
+                class="mdi mdi-spin mdi-loading"
+                aria-hidden="true"
+            ></span>
         </div>
-        <div class="upload-drop-surface" :class="{dragging: dragging}"
-             @dragenter.prevent="dragEnter" @dragover.prevent="dragEnter"
-             @dragleave.prevent="dragLeave" @drop.prevent="drop">
-            <form-file-upload @input="addFile" @upload-url="uploadUrl" @upload-inbox="uploadInbox" @drop.stop multiple="1" :key="updateUploader"
-                          :no-camera="noCamera" :no-description="noDescription" :no-pixabay="noPixabay" :no-url="noUrl" :no-inbox="noInbox"
-                          :no-source-tabs="noSourceTabs" :cut="cut" :help-text="helpText"
+        <div
+            class="upload-drop-surface"
+            :class="{ dragging: dragging }"
+            @dragenter.prevent="dragEnter"
+            @dragover.prevent="dragEnter"
+            @dragleave.prevent="dragLeave"
+            @drop.prevent="drop"
+        >
+            <form-file-upload
+                @input="addFile"
+                @upload-url="uploadUrl"
+                @upload-inbox="uploadInbox"
+                @drop.stop
+                multiple="1"
+                :key="updateUploader"
+                :no-camera="noCamera"
+                :no-description="noDescription"
+                :no-pixabay="noPixabay"
+                :no-url="noUrl"
+                :no-inbox="noInbox"
+                :no-source-tabs="noSourceTabs"
+                :cut="cut"
+                :help-text="helpText"
             />
         </div>
-        <div v-if="queue.length" class="upload-queue" aria-label="Upload-Warteschlange">
-            <div v-for="item in queue" :key="item.id" class="upload-queue-item">
-                <img v-if="isImage(item)" :src="item.previewUrl" class="queue-preview" :alt="item.title" />
-                <span v-else class="queue-file-icon mdi mdi-file" aria-hidden="true"></span>
+        <div
+            v-if="queue.length"
+            class="upload-queue"
+            aria-label="Upload-Warteschlange"
+        >
+            <div
+                v-for="item in queue"
+                :key="item.id"
+                class="upload-queue-item"
+            >
+                <img
+                    v-if="isImage(item)"
+                    :src="item.previewUrl"
+                    class="queue-preview"
+                    :alt="item.title"
+                />
+                <span
+                    v-else
+                    class="queue-file-icon mdi mdi-file"
+                    aria-hidden="true"
+                ></span>
                 <div class="queue-details">
                     <strong class="queue-title">{{ item.title }}</strong>
-                    <div v-if="item.preset" class="queue-target badge text-bg-light">{{ item.preset.title }}</div>
-                    <small class="text-muted">{{ item.file.name }} · {{ statusLabel(item) }}</small>
-                    <div v-if="item.status === 'uploading' || item.status === 'error'" class="progress mt-1" role="progressbar"
-                         :aria-valuenow="item.progress" aria-valuemin="0" aria-valuemax="100">
-                        <div class="progress-bar" :class="{'bg-danger': item.status === 'error'}"
-                             :style="{width: `${item.progress}%`}">{{ item.progress }}%</div>
+                    <div
+                        v-if="item.preset"
+                        class="queue-target badge text-bg-light"
+                    >
+                        {{ item.preset.title }}
                     </div>
-                    <small v-if="item.error" class="text-danger">{{ item.error }}</small>
+                    <small class="text-muted">{{ item.file.name }} · {{ statusLabel(item) }}</small>
+                    <div
+                        v-if="item.status === 'uploading' || item.status === 'error'"
+                        class="progress mt-1"
+                        role="progressbar"
+                        :aria-valuenow="item.progress"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                    >
+                        <div
+                            class="progress-bar"
+                            :class="{ 'bg-danger': item.status === 'error' }"
+                            :style="{ width: `${item.progress}%` }"
+                        >
+                            {{ item.progress }}%
+                        </div>
+                    </div>
+                    <small
+                        v-if="item.error"
+                        class="text-danger"
+                        >{{ item.error }}</small
+                    >
                 </div>
-                <button v-if="item.status !== 'uploading'" type="button"
-                        class="btn btn-sm btn-outline-secondary" title="Datei bearbeiten"
-                        @click="openEditor(item)">
-                    <span class="mdi" :class="isImage(item) ? 'mdi-crop' : 'mdi-pencil'" aria-hidden="true"></span>
+                <button
+                    v-if="item.status !== 'uploading'"
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    title="Datei bearbeiten"
+                    @click="openEditor(item)"
+                >
+                    <span
+                        class="mdi"
+                        :class="isImage(item) ? 'mdi-crop' : 'mdi-pencil'"
+                        aria-hidden="true"
+                    ></span>
                 </button>
-                <button v-if="item.status !== 'uploading'" type="button" class="btn btn-sm btn-outline-secondary"
-                        title="Als Variante duplizieren" @click="duplicate(item)">
-                    <span class="mdi mdi-content-copy" aria-hidden="true"></span>
+                <button
+                    v-if="item.status !== 'uploading'"
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    title="Als Variante duplizieren"
+                    @click="duplicate(item)"
+                >
+                    <span
+                        class="mdi mdi-content-copy"
+                        aria-hidden="true"
+                    ></span>
                 </button>
-                <button v-if="item.status === 'error'" type="button" class="btn btn-sm btn-outline-warning"
-                        @click="retry(item)">Erneut versuchen</button>
-                <button v-if="item.status !== 'uploading'" type="button" class="btn btn-sm btn-outline-danger"
-                        title="Aus Warteschlange entfernen" @click="remove(item)">
-                    <span class="mdi mdi-delete" aria-hidden="true"></span>
+                <button
+                    v-if="item.status === 'error'"
+                    type="button"
+                    class="btn btn-sm btn-outline-warning"
+                    @click="retry(item)"
+                >
+                    Erneut versuchen
+                </button>
+                <button
+                    v-if="item.status !== 'uploading'"
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    title="Aus Warteschlange entfernen"
+                    @click="remove(item)"
+                >
+                    <span
+                        class="mdi mdi-delete"
+                        aria-hidden="true"
+                    ></span>
                 </button>
             </div>
             <div class="upload-queue-actions">
-                <button type="button" class="btn btn-primary" :disabled="uploading || !readyItems.length" @click="uploadAll">
-                    <span class="mdi mdi-upload" aria-hidden="true"></span> Alle hochladen
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    :disabled="uploading || !readyItems.length"
+                    @click="uploadAll"
+                >
+                    <span
+                        class="mdi mdi-upload"
+                        aria-hidden="true"
+                    ></span>
+                    Alle hochladen
                 </button>
                 <span class="text-muted">{{ readyItems.length }} bereit</span>
             </div>
         </div>
-        <modal :title="isEditingImage ? 'Bild bearbeiten' : 'Datei bearbeiten'" v-if="editingItem" min-height="50vh"
-               :allow-close="false" :allow-cancel="false" max-width="1000">
+        <modal
+            :title="isEditingImage ? 'Bild bearbeiten' : 'Datei bearbeiten'"
+            v-if="editingItem"
+            min-height="50vh"
+            :allow-close="false"
+            :allow-cancel="false"
+            max-width="1000"
+        >
             <div class="edit-file-meta">
-                <label class="form-label" for="editing-file-title">Titel / Beschreibung</label>
-                <input id="editing-file-title" v-model="editingItem.title" class="form-control" type="text" />
+                <label
+                    class="form-label"
+                    for="editing-file-title"
+                    >Titel / Beschreibung</label
+                >
+                <input
+                    id="editing-file-title"
+                    v-model="editingItem.title"
+                    class="form-control"
+                    type="text"
+                />
                 <small class="text-muted">{{ editingItem.file.name }}</small>
             </div>
-            <attachment-image-editor v-if="isEditingImage" :file="editingItem.sourceFile || editingItem.file"
-                                     :width="editingItem.preset?.width || width"
-                                     :height="editingItem.preset?.height || height"
-                                     :preset="editingItem.preset"
-                                     :presets="presets"
-                                     :initial-transform="editingItem.transform"
-                                     @apply="applyEditorResult" @cancel="cancelEditing" />
-            <div v-else class="generic-file-editor">
+            <attachment-image-editor
+                v-if="isEditingImage"
+                :file="editingItem.sourceFile || editingItem.file"
+                :width="editingItem.preset?.width || width"
+                :height="editingItem.preset?.height || height"
+                :preset="editingItem.preset"
+                :presets="presets"
+                :initial-transform="editingItem.transform"
+                @apply="applyEditorResult"
+                @cancel="cancelEditing"
+            />
+            <div
+                v-else
+                class="generic-file-editor"
+            >
                 <div class="file-preview-placeholder">
-                    <span class="mdi mdi-file-outline" aria-hidden="true"></span>
+                    <span
+                        class="mdi mdi-file-outline"
+                        aria-hidden="true"
+                    ></span>
                     <span>{{ editingItem.file.type || 'Datei' }}</span>
                 </div>
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-link" @click="cancelEditing">Abbrechen</button>
-                    <button type="button" class="btn btn-primary" @click="applyFileDetails">Übernehmen</button>
+                    <button
+                        type="button"
+                        class="btn btn-link"
+                        @click="cancelEditing"
+                    >
+                        Abbrechen
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        @click="applyFileDetails"
+                    >
+                        Übernehmen
+                    </button>
                 </div>
             </div>
         </modal>
@@ -107,31 +244,50 @@
 </template>
 
 <script>
-import FormFileUpload from "./FormFileUpload";
-import Modal from "../modals/Modal";
-import AttachmentImageEditor from './AttachmentImageEditor.vue';
-import { appendFiles, duplicateUploadItem } from './attachmentUploadQueue.js';
-import { uploadFileInChunks } from './resumableUpload.js';
-
+import FormFileUpload from './FormFileUpload'
+import Modal from '../modals/Modal'
+import AttachmentImageEditor from './AttachmentImageEditor.vue'
+import { appendFiles, duplicateUploadItem } from './attachmentUploadQueue.js'
+import { uploadFileInChunks } from './resumableUpload.js'
 
 export default {
-    name: "FormFileUploader",
-    components: {Modal, FormFileUpload, AttachmentImageEditor},
+    name: 'FormFileUploader',
+    components: { Modal, FormFileUpload, AttachmentImageEditor },
     emits: ['input', 'update:modelValue', 'queue-change'],
-    props: ['parent', 'uploadRoute', 'title', 'cropperCanvas', 'cropperStencil', 'width', 'height', 'presets',
-        'chunkUploadRoute', 'chunkTarget', 'chunkThreshold', 'chunkSize', 'noSource',
-        'noCamera', 'noUrl', 'noPixabay', 'noDescription', 'noInbox', 'noSourceTabs', 'cut', 'helpText'],
+    props: [
+        'parent',
+        'uploadRoute',
+        'title',
+        'cropperCanvas',
+        'cropperStencil',
+        'width',
+        'height',
+        'presets',
+        'chunkUploadRoute',
+        'chunkTarget',
+        'chunkThreshold',
+        'chunkSize',
+        'noSource',
+        'noCamera',
+        'noUrl',
+        'noPixabay',
+        'noDescription',
+        'noInbox',
+        'noSourceTabs',
+        'cut',
+        'helpText',
+    ],
     data() {
-        let canvasSettings = this.cropperCanvas || {};
-        let stencilSettings = this.cropperStencil || {};
+        let canvasSettings = this.cropperCanvas || {}
+        let stencilSettings = this.cropperStencil || {}
         if (this.width) {
-            canvasSettings['width'] = this.width;
+            canvasSettings['width'] = this.width
         }
         if (this.height) {
-            canvasSettings['height'] = this.height;
+            canvasSettings['height'] = this.height
         }
         if (this.width && this.height) {
-            stencilSettings['aspectRatio'] = this.width / this.height;
+            stencilSettings['aspectRatio'] = this.width / this.height
         }
         return {
             dragging: false,
@@ -151,14 +307,16 @@ export default {
             return Boolean(this.editingItem?.file?.type?.startsWith('image/'))
         },
         uploading() {
-            return this.queue.some(item => item.status === 'uploading')
+            return this.queue.some((item) => item.status === 'uploading')
         },
         readyItems() {
-            return this.queue.filter(item => item.status === 'ready' || item.status === 'error')
+            return this.queue.filter((item) => item.status === 'ready' || item.status === 'error')
         },
         totalProgress() {
             if (!this.queue.length) return 0
-            return Math.round(this.queue.reduce((total, item) => total + item.progress, 0) / this.queue.length)
+            return Math.round(
+                this.queue.reduce((total, item) => total + item.progress, 0) / this.queue.length,
+            )
         },
     },
     methods: {
@@ -172,7 +330,7 @@ export default {
         addFile(files, metadata = {}) {
             const selected = Array.isArray(files) ? files : [files]
             const newItems = appendFiles([], selected)
-            newItems.forEach(item => {
+            newItems.forEach((item) => {
                 item.previewUrl = this.previewUrl(item.file)
                 item.status = 'editing'
                 if (this.title) item.title = this.title
@@ -193,12 +351,14 @@ export default {
             return item.file.type?.startsWith('image/') && item.previewUrl
         },
         statusLabel(item) {
-            return {
-                ready: 'Bereit',
-                uploading: 'Wird hochgeladen',
-                done: 'Fertig',
-                error: 'Fehler',
-            }[item.status] || item.status
+            return (
+                {
+                    ready: 'Bereit',
+                    uploading: 'Wird hochgeladen',
+                    done: 'Fertig',
+                    error: 'Fehler',
+                }[item.status] || item.status
+            )
         },
         dragEnter() {
             this.dragging = true
@@ -208,11 +368,13 @@ export default {
         },
         drop(event) {
             this.dragging = false
-            if (event.dataTransfer?.files?.length) this.addFile(Array.from(event.dataTransfer.files))
+            if (event.dataTransfer?.files?.length)
+                this.addFile(Array.from(event.dataTransfer.files))
         },
         remove(item) {
-            if (item.previewUrl && window.URL?.revokeObjectURL) window.URL.revokeObjectURL(item.previewUrl)
-            this.queue = this.queue.filter(queueItem => queueItem.id !== item.id)
+            if (item.previewUrl && window.URL?.revokeObjectURL)
+                window.URL.revokeObjectURL(item.previewUrl)
+            this.queue = this.queue.filter((queueItem) => queueItem.id !== item.id)
             this.$emit('queue-change', this.queue.length)
         },
         openEditor(item) {
@@ -220,7 +382,8 @@ export default {
         },
         /** Open the next file that is waiting for its upload details. */
         openNextEditor() {
-            if (!this.editingItem) this.editingItem = this.queue.find(item => item.status === 'editing') || null
+            if (!this.editingItem)
+                this.editingItem = this.queue.find((item) => item.status === 'editing') || null
         },
         /** Discard the current pending upload when the dialog is cancelled. */
         cancelEditing() {
@@ -250,26 +413,30 @@ export default {
          * @returns {void}
          */
         selectPreset(item, cut) {
-            const preset = (this.presets || []).find(candidate => candidate.cut === cut) || null
+            const preset = (this.presets || []).find((candidate) => candidate.cut === cut) || null
             item.cut = preset?.cut || null
             item.preset = preset
         },
         applyEditorResult(file, transform, preset = null, variants = []) {
             if (!this.editingItem) return
             const sourceItem = this.editingItem
-            const renderedVariants = variants.length ? variants : [{file, transform, preset}]
+            const renderedVariants = variants.length ? variants : [{ file, transform, preset }]
             renderedVariants.forEach((variant, index) => {
-                const item = index === 0 ? sourceItem : duplicateUploadItem(sourceItem, {
-                    file: variant.file,
-                    preset: variant.preset,
-                    cut: variant.preset?.cut || null,
-                    transform: variant.transform,
-                })
+                const item =
+                    index === 0
+                        ? sourceItem
+                        : duplicateUploadItem(sourceItem, {
+                              file: variant.file,
+                              preset: variant.preset,
+                              cut: variant.preset?.cut || null,
+                              transform: variant.transform,
+                          })
                 if (index > 0) {
                     item.previewUrl = this.previewUrl(item.file)
                     this.queue.push(item)
                 }
-                if (item.previewUrl && index === 0 && window.URL?.revokeObjectURL) window.URL.revokeObjectURL(item.previewUrl)
+                if (item.previewUrl && index === 0 && window.URL?.revokeObjectURL)
+                    window.URL.revokeObjectURL(item.previewUrl)
                 item.file = variant.file
                 item.previewUrl = this.previewUrl(variant.file)
                 item.transform = variant.transform
@@ -302,90 +469,133 @@ export default {
                 item.progress = 100
                 item.status = 'done'
                 this.$emit('input', Array.isArray(responseData) ? responseData : [responseData])
-                this.$emit('update:modelValue', Array.isArray(responseData) ? responseData : [responseData])
-                if (item.previewUrl && window.URL?.revokeObjectURL) window.URL.revokeObjectURL(item.previewUrl)
-                this.queue = this.queue.filter(queueItem => queueItem.id !== item.id)
+                this.$emit(
+                    'update:modelValue',
+                    Array.isArray(responseData) ? responseData : [responseData],
+                )
+                if (item.previewUrl && window.URL?.revokeObjectURL)
+                    window.URL.revokeObjectURL(item.previewUrl)
+                this.queue = this.queue.filter((queueItem) => queueItem.id !== item.id)
                 this.$emit('queue-change', this.queue.length)
             } catch (error) {
                 item.status = 'error'
-                item.error = error.response?.data?.message || error.message || 'Die Datei konnte nicht hochgeladen werden.'
+                item.error =
+                    error.response?.data?.message ||
+                    error.message ||
+                    'Die Datei konnte nicht hochgeladen werden.'
             }
         },
         /** Determine whether a queue item uses the resumable protocol. */
         shouldUseChunks(item) {
-            return Boolean(this.chunkUploadRoute && item.file.size >= (this.chunkThreshold || 10 * 1024 * 1024))
+            return Boolean(
+                this.chunkUploadRoute &&
+                item.file.size >= (this.chunkThreshold || 10 * 1024 * 1024),
+            )
         },
         async uploadDirect(item) {
-                const form = new FormData()
-                form.append('attachment_text[0]', item.title)
-                form.append('attachments[0]', item.file)
-                if (item.cut || this.cut) form.append('cut', item.cut || this.cut)
-                const response = await axios.post(this.uploadRoute, form, {
-                    headers: {'Content-Type': 'multipart/form-data'},
-                    onUploadProgress: progressEvent => {
-                        if (progressEvent.total) item.progress = Math.round(progressEvent.loaded / progressEvent.total * 100)
-                    },
-                })
-                return response.data
+            const form = new FormData()
+            form.append('attachment_text[0]', item.title)
+            form.append('attachments[0]', item.file)
+            if (item.cut || this.cut) form.append('cut', item.cut || this.cut)
+            const response = await axios.post(this.uploadRoute, form, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+                onUploadProgress: (progressEvent) => {
+                    if (progressEvent.total)
+                        item.progress = Math.round(
+                            (progressEvent.loaded / progressEvent.total) * 100,
+                        )
+                },
+            })
+            return response.data
         },
         async uploadChunked(item) {
             const target = this.chunkTarget || {}
             return uploadFileInChunks(item.file, {
                 chunkSize: this.chunkSize || 5 * 1024 * 1024,
                 session: item.uploadSession,
-                start: metadata => axios.post(this.chunkUploadRoute, {
-                    ...metadata,
-                    ...target,
-                    title: item.title,
-                    cut: item.cut || this.cut || null,
-                }).then(response => response.data),
-                status: session => axios.get(
-                    route('api.attachment-uploads.status', {session})
-                ).then(response => response.data),
-                onSession: session => { item.uploadSession = session },
-                onChunk: (index, received) => { item.uploadReceived = received },
-                checksum: async blob => {
+                start: (metadata) =>
+                    axios
+                        .post(this.chunkUploadRoute, {
+                            ...metadata,
+                            ...target,
+                            title: item.title,
+                            cut: item.cut || this.cut || null,
+                        })
+                        .then((response) => response.data),
+                status: (session) =>
+                    axios
+                        .get(route('api.attachment-uploads.status', { session }))
+                        .then((response) => response.data),
+                onSession: (session) => {
+                    item.uploadSession = session
+                },
+                onChunk: (index, received) => {
+                    item.uploadReceived = received
+                },
+                checksum: async (blob) => {
                     const buffer = await blob.arrayBuffer()
                     const digest = await crypto.subtle.digest('SHA-256', buffer)
-                    return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
+                    return Array.from(new Uint8Array(digest), (byte) =>
+                        byte.toString(16).padStart(2, '0'),
+                    ).join('')
                 },
-                sendChunk: (session, index, blob, checksum) => axios.put(
-                    route('api.attachment-uploads.chunk', {session, index}),
-                    blob,
-                    {headers: {'Content-Type': 'application/octet-stream', 'X-Chunk-Checksum': checksum}}
-                ).then(response => response.data),
-                complete: session => axios.post(
-                    route('api.attachment-uploads.complete', {session})
-                ).then(response => response.data),
-                onProgress: progress => { item.progress = progress },
+                sendChunk: (session, index, blob, checksum) =>
+                    axios
+                        .put(route('api.attachment-uploads.chunk', { session, index }), blob, {
+                            headers: {
+                                'Content-Type': 'application/octet-stream',
+                                'X-Chunk-Checksum': checksum,
+                            },
+                        })
+                        .then((response) => response.data),
+                complete: (session) =>
+                    axios
+                        .post(route('api.attachment-uploads.complete', { session }))
+                        .then((response) => response.data),
+                onProgress: (progress) => {
+                    item.progress = progress
+                },
             })
         },
         /** Download a URL source, using the authenticated client for internal proxies. */
         uploadUrl(data) {
-            this.info = data.info;
+            this.info = data.info
             const download = data.pixabay
-                ? this.$api().post(route('api.pixabay.image'), {url: data.url}, {responseType: 'blob'}).then(response => response.data)
+                ? this.$api()
+                      .post(route('api.pixabay.image'), { url: data.url }, { responseType: 'blob' })
+                      .then((response) => response.data)
                 : data.authenticated
-                ? this.$api().get(data.url, {responseType: 'blob'}).then(response => response.data)
-                : fetch(data.url).then(response => response.blob())
-            download.then(blob => {
-                const name = data.url.split('/').pop().split('?')[0] || 'download'
-                const [item] = this.addFile(new File([blob], name, {type: blob.type || 'application/octet-stream'}))
-                if (data.title && item) item.title = data.title
-            }).catch(() => {
-                const [item] = this.addFile(new File([], 'URL-Datei'))
-                item.status = 'error'
-                item.error = 'Die Datei konnte von der URL nicht geladen werden.'
-                this.editingItem = null
-            })
+                  ? this.$api()
+                        .get(data.url, { responseType: 'blob' })
+                        .then((response) => response.data)
+                  : fetch(data.url).then((response) => response.blob())
+            download
+                .then((blob) => {
+                    const name = data.url.split('/').pop().split('?')[0] || 'download'
+                    const [item] = this.addFile(
+                        new File([blob], name, { type: blob.type || 'application/octet-stream' }),
+                    )
+                    if (data.title && item) item.title = data.title
+                })
+                .catch(() => {
+                    const [item] = this.addFile(new File([], 'URL-Datei'))
+                    item.status = 'error'
+                    item.error = 'Die Datei konnte von der URL nicht geladen werden.'
+                    this.editingItem = null
+                })
         },
         uploadInbox(inboxFile) {
-            axios.get(route('api.inbox.download', {filename: inboxFile.name}), {responseType: 'blob'})
-                .then(response => {
+            axios
+                .get(route('api.inbox.download', { filename: inboxFile.name }), {
+                    responseType: 'blob',
+                })
+                .then((response) => {
                     const blob = response.data
-                    const [item] = this.addFile(new File([blob], inboxFile.name, {
-                        type: blob.type || 'application/octet-stream',
-                    }))
+                    const [item] = this.addFile(
+                        new File([blob], inboxFile.name, {
+                            type: blob.type || 'application/octet-stream',
+                        }),
+                    )
                     if (item) item.title = inboxFile.name
                 })
                 .catch(() => {
@@ -396,14 +606,21 @@ export default {
         },
         /** Queue an existing attachment as a new local editing source. */
         async reuseAttachment(attachment, preset = null) {
-            const response = await fetch(route('image', {path: attachment.file.replace('attachments/', '')}))
+            const response = await fetch(
+                route('image', { path: attachment.file.replace('attachments/', '') }),
+            )
             const blob = await response.blob()
-            const [item] = this.addFile(new File([blob], attachment.file.split('/').pop() || 'bild', {type: blob.type || 'image/jpeg'}), {preset})
+            const [item] = this.addFile(
+                new File([blob], attachment.file.split('/').pop() || 'bild', {
+                    type: blob.type || 'image/jpeg',
+                }),
+                { preset },
+            )
             if (item) {
                 item.title = attachment.title || item.title
             }
         },
-    }
+    },
 }
 </script>
 
@@ -413,54 +630,64 @@ export default {
 }
 
 .upload-drop-surface {
-    padding: .75rem;
+    padding: 0.75rem;
     border: 1px solid var(--bs-border-color, #dee2e6);
-    border-radius: var(--bs-border-radius, .375rem);
+    border-radius: var(--bs-border-radius, 0.375rem);
     background: var(--bs-body-bg, #f8f9fa);
-    transition: border-color .15s ease, background-color .15s ease;
+    transition:
+        border-color 0.15s ease,
+        background-color 0.15s ease;
 }
 
 .upload-drop-surface.dragging {
     border-color: var(--bs-primary, #0d6efd);
-    background: rgba(var(--bs-primary-rgb), .04);
+    background: rgba(var(--bs-primary-rgb), 0.04);
 }
 
 .upload-summary {
-    margin-bottom: .75rem;
+    margin-bottom: 0.75rem;
     color: var(--bs-secondary-color, #6c757d);
-    font-size: .9rem;
+    font-size: 0.9rem;
 }
 
 .upload-queue {
     display: flex;
     flex-direction: column;
-    gap: .75rem;
+    gap: 0.75rem;
     margin-top: 1rem;
 }
 
 .upload-queue-item {
     display: grid;
     grid-template-columns: 5.5rem minmax(0, 1fr) auto auto auto;
-    gap: .75rem;
+    gap: 0.75rem;
     align-items: center;
-    padding: .75rem;
+    padding: 0.75rem;
     border: 1px solid var(--bs-border-color, #dee2e6);
-    border-radius: var(--bs-border-radius, .375rem);
+    border-radius: var(--bs-border-radius, 0.375rem);
     background: var(--bs-body-bg, #fff);
-    box-shadow: var(--bs-box-shadow-sm, 0 .125rem .25rem rgba(0, 0, 0, .075));
+    box-shadow: var(--bs-box-shadow-sm, 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075));
 }
 
 .queue-preview {
     display: block;
     width: 5.5rem;
     height: 4.25rem;
-    padding: .25rem;
+    padding: 0.25rem;
     border: 1px solid var(--bs-border-color, #dee2e6);
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     background-color: #f8f9fa;
-    background-image: linear-gradient(45deg, #e1e5e9 25%, transparent 25%), linear-gradient(-45deg, #e1e5e9 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e1e5e9 75%), linear-gradient(-45deg, transparent 75%, #e1e5e9 75%);
-    background-size: .75rem .75rem;
-    background-position: 0 0, 0 .375rem, .375rem -.375rem, -.375rem 0;
+    background-image:
+        linear-gradient(45deg, #e1e5e9 25%, transparent 25%),
+        linear-gradient(-45deg, #e1e5e9 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #e1e5e9 75%),
+        linear-gradient(-45deg, transparent 75%, #e1e5e9 75%);
+    background-size: 0.75rem 0.75rem;
+    background-position:
+        0 0,
+        0 0.375rem,
+        0.375rem -0.375rem,
+        -0.375rem 0;
     object-fit: contain;
 }
 
@@ -470,7 +697,7 @@ export default {
     height: 4.25rem;
     place-items: center;
     border: 1px solid var(--bs-border-color, #dee2e6);
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     color: var(--bs-secondary-color, #6c757d);
     background: var(--bs-light, #f8f9fa);
     font-size: 1.75rem;
@@ -489,7 +716,7 @@ export default {
 
 .queue-target {
     display: inline-block;
-    margin: .25rem 0;
+    margin: 0.25rem 0;
     font-weight: 400;
 }
 
@@ -509,8 +736,8 @@ export default {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: .75rem;
-    padding-top: .25rem;
+    gap: 0.75rem;
+    padding-top: 0.25rem;
 }
 
 .edit-file-meta {
@@ -531,7 +758,7 @@ export default {
 .file-preview-placeholder {
     display: flex;
     align-items: center;
-    gap: .75rem;
+    gap: 0.75rem;
     color: var(--bs-secondary-color);
 }
 
@@ -554,5 +781,4 @@ export default {
         grid-row: 2;
     }
 }
-
 </style>

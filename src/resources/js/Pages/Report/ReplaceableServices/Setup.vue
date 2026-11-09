@@ -29,58 +29,88 @@
 <template>
     <admin-layout title="Zu vertretende Dienste für eine Person finden">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Zu vertretende Dienste für eine Person finden" @click="renderReport" />
-            <nav-button title="Zur Übersicht der Diensten mit Möglichkeit zum Eintragen" icon="mdi mdi-list" class="ms-1" @click="wizard">Direkt eintragen</nav-button>
+            <save-button
+                label="Erstellen"
+                title="Zu vertretende Dienste für eine Person finden"
+                @click="renderReport"
+            />
+            <nav-button
+                title="Zur Übersicht der Diensten mit Möglichkeit zum Eintragen"
+                icon="mdi mdi-list"
+                class="ms-1"
+                @click="wizard"
+                >Direkt eintragen</nav-button
+            >
         </template>
-        <form method="post" :action="myAction" @submit.prevent="renderReport" :key="myAction">
+        <form
+            method="post"
+            :action="myAction"
+            @submit.prevent="renderReport"
+            :key="myAction"
+        >
             <form-csrf-token />
-            <form-selectize name="person" label="Nach folgender Person suchen" :options="users" v-model="myUser" />
-            <form-date-range-picker label="Dienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
+            <form-selectize
+                name="person"
+                label="Nach folgender Person suchen"
+                :options="users"
+                v-model="myUser"
+            />
+            <form-date-range-picker
+                label="Dienste von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import NavButton from "../../../components/Ui/buttons/NavButton.vue";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import NavButton from '../../../components/Ui/buttons/NavButton.vue'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['users'],
-    components: {NavButton, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {
+        NavButton,
+        FormDateRangePicker,
+        FormInput,
+        FormCsrfToken,
+        FormSelectize,
+        SaveButton,
+    },
     data() {
         return {
             myUser: this.$page.props.currentUser.data.id,
             myStart: moment(),
             myEnd: moment().endOf('year'),
-            myAction: route('reports.render', {report: 'replaceableServices'}),
+            myAction: route('reports.render', { report: 'replaceableServices' }),
         }
     },
     methods: {
         renderReport() {
-            this.myAction = route('reports.render', {report: 'replaceableServices'});
+            this.myAction = route('reports.render', { report: 'replaceableServices' })
             submitReportForm(this.myAction, {
                 person: this.myUser,
                 start: this.myStart,
                 end: this.myEnd,
-            });
+            })
         },
         wizard() {
-            this.myAction = route('report.step', {report: 'replaceableServices', step: 'wizard'})
+            this.myAction = route('report.step', { report: 'replaceableServices', step: 'wizard' })
             submitReportForm(this.myAction, {
                 person: this.myUser,
                 start: this.myStart,
                 end: this.myEnd,
-            });
-        }
-    }
+            })
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

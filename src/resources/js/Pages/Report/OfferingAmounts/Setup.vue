@@ -29,9 +29,17 @@
 <template>
     <admin-layout title="Übersicht der eingenommenen Opfer erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Übersicht der eingenommenen Opfer erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Übersicht der eingenommenen Opfer erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'offeringAmounts'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'offeringAmounts' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
             <city-location-filter
                 :cities="cities"
@@ -42,24 +50,29 @@
                 v-model:city-model-value="myCities"
                 v-model:location-model-value="myLocations"
             />
-            <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
+            <form-date-range-picker
+                label="Gottesdienste von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import CityLocationFilter from '../../../components/Reports/CityLocationFilter.vue'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'locations'],
-    components: {CityLocationFilter, FormDateRangePicker, FormCsrfToken, SaveButton},
+    components: { CityLocationFilter, FormDateRangePicker, FormCsrfToken, SaveButton },
     data() {
-        let myStart = moment().startOf('year');
-        let myEnd = moment().endOf('year');
+        let myStart = moment().startOf('year')
+        let myEnd = moment().endOf('year')
 
         return {
             myCities: this.cities.length ? [this.cities[0].id] : null,
@@ -70,17 +83,15 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'offeringAmounts'}), {
+            submitReportForm(route('reports.render', { report: 'offeringAmounts' }), {
                 cities: this.myCities,
                 locations: this.myLocations,
                 start: this.myStart,
                 end: this.myEnd,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

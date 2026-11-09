@@ -27,19 +27,19 @@
   -->
 
 <template>
-    <embed-code :html="html" :title="title" />
+    <embed-code
+        :html="html"
+        :title="title"
+    />
 </template>
 
 <script>
-
-import EmbedCode from "../../../components/Reports/EmbedCode";
+import EmbedCode from '../../../components/Reports/EmbedCode'
 export default {
-    name: "Render",
-    components: {EmbedCode},
+    name: 'Render',
+    components: { EmbedCode },
     props: ['html', 'title'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

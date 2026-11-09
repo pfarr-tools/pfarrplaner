@@ -34,10 +34,8 @@
 
 <script>
 export default {
-name: "tabs"
+    name: 'tabs',
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

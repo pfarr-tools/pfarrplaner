@@ -28,16 +28,24 @@
 
 <template>
     <div>
-        <form-selectize :name="name" :items="items" v-model="myValue" @input="handleInput"
-                        :label="label" :help="help" id-key="id" title-key="name"/>
+        <form-selectize
+            :name="name"
+            :items="items"
+            v-model="myValue"
+            @input="handleInput"
+            :label="label"
+            :help="help"
+            id-key="id"
+            title-key="name"
+        />
     </div>
 </template>
 
 <script>
-import FormSelectize from "../forms/FormSelectize";
+import FormSelectize from '../forms/FormSelectize'
 
 export default {
-    name: "KonfiAppEventTypeSelect",
+    name: 'KonfiAppEventTypeSelect',
     emits: ['input', 'update:modelValue'],
     props: {
         city: Object,
@@ -47,31 +55,31 @@ export default {
         label: String,
         help: String,
     },
-    components: {FormSelectize},
+    components: { FormSelectize },
     created() {
-        this.$api().get('/api/city/'+this.city.id+'/konfiapp-types')
-        .then(response => {
-            return response.data
-        }).then(data => {
-            this.items = Array.isArray(data) ? data : [];
-        })
+        this.$api()
+            .get('/api/city/' + this.city.id + '/konfiapp-types')
+            .then((response) => {
+                return response.data
+            })
+            .then((data) => {
+                this.items = Array.isArray(data) ? data : []
+            })
     },
     data() {
         return {
             items: [],
             myValue: this.modelValue !== undefined ? this.modelValue : this.value,
-        };
+        }
     },
     methods: {
         handleInput(e) {
-            const value = (e && (typeof e === 'object') && ('id' in e)) ? e.id : e;
-            this.$emit('input', value);
-            this.$emit('update:modelValue', value);
+            const value = e && typeof e === 'object' && 'id' in e ? e.id : e
+            this.$emit('input', value)
+            this.$emit('update:modelValue', value)
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

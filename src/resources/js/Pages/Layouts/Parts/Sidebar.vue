@@ -34,25 +34,56 @@
     >
         <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
             <strong>Menü</strong>
-            <button class="btn btn-sm btn-outline-secondary" @click="$emit('close')">
+            <button
+                class="btn btn-sm btn-outline-secondary"
+                @click="$emit('close')"
+            >
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
 
         <ul class="nav flex-column">
-            <li v-for="item in menu" :class="{
-                            'nav-header': (item.text == undefined) ,
-                            'nav-item': (item.text != undefined),
-                        }">
-                <div v-if="item.text === undefined" class="px-4 p-2 text-start text-uppercase">{{  item }}</div>
-                <inertia-link v-if="item.text && item.inertia" class="px-4 p-2 text-start w-100 nav-link" :class="{ active: item.active }" :href="item.url">
-                    <i v-if="item.icon && (!item.profile)" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
+            <li
+                v-for="item in menu"
+                :class="{
+                    'nav-header': item.text == undefined,
+                    'nav-item': item.text != undefined,
+                }"
+            >
+                <div
+                    v-if="item.text === undefined"
+                    class="px-4 p-2 text-start text-uppercase"
+                >
+                    {{ item }}
+                </div>
+                <inertia-link
+                    v-if="item.text && item.inertia"
+                    class="px-4 p-2 text-start w-100 nav-link"
+                    :class="{ active: item.active }"
+                    :href="item.url"
+                >
+                    <i
+                        v-if="item.icon && !item.profile"
+                        class="nav-icon"
+                        :class="item.icon"
+                        :style="{ color: item.icon_color || 'inherit' }"
+                    ></i>
                     <span v-if="item.text">
                         {{ item.text }}
                     </span>
                 </inertia-link>
-                <a v-if="item.text && (!item.inertia)" class="px-4 p-2 text-start w-100 nav-link" :class="{ active: item.active }" :href="item.url">
-                    <i v-if="item.icon && (!item.profile)" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
+                <a
+                    v-if="item.text && !item.inertia"
+                    class="px-4 p-2 text-start w-100 nav-link"
+                    :class="{ active: item.active }"
+                    :href="item.url"
+                >
+                    <i
+                        v-if="item.icon && !item.profile"
+                        class="nav-icon"
+                        :class="item.icon"
+                        :style="{ color: item.icon_color || 'inherit' }"
+                    ></i>
                     <span v-if="item.text">
                         {{ item.text }}
                     </span>
@@ -74,44 +105,96 @@
     <aside
         v-else
         class="admin-sidebar border-end shadow-sm d-flex flex-column p-0 m-0"
-        :class="{ 'expanded': expanded, 'bg-info': dev, 'bg-primary': !dev }"
+        :class="{ expanded: expanded, 'bg-info': dev, 'bg-primary': !dev }"
         @mouseenter="setHover(true)"
         @mouseleave="setHover(false)"
     >
-        <div class="p-0 m-0 d-flex justify-content-between align-items-center border-bottom brand-container">
-            <inertia-link href="/" class="px-3 text-decoration-none fw-bold brand-link">
+        <div
+            class="p-0 m-0 d-flex justify-content-between align-items-center border-bottom brand-container"
+        >
+            <inertia-link
+                href="/"
+                class="px-3 text-decoration-none fw-bold brand-link"
+            >
                 <!--begin::Brand Image-->
-                <img src="/img/logo/pfarrplaner.svg" class="brand-image opacity-75 shadow" :title="'Startseite (Pfarrplaner '+appInfo+')'">
+                <img
+                    src="/img/logo/pfarrplaner.svg"
+                    class="brand-image opacity-75 shadow"
+                    :title="'Startseite (Pfarrplaner ' + appInfo + ')'"
+                />
                 <!--end::Brand Image-->
                 <!--begin::Brand Text-->
-                <span v-if="expanded" class="px-2 brand-text">{{ appName }}</span>
+                <span
+                    v-if="expanded"
+                    class="px-2 brand-text"
+                    >{{ appName }}</span
+                >
                 <!--end::Brand Text-->
             </inertia-link>
 
-            <button v-if="expanded"
+            <button
+                v-if="expanded"
                 @click="$emit('pin')"
                 class="btn btn-sm me-2 btn-outline-light"
-                :title="pinned ? 'Klicken, um Seitenleiste automatisch zu öffnen und zu schließen' : 'Klicken, um Seitenleiste anzuheften'"
+                :title="
+                    pinned
+                        ? 'Klicken, um Seitenleiste automatisch zu öffnen und zu schließen'
+                        : 'Klicken, um Seitenleiste anzuheften'
+                "
             >
                 <i :class="pinned ? 'mdi mdi-pin-off-outline' : 'mdi mdi-pin-outline'"></i>
             </button>
         </div>
 
         <ul class="nav flex-column p-0 flex-grow-1 overflow-auto text-center">
-            <li v-for="item in menu" :class="{
-                            'nav-header': (item.text == undefined) ,
-                            'nav-item': (item.text != undefined),
-                        }">
-                <div v-if="expanded && (item.text === undefined)" class="px-4 p-2 text-start text-uppercase">{{  item }}</div>
-                <inertia-link v-if="item.text && item.inertia" class="px-4 p-2 text-start w-100 nav-link" :class="{ active: item.active }" :href="item.url">
-                    <i v-if="item.icon && (!item.profile)" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
-                    <span v-if="expanded && item.text" class="ms-1">
+            <li
+                v-for="item in menu"
+                :class="{
+                    'nav-header': item.text == undefined,
+                    'nav-item': item.text != undefined,
+                }"
+            >
+                <div
+                    v-if="expanded && item.text === undefined"
+                    class="px-4 p-2 text-start text-uppercase"
+                >
+                    {{ item }}
+                </div>
+                <inertia-link
+                    v-if="item.text && item.inertia"
+                    class="px-4 p-2 text-start w-100 nav-link"
+                    :class="{ active: item.active }"
+                    :href="item.url"
+                >
+                    <i
+                        v-if="item.icon && !item.profile"
+                        class="nav-icon"
+                        :class="item.icon"
+                        :style="{ color: item.icon_color || 'inherit' }"
+                    ></i>
+                    <span
+                        v-if="expanded && item.text"
+                        class="ms-1"
+                    >
                         {{ item.text }}
                     </span>
                 </inertia-link>
-                <a v-if="item.text && (!item.inertia)" class="px-4 p-2 text-start w-100 nav-link" :class="{ active: item.active }" :href="item.url">
-                    <i v-if="item.icon && (!item.profile)" class="nav-icon" :class="item.icon"  :style="{ color: item.icon_color || 'inherit'}"></i>
-                    <span v-if="expanded && item.text" class="ms-1">
+                <a
+                    v-if="item.text && !item.inertia"
+                    class="px-4 p-2 text-start w-100 nav-link"
+                    :class="{ active: item.active }"
+                    :href="item.url"
+                >
+                    <i
+                        v-if="item.icon && !item.profile"
+                        class="nav-icon"
+                        :class="item.icon"
+                        :style="{ color: item.icon_color || 'inherit' }"
+                    ></i>
+                    <span
+                        v-if="expanded && item.text"
+                        class="ms-1"
+                    >
                         {{ item.text }}
                     </span>
                 </a>
@@ -124,7 +207,11 @@
                 @click="toggleSupportMenu($event)"
             >
                 <span aria-hidden="true">❤️</span>
-                <span v-if="expanded" class="ms-2">Pfarrplaner unterstützen</span>
+                <span
+                    v-if="expanded"
+                    class="ms-2"
+                    >Pfarrplaner unterstützen</span
+                >
             </button>
         </div>
     </aside>
@@ -178,17 +265,23 @@ export default {
             return this.pinned || this.hovered
         },
         appInfo() {
-            return this.$page.props.package.info.version+'-'+this.$page.props.package.env+', '+moment(this.$page.props.package.date).locale('de').format('LLLL')
+            return (
+                this.$page.props.package.info.version +
+                '-' +
+                this.$page.props.package.env +
+                ', ' +
+                moment(this.$page.props.package.date).locale('de').format('LLLL')
+            )
         },
         menu() {
-            return this.$page.props.menu;
+            return this.$page.props.menu
         },
         appName() {
-            return this.$page.props.appName;
+            return this.$page.props.appName
         },
         dev() {
-            return this.$page.props.dev;
-        }
+            return this.$page.props.dev
+        },
     },
     mounted() {
         document.addEventListener('click', this.handleDocumentClick)
@@ -224,10 +317,7 @@ export default {
 
             const rect = event.currentTarget.getBoundingClientRect()
             const popupWidth = 240
-            const left = Math.min(
-                Math.max(12, rect.left),
-                window.innerWidth - popupWidth - 12
-            )
+            const left = Math.min(Math.max(12, rect.left), window.innerWidth - popupWidth - 12)
 
             this.supportMenuButton = event.currentTarget
             this.supportMenuStyle = {
@@ -237,13 +327,12 @@ export default {
                 transform: 'translateY(-100%)',
             }
             this.supportMenuOpen = true
-        }
-    }
+        },
+    },
 }
 </script>
 
 <style scoped lang="scss">
-
 @use '../../../../sass/theme' as theme;
 
 aside {
@@ -259,7 +348,6 @@ aside {
     top: 0;
     overflow: hidden;
     color: white;
-
 }
 
 .admin-sidebar.expanded {
@@ -273,9 +361,8 @@ aside {
     max-height: 58px;
     min-height: 58px;
     height: 58px;
-    background-color: theme.elkw-color("violett");
+    background-color: theme.elkw-color('violett');
 }
-
 
 .brand-link {
     display: flex;
@@ -334,5 +421,4 @@ button.nav-link:hover {
 .support-popup-link:hover {
     background-color: #f1f3f5;
 }
-
 </style>

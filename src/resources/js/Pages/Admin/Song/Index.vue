@@ -29,17 +29,30 @@
 <template>
     <admin-layout title="Lieder">
         <template v-slot:navbar-left>
-            <nav-button type="success" icon="mdi mdi-plus" title="Lied hinzufügen"
-                        :href="route('admin.songs.create')">Neues Lied</nav-button>
+            <nav-button
+                type="success"
+                icon="mdi mdi-plus"
+                title="Lied hinzufügen"
+                :href="route('admin.songs.create')"
+                >Neues Lied</nav-button
+            >
         </template>
-            <dataset
-                 v-slot="{ ds }"
-                 :ds-data="searchableSongs"
-                 ds-sort-by="title"
-                 :ds-search-in="['search_text']">
-            <div class="row mb-3" :data-page-count="ds.dsPagecount">
+        <dataset
+            v-slot="{ ds }"
+            :ds-data="searchableSongs"
+            ds-sort-by="title"
+            :ds-search-in="['search_text']"
+        >
+            <div
+                class="row mb-3"
+                :data-page-count="ds.dsPagecount"
+            >
                 <div class="col-md-6 mb-2 mb-md-0">
-                    <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
+                    <dataset-search
+                        ds-search-placeholder="Suchen..."
+                        ref="search"
+                        autofocus
+                    />
                 </div>
                 <div class="col-md-5 text-end">
                     <dataset-show class="float-right" />
@@ -50,34 +63,71 @@
                     <div class="table-responsive">
                         <table class="table table-striped table-hover d-md-table">
                             <thead>
-                            <tr>
-                                <th>Referenz</th>
-                                <th>Titel</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>Referenz</th>
+                                    <th>Titel</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <dataset-item tag="tbody">
                                 <template #default="{ row, rowIndex }">
                                     <tr>
                                         <td class="text-small">
-                                            <div v-for="songbook in (row.songbooks || [])"
-                                                 :title="songbook.name+(songbook.pivot.reference ? ', Nr. '+songbook.pivot.reference : '')">
-                                                <img v-if="songbook.image" style="max-height: 1em;" :src="route('image', songbook.image.replace('attachments/', ''))" />
-                                                {{ songbook.code }} {{ songbook.pivot.reference}} <span v-if="row.alt_eg">(EG {{ row.alt_eg}})</span>
+                                            <div
+                                                v-for="songbook in row.songbooks || []"
+                                                :title="
+                                                    songbook.name +
+                                                    (songbook.pivot.reference
+                                                        ? ', Nr. ' + songbook.pivot.reference
+                                                        : '')
+                                                "
+                                            >
+                                                <img
+                                                    v-if="songbook.image"
+                                                    style="max-height: 1em"
+                                                    :src="
+                                                        route(
+                                                            'image',
+                                                            songbook.image.replace(
+                                                                'attachments/',
+                                                                '',
+                                                            ),
+                                                        )
+                                                    "
+                                                />
+                                                {{ songbook.code }} {{ songbook.pivot.reference }}
+                                                <span v-if="row.alt_eg">(EG {{ row.alt_eg }})</span>
                                             </div>
-
                                         </td>
                                         <td>{{ row.title }}</td>
                                         <td class="text-end">
-                                            <nav-button class="btn-sm"
-                                                        type="light" icon="mdi mdi-music-note-eighth" title="Noten bearbeiten"
-                                                        force-icon force-no-text :href="route('liturgy.song.musiceditor', row.id)" />
-                                            <nav-button class="btn-sm"
-                                                        type="primary" icon="mdi mdi-pencil" title="Lied bearbeiten"
-                                                        force-icon force-no-text :href="route('admin.song.edit', row.id)" />
-                                            <nav-button class="btn-sm"
-                                                        type="danger" icon="mdi mdi-delete" title="Lied löschen"
-                                                        force-icon force-no-text @click="deleteSong(row)" />
+                                            <nav-button
+                                                class="btn-sm"
+                                                type="light"
+                                                icon="mdi mdi-music-note-eighth"
+                                                title="Noten bearbeiten"
+                                                force-icon
+                                                force-no-text
+                                                :href="route('liturgy.song.musiceditor', row.id)"
+                                            />
+                                            <nav-button
+                                                class="btn-sm"
+                                                type="primary"
+                                                icon="mdi mdi-pencil"
+                                                title="Lied bearbeiten"
+                                                force-icon
+                                                force-no-text
+                                                :href="route('admin.song.edit', row.id)"
+                                            />
+                                            <nav-button
+                                                class="btn-sm"
+                                                type="danger"
+                                                icon="mdi mdi-delete"
+                                                title="Lied löschen"
+                                                force-icon
+                                                force-no-text
+                                                @click="deleteSong(row)"
+                                            />
                                         </td>
                                     </tr>
                                 </template>
@@ -86,25 +136,25 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
+            <div
+                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+            >
+                <dataset-info class="mb-2 mb-md-0" />
+                <dataset-pager />
             </div>
         </dataset>
     </admin-layout>
 </template>
 
 <script>
-
-import {Dataset, DatasetItem, DatasetSearch,} from 'vue-dataset';
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../../../components/Ui/dataset/DatasetInfo'
+import DatasetShow from '../../../components/Ui/dataset/DatasetShow'
+import DatasetPager from '../../../components/Ui/dataset/DatasetPager'
+import NavButton from '../../../components/Ui/buttons/NavButton'
 
 export default {
-    name: "Index",
+    name: 'Index',
     props: ['songs'],
     components: {
         NavButton,
@@ -113,18 +163,22 @@ export default {
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     computed: {
         searchableSongs() {
-            return (this.songs || []).map(song => {
-                const songbookReferences = (song.songbooks || []).map(songbook => {
-                    return [
-                        songbook.code || '',
-                        songbook.pivot?.reference || '',
-                        songbook.name || '',
-                    ].join(' ').trim();
-                }).join(' ');
+            return (this.songs || []).map((song) => {
+                const songbookReferences = (song.songbooks || [])
+                    .map((songbook) => {
+                        return [
+                            songbook.code || '',
+                            songbook.pivot?.reference || '',
+                            songbook.name || '',
+                        ]
+                            .join(' ')
+                            .trim()
+                    })
+                    .join(' ')
 
                 return {
                     ...song,
@@ -132,20 +186,20 @@ export default {
                         song.title || '',
                         songbookReferences,
                         song.alt_eg ? `EG ${song.alt_eg}` : '',
-                    ].join(' ').trim(),
-                };
-            });
+                    ]
+                        .join(' ')
+                        .trim(),
+                }
+            })
         },
     },
     methods: {
         deleteSong(song) {
-            if (!confirm('Willst du wirklich das komplette Lied löschen?')) return;
-            this.$inertia.delete(route('admin.song.destroy', song.id));
+            if (!confirm('Willst du wirklich das komplette Lied löschen?')) return
+            this.$inertia.delete(route('admin.song.destroy', song.id))
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

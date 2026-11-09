@@ -29,9 +29,17 @@
 <template>
     <admin-layout title="Opferplan ausgeben">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Opferplan ausgeben" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Opferplan ausgeben"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'offeringPlan'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'offeringPlan' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
             <city-location-filter
                 :cities="cities"
@@ -42,25 +50,38 @@
                 v-model:city-model-value="myCities"
                 v-model:location-model-value="myLocations"
             />
-            <form-input name="year" label="Jahr" v-model="myYear" type="number" />
+            <form-input
+                name="year"
+                label="Jahr"
+                v-model="myYear"
+                type="number"
+            />
             <br />
-            <form-check name="includeOfferingCounters" v-model="myIncludeOfferingCounters" label="Opferzähler mit ausgeben"/>
-            <form-check name="highlightEmpty" v-model="myHighlightEmpty" label="Fehlende Einträge hervorheben"/>
+            <form-check
+                name="includeOfferingCounters"
+                v-model="myIncludeOfferingCounters"
+                label="Opferzähler mit ausgeben"
+            />
+            <form-check
+                name="highlightEmpty"
+                v-model="myHighlightEmpty"
+                label="Fehlende Einträge hervorheben"
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormCheck from "../../../components/Ui/forms/FormCheck.vue";
-import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormCheck from '../../../components/Ui/forms/FormCheck.vue'
+import CityLocationFilter from '../../../components/Reports/CityLocationFilter.vue'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'locations'],
-    components: {CityLocationFilter, FormCheck, FormInput, FormCsrfToken, SaveButton},
+    components: { CityLocationFilter, FormCheck, FormInput, FormCsrfToken, SaveButton },
     data() {
         return {
             myCities: this.cities.length > 0 ? [this.cities[0].id] : null,
@@ -72,18 +93,16 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'offeringPlan'}), {
+            submitReportForm(route('reports.render', { report: 'offeringPlan' }), {
                 cities: this.myCities,
                 locations: this.myLocations,
                 year: this.myYear,
                 includeOfferingCounters: this.myIncludeOfferingCounters,
                 highlightEmpty: this.myHighlightEmpty,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -27,120 +27,238 @@
   -->
 
 <template>
-    <liturgy-sheet-configuration-layout :title="sheetConfig.title" :service="service"
-                                        :sheet-config="sheetConfig">
+    <liturgy-sheet-configuration-layout
+        :title="sheetConfig.title"
+        :service="service"
+        :sheet-config="sheetConfig"
+    >
         <tab-headers>
-            <tab-header id="colorscheme" active="1" title="Farbschema" />
-            <tab-header id="layout" title="Layout" />
-            <tab-header id="content" title="Inhalte" />
-            <tab-header id="ads" title="Werbung" />
-            <tab-header id="format" title="Ausgabeformat" />
+            <tab-header
+                id="colorscheme"
+                active="1"
+                title="Farbschema"
+            />
+            <tab-header
+                id="layout"
+                title="Layout"
+            />
+            <tab-header
+                id="content"
+                title="Inhalte"
+            />
+            <tab-header
+                id="ads"
+                title="Werbung"
+            />
+            <tab-header
+                id="format"
+                title="Ausgabeformat"
+            />
         </tab-headers>
         <tabs>
-            <tab id="colorscheme" active="1">
-                <input type="hidden" name="config[backgroundColor]" v-model="myConfig.backgroundColor" />
-                <form-selectize label="Hintergrundfarbe für Folien mit Text" v-model="myConfig.backgroundColor"
-                                :options="myColorOptions" />
-                <input type="hidden" name="config[backgroundColorEmpty]" v-model="myConfig.backgroundColorEmpty" />
-                <form-selectize label="Hintergrundfarbe für Folien ohne Text" v-model="myConfig.backgroundColorEmpty"
-                                :options="myColorOptions" />
-                <input type="hidden" name="config[textColor]" v-model="myConfig.textColor" />
-                <form-selectize label="Textfarbe" v-model="myConfig.textColor"
-                                :options="myColorOptions" />
-                <input type="hidden" name="config[verticalAlignment]" v-model="myConfig.verticalAlignment" />
+            <tab
+                id="colorscheme"
+                active="1"
+            >
+                <input
+                    type="hidden"
+                    name="config[backgroundColor]"
+                    v-model="myConfig.backgroundColor"
+                />
+                <form-selectize
+                    label="Hintergrundfarbe für Folien mit Text"
+                    v-model="myConfig.backgroundColor"
+                    :options="myColorOptions"
+                />
+                <input
+                    type="hidden"
+                    name="config[backgroundColorEmpty]"
+                    v-model="myConfig.backgroundColorEmpty"
+                />
+                <form-selectize
+                    label="Hintergrundfarbe für Folien ohne Text"
+                    v-model="myConfig.backgroundColorEmpty"
+                    :options="myColorOptions"
+                />
+                <input
+                    type="hidden"
+                    name="config[textColor]"
+                    v-model="myConfig.textColor"
+                />
+                <form-selectize
+                    label="Textfarbe"
+                    v-model="myConfig.textColor"
+                    :options="myColorOptions"
+                />
+                <input
+                    type="hidden"
+                    name="config[verticalAlignment]"
+                    v-model="myConfig.verticalAlignment"
+                />
             </tab>
             <tab id="layout">
-                <form-selectize label="Vertikale Ausrichtung der Texte" v-model="myConfig.verticalAlignment"
-                                :options="myAlignmentOptions" />
-                <form-input label="Schrifgröße" type="number" v-model="myConfig.fontSize" />
+                <form-selectize
+                    label="Vertikale Ausrichtung der Texte"
+                    v-model="myConfig.verticalAlignment"
+                    :options="myAlignmentOptions"
+                />
+                <form-input
+                    label="Schrifgröße"
+                    type="number"
+                    v-model="myConfig.fontSize"
+                />
             </tab>
             <tab id="content">
-                <form-check label="Leere Folien zwischen den Elementen" v-model="myConfig.includeEmpty" name="config[includeEmpty]"/>
-                <form-check label="Platzhalter für Jingle, Intro, ..." v-model="myConfig.includeJingleAndIntro" name="config[includeJingleAndIntro]"/>
-                <form-check label="Mitwirkende anzeigen" v-model="myConfig.includeCredits" name="config[includeCredits]"/>
+                <form-check
+                    label="Leere Folien zwischen den Elementen"
+                    v-model="myConfig.includeEmpty"
+                    name="config[includeEmpty]"
+                />
+                <form-check
+                    label="Platzhalter für Jingle, Intro, ..."
+                    v-model="myConfig.includeJingleAndIntro"
+                    name="config[includeJingleAndIntro]"
+                />
+                <form-check
+                    label="Mitwirkende anzeigen"
+                    v-model="myConfig.includeCredits"
+                    name="config[includeCredits]"
+                />
                 <hr />
-                <form-check label="Liederliste am Anfang" v-model="myConfig.includeSongList" name="config[includeSongList]"/>
-                <form-check label="Hinweis auf Liederbuch vor jedem Lied" v-model="myConfig.includeSongbookReference" name="config[includeSongbookReference]"/>
-                <form-check label="Wo möglich, Noten statt Text verwenden" v-model="myConfig.renderMusic" name="config[renderMusic]" />
-                <form-check label="QR-Code für digitales Liedblatt anzeigen" v-model="myConfig.includeVirtualSongsheetQR" name="config[includeVirtualSongsheetQR]"/>
+                <form-check
+                    label="Liederliste am Anfang"
+                    v-model="myConfig.includeSongList"
+                    name="config[includeSongList]"
+                />
+                <form-check
+                    label="Hinweis auf Liederbuch vor jedem Lied"
+                    v-model="myConfig.includeSongbookReference"
+                    name="config[includeSongbookReference]"
+                />
+                <form-check
+                    label="Wo möglich, Noten statt Text verwenden"
+                    v-model="myConfig.renderMusic"
+                    name="config[renderMusic]"
+                />
+                <form-check
+                    label="QR-Code für digitales Liedblatt anzeigen"
+                    v-model="myConfig.includeVirtualSongsheetQR"
+                    name="config[includeVirtualSongsheetQR]"
+                />
             </tab>
             <tab id="ads">
-                <form-check label="Veranstaltungswerbung am Anfang einfügen" v-model="myConfig.includeAdLoopStart" name="config[includeAdLoopStart]"/>
-                <form-check label="Veranstaltungswerbung am Ende einfügen" v-model="myConfig.includeAdLoopEnd" name="config[includeAdLoopEnd]"/>
-                <form-selectize label="Veranstaltungswerbung bei folgenden Elementen einfügen" multiple :options="myItems"
-                                v-model="myConfig.includeAdLoopElements" name="config[includeAdLoopElements][]" />
+                <form-check
+                    label="Veranstaltungswerbung am Anfang einfügen"
+                    v-model="myConfig.includeAdLoopStart"
+                    name="config[includeAdLoopStart]"
+                />
+                <form-check
+                    label="Veranstaltungswerbung am Ende einfügen"
+                    v-model="myConfig.includeAdLoopEnd"
+                    name="config[includeAdLoopEnd]"
+                />
+                <form-selectize
+                    label="Veranstaltungswerbung bei folgenden Elementen einfügen"
+                    multiple
+                    :options="myItems"
+                    v-model="myConfig.includeAdLoopElements"
+                    name="config[includeAdLoopElements][]"
+                />
                 <hr />
-                <form-selectize label="Veranstaltungen aus folgenden Kirchengemeinden einschließen" :key="this.myCities.length" multiple
-                                v-model="myConfig.showAdsFromCities" name="config[showAdsFromCities][]" :options="myCities" />
+                <form-selectize
+                    label="Veranstaltungen aus folgenden Kirchengemeinden einschließen"
+                    :key="this.myCities.length"
+                    multiple
+                    v-model="myConfig.showAdsFromCities"
+                    name="config[showAdsFromCities][]"
+                    :options="myCities"
+                />
                 <hr />
-                <form-input label="Werbefolien nach ___ Sekunden weiterschalten" v-model="myConfig.adLoopDelay"
-                            name="config[adLoopDelay]" type="number" min="0"
-                            help="Bei 0 erfolgt keine automatische Weiterschaltung" />
+                <form-input
+                    label="Werbefolien nach ___ Sekunden weiterschalten"
+                    v-model="myConfig.adLoopDelay"
+                    name="config[adLoopDelay]"
+                    type="number"
+                    min="0"
+                    help="Bei 0 erfolgt keine automatische Weiterschaltung"
+                />
             </tab>
             <tab id="format">
-                <form-selectize label="Dateiformat" v-model="myConfig.outputFormat"
-                                :options="[
-                                    {id: 'ppt', name: 'Microsoft PowerPoint (.pptx, .pptm)'},
-                                    {id: 'odp', name: 'OpenDocument Presentation (.odp)'},
-                                ]" />
+                <form-selectize
+                    label="Dateiformat"
+                    v-model="myConfig.outputFormat"
+                    :options="[
+                        { id: 'ppt', name: 'Microsoft PowerPoint (.pptx, .pptm)' },
+                        { id: 'odp', name: 'OpenDocument Presentation (.odp)' },
+                    ]"
+                />
             </tab>
         </tabs>
     </liturgy-sheet-configuration-layout>
 </template>
 
 <script>
-import LiturgySheetConfigurationLayout from "./LiturgySheetConfigurationLayout";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
-import Tab from "../../../components/Ui/tabs/tab.vue";
-import Tabs from "../../../components/Ui/tabs/tabs.vue";
-import FormInput from "../../../components/Ui/forms/FormInput.vue";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize.vue";
-import TabHeader from "../../../components/Ui/tabs/tabHeader.vue";
-import TabHeaders from "../../../components/Ui/tabs/tabHeaders.vue";
+import LiturgySheetConfigurationLayout from './LiturgySheetConfigurationLayout'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
+import Tab from '../../../components/Ui/tabs/tab.vue'
+import Tabs from '../../../components/Ui/tabs/tabs.vue'
+import FormInput from '../../../components/Ui/forms/FormInput.vue'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize.vue'
+import TabHeader from '../../../components/Ui/tabs/tabHeader.vue'
+import TabHeaders from '../../../components/Ui/tabs/tabHeaders.vue'
 
 export default {
-    name: "SongPPTSongSheetConfiguration",
-    components: {TabHeaders, TabHeader, FormSelectize, FormInput, Tabs, Tab, FormCheck, LiturgySheetConfigurationLayout},
+    name: 'SongPPTSongSheetConfiguration',
+    components: {
+        TabHeaders,
+        TabHeader,
+        FormSelectize,
+        FormInput,
+        Tabs,
+        Tab,
+        FormCheck,
+        LiturgySheetConfigurationLayout,
+    },
     props: ['service', 'sheetConfig', 'config'],
     created() {
-        this.$api().get(route('api.cities.index')).then(response => {
-            this.myCities = response.data;
-        });
+        this.$api()
+            .get(route('api.cities.index'))
+            .then((response) => {
+                this.myCities = response.data
+            })
     },
     data() {
-        let myConfig = this.config || {};
-        if (!(myConfig.showAdsFromCities || []).length) myConfig.showAdsFromCities = [this.service.city_id];
-        if (!myConfig.outputFormat) myConfig.outputFormat = 'ppt';
+        let myConfig = this.config || {}
+        if (!(myConfig.showAdsFromCities || []).length)
+            myConfig.showAdsFromCities = [this.service.city_id]
+        if (!myConfig.outputFormat) myConfig.outputFormat = 'ppt'
 
-
-        let myItems = [];
-        if (!(myConfig.includeAdLoopElements || []).length) myConfig.includeAdLoopElements = [];
-        (this.service.liturgy || this.service.liturgy_blocks || []).forEach(block => {
-            block.items.forEach(item => {
-                myItems.push({id: item.id, name: item.title });
-            });
-        });
+        let myItems = []
+        if (!(myConfig.includeAdLoopElements || []).length) myConfig.includeAdLoopElements = []
+        ;(this.service.liturgy || this.service.liturgy_blocks || []).forEach((block) => {
+            block.items.forEach((item) => {
+                myItems.push({ id: item.id, name: item.title })
+            })
+        })
 
         return {
             myCities: [],
             myConfig,
             myItems,
             myColorOptions: [
-                {id: 'FF043b04', name: 'Grün (für Greenscreen bei der Liveübertragung)'},
-                {id: 'FF000000', name: 'Schwarz'},
-                {id: 'FFFFFFFF', name: 'Weiß'},
+                { id: 'FF043b04', name: 'Grün (für Greenscreen bei der Liveübertragung)' },
+                { id: 'FF000000', name: 'Schwarz' },
+                { id: 'FFFFFFFF', name: 'Weiß' },
             ],
             myAlignmentOptions: [
-                {id: 't', name: 'Am oberen Rand ausrichten'},
-                {id: 'b', name: 'Am unteren Rand ausrichten'},
-                {id: 'ctr', name: 'Mittig ausrichten'},
-                {id: 'auto', name: 'Automatisch ausrichten'},
+                { id: 't', name: 'Am oberen Rand ausrichten' },
+                { id: 'b', name: 'Am unteren Rand ausrichten' },
+                { id: 'ctr', name: 'Mittig ausrichten' },
+                { id: 'auto', name: 'Automatisch ausrichten' },
             ],
         }
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -31,36 +31,57 @@
         <card>
             <card-header>API-Tokens verwalten</card-header>
             <card-body>
-                <table v-if="tokens" class="table table-striped">
+                <table
+                    v-if="tokens"
+                    class="table table-striped"
+                >
                     <thead>
-                    <tr>
-                        <th>Bezeichnung</th>
-                        <th>Angelegt</th>
-                        <th></th>
-                    </tr>
+                        <tr>
+                            <th>Bezeichnung</th>
+                            <th>Angelegt</th>
+                            <th></th>
+                        </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="(token,key,index) in tokens" :key="key">
-                        <td>{{ token.name }}</td>
-                        <td>{{ moment(token.created_at).locale('de').format('LLLL')}}</td>
-                        <td class="text-end">
-                            <button class="btn btn-sm btn-danger" title="Token löschen" @click.prevent="deleteToken(token)">
-                                <span class="mdi mdi-delete"></span>
-                            </button>
-                        </td>
-                    </tr>
+                        <tr
+                            v-for="(token, key, index) in tokens"
+                            :key="key"
+                        >
+                            <td>{{ token.name }}</td>
+                            <td>{{ moment(token.created_at).locale('de').format('LLLL') }}</td>
+                            <td class="text-end">
+                                <button
+                                    class="btn btn-sm btn-danger"
+                                    title="Token löschen"
+                                    @click.prevent="deleteToken(token)"
+                                >
+                                    <span class="mdi mdi-delete"></span>
+                                </button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
                 <div v-if="token">
                     <hr />
                     <h3>Neues Token "{{ token.accessToken.name }}" hinzugefügt.</h3>
-                    <p>Das folgende Token wird einmalig hier angezeigt. Bitte kopiere den Inhalt an einen sicheren Ort:</p>
+                    <p>
+                        Das folgende Token wird einmalig hier angezeigt. Bitte kopiere den Inhalt an
+                        einen sicheren Ort:
+                    </p>
                     <pre>{{ token.plainTextToken }}</pre>
                 </div>
                 <hr />
                 <h3>Neues Token hinzufügen</h3>
-                <form-input v-model="newTokenTitle" label="Bezeichnung" name="newTokenTitle"></form-input>
-                <button class="btn btn-success" title="Token hinzufügen" @click.prevent="addToken">
+                <form-input
+                    v-model="newTokenTitle"
+                    label="Bezeichnung"
+                    name="newTokenTitle"
+                ></form-input>
+                <button
+                    class="btn btn-success"
+                    title="Token hinzufügen"
+                    @click.prevent="addToken"
+                >
                     Neues Token anlegen
                 </button>
             </card-body>
@@ -69,13 +90,13 @@
 </template>
 
 <script>
-import Card from "../components/Ui/cards/card";
-import CardBody from "../components/Ui/cards/cardBody";
-import CardHeader from "../components/Ui/cards/cardHeader";
-import FormInput from "../components/Ui/forms/FormInput";
+import Card from '../components/Ui/cards/card'
+import CardBody from '../components/Ui/cards/cardBody'
+import CardHeader from '../components/Ui/cards/cardHeader'
+import FormInput from '../components/Ui/forms/FormInput'
 export default {
-    name: "tokens",
-    components: {FormInput, CardHeader, CardBody, Card},
+    name: 'tokens',
+    components: { FormInput, CardHeader, CardBody, Card },
     props: ['tokens', 'token'],
     data() {
         return {
@@ -84,16 +105,14 @@ export default {
     },
     methods: {
         addToken() {
-            this.$inertia.post(route('tokens.create', {title: this.newTokenTitle}));
+            this.$inertia.post(route('tokens.create', { title: this.newTokenTitle }))
         },
         deleteToken(token) {
-            if (!confirm('Willst du diesen Zugangsschlüssel wirklich löschen?')) return;
-            this.$inertia.delete(route('tokens.destroy', {token: token.id}));
-        }
-    }
+            if (!confirm('Willst du diesen Zugangsschlüssel wirklich löschen?')) return
+            this.$inertia.delete(route('tokens.destroy', { token: token.id }))
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

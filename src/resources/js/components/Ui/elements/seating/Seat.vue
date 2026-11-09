@@ -27,34 +27,44 @@
   -->
 
 <template>
-    <div class="seat" :style="{
-        backgroundColor: seat.color,
-        padding: (icon == 'mdi mdi-sofa') ? '1px 30px 1px 30px' : '1px 3px',
-        fontWeight: booking.fixed_seat ? 'bold' : 'normal',
-        fontStyle: booking.fixed_seat ? 'normal' : 'italic',
-    }">
-        <span class="fa" :class="[icon]"></span> {{ seat.title }}
+    <div
+        class="seat"
+        :style="{
+            backgroundColor: seat.color,
+            padding: icon == 'mdi mdi-sofa' ? '1px 30px 1px 30px' : '1px 3px',
+            fontWeight: booking.fixed_seat ? 'bold' : 'normal',
+            fontStyle: booking.fixed_seat ? 'normal' : 'italic',
+        }"
+    >
+        <span
+            class="fa"
+            :class="[icon]"
+        ></span>
+        {{ seat.title }}
     </div>
 </template>
 
 <script>
 export default {
-    name: "Seat",
+    name: 'Seat',
     props: ['seat', 'booking'],
     computed: {
         icon() {
-            return (!isNaN(this.seat.title)) && (this.seat.seats > 1) ? 'mdi mdi-sofa' : 'mdi mdi-sofa-single';
-        }
-    }
+            return !isNaN(this.seat.title) && this.seat.seats > 1
+                ? 'mdi mdi-sofa'
+                : 'mdi mdi-sofa-single'
+        },
+    },
 }
 </script>
 
 <style scoped>
-    div.seat {
-        display: inline-block;
-        border: solid 1px darkgray;  border-radius: 0;
-        box-shadow: darkgray 0px 0px 1px 1px;
-        margin-right: 3px;
-        margin-bottom: 3px;
-    }
+div.seat {
+    display: inline-block;
+    border: solid 1px darkgray;
+    border-radius: 0;
+    box-shadow: darkgray 0px 0px 1px 1px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+}
 </style>

@@ -28,39 +28,62 @@
 
 <template>
     <card>
-        <card-header :id="'heading'+uid">
+        <card-header :id="'heading' + uid">
             <h2 class="mb-0">
-                <button class="btn btn-block text-left pl-0 accordion-button" :class="{ collapsed : !open}" type="button" data-bs-toggle="collapse" :data-target="'#collapse'+uid" aria-expanded="false" :aria-controls="'collapse'+uid"
-                @click="open = !open">
-                    <span v-if="icon" :class="icon"></span>
-                    <img v-if="image" class="mx-2" style="max-height: 2em" :src="image" />
+                <button
+                    class="btn btn-block text-left pl-0 accordion-button"
+                    :class="{ collapsed: !open }"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    :data-target="'#collapse' + uid"
+                    aria-expanded="false"
+                    :aria-controls="'collapse' + uid"
+                    @click="open = !open"
+                >
+                    <span
+                        v-if="icon"
+                        :class="icon"
+                    ></span>
+                    <img
+                        v-if="image"
+                        class="mx-2"
+                        style="max-height: 2em"
+                        :src="image"
+                    />
                     {{ title }}
                 </button>
-            </h2>        </card-header>
-        <div :id="'collapse'+uid" class="collapse" :class="{ show: open}" :aria-labelledby="'heading'+uid" :data-parent="'#'+accordionId">
-        <card-body>
-            <slot />
-        </card-body>
+            </h2>
+        </card-header>
+        <div
+            :id="'collapse' + uid"
+            class="collapse"
+            :class="{ show: open }"
+            :aria-labelledby="'heading' + uid"
+            :data-parent="'#' + accordionId"
+        >
+            <card-body>
+                <slot />
+            </card-body>
         </div>
     </card>
 </template>
 
 <script>
-import Card from "../cards/card";
-import CardHeader from "../cards/cardHeader";
-import CardBody from "../cards/cardBody";
-import { uid } from '../../../libraries/uid';
+import Card from '../cards/card'
+import CardHeader from '../cards/cardHeader'
+import CardBody from '../cards/cardBody'
+import { uid } from '../../../libraries/uid'
 export default {
-    name: "AccordionElement",
+    name: 'AccordionElement',
     props: ['title', 'icon', 'image'],
-    components: {CardBody, CardHeader, Card},
+    components: { CardBody, CardHeader, Card },
     inject: ['accordionId'],
     data() {
         return {
             open: false,
             uid: uid(),
         }
-    }
+    },
 }
 </script>
 
@@ -73,5 +96,4 @@ export default {
 .btn.accordion-button:focus {
     box-shadow: none;
 }
-
 </style>

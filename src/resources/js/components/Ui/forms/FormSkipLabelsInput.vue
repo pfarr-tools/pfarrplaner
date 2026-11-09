@@ -27,13 +27,13 @@
   -->
 
 <script>
-import FormGroup from "./FormGroup.vue";
+import FormGroup from './FormGroup.vue'
 
 export default {
-    name: "FormSkipLabelsInput",
+    name: 'FormSkipLabelsInput',
     props: ['label', 'labels', 'length', 'modelValue'],
     emits: ['update:modelValue', 'input'],
-    components: {FormGroup},
+    components: { FormGroup },
     data() {
         return {
             myValue: this.modelValue,
@@ -41,19 +41,21 @@ export default {
     },
     computed: {
         states() {
-            return Array.from({ length: this.labels }, (_, index) => index);
+            return Array.from({ length: this.labels }, (_, index) => index)
         },
     },
     watch: {
-        modelValue(v) { this.myValue = v; },
+        modelValue(v) {
+            this.myValue = v
+        },
     },
     methods: {
         setValue(value) {
-            this.myValue = value;
-            this.$emit('update:modelValue', value);
-            this.$emit('input', value);
-        }
-    }
+            this.myValue = value
+            this.$emit('update:modelValue', value)
+            this.$emit('input', value)
+        },
+    },
 }
 </script>
 
@@ -61,15 +63,34 @@ export default {
     <form-group :label="label">
         <div class="row">
             <div class="col-12 col-md-4">
-                <div class="row page m-3" role="listbox" aria-label="Druckbeginn für Etiketten">
-                    <button v-for="labelIndex in states" :key="labelIndex" type="button"
-                         class="col-4 label p-3"
-                         :class="labelIndex < myValue ? 'skipped' : (labelIndex < myValue+length ? 'active' : 'empty')"
-                         :aria-selected="labelIndex === myValue ? 'true' : 'false'"
-                         @click="setValue(labelIndex)"
+                <div
+                    class="row page m-3"
+                    role="listbox"
+                    aria-label="Druckbeginn für Etiketten"
+                >
+                    <button
+                        v-for="labelIndex in states"
+                        :key="labelIndex"
+                        type="button"
+                        class="col-4 label p-3"
+                        :class="
+                            labelIndex < myValue
+                                ? 'skipped'
+                                : labelIndex < myValue + length
+                                  ? 'active'
+                                  : 'empty'
+                        "
+                        :aria-selected="labelIndex === myValue ? 'true' : 'false'"
+                        @click="setValue(labelIndex)"
                     >
-                        <span v-if="(labelIndex >= myValue) && (labelIndex < myValue+length)">Dieses Etikett wird bedruckt.</span>
-                        <span v-else class="visually-hidden">Druck beginnt ab diesem Etikett.</span>
+                        <span v-if="labelIndex >= myValue && labelIndex < myValue + length"
+                            >Dieses Etikett wird bedruckt.</span
+                        >
+                        <span
+                            v-else
+                            class="visually-hidden"
+                            >Druck beginnt ab diesem Etikett.</span
+                        >
                     </button>
                 </div>
             </div>
@@ -78,19 +99,20 @@ export default {
 </template>
 
 <style scoped>
-    .page {
-        background-color: white;
-        border: solid 1px black;
-    }
-    .label {
-        background-color: lightgray;
-        border: solid 1px black;
-        min-height: 7em !important;
-        font-size: .6em;
-        text-align: left;
-    }
+.page {
+    background-color: white;
+    border: solid 1px black;
+}
+.label {
+    background-color: lightgray;
+    border: solid 1px black;
+    min-height: 7em !important;
+    font-size: 0.6em;
+    text-align: left;
+}
 
-    .label.active, .label.empty {
-        background-color: white;
-    }
+.label.active,
+.label.empty {
+    background-color: white;
+}
 </style>

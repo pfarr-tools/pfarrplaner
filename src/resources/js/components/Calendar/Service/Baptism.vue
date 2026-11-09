@@ -33,10 +33,8 @@
 <script>
 export default {
     name: 'CalendarServiceBaptism',
-    props: ['baptism']
+    props: ['baptism'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

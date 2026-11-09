@@ -27,26 +27,29 @@
   -->
 
 <template>
-    <button class="btn btn-light dropdown-toggle" type="button"
-            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-            @click="toggleMenu"
-            :title="menu.title">
+    <button
+        class="btn btn-light dropdown-toggle"
+        type="button"
+        data-bs-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+        @click="toggleMenu"
+        :title="menu.title"
+    >
         <span :class="menu.icon"></span> {{ menu.title }}
     </button>
 </template>
 
 <script>
 export default {
-    name: "ReplacementMenuButton",
+    name: 'ReplacementMenuButton',
     props: ['menu'],
     methods: {
         toggleMenu() {
-            this.$emit('toggle', !this.menu.show);
-        }
-    }
+            this.$emit('toggle', !this.menu.show)
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

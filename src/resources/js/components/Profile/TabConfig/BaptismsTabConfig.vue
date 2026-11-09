@@ -28,22 +28,32 @@
 
 <template>
     <div class="baptisms-tab-config">
-        <form-check label="Nur meine eigenen Taufen anzeigen" v-model="tab.config.mine" />
-        <form-check label="Taufanfragen anzeigen" v-model="tab.config.showRequests" />
-        <form-check label="Späteste Tauftermine zuerst anzeigen" v-model="tab.config.newestFirst" />
-        <form-check label="Ins Kirchenbuch eingetragene Taufen ausblenden" v-model="tab.config.excludeProcessed" />
+        <form-check
+            label="Nur meine eigenen Taufen anzeigen"
+            v-model="tab.config.mine"
+        />
+        <form-check
+            label="Taufanfragen anzeigen"
+            v-model="tab.config.showRequests"
+        />
+        <form-check
+            label="Späteste Tauftermine zuerst anzeigen"
+            v-model="tab.config.newestFirst"
+        />
+        <form-check
+            label="Ins Kirchenbuch eingetragene Taufen ausblenden"
+            v-model="tab.config.excludeProcessed"
+        />
     </div>
 </template>
 
 <script>
-import FormCheck from "../../Ui/forms/FormCheck";
+import FormCheck from '../../Ui/forms/FormCheck'
 export default {
-    name: "BaptismsTabConfig",
-    components: {FormCheck},
+    name: 'BaptismsTabConfig',
+    components: { FormCheck },
     props: ['tab'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

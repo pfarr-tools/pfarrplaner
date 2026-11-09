@@ -30,18 +30,23 @@
     <div class="attachments-tab">
         <h3>Angehängte Dateien</h3>
         <div>
-            <attachment-list v-model="myService.attachments"
-                             delete-route-name="service.detach"
-                             parent-type="service"
-                             parent-route-key="slug"
-                             :parent-object="myService"
-                             :upload-route="route('service.attach', myService.slug)"
-                             chunk-upload-route="/api/attachment-uploads"
-                             :chunk-target="{target_type: 'App\\Models\\Service', target_id: myService.id}"
-                             :auto-attachments="autoAttachments"
-                             @open-auto-attachment="openAutoAttachment" />
+            <attachment-list
+                v-model="myService.attachments"
+                delete-route-name="service.detach"
+                parent-type="service"
+                parent-route-key="slug"
+                :parent-object="myService"
+                :upload-route="route('service.attach', myService.slug)"
+                chunk-upload-route="/api/attachment-uploads"
+                :chunk-target="{ target_type: 'App\\Models\\Service', target_id: myService.id }"
+                :auto-attachments="autoAttachments"
+                @open-auto-attachment="openAutoAttachment"
+            />
         </div>
-        <template v-for="sheet in configurableLiturgySheets" :key="'dlg' + sheet.key">
+        <template
+            v-for="sheet in configurableLiturgySheets"
+            :key="'dlg' + sheet.key"
+        >
             <modal
                 v-if="dialogs[sheet.key]"
                 :title="dialogTitle(sheet)"
@@ -51,28 +56,31 @@
                 :close-button-label="dialogCloseButtonLabel(sheet)"
                 cancel-button-label="Abbrechen"
             >
-                <component :is="sheet.configurationComponent" :service="service" :sheet="sheet" />
+                <component
+                    :is="sheet.configurationComponent"
+                    :service="service"
+                    :sheet="sheet"
+                />
             </modal>
         </template>
     </div>
 </template>
 
 <script>
-import AttachmentList from "../../Ui/elements/AttachmentList.vue";
-import FormInput from "../../Ui/forms/FormInput";
-import FormGroup from "../../Ui/forms/FormGroup";
-import Modal from "../../Ui/modals/Modal";
-import FullTextLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/FullTextLiturgySheetConfiguration";
-import SongPPTLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/SongPPTLiturgySheetConfiguration";
-import SongSheetLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/SongSheetLiturgySheetConfiguration";
-import SBLiturgySheetConfiguration from "../../LiturgyEditor/LiturgySheets/SBLiturgySheetConfiguration.vue";
-import A4WordSpecificLiturgySheetConfiguration
-    from "../../LiturgyEditor/LiturgySheets/A4WordSpecificLiturgySheetConfiguration.vue";
-import SongMailLiturgySheetDialog from "../../LiturgyEditor/LiturgySheets/SongMailLiturgySheetDialog.vue";
-import AIPromptLiturgySheetDialog from "../../LiturgyEditor/LiturgySheets/AIPromptLiturgySheetDialog.vue";
+import AttachmentList from '../../Ui/elements/AttachmentList.vue'
+import FormInput from '../../Ui/forms/FormInput'
+import FormGroup from '../../Ui/forms/FormGroup'
+import Modal from '../../Ui/modals/Modal'
+import FullTextLiturgySheetConfiguration from '../../LiturgyEditor/LiturgySheets/FullTextLiturgySheetConfiguration'
+import SongPPTLiturgySheetConfiguration from '../../LiturgyEditor/LiturgySheets/SongPPTLiturgySheetConfiguration'
+import SongSheetLiturgySheetConfiguration from '../../LiturgyEditor/LiturgySheets/SongSheetLiturgySheetConfiguration'
+import SBLiturgySheetConfiguration from '../../LiturgyEditor/LiturgySheets/SBLiturgySheetConfiguration.vue'
+import A4WordSpecificLiturgySheetConfiguration from '../../LiturgyEditor/LiturgySheets/A4WordSpecificLiturgySheetConfiguration.vue'
+import SongMailLiturgySheetDialog from '../../LiturgyEditor/LiturgySheets/SongMailLiturgySheetDialog.vue'
+import AIPromptLiturgySheetDialog from '../../LiturgyEditor/LiturgySheets/AIPromptLiturgySheetDialog.vue'
 
 export default {
-    name: "AttachmentsTab",
+    name: 'AttachmentsTab',
     components: {
         AttachmentList,
         Modal,
@@ -93,34 +101,34 @@ export default {
     },
     computed: {
         downloadableLiturgySheets() {
-            return Object.values(this.liturgySheets)
-                .filter(sheet => sheet && !sheet.isNotAFile);
+            return Object.values(this.liturgySheets).filter((sheet) => sheet && !sheet.isNotAFile)
         },
         configurableLiturgySheets() {
-            return this.downloadableLiturgySheets
-                .filter(sheet => sheet.configurationComponent);
+            return this.downloadableLiturgySheets.filter((sheet) => sheet.configurationComponent)
         },
         hasAutoAttachments() {
-            return this.myService.event_class == 'service';
+            return this.myService.event_class == 'service'
         },
         hasAnnouncements() {
-            if (this.myService.event_class != 'service') return false;
-            let found = false;
-            this.service.attachments.forEach(attachment => {
-                found = found || (attachment.title == 'Bekanntgaben');
-            });
+            if (this.myService.event_class != 'service') return false
+            let found = false
+            this.service.attachments.forEach((attachment) => {
+                found = found || attachment.title == 'Bekanntgaben'
+            })
             for (const sheetKey in this.liturgySheets) {
-                found = found || (sheetKey == 'Schriftlesung und Abkündigungen');
+                found = found || sheetKey == 'Schriftlesung und Abkündigungen'
             }
-            return found;
+            return found
         },
         autoAttachments() {
-            const attachments = [];
+            const attachments = []
             if (this.myService.liturgy_blocks.length > 0) {
-                this.downloadableLiturgySheets.forEach(sheet => attachments.push({
-                    ...sheet,
-                    size: 'Größe unbekannt',
-                }));
+                this.downloadableLiturgySheets.forEach((sheet) =>
+                    attachments.push({
+                        ...sheet,
+                        size: 'Größe unbekannt',
+                    }),
+                )
             }
             if (this.myService.konfiapp_event_qr) {
                 attachments.push({
@@ -130,7 +138,7 @@ export default {
                     size: 'ca. 50 kB',
                     icon: 'mdi mdi-file-pdf-box',
                     type: 'qr',
-                });
+                })
             }
             if (!this.hasAnnouncements) {
                 attachments.push({
@@ -140,9 +148,9 @@ export default {
                     size: 'ca. 20 kB',
                     icon: 'mdi mdi-file-word-box',
                     type: 'announcements',
-                });
+                })
             }
-            return attachments;
+            return attachments
         },
     },
     data() {
@@ -154,100 +162,121 @@ export default {
     },
     watch: {
         liturgySheets(newSheets) {
-            const newDialogs = this.createDialogs(newSheets);
-            Object.keys(this.dialogs).forEach(key => {
-                if (Object.prototype.hasOwnProperty.call(newDialogs, key)) newDialogs[key] = this.dialogs[key];
-            });
-            this.dialogs = newDialogs;
+            const newDialogs = this.createDialogs(newSheets)
+            Object.keys(this.dialogs).forEach((key) => {
+                if (Object.prototype.hasOwnProperty.call(newDialogs, key))
+                    newDialogs[key] = this.dialogs[key]
+            })
+            this.dialogs = newDialogs
         },
     },
     methods: {
         createDialogs(sheets) {
-            const dialogs = {};
-            Object.values(sheets).forEach(sheet => {
-                if (sheet.configurationComponent) dialogs[sheet.key] = false;
-            });
-            return dialogs;
+            const dialogs = {}
+            Object.values(sheets).forEach((sheet) => {
+                if (sheet.configurationComponent) dialogs[sheet.key] = false
+            })
+            return dialogs
         },
         openDialog(key) {
             this.$nextTick(() => {
-                this.dialogs[key] = true;
-            });
+                this.dialogs[key] = true
+            })
         },
         downloadSheet(sheet) {
             if (sheet.configurationPage) {
-                this.$inertia.visit(route('liturgy.configure', {service: this.service.slug, key: sheet.key}));
+                this.$inertia.visit(
+                    route('liturgy.configure', { service: this.service.slug, key: sheet.key }),
+                )
             } else {
-                window.location.href = route('liturgy.download', {service: this.service.slug, key: sheet.key});
+                window.location.href = route('liturgy.download', {
+                    service: this.service.slug,
+                    key: sheet.key,
+                })
             }
         },
         downloadConfiguredSheet(sheet) {
-            document.getElementById('frm'+sheet.key).submit();
-            this.dialogs[sheet.key] = false;
+            document.getElementById('frm' + sheet.key).submit()
+            this.dialogs[sheet.key] = false
         },
         handleDialogClose(sheet) {
             if (sheet.configurationCloseOnly) {
-                this.dialogs[sheet.key] = false;
-                return;
+                this.dialogs[sheet.key] = false
+                return
             }
 
-            this.downloadConfiguredSheet(sheet);
+            this.downloadConfiguredSheet(sheet)
         },
         dialogTitle(sheet) {
-            if (sheet.configurationCloseOnly) return sheet.title;
-            return sheet.title + ' herunterladen';
+            if (sheet.configurationCloseOnly) return sheet.title
+            return sheet.title + ' herunterladen'
         },
         dialogCloseButtonLabel(sheet) {
-            if (sheet.configurationCloseOnly) return 'Schließen';
-            return 'Herunterladen';
+            if (sheet.configurationCloseOnly) return 'Schließen'
+            return 'Herunterladen'
         },
         downloadQR() {
-            window.location.href = route('report.step', {report: 'KonfiAppQR', step: 'single', service: this.myService.id});
+            window.location.href = route('report.step', {
+                report: 'KonfiAppQR',
+                step: 'single',
+                service: this.myService.id,
+            })
         },
         downloadAnnouncements() {
-            window.location.href = route('report.step', {report: 'Announcements', step: 'auto', service: this.myService.id});
+            window.location.href = route('report.step', {
+                report: 'Announcements',
+                step: 'auto',
+                service: this.myService.id,
+            })
         },
         openAutoAttachment(attachment) {
-            if (attachment.type === 'qr') return this.downloadQR();
-            if (attachment.type === 'announcements') return this.downloadAnnouncements();
-            if (attachment.configurationComponent) return this.openDialog(attachment.key);
-            return this.downloadSheet(attachment);
+            if (attachment.type === 'qr') return this.downloadQR()
+            if (attachment.type === 'announcements') return this.downloadAnnouncements()
+            if (attachment.configurationComponent) return this.openDialog(attachment.key)
+            return this.downloadSheet(attachment)
         },
         newRow() {
-            this.files.attachment_text.push('');
-            this.files.attachments.push(null);
-            this.$forceUpdate();
+            this.files.attachment_text.push('')
+            this.files.attachments.push(null)
+            this.$forceUpdate()
         },
         deleteAttachment(attachment, key) {
-            if (!confirm('Willst du diese Datei wirklich löschen?')) return;
-            axios.delete(route('service.detach', {service: this.myService.slug, attachment: attachment.id}))
-            .then(response => {
-                this.myService.attachments = response.data;
-            });
+            if (!confirm('Willst du diese Datei wirklich löschen?')) return
+            axios
+                .delete(
+                    route('service.detach', {
+                        service: this.myService.slug,
+                        attachment: attachment.id,
+                    }),
+                )
+                .then((response) => {
+                    this.myService.attachments = response.data
+                })
         },
         upload(file) {
-            let title = file.name;
-            title = title.substr(0, title.lastIndexOf('.'));
-            title = title.charAt(0).toUpperCase() + title.slice(1);
-            title = window.prompt('Bitte gib eine Beschreibung zu dieser Datei an.', title);
-            if (null == title) return;
+            let title = file.name
+            title = title.substr(0, title.lastIndexOf('.'))
+            title = title.charAt(0).toUpperCase() + title.slice(1)
+            title = window.prompt('Bitte gib eine Beschreibung zu dieser Datei an.', title)
+            if (null == title) return
 
-            let fd = new FormData();
-            fd.append('attachment_text[0]', title);
-            fd.append('attachments[0]', file);
+            let fd = new FormData()
+            fd.append('attachment_text[0]', title)
+            fd.append('attachments[0]', file)
 
-            this.uploading = true;
-            axios.post(route('service.attach', this.service.slug), fd, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then(response => {
-                this.myService.attachments = response.data;
-                this.uploading = false;
-            });
-
-        }
-    }
+            this.uploading = true
+            axios
+                .post(route('service.attach', this.service.slug), fd, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                .then((response) => {
+                    this.myService.attachments = response.data
+                    this.uploading = false
+                })
+        },
+    },
 }
 </script>
 
@@ -255,7 +284,7 @@ export default {
 .liturgy-sheet {
     width: 100%;
     text-align: left;
-    margin-bottom: .25rem;
+    margin-bottom: 0.25rem;
 }
 
 .liturgy-sheet small {

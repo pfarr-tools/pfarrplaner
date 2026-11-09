@@ -29,26 +29,56 @@
 <template>
     <admin-layout title="Lied bearbeiten">
         <template v-slot:navbar-left>
-            <save-button @click="saveSong"/>
+            <save-button @click="saveSong" />
         </template>
         <template v-slot:tab-headers>
             <tab-headers>
-                <tab-header id="home" :active-tab="activeTab" title="Allgemeines" :switch-handler="true"
-                            @tab="activeTab = $event"/>
-                <tab-header id="text" :active-tab="activeTab" title="Text" :switch-handler="true"
-                            @tab="activeTab = $event"/>
-                <tab-header id="songbooks" :active-tab="activeTab" title="Liederbücher" :switch-handler="true"
-                            @tab="activeTab = $event"/>
+                <tab-header
+                    id="home"
+                    :active-tab="activeTab"
+                    title="Allgemeines"
+                    :switch-handler="true"
+                    @tab="activeTab = $event"
+                />
+                <tab-header
+                    id="text"
+                    :active-tab="activeTab"
+                    title="Text"
+                    :switch-handler="true"
+                    @tab="activeTab = $event"
+                />
+                <tab-header
+                    id="songbooks"
+                    :active-tab="activeTab"
+                    title="Liederbücher"
+                    :switch-handler="true"
+                    @tab="activeTab = $event"
+                />
             </tab-headers>
         </template>
         <tabs>
-            <tab id="home" :active-tab="activeTab">
-                <form-input label="Titel des Lieds" v-model="mySong.title"/>
-                <form-textarea label="Copyrights" v-model="mySong.copyrights"/>
+            <tab
+                id="home"
+                :active-tab="activeTab"
+            >
+                <form-input
+                    label="Titel des Lieds"
+                    v-model="mySong.title"
+                />
+                <form-textarea
+                    label="Copyrights"
+                    v-model="mySong.copyrights"
+                />
             </tab>
-            <tab id="text" :active-tab="activeTab">
-                <form-textarea label="Kehrvers" v-model="mySong.refrain"
-                               placeholder="Leer lassen, wenn es keinen Kehrvers gibt"/>
+            <tab
+                id="text"
+                :active-tab="activeTab"
+            >
+                <form-textarea
+                    label="Kehrvers"
+                    v-model="mySong.refrain"
+                    placeholder="Leer lassen, wenn es keinen Kehrvers gibt"
+                />
                 <div class="row">
                     <div class="col-1 form-group">
                         <label>Strophe</label>
@@ -57,62 +87,107 @@
                         <label>Text der Strophe</label>
                     </div>
                 </div>
-                <div v-for="(verse, verseIndex) in mySong.verses" :key="verse.id || `verse-${verseIndex}`">
+                <div
+                    v-for="(verse, verseIndex) in mySong.verses"
+                    :key="verse.id || `verse-${verseIndex}`"
+                >
                     <div class="row">
                         <div class="col-1">
-                            <form-input :id="`verseNumber${verseIndex}`" label="" v-model="verse.number"/>
+                            <form-input
+                                :id="`verseNumber${verseIndex}`"
+                                label=""
+                                v-model="verse.number"
+                            />
                         </div>
                         <div class="col-10">
-                            <form-textarea :id="`verseText${verseIndex}`" label="" v-model="verse.text" />
+                            <form-textarea
+                                :id="`verseText${verseIndex}`"
+                                label=""
+                                v-model="verse.text"
+                            />
                             <div class="form-check-inline">
-                                <input type="checkbox" v-model="verse.refrain_before"/> &nbsp;
-                                Kehrvers vor dieser Strophe
+                                <input
+                                    type="checkbox"
+                                    v-model="verse.refrain_before"
+                                />
+                                &nbsp; Kehrvers vor dieser Strophe
                             </div>
                             <div class="form-check-inline">
-                                <input type="checkbox" v-model="verse.refrain_after"/> &nbsp;
-                                Kehrvers nach dieser Strophe
+                                <input
+                                    type="checkbox"
+                                    v-model="verse.refrain_after"
+                                />
+                                &nbsp; Kehrvers nach dieser Strophe
                             </div>
                         </div>
-                        <div class="col-1 text-end" style="margin-top: 2em;">
-                            <button class="btn btn-sm btn-danger" @click.prevent="deleteVerse(verseIndex)">
+                        <div
+                            class="col-1 text-end"
+                            style="margin-top: 2em"
+                        >
+                            <button
+                                class="btn btn-sm btn-danger"
+                                @click.prevent="deleteVerse(verseIndex)"
+                            >
                                 <span class="mdi mdi-delete"></span>
                             </button>
                         </div>
                     </div>
                 </div>
-                <hr/>
+                <hr />
                 <div class="form-group">
-                    <button class="btn btn-sm btn-light" @click.prevent="addVerse">Strophe hinzufügen</button>
+                    <button
+                        class="btn btn-sm btn-light"
+                        @click.prevent="addVerse"
+                    >
+                        Strophe hinzufügen
+                    </button>
                 </div>
             </tab>
-            <tab id="songbooks" :active-tab="activeTab">
-                <songbook-list v-model="mySong.songbooks" :allow-split="true" />
+            <tab
+                id="songbooks"
+                :active-tab="activeTab"
+            >
+                <songbook-list
+                    v-model="mySong.songbooks"
+                    :allow-split="true"
+                />
                 <hr class="mt-3" />
-                <form-input label="Alternative EG-Nummer" v-model="mySong.alt_eg" />
+                <form-input
+                    label="Alternative EG-Nummer"
+                    v-model="mySong.alt_eg"
+                />
             </tab>
         </tabs>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormTextarea from "../../../components/Ui/forms/FormTextarea";
-import FormImageAttacher from "../../../components/Ui/forms/FormImageAttacher";
-import SongEditPane from "../../../components/LiturgyEditor/Editors/Elements/SongEditPane";
-import TabHeaders from "../../../components/Ui/tabs/tabHeaders";
-import TabHeader from "../../../components/Ui/tabs/tabHeader";
-import Tabs from "../../../components/Ui/tabs/tabs";
-import Tab from "../../../components/Ui/tabs/tab";
-import SongbookList from "../../../components/LiturgyEditor/Editors/Elements/SongbookList";
-import FormGroup from "../../../components/Ui/forms/FormGroup";
-import __ from "lodash";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormTextarea from '../../../components/Ui/forms/FormTextarea'
+import FormImageAttacher from '../../../components/Ui/forms/FormImageAttacher'
+import SongEditPane from '../../../components/LiturgyEditor/Editors/Elements/SongEditPane'
+import TabHeaders from '../../../components/Ui/tabs/tabHeaders'
+import TabHeader from '../../../components/Ui/tabs/tabHeader'
+import Tabs from '../../../components/Ui/tabs/tabs'
+import Tab from '../../../components/Ui/tabs/tab'
+import SongbookList from '../../../components/LiturgyEditor/Editors/Elements/SongbookList'
+import FormGroup from '../../../components/Ui/forms/FormGroup'
+import __ from 'lodash'
 
 export default {
-    name: "SongEditor",
+    name: 'SongEditor',
     components: {
         SongbookList,
-        Tab, Tabs, TabHeader, TabHeaders, SongEditPane, FormImageAttacher, FormTextarea, FormInput, SaveButton
+        Tab,
+        Tabs,
+        TabHeader,
+        TabHeaders,
+        SongEditPane,
+        FormImageAttacher,
+        FormTextarea,
+        FormInput,
+        SaveButton,
     },
     props: ['song'],
     data() {
@@ -125,16 +200,16 @@ export default {
         song: {
             deep: true,
             handler(song) {
-                this.mySong = __.cloneDeep(song);
+                this.mySong = __.cloneDeep(song)
             },
         },
     },
     methods: {
         saveSong() {
             if (this.mySong.id) {
-                this.$inertia.patch(route('admin.song.update', this.mySong.id), this.mySong);
+                this.$inertia.patch(route('admin.song.update', this.mySong.id), this.mySong)
             } else {
-                this.$inertia.post(route('admin.songs.store'), this.mySong);
+                this.$inertia.post(route('admin.songs.store'), this.mySong)
             }
         },
         addVerse() {
@@ -143,16 +218,14 @@ export default {
                 number: this.mySong.verses.length + 1,
                 text: '',
                 refrain_before: false,
-                refrain_after: false
-            });
+                refrain_after: false,
+            })
         },
         deleteVerse(verseIndex) {
-            this.mySong.verses.splice(verseIndex, 1);
+            this.mySong.verses.splice(verseIndex, 1)
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

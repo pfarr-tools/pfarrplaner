@@ -36,45 +36,66 @@
                 @update:modelValue="handleSelect"
             />
         </div>
-        <modal title="Neues Liederbuch anlegen" v-if="showModal" @close="closeModal" @cancel="cancelModal"
-               @shown="modalShown" close-button-label="Speichern">
-            <form-input label="Titel" v-model="modalSongbook.name"/>
-            <form-input label="Kürzel" v-model="modalSongbook.code"/>
-            <form-input label="ISBN" v-model="modalSongbook.isbn"/>
-            <form-textarea label="Beschreibung" v-model="modalSongbook.description"/>
+        <modal
+            title="Neues Liederbuch anlegen"
+            v-if="showModal"
+            @close="closeModal"
+            @cancel="cancelModal"
+            @shown="modalShown"
+            close-button-label="Speichern"
+        >
+            <form-input
+                label="Titel"
+                v-model="modalSongbook.name"
+            />
+            <form-input
+                label="Kürzel"
+                v-model="modalSongbook.code"
+            />
+            <form-input
+                label="ISBN"
+                v-model="modalSongbook.isbn"
+            />
+            <form-textarea
+                label="Beschreibung"
+                v-model="modalSongbook.description"
+            />
         </modal>
-
     </div>
 </template>
 
 <script>
-import FormSelectize from "../../../Ui/forms/FormSelectize";
-import Modal from "../../../Ui/modals/Modal";
-import FormInput from "../../../Ui/forms/FormInput";
-import FormTextarea from "../../../Ui/forms/FormTextarea";
+import FormSelectize from '../../../Ui/forms/FormSelectize'
+import Modal from '../../../Ui/modals/Modal'
+import FormInput from '../../../Ui/forms/FormInput'
+import FormTextarea from '../../../Ui/forms/FormTextarea'
 
 export default {
-    name: "SongbookSelect",
+    name: 'SongbookSelect',
     emits: ['update:modelValue'],
-    components: {FormTextarea, FormInput, Modal, FormSelectize},
+    components: { FormTextarea, FormInput, Modal, FormSelectize },
     props: ['modelValue', 'songbooks', 'pivot'],
     data() {
         return {
-            myValue: this.modelValue ? (this.modelValue.id || this.modelValue) : null,
+            myValue: this.modelValue ? this.modelValue.id || this.modelValue : null,
             settings: {
                 searchField: ['name', 'code'],
                 create: this.addSongbook,
                 render: {
                     option_create: function (data, escape) {
-                        return '<div class="create">Neues Liederbuch anlegen: <strong>' + escape(data.input) + '</strong>&hellip;</div>';
+                        return (
+                            '<div class="create">Neues Liederbuch anlegen: <strong>' +
+                            escape(data.input) +
+                            '</strong>&hellip;</div>'
+                        )
                     },
                     item: function (item, escape) {
-                        return '<div>' + escape(item.name) + ' (' + escape(item.code) + ')</div>';
+                        return '<div>' + escape(item.name) + ' (' + escape(item.code) + ')</div>'
                     },
                     option: function (item, escape) {
-                        return '<div>' + escape(item.name) + ' (' + escape(item.code) + ')</div>';
+                        return '<div>' + escape(item.name) + ' (' + escape(item.code) + ')</div>'
                     },
-                }
+                },
             },
             createCallback: null,
             modalSongbook: {},
@@ -83,52 +104,51 @@ export default {
     },
     watch: {
         modelValue(val) {
-            this.myValue = val ? (val.id || val) : null;
+            this.myValue = val ? val.id || val : null
         },
     },
     methods: {
         addSongbook(item, callback = null) {
-            this.createCallback = callback;
+            this.createCallback = callback
             this.modalSongbook = {
                 name: item,
                 code: '',
                 isbn: '',
                 description: '',
                 image: '',
-            };
-            this.showModal = true;
+            }
+            this.showModal = true
         },
         closeModal() {
-            this.createCallback({});
-            this.$api().post(route('api.songbooks.store'), this.modalSongbook)
-                .then(response => {
-                    this.modalSongbook = response.data;
-                    this.songbooks.push(this.modalSongbook);
-                    this.myValue = this.modalSongbook.id;
-                    this.$forceUpdate();
-                    this.handleSelect(this.myValue);
-                });
-            this.showModal = false;
+            this.createCallback({})
+            this.$api()
+                .post(route('api.songbooks.store'), this.modalSongbook)
+                .then((response) => {
+                    this.modalSongbook = response.data
+                    this.songbooks.push(this.modalSongbook)
+                    this.myValue = this.modalSongbook.id
+                    this.$forceUpdate()
+                    this.handleSelect(this.myValue)
+                })
+            this.showModal = false
         },
         cancelModal() {
-            this.showModal = false;
+            this.showModal = false
         },
         handleSelect(value = this.myValue) {
-            this.myValue = value;
-            let filtered = this.songbooks.filter(item => {
+            this.myValue = value
+            let filtered = this.songbooks.filter((item) => {
                 return item.id == value
-            });
+            })
             if (filtered.length) {
-                filtered = filtered[0];
-                filtered.pivot = this.pivot;
-                filtered.pivot.songbook_id = value;
-                this.$emit('update:modelValue', filtered);
+                filtered = filtered[0]
+                filtered.pivot = this.pivot
+                filtered.pivot.songbook_id = value
+                this.$emit('update:modelValue', filtered)
             }
-        }
-    }
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

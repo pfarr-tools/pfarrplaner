@@ -27,25 +27,68 @@
   -->
 
 <template>
-    <div class="btn-group btn-group-toggle" data-bs-toggle="buttons">
-        <label class="btn btn-light btn-sm no-rights" :class="{active: rights == 'n'}">
-            <input type="radio" v-model="rights" value="n" @input="changed" title="Keine Rechte"> <span class="mdi mdi-eye-off"></span> Keine
+    <div
+        class="btn-group btn-group-toggle"
+        data-bs-toggle="buttons"
+    >
+        <label
+            class="btn btn-light btn-sm no-rights"
+            :class="{ active: rights == 'n' }"
+        >
+            <input
+                type="radio"
+                v-model="rights"
+                value="n"
+                @input="changed"
+                title="Keine Rechte"
+            />
+            <span class="mdi mdi-eye-off"></span> Keine
         </label>
-        <label class="btn btn-light btn-sm rights-read" :class="{active: rights == 'r'}">
-            <input type="radio" v-model="rights" value="r" @input="changed"  title="Leserecht"> <span class="mdi mdi-eye"></span> Lesen
+        <label
+            class="btn btn-light btn-sm rights-read"
+            :class="{ active: rights == 'r' }"
+        >
+            <input
+                type="radio"
+                v-model="rights"
+                value="r"
+                @input="changed"
+                title="Leserecht"
+            />
+            <span class="mdi mdi-eye"></span> Lesen
         </label>
-        <label class="btn btn-light btn-sm rights-write" :class="{active: rights == 'w'}">
-            <input type="radio" v-model="rights" value="w" @input="changed"  title="Schreibrecht"> <span class="mdi mdi-pencil"></span> Schreiben
+        <label
+            class="btn btn-light btn-sm rights-write"
+            :class="{ active: rights == 'w' }"
+        >
+            <input
+                type="radio"
+                v-model="rights"
+                value="w"
+                @input="changed"
+                title="Schreibrecht"
+            />
+            <span class="mdi mdi-pencil"></span> Schreiben
         </label>
-        <label class="btn btn-light btn-sm rights-admin" :class="{active: rights == 'a'}">
-            <input type="radio" v-model="rights" value="a" @input="changed"  title="Administrator"> <span class="mdi mdi-account-tie-hat"></span> Administrator
+        <label
+            class="btn btn-light btn-sm rights-admin"
+            :class="{ active: rights == 'a' }"
+        >
+            <input
+                type="radio"
+                v-model="rights"
+                value="a"
+                @input="changed"
+                title="Administrator"
+            />
+            <span class="mdi mdi-account-tie-hat"></span> Administrator
         </label>
     </div>
 </template>
 
 <script>
 export default {
-    name: "CityPermissionToggle",
+    name: 'CityPermissionToggle',
     emits: ['update:modelValue', 'input'],
     props: ['modelValue'],
     data() {
@@ -55,38 +98,38 @@ export default {
     },
     methods: {
         changed(e) {
-            this.$emit('update:modelValue', e.target.value);
-            this.$emit('input', e.target.value);
-        }
-    }
+            this.$emit('update:modelValue', e.target.value)
+            this.$emit('input', e.target.value)
+        },
+    },
 }
 </script>
 
 <style scoped>
-    .btn-light.no-rights:hover {
-        background-color: lightcoral;
-    }
-    .btn-light.no-rights.active {
-        background-color: #dc3545;
-        color: white;
-    }
-    .btn-light.rights-read:hover {
-        background-color: lightyellow;
-    }
-    .btn-light.rights-read.active {
-        background-color: #f5d403;
-    }
-    .btn-light.rights-write:hover {
-        background-color: lightgreen;
-    }
-    .btn-light.rights-write.active {
-        background-color: #28a745;
-    }
-    .btn-light.rights-admin:hover {
-        background-color: plum;
-    }
-    .btn-light.rights-admin.active {
-        background-color: purple;
-        color: white;
-    }
+.btn-light.no-rights:hover {
+    background-color: lightcoral;
+}
+.btn-light.no-rights.active {
+    background-color: #dc3545;
+    color: white;
+}
+.btn-light.rights-read:hover {
+    background-color: lightyellow;
+}
+.btn-light.rights-read.active {
+    background-color: #f5d403;
+}
+.btn-light.rights-write:hover {
+    background-color: lightgreen;
+}
+.btn-light.rights-write.active {
+    background-color: #28a745;
+}
+.btn-light.rights-admin:hover {
+    background-color: plum;
+}
+.btn-light.rights-admin.active {
+    background-color: purple;
+    color: white;
+}
 </style>

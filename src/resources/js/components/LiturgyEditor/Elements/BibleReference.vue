@@ -27,28 +27,51 @@
   -->
 
 <template xmlns="http://www.w3.org/1999/html">
-    <div class="bible-reference" :class="{'bible-reference-inline' : inline}" :title="text">
-        <div v-if="myPerikope.Bibelstelle" :key="myPerikope.Bibelstelle.replaceAll(' ', '_')+'Text__'+text">
-            <span v-if="title" class="bible-reference__label">{{ title }}</span><a v-if="myPerikope.URL" :href="myPerikope.URL"
-                   target="_blank">{{ myPerikope.Bibelstelle }}</a><span v-else>{{ myPerikope.Bibelstelle }} </span>
-            <span v-if="loading" class="mdi mdi-spin mdi-loading"></span>
-            <span v-if="!loading" class="mdi mdi-content-copy" @click.prevent.stop="copyToClipboard"
-                  title="Klicken, um den Text in die Zwischenablage zu kopieren"></span>
+    <div
+        class="bible-reference"
+        :class="{ 'bible-reference-inline': inline }"
+        :title="text"
+    >
+        <div
+            v-if="myPerikope.Bibelstelle"
+            :key="myPerikope.Bibelstelle.replaceAll(' ', '_') + 'Text__' + text"
+        >
+            <span
+                v-if="title"
+                class="bible-reference__label"
+                >{{ title }}</span
+            ><a
+                v-if="myPerikope.URL"
+                :href="myPerikope.URL"
+                target="_blank"
+                >{{ myPerikope.Bibelstelle }}</a
+            ><span v-else>{{ myPerikope.Bibelstelle }} </span>
+            <span
+                v-if="loading"
+                class="mdi mdi-spin mdi-loading"
+            ></span>
+            <span
+                v-if="!loading"
+                class="mdi mdi-content-copy"
+                @click.prevent.stop="copyToClipboard"
+                title="Klicken, um den Text in die Zwischenablage zu kopieren"
+            ></span>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    name: "BibleReference",
+    name: 'BibleReference',
     props: ['perikope', 'title', 'inline'],
     data() {
-        let myPerikope = this.perikope;
-        if (typeof myPerikope != 'object') myPerikope = {
-            Bibelstelle: myPerikope || '',
-            URL: null,
-        }
-        if (undefined === myPerikope.Bibelstelle) myPerikope.Bibelstelle = '';
+        let myPerikope = this.perikope
+        if (typeof myPerikope != 'object')
+            myPerikope = {
+                Bibelstelle: myPerikope || '',
+                URL: null,
+            }
+        if (undefined === myPerikope.Bibelstelle) myPerikope.Bibelstelle = ''
 
         return {
             text: '',
@@ -58,47 +81,51 @@ export default {
         }
     },
     mounted() {
-        if(this.myPerikope.Bibelstelle) {
-            axios.get(route('bible.text', {reference: this.myPerikope.Bibelstelle}))
-                .then(result => {
-                    this.text = result.data.text;
-                    this.reference = result.data.reference;
-                    console.log('returned reference');
-                    this.loading = false;
-                });
+        if (this.myPerikope.Bibelstelle) {
+            axios
+                .get(route('bible.text', { reference: this.myPerikope.Bibelstelle }))
+                .then((result) => {
+                    this.text = result.data.text
+                    this.reference = result.data.reference
+                    console.log('returned reference')
+                    this.loading = false
+                })
         }
     },
     methods: {
         copyToClipboard() {
-            const cb = navigator.clipboard;
-            cb.writeText(this.text+"\n("+this.reference.correctedReference+')').then(result => {});
-        }
+            const cb = navigator.clipboard
+            cb.writeText(this.text + '\n(' + this.reference.correctedReference + ')').then(
+                (result) => {},
+            )
+        },
     },
 }
 </script>
 
 <style scoped>
-    .bible-reference.bible-reference-inline, .bible-reference.bible-reference-inline div {
-        display: inline;
-    }
+.bible-reference.bible-reference-inline,
+.bible-reference.bible-reference-inline div {
+    display: inline;
+}
 
-    .bible-reference__label {
-        display: inline-block;
-        min-width: 2.5rem;
-    }
+.bible-reference__label {
+    display: inline-block;
+    min-width: 2.5rem;
+}
 
-    .mdi.mdi-spin {
-        color: lightgray;
-    }
-    .mdi-content-copy {
-        color: lightgray;
-        display: none;
-    }
-    .mdi-content-copy:hover {
-        color: gray;
-    }
+.mdi.mdi-spin {
+    color: lightgray;
+}
+.mdi-content-copy {
+    color: lightgray;
+    display: none;
+}
+.mdi-content-copy:hover {
+    color: gray;
+}
 
-    .bible-reference:hover .mdi-content-copy {
-        display: inline;
-    }
+.bible-reference:hover .mdi-content-copy {
+    display: inline;
+}
 </style>

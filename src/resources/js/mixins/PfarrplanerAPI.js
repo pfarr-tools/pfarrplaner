@@ -29,25 +29,29 @@
 export default {
     data() {
         return {
-            '$componentState': Math.random().toString(36).substr(2, 9),
+            $componentState: Math.random().toString(36).substr(2, 9),
         }
     },
     methods: {
         $api() {
-            let myApiAxios = window.api;
-            myApiAxios.defaults.headers.common['Authorization'] = 'Bearer '+this.$page.props.currentUser.data.api_token;
-            myApiAxios.defaults.headers.common['Accept'] = 'application/json';
-            return myApiAxios;
+            let myApiAxios = window.api
+            myApiAxios.defaults.headers.common['Authorization'] =
+                'Bearer ' + this.$page.props.currentUser.data.api_token
+            myApiAxios.defaults.headers.common['Accept'] = 'application/json'
+            return myApiAxios
         },
         setUserSetting(key, value) {
-            this.$api().post(route('setting.set', {
-                user: this.$page.props.currentUser.data.id,
-                key: key,
-            }), {value: value});
-            this.$settings[key] = value;
+            this.$api().post(
+                route('setting.set', {
+                    user: this.$page.props.currentUser.data.id,
+                    key: key,
+                }),
+                { value: value },
+            )
+            this.$settings[key] = value
         },
         $updateComponentState() {
-            this.$componentState = Math.random().toString(36).substr(2, 9);
-        }
-    }
-};
+            this.$componentState = Math.random().toString(36).substr(2, 9)
+        },
+    },
+}

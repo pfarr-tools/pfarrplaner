@@ -27,11 +27,24 @@
   -->
 
 <template>
-    <div v-if="count == 0" class="alert alert-info">Zur Zeit gibt es keine Gottesdienste mit Anmeldungen.</div>
-    <fake-table v-else :columns="[2,4,2,4]" :headers="['Gottesdienst', 'Informationen zum Gottesdienst', 'Plätze', '']"
-                collapsed-header="Gottesdienste">
-        <div v-for="(service,serviceIndex) in services" :key="serviceIndex" class="row mb-3 p-1"
-             :class="{'stripe-odd': (serviceIndex%2==0)}">
+    <div
+        v-if="count == 0"
+        class="alert alert-info"
+    >
+        Zur Zeit gibt es keine Gottesdienste mit Anmeldungen.
+    </div>
+    <fake-table
+        v-else
+        :columns="[2, 4, 2, 4]"
+        :headers="['Gottesdienst', 'Informationen zum Gottesdienst', 'Plätze', '']"
+        collapsed-header="Gottesdienste"
+    >
+        <div
+            v-for="(service, serviceIndex) in services"
+            :key="serviceIndex"
+            class="row mb-3 p-1"
+            :class="{ 'stripe-odd': serviceIndex % 2 == 0 }"
+        >
             <div class="col-md-2">
                 <div>{{ moment(service.date).locale('de').format('LL') }}</div>
                 <div>{{ service.timeText }}</div>
@@ -40,17 +53,33 @@
             <div class="col-md-4">
                 <details-info :service="service" />
             </div>
-            <div class="col-md-2">{{ service.freeSeatsText}}</div>
+            <div class="col-md-2">{{ service.freeSeatsText }}</div>
             <div class="col-md-4 text-end">
-                <nav-button :href="route('seatfinder', service.slug)" title="Anmeldung hinzufügen"
-                            type="success" icon="mdi mdi-ticket">Neue Anmeldung</nav-button>
-                <nav-button type="light" icon="mdi mdi-ticket" title="Anmeldungen anzeigen"
-                            :href="route('service.edit', {service: service.slug, tab: 'registrations'})">
+                <nav-button
+                    :href="route('seatfinder', service.slug)"
+                    title="Anmeldung hinzufügen"
+                    type="success"
+                    icon="mdi mdi-ticket"
+                    >Neue Anmeldung</nav-button
+                >
+                <nav-button
+                    type="light"
+                    icon="mdi mdi-ticket"
+                    title="Anmeldungen anzeigen"
+                    :href="route('service.edit', { service: service.slug, tab: 'registrations' })"
+                >
                     <span class="d-none d-md-inline">Anmeldungen</span>
-                    <span v-if="service.bookings.length > 0" class="badge bg-info">{{ service.bookings.length }}</span>
+                    <span
+                        v-if="service.bookings.length > 0"
+                        class="badge bg-info"
+                        >{{ service.bookings.length }}</span
+                    >
                 </nav-button>
-                <a :href="route('booking.finalize', service.id)" title="Anmeldeliste ausgeben"
-                   class="btn btn-light"><span class="mdi mdi-clipboard-check"></span>
+                <a
+                    :href="route('booking.finalize', service.id)"
+                    title="Anmeldeliste ausgeben"
+                    class="btn btn-light"
+                    ><span class="mdi mdi-clipboard-check"></span>
                     <span class="d-none d-md-inline">Anmeldeliste</span>
                 </a>
             </div>
@@ -59,18 +88,21 @@
 </template>
 
 <script>
-import FakeTable from "../Ui/FakeTable";
-import DetailsInfo from "../Service/DetailsInfo";
-import NavButton from "../Ui/buttons/NavButton";
+import FakeTable from '../Ui/FakeTable'
+import DetailsInfo from '../Service/DetailsInfo'
+import NavButton from '../Ui/buttons/NavButton'
 export default {
-    name: "RegistrationsTab",
-    components: {NavButton, DetailsInfo, FakeTable},
+    name: 'RegistrationsTab',
+    components: { NavButton, DetailsInfo, FakeTable },
     props: {
-        title: String, description: String, user: Object, settings: Object, services: Array, count: Number,
+        title: String,
+        description: String,
+        user: Object,
+        settings: Object,
+        services: Array,
+        count: Number,
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

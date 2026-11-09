@@ -27,19 +27,23 @@
   -->
 
 <template>
-    <nav-button type="primary" icon="mdi mdi-content-save" title="Änderungen speichern" @click="$emit('click')">{{ label || 'Speichern'}}</nav-button>
+    <nav-button
+        type="primary"
+        icon="mdi mdi-content-save"
+        title="Änderungen speichern"
+        @click="$emit('click')"
+        >{{ label || 'Speichern' }}</nav-button
+    >
 </template>
 
 <script>
-import NavButton from "./NavButton";
+import NavButton from './NavButton'
 export default {
-    name: "SaveButton",
+    name: 'SaveButton',
     emits: ['click'],
     props: ['label'],
-    components: {NavButton}
+    components: { NavButton },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

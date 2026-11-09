@@ -29,31 +29,72 @@
 <template>
     <admin-layout title="Psalm bearbeiten">
         <template v-slot:navbar-left>
-            <save-button @click="savePsalm"/>
-            <nav-button @click="saveAsCopy" class="ms-1" title="Kopie als neuen Psalm speichern"
-                        type="light" icon="mdi mdi-content-save-move-outline">Kopie speichern</nav-button>
+            <save-button @click="savePsalm" />
+            <nav-button
+                @click="saveAsCopy"
+                class="ms-1"
+                title="Kopie als neuen Psalm speichern"
+                type="light"
+                icon="mdi mdi-content-save-move-outline"
+                >Kopie speichern</nav-button
+            >
         </template>
         <div class="row">
             <div class="col-md-8">
-                <form-input label="Titel des Psalms" v-model="myPsalm.title"/>
-                <form-textarea name="intro" label="Einleitende Worte" v-model="myPsalm.intro" />
-                <form-textarea name="text" label="Text" v-model="myPsalm.text" />
-                <form-textarea name="copyrights" label="Copyrights" v-model="myPsalm.copyrights" />
+                <form-input
+                    label="Titel des Psalms"
+                    v-model="myPsalm.title"
+                />
+                <form-textarea
+                    name="intro"
+                    label="Einleitende Worte"
+                    v-model="myPsalm.intro"
+                />
+                <form-textarea
+                    name="text"
+                    label="Text"
+                    v-model="myPsalm.text"
+                />
+                <form-textarea
+                    name="copyrights"
+                    label="Copyrights"
+                    v-model="myPsalm.copyrights"
+                />
                 <div class="row">
                     <div class="col-10">
-                        <form-input name="songbook" label="Liederbuch" v-model="myPsalm.songbook" />
+                        <form-input
+                            name="songbook"
+                            label="Liederbuch"
+                            v-model="myPsalm.songbook"
+                        />
                     </div>
                     <div class="col-2 form-group">
-                        <form-input name="songbook_abbreviation" label="Abkürzung" v-model="myPsalm.songbook_abbreviation" />
+                        <form-input
+                            name="songbook_abbreviation"
+                            label="Abkürzung"
+                            v-model="myPsalm.songbook_abbreviation"
+                        />
                     </div>
                 </div>
-                <form-input name="reference" label="Liednummer" v-model="myPsalm.reference"/>
+                <form-input
+                    name="reference"
+                    label="Liednummer"
+                    v-model="myPsalm.reference"
+                />
             </div>
             <div class="col-md-4">
                 <div class="liturgical-text-quote">
-                    <p v-if="myPsalm.title"><b>{{ myPsalm.title }}</b></p>
-                    <p v-if="myPsalm.intro"><i>{{ myPsalm.intro }}</i></p>
-                    <nl2br v-if="myPsalm.text" tag="p" :text="myPsalm.text" />
+                    <p v-if="myPsalm.title">
+                        <b>{{ myPsalm.title }}</b>
+                    </p>
+                    <p v-if="myPsalm.intro">
+                        <i>{{ myPsalm.intro }}</i>
+                    </p>
+                    <nl2br
+                        v-if="myPsalm.text"
+                        tag="p"
+                        :text="myPsalm.text"
+                    />
                 </div>
                 <text-stats :text="myPsalm.text" />
             </div>
@@ -62,25 +103,29 @@
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormTextarea from "../../../components/Ui/forms/FormTextarea";
-import FormImageAttacher from "../../../components/Ui/forms/FormImageAttacher";
-import SongEditPane from "../../../components/LiturgyEditor/Editors/Elements/SongEditPane";
-import TabHeaders from "../../../components/Ui/tabs/tabHeaders";
-import TabHeader from "../../../components/Ui/tabs/tabHeader";
-import Tabs from "../../../components/Ui/tabs/tabs";
-import Tab from "../../../components/Ui/tabs/tab";
-import SongbookList from "../../../components/LiturgyEditor/Editors/Elements/SongbookList";
-import TextStats from "../../../components/LiturgyEditor/Elements/TextStats";
-import Nl2br from '../../../components/Ui/Nl2br.vue';
-import NavButton from "../../../components/Ui/buttons/NavButton";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormTextarea from '../../../components/Ui/forms/FormTextarea'
+import FormImageAttacher from '../../../components/Ui/forms/FormImageAttacher'
+import SongEditPane from '../../../components/LiturgyEditor/Editors/Elements/SongEditPane'
+import TabHeaders from '../../../components/Ui/tabs/tabHeaders'
+import TabHeader from '../../../components/Ui/tabs/tabHeader'
+import Tabs from '../../../components/Ui/tabs/tabs'
+import Tab from '../../../components/Ui/tabs/tab'
+import SongbookList from '../../../components/LiturgyEditor/Editors/Elements/SongbookList'
+import TextStats from '../../../components/LiturgyEditor/Elements/TextStats'
+import Nl2br from '../../../components/Ui/Nl2br.vue'
+import NavButton from '../../../components/Ui/buttons/NavButton'
 
 export default {
-    name: "SongEditor",
+    name: 'SongEditor',
     components: {
         NavButton,
-        TextStats, Nl2br, FormTextarea, FormInput, SaveButton
+        TextStats,
+        Nl2br,
+        FormTextarea,
+        FormInput,
+        SaveButton,
     },
     props: ['psalm'],
     data() {
@@ -92,9 +137,9 @@ export default {
     methods: {
         savePsalm() {
             if (this.myPsalm.id) {
-                this.$inertia.patch(route('admin.psalm.update', this.myPsalm.id), this.myPsalm);
+                this.$inertia.patch(route('admin.psalm.update', this.myPsalm.id), this.myPsalm)
             } else {
-                this.saveAsCopy();
+                this.saveAsCopy()
             }
         },
         saveAsCopy() {
@@ -106,9 +151,9 @@ export default {
                 songbook_abbreviation: this.myPsalm.songbook_abbreviation,
                 reference: this.myPsalm.reference,
                 text: this.myPsalm.text,
-            });
-        }
-    }
+            })
+        },
+    },
 }
 </script>
 
@@ -118,5 +163,4 @@ export default {
     border-left: solid 3px lightgray;
     margin: 10px;
 }
-
 </style>

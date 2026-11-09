@@ -31,19 +31,26 @@
         <h2>Die folgenden Termine wurden in deinen Kalender eingetragen</h2>
         <table class="table">
             <thead>
-            <tr>
-                <th>Datum, Uhrzeit</th>
-                <th>Ziel</th>
-            </tr>
+                <tr>
+                    <th>Datum, Uhrzeit</th>
+                    <th>Ziel</th>
+                </tr>
             </thead>
             <tbody>
-            <tr v-for="(event,eventKey) in events" :key="event">
-                <td>{{ moment(event.startDate).locale('de').format('DD.MM.YYYY') }} {{ moment(event.startDate).locale('de').format('LT') }} - {{ moment(event.endDate).locale('de').format('LT') }}</td>
-                <td>
-                    <div class="text-bold">{{ event.title }}</div>
-                    <div>{{ event.location }}</div>
-                </td>
-            </tr>
+                <tr
+                    v-for="(event, eventKey) in events"
+                    :key="event"
+                >
+                    <td>
+                        {{ moment(event.startDate).locale('de').format('DD.MM.YYYY') }}
+                        {{ moment(event.startDate).locale('de').format('LT') }} -
+                        {{ moment(event.endDate).locale('de').format('LT') }}
+                    </td>
+                    <td>
+                        <div class="text-bold">{{ event.title }}</div>
+                        <div>{{ event.location }}</div>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </admin-layout>
@@ -51,11 +58,9 @@
 
 <script>
 export default {
-    name: "Results",
-    props: ['events']
+    name: 'Results',
+    props: ['events'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

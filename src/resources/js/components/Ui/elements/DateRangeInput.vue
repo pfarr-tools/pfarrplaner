@@ -52,13 +52,16 @@
 </template>
 
 <script>
-import { VueDatePicker } from '@vuepic/vue-datepicker';
-import FormGroup from "../forms/FormGroup";
-import * as dateFnsLocales from 'date-fns/locale';
-import { formatPlannerDateForDisplay, plannerValueToPickerDate } from "../../../helpers/plannerDates";
+import { VueDatePicker } from '@vuepic/vue-datepicker'
+import FormGroup from '../forms/FormGroup'
+import * as dateFnsLocales from 'date-fns/locale'
+import {
+    formatPlannerDateForDisplay,
+    plannerValueToPickerDate,
+} from '../../../helpers/plannerDates'
 
 export default {
-    name: "DateRangeInput",
+    name: 'DateRangeInput',
     components: { FormGroup, VueDatePicker },
 
     props: {
@@ -76,43 +79,43 @@ export default {
         },
     },
 
-    emits: ["update:modelValue", "input"],
+    emits: ['update:modelValue', 'input'],
 
     computed: {
         dpLocale() {
-            return dateFnsLocales.de;
+            return dateFnsLocales.de
         },
 
         internalRange() {
             if (this.modelValue && this.modelValue.length === 2) {
-                return [this.toDate(this.modelValue[0]), this.toDate(this.modelValue[1])];
+                return [this.toDate(this.modelValue[0]), this.toDate(this.modelValue[1])]
             }
             if (this.from && this.to) {
-                return [this.toDate(this.from), this.toDate(this.to)];
+                return [this.toDate(this.from), this.toDate(this.to)]
             }
-            return null;
+            return null
         },
     },
 
     methods: {
         toDate(val) {
-            return plannerValueToPickerDate(val);
+            return plannerValueToPickerDate(val)
         },
 
         formatDisplay(dates) {
-            if (!dates || !dates[0]) return '';
-            const from = formatPlannerDateForDisplay(dates[0]);
-            if (!dates[1]) return from;
-            return `${from} – ${formatPlannerDateForDisplay(dates[1])}`;
+            if (!dates || !dates[0]) return ''
+            const from = formatPlannerDateForDisplay(dates[0])
+            if (!dates[1]) return from
+            return `${from} – ${formatPlannerDateForDisplay(dates[1])}`
         },
 
         onRangeChange(range) {
-            if (!range || range.length < 2 || !range[1]) return;
-            const start = plannerValueToPickerDate(range[0]);
-            const end = plannerValueToPickerDate(range[1]);
-            this.$emit('update:modelValue', [start, end]);
-            this.$emit('input', [start, end]);
+            if (!range || range.length < 2 || !range[1]) return
+            const start = plannerValueToPickerDate(range[0])
+            const end = plannerValueToPickerDate(range[1])
+            this.$emit('update:modelValue', [start, end])
+            this.$emit('input', [start, end])
         },
     },
-};
+}
 </script>
