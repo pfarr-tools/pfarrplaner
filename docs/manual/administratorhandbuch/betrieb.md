@@ -34,7 +34,18 @@ den Postfix-Logs. Details stehen im [Mail-Betriebskapitel](mail.md).
 
 ### Scheduler
 
-Der Scheduler sollte einmal pro Minute laufen. Fehlt dieser Cronjob oder ist er defekt, bleiben geplante Aufgaben liegen.
+Der Scheduler sollte einmal pro Minute laufen. Fehlt dieser Dienst oder ist er
+defekt, bleiben geplante Aufgaben liegen. Der Docker-Scheduler führt die
+Anwendungsaufgaben selbstständig aus: YouTube-Streams werden alle zehn Minuten
+aktualisiert und stündlich bereinigt; Query-Logs werden um 03:00 Uhr geleert,
+der Liturgiekalender um 05:01 Uhr aktualisiert und abgelaufene Anmeldungen um
+05:10 Uhr gelöscht.
+
+Backups gehören nicht zu diesen Laravel-Aufgaben. `./planer backup create`
+verwendet den separaten Backup-Container und hält App, Horizon und Scheduler
+während der Sicherung gemeinsam an. Backup-Erstellung, Aufbewahrung und
+Prüfung müssen deshalb weiterhin über den dokumentierten Root-Workflow und
+einen passenden Host-Timer ausgelöst werden.
 
 ### Dateispeicher
 

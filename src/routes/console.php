@@ -46,7 +46,21 @@ use Laravel\Telescope\Telescope;
 if (app()->environment('local') && class_exists(Telescope::class)) {
     Schedule::command('telescope:prune --hours=48')->daily();
 }
-Schedule::command('liturgy:get')->daily();
+Schedule::command('youtube:update')
+    ->everyTenMinutes()
+    ->withoutOverlapping();
+Schedule::command('youtube:unpublish')
+    ->hourly()
+    ->withoutOverlapping();
+Schedule::command('query:clear')
+    ->dailyAt('03:00')
+    ->withoutOverlapping();
+Schedule::command('liturgy:get')
+    ->dailyAt('05:01')
+    ->withoutOverlapping();
+Schedule::command('registrations:expire')
+    ->dailyAt('05:10')
+    ->withoutOverlapping();
 Schedule::command('trash:prune --days=30')->daily();
 Schedule::command('cache:prune-stale-tags')->hourly();
 Schedule::call(fn () => app(AttachmentUploadService::class)->cleanup())->hourly();
