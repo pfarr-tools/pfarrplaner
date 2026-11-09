@@ -27,6 +27,10 @@ grep -q '^APP_URL=https://localhost$' "$TEST_ROOT/.env"
 grep -q '^OCTANE_HTTPS=false$' "$TEST_ROOT/.env"
 grep -q '^TRUST_PROXY=\*$' "$TEST_ROOT/.env"
 grep -q '^APP_PROVIDER=Pfarrplaner$' "$TEST_ROOT/.env"
+grep -q '^FTP_USER=pfarrplaner$' "$TEST_ROOT/.env"
+grep -q '^FTP_PASV_ADDRESS=localhost$' "$TEST_ROOT/.env"
+grep -q '^FTP_INBOX_STORAGE_PATH=inbox$' "$TEST_ROOT/.env"
+test -n "$(grep '^FTP_PASSWORD=' "$TEST_ROOT/.env" | cut -d= -f2-)"
 grep -q '^SENTRY_LARAVEL_DSN=$' "$TEST_ROOT/.env"
 grep -q '^SENTRY_TAG=$' "$TEST_ROOT/.env"
 grep -q '^SENTRY_TRACES_SAMPLE_RATE=0$' "$TEST_ROOT/.env"
@@ -76,7 +80,7 @@ cp "$TEST_ROOT/.env" "$TEST_ROOT/.env.before"
 printf 'n\n' | PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" script -qec "bash '$ROOT/scripts/bootstrap.sh' --dev" /dev/null >/dev/null 2>&1
 cmp "$TEST_ROOT/.env" "$TEST_ROOT/.env.before"
 
-printf 'y\nn\n\n\n\n\n\n\n\n\n\n\n\n\n\nn\n' |
+printf 'y\nn\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nn\n' |
   PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" script -qec "bash '$ROOT/scripts/bootstrap.sh' --dev" /dev/null >/dev/null 2>&1
 grep -qx 'APP_URL=https://existing.example' "$TEST_ROOT/.env"
 grep -qx 'APP_ENV=production' "$TEST_ROOT/.env"

@@ -47,6 +47,21 @@ ui_text() {
   printf '%s' "${value:-$default}"
 }
 
+ui_secret() {
+  local label="$1" default="$2" value
+  if [[ -n "$default" ]]; then
+    printf '%s' "$label (leer lassen für den bestehenden oder erzeugten Wert): " > /dev/tty
+  else
+    printf '%s' "$label: " > /dev/tty
+  fi
+  read -r -s value < /dev/tty || {
+    ui_error 'Abbruch: Interaktive Eingabe nicht verfügbar. Nutze --defaults.'
+    return 2
+  }
+  printf '\n' > /dev/tty
+  printf '%s' "${value:-$default}"
+}
+
 ui_confirm() {
   local label="$1" default="${2:-no}" answer prompt
   case "${default,,}" in

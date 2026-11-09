@@ -43,7 +43,7 @@ done
 
 if [[ -e .env ]]; then
   if (( CHECK )); then
-    for key in APP_KEY APP_ENV APP_URL COMPOSE_PROJECT_NAME DB_DATABASE DB_USERNAME DB_PASSWORD AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+    for key in APP_KEY APP_ENV APP_URL COMPOSE_PROJECT_NAME DB_DATABASE DB_USERNAME DB_PASSWORD AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY FTP_USER FTP_PASSWORD FTP_PASV_ADDRESS FTP_PORT FTP_PASV_MIN_PORT FTP_PASV_MAX_PORT; do
       grep -Eq "^${key}=.+" .env || { echo "Fehlt oder leer: ${key}" >&2; exit 2; }
     done
     echo '.env ist vorhanden und enthält die erforderlichen Grundwerte.'
@@ -97,8 +97,36 @@ ask() {
       exit 2
     }
   fi
+  if [[ "$key" == FTP_USER ]]; then
+    [[ "$value" =~ ^[A-Za-z0-9._-]+$ ]] || {
+      echo "Ungültiger FTP-Benutzername: ${value}" >&2
+      exit 2
+    }
+  fi
+  if [[ "$key" == FTP_PASV_ADDRESS ]]; then
+    [[ -n "$value" && "$value" != *[[:space:]]* ]] || {
+      echo 'FTP-Passivadresse darf nicht leer sein oder Leerzeichen enthalten.' >&2
+      exit 2
+    }
+  fi
   set_env "$key" "$value"
   printf '  %-28s %s\n' "$key" "$value"
+}
+ask_secret() {
+  local key="$1" label="$2" default="$3" value
+  if (( EXISTING_ENV )); then
+    default="$(env_value "$key")"
+  fi
+  if [[ "$MODE" == defaults ]]; then
+    value="$default"
+  elif (( EXISTING_ENV )) && (( replace_secrets == 0 )) && [[ -n "$default" ]]; then
+    value="$default"
+  else
+    value="$(ui_secret "$label" "$default")" || exit 2
+  fi
+  [[ -n "$value" ]] || value="$(random_secret)"
+  set_env "$key" "$value"
+  printf '  %-28s [gesetzt]\n' "$key"
 }
 ask_url() {
   local key="$1" label="$2" default="$3" value
@@ -166,6 +194,16 @@ if (( replace_domain_keys )); then
 fi
 ask APP_PROVIDER 'Bezeichnung des Anbieters' Pfarrplaner
 ask APP_ADMINISTRATOR 'Administrator-E-Mail-Adresse' admin@localhost
+ui_section 'Ablage über FTP'
+ask FTP_USER 'FTP-Benutzername' pfarrplaner
+if [[ "$TARGET" == prod ]]; then
+  FTP_PASV_ADDRESS_DEFAULT=localhost
+else
+  FTP_PASV_ADDRESS_DEFAULT=127.0.0.1
+fi
+ask FTP_PASV_ADDRESS 'FTP-Passivadresse für Scanner' "$FTP_PASV_ADDRESS_DEFAULT"
+FTP_INBOX_STORAGE_PATH_VALUE="$(env_value FTP_INBOX_STORAGE_PATH)"
+set_env FTP_INBOX_STORAGE_PATH "${FTP_INBOX_STORAGE_PATH_VALUE:-inbox}"
 ui_section 'Fehlerüberwachung'
 ask SENTRY_LARAVEL_DSN 'Sentry-DSN' ''
 ask SENTRY_TAG 'Sentry-Tag' ''
@@ -178,6 +216,13 @@ ask FORWARD_S3_PORT 'MinIO-Port' 9900
 ask FORWARD_S3_CONSOLE_PORT 'MinIO-Konsolenport' 9901
 ask SOKETI_PORT 'Soketi-Port' 6601
 ask FORWARD_MAILPIT_PORT 'Mailpit-Port' 9825
+ask FTP_PORT 'FTP-Port' 2121
+ask FTP_PASV_MIN_PORT 'FTP-Passivport von' 21100
+ask FTP_PASV_MAX_PORT 'FTP-Passivport bis' 21110
+(( 10#$(env_value FTP_PASV_MIN_PORT) <= 10#$(env_value FTP_PASV_MAX_PORT) )) || {
+  echo 'FTP-Passivport von darf nicht größer als FTP-Passivport bis sein.' >&2
+  exit 2
+}
 ui_section 'Sicherheitsgeheimnisse'
 replace_secrets=1
 if (( EXISTING_ENV )); then
@@ -195,6 +240,7 @@ if (( replace_secrets )); then
   set_random_secret PUSHER_APP_KEY
   set_random_secret PUSHER_APP_SECRET
 fi
+ask_secret FTP_PASSWORD 'FTP-Passwort' "$(random_secret)"
 
 mkdir -p src/storage/app src/storage/framework/{cache,sessions,views} src/storage/logs src/bootstrap/cache
 if [[ "$TARGET" == prod ]]; then

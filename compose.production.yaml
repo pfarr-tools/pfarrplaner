@@ -13,6 +13,7 @@ x-app: &app
       required: false
   volumes:
     - ./src/storage:/var/www/html/storage
+    - ftp_inbox:/var/www/html/storage/inbox
     - bible_resources:/var/www/html/resources/bible
     - ./backups:/var/backups/pfarrplaner
   depends_on:
@@ -166,6 +167,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 12
+  ftp:
+    image: fauria/vsftpd:latest
+    restart: unless-stopped
+    environment:
+      FTP_USER: ${FTP_USER:?FTP_USER muss gesetzt sein}
+      FTP_PASS: ${FTP_PASSWORD:?FTP_PASSWORD muss gesetzt sein}
+      PASV_ADDRESS: ${FTP_PASV_ADDRESS:?FTP_PASV_ADDRESS muss gesetzt sein}
+      PASV_MIN_PORT: ${FTP_PASV_MIN_PORT:?FTP_PASV_MIN_PORT muss gesetzt sein}
+      PASV_MAX_PORT: ${FTP_PASV_MAX_PORT:?FTP_PASV_MAX_PORT muss gesetzt sein}
+    ports:
+      - "${FTP_PORT:?FTP_PORT muss gesetzt sein}:21"
+      - "${FTP_PASV_MIN_PORT:?FTP_PASV_MIN_PORT muss gesetzt sein}-${FTP_PASV_MAX_PORT:?FTP_PASV_MAX_PORT muss gesetzt sein}:${FTP_PASV_MIN_PORT:?FTP_PASV_MIN_PORT muss gesetzt sein}-${FTP_PASV_MAX_PORT:?FTP_PASV_MAX_PORT muss gesetzt sein}"
+    volumes:
+      - ftp_inbox:/home/vsftpd/${FTP_USER:?FTP_USER muss gesetzt sein}
+    networks: [backend]
 
 networks:
   frontend:
@@ -187,3 +203,4 @@ volumes:
   caddy_config:
   public_assets:
   postfix_queue:
+  ftp_inbox:

@@ -38,6 +38,7 @@ Die Entwicklungsdatei enthält unter anderem:
 - `horizon` und `scheduler`: Hintergrundprozesse
 - `soketi`: WebSocket-Broadcasting
 - `mailpit`: lokale Mailprüfung
+- `ftp`: FTP-Eingang für Scanner und andere Ablagequellen
 
 Die Produktionsdatei ergänzt beziehungsweise ersetzt dies durch:
 
@@ -47,6 +48,7 @@ Die Produktionsdatei ergänzt beziehungsweise ersetzt dies durch:
 - `horizon` und `scheduler`
 - `mariadb`, `redis`, `minio`, `soketi` und `backup`
 - optional `postfix` im Compose-Profil `mail`
+- `ftp`: FTP-Eingang für Scanner und andere Ablagequellen
 
 ## Persistente Volumes
 
@@ -56,6 +58,7 @@ Mindestens diese Daten dürfen bei Container-Neustarts nicht verloren gehen:
 - MariaDB-Volume
 - Redis-Volume
 - MinIO-Volume
+- das persistente FTP-Inbox-Volume `ftp_inbox`
 - das Postfix-Queue-Volume `postfix_queue`, sofern das Mail-Profil verwendet wird
 - `backup.yaml` und `secrets/` außerhalb von Git
 
@@ -66,6 +69,20 @@ Die Compose-Dateien beziehen den MinIO-Server als community-gepflegten
 weil die offiziellen MinIO-Community-Images nicht mehr anonym aus Docker Hub
 oder Quay bezogen werden können. Für Produktionsumgebungen sind die geprüften
 Image-Digests zusätzlich zu pinnen.
+
+## FTP-Inbox für Scanner
+
+`./planer install` fragt `FTP_USER`, `FTP_PASSWORD`, `FTP_PASV_ADDRESS`,
+`FTP_PORT`, `FTP_PASV_MIN_PORT` und `FTP_PASV_MAX_PORT` ab. Die FTP-Adresse
+und der gesamte passive Portbereich müssen vom Scanner erreichbar sein. Der
+FTP-Dienst ist kein öffentlicher Dateiserver und sollte nur im vertrauenswürdigen
+Netz oder über eine entsprechend begrenzte Firewall freigegeben werden.
+
+Die Dateien liegen im Volume `ftp_inbox` und werden in der App unter
+`storage/inbox` angezeigt. Nach der Übernahme in die Anwendung werden sie aus
+der Inbox entfernt. Das Volume gehört nicht zum MinIO-Backup; ausstehende
+Scanner-Dateien müssen daher vor einer bewussten Volume-Löschung verarbeitet
+oder separat gesichert werden.
 
 ## Build oder Image
 

@@ -122,8 +122,16 @@ Bei einem lokalen Produktions- oder Vorabtest kann ein Image zunächst über `./
 | `soketi` | WebSocket-Broadcasting | keine Fachdatenpersistenz |
 | `mailpit` | lokale Mailprüfung bzw. produktiver Diagnosezugang | in Produktion nur loopback-gebunden, keine Mailzustellung und keine Fachdatenpersistenz |
 | `postfix` | optionales produktives Send-only-Mail-Relay | `postfix_queue` |
+| `ftp` | FTP-Eingang für die Ablage-API | `ftp_inbox`, FTP-/Passivports aus `.env` |
 
 MariaDB, Redis, MinIO und – bei aktiviertem Mailprofil – die Postfix-Warteschlange dürfen bei Container-Neustarts nicht verloren gehen. Anhänge werden nicht ungeprüft in `storage/app` abgelegt; MinIO ist der verbindliche Dateispeicher.
+
+Der Dienst `ftp` verwendet die Variablen `FTP_USER`, `FTP_PASSWORD`,
+`FTP_PASV_ADDRESS`, `FTP_PORT`, `FTP_PASV_MIN_PORT` und `FTP_PASV_MAX_PORT`.
+Das Volume `ftp_inbox` wird beim FTP-Benutzer eingehängt und parallel als
+`/var/www/html/storage/inbox` in den App-Containern eingebunden. Die
+`FTP_INBOX_STORAGE_PATH`-Konfiguration lautet standardmäßig `inbox`. Der
+Eingang bleibt bewusst vom MinIO-Storage und vom MinIO-/Restic-Backup getrennt.
 
 ## 6. Erstprüfung
 

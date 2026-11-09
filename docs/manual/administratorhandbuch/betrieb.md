@@ -58,6 +58,13 @@ Sie müssen im Backup enthalten sein; lokale Containerdateien oder `storage/`
 allein sind dafür nicht ausreichend. Prüfen Sie außerdem Speicherplatz und
 Zugriff auf das MinIO-Volume.
 
+Scanner-Dateien werden vorübergehend über den Dienst `ftp` in der Inbox
+`ftp_inbox` abgelegt. Prüfen Sie nach der Einrichtung `./planer status` und
+`./planer logs ftp` sowie die Erreichbarkeit des konfigurierten FTP- und
+Passivportbereichs aus dem Scanner-Netz. Die Inbox ist nicht Teil des MinIO-
+Backups. Verarbeiten Sie offene Dateien vor einer Volume-Löschung oder sichern
+Sie sie vorher außerhalb des Pfarrplaner-Backups.
+
 ## Prüfliste nach Server-Arbeiten
 
 Wenn Sie am Server, an PHP oder an Docker-Grundlagen gearbeitet haben, prüfen Sie danach mindestens:

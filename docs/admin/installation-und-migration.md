@@ -176,6 +176,27 @@ Upload-Verzeichnisse und alle datenbankreferenzierten Dateien geprüft.
 Schlüssel werden nicht umbenannt. Cache, Sessions, Logs und temporäre
 PDF-Dateien werden nicht als langlebige Objekte übernommen.
 
+### FTP-Inbox für Scanner
+
+Die Compose-Umgebungen enthalten den Dienst `ftp` als Eingang für Scanner und
+andere Ablagequellen. Der Dienst schreibt in das persistente Volume
+`ftp_inbox`; die App sieht denselben Inhalt unter
+`/var/www/html/storage/inbox`. Die Laravel-Inbox-API übernimmt daraus nur PDF-,
+JPG-, JPEG- und PNG-Dateien. Dauerhafte Anhänge werden anschließend wie bisher
+im MinIO-Bucket gespeichert.
+
+`./planer install` fragt den FTP-Benutzernamen, die Passivadresse, den
+FTP-Port, den passiven Portbereich und – verdeckt – das FTP-Passwort ab. Der
+Passivbereich muss aus dem Scanner-Netz erreichbar sein. Die Werte stehen in
+`.env` und dürfen nicht in Tickets oder Git übernommen werden. Für
+automatisierte lokale Einrichtungen erzeugt `./planer install --defaults` ein
+zufälliges Passwort; für Produktion muss die Passivadresse anschließend auf
+die tatsächlich erreichbare Serveradresse geprüft werden.
+
+Die Inbox ist ein Eingang und kein Ersatz für MinIO. Noch nicht verarbeitete
+Dateien werden nicht in den MinIO-/Restic-Satz aufgenommen; vor dem Löschen
+des `ftp_inbox`-Volumes müssen sie verarbeitet oder separat gesichert werden.
+
 ## Lokale Build-Artefakte nach Releases
 
 `scripts/build-production.sh` bereinigt nach jedem Produktionsbuild den

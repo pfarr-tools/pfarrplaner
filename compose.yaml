@@ -19,6 +19,7 @@ x-app: &app
     - bible_resources:/var/www/html/resources/bible
     - ./docs/manual:/var/www/docs/manual
     - ./backups:/var/backups/pfarrplaner
+    - ftp_inbox:/var/www/html/storage/inbox
     - composer_cache:/tmp/composer-cache
     - node_modules:/var/www/html/node_modules
     - vendor:/var/www/html/vendor
@@ -161,6 +162,21 @@ services:
     image: axllent/mailpit:latest
     ports: ["${FORWARD_MAILPIT_PORT:-8025}:8025"]
     networks: [pfarrplaner]
+  ftp:
+    image: fauria/vsftpd:latest
+    restart: unless-stopped
+    environment:
+      FTP_USER: ${FTP_USER:-pfarrplaner}
+      FTP_PASS: ${FTP_PASSWORD:-pfarrplaner-development-ftp}
+      PASV_ADDRESS: ${FTP_PASV_ADDRESS:-127.0.0.1}
+      PASV_MIN_PORT: ${FTP_PASV_MIN_PORT:-21100}
+      PASV_MAX_PORT: ${FTP_PASV_MAX_PORT:-21110}
+    ports:
+      - "${FTP_PORT:-2121}:21"
+      - "${FTP_PASV_MIN_PORT:-21100}-${FTP_PASV_MAX_PORT:-21110}:${FTP_PASV_MIN_PORT:-21100}-${FTP_PASV_MAX_PORT:-21110}"
+    volumes:
+      - ftp_inbox:/home/vsftpd/${FTP_USER:-pfarrplaner}
+    networks: [pfarrplaner]
 
 networks:
   pfarrplaner: {driver: bridge}
@@ -174,3 +190,4 @@ volumes:
   vendor:
   caddy_data:
   caddy_config:
+  ftp_inbox:

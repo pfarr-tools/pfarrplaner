@@ -28,6 +28,7 @@ Der empfohlene Einstieg für eine neue Umgebung ist [Installation und Erstbetrie
 - `routes/`: Web-, API- und Teilrouten
 - `scripts/`: Build-, Release- und Hilfsskripte
 - `storage/`: Logs und lokale Laufzeitdaten der Laravel-Anwendung
+- `storage/inbox/`: gemeinsamer Eingang des FTP-Dienstes für noch nicht verarbeitete Scanner-Dateien; dauerhaft gespeicherte Anhänge liegen in MinIO
 
 ## Dokumentationsrelevante Dateien
 
@@ -41,6 +42,7 @@ Der empfohlene Einstieg für eine neue Umgebung ist [Installation und Erstbetrie
 
 - `compose.yaml`: lokale Entwicklungsumgebung einschließlich Manual-Container
 - `compose.production.yaml`: Produktionsumgebung
+- `ftp_inbox`: persistentes Compose-Volume für den FTP-Eingang; nicht mit dem MinIO-Bucket verwechseln
 - `planer`: zentraler Einstieg für Betrieb, Updates und Datenpflege
 - `scripts/update-production.sh`: abgesicherter Produktions-Update-Ablauf
 
