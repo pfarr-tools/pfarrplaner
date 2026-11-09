@@ -375,6 +375,14 @@ Access denied` bedeutet daher, dass die `.env` nicht zu den tatsächlich
 initialisierten Datenbankzugangsdaten passt oder der Benutzer keinen Zugriff
 vom gewählten Container-Netzwerk hat.
 
+Für den Verbindungs- und Exporttest verwendet der Legacy-Import zusätzlich
+`--no-tablespaces`. Dadurch fordert `mysqldump` beziehungsweise `mariadb-dump`
+keine Tablespace-Metadaten an, für die neuere MySQL-/MariaDB-Server das
+weitreichende `PROCESS`-Recht verlangen können. Der Legacy-Datenbankbenutzer
+benötigt damit weiterhin nur die für den logischen Datenbankdump erforderlichen
+Rechte; die Option wird sowohl beim Dry-Run als auch beim späteren Export
+verwendet.
+
 Die kryptografische Identität wird ebenfalls aus der Legacy-`.env` gelesen:
 `APP_KEY`, `DATABASE_KEY` und `DATABASE_CIPHER` sind erforderlich. Diese drei
 Werte werden nach Erstellung des Legacy-Archivs in die lokale Ziel-`.env`

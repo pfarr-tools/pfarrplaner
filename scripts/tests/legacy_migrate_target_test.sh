@@ -17,6 +17,9 @@ grep -q 'docker build --pull --target production' "$SCRIPT"
 grep -q 'legacy_path" == /\*' "$SCRIPT"
 grep -q 'legacy_local' "$SCRIPT"
 grep -q 'bash -c' "$SCRIPT"
+grep -q "legacy_dump_common_options='--no-tablespaces'" "$SCRIPT"
+grep -q 'legacy_dump_common_options.*legacy_db_auth_options.*legacy_db_name' "$SCRIPT"
+grep -q 'legacy_dump_common_options.*legacy_volatile_data_options.*legacy_db_auth_options' "$SCRIPT"
 
 output="$(bash "$SCRIPT" example:relative --dry-run 2>&1 || true)"
 grep -q 'Zielumgebung: dev' <<<"$output"
@@ -42,8 +45,9 @@ DB_PASSWORD=secret
 APP_KEY=legacy-app-key
 DATABASE_KEY=legacy-database-key
 EOF
-cat > "$TEST_ROOT/bin/mariadb-dump" <<'EOF'
+cat > "$TEST_ROOT/bin/mariadb-dump" <<EOF
 #!/usr/bin/env bash
+printf '%s\n' "\$@" > "$TEST_ROOT/dump-args"
 exit 0
 EOF
 chmod +x "$TEST_ROOT/bin/mariadb-dump"
@@ -52,5 +56,6 @@ git -C "$TEST_ROOT" -c user.name=Test -c user.email=test@example.test add .
 git -C "$TEST_ROOT" -c user.name=Test -c user.email=test@example.test commit -qm initial
 output="$(PLANER_MIGRATE_ROOT="$TEST_ROOT" PATH="$TEST_ROOT/bin:$PATH" bash "$SCRIPT" "$TEST_ROOT/legacy" --prod --dry-run 2>&1)"
 grep -q 'Produktionsbild: pfarrplaner-app:commit-' <<<"$output"
+grep -qx -- '--no-tablespaces' "$TEST_ROOT/dump-args"
 
 echo 'legacy migration target tests passed'
