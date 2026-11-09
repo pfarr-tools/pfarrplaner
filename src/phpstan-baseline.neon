@@ -1915,30 +1915,6 @@ parameters:
 			path: app/Http/Controllers/RitesController.php
 
 		-
-			message: '#^Method App\\Http\\Controllers\\RoleController\:\:destroy\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\RedirectResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/RoleController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\RoleController\:\:store\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\RedirectResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/RoleController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\RoleController\:\:update\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\RedirectResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/RoleController.php
-
-		-
-			message: '#^Parameter \#2 \$direction of method Illuminate\\Database\\Eloquent\\Builder\<Spatie\\Permission\\Models\\Role\>\:\:orderBy\(\) expects ''asc''\|''desc''\|SortDirection, ''ASC'' given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Http/Controllers/RoleController.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1

@@ -30,41 +30,41 @@
 
 ### 1. Konfigurationsquelle und Sync-Modell festlegen
 
-- [ ] `src/config/roles.php` mit der vollständigen Permission-Liste und den Rollen-Zuordnungen aus der bisherigen fachlichen Struktur anlegen.
-- [ ] Die Guard-Namen explizit auf `web` festlegen und die Super-Administrator-Rolle als besondere Gate-Rolle dokumentieren, ohne eine nicht unterstützte Wildcard-Permission einzuführen.
-- [ ] Die Rollen-/Permission-Daten aus `RoleSeeder` und `InstallSetup` vergleichen; doppelte oder widersprüchliche Definitionen entfernen.
-- [ ] Einen dedizierten Service, z. B. `RoleConfigurationSynchronizer`, mit klarer Ergebnisstruktur für angelegt, aktualisiert, unverändert und übersprungen implementieren.
-- [ ] Den Sync so gestalten, dass konfigurierte Rollen ihre konfigurierten Permissions erhalten, nicht konfigurierte DB-Rollen und -Permissions aber nicht automatisch gelöscht werden.
+- [x] `src/config/roles.php` mit der vollständigen Permission-Liste und den Rollen-Zuordnungen aus der bisherigen fachlichen Struktur anlegen.
+- [x] Die Guard-Namen explizit auf `web` festlegen und die Super-Administrator-Rolle als besondere Gate-Rolle dokumentieren, ohne eine nicht unterstützte Wildcard-Permission einzuführen.
+- [x] Die Rollen-/Permission-Daten aus `RoleSeeder` und `InstallSetup` vergleichen; doppelte oder widersprüchliche Definitionen entfernen.
+- [x] Einen dedizierten Service, z. B. `RoleConfigurationSynchronizer`, mit klarer Ergebnisstruktur für angelegt, aktualisiert, unverändert und übersprungen implementieren.
+- [x] Den Sync so gestalten, dass konfigurierte Rollen ihre konfigurierten Permissions erhalten, nicht konfigurierte DB-Rollen und -Permissions aber nicht automatisch gelöscht werden.
 
 ### 2. Artisan-Befehl und Installationspfade
 
-- [ ] `roles:sync` mit `--dry-run` implementieren; die Ausgabe muss Änderungen nachvollziehbar benennen und der Dry-Run darf keine Datenbankänderung durchführen.
-- [ ] `RoleSeeder` auf die gemeinsame Konfiguration bzw. den Synchronizer umstellen, damit Seed und Betriebsbefehl nicht auseinanderlaufen.
-- [ ] `install:setup`, `pfarrplaner:install` und `scripts/bootstrap-import.sh` auf den gemeinsamen Abgleich umstellen.
-- [ ] Den regulären Updatepfad prüfen und den Sync dort an geeigneter Stelle ausführen, ohne `.env` oder Produktionsdaten außerhalb des bestehenden Updateablaufs zu verändern.
-- [ ] Initiale Super-Admin-Erzeugung auf die zentrale Rollenkonstante bzw. Konfiguration ausrichten und die bestehende Gate-Ausnahme beibehalten.
+- [x] `roles:sync` mit `--dry-run` implementieren; die Ausgabe muss Änderungen nachvollziehbar benennen und der Dry-Run darf keine Datenbankänderung durchführen.
+- [x] `RoleSeeder` auf die gemeinsame Konfiguration bzw. den Synchronizer umstellen, damit Seed und Betriebsbefehl nicht auseinanderlaufen.
+- [x] `install:setup`, `pfarrplaner:install` und `scripts/bootstrap-import.sh` auf den gemeinsamen Abgleich umstellen.
+- [x] Den regulären Updatepfad prüfen und den Sync dort an geeigneter Stelle ausführen, ohne `.env` oder Produktionsdaten außerhalb des bestehenden Updateablaufs zu verändern.
+- [x] Initiale Super-Admin-Erzeugung auf die zentrale Rollenkonstante bzw. Konfiguration ausrichten und die bestehende Gate-Ausnahme beibehalten.
 
 ### 3. Rollen-UI und nicht mehr benötigte Zugriffspunkte entfernen
 
-- [ ] Den Rollenmenüeintrag aus `AdminModule` entfernen.
-- [ ] `routes/web/admin/Roles.php` sowie `RoleController` und `RolePolicy` entfernen, sofern nach der Routen-/Menüprüfung keine Laufzeitreferenzen verbleiben.
-- [ ] Inertia-Seiten `Admin/Role/*` und veraltete Blade-Rollenansichten entfernen.
-- [ ] Rollenbezogene Browser-, Feature- und Policy-Tests entfernen oder in Tests für den neuen Sync-Befehl und das Fehlen der UI umwandeln.
-- [ ] Verbleibende Rollenverwendung in der Benutzerverwaltung ausdrücklich prüfen; dort nur die Auswahl konfigurierter Rollen anbieten, falls die bestehende UI dies bereits voraussetzt.
+- [x] Den Rollenmenüeintrag aus `AdminModule` entfernen.
+- [x] `routes/web/admin/Roles.php` sowie `RoleController` und `RolePolicy` entfernen, sofern nach der Routen-/Menüprüfung keine Laufzeitreferenzen verbleiben.
+- [x] Inertia-Seiten `Admin/Role/*` und veraltete Blade-Rollenansichten entfernen.
+- [x] Rollenbezogene Browser-, Feature- und Policy-Tests entfernen oder in Tests für den neuen Sync-Befehl und das Fehlen der UI umwandeln.
+- [x] Verbleibende Rollenverwendung in der Benutzerverwaltung ausdrücklich prüfen; dort nur die Auswahl konfigurierter Rollen anbieten, falls die bestehende UI dies bereits voraussetzt.
 
 ### 4. Dokumentation und fokussierte Tests
 
-- [ ] Das Administrator-/Betriebshandbuch um `roles:sync`, `--dry-run`, Bootstrap-/Update-Verhalten und den nicht destruktiven Standard ergänzen.
-- [ ] Den technischen Abschnitt um die Konfigurationsdatei, Guard `web`, Super-Admin-Ausnahme und den fehlenden UI-Zugriff ergänzen.
-- [ ] Unit-/Feature-Tests für Konfigurationsvalidierung, Sync, Idempotenz und Dry-Run schreiben.
-- [ ] Tests für installierte Artisan-Kommandos sowie fehlende Rollenrouten und fehlenden Admin-Menüeintrag ergänzen.
-- [ ] Mit `git diff --check` und den fokussierten Docker-isolierten Tests verifizieren; anschließend relevante Build-/Bootstrap-Prüfungen ausführen.
+- [x] Das Administrator-/Betriebshandbuch um `roles:sync`, `--dry-run`, Bootstrap-/Update-Verhalten und den nicht destruktiven Standard ergänzen.
+- [x] Den technischen Abschnitt um die Konfigurationsdatei, Guard `web`, Super-Admin-Ausnahme und den fehlenden UI-Zugriff ergänzen.
+- [x] Unit-/Feature-Tests für Konfigurationsvalidierung, Sync, Idempotenz und Dry-Run schreiben.
+- [x] Tests für installierte Artisan-Kommandos sowie fehlende Rollenrouten und fehlenden Admin-Menüeintrag ergänzen.
+- [x] Mit `git diff --check` und den fokussierten Docker-isolierten Tests verifizieren; anschließend relevante Build-/Bootstrap-Prüfungen ausführen.
 
 ### 5. Abschlussprüfung
 
-- [ ] `rg`-Prüfung auf alte Rollen-Definitionsquellen, CRUD-Routen und UI-Referenzen durchführen.
-- [ ] Änderungen und Testresultate im Issue #6 kommentieren.
-- [ ] Erst nach bestätigter fachlicher/realer Prüfung über Commit, Push und Issue-Abschluss entscheiden; Issue #6 nicht automatisch schließen, bevor der reale Test erfolgt ist.
+- [x] `rg`-Prüfung auf alte Rollen-Definitionsquellen, CRUD-Routen und UI-Referenzen durchführen.
+- [x] Änderungen und Testresultate im Issue #6 kommentieren.
+- [x] Erst nach bestätigter fachlicher/realer Prüfung über Commit, Push und Issue-Abschluss entscheiden; Issue #6 nicht automatisch schließen, bevor der reale Test erfolgt ist.
 
 ## Alternativen und Entscheidung
 

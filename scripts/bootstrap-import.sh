@@ -26,7 +26,7 @@ initialize_empty() {
   local first_name last_name title email password confirmation
   start_stack
   "$ROOT/planer" artisan migrate --force
-  "$ROOT/planer" artisan db:seed --class=Database\\Seeders\\RoleSeeder --force
+  "$ROOT/planer" artisan roles:sync
   first_name="$(ask 'Vorname des ersten Super-Admins' Administrator)"
   last_name="$(ask 'Nachname des ersten Super-Admins' Pfarrplaner)"
   title="$(ask 'Titel des ersten Super-Admins' '')"

@@ -30,13 +30,14 @@
 
 namespace App\Console\Commands\Install;
 
+use App\Services\RoleConfigurationSynchronizer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
-use Symfony\Component\Console\Output\BufferedOutput;
 
+/**
+ * Performs the initial application setup.
+ */
 class InstallSetup extends Command
 {
     /**
@@ -76,109 +77,35 @@ class InstallSetup extends Command
         }
     }
 
-    public function setupPermissions()
+    /**
+     * Retains the historical permissions setup hook for compatibility.
+     *
+     * @return bool Always false because roles:sync owns the setup now.
+     */
+    public function setupPermissions(): bool
     {
         return false;
     }
 
-    public function setupRoles()
+    /**
+     * Synchronizes the configured roles and permissions.
+     *
+     * @return bool Whether synchronization completed.
+     */
+    public function setupRoles(): bool
     {
-        $roleDefinitions = [
-            'Administrator:in' => [
-                'admin',
-                'fremden-urlaub-bearbeiten',
-                'gd-abendmahl-bearbeiten',
-                'gd-allgemein-bearbeiten',
-                'gd-anmerkungen-bearbeiten',
-                'gd-bearbeiten',
-                'gd-kasualien-bearbeiten',
-                'gd-kinderkirche-bearbeiten',
-                'gd-loeschen',
-                'gd-mesner-bearbeiten',
-                'gd-opfer-bearbeiten',
-                'gd-organist-bearbeiten',
-                'gd-pfarrer-bearbeiten',
-                'gd-taufe-bearbeiten',
-                'ort-bearbeiten',
-                'benutzer-bearbeiten',
-                'rollen-bearbeiten',
-                'liederbuecher-bearbeiten',
-                'lieder-bearbeiten',
-            ],
-            'Gemeindesekretär:in' => [
-                'gd-abendmahl-bearbeiten',
-                'gd-allgemein-bearbeiten',
-                'gd-bearbeiten',
-                'gd-kasualien-bearbeiten',
-                'gd-kasualien-lesen',
-                'gd-kinderkirche-bearbeiten',
-                'gd-loeschen',
-                'gd-mesner-bearbeiten',
-                'gd-opfer-bearbeiten',
-                'gd-organist-bearbeiten',
-                'gd-pfarrer-bearbeiten',
-                'gd-taufe-bearbeiten',
-                'kirche-bearbeiten',
-                'ort-bearbeiten',
-                'pfarramt-bearbeiten',
-            ],
-            'Kirchenpflege' => [
-                'fremden-urlaub-bearbeiten',
-                'gd-allgemein-bearbeiten',
-                'gd-bearbeiten',
-                'gd-kasualien-bearbeiten',
-                'gd-kasualien-lesen',
-                'gd-kinderkirche-bearbeiten',
-                'gd-mesner-bearbeiten',
-                'gd-opfer-bearbeiten',
-                'kirche-bearbeiten',
-                'gd-organist-bearbeiten',
-            ],
-            'Gottesdienstbearbeiter:in' => ['gd-bearbeiten'],
-            'Prädikant:in' => [],
-            'Urlaubsbearbeiter:in' => ['fremden-urlaub-bearbeiten'],
-            'KGR' => ['gd-kasualien-nur-statistik'],
-            'Opferverwaltung' => ['gd-bearbeiten'],
-            'Pfarrer:in' => [
-                'benutzerliste-lokal-sehen',
-                'gd-abendmahl-bearbeiten',
-                'gd-allgemein-bearbeiten',
-                'gd-bearbeiten',
-                'gd-kasualien-bearbeiten',
-                'gd-kasualien-lesen',
-                'gd-kinderkirche-bearbeiten',
-                'gd-loeschen',
-                'gd-mesner-bearbeiten',
-                'gd-opfer-bearbeiten',
-                'gd-organist-bearbeiten',
-                'gd-pfarrer-bearbeiten',
-                'gd-taufe-bearbeiten',
-                'kirche-bearbeiten',
-                'urlaub-lesen',
-                'ort-bearbeiten',
-            ],
-            'Streaming-Bearbeiter:in' => [
-                'ort-bearbeiten',
-                'gd-bearbeiten',
-                'gd-allgemein-bearbeiten',
-            ],
-        ];
-
-        foreach ($roleDefinitions as $roleName => $rolePermissions) {
-            $role = Role::firstOrCreate(['name' => $roleName]);
-            foreach ($rolePermissions as $permissionName) {
-                $permission = Permission::firstOrCreate(['name' => $permissionName]);
-                $role->givePermissionTo($permissionName);
-            }
-        }
+        app(RoleConfigurationSynchronizer::class)->synchronize();
 
         return true;
     }
 
-    public function setupAdmin()
+    /**
+     * Creates the initial administrator through the dedicated command.
+     *
+     * @return int Command exit status.
+     */
+    public function setupAdmin(): int
     {
-        $output = new BufferedOutput;
-
         return Artisan::call('install:admin', [], $this->getOutput());
     }
 }

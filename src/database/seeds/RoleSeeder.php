@@ -2,63 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Services\RoleService;
+use App\Services\RoleConfigurationSynchronizer;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
+/**
+ * Seeds the configured roles and permissions.
+ */
 class RoleSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    public function run(RoleConfigurationSynchronizer $synchronizer): void
     {
-        foreach ($this->permissions() as $permissionName) {
-            Permission::firstOrCreate(['name' => $permissionName]);
-        }
-
-        foreach ([
-            RoleService::ROLE_SUPER_ADMIN,
-            RoleService::ROLE_ADMIN,
-            RoleService::ROLE_PASTOR,
-            RoleService::ROLE_PREDICANT,
-        ] as $roleName) {
-            Role::firstOrCreate(['name' => $roleName]);
-        }
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function permissions(): array
-    {
-        return [
-            'admin',
-            'benutzer-bearbeiten',
-            'benutzerliste-lokal-sehen',
-            'fremden-urlaub-bearbeiten',
-            'gd-abendmahl-bearbeiten',
-            'gd-allgemein-bearbeiten',
-            'gd-anmerkungen-bearbeiten',
-            'gd-bearbeiten',
-            'gd-kasualien-bearbeiten',
-            'gd-kasualien-lesen',
-            'gd-kasualien-nur-statistik',
-            'gd-kinderkirche-bearbeiten',
-            'gd-loeschen',
-            'gd-mesner-bearbeiten',
-            'gd-opfer-bearbeiten',
-            'gd-organist-bearbeiten',
-            'gd-pfarrer-bearbeiten',
-            'gd-taufe-bearbeiten',
-            'kirche-bearbeiten',
-            'lieder-bearbeiten',
-            'liederbuecher-bearbeiten',
-            'ort-bearbeiten',
-            'pfarramt-bearbeiten',
-            'rollen-bearbeiten',
-            'urlaub-lesen',
-        ];
+        $synchronizer->synchronize();
     }
 }

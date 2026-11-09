@@ -911,7 +911,6 @@ app/Http/Controllers/ReportsController.php:124:T_FUNCTION
 app/Http/Controllers/ReportsController.php:48:T_FUNCTION
 app/Http/Controllers/RitesController.php:36:T_CLASS
 app/Http/Controllers/RitesController.php:46:T_FUNCTION
-app/Http/Controllers/RoleController.php:44:T_FUNCTION
 app/Http/Controllers/SeatingRowController.php:37:T_CLASS
 app/Http/Controllers/SeatingRowController.php:41:T_FUNCTION
 app/Http/Controllers/SeatingRowController.php:57:T_FUNCTION

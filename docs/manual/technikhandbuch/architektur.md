@@ -15,7 +15,13 @@ Das Projekt folgt im Kern einer Laravel-Struktur, nutzt aber mehrere projektweit
 
 - **Gottesdienste und Veranstaltungen**: `Service`, Kalender, Mitwirkende, Werbung, Berichte
 - **Kasualien**: Taufen, Trauungen, Beerdigungen
-- **Benutzer und Rechte**: Personen, Rollen, Gemeindezuordnungen
+- **Benutzer und Rechte**: Personen, versionierte Rollen-/Berechtigungskonfiguration und Gemeindezuordnungen
+
+Die fachliche Rollenstruktur liegt in `config/roles.php`. Der Befehl
+`roles:sync` gleicht die konfigurierten Rollen und Berechtigungen idempotent mit
+der Datenbank ab. Der Standard ist nicht destruktiv: unbekannte bestehende
+Einträge werden nicht automatisch gelöscht. Die Rolle
+`Super-Administrator:in` bleibt als Gate-Ausnahme erhalten.
 - **Orte und Gemeinden**: Kirchengemeinden, Pfarrämter, Veranstaltungsorte, Sitzpläne
 - **Urlaub und Vertretung**: Abwesenheiten, Pools, Poolmaster
 - **Liturgie**: Bausteine, Lieder, Psalmen, liturgische Texte

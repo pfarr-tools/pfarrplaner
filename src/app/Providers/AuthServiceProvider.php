@@ -64,7 +64,6 @@ use App\Policies\LocationPolicy;
 use App\Policies\ParishPolicy;
 use App\Policies\PsalmPolicy;
 use App\Policies\ReplacementPolicy;
-use App\Policies\RolePolicy;
 use App\Policies\SermonPolicy;
 use App\Policies\ServiceGroupPolicy;
 use App\Policies\ServicePolicy;
@@ -77,7 +76,6 @@ use App\Policies\UserPolicy;
 use App\Policies\WeddingPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
-use Spatie\Permission\Models\Role;
 
 /**
  * Class AuthServiceProvider
@@ -102,7 +100,6 @@ class AuthServiceProvider extends ServiceProvider
         '\App\Models\Service' => ServicePolicy::class,
         'App\Models\Service' => ServicePolicy::class,
         Day::class => DayPolicy::class,
-        Role::class => RolePolicy::class,
         Absence::class => AbsencePolicy::class,
         Replacement::class => ReplacementPolicy::class,
         AdConfig::class => AdConfigPolicy::class,

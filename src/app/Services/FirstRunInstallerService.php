@@ -109,6 +109,7 @@ class FirstRunInstallerService
 
     public function createOrUpdateAdminUser(array $data): User
     {
+        app(RoleConfigurationSynchronizer::class)->synchronize();
         $this->ensureRoleExists(RoleService::ROLE_SUPER_ADMIN);
 
         /** @var User $user */

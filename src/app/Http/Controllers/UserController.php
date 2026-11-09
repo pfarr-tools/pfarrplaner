@@ -161,7 +161,7 @@ class UserController extends Controller
                 'user' => $this->compactEditorUser($user),
                 'cities' => $this->compactOptions($cities),
                 'adminCities' => $this->compactOptions($adminCities),
-                'roles' => $this->compactRoles(Role::all()),
+                'roles' => $this->compactRoles($this->getRoles()),
                 'parishes' => $this->compactOptions(Parish::query()->select(['id', 'name'])->get()),
                 'users' => $this->compactPeople(),
                 'activeTab' => 'home',
@@ -180,10 +180,12 @@ class UserController extends Controller
      */
     protected function getRoles()
     {
+        $rolesQuery = Role::query()->whereIn('name', array_keys(config('roles.roles')));
+
         if (Auth::user()->hasRole('Super-Administrator:in')) {
-            $roles = Role::all();
+            $roles = $rolesQuery->get();
         } else {
-            $roles = Role::where('name', '!=', 'Super-Administrator:in')->get();
+            $roles = $rolesQuery->where('name', '!=', 'Super-Administrator:in')->get();
         }
 
         return $roles->sortBy('name');
@@ -234,9 +236,7 @@ class UserController extends Controller
 
         $cities = $user->homeCities->merge(collect($adminCities));
 
-        $roles = Role::all()->sortBy('name')->reject(function ($item) {
-            return $item->name == 'Super-Administrator:in';
-        });
+        $roles = $this->getRoles();
 
         $parishes = Parish::inCities(Auth::user()->adminCities->pluck('id'))->get();
         $homescreen = $user->getSetting('homeScreen', 'route:calendar');

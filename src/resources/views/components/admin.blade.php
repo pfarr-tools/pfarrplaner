@@ -27,7 +27,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('ical.connect') }}"><span class="fa fa-calendar-alt" title="Mit Outlook verbinden"></span></a>
             </li>
-        @canany(['benutzerliste-lokal-sehen', 'benutzer-bearbeiten', 'ort-bearbeiten', 'kirche-bearbeiten', 'rollen-bearbeiten'])
+        @canany(['benutzerliste-lokal-sehen', 'benutzer-bearbeiten', 'ort-bearbeiten', 'kirche-bearbeiten'])
         <li class="nav-item dropdown">
             <a id="navbarDropdown2" class="nav-link dropdown-toggle" href="#" role="button"
                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
@@ -39,11 +39,6 @@
                 <a class="dropdown-item" href="{{ route('users.index') }}">
                     Benutzer
                 </a>
-                @endcan
-                @can('rollen-bearbeiten')
-                    <a class="dropdown-item" href="{{ route('roles.index') }}">
-                        Benutzerrollen
-                    </a>
                 @endcan
                 @canany(['ort-bearbeiten', 'gd-opfer-bearbeiten'])
                 <a class="dropdown-item" href="{{ route('admin.cities.index') }}">
@@ -65,7 +60,7 @@
                         Pfarrämter
                     </a>
                 @endcan
-                @canany(['benutzerliste-lokal-sehen', 'benutzer-bearbeiten', 'rollen-bearbeiten', 'ort-bearbeiten', 'kirche-bearbeiten', 'tags-bearbeiten'])
+                @canany(['benutzerliste-lokal-sehen', 'benutzer-bearbeiten', 'ort-bearbeiten', 'kirche-bearbeiten', 'tags-bearbeiten'])
                     <div class="dropdown-divider"></div>
                 @endcanany
                     <a class="dropdown-item" href="{{ route('calendar', ['date' => null, 'month' => null, 'slave' => 1]) }}" target="_blank">

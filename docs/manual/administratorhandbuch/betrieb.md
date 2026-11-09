@@ -69,7 +69,7 @@ Wenn Sie am Server, an PHP oder an Docker-Grundlagen gearbeitet haben, prüfen S
 Zur technischen Administration gehört auch ein klares Verständnis der administrativen Oberfläche:
 
 - Benutzer
-- Rollen
+- Rollen und Berechtigungen über die Konfiguration und `roles:sync`
 - Gemeinden
 - Orte
 - Vertretungs-Pools

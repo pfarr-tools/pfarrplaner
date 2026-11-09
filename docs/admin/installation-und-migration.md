@@ -47,7 +47,20 @@ selbst. Für ein Backup werden Ziel und Backup-ID abgefragt und der Restore nur
 nach der Bestätigung `JA` angewendet. Für eine Legacy-Installation wird zuerst
 ein Dry-Run ausgeführt; ein absoluter lokaler Pfad wird direkt gelesen, während
 nur `user@host:/absoluter/pfad` SSH verwendet. Wird keine Quelle gewählt,
-werden Migrationen, Rollen und der initiale Administrator eingerichtet.
+werden Migrationen, die Rollen über `roles:sync` und der initiale Administrator
+eingerichtet.
+
+Die versionierte Rollen- und Berechtigungsstruktur liegt in
+`src/config/roles.php`. Nach Änderungen oder bei einer bestehenden Installation
+kann der Abgleich zunächst ohne Datenbankänderung geprüft werden:
+
+```sh
+./planer artisan roles:sync --dry-run
+./planer artisan roles:sync
+```
+
+Der Abgleich ist idempotent und löscht unbekannte bestehende Rollen und
+Berechtigungen nicht automatisch.
 
 `./planer bootstrap --dev --defaults` ist für automatisierte
 Entwicklungsumgebungen geeignet; mit `--defaults` werden synthetische

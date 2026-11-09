@@ -249,18 +249,6 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
         });
     }
 
-    public function test_capture_role_list(): void
-    {
-        $this->browse(function (Browser $browser) {
-            $this->captureManualScreenshot(
-                $browser,
-                route('roles.index'),
-                'admin-rollen',
-                800
-            );
-        });
-    }
-
     public function test_capture_user_editor_tabs(): void
     {
         $this->browse(function (Browser $browser) {

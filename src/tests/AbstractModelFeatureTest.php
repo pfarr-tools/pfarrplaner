@@ -48,7 +48,7 @@ abstract class AbstractModelFeatureTest extends TestCase
 
     public function test_index_view_works()
     {
-        $this->assertEquals(3, Role::count());
+        $this->assertCount(count(config('roles.roles')), Role::all());
 
         $existing = $this->factory()->create();
 
@@ -67,7 +67,7 @@ abstract class AbstractModelFeatureTest extends TestCase
 
     public function test_editor_view_works()
     {
-        $this->assertEquals(3, Role::count());
+        $this->assertCount(count(config('roles.roles')), Role::all());
 
         $existing = $this->factory()->create();
 

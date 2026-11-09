@@ -130,19 +130,9 @@ Im Benutzer-Editor finden Sie die Schaltfläche **„Passwort zurücksetzen"**. 
 
 ## Rollen und Berechtigungen
 
-### Was sind Rollen?
-
-Rollen bündeln Berechtigungen. Statt jedem Benutzer einzeln Rechte zuzuweisen, weisen Sie ihm eine Rolle zu (z. B. „Kirchenmusiker"), die dann alle nötigen Rechte enthält.
-
-### Rollen verwalten
-
-![Rollen verwalten](media/images/admin-rollen.png)
-
-Unter **Administration → Benutzerrollen** sehen Sie alle vorhandenen Rollen.
-
-- **Neue Rolle anlegen**: Öffnen Sie die Benutzerrollen und legen Sie eine neue Rolle an. Geben Sie einen Namen ein und wählen Sie die zugehörigen Berechtigungen aus der Liste.
-- **Rolle bearbeiten**: Klicken Sie auf eine Rolle, um ihre Berechtigungen anzupassen.
-- **Rolle löschen**: Rollen löschen Sie über die Schaltfläche „Löschen" in der Rollenansicht.
+Rollen bündeln Berechtigungen. Die verfügbaren Rollen und ihre fachlichen
+Berechtigungen werden von der Einrichtung vorgegeben und sind nicht über die
+Benutzeroberfläche änderbar.
 
 ### Benutzer einer Rolle zuweisen
 

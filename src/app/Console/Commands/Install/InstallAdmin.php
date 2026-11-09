@@ -32,9 +32,13 @@ namespace App\Console\Commands\Install;
 
 use App\Models\People\User;
 use App\Services\PasswordService;
+use App\Services\RoleConfigurationSynchronizer;
 use Illuminate\Console\Command;
 use Spatie\Permission\Models\Role;
 
+/**
+ * Creates the legacy initial administrator during installation.
+ */
 class InstallAdmin extends Command
 {
     /**
@@ -53,10 +57,8 @@ class InstallAdmin extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(RoleConfigurationSynchronizer $synchronizer): int
     {
         if (User::where('last_name', 'Admin')->whereNull('first_name')->count()) {
             $this->line('<error>ERROR</error> Admin user already exists.');
@@ -64,7 +66,8 @@ class InstallAdmin extends Command
             return Command::FAILURE;
         }
 
-        $role = Role::firstOrCreate(['name' => 'Super-Administrator:in']);
+        $synchronizer->synchronize();
+        $role = Role::where('name', 'Super-Administrator:in')->firstOrFail();
         $domain = parse_url(url('/'), PHP_URL_HOST);
 
         $password = PasswordService::randomPassword();

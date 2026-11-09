@@ -40,7 +40,6 @@ use App\Models\Service;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
 
 class AdminModule extends AbstractModule
 {
@@ -98,16 +97,6 @@ class AdminModule extends AbstractModule
                 'icon' => 'mdi mdi-account-multiple',
                 'url' => route('admin.teams.index'),
                 'active' => $route == 'admin.teams.index',
-                'inertia' => true,
-            ];
-        }
-        if ($user->can('index', Role::class)) {
-            $adminMenu[] = [
-                'text' => 'Benutzerrollen',
-                'group' => 'Personen',
-                'icon' => 'mdi mdi-badge-account',
-                'url' => route('roles.index'),
-                'active' => $route == 'roles.index',
                 'inertia' => true,
             ];
         }

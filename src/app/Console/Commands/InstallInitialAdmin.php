@@ -4,9 +4,9 @@ namespace App\Console\Commands;
 
 use App\Models\People\User;
 use App\Services\FirstRunInstallerService;
+use App\Services\RoleConfigurationSynchronizer;
 use App\Services\RoleService;
 use Illuminate\Console\Command;
-use Spatie\Permission\Models\Role;
 
 class InstallInitialAdmin extends Command
 {
@@ -20,11 +20,22 @@ class InstallInitialAdmin extends Command
 
     protected $description = 'Erzeuge den ersten Super-Administrator idempotent';
 
-    public function __construct(protected FirstRunInstallerService $installer)
-    {
+    /**
+     * @param  FirstRunInstallerService  $installer  First-run user installer.
+     * @param  RoleConfigurationSynchronizer  $synchronizer  Role synchronization service.
+     */
+    public function __construct(
+        protected FirstRunInstallerService $installer,
+        protected RoleConfigurationSynchronizer $synchronizer,
+    ) {
         parent::__construct();
     }
 
+    /**
+     * Creates or updates the initial super administrator.
+     *
+     * @return int Command exit status.
+     */
     public function handle(): int
     {
         $email = trim((string) $this->option('email'));
@@ -39,10 +50,7 @@ class InstallInitialAdmin extends Command
 
         $existing = User::query()->where('email', $email)->first();
         if ($existing) {
-            Role::firstOrCreate([
-                'name' => RoleService::ROLE_SUPER_ADMIN,
-                'guard_name' => 'web',
-            ]);
+            $this->synchronizer->synchronize();
             $existing->assignRole(RoleService::ROLE_SUPER_ADMIN);
             $this->components->info("Super-Administrator {$email} ist bereits vorhanden.");
 
