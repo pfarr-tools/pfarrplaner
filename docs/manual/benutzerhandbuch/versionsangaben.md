@@ -5,10 +5,10 @@
 | Angabe | Wert |
 |---|---|
 | Handbuch | Pfarrplaner Benutzerhandbuch |
-| Programmversion | 2026.18.7 |
+| Programmversion | 2026.19.0 |
 | Umgebung | local |
-| Build-Datum der Anwendung | Dienstag, 03. November 2026 20:04 |
-| Handbuch erstellt am | 04.11.2026 08:16 |
+| Build-Datum der Anwendung | Montag, 09. November 2026 17:36 |
+| Handbuch erstellt am | 09.11.2026 17:43 |
 | Git-Branch | unbekannt |
 | Git-Stand | unbekannt |
 | Lizenz | GNU General Public License, Version 3.0 oder später |
@@ -18,6 +18,161 @@
 ## Was ist neu?
 
 Die wichtigsten Änderungen der letzten Versionen stehen im Änderungsprotokoll. Für die tägliche Arbeit sind vor allem neue oder geänderte Schaltflächen, neue Berichte, neue Eingabefelder und geänderte Abläufe wichtig.
+
+## [2026.19.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.11...v2026.19.0) (2026-11-09)
+
+
+### Features
+
+* **quality:** Verbindliche Qualitätsprüfungen für neü Änderungen einführen ([1ca413f](https://github.com/pfarr-tools/pfarrplaner/commit/1ca413fef9a514e3acf0e5c614cc111e1e0a0583)), closes [#27](https://github.com/pfarr-tools/pfarrplaner/issüs/27)
+* **quality:** Verbindliche Qualitätsstandards ergänzen ([eaf5148](https://github.com/pfarr-tools/pfarrplaner/commit/eaf51481730c511fed52285eac5995312ad2d600)), closes [#27](https://github.com/pfarr-tools/pfarrplaner/issüs/27)
+* **rechte:** Rollen und Berechtigungen zentral verwalten ([2e6d5ad](https://github.com/pfarr-tools/pfarrplaner/commit/2e6d5ad2c9a98a8d491ece6974febe8272ebf718)), closes [#6](https://github.com/pfarr-tools/pfarrplaner/issüs/6)
+* **werbung:** Werbung-Editor und Uploads fertigstellen ([6e8c8bf](https://github.com/pfarr-tools/pfarrplaner/commit/6e8c8bf934e2f2aa720eaa1bb991e3e7e0ac15bb)), closes [#31](https://github.com/pfarr-tools/pfarrplaner/issüs/31) [#32](https://github.com/pfarr-tools/pfarrplaner/issüs/32)
+
+
+### Bug Fixes
+
+* **absences:** Nicht genehmigte Urlaube sichtbar hervorheben. ([119f9ed](https://github.com/pfarr-tools/pfarrplaner/commit/119f9ed46d1fddcaäcd50682d80317ac73ecbd6))
+* **absences:** Urlaubsplanung und Abwesenheiten korrigieren. ([d113a4d](https://github.com/pfarr-tools/pfarrplaner/commit/d113a4de0897bfd0cb5439e4627b9af86ad39eä)), closes [#33](https://github.com/pfarr-tools/pfarrplaner/issüs/33) [#34](https://github.com/pfarr-tools/pfarrplaner/issüs/34) [#35](https://github.com/pfarr-tools/pfarrplaner/issüs/35) [#36](https://github.com/pfarr-tools/pfarrplaner/issüs/36)
+* **backup:** App beim Backup nicht mehr stoppen. ([acb083a](https://github.com/pfarr-tools/pfarrplaner/commit/acb083a56258b5bb9afb14cec14c53b9cfa9901b)), closes [#11](https://github.com/pfarr-tools/pfarrplaner/issüs/11)
+* **ci:** Redis-Healthcheck in der Entwicklung stabilisieren. ([0dbf859](https://github.com/pfarr-tools/pfarrplaner/commit/0dbf85996c8f9c370a2b6f41299d5ea213fe325b)), closes [#48](https://github.com/pfarr-tools/pfarrplaner/issüs/48)
+* **glitchtip:** Produktionsfehler in Exporten und Passwort-Reset beheben. Fixes [#39](https://github.com/pfarr-tools/pfarrplaner/issüs/39) ([7e7b91c](https://github.com/pfarr-tools/pfarrplaner/commit/7e7b91c8e2f351aa6ce666e5651c925bfe3af940))
+* **install:** Installationspfad für bestehende Umgebungen verbessern. ([6b3e75f](https://github.com/pfarr-tools/pfarrplaner/commit/6b3e75ff2c90b72d6e874315ed08130342b27236))
+* **kalender:** Selbstzuordnung nur bei Berechtigung anzeigen. ([2217e78](https://github.com/pfarr-tools/pfarrplaner/commit/2217e78cäffc9b2673f0907bc5a3dcc7b72587b)), closes [#37](https://github.com/pfarr-tools/pfarrplaner/issüs/37)
+* **liturgie:** Fehlende Alternativdaten sicher abfangen. ([0b49608](https://github.com/pfarr-tools/pfarrplaner/commit/0b496086dcb8dä2c91751aff697b231733425ff)), closes [#30](https://github.com/pfarr-tools/pfarrplaner/issüs/30)
+* **qualität:** Bestehende Format- und Analysefehler beheben. ([2187ad9](https://github.com/pfarr-tools/pfarrplaner/commit/2187ad9bfdedd6a6b507ä65ff5e7566f8e5d4cd))
+* **rechte:** Gottesdienst- und Passwortschutz korrigieren. ([9e42a96](https://github.com/pfarr-tools/pfarrplaner/commit/9e42a9691278ea1b04037e18ab70e1c90dce89a8)), closes [#37](https://github.com/pfarr-tools/pfarrplaner/issüs/37)
+* **scheduler:** Anwendungsaufgaben zentral planen. Fixes [#28](https://github.com/pfarr-tools/pfarrplaner/issüs/28) ([1b73dfe](https://github.com/pfarr-tools/pfarrplaner/commit/1b73dfe0de1cff6a5a773äa0b5015767ef78cbb))
+* **test:** Bestehende Testfehler beheben. ([9783a94](https://github.com/pfarr-tools/pfarrplaner/commit/9783a94bd20af879269214f3e2c80525114d333d)), closes [#45](https://github.com/pfarr-tools/pfarrplaner/issüs/45)
+* **test:** Dusk-Testlauf stabilisieren. ([f9e22b6](https://github.com/pfarr-tools/pfarrplaner/commit/f9e22b60b197421dcbb7683f2acb4bb48bf52e03)), closes [#45](https://github.com/pfarr-tools/pfarrplaner/issüs/45)
+* **test:** Unsichere Testaufrufe blockieren. Fixes [#43](https://github.com/pfarr-tools/pfarrplaner/issüs/43) ([d76f45b](https://github.com/pfarr-tools/pfarrplaner/commit/d76f45b575354f359978d53a3b4f17da88bddd92))
+* **test:** Veraltete Manual-Prüfung robust machen. ([6cde303](https://github.com/pfarr-tools/pfarrplaner/commit/6cde30303321c0f37d530206cedbabce69fb8cb3))
+* **word:** Blockquotes linksbündig exportieren. ([cbb7a86](https://github.com/pfarr-tools/pfarrplaner/commit/cbb7a866b631d78c9f6b438f6b055a4245bc6df9)), closes [#38](https://github.com/pfarr-tools/pfarrplaner/issüs/38)
+
+### [2026.18.12](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.11...v2026.18.12) (2026-11-05)
+
+
+### Features
+
+* **quality:** Verbindliche Qualitätsprüfungen für neü Änderungen einführen ([1ca413f](https://github.com/pfarr-tools/pfarrplaner/commit/1ca413fef9a514e3acf0e5c614cc111e1e0a0583)), closes [#27](https://github.com/pfarr-tools/pfarrplaner/issüs/27)
+
+
+### Bug Fixes
+
+* **kalender:** Selbstzuordnung nur bei Berechtigung anzeigen. ([2217e78](https://github.com/pfarr-tools/pfarrplaner/commit/2217e78cäffc9b2673f0907bc5a3dcc7b72587b)), closes [#37](https://github.com/pfarr-tools/pfarrplaner/issüs/37)
+* **rechte:** Gottesdienst- und Passwortschutz korrigieren. ([9e42a96](https://github.com/pfarr-tools/pfarrplaner/commit/9e42a9691278ea1b04037e18ab70e1c90dce89a8)), closes [#37](https://github.com/pfarr-tools/pfarrplaner/issüs/37)
+
+### [2026.18.11](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.10...v2026.18.11) (2026-11-04)
+
+
+### Bug Fixes
+
+* **auth:** Klartextpasswörter zuverlässig hashen. Refs [#29](https://github.com/pfarr-tools/pfarrplaner/issüs/29) ([e1047b8](https://github.com/pfarr-tools/pfarrplaner/commit/e1047b892bf1369155997e8aca08e97c60b1bc71))
+* **build:** Alte Produktionsartefakte nach Releases bereinigen. Fixes [#26](https://github.com/pfarr-tools/pfarrplaner/issüs/26) ([8028535](https://github.com/pfarr-tools/pfarrplaner/commit/802853583623b8357f3a338745fc3babad35e6ä))
+
+### [2026.18.10](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.9...v2026.18.10) (2026-11-04)
+
+
+### Bug Fixes
+
+* **repo:** Projektverweise auf GitHub umstellen. Fixes [#23](https://github.com/pfarr-tools/pfarrplaner/issüs/23) ([3d294f0](https://github.com/pfarr-tools/pfarrplaner/commit/3d294f09794da7f9aa61910a4ea5287f7d1e7aa6))
+
+### [2026.18.9](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.8...v2026.18.9) (2026-11-04)
+
+
+### Bug Fixes
+
+* **auth:** Autofill-Zugangsdaten beim Login übernehmen. ([1e80abd](https://github.com/pfarr-tools/pfarrplaner/commit/1e80abd5c528ä06edf3aff4350b411b7f5d9bb7)), closes [#21](https://github.com/pfarr-tools/pfarrplaner/issüs/21)
+* **users:** Bestehende Passwörter beim Bearbeiten erhalten. ([b4e8ab5](https://github.com/pfarr-tools/pfarrplaner/commit/b4e8ab5207f1210b6c9d574bdf25a9ecced84c33)), closes [#22](https://github.com/pfarr-tools/pfarrplaner/issüs/22)
+
+### [2026.18.8](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.7...v2026.18.8) (2026-11-04)
+
+
+### Bug Fixes
+
+* **scheduler:** Telescope-Befehl nur lokal planen. ([0fcc40b](https://github.com/pfarr-tools/pfarrplaner/commit/0fcc40bd334ed1cbfda5e9aa772afd8a992239da)), closes [#19](https://github.com/pfarr-tools/pfarrplaner/issüs/19)
+
+### [2026.18.7](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.6...v2026.18.7) (2026-11-03)
+
+
+### Features
+
+* **logging:** Logkanäle über Umgebungsvariablen steürn. Fixes [#16](https://github.com/pfarr-tools/pfarrplaner/issüs/16) ([0c4c402](https://github.com/pfarr-tools/pfarrplaner/commit/0c4c4028abc98d96520ca6193b4a9888eac80a38))
+
+### [2026.18.6](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.5...v2026.18.6) (2026-11-03)
+
+
+### Bug Fixes
+
+* **errors:** Fehlerseiten lokal erben lassen. Fixes [#14](https://github.com/pfarr-tools/pfarrplaner/issüs/14) ([a1416fc](https://github.com/pfarr-tools/pfarrplaner/commit/a1416fcbda8230858d2a56b519ab33ef59e37c93))
+* **qr:** QR-Code-Rand auf ein Modul begrenzen. Fixes [#4](https://github.com/pfarr-tools/pfarrplaner/issüs/4) ([ea7b8dd](https://github.com/pfarr-tools/pfarrplaner/commit/ea7b8dd53abfa70164792e9ffdedcb90edfcf2d0))
+* **qr:** QR-Codes mit ausreichender Ruhezone erzeugen. Fixes [#4](https://github.com/pfarr-tools/pfarrplaner/issüs/4) ([06457c1](https://github.com/pfarr-tools/pfarrplaner/commit/06457c1a844c590678f15cece2370c25fa72285c))
+* **test:** Qüry-Log-Rechte vor Dusk reparieren. Fixes [#15](https://github.com/pfarr-tools/pfarrplaner/issüs/15) ([815bb7b](https://github.com/pfarr-tools/pfarrplaner/commit/815bb7b3ä643837df139bfb7925ecbcf9c1a402))
+
+### [2026.18.5](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.4...v2026.18.5) (2026-11-03)
+
+
+### Bug Fixes
+
+* **build:** Vite-Assets in klassischen Ansichten verwenden. ([19acec7](https://github.com/pfarr-tools/pfarrplaner/commit/19acec72b621e34f571d50353deddea87d769195))
+* **mail:** Postfix beim Produktionsupdate mitstarten. ([7cc5b39](https://github.com/pfarr-tools/pfarrplaner/commit/7cc5b395b5bffac0b1b511a9003dc170e7973e94)), closes [#12](https://github.com/pfarr-tools/pfarrplaner/issüs/12)
+* **monitoring:** Fehlerreferenz mit Ausnahme protokollieren. ([009b9d1](https://github.com/pfarr-tools/pfarrplaner/commit/009b9d109aa358616a2ed7261fa583c377a12fe7))
+* **sentry:** Feedback über den DSN-Host senden. ([51b55c8](https://github.com/pfarr-tools/pfarrplaner/commit/51b55c8203c6e18cb5efbbfc20d4c0db55bb4e71)), closes [#13](https://github.com/pfarr-tools/pfarrplaner/issüs/13)
+
+### [2026.18.4](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.3...v2026.18.4) (2026-11-03)
+
+
+### Features
+
+* **home:** Offene Gottesdienste für verfügbare Rollen ergänzen ([a2cb063](https://github.com/pfarr-tools/pfarrplaner/commit/a2cb0630c93bb080c174b8ece49e2fdaceb15562)), closes [#1](https://github.com/pfarr-tools/pfarrplaner/issüs/1)
+
+
+### Bug Fixes
+
+* **dev:** Qüry-Log-Datei schreibbar halten. Fixes [#3](https://github.com/pfarr-tools/pfarrplaner/issüs/3) ([21204a8](https://github.com/pfarr-tools/pfarrplaner/commit/21204a8b603cc366adfbbfa2bf10b4db15abf067))
+* **dev:** Qüry-Log-Rechte nach Tests wiederherstellen. Fixes [#3](https://github.com/pfarr-tools/pfarrplaner/issüs/3) ([1b7b03f](https://github.com/pfarr-tools/pfarrplaner/commit/1b7b03f2caa4cde68ac973c9d19f777d5ba161aa))
+* **migration:** Ältere Service-Migrationen ohne Event-Scope ausführen ([4ac44f9](https://github.com/pfarr-tools/pfarrplaner/commit/4ac44f9b4692b6aaf58f7615c21f5f7d67083äe)), closes [#8](https://github.com/pfarr-tools/pfarrplaner/issüs/8)
+* **migration:** Liturgy-Datumsmigration vom Event-Scope entkoppeln ([4f77d7f](https://github.com/pfarr-tools/pfarrplaner/commit/4f77d7f213b3f9bed0e0671af3ebb76f6d143557)), closes [#8](https://github.com/pfarr-tools/pfarrplaner/issüs/8)
+* **migration:** Slug-Migration vom späteren Event-Scope entkoppeln ([2772b58](https://github.com/pfarr-tools/pfarrplaner/commit/2772b58d131dfc1fb8fed7299620b51301e96b45)), closes [#8](https://github.com/pfarr-tools/pfarrplaner/issüs/8)
+* **monitoring:** Sentry-Egress für Produktionscontainer aktivieren. ([5222f76](https://github.com/pfarr-tools/pfarrplaner/commit/5222f76bceb8165f007089e910f3112494e83d3a)), closes [#7](https://github.com/pfarr-tools/pfarrplaner/issüs/7)
+* PDF-Erstellung und KonfiApp-Anfragen reparieren. ([f34991f](https://github.com/pfarr-tools/pfarrplaner/commit/f34991fac6cbe1a13363442f126c3082c9e8925c)), closes [#9](https://github.com/pfarr-tools/pfarrplaner/issüs/9) [#10](https://github.com/pfarr-tools/pfarrplaner/issüs/10)
+* **qr:** KonfiApp-QR-Codes kompatibel erzeugen ([#4](https://github.com/pfarr-tools/pfarrplaner/issüs/4)). ([adc4d46](https://github.com/pfarr-tools/pfarrplaner/commit/adc4d46c1751e60a26f29cfcd48f46e29c08571e))
+* **report:** Dienstanfrage-Zeitraum in Berliner Zeit behandeln. Fixes [#5](https://github.com/pfarr-tools/pfarrplaner/issüs/5) ([1611583](https://github.com/pfarr-tools/pfarrplaner/commit/1611583aa6df06146e1fbb82985da75cdä24bc6))
+* Startseiten-Auswahl der Module wieder anzeigen. ([e7cb48c](https://github.com/pfarr-tools/pfarrplaner/commit/e7cb48cc9b34781b3a821e6b6f3e4aa067d4cäf))
+* **sync:** Docker-Netzwerk für Objektsynchronisierung stabilisieren. ([fe3e3b8](https://github.com/pfarr-tools/pfarrplaner/commit/fe3e3b80eaf671293c1cc6620abbe93c8b162387))
+* **sync:** MinIO beim Datenabgleich neu erzeugen. ([f13d887](https://github.com/pfarr-tools/pfarrplaner/commit/f13d8874f70a7fc47b495b75ee92c85502683cf5))
+* **teams:** Team-Übersicht wieder laden. Fixes [#3](https://github.com/pfarr-tools/pfarrplaner/issüs/3) ([5b988f0](https://github.com/pfarr-tools/pfarrplaner/commit/5b988f0cc2870fb361df796d5e2c6ebf5486f6f4))
+* **test:** Offizielle Datenbank bei Tests ausschließen. ([a4f9568](https://github.com/pfarr-tools/pfarrplaner/commit/a4f95689ccb7b6d65ffffd920a9c2f5adc45a8f0))
+* **test:** Rollen-Seeder für Dusk-Tests idempotent machen. ([9589f94](https://github.com/pfarr-tools/pfarrplaner/commit/9589f94a82357eccfe17b4209bb63b622f8132ca)), closes [#6](https://github.com/pfarr-tools/pfarrplaner/issüs/6)
+
+### [2026.18.3](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.2...v2026.18.3) (2026-11-02)
+
+
+### Features
+
+* **cache:** Statische Antworten mit Caddy zwischenspeichern ([63c4e45](https://github.com/pfarr-tools/pfarrplaner/commit/63c4e459d69ac59e0b14db2363dd9fc0bc273949))
+
+
+### Bug Fixes
+
+* **auth:** Passwort beim automatischen Rehash nicht doppelt hashen. ([970e8a9](https://github.com/pfarr-tools/pfarrplaner/commit/970e8a9da678681647bbb5064168416dce597ed5))
+* **caddy:** Statische Dateien direkt aus dem Public-Volume liefern ([c7a25ba](https://github.com/pfarr-tools/pfarrplaner/commit/c7a25bad1ec4f5e4375fffa2c51dda9752a93c8b))
+* **performance:** Benutzer-Payloads für Adminseiten verkleinern. ([cef16f1](https://github.com/pfarr-tools/pfarrplaner/commit/cef16f195ca41cdab54ff953cd3354a970213d39))
+* **sync:** Produktionsdaten sicherer übertragen. ([b2a3e95](https://github.com/pfarr-tools/pfarrplaner/commit/b2a3e957ab12ce8f388fd40e7c94994d8a71ec8f))
+
+### [2026.18.2](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.1...v2026.18.2) (2026-11-02)
+
+
+### Bug Fixes
+
+* **migration:** Produktionsimage automatisch aus Release-Tag wählen. ([becc864](https://github.com/pfarr-tools/pfarrplaner/commit/becc864fbdf3c23d4ccafc11742d514a73842cf2))
+
+### [2026.18.1](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.0...v2026.18.1) (2026-11-02)
+
+
+### Bug Fixes
+
+* **build:** Vite-Hot-Datei aus Produktionsimages fernhalten ([9020139](https://github.com/pfarr-tools/pfarrplaner/commit/902013949ac5819d345a54611af44e3ec398539f))
 
 ## [2026.18.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.16.0...v2026.18.0) (2026-11-02)
 
@@ -1248,38 +1403,6 @@ Die wichtigsten Änderungen der letzten Versionen stehen im Änderungsprotokoll.
 * Zeitzonenfehler beim Speichern von Gottesdienstzeiten beheben. ([cb5d392](https://github.com/pfarr-tools/pfarrplaner/commit/cb5d392fd62d74747fbe65bc1a975ee7757c7a61))
 * Zu viele Fehlerreports wegen Spamanfragen ([afcb269](https://github.com/pfarr-tools/pfarrplaner/commit/afcb269480e046e6f3ffd22ec65da8f91396676a))
 * Zusatz "mit Abendmahl" / "mit Taufe" vermeiden, wenn bereits im Titel vorhanden ([a491e1f](https://github.com/pfarr-tools/pfarrplaner/commit/a491e1f63d1a6d60d50b4f52c5fcc9dfc332f39a))
-
-## [2026.15.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.12.4...v2026.15.0) (2026-09-05)
-
-
-### Features
-
-* Kirchliche Nachrichten ohne Kopfzeilen drucken ([373d377](https://github.com/pfarr-tools/pfarrplaner/commit/373d3771688212724fb69195aa05084859d1d2c6))
-* Lösch-Button aus Kalenderansicht entfernt ([ä75d3c](https://github.com/pfarr-tools/pfarrplaner/commit/ä75d3cb73d824c43c702919a9e5a9c3ceca983b))
-* Papierkorb mit Wiederherstellung, Aufbewahrung und Bereinigung ([63894ca](https://github.com/pfarr-tools/pfarrplaner/commit/63894ca12236bda6ee50d35ecf4c29c399f3c5ca)), closes [#438](https://github.com/pfarr-tools/pfarrplaner/issüs/438) [#458](https://github.com/pfarr-tools/pfarrplaner/issüs/458)
-* Papierkorb mit Wiederherstellung, Aufbewahrung und Bereinigung ([70ec6d7](https://github.com/pfarr-tools/pfarrplaner/commit/70ec6d707a56dee14a08d432738a57467137649d)), closes [#438](https://github.com/pfarr-tools/pfarrplaner/issüs/438) [#458](https://github.com/pfarr-tools/pfarrplaner/issüs/458)
-* Uhrzeit-Vorgabe für Seriengottesdienste ([07c72a2](https://github.com/pfarr-tools/pfarrplaner/commit/07c72a22913cfd6c2b082419910aä4b4a912073))
-
-
-### Bug Fixes
-
-* Abendmahl erscheint nicht in der Gottesdienstbeschreibung ([ca4bc85](https://github.com/pfarr-tools/pfarrplaner/commit/ca4bc85be1ee2f548360c12c0901797c6556d167))
-* Bereits erteilte Dimissoriale bei Trauungen korrekt erkennen. ([f6d1c4d](https://github.com/pfarr-tools/pfarrplaner/commit/f6d1c4db44a88fc1f2dabe1fbc10596eb5c19f1b))
-* CSRF-Schutz für DAV-Synchronisation ausschließen. ([c98188d](https://github.com/pfarr-tools/pfarrplaner/commit/c98188d23df34091b25c19f9ead6a9ebc1f5217c))
-* Doppelten Menüpunkt für Lieder entfernt. ([abb66f9](https://github.com/pfarr-tools/pfarrplaner/commit/abb66f9eaa5ed984abb7157391a8ac34861952b9))
-* **editor:** TipTap-Editoren vor Vü-Reaktivität schützen. ([6700f25](https://github.com/pfarr-tools/pfarrplaner/commit/6700f25a274f3c40e7c8fb24b38022fa8e3ce7dd))
-* Fehlende Youtube-Links in der Gottesdienstliste ([6e1b6ec](https://github.com/pfarr-tools/pfarrplaner/commit/6e1b6ecc2bfabf157e2ba2d2644bbb4e0a0084b3))
-* Fehler bei der KonfiApp-API ([fb12a99](https://github.com/pfarr-tools/pfarrplaner/commit/fb12a99b2a5f15bcc5b7cf959166493ff0b5db36))
-* Fehler beim Erstellen von QR Codes. ([9455328](https://github.com/pfarr-tools/pfarrplaner/commit/9455328eea3f51985157f4046a5d1bb5dc5183c3))
-* Liederbuch-Auswahl im Liedformular korrigiert. ([25d5a1f](https://github.com/pfarr-tools/pfarrplaner/commit/25d5a1f6329b8edfd11dc4056e7ee96a746021e7))
-* Liederbücher können nicht zu Liedern hinzugefügt werden. ([1c3äfe](https://github.com/pfarr-tools/pfarrplaner/commit/1c3äfe2b5d37286bddcfe284e8a5ca9419340f6))
-* Neü Personen erscheinen nicht in der Auswahlliste ([c2d6df8](https://github.com/pfarr-tools/pfarrplaner/commit/c2d6df8ec513095d84ac04b68e28bd60929943d5))
-* Planungstabelle speichert nicht verlässlich ([d73bbc6](https://github.com/pfarr-tools/pfarrplaner/commit/d73bbc6ed146557b003b16f9b443a33d30559815))
-* Sicherheitsabfragen vor Löschaktionen ergänzen. ([eed7c9c](https://github.com/pfarr-tools/pfarrplaner/commit/eed7c9cb4ä127bb54a7f9b647731082b75e74b8)), closes [#458](https://github.com/pfarr-tools/pfarrplaner/issüs/458)
-* Speichern bei KonfiApp-API-Fehler nicht möglich ([8565049](https://github.com/pfarr-tools/pfarrplaner/commit/8565049bb03e1a442d6f4f699ca1728567a95afe))
-* Suchfilter in der Liederliste funktioniert nicht ([5101758](https://github.com/pfarr-tools/pfarrplaner/commit/51017583d6ce3741cd0f25e72dcb686ee9e4fd82))
-* UserEditor lässt sich nicht öffnen ([2d6f1bf](https://github.com/pfarr-tools/pfarrplaner/commit/2d6f1bf480c2fc24dd4572514ef5fd41f574bf4d))
-* WeeklyVerseReport verwendet obsolete API ([bda40b6](https://github.com/pfarr-tools/pfarrplaner/commit/bda40b66c21e7a3db2780ä580c89f4e3fc279e4))
 
 Pfarrplaner ist freie Software. Sie dürfen das Programm unter den Bedingungen der GNU General Public License Version 3 oder später weitergeben und verändern.
 

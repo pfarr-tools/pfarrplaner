@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.19.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.11...v2026.19.0) (2026-11-09)
+
+
+### Features
+
+* **quality:** Verbindliche Qualitätsprüfungen für neue Änderungen einführen ([1ca413f](https://github.com/pfarr-tools/pfarrplaner/commit/1ca413fef9a514e3acf0e5c614cc111e1e0a0583)), closes [#27](https://github.com/pfarr-tools/pfarrplaner/issues/27)
+* **quality:** Verbindliche Qualitätsstandards ergänzen ([eaf5148](https://github.com/pfarr-tools/pfarrplaner/commit/eaf51481730c511fed52285eac5995312ad2d600)), closes [#27](https://github.com/pfarr-tools/pfarrplaner/issues/27)
+* **rechte:** Rollen und Berechtigungen zentral verwalten ([2e6d5ad](https://github.com/pfarr-tools/pfarrplaner/commit/2e6d5ad2c9a98a8d491ece6974febe8272ebf718)), closes [#6](https://github.com/pfarr-tools/pfarrplaner/issues/6)
+* **werbung:** Werbung-Editor und Uploads fertigstellen ([6e8c8bf](https://github.com/pfarr-tools/pfarrplaner/commit/6e8c8bf934e2f2aa720eaa1bb991e3e7e0ac15bb)), closes [#31](https://github.com/pfarr-tools/pfarrplaner/issues/31) [#32](https://github.com/pfarr-tools/pfarrplaner/issues/32)
+
+
+### Bug Fixes
+
+* **absences:** Nicht genehmigte Urlaube sichtbar hervorheben. ([119f9ed](https://github.com/pfarr-tools/pfarrplaner/commit/119f9ed46d1fddcaaecd50682d80317ac73ecbd6))
+* **absences:** Urlaubsplanung und Abwesenheiten korrigieren. ([d113a4d](https://github.com/pfarr-tools/pfarrplaner/commit/d113a4de0897bfd0cb5439e4627b9af86ad39eae)), closes [#33](https://github.com/pfarr-tools/pfarrplaner/issues/33) [#34](https://github.com/pfarr-tools/pfarrplaner/issues/34) [#35](https://github.com/pfarr-tools/pfarrplaner/issues/35) [#36](https://github.com/pfarr-tools/pfarrplaner/issues/36)
+* **backup:** App beim Backup nicht mehr stoppen. ([acb083a](https://github.com/pfarr-tools/pfarrplaner/commit/acb083a56258b5bb9afb14cec14c53b9cfa9901b)), closes [#11](https://github.com/pfarr-tools/pfarrplaner/issues/11)
+* **ci:** Redis-Healthcheck in der Entwicklung stabilisieren. ([0dbf859](https://github.com/pfarr-tools/pfarrplaner/commit/0dbf85996c8f9c370a2b6f41299d5ea213fe325b)), closes [#48](https://github.com/pfarr-tools/pfarrplaner/issues/48)
+* **glitchtip:** Produktionsfehler in Exporten und Passwort-Reset beheben. Fixes [#39](https://github.com/pfarr-tools/pfarrplaner/issues/39) ([7e7b91c](https://github.com/pfarr-tools/pfarrplaner/commit/7e7b91c8e2f351aa6ce666e5651c925bfe3af940))
+* **install:** Installationspfad für bestehende Umgebungen verbessern. ([6b3e75f](https://github.com/pfarr-tools/pfarrplaner/commit/6b3e75ff2c90b72d6e874315ed08130342b27236))
+* **kalender:** Selbstzuordnung nur bei Berechtigung anzeigen. ([2217e78](https://github.com/pfarr-tools/pfarrplaner/commit/2217e78caeffc9b2673f0907bc5a3dcc7b72587b)), closes [#37](https://github.com/pfarr-tools/pfarrplaner/issues/37)
+* **liturgie:** Fehlende Alternativdaten sicher abfangen. ([0b49608](https://github.com/pfarr-tools/pfarrplaner/commit/0b496086dcb8dae2c91751aff697b231733425ff)), closes [#30](https://github.com/pfarr-tools/pfarrplaner/issues/30)
+* **qualitaet:** Bestehende Format- und Analysefehler beheben. ([2187ad9](https://github.com/pfarr-tools/pfarrplaner/commit/2187ad9bfdedd6a6b507ae65ff5e7566f8e5d4cd))
+* **rechte:** Gottesdienst- und Passwortschutz korrigieren. ([9e42a96](https://github.com/pfarr-tools/pfarrplaner/commit/9e42a9691278ea1b04037e18ab70e1c90dce89a8)), closes [#37](https://github.com/pfarr-tools/pfarrplaner/issues/37)
+* **scheduler:** Anwendungsaufgaben zentral planen. Fixes [#28](https://github.com/pfarr-tools/pfarrplaner/issues/28) ([1b73dfe](https://github.com/pfarr-tools/pfarrplaner/commit/1b73dfe0de1cff6a5a773aea0b5015767ef78cbb))
+* **test:** Bestehende Testfehler beheben. ([9783a94](https://github.com/pfarr-tools/pfarrplaner/commit/9783a94bd20af879269214f3e2c80525114d333d)), closes [#45](https://github.com/pfarr-tools/pfarrplaner/issues/45)
+* **test:** Dusk-Testlauf stabilisieren. ([f9e22b6](https://github.com/pfarr-tools/pfarrplaner/commit/f9e22b60b197421dcbb7683f2acb4bb48bf52e03)), closes [#45](https://github.com/pfarr-tools/pfarrplaner/issues/45)
+* **test:** Unsichere Testaufrufe blockieren. Fixes [#43](https://github.com/pfarr-tools/pfarrplaner/issues/43) ([d76f45b](https://github.com/pfarr-tools/pfarrplaner/commit/d76f45b575354f359978d53a3b4f17da88bddd92))
+* **test:** Veraltete Manual-Prüfung robust machen. ([6cde303](https://github.com/pfarr-tools/pfarrplaner/commit/6cde30303321c0f37d530206cedbabce69fb8cb3))
+* **word:** Blockquotes linksbündig exportieren. ([cbb7a86](https://github.com/pfarr-tools/pfarrplaner/commit/cbb7a866b631d78c9f6b438f6b055a4245bc6df9)), closes [#38](https://github.com/pfarr-tools/pfarrplaner/issues/38)
+
 ### [2026.18.12](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.11...v2026.18.12) (2026-11-05)
 
 
