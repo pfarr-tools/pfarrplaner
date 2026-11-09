@@ -113,7 +113,7 @@ DKIM-Schlüssel und aktiviert beim normalen Produktionsstart automatisch das
 Compose-Profil `mail`:
 
 ```sh
-./planer bootstrap
+./planer install
 ./planer up -d
 ./planer status postfix
 ./planer logs postfix

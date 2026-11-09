@@ -68,11 +68,20 @@ example_keys="$(grep -E '^[A-Z][A-Z0-9_]*=' "$TEST_ROOT/.env.example" | cut -d= 
 generated_keys="$(grep -E '^[A-Z][A-Z0-9_]*=' "$TEST_ROOT/.env" | cut -d= -f1 | sort)"
 test "$example_keys" = "$generated_keys"
 while IFS= read -r key; do
-  grep -B1 "^${key}=" "$TEST_ROOT/.env" | head -1 | grep -q '^# '
+  grep -q "^${key}=" "$TEST_ROOT/.env"
 done <<<"$generated_keys"
 
-printf 'APP_KEY=existing\n' > "$TEST_ROOT/.env"
-PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" "$ROOT/scripts/bootstrap.sh" --defaults >/dev/null
+printf 'APP_ENV=production\nAPP_URL=https://existing.example\nCUSTOM_VALUE=keep\nAPP_KEY=existing\nDB_PASSWORD=existing-db-password\n' > "$TEST_ROOT/.env"
+cp "$TEST_ROOT/.env" "$TEST_ROOT/.env.before"
+printf 'n\n' | PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" script -qec "bash '$ROOT/scripts/bootstrap.sh' --dev" /dev/null >/dev/null 2>&1
+cmp "$TEST_ROOT/.env" "$TEST_ROOT/.env.before"
+
+printf 'y\nn\n\n\n\n\n\n\n\n\n\n\n\n\n\nn\n' |
+  PLANER_BOOTSTRAP_ROOT="$TEST_ROOT" script -qec "bash '$ROOT/scripts/bootstrap.sh' --dev" /dev/null >/dev/null 2>&1
+grep -qx 'APP_URL=https://existing.example' "$TEST_ROOT/.env"
+grep -qx 'APP_ENV=production' "$TEST_ROOT/.env"
+grep -qx 'CUSTOM_VALUE=keep' "$TEST_ROOT/.env"
 grep -qx 'APP_KEY=existing' "$TEST_ROOT/.env"
+grep -qx 'DB_PASSWORD=existing-db-password' "$TEST_ROOT/.env"
 
 echo 'bootstrap tests passed'

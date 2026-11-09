@@ -51,6 +51,11 @@ PLANER_ROUTING_LOG="$TEST_ROOT/log" run_and_assert_rejected dev exec app php art
 printf 'compose -f %s/compose.production.yaml ps\n' "$ROOT" > "$TEST_ROOT/production-alias"
 PLANER_ROUTING_LOG="$TEST_ROOT/log" run_and_assert "$TEST_ROOT/production-alias" prod ps
 
+"$ROOT/planer" install --help > "$TEST_ROOT/install-help"
+"$ROOT/planer" bootstrap --help > "$TEST_ROOT/bootstrap-help"
+grep -q './planer install' "$TEST_ROOT/install-help"
+grep -q './planer install' "$TEST_ROOT/bootstrap-help"
+
 grep -q 'legacy-migrate.sh.*"\$@" --prod' "$ROOT/planer"
 grep -q 'PLANER_MANUAL_DEV=1' "$ROOT/planer"
 

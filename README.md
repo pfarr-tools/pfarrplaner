@@ -51,12 +51,13 @@ Entwicklungsbetrieb sollten die konfigurierten Ports frei sein; sie können in
 ## Produktionsumgebung starten
 
 ```sh
-./planer bootstrap
+./planer install
 ./planer up -d --build
 ./planer status
 ```
 
-`bootstrap` richtet die Produktionsinstanz interaktiv ein. Dabei werden
+`install` richtet die Produktionsinstanz interaktiv ein. `bootstrap` bleibt als
+kompatibler Alias erhalten. Dabei werden
 `APP_PROVIDER`, der Administrator, optionale Backup-Ziele, Mailversand und
 wahlweise ein Backup- oder Legacy-Import abgefragt. Wenn keine Daten importiert
 werden, wird ein initialer Super-Administrator angelegt.
@@ -64,7 +65,7 @@ werden, wird ein initialer Super-Administrator angelegt.
 Für Entwicklung wird der Modus ausdrücklich angegeben:
 
 ```sh
-./planer bootstrap --dev
+./planer install --dev
 ./planer dev up -d --build
 ./planer dev status
 ```

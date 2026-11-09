@@ -6,7 +6,7 @@ COMPOSE=(docker compose -f "$ROOT/compose.production.yaml")
 LOCK="$ROOT/.planer-production-update.lock"
 
 die() { echo "Fehler: $*" >&2; exit 2; }
-[[ -f "$ROOT/.env" ]] || die '.env fehlt. Erst ./planer bootstrap ausführen.'
+[[ -f "$ROOT/.env" ]] || die '.env fehlt. Erst ./planer install ausführen.'
 grep -Eq '^APP_ENV=production([[:space:]]|$)' "$ROOT/.env" || die 'APP_ENV muss production sein.'
 
 postfix_services=()

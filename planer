@@ -24,7 +24,8 @@ Produktion (Standard):
   ./planer artisan <Befehl>
   ./planer backup create|list|verify|restore|prune|check|init
   ./planer migrate legacy <Pfad> [Optionen]
-  ./planer bootstrap [--dev]
+  ./planer install [--dev]
+  ./planer bootstrap [--dev] (Alias)
 
 Entwicklung:
   ./planer dev up|down|restart|status|logs|exec [Argumente]
@@ -184,7 +185,7 @@ run_production() {
       shift
       exec "$ROOT/scripts/legacy-migrate.sh" "$@" --prod
       ;;
-    bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
+    install|bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
     help|--help|-h) usage ;;
   test|composer|npm|pint|format|format:check|analyse|docs:check|lint|quality|complexity:check|fresh)
       echo "Fehler: '$command' ist ein Entwicklungsbefehl. Verwende ./planer dev $command ..." >&2
@@ -199,7 +200,7 @@ shift || true
 case "$COMMAND" in
   dev) run_dev "$@" ;;
   prod|production) run_production "$@" ;;
-  bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
+  install|bootstrap) exec "$ROOT/scripts/bootstrap.sh" "$@" ;;
   manual|manual:build|manual:dusk|manual:site|manual:all|manual:deploy|manual:source-publish)
     run_dev "$COMMAND" "$@" ;;
   up|down|restart|status|ps|logs|exec|shell|artisan|data|backup|release|update|build|migrate|test|composer|npm|pint|fresh)

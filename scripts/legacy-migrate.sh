@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="${PLANER_MIGRATE_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 ENV_READER="$ROOT/scripts/legacy-env.sh"
 usage() {
   cat <<'EOF'
@@ -59,9 +59,19 @@ if [[ "$target" == prod || "$target" == demo ]]; then
   image_ref="${PFARRPLANER_IMAGE:-$(bash "$ENV_READER" "$ROOT/.env" PFARRPLANER_IMAGE 2>/dev/null || true)}"
   if [[ -z "$image_ref" ]]; then
     release_tag="$(git -C "$ROOT" describe --tags --exact-match HEAD 2>/dev/null || true)"
-    [[ -n "$release_tag" ]] || die 'Für --prod/--demo muss PFARRPLANER_IMAGE gesetzt sein oder HEAD exakt auf einem Release-Tag stehen.'
     image_repository="${PFARRPLANER_IMAGE_REPOSITORY:-pfarrtools/pfarrplaner}"
-    image_ref="$image_repository:$release_tag"
+    if [[ -n "$release_tag" ]]; then
+      image_ref="$image_repository:$release_tag"
+    else
+      commit_ref="$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)"
+      [[ -n "$commit_ref" ]] || die 'Der aktuelle Commit konnte nicht ermittelt werden.'
+      image_ref="pfarrplaner-app:commit-$commit_ref"
+      if (( ! dry_run )); then
+        command -v docker >/dev/null || die 'Docker wird für die Installation eines ungetaggten Commits benötigt.'
+        echo "  Produktionsbild aus aktuellem Commit bauen: $image_ref"
+        docker build --pull --target production --tag "$image_ref" "$ROOT"
+      fi
+    fi
   fi
   export PFARRPLANER_IMAGE="$image_ref"
   echo "  Produktionsbild: $PFARRPLANER_IMAGE"

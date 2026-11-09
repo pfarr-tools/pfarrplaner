@@ -19,7 +19,7 @@ Voraussetzungen sind Docker Engine mit Compose Plugin, mindestens 2 CPU-Kerne,
 mit TLS sowie ein unabhängiges Backup-Ziel außerhalb des Servers.
 
 ```sh
-./planer bootstrap
+./planer install
 ```
 
 Für eine Produktionsumgebung wird der Produktionsmodus verwendet. Er fragt die
@@ -28,19 +28,20 @@ vollständig kommentierte `.env` mit allen verfügbaren Betriebs-, Backup-,
 Mail-Relay- und Integrationsvariablen an:
 
 ```sh
-./planer bootstrap
+./planer install
 ./planer up -d --build
 ./planer status
 ```
 
-Der Produktionsbootstrap setzt das Compose-Projekt fest auf `pfarrplaner` und
+Die Installation setzt das Compose-Projekt fest auf `pfarrplaner` und
 fragt `APP_PROVIDER`, den ersten Administrator, Backup-Ziele und den Mailmodus
 ab. Zusätzlich fragt er die optionale Sentry-DSN (`SENTRY_LARAVEL_DSN`) und den
 Sentry-Tag (`SENTRY_TAG`) für die Fehlerüberwachung ab. Optional kann
 anschließend ein Restic-Backup oder eine Legacy-Installation
 übernommen werden. Ohne Datenimport wird ein initialer
 `Super-Administrator:in` angelegt. Entwicklung verwendet ausdrücklich
-`./planer bootstrap --dev` und `./planer dev ...`.
+`./planer install --dev` und `./planer dev ...`. Der bisherige Befehl
+`./planer bootstrap` bleibt als Alias erhalten.
 
 Bei der Datenübernahme startet der Bootstrap die Produktionsdienste zunächst
 selbst. Für ein Backup werden Ziel und Backup-ID abgefragt und der Restore nur
@@ -62,7 +63,7 @@ kann der Abgleich zunächst ohne Datenbankänderung geprüft werden:
 Der Abgleich ist idempotent und löscht unbekannte bestehende Rollen und
 Berechtigungen nicht automatisch.
 
-`./planer bootstrap --dev --defaults` ist für automatisierte
+`./planer install --dev --defaults` ist für automatisierte
 Entwicklungsumgebungen geeignet; mit `--defaults` werden synthetische
 Produktionsdefaults verwendet. Vor dem öffentlichen Betrieb müssen insbesondere `APP_URL`,
 Backup-Ziel, Mail-Relay und `HORIZON_ALLOWED_EMAILS` geprüft werden. Die
@@ -107,8 +108,12 @@ Leerzeichen werden entfernt und die Prüfung ist unabhängig von Groß- und
 Kleinschreibung. Eine leere Liste gewährt in Produktionsumgebungen niemandem
 Zugriff auf `/horizon`.
 
-`.env` wird nur angelegt, wenn sie fehlt, und niemals überschrieben. Das
-Bootstrap erzeugt beim ersten Anlegen zufällige Werte für `APP_KEY`,
+`.env` wird nur angelegt, wenn sie fehlt, und niemals ohne interaktive
+Bestätigung verändert. Bei einer vorhandenen `.env` ist die Standardantwort auf
+die Fortsetzungsfrage Nein. Nach der Bestätigung werden vorhandene Werte als
+Eingabe-Defaults verwendet; unbekannte Werte bleiben erhalten. Domain-Werte und
+Sicherheitsgeheimnisse werden zusätzlich jeweils separat zur Ersetzung bestätigt.
+Die Installation erzeugt beim ersten Anlegen zufällige Werte für `APP_KEY`,
 `DATABASE_KEY`, `TOKEN_SALT`, die MariaDB-/Redis-Passwörter, den MinIO-
 Secret-Schlüssel und die Soketi-Schlüssel. Externe Zugangsdaten wie Mail-,
 Stripe- oder andere Provider-Geheimnisse werden nicht automatisch gesetzt.
@@ -336,8 +341,9 @@ verhindert, dass ein fehlender Demo-Preflight als erfolgreicher Import endet.
 Bei `--prod` und `--demo` verwendet der Import automatisch das Produktionsimage
 des exakten Release-Tags auf `HEAD`. Alternativ kann mit
 `PFARRPLANER_IMAGE=pfarrtools/pfarrplaner:vVERSION` ein Image ausdrücklich
-vorgegeben werden. Ein ungetaggter Produktionsstand ohne diese Variable wird
-abgelehnt; das veränderliche Image `:latest` wird nicht automatisch verwendet.
+vorgegeben werden. Ein ungetaggter Produktionsstand wird für den Import als
+lokales Image `pfarrplaner-app:commit-<kurzer-commit>` gebaut; ein veränderliches
+Image `:latest` wird nicht automatisch verwendet.
 
 `--database` und `--user` sind optionale Überschreibungen. Standardmäßig liest der
 Legacy-Import `DB_DATABASE`, `DB_USERNAME`, `DB_HOST`, `DB_PORT` und
