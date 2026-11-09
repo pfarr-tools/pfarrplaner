@@ -40,9 +40,13 @@ run_backup() {
 }
 
 running_writers=()
+maintenance_set=0
 restore_writers() {
   if ((${#running_writers[@]})); then
-    "${COMPOSE[@]}" start "${running_writers[@]}" >/dev/null
+    if ! "${COMPOSE[@]}" start "${running_writers[@]}" >/dev/null; then
+      echo 'Warnung: Zuvor laufende Backup-Dienste konnten nicht vollständig gestartet werden.' >&2
+      return 1
+    fi
   fi
 }
 
@@ -50,7 +54,7 @@ was_running() {
   [[ -n "$("${COMPOSE[@]}" ps -q --status running "$1" 2>/dev/null)" ]]
 }
 
-quiesce() {
+quiesce_restore() {
   running_writers=()
   for service in app horizon scheduler; do
     if was_running "$service"; then
@@ -60,6 +64,73 @@ quiesce() {
   ((${#running_writers[@]})) && "${COMPOSE[@]}" stop "${running_writers[@]}" >/dev/null
 }
 
+quiesce_backup_workers() {
+  running_writers=()
+  for service in horizon scheduler; do
+    if was_running "$service"; then
+      running_writers+=("$service")
+    fi
+  done
+  ((${#running_writers[@]})) && "${COMPOSE[@]}" stop "${running_writers[@]}" >/dev/null
+}
+
+app_in_maintenance() {
+  local state
+  if ! state=$("${COMPOSE[@]}" exec -T app php artisan tinker \
+    --execute='echo app()->isDownForMaintenance() ? "1" : "0";' 2>/dev/null); then
+    echo 'Fehler: Laravel-Wartungsstatus konnte nicht ermittelt werden.' >&2
+    return 2
+  fi
+  case "$state" in
+    *1*) return 0 ;;
+    *0*) return 1 ;;
+    *)
+      echo 'Fehler: Laravel-Wartungsstatus ist unbekannt.' >&2
+      return 2
+      ;;
+  esac
+}
+
+enter_backup_maintenance() {
+  if ! was_running app; then
+    return
+  fi
+  if app_in_maintenance; then
+    return
+  fi
+  local maintenance_status=$?
+  ((maintenance_status == 1)) || return "$maintenance_status"
+  "${COMPOSE[@]}" exec -T app php artisan down >/dev/null
+  maintenance_set=1
+}
+
+leave_backup_maintenance() {
+  if ((maintenance_set)); then
+    if ! "${COMPOSE[@]}" exec -T app php artisan up >/dev/null; then
+      echo 'Warnung: Laravel-Wartungsmodus konnte nicht aufgehoben werden.' >&2
+      return 1
+    fi
+    maintenance_set=0
+  fi
+}
+
+cleanup_backup() {
+  local status=$?
+  local cleanup_status=0
+  set +e
+  if [[ -n "${backup_pid:-}" ]] && kill -0 "$backup_pid" 2>/dev/null; then
+    kill "$backup_pid" 2>/dev/null
+    wait "$backup_pid" 2>/dev/null
+  fi
+  leave_backup_maintenance || cleanup_status=1
+  restore_writers || cleanup_status=1
+  rm -f "$release_file" "$ready_file"
+  if ((status == 0 && cleanup_status != 0)); then
+    status=1
+  fi
+  exit "$status"
+}
+
 command_name="${1:-help}"
 shift || true
 case "$command_name" in
@@ -67,8 +138,11 @@ case "$command_name" in
     release_file="$ROOT/backups/.backup-release"
     ready_file="$ROOT/backups/.backup-ready"
     rm -f "$release_file" "$ready_file"
-    trap 'restore_writers; rm -f "$release_file" "$ready_file"' EXIT INT TERM
-    quiesce
+    trap cleanup_backup EXIT
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
+    enter_backup_maintenance
+    quiesce_backup_workers
     "${COMPOSE[@]}" run --rm --no-deps -T \
       -e BACKUP_RELEASE_FILE=/backups/.backup-release \
       -e BACKUP_READY_FILE=/backups/.backup-ready \
@@ -86,6 +160,7 @@ case "$command_name" in
       sleep 1
     done
     [[ -f "$ready_file" ]] || { echo 'Fehler: Backup-Erfassung wurde nicht freigegeben.' >&2; exit 2; }
+    leave_backup_maintenance
     restore_writers
     touch "$release_file"
     wait "$backup_pid" || {
@@ -101,7 +176,7 @@ case "$command_name" in
     if ((apply)); then
       [[ " ${*} " == *' --yes '* ]] || { echo 'Fehler: --apply benötigt zusätzlich --yes.' >&2; exit 2; }
       trap 'restore_writers' EXIT INT TERM
-      quiesce
+      quiesce_restore
     fi
     run_backup restore "$@"
     ;;

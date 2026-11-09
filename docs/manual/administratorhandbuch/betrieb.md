@@ -42,10 +42,14 @@ der Liturgiekalender um 05:01 Uhr aktualisiert und abgelaufene Anmeldungen um
 05:10 Uhr gelöscht.
 
 Backups gehören nicht zu diesen Laravel-Aufgaben. `./planer backup create`
-verwendet den separaten Backup-Container und hält App, Horizon und Scheduler
-während der Sicherung gemeinsam an. Backup-Erstellung, Aufbewahrung und
-Prüfung müssen deshalb weiterhin über den dokumentierten Root-Workflow und
-einen passenden Host-Timer ausgelöst werden.
+verwendet den separaten Backup-Container. Während der lokalen Erfassung sperrt
+der Root-Workflow den HTTP- und API-Zugriff über den Laravel-Wartungsmodus und
+hält nur die zuvor laufenden Worker von Horizon und Scheduler an. MariaDB und
+MinIO bleiben verfügbar. Nach der lokalen Erfassung wird die Anwendung wieder
+freigegeben; der Restic-Upload darf danach weiterlaufen. Ein bereits aktiver
+Wartungsmodus sowie zuvor gestoppte Dienste werden nicht ungefragt verändert.
+Backup-Erstellung, Aufbewahrung und Prüfung müssen weiterhin über den
+dokumentierten Root-Workflow und einen passenden Host-Timer ausgelöst werden.
 
 ### Dateispeicher
 

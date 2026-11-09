@@ -37,6 +37,31 @@ grep -q 'mc.*mirror' "$ROOT/docker/backup/backup.py"
 ! grep -q 'spatie/laravel-backup\|spatie/db-dumper' "$ROOT/src/composer.json" "$ROOT/src/composer.lock"
 grep -q 'Backups sind nicht konfiguriert' "$ROOT/scripts/backup.sh"
 grep -q 'run --build --rm --no-deps backup' "$ROOT/scripts/backup.sh"
+grep -q 'php artisan down' "$ROOT/scripts/backup.sh"
+grep -q 'php artisan up' "$ROOT/scripts/backup.sh"
+grep -q 'isDownForMaintenance' "$ROOT/scripts/backup.sh"
+! grep -q 'storage/framework/down' "$ROOT/scripts/backup.sh"
+grep -q 'maintenance_set' "$ROOT/scripts/backup.sh"
+grep -q 'quiesce_backup_workers' "$ROOT/scripts/backup.sh"
+grep -q 'for service in horizon scheduler' "$ROOT/scripts/backup.sh"
+! grep -q 'quiesce$' "$ROOT/scripts/backup.sh"
+! grep -q 'quiesce.*app' "$ROOT/scripts/backup.sh"
+grep -q 'trap.*restore' "$ROOT/scripts/backup.sh"
+grep -q 'Wartungsstatus konnte nicht ermittelt werden' "$ROOT/scripts/backup.sh"
+grep -q 'Wartungsmodus konnte nicht aufgehoben werden' "$ROOT/scripts/backup.sh"
+python3 - "$ROOT/scripts/backup.sh" <<'PY'
+from pathlib import Path
+import sys
+
+source = Path(sys.argv[1]).read_text()
+workers = source.split("quiesce_backup_workers()", 1)[1].split("app_in_maintenance()", 1)[0]
+assert "for service in horizon scheduler" in workers
+assert "app" not in workers
+create = source.split("  create)", 1)[1].split("  restore)", 1)[0]
+assert create.index("enter_backup_maintenance") < create.index("quiesce_backup_workers")
+assert create.index("leave_backup_maintenance") < create.index("touch \"$release_file\"")
+assert "kill \"$backup_pid\"" in source
+PY
 grep -q 'networks: \[backend, mail-egress\]' "$ROOT/compose.production.yaml"
 grep -q 'sftp:BENUTZER@HOST:/absoluter/remote/pfad' "$ROOT/scripts/bootstrap-backup.sh"
 grep -q 'SFTP-Passwort' "$ROOT/scripts/bootstrap-backup.sh"

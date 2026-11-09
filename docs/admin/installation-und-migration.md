@@ -193,12 +193,24 @@ Rückfallpunkt erhalten.
 
 ## Backups und Restore
 
-`./planer backup create` startet einen kurzlebigen Backup-Container. Dieser
-quiesziert App, Horizon und Scheduler, erstellt eine MariaDB-Sicherung und
-exportiert den Live-MinIO-Bucket, legt beides mit Deployment-Konfiguration und
+`./planer backup create` startet einen kurzlebigen Backup-Container. Wenn die
+App läuft, sperrt der Root-Befehl während der lokalen Erfassung den HTTP- und
+API-Zugriff über den Laravel-Wartungsmodus. Horizon und Scheduler werden nur
+dann angehalten, wenn sie vorher liefen; MariaDB und MinIO bleiben verfügbar.
+Nach der lokalen Erfassung wird die App wieder freigegeben und die zuvor
+laufenden Worker werden gestartet, während der Backup-Container den Restic-
+Upload fortsetzt. Die Erfassung erstellt eine MariaDB-Sicherung und exportiert
+den Live-MinIO-Bucket, legt beides mit Deployment-Konfiguration und
 `manifest.json` in einem geschützten Staging-Verzeichnis ab und lädt denselben
 unveränderlichen Satz in jedes aktivierte Restic-Repository. Restic verschlüsselt
 und versioniert die Snapshots; AWS S3 ist kein Backup-Backend.
+
+Ein bereits vor dem Backup aktivierter Laravel-Wartungsmodus bleibt bestehen.
+Bei einem Fehler oder Abbruch stellt die Aufräumlogik den zuvor aktiven
+Wartungs- und Dienstzustand soweit möglich wieder her. Wenn App, Horizon oder
+Scheduler vorher nicht liefen, werden sie nicht ungefragt gestartet.
+Der App-Healthcheck kann während dieser Wartungsphase erwartungsgemäß
+fehlschlagen; der Container wird deshalb nicht heruntergefahren.
 
 Der aktuelle MinIO-Export sichert Objektinhalt, Schlüssel und Größeninventar.
 MinIO-Versionenhistorie, Tags und Bucket-Metadaten werden nicht als eigene
