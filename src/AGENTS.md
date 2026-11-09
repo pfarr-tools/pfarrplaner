@@ -77,6 +77,18 @@ Controllers have subdirectories for `Api/`, `Auth/`, `Extranet/`.
 - Component slot pattern: `@component('components.ui.card') @slot('cardHeader') ... @endslot @endcomponent`
 - Blade includes registered as aliases in `AppServiceProvider` via `Blade::include()`
 - Inertia.js used for all interactive views; traditional Blade for emails and print layouts
+- Blade-Templates werden mit `blade-formatter` formatiert; die Konfiguration
+  steht in `.bladeformatterrc.json`, die ausgeschlossenen Vendor-Templates in
+  `.bladeignore`.
+- CSS, SCSS und Sass werden mit Prettier formatiert. Die Formatierung und
+  Prüfung erfolgt über `./planer dev format` beziehungsweise
+  `./planer dev format:check`.
+- JSON- und YAML-Dateien unter `src/` werden ebenfalls mit Prettier geprüft;
+  `package-lock.json` bleibt der npm-eigenen Formatierung überlassen.
+- Blade-Direktiven, eingebettetes PHP sowie Mail- und Druck-Markup dürfen durch
+  die Formatierung semantisch nicht verändert werden. Für nachweislich
+  instabile Fremd- oder Kommentarbereiche ist die lokale
+  `blade-formatter-disable`-Direktive zu verwenden und zu begründen.
 - `window.moment` in the frontend is `dayjs` with the `utc` plugin, not Moment Timezone
 - Any user-facing date/time output in frontend, generated files, exports, emails, PDFs, and similar surfaces must be rendered in `Europe/Berlin`
 

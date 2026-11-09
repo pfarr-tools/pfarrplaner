@@ -108,6 +108,11 @@ class AbstractLiturgySheet
         return [];
     }
 
+    /**
+     * Return the footer content for the generated document.
+     *
+     * @return mixed Footer content.
+     */
     protected function getFooter()
     {
         return '<div style="width: 100%; font-size: 8pt; font-family: \'Sarabun Light\', sans-serif; display: flex; justify-content: space-between; align-items: center; padding: 0 15mm;">'
@@ -117,11 +122,22 @@ class AbstractLiturgySheet
               .'</div>';
     }
 
+    /**
+     * Return the view name used for rendering.
+     *
+     * @return string Render view name.
+     */
     protected function getRenderViewName()
     {
         return 'liturgy.sheets.'.strtolower($this->getKey().'.render');
     }
 
+    /**
+     * Build a signature identifying the generated file for a service.
+     *
+     * @param  Service  $service  Service being rendered.
+     * @return string File signature.
+     */
     public function getFileSignature(Service $service)
     {
         if ($service->funerals->count()) {
@@ -159,21 +175,41 @@ class AbstractLiturgySheet
         );
     }
 
+    /**
+     * Return the sheet title.
+     *
+     * @return string Sheet title.
+     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
+    /**
+     * Set the sheet title.
+     *
+     * @param  string  $title  New sheet title.
+     */
     public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
+    /**
+     * Return the sheet icon identifier.
+     *
+     * @return string Icon identifier.
+     */
     public function getIcon(): string
     {
         return $this->icon;
     }
 
+    /**
+     * Set the sheet icon identifier.
+     *
+     * @param  string  $icon  New icon identifier.
+     */
     public function setIcon(string $icon): void
     {
         $this->icon = $icon;
@@ -183,6 +219,11 @@ class AbstractLiturgySheet
      * Return the PDF layout configuration used by the sheet renderer.
      *
      * @return array{format: string, landscape?: bool}
+     */
+    /**
+     * Return the sheet layout configuration.
+     *
+     * @return array<string, mixed> Layout configuration.
      */
     public function getLayout(): array
     {
@@ -199,31 +240,61 @@ class AbstractLiturgySheet
         $this->layout = $layout;
     }
 
+    /**
+     * Return the generated file title.
+     *
+     * @return string File title.
+     */
     public function getFileTitle(): string
     {
         return $this->fileTitle;
     }
 
+    /**
+     * Set the generated file title.
+     *
+     * @param  string  $fileTitle  New file title.
+     */
     public function setFileTitle(string $fileTitle): void
     {
         $this->fileTitle = $fileTitle;
     }
 
+    /**
+     * Return the generated file extension.
+     *
+     * @return string File extension.
+     */
     public function getExtension(): string
     {
         return $this->extension;
     }
 
+    /**
+     * Set the generated file extension.
+     *
+     * @param  string  $extension  New file extension.
+     */
     public function setExtension(string $extension): void
     {
         $this->extension = $extension;
     }
 
+    /**
+     * Determine whether the sheet produces no file.
+     *
+     * @return bool Whether the sheet is not file-based.
+     */
     public function isNotAFile(): bool
     {
         return $this->isNotAFile;
     }
 
+    /**
+     * Set whether the sheet produces no file.
+     *
+     * @param  bool  $isNotAFile  New file-generation flag.
+     */
     public function setIsNotAFile(bool $isNotAFile): void
     {
         $this->isNotAFile = $isNotAFile;
@@ -293,21 +364,41 @@ class AbstractLiturgySheet
         $this->configurationComponent = $configurationComponent;
     }
 
+    /**
+     * Determine whether configuration closes after one interaction.
+     *
+     * @return bool Whether configuration is close-only.
+     */
     public function isConfigurationCloseOnly(): bool
     {
         return $this->configurationCloseOnly;
     }
 
+    /**
+     * Set whether configuration closes after one interaction.
+     *
+     * @param  bool  $configurationCloseOnly  New close-only flag.
+     */
     public function setConfigurationCloseOnly(bool $configurationCloseOnly): void
     {
         $this->configurationCloseOnly = $configurationCloseOnly;
     }
 
+    /**
+     * Determine whether the sheet is restricted to privileged users.
+     *
+     * @return bool Whether privileged access is required.
+     */
     public function isPrivileged(): bool
     {
         return $this->privileged;
     }
 
+    /**
+     * Set whether the sheet is restricted to privileged users.
+     *
+     * @param  bool  $privileged  New privilege flag.
+     */
     public function setPrivileged(bool $privileged): void
     {
         $this->privileged = $privileged;

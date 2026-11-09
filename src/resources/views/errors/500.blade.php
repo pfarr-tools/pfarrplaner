@@ -18,7 +18,8 @@
             <div class="error-reference">
                 <span>Fehlerreferenz</span>
                 <code id="error-reference">{{ $reference }}</code>
-                <button type="button" class="copy-button" onclick="navigator.clipboard?.writeText(document.getElementById('error-reference').textContent)">
+                <button type="button" class="copy-button"
+                    onclick="navigator.clipboard?.writeText(document.getElementById('error-reference').textContent)">
                     Kopieren
                 </button>
             </div>
@@ -27,13 +28,16 @@
         @if (session('feedback_success'))
             <div class="feedback-message success" role="status">Danke! Dein Hinweis wurde übermittelt.</div>
         @elseif (session('feedback_error'))
-            <div class="feedback-message warning" role="status">Der Hinweis konnte gerade nicht automatisch übermittelt werden. Bitte notiere die Fehlerreferenz und wende dich an den Support.</div>
+            <div class="feedback-message warning" role="status">Der Hinweis konnte gerade nicht automatisch übermittelt
+                werden. Bitte notiere die Fehlerreferenz und wende dich an den Support.</div>
         @elseif (preg_match('/^[0-9a-f]{32}$/i', (string) $reference))
             <form class="feedback-form" method="POST" action="{{ route('errors.feedback') }}">
                 @csrf
-                <input type="hidden" name="event_id" value="{{ preg_match('/^[0-9a-f]{32}$/i', (string) $reference) ? $reference : '' }}">
+                <input type="hidden" name="event_id"
+                    value="{{ preg_match('/^[0-9a-f]{32}$/i', (string) $reference) ? $reference : '' }}">
                 <label for="comments">Was ist passiert?</label>
-                <textarea id="comments" name="comments" rows="4" maxlength="5000" required placeholder="Zum Beispiel: Ich habe gerade den Gottesdienstkalender geöffnet …"></textarea>
+                <textarea id="comments" name="comments" rows="4" maxlength="5000" required
+                    placeholder="Zum Beispiel: Ich habe gerade den Gottesdienstkalender geöffnet …"></textarea>
                 <div class="feedback-row">
                     <div>
                         <label for="name">Dein Name <span>(optional)</span></label>
@@ -44,11 +48,14 @@
                         <input id="email" name="email" maxlength="255" type="email">
                     </div>
                 </div>
-                @error('comments')<div class="field-error">{{ $message }}</div>@enderror
+                @error('comments')
+                    <div class="field-error">{{ $message }}</div>
+                @enderror
                 <button class="submit-button" type="submit">Hinweis senden</button>
             </form>
         @else
-            <div class="feedback-message warning" role="status">Bitte notiere die Fehlerreferenz und wende dich an den Support. Eine automatische Zuordnung war gerade nicht möglich.</div>
+            <div class="feedback-message warning" role="status">Bitte notiere die Fehlerreferenz und wende dich an den
+                Support. Eine automatische Zuordnung war gerade nicht möglich.</div>
         @endif
 
         <a class="back-link" href="{{ url('/') }}">Zurück zu Pfarrplaner</a>

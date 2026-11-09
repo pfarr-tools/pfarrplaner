@@ -27,58 +27,58 @@
     <meta name="msapplication-config" content="/img/favicons/browserconfig.xml">
     <meta name="theme-color" content="#ffffff">
 </head>
-<body
-    class="notranslate hold-transition layout-fixed sidebar-expand-lg sidebar-mini sidebar-collapse bg-body-tertiary">
+<body class="notranslate hold-transition layout-fixed sidebar-expand-lg sidebar-mini sidebar-collapse bg-body-tertiary">
     @inertia
-<!-- ./wrapper -->
+    <!-- ./wrapper -->
 
-<!-- REQUIRED SCRIPTS -->
+    <!-- REQUIRED SCRIPTS -->
 
-<!-- jQuery -->
-<script>
-    @auth
+    <!-- jQuery -->
+    <script>
+        @auth
         window.Laravel = {!! json_encode([
-       'csrfToken' => csrf_token(),
-       'apiToken' => Auth::user()->api_token ?? null,
-       ]); !!};
-    @endauth
+            'csrfToken' => csrf_token(),
+            'apiToken' => Auth::user()->api_token ?? null,
+        ]) !!};
+        @endauth
         @guest
         window.Laravel = {};
-    @endguest
+        @endguest
 
         window.Laravel.loggedIn = {{ json_encode(!Auth::guest()) }};
-    window.Laravel.timeout = {{ (config('session.lifetime')*60000)-30000 }};
-    window.Laravel.expires = new Date('{!! \Carbon\Carbon::now()->addMinutes((int)config('session.lifetime'))->toIso8601String() !!}');
-    @auth
-    window.Laravel.permissions = {!!  json_encode(Auth::user()->getAllPermissions()->pluck('name')) !!};
-    @endauth
-    @guest
+        window.Laravel.timeout = {{ config('session.lifetime') * 60000 - 30000 }};
+        window.Laravel.expires = new Date('{!! \Carbon\Carbon::now()->addMinutes((int) config('session.lifetime'))->toIso8601String() !!}');
+        @auth
+        window.Laravel.permissions = {!! json_encode(Auth::user()->getAllPermissions()->pluck('name')) !!};
+        @endauth
+        @guest
         window.Laravel.permissions = [];
-    @endguest
+        @endguest
 
-    window.Laravel.assetUrl = '{{ asset('') }}';
-
-</script>
-<!-- other libraries -->
-@yield('scripts')
-@if(env('MATOMO_SITE') >0)
-    <script>
-        var _paq = window._paq || [];
-        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
-        (function () {
-            var u = "//matomo.pfarrplaner.de/";
-            _paq.push(['setTrackerUrl', u + 'matomo.php']);
-            _paq.push(['setSiteId', '{{ env('MATOMO_SITE') }}']);
-            var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-            g.type = 'text/javascript';
-            g.async = true;
-            g.defer = true;
-            g.src = u + 'matomo.js';
-            s.parentNode.insertBefore(g, s);
-        })();
+        window.Laravel.assetUrl = '{{ asset('') }}';
     </script>
-@endif
+    <!-- other libraries -->
+    @yield('scripts')
+    @if (env('MATOMO_SITE') > 0)
+        <script>
+            var _paq = window._paq || [];
+            /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
+            (function() {
+                var u = "//matomo.pfarrplaner.de/";
+                _paq.push(['setTrackerUrl', u + 'matomo.php']);
+                _paq.push(['setSiteId', '{{ env('MATOMO_SITE') }}']);
+                var d = document,
+                    g = d.createElement('script'),
+                    s = d.getElementsByTagName('script')[0];
+                g.type = 'text/javascript';
+                g.async = true;
+                g.defer = true;
+                g.src = u + 'matomo.js';
+                s.parentNode.insertBefore(g, s);
+            })();
+        </script>
+    @endif
 </body>
 </html>

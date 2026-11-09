@@ -171,6 +171,13 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
             ->all();
     }
 
+    /**
+     * Render the liturgy items as a Word table.
+     *
+     * @param  DefaultWordDocument  $doc  Target document.
+     * @param  string  $recipient  Optional recipient label.
+     * @return void
+     */
     protected function renderLiturgyTable(DefaultWordDocument $doc, $recipient = '')
     {
         $run = new TextRun($doc->getConfig()['styles']['paragraphs']['titles'][1]);
@@ -214,11 +221,24 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         $properties->setSubject('Ablauf und Texte');
     }
 
+    /**
+     * Return the configured title used for the generated file.
+     *
+     * @return string File title.
+     */
     public function getFileTitle(): string
     {
         return 'Gottesdienst'.(($this->service) && ($this->service->sermon) ? ' - '.$this->service->sermon->title : '');
     }
 
+    /**
+     * Render one generic liturgy item row.
+     *
+     * @param  Table  $table  Target table.
+     * @param  Item  $item  Liturgy item.
+     * @param  string  $text  Row text.
+     * @return void
+     */
     protected function renderRow(Table $table, Item $item, $text)
     {
         $table->addCell(Converter::cmToTwip(4.3))->addText($item->title, ['bold' => true]);
@@ -227,6 +247,13 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
 
     }
 
+    /**
+     * Render recipient information for a liturgy item.
+     *
+     * @param  Table  $table  Target table.
+     * @param  Item  $item  Liturgy item.
+     * @return void
+     */
     protected function renderRecipients(Table $table, Item $item)
     {
         $cell = $table->addCell(Converter::cmToTwip(4.3));
@@ -241,6 +268,14 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         }
     }
 
+    /**
+     * Render a free-text item as a table row.
+     *
+     * @param  DefaultWordDocument  $doc  Target document.
+     * @param  Table  $table  Target table.
+     * @param  Item  $item  Liturgy item.
+     * @return void
+     */
     protected function renderFreetextItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         $text = '';
@@ -251,11 +286,27 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         $this->renderRow($table, $item, $text);
     }
 
+    /**
+     * Render a sermon item as a table row.
+     *
+     * @param  DefaultWordDocument  $doc  Target document.
+     * @param  Table  $table  Target table.
+     * @param  Item  $item  Liturgy item.
+     * @return void
+     */
     protected function renderSermonItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         $this->renderRow($table, $item, $this->service->sermon_id ? $this->service->sermon->title : '');
     }
 
+    /**
+     * Render a psalm item as a table row.
+     *
+     * @param  DefaultWordDocument  $doc  Target document.
+     * @param  Table  $table  Target table.
+     * @param  Item  $item  Liturgy item.
+     * @return void
+     */
     protected function renderPsalmItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         /** @var PsalmItemHelper $helper */
@@ -263,6 +314,14 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         $this->renderRow($table, $item, $helper->getTitleText());
     }
 
+    /**
+     * Render a song item as a table row.
+     *
+     * @param  DefaultWordDocument  $doc  Target document.
+     * @param  Table  $table  Target table.
+     * @param  Item  $item  Liturgy item.
+     * @return void
+     */
     protected function renderSongItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         if (! isset($item->data['song'])) {
@@ -273,11 +332,26 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         $this->renderRow($table, $item, $helper->getTitleText());
     }
 
+    /**
+     * Render a reading item as a table row.
+     *
+     * @param  DefaultWordDocument  $doc  Target document.
+     * @param  Table  $table  Target table.
+     * @param  Item  $item  Liturgy item.
+     * @return void
+     */
     protected function renderReadingItemRow(DefaultWordDocument $doc, Table $table, Item $item)
     {
         $this->renderRow($table, $item, $item->data['reference'] ?? '');
     }
 
+    /**
+     * Render the content of a free-text item.
+     *
+     * @param  DefaultWordDocument  $doc  Target document.
+     * @param  Item  $item  Liturgy item.
+     * @return void
+     */
     protected function renderFreetextItem(DefaultWordDocument $doc, Item $item)
     {
         if (! $item->data['description']) {
@@ -286,6 +360,13 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         $doc->renderNormalText(Replacement::replaceAll($item->getHelper()->getText(), $this->service));
     }
 
+    /**
+     * Render the content of a sermon item.
+     *
+     * @param  DefaultWordDocument  $doc  Target document.
+     * @param  Item  $item  Liturgy item.
+     * @return void
+     */
     protected function renderSermonItem(DefaultWordDocument $doc, Item $item)
     {
         if ($this->service->sermon === null) {
@@ -321,6 +402,13 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         }
     }
 
+    /**
+     * Render the content of a psalm item.
+     *
+     * @param  DefaultWordDocument  $doc  Target document.
+     * @param  Item  $item  Liturgy item.
+     * @return void
+     */
     protected function renderPsalmItem(DefaultWordDocument $doc, Item $item)
     {
         if (! $item->data['psalm']['text']) {
@@ -332,6 +420,13 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         $doc->renderNormalText($item->data['psalm']['text']);
     }
 
+    /**
+     * Render the content of a song item.
+     *
+     * @param  DefaultWordDocument  $doc  Target document.
+     * @param  Item  $item  Liturgy item.
+     * @return void
+     */
     protected function renderSongItem(DefaultWordDocument $doc, Item $item)
     {
         if (! isset($item->data['song'])) {
@@ -362,6 +457,13 @@ class A4WordSpecificLiturgySheet extends AbstractLiturgySheet
         }
     }
 
+    /**
+     * Render the content of a reading item.
+     *
+     * @param  DefaultWordDocument  $doc  Target document.
+     * @param  Item  $item  Liturgy item.
+     * @return void
+     */
     protected function renderReadingItem(DefaultWordDocument $doc, Item $item)
     {
         if (! $item->data['reference']) {

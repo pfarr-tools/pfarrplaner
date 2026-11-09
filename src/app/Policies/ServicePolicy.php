@@ -43,11 +43,23 @@ class ServicePolicy
 {
     use HandlesAuthorization;
 
+    /**
+     * Determine whether the user may list services.
+     *
+     * @param  User  $user  User requesting access.
+     * @return bool Whether access is granted.
+     */
     public function index(User $user)
     {
         return $user->hasPermissionTo('gd-bearbeiten');
     }
 
+    /**
+     * Determine whether the user may view any services.
+     *
+     * @param  User  $user  User requesting access.
+     * @return bool Whether access is granted.
+     */
     public function viewAny(User $user)
     {
         return $user->hasPermissionTo('gd-bearbeiten');

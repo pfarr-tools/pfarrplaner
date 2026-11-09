@@ -1,12 +1,12 @@
 @component('mail::message')
-Eine neue Nachricht wurde über das Kontaktformular gesandt.
-===========================================================
+    Eine neue Nachricht wurde über das Kontaktformular gesandt.
+    ===========================================================
 
-* Absender: {{ $name }} ({{ $email }})
+    * Absender: {{ $name }} ({{ $email }})
 
-@component('mail::panel')
-{!! $message !!}
-@endcomponent
+    @component('mail::panel')
+        {!! $message !!}
+    @endcomponent
 
-{{ config('app.name') }}
+    {{ config('app.name') }}
 @endcomponent

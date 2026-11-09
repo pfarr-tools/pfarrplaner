@@ -36,6 +36,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * Transforms a service into the detailed calendar representation.
+ */
 class CalendarServiceResource extends JsonResource
 {
     public $preserveKeys = true;

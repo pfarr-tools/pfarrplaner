@@ -62,7 +62,7 @@ class CalendarService
                 );
                 $days->push($day);
             }
-            $today->addDay(1);
+            $today->addDay();
         }
 
         return $days;
@@ -120,7 +120,7 @@ class CalendarService
         foreach ($raw as $holiday) {
             $holidays[] = [
                 'start' => new Carbon($holiday['startDate']),
-                'end' => (new Carbon($holiday['endDate']))->addDay(1)->subSecond(1),
+                'end' => (new Carbon($holiday['endDate']))->addDay()->subSecond(1),
                 'name' => $holiday['name'][0]['text'],
             ];
         }
@@ -147,6 +147,13 @@ class CalendarService
         return new Carbon($year.'-'.$month.'-01 0:00:00');
     }
 
+    /**
+     * Add liturgically relevant dates missing from the current month payload.
+     *
+     * @param  Carbon  $date  Date within the target month.
+     * @param  Collection  $days  Existing date values.
+     * @return Collection Updated unique, sorted dates.
+     */
     public static function addMissingDefaultDays($date, $days)
     {
         $currentDate = $date->copy()->firstOfMonth()->startOfDay();
@@ -155,7 +162,7 @@ class CalendarService
             if (isset($litInfo[$currentDate->format('Y-m-d')])) {
                 $days->push($currentDate->format('Y-m-d'));
             }
-            $currentDate->addDay(1);
+            $currentDate->addDay();
         }
 
         return $days->unique()->sort();

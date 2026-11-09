@@ -62,6 +62,11 @@ class AdminModule extends AbstractModule
         return $items;
     }
 
+    /**
+     * Collect the configured administration modules for the current user.
+     *
+     * @return array<int, array<string, mixed>> Administration menu entries.
+     */
     public static function modules()
     {
         $adminMenu = [];

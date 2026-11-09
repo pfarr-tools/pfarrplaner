@@ -6,7 +6,7 @@
     "overrides": [
         {
             "files": ["*.vue"],
-            "options": {"singleAttributePerLine": true}
+            "options": { "singleAttributePerLine": true }
         }
     ]
 }

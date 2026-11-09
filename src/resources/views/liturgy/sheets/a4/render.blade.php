@@ -35,7 +35,9 @@
             color: #951981;
         }
 
-        h1, h2, h3 {
+        h1,
+        h2,
+        h3 {
             margin: 0;
             padding: 0;
             line-height: 1.4em;
@@ -54,13 +56,15 @@
             margin-top: 1cm;
         }
 
-        table.table td, .table.table th {
+        table.table td,
+        .table.table th {
             margin: 0;
             padding: 3px;
             border: solid 1px gray;
         }
 
-        table.table tr:first td, table.table tr:first th {
+        table.table tr:first td,
+        table.table tr:first th {
             border-top-width: 0;
         }
 
@@ -71,8 +75,8 @@
             padding-bottom: 0.2cm;
         }
 
-        table.table td, th {
-        }
+        table.table td,
+        th {}
 
 
         table.table th {
@@ -89,7 +93,8 @@
 
         hr {
             border: 0;
-            height: 1px; background: #333;
+            height: 1px;
+            background: #333;
             background-image: linear-gradient(to right, #ccc, #333, #ccc);
         }
 
@@ -138,7 +143,8 @@
             text-align: left;
         }
 
-        figcaption.image-copyrights, figcaption.image-copyrights a {
+        figcaption.image-copyrights,
+        figcaption.image-copyrights a {
             text-decoration: none;
             font-size: 7pt;
             color: darkgray;
@@ -172,12 +178,11 @@
         }
 
         .column1-container img {
-            max-width:100%;
-            max-height:100%;
+            max-width: 100%;
+            max-height: 100%;
         }
 
-        .date-and-preacher {
-        }
+        .date-and-preacher {}
 
         .small {
             color: darkgray;
@@ -220,124 +225,155 @@
     </style>
 </head>
 <body>
-<table class="head" cellpadding="0" cellspacing="0">
-    <tr>
-        <td valign="top">
-            <h1 >{{ $service->titleText(false) }}</h1>
-        </td>
-        <td valign="top" style="font-size: 8pt; text-align: right;">
-            {{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }}, {{ $service->locationText() }} <br />
-        </td>
-    </tr>
-
-</table>
-<table class="table" border="0">
-    <tbody>
-    @foreach($service->liturgyBlocks as $block)
-        <tr @if($loop->first) class="first" @endif>
-            <td class="section-title" colspan="3" valign="top"><h3>{{ $block->title }}</h3></td>
-        </tr>
-        @foreach ($block->items as $item)
-            <tr>
-                <td valign="top" width="25%" style="font-weight: bold">{{ $item->title }}</td>
-                @if($item->data_type == 'freetext')
-                    <td valign="top">{{ $item->getHelper()->getText(40) }}</td>
-                @elseif($item->data_type == 'song')
-                    <td valign="top">
-                        @if(isset($item->data['song']) && isset($item->data['song']['song']))
-                            @if (isset($item->data['song']['code']) || isset($item->data['song']['songbook']))
-                                {{ $item->data['song']['code'] ?? ($item['song']['songbook']['name'] ?? '') }}
-                            @endif
-                            {{ $item->data['song']['reference'] ?? '' }}@if(isset($item->data['song']) && isset($item->data['song']['altEG'])) (EG {{ $item->data['song']['altEG'] }})@endif
-                            @if(isset($item->data['song']['song']['title'])){{ $item->data['song']['song']['title'] ?: '' }}@endif{{""}}@if ($item->data['verses']), {{ $item->data['verses'] }}@endif
-                        @endif
-                    </td>
-                @elseif($item->data_type == 'psalm')
-                    <td valign="top">
-                        @if(isset($item->data['psalm']))
-                            @if (isset($item->data['psalm']['songbook_abbreviation']) || isset($item->data['psalm']['songbook']))
-                                {{ $item->data['psalm']['songbook_abbreviation'] ?? ($item['psalm']['songbook'] ?? '') }}
-                            @endif
-                            {{ $item->data['psalm']['reference'] ?? '' }}
-                            {{ $item->data['psalm']['title'] ?? '' }}
-                        @endif
-                    </td>
-                @elseif($item->data_type == 'reading')
-                    <td valign="top">{{ $item->data['reference'] }}</td>
-                @elseif($item->data_type == 'sermon')
-                    @if($service->sermon)
-                    <td valign="top">@if($service->sermon->title){{ $service->sermon->fullTitle }} @if($service->sermon->reference)({{ $service->sermon->reference }})@endif @else {{ $service->sermon->reference }} @endif</td>
-                    @else
-                        <td></td>
-                    @endif
-                @endif
-                <td width="25% "valign="top">{{ join(', ', $item->recipients()) }}</td>
-            </tr>
-        @endforeach
-    @endforeach
-    </tbody>
-</table>
-
-@foreach ($recipients as $recipient)
-    <pagebreak resetpagenum="1" />
     <table class="head" cellpadding="0" cellspacing="0">
         <tr>
             <td valign="top">
-                <h1 >{{ $service->titleText(false) }}</h1>
+                <h1>{{ $service->titleText(false) }}</h1>
             </td>
             <td valign="top" style="font-size: 8pt; text-align: right;">
-                {{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }}, {{ $service->locationText() }} <br />
-                Plan für {{ $recipient }}
+                {{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }}, {{ $service->locationText() }}
+                <br />
             </td>
         </tr>
 
     </table>
     <table class="table" border="0">
         <tbody>
-        @foreach($service->liturgyBlocks as $block)
-            <tr @if($loop->first) class="first" @endif>
-                <td class="section-title" colspan="3" valign="top"><h3>{{ $block->title }}</h3></td>
-            </tr>
-            @foreach ($block->items as $item)
-                <tr>
-                    <td valign="top" width="25%" style="font-weight: bold">{{ $item->title }}</td>
-                    @if($item->data_type == 'freetext')
-                        <td valign="top"></td>
-                    @elseif($item->data_type == 'song')
-                        <td valign="top">
-                            @if(isset($item->data['song']))
-                                @if (isset($item->data['song']['songbook_abbreviation']) || isset($item->data['song']['songbook']))
-                                {{ $item->data['song']['songbook_abbreviation'] ?: ($item['song']['songbook'] ?: '') }}
-                                @endif
-                                {{ $item->data['song']['reference'] ?: '' }}
-                                @if(isset($item->data['song']['song']['title'])){{ $item->data['song']['song']['title'] ?: '' }}@endif{{""}}@if ($item->data['verses']), {{ $item->data['verses'] }}@endif
-                            @endif
-                        </td>
-                    @elseif($item->data_type == 'psalm')
-                        <td valign="top">
-                            @if(isset($item->data['psalm']))
-                                {{ $item->data['psalm']['songbook_abbreviation'] ?: ($item['psalm']['songbook'] ?: '') }}
-                                {{ $item->data['psalm']['reference'] ?: '' }}
-                                {{ $item->data['psalm']['title'] ?: '' }}
-                            @endif
-                        </td>
-                    @elseif($item->data_type == 'reading')
-                        <td valign="top">{{ $item->data['reference'] }}</td>
-                    @elseif($item->data_type == 'sermon')
-                        @if($service->sermon)
-                            <td valign="top">@if($service->sermon->title){{ $service->sermon->fullTitle }} @if($service->sermon->reference)({{ $service->sermon->reference }})@endif @else {{ $service->sermon->reference }} @endif</td>
-                        @else
-                            <td></td>
-                        @endif
-                    @endif
-                    <td width="25% "valign="top">{{ join(', ', $item->recipients()) }}</td>
+            @foreach ($service->liturgyBlocks as $block)
+                <tr @if ($loop->first) class="first" @endif>
+                    <td class="section-title" colspan="3" valign="top">
+                        <h3>{{ $block->title }}</h3>
+                    </td>
                 </tr>
+                @foreach ($block->items as $item)
+                    <tr>
+                        <td valign="top" width="25%" style="font-weight: bold">{{ $item->title }}</td>
+                        @if ($item->data_type == 'freetext')
+                            <td valign="top">{{ $item->getHelper()->getText(40) }}</td>
+                        @elseif($item->data_type == 'song')
+                            <td valign="top">
+                                @if (isset($item->data['song']) && isset($item->data['song']['song']))
+                                    @if (isset($item->data['song']['code']) || isset($item->data['song']['songbook']))
+                                        {{ $item->data['song']['code'] ?? ($item['song']['songbook']['name'] ?? '') }}
+                                    @endif
+                                    {{ $item->data['song']['reference'] ?? '' }}@if (isset($item->data['song']) && isset($item->data['song']['altEG']))
+                                        (EG {{ $item->data['song']['altEG'] }})
+                                    @endif
+                                    @if (isset($item->data['song']['song']['title']))
+                                        {{ $item->data['song']['song']['title'] ?: '' }}
+                                        @endif{{ '' }}@if ($item->data['verses'])
+                                            , {{ $item->data['verses'] }}
+                                        @endif
+                                    @endif
+                            </td>
+                        @elseif($item->data_type == 'psalm')
+                            <td valign="top">
+                                @if (isset($item->data['psalm']))
+                                    @if (isset($item->data['psalm']['songbook_abbreviation']) || isset($item->data['psalm']['songbook']))
+                                        {{ $item->data['psalm']['songbook_abbreviation'] ?? ($item['psalm']['songbook'] ?? '') }}
+                                    @endif
+                                    {{ $item->data['psalm']['reference'] ?? '' }}
+                                    {{ $item->data['psalm']['title'] ?? '' }}
+                                @endif
+                            </td>
+                        @elseif($item->data_type == 'reading')
+                            <td valign="top">{{ $item->data['reference'] }}</td>
+                        @elseif($item->data_type == 'sermon')
+                            @if ($service->sermon)
+                                <td valign="top">
+                                    @if ($service->sermon->title)
+                                        {{ $service->sermon->fullTitle }} @if ($service->sermon->reference)
+                                            ({{ $service->sermon->reference }})
+                                        @endif
+                                    @else
+                                        {{ $service->sermon->reference }}
+                                    @endif
+                                </td>
+                            @else
+                                <td></td>
+                            @endif
+                        @endif
+                        <td width="25% "valign="top">{{ join(', ', $item->recipients()) }}</td>
+                    </tr>
+                @endforeach
             @endforeach
-        @endforeach
         </tbody>
     </table>
 
-@endforeach
+    @foreach ($recipients as $recipient)
+        <pagebreak resetpagenum="1" />
+        <table class="head" cellpadding="0" cellspacing="0">
+            <tr>
+                <td valign="top">
+                    <h1>{{ $service->titleText(false) }}</h1>
+                </td>
+                <td valign="top" style="font-size: 8pt; text-align: right;">
+                    {{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }},
+                    {{ $service->locationText() }} <br />
+                    Plan für {{ $recipient }}
+                </td>
+            </tr>
+
+        </table>
+        <table class="table" border="0">
+            <tbody>
+                @foreach ($service->liturgyBlocks as $block)
+                    <tr @if ($loop->first) class="first" @endif>
+                        <td class="section-title" colspan="3" valign="top">
+                            <h3>{{ $block->title }}</h3>
+                        </td>
+                    </tr>
+                    @foreach ($block->items as $item)
+                        <tr>
+                            <td valign="top" width="25%" style="font-weight: bold">{{ $item->title }}</td>
+                            @if ($item->data_type == 'freetext')
+                                <td valign="top"></td>
+                            @elseif($item->data_type == 'song')
+                                <td valign="top">
+                                    @if (isset($item->data['song']))
+                                        @if (isset($item->data['song']['songbook_abbreviation']) || isset($item->data['song']['songbook']))
+                                            {{ $item->data['song']['songbook_abbreviation'] ?: ($item['song']['songbook'] ?: '') }}
+                                        @endif
+                                        {{ $item->data['song']['reference'] ?: '' }}
+                                        @if (isset($item->data['song']['song']['title']))
+                                            {{ $item->data['song']['song']['title'] ?: '' }}
+                                            @endif{{ '' }}@if ($item->data['verses'])
+                                                , {{ $item->data['verses'] }}
+                                            @endif
+                                        @endif
+                                </td>
+                            @elseif($item->data_type == 'psalm')
+                                <td valign="top">
+                                    @if (isset($item->data['psalm']))
+                                        {{ $item->data['psalm']['songbook_abbreviation'] ?: ($item['psalm']['songbook'] ?: '') }}
+                                        {{ $item->data['psalm']['reference'] ?: '' }}
+                                        {{ $item->data['psalm']['title'] ?: '' }}
+                                    @endif
+                                </td>
+                            @elseif($item->data_type == 'reading')
+                                <td valign="top">{{ $item->data['reference'] }}</td>
+                            @elseif($item->data_type == 'sermon')
+                                @if ($service->sermon)
+                                    <td valign="top">
+                                        @if ($service->sermon->title)
+                                            {{ $service->sermon->fullTitle }} @if ($service->sermon->reference)
+                                                ({{ $service->sermon->reference }})
+                                            @endif
+                                        @else
+                                            {{ $service->sermon->reference }}
+                                        @endif
+                                    </td>
+                                @else
+                                    <td></td>
+                                @endif
+                            @endif
+                            <td width="25% "valign="top">{{ join(', ', $item->recipients()) }}</td>
+                        </tr>
+                    @endforeach
+                @endforeach
+            </tbody>
+        </table>
+    @endforeach
 
 </body>
 </html>

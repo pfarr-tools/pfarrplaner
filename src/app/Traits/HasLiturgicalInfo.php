@@ -66,6 +66,11 @@ trait HasLiturgicalInfo
         return $this->isAlternateProprium ? ($this->liturgical_info['isoDate'] ?? $this->date) : $this->date;
     }
 
+    /**
+     * Determine whether alternate proprium metadata is present.
+     *
+     * @return bool Whether the service uses an alternate proprium.
+     */
     public function getIsAlternatePropriumAttribute(): bool
     {
         return $this->alt_proprium !== null;

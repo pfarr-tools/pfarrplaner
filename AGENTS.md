@@ -129,6 +129,15 @@ Bezeichnern, Dateinamen, URLs und CLI-Optionen vorbehalten.
 - Qualitätswerkzeuge laufen ausschließlich über Docker: `./planer dev format`,
   `./planer dev format:check`, `./planer dev analyse`, `./planer dev lint`,
   `./planer dev docs:check` und `./planer dev quality`.
+- Prettier ist für JavaScript, Vue, Skripte, CSS, SCSS, Sass, JSON und YAML
+  verbindlich;
+  `blade-formatter` ist für `src/resources/views/**/*.blade.php` verbindlich.
+  Beide Formatter werden ausschließlich über `./planer dev format` bzw.
+  `./planer dev format:check` ausgeführt.
+- Vendor-Templates unter `src/resources/views/vendor` und generierte Dateien
+  bleiben von der Blade-Formatierung ausgeschlossen. Nicht-idempotente
+  Sonderstellen werden direkt im Template mit der dokumentierten
+  `blade-formatter-disable`-Direktive begrenzt.
 - `./planer dev quality` ist schreibgeschützt. Automatische Korrekturen werden
   nur mit den ausdrücklich dafür vorgesehenen Formatierungsbefehlen ausgeführt.
 - Baselines dokumentieren nur bestehende Altlasten. Neue Verstöße dürfen nicht

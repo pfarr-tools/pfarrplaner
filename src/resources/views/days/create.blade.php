@@ -8,44 +8,40 @@
         @component('components.ui.card')
             @slot('cardFooter')
                 <button type="submit" class="btn btn-primary" id="submit" disabled="disabled">Ansicht ändern</button>
-                <a class="btn btn-secondary" href="{{ route('calendar', $year.'-'.$month) }}">Zurück</a>
+                <a class="btn btn-secondary" href="{{ route('calendar', $year . '-' . $month) }}">Zurück</a>
             @endslot
-            <input type="hidden" name="date"/>
-            <label>{{ $start->isoFormat ('MMMM YYYY') }}</label>
+            <input type="hidden" name="date" />
+            <label>{{ $start->isoFormat('MMMM YYYY') }}</label>
             <table width="100%;" id="days">
                 <tr>
-                    <?php $date = $start->copy() ?>
-                    @while($date < $end )
+                    <?php $date = $start->copy(); ?>
+                    @while ($date < $end)
                         <td class="day
-                                    @if(isset($existing[$date->format('Y-m-d')]))
-                        @if ($existing[$date->format('Y-m-d')]->day_type == \App\Models\Calendar\Day::DAY_TYPE_LIMITED) day-type-limited @else day-type-default @endif
+                                    @if (isset($existing[$date->format('Y-m-d')])) @if ($existing[$date->format('Y-m-d')]->day_type == \App\Models\Calendar\Day::DAY_TYPE_LIMITED) day-type-limited @else day-type-default @endif
                             exists
-                        @else new @endif
-                            " id="day_{{ $date->day }}"
-                            data-day="{{ $date->day }}" data-weekday="{{ $date->isoFormat('DDDD') }}"
-                            data-date="{{ $date->format('d.m.Y') }}"
-                            @if(isset($existing[$date->format('Y-m-d')]) && $existing[$date->format('Y-m-d')]->day_type == \App\Models\Calendar\Day::DAY_TYPE_LIMITED)
-                                data-cities="{{ $existing[$date->format('Y-m-d')]->cities->pluck('id')->join(',') }}"
-                            @endif
-                            @if(isset($existing[$date->format('Y-m-d')]))
-                                @if ($existing[$date->format('Y-m-d')]->day_type == \App\Models\Calendar\Day::DAY_TYPE_LIMITED)
+@else
+new @endif
+                            "
+                            id="day_{{ $date->day }}" data-day="{{ $date->day }}"
+                            data-weekday="{{ $date->isoFormat('DDDD') }}" data-date="{{ $date->format('d.m.Y') }}"
+                            @if (isset($existing[$date->format('Y-m-d')]) &&
+                                    $existing[$date->format('Y-m-d')]->day_type == \App\Models\Calendar\Day::DAY_TYPE_LIMITED) data-cities="{{ $existing[$date->format('Y-m-d')]->cities->pluck('id')->join(',') }}" @endif
+                            @if (isset($existing[$date->format('Y-m-d')])) @if ($existing[$date->format('Y-m-d')]->day_type == \App\Models\Calendar\Day::DAY_TYPE_LIMITED)
                                     title="Dieser Tag existiert bereits, wird aber noch nicht für alle Gemeinden angezeigt."
                             @else
                                 title="Dieser Tag existiert bereits."
-                            @if(isset($existingCities[$date->format('Y-m-d')])) data-cities="{{ $existingCities[$date->format('Y-m-d')]->join(',') }}"
+                            @if (isset($existingCities[$date->format('Y-m-d')])) data-cities="{{ $existingCities[$date->format('Y-m-d')]->join(',') }}" @endif
                             @endif
-                            @endif
-                            @else
-                                title="Diesen Tag neu anlegen"
-                            @endif
+                        @else
+                            title="Diesen Tag neu anlegen"
+                    @endif
 
-                        >
+                    >
 
-                            <span
-                                class="weekday-label weekday-label-{{ $date->isoFormat('dd') }}">{!! $date->isoFormat('dd') !!}</span><br/>
-                            {{ $date->day }}
-                        </td>
-                            <?php $date->addDay(1) ?>
+                    <span class="weekday-label weekday-label-{{ $date->isoFormat('dd') }}">{!! $date->isoFormat('dd') !!}</span><br />
+                    {{ $date->day }}
+                    </td>
+                    <?php $date->addDay(1); ?>
                     @endwhile
                 </tr>
             </table>
@@ -62,8 +58,7 @@
                                         <span class="day-label">{{ $start->day }}</span>
                                         <div class="liturgy"></div>
                                     </div>
-                                    <div class="card-footer day-name"
-                                         title="">{{ $start->isoFormat('MMMM') }}</div>
+                                    <div class="card-footer day-name" title="">{{ $start->isoFormat('MMMM') }}</div>
                                 </div>
                             </th>
                         </tr>
@@ -74,7 +69,7 @@
                         <label style="display:block;">Anzeige</label>
                         <div class="form-check">
                             <input type="radio" name="day_type" value="{{ \App\Models\Calendar\Day::DAY_TYPE_DEFAULT }}"
-                                   autocomplete="off" id="check-type-default">
+                                autocomplete="off" id="check-type-default">
                             <label class="form-check-label" style="color: red;">
                                 Diesen Tag für alle Gemeinden anzeigen
                             </label>
@@ -84,18 +79,18 @@
                         </div>
                         <div class="form-check">
                             <input type="radio" name="day_type" value="{{ \App\Models\Calendar\Day::DAY_TYPE_LIMITED }}"
-                                   autocomplete="off" id="check-type-limited" checked>
+                                autocomplete="off" id="check-type-limited" checked>
                             <label class="form-check-label" style="background-color: #dcd0ff;">
                                 Diesen Tag nur für folgende Gemeinden im Kalender anzeigen:
                             </label>
                             @foreach ($cities as $city)
                                 <div class="form-check">
                                     <input
-                                        class="form-check-input city-check @if(Auth::user()->cities->contains($city))my-city @else not-my-city @endif"
+                                        class="form-check-input city-check @if (Auth::user()->cities->contains($city)) my-city @else not-my-city @endif"
                                         type="checkbox" name="cities[]" value="{{ $city->id }}"
-                                        id="defaultCheck{{$city->id}}">
-                                    <label class="form-check-label" for="defaultCheck{{$city->id}}">
-                                        {{$city->name}}
+                                        id="defaultCheck{{ $city->id }}">
+                                    <label class="form-check-label" for="defaultCheck{{ $city->id }}">
+                                        {{ $city->name }}
                                     </label>
                                 </div>
                             @endforeach
@@ -135,15 +130,15 @@
 
         }
 
-        $(document).ready(function () {
-            $('.day.new, .day-type-limited, .day-type-default').click(function () {
+        $(document).ready(function() {
+            $('.day.new, .day-type-limited, .day-type-default').click(function() {
                 selectDay($(this).data('day'));
             });
 
 
-            $('.city-check').change(function () {
+            $('.city-check').change(function() {
                 var limit = false;
-                $('.city-check').each(function () {
+                $('.city-check').each(function() {
                     limit = limit || $(this).prop('checked');
                 });
                 if (limit) {
@@ -152,9 +147,11 @@
                 }
             });
 
-            $('#check-type-default, #check-type-limited').change(function () {
+            $('#check-type-default, #check-type-limited').change(function() {
                 if ($('#check-type-default').is(':checked')) {
-                    alert('Bitte lege Tage dieses Typs nur an, wenn du sicher bist, dass alle Gemeinden den Tag in ihrem Kalender sehen wollen. Im Normalfall trifft das nur auf allgemeine kirchliche Feiertage zu. Wenn du dir nicht sicher bist, wähle "Diesen Tag nur für folgende Gemeinden anzeigen" und schalte den Tag für deine Gemeinde frei.');
+                    alert(
+                        'Bitte lege Tage dieses Typs nur an, wenn du sicher bist, dass alle Gemeinden den Tag in ihrem Kalender sehen wollen. Im Normalfall trifft das nur auf allgemeine kirchliche Feiertage zu. Wenn du dir nicht sicher bist, wähle "Diesen Tag nur für folgende Gemeinden anzeigen" und schalte den Tag für deine Gemeinde frei.'
+                    );
                 }
             });
 
@@ -178,7 +175,8 @@
             color: gray;
         }
 
-        .day.new:hover, .day.day-type-limited:hover {
+        .day.new:hover,
+        .day.day-type-limited:hover {
             cursor: pointer;
             color: black;
             background-color: #DDFFDD;
@@ -219,7 +217,7 @@
 
         #days {
             border: solid 1px gray;
-             border-radius: 0;
+            border-radius: 0;
             margin-bottom: 10px;
         }
 
@@ -228,6 +226,5 @@
             font-size: 0.8em;
             margin-bottom: 20px;
         }
-
     </style>
 @endsection

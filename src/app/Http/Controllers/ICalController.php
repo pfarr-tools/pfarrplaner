@@ -52,6 +52,13 @@ class ICalController extends Controller
     /** @var User */
     protected $user = null;
 
+    /**
+     * Stream the private service calendar for a named person.
+     *
+     * @param  string  $name  Person name to search.
+     * @param  string  $token  API token.
+     * @return never Sends the calendar response and exits.
+     */
     public function private($name, $token)
     {
         $this->checkToken($token);
@@ -79,6 +86,12 @@ class ICalController extends Controller
         exit($raw);
     }
 
+    /**
+     * Authenticate a calendar request and store its user.
+     *
+     * @param  string  $token  API token to validate.
+     * @return void
+     */
     protected function checkToken($token)
     {
         $tokenUser = User::where('api_token', $token)->first();
@@ -88,6 +101,13 @@ class ICalController extends Controller
         $this->user = $tokenUser;
     }
 
+    /**
+     * Stream the service calendar for selected locations.
+     *
+     * @param  string  $locationIds  Comma-separated location IDs.
+     * @param  string  $token  API token.
+     * @return never Sends the calendar response and exits.
+     */
     public function byLocation($locationIds, $token)
     {
         $this->checkToken($token);
@@ -113,6 +133,13 @@ class ICalController extends Controller
     /*
      * Export absences as ical
      *
+     */
+    /**
+     * Stream the visible absences for a user as iCalendar data.
+     *
+     * @param  User  $user  User whose visible absences are exported.
+     * @param  string  $token  API token.
+     * @return never Sends the calendar response and exits.
      */
     public function absences(User $user, $token)
     {

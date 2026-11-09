@@ -32,7 +32,9 @@
             color: #951981;
         }
 
-        h1, h2, h3 {
+        h1,
+        h2,
+        h3 {
             margin: 0;
             padding: 0;
             line-height: 1.4em;
@@ -49,13 +51,15 @@
             margin-top: 1cm;
         }
 
-        table.table td, .table.table th {
+        table.table td,
+        .table.table th {
             margin: 0;
             padding: 3px;
             border: solid 1px gray;
         }
 
-        table.table tr:first td, table.table tr:first th {
+        table.table tr:first td,
+        table.table tr:first th {
             border-top-width: 0;
         }
 
@@ -66,10 +70,11 @@
             padding-bottom: 0.2cm;
         }
 
-        table.table td, th {
-        }
+        table.table td,
+        th {}
 
-        table.table tr:last-child td, tr:last-child th {
+        table.table tr:last-child td,
+        tr:last-child th {
             border: 0;
             margin-bottom: 0;
         }
@@ -138,7 +143,8 @@
             text-align: left;
         }
 
-        figcaption.image-copyrights, figcaption.image-copyrights a {
+        figcaption.image-copyrights,
+        figcaption.image-copyrights a {
             text-decoration: none;
             font-size: 7pt;
             color: darkgray;
@@ -176,8 +182,7 @@
             max-height: 100%;
         }
 
-        .date-and-preacher {
-        }
+        .date-and-preacher {}
 
         .small {
             color: darkgray;
@@ -227,52 +232,65 @@
     </style>
 </head>
 <body>
-<htmlpagefooter name="PageFooter">
-    <table class="footer" style="">
-        <tr>
-            <td valign="top" style="text-align: right">Seite {PAGENO} / {nbpg}</td>
-        </tr>
-    </table>
-</htmlpagefooter>
-<h1>Lieder und Texte zum Gottesdienst am {{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }}, {{ $service->locationText() }}</h1>
-@foreach($service->liturgyBlocks as $block)
-    @foreach ($block->items as $item)
-        @if($item->data_type == 'song')
-            @if(isset($item->data['song']) && isset($item->data['song']['song']))
-                @if($item->data['song']['title'])<h2>{{ $item->data['song']['title'] }}</h2>@endif
-                <small> {{ $item->data['song']['songbook_abbreviation'] ?: ($item['song']['songbook'] ?: '') }}
-                    {{ $item->data['song']['reference'] ?: '' }}@if ($item->data['verses']), {{ $item->data['verses'] }}</small>@endif
+    <htmlpagefooter name="PageFooter">
+        <table class="footer" style="">
+            <tr>
+                <td valign="top" style="text-align: right">Seite {PAGENO} / {nbpg}</td>
+            </tr>
+        </table>
+    </htmlpagefooter>
+    <h1>Lieder und Texte zum Gottesdienst am {{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }},
+        {{ $service->locationText() }}</h1>
+    @foreach ($service->liturgyBlocks as $block)
+        @foreach ($block->items as $item)
+            @if ($item->data_type == 'song')
+                @if (isset($item->data['song']) && isset($item->data['song']['song']))
+                    @if ($item->data['song']['title'])
+                        <h2>{{ $item->data['song']['title'] }}</h2>
+                    @endif
+                    <small> {{ $item->data['song']['songbook_abbreviation'] ?: ($item['song']['songbook'] ?: '') }}
+                        {{ $item->data['song']['reference'] ?: '' }}@if ($item->data['verses'])
+                            , {{ $item->data['verses'] }}</small>
+                @endif
 
                 @php $refrain = false; @endphp
 
                 @foreach ($item->getHelper()->getActiveVerses() as $verse)
-                    @if(($verse['refrain_before']) && (!$refrain))
+                    @if ($verse['refrain_before'] && !$refrain)
                         @php $refrain = true; @endphp
                         <p style="font-style: italic;">Kehrvers: <br />{{ $item->data['song']['refrain'] }}</p>
                     @elseif ($verse['refrain_before'])
                         <p style="font-style: italic;">Kehrvers</p>
                     @endif
                     <p>{{ $verse['number'] }}. {{ $verse['text'] }}</p>
-                    @if(($verse['refrain_after']) && (!$refrain))
+                    @if ($verse['refrain_after'] && !$refrain)
                         @php $refrain = true; @endphp
                         <p style="font-style: italic;">Kehrvers: <br />{{ $item->data['song']['refrain'] }}</p>
                     @elseif ($verse['refrain_after'])
                         <p style="font-style: italic;">Kehrvers</p>
                     @endif
                 @endforeach
-        @endif
+            @endif
         @elseif($item->data_type == 'psalm')
-                @if(isset($item->data['psalm']))
-                    <h2>{{ $item->data['psalm']['songbook_abbreviation'] ?: ($item['psalm']['songbook'] ?: '') }}
+            @if (isset($item->data['psalm']))
+                <h2>{{ $item->data['psalm']['songbook_abbreviation'] ?: ($item['psalm']['songbook'] ?: '') }}
                     {{ $item->data['psalm']['reference'] ?: '' }}
                     {{ $item->data['psalm']['title'] ?: '' }}</h2>
-                    <p>{!! str_replace("@@@", "<br />", str_replace("\n", '<br /><br />', str_replace("\n\t", '<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', $item->data['psalm']['text']))) !!}</p>
-                @endif
+                <p>{!! str_replace(
+                    '@@@',
+                    '<br />',
+                    str_replace(
+                        "\n",
+                        '<br /><br />',
+                        str_replace("\n\t", '<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', $item->data['psalm']['text']),
+                    ),
+                ) !!}</p>
+            @endif
         @endif
     @endforeach
-@endforeach
-<p style="margin-top: 0.5cm;"><small>
-        Stand: {{ \Carbon\Carbon::now()->setTimezone('Europe/Berlin')->format('d.m.Y, H:i') }} Uhr
-    </small></p>
+    @endforeach
+    <p style="margin-top: 0.5cm;"><small>
+            Stand: {{ \Carbon\Carbon::now()->setTimezone('Europe/Berlin')->format('d.m.Y, H:i') }} Uhr
+        </small></p>
 </body>
 </html>
