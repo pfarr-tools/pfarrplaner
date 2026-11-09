@@ -3,15 +3,12 @@
 namespace Tests\Browser;
 
 use App\Models\People\User;
-use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Support\Str;
 use Laravel\Dusk\Browser;
-use Tests\DuskTestCase;
+use Tests\AbstractPageLoadTest;
 
-class LoginTest extends DuskTestCase
+class LoginTest extends AbstractPageLoadTest
 {
-    use DatabaseTruncation;
-
     /** @var User */
     protected $testUser;
 
@@ -36,11 +33,12 @@ class LoginTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
-                ->type('email', $this->testUser->email)
-                ->type('password', $this->password)
-                ->waitForReload(function (Browser $browser) {
-                    $browser->press('Anmelden');
-                })->assertRouteIs('home');
+                ->waitFor('[name="email"]')
+                ->type('[name="email"]', $this->testUser->email)
+                ->type('[name="password"]', $this->password)
+                ->press('Anmelden')
+                ->waitForLocation('/')
+                ->assertRouteIs('home');
         });
     }
 

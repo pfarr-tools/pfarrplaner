@@ -277,7 +277,9 @@ class DuskRunCommand extends Command
             return;
         }
 
-        @unlink($database);
+        foreach ([$database, $database.'-wal', $database.'-shm'] as $databaseFile) {
+            @unlink($databaseFile);
+        }
     }
 
     /**

@@ -164,8 +164,10 @@ abstract class DuskTestCase extends BaseTestCase
             return;
         }
 
-        if (file_exists($database)) {
-            unlink($database);
+        foreach ([$database, $database.'-wal', $database.'-shm'] as $databaseFile) {
+            if (file_exists($databaseFile)) {
+                unlink($databaseFile);
+            }
         }
     }
 

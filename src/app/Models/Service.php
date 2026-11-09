@@ -1382,7 +1382,7 @@ class Service extends Model implements HasDAVCalendarItems
                 'ad_configs.*.offset' => 'nullable|int|min:0',
                 'ad_configs.*.ad_text' => 'nullable|string',
             ]);
-            $adConfigs = $data['ad_configs'];
+            $adConfigs = $data['ad_configs'] ?? [];
             foreach ($this->city->getActiveAdChannels() as $key => $channel) {
                 if (isset($adConfigs[$key]) && (($adConfigs[$key]['offset'] ?? 0) > 0)) {
                     app(AdConfig::getContractName('create'))->create($request->user(), $this, [

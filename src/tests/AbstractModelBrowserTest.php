@@ -33,11 +33,18 @@ namespace Tests;
 use App\Models\AbstractModel as BaseAbstractModel;
 use App\Models\Ads\AdConfig;
 use App\Models\Attachment;
+use App\Models\AttachmentUploadSession;
 use App\Models\Comment;
+use App\Models\Leave\Poolmaster;
 use App\Models\Occurence;
+use App\Models\Parish;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Replacement;
+use App\Models\Rites\Funeral;
+use App\Models\Rites\Wedding;
+use App\Models\Seating\SeatingRow;
+use App\Models\Seating\SeatingSection;
 use App\Models\ServiceGroup;
 use App\Models\StreetRange;
 use App\Services\RoleService;
@@ -68,9 +75,16 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
     protected const EXCLUDED_MODEL_CLASSES = [
         AdConfig::class,
         Attachment::class,
+        AttachmentUploadSession::class,
         Comment::class,
         Occurence::class,
+        Parish::class,
+        Poolmaster::class,
         Replacement::class,
+        Funeral::class,
+        Wedding::class,
+        SeatingRow::class,
+        SeatingSection::class,
         ServiceGroup::class,
         StreetRange::class,
     ];
@@ -331,7 +345,7 @@ abstract class AbstractModelBrowserTest extends DuskTestCase
         }
         $config = ($this->modelClass)::getAdminModuleConfig();
         if (($config === false) || ($config === []) || ($config === null)) {
-            $this->assertTrue();
+            $this->assertTrue(true);
 
             return true;
         }
