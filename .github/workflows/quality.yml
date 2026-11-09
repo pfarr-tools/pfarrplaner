@@ -32,7 +32,9 @@ jobs:
         uses: docker/bake-action@v7
         with:
           files: compose.yaml
-          targets: app vite
+          targets: |
+            app
+            vite
           set: |
             *.cache-from=type=gha
             *.cache-to=type=gha,mode=max
