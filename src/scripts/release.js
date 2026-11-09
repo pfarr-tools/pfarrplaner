@@ -13,7 +13,7 @@
 
 'use strict'
 
-const { execFileSync, execSync } = require('child_process')
+const { execSync } = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
@@ -60,74 +60,6 @@ function gitAddExisting(paths) {
     execSync(`git -C "${repositoryRoot}" add -- ${existingPaths.join(' ')}`, { stdio: 'inherit' })
 }
 
-function manualNeedsDusk() {
-    let lastTag = ''
-    try {
-        lastTag = execFileSync('git', ['describe', '--tags', '--abbrev=0'], {
-            cwd: repositoryRoot,
-            encoding: 'utf8',
-        }).trim()
-    } catch {
-        return true
-    }
-
-    const changedFiles = execFileSync(
-        'git',
-        ['diff', '--name-only', `${lastTag}..HEAD`, '--', 'src/resources', 'src/public'],
-        {
-            cwd: repositoryRoot,
-            encoding: 'utf8',
-        },
-    )
-
-    return changedFiles.trim().length > 0
-}
-
-function removeStaleDevNetworkEndpoints() {
-    const composeFile = path.resolve(repositoryRoot, 'compose.yaml')
-    let composeConfig
-
-    try {
-        composeConfig = JSON.parse(
-            execFileSync('docker', ['compose', '-f', composeFile, 'config', '--format', 'json'], {
-                cwd: repositoryRoot,
-                encoding: 'utf8',
-            }),
-        )
-    } catch {
-        return
-    }
-
-    const networkName = composeConfig.networks?.pfarrplaner?.name
-    if (!networkName) {
-        return
-    }
-
-    let network
-    try {
-        network = JSON.parse(
-            execFileSync('docker', ['network', 'inspect', networkName], {
-                cwd: repositoryRoot,
-                encoding: 'utf8',
-            }),
-        )[0]
-    } catch {
-        return
-    }
-
-    for (const container of Object.values(network.Containers || {})) {
-        try {
-            execFileSync('docker', ['network', 'disconnect', '-f', networkName, container.Name], {
-                cwd: repositoryRoot,
-                stdio: 'ignore',
-            })
-            console.log(`Bereinige verwaisten Docker-Netzwerk-Endpunkt: ${container.Name}`)
-        } catch {
-            // The endpoint may disappear while Compose is reconciling the stack.
-        }
-    }
-}
-
 if (forcedType) {
     releaseType = forcedType
     console.log(`Forced release type: ${releaseType}`)
@@ -166,43 +98,6 @@ try {
 
 const newPkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'))
 const releaseMessage = `chore(release): ${newPkg.version}`
-
-if (releaseType === 'major' || releaseType === 'minor') {
-    console.log('Rebuilding and deploying manual...')
-    try {
-        const planer = path.resolve(repositoryRoot, 'planer')
-        execFileSync(planer, ['dev', 'down', '--remove-orphans'], {
-            cwd: repositoryRoot,
-            stdio: 'inherit',
-        })
-        removeStaleDevNetworkEndpoints()
-        execFileSync(planer, ['dev', 'up', '-d', '--remove-orphans'], {
-            cwd: repositoryRoot,
-            stdio: 'inherit',
-        })
-        const manualArgs = ['dev', 'manual', 'all']
-        if (!manualNeedsDusk()) {
-            manualArgs.push('--skip-dusk')
-            console.log(
-                'Keine Änderungen unter src/resources/ oder src/public/ seit dem letzten Release; überspringe Dusk-Screenshot-Tests.',
-            )
-        }
-        execFileSync(planer, manualArgs, {
-            cwd: repositoryRoot,
-            stdio: 'inherit',
-        })
-        execSync('npm run manual:deploy', { stdio: 'inherit' })
-        gitAddExisting([
-            'docs/manual/benutzerhandbuch/versionsangaben.md',
-            'docs/manual/benutzerhandbuch/lizenzen.md',
-            'docs/manual/media/images',
-            'docs/manual/media/site',
-        ])
-    } catch (err) {
-        console.error('Manual build/deploy failed.')
-        process.exit(err.status ?? 1)
-    }
-}
 
 try {
     gitAddExisting([

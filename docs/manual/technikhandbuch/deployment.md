@@ -19,11 +19,12 @@ Ein Release und seine Auslieferung laufen über:
 ./planer update --ref v2026.15.0 --backup-confirmed
 ```
 
-`release` baut und veröffentlicht das versionierte Image
-`pfarrtools/pfarrplaner:vVERSION`. `update` zieht dieses Image, führt
-Migrationen aus, aktualisiert die öffentlichen Assets und startet App, Horizon
-und Scheduler mit Health-Check neu. Der alte Image-Stand bleibt als
-Rollback-Grundlage erhalten. Wenn `MAIL_POSTFIX_ENABLED=true` gesetzt ist,
+`release` aktualisiert lokal Version, Changelog, Commit und Tag und pusht den
+Tag. GitHub Actions baut daraufhin das versionierte Image
+`pfarrtools/pfarrplaner:vVERSION` und veröffentlicht das Handbuch. `update`
+zieht dieses Image, führt Migrationen aus, aktualisiert die öffentlichen Assets
+und startet App, Horizon und Scheduler mit Health-Check neu. Der alte Image-
+Stand bleibt als Rollback-Grundlage erhalten. Wenn `MAIL_POSTFIX_ENABLED=true` gesetzt ist,
 aktiviert der Updatepfad automatisch das Compose-Profil `mail` und startet
 Postfix gemeinsam mit App, Horizon und Scheduler. Dadurch bleibt der interne
 Hostname `postfix` auch nach einem Containerwechsel erreichbar.

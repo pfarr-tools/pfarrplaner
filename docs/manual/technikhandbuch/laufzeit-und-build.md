@@ -54,10 +54,11 @@ Der Handbook-Build erzeugt jetzt:
 - `technikhandbuch/`
 - eine gemeinsame Landing-Page unter `https://handbuch.pfarrplaner.de/`
 
-Beim automatischen Release prüft das Release-Skript die Änderungen seit dem
-letzten Git-Tag. Dusk-Screenshot-Tests laufen dort nur bei Änderungen unter
-`src/resources/` oder `src/public/`; bei reinen Code-, Dokumentations- oder
-Betriebsänderungen wird der Manual-Build mit `--skip-dusk` ausgeführt.
+Beim automatischen Release startet der Push des Git-Tags den GitHub-Actions-
+Workflow. Dieser führt den vollständigen Manual-Build einschließlich
+Dusk-Screenshot-Tests aus, baut die statische Website und die PDFs und
+veröffentlicht anschließend die Website. Der lokale Releasepfad führt diese
+Docker- und Manual-Schritte nicht aus.
 
 ## Screenshot-Workflow
 

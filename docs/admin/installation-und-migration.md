@@ -306,22 +306,38 @@ ein Minor-Release bei neuen Features und sonst ein Patch-Release.
 
 Der Release aktualisiert `src/package.json`, `src/package-lock.json` und
 `src/CHANGELOG.md`, erstellt `chore(release): VERSION`, setzt den Tag
-`vVERSION`, baut das Produktionsimage und veröffentlicht es als
-`pfarrtools/pfarrplaner:vVERSION`. Dafür muss Docker lokal am Docker Hub
-angemeldet sein. Der Manual-Build läuft im Dev-Container. Dusk-Screenshot-
-Tests werden dabei nur ausgeführt, wenn sich seit dem letzten Release Dateien
-unter `src/resources/` oder `src/public/` geändert haben; andernfalls wird nur
-der restliche Manual-Build ausgeführt.
+`vVERSION` und pusht Branch und Tag. Der Push startet den GitHub-Actions-
+Workflow `Release`. Dieser baut und veröffentlicht das Produktionsimage als
+`pfarrtools/pfarrplaner:vVERSION` und baut das vollständige Manual einschließlich
+Dusk-Screenshot-Tests, statischer Website und PDFs. Anschließend wird die
+Website über Rsync veröffentlicht.
 
 ```sh
 ./planer release
 ```
 
+Für den Release-Workflow müssen im GitHub-Repository folgende Werte hinterlegt
+sein:
+
+- Secret `DOCKERHUB_USERNAME` und Secret `DOCKERHUB_TOKEN` für die
+  Veröffentlichung des Produktionsimages
+- Secret `MANUAL_DEPLOY_SSH_KEY` mit dem privaten Deployment-Schlüssel
+- Secret `MANUAL_DEPLOY_KNOWN_HOSTS` mit dem geprüften Eintrag für den
+  Manual-Host
+- Variables `MANUAL_DEPLOY_USER`, `MANUAL_DEPLOY_HOST` und
+  `MANUAL_DEPLOY_PATH` für das Rsync-Ziel
+
+Der Workflow läuft ausschließlich für Tags im Format `vYYYY.MAJOR.MINOR`.
+Schlägt ein Manual- oder Image-Schritt fehl, bleibt der Release-Tag bestehen,
+aber die Veröffentlichung muss nach Fehlerbehebung über den Workflow erneut
+ausgeführt werden.
+
 `update` zieht zuerst das neue Image, führt danach die Migrationen in einem
 separaten Container aus und aktualisiert anschließend Assets, Octane, Horizon
 und Scheduler. Ein Tag-Update ist deshalb der empfohlene Produktionsweg.
 Für einen lokalen Notfall-Build stehen `./planer build --ref <tag|commit>` und
-`./planer update --build` zur Verfügung.
+`./planer update --build` zur Verfügung; diese Wege sind nicht Teil des
+regulären Release-Workflows.
 
 ## Datenübertragung und Legacy-Migration
 

@@ -32,7 +32,6 @@ echo "Pfarrplaner-Release starten (Typ: $release_type)."
 tag=$(git -C "$ROOT" describe --tags --exact-match HEAD 2>/dev/null || true)
 [[ -n "$tag" ]] || die 'Das Release-Skript hat keinen Git-Tag am neuen Release-Commit erzeugt.'
 
-"$ROOT/scripts/build-production.sh" --ref "$tag" --push
 git -C "$ROOT" push origin main "$tag"
 
 echo

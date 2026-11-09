@@ -159,9 +159,9 @@ erstellt den semantischen Release-Commit und setzt den Tag:
 ./planer release minor
 ```
 
-Der Release baut und veröffentlicht das versionierte Produktionsimage unter
-`pfarrtools/pfarrplaner`. Das Produktionsupdate zieht dieses veröffentlichte
-Image:
+Nach dem Push des Tags baut und veröffentlicht GitHub Actions das versionierte
+Produktionsimage unter `pfarrtools/pfarrplaner` und veröffentlicht das
+Handbuch. Das Produktionsupdate zieht dieses veröffentlichte Image:
 
 ```sh
 ./planer backup create
