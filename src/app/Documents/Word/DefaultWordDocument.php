@@ -425,7 +425,7 @@ class DefaultWordDocument
     }
 
     /**
-     * @param  null  $recipient
+     * @param  string|null  $recipient  Recipient name.
      */
     public function setRecipient($recipient): void
     {

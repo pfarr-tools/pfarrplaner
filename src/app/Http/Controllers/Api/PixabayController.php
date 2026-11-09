@@ -30,13 +30,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-
-use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Http\Response;
 
 /**
  * Class PixabayController
@@ -51,11 +48,10 @@ class PixabayController extends Controller
     /**
      * Search Pixabay images for the uploader.
      *
-     * @param string $query Search phrase.
-     * @param string|int $page Requested result page.
-     * @return Application|ResponseFactory|Response
+     * @param  string  $query  Search phrase.
+     * @param  string|int  $page  Requested result page.
      */
-    public function query(string $query, string|int $page = 1)
+    public function query(string $query, string|int $page = 1): JsonResponse
     {
         $page = max(1, (int) $page);
         $apiKey = config('pixabay.api_key');
@@ -93,7 +89,7 @@ class PixabayController extends Controller
         abort_unless($response->successful(), 502, 'Das Pixabay-Bild konnte nicht geladen werden.');
 
         return response($response->body(), 200, [
-            'Content-Type' => $response->header('Content-Type', 'application/octet-stream'),
+            'Content-Type' => $response->header('Content-Type') ?: 'application/octet-stream',
             'Cache-Control' => 'private, max-age=300',
         ]);
     }

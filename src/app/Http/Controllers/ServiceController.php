@@ -52,6 +52,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -59,6 +60,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 /**
  * Class ServiceController
@@ -122,7 +124,7 @@ class ServiceController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  string  $tab  optional tab name
-     * @return Response
+     * @return RedirectResponse|InertiaResponse
      */
     public function edit(Request $request, Service $service, $tab = 'home')
     {

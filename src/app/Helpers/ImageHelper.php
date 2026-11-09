@@ -196,9 +196,6 @@ class ImageHelper
      */
     public static function getEmbeddedLicenseString($image, $withUrl = false)
     {
-        if (! file_exists($image)) {
-            '';
-        }
         $iptc = self::IPTC($image);
         if (! count($iptc)) {
             return '';

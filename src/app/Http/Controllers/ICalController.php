@@ -41,6 +41,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
+use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -144,7 +145,7 @@ class ICalController extends Controller
     }
 
     /**
-     * @return \Inertia\Response
+     * @return Response
      */
     public function connect()
     {

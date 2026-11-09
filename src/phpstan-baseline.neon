@@ -541,12 +541,6 @@ parameters:
 			path: app/FileFormats/ODP.php
 
 		-
-			message: '#^Expression "''''" on a separate line does not do anything\.$#'
-			identifier: expr.resultUnused
-			count: 1
-			path: app/Helpers/ImageHelper.php
-
-		-
 			message: '#^Method App\\Helpers\\ImageHelper\:\:getProportionalHeight\(\) should return int but returns float\.$#'
 			identifier: return.type
 			count: 1
@@ -2000,12 +1994,6 @@ parameters:
 
 		-
 			message: '#^Method App\\Http\\Controllers\\ServiceController\:\:destroy\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\RedirectResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: '#^Method App\\Http\\Controllers\\ServiceController\:\:edit\(\) should return Illuminate\\Http\\Response but returns Inertia\\Response\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Http/Controllers/ServiceController.php

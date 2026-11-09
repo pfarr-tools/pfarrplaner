@@ -42,6 +42,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Inertia\Response;
 
 /**
  * Controller for handling city-related functionality.
@@ -110,7 +111,7 @@ class CityController extends AbstractCRUDController
      * Show QR codes
      *
      * @param  string  $city
-     * @return \Inertia\Response
+     * @return Response
      */
     public function qr(Request $request, $city)
     {

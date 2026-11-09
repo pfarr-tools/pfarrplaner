@@ -198,9 +198,13 @@ class AttachmentUploadService
     private function authorizeTarget(User $user, AttachmentUploadSession $session): Model
     {
         $targetClass = self::TARGETS[$session->attachable_type] ?? null;
-        abort_unless($targetClass, 404);
+        if (! $targetClass) {
+            abort(404);
+        }
         $target = $targetClass::find($session->attachable_id);
-        abort_unless($target, 404);
+        if (! $target) {
+            abort(404);
+        }
         Gate::forUser($user)->authorize('update', $target);
 
         return $target;
