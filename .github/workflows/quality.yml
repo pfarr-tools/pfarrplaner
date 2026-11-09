@@ -1,6 +1,9 @@
 name: Qualität
 
 on:
+  push:
+    branches:
+      - '**'
   pull_request:
 
 permissions:
@@ -15,7 +18,7 @@ jobs:
     name: Docker-Qualitätsprüfung
     runs-on: ubuntu-latest
     env:
-      QUALITY_BASE_REF: origin/${{ github.base_ref }}
+      QUALITY_BASE_REF: origin/${{ github.base_ref || github.ref_name }}
     steps:
       - name: Quelltext auschecken
         uses: actions/checkout@v6
@@ -39,6 +42,9 @@ jobs:
 
       - name: Qualitätsgates ausführen
         run: ./planer dev quality
+
+      - name: Vollständige Test-Suite ausführen
+        run: ./planer dev test
 
       - name: Umgebung beenden
         if: always()

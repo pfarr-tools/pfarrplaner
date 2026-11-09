@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Handbuch und Docker-Image veröffentlichen
+    runs-on: ubuntu-latest
+    env:
+      MANUAL_DEPLOY: '1'
+      MANUAL_DEPLOY_USER: ${{ vars.MANUAL_DEPLOY_USER || 'peregrinus' }}
+      MANUAL_DEPLOY_HOST: ${{ vars.MANUAL_DEPLOY_HOST || 'pfarr.tools' }}
+      MANUAL_DEPLOY_PATH: ${{ vars.MANUAL_DEPLOY_PATH || '/home/peregrinus/pfarr.tools/planer-handbuch/' }}
+      PFARRPLANER_IMAGE_REPOSITORY: pfarrtools/pfarrplaner
+    steps:
+      - name: Quelltext auschecken
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Release-Tag prüfen
+        run: |
+          case "$GITHUB_REF_NAME" in
+            v*) ;;
+            *) echo 'Fehler: Der Release-Workflow benötigt ein v*-Tag.' >&2; exit 2 ;;
+          esac
+
+      - name: Erforderliche Secrets prüfen
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          MANUAL_DEPLOY_SSH_KEY: ${{ secrets.MANUAL_DEPLOY_SSH_KEY }}
+          MANUAL_DEPLOY_KNOWN_HOSTS: ${{ secrets.MANUAL_DEPLOY_KNOWN_HOSTS }}
+        run: |
+          for name in DOCKERHUB_USERNAME DOCKERHUB_TOKEN MANUAL_DEPLOY_SSH_KEY MANUAL_DEPLOY_KNOWN_HOSTS; do
+            if [[ -z "${!name}" ]]; then
+              echo "Fehler: GitHub-Secret $name ist nicht gesetzt." >&2
+              exit 2
+            fi
+          done
+
+      - name: Docker-Builder einrichten
+        uses: docker/setup-buildx-action@v4
+
+      - name: Bei Docker Hub anmelden
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: SSH-Agent für Handbuch-Deployment einrichten
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.MANUAL_DEPLOY_SSH_KEY }}
+
+      - name: Known Hosts für Handbuch-Deployment einrichten
+        env:
+          MANUAL_DEPLOY_KNOWN_HOSTS: ${{ secrets.MANUAL_DEPLOY_KNOWN_HOSTS }}
+        run: |
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$MANUAL_DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+      - name: Entwicklungsumgebung für den Manual-Build starten
+        run: ./planer dev up -d
+
+      - name: Handbuch bauen
+        run: ./planer dev manual all
+
+      - name: Handbuch veröffentlichen
+        run: ./planer dev manual deploy
+
+      - name: Produktionsimage bauen und veröffentlichen
+        run: ./scripts/build-production.sh --tag "$GITHUB_REF_NAME" --push
+
+      - name: Entwicklungsumgebung beenden
+        if: always()
+        run: ./planer dev down -v

@@ -294,12 +294,28 @@ ein Minor-Release bei neuen Features und sonst ein Patch-Release.
 
 Der Release aktualisiert `src/package.json`, `src/package-lock.json` und
 `src/CHANGELOG.md`, erstellt `chore(release): VERSION`, setzt den Tag
-`vVERSION`, baut das Produktionsimage und veröffentlicht es als
-`pfarrtools/pfarrplaner:vVERSION`. Dafür muss Docker lokal am Docker Hub
-angemeldet sein. Der Manual-Build läuft im Dev-Container. Dusk-Screenshot-
-Tests werden dabei nur ausgeführt, wenn sich seit dem letzten Release Dateien
-unter `src/resources/` oder `src/public/` geändert haben; andernfalls wird nur
-der restliche Manual-Build ausgeführt.
+`vVERSION` und veröffentlicht Commit und Tag nach GitHub. Das Pushen des Tags
+startet die GitHub Action `Release`. Sie baut das Handbuch im Dev-Container,
+veröffentlicht es per Rsync und baut/pusht das Produktionsimage als
+`pfarrtools/pfarrplaner:vVERSION`. Docker- und SSH-Anmeldungen sind dafür nicht
+mehr auf dem lokalen Rechner erforderlich. Dusk-Screenshot-Tests werden beim
+Release-Manual-Build ausgeführt.
+
+Für die Action müssen im Repository unter **Settings → Secrets and variables →
+Actions** folgende Repository-Secrets hinterlegt werden:
+
+- `DOCKERHUB_USERNAME`: Docker-Hub-Benutzername.
+- `DOCKERHUB_TOKEN`: persönliches Docker-Hub-Access-Token mit Push-Rechten für
+  `pfarrtools/pfarrplaner`.
+- `MANUAL_DEPLOY_SSH_KEY`: privater SSH-Schlüssel für das Handbuchziel.
+- `MANUAL_DEPLOY_KNOWN_HOSTS`: geprüfter `known_hosts`-Eintrag für
+  `pfarr.tools`.
+
+Optional können unter **Variables → Actions** `MANUAL_DEPLOY_USER`,
+`MANUAL_DEPLOY_HOST` und `MANUAL_DEPLOY_PATH` abweichend vom Standardziel
+gesetzt werden. Die Action benötigt außerdem Zugriff auf GitHub Actions für
+das Repository; die Workflow-Datei fordert nur Leserechte für den Repository-
+Inhalt an.
 
 ```sh
 ./planer release

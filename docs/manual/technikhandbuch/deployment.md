@@ -19,8 +19,10 @@ Ein Release und seine Auslieferung laufen über:
 ./planer update --ref v2026.15.0 --backup-confirmed
 ```
 
-`release` baut und veröffentlicht das versionierte Image
-`pfarrtools/pfarrplaner:vVERSION`. `update` zieht dieses Image, führt
+`release` erstellt den Release-Commit und das versionierte Tag. Der Push des
+Tags startet die GitHub Action `Release`, die das Handbuch baut und
+veröffentlicht sowie das versionierte Image
+`pfarrtools/pfarrplaner:vVERSION` baut und pusht. `update` zieht dieses Image, führt
 Migrationen aus, aktualisiert die öffentlichen Assets und startet App, Horizon
 und Scheduler mit Health-Check neu. Der alte Image-Stand bleibt als
 Rollback-Grundlage erhalten. Wenn `MAIL_POSTFIX_ENABLED=true` gesetzt ist,
@@ -44,9 +46,12 @@ Netzwerke bleiben ohne direkten externen Zugriff.
 
 ## Release-Kontext
 
-Das Repository enthält Release-Skripte, die neben Versionsständen auch den
-Neubau und die Auslieferung des Handbuchs berücksichtigen. Manual-Operationen
-können unabhängig davon ausgeführt werden:
+Das Repository enthält Release-Skripte für Versionsstände und Tags. Die
+GitHub-Action benötigt die Secrets `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`,
+`MANUAL_DEPLOY_SSH_KEY` und `MANUAL_DEPLOY_KNOWN_HOSTS`; Zielparameter können
+über die Actions-Variablen `MANUAL_DEPLOY_USER`, `MANUAL_DEPLOY_HOST` und
+`MANUAL_DEPLOY_PATH` angepasst werden. Manual-Operationen können unabhängig
+davon ausgeführt werden:
 
 ```sh
 ./planer dev manual all
