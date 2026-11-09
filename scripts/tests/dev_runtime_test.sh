@@ -18,6 +18,8 @@ grep -q "env('CACHE_STORE', env('CACHE_DRIVER', 'file'))" "$ROOT/src/config/cach
 test -f "$ROOT/src/database/migrations/2014_10_12_200000_create_sessions_table.php"
 grep -q -- "--requirepass" "$ROOT/compose.yaml"
 grep -Fq 'redis-cli -a \"$$REDIS_PASSWORD\" ping' "$ROOT/compose.yaml"
+redis_block="$(sed -n '/^  redis:/,/^  minio:/p' "$ROOT/compose.yaml")"
+grep -q 'REDIS_PASSWORD: \${REDIS_PASSWORD:-pfarrplaner-development-redis}' <<<"$redis_block"
 grep -q -- '--max_allowed_packet=256M' "$ROOT/compose.yaml"
 grep -q 'command: \["php", "artisan", "horizon"\]' "$ROOT/compose.yaml"
 grep -q 'grep --line-buffered -vE' "$ROOT/compose.yaml"

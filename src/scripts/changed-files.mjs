@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process'
  * @returns {string[]} Changed paths relative to the application root.
  */
 export function changedFiles() {
-    if (process.env.QUALITY_FILES) {
+    if (process.env.QUALITY_FILES !== undefined) {
         return process.env.QUALITY_FILES.split('\n').filter(Boolean)
     }
 
