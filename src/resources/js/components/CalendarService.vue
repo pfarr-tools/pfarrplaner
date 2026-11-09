@@ -28,26 +28,35 @@
 
 <template>
     <div v-if="loading"><span class="mdi mdi-spin mdi-loading"></span></div>
-    <div v-else class="service-entry editable" style="cursor: pointer;"
-         title="Klicken, um diesen Eintrag zu bearbeiten" onclick="">
+    <div
+        v-else
+        class="service-entry editable"
+        style="cursor: pointer"
+        title="Klicken, um diesen Eintrag zu bearbeiten"
+        onclick=""
+    >
         <template v-if="null != service.special_location">
-            <div class="service-time">
-                {{ service.timeText }} HI
-            </div>
+            <div class="service-time">{{ service.timeText }} HI</div>
             <span class="separator">|</span>
             <div class="service-location">{{ service.special_location }}</div>
         </template>
         <template v-else>
-            <div class="service-time">
-                {{ service.timeText }} HO
-            </div>
+            <div class="service-time">{{ service.timeText }} HO</div>
             <span class="separator">|</span>
             <div class="service-location">{{ service.location.name }}</div>
         </template>
-        <img v-if="service.cc" src="/img/cc.png" :title="ccInfo()"/>
+        <img
+            v-if="service.cc"
+            src="/img/cc.png"
+            :title="ccInfo()"
+        />
         <div class="service-team service-pastor">
             <span class="designation">{{ $page.props.labels.code_pastor }}: </span>
-            <span v-if="service.need_predicant" class="need-predicant">{{ $page.props.labels.predicant }} benötigt</span>
+            <span
+                v-if="service.need_predicant"
+                class="need-predicant"
+                >{{ $page.props.labels.predicant }} benötigt</span
+            >
             <span v-for="person in service.pastors">{{ person.name }} </span>
         </div>
         <div class="service-team service-organist">
@@ -58,20 +67,24 @@
             <span class="designation">{{ $page.props.labels.code_sacristan }}: </span>
             <span v-for="person in service.sacristans">{{ person.name }} </span>
         </div>
-        <div class="service-description" v-html="service.descriptionText"></div>
+        <div
+            class="service-description"
+            v-html="service.descriptionText"
+        ></div>
         <div class="service-description">
-            <span v-if="service.baptisms.length > 0" :title="service.baptismsText"><span
-                class="mdi mdi-water"></span>{{ service.baptims.length }}</span>
+            <span
+                v-if="service.baptisms.length > 0"
+                :title="service.baptismsText"
+                ><span class="mdi mdi-water"></span>{{ service.baptims.length }}</span
+            >
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    name: "CalendarService",
-    props: [
-        'serviceId'
-    ],
+    name: 'CalendarService',
+    props: ['serviceId'],
     data() {
         return {
             service: [],
@@ -79,25 +92,31 @@ export default {
         }
     },
     created() {
-        this.getData();
+        this.getData()
     },
 
     methods: {
         getData(api_url) {
-            api_url = api_url || '/api/service/' + this.serviceId;
-            this.$api().get(api_url)
-                .then(response => {
-                    this.service = response.data;
-                    this.loading = false;
-                });
+            api_url = api_url || '/api/service/' + this.serviceId
+            this.$api()
+                .get(api_url)
+                .then((response) => {
+                    this.service = response.data
+                    this.loading = false
+                })
         },
         ccInfo: function () {
-            return 'Parallel Kinderkirche (' + service.cc_location + ') zum Thema ' + service.cc_lesson + ': ' + service.cc_staff;
-        }
-    }
+            return (
+                'Parallel Kinderkirche (' +
+                service.cc_location +
+                ') zum Thema ' +
+                service.cc_lesson +
+                ': ' +
+                service.cc_staff
+            )
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

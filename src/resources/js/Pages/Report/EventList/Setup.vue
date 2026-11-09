@@ -29,33 +29,66 @@
 <template>
     <admin-layout title="Terminliste erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Terminliste erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Terminliste erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'eventList'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'eventList' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="city" label="Liste für folgende Kirchengemeinde erstellen" v-model="myCity" :options="cities" />
-            <form-date-range-picker label="Von" v-model:from="myStart" v-model:to="myEnd" iso-date />
-            <form-check name="mixOutlook" label="Veranstaltungen aus dem Outlook-Kalender mit aufnehmen." v-model="mixOutlook" />
-            <form-check name="mixOP" label="Veranstaltungen aus dem Online Planer mit aufnehmen." v-model="mixOP" />
+            <form-selectize
+                name="city"
+                label="Liste für folgende Kirchengemeinde erstellen"
+                v-model="myCity"
+                :options="cities"
+            />
+            <form-date-range-picker
+                label="Von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
+            <form-check
+                name="mixOutlook"
+                label="Veranstaltungen aus dem Outlook-Kalender mit aufnehmen."
+                v-model="mixOutlook"
+            />
+            <form-check
+                name="mixOP"
+                label="Veranstaltungen aus dem Online Planer mit aufnehmen."
+                v-model="mixOP"
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities'],
-    components: {FormCheck, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {
+        FormCheck,
+        FormDateRangePicker,
+        FormInput,
+        FormCsrfToken,
+        FormSelectize,
+        SaveButton,
+    },
     data() {
-        let myStart = moment().startOf('month').add(1, 'month');
-        let myEnd = moment().startOf('month').add(2, 'months').subtract(1, 'day');
+        let myStart = moment().startOf('month').add(1, 'month')
+        let myEnd = moment().startOf('month').add(2, 'months').subtract(1, 'day')
 
         return {
             myCity: this.cities.length ? this.cities[0].id : null,
@@ -67,18 +100,16 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'eventList'}), {
+            submitReportForm(route('reports.render', { report: 'eventList' }), {
                 city: this.myCity,
                 start: this.myStart,
                 end: this.myEnd,
                 mixOutlook: this.mixOutlook,
                 mixOP: this.mixOP,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

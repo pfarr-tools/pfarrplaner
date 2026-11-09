@@ -28,26 +28,32 @@
 
 <template>
     <div v-if="parent.needs_dimissorial">
-        <checked-process-item v-if="parent.dimissorial_requested || parent.dimissorial_received" :check="parent.dimissorial_received"
-                              :positive="'Dimissoriale  erhalten'">
+        <checked-process-item
+            v-if="parent.dimissorial_requested || parent.dimissorial_received"
+            :check="parent.dimissorial_received"
+            :positive="'Dimissoriale  erhalten'"
+        >
             <template #negative>
-                Dimissoriale steht noch aus (beantragt am {{ moment(parent.dimissorial_requested).format('DD.MM.YYYY') }})
+                Dimissoriale steht noch aus (beantragt am
+                {{ moment(parent.dimissorial_requested).format('DD.MM.YYYY') }})
             </template>
         </checked-process-item>
-        <checked-process-item v-else :check="parent.dimissorial_requested"
-                              :negative="'Dimissoriale noch nicht beantragt'" positive="" />
+        <checked-process-item
+            v-else
+            :check="parent.dimissorial_requested"
+            :negative="'Dimissoriale noch nicht beantragt'"
+            positive=""
+        />
     </div>
 </template>
 
 <script>
-import CheckedProcessItem from "../Ui/elements/CheckedProcessItem";
+import CheckedProcessItem from '../Ui/elements/CheckedProcessItem'
 export default {
-    name: "DimissorialCheckItem",
-    components: {CheckedProcessItem},
+    name: 'DimissorialCheckItem',
+    components: { CheckedProcessItem },
     props: ['parent'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

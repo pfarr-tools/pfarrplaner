@@ -12,9 +12,17 @@
 <template>
     <admin-layout title="Excel-Tabelle der Gottesdienste erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Excel-Tabelle der Gottesdienste erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Excel-Tabelle der Gottesdienste erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'serviceExcelTable'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'serviceExcelTable' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
             <city-location-filter
                 :cities="cities"
@@ -55,17 +63,26 @@
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker.vue";
-import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker.vue'
+import CityLocationFilter from '../../../components/Reports/CityLocationFilter.vue'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 
 export default {
-    name: "Setup",
-    props: ['cities', 'locations', 'ministries', 'savedMinistries', 'readableHeaders', 'servicesOnly', 'start', 'end'],
+    name: 'Setup',
+    props: [
+        'cities',
+        'locations',
+        'ministries',
+        'savedMinistries',
+        'readableHeaders',
+        'servicesOnly',
+        'start',
+        'end',
+    ],
     components: {
         CityLocationFilter,
         FormCheck,
@@ -83,11 +100,11 @@ export default {
             myServicesOnly: this.servicesOnly ?? 1,
             myStart: this.start,
             myEnd: this.end,
-        };
+        }
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'serviceExcelTable'}), {
+            submitReportForm(route('reports.render', { report: 'serviceExcelTable' }), {
                 cities: this.myCities,
                 locations: this.myLocations,
                 start: this.myStart,
@@ -95,8 +112,8 @@ export default {
                 ministries: this.myMinistries,
                 readable_headers: this.myReadableHeaders,
                 services_only: this.myServicesOnly,
-            });
+            })
         },
-    }
+    },
 }
 </script>

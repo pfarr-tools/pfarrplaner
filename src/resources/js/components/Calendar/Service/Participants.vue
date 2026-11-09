@@ -28,20 +28,31 @@
 
 <template>
     <div class="service-team">
-        <span v-if="category" class="designation">{{ category }}: </span>
-        <span v-if="predicant" class="need-predicant">{{ $page.props.labels.predicant }} benötigt</span>
+        <span
+            v-if="category"
+            class="designation"
+            >{{ category }}:
+        </span>
+        <span
+            v-if="predicant"
+            class="need-predicant"
+            >{{ $page.props.labels.predicant }} benötigt</span
+        >
         <template v-if="text">
             <span>{{ text }}</span>
         </template>
         <template v-else>
-            <span v-for="person,index in participants"><span :class="{me: person.id == user.id}">{{ formatName(person) }}</span><span v-if="index<participants.length-1"> | </span></span>
+            <span v-for="(person, index) in participants"
+                ><span :class="{ me: person.id == user.id }">{{ formatName(person) }}</span
+                ><span v-if="index < participants.length - 1"> | </span></span
+            >
         </template>
     </div>
 </template>
 
 <script>
-import EventBus from "../../../plugins/EventBus";
-import {CalendarNewNameFormatEvent} from "../../../events/CalendarNewNameFormatEvent";
+import EventBus from '../../../plugins/EventBus'
+import { CalendarNewNameFormatEvent } from '../../../events/CalendarNewNameFormatEvent'
 
 export default {
     name: 'CalendarServiceParticipants',
@@ -54,19 +65,19 @@ export default {
     },
     methods: {
         formatName(person) {
-            if (!person.last_name) return person.name;
-            if (!person.first_name) return person.name;
-            return [person.title, person.first_name, person.last_name].join(' ').trim();
+            if (!person.last_name) return person.name
+            if (!person.first_name) return person.name
+            return [person.title, person.first_name, person.last_name].join(' ').trim()
         },
         handeNameFormatChange(e) {
-            this.nameFormat = e.format;
-        }
-    }
+            this.nameFormat = e.format
+        },
+    },
 }
 </script>
 
 <style scoped>
-    .me {
-        font-weight: bold;
-    }
+.me {
+    font-weight: bold;
+}
 </style>

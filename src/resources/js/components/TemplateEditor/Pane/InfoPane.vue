@@ -28,46 +28,58 @@
 
 <template>
     <div class="template-info-pane">
-        <form-input label="Titel" v-model="myTemplate.title" autofocus/>
-        <form-textarea label="Beschreibung" v-model="myTemplate.description"/>
-        <form-input label="Quelle" v-model="myTemplate.special_location"/>
+        <form-input
+            label="Titel"
+            v-model="myTemplate.title"
+            autofocus
+        />
+        <form-textarea
+            label="Beschreibung"
+            v-model="myTemplate.description"
+        />
+        <form-input
+            label="Quelle"
+            v-model="myTemplate.special_location"
+        />
     </div>
 </template>
 
 <script>
-import FormInput from "../../Ui/forms/FormInput.vue";
-import FormTextarea from "../../Ui/forms/FormTextarea.vue";
+import FormInput from '../../Ui/forms/FormInput.vue'
+import FormTextarea from '../../Ui/forms/FormTextarea.vue'
 
 export default {
-    name: "InfoPane",
+    name: 'InfoPane',
     emits: ['update:modelValue'],
-    components: {FormTextarea, FormInput},
+    components: { FormTextarea, FormInput },
     data() {
         return {
             myTemplate: this.modelValue,
-        };
+        }
     },
     props: ['modelValue'],
     watch: {
         myTemplate: {
             deep: true,
             handler(newValue) {
-                this.$emit('update:modelValue', newValue);
+                this.$emit('update:modelValue', newValue)
             },
-        }
+        },
     },
     methods: {
         editTemplateInfo() {
-            this.editing = true;
+            this.editing = true
         },
         saveTemplateInfo() {
             if (undefined == this.template.id) {
-                this.$inertia.post(route('template.store'), this.template, {preserveState: false});
+                this.$inertia.post(route('template.store'), this.template, { preserveState: false })
             } else {
-                this.$inertia.patch(route('template.update', this.template.id), this.template, {preserveState: false});
+                this.$inertia.patch(route('template.update', this.template.id), this.template, {
+                    preserveState: false,
+                })
             }
-        }
-    }
+        },
+    },
 }
 </script>
 
@@ -80,7 +92,7 @@ export default {
     border: solid 1px gray;
     min-width: 10px;
     min-height: 10px;
-     border-radius: 0;
+    border-radius: 0;
     display: inline-block;
 }
 </style>

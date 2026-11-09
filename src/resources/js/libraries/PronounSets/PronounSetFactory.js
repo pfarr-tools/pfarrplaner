@@ -26,19 +26,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ErPronounSet} from "./ErPronounSet";
-import {SiePronounSet} from "./SiePronounSet";
+import { ErPronounSet } from './ErPronounSet'
+import { SiePronounSet } from './SiePronounSet'
 
 export class PronounSetFactory {
     static get(key) {
-        switch(key) {
+        switch (key) {
             case 'sie':
-                return new SiePronounSet();
-                break;
+                return new SiePronounSet()
+                break
             case 'er':
             default:
-                return new ErPronounSet();
-                break;
+                return new ErPronounSet()
+                break
         }
     }
 }

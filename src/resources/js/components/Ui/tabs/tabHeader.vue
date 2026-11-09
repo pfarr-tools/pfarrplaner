@@ -27,25 +27,64 @@
   -->
 
 <template>
-    <li :id="id+'Tab'" class="nav-item" :title="disabled ? disabledTitle : ''" @click="tabSwitch">
-        <span v-if="(!title) && (!icon)" class="nav-link mdi mdi-spin mdi-loading"></span>
-        <a v-else class="nav-link" :class="{active: (active || (activeTab == id)) && !disabled, disabled: disabled}" :href="href || ('#'+id)" role="tab"
-           data-bs-toggle="tab" @click="tabSwitch">
-            <span v-if="icon" :class="icon"></span>
+    <li
+        :id="id + 'Tab'"
+        class="nav-item"
+        :title="disabled ? disabledTitle : ''"
+        @click="tabSwitch"
+    >
+        <span
+            v-if="!title && !icon"
+            class="nav-link mdi mdi-spin mdi-loading"
+        ></span>
+        <a
+            v-else
+            class="nav-link"
+            :class="{ active: (active || activeTab == id) && !disabled, disabled: disabled }"
+            :href="href || '#' + id"
+            role="tab"
+            data-bs-toggle="tab"
+            @click="tabSwitch"
+        >
+            <span
+                v-if="icon"
+                :class="icon"
+            ></span>
             {{ title }}
-            <span v-if="count && (count > 0) && (!disabled)" class="badge" :class="badgeClass()">{{ count }}</span>
-            <value-check v-if="isCheckedItem" :value="checkValue" />
+            <span
+                v-if="count && count > 0 && !disabled"
+                class="badge"
+                :class="badgeClass()"
+                >{{ count }}</span
+            >
+            <value-check
+                v-if="isCheckedItem"
+                :value="checkValue"
+            />
         </a>
     </li>
-
 </template>
 
 <script>
-import ValueCheck from "../elements/ValueCheck";
+import ValueCheck from '../elements/ValueCheck'
 export default {
-    name: "tabHeader",
-    components: {ValueCheck},
-    props: ['id', 'active', 'activeTab', 'title', 'count', 'badgeType', 'icon', 'href', 'isCheckedItem', 'checkValue', 'disabled', 'disabledTitle', 'switchHandler'],
+    name: 'tabHeader',
+    components: { ValueCheck },
+    props: [
+        'id',
+        'active',
+        'activeTab',
+        'title',
+        'count',
+        'badgeType',
+        'icon',
+        'href',
+        'isCheckedItem',
+        'checkValue',
+        'disabled',
+        'disabledTitle',
+        'switchHandler',
+    ],
     data() {
         return {
             myActiveTab: this.activeTab,
@@ -53,20 +92,18 @@ export default {
     },
     methods: {
         badgeClass() {
-            return this.badgeType ? 'badge-'+this.badgeType : 'badge-primary';
+            return this.badgeType ? 'badge-' + this.badgeType : 'badge-primary'
         },
         tabSwitch(e) {
             if (this.switchHandler) {
-                e.preventDefault();
-                e.stopPropagation();
-                this.myActiveTab = this.id;
-                this.$emit('tab', this.id);
+                e.preventDefault()
+                e.stopPropagation()
+                this.myActiveTab = this.id
+                this.$emit('tab', this.id)
             }
-        }
-    }
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

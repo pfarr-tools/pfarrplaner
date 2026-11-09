@@ -26,71 +26,69 @@
   - along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<template>
-
-</template>
+<template></template>
 
 <script>
 export default {
-    name: "EditorContent",
+    name: 'EditorContent',
     emits: ['input'],
     props: {
         editor: {
             default: null,
-            type: Object
+            type: Object,
         },
         value: {
-            default: "",
-            type: String
-        }
+            default: '',
+            type: String,
+        },
     },
 
     watch: {
         editor: {
             immediate: true,
             handler(editor) {
-                if (!editor || !editor.element) return;
+                if (!editor || !editor.element) return
 
-                this.editor.setContent(this.value);
-                this.editor.on("update", ({ getHTML }) => {
-                    this.$emit("input", getHTML());
-                });
+                this.editor.setContent(this.value)
+                this.editor.on('update', ({ getHTML }) => {
+                    this.$emit('input', getHTML())
+                })
 
                 this.$nextTick(() => {
-                    this.$el.appendChild(editor.element.firstChild);
-                    editor.setParentComponent(this);
-                });
-            }
+                    this.$el.appendChild(editor.element.firstChild)
+                    editor.setParentComponent(this)
+                })
+            },
         },
         value: {
             handler(value) {
-                this.editor.setContent(value);
-            }
-        }
+                this.editor.setContent(value)
+            },
+        },
     },
 
     render(createElement) {
-        return createElement("div");
+        return createElement('div')
     },
 
     beforeUnmount() {
-        this.editor.element = this.$el;
-    }
-};
+        this.editor.element = this.$el
+    },
+}
 </script>
 
 <style scoped>
 .ProseMirror {
     border: 1px solid #ced4da;
-     border-radius: 0;
+    border-radius: 0;
     box-shadow: inset 0 0 0 transparent;
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-    padding: .375rem .75rem;
+    transition:
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out;
+    padding: 0.375rem 0.75rem;
 }
 
 .ProseMirror-focused {
     border-color: #80bdff !important;
 }
-
-
 </style>

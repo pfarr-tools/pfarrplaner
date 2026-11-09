@@ -26,38 +26,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import {AbstractPronounSet} from "./AbstractPronounSet";
+import { AbstractPronounSet } from './AbstractPronounSet'
 
 export class SiePronounSet extends AbstractPronounSet {
     data = {
-        'er': 'sie',
-        'seiner': 'ihrer',
-        'ihm': 'sie',
-        'ihn': 'sie',
+        er: 'sie',
+        seiner: 'ihrer',
+        ihm: 'sie',
+        ihn: 'sie',
         // possessive
-        'sein': 'ihr',
-        'seine': 'ihre',
-        'seines': 'ihres',
-        'seinem': 'ihrem',
-        'seinen': 'ihren',
+        sein: 'ihr',
+        seine: 'ihre',
+        seines: 'ihres',
+        seinem: 'ihrem',
+        seinen: 'ihren',
         // relative
-        'der': 'die',
-        'dessen': 'deren',
-        'dem': 'der',
-        'den': 'die',
+        der: 'die',
+        dessen: 'deren',
+        dem: 'der',
+        den: 'die',
         // demonstrative
-        'dieser': 'diese',
-        'welcher': 'welche',
+        dieser: 'diese',
+        welcher: 'welche',
         // misc
-        'Sohn': 'Tochter',
-        'Bruder': 'Schwester',
-        'Mann': 'Frau',
+        Sohn: 'Tochter',
+        Bruder: 'Schwester',
+        Mann: 'Frau',
         'deinem Ehemann': 'deiner Ehefrau',
-        'Ehemann': 'Ehefrau',
-        'Ehegatte': 'Ehegattin',
-        'Ehepartner': 'Ehepartnerin',
-        'Verstorbener': 'Verstorbene',
+        Ehemann: 'Ehefrau',
+        Ehegatte: 'Ehegattin',
+        Ehepartner: 'Ehepartnerin',
+        Verstorbener: 'Verstorbene',
         'der Verstorbene': 'die Verstorbene',
         'des Verstorbenen': 'der Verstorbenen',
         'dem Verstorbenen': 'der Verstorbenen',

@@ -30,72 +30,143 @@
     <div class="absences-tab">
         <h2>Urlaubsanträge</h2>
         <div>
-            <a class="btn btn-primary" :href="route('absences.index')" title="Urlaubskalender öffnen">Urlaubskalender
-                öffnen</a>
+            <a
+                class="btn btn-primary"
+                :href="route('absences.index')"
+                title="Urlaubskalender öffnen"
+                >Urlaubskalender öffnen</a
+            >
         </div>
-        <hr/>
-        <div v-if="(check.length == 0) && (approve.length == 0)" class="alert alert-info">Zur Zeit gibt es keine zu
-            bearbeitenden. Urlaubsanträge.
+        <hr />
+        <div
+            v-if="check.length == 0 && approve.length == 0"
+            class="alert alert-info"
+        >
+            Zur Zeit gibt es keine zu bearbeitenden. Urlaubsanträge.
         </div>
         <div v-else>
-            <div v-if="(check.length > 0)">
+            <div v-if="check.length > 0">
                 <h3>Zur Überprüfung</h3>
-                <fake-table :columns="[3,3,3,3]" :headers="['Benutzer', 'Beschreibung', '', '']"
-                            collapsed-header="Abwesenheiten">
-                    <div class="row mb-3 p-1" v-for="absence in myCheckableAbsences">
+                <fake-table
+                    :columns="[3, 3, 3, 3]"
+                    :headers="['Benutzer', 'Beschreibung', '', '']"
+                    collapsed-header="Abwesenheiten"
+                >
+                    <div
+                        class="row mb-3 p-1"
+                        v-for="absence in myCheckableAbsences"
+                    >
                         <div class="col-md-3">
-                            <b>{{ absence.user.name }}</b><br/>
+                            <b>{{ absence.user.name }}</b
+                            ><br />
                             vom {{ moment(absence.updated_at).locale('de').format('DD.MM.YYYY') }}
                         </div>
                         <div class="col-md-3">
-                            <b>{{ absence.reason }}</b><br/>
+                            <b>{{ absence.reason }}</b
+                            ><br />
                             {{ moment(absence.from).locale('de').format('DD.MM.YYYY') }} -
                             {{ moment(absence.to).locale('de').format('DD.MM.YYYY') }}
                         </div>
                         <div class="col-md-3"></div>
                         <div class="col-md-3 text-end">
-                            <nav-button v-if="!absence.checking" type="success" icon="mdi mdi-check"
-                                        title="Als überprüft markieren" force-icon @click="absence.checking=true; forceChecked(absence)" />
-                            <span v-else class="mdi mdi-spin mdi-loading" title="Wird als überprüft markiert..."></span>
-                            <nav-button type="primary" icon="mdi mdi-pencil" title="Zur Überprüfung des Antrags" force-icon
-                                        @click="editAbsence(absence)"/>
-                            <nav-button type="danger" icon="mdi mdi-delete" title="Antrag kommentarlos löschen" force-icon
-                                        @click="deleteAbsence(absence)"/>
+                            <nav-button
+                                v-if="!absence.checking"
+                                type="success"
+                                icon="mdi mdi-check"
+                                title="Als überprüft markieren"
+                                force-icon
+                                @click="checkAbsence(absence)"
+                            />
+                            <span
+                                v-else
+                                class="mdi mdi-spin mdi-loading"
+                                title="Wird als überprüft markiert..."
+                            ></span>
+                            <nav-button
+                                type="primary"
+                                icon="mdi mdi-pencil"
+                                title="Zur Überprüfung des Antrags"
+                                force-icon
+                                @click="editAbsence(absence)"
+                            />
+                            <nav-button
+                                type="danger"
+                                icon="mdi mdi-delete"
+                                title="Antrag kommentarlos löschen"
+                                force-icon
+                                @click="deleteAbsence(absence)"
+                            />
                         </div>
                     </div>
                 </fake-table>
             </div>
-            <div v-if="(approve.length > 0)">
-                <hr v-if="check.length > 0"/>
+            <div v-if="approve.length > 0">
+                <hr v-if="check.length > 0" />
                 <h3>Zur Genehmigung</h3>
-                <fake-table :columns="[3,3,3,3]" :headers="['Benutzer', 'Beschreibung', 'Status', '']"
-                            collapsed-header="Abwesenheiten">
-                    <div class="row mb-3 p-1" v-for="absence in myApprovableAbsences">
+                <fake-table
+                    :columns="[3, 3, 3, 3]"
+                    :headers="['Benutzer', 'Beschreibung', 'Status', '']"
+                    collapsed-header="Abwesenheiten"
+                >
+                    <div
+                        class="row mb-3 p-1"
+                        v-for="absence in myApprovableAbsences"
+                    >
                         <div class="col-md-3">
-                            <b>{{ absence.user.name }}</b><br/>
+                            <b>{{ absence.user.name }}</b
+                            ><br />
                             vom {{ moment(absence.updated_at).locale('de').format('DD.MM.YYYY') }}
                         </div>
                         <div class="col-md-3">
-                            <b>{{ absence.reason }}</b><br/>
+                            <b>{{ absence.reason }}</b
+                            ><br />
                             {{ moment(absence.from).locale('de').format('DD.MM.YYYY') }} -
                             {{ moment(absence.to).locale('de').format('DD.MM.YYYY') }}
                         </div>
                         <div class="col-md-3">
                             <checked-process-item check="1">
                                 <template #positive>
-                                    Überprüft <span v-if="absence.checked_at">
-                                        am {{ moment(absence.checked_at).locale('de').format('DD.MM.YYYY') }}
-                                        um {{ moment(absence.checked_at).locale('de').format('HH:MM') }} Uhr
-                                    </span> <span v-if="absence.checked_by">von {{ absence.checked_by.name }}</span>
+                                    Überprüft
+                                    <span v-if="absence.checked_at">
+                                        am
+                                        {{
+                                            moment(absence.checked_at)
+                                                .locale('de')
+                                                .format('DD.MM.YYYY')
+                                        }}
+                                        um
+                                        {{
+                                            moment(absence.checked_at).locale('de').format('HH:MM')
+                                        }}
+                                        Uhr
+                                    </span>
+                                    <span v-if="absence.checked_by"
+                                        >von {{ absence.checked_by.name }}</span
+                                    >
                                 </template>
                             </checked-process-item>
                         </div>
                         <div class="col-md-3 text-end">
-                            <nav-button v-if="!absence.approving" type="success" icon="mdi mdi-check"
-                                        title="Als genehmigt markieren" force-icon @click="absence.approving=true; forceApproved(absence)" />
-                            <span v-else class="mdi mdi-spin mdi-loading" title="Wird als genehmigt markiert..."></span>
-                            <nav-button type="primary" icon="mdi mdi-pencil" title="Zur Genehmigung des Antrags" force-icon
-                                        @click="editAbsence(absence)"/>
+                            <nav-button
+                                v-if="!absence.approving"
+                                type="success"
+                                icon="mdi mdi-check"
+                                title="Als genehmigt markieren"
+                                force-icon
+                                @click="approveAbsence(absence)"
+                            />
+                            <span
+                                v-else
+                                class="mdi mdi-spin mdi-loading"
+                                title="Wird als genehmigt markiert..."
+                            ></span>
+                            <nav-button
+                                type="primary"
+                                icon="mdi mdi-pencil"
+                                title="Zur Genehmigung des Antrags"
+                                force-icon
+                                @click="editAbsence(absence)"
+                            />
                         </div>
                     </div>
                 </fake-table>
@@ -105,23 +176,23 @@
 </template>
 
 <script>
-import FakeTable from "../Ui/FakeTable";
-import NavButton from "../Ui/buttons/NavButton";
-import CheckedProcessItem from "../Ui/elements/CheckedProcessItem";
+import FakeTable from '../Ui/FakeTable'
+import NavButton from '../Ui/buttons/NavButton'
+import CheckedProcessItem from '../Ui/elements/CheckedProcessItem'
 
 export default {
-    name: "AbsenceRequestsTab",
-    components: {CheckedProcessItem, NavButton, FakeTable},
+    name: 'AbsenceRequestsTab',
+    components: { CheckedProcessItem, NavButton, FakeTable },
     props: ['title', 'description', 'user', 'settings', 'check', 'approve', 'count', 'config'],
     data() {
-        let myCheckableAbsences =  this.check;
-        let myApprovableAbsences = this.approve;
+        let myCheckableAbsences = this.check
+        let myApprovableAbsences = this.approve
 
         for (let id in myCheckableAbsences) {
-            myCheckableAbsences[id].checking = false;
+            myCheckableAbsences[id].checking = false
         }
         for (let id in myApprovableAbsences) {
-            myApprovableAbsences[id].approving = false;
+            myApprovableAbsences[id].approving = false
         }
 
         return {
@@ -130,37 +201,77 @@ export default {
         }
     },
     methods: {
+        /**
+         * Mark an absence as being checked and persist that state.
+         *
+         * @param {object} absence Absence request to check.
+         */
+        checkAbsence(absence) {
+            absence.checking = true
+            this.forceChecked(absence)
+        },
+        /**
+         * Mark an absence as being approved and persist that state.
+         *
+         * @param {object} absence Absence request to approve.
+         */
+        approveAbsence(absence) {
+            absence.approving = true
+            this.forceApproved(absence)
+        },
         editAbsence(absence) {
-            this.$inertia.get(route('absence.edit', absence.id));
+            this.$inertia.get(route('absence.edit', absence.id))
         },
         deleteAbsence(absence) {
-            if (!confirm('Willst du diesen Abwesenheitseintrag wirklich in den Papierkorb verschieben? Du kannst ihn dort später wiederherstellen.')) return;
-            this.$api().delete(route('api.absence.destroy', {
-                absence: absence.id,
-            })).then(response => {
-                this.myCheckableAbsences = this.myCheckableAbsences.filter(item => item.id != absence.id);
-                this.myApprovableAbsences = this.myApprovableAbsences.filter(item => item.id != absence.id);
-            });
+            if (
+                !confirm(
+                    'Willst du diesen Abwesenheitseintrag wirklich in den Papierkorb verschieben? Du kannst ihn dort später wiederherstellen.',
+                )
+            )
+                return
+            this.$api()
+                .delete(
+                    route('api.absence.destroy', {
+                        absence: absence.id,
+                    }),
+                )
+                .then((response) => {
+                    this.myCheckableAbsences = this.myCheckableAbsences.filter(
+                        (item) => item.id != absence.id,
+                    )
+                    this.myApprovableAbsences = this.myApprovableAbsences.filter(
+                        (item) => item.id != absence.id,
+                    )
+                })
         },
         forceChecked(absence) {
-            this.$api().post(route('api.absence.set-checked', {
-                absence: absence.id,
-            })).then(response => {
-                this.myCheckableAbsences = this.myCheckableAbsences.filter(item => item.id != absence.id);
-            });
+            this.$api()
+                .post(
+                    route('api.absence.set-checked', {
+                        absence: absence.id,
+                    }),
+                )
+                .then((response) => {
+                    this.myCheckableAbsences = this.myCheckableAbsences.filter(
+                        (item) => item.id != absence.id,
+                    )
+                })
         },
         forceApproved(absence) {
-            this.$api().post(route('api.absence.set-approved', {
-                absence: absence.id,
-            })).then(response => {
-                this.myApprovableAbsences = this.myApprovableAbsences.filter(item => item.id != absence.id);
-            });
+            this.$api()
+                .post(
+                    route('api.absence.set-approved', {
+                        absence: absence.id,
+                    }),
+                )
+                .then((response) => {
+                    this.myApprovableAbsences = this.myApprovableAbsences.filter(
+                        (item) => item.id != absence.id,
+                    )
+                })
         },
-    }
-
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

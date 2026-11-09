@@ -27,69 +27,115 @@
   -->
 
 <template>
-    <admin-layout :title="today.format('ddd, DD. MMMM YYYY')+' ('+city.name+')'" no-content-header>
+    <admin-layout
+        :title="today.format('ddd, DD. MMMM YYYY') + ' (' + city.name + ')'"
+        no-content-header
+    >
         <template #navbar-left>
-            <a class="btn btn-light" :href="route('calendar', {date: today.format('YYYY-MM')})">
+            <a
+                class="btn btn-light"
+                :href="route('calendar', { date: today.format('YYYY-MM') })"
+            >
                 <span class="mdi mdi-calendar"></span> {{ today.format('MMMM YYYY') }}
             </a>
         </template>
         <table class="table calendar-month">
             <thead>
-            <tr>
-                <th>
-                    <div class="card card-effect">
-                        <div :class="{'card-header': 1, 'day-header-So': today.format('E') == 7}">
-                            {{ today.format('dddd') }}
-                        </div>
-                        <div class="card-body">
-                            {{ today.format('D') }}
-                        </div>
-                        <div class="liturgy">
-                            <div class="liturgy-sermon" v-if="liturgy.perikope">
-                                <div :class="liturgy.litColor" class="liturgy-color" :title="liturgy.feastCircleName"></div>
-                                <a :href="liturgy.currentPerikopeLink" target="_blank">
-                                    {{ liturgy.currentPerikope }}
-                                </a>
+                <tr>
+                    <th>
+                        <div class="card card-effect">
+                            <div
+                                :class="{
+                                    'card-header': 1,
+                                    'day-header-So': today.format('E') == 7,
+                                }"
+                            >
+                                {{ today.format('dddd') }}
+                            </div>
+                            <div class="card-body">
+                                {{ today.format('D') }}
+                            </div>
+                            <div class="liturgy">
+                                <div
+                                    class="liturgy-sermon"
+                                    v-if="liturgy.perikope"
+                                >
+                                    <div
+                                        :class="liturgy.litColor"
+                                        class="liturgy-color"
+                                        :title="liturgy.feastCircleName"
+                                    ></div>
+                                    <a
+                                        :href="liturgy.currentPerikopeLink"
+                                        target="_blank"
+                                    >
+                                        {{ liturgy.currentPerikope }}
+                                    </a>
+                                </div>
+                            </div>
+                            <div
+                                class="card-footer day-name"
+                                :title="liturgy.litProfileGist"
+                                v-if="liturgy.title"
+                            >
+                                {{ liturgy.title }}
                             </div>
                         </div>
-                        <div class="card-footer day-name" :title="liturgy.litProfileGist" v-if="liturgy.title">
-                            {{liturgy.title}}
+                    </th>
+                </tr>
+                <tr>
+                    <th class="text-center">
+                        {{ city.name }}
+                        <div
+                            v-if="absences.length && $can('urlaub-lesen')"
+                            class="my-1"
+                        >
+                            <div
+                                class="vacation me-1"
+                                v-for="absence in absences"
+                                :absence="absence"
+                                :title="
+                                    absence.user.name +
+                                    ': ' +
+                                    absence.reason +
+                                    ' (' +
+                                    absence.durationText +
+                                    ') ' +
+                                    replacementText(absence)
+                                "
+                            >
+                                <span class="mdi mdi-earth"></span> {{ absence.user.last_name }}
+                            </div>
                         </div>
-                    </div>
-                </th>
-            </tr>
-            <tr>
-                <th class="text-center">
-                    {{ city.name }}
-                    <div v-if="(absences.length) && $can('urlaub-lesen')" class="my-1">
-                        <div class="vacation me-1" v-for="absence in absences" :absence="absence"
-                             :title="absence.user.name+': '+absence.reason+' ('+absence.durationText+') '+replacementText(absence)">
-                            <span class="mdi mdi-earth"></span> {{ absence.user.last_name }}</div>
-                    </div>
-                </th>
-            </tr>
+                    </th>
+                </tr>
             </thead>
             <tbody>
-            <tr>
-                <calendar-cell :day="day" :services="services" :city="city" :can-create="canCreate" :uncollapsed="true"/>
-            </tr>
+                <tr>
+                    <calendar-cell
+                        :day="day"
+                        :services="services"
+                        :city="city"
+                        :can-create="canCreate"
+                        :uncollapsed="true"
+                    />
+                </tr>
             </tbody>
         </table>
     </admin-layout>
 </template>
 
 <script>
-import CalendarCell from "../../components/Calendar/Cell.vue";
+import CalendarCell from '../../components/Calendar/Cell.vue'
 
 export default {
-    name: "SingleDay",
-    components: {CalendarCell},
+    name: 'SingleDay',
+    components: { CalendarCell },
     props: ['services', 'day', 'city', 'absences', 'canCreate'],
     provide() {
         return {
             settings: this.$page.props.settings || {},
-
-    }
+        }
     },
     data() {
         return {
@@ -99,15 +145,13 @@ export default {
     },
     methods: {
         back() {
-            window.history.back();
+            window.history.back()
         },
         replacementText: function (absence) {
-            return absence.replacementText ? '[V: '+absence.replacementText+']' : '';
+            return absence.replacementText ? '[V: ' + absence.replacementText + ']' : ''
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

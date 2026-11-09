@@ -27,26 +27,31 @@
   -->
 
 <template>
-    <span class="badge bg-light" :style="{backgroundColor: color}">{{ value.title }}</span>
+    <span
+        class="badge bg-light"
+        :style="{ backgroundColor: color }"
+        >{{ value.title }}</span
+    >
 </template>
 
 <script>
 export default {
-    name: "SeatingLabel",
+    name: 'SeatingLabel',
     props: ['value'],
     computed: {
         color() {
-            let color = this.value.color || null;
-            if ((null === color) && (undefined !== this.value.seating_section)) return this.value.seating_section.color;
-            return color;
-        }
-    }
+            let color = this.value.color || null
+            if (null === color && undefined !== this.value.seating_section)
+                return this.value.seating_section.color
+            return color
+        },
+    },
 }
 </script>
 
 <style scoped>
-    .badge {
-        font-size: 1em;
-        font-weight: normal;
-    }
+.badge {
+    font-size: 1em;
+    font-weight: normal;
+}
 </style>

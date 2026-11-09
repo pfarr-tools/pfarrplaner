@@ -29,73 +29,105 @@
 <template>
     <admin-layout title="Bekanntgaben erstellen">
         <template v-slot:navbar-left>
-            <nav-button type="primary" icon="mdi mdi-email-fast" title="Bekanntgaben erstellen"
-                        @click="submitForm">Erstellen
+            <nav-button
+                type="primary"
+                icon="mdi mdi-email-fast"
+                title="Bekanntgaben erstellen"
+                @click="submitForm"
+                >Erstellen
             </nav-button>
         </template>
         <template v-slot:before-flash>
-            <div v-if="servicesLoading || lastServiceLoading" class="alert alert-warning">Lade Daten, bitte warten...</div>
+            <div
+                v-if="servicesLoading || lastServiceLoading"
+                class="alert alert-warning"
+            >
+                Lade Daten, bitte warten...
+            </div>
         </template>
-        <form method="post" :action="route('reports.render', {report: 'announcements'})" @submit.prevent="submitForm">
-            <form-csrf-token/>
-            <form-selectize label="Kirchengemeinde" name="city" v-model="myCity" :options="cities"/>
-            <div v-if="(!servicesLoading) && (services.length > 0)">
-                <form-selectize label="Bekanntgaben für den folgenden Gottesdienst erstellen"
-                                name="service" :options="services" v-model="myService"/>
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'announcements' })"
+            @submit.prevent="submitForm"
+        >
+            <form-csrf-token />
+            <form-selectize
+                label="Kirchengemeinde"
+                name="city"
+                v-model="myCity"
+                :options="cities"
+            />
+            <div v-if="!servicesLoading && services.length > 0">
+                <form-selectize
+                    label="Bekanntgaben für den folgenden Gottesdienst erstellen"
+                    name="service"
+                    :options="services"
+                    v-model="myService"
+                />
             </div>
-            <form-check label="Wöchentlich wiederholte Veranstaltungen (nicht Gottesdienste) ausschließen"
-                        name="excludeRegularWeekly" v-model="excludeRegularWeekly" class="mb-1"/>
-            <div v-if="(!lastServiceLoading) && (myLastServiceDays.length > 0)">
-                <form-selectize label="Herzlichen Dank für das Opfer der Gottesdienste vom..."
-                                :key="lastServiceDaysLoaded"
-                                name="lastService" :options="myLastServiceDays" v-model="myLastServiceDay"/>
+            <form-check
+                label="Wöchentlich wiederholte Veranstaltungen (nicht Gottesdienste) ausschließen"
+                name="excludeRegularWeekly"
+                v-model="excludeRegularWeekly"
+                class="mb-1"
+            />
+            <div v-if="!lastServiceLoading && myLastServiceDays.length > 0">
+                <form-selectize
+                    label="Herzlichen Dank für das Opfer der Gottesdienste vom..."
+                    :key="lastServiceDaysLoaded"
+                    name="lastService"
+                    :options="myLastServiceDays"
+                    v-model="myLastServiceDay"
+                />
             </div>
-            <div v-if="(!amountLoading)">
-                <form-input label="... in Höhe von ..."
-                            :key="amountLoaded"
-                            name="offerings" v-model="amount"/>
+            <div v-if="!amountLoading">
+                <form-input
+                    label="... in Höhe von ..."
+                    :key="amountLoaded"
+                    name="offerings"
+                    v-model="amount"
+                />
             </div>
         </form>
     </admin-layout>
-
 </template>
 
 <script>
-
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
-import LocationSelect from "../../../components/Ui/elements/LocationSelect";
-import FakeTable from "../../../components/Ui/FakeTable";
-import PeopleSelect from "../../../components/Ui/elements/PeopleSelect";
-import TabHeaders from "../../../components/Ui/tabs/tabHeaders";
-import TabHeader from "../../../components/Ui/tabs/tabHeader";
-import Tabs from "../../../components/Ui/tabs/tabs";
-import Tab from "../../../components/Ui/tabs/tab";
-import FormTextarea from "../../../components/Ui/forms/FormTextarea";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormDatePicker from '../../../components/Ui/forms/FormDatePicker'
+import LocationSelect from '../../../components/Ui/elements/LocationSelect'
+import FakeTable from '../../../components/Ui/FakeTable'
+import PeopleSelect from '../../../components/Ui/elements/PeopleSelect'
+import TabHeaders from '../../../components/Ui/tabs/tabHeaders'
+import TabHeader from '../../../components/Ui/tabs/tabHeader'
+import Tabs from '../../../components/Ui/tabs/tabs'
+import Tab from '../../../components/Ui/tabs/tab'
+import FormTextarea from '../../../components/Ui/forms/FormTextarea'
+import NavButton from '../../../components/Ui/buttons/NavButton'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities'],
     components: {
         FormCsrfToken,
         FormCheck,
         NavButton,
         FormTextarea,
-        FormSelectize, FormInput
+        FormSelectize,
+        FormInput,
     },
     async mounted() {
-        await this.getServices();
-        await this.getLastServiceDays();
-        await this.getAmount();
+        await this.getServices()
+        await this.getLastServiceDays()
+        await this.getAmount()
     },
     computed: {
         currentCity() {
-            if (this.myCity) return this.cities.filter(city => city.id == this.myCity)[0] || null;
+            if (this.myCity) return this.cities.filter((city) => city.id == this.myCity)[0] || null
         },
     },
     data() {
@@ -120,82 +152,98 @@ export default {
     },
     watch: {
         async myCity() {
-            await this.getServices();
+            await this.getServices()
         },
         async myService() {
-            await this.getLastServiceDays();
+            await this.getLastServiceDays()
         },
         async myLastServiceDay() {
-            await this.getAmount();
+            await this.getAmount()
         },
     },
     methods: {
         queryDate(d) {
-            return typeof d == 'object' ? d.format('YYYY-MM-DD') : moment(d, 'DD.MM.YYYY').format('YYYY-MM-DD');
+            return typeof d == 'object'
+                ? d.format('YYYY-MM-DD')
+                : moment(d, 'DD.MM.YYYY').format('YYYY-MM-DD')
         },
         async getServices() {
-            if (!this.myCity) return [];
-            this.servicesLoading = true;
-            this.services = await this.$api().post(route('api.report.step', {
-                report: 'announcements',
-                step: 'services',
-                city: this.myCity,
-            })).then(response => {
-                this.services = response.data.services;
-                if (this.services.length) this.myService = this.services[0].id;
-                this.servicesLoading = false;
-                this.servicesLoaded++;
-                return response.data.services;
-            });
+            if (!this.myCity) return []
+            this.servicesLoading = true
+            this.services = await this.$api()
+                .post(
+                    route('api.report.step', {
+                        report: 'announcements',
+                        step: 'services',
+                        city: this.myCity,
+                    }),
+                )
+                .then((response) => {
+                    this.services = response.data.services
+                    if (this.services.length) this.myService = this.services[0].id
+                    this.servicesLoading = false
+                    this.servicesLoaded++
+                    return response.data.services
+                })
         },
         async getLastServiceDays() {
-            if ((!this.myCity) || (!this.myService)) return [];
-            this.lastServiceLoading = true;
-            this.myLastServiceDays = await this.$api().post(route('api.report.step', {
-                report: 'announcements',
-                step: 'lastServiceDays',
-                city: this.myCity,
-                service: this.myService,
-            })).then(response => {
-                this.myLastServiceDays = response.data;
-                if (this.myLastServiceDays.length) this.myLastServiceDay = this.myLastServiceDays[0].id;
-                this.lastServiceLoading = false;
-                this.lastServiceDaysLoaded++;
-                return response.data;
-            });
-            if (this.myLastServiceDays.length) this.myLastServiceDay = this.myLastServiceDays[0].id;
+            if (!this.myCity || !this.myService) return []
+            this.lastServiceLoading = true
+            this.myLastServiceDays = await this.$api()
+                .post(
+                    route('api.report.step', {
+                        report: 'announcements',
+                        step: 'lastServiceDays',
+                        city: this.myCity,
+                        service: this.myService,
+                    }),
+                )
+                .then((response) => {
+                    this.myLastServiceDays = response.data
+                    if (this.myLastServiceDays.length)
+                        this.myLastServiceDay = this.myLastServiceDays[0].id
+                    this.lastServiceLoading = false
+                    this.lastServiceDaysLoaded++
+                    return response.data
+                })
+            if (this.myLastServiceDays.length) this.myLastServiceDay = this.myLastServiceDays[0].id
         },
         async getAmount() {
-            if ((!this.myCity) || (!this.myLastServiceDay)) return [];
-            this.amountLoading = true;
-            this.amount = await this.$api().post(route('api.report.step', {
-                report: 'announcements',
-                step: 'offerings',
-                city: this.myCity,
-                day: this.myLastServiceDay,
-            })).then(response => {
-                this.amountLoading = false;
-                this.amountLoaded++;
-                return (new Intl.NumberFormat('de-DE', {style: 'currency', currency: 'EUR'}).format(response.data));
-            });
-            if (this.myLastServiceDays.length) this.myLastServiceDay = this.myLastServiceDays[0].id;
+            if (!this.myCity || !this.myLastServiceDay) return []
+            this.amountLoading = true
+            this.amount = await this.$api()
+                .post(
+                    route('api.report.step', {
+                        report: 'announcements',
+                        step: 'offerings',
+                        city: this.myCity,
+                        day: this.myLastServiceDay,
+                    }),
+                )
+                .then((response) => {
+                    this.amountLoading = false
+                    this.amountLoaded++
+                    return new Intl.NumberFormat('de-DE', {
+                        style: 'currency',
+                        currency: 'EUR',
+                    }).format(response.data)
+                })
+            if (this.myLastServiceDays.length) this.myLastServiceDay = this.myLastServiceDays[0].id
         },
         setLocation(e) {
-            this.myLocations = e;
+            this.myLocations = e
         },
         submitForm() {
-            submitReportForm(route('reports.render', {report: 'announcements'}), {
+            submitReportForm(route('reports.render', { report: 'announcements' }), {
                 city: this.myCity,
                 service: this.myService,
                 excludeRegularWeekly: this.excludeRegularWeekly,
                 lastService: this.myLastServiceDay,
                 offerings: this.amount,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

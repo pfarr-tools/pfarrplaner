@@ -27,18 +27,22 @@
   -->
 
 <template>
-    <model-index-page title="Kirchengemeinden" :records="cities" :can-create="canCreate"
-                      create-label="Neue Kirchengemeinde" create-route-name="admin.cities.create"
-                      model-label="Kirchengemeinde">
+    <model-index-page
+        title="Kirchengemeinden"
+        :records="cities"
+        :can-create="canCreate"
+        create-label="Neue Kirchengemeinde"
+        create-route-name="admin.cities.create"
+        model-label="Kirchengemeinde"
+    >
     </model-index-page>
 </template>
 
 <script>
-import ModelIndexPage from "../../../components/Admin/ModelIndexPage.vue";
-
+import ModelIndexPage from '../../../components/Admin/ModelIndexPage.vue'
 
 export default {
-    name: "Index",
+    name: 'Index',
     components: {
         ModelIndexPage,
     },
@@ -46,5 +50,4 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

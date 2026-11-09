@@ -27,22 +27,40 @@
   -->
 
 <template>
-    <form-group :id="myId" :input-id="`${myId}Input`" :label="label" :help="help" :name="name"
-                :pre-label="preLabel" :required="required" v-slot="field">
-        <textarea :id="field.fieldId" :value="currentValue" class="form-control" :class="{'is-invalid': field.error}"
-                  :rows="rows" :placeholder="placeholder" :disabled="disabled" :name="name"
-                  :required="required" :aria-required="required ? 'true' : 'false'"
-                  :aria-invalid="field.error ? 'true' : 'false'" :aria-describedby="field.describedBy || undefined"
-                  @input="onInput($event.target.value)" />
+    <form-group
+        :id="myId"
+        :input-id="`${myId}Input`"
+        :label="label"
+        :help="help"
+        :name="name"
+        :pre-label="preLabel"
+        :required="required"
+        v-slot="field"
+    >
+        <textarea
+            :id="field.fieldId"
+            :value="currentValue"
+            class="form-control"
+            :class="{ 'is-invalid': field.error }"
+            :rows="rows"
+            :placeholder="placeholder"
+            :disabled="disabled"
+            :name="name"
+            :required="required"
+            :aria-required="required ? 'true' : 'false'"
+            :aria-invalid="field.error ? 'true' : 'false'"
+            :aria-describedby="field.describedBy || undefined"
+            @input="onInput($event.target.value)"
+        />
     </form-group>
 </template>
 
 <script>
-import FormGroup from "./FormGroup";
-import { uid } from '../../../libraries/uid';
+import FormGroup from './FormGroup'
+import { uid } from '../../../libraries/uid'
 export default {
-    name: "FormTextarea",
-    components: {FormGroup},
+    name: 'FormTextarea',
+    components: { FormGroup },
     emits: ['input', 'update:modelValue'],
     props: {
         label: String,
@@ -66,7 +84,7 @@ export default {
     },
     computed: {
         currentValue() {
-            return this.modelValue !== undefined ? this.modelValue : this.value;
+            return this.modelValue !== undefined ? this.modelValue : this.value
         },
     },
     data() {
@@ -76,13 +94,11 @@ export default {
     },
     methods: {
         onInput(v) {
-            this.$emit('input', v);
-            this.$emit('update:modelValue', v);
-        }
-    }
+            this.$emit('input', v)
+            this.$emit('update:modelValue', v)
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

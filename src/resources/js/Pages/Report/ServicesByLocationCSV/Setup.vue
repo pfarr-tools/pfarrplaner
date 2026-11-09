@@ -29,31 +29,56 @@
 <template>
     <admin-layout title="Liste der Gottesdienste für einen Ort erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Liste der Gottesdienste für einen Ort erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Liste der Gottesdienste für einen Ort erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'servicesByLocationCSV'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'servicesByLocationCSV' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="location_id" label="Ort" v-model="myLocation" :options="locations" />
-            <form-date-range-picker label="Von" v-model:from="myStart" v-model:to="myEnd" iso-date />
+            <form-selectize
+                name="location_id"
+                label="Ort"
+                v-model="myLocation"
+                :options="locations"
+            />
+            <form-date-range-picker
+                label="Von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['locations'],
-    components: {FormCheck, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {
+        FormCheck,
+        FormDateRangePicker,
+        FormInput,
+        FormCsrfToken,
+        FormSelectize,
+        SaveButton,
+    },
     data() {
-        let myStart = moment().startOf('month').add(1, 'month');
-        let myEnd = moment().endOf('year');
+        let myStart = moment().startOf('month').add(1, 'month')
+        let myEnd = moment().endOf('year')
 
         return {
             myStart,
@@ -63,16 +88,14 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'servicesByLocationCSV'}), {
+            submitReportForm(route('reports.render', { report: 'servicesByLocationCSV' }), {
                 location_id: this.myLocation,
                 start: this.myStart,
                 end: this.myEnd,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

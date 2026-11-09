@@ -29,10 +29,21 @@
 <template>
     <admin-layout title="Ausgabeformat wählen">
         <div v-for="(groupReports, groupTitle) in reports">
-            <h3 v-if="groupReports.length" class="mt-3">{{ groupTitle}}</h3>
-            <div v-if="groupReports.length" class="row">
-                <div v-for="report in groupReports" class="col-md-4 p-2 border-light report-card"
-                @click="createReport(report)">
+            <h3
+                v-if="groupReports.length"
+                class="mt-3"
+            >
+                {{ groupTitle }}
+            </h3>
+            <div
+                v-if="groupReports.length"
+                class="row"
+            >
+                <div
+                    v-for="report in groupReports"
+                    class="col-md-4 p-2 border-light report-card"
+                    @click="createReport(report)"
+                >
                     <div class="fw-semibold">
                         <span :class="report.icon"></span>
                         {{ report.title }}
@@ -45,30 +56,29 @@
 </template>
 
 <script>
-
-import Card from "../../components/Ui/cards/card.vue";
-import CardBody from "../../components/Ui/cards/cardBody.vue";
+import Card from '../../components/Ui/cards/card.vue'
+import CardBody from '../../components/Ui/cards/cardBody.vue'
 
 export default {
-    name: "Index",
+    name: 'Index',
     props: ['reports'],
     components: {
-        Card, CardBody
+        Card,
+        CardBody,
     },
     methods: {
         createReport(report) {
             if (report.inertia) {
-                this.$inertia.get(route('reports.setup', report.key));
+                this.$inertia.get(route('reports.setup', report.key))
             } else {
-                window.location.href = route('reports.setup', report.key);
+                window.location.href = route('reports.setup', report.key)
             }
-        }
-    }
+        },
+    },
 }
 </script>
 
 <style scoped lang="scss">
-
 @use '../../../sass/theme' as theme;
 
 h3 {
@@ -76,14 +86,12 @@ h3 {
     border-bottom: solid 1px lightgray;
 }
 
-
 .report-card {
     cursor: pointer;
 }
 
 .report-card:hover {
-    background-color: theme.theme-color("secondary");
+    background-color: theme.theme-color('secondary');
     color: white;
 }
-
 </style>

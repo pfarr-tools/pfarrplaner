@@ -29,22 +29,35 @@
 <template>
     <div class="service-activator">
         <h3>{{ title }}</h3>
-        <div v-if="services.length == 0" class="alert alert-warning">
+        <div
+            v-if="services.length == 0"
+            class="alert alert-warning"
+        >
             Diese Liste enthält aktuell keine Gottesdienste.
         </div>
         <table class="table table-striped table-hover">
             <thead></thead>
             <tbody>
-            <tr v-for="(service,key,index) in services" title="Klicken, um auszuwählen"
-                @click="activateServiceStream(service)">
-                <td>{{ moment(service.date).locale('de').format('LL') }}, {{ service.timeText}}<br />
-                    {{ service.locationText }}</td>
-                <td>
-                    <button class="btn btn-success" @click="activateServiceStream(service)" title="Diesen Gottesdienst aktivieren">
-                        <span class="mdi mdi-check"></span> Aktivieren
-                    </button>
-                </td>
-            </tr>
+                <tr
+                    v-for="(service, key, index) in services"
+                    title="Klicken, um auszuwählen"
+                    @click="activateServiceStream(service)"
+                >
+                    <td>
+                        {{ moment(service.date).locale('de').format('LL') }}, {{ service.timeText
+                        }}<br />
+                        {{ service.locationText }}
+                    </td>
+                    <td>
+                        <button
+                            class="btn btn-success"
+                            @click="activateServiceStream(service)"
+                            title="Diesen Gottesdienst aktivieren"
+                        >
+                            <span class="mdi mdi-check"></span> Aktivieren
+                        </button>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -52,19 +65,17 @@
 
 <script>
 export default {
-    name: "ServiceActivator",
+    name: 'ServiceActivator',
     props: ['services', 'title'],
     methods: {
         activateServiceStream(service) {
-            this.$emit('close');
-            this.$inertia.post(route('streaming.troubleshooter.activateService', {service: service.id}));
+            this.$emit('close')
+            this.$inertia.post(
+                route('streaming.troubleshooter.activateService', { service: service.id }),
+            )
         },
-
-    }
-
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

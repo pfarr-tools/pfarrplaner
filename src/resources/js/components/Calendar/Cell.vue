@@ -27,7 +27,8 @@
   -->
 
 <template>
-    <td valign="top"
+    <td
+        valign="top"
         class="calendar-cell"
         v-bind:class="{
             now: false, // TODO: next day
@@ -35,38 +36,50 @@
     >
         <div class="celldata">
             <template v-if="loading">
-                <calendar-service-skeleton v-for="index in skeletonCount" :key="'skeleton_'+index" />
+                <calendar-service-skeleton
+                    v-for="index in skeletonCount"
+                    :key="'skeleton_' + index"
+                />
             </template>
-            <div v-for="(service,index) in services" :key="service.id">
-                <calendar-service :service="service" :key="service.id" :index="index" :city="city"
-                                  :targetMode="targetMode" :target="target"
-                                  @deleted="forwardDeletedService"/>
+            <div
+                v-for="(service, index) in services"
+                :key="service.id"
+            >
+                <calendar-service
+                    :service="service"
+                    :key="service.id"
+                    :index="index"
+                    :city="city"
+                    :targetMode="targetMode"
+                    :target="target"
+                    @deleted="forwardDeletedService"
+                />
             </div>
         </div>
     </td>
 </template>
 <script>
-import EventBus from "../../plugins/EventBus";
-import {CalendarToggleDayColumnEvent} from "../../events/CalendarToggleDayColumnEvent";
-import NavButton from "../Ui/buttons/NavButton";
-import CalendarService from "./Service.vue";
-import CalendarServiceSkeleton from "./Service/Skeleton.vue";
+import EventBus from '../../plugins/EventBus'
+import { CalendarToggleDayColumnEvent } from '../../events/CalendarToggleDayColumnEvent'
+import NavButton from '../Ui/buttons/NavButton'
+import CalendarService from './Service.vue'
+import CalendarServiceSkeleton from './Service/Skeleton.vue'
 
 export default {
     name: 'CalendarCell',
     emits: ['deleted'],
     props: ['city', 'day', 'services', 'targetMode', 'target', 'loading'],
-    components: {CalendarServiceSkeleton, CalendarService, NavButton},
+    components: { CalendarServiceSkeleton, CalendarService, NavButton },
     computed: {
         skeletonCount() {
-            return this.city?.is_org ? 3 : 2;
-        }
+            return this.city?.is_org ? 3 : 2
+        },
     },
     methods: {
         forwardDeletedService(payload) {
-            this.$emit('deleted', payload);
-        }
-    }
+            this.$emit('deleted', payload)
+        },
+    },
 }
 </script>
 <style scoped>
@@ -80,6 +93,4 @@ export default {
     color: lightgray !important;
     font-size: 3em !important;
 }
-
-
 </style>

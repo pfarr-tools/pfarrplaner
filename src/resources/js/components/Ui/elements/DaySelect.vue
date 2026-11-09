@@ -27,24 +27,43 @@
   -->
 
 <template>
-    <form-group :id="myId" :input-id="`${myId}Input`" :name="name" :label="label" :help="help" :error="error" v-slot="field">
-        <select :id="field.fieldId" :name="name" class="form-control"
-                :class="{'is-invalid' : field.error}" :value="myValue"
-                :aria-invalid="field.error ? 'true' : 'false'" :aria-describedby="field.describedBy || undefined"
-                @input="changed">
-            <option v-for="day in days" :value="day.id">{{ moment(day.date).format('DD.MM.YYYY') }}</option>
+    <form-group
+        :id="myId"
+        :input-id="`${myId}Input`"
+        :name="name"
+        :label="label"
+        :help="help"
+        :error="error"
+        v-slot="field"
+    >
+        <select
+            :id="field.fieldId"
+            :name="name"
+            class="form-control"
+            :class="{ 'is-invalid': field.error }"
+            :value="myValue"
+            :aria-invalid="field.error ? 'true' : 'false'"
+            :aria-describedby="field.describedBy || undefined"
+            @input="changed"
+        >
+            <option
+                v-for="day in days"
+                :value="day.id"
+            >
+                {{ moment(day.date).format('DD.MM.YYYY') }}
+            </option>
         </select>
     </form-group>
 </template>
 
 <script>
-import FormGroup from "../forms/FormGroup";
-import { uid } from '../../../libraries/uid';
+import FormGroup from '../forms/FormGroup'
+import { uid } from '../../../libraries/uid'
 
 export default {
-    name: "DaySelect",
+    name: 'DaySelect',
     emits: ['input', 'update:modelValue'],
-    components: {FormGroup},
+    components: { FormGroup },
     props: {
         label: String,
         id: String,
@@ -62,7 +81,7 @@ export default {
         days: Array,
     },
     data() {
-        const initVal = this.modelValue !== undefined ? this.modelValue : this.value;
+        const initVal = this.modelValue !== undefined ? this.modelValue : this.value
         return {
             myId: this.id || uid(),
             myValue: initVal ? initVal.id : null,
@@ -70,30 +89,27 @@ export default {
     },
     watch: {
         modelValue(v) {
-            this.myValue = v ? v.id : null;
+            this.myValue = v ? v.id : null
         },
         value(v) {
-            if (this.modelValue === undefined) this.myValue = v ? v.id : null;
+            if (this.modelValue === undefined) this.myValue = v ? v.id : null
         },
     },
     methods: {
         changed(event) {
-            let found = false;
-            const target = event.target.value;
+            let found = false
+            const target = event.target.value
             this.days.forEach(function (day) {
-                if (target == day.id) found = day;
-            });
+                if (target == day.id) found = day
+            })
             if (found) {
-                this.myValue = found.id;
-                this.$emit('input', found);
-                this.$emit('update:modelValue', found);
+                this.myValue = found.id
+                this.$emit('input', found)
+                this.$emit('update:modelValue', found)
             }
-        }
+        },
     },
-
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

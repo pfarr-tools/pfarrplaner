@@ -28,21 +28,29 @@
 
 <template>
     <div class="dimissorial-url">
-        <b>Link zum automatischen Erteilen des Dimissoriale:</b> <a :href="url" target="_blank">{{ url }}</a>
-        <span class="mdi mdi-content-copy" @click.prevent.stop="copyToClipboard"
-              title="Klicken, um den Text in die Zwischenablage zu kopieren"></span>
+        <b>Link zum automatischen Erteilen des Dimissoriale:</b>
+        <a
+            :href="url"
+            target="_blank"
+            >{{ url }}</a
+        >
+        <span
+            class="mdi mdi-content-copy"
+            @click.prevent.stop="copyToClipboard"
+            title="Klicken, um den Text in die Zwischenablage zu kopieren"
+        ></span>
     </div>
 </template>
 
 <script>
 export default {
-    name: "DimissorialUrl",
+    name: 'DimissorialUrl',
     props: ['url'],
     methods: {
         copyToClipboard() {
-            const cb = navigator.clipboard;
-            cb.writeText(this.url).then(result => {});
-        }
+            const cb = navigator.clipboard
+            cb.writeText(this.url).then((result) => {})
+        },
     },
 }
 </script>
@@ -59,5 +67,4 @@ export default {
 .dimissorial-url:hover .mdi-content-copy {
     display: inline;
 }
-
 </style>

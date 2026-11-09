@@ -30,24 +30,42 @@
     <admin-layout title="Administration">
         <div class="admin-index">
             <div v-for="(groupModules, groupName) in modules">
-                <h3 v-if="groupModules.length" class="mt-3">{{ groupName }}
-                    <div v-if="(groupName == 'Orte') && canCreateCities" class="float-end">
-                        <inertia-link class="btn btn-success" :href="route('admin.cities.create')"
-                                      icon="mdi mdi-plus">Neuer Ort</inertia-link>
+                <h3
+                    v-if="groupModules.length"
+                    class="mt-3"
+                >
+                    {{ groupName }}
+                    <div
+                        v-if="groupName == 'Orte' && canCreateCities"
+                        class="float-end"
+                    >
+                        <inertia-link
+                            class="btn btn-success"
+                            :href="route('admin.cities.create')"
+                            icon="mdi mdi-plus"
+                            >Neuer Ort</inertia-link
+                        >
                     </div>
                 </h3>
-                <div v-if="groupModules.length" class="row">
-                    <div v-for="module in groupModules"
-                         class="col-md-4 p-2 module"
-                         @click="$inertia.get(module.url)"
-                         :title="'Klicken, um '+module.text+' zu verwalten'">
+                <div
+                    v-if="groupModules.length"
+                    class="row"
+                >
+                    <div
+                        v-for="module in groupModules"
+                        class="col-md-4 p-2 module"
+                        @click="$inertia.get(module.url)"
+                        :title="'Klicken, um ' + module.text + ' zu verwalten'"
+                    >
                         <div class="fw-semibold">
-                        <span v-if="module.icon" :class="module.icon" class="me-1"></span>
-                        {{ module.text }}
+                            <span
+                                v-if="module.icon"
+                                :class="module.icon"
+                                class="me-1"
+                            ></span>
+                            {{ module.text }}
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>
@@ -55,15 +73,13 @@
 </template>
 
 <script>
-
-import {Dataset, DatasetItem, DatasetSearch,} from 'vue-dataset';
-import DatasetInfo from "../../components/Ui/dataset/DatasetInfo";
-import DatasetShow from "../../components/Ui/dataset/DatasetShow";
-import DatasetPager from "../../components/Ui/dataset/DatasetPager";
-
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../../components/Ui/dataset/DatasetInfo'
+import DatasetShow from '../../components/Ui/dataset/DatasetShow'
+import DatasetPager from '../../components/Ui/dataset/DatasetPager'
 
 export default {
-    name: "Index",
+    name: 'Index',
     props: ['modules', 'canCreateCities'],
     components: {
         Dataset,
@@ -71,7 +87,7 @@ export default {
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
 }
 </script>
@@ -89,7 +105,7 @@ h3 {
 }
 
 .module:hover {
-    background-color: theme.theme-color("secondary");
+    background-color: theme.theme-color('secondary');
     color: white;
 }
 </style>

@@ -28,61 +28,115 @@
 
 <template>
     <div class="details-info">
-        <div v-if="service.titleText != 'Gottesdienst'" class="service-description">
+        <div
+            v-if="service.titleText != 'Gottesdienst'"
+            class="service-description"
+        >
             <b>{{ service.titleText }}</b>
         </div>
-        <div class="service-description" v-if="service.weddings.length > 0">
+        <div
+            class="service-description"
+            v-if="service.weddings.length > 0"
+        >
             <span class="mdi mdi-ring"></span>
-            <calendar-service-wedding v-if="$can('gd-kasualien-lesen') || $can('gd-kasualien-barbeiten')"
-                                      v-for="(wedding,index) in service.weddings" :key="wedding.id" :wedding="wedding" trailer=", " :trail="index > 0"/>
+            <calendar-service-wedding
+                v-if="$can('gd-kasualien-lesen') || $can('gd-kasualien-barbeiten')"
+                v-for="(wedding, index) in service.weddings"
+                :key="wedding.id"
+                :wedding="wedding"
+                trailer=", "
+                :trail="index > 0"
+            />
         </div>
-        <div class="service-description" v-if="service.funerals.length > 0">
+        <div
+            class="service-description"
+            v-if="service.funerals.length > 0"
+        >
             <span class="mdi mdi-grave-stone"></span>
-            <calendar-service-funeral v-if="$can('gd-kasualien-lesen') || $can('gd-kasualien-barbeiten')"
-                                      v-for="(wedding,index) in service.weddings" :key="wedding.id" :wedding="wedding" trailer=", " :trail="index > 0"/>
+            <calendar-service-funeral
+                v-if="$can('gd-kasualien-lesen') || $can('gd-kasualien-barbeiten')"
+                v-for="(wedding, index) in service.weddings"
+                :key="wedding.id"
+                :wedding="wedding"
+                trailer=", "
+                :trail="index > 0"
+            />
         </div>
-        <div class="service-description" v-html="service.descriptionText"></div>
-        <div class="service-description" v-if="service.internal_remarks">
-            <span class="mdi mdi-eye-off" title="Anmerkung nur für den internen Gebrauch"></span> {{ service.internal_remarks }}
+        <div
+            class="service-description"
+            v-html="service.descriptionText"
+        ></div>
+        <div
+            class="service-description"
+            v-if="service.internal_remarks"
+        >
+            <span
+                class="mdi mdi-eye-off"
+                title="Anmerkung nur für den internen Gebrauch"
+            ></span>
+            {{ service.internal_remarks }}
         </div>
 
-        <calendar-service-participants :participants="service.pastors" :category="$page.props.labels.code_pastor" :predicant="service.need_predicant" />
-        <calendar-service-participants :participants="service.organists" :category="$page.props.labels.code_organist" :predicant="0" />
-        <calendar-service-participants :participants="service.sacristans" :category="$page.props.labels.code_sacristan" :predicant="0" />
-        <calendar-service-participants v-for="participants,ministry in myService.ministriesByCategory" :key="ministry"
-                                       :participants="participants" :category="ministry" :predicant="0" />
+        <calendar-service-participants
+            :participants="service.pastors"
+            :category="$page.props.labels.code_pastor"
+            :predicant="service.need_predicant"
+        />
+        <calendar-service-participants
+            :participants="service.organists"
+            :category="$page.props.labels.code_organist"
+            :predicant="0"
+        />
+        <calendar-service-participants
+            :participants="service.sacristans"
+            :category="$page.props.labels.code_sacristan"
+            :predicant="0"
+        />
+        <calendar-service-participants
+            v-for="(participants, ministry) in myService.ministriesByCategory"
+            :key="ministry"
+            :participants="participants"
+            :category="ministry"
+            :predicant="0"
+        />
         <div v-if="$can('gd-kasualien-lesen') || $can('gd-kasualien-nur-statistik')">
-            <div class="service-description" v-if="service.baptisms.length > 0">
-                <span class="mdi mdi-water" :title="$can('gd-kasualien-lesen') ? service.baptismsText : ''"></span> {{ service.baptisms.length }}
+            <div
+                class="service-description"
+                v-if="service.baptisms.length > 0"
+            >
+                <span
+                    class="mdi mdi-water"
+                    :title="$can('gd-kasualien-lesen') ? service.baptismsText : ''"
+                ></span>
+                {{ service.baptisms.length }}
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import CalendarServiceWedding from "../Calendar/Service/Wedding.vue";
-import CalendarServiceFuneral from "../Calendar/Service/Funeral.vue";
-import CalendarServiceParticipants from "../Calendar/Service/Participants.vue";
+import CalendarServiceWedding from '../Calendar/Service/Wedding.vue'
+import CalendarServiceFuneral from '../Calendar/Service/Funeral.vue'
+import CalendarServiceParticipants from '../Calendar/Service/Participants.vue'
 
 export default {
-    name: "DetailsInfo",
-    components: {CalendarServiceParticipants, CalendarServiceFuneral, CalendarServiceWedding},
+    name: 'DetailsInfo',
+    components: { CalendarServiceParticipants, CalendarServiceFuneral, CalendarServiceWedding },
     props: ['service'],
     data() {
-        let myService = this.service;
-        if (Array.isArray(myService.ministriesByCategory)) myService.ministriesByCategory = {};
-        if (!myService.ministriesByCategory) myService.ministriesByCategory = {};
-        this.service.city.default_ministries.forEach(ministry => {
-            if (!myService.ministriesByCategory[ministry]) myService.ministriesByCategory[ministry] = [];
-        });
+        let myService = this.service
+        if (Array.isArray(myService.ministriesByCategory)) myService.ministriesByCategory = {}
+        if (!myService.ministriesByCategory) myService.ministriesByCategory = {}
+        this.service.city.default_ministries.forEach((ministry) => {
+            if (!myService.ministriesByCategory[ministry])
+                myService.ministriesByCategory[ministry] = []
+        })
 
         return {
             myService,
         }
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

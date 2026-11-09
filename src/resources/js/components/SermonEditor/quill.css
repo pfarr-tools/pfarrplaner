@@ -28,12 +28,13 @@
 
 .quill-editor .ql-container.ql-snow {
     border-top: solid 1px #ccc !important;
-    border-radius: .25rem !important;
+    border-radius: 0.25rem !important;
 }
 
-.quill-editor, .quill-editor .ql-toolbar.ql-snow {
-    border-top-left-radius: .25rem !important;
-    border-top-right-radius: .25rem !important;
+.quill-editor,
+.quill-editor .ql-toolbar.ql-snow {
+    border-top-left-radius: 0.25rem !important;
+    border-top-right-radius: 0.25rem !important;
 }
 
 .quill-editor .ql-toolbar {
@@ -46,7 +47,7 @@
 }
 .quill-editor.focused {
     border: solid 1px #80bdff;
-     border-radius: 0;
+    border-radius: 0;
 }
 
 .quill-editor.focused .ql-toolbar {
@@ -57,16 +58,17 @@
     font-size: 1rem !important;
 }
 
-.ql-editor h1, .ql-editor h2 {
+.ql-editor h1,
+.ql-editor h2 {
     margin: 1rem 0;
 }
 
 .ql-editor p {
-    margin-bottom: .4rem;
+    margin-bottom: 0.4rem;
 }
 
 .ql-snow .ql-editor blockquote {
-    font-size: .8rem;
+    font-size: 0.8rem;
     margin-bottom: 0 !important;
     margin-top: 0 !important;
     padding: 10px 50px 10px 30px;

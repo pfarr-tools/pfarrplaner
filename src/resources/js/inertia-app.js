@@ -53,7 +53,7 @@ dayjs.extend(relativeTime)
 dayjs.extend(isoWeek)
 dayjs.extend(utc)
 dayjs.locale('de')
-dayjs.isMoment = dayjs.isDayjs  // backward-compat shim for legacy moment.isMoment() calls
+dayjs.isMoment = dayjs.isDayjs // backward-compat shim for legacy moment.isMoment() calls
 window.moment = dayjs
 window.dayjs = dayjs
 
@@ -78,7 +78,11 @@ if (currentToken) {
 }
 
 // Warm up cookies early (don't block app boot if it fails)
-;(async () => { try { await window.axios.get('/csrf-cookie') } catch (e) {} })()
+;(async () => {
+    try {
+        await window.axios.get('/csrf-cookie')
+    } catch (e) {}
+})()
 
 // Inertia / Vue 3
 import { createApp, h, reactive } from 'vue'
@@ -99,7 +103,7 @@ import PfarrplanerAPIMixin from './mixins/PfarrplanerAPI.js'
 const pages = import.meta.glob('./Pages/**/*.vue')
 
 createInertiaApp({
-    resolve: name => pages[`./Pages/${name}.vue`](),
+    resolve: (name) => pages[`./Pages/${name}.vue`](),
     setup({ el, App, props, plugin }) {
         const app = createApp({ render: () => h(App, props) })
         const settings = reactive(props.initialPage.props.settings ?? {})
@@ -117,15 +121,20 @@ createInertiaApp({
         app.mixin(PfarrplanerAPIMixin)
 
         app.component('admin-layout', AdminLayout)
-        app.component('inertia-link', Link)   // backward-compat alias
+        app.component('inertia-link', Link) // backward-compat alias
         app.component('Link', Link)
         app.component('date-picker', DatePickerShim)
 
         app.directive('focus', {
-            mounted(el) { el.focus(); el.select() },
+            mounted(el) {
+                el.focus()
+                el.select()
+            },
         })
         app.directive('scrollTo', {
-            mounted(el) { el.scrollIntoView() },
+            mounted(el) {
+                el.scrollIntoView()
+            },
         })
         app.directive('bindCustomEvent', {
             mounted(el, binding) {

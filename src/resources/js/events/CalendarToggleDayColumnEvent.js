@@ -27,11 +27,8 @@
  */
 
 export class CalendarToggleDayColumnEvent {
-
-    constructor(day, state){
-        this.day = day;
-        this.state = state;
+    constructor(day, state) {
+        this.day = day
+        this.state = state
     }
-
 }
-

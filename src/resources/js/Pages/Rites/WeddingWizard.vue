@@ -29,38 +29,75 @@
 <template>
     <admin-layout title="Trauung hinzufügen">
         <template #navbar-left>
-            <button class="btn btn-primary" @click.prevent="createWedding"
-                    :disabled="!(wedding.city && wedding.location && wedding.date && wedding.spouse1_name && wedding.spouse2_name)">Erstellen
+            <button
+                class="btn btn-primary"
+                @click.prevent="createWedding"
+                :disabled="
+                    !(
+                        wedding.city &&
+                        wedding.location &&
+                        wedding.date &&
+                        wedding.spouse1_name &&
+                        wedding.spouse2_name
+                    )
+                "
+            >
+                Erstellen
             </button>
         </template>
         <form-group label="Datum">
-            <date-picker :config="myDatePickerConfig" v-model="wedding.date"/>
+            <date-picker
+                :config="myDatePickerConfig"
+                v-model="wedding.date"
+            />
         </form-group>
-        <form-selectize v-model="wedding.city" :options="cities" name="city"
-                        id-key="id" title-key="name"
-                        label="Kirchengemeinde"/>
-        <location-select v-model="wedding.location" :locations="locations" name="location"
-                         label="Ort" @set-location="setLocation"/>
-        <form-input label="1. Ehepartner:in" placeholder="Nachname, Vorname" name="spouse1_name"
-                    v-model="wedding.spouse1_name"/>
-        <form-input label="2. Ehepartner:in" placeholder="Nachname, Vorname" name="spouse2_name"
-                    v-model="wedding.spouse2_name"/>
+        <form-selectize
+            v-model="wedding.city"
+            :options="cities"
+            name="city"
+            id-key="id"
+            title-key="name"
+            label="Kirchengemeinde"
+        />
+        <location-select
+            v-model="wedding.location"
+            :locations="locations"
+            name="location"
+            label="Ort"
+            @set-location="setLocation"
+        />
+        <form-input
+            label="1. Ehepartner:in"
+            placeholder="Nachname, Vorname"
+            name="spouse1_name"
+            v-model="wedding.spouse1_name"
+        />
+        <form-input
+            label="2. Ehepartner:in"
+            placeholder="Nachname, Vorname"
+            name="spouse2_name"
+            v-model="wedding.spouse2_name"
+        />
         <form-group :label="$page.props.labels.pastor">
-            <people-select :people="people" v-model="wedding.pastor"  :city="{id: wedding.city}"/>
+            <people-select
+                :people="people"
+                v-model="wedding.pastor"
+                :city="{ id: wedding.city }"
+            />
         </form-group>
     </admin-layout>
 </template>
 
 <script>
-import FormSelectize from "../../components/Ui/forms/FormSelectize";
-import FormGroup from "../../components/Ui/forms/FormGroup";
-import LocationSelect from "../../components/Ui/elements/LocationSelect";
-import FormInput from "../../components/Ui/forms/FormInput";
-import PeopleSelect from "../../components/Ui/elements/PeopleSelect";
+import FormSelectize from '../../components/Ui/forms/FormSelectize'
+import FormGroup from '../../components/Ui/forms/FormGroup'
+import LocationSelect from '../../components/Ui/elements/LocationSelect'
+import FormInput from '../../components/Ui/forms/FormInput'
+import PeopleSelect from '../../components/Ui/elements/PeopleSelect'
 
 export default {
-    name: "WeddingWizard",
-    components: {PeopleSelect, FormInput, LocationSelect, FormGroup, FormSelectize},
+    name: 'WeddingWizard',
+    components: { PeopleSelect, FormInput, LocationSelect, FormGroup, FormSelectize },
     props: ['cities', 'locations', 'people', 'user'],
     data() {
         return {
@@ -80,15 +117,13 @@ export default {
     },
     methods: {
         setLocation(e) {
-            this.wedding.location = e;
+            this.wedding.location = e
         },
         createWedding() {
-            this.$inertia.post(route('weddings.wizard.save'), this.wedding);
-        }
-    }
+            this.$inertia.post(route('weddings.wizard.save'), this.wedding)
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -27,11 +27,19 @@
   -->
 
 <template>
-    <div class="dropdown-menu bg-light" :style="{display: menu.show ? 'block' : 'none'}"
-         aria-labelledby="dropdownMenuButton">
-        <a v-for="(item,itemKey) in myItems" :key="itemKey"
-           class="dropdown-item" :title="item.title || ''"
-           href="#" @click.prevent.stop="submit(item)">
+    <div
+        class="dropdown-menu bg-light"
+        :style="{ display: menu.show ? 'block' : 'none' }"
+        aria-labelledby="dropdownMenuButton"
+    >
+        <a
+            v-for="(item, itemKey) in myItems"
+            :key="itemKey"
+            class="dropdown-item"
+            :title="item.title || ''"
+            href="#"
+            @click.prevent.stop="submit(item)"
+        >
             {{ itemKey }}: {{ item || '' }}
         </a>
     </div>
@@ -39,24 +47,23 @@
 
 <script>
 export default {
-    name: "ReplacementMenu",
+    name: 'ReplacementMenu',
     emits: ['input'],
     props: ['menu'],
     data() {
-        let myItems = {};
+        let myItems = {}
         // filter empty items
         for (let itemKey in this.menu.items) {
-            if (this.menu.items[itemKey]) myItems[itemKey] = this.menu.items[itemKey];
+            if (this.menu.items[itemKey]) myItems[itemKey] = this.menu.items[itemKey]
         }
         return { myItems }
     },
     methods: {
         submit(text) {
-            this.$emit('input', text);
-        }
-    }
+            this.$emit('input', text)
+        },
+    },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

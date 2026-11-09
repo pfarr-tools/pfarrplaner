@@ -28,8 +28,8 @@
 
 <script>
 import draggable from 'vuedraggable'
-import EventBus from "../../../plugins/EventBus";
-import {CalendarNewSortOrderEvent} from "../../../events/CalendarNewSortOrderEvent";
+import EventBus from '../../../plugins/EventBus'
+import { CalendarNewSortOrderEvent } from '../../../events/CalendarNewSortOrderEvent'
 
 export default {
     name: 'CalendarCitySelect',
@@ -45,51 +45,54 @@ export default {
     },
     computed: {
         visibleCount() {
-            return this.cityItems.filter(city => city.visible).length;
+            return this.cityItems.filter((city) => city.visible).length
         },
     },
     data() {
-        const hiddenCities = Object.values(this.$page.props.currentUser.data.hiddenCities);
+        const hiddenCities = Object.values(this.$page.props.currentUser.data.hiddenCities)
         return {
             cityItems: [
-                ...Object.values(this.cities).map(city => ({...city, visible: true})),
-                ...hiddenCities.map(city => ({...city, visible: false})),
+                ...Object.values(this.cities).map((city) => ({ ...city, visible: true })),
+                ...hiddenCities.map((city) => ({ ...city, visible: false })),
             ],
             user: this.$page.props.currentUser.data,
         }
     },
     methods: {
         toggleCity(cityId) {
-            const city = this.cityItems.find(city => city.id === cityId);
-            if (!city) return;
-            city.visible = !city.visible;
-            this.persistState();
+            const city = this.cityItems.find((city) => city.id === cityId)
+            if (!city) return
+            city.visible = !city.visible
+            this.persistState()
         },
         isVisible(cityId) {
-            return !!this.cityItems.find(city => city.id === cityId)?.visible;
+            return !!this.cityItems.find((city) => city.id === cityId)?.visible
         },
         persistState() {
-            const visibleCities = this.cityItems.filter(city => city.visible);
-            EventBus.publish(new CalendarNewSortOrderEvent(visibleCities));
+            const visibleCities = this.cityItems.filter((city) => city.visible)
+            EventBus.publish(new CalendarNewSortOrderEvent(visibleCities))
 
-            const ids = visibleCities.map(city => city.id);
-            axios.post(route('setting.set', {user: this.user.id, key: 'sorted_cities'}), {
-                value: ids.join(',')
-            });
+            const ids = visibleCities.map((city) => city.id)
+            axios.post(route('setting.set', { user: this.user.id, key: 'sorted_cities' }), {
+                value: ids.join(','),
+            })
         },
         toggleChildChurchDetails() {
-            const nextValue = !this.settings.show_cc_details;
-            this.settings.show_cc_details = nextValue;
-            axios.post(route('setting.set', {user: this.user.id, key: 'show_cc_details'}), {
+            const nextValue = !this.settings.show_cc_details
+            this.settings.show_cc_details = nextValue
+            axios.post(route('setting.set', { user: this.user.id, key: 'show_cc_details' }), {
                 value: nextValue,
-            });
+            })
         },
-    }
-};
+    },
+}
 </script>
 
 <template>
-    <div class="calendar-city-select dropdown" data-bs-auto-close="outside">
+    <div
+        class="calendar-city-select dropdown"
+        data-bs-auto-close="outside"
+    >
         <button
             class="btn btn-sm btn-outline-secondary dropdown-toggle calendar-filter-trigger"
             type="button"
@@ -102,10 +105,14 @@ export default {
             <span class="badge text-bg-secondary">{{ visibleCount }}</span>
         </button>
         <div class="dropdown-menu dropdown-menu-end p-0 calendar-filter-menu">
-            <div class="calendar-filter-panel" @click.stop>
+            <div
+                class="calendar-filter-panel"
+                @click.stop
+            >
                 <div class="calendar-filter-heading">Kirchengemeinden</div>
                 <p class="calendar-filter-copy">
-                    Ziehen Sie die Einträge in die gewünschte Reihenfolge. Ein Klick schaltet die Anzeige im Kalender ein oder aus.
+                    Ziehen Sie die Einträge in die gewünschte Reihenfolge. Ein Klick schaltet die
+                    Anzeige im Kalender ein oder aus.
                 </p>
                 <draggable
                     :list="cityItems"
@@ -122,8 +129,10 @@ export default {
                         >
                             <span class="calendar-city-drag-handle mdi mdi-drag-vertical"></span>
                             <span class="calendar-city-toggle-label">{{ city.name }}</span>
-                            <span class="badge rounded-pill"
-                                  :class="city.visible ? 'bg-success text-dark' : 'bg-secondary'">
+                            <span
+                                class="badge rounded-pill"
+                                :class="city.visible ? 'bg-success text-dark' : 'bg-secondary'"
+                            >
                                 {{ city.visible ? 'An' : 'Aus' }}
                             </span>
                         </button>
@@ -140,8 +149,12 @@ export default {
                         <span class="calendar-city-toggle-label">
                             Details zur Kinderkirche anzeigen
                         </span>
-                        <span class="badge rounded-pill"
-                              :class="settings.show_cc_details ? 'bg-success text-dark' : 'bg-secondary'">
+                        <span
+                            class="badge rounded-pill"
+                            :class="
+                                settings.show_cc_details ? 'bg-success text-dark' : 'bg-secondary'
+                            "
+                        >
                             {{ settings.show_cc_details ? 'An' : 'Aus' }}
                         </span>
                     </button>
@@ -193,7 +206,7 @@ export default {
 }
 
 .calendar-city-list:empty::after {
-    content: "Keine Einträge";
+    content: 'Keine Einträge';
     display: block;
     padding: 0.55rem 0.7rem;
     border: 1px dashed #ced4da;
@@ -211,7 +224,10 @@ export default {
     border: 1px solid #dee2e6;
     border-radius: 0;
     text-align: left;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
     background: #fff;
     color: #212529;
 }

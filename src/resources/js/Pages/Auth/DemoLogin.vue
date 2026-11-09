@@ -27,44 +27,77 @@
   -->
 
 <template>
-    <section style="height: 100vh;">
+    <section style="height: 100vh">
         <div class="container-fluid h-custom">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-md-9 col-lg-6 col-xl-5">
-                    <img src="/img/logo/pfarrplaner.svg" class="img-fluid d-none d-md-inline" alt="Pfarrplaner">
+                    <img
+                        src="/img/logo/pfarrplaner.svg"
+                        class="img-fluid d-none d-md-inline"
+                        alt="Pfarrplaner"
+                    />
                 </div>
                 <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                     <h1 class="ps-0 pl-0 ms-0 ms-0 mb-4">{{ layout.appName }}</h1>
-                    <p>Diese Demoversion wird aus anonymisierten Daten einer realen Installation genutzt
-                        und bietet dadurch Einblicke in die Verwendung des Dienstes.
-                        Ein Passwort ist nicht erforderlich. Bitte wähle den gewünschten Benutzer einfach unten aus.
+                    <p>
+                        Diese Demoversion wird aus anonymisierten Daten einer realen Installation
+                        genutzt und bietet dadurch Einblicke in die Verwendung des Dienstes. Ein
+                        Passwort ist nicht erforderlich. Bitte wähle den gewünschten Benutzer
+                        einfach unten aus.
                     </p>
-                    <form method="POST" id="loginForm" @submit.prevent.stop="submit" novalidate>
+                    <form
+                        method="POST"
+                        id="loginForm"
+                        @submit.prevent.stop="submit"
+                        novalidate
+                    >
                         <form-csrf-token />
                         <!-- Email input -->
                         <form-group label="E-Mailadresse">
-                            <select id="demoUsers" name="email" class="form-control" v-model="form.email" aria-describedby="demoUsersHelp">
-                                <option v-for="user in users" :key="user.email" :value="user.email">
-                                    {{ user.title ? user.title + ' ' : '' }}{{ user.name }} ({{ user.email }})
+                            <select
+                                id="demoUsers"
+                                name="email"
+                                class="form-control"
+                                v-model="form.email"
+                                aria-describedby="demoUsersHelp"
+                            >
+                                <option
+                                    v-for="user in users"
+                                    :key="user.email"
+                                    :value="user.email"
+                                >
+                                    {{ user.title ? user.title + ' ' : '' }}{{ user.name }} ({{
+                                        user.email
+                                    }})
                                 </option>
                             </select>
-                            <small id="demoUsersHelp" class="form-text text-muted">Wählen Sie den gewünschten Demo-Benutzer aus.</small>
+                            <small
+                                id="demoUsersHelp"
+                                class="form-text text-muted"
+                                >Wählen Sie den gewünschten Demo-Benutzer aus.</small
+                            >
                         </form-group>
-                        <div class="text-end text-lg-start mt-4 pt-2" :key="attempts">
-                            <button type="submit" class="btn btn-primary btn-lg"
-                                    :disabled="loggingIn"
-                                    style="padding-left: 2.5rem; padding-right: 2.5rem;">Anmelden
+                        <div
+                            class="text-end text-lg-start mt-4 pt-2"
+                            :key="attempts"
+                        >
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-lg"
+                                :disabled="loggingIn"
+                                style="padding-left: 2.5rem; padding-right: 2.5rem"
+                            >
+                                Anmelden
                             </button>
                         </div>
-
-
                     </form>
-                    <donation-notice class="mt-4 pt-3 border-top"/>
+                    <donation-notice class="mt-4 pt-3 border-top" />
                 </div>
             </div>
         </div>
         <div
-            class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+            class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary"
+        >
             <!-- Copyright -->
             <div class="text-white mb-3 mb-md-0">
                 Copyright © <b>Pfarrplaner</b>. All rights reserved.
@@ -73,31 +106,36 @@
 
             <!-- Right -->
             <div>
-                <a class="me-2 me-2 text-white" :href="route('what.is')">Was ist der Pfarrplaner?</a>
-                <a href="https://pfarr.tools" class="text-white">
+                <a
+                    class="me-2 me-2 text-white"
+                    :href="route('what.is')"
+                    >Was ist der Pfarrplaner?</a
+                >
+                <a
+                    href="https://pfarr.tools"
+                    class="text-white"
+                >
                     <i class="fa fa-wrench"></i> pfarr.tools
                 </a>
             </div>
             <!-- Right -->
         </div>
     </section>
-
 </template>
 
-
 <script>
-import FormCsrfToken from "../../components/Ui/forms/FormCsrfToken.vue";
-import FormGroup from "../../components/Ui/forms/FormGroup.vue";
-import DonationNotice from "../../components/Ui/DonationNotice.vue";
+import FormCsrfToken from '../../components/Ui/forms/FormCsrfToken.vue'
+import FormGroup from '../../components/Ui/forms/FormGroup.vue'
+import DonationNotice from '../../components/Ui/DonationNotice.vue'
 
 export default {
-    name: "Login",
-    components: {DonationNotice, FormCsrfToken, FormGroup},
+    name: 'Login',
+    components: { DonationNotice, FormCsrfToken, FormGroup },
     props: ['users'],
     computed: {
         layout() {
-            return this.$page.props;
-        }
+            return this.$page.props
+        },
     },
     data() {
         return {
@@ -109,28 +147,26 @@ export default {
                 email: this.users?.[0]?.email || '',
                 password: 'test',
                 remember: false,
-            }
-        };
+            },
+        }
     },
     methods: {
         submit() {
-            if (this.loggingIn) return;
-            this.loggingIn = true;
-            axios.get(route('csrf.keepalive')).then(response => {
-                this.form._token = response.data.token;
-                this.$inertia.post(route('login'), this.form, {preserveState: false});
+            if (this.loggingIn) return
+            this.loggingIn = true
+            axios.get(route('csrf.keepalive')).then((response) => {
+                this.form._token = response.data.token
+                this.$inertia.post(route('login'), this.form, { preserveState: false })
             })
-        }
+        },
     },
-
 }
 </script>
-
 
 <style scoped>
 .divider:after,
 .divider:before {
-    content: "";
+    content: '';
     flex: 1;
     height: 1px;
     background: #eee;

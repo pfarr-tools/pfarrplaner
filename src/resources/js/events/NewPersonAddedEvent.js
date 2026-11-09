@@ -28,7 +28,7 @@
 
 export class NewPersonAddedEvent {
     constructor(origin, person) {
-        this.origin = origin;
-        this.person = person;
+        this.origin = origin
+        this.person = person
     }
 }

@@ -27,14 +27,16 @@
   -->
 
 <template>
-    <input type="hidden" name="_token" :value="$page.props.csrfToken" />
+    <input
+        type="hidden"
+        name="_token"
+        :value="$page.props.csrfToken"
+    />
 </template>
 <script>
 export default {
-    name: "FormCsrfToken",
+    name: 'FormCsrfToken',
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

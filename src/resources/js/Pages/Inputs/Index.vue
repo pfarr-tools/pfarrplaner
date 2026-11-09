@@ -28,16 +28,28 @@
 
 <template>
     <admin-layout title="Assistent wählen">
-        <dataset v-slot="{ ds }"
-                 :ds-data="inputs"
-                 ds-sort-by="name"
-                 :ds-search-in="['title', 'description', 'group']">
-            <div class="row mb-3" :data-page-count="ds.dsPagecount">
+        <dataset
+            v-slot="{ ds }"
+            :ds-data="inputs"
+            ds-sort-by="name"
+            :ds-search-in="['title', 'description', 'group']"
+        >
+            <div
+                class="row mb-3"
+                :data-page-count="ds.dsPagecount"
+            >
                 <div class="col-md-6 mb-2 mb-md-0">
-                    <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus/>
+                    <dataset-search
+                        ds-search-placeholder="Suchen..."
+                        ref="search"
+                        autofocus
+                    />
                 </div>
                 <div class="col-md-6 text-end">
-                    <dataset-show class="float-right" :ds-show-entries="showEntries"/>
+                    <dataset-show
+                        class="float-right"
+                        :ds-show-entries="showEntries"
+                    />
                 </div>
             </div>
             <div class="row">
@@ -45,14 +57,27 @@
                     <dataset-item class="form-row row mb-3">
                         <template #default="{ row, rowIndex }">
                             <div class="col-md-4">
-                                <a @click.prevent.stop="createInput(row)" href="#" class="report-link">
-                                    <card class="mb-2 report-card" title="Klicken, um diesen Assistenten zu wählen"
-                                          @click="createInput(row)">
+                                <a
+                                    @click.prevent.stop="createInput(row)"
+                                    href="#"
+                                    class="report-link"
+                                >
+                                    <card
+                                        class="mb-2 report-card"
+                                        title="Klicken, um diesen Assistenten zu wählen"
+                                        @click="createInput(row)"
+                                    >
                                         <card-body>
-                                            <h3 class="card-title mb-2" :title="`Index: ${rowIndex}`">
-                                                <span class="mdi mdi-keyboard"></span> {{ row.name }}
+                                            <h3
+                                                class="card-title mb-2"
+                                                :title="`Index: ${rowIndex}`"
+                                            >
+                                                <span class="mdi mdi-keyboard"></span>
+                                                {{ row.name }}
                                             </h3>
-                                            <div class="card-text mb-0 ps-4">{{ row.description }}</div>
+                                            <div class="card-text mb-0 ps-4">
+                                                {{ row.description }}
+                                            </div>
                                         </card-body>
                                     </card>
                                 </a>
@@ -66,36 +91,40 @@
                     </dataset-item>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
+            <div
+                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+            >
+                <dataset-info class="mb-2 mb-md-0" />
+                <dataset-pager />
             </div>
         </dataset>
     </admin-layout>
 </template>
 
 <script>
-import NavButton from "../../components/Ui/buttons/NavButton";
-import CardBody from "../../components/Ui/cards/cardBody";
-import Card from "../../components/Ui/cards/card";
-import {Dataset, DatasetItem, DatasetSearch} from "vue-dataset";
-import DatasetInfo from "../../components/Ui/dataset/DatasetInfo";
-import DatasetPager from "../../components/Ui/dataset/DatasetPager";
-import DatasetShow from "../../components/Ui/dataset/DatasetShow";
-import CardHeader from "../../components/Ui/cards/cardHeader";
+import NavButton from '../../components/Ui/buttons/NavButton'
+import CardBody from '../../components/Ui/cards/cardBody'
+import Card from '../../components/Ui/cards/card'
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../../components/Ui/dataset/DatasetInfo'
+import DatasetPager from '../../components/Ui/dataset/DatasetPager'
+import DatasetShow from '../../components/Ui/dataset/DatasetShow'
+import CardHeader from '../../components/Ui/cards/cardHeader'
 
 export default {
-    name: "Index",
+    name: 'Index',
     props: ['inputs'],
     components: {
         CardHeader,
-        NavButton, CardBody, Card,
+        NavButton,
+        CardBody,
+        Card,
         Dataset,
         DatasetItem,
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     data() {
         return {
@@ -104,9 +133,9 @@ export default {
     },
     methods: {
         createInput(input) {
-            this.$inertia.get(route('inputs.setup', input.id));
-        }
-    }
+            this.$inertia.get(route('inputs.setup', input.id))
+        },
+    },
 }
 </script>
 
@@ -127,7 +156,8 @@ export default {
     display: block;
 }
 
-a.report-link, a.report-link:hover {
+a.report-link,
+a.report-link:hover {
     text-decoration: none;
     color: black;
 }

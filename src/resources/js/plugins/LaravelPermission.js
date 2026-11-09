@@ -28,7 +28,7 @@
 
 export default {
     install(app) {
-        app.config.globalProperties.hasPermission = p => window.Laravel.permissions.includes(p)
-        app.config.globalProperties.$can = p => window.Laravel.permissions.includes(p)
+        app.config.globalProperties.hasPermission = (p) => window.Laravel.permissions.includes(p)
+        app.config.globalProperties.$can = (p) => window.Laravel.permissions.includes(p)
     },
 }

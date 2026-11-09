@@ -30,44 +30,77 @@
     <div class="rites-tab">
         <div v-if="myService.weddings.length > 0">
             <h3>Trauungen</h3>
-            <wedding class="rite-wrapper" :class="{first: index != 0}"
-                     v-for="(wedding,key,index) in myService.weddings" :key="key" :wedding="wedding" />
+            <wedding
+                class="rite-wrapper"
+                :class="{ first: index != 0 }"
+                v-for="(wedding, key, index) in myService.weddings"
+                :key="key"
+                :wedding="wedding"
+            />
         </div>
         <div v-if="myService.baptisms.length > 0">
             <h3>Taufen</h3>
-            <baptism class="rite-wrapper" :class="{first: index != 0}"
-                     v-for="(baptism,key,index) in myService.baptisms" :key="key" :baptism="baptism"/>
+            <baptism
+                class="rite-wrapper"
+                :class="{ first: index != 0 }"
+                v-for="(baptism, key, index) in myService.baptisms"
+                :key="key"
+                :baptism="baptism"
+            />
         </div>
         <div v-if="myService.funerals.length > 0">
             <h3>Bestattungen</h3>
-            <funeral class="rite-wrapper" :class="{first: index != 0}"
-                     v-for="(funeral,key,index) in myService.funerals" :key="key" :funeral="funeral"/>
+            <funeral
+                class="rite-wrapper"
+                :class="{ first: index != 0 }"
+                v-for="(funeral, key, index) in myService.funerals"
+                :key="key"
+                :funeral="funeral"
+            />
         </div>
-        <div v-if="myService.weddings.length == myService.baptisms.length == myService.funerals.length == 0">
+        <div
+            v-if="
+                ((myService.weddings.length == myService.baptisms.length) ==
+                    myService.funerals.length) ==
+                0
+            "
+        >
             Für diesen Gottesdienst sind noch keine Kasualien eingetragen.
         </div>
         <hr />
         <div id="rites-buttons">
-            <a class="btn btn-default btn-light btn-rite" :href="route('wedding.add', service.id)">Trauung hinzufügen</a>
-            <inertia-link class="btn btn-default btn-light btn-rite" :href="route('baptism.add', service.id)">Taufe hinzufügen</inertia-link>
-            <a class="btn btn-default btn-light btn-rite" :href="route('funeral.add', service.id)">Bestattung hinzufügen</a>
+            <a
+                class="btn btn-default btn-light btn-rite"
+                :href="route('wedding.add', service.id)"
+                >Trauung hinzufügen</a
+            >
+            <inertia-link
+                class="btn btn-default btn-light btn-rite"
+                :href="route('baptism.add', service.id)"
+                >Taufe hinzufügen</inertia-link
+            >
+            <a
+                class="btn btn-default btn-light btn-rite"
+                :href="route('funeral.add', service.id)"
+                >Bestattung hinzufügen</a
+            >
         </div>
     </div>
 </template>
 
 <script>
-import FormInput from "../../Ui/forms/FormInput";
-import FormTextarea from "../../Ui/forms/FormTextarea";
-import FormRadioGroup from "../../Ui/forms/FormRadioGroup";
-import FormCheck from "../../Ui/forms/FormCheck";
-import FormGroup from "../../Ui/forms/FormGroup";
-import CheckedProcessItem from "../../Ui/elements/CheckedProcessItem";
-import Baptism from "../rites/Baptism";
-import Wedding from "../rites/Wedding";
-import Funeral from "../rites/Funeral";
+import FormInput from '../../Ui/forms/FormInput'
+import FormTextarea from '../../Ui/forms/FormTextarea'
+import FormRadioGroup from '../../Ui/forms/FormRadioGroup'
+import FormCheck from '../../Ui/forms/FormCheck'
+import FormGroup from '../../Ui/forms/FormGroup'
+import CheckedProcessItem from '../../Ui/elements/CheckedProcessItem'
+import Baptism from '../rites/Baptism'
+import Wedding from '../rites/Wedding'
+import Funeral from '../rites/Funeral'
 
 export default {
-    name: "RitesTab",
+    name: 'RitesTab',
     components: {
         Wedding,
         Baptism,
@@ -89,7 +122,7 @@ export default {
     },
     methods: {
         editBaptism() {},
-    }
+    },
 }
 </script>
 
@@ -103,5 +136,4 @@ export default {
     border-top: 0;
     padding-top: 0;
 }
-
 </style>

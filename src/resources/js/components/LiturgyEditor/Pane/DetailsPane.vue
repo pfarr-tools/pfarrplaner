@@ -30,43 +30,70 @@
     <form submit.prevent="save">
         <div class="row">
             <div class="col-sm-9">
-                <div class="liturgy-editor-details-pane p-1" v-scroll-to :key="state">
-                    <component :is="editorComponent" :element="editedElement" v-model="editedElement" :service="service"
-                               :agenda-mode="agendaMode" :markers="markers" @unfocus="$emit('unfocus')"/>
+                <div
+                    class="liturgy-editor-details-pane p-1"
+                    v-scroll-to
+                    :key="state"
+                >
+                    <component
+                        :is="editorComponent"
+                        :element="editedElement"
+                        v-model="editedElement"
+                        :service="service"
+                        :agenda-mode="agendaMode"
+                        :markers="markers"
+                        @unfocus="$emit('unfocus')"
+                    />
                 </div>
             </div>
             <div class="col-sm-3">
-                <people-pane :service="service" :element="editedElement"
-                             :agenda-mode="agendaMode"
-                             @close="doneEditingResponsibles(item)"
-                             :ministries="lists.ministries"/>
+                <people-pane
+                    :service="service"
+                    :element="editedElement"
+                    :agenda-mode="agendaMode"
+                    @close="doneEditingResponsibles(item)"
+                    :ministries="lists.ministries"
+                />
             </div>
         </div>
         <div class="p-1">
-            <time-fields v-if="element.data_type != 'block'"
-                         :service="service" :element="editedElement" :agenda-mode="agendaMode"/>
+            <time-fields
+                v-if="element.data_type != 'block'"
+                :service="service"
+                :element="editedElement"
+                :agenda-mode="agendaMode"
+            />
             <div class="form-group">
-                <button class="btn btn-primary me-1" @click.prevent.stop="save">Speichern</button>
-                <button class="btn btn-secondary" @click.prevent.stop="cancel">Abbrechen</button>
+                <button
+                    class="btn btn-primary me-1"
+                    @click.prevent.stop="save"
+                >
+                    Speichern
+                </button>
+                <button
+                    class="btn btn-secondary"
+                    @click.prevent.stop="cancel"
+                >
+                    Abbrechen
+                </button>
             </div>
         </div>
     </form>
 </template>
 
 <script>
-
-import BlockEditor from "../Editors/BlockEditor";
-import FreetextEditor from "../Editors/FreetextEditor";
-import PsalmEditor from "../Editors/PsalmEditor";
-import ReadingEditor from "../Editors/ReadingEditor";
-import SermonEditor from "../Editors/SermonEditor";
-import SongEditor from "../Editors/SongEditor";
-import __ from "lodash";
-import TimeFields from "../Editors/Elements/TimeFields";
-import PeoplePane from "./PeoplePane.vue";
+import BlockEditor from '../Editors/BlockEditor'
+import FreetextEditor from '../Editors/FreetextEditor'
+import PsalmEditor from '../Editors/PsalmEditor'
+import ReadingEditor from '../Editors/ReadingEditor'
+import SermonEditor from '../Editors/SermonEditor'
+import SongEditor from '../Editors/SongEditor'
+import __ from 'lodash'
+import TimeFields from '../Editors/Elements/TimeFields'
+import PeoplePane from './PeoplePane.vue'
 
 export default {
-    name: "DetailsPane",
+    name: 'DetailsPane',
     components: {
         PeoplePane,
         TimeFields,
@@ -75,7 +102,7 @@ export default {
         PsalmEditor,
         ReadingEditor,
         SermonEditor,
-        SongEditor
+        SongEditor,
     },
     props: {
         element: Object,
@@ -87,13 +114,16 @@ export default {
         markers: {
             type: Object,
             default: false,
-        }
+        },
     },
     inject: ['lists'],
     data() {
         return {
             savedState: Object.assign({}, this.element),
-            editorComponent: this.element.data_type.charAt(0).toUpperCase() + this.element.data_type.slice(1) + 'Editor',
+            editorComponent:
+                this.element.data_type.charAt(0).toUpperCase() +
+                this.element.data_type.slice(1) +
+                'Editor',
             editedElement: this.element,
             state: 1,
         }
@@ -101,31 +131,39 @@ export default {
     methods: {
         save: function () {
             if (this.editedElement.data_type == 'block') {
-                this.$api().patch(route('api.liturgy.block.update', {
-                    block: this.editedElement.id,
-                }), this.editedElement).then(response => {
-                    this.editedElement.editing = false;
-                    this.$emit('unfocus', this.editedElement);
-                })
+                this.$api()
+                    .patch(
+                        route('api.liturgy.block.update', {
+                            block: this.editedElement.id,
+                        }),
+                        this.editedElement,
+                    )
+                    .then((response) => {
+                        this.editedElement.editing = false
+                        this.$emit('unfocus', this.editedElement)
+                    })
             } else {
-                this.$api().patch(route('api.liturgy.item.update', {
-                    item: this.editedElement.id,
-                }), this.editedElement).then(response => {
-                    this.editedElement.editing = false;
-                    this.$emit('unfocus', this.editedElement);
-                });
+                this.$api()
+                    .patch(
+                        route('api.liturgy.item.update', {
+                            item: this.editedElement.id,
+                        }),
+                        this.editedElement,
+                    )
+                    .then((response) => {
+                        this.editedElement.editing = false
+                        this.$emit('unfocus', this.editedElement)
+                    })
             }
         },
         cancel: function () {
-            this.editedElement = Object.assign({}, this.savedState);
-            this.state++;
-            this.editedElement.editing = false;
-            this.$emit('unfocus', this.savedState);
-        }
-    }
+            this.editedElement = Object.assign({}, this.savedState)
+            this.state++
+            this.editedElement.editing = false
+            this.$emit('unfocus', this.savedState)
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

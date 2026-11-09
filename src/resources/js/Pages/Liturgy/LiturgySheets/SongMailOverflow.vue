@@ -29,41 +29,49 @@
 <template>
     <admin-layout title="Als E-Mail versenden">
         <template v-slot:navbar-left>
-            <nav-button type="primary" icon="mdi mdi-email-arrow-right-outline" @click="sendMail" title="Nachricht erstellen">Nachricht erstellen</nav-button>
+            <nav-button
+                type="primary"
+                icon="mdi mdi-email-arrow-right-outline"
+                @click="sendMail"
+                title="Nachricht erstellen"
+                >Nachricht erstellen</nav-button
+            >
         </template>
         <div class="alert alert-warning">
-            Der Text deiner Nachricht ist zu lang, um automatisch an Outlook übergeben zu werden. Klicke auf
-            "Nachricht erstellen", um den Text in die Zwischenanlage zu kopieren und eine leere Nachricht zu öffnen.
-            Du kannst den Text anschließend mit Strg+V dort einfügen.
+            Der Text deiner Nachricht ist zu lang, um automatisch an Outlook übergeben zu werden.
+            Klicke auf "Nachricht erstellen", um den Text in die Zwischenanlage zu kopieren und eine
+            leere Nachricht zu öffnen. Du kannst den Text anschließend mit Strg+V dort einfügen.
         </div>
-        <form-textarea label="E-Mailtext" v-model="myBody" />
+        <form-textarea
+            label="E-Mailtext"
+            v-model="myBody"
+        />
     </admin-layout>
 </template>
 
 <script>
-import FormTextarea from "../../../components/Ui/forms/FormTextarea.vue";
-import NavButton from "../../../components/Ui/buttons/NavButton.vue";
+import FormTextarea from '../../../components/Ui/forms/FormTextarea.vue'
+import NavButton from '../../../components/Ui/buttons/NavButton.vue'
 
 export default {
-    name: "SongMailOverflow",
+    name: 'SongMailOverflow',
     props: ['body', 'subject', 'recipients', 'service'],
     data() {
         return {
             myBody: this.body,
         }
     },
-    components: {NavButton, FormTextarea},
+    components: { NavButton, FormTextarea },
     methods: {
         sendMail() {
-            const cb = navigator.clipboard;
-            cb.writeText(this.myBody);
-            window.location.href = 'mailto:'+this.recipients.join(',')+'?subject='+this.subject;
-            this.$inertia.get(route('liturgy.editor', this.service.slug));
-        }
-    }
+            const cb = navigator.clipboard
+            cb.writeText(this.myBody)
+            window.location.href =
+                'mailto:' + this.recipients.join(',') + '?subject=' + this.subject
+            this.$inertia.get(route('liturgy.editor', this.service.slug))
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

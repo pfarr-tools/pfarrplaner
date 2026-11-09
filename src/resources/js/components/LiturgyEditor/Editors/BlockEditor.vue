@@ -29,20 +29,24 @@
 <template>
     <form @submit.prevent.stop="save">
         <div class="liturgy-item-block-editor">
-            <default-fields :service="service" :element="editedElement" :agenda-mode="agendaMode"/>
+            <default-fields
+                :service="service"
+                :element="editedElement"
+                :agenda-mode="agendaMode"
+            />
         </div>
     </form>
 </template>
 
 <script>
-import DefaultFields from "./Elements/DefaultFields";
-import TimeFields from "./Elements/TimeFields";
-import __ from "lodash";
+import DefaultFields from './Elements/DefaultFields'
+import TimeFields from './Elements/TimeFields'
+import __ from 'lodash'
 
 export default {
-    name: "BlockEditor",
+    name: 'BlockEditor',
     components: {
-      TimeFields,
+        TimeFields,
         DefaultFields,
     },
     props: {
@@ -51,14 +55,14 @@ export default {
         agendaMode: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     data() {
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
             savedState: __.clone(this.element),
             editedElement: this.element,
-        };
+        }
     },
 }
 </script>
@@ -67,5 +71,4 @@ export default {
 .liturgy-item-block-editor {
     padding: 5px;
 }
-
 </style>

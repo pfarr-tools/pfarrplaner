@@ -28,7 +28,7 @@
 
 <script>
 export default {
-    name: "IconBlock",
+    name: 'IconBlock',
     props: ['icon'],
 }
 </script>
@@ -38,12 +38,12 @@ export default {
         <div class="card-body">
             <div class="row align-items-start">
                 <div class="d-none d-md-block col-md-1 icon-block-symbol">
-                <span :class="icon"></span>
+                    <span :class="icon"></span>
+                </div>
+                <div class="col-12 col-md-11">
+                    <slot />
+                </div>
             </div>
-            <div class="col-12 col-md-11">
-                <slot/>
-            </div>
-        </div>
         </div>
     </section>
 </template>

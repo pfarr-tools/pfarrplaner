@@ -28,25 +28,33 @@
 
 <template>
     <div class="fake-table">
-        <div v-if="collapsedHeader" class="d-block d-md-none fake-table-head py-2 px-1">{{ collapsedHeader }}</div>
+        <div
+            v-if="collapsedHeader"
+            class="d-block d-md-none fake-table-head py-2 px-1"
+        >
+            {{ collapsedHeader }}
+        </div>
         <div class="d-none d-md-block fake-table-head py-2 px-1">
             <div class="row">
-                <div v-for="(header,index) in headers" :class="'col-md-'+columns[index]">{{ header }}</div>
+                <div
+                    v-for="(header, index) in headers"
+                    :class="'col-md-' + columns[index]"
+                >
+                    {{ header }}
+                </div>
             </div>
         </div>
         <div class="fake-table-body">
-            <slot/>
+            <slot />
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    name: "FakeTable",
+    name: 'FakeTable',
     props: ['columns', 'headers', 'collapsedHeader'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

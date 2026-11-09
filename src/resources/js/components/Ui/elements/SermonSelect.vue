@@ -26,16 +26,12 @@
   - along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<template>
-
-</template>
+<template></template>
 
 <script>
 export default {
-name: "SermonSelect"
+    name: 'SermonSelect',
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

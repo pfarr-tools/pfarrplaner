@@ -1,5 +1,3 @@
-
-
 /*
  * Pfarrplaner
  *
@@ -34,12 +32,12 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-import $ from 'jquery';
-window.$ = window.jQuery = $;
+import $ from 'jquery'
+window.$ = window.jQuery = $
 
-require('./bootstrap');
+require('./bootstrap')
 
-window.Vue = require('vue');
+window.Vue = require('vue')
 
 /**
  * The following block of code may be used to automatically register your
@@ -50,20 +48,17 @@ window.Vue = require('vue');
  */
 
 const files = require.context('./', true, /\.vue$/i)
-files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
+files.keys().map((key) => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 // Vue.component('post-list', require('./components/PostList.vue').default);
 
-Vue.prototype.moment = moment;
+Vue.prototype.moment = moment
 
-
-import Permissions from './mixins/Permissions.js';
-Vue.mixin(Permissions);
-
+import Permissions from './mixins/Permissions.js'
+Vue.mixin(Permissions)
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
-

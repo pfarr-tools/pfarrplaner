@@ -28,85 +28,139 @@
 
 <template>
     <div class="baptism row">
-        <div class="col-md-2" v-if="showService">
+        <div
+            class="col-md-2"
+            v-if="showService"
+        >
             {{ moment(baptism.service.date).format('DD.MM.YYYY') }}<br />
             {{ baptism.service.timeText }}<br />
             {{ baptism.service.locationText }}
             <div v-if="showPastor">
-                <participants :participants="baptism.service.pastors"/>
+                <participants :participants="baptism.service.pastors" />
             </div>
         </div>
         <div class="col-md-2">
-            {{ baptism.candidate_name}}<br />
-            <small>Fon {{ baptism.candidate_phone }}<br />E-Mail {{ baptism.candidate_email}}</small>
+            {{ baptism.candidate_name }}<br />
+            <small
+                >Fon {{ baptism.candidate_phone }}<br />E-Mail {{ baptism.candidate_email }}</small
+            >
         </div>
         <div class="col-md-4">
-            <checked-process-item :check="(baptism.first_contact_on) && (baptism.first_contact_with)"
-                                  negative="Erstkontakt nicht dokumentiert">
+            <checked-process-item
+                :check="baptism.first_contact_on && baptism.first_contact_with"
+                negative="Erstkontakt nicht dokumentiert"
+            >
                 <template #positive>
                     Erstkontakt dokumentiert:
-                    <span v-if="baptism.first_contact_on">{{ moment(baptism.first_contact_on).format('DD.MM.YYYY') }}, </span>
+                    <span v-if="baptism.first_contact_on"
+                        >{{ moment(baptism.first_contact_on).format('DD.MM.YYYY') }},
+                    </span>
                     {{ baptism.first_contact_with }}
                 </template>
             </checked-process-item>
             <div>
-                <checked-process-item :check="(baptism.appointment)" negative="Taufgespräch noch nicht vereinbart">
+                <checked-process-item
+                    :check="baptism.appointment"
+                    negative="Taufgespräch noch nicht vereinbart"
+                >
                     <template #positive>
-                        Taufgespräch am {{ moment(baptism.appointment).locale('de').format('LLLL') }} Uhr
+                        Taufgespräch am
+                        {{ moment(baptism.appointment).locale('de').format('LLLL') }} Uhr
                     </template>
                 </checked-process-item>
             </div>
             <dimissorial-check-item :parent="baptism" />
             <div>
-                <checked-process-item :check="baptism.hasRegistrationForm" positive="Anmeldung aufgenommen und Anmeldeformular erstellt" negative="Anmeldeformular noch nicht erstellt" />
-                <checked-process-item :check="baptism.signed" positive="Anmeldung unterschrieben" negative="Anmeldung noch nicht unterschrieben" />
+                <checked-process-item
+                    :check="baptism.hasRegistrationForm"
+                    positive="Anmeldung aufgenommen und Anmeldeformular erstellt"
+                    negative="Anmeldeformular noch nicht erstellt"
+                />
+                <checked-process-item
+                    :check="baptism.signed"
+                    positive="Anmeldung unterschrieben"
+                    negative="Anmeldung noch nicht unterschrieben"
+                />
             </div>
             <div>
-                <checked-process-item :check="baptism.text" positive="Taufspruch" negative="Taufspruch noch nicht eingetragen">
+                <checked-process-item
+                    :check="baptism.text"
+                    positive="Taufspruch"
+                    negative="Taufspruch noch nicht eingetragen"
+                >
                     <template #positive>
-                        <bible-reference title="Taufspruch:" :perikope="{ Bibelstelle: myBaptism.text }" inline="1" />
+                        <bible-reference
+                            title="Taufspruch:"
+                            :perikope="{ Bibelstelle: myBaptism.text }"
+                            inline="1"
+                        />
                     </template>
                 </checked-process-item>
             </div>
             <div>
-                <checked-process-item :check="baptism.docs_ready" positive="Urkunden erstellt" negative="Urkunden noch nicht erstellt">
+                <checked-process-item
+                    :check="baptism.docs_ready"
+                    positive="Urkunden erstellt"
+                    negative="Urkunden noch nicht erstellt"
+                >
                     <template #positive>
-                        Urkunden erstellt<small v-if="baptism.docs_where"><br />Hinterlegt: {{ baptism.docs_where }}</small>
+                        Urkunden erstellt<small v-if="baptism.docs_where"
+                            ><br />Hinterlegt: {{ baptism.docs_where }}</small
+                        >
                     </template>
                 </checked-process-item>
             </div>
             <div>
-                <checked-process-item :check="baptism.processed" positive="Ins Kirchenbuch eingetragen" negative="Noch nicht ins Kirchenbuch eingetragen" />
+                <checked-process-item
+                    :check="baptism.processed"
+                    positive="Ins Kirchenbuch eingetragen"
+                    negative="Noch nicht ins Kirchenbuch eingetragen"
+                />
             </div>
         </div>
         <div class="col-md-3">
-            <file-drag-receiver multi
-                                v-model="myBaptism.attachments"
-                                :upload-route="route('baptism.attach', myBaptism.id)" :key="Object.keys(myBaptism.attachments).length">
-                <attachment  v-for="(attachment,key,index) in myBaptism.attachments" :key="'attachment'+key" :attachment="attachment" />
+            <file-drag-receiver
+                multi
+                v-model="myBaptism.attachments"
+                :upload-route="route('baptism.attach', myBaptism.id)"
+                :key="Object.keys(myBaptism.attachments).length"
+            >
+                <attachment
+                    v-for="(attachment, key, index) in myBaptism.attachments"
+                    :key="'attachment' + key"
+                    :attachment="attachment"
+                />
             </file-drag-receiver>
         </div>
         <div class="col-md-1 text-end">
-            <inertia-link class="btn btn-sm btn-light" title="Taufe bearbeiten"
-               :href="route('baptisms.edit', {modelId: baptism.id})"><span class="mdi mdi-pencil"></span></inertia-link>
-            <button class="btn btn-sm btn-danger" title="Taufe löschen"
-                    @click.prevent="deleteBaptism"><span class="mdi mdi-delete"></span></button>
+            <inertia-link
+                class="btn btn-sm btn-light"
+                title="Taufe bearbeiten"
+                :href="route('baptisms.edit', { modelId: baptism.id })"
+                ><span class="mdi mdi-pencil"></span
+            ></inertia-link>
+            <button
+                class="btn btn-sm btn-danger"
+                title="Taufe löschen"
+                @click.prevent="deleteBaptism"
+            >
+                <span class="mdi mdi-delete"></span>
+            </button>
         </div>
     </div>
-
 </template>
 
 <script>
-import CheckedProcessItem from "../../Ui/elements/CheckedProcessItem";
-import Attachment from "../../Ui/elements/Attachment";
-import DetailsInfo from "../../Service/DetailsInfo";
-import Participants from "../../Calendar/Service/Participants";
-import FileDragReceiver from "../../Ui/elements/FileDragReceiver";
-import BibleReference from "../../LiturgyEditor/Elements/BibleReference";
-import DimissorialCheckItem from "../../RiteEditors/DimissorialCheckItem";
+import CheckedProcessItem from '../../Ui/elements/CheckedProcessItem'
+import Attachment from '../../Ui/elements/Attachment'
+import DetailsInfo from '../../Service/DetailsInfo'
+import Participants from '../../Calendar/Service/Participants'
+import FileDragReceiver from '../../Ui/elements/FileDragReceiver'
+import BibleReference from '../../LiturgyEditor/Elements/BibleReference'
+import DimissorialCheckItem from '../../RiteEditors/DimissorialCheckItem'
 
 export default {
-    name: "Baptism",
+    name: 'Baptism',
     components: {
         DimissorialCheckItem,
         BibleReference,
@@ -134,13 +188,18 @@ export default {
     },
     methods: {
         deleteBaptism() {
-            if (!confirm('Willst du diese Taufe wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.')) return;
-            this.$inertia.delete(route('baptisms.destroy', {modelId: this.baptism.id}), {preserveState: false});
-        }
-    }
-
+            if (
+                !confirm(
+                    'Willst du diese Taufe wirklich in den Papierkorb verschieben? Du kannst sie dort später wiederherstellen.',
+                )
+            )
+                return
+            this.$inertia.delete(route('baptisms.destroy', { modelId: this.baptism.id }), {
+                preserveState: false,
+            })
+        },
+    },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

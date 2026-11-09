@@ -32,10 +32,8 @@
 
 <script>
 export default {
-name: "cardBody"
+    name: 'cardBody',
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

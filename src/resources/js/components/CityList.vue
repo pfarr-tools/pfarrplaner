@@ -28,8 +28,12 @@
 
 <template>
     <div>
-        <div class="card mb-2" v-for="city in cities" v-bind:key="city.id">
-            <div class="card-body ">
+        <div
+            class="card mb-2"
+            v-for="city in cities"
+            v-bind:key="city.id"
+        >
+            <div class="card-body">
                 <h4 class="card-title">{{ city.name }}</h4>
             </div>
         </div>
@@ -37,25 +41,26 @@
 </template>
 
 <script>
-    export default {
-        data() {
-            return {
-                cities: []
-            };
-        },
-
-        created() {
-            this.getCities();
-        },
-
-        methods: {
-            getCities(api_url) {
-                api_url = api_url || '/api/cities';
-                this.$api().get(api_url)
-                    .then(response => {
-                        this.cities= response.data;
-                    });
-            }
+export default {
+    data() {
+        return {
+            cities: [],
         }
-    };
+    },
+
+    created() {
+        this.getCities()
+    },
+
+    methods: {
+        getCities(api_url) {
+            api_url = api_url || '/api/cities'
+            this.$api()
+                .get(api_url)
+                .then((response) => {
+                    this.cities = response.data
+                })
+        },
+    },
+}
 </script>

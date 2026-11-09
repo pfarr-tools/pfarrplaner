@@ -29,20 +29,50 @@
 <template>
     <admin-layout title="Gottesdienstliste für den Gemeindebrief erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Gottesdienstliste für den Gemeindebrief erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Gottesdienstliste für den Gemeindebrief erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'bulletin'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'bulletin' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="includeCities[]" label="Folgende Kirchengemeinden mit einbeziehen"
-                            v-model="myCities" :options="cities" multiple/>
-            <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
+            <form-selectize
+                name="includeCities[]"
+                label="Folgende Kirchengemeinden mit einbeziehen"
+                v-model="myCities"
+                :options="cities"
+                multiple
+            />
+            <form-date-range-picker
+                label="Gottesdienste von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
             <div class="row">
-                <div class="col-6" v-for="format in formats">
+                <div
+                    class="col-6"
+                    v-for="format in formats"
+                >
                     <label>
-                        <input type="radio" name="format" :value="format" v-model="myFormat" />
-                        Format: <b>{{ format }}</b><br/>
-                    </label><br />
-                    <img class="img-fluid" :src="'/img/bulletin/'+slug(format)+'.jpg'"/>
+                        <input
+                            type="radio"
+                            name="format"
+                            :value="format"
+                            v-model="myFormat"
+                        />
+                        Format: <b>{{ format }}</b
+                        ><br /> </label
+                    ><br />
+                    <img
+                        class="img-fluid"
+                        :src="'/img/bulletin/' + slug(format) + '.jpg'"
+                    />
                 </div>
             </div>
         </form>
@@ -50,17 +80,17 @@
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import {kebabCase} from "lodash";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import { kebabCase } from 'lodash'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'formats'],
-    components: {FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: { FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton },
     data() {
         return {
             myCities: this.cities.length ? [this.cities[0].id] : null,
@@ -71,20 +101,18 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'bulletin'}), {
+            submitReportForm(route('reports.render', { report: 'bulletin' }), {
                 includeCities: this.myCities,
                 start: this.myStart,
                 end: this.myEnd,
                 format: this.myFormat,
-            });
+            })
         },
         slug(s) {
-            return kebabCase(s);
-        }
-    }
+            return kebabCase(s)
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

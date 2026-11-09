@@ -29,70 +29,93 @@
 <template>
     <admin-layout :title="getTitle()">
         <template #navbar-left>
-            <button class="btn btn-primary me-1" title="Speichern" @click="savePoolmaster">
-                <span class="d-inline d-md-none mdi mdi-content-save"></span> <span class="d-none d-md-inline">Speichern</span>
+            <button
+                class="btn btn-primary me-1"
+                title="Speichern"
+                @click="savePoolmaster"
+            >
+                <span class="d-inline d-md-none mdi mdi-content-save"></span>
+                <span class="d-none d-md-inline">Speichern</span>
             </button>
-            <button class="btn btn-danger" title="Löschen" @click="deletePoolmaster">
-                <span class="d-inline d-md-none mdi mdi-delete"></span> <span class="d-none d-md-inline">Löschen</span>
+            <button
+                class="btn btn-danger"
+                title="Löschen"
+                @click="deletePoolmaster"
+            >
+                <span class="d-inline d-md-none mdi mdi-delete"></span>
+                <span class="d-none d-md-inline">Löschen</span>
             </button>
         </template>
-        <form-selectize label="Pool" :options="pools" v-model="myPoolmaster.pool_id" />
-        <date-range-input label="Zeitraum" :from="myPoolmaster.start" :to="myPoolmaster.end"
-                          @input="setDateRange" />
+        <form-selectize
+            label="Pool"
+            :options="pools"
+            v-model="myPoolmaster.pool_id"
+        />
+        <date-range-input
+            label="Zeitraum"
+            :from="myPoolmaster.start"
+            :to="myPoolmaster.end"
+            @input="setDateRange"
+        />
     </admin-layout>
 </template>
 
 <script>
-import FormInput from "../../../components/Ui/forms/FormInput.vue";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize.vue";
-import PeopleSelect from "../../../components/Ui/elements/PeopleSelect.vue";
-import DateRangeInput from "../../../components/Ui/elements/DateRangeInput.vue";
-import { serializePlannerDateToBerlinDateString } from "../../../helpers/plannerDates";
+import FormInput from '../../../components/Ui/forms/FormInput.vue'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize.vue'
+import PeopleSelect from '../../../components/Ui/elements/PeopleSelect.vue'
+import DateRangeInput from '../../../components/Ui/elements/DateRangeInput.vue'
+import { serializePlannerDateToBerlinDateString } from '../../../helpers/plannerDates'
 
 export default {
-    name: "Editor",
-    components: {DateRangeInput, PeopleSelect, FormSelectize, FormInput},
+    name: 'Editor',
+    components: { DateRangeInput, PeopleSelect, FormSelectize, FormInput },
     props: ['poolmaster', 'pools', 'date', 'user'],
     data() {
         return {
-            myPoolmaster: this.poolmaster.id ? {
-                start: moment(this.poolmaster.start).startOf('day'),
-                end: moment(this.poolmaster.end).endOf('day'),
-                ...this.poolmaster,
-            } : {
-                id: null,
-                user_id: this.user.id,
-                pool_id: this.pools.length ? this.pools[0].id : null,
-                start: this.date,
-                end: moment(this.date).endOf('month'),
-            }
+            myPoolmaster: this.poolmaster.id
+                ? {
+                      start: moment(this.poolmaster.start).startOf('day'),
+                      end: moment(this.poolmaster.end).endOf('day'),
+                      ...this.poolmaster,
+                  }
+                : {
+                      id: null,
+                      user_id: this.user.id,
+                      pool_id: this.pools.length ? this.pools[0].id : null,
+                      start: this.date,
+                      end: moment(this.date).endOf('month'),
+                  },
         }
     },
     methods: {
         getTitle() {
-            if (!this.myPoolmaster.id) return 'Poolmaster:in werden';
-            return 'Einsatz als Poolmaster:in bearbeiten';
+            if (!this.myPoolmaster.id) return 'Poolmaster:in werden'
+            return 'Einsatz als Poolmaster:in bearbeiten'
         },
         setDateRange(e) {
-            this.myPoolmaster.start = serializePlannerDateToBerlinDateString(e[0]);
-            this.myPoolmaster.end = serializePlannerDateToBerlinDateString(e[1]);
+            this.myPoolmaster.start = serializePlannerDateToBerlinDateString(e[0])
+            this.myPoolmaster.end = serializePlannerDateToBerlinDateString(e[1])
         },
         savePoolmaster() {
             if (!this.myPoolmaster.id) {
-                this.$inertia.post(route('admin.poolmasters.store'), this.myPoolmaster);
+                this.$inertia.post(route('admin.poolmasters.store'), this.myPoolmaster)
             } else {
-                this.$inertia.patch(route('admin.poolmaster.update', {modelId: this.myPoolmaster.id}), this.myPoolmaster);
+                this.$inertia.patch(
+                    route('admin.poolmaster.update', { modelId: this.myPoolmaster.id }),
+                    this.myPoolmaster,
+                )
             }
         },
         deletePoolmaster() {
-            if (!this.myPoolmaster.id) window.history.back();
-            if (!confirm('Willst du diese Poolmaster-Zuordnung wirklich löschen?')) return;
-            this.$inertia.delete(route('admin.poolmaster.destroy', {modelId: this.myPoolmaster.id }));
-        }
+            if (!this.myPoolmaster.id) window.history.back()
+            if (!confirm('Willst du diese Poolmaster-Zuordnung wirklich löschen?')) return
+            this.$inertia.delete(
+                route('admin.poolmaster.destroy', { modelId: this.myPoolmaster.id }),
+            )
+        },
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

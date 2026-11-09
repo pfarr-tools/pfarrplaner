@@ -27,13 +27,28 @@
   -->
 
 <template>
-    <admin-layout :title="pageTitle" no-content-header no-padding no-outer-padding>
+    <admin-layout
+        :title="pageTitle"
+        no-content-header
+        no-padding
+        no-outer-padding
+    >
         <template #navbar-left>
-            <absence-nav :year="year" :month="month" :years="years" />
+            <absence-nav
+                :year="year"
+                :month="month"
+                :years="years"
+            />
         </template>
         <template #navbar-right>
-            <div v-if="plannerVisibilityUsers.length" class="planner-topbar-actions">
-                <div class="btn-group" role="group">
+            <div
+                v-if="plannerVisibilityUsers.length"
+                class="planner-topbar-actions"
+            >
+                <div
+                    class="btn-group"
+                    role="group"
+                >
                     <button
                         id="plannerVisibilityDropdown"
                         type="button"
@@ -47,8 +62,14 @@
                             {{ activeToggleableUsersCount }}/{{ plannerVisibilityUsers.length }}
                         </span>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-end planner-visibility-dropdown" aria-labelledby="plannerVisibilityDropdown">
-                        <template v-for="section in plannerVisibilitySections" :key="section.label">
+                    <div
+                        class="dropdown-menu dropdown-menu-end planner-visibility-dropdown"
+                        aria-labelledby="plannerVisibilityDropdown"
+                    >
+                        <template
+                            v-for="section in plannerVisibilitySections"
+                            :key="section.label"
+                        >
                             <div class="dropdown-header">{{ section.label }}</div>
                             <button
                                 v-for="user in section.users"
@@ -57,8 +78,13 @@
                                 class="dropdown-item planner-visibility-item"
                                 @click.prevent.stop="togglePinned(user)"
                             >
-                                <span class="planner-visibility-name">{{ formatUserName(user) }}</span>
-                                <span class="badge rounded-pill" :class="user.pinned ? 'bg-success text-dark' : 'bg-secondary'">
+                                <span class="planner-visibility-name">{{
+                                    formatUserName(user)
+                                }}</span>
+                                <span
+                                    class="badge rounded-pill"
+                                    :class="user.pinned ? 'bg-success text-dark' : 'bg-secondary'"
+                                >
                                     {{ user.pinned ? 'An' : 'Aus' }}
                                 </span>
                             </button>
@@ -69,134 +95,218 @@
         </template>
 
         <div class="planner-page">
-        <card class="planner-card">
-            <card-body class="p-0 planner-card-body">
-                <div class="table-responsive tbl-absences">
-                    <table class="table table-bordered table-hover table-sm mb-0 absence-planner-table">
-                        <thead>
-                        <tr>
-                            <th class="planner-sticky-column planner-name-header">Person</th>
-                            <th
-                                v-for="day in calendarDays"
-                                :key="day.key"
-                                class="cal-cell text-center planner-day-header"
-                                :class="headerDayClass(day)"
-                            >
-                                <div class="fw-semibold">{{ day.weekdayShort }}</div>
-                                <div>{{ day.dayOfMonth }}</div>
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody v-if="loadingUsers && !sections.length">
-                        <tr v-for="index in skeletonRowCount" :key="'planner-skeleton-' + index" class="planner-skeleton-row">
-                            <th class="user-name planner-sticky-column">
-                                <div class="planner-skeleton planner-skeleton-name"></div>
-                            </th>
-                            <td v-for="day in calendarDays" :key="'planner-skeleton-cell-' + index + '-' + day.key" class="cal-cell">
-                                <div class="planner-skeleton planner-skeleton-cell"></div>
-                            </td>
-                        </tr>
-                        </tbody>
-                        <tbody v-for="(category, categoryIndex) in sections" :key="category">
-                        <tr
-                            v-if="categoryIndex > 0"
-                            class="category-header"
-                            @click="toggleRow(category)"
+            <card class="planner-card">
+                <card-body class="p-0 planner-card-body">
+                    <div class="table-responsive tbl-absences">
+                        <table
+                            class="table table-bordered table-hover table-sm mb-0 absence-planner-table"
                         >
-                            <th :colspan="sectionColumnCount" class="planner-sticky-column">
-                                <div class="d-flex align-items-center justify-content-between gap-2">
-                                    <span>
-                                        <span :class="openSections[category] ? 'mdi mdi-chevron-down' : 'mdi mdi-chevron-right'" />
-                                        <span class="mdi mdi-account-multiple"></span>
-                                        {{ category }}
-                                    </span>
-                                    <span class="badge bg-light text-dark border">
-                                        {{ users[category]?.length || 0 }}
-                                    </span>
-                                </div>
-                            </th>
-                        </tr>
-                        <template v-for="user in users[category]" :key="user.id">
-                            <tr v-if="openSections[category] && userDays[user.id]" :key="userRowKey(category, user)" class="planner-row-compact">
-                                <th class="user-name planner-sticky-column">
-                                    <div class="d-flex justify-content-between align-items-start gap-2">
-                                        <div>
-                                            <div class="planner-user-label">{{ formatUserName(user) }}</div>
-                                        </div>
-                                        <div v-if="user.canEdit" class="btn-group btn-group-sm planner-user-actions" role="group">
-                                            <button
-                                                type="button"
-                                                class="btn btn-success me-1"
-                                                :data-dusk="'create-absence-' + user.id"
-                                                title="Neue Abwesenheit anlegen"
-                                                @click.prevent="openAbsenceCreateModal(user)"
-                                            >
-                                                <span class="mdi mdi-briefcase-plus"></span>
-                                            </button>
-                                            <button
-                                                v-if="availablePools(user).length > 0"
-                                                type="button"
-                                                class="btn btn-primary"
-                                                :data-dusk="'create-poolmaster-' + user.id"
-                                                title="Poolmaster:in anlegen"
-                                                @click.prevent="openPoolmasterCreateModal(user)"
-                                            >
-                                                <span class="mdi mdi-account-tie"></span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </th>
-                                <template v-for="day in calendarDays" :key="day.key + '-' + user.id">
+                            <thead>
+                                <tr>
+                                    <th class="planner-sticky-column planner-name-header">
+                                        Person
+                                    </th>
+                                    <th
+                                        v-for="day in calendarDays"
+                                        :key="day.key"
+                                        class="cal-cell text-center planner-day-header"
+                                        :class="headerDayClass(day)"
+                                    >
+                                        <div class="fw-semibold">{{ day.weekdayShort }}</div>
+                                        <div>{{ day.dayOfMonth }}</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody v-if="loadingUsers && !sections.length">
+                                <tr
+                                    v-for="index in skeletonRowCount"
+                                    :key="'planner-skeleton-' + index"
+                                    class="planner-skeleton-row"
+                                >
+                                    <th class="user-name planner-sticky-column">
+                                        <div class="planner-skeleton planner-skeleton-name"></div>
+                                    </th>
                                     <td
-                                        v-if="getUserDay(user, day)?.show"
+                                        v-for="day in calendarDays"
+                                        :key="'planner-skeleton-cell-' + index + '-' + day.key"
                                         class="cal-cell"
-                                        :class="cellClass(user, day)"
-                                        :title="cellTitle(user, day)"
-                                        :colspan="colspan(user, day)"
-                                        @click="edit(user, day, getUserDay(user, day)?.absence)"
+                                    >
+                                        <div class="planner-skeleton planner-skeleton-cell"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tbody
+                                v-for="(category, categoryIndex) in sections"
+                                :key="category"
+                            >
+                                <tr
+                                    v-if="categoryIndex > 0"
+                                    class="category-header"
+                                    @click="toggleRow(category)"
+                                >
+                                    <th
+                                        :colspan="sectionColumnCount"
+                                        class="planner-sticky-column"
                                     >
                                         <div
-                                            v-if="getUserDay(user, day)?.duration"
-                                            class="absence"
-                                            :title="cellTitle(user, day)"
-                                            :class="{ editable: canEditCell(user, getUserDay(user, day)?.absence) }"
+                                            class="d-flex align-items-center justify-content-between gap-2"
                                         >
-                                            <strong>{{ getUserDay(user, day)?.absence?.user?.name }}</strong>
-                                            <span v-if="showAbsenceReason(user, day)">
-                                                ({{ getUserDay(user, day)?.absence?.reason }})
+                                            <span>
+                                                <span
+                                                    :class="
+                                                        openSections[category]
+                                                            ? 'mdi mdi-chevron-down'
+                                                            : 'mdi mdi-chevron-right'
+                                                    "
+                                                />
+                                                <span class="mdi mdi-account-multiple"></span>
+                                                {{ category }}
+                                            </span>
+                                            <span class="badge bg-light text-dark border">
+                                                {{ users[category]?.length || 0 }}
                                             </span>
                                         </div>
-                                        <div
-                                            v-else
-                                            class="cell-hitarea"
-                                            :aria-label="cellTitle(user, day)"
-                                            :title="cellTitle(user, day)"
-                                        ></div>
-                                    </td>
+                                    </th>
+                                </tr>
+                                <template
+                                    v-for="user in users[category]"
+                                    :key="user.id"
+                                >
+                                    <tr
+                                        v-if="openSections[category] && userDays[user.id]"
+                                        :key="userRowKey(category, user)"
+                                        class="planner-row-compact"
+                                    >
+                                        <th class="user-name planner-sticky-column">
+                                            <div
+                                                class="d-flex justify-content-between align-items-start gap-2"
+                                            >
+                                                <div>
+                                                    <div class="planner-user-label">
+                                                        {{ formatUserName(user) }}
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    v-if="user.canEdit"
+                                                    class="btn-group btn-group-sm planner-user-actions"
+                                                    role="group"
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-success me-1"
+                                                        :data-dusk="'create-absence-' + user.id"
+                                                        title="Neue Abwesenheit anlegen"
+                                                        @click.prevent="
+                                                            openAbsenceCreateModal(user)
+                                                        "
+                                                    >
+                                                        <span class="mdi mdi-briefcase-plus"></span>
+                                                    </button>
+                                                    <button
+                                                        v-if="availablePools(user).length > 0"
+                                                        type="button"
+                                                        class="btn btn-primary"
+                                                        :data-dusk="'create-poolmaster-' + user.id"
+                                                        title="Poolmaster:in anlegen"
+                                                        @click.prevent="
+                                                            openPoolmasterCreateModal(user)
+                                                        "
+                                                    >
+                                                        <span class="mdi mdi-account-tie"></span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <template
+                                            v-for="day in calendarDays"
+                                            :key="day.key + '-' + user.id"
+                                        >
+                                            <td
+                                                v-if="getUserDay(user, day)?.show"
+                                                class="cal-cell"
+                                                :class="cellClass(user, day)"
+                                                :title="cellTitle(user, day)"
+                                                :colspan="colspan(user, day)"
+                                                @click="
+                                                    edit(user, day, getUserDay(user, day)?.absence)
+                                                "
+                                            >
+                                                <div
+                                                    v-if="getUserDay(user, day)?.duration"
+                                                    class="absence"
+                                                    :title="cellTitle(user, day)"
+                                                    :class="{
+                                                        editable: canEditCell(
+                                                            user,
+                                                            getUserDay(user, day)?.absence,
+                                                        ),
+                                                    }"
+                                                >
+                                                    <strong>{{
+                                                        getUserDay(user, day)?.absence?.user?.name
+                                                    }}</strong>
+                                                    <span v-if="showAbsenceReason(user, day)">
+                                                        ({{
+                                                            getUserDay(user, day)?.absence?.reason
+                                                        }})
+                                                    </span>
+                                                </div>
+                                                <div
+                                                    v-else
+                                                    class="cell-hitarea"
+                                                    :aria-label="cellTitle(user, day)"
+                                                    :title="cellTitle(user, day)"
+                                                ></div>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                    <tr
+                                        v-else-if="
+                                            openSections[category] && isUserDaysLoading(user)
+                                        "
+                                        :key="userRowKey(category, user) + '-loading'"
+                                        class="planner-skeleton-row"
+                                    >
+                                        <th class="user-name planner-sticky-column">
+                                            <div
+                                                class="d-flex justify-content-between align-items-start gap-2"
+                                            >
+                                                <div>
+                                                    <div class="planner-user-label">
+                                                        {{ formatUserName(user) }}
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    v-if="user.canEdit"
+                                                    class="btn-group btn-group-sm planner-user-actions"
+                                                    role="group"
+                                                >
+                                                    <span
+                                                        class="planner-skeleton planner-skeleton-button"
+                                                    ></span>
+                                                    <span
+                                                        v-if="pools.length > 0"
+                                                        class="planner-skeleton planner-skeleton-button"
+                                                    ></span>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <td
+                                            v-for="day in calendarDays"
+                                            :key="user.id + '-loading-' + day.key"
+                                            class="cal-cell"
+                                        >
+                                            <div
+                                                class="planner-skeleton planner-skeleton-cell"
+                                            ></div>
+                                        </td>
+                                    </tr>
                                 </template>
-                            </tr>
-                            <tr v-else-if="openSections[category] && isUserDaysLoading(user)" :key="userRowKey(category, user) + '-loading'" class="planner-skeleton-row">
-                                <th class="user-name planner-sticky-column">
-                                    <div class="d-flex justify-content-between align-items-start gap-2">
-                                        <div>
-                                            <div class="planner-user-label">{{ formatUserName(user) }}</div>
-                                        </div>
-                                        <div v-if="user.canEdit" class="btn-group btn-group-sm planner-user-actions" role="group">
-                                            <span class="planner-skeleton planner-skeleton-button"></span>
-                                            <span v-if="pools.length > 0" class="planner-skeleton planner-skeleton-button"></span>
-                                        </div>
-                                    </div>
-                                </th>
-                                <td v-for="day in calendarDays" :key="user.id + '-loading-' + day.key" class="cal-cell">
-                                    <div class="planner-skeleton planner-skeleton-cell"></div>
-                                </td>
-                            </tr>
-                        </template>
-                        </tbody>
-                    </table>
-                </div>
-            </card-body>
-        </card>
+                            </tbody>
+                        </table>
+                    </div>
+                </card-body>
+            </card>
         </div>
 
         <modal
@@ -210,7 +320,11 @@
             @cancel="closeCreateModals"
         >
             <p class="mb-3">
-                Neue Abwesenheit für <strong>{{ formatUserName(activeAbsenceCreateUser) }}. Bitte wähle Anfangs- und Enddatum.</strong>
+                Neue Abwesenheit für
+                <strong
+                    >{{ formatUserName(activeAbsenceCreateUser) }}. Bitte wähle Anfangs- und
+                    Enddatum.</strong
+                >
             </p>
             <date-range-input
                 label="Zeitraum"
@@ -231,7 +345,8 @@
             @cancel="closeCreateModals"
         >
             <p class="mb-3">
-                Neuen Poolmaster-Einsatz für <strong>{{ formatUserName(activePoolmasterCreateUser) }}</strong>
+                Neuen Poolmaster-Einsatz für
+                <strong>{{ formatUserName(activePoolmasterCreateUser) }}</strong>
             </p>
             <label class="form-label">Pool</label>
             <select
@@ -258,27 +373,44 @@
 </template>
 
 <script>
-import { DateTime } from 'luxon';
-import AbsenceNav from "./AbsenceNav";
-import Card from "../../components/Ui/cards/card";
-import CardBody from "../../components/Ui/cards/cardBody";
-import DateRangeInput from "../../components/Ui/elements/DateRangeInput.vue";
-import Modal from "../../components/Ui/modals/Modal.vue";
-import { serializePlannerDateToBerlinDateString, serializePlannerDateToUtc } from "../../helpers/plannerDates";
+import { DateTime } from 'luxon'
+import AbsenceNav from './AbsenceNav'
+import Card from '../../components/Ui/cards/card'
+import CardBody from '../../components/Ui/cards/cardBody'
+import DateRangeInput from '../../components/Ui/elements/DateRangeInput.vue'
+import Modal from '../../components/Ui/modals/Modal.vue'
+import {
+    serializePlannerDateToBerlinDateString,
+    serializePlannerDateToUtc,
+} from '../../helpers/plannerDates'
 
 export default {
-    name: "Planner",
-    components: {AbsenceNav, Card, CardBody, DateRangeInput, Modal},
-    props: ['start', 'end', 'year', 'month', 'months', 'years', 'now', 'holidays', 'days', 'sectionConfig', 'pinList', 'pastorPinList', 'pools'],
+    name: 'Planner',
+    components: { AbsenceNav, Card, CardBody, DateRangeInput, Modal },
+    props: [
+        'start',
+        'end',
+        'year',
+        'month',
+        'months',
+        'years',
+        'now',
+        'holidays',
+        'days',
+        'sectionConfig',
+        'pinList',
+        'pastorPinList',
+        'pools',
+    ],
     mounted() {
-        this.loadPlanner();
+        this.loadPlanner()
     },
     data() {
         let mask = {
             'Eigenes Konto': true,
-        };
-        mask[this.pastorPluralLabel()] = true;
-        mask['Mitarbeitende'] = true;
+        }
+        mask[this.pastorPluralLabel()] = true
+        mask['Mitarbeitende'] = true
 
         return {
             users: {},
@@ -288,7 +420,7 @@ export default {
             sections: [],
             openSections: this.normalizeOpenSections(this.sectionConfig, mask),
             pinnedUsers: this.pinList || [],
-            pinnedPastors: this.pastorPinList === null ? null : (this.pastorPinList || []),
+            pinnedPastors: this.pastorPinList === null ? null : this.pastorPinList || [],
             toggleableUsers: [],
             isPastor: this.$page.props.currentUser.data.isPastor,
             draftAbsenceRanges: {},
@@ -301,30 +433,32 @@ export default {
     },
     computed: {
         pageTitle() {
-            return 'Urlaubsplaner ' + this.formatPlannerDate(this.start, 'LLLL yyyy');
+            return 'Urlaubsplaner ' + this.formatPlannerDate(this.start, 'LLLL yyyy')
         },
         calendarDays() {
             return Object.values(this.days || {})
-                .filter(day => day && typeof day === 'object' && day.date && day.day !== undefined)
+                .filter(
+                    (day) => day && typeof day === 'object' && day.date && day.day !== undefined,
+                )
                 .reduce((days, day) => {
-                    if (days.find(existingDay => existingDay.day === day.day)) return days;
+                    if (days.find((existingDay) => existingDay.day === day.day)) return days
                     days.push({
                         ...day,
                         key: `day-${day.day}`,
                         weekdayShort: this.formatPlannerDate(day.date, 'ccc'),
                         dayOfMonth: this.formatPlannerDate(day.date, 'dd'),
-                    });
-                    return days;
-                }, []);
+                    })
+                    return days
+                }, [])
         },
         sectionColumnCount() {
-            return this.calendarDays.length + 1;
+            return this.calendarDays.length + 1
         },
         skeletonRowCount() {
-            return 6;
+            return 6
         },
         plannerVisibilityUsers() {
-            return this.toggleableUsers.filter(Boolean);
+            return this.toggleableUsers.filter(Boolean)
         },
         /**
          * Group visibility controls by pastor and employee category.
@@ -332,21 +466,27 @@ export default {
          * @returns {Array<{label: string, users: Object[]}>} Visibility groups.
          */
         plannerVisibilitySections() {
-            const pastorLabel = this.pastorPluralLabel();
+            const pastorLabel = this.pastorPluralLabel()
 
             return [
-                {label: pastorLabel, users: this.plannerVisibilityUsers.filter(user => user.isPastor)},
-                {label: 'Mitarbeitende', users: this.plannerVisibilityUsers.filter(user => !user.isPastor)},
-            ].filter(section => section.users.length);
+                {
+                    label: pastorLabel,
+                    users: this.plannerVisibilityUsers.filter((user) => user.isPastor),
+                },
+                {
+                    label: 'Mitarbeitende',
+                    users: this.plannerVisibilityUsers.filter((user) => !user.isPastor),
+                },
+            ].filter((section) => section.users.length)
         },
         activeToggleableUsersCount() {
-            return this.plannerVisibilityUsers.filter(user => user.pinned).length;
+            return this.plannerVisibilityUsers.filter((user) => user.pinned).length
         },
         activeAbsenceCreateUser() {
-            return this.findUserById(this.activeAbsenceCreateUserId);
+            return this.findUserById(this.activeAbsenceCreateUserId)
         },
         activePoolmasterCreateUser() {
-            return this.findUserById(this.activePoolmasterCreateUserId);
+            return this.findUserById(this.activePoolmasterCreateUserId)
         },
     },
     methods: {
@@ -356,102 +496,102 @@ export default {
          * @returns {string} Localized plural label.
          */
         pastorPluralLabel() {
-            const label = this.$page.props.labels.pastor;
+            const label = this.$page.props.labels.pastor
 
-            return label.endsWith(':in') ? label + 'nen' : label + ':innen';
+            return label.endsWith(':in') ? label + 'nen' : label + ':innen'
         },
         plannerDateTime(value) {
-            if (!value) return null;
+            if (!value) return null
             if (DateTime.isDateTime(value)) {
-                return value.setZone('Europe/Berlin').setLocale('de');
+                return value.setZone('Europe/Berlin').setLocale('de')
             }
             if (typeof value === 'string') {
-                const iso = DateTime.fromISO(value, { setZone: true });
+                const iso = DateTime.fromISO(value, { setZone: true })
                 if (iso.isValid) {
-                    return iso.setZone('Europe/Berlin').setLocale('de');
+                    return iso.setZone('Europe/Berlin').setLocale('de')
                 }
             }
 
-            const fallback = moment(value);
-            if (!fallback.isValid()) return null;
+            const fallback = moment(value)
+            if (!fallback.isValid()) return null
 
-            return DateTime.fromJSDate(fallback.toDate())
-                .setZone('Europe/Berlin')
-                .setLocale('de');
+            return DateTime.fromJSDate(fallback.toDate()).setZone('Europe/Berlin').setLocale('de')
         },
         formatPlannerDate(value, format) {
-            const plannerDate = this.plannerDateTime(value);
-            return plannerDate ? plannerDate.toFormat(format) : '';
+            const plannerDate = this.plannerDateTime(value)
+            return plannerDate ? plannerDate.toFormat(format) : ''
         },
         plannerIsoWeekday(value) {
-            return this.plannerDateTime(value)?.weekday || null;
+            return this.plannerDateTime(value)?.weekday || null
         },
         normalizeOpenSections(sectionConfig, defaults) {
             return {
                 ...defaults,
                 ...(sectionConfig || {}),
-            };
+            }
         },
         defaultPlannerRange() {
-            const firstDay = this.calendarDays[0]?.date ?? this.start;
-            const fallback = this.plannerDateTime(firstDay);
+            const firstDay = this.calendarDays[0]?.date ?? this.start
+            const fallback = this.plannerDateTime(firstDay)
 
-            return fallback ? [fallback.toJSDate(), fallback.toJSDate()] : [];
+            return fallback ? [fallback.toJSDate(), fallback.toJSDate()] : []
         },
         availablePools(user) {
-            return user?.pools ?? [];
+            return user?.pools ?? []
         },
         findUserById(userId) {
-            if (!userId) return null;
+            if (!userId) return null
 
-            return Object.values(this.users)
-                .flat()
-                .find(user => Number(user.id) === Number(userId)) || null;
+            return (
+                Object.values(this.users)
+                    .flat()
+                    .find((user) => Number(user.id) === Number(userId)) || null
+            )
         },
         closeCreateModals() {
-            this.activeAbsenceCreateUserId = null;
-            this.activePoolmasterCreateUserId = null;
+            this.activeAbsenceCreateUserId = null
+            this.activePoolmasterCreateUserId = null
         },
         openAbsenceCreateModal(user) {
-            this.draftAbsenceRange(user);
-            this.activePoolmasterCreateUserId = null;
-            this.activeAbsenceCreateUserId = user.id;
+            this.draftAbsenceRange(user)
+            this.activePoolmasterCreateUserId = null
+            this.activeAbsenceCreateUserId = user.id
         },
         openPoolmasterCreateModal(user) {
-            this.draftPoolmasterRange(user);
-            this.selectedPoolId(user);
-            this.activeAbsenceCreateUserId = null;
-            this.activePoolmasterCreateUserId = user.id;
+            this.draftPoolmasterRange(user)
+            this.selectedPoolId(user)
+            this.activeAbsenceCreateUserId = null
+            this.activePoolmasterCreateUserId = user.id
         },
         draftAbsenceRange(user) {
             if (!this.draftAbsenceRanges[user.id]) {
-                this.draftAbsenceRanges[user.id] = this.defaultPlannerRange();
+                this.draftAbsenceRanges[user.id] = this.defaultPlannerRange()
             }
 
-            return this.draftAbsenceRanges[user.id];
+            return this.draftAbsenceRanges[user.id]
         },
         setDraftAbsenceRange(user, range) {
-            this.draftAbsenceRanges[user.id] = range;
+            this.draftAbsenceRanges[user.id] = range
         },
         draftPoolmasterRange(user) {
             if (!this.draftPoolmasterRanges[user.id]) {
-                this.draftPoolmasterRanges[user.id] = this.defaultPlannerRange();
+                this.draftPoolmasterRanges[user.id] = this.defaultPlannerRange()
             }
 
-            return this.draftPoolmasterRanges[user.id];
+            return this.draftPoolmasterRanges[user.id]
         },
         setDraftPoolmasterRange(user, range) {
-            this.draftPoolmasterRanges[user.id] = range;
+            this.draftPoolmasterRanges[user.id] = range
         },
         selectedPoolId(user) {
             if (!this.selectedPoolIds[user.id]) {
-                this.selectedPoolIds[user.id] = this.availablePools(user)[0]?.id ?? '';
+                this.selectedPoolIds[user.id] = this.availablePools(user)[0]?.id ?? ''
             }
 
-            return this.selectedPoolIds[user.id];
+            return this.selectedPoolIds[user.id]
         },
         setSelectedPoolId(user, poolId) {
-            this.selectedPoolIds[user.id] = Number(poolId);
+            this.selectedPoolIds[user.id] = Number(poolId)
         },
         createAbsencePayload(user, from, to) {
             return {
@@ -459,173 +599,191 @@ export default {
                 reason: 'Urlaub',
                 from: serializePlannerDateToUtc(from),
                 to: serializePlannerDateToUtc(to, { endOfDay: true }),
-            };
+            }
         },
         submitNewAbsence(user, from, to) {
-            this.$inertia.post(route('absence.store'), this.createAbsencePayload(user, from, to));
+            this.$inertia.post(route('absence.store'), this.createAbsencePayload(user, from, to))
         },
         createAbsenceForRange(user) {
-            const range = this.draftAbsenceRange(user);
-            if (!range?.[0] || !range?.[1]) return;
+            const range = this.draftAbsenceRange(user)
+            if (!range?.[0] || !range?.[1]) return
 
-            this.closeCreateModals();
-            this.submitNewAbsence(user, range[0], range[1]);
+            this.closeCreateModals()
+            this.submitNewAbsence(user, range[0], range[1])
         },
         createPoolmasterForRange(user) {
-            const range = this.draftPoolmasterRange(user);
-            const poolId = this.selectedPoolId(user);
-            if (!range?.[0] || !range?.[1] || !poolId) return;
+            const range = this.draftPoolmasterRange(user)
+            const poolId = this.selectedPoolId(user)
+            if (!range?.[0] || !range?.[1] || !poolId) return
 
-            this.$inertia.post(route('admin.poolmasters.store'), {
-                user_id: user.id,
-                pool_id: poolId,
-                start: serializePlannerDateToBerlinDateString(range[0]),
-                end: serializePlannerDateToBerlinDateString(range[1]),
-            }, {
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: () => {
-                    this.closeCreateModals();
-                    this.reloadUserDays(user);
+            this.$inertia.post(
+                route('admin.poolmasters.store'),
+                {
+                    user_id: user.id,
+                    pool_id: poolId,
+                    start: serializePlannerDateToBerlinDateString(range[0]),
+                    end: serializePlannerDateToBerlinDateString(range[1]),
                 },
-            });
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        this.closeCreateModals()
+                        this.reloadUserDays(user)
+                    },
+                },
+            )
         },
         async loadPlanner() {
-            const response = await axios.get(route('planner.users'));
-            const users = this.sortUsers(response.data);
-            this.users = users;
-            this.loadingUsers = false;
+            const response = await axios.get(route('planner.users'))
+            const users = this.sortUsers(response.data)
+            this.users = users
+            this.loadingUsers = false
 
-            response.data.forEach(user => {
-                this.reloadUserDays(user);
-            });
+            response.data.forEach((user) => {
+                this.reloadUserDays(user)
+            })
         },
         reloadUserDays(user) {
-            if (!user?.id) return;
+            if (!user?.id) return
 
-            this.loadingUserDays[user.id] = true;
-            axios.get(route('planner.days', {user: user.id, date: this.formatPlannerDate(this.start, 'yyyy-MM')}))
-                .then(userResponse => {
-                    this.userDays[user.id] = userResponse.data;
+            this.loadingUserDays[user.id] = true
+            axios
+                .get(
+                    route('planner.days', {
+                        user: user.id,
+                        date: this.formatPlannerDate(this.start, 'yyyy-MM'),
+                    }),
+                )
+                .then((userResponse) => {
+                    this.userDays[user.id] = userResponse.data
                 })
                 .finally(() => {
-                    delete this.loadingUserDays[user.id];
-                });
+                    delete this.loadingUserDays[user.id]
+                })
         },
         formatUserName(user) {
             if (user.first_name && user.last_name) {
-                return `${user.last_name}, ${user.first_name}`;
+                return `${user.last_name}, ${user.first_name}`
             }
 
-            return user.name;
+            return user.name
         },
         userRowKey(category, user) {
-            return `${category}-${user.id}-${this.openSections[category] ? 'open' : 'closed'}`;
+            return `${category}-${user.id}-${this.openSections[category] ? 'open' : 'closed'}`
         },
         persistPlannerSetting(key, value) {
-            axios.post(route('setting.set', {
-                user: this.$page.props.currentUser.data.id,
-                key: key,
-            }), {
-                value: value,
-            });
+            axios.post(
+                route('setting.set', {
+                    user: this.$page.props.currentUser.data.id,
+                    key: key,
+                }),
+                {
+                    value: value,
+                },
+            )
         },
         dayClass(user, day) {
-            let prefix = user.canEdit ? 'editable ' : '';
-            if (this.plannerIsoWeekday(day.date) === 7) return prefix + 'sunday';
-            if (day.holiday) return prefix + 'vacation';
-            return prefix + 'day';
+            let prefix = user.canEdit ? 'editable ' : ''
+            if (this.plannerIsoWeekday(day.date) === 7) return prefix + 'sunday'
+            if (day.holiday) return prefix + 'vacation'
+            return prefix + 'day'
         },
         headerDayClass(day) {
-            let classes = 'day';
-            if (day.holiday) classes += ' vacation';
-            if (this.plannerIsoWeekday(day.date) === 7) classes += ' sunday-header';
-            return classes;
+            let classes = 'day'
+            if (day.holiday) classes += ' vacation'
+            if (this.plannerIsoWeekday(day.date) === 7) classes += ' sunday-header'
+            return classes
         },
         canEditCell(user, absence) {
-            return !!(user?.canEdit || absence?.canEdit);
+            return !!(user?.canEdit || absence?.canEdit)
         },
         canCreateAbsenceOnDay(user, day) {
-            const userDay = this.getUserDay(user, day);
-            return !!(user.canEdit && userDay && !userDay.duration && !userDay.busy);
+            const userDay = this.getUserDay(user, day)
+            return !!(user.canEdit && userDay && !userDay.duration && !userDay.busy)
         },
         isCellClickable(user, day) {
-            const userDay = this.getUserDay(user, day);
+            const userDay = this.getUserDay(user, day)
             if (userDay?.duration) {
-                return this.canEditCell(user, userDay.absence);
+                return this.canEditCell(user, userDay.absence)
             }
 
-            return this.canCreateAbsenceOnDay(user, day);
+            return this.canCreateAbsenceOnDay(user, day)
         },
         cellClass(user, day) {
-            const userDay = this.getUserDay(user, day);
+            const userDay = this.getUserDay(user, day)
             if (userDay?.duration) {
-                return this.absenceClass(user, day) + (this.isCellClickable(user, day) ? ' is-clickable' : ' is-static');
+                return (
+                    this.absenceClass(user, day) +
+                    (this.isCellClickable(user, day) ? ' is-clickable' : ' is-static')
+                )
             }
 
-            let classes = this.dayClass(user, day);
+            let classes = this.dayClass(user, day)
             if (this.plannerIsoWeekday(day.date) === 7 && userDay?.busy) {
-                classes += ' sunday-busy';
+                classes += ' sunday-busy'
             } else if (day.holiday && userDay?.busy) {
-                classes += ' vacation-busy';
+                classes += ' vacation-busy'
             } else if (userDay?.busy) {
-                classes += ' busy-day';
+                classes += ' busy-day'
             }
-            classes += this.isCellClickable(user, day) ? ' is-clickable' : ' is-static';
+            classes += this.isCellClickable(user, day) ? ' is-clickable' : ' is-static'
 
-            return classes;
+            return classes
         },
         cellTitle(user, day) {
-            const userDay = this.getUserDay(user, day);
+            const userDay = this.getUserDay(user, day)
             if (userDay?.duration) {
-                return this.absenceTitle(user, userDay.absence);
+                return this.absenceTitle(user, userDay.absence)
             }
 
             if (userDay?.busy) {
-                return 'An diesem Tag ist bereits ein Gottesdienst eingetragen.';
+                return 'An diesem Tag ist bereits ein Gottesdienst eingetragen.'
             }
 
             if (this.canCreateAbsenceOnDay(user, day)) {
-                return 'Klicken, um einen neuen Abwesenheitseintrag anzulegen.';
+                return 'Klicken, um einen neuen Abwesenheitseintrag anzulegen.'
             }
 
             if (!user.canEdit) {
-                return 'Für diese Person dürfen Sie an diesem Tag keinen Abwesenheitseintrag anlegen.';
+                return 'Für diese Person dürfen Sie an diesem Tag keinen Abwesenheitseintrag anlegen.'
             }
 
-            return 'An diesem Tag kann kein neuer Abwesenheitseintrag angelegt werden.';
+            return 'An diesem Tag kann kein neuer Abwesenheitseintrag angelegt werden.'
         },
         showAbsenceReason(user, day) {
-            const absence = this.getUserDay(user, day)?.absence;
-            return !!(absence && (user.canEdit || absence.canEdit || absence.replacing));
+            const absence = this.getUserDay(user, day)?.absence
+            return !!(absence && (user.canEdit || absence.canEdit || absence.replacing))
         },
         edit(user, day, absence) {
-            if (!this.canEditCell(user, absence)) return;
+            if (!this.canEditCell(user, absence)) return
 
             if (absence) {
                 if (absence.poolmaster_id) {
-                    if (!absence.canEdit) return;
-                    this.$inertia.visit(route('admin.poolmaster.edit', {modelId: absence.poolmaster_id}));
-                    return;
+                    if (!absence.canEdit) return
+                    this.$inertia.visit(
+                        route('admin.poolmaster.edit', { modelId: absence.poolmaster_id }),
+                    )
+                    return
                 }
 
-                this.$inertia.visit(route('absence.edit', {absence: absence.id}));
-                return;
+                this.$inertia.visit(route('absence.edit', { absence: absence.id }))
+                return
             }
 
-            if (!this.canCreateAbsenceOnDay(user, day)) return;
+            if (!this.canCreateAbsenceOnDay(user, day)) return
 
-            this.submitNewAbsence(user, day.date, day.date);
+            this.submitNewAbsence(user, day.date, day.date)
         },
         absenceClass(user, day) {
-            const absence = this.userDays[user.id][day.day].absence;
-            let absenceStatus = ' ' + this.absenceStatusClass(absence);
-            let editable = ' not-editable';
-            if (user.canEdit || absence.canEdit) editable = ' editable';
-            if (absence.sick_days && (absence.canEdit || user.canEdit)) editable = ' sick editable';
-            if (absence.poolmaster) return 'poolmaster' + editable;
-            if (absence.replacing) return 'replacing' + editable;
-            return 'absent' + absenceStatus + editable;
+            const absence = this.userDays[user.id][day.day].absence
+            let absenceStatus = ' ' + this.absenceStatusClass(absence)
+            let editable = ' not-editable'
+            if (user.canEdit || absence.canEdit) editable = ' editable'
+            if (absence.sick_days && (absence.canEdit || user.canEdit)) editable = ' sick editable'
+            if (absence.poolmaster) return 'poolmaster' + editable
+            if (absence.replacing) return 'replacing' + editable
+            return 'absent' + absenceStatus + editable
         },
         /**
          * Return a stable visual status for an absence, including legacy/null values.
@@ -636,120 +794,145 @@ export default {
         absenceStatusClass(absence) {
             return [2, 11].includes(Number(absence?.workflow_status))
                 ? 'absence-status-approved'
-                : 'absence-status-unapproved';
+                : 'absence-status-unapproved'
         },
         absenceTitle(user, absence) {
-            if ((!user.canEdit) && (!absence.canEdit) && (!absence.replacing)) {
-                return absence.user.name + ' (' + this.formatPlannerDate(absence.from, 'dd.MM.yyyy') + ' - '
-                    + this.formatPlannerDate(absence.to, 'dd.MM.yyyy') + ')';
+            if (!user.canEdit && !absence.canEdit && !absence.replacing) {
+                return (
+                    absence.user.name +
+                    ' (' +
+                    this.formatPlannerDate(absence.from, 'dd.MM.yyyy') +
+                    ' - ' +
+                    this.formatPlannerDate(absence.to, 'dd.MM.yyyy') +
+                    ')'
+                )
             }
 
-            let statusText = '';
-            let replacementText = '';
-            if (absence.workflow_status === 0) statusText = ' Status: Warte auf Überprüfung. ';
-            if (absence.workflow_status === 1) statusText = ' Status: Warte auf Genehmigung. ';
-            if (absence.workflow_status === 10) statusText = ' Status: Warte auf Genehmigung. ';
+            let statusText = ''
+            let replacementText = ''
+            if (absence.workflow_status === 0) statusText = ' Status: Warte auf Überprüfung. '
+            if (absence.workflow_status === 1) statusText = ' Status: Warte auf Genehmigung. '
+            if (absence.workflow_status === 10) statusText = ' Status: Warte auf Genehmigung. '
             if (!absence.poolmaster && absence.replacementText) {
-                replacementText = 'V: ' + absence.replacementText;
+                replacementText = 'V: ' + absence.replacementText
             }
 
-            return absence.reason + ' (' + this.formatPlannerDate(absence.from, 'dd.MM.yyyy') + ' - '
-                + this.formatPlannerDate(absence.to, 'dd.MM.yyyy') + ') ' + replacementText + statusText + (user.canEdit ? ' --> Klicken, um zu bearbeiten' : '');
+            return (
+                absence.reason +
+                ' (' +
+                this.formatPlannerDate(absence.from, 'dd.MM.yyyy') +
+                ' - ' +
+                this.formatPlannerDate(absence.to, 'dd.MM.yyyy') +
+                ') ' +
+                replacementText +
+                statusText +
+                (user.canEdit ? ' --> Klicken, um zu bearbeiten' : '')
+            )
         },
         colspan(user, day) {
-            if (undefined === this.userDays[user.id]) return this.calendarDays.length;
-            return this.userDays[user.id][day.day].duration || 1;
+            if (undefined === this.userDays[user.id]) return this.calendarDays.length
+            return this.userDays[user.id][day.day].duration || 1
         },
         sortUsers(users) {
-            let sortedUsers = {};
-            let usedIds = [];
-            let allToggleableUsers = [];
+            let sortedUsers = {}
+            let usedIds = []
+            let allToggleableUsers = []
 
-            this.sections = [];
-            this.toggleableUsers = [];
+            this.sections = []
+            this.toggleableUsers = []
 
-            users.forEach(user => {
+            users.forEach((user) => {
                 if (user.id === this.$page.props.currentUser.data.id) {
-                    sortedUsers['Eigenes Konto'] = [];
-                    this.sections.push('Eigenes Konto');
-                    sortedUsers['Eigenes Konto'].push(user);
-                    usedIds.push(user.id);
+                    sortedUsers['Eigenes Konto'] = []
+                    this.sections.push('Eigenes Konto')
+                    sortedUsers['Eigenes Konto'].push(user)
+                    usedIds.push(user.id)
                 }
-            });
+            })
 
             if (this.$page.props.currentUser.data.isPastor) {
-                sortedUsers[this.pastorPluralLabel()] = [];
-                this.sections.push(this.pastorPluralLabel());
-                users.forEach(user => {
-                    if (usedIds.includes(user.id)) return;
+                sortedUsers[this.pastorPluralLabel()] = []
+                this.sections.push(this.pastorPluralLabel())
+                users.forEach((user) => {
+                    if (usedIds.includes(user.id)) return
                     if (user.isPastor) {
-                        user.pinned = this.pinnedPastors === null
-                            || this.pinnedPastors.includes(String(user.id))
-                            || this.pinnedPastors.includes(user.id);
-                        allToggleableUsers.push(user);
+                        user.pinned =
+                            this.pinnedPastors === null ||
+                            this.pinnedPastors.includes(String(user.id)) ||
+                            this.pinnedPastors.includes(user.id)
+                        allToggleableUsers.push(user)
                         if (user.pinned) {
-                            sortedUsers[this.pastorPluralLabel()].push(user);
-                            usedIds.push(user.id);
+                            sortedUsers[this.pastorPluralLabel()].push(user)
+                            usedIds.push(user.id)
                         }
                     }
-                });
-                sortedUsers['Mitarbeitende'] = [];
-                this.sections.push('Mitarbeitende');
-                users.forEach(user => {
-                    if (usedIds.includes(user.id)) return;
-                    if (this.isPastor && user.isPastor) return;
+                })
+                sortedUsers['Mitarbeitende'] = []
+                this.sections.push('Mitarbeitende')
+                users.forEach((user) => {
+                    if (usedIds.includes(user.id)) return
+                    if (this.isPastor && user.isPastor) return
                     if (!user.show_absences_with_services) {
-                        user.pinned = this.pinnedUsers.includes(String(user.id)) || this.pinnedUsers.includes(user.id);
-                        allToggleableUsers.push(user);
+                        user.pinned =
+                            this.pinnedUsers.includes(String(user.id)) ||
+                            this.pinnedUsers.includes(user.id)
+                        allToggleableUsers.push(user)
                     }
                     if (user.show_absences_with_services || user.pinned) {
-                        user.pinned = true;
-                        sortedUsers['Mitarbeitende'].push(user);
-                        usedIds.push(user.id);
+                        user.pinned = true
+                        sortedUsers['Mitarbeitende'].push(user)
+                        usedIds.push(user.id)
                     }
-                });
+                })
             } else {
-                this.sections.push('Mitarbeitende');
-                sortedUsers['Mitarbeitende'] = [];
+                this.sections.push('Mitarbeitende')
+                sortedUsers['Mitarbeitende'] = []
             }
 
-            users.forEach(user => {
-                if (usedIds.includes(user.id)) return;
-                if (this.isPastor && user.isPastor) return;
-                user.pinned = true;
-                sortedUsers['Mitarbeitende'].push(user);
-            });
+            users.forEach((user) => {
+                if (usedIds.includes(user.id)) return
+                if (this.isPastor && user.isPastor) return
+                user.pinned = true
+                sortedUsers['Mitarbeitende'].push(user)
+            })
 
-            this.toggleableUsers = allToggleableUsers.sort((a, b) => a.sortName < b.sortName ? -1 : 1);
+            this.toggleableUsers = allToggleableUsers.sort((a, b) =>
+                a.sortName < b.sortName ? -1 : 1,
+            )
 
-            return sortedUsers;
+            return sortedUsers
         },
         toggleRow(category) {
-            this.openSections[category] = !this.openSections[category];
-            this.persistPlannerSetting('planner_open_sections', this.openSections);
+            this.openSections[category] = !this.openSections[category]
+            this.persistPlannerSetting('planner_open_sections', this.openSections)
         },
         togglePinned(user) {
-            user.pinned = !user.pinned;
-            const settingKey = user.isPastor ? 'planner_pinned_pastors' : 'planner_pinned_users';
+            user.pinned = !user.pinned
+            const settingKey = user.isPastor ? 'planner_pinned_pastors' : 'planner_pinned_users'
             if (user.isPastor) {
-                this.pinnedPastors = this.pinnedPastors || this.toggleableUsers
-                    .filter(toggleableUser => toggleableUser.isPastor)
-                    .map(pastor => pastor.id);
+                this.pinnedPastors =
+                    this.pinnedPastors ||
+                    this.toggleableUsers
+                        .filter((toggleableUser) => toggleableUser.isPastor)
+                        .map((pastor) => pastor.id)
                 this.pinnedPastors = user.pinned
                     ? [...new Set([...this.pinnedPastors, user.id])]
-                    : this.pinnedPastors.filter((id) => String(id) !== String(user.id));
+                    : this.pinnedPastors.filter((id) => String(id) !== String(user.id))
             } else {
                 this.pinnedUsers = user.pinned
                     ? [...new Set([...this.pinnedUsers, user.id])]
-                    : this.pinnedUsers.filter((id) => String(id) !== String(user.id));
+                    : this.pinnedUsers.filter((id) => String(id) !== String(user.id))
             }
 
             if (user.pinned) {
-                this.addUserToVisibilitySection(user);
+                this.addUserToVisibilitySection(user)
             } else {
-                this.removeUserFromVisibilitySection(user);
+                this.removeUserFromVisibilitySection(user)
             }
-            this.persistPlannerSetting(settingKey, user.isPastor ? this.pinnedPastors : this.pinnedUsers);
+            this.persistPlannerSetting(
+                settingKey,
+                user.isPastor ? this.pinnedPastors : this.pinnedUsers,
+            )
         },
         /**
          * Add a visible user to the correct planner section.
@@ -758,11 +941,11 @@ export default {
          * @returns {void}
          */
         addUserToVisibilitySection(user) {
-            const section = user.isPastor ? this.pastorPluralLabel() : 'Mitarbeitende';
-            if (!this.users[section]) this.users[section] = [];
-            if (!this.users[section].find(existingUser => existingUser.id === user.id)) {
-                this.users[section].push(user);
-                this.users[section].sort((a, b) => a.sortName < b.sortName ? -1 : 1);
+            const section = user.isPastor ? this.pastorPluralLabel() : 'Mitarbeitende'
+            if (!this.users[section]) this.users[section] = []
+            if (!this.users[section].find((existingUser) => existingUser.id === user.id)) {
+                this.users[section].push(user)
+                this.users[section].sort((a, b) => (a.sortName < b.sortName ? -1 : 1))
             }
         },
         /**
@@ -772,18 +955,20 @@ export default {
          * @returns {void}
          */
         removeUserFromVisibilitySection(user) {
-            const section = user.isPastor ? this.pastorPluralLabel() : 'Mitarbeitende';
-            if (!this.users[section]) return;
-            this.users[section] = this.users[section].filter(existingUser => existingUser.id !== user.id);
+            const section = user.isPastor ? this.pastorPluralLabel() : 'Mitarbeitende'
+            if (!this.users[section]) return
+            this.users[section] = this.users[section].filter(
+                (existingUser) => existingUser.id !== user.id,
+            )
         },
         getUserDay(user, day) {
-            if (!user || !day) return null;
-            return this.userDays?.[user.id]?.[day.day] || null;
+            if (!user || !day) return null
+            return this.userDays?.[user.id]?.[day.day] || null
         },
         isUserDaysLoading(user) {
-            return !!this.loadingUserDays[user.id];
-        }
-    }
+            return !!this.loadingUserDays[user.id]
+        },
+    },
 }
 </script>
 
@@ -984,17 +1169,17 @@ export default {
 }
 
 .category-header th {
-    background: tint-color(theme.theme-color("secondary"), 88%);
+    background: tint-color(theme.theme-color('secondary'), 88%);
     font-weight: 600;
 }
 
 .absent {
-    background-color: theme.elkw-color("orange");
+    background-color: theme.elkw-color('orange');
 }
 
 .absence-planner-table .cal-cell.absent {
-    background-color: theme.elkw-color("orange");
-    border-right-color: theme.elkw-color("orange");
+    background-color: theme.elkw-color('orange');
+    border-right-color: theme.elkw-color('orange');
 }
 
 .absence-planner-table .cal-cell.absent.absence-status-unapproved {
@@ -1003,11 +1188,11 @@ export default {
 }
 
 .replacing {
-    background-color: theme.elkw-color("hellblau");
+    background-color: theme.elkw-color('hellblau');
 }
 
 .poolmaster {
-    background-color: theme.elkw-color("dunkelblau");
+    background-color: theme.elkw-color('dunkelblau');
     color: white;
 }
 
@@ -1021,12 +1206,12 @@ export default {
 }
 
 .absence-planner-table tbody .cal-cell.busy-day {
-    background-color: rgba(var(--bs-primary-rgb), 0.10) !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
     color: var(--bs-primary) !important;
 }
 
 .vacation {
-    background-color: rgba(25, 135, 84, 0.10);
+    background-color: rgba(25, 135, 84, 0.1);
     color: var(--bs-success-text-emphasis, var(--bs-success));
 }
 
@@ -1036,22 +1221,22 @@ export default {
 }
 
 .sick.editable {
-    background-color: tint-color(theme.elkw-color("dunkelrot"), 70%);
+    background-color: tint-color(theme.elkw-color('dunkelrot'), 70%);
 }
 
 .sick.replacing {
-    background-color: tint-color(theme.elkw-color("hellblau"), 50%);
+    background-color: tint-color(theme.elkw-color('hellblau'), 50%);
 }
 
 .editable:hover {
-    background-color: theme.theme-color("primary");
+    background-color: theme.theme-color('primary');
     color: white !important;
 }
 
 .day.editable:hover,
 .sunday.editable:hover,
 .vacation.editable:hover {
-    background-color: theme.theme-color("success");
+    background-color: theme.theme-color('success');
 }
 
 .absence-planner-table .cal-cell.is-clickable {

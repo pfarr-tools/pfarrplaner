@@ -28,8 +28,14 @@
 
 <template>
     <div>
-        <span class="badge bg-light" :style="{backgroundColor: color}">
-            <span v-if="icon" :class="icon"></span>
+        <span
+            class="badge bg-light"
+            :style="{ backgroundColor: color }"
+        >
+            <span
+                v-if="icon"
+                :class="icon"
+            ></span>
             {{ description }}
         </span>
     </div>
@@ -37,18 +43,28 @@
 
 <script>
 export default {
-    name: "ControlledAccess",
+    name: 'ControlledAccess',
     props: ['service'],
     data() {
         return {
-            color: ['', 'yellow', 'green', 'greenyellow', 'dodgerblue', 'lightskyblue', 'red'][this.service.controlled_access],
-            description: ['', '3G', '2G', '2G+', 'Test nötig', 'Test empfohlen', 'Geschlossene Gruppe'][this.service.controlled_access],
-            icon: ['', '', '', '', 'mdi mdi-virus-off', 'mdi mdi-virus-off', ''][this.service.controlled_access]
+            color: ['', 'yellow', 'green', 'greenyellow', 'dodgerblue', 'lightskyblue', 'red'][
+                this.service.controlled_access
+            ],
+            description: [
+                '',
+                '3G',
+                '2G',
+                '2G+',
+                'Test nötig',
+                'Test empfohlen',
+                'Geschlossene Gruppe',
+            ][this.service.controlled_access],
+            icon: ['', '', '', '', 'mdi mdi-virus-off', 'mdi mdi-virus-off', ''][
+                this.service.controlled_access
+            ],
         }
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

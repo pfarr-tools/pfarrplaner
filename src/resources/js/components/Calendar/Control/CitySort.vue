@@ -30,9 +30,18 @@
     <div class="calendar-city-sort">
         <div class="calendar-city-sort-section">
             <div class="calendar-city-sort-title">Im Kalender sichtbar</div>
-            <draggable :list="list1" item-key="id" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities" @change="handleChange">
+            <draggable
+                :list="list1"
+                item-key="id"
+                group="cities"
+                @start="drag = true"
+                @end="drag = false"
+                class="sortable-cities"
+                @change="handleChange"
+            >
                 <template #item="{ element: city }">
-                    <div class="sortable-city"><span class="mdi mdi-church"></span>
+                    <div class="sortable-city">
+                        <span class="mdi mdi-church"></span>
                         {{ city.name }}
                     </div>
                 </template>
@@ -41,9 +50,18 @@
 
         <div class="calendar-city-sort-section">
             <div class="calendar-city-sort-title">Ausgeblendet</div>
-            <draggable :list="list2" item-key="id" group="cities" @start="drag=true" @end="drag=false" class="sortable-cities" @change="handleChange">
+            <draggable
+                :list="list2"
+                item-key="id"
+                group="cities"
+                @start="drag = true"
+                @end="drag = false"
+                class="sortable-cities"
+                @change="handleChange"
+            >
                 <template #item="{ element: city }">
-                    <div class="sortable-city sortable-city-muted"><span class="mdi mdi-church-outline"></span>
+                    <div class="sortable-city sortable-city-muted">
+                        <span class="mdi mdi-church-outline"></span>
                         {{ city.name }}
                     </div>
                 </template>
@@ -54,8 +72,8 @@
 
 <script>
 import draggable from 'vuedraggable'
-import EventBus from "../../../plugins/EventBus";
-import {CalendarNewSortOrderEvent} from '../../../events/CalendarNewSortOrderEvent';
+import EventBus from '../../../plugins/EventBus'
+import { CalendarNewSortOrderEvent } from '../../../events/CalendarNewSortOrderEvent'
 
 export default {
     name: 'CalendarControlCitySort',
@@ -72,17 +90,17 @@ export default {
     },
     methods: {
         handleChange() {
-            EventBus.publish(new CalendarNewSortOrderEvent(this.list1));
+            EventBus.publish(new CalendarNewSortOrderEvent(this.list1))
 
-            var ids = [];
-            this.list1.forEach(function(city){
-                ids.push(city.id);
-            });
-            axios.post(route('setting.set', {user: this.user.id, key: 'sorted_cities'}), {
-                value: ids.join(',')
-            });
-        }
-    }
+            var ids = []
+            this.list1.forEach(function (city) {
+                ids.push(city.id)
+            })
+            axios.post(route('setting.set', { user: this.user.id, key: 'sorted_cities' }), {
+                value: ids.join(','),
+            })
+        },
+    },
 }
 </script>
 

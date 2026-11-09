@@ -29,27 +29,69 @@
 <template>
     <form @submit.prevent="closeModal">
         <!-- Modal -->
-        <div class="modal fade show d-block" :data-dusk="$attrs['data-dusk']" :data-bs-backdrop="allowCancel ? '' : 'static'" tabindex="-1" aria-hidden="true"
-             @keyup.esc="handleEsc" @keyup.enter="closeModal" @click="handleEsc">
-            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document" :style="{maxWidth: maxWidth, minHeight: minHeight || 'auto', maxHeight: maxHeight || 'auto'}"
-                 @click.stop="nop">
-                <div class="modal-content" :style="{maxWidth: maxWidth, minHeight: minHeight || 'auto', maxHeight: maxHeight || 'auto'}">
+        <div
+            class="modal fade show d-block"
+            :data-dusk="$attrs['data-dusk']"
+            :data-bs-backdrop="allowCancel ? '' : 'static'"
+            tabindex="-1"
+            aria-hidden="true"
+            @keyup.esc="handleEsc"
+            @keyup.enter="closeModal"
+            @click="handleEsc"
+        >
+            <div
+                class="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+                role="document"
+                :style="{
+                    maxWidth: maxWidth,
+                    minHeight: minHeight || 'auto',
+                    maxHeight: maxHeight || 'auto',
+                }"
+                @click.stop="nop"
+            >
+                <div
+                    class="modal-content"
+                    :style="{
+                        maxWidth: maxWidth,
+                        minHeight: minHeight || 'auto',
+                        maxHeight: maxHeight || 'auto',
+                    }"
+                >
                     <div class="modal-header">
                         <h5 class="modal-title">{{ title }}</h5>
-                        <button v-if="allowCancel" type="button" class="btn-close" data-dismiss="modal"
-                                aria-label="Fenster schließen" @click.prevent="cancelModal('window')">
+                        <button
+                            v-if="allowCancel"
+                            type="button"
+                            class="btn-close"
+                            data-dismiss="modal"
+                            aria-label="Fenster schließen"
+                            @click.prevent="cancelModal('window')"
+                        >
                             <span aria-hidden="true"></span>
                         </button>
                     </div>
-                    <div class="modal-body" ref="body">
+                    <div
+                        class="modal-body"
+                        ref="body"
+                    >
                         <slot />
                     </div>
                     <div class="modal-footer">
                         <slot name="additional-buttons" />
-                        <button  v-if="allowClose" type="button" :class="'btn btn-'+submitButtonType"
-                                 @click.prevent="closeModal">{{ closeButtonLabel }}
+                        <button
+                            v-if="allowClose"
+                            type="button"
+                            :class="'btn btn-' + submitButtonType"
+                            @click.prevent="closeModal"
+                        >
+                            {{ closeButtonLabel }}
                         </button>
-                        <button v-if="allowCancel" type="button" :class="'btn btn-'+cancelButtonType" @click.prevent="cancelModal('button')">
+                        <button
+                            v-if="allowCancel"
+                            type="button"
+                            :class="'btn btn-' + cancelButtonType"
+                            @click.prevent="cancelModal('button')"
+                        >
                             {{ cancelButtonLabel }}
                         </button>
                     </div>
@@ -61,7 +103,7 @@
 
 <script>
 export default {
-    name: "Modal",
+    name: 'Modal',
     props: {
         title: String,
         allowCancel: {
@@ -105,31 +147,30 @@ export default {
         }
     },
     mounted() {
-        document.body.classList.add("modal-open");
-        this.$emit('shown', this.$refs.body);
+        document.body.classList.add('modal-open')
+        this.$emit('shown', this.$refs.body)
     },
     methods: {
         closeModal() {
-            document.body.classList.remove("modal-open");
-            this.$emit('close');
+            document.body.classList.remove('modal-open')
+            this.$emit('close')
         },
         cancelModal(source) {
-            document.body.classList.remove("modal-open");
-            this.$emit('cancel', source);
+            document.body.classList.remove('modal-open')
+            this.$emit('cancel', source)
         },
         nop() {},
         handleEsc() {
-            if (!this.allowCancel) return;
-            this.cancelModal('esc');
+            if (!this.allowCancel) return
+            this.cancelModal('esc')
         },
-    }
+    },
 }
 </script>
 
 <style scoped>
-
 .modal {
-    background-color: #000A;
+    background-color: #000a;
 }
 
 .modal-dialog {
@@ -137,5 +178,4 @@ export default {
     max-width: 90vw;
     overflow-y: auto;
 }
-
 </style>

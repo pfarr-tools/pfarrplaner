@@ -29,11 +29,17 @@
 <template>
     <admin-layout :title="title + ' einrichten'">
         <template #navbar-left>
-            <button class="btn btn-primary" @click="submit">
+            <button
+                class="btn btn-primary"
+                @click="submit"
+            >
                 <span class="d-inline d-md-none mdi mdi-download"></span>
                 <span class="d-none d-md-inline">Herunterladen</span>
             </button>
-            <button class="btn btn-light ms-1" @click="back">
+            <button
+                class="btn btn-light ms-1"
+                @click="back"
+            >
                 <span class="d-inline d-md-none mdi mdi-chevron-left"></span>
                 <span class="d-none d-md-inline">Zurück</span>
             </button>
@@ -44,12 +50,18 @@
         <card>
             <card-header>Einstellungen für {{ title }}</card-header>
             <card-body>
-                <form id="configForm" method="post" :action="route('liturgy.download', {
-                    service: this.service.slug,
-                    key: this.sheetConfig.key,
-                })">
+                <form
+                    id="configForm"
+                    method="post"
+                    :action="
+                        route('liturgy.download', {
+                            service: this.service.slug,
+                            key: this.sheetConfig.key,
+                        })
+                    "
+                >
                     <form-csrf-token />
-                    <slot/>
+                    <slot />
                 </form>
             </card-body>
         </card>
@@ -57,26 +69,24 @@
 </template>
 
 <script>
-import Card from "../../../components/Ui/cards/card";
-import CardHeader from "../../../components/Ui/cards/cardHeader";
-import CardBody from "../../../components/Ui/cards/cardBody";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken.vue";
+import Card from '../../../components/Ui/cards/card'
+import CardHeader from '../../../components/Ui/cards/cardHeader'
+import CardBody from '../../../components/Ui/cards/cardBody'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken.vue'
 
 export default {
-    name: "LiturgySheetConfigurationLayout",
-    components: {FormCsrfToken, CardBody, CardHeader, Card},
+    name: 'LiturgySheetConfigurationLayout',
+    components: { FormCsrfToken, CardBody, CardHeader, Card },
     props: ['title', 'service', 'sheetConfig'],
     methods: {
         submit() {
-            document.getElementById('configForm').submit();
+            document.getElementById('configForm').submit()
         },
         back() {
-            history.back();
-        }
-    }
+            history.back()
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

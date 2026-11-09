@@ -30,52 +30,117 @@
     <div class="people-tab">
         <div class="row">
             <div class="col-md-4">
-                <people-select name="participants[P][]" :label="$page.props.labels.pastor" :people="people" :teams="teams"
-                               v-model="myService.pastors"
-                               :include-teams-from-city="myService.city" :city="myService.city"
-                                @count="updatePeopleCounter" />
-                <form-check name="need_predicant"
-                            :label="'Für diesen Gottesdienst wird ein:e '+$page.props.labels.predicant+' benötigt.'"
-                            v-model="myService.need_predicant" />
+                <people-select
+                    name="participants[P][]"
+                    :label="$page.props.labels.pastor"
+                    :people="people"
+                    :teams="teams"
+                    v-model="myService.pastors"
+                    :include-teams-from-city="myService.city"
+                    :city="myService.city"
+                    @count="updatePeopleCounter"
+                />
+                <form-check
+                    name="need_predicant"
+                    :label="
+                        'Für diesen Gottesdienst wird ein:e ' +
+                        $page.props.labels.predicant +
+                        ' benötigt.'
+                    "
+                    v-model="myService.need_predicant"
+                />
             </div>
             <div class="col-md-4">
-                <people-select name="participants[O][]" :label="$page.props.labels.organist" :people="people" :teams="teams"
-                               v-model="myService.organists"
-                               :include-teams-from-city="myService.city" :city="myService.city"
-                               @count="updatePeopleCounter"  />
+                <people-select
+                    name="participants[O][]"
+                    :label="$page.props.labels.organist"
+                    :people="people"
+                    :teams="teams"
+                    v-model="myService.organists"
+                    :include-teams-from-city="myService.city"
+                    :city="myService.city"
+                    @count="updatePeopleCounter"
+                />
             </div>
             <div class="col-md-4">
-                <people-select name="participants[M][]" :label="$page.props.labels.sacristan" :people="people" :teams="teams"
-                               v-model="myService.sacristans"
-                               :include-teams-from-city="myService.city" :city="myService.city"
-                               @count="updatePeopleCounter"  />
+                <people-select
+                    name="participants[M][]"
+                    :label="$page.props.labels.sacristan"
+                    :people="people"
+                    :teams="teams"
+                    v-model="myService.sacristans"
+                    :include-teams-from-city="myService.city"
+                    :city="myService.city"
+                    @count="updatePeopleCounter"
+                />
             </div>
         </div>
         <hr />
-        <form-radio-group name="wtc_category" label="Einstufung für Hauptamtliche mit AZE" v-model="myService.wtc_category" :items="{
-                            '': 'ohne Kategorie',
-                            'HG': 'Hauptgottesdienst',
-                            'WG': 'Weiterer Gottesdienst',
-                        }"/>
-        <hr/>
-        <div><label><span class="mdi mdi-account-multiple"></span> Weitere Dienste</label></div>
+        <form-radio-group
+            name="wtc_category"
+            label="Einstufung für Hauptamtliche mit AZE"
+            v-model="myService.wtc_category"
+            :items="{
+                '': 'ohne Kategorie',
+                HG: 'Hauptgottesdienst',
+                WG: 'Weiterer Gottesdienst',
+            }"
+        />
+        <hr />
+        <div>
+            <label><span class="mdi mdi-account-multiple"></span> Weitere Dienste</label>
+        </div>
         <div class="row">
             <div class="col-md-6"><label>Dienstbeschreibung</label></div>
             <div class="col-md-6"><label>Eingeteilte Personen</label></div>
         </div>
-        <ministry-row v-for="(members,title,index) in myService.ministriesByCategory"
-                      :title="title" :members="members" :index="index" :people="people" :teams="teams"
-                      :key="'ministry_rows'+Object.entries(myService.ministriesByCategory).length+'_'+index"
-                      :ministries="ministries" v-model="myService.ministriesByCategory" @delete="deleteRow"
-                      :include-teams-from-city="myService.city" :city="myService.city"
-                      @count="updatePeopleCounter" />
-        <button class="btn btn-light btn-sm" @click.prevent.stop="addRow">Reihe hinzufügen</button>
-        <hr>
+        <ministry-row
+            v-for="(members, title, index) in myService.ministriesByCategory"
+            :title="title"
+            :members="members"
+            :index="index"
+            :people="people"
+            :teams="teams"
+            :key="
+                'ministry_rows' +
+                Object.entries(myService.ministriesByCategory).length +
+                '_' +
+                index
+            "
+            :ministries="ministries"
+            v-model="myService.ministriesByCategory"
+            @delete="deleteRow"
+            :include-teams-from-city="myService.city"
+            :city="myService.city"
+            @count="updatePeopleCounter"
+        />
+        <button
+            class="btn btn-light btn-sm"
+            @click.prevent.stop="addRow"
+        >
+            Reihe hinzufügen
+        </button>
+        <hr />
         <div>
-            <button class="btn btn-light" title="Liste der Beteiligten ('Credits') kopieren" @click.prevent="copyCredits">
-                <span class="mdi mdi-content-copy"></span> <span class="d-none d-md-inline">Liste der Beteiligten ("Credits") kopieren</span></button>
-            <div v-if="creditsCopied" class="alert alert-info alert-dismissible fade show mt-2">Die Liste der Beteiligten wurde in die Zwischenablage kopiert.
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <button
+                class="btn btn-light"
+                title="Liste der Beteiligten ('Credits') kopieren"
+                @click.prevent="copyCredits"
+            >
+                <span class="mdi mdi-content-copy"></span>
+                <span class="d-none d-md-inline">Liste der Beteiligten ("Credits") kopieren</span>
+            </button>
+            <div
+                v-if="creditsCopied"
+                class="alert alert-info alert-dismissible fade show mt-2"
+            >
+                Die Liste der Beteiligten wurde in die Zwischenablage kopiert.
+                <button
+                    type="button"
+                    class="close"
+                    data-dismiss="alert"
+                    aria-label="Close"
+                >
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -84,16 +149,16 @@
 </template>
 
 <script>
-import FormInput from "../../Ui/forms/FormInput";
-import LocationSelect from "../../Ui/elements/LocationSelect";
-import DaySelect from "../../Ui/elements/DaySelect";
-import PeopleSelect from "../../Ui/elements/PeopleSelect";
-import FormCheck from "../../Ui/forms/FormCheck";
-import MinistryRow from "../../Ui/elements/MinistryRow";
-import FormRadioGroup from "../../Ui/forms/FormRadioGroup";
+import FormInput from '../../Ui/forms/FormInput'
+import LocationSelect from '../../Ui/elements/LocationSelect'
+import DaySelect from '../../Ui/elements/DaySelect'
+import PeopleSelect from '../../Ui/elements/PeopleSelect'
+import FormCheck from '../../Ui/forms/FormCheck'
+import MinistryRow from '../../Ui/elements/MinistryRow'
+import FormRadioGroup from '../../Ui/forms/FormRadioGroup'
 
 export default {
-    name: "PeopleTab",
+    name: 'PeopleTab',
     components: {
         FormRadioGroup,
         MinistryRow,
@@ -112,15 +177,16 @@ export default {
         teams: Array,
     },
     data() {
-        if (!this.service.ministriesByCategory) this.service.ministriesByCategory = {};
-        if (this.service.ministriesByCategory.length == 0) this.service.ministriesByCategory = {};
+        if (!this.service.ministriesByCategory) this.service.ministriesByCategory = {}
+        if (this.service.ministriesByCategory.length == 0) this.service.ministriesByCategory = {}
 
-        let myService = this.service;
-        if (Array.isArray(myService.ministriesByCategory)) myService.ministriesByCategory = {};
-        if (!myService.ministriesByCategory) myService.ministriesByCategory = {};
-        this.service.city.default_ministries.forEach(ministry => {
-            if (undefined == myService.ministriesByCategory[ministry]) myService.ministriesByCategory[ministry] = [];
-        });
+        let myService = this.service
+        if (Array.isArray(myService.ministriesByCategory)) myService.ministriesByCategory = {}
+        if (!myService.ministriesByCategory) myService.ministriesByCategory = {}
+        this.service.city.default_ministries.forEach((ministry) => {
+            if (undefined == myService.ministriesByCategory[ministry])
+                myService.ministriesByCategory[ministry] = []
+        })
 
         return {
             myService,
@@ -131,51 +197,49 @@ export default {
     },
     methods: {
         addRow() {
-            this.myService.ministriesByCategory['Neuer Dienst'] = [];
-            this.$forceUpdate();
+            this.myService.ministriesByCategory['Neuer Dienst'] = []
+            this.$forceUpdate()
         },
         deleteRow(category) {
-            delete this.myService.ministriesByCategory[category];
-            this.updatePeopleCounter();
-            this.$forceUpdate();
+            delete this.myService.ministriesByCategory[category]
+            this.updatePeopleCounter()
+            this.$forceUpdate()
         },
         copyCredits() {
-            var credits = { Liturgie: [], Orgel: []};
-            let sacristanKey = this.$page.props.labels.sacristan.replaceAll(':in', '');
-            credits[sacristanKey] = [];
+            var credits = { Liturgie: [], Orgel: [] }
+            let sacristanKey = this.$page.props.labels.sacristan.replaceAll(':in', '')
+            credits[sacristanKey] = []
 
-            this.myService.pastors.forEach(person => {
-                credits.Liturgie.push(person.name);
-            });
-            this.myService.organists.forEach(person => {
-                credits.Orgel.push(person.name);
-            });
-            Object.entries(this.myService.ministriesByCategory).forEach(item => {
-                item[1].forEach(person => {
-                    if (!credits[item[0]]) credits[item[0]] = [];
-                    credits[item[0]].push(person.name);
-                });
+            this.myService.pastors.forEach((person) => {
+                credits.Liturgie.push(person.name)
             })
-            this.myService.sacristans.forEach(person => {
-                credits[sacristanKey].push(person.name);
-            });
+            this.myService.organists.forEach((person) => {
+                credits.Orgel.push(person.name)
+            })
+            Object.entries(this.myService.ministriesByCategory).forEach((item) => {
+                item[1].forEach((person) => {
+                    if (!credits[item[0]]) credits[item[0]] = []
+                    credits[item[0]].push(person.name)
+                })
+            })
+            this.myService.sacristans.forEach((person) => {
+                credits[sacristanKey].push(person.name)
+            })
 
-            var creditsText = [];
-            Object.entries(credits).forEach(item => {
-                creditsText.push(item[0]+': '+item[1].join(', '));
-            });
-            const cb = navigator.clipboard;
-            cb.writeText(creditsText.join(' · ')).then(result => {
-                this.creditsCopied = true;
-            });
+            var creditsText = []
+            Object.entries(credits).forEach((item) => {
+                creditsText.push(item[0] + ': ' + item[1].join(', '))
+            })
+            const cb = navigator.clipboard
+            cb.writeText(creditsText.join(' · ')).then((result) => {
+                this.creditsCopied = true
+            })
         },
         updatePeopleCounter() {
-            this.$emit('count');
+            this.$emit('count')
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

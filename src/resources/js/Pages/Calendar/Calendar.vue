@@ -27,94 +27,182 @@
   -->
 
 <template>
-    <admin-layout :enable-control-sidebar="false" :title="pageTitle" no-padding no-content-header no-outer-padding :key="calendarState">
+    <admin-layout
+        :enable-control-sidebar="false"
+        :title="pageTitle"
+        no-padding
+        no-content-header
+        no-outer-padding
+        :key="calendarState"
+    >
         <template #navbar-left>
-            <calendar-nav-top :date="new Date(myDate)" :years="years"
-                              :targetMode="targetMode" :target="target" :calendar-mode="calendarMode"
-                              :writable-cities="writableCities" :can-create="canCreate"
-                              @toggle-target-mode="toggleTargetMode"
-                              @navigate="navigateTo"
+            <calendar-nav-top
+                :date="new Date(myDate)"
+                :years="years"
+                :targetMode="targetMode"
+                :target="target"
+                :calendar-mode="calendarMode"
+                :writable-cities="writableCities"
+                :can-create="canCreate"
+                @toggle-target-mode="toggleTargetMode"
+                @navigate="navigateTo"
             />
         </template>
         <template #navbar-right>
             <div class="calendar-topbar-actions">
-                <div class="btn-group calendar-mode-toggle" role="group" aria-label="Kalenderansicht umschalten">
-                    <input type="radio" class="btn-check" name="calendarModeTopbar" id="calendarModeTopbarServices" autocomplete="off"
-                           :checked="calendarMode === 'services'"
-                           value="services" @input="toggleCalendarMode('services')"/>
-                    <label class="btn btn-sm btn-outline-secondary calendar-topbar-button" for="calendarModeTopbarServices" title="Gottesdienstkalender anzeigen">
+                <div
+                    class="btn-group calendar-mode-toggle"
+                    role="group"
+                    aria-label="Kalenderansicht umschalten"
+                >
+                    <input
+                        type="radio"
+                        class="btn-check"
+                        name="calendarModeTopbar"
+                        id="calendarModeTopbarServices"
+                        autocomplete="off"
+                        :checked="calendarMode === 'services'"
+                        value="services"
+                        @input="toggleCalendarMode('services')"
+                    />
+                    <label
+                        class="btn btn-sm btn-outline-secondary calendar-topbar-button"
+                        for="calendarModeTopbarServices"
+                        title="Gottesdienstkalender anzeigen"
+                    >
                         <span class="mdi mdi-church"></span>
                         <span class="d-none d-xl-inline">Gottesdienste</span>
                     </label>
 
-                    <input type="radio" class="btn-check" name="calendarModeTopbar" id="calendarModeTopbarEvents" autocomplete="off"
-                           :checked="calendarMode === 'events'"
-                           value="events" @input="toggleCalendarMode('events')"/>
-                    <label class="btn btn-sm btn-outline-secondary calendar-topbar-button" for="calendarModeTopbarEvents" title="Veranstaltungskalender anzeigen">
+                    <input
+                        type="radio"
+                        class="btn-check"
+                        name="calendarModeTopbar"
+                        id="calendarModeTopbarEvents"
+                        autocomplete="off"
+                        :checked="calendarMode === 'events'"
+                        value="events"
+                        @input="toggleCalendarMode('events')"
+                    />
+                    <label
+                        class="btn btn-sm btn-outline-secondary calendar-topbar-button"
+                        for="calendarModeTopbarEvents"
+                        title="Veranstaltungskalender anzeigen"
+                    >
                         <span class="mdi mdi-calendar"></span>
                         <span class="d-none d-xl-inline">Veranstaltungen</span>
                     </label>
                 </div>
 
-                <calendar-city-select v-if="calendarMode == 'services'" :cities="cities"/>
-                <calendar-select v-if="calendarMode == 'events'"
-                                 :calendars="calendars"
-                                 :model-value="selectedCalendar"
-                                 @update:modelValue="selectCalendar"/>
+                <calendar-city-select
+                    v-if="calendarMode == 'services'"
+                    :cities="cities"
+                />
+                <calendar-select
+                    v-if="calendarMode == 'events'"
+                    :calendars="calendars"
+                    :model-value="selectedCalendar"
+                    @update:modelValue="selectCalendar"
+                />
             </div>
         </template>
-        <div v-if="calendarMode == 'services'" class="calendar-mode-container">
+        <div
+            v-if="calendarMode == 'services'"
+            class="calendar-mode-container"
+        >
             <div class="calendar-full-container">
-                <calendar-pane-vertical :date="myDate" :cities="cityList"
-                                        :initial-data="calendarData"
-                                        :key="calendarState"
-                                        :targetMode="targetMode" :target="target"
-                                        :can-create="canCreate "/>
+                <calendar-pane-vertical
+                    :date="myDate"
+                    :cities="cityList"
+                    :initial-data="calendarData"
+                    :key="calendarState"
+                    :targetMode="targetMode"
+                    :target="target"
+                    :can-create="canCreate"
+                />
             </div>
         </div>
-        <div v-if="calendarMode == 'events'" class="calendar-mode-container">
+        <div
+            v-if="calendarMode == 'events'"
+            class="calendar-mode-container"
+        >
             <div class="calendar-full-container">
-                <events-calendar :date="myDate" :calendar="selectedCalendar" :writable-cities="writableCities" :key="selectedCalendar.join(',')+myDate"/>
+                <events-calendar
+                    :date="myDate"
+                    :calendar="selectedCalendar"
+                    :writable-cities="writableCities"
+                    :key="selectedCalendar.join(',') + myDate"
+                />
             </div>
         </div>
-        <modal v-if="showTargetModeModal" title="Person(en) schnell eintragen"
-               @close="setTarget" :key="peopleLoaded"
-               close-button-label="Aktivieren"
-               @cancel="showTargetModeModal = false; targetMode = false;">
-            <div v-if="!peopleLoaded" class="text-small text-muted"><span class="mdi mdi-spin mdi-loading"></span>
+        <modal
+            v-if="showTargetModeModal"
+            title="Person(en) schnell eintragen"
+            @close="setTarget"
+            :key="peopleLoaded"
+            close-button-label="Aktivieren"
+            @cancel="cancelTargetMode"
+        >
+            <div
+                v-if="!peopleLoaded"
+                class="text-small text-muted"
+            >
+                <span class="mdi mdi-spin mdi-loading"></span>
                 Personenliste wird geladen...
             </div>
-            <div v-if="peopleLoaded" :key="myPeople.length">
-                <people-select :people="myPeople" :teams="myTeams" v-model="target.people"
-                               label="Folgende Person(en) eintragen" :key="myPeople.length"/>
+            <div
+                v-if="peopleLoaded"
+                :key="myPeople.length"
+            >
+                <people-select
+                    :people="myPeople"
+                    :teams="myTeams"
+                    v-model="target.people"
+                    label="Folgende Person(en) eintragen"
+                    :key="myPeople.length"
+                />
             </div>
-            <div v-if="!ministriesLoaded" class="text-small text-muted"><span class="mdi mdi-spin mdi-loading"></span>
+            <div
+                v-if="!ministriesLoaded"
+                class="text-small text-muted"
+            >
+                <span class="mdi mdi-spin mdi-loading"></span>
                 Dienste werden geladen...
             </div>
-            <div v-if="ministriesLoaded" :key="myMinistries.length">
-                <form-selectize label="Für folgenden Dienst eintragen" v-model="target.ministry" :options="myMinistries"
-                                :key="myMinistries.length"/>
+            <div
+                v-if="ministriesLoaded"
+                :key="myMinistries.length"
+            >
+                <form-selectize
+                    label="Für folgenden Dienst eintragen"
+                    v-model="target.ministry"
+                    :options="myMinistries"
+                    :key="myMinistries.length"
+                />
             </div>
-            <form-check label="Bestehende Einträge überschreiben" v-model="target.exclusive"/>
+            <form-check
+                label="Bestehende Einträge überschreiben"
+                v-model="target.exclusive"
+            />
         </modal>
     </admin-layout>
 </template>
 
 <script>
-import dayjs from 'dayjs';
-import EventBus from "../../plugins/EventBus";
-import {CalendarNewSortOrderEvent} from "../../events/CalendarNewSortOrderEvent";
-import CalendarPaneHorizontal from '../../components/Calendar/Pane/Horizontal.vue';
-import CalendarPaneVertical from '../../components/Calendar/Pane/Vertical.vue';
-import CalendarPaneMobile from "../../components/Calendar/Pane/Mobile";
-import Modal from "../../components/Ui/modals/Modal";
-import PeopleSelect from "../../components/Ui/elements/PeopleSelect";
-import FormSelectize from "../../components/Ui/forms/FormSelectize";
-import FormCheck from "../../components/Ui/forms/FormCheck";
-import CalendarNavTop from "../../components/Calendar/Nav/Top.vue";
-import CalendarCitySelect from "../../components/Calendar/Nav/CitySelect.vue";
-import CalendarSelect from "../../components/Calendar/Nav/CalendarSelect.vue";
-import EventsCalendar from "../../components/Calendar/Pane/EventsCalendar.vue";
+import dayjs from 'dayjs'
+import EventBus from '../../plugins/EventBus'
+import { CalendarNewSortOrderEvent } from '../../events/CalendarNewSortOrderEvent'
+import CalendarPaneHorizontal from '../../components/Calendar/Pane/Horizontal.vue'
+import CalendarPaneVertical from '../../components/Calendar/Pane/Vertical.vue'
+import CalendarPaneMobile from '../../components/Calendar/Pane/Mobile'
+import Modal from '../../components/Ui/modals/Modal'
+import PeopleSelect from '../../components/Ui/elements/PeopleSelect'
+import FormSelectize from '../../components/Ui/forms/FormSelectize'
+import FormCheck from '../../components/Ui/forms/FormCheck'
+import CalendarNavTop from '../../components/Calendar/Nav/Top.vue'
+import CalendarCitySelect from '../../components/Calendar/Nav/CitySelect.vue'
+import CalendarSelect from '../../components/Calendar/Nav/CalendarSelect.vue'
+import EventsCalendar from '../../components/Calendar/Pane/EventsCalendar.vue'
 
 export default {
     components: {
@@ -128,9 +216,18 @@ export default {
         Modal,
         CalendarPaneMobile,
         CalendarPaneHorizontal,
-        CalendarPaneVertical
+        CalendarPaneVertical,
     },
-    props: ['date', 'cities', 'years', 'canCreate', 'ministries', 'writableCities', 'calendars', 'initialCalendarData'],
+    props: [
+        'date',
+        'cities',
+        'years',
+        'canCreate',
+        'ministries',
+        'writableCities',
+        'calendars',
+        'initialCalendarData',
+    ],
     provide() {
         return {
             settings: this.$page.props.settings || {},
@@ -156,85 +253,101 @@ export default {
                 exclusive: false,
             },
             calendarData: this.initialCalendarData,
-            selectedCalendar: this.normalizeSelectedCalendar(this.$page.props.settings.calendar_select || this.calendars[0]?.id || null),
+            selectedCalendar: this.normalizeSelectedCalendar(
+                this.$page.props.settings.calendar_select || this.calendars[0]?.id || null,
+            ),
         }
     },
     created() {
-        if (undefined === this.settings.show_cc_details) this.settings.show_cc_details = 0;
-        this.navigateTo(dayjs(this.myDate).format('YYYY-MM'));
+        if (undefined === this.settings.show_cc_details) this.settings.show_cc_details = 0
+        this.navigateTo(dayjs(this.myDate).format('YYYY-MM'))
     },
     mounted() {
-        EventBus.listen(CalendarNewSortOrderEvent, this.sortHandler);
+        EventBus.listen(CalendarNewSortOrderEvent, this.sortHandler)
     },
     methods: {
         sortHandler(e) {
-            this.cityList = e.list;
+            this.cityList = e.list
         },
         toggleTargetMode(e) {
             if (!e) {
-                this.targetMode = false;
-                return;
+                this.targetMode = false
+                return
             }
-            this.showTargetModeModal = true;
-            this.ensureTargetModeDataLoaded();
+            this.showTargetModeModal = true
+            this.ensureTargetModeDataLoaded()
         },
         toggleCalendarMode(e) {
-            this.calendarMode = e || 'services';
-            this.setUserSetting('calendar_mode', this.calendarMode);
+            this.calendarMode = e || 'services'
+            this.setUserSetting('calendar_mode', this.calendarMode)
         },
         setTarget() {
-            this.showTargetModeModal = false;
-            this.targetMode = true;
+            this.showTargetModeModal = false
+            this.targetMode = true
+        },
+        /**
+         * Close the target-mode dialog without activating target mode.
+         */
+        cancelTargetMode() {
+            this.showTargetModeModal = false
+            this.targetMode = false
         },
         navigateTo(targetDate) {
-            this.myDate = targetDate;
+            this.myDate = targetDate
         },
         normalizeSelectedCalendar(value) {
-            if (Array.isArray(value)) return value;
-            if (value === null || value === undefined || value === '') return [];
-            return [value];
+            if (Array.isArray(value)) return value
+            if (value === null || value === undefined || value === '') return []
+            return [value]
         },
         selectCalendar(e) {
-            this.selectedCalendar = this.normalizeSelectedCalendar(e);
-            this.setUserSetting('calendar_select', this.selectedCalendar);
+            this.selectedCalendar = this.normalizeSelectedCalendar(e)
+            this.setUserSetting('calendar_select', this.selectedCalendar)
         },
         ensureTargetModeDataLoaded() {
             if (!this.peopleLoaded) {
-                this.$api().get(route('api.people.select')).then(response => {
-                    this.myPeople = response.data.users;
-                    this.myTeams = response.data.teams;
-                    this.target.people = this.myPeople.filter(person => person.id == this.$page.props.currentUser.data.id)
-                    this.peopleLoaded = 1;
-                });
+                this.$api()
+                    .get(route('api.people.select'))
+                    .then((response) => {
+                        this.myPeople = response.data.users
+                        this.myTeams = response.data.teams
+                        this.target.people = this.myPeople.filter(
+                            (person) => person.id == this.$page.props.currentUser.data.id,
+                        )
+                        this.peopleLoaded = 1
+                    })
             }
 
             if (!this.ministriesLoaded) {
-                this.$api().get(route('api.ministries.list')).then(response => {
-                    this.myMinistries = [
-                        {id: 'P', 'name': this.$page.props.labels.pastor},
-                        {id: 'O', 'name': this.$page.props.labels.organist},
-                        {id: 'M', 'name': this.$page.props.labels.sacristan},
-                    ];
-                    for (const ministryKey in response.data) {
-                        this.myMinistries.push({
-                            id: response.data[ministryKey].category,
-                            name: response.data[ministryKey].category
-                        });
-                    }
-                    this.ministriesLoaded = true;
-                });
+                this.$api()
+                    .get(route('api.ministries.list'))
+                    .then((response) => {
+                        this.myMinistries = [
+                            { id: 'P', name: this.$page.props.labels.pastor },
+                            { id: 'O', name: this.$page.props.labels.organist },
+                            { id: 'M', name: this.$page.props.labels.sacristan },
+                        ]
+                        for (const ministryKey in response.data) {
+                            this.myMinistries.push({
+                                id: response.data[ministryKey].category,
+                                name: response.data[ministryKey].category,
+                            })
+                        }
+                        this.ministriesLoaded = true
+                    })
             }
-        }
+        },
     },
     computed: {
         pageTitle() {
-            return dayjs(this.myDate).format('MMMM YYYY');
+            return dayjs(this.myDate).format('MMMM YYYY')
         },
-    }
+    },
 }
 </script>
 <style scoped>
-th, td {
+th,
+td {
     vertical-align: top;
 }
 
@@ -289,5 +402,4 @@ th, td {
         gap: 0.25rem;
     }
 }
-
 </style>

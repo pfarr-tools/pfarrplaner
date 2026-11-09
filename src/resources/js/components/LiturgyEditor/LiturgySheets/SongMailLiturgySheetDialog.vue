@@ -29,34 +29,54 @@
 <template>
     <div>
         <div class="alert alert-warning">
-            Der Text wird in die Zwischenablage kopiert. Anschließend wird eine neue E-Mail mit Betreff und Empfängern geöffnet.
+            Der Text wird in die Zwischenablage kopiert. Anschließend wird eine neue E-Mail mit
+            Betreff und Empfängern geöffnet.
         </div>
 
         <div class="mb-3 d-flex flex-wrap gap-2">
-            <button class="btn btn-primary" @click.prevent="sendMail" :disabled="loading || !body">
+            <button
+                class="btn btn-primary"
+                @click.prevent="sendMail"
+                :disabled="loading || !body"
+            >
                 <span class="mdi mdi-email-arrow-right-outline me-1"></span>Nachricht erstellen
             </button>
-            <button class="btn btn-outline-secondary" @click.prevent="copyToClipboard" :disabled="loading || !body">
+            <button
+                class="btn btn-outline-secondary"
+                @click.prevent="copyToClipboard"
+                :disabled="loading || !body"
+            >
                 <span class="mdi mdi-content-copy me-1"></span>Text kopieren
             </button>
         </div>
 
-        <div v-if="loading" class="alert alert-info mb-0">
+        <div
+            v-if="loading"
+            class="alert alert-info mb-0"
+        >
             E-Mailtext wird geladen...
         </div>
-        <div v-else-if="error" class="alert alert-danger mb-0">
+        <div
+            v-else-if="error"
+            class="alert alert-danger mb-0"
+        >
             {{ error }}
         </div>
-        <form-textarea v-else label="E-Mailtext" v-model="body" rows="18"/>
+        <form-textarea
+            v-else
+            label="E-Mailtext"
+            v-model="body"
+            rows="18"
+        />
     </div>
 </template>
 
 <script>
-import FormTextarea from "../../Ui/forms/FormTextarea.vue";
+import FormTextarea from '../../Ui/forms/FormTextarea.vue'
 
 export default {
-    name: "SongMailLiturgySheetDialog",
-    components: {FormTextarea},
+    name: 'SongMailLiturgySheetDialog',
+    components: { FormTextarea },
     props: ['service', 'sheet'],
     data() {
         return {
@@ -65,39 +85,42 @@ export default {
             body: '',
             subject: '',
             recipients: [],
-        };
+        }
     },
     mounted() {
-        this.loadData();
+        this.loadData()
     },
     methods: {
         loadData() {
-            this.loading = true;
-            this.error = null;
-            axios.get(route('liturgy.dialog', {service: this.service.slug, key: this.sheet.key}))
-                .then(response => {
-                    this.body = response.data.body || '';
-                    this.subject = response.data.subject || '';
-                    this.recipients = response.data.recipients || [];
+            this.loading = true
+            this.error = null
+            axios
+                .get(route('liturgy.dialog', { service: this.service.slug, key: this.sheet.key }))
+                .then((response) => {
+                    this.body = response.data.body || ''
+                    this.subject = response.data.subject || ''
+                    this.recipients = response.data.recipients || []
                 })
                 .catch(() => {
-                    this.error = 'Der E-Mailtext konnte nicht geladen werden.';
+                    this.error = 'Der E-Mailtext konnte nicht geladen werden.'
                 })
                 .finally(() => {
-                    this.loading = false;
-                });
+                    this.loading = false
+                })
         },
         copyToClipboard() {
-            navigator.clipboard.writeText(this.body);
+            navigator.clipboard.writeText(this.body)
         },
         sendMail() {
-            this.copyToClipboard();
-            window.location.href = 'mailto:' + this.recipients.join(',') + '?subject=' + encodeURIComponent(this.subject);
+            this.copyToClipboard()
+            window.location.href =
+                'mailto:' +
+                this.recipients.join(',') +
+                '?subject=' +
+                encodeURIComponent(this.subject)
         },
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

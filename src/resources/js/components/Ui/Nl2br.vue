@@ -27,7 +27,7 @@
   -->
 
 <script>
-import { h } from 'vue';
+import { h } from 'vue'
 
 export default {
     name: 'Nl2br',
@@ -36,13 +36,13 @@ export default {
         text: { type: String, default: '' },
     },
     render() {
-        const lines = (this.text ?? '').split('\n');
-        const children = [];
+        const lines = (this.text ?? '').split('\n')
+        const children = []
         lines.forEach((line, i) => {
-            if (i > 0) children.push(h('br'));
-            children.push(line);
-        });
-        return h(this.tag, children);
+            if (i > 0) children.push(h('br'))
+            children.push(line)
+        })
+        return h(this.tag, children)
     },
-};
+}
 </script>

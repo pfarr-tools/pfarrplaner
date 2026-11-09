@@ -33,11 +33,11 @@
 export default {
     methods: {
         asset(path) {
-            var base_path = window.Laravel.assetUrl || '';
-            return base_path + path;
+            var base_path = window.Laravel.assetUrl || ''
+            return base_path + path
         },
         uploadedImage(path) {
-            return route('image', path.replace('attachments/', ''));
-        }
-    }
+            return route('image', path.replace('attachments/', ''))
+        },
+    },
 }

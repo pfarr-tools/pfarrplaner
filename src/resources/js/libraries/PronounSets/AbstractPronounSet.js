@@ -29,16 +29,15 @@
 export class AbstractPronounSet {
     data = {}
     replacementSet(prefix) {
-        let dataset = {};
+        let dataset = {}
         for (const key in this.data) {
-            dataset[prefix+':'+key] = this.data[key];
+            dataset[prefix + ':' + key] = this.data[key]
             if (key.charAt(0) == key.charAt().toLowerCase()) {
-                let key2 = key.charAt(0).toUpperCase()+key.slice(1);
-                dataset[prefix+':'+key2] = this.data[key].charAt(0).toUpperCase()+this.data[key].slice(1);
+                let key2 = key.charAt(0).toUpperCase() + key.slice(1)
+                dataset[prefix + ':' + key2] =
+                    this.data[key].charAt(0).toUpperCase() + this.data[key].slice(1)
             }
-
         }
-        return dataset;
+        return dataset
     }
 }
-

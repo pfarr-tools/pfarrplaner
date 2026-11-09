@@ -30,60 +30,81 @@
     <div class="next-services-tab">
         <h2>{{ title }}</h2>
         <p>Angezeigt werden die Gottesdienste der nächsten 2 Monate.</p>
-        <div class="alert alert-info" v-if="services.length == 0">Es sind keine anzuzeigenden Gottesdienste vorhanden.</div>
-        <fake-table :columns="[2,4,4,2]" :headers="['Gottesdienst', 'Liturgie', 'Infos zum Gottesdienst', '']"
-                    collapsed-header="Gottesdienste" v-if="services.length > 0">
-            <div v-for="(service,serviceIndex) in services" :key="serviceIndex"
-                 :class="{'stripe-odd': (serviceIndex %2 ==0)}" class="row mb-3 p-1">
+        <div
+            class="alert alert-info"
+            v-if="services.length == 0"
+        >
+            Es sind keine anzuzeigenden Gottesdienste vorhanden.
+        </div>
+        <fake-table
+            :columns="[2, 4, 4, 2]"
+            :headers="['Gottesdienst', 'Liturgie', 'Infos zum Gottesdienst', '']"
+            collapsed-header="Gottesdienste"
+            v-if="services.length > 0"
+        >
+            <div
+                v-for="(service, serviceIndex) in services"
+                :key="serviceIndex"
+                :class="{ 'stripe-odd': serviceIndex % 2 == 0 }"
+                class="row mb-3 p-1"
+            >
                 <div class="col-md-2">
                     <basic-info :service="service" />
                 </div>
                 <div class="col-md-4">
-                    <liturgical-info :service="service"/>
+                    <liturgical-info :service="service" />
                 </div>
                 <div class="col-md-4">
                     <details-info :service="service" />
                 </div>
                 <div class="col-md-2 text-end">
-                    <inertia-link class="btn btn-light" title="Im Kalender ansehen"
-                                  :href="route('calendar', moment(service.date).format('YYYY-MM'))">
+                    <inertia-link
+                        class="btn btn-light"
+                        title="Im Kalender ansehen"
+                        :href="route('calendar', moment(service.date).format('YYYY-MM'))"
+                    >
                         <span class="mdi mdi-calendar"></span>
                     </inertia-link>
-                    <inertia-link v-if="service.isEditable"
-                                  class="btn btn-primary" title="Gottesdienst bearbeiten"
-                                  :href="route('service.edit', service.slug)">
+                    <inertia-link
+                        v-if="service.isEditable"
+                        class="btn btn-primary"
+                        title="Gottesdienst bearbeiten"
+                        :href="route('service.edit', service.slug)"
+                    >
                         <span class="mdi mdi-pencil"></span>
                     </inertia-link>
-                    <inertia-link v-if="service.isEditable"
-                                  class="btn btn-light" title="Liturgie bearbeiten"
-                                  :href="route('liturgy.editor', service.slug)">
+                    <inertia-link
+                        v-if="service.isEditable"
+                        class="btn btn-light"
+                        title="Liturgie bearbeiten"
+                        :href="route('liturgy.editor', service.slug)"
+                    >
                         <span class="mdi mdi-view-list"></span>
                     </inertia-link>
-                    <inertia-link v-if="service.isEditable"
-                                  class="btn btn-light" title="Predigt bearbeiten"
-                                  :href="route('service.sermon.editor', service.slug)">
+                    <inertia-link
+                        v-if="service.isEditable"
+                        class="btn btn-light"
+                        title="Predigt bearbeiten"
+                        :href="route('service.sermon.editor', service.slug)"
+                    >
                         <span class="mdi mdi-microphone"></span>
                     </inertia-link>
                 </div>
             </div>
-
         </fake-table>
-
     </div>
 </template>
 
 <script>
-import LiturgicalInfo from "../Service/LiturgicalInfo";
-import DetailsInfo from "../Service/DetailsInfo";
-import FakeTable from "../Ui/FakeTable";
-import BasicInfo from "../Service/BasicInfo";
+import LiturgicalInfo from '../Service/LiturgicalInfo'
+import DetailsInfo from '../Service/DetailsInfo'
+import FakeTable from '../Ui/FakeTable'
+import BasicInfo from '../Service/BasicInfo'
 export default {
-    name: "NextServicesTab",
-    components: {BasicInfo, FakeTable, DetailsInfo, LiturgicalInfo},
-    props: ['title', 'description', 'user', 'settings', 'services']
+    name: 'NextServicesTab',
+    components: { BasicInfo, FakeTable, DetailsInfo, LiturgicalInfo },
+    props: ['title', 'description', 'user', 'settings', 'services'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

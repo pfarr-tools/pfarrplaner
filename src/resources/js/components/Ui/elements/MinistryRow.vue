@@ -29,28 +29,50 @@
 <template>
     <div class="row">
         <div class="col-md-6">
-            <Multiselect v-model="myDescription" :options="ministryOptions" :create-option="true" :searchable="true" :allow-absent="true" mode="single" locale="de" :no-results-text="{ de: 'Keine Ergebnisse gefunden', en: 'No results found' }" :no-options-text="{ de: 'Die Liste ist leer', en: 'The list is empty' }" />
+            <Multiselect
+                v-model="myDescription"
+                :options="ministryOptions"
+                :create-option="true"
+                :searchable="true"
+                :allow-absent="true"
+                mode="single"
+                locale="de"
+                :no-results-text="{ de: 'Keine Ergebnisse gefunden', en: 'No results found' }"
+                :no-options-text="{ de: 'Die Liste ist leer', en: 'The list is empty' }"
+            />
         </div>
         <div class="col-md-5">
-            <people-select :name="'ministries['+index+']'+'[people][]'" v-model="myMembers" :teams="teams"
-                           :people="people" @input="changed"
-                           :include-teams-from-city="includeTeamsFromCity" :city="city"
-                           @count="$emit('count')" />
+            <people-select
+                :name="'ministries[' + index + ']' + '[people][]'"
+                v-model="myMembers"
+                :teams="teams"
+                :people="people"
+                @input="changed"
+                :include-teams-from-city="includeTeamsFromCity"
+                :city="city"
+                @count="$emit('count')"
+            />
         </div>
         <div class="col-md-1 text-end">
-            <button class="btn btn-danger btn-sm" @click.prevent="deleteRow()" title="Reihe entfernen"><span class="mdi mdi-delete"></span></button>
+            <button
+                class="btn btn-danger btn-sm"
+                @click.prevent="deleteRow()"
+                title="Reihe entfernen"
+            >
+                <span class="mdi mdi-delete"></span>
+            </button>
         </div>
     </div>
 </template>
 
 <script>
-import Multiselect from '@vueform/multiselect';
-import '@vueform/multiselect/themes/default.css';
-import PeopleSelect from "./PeopleSelect";
+import Multiselect from '@vueform/multiselect'
+import '@vueform/multiselect/themes/default.css'
+import PeopleSelect from './PeopleSelect'
 export default {
-    name: "MinistryRow",
+    name: 'MinistryRow',
     emits: ['input', 'update:modelValue', 'count', 'delete'],
-    components: {PeopleSelect, Multiselect},
+    components: { PeopleSelect, Multiselect },
     props: {
         title: String,
         members: Array,
@@ -64,23 +86,23 @@ export default {
         city: Object,
     },
     data() {
-        var myMinistries = [];
-        const defaults = ['P', 'O', 'M', 'A'];
+        var myMinistries = []
+        const defaults = ['P', 'O', 'M', 'A']
         this.ministries.forEach(function (ministry) {
             if (!defaults.includes(ministry.category)) {
-                myMinistries.push(ministry);
+                myMinistries.push(ministry)
             }
-        });
+        })
         return {
             myDescription: this.title != 'test' ? this.title : '',
             myMinistries: myMinistries,
             myMembers: this.members,
             store: this.modelValue !== undefined ? this.modelValue : this.value,
-        };
+        }
     },
     computed: {
         ministryOptions() {
-            return this.myMinistries.map(m => m.category);
+            return this.myMinistries.map((m) => m.category)
         },
     },
     watch: {
@@ -91,12 +113,12 @@ export default {
              * @param oldVal old ministry description
              */
             handler: function (newVal, oldVal) {
-                this.store[newVal] = this.store[oldVal];
-                delete this.store[oldVal];
-                this.$emit('input', this.store);
-                this.$emit('update:modelValue', this.store);
-            }
-        }
+                this.store[newVal] = this.store[oldVal]
+                delete this.store[oldVal]
+                this.$emit('input', this.store)
+                this.$emit('update:modelValue', this.store)
+            },
+        },
     },
     methods: {
         /**
@@ -104,17 +126,15 @@ export default {
          * @param newVal Array with all assigned people ids
          */
         changed(newVal) {
-            this.store[this.myDescription] = newVal;
-            this.$emit('input', this.store);
-            this.$emit('update:modelValue', this.store);
+            this.store[this.myDescription] = newVal
+            this.$emit('input', this.store)
+            this.$emit('update:modelValue', this.store)
         },
         deleteRow() {
-            this.$emit('delete', this.myDescription);
-        }
-    }
+            this.$emit('delete', this.myDescription)
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -30,45 +30,76 @@
     <div class="people-tab">
         <div class="row">
             <div class="col-md-6">
-                <people-select label="Vorsitz" :people="people" :teams="teams"
-                               v-model="myService.ministriesByCategory['Vorsitz']"
-                               :include-teams-from-city="myService.city" :city="myService.city"
-                                @count="updatePeopleCounter" />
+                <people-select
+                    label="Vorsitz"
+                    :people="people"
+                    :teams="teams"
+                    v-model="myService.ministriesByCategory['Vorsitz']"
+                    :include-teams-from-city="myService.city"
+                    :city="myService.city"
+                    @count="updatePeopleCounter"
+                />
             </div>
             <div class="col-md-6">
-                <people-select label="Schriftführung" :people="people" :teams="teams"
-                               v-model="myService.ministriesByCategory['Protokoll']"
-                               :include-teams-from-city="myService.city" :city="myService.city"
-                               @count="updatePeopleCounter" />
+                <people-select
+                    label="Schriftführung"
+                    :people="people"
+                    :teams="teams"
+                    v-model="myService.ministriesByCategory['Protokoll']"
+                    :include-teams-from-city="myService.city"
+                    :city="myService.city"
+                    @count="updatePeopleCounter"
+                />
             </div>
         </div>
-        <div><label><span class="mdi mdi-account-multiple"></span> Weitere Rollen</label></div>
+        <div>
+            <label><span class="mdi mdi-account-multiple"></span> Weitere Rollen</label>
+        </div>
         <div class="row">
             <div class="col-md-6"><label>Rolle</label></div>
             <div class="col-md-6"><label>Eingeteilte Personen</label></div>
         </div>
-        <ministry-row v-for="(members,title,index) in myService.ministriesByCategory"
-                      v-if="!['Protokoll', 'Vorsitz'].includes(title)"
-                      :title="title" :members="members" :index="index" :people="people" :teams="teams"
-                      :key="'ministry_rows'+Object.entries(myService.ministriesByCategory).length+'_'+index"
-                      :ministries="ministries" v-model="myService.ministriesByCategory" @delete="deleteRow"
-                      :include-teams-from-city="myService.city" :city="myService.city"
-                      @count="updatePeopleCounter" />
-        <button class="btn btn-light btn-sm" @click.prevent.stop="addRow">Reihe hinzufügen</button>
+        <ministry-row
+            v-for="(members, title, index) in myService.ministriesByCategory"
+            v-if="!['Protokoll', 'Vorsitz'].includes(title)"
+            :title="title"
+            :members="members"
+            :index="index"
+            :people="people"
+            :teams="teams"
+            :key="
+                'ministry_rows' +
+                Object.entries(myService.ministriesByCategory).length +
+                '_' +
+                index
+            "
+            :ministries="ministries"
+            v-model="myService.ministriesByCategory"
+            @delete="deleteRow"
+            :include-teams-from-city="myService.city"
+            :city="myService.city"
+            @count="updatePeopleCounter"
+        />
+        <button
+            class="btn btn-light btn-sm"
+            @click.prevent.stop="addRow"
+        >
+            Reihe hinzufügen
+        </button>
     </div>
 </template>
 
 <script>
-import FormInput from "../../Ui/forms/FormInput";
-import LocationSelect from "../../Ui/elements/LocationSelect";
-import DaySelect from "../../Ui/elements/DaySelect";
-import PeopleSelect from "../../Ui/elements/PeopleSelect";
-import FormCheck from "../../Ui/forms/FormCheck";
-import MinistryRow from "../../Ui/elements/MinistryRow";
-import FormRadioGroup from "../../Ui/forms/FormRadioGroup";
+import FormInput from '../../Ui/forms/FormInput'
+import LocationSelect from '../../Ui/elements/LocationSelect'
+import DaySelect from '../../Ui/elements/DaySelect'
+import PeopleSelect from '../../Ui/elements/PeopleSelect'
+import FormCheck from '../../Ui/forms/FormCheck'
+import MinistryRow from '../../Ui/elements/MinistryRow'
+import FormRadioGroup from '../../Ui/forms/FormRadioGroup'
 
 export default {
-    name: "AttendanceTab",
+    name: 'AttendanceTab',
     components: {
         FormRadioGroup,
         MinistryRow,
@@ -87,12 +118,14 @@ export default {
         teams: Array,
     },
     data() {
-        if (!this.service.ministriesByCategory) this.service.ministriesByCategory = {};
-        if (this.service.ministriesByCategory.length == 0) this.service.ministriesByCategory = {};
-        if (undefined === this.service.ministriesByCategory['Vorsitz']) this.service.ministriesByCategory['Vorsitz'] = [];
-        if (undefined === this.service.ministriesByCategory['Protokoll']) this.service.ministriesByCategory['Protokoll'] = [];
+        if (!this.service.ministriesByCategory) this.service.ministriesByCategory = {}
+        if (this.service.ministriesByCategory.length == 0) this.service.ministriesByCategory = {}
+        if (undefined === this.service.ministriesByCategory['Vorsitz'])
+            this.service.ministriesByCategory['Vorsitz'] = []
+        if (undefined === this.service.ministriesByCategory['Protokoll'])
+            this.service.ministriesByCategory['Protokoll'] = []
 
-        let myService = this.service;
+        let myService = this.service
 
         return {
             myService,
@@ -100,21 +133,19 @@ export default {
     },
     methods: {
         addRow() {
-            this.myService.ministriesByCategory['Neuer Dienst'] = [];
-            this.$forceUpdate();
+            this.myService.ministriesByCategory['Neuer Dienst'] = []
+            this.$forceUpdate()
         },
         deleteRow(category) {
-            delete this.myService.ministriesByCategory[category];
-            this.updatePeopleCounter();
-            this.$forceUpdate();
+            delete this.myService.ministriesByCategory[category]
+            this.updatePeopleCounter()
+            this.$forceUpdate()
         },
         updatePeopleCounter() {
-            this.$emit('count');
+            this.$emit('count')
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

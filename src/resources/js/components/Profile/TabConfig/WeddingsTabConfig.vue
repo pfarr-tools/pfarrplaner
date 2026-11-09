@@ -28,21 +28,28 @@
 
 <template>
     <div class="weddings-tab-config">
-        <form-check label="Nur meine eigenen Trauungen anzeigen" v-model="tab.config.mine" />
-        <form-check label="Späteste Trautermine zuerst anzeigen" v-model="tab.config.newestFirst" />
-        <form-check label="Ins Kirchenbuch eingetragene Trauungen ausblenden" v-model="tab.config.excludeProcessed" />
+        <form-check
+            label="Nur meine eigenen Trauungen anzeigen"
+            v-model="tab.config.mine"
+        />
+        <form-check
+            label="Späteste Trautermine zuerst anzeigen"
+            v-model="tab.config.newestFirst"
+        />
+        <form-check
+            label="Ins Kirchenbuch eingetragene Trauungen ausblenden"
+            v-model="tab.config.excludeProcessed"
+        />
     </div>
 </template>
 
 <script>
-import FormCheck from "../../Ui/forms/FormCheck";
+import FormCheck from '../../Ui/forms/FormCheck'
 export default {
-    name: "WeddingsTabConfig",
-    components: {FormCheck},
+    name: 'WeddingsTabConfig',
+    components: { FormCheck },
     props: ['tab'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

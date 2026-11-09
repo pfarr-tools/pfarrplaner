@@ -29,24 +29,36 @@
 <template>
     <div class="stream-activator">
         <h3>{{ title }}</h3>
-        <div v-if="broadcasts.length == 0" class="alert alert-warning">
+        <div
+            v-if="broadcasts.length == 0"
+            class="alert alert-warning"
+        >
             Diese Liste enthält aktuell keine Livestreams.
         </div>
         <table class="table table-striped table-hover">
             <thead></thead>
             <tbody>
-            <tr v-for="(broadcast,key,index) in broadcasts" title="Klicken, um auszuwählen" v-if="!broadcast.service"
-                @click="activateBroadcast(broadcast)">
-                <td>
-                    {{ moment (broadcast.snippet.scheduledStartTime).locale('de').format('LLL') }}<br />
-                    {{ broadcast.snippet.title }}
-                </td>
-                <td>
-                    <button class="btn btn-success" @click="activateBroadcast(broadcast)" title="Diesen Livestream aktivieren">
-                        <span class="mdi mdi-check"></span> Aktivieren
-                    </button>
-                </td>
-            </tr>
+                <tr
+                    v-for="(broadcast, key, index) in broadcasts"
+                    title="Klicken, um auszuwählen"
+                    v-if="!broadcast.service"
+                    @click="activateBroadcast(broadcast)"
+                >
+                    <td>
+                        {{ moment(broadcast.snippet.scheduledStartTime).locale('de').format('LLL')
+                        }}<br />
+                        {{ broadcast.snippet.title }}
+                    </td>
+                    <td>
+                        <button
+                            class="btn btn-success"
+                            @click="activateBroadcast(broadcast)"
+                            title="Diesen Livestream aktivieren"
+                        >
+                            <span class="mdi mdi-check"></span> Aktivieren
+                        </button>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -54,19 +66,21 @@
 
 <script>
 export default {
-    name: "StreamActivator",
+    name: 'StreamActivator',
     props: ['broadcasts', 'title', 'city'],
     methods: {
         activateBroadcast(broadcast) {
-            this.$emit('close');
-            this.$inertia.post(route('streaming.troubleshooter.activateBroadcast', {city: this.city.name.toLowerCase(), broadcast: broadcast.id}), { preserveState: false});
+            this.$emit('close')
+            this.$inertia.post(
+                route('streaming.troubleshooter.activateBroadcast', {
+                    city: this.city.name.toLowerCase(),
+                    broadcast: broadcast.id,
+                }),
+                { preserveState: false },
+            )
         },
-
-    }
-
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

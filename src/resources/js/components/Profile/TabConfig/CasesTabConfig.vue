@@ -28,23 +28,28 @@
 
 <template>
     <div class="cases-tab-config">
-        <form-input label="Titel" v-model="tab.config.title" />
-        <form-selectize label="Kasualien für folgende Gemeinden anzeigen" multiple
-                        :options="cities" :settings="{searchField: ['name']}"
-                        v-model="tab.config.includeCities" />
+        <form-input
+            label="Titel"
+            v-model="tab.config.title"
+        />
+        <form-selectize
+            label="Kasualien für folgende Gemeinden anzeigen"
+            multiple
+            :options="cities"
+            :settings="{ searchField: ['name'] }"
+            v-model="tab.config.includeCities"
+        />
     </div>
 </template>
 
 <script>
-import FormInput from "../../Ui/forms/FormInput";
-import FormSelectize from "../../Ui/forms/FormSelectize";
+import FormInput from '../../Ui/forms/FormInput'
+import FormSelectize from '../../Ui/forms/FormSelectize'
 export default {
-    name: "CasesTabConfig",
-    components: {FormSelectize, FormInput},
+    name: 'CasesTabConfig',
+    components: { FormSelectize, FormInput },
     props: ['tab', 'cities'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

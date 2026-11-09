@@ -30,35 +30,55 @@
     <div class="external-content-tab">
         <fieldset>
             <legend>Homepage</legend>
-            <form-input name="own_website" label="Eigene Homepage" help="URL der eigenen Homepage"
-                        v-model="editedUser.own_website" placeholder="https://..." />
+            <form-input
+                name="own_website"
+                label="Eigene Homepage"
+                help="URL der eigenen Homepage"
+                v-model="editedUser.own_website"
+                placeholder="https://..."
+            />
         </fieldset>
         <fieldset>
             <legend>Podcast</legend>
-            <form-input name="own_podcast_title" label="Titel" v-model="editedUser.own_podcast_title" />
-            <form-input name="own_podcast_url" label="Adresse" v-model="editedUser.own_podcast_url"
-                        placeholder="https://..." help="URL des eigenen Podcasts" />
-            <form-check name="own_podcast_spotify" label="Auf Spotify verfügbar" v-model="editedUser.own_podcast_spotify" />
-            <form-check name="own_podcast_itunes" label="Auf iTunes verfügbar" v-model="editedUser.own_podcast_itunes" />
+            <form-input
+                name="own_podcast_title"
+                label="Titel"
+                v-model="editedUser.own_podcast_title"
+            />
+            <form-input
+                name="own_podcast_url"
+                label="Adresse"
+                v-model="editedUser.own_podcast_url"
+                placeholder="https://..."
+                help="URL des eigenen Podcasts"
+            />
+            <form-check
+                name="own_podcast_spotify"
+                label="Auf Spotify verfügbar"
+                v-model="editedUser.own_podcast_spotify"
+            />
+            <form-check
+                name="own_podcast_itunes"
+                label="Auf iTunes verfügbar"
+                v-model="editedUser.own_podcast_itunes"
+            />
         </fieldset>
     </div>
 </template>
 
 <script>
-import FormInput from "../../Ui/forms/FormInput";
-import FormCheck from "../../Ui/forms/FormCheck";
+import FormInput from '../../Ui/forms/FormInput'
+import FormCheck from '../../Ui/forms/FormCheck'
 export default {
-    components: {FormCheck, FormInput},
+    components: { FormCheck, FormInput },
     props: ['user'],
-    name: "ExternalContentTab",
+    name: 'ExternalContentTab',
     data() {
         return {
             editedUser: this.user,
         }
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

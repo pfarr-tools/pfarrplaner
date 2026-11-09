@@ -29,45 +29,53 @@
 <template>
     <admin-layout title="HTML-Code für Gottesdienststreams erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="HTML-Code für Gottesdienststreams erstellen"
-                         @click="renderReport"/>
+            <save-button
+                label="Erstellen"
+                title="HTML-Code für Gottesdienststreams erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form-selectize name="city" label="Code für folgende Kirchengemeinde erstellen"
-                        v-model="myForm.city" :options="cities"/>
-        <form-input name="cors-origin" label="Aufrufende Website"
-                    placeholder="z.B. https://www.tailfingen-evangelisch.de"
-                    v-model="myForm['cors-origin']" />
+        <form-selectize
+            name="city"
+            label="Code für folgende Kirchengemeinde erstellen"
+            v-model="myForm.city"
+            :options="cities"
+        />
+        <form-input
+            name="cors-origin"
+            label="Aufrufende Website"
+            placeholder="z.B. https://www.tailfingen-evangelisch.de"
+            v-model="myForm['cors-origin']"
+        />
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDatePicker from '../../../components/Ui/forms/FormDatePicker'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
 
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities'],
-    components: {FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: { FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton },
     data() {
         return {
             myForm: {
                 city: this.cities.length ? this.cities[0].id : null,
                 'cors-origin': null,
-            }
+            },
         }
     },
     methods: {
         renderReport() {
-            this.$inertia.post(route('reports.render', 'embedStreaming'), this.myForm);
+            this.$inertia.post(route('reports.render', 'embedStreaming'), this.myForm)
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

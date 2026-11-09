@@ -27,16 +27,16 @@
   -->
 
 <template>
-    <span v-if="hasPermission('gd-kasualien-lesen')">{{ funeral.type || 'Beerdigung' }} von {{ funeral.buried_name }}</span>
+    <span v-if="hasPermission('gd-kasualien-lesen')"
+        >{{ funeral.type || 'Beerdigung' }} von {{ funeral.buried_name }}</span
+    >
 </template>
 
 <script>
 export default {
     name: 'CalendarServiceFuneral',
-    props: ['funeral']
+    props: ['funeral'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

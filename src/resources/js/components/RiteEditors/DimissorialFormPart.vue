@@ -31,63 +31,88 @@
         <legend>Dimissoriale</legend>
         <div class="row">
             <div class="col-md-3">
-                <form-check name="needs_dimissorial" label="Dimissoriale benötigt"
-                            v-model="needed"/>
+                <form-check
+                    name="needs_dimissorial"
+                    label="Dimissoriale benötigt"
+                    v-model="needed"
+                />
             </div>
-            <div class="col-md-3" v-if="needed">
-                <form-input name="dimissorial_issuer" label="Zuständiges Pfarramt" v-model="parent.dimissorial_issuer"/>
+            <div
+                class="col-md-3"
+                v-if="needed"
+            >
+                <form-input
+                    name="dimissorial_issuer"
+                    label="Zuständiges Pfarramt"
+                    v-model="parent.dimissorial_issuer"
+                />
             </div>
-            <div class="col-md-3" v-if="needed">
-                <form-date-picker name="dimissorial_requested" label="Beantragt" v-model="parent.dimissorial_requested"
-                                  :is-checked-item="true" />
+            <div
+                class="col-md-3"
+                v-if="needed"
+            >
+                <form-date-picker
+                    name="dimissorial_requested"
+                    label="Beantragt"
+                    v-model="parent.dimissorial_requested"
+                    :is-checked-item="true"
+                />
             </div>
-            <div class="col-md-3" v-if="needed">
-                <form-date-picker name="dimissorial_received" label="Erhalten" v-model="parent.dimissorial_received"
-                                  :is-checked-item="true" />
+            <div
+                class="col-md-3"
+                v-if="needed"
+            >
+                <form-date-picker
+                    name="dimissorial_received"
+                    label="Erhalten"
+                    v-model="parent.dimissorial_received"
+                    :is-checked-item="true"
+                />
             </div>
         </div>
-        <dimissorial-url v-if="needed" :url="parent.dimissorialUrl" />
+        <dimissorial-url
+            v-if="needed"
+            :url="parent.dimissorialUrl"
+        />
     </fieldset>
 </template>
 
 <script>
-import FormCheck from "../Ui/forms/FormCheck";
-import FormInput from "../Ui/forms/FormInput";
-import FormDatePicker from "../Ui/forms/FormDatePicker";
-import DimissorialUrl from "./DimissorialUrl";
+import FormCheck from '../Ui/forms/FormCheck'
+import FormInput from '../Ui/forms/FormInput'
+import FormDatePicker from '../Ui/forms/FormDatePicker'
+import DimissorialUrl from './DimissorialUrl'
 
 function normalizeDateValue(value) {
-    if (!value) return value;
-    if ((typeof value === 'string') && moment(value, 'DD.MM.YYYY', true).isValid()) return value;
+    if (!value) return value
+    if (typeof value === 'string' && moment(value, 'DD.MM.YYYY', true).isValid()) return value
 
-    const parsedValue = moment(value, ['YYYY-MM-DD', moment.ISO_8601], true);
-    if (parsedValue.isValid()) return parsedValue.format('DD.MM.YYYY');
+    const parsedValue = moment(value, ['YYYY-MM-DD', moment.ISO_8601], true)
+    if (parsedValue.isValid()) return parsedValue.format('DD.MM.YYYY')
 
-    return '';
+    return ''
 }
 
 export default {
-    name: "DimissorialFormPart",
-    components: {DimissorialUrl, FormDatePicker, FormInput, FormCheck},
+    name: 'DimissorialFormPart',
+    components: { DimissorialUrl, FormDatePicker, FormInput, FormCheck },
     props: ['parent'],
     watch: {
         needed: function (newV, oldV) {
-            this.myParent.needs_dimissorial = newV;
+            this.myParent.needs_dimissorial = newV
         },
     },
     data() {
-        var myParent = this.parent;
-        myParent.dimissorial_requested = normalizeDateValue(myParent.dimissorial_requested);
-        myParent.dimissorial_received = normalizeDateValue(myParent.dimissorial_received);
+        var myParent = this.parent
+        myParent.dimissorial_requested = normalizeDateValue(myParent.dimissorial_requested)
+        myParent.dimissorial_received = normalizeDateValue(myParent.dimissorial_received)
 
         return {
             myParent: myParent,
             needed: this.parent.needs_dimissorial,
         }
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

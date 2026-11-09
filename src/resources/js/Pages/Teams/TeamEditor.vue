@@ -29,35 +29,57 @@
 <template>
     <admin-layout :title="myTeam.name || 'Neues Team'">
         <template #navbar-left>
-            <button class="btn btn-primary" @click="saveTeam">
+            <button
+                class="btn btn-primary"
+                @click="saveTeam"
+            >
                 <span class="d-inline d-md-none mdi mdi-content-save"></span>
                 <span class="d-none d-md-inline">Speichern</span>
             </button>
-            <button v-if="myTeam.id" class="btn btn-danger ms-1" @click="deleteTeam">
+            <button
+                v-if="myTeam.id"
+                class="btn btn-danger ms-1"
+                @click="deleteTeam"
+            >
                 <span class="d-inline d-md-none mdi mdi-account-multiple-minus"></span>
                 <span class="d-none d-md-inline">Löschen</span>
             </button>
         </template>
         <card>
             <card-body>
-                <form-input name="name" v-model="myTeam.name" label="Bezeichnung" autofocus />
-                <form-selectize name="city_id" v-model="myTeam.city_id" label="Kirchengemeinde"
-                                :options="cities" />
-                <people-select name="users" v-model="myTeam.users" :people="users" label="Mitglieder"  :city="{id: myTeam.city_id}"/>
+                <form-input
+                    name="name"
+                    v-model="myTeam.name"
+                    label="Bezeichnung"
+                    autofocus
+                />
+                <form-selectize
+                    name="city_id"
+                    v-model="myTeam.city_id"
+                    label="Kirchengemeinde"
+                    :options="cities"
+                />
+                <people-select
+                    name="users"
+                    v-model="myTeam.users"
+                    :people="users"
+                    label="Mitglieder"
+                    :city="{ id: myTeam.city_id }"
+                />
             </card-body>
         </card>
     </admin-layout>
 </template>
 
 <script>
-import Card from "../../components/Ui/cards/card";
-import CardBody from "../../components/Ui/cards/cardBody";
-import FormInput from "../../components/Ui/forms/FormInput";
-import FormSelectize from "../../components/Ui/forms/FormSelectize";
-import PeopleSelect from "../../components/Ui/elements/PeopleSelect";
+import Card from '../../components/Ui/cards/card'
+import CardBody from '../../components/Ui/cards/cardBody'
+import FormInput from '../../components/Ui/forms/FormInput'
+import FormSelectize from '../../components/Ui/forms/FormSelectize'
+import PeopleSelect from '../../components/Ui/elements/PeopleSelect'
 export default {
-    name: "TeamEditor",
-    components: {PeopleSelect, FormSelectize, FormInput, CardBody, Card},
+    name: 'TeamEditor',
+    components: { PeopleSelect, FormSelectize, FormInput, CardBody, Card },
     props: ['team', 'cities', 'users'],
     data() {
         return {
@@ -67,19 +89,17 @@ export default {
     methods: {
         saveTeam() {
             if (this.myTeam.id) {
-                this.$inertia.patch(route('admin.team.update', this.myTeam.id), this.myTeam);
+                this.$inertia.patch(route('admin.team.update', this.myTeam.id), this.myTeam)
             } else {
-                this.$inertia.post(route('admin.teams.store'), this.myTeam);
+                this.$inertia.post(route('admin.teams.store'), this.myTeam)
             }
         },
         deleteTeam() {
             if (confirm('Willst du dieses Team wirklich löschen?'))
-                this.$inertia.delete(route('admin.team.destroy', this.team.id));
+                this.$inertia.delete(route('admin.team.destroy', this.team.id))
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

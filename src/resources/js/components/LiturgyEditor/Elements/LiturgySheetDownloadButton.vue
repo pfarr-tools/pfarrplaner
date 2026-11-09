@@ -29,45 +29,71 @@
 <template>
     <div v-if="hasDownload">
         <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="liturgySheetDownloadButton"
-                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                    title="Dokumente herunterladen">
+            <button
+                class="btn btn-secondary dropdown-toggle"
+                type="button"
+                id="liturgySheetDownloadButton"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                title="Dokumente herunterladen"
+            >
                 <span class="mdi mdi-download me-lg-1"></span>
                 <span class="d-none d-lg-inline">Herunterladen</span>
             </button>
-            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="liturgySheetDownloadButton">
-                <div v-for="sheet in downloadableSheets" :key="sheet.key">
-                    <liturgy-sheet-link :service="service" :sheet="sheet"
-                                        @open="openDialog(sheet.key)"/>
+            <div
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="liturgySheetDownloadButton"
+            >
+                <div
+                    v-for="sheet in downloadableSheets"
+                    :key="sheet.key"
+                >
+                    <liturgy-sheet-link
+                        :service="service"
+                        :sheet="sheet"
+                        @open="openDialog(sheet.key)"
+                    />
                 </div>
             </div>
         </div>
 
-        <template v-for="sheet in downloadableSheets" :key="'dlg' + sheet.key">
-            <modal v-if="dialogs[sheet.key]" :title="dialogTitle(sheet)"
-                   :allow-cancel="!sheet.configurationCloseOnly"
-                   @close="handleDialogClose(sheet)"
-                   @cancel="dialogs[sheet.key] = false"
-                   :close-button-label="dialogCloseButtonLabel(sheet)" cancel-button-label="Abbrechen">
-                <component :is="sheet.configurationComponent" :service="service" :sheet="sheet"/>
+        <template
+            v-for="sheet in downloadableSheets"
+            :key="'dlg' + sheet.key"
+        >
+            <modal
+                v-if="dialogs[sheet.key]"
+                :title="dialogTitle(sheet)"
+                :allow-cancel="!sheet.configurationCloseOnly"
+                @close="handleDialogClose(sheet)"
+                @cancel="dialogs[sheet.key] = false"
+                :close-button-label="dialogCloseButtonLabel(sheet)"
+                cancel-button-label="Abbrechen"
+            >
+                <component
+                    :is="sheet.configurationComponent"
+                    :service="service"
+                    :sheet="sheet"
+                />
             </modal>
         </template>
     </div>
 </template>
 
 <script>
-import Modal from "../../Ui/modals/Modal";
-import LiturgySheetLink from "./LiturgySheetLink";
-import FullTextLiturgySheetConfiguration from "../LiturgySheets/FullTextLiturgySheetConfiguration";
-import A4WordSpecificLiturgySheetConfiguration from "../LiturgySheets/A4WordSpecificLiturgySheetConfiguration";
-import SongPPTLiturgySheetConfiguration from "../LiturgySheets/SongPPTLiturgySheetConfiguration";
-import SongSheetLiturgySheetConfiguration from "../LiturgySheets/SongSheetLiturgySheetConfiguration";
-import SBLiturgySheetConfiguration from "../LiturgySheets/SBLiturgySheetConfiguration.vue";
-import SongMailLiturgySheetDialog from "../LiturgySheets/SongMailLiturgySheetDialog.vue";
-import AIPromptLiturgySheetDialog from "../LiturgySheets/AIPromptLiturgySheetDialog.vue";
+import Modal from '../../Ui/modals/Modal'
+import LiturgySheetLink from './LiturgySheetLink'
+import FullTextLiturgySheetConfiguration from '../LiturgySheets/FullTextLiturgySheetConfiguration'
+import A4WordSpecificLiturgySheetConfiguration from '../LiturgySheets/A4WordSpecificLiturgySheetConfiguration'
+import SongPPTLiturgySheetConfiguration from '../LiturgySheets/SongPPTLiturgySheetConfiguration'
+import SongSheetLiturgySheetConfiguration from '../LiturgySheets/SongSheetLiturgySheetConfiguration'
+import SBLiturgySheetConfiguration from '../LiturgySheets/SBLiturgySheetConfiguration.vue'
+import SongMailLiturgySheetDialog from '../LiturgySheets/SongMailLiturgySheetDialog.vue'
+import AIPromptLiturgySheetDialog from '../LiturgySheets/AIPromptLiturgySheetDialog.vue'
 
 export default {
-    name: "LiturgySheetDownloadButton",
+    name: 'LiturgySheetDownloadButton',
     components: {
         Modal,
         LiturgySheetLink,
@@ -94,62 +120,63 @@ export default {
     data() {
         return {
             dialogs: this.createDialogs(this.sheets),
-        };
+        }
     },
     computed: {
         downloadableSheets() {
-            return Object.values(this.sheets).filter(sheet => this.showPrivileged || !sheet.privileged);
+            return Object.values(this.sheets).filter(
+                (sheet) => this.showPrivileged || !sheet.privileged,
+            )
         },
         hasDownload() {
-            return (this.blockCount > 0) && (this.downloadableSheets.length > 0);
+            return this.blockCount > 0 && this.downloadableSheets.length > 0
         },
     },
     watch: {
         sheets(newSheets) {
-            const newDialogs = this.createDialogs(newSheets);
-            Object.keys(this.dialogs).forEach(key => {
-                if (Object.prototype.hasOwnProperty.call(newDialogs, key)) newDialogs[key] = this.dialogs[key];
-            });
-            this.dialogs = newDialogs;
+            const newDialogs = this.createDialogs(newSheets)
+            Object.keys(this.dialogs).forEach((key) => {
+                if (Object.prototype.hasOwnProperty.call(newDialogs, key))
+                    newDialogs[key] = this.dialogs[key]
+            })
+            this.dialogs = newDialogs
         },
     },
     methods: {
         createDialogs(sheets) {
-            const dialogs = {};
-            Object.values(sheets).forEach(sheet => {
-                if (sheet.configurationComponent) dialogs[sheet.key] = false;
-            });
-            return dialogs;
+            const dialogs = {}
+            Object.values(sheets).forEach((sheet) => {
+                if (sheet.configurationComponent) dialogs[sheet.key] = false
+            })
+            return dialogs
         },
         openDialog(key) {
             this.$nextTick(() => {
-                this.dialogs[key] = true;
-            });
+                this.dialogs[key] = true
+            })
         },
         downloadConfiguredSheet(sheet) {
-            document.getElementById('frm' + sheet.key).submit();
-            this.dialogs[sheet.key] = false;
+            document.getElementById('frm' + sheet.key).submit()
+            this.dialogs[sheet.key] = false
         },
         handleDialogClose(sheet) {
             if (sheet.configurationCloseOnly) {
-                this.dialogs[sheet.key] = false;
-                return;
+                this.dialogs[sheet.key] = false
+                return
             }
 
-            this.downloadConfiguredSheet(sheet);
+            this.downloadConfiguredSheet(sheet)
         },
         dialogTitle(sheet) {
-            if (sheet.configurationCloseOnly) return sheet.title;
-            return sheet.title + ' herunterladen';
+            if (sheet.configurationCloseOnly) return sheet.title
+            return sheet.title + ' herunterladen'
         },
         dialogCloseButtonLabel(sheet) {
-            if (sheet.configurationCloseOnly) return 'Schließen';
-            return 'Herunterladen';
+            if (sheet.configurationCloseOnly) return 'Schließen'
+            return 'Herunterladen'
         },
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

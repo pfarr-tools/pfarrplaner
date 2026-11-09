@@ -29,32 +29,62 @@
 <template>
     <admin-layout title="Liste der Gottesdienste für bestimmte Kirchengemeinden erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Liste der Gottesdienste für bestimmte Kirchengemeinden erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Liste der Gottesdienste für bestimmte Kirchengemeinden erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'servicesByCitiesCSV'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'servicesByCitiesCSV' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="cities[]" label="Kirchengemeinden" v-model="myCities" :options="cities" multiple />
-            <form-check name="full_location" label="Komplette Ortsangabe bei der Bezeichung des Gottesdienstortes" v-model="myFullLocation" />
-            <form-date-range-picker label="Von" v-model:from="myStart" v-model:to="myEnd" iso-date />
+            <form-selectize
+                name="cities[]"
+                label="Kirchengemeinden"
+                v-model="myCities"
+                :options="cities"
+                multiple
+            />
+            <form-check
+                name="full_location"
+                label="Komplette Ortsangabe bei der Bezeichung des Gottesdienstortes"
+                v-model="myFullLocation"
+            />
+            <form-date-range-picker
+                label="Von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities'],
-    components: {FormCheck, FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {
+        FormCheck,
+        FormDateRangePicker,
+        FormInput,
+        FormCsrfToken,
+        FormSelectize,
+        SaveButton,
+    },
     data() {
-        let myStart = moment().startOf('month').add(1, 'month');
-        let myEnd = moment().endOf('year');
+        let myStart = moment().startOf('month').add(1, 'month')
+        let myEnd = moment().endOf('year')
 
         return {
             myStart,
@@ -65,17 +95,15 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'servicesByCitiesCSV'}), {
+            submitReportForm(route('reports.render', { report: 'servicesByCitiesCSV' }), {
                 cities: this.myCities,
                 full_location: this.myFullLocation,
                 start: this.myStart,
                 end: this.myEnd,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

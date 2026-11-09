@@ -29,91 +29,166 @@
 <template>
     <admin-layout title="Mein Profil">
         <template #navbar-left>
-            <button class="btn btn-primary" title="Profil speichern" @click="saveProfile">
-                <span class="d-inline d-md-none mdi mdi-content-save"></span> <span class="d-none d-md-inline">Speichern</span>
+            <button
+                class="btn btn-primary"
+                title="Profil speichern"
+                @click="saveProfile"
+            >
+                <span class="d-inline d-md-none mdi mdi-content-save"></span>
+                <span class="d-none d-md-inline">Speichern</span>
             </button>
         </template>
         <template #tab-headers>
             <tab-headers>
-                <tab-header title="Profil" id="profile" :active-tab="activeTab"/>
-                <tab-header title="Sicherheit" id="security" :active-tab="activeTab"/>
-                <tab-header title="E-Mailbenachrichtigungen" id="subscriptions" :active-tab="activeTab"/>
-                <tab-header title="Startseite" id="homeScreenConfiguration" :active-tab="activeTab"/>
-                <tab-header title="Verbundene Kalender" id="calendars" :active-tab="activeTab"
-                            :count="calendarConnections.length"
-                            :disabled="user.email.slice(-8) != '@elkw.de'"
-                            disabled-title="Diese Funktion ist nur für Benutzer mit einem ELKW-Konto verfügbar."/>
-                <tab-header title="Externe Inhalte" id="externalContent" :active-tab="activeTab"/>
+                <tab-header
+                    title="Profil"
+                    id="profile"
+                    :active-tab="activeTab"
+                />
+                <tab-header
+                    title="Sicherheit"
+                    id="security"
+                    :active-tab="activeTab"
+                />
+                <tab-header
+                    title="E-Mailbenachrichtigungen"
+                    id="subscriptions"
+                    :active-tab="activeTab"
+                />
+                <tab-header
+                    title="Startseite"
+                    id="homeScreenConfiguration"
+                    :active-tab="activeTab"
+                />
+                <tab-header
+                    title="Verbundene Kalender"
+                    id="calendars"
+                    :active-tab="activeTab"
+                    :count="calendarConnections.length"
+                    :disabled="user.email.slice(-8) != '@elkw.de'"
+                    disabled-title="Diese Funktion ist nur für Benutzer mit einem ELKW-Konto verfügbar."
+                />
+                <tab-header
+                    title="Externe Inhalte"
+                    id="externalContent"
+                    :active-tab="activeTab"
+                />
             </tab-headers>
         </template>
         <tabs>
-            <tab id="profile" :active-tab="activeTab">
-                <profile-tab :user="user"/>
+            <tab
+                id="profile"
+                :active-tab="activeTab"
+            >
+                <profile-tab :user="user" />
             </tab>
-            <tab id="security" :active-tab="activeTab">
-                <security-tab :user="user" :password="password"/>
+            <tab
+                id="security"
+                :active-tab="activeTab"
+            >
+                <security-tab
+                    :user="user"
+                    :password="password"
+                />
             </tab>
-            <tab id="subscriptions" :active-tab="activeTab">
-                <subscriptions-tab :cities="cities" :subscriptions="subscriptions"/>
+            <tab
+                id="subscriptions"
+                :active-tab="activeTab"
+            >
+                <subscriptions-tab
+                    :cities="cities"
+                    :subscriptions="subscriptions"
+                />
             </tab>
-            <tab id="homeScreenConfiguration" :active-tab="activeTab">
-                <home-screen-configuration-tab :available-tabs="availableTabs" :cities="cities"
-                                               :home-screen-tabs-config="myHomeScreenTabsConfig"
-                                               :locations="locations" :ministries="ministries"
-                                               :settings="settings"/>
+            <tab
+                id="homeScreenConfiguration"
+                :active-tab="activeTab"
+            >
+                <home-screen-configuration-tab
+                    :available-tabs="availableTabs"
+                    :cities="cities"
+                    :home-screen-tabs-config="myHomeScreenTabsConfig"
+                    :locations="locations"
+                    :ministries="ministries"
+                    :settings="settings"
+                />
             </tab>
-            <tab id="calendars" :active-tab="activeTab">
-                <calendar-connections-tab :user="user" :calendar-connections="calendarConnections"/>
+            <tab
+                id="calendars"
+                :active-tab="activeTab"
+            >
+                <calendar-connections-tab
+                    :user="user"
+                    :calendar-connections="calendarConnections"
+                />
             </tab>
-            <tab id="externalContent" :active-tab="activeTab">
-                <external-content-tab :user="editedUser"/>
+            <tab
+                id="externalContent"
+                :active-tab="activeTab"
+            >
+                <external-content-tab :user="editedUser" />
             </tab>
         </tabs>
     </admin-layout>
 </template>
 
 <script>
-import Card from "../../components/Ui/cards/card";
-import CardHeader from "../../components/Ui/cards/cardHeader";
-import TabHeaders from "../../components/Ui/tabs/tabHeaders";
-import TabHeader from "../../components/Ui/tabs/tabHeader";
-import CardBody from "../../components/Ui/cards/cardBody";
-import Tabs from "../../components/Ui/tabs/tabs";
-import Tab from "../../components/Ui/tabs/tab";
-import ProfileTab from "../../components/Profile/Tabs/ProfileTab";
-import SecurityTab from "../../components/Profile/Tabs/SecurityTab";
-import CalendarConnectionsTab from "../../components/Profile/Tabs/CalendarConnectionsTab";
-import SubscriptionsTab from "../../components/Profile/Tabs/SubscriptionsTab";
-import HomeScreenConfigurationTab from "../../components/Profile/Tabs/HomeScreenConfigurationTab";
-import ExternalContentTab from "../../components/Profile/Tabs/ExternalContentTab";
+import Card from '../../components/Ui/cards/card'
+import CardHeader from '../../components/Ui/cards/cardHeader'
+import TabHeaders from '../../components/Ui/tabs/tabHeaders'
+import TabHeader from '../../components/Ui/tabs/tabHeader'
+import CardBody from '../../components/Ui/cards/cardBody'
+import Tabs from '../../components/Ui/tabs/tabs'
+import Tab from '../../components/Ui/tabs/tab'
+import ProfileTab from '../../components/Profile/Tabs/ProfileTab'
+import SecurityTab from '../../components/Profile/Tabs/SecurityTab'
+import CalendarConnectionsTab from '../../components/Profile/Tabs/CalendarConnectionsTab'
+import SubscriptionsTab from '../../components/Profile/Tabs/SubscriptionsTab'
+import HomeScreenConfigurationTab from '../../components/Profile/Tabs/HomeScreenConfigurationTab'
+import ExternalContentTab from '../../components/Profile/Tabs/ExternalContentTab'
 
 function normalizeHomeScreenTabsConfig(config) {
     if (!config || typeof config !== 'object' || Array.isArray(config)) {
-        return { tabs: [] };
+        return { tabs: [] }
     }
 
     if (!Array.isArray(config.tabs)) {
-        config.tabs = [];
+        config.tabs = []
     }
 
-    return config;
+    return config
 }
 
 export default {
-    name: "ProfileEditor",
-    props: ['tab', 'user', 'calendarConnections', 'cities', 'subscriptions', 'availableTabs', 'homeScreenTabsConfig',
-        'locations', 'ministries', 'settings'],
+    name: 'ProfileEditor',
+    props: [
+        'tab',
+        'user',
+        'calendarConnections',
+        'cities',
+        'subscriptions',
+        'availableTabs',
+        'homeScreenTabsConfig',
+        'locations',
+        'ministries',
+        'settings',
+    ],
     components: {
         ExternalContentTab,
         HomeScreenConfigurationTab,
         SubscriptionsTab,
         CalendarConnectionsTab,
-        SecurityTab, ProfileTab, Tab, Tabs,  TabHeader, TabHeaders,
+        SecurityTab,
+        ProfileTab,
+        Tab,
+        Tabs,
+        TabHeader,
+        TabHeaders,
     },
     data() {
         return {
             activeTab: this.tab || 'profile',
-            password: {current: '', new: '', confirm: ''},
+            password: { current: '', new: '', confirm: '' },
             editedUser: this.user,
             myHomeScreenTabsConfig: normalizeHomeScreenTabsConfig(this.homeScreenTabsConfig),
         }
@@ -135,17 +210,16 @@ export default {
                 own_podcast_url: this.user.own_podcast_url,
                 own_podcast_spotify: this.user.own_podcast_spotify,
                 own_podcast_itunes: this.user.own_podcast_itunes,
-            };
-            if (this.password.current && this.password.new && this.password.confirm) {
-                result['current_password'] = this.password.current;
-                result['new_password'] = this.password.new;
-                result['new_password_confirmation'] = this.password.confirm;
             }
-            this.$inertia.patch(route('user.profile.save'), result);
+            if (this.password.current && this.password.new && this.password.confirm) {
+                result['current_password'] = this.password.current
+                result['new_password'] = this.password.new
+                result['new_password_confirmation'] = this.password.confirm
+            }
+            this.$inertia.patch(route('user.profile.save'), result)
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -31,18 +31,38 @@
         <template v-slot:navbar-left>
             <save-button @click="saveSongbook" />
         </template>
-        <form-input label="Titel" name="name" v-model="mySongbook.name"/>
-        <form-input label="Kürzel" name="code" v-model="mySongbook.code"/>
-        <form-input label="ISBN" name="isbn" v-model="mySongbook.isbn"/>
-        <form-textarea label="Beschreibung" name="description" v-model="mySongbook.description"/>
-        <div v-if="!(mySongbook.id)" class="alert alert-info">
+        <form-input
+            label="Titel"
+            name="name"
+            v-model="mySongbook.name"
+        />
+        <form-input
+            label="Kürzel"
+            name="code"
+            v-model="mySongbook.code"
+        />
+        <form-input
+            label="ISBN"
+            name="isbn"
+            v-model="mySongbook.isbn"
+        />
+        <form-textarea
+            label="Beschreibung"
+            name="description"
+            v-model="mySongbook.description"
+        />
+        <div
+            v-if="!mySongbook.id"
+            class="alert alert-info"
+        >
             Du musst das Liederbuch erst einmal speichern, um ein Bild hinzufügen zu können.
         </div>
         <div v-else>
             <form-image-attacher
-                :attach-route="route('songbook.cover.attach', {model: mySongbook.id})"
-                :detach-route="route('songbook.cover.detach', {model: mySongbook.id})"
-                label="Titelbild" :handle-paste="true"
+                :attach-route="route('songbook.cover.attach', { model: mySongbook.id })"
+                :detach-route="route('songbook.cover.detach', { model: mySongbook.id })"
+                label="Titelbild"
+                :handle-paste="true"
                 v-model="mySongbook.image"
             />
         </div>
@@ -50,13 +70,13 @@
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormTextarea from "../../../components/Ui/forms/FormTextarea";
-import FormImageAttacher from "../../../components/Ui/forms/FormImageAttacher";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormTextarea from '../../../components/Ui/forms/FormTextarea'
+import FormImageAttacher from '../../../components/Ui/forms/FormImageAttacher'
 export default {
-    name: "SongbookEditor",
-    components: {FormImageAttacher, FormTextarea, FormInput, SaveButton},
+    name: 'SongbookEditor',
+    components: { FormImageAttacher, FormTextarea, FormInput, SaveButton },
     props: ['songbook'],
     data() {
         return {
@@ -66,15 +86,16 @@ export default {
     methods: {
         saveSongbook() {
             if (this.mySongbook.id) {
-                this.$inertia.patch(route('admin.songbook.update', this.mySongbook.id), this.mySongbook);
+                this.$inertia.patch(
+                    route('admin.songbook.update', this.mySongbook.id),
+                    this.mySongbook,
+                )
             } else {
-                this.$inertia.post(route('admin.songbooks.store'), this.mySongbook);
+                this.$inertia.post(route('admin.songbooks.store'), this.mySongbook)
             }
-        }
-    }
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

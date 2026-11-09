@@ -28,35 +28,69 @@
 
 <template>
     <div class="calendar-connections-tab">
-        <div v-if="calendarConnections.length == 0" class="alert alert-info">Du hast noch keine externen Kalender verbunden.</div>
+        <div
+            v-if="calendarConnections.length == 0"
+            class="alert alert-info"
+        >
+            Du hast noch keine externen Kalender verbunden.
+        </div>
         <div class="alert alert-info">
-            Um einen Kalender mit Outlook zu verbinden, wird das kostenlose Outlook-Addin <i>Outlook CalDav Synchronizer</i>
-            benötigt. Du kannst es <a href="http://caldavsynchronizer.org/download-2/" target="_blank">hier herunterladen</a>.
+            Um einen Kalender mit Outlook zu verbinden, wird das kostenlose Outlook-Addin
+            <i>Outlook CalDav Synchronizer</i> benötigt. Du kannst es
+            <a
+                href="http://caldavsynchronizer.org/download-2/"
+                target="_blank"
+                >hier herunterladen</a
+            >.
             <a href="/docs/Eine%20Kalenderverbindung%20mit%20Outlook%20einrichten.pdf">Hier</a>
             findest du eine Anleitung zum Einrichten der Verbindung in Outlook.
         </div>
         <div class="mb-2">
-            <inertia-link v-if="createRoute" class="btn btn-light" title="Neuen Kalender verbinden"
-                          :href="createRoute">
-                <span class="d-inline d-md-none mdi mdi-calendar-plus"></span><span class="d-none d-md-inline">Neue Verbindung anlegen</span>
+            <inertia-link
+                v-if="createRoute"
+                class="btn btn-light"
+                title="Neuen Kalender verbinden"
+                :href="createRoute"
+            >
+                <span class="d-inline d-md-none mdi mdi-calendar-plus"></span
+                ><span class="d-none d-md-inline">Neue Verbindung anlegen</span>
             </inertia-link>
-            <button v-else class="btn btn-light" title="Neue Kalenderverbindungen sind in dieser Installation nicht freigeschaltet" disabled>
-                <span class="d-inline d-md-none mdi mdi-calendar-plus"></span><span class="d-none d-md-inline">Neue Verbindung anlegen</span>
+            <button
+                v-else
+                class="btn btn-light"
+                title="Neue Kalenderverbindungen sind in dieser Installation nicht freigeschaltet"
+                disabled
+            >
+                <span class="d-inline d-md-none mdi mdi-calendar-plus"></span
+                ><span class="d-none d-md-inline">Neue Verbindung anlegen</span>
             </button>
         </div>
-        <fake-table v-if="calendarConnections.length >0"
-                    :columns="[5,5,2]" collapsed-header="Kalender"
-                    :headers="['Titel', 'URL', '']" >
-            <div class="row p-1" v-for="(calendarConnection, key) in calendarConnections" :key="key">
+        <fake-table
+            v-if="calendarConnections.length > 0"
+            :columns="[5, 5, 2]"
+            collapsed-header="Kalender"
+            :headers="['Titel', 'URL', '']"
+        >
+            <div
+                class="row p-1"
+                v-for="(calendarConnection, key) in calendarConnections"
+                :key="key"
+            >
                 <div class="col-md-5">{{ calendarConnection.title }}</div>
                 <div class="col-md-5"><copyable-code :content="calendarConnection.uri" /></div>
                 <div class="col-md-2 text-end">
-                    <button class="btn btn-primary btn-sm" @click="editConnection(calendarConnection)"
-                            title="Verbindung bearbeiten">
+                    <button
+                        class="btn btn-primary btn-sm"
+                        @click="editConnection(calendarConnection)"
+                        title="Verbindung bearbeiten"
+                    >
                         <span class="mdi mdi-pencil"></span>
                     </button>
-                    <button class="btn btn-danger btn-sm" @click="deleteConnection(calendarConnection)"
-                            title="Verbindung löschen">
+                    <button
+                        class="btn btn-danger btn-sm"
+                        @click="deleteConnection(calendarConnection)"
+                        title="Verbindung löschen"
+                    >
                         <span class="mdi mdi-delete"></span>
                     </button>
                 </div>
@@ -66,32 +100,36 @@
 </template>
 
 <script>
-import FakeTable from "../../Ui/FakeTable";
-import CopyableCode from "../../Ui/CopyableCode.vue";
+import FakeTable from '../../Ui/FakeTable'
+import CopyableCode from '../../Ui/CopyableCode.vue'
 export default {
-    name: "CalendarConnectionsTab",
-    components: {CopyableCode, FakeTable},
+    name: 'CalendarConnectionsTab',
+    components: { CopyableCode, FakeTable },
     props: ['user', 'calendarConnections'],
     computed: {
         createRoute() {
-            return route().has('calendarConnection.create') ? route('calendarConnection.create') : null;
+            return route().has('calendarConnection.create')
+                ? route('calendarConnection.create')
+                : null
         },
     },
     methods: {
         editConnection(calendarConnection) {
-            this.$inertia.get(route('calendarConnection.edit', calendarConnection.id));
+            this.$inertia.get(route('calendarConnection.edit', calendarConnection.id))
         },
         deleteConnection(calendarConnection) {
             if (confirm('Willst du diese Verbindung wirklich löschen?')) {
-                this.$inertia.delete(route('calendarConnection.destroy', calendarConnection.id));
+                this.$inertia.delete(route('calendarConnection.destroy', calendarConnection.id))
             }
         },
-    }
+    },
 }
 </script>
 
 <style scoped>
-    .alert-info a, .alert-info a:visited, .alert-info a:focus {
-        color: black;
-    }
+.alert-info a,
+.alert-info a:visited,
+.alert-info a:focus {
+    color: black;
+}
 </style>

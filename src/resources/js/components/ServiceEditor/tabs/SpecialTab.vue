@@ -30,51 +30,84 @@
     <div class="home-tab">
         <div class="row">
             <div class="col-md-6">
-                <form-check name="baptism" label="Dies ist ein Taufgottesdienst." v-model="service.baptism"/>
+                <form-check
+                    name="baptism"
+                    label="Dies ist ein Taufgottesdienst."
+                    v-model="service.baptism"
+                />
             </div>
             <div class="col-md-6">
-                <form-check name="eucharist" label="Dies ist ein Abendmahlsgottesdienst." v-model="service.eucharist"/>
-            </div>
-        </div>
-        <hr/>
-        <div class="row">
-            <div class="col-md-6">
-                <form-input name="title" label="Abweichender Titel" v-model="service.title"
-                            help="z.B. für öffentliche Listen"/>
-            </div>
-            <div class="col-md-6">
-                <form-input name="description" label="Anmerkungen" v-model="service.description"
-                            help="Wird als Beschreibung in öffentlichen Listen angezeigt"/>
+                <form-check
+                    name="eucharist"
+                    label="Dies ist ein Abendmahlsgottesdienst."
+                    v-model="service.eucharist"
+                />
             </div>
         </div>
-        <form-textarea name="announcements" label="Zusätzliche Bekanntgaben" v-model="service.announcements"
-                       help="Bekanntgaben, die über die automatisch erstellte Terminliste hinausgehen."/>
-        <hr/>
-        <form-textarea name="internal_remarks" label="Interne Anmerkungen" v-model="service.internal_remarks"
-                       help="Diese Anmerkungen werden nirgends veröffentlicht, sondern sind nur hier zu sehen."
-                       pre-label="eye-slash"/>
+        <hr />
         <div class="row">
             <div class="col-md-6">
-                <form-selectize name="tags" label="Kennzeichnungen" v-model="service.tags"
-                                help="Kennzeichnungen z.B. für den Gemeindebrief" :items="tags"/>
+                <form-input
+                    name="title"
+                    label="Abweichender Titel"
+                    v-model="service.title"
+                    help="z.B. für öffentliche Listen"
+                />
             </div>
             <div class="col-md-6">
-                <form-selectize name="service_groups" label="Dieser Gottesdienst gehört zu folgenden Gruppen"
-                                v-model="service.service_groups" help="Gruppen z.B. für den Gemeindebrief"
-                                :items="serviceGroups"/>
+                <form-input
+                    name="description"
+                    label="Anmerkungen"
+                    v-model="service.description"
+                    help="Wird als Beschreibung in öffentlichen Listen angezeigt"
+                />
+            </div>
+        </div>
+        <form-textarea
+            name="announcements"
+            label="Zusätzliche Bekanntgaben"
+            v-model="service.announcements"
+            help="Bekanntgaben, die über die automatisch erstellte Terminliste hinausgehen."
+        />
+        <hr />
+        <form-textarea
+            name="internal_remarks"
+            label="Interne Anmerkungen"
+            v-model="service.internal_remarks"
+            help="Diese Anmerkungen werden nirgends veröffentlicht, sondern sind nur hier zu sehen."
+            pre-label="eye-slash"
+        />
+        <div class="row">
+            <div class="col-md-6">
+                <form-selectize
+                    name="tags"
+                    label="Kennzeichnungen"
+                    v-model="service.tags"
+                    help="Kennzeichnungen z.B. für den Gemeindebrief"
+                    :items="tags"
+                />
+            </div>
+            <div class="col-md-6">
+                <form-selectize
+                    name="service_groups"
+                    label="Dieser Gottesdienst gehört zu folgenden Gruppen"
+                    v-model="service.service_groups"
+                    help="Gruppen z.B. für den Gemeindebrief"
+                    :items="serviceGroups"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import FormCheck from "../../Ui/forms/FormCheck";
-import FormInput from "../../Ui/forms/FormInput";
-import FormTextarea from "../../Ui/forms/FormTextarea";
-import FormSelectize from "../../Ui/forms/FormSelectize";
+import FormCheck from '../../Ui/forms/FormCheck'
+import FormInput from '../../Ui/forms/FormInput'
+import FormTextarea from '../../Ui/forms/FormTextarea'
+import FormSelectize from '../../Ui/forms/FormSelectize'
 
 export default {
-    name: "SpecialTab",
+    name: 'SpecialTab',
     components: {
         FormSelectize,
         FormTextarea,
@@ -91,10 +124,8 @@ export default {
             myService: this.service,
         }
     },
-    methods: {}
+    methods: {},
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

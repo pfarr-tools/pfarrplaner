@@ -27,24 +27,33 @@
   -->
 
 <template>
-    <modal title="Worddokument einfügen" close-button-label="Abbrechen"
-           :allow-cancel="false" submit-button-type="secondary"
-           @cancel="$emit('input', '')"
-           @close="$emit('input', '')">
-        <form-file-upload @input="upload"
-                          no-url="1" no-pixabay="1" no-camera="1" no-description="1"/>
+    <modal
+        title="Worddokument einfügen"
+        close-button-label="Abbrechen"
+        :allow-cancel="false"
+        submit-button-type="secondary"
+        @cancel="$emit('input', '')"
+        @close="$emit('input', '')"
+    >
+        <form-file-upload
+            @input="upload"
+            no-url="1"
+            no-pixabay="1"
+            no-camera="1"
+            no-description="1"
+        />
     </modal>
 </template>
 
 <script>
-import Modal from "../../../Ui/modals/Modal.vue";
-import {romanize} from "@pfarr.tools/romanize";
-import FormFileUpload from "../../../Ui/forms/FormFileUpload.vue";
+import Modal from '../../../Ui/modals/Modal.vue'
+import { romanize } from '@pfarr.tools/romanize'
+import FormFileUpload from '../../../Ui/forms/FormFileUpload.vue'
 
 export default {
-    name: "InsertWordDocumentDialog",
+    name: 'InsertWordDocumentDialog',
     emits: ['input'],
-    components: {FormFileUpload, Modal},
+    components: { FormFileUpload, Modal },
     data() {
         return {
             insertBibleReference: '',
@@ -52,22 +61,22 @@ export default {
     },
     methods: {
         upload(file) {
-            let fd = new FormData();
-            fd.append('import', file);
+            let fd = new FormData()
+            fd.append('import', file)
 
-            this.uploading = true;
-            this.$api().post(route('api.liturgy.text.import'), fd, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then(response => {
-                this.$emit('input', response.data);
-            });
+            this.uploading = true
+            this.$api()
+                .post(route('api.liturgy.text.import'), fd, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                .then((response) => {
+                    this.$emit('input', response.data)
+                })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

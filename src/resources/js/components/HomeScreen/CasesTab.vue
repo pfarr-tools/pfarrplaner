@@ -29,61 +29,115 @@
 <template>
     <div class="cases-tab">
         <h2>Beerdigungen</h2>
-        <div v-if="!funeralsCount" class="alert alert-info">
+        <div
+            v-if="!funeralsCount"
+            class="alert alert-info"
+        >
             <span>Es sind keine Beerdigungen eingetragen.</span>
         </div>
         <div v-else>
-            <fake-table :columns="[2,2,4,3,1]" collapsed-header="Beerdigungen"
-                        :headers="['Gottesdienst', 'Verstorbene:r', 'Informationen zur Bestattung', 'Details', '']">
-                <funeral v-for="(funeral,funeralIndex) in funerals" :funeral="funeral" :key="'case_funeral_'+funeral.id+'_'+funeralIndex"
-                         :show-service="true" :show-pastor="true"
-                         class="row mb-3 p-1" :class="{'stripe-odd': (funeralIndex % 2 == 0)}"/>
+            <fake-table
+                :columns="[2, 2, 4, 3, 1]"
+                collapsed-header="Beerdigungen"
+                :headers="[
+                    'Gottesdienst',
+                    'Verstorbene:r',
+                    'Informationen zur Bestattung',
+                    'Details',
+                    '',
+                ]"
+            >
+                <funeral
+                    v-for="(funeral, funeralIndex) in funerals"
+                    :funeral="funeral"
+                    :key="'case_funeral_' + funeral.id + '_' + funeralIndex"
+                    :show-service="true"
+                    :show-pastor="true"
+                    class="row mb-3 p-1"
+                    :class="{ 'stripe-odd': funeralIndex % 2 == 0 }"
+                />
             </fake-table>
         </div>
         <hr />
         <h2>Trauungen</h2>
-        <div v-if="!weddingsCount" class="alert alert-info">
+        <div
+            v-if="!weddingsCount"
+            class="alert alert-info"
+        >
             <span>Es sind keine Trauungen eingetragen.</span>
         </div>
         <div v-else>
-            <fake-table :columns="[2,2,4,3,1]" collapsed-header="Trauungen"
-                        :headers="['Gottesdienst','Hochzeitspaar', 'Informationen zur Trauung', 'Details', '']">
-                <wedding v-for="(wedding, weddingIndex) in weddings"  :wedding="wedding" :key="'case_wedding_'+wedding.id+'_'+weddingIndex"
-                         :show-service="true" :show-pastor="true"
-                         class="mb-3 p-1" :class="{'stripe-odd': (weddingIndex % 2 == 0)}"/>
+            <fake-table
+                :columns="[2, 2, 4, 3, 1]"
+                collapsed-header="Trauungen"
+                :headers="[
+                    'Gottesdienst',
+                    'Hochzeitspaar',
+                    'Informationen zur Trauung',
+                    'Details',
+                    '',
+                ]"
+            >
+                <wedding
+                    v-for="(wedding, weddingIndex) in weddings"
+                    :wedding="wedding"
+                    :key="'case_wedding_' + wedding.id + '_' + weddingIndex"
+                    :show-service="true"
+                    :show-pastor="true"
+                    class="mb-3 p-1"
+                    :class="{ 'stripe-odd': weddingIndex % 2 == 0 }"
+                />
             </fake-table>
         </div>
         <hr />
         <h2>Taufen</h2>
-        <div v-if="!baptismsCount" class="alert alert-info">
+        <div
+            v-if="!baptismsCount"
+            class="alert alert-info"
+        >
             <span>Es sind keine Taufen eingetragen.</span>
         </div>
         <div v-else>
-            <fake-table :columns="[2,2,4,3,1]" collapsed-header="Taufen"
-                        :headers="['Gottesdienst', 'Täufling', 'Informationen zur Taufe', 'Details', '']">
-                <baptism v-for="(baptism, baptismIndex) in baptisms" :baptism="baptism" :key="'case_baptism_'+baptism.id+'_'+baptismIndex"
-                         :show-service="true" :show-pastor="true"
-                         class="mb-3 p-1" :class="{'stripe-odd': (baptismIndex % 2 == 0)}"/>
-
+            <fake-table
+                :columns="[2, 2, 4, 3, 1]"
+                collapsed-header="Taufen"
+                :headers="['Gottesdienst', 'Täufling', 'Informationen zur Taufe', 'Details', '']"
+            >
+                <baptism
+                    v-for="(baptism, baptismIndex) in baptisms"
+                    :baptism="baptism"
+                    :key="'case_baptism_' + baptism.id + '_' + baptismIndex"
+                    :show-service="true"
+                    :show-pastor="true"
+                    class="mb-3 p-1"
+                    :class="{ 'stripe-odd': baptismIndex % 2 == 0 }"
+                />
             </fake-table>
         </div>
     </div>
-
 </template>
 
 <script>
-import FakeTable from "../Ui/FakeTable";
-import Baptism from "../ServiceEditor/rites/Baptism";
-import Funeral from "../ServiceEditor/rites/Funeral";
-import Wedding from "../ServiceEditor/rites/Wedding";
+import FakeTable from '../Ui/FakeTable'
+import Baptism from '../ServiceEditor/rites/Baptism'
+import Funeral from '../ServiceEditor/rites/Funeral'
+import Wedding from '../ServiceEditor/rites/Wedding'
 export default {
-    name: "CasesTab",
-    components: {Baptism, Funeral, Wedding, FakeTable},
-    props: ['title', 'description', 'user', 'settings', 'funerals', 'funeralsCount', 'weddings', 'weddingsCount', 'baptisms', 'baptismsCount']
-
+    name: 'CasesTab',
+    components: { Baptism, Funeral, Wedding, FakeTable },
+    props: [
+        'title',
+        'description',
+        'user',
+        'settings',
+        'funerals',
+        'funeralsCount',
+        'weddings',
+        'weddingsCount',
+        'baptisms',
+        'baptismsCount',
+    ],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

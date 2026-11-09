@@ -28,23 +28,34 @@
 
 <template>
     <div class="card">
-        <div class="card-header">
-            {{ funeral.type }} von {{ funeral.buried_name }}
-        </div>
+        <div class="card-header">{{ funeral.type }} von {{ funeral.buried_name }}</div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-2">Geboren: {{ moment(funeral.dob).locale('de').format('LL') }}</div>
-                <div class="col-md-5">Verstorben: {{ dodString }}
-                    <span class="mdi mdi-content-copy" @click.prevent.stop="copyToClipboard"
-                          title="Klicken, um den Text in die Zwischenablage zu kopieren"></span>
+                <div class="col-md-2">
+                    Geboren: {{ moment(funeral.dob).locale('de').format('LL') }}
+                </div>
+                <div class="col-md-5">
+                    Verstorben: {{ dodString }}
+                    <span
+                        class="mdi mdi-content-copy"
+                        @click.prevent.stop="copyToClipboard"
+                        title="Klicken, um den Text in die Zwischenablage zu kopieren"
+                    ></span>
                 </div>
                 <div class="col-md-2">
-                    <bible-reference v-if="funeral.text" :perikope="funeral.text" title="Text:"/>
+                    <bible-reference
+                        v-if="funeral.text"
+                        :perikope="funeral.text"
+                        title="Text:"
+                    />
                 </div>
                 <div class="col-md-3 text-end">
-                    <inertia-link class="btn btn-light btn-sm"
-                                  :href="route('funerals.edit', funeral.id)"
-                                  title="Beerdigung bearbeiten"><span class="mdi mdi-pencil"></span></inertia-link>
+                    <inertia-link
+                        class="btn btn-light btn-sm"
+                        :href="route('funerals.edit', funeral.id)"
+                        title="Beerdigung bearbeiten"
+                        ><span class="mdi mdi-pencil"></span
+                    ></inertia-link>
                 </div>
             </div>
         </div>
@@ -52,37 +63,54 @@
 </template>
 
 <script>
-import RelativeDate from "@pfarr.tools/relative-date";
-import BibleReference from "../Elements/BibleReference";
+import RelativeDate from '@pfarr.tools/relative-date'
+import BibleReference from '../Elements/BibleReference'
 
 export default {
-    name: "FuneralInfoPane",
-    components: {BibleReference},
+    name: 'FuneralInfoPane',
+    components: { BibleReference },
     props: ['service', 'funeral'],
     computed: {
         age() {
-            if ((!this.funeral.dod) || (!this.funeral.dob)) return null;
-            return moment(this.funeral.dod).diff(moment(this.funeral.dob), 'years');
+            if (!this.funeral.dod || !this.funeral.dob) return null
+            return moment(this.funeral.dod).diff(moment(this.funeral.dob), 'years')
         },
         dodString() {
-            if (!this.funeral.dod) return '';
-            let dod = moment(this.funeral.dod).locale('de');
-            return dod.format('LL') + ' (' + RelativeDate(dod.format('DD.MM.YYYY'), moment().format('DD.MM.YYYY')) + ', ' + this.age+')';
+            if (!this.funeral.dod) return ''
+            let dod = moment(this.funeral.dod).locale('de')
+            return (
+                dod.format('LL') +
+                ' (' +
+                RelativeDate(dod.format('DD.MM.YYYY'), moment().format('DD.MM.YYYY')) +
+                ', ' +
+                this.age +
+                ')'
+            )
         },
     },
     data() {
         return {
-            liturgy: {funeral: this.funeral.text},
-        };
+            liturgy: { funeral: this.funeral.text },
+        }
     },
     methods: {
         copyToClipboard() {
-            if (!this.funeral.dod) return;
-            let dod = moment(this.funeral.dod).locale('de');
-            const cb = navigator.clipboard;
-            cb.writeText(dod.format('LL') + ' = ' + RelativeDate(dod.format('DD.MM.YYYY'), moment(this.service.date).format('DD.MM.YYYY')) + ', im Alter von ' + this.age + ' Jahren ');
-        }
-    }
+            if (!this.funeral.dod) return
+            let dod = moment(this.funeral.dod).locale('de')
+            const cb = navigator.clipboard
+            cb.writeText(
+                dod.format('LL') +
+                    ' = ' +
+                    RelativeDate(
+                        dod.format('DD.MM.YYYY'),
+                        moment(this.service.date).format('DD.MM.YYYY'),
+                    ) +
+                    ', im Alter von ' +
+                    this.age +
+                    ' Jahren ',
+            )
+        },
+    },
 }
 </script>
 
@@ -93,6 +121,4 @@ export default {
 .mdi-content-copy:hover {
     color: gray;
 }
-
-
 </style>

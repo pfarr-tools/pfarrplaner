@@ -27,35 +27,56 @@
   -->
 
 <template>
-    <liturgy-sheet-configuration-form :service="service" :sheet="sheet">
-        <form-check label="Platzhalter für Jingle, Intro, ..." v-model="myConfig.includeJingleAndIntro"
-                    name="config[includeJingleAndIntro]"/>
-        <form-check label="Mitwirkende anzeigen" v-model="myConfig.includeCredits" name="config[includeCredits]"/>
-        <form-check label="Liederliste am Anfang" v-model="myConfig.includeSongList" name="config[includeSongList]"/>
+    <liturgy-sheet-configuration-form
+        :service="service"
+        :sheet="sheet"
+    >
+        <form-check
+            label="Platzhalter für Jingle, Intro, ..."
+            v-model="myConfig.includeJingleAndIntro"
+            name="config[includeJingleAndIntro]"
+        />
+        <form-check
+            label="Mitwirkende anzeigen"
+            v-model="myConfig.includeCredits"
+            name="config[includeCredits]"
+        />
+        <form-check
+            label="Liederliste am Anfang"
+            v-model="myConfig.includeSongList"
+            name="config[includeSongList]"
+        />
     </liturgy-sheet-configuration-form>
 </template>
 
 <script>
-import LiturgySheetConfigurationForm from "./LiturgySheetConfigurationForm";
-import FormCheck from "../../Ui/forms/FormCheck";
-import FormSelectize from "../../Ui/forms/FormSelectize";
-import FormInput from "../../Ui/forms/FormInput";
-import Tabs from "../../Ui/tabs/tabs";
-import Tab from "../../Ui/tabs/tab";
-import TabHeaders from "../../Ui/tabs/tabHeaders";
-import TabHeader from "../../Ui/tabs/tabHeader";
+import LiturgySheetConfigurationForm from './LiturgySheetConfigurationForm'
+import FormCheck from '../../Ui/forms/FormCheck'
+import FormSelectize from '../../Ui/forms/FormSelectize'
+import FormInput from '../../Ui/forms/FormInput'
+import Tabs from '../../Ui/tabs/tabs'
+import Tab from '../../Ui/tabs/tab'
+import TabHeaders from '../../Ui/tabs/tabHeaders'
+import TabHeader from '../../Ui/tabs/tabHeader'
 export default {
-    name: "SBLiturgySheetConfiguration",
-    components: {TabHeader, TabHeaders, Tab, Tabs, FormInput, FormSelectize, FormCheck, LiturgySheetConfigurationForm},
+    name: 'SBLiturgySheetConfiguration',
+    components: {
+        TabHeader,
+        TabHeaders,
+        Tab,
+        Tabs,
+        FormInput,
+        FormSelectize,
+        FormCheck,
+        LiturgySheetConfigurationForm,
+    },
     props: ['service', 'sheet'],
     data() {
         return {
             myConfig: this.sheet.config,
         }
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

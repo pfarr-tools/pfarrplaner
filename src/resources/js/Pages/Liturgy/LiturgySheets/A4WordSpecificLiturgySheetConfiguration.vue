@@ -27,26 +27,37 @@
   -->
 
 <template>
-    <liturgy-sheet-configuration-layout :title="sheetConfig.title" :service="service"
-                                        :sheet-config="sheetConfig">
+    <liturgy-sheet-configuration-layout
+        :title="sheetConfig.title"
+        :service="service"
+        :sheet-config="sheetConfig"
+    >
         <fieldset>
             <legend>Folgende Inhalte mit einschließen:</legend>
-            <form-check label="Komplette Liedtexte" v-model="myConfig.includeSongTexts" name="config[includeSongTexts]"/>
-            <form-check label="Komplette Schriftlesungen" v-model="myConfig.includeFullReadings" name="config[includeFullReadings]"/>
+            <form-check
+                label="Komplette Liedtexte"
+                v-model="myConfig.includeSongTexts"
+                name="config[includeSongTexts]"
+            />
+            <form-check
+                label="Komplette Schriftlesungen"
+                v-model="myConfig.includeFullReadings"
+                name="config[includeFullReadings]"
+            />
         </fieldset>
     </liturgy-sheet-configuration-layout>
 </template>
 
 <script>
-import LiturgySheetConfigurationLayout from "./LiturgySheetConfigurationLayout";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
+import LiturgySheetConfigurationLayout from './LiturgySheetConfigurationLayout'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
 
 export default {
-    name: "A4WordSpecificLiturgySheetConfiguration",
-    components: {FormCheck, LiturgySheetConfigurationLayout},
+    name: 'A4WordSpecificLiturgySheetConfiguration',
+    components: { FormCheck, LiturgySheetConfigurationLayout },
     props: ['service', 'sheetConfig', 'config'],
     data() {
-        var recipients = [];
+        var recipients = []
 
         return {
             myConfig: this.config,
@@ -56,6 +67,4 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

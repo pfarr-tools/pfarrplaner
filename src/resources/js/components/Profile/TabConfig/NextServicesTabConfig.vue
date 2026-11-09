@@ -28,19 +28,20 @@
 
 <template>
     <div class="next-services-tab-config">
-        <form-check label="Nur meine eigenen Gottesdienste anzeigen" v-model="tab.config.mine" />
+        <form-check
+            label="Nur meine eigenen Gottesdienste anzeigen"
+            v-model="tab.config.mine"
+        />
     </div>
 </template>
 
 <script>
-import FormCheck from "../../Ui/forms/FormCheck";
+import FormCheck from '../../Ui/forms/FormCheck'
 export default {
-    name: "NextServicesTabConfig",
-    components: {FormCheck},
+    name: 'NextServicesTabConfig',
+    components: { FormCheck },
     props: ['tab'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

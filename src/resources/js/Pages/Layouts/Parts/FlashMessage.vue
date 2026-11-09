@@ -30,14 +30,19 @@
     <div
         class="alert alert-dismissible fade show m-3"
         :class="{
-      'alert-success': type === 'success',
-      'alert-danger': type === 'error',
-      'alert-info': !type || type === 'info'
-    }"
+            'alert-success': type === 'success',
+            'alert-danger': type === 'error',
+            'alert-info': !type || type === 'info',
+        }"
         role="alert"
     >
         {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+        ></button>
     </div>
 </template>
 
@@ -46,7 +51,7 @@ export default {
     name: 'FlashMessage',
     props: {
         message: String,
-        type: String
-    }
+        type: String,
+    },
 }
 </script>

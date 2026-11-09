@@ -29,7 +29,12 @@
 -->
 
 <template>
-    <form-group :id="myId" :input-id="`${myId}Input`" :label="label" v-slot="field">
+    <form-group
+        :id="myId"
+        :input-id="`${myId}Input`"
+        :label="label"
+        v-slot="field"
+    >
         <VueDatePicker
             :id="field.fieldId"
             :model-value="pickerRange"
@@ -46,21 +51,29 @@
             :aria-describedby="field.describedBy || undefined"
             @update:model-value="onRangeChange"
         />
-        <input type="hidden" :name="nameFrom" :value="hiddenFrom" />
-        <input type="hidden" :name="nameTo" :value="hiddenTo" />
+        <input
+            type="hidden"
+            :name="nameFrom"
+            :value="hiddenFrom"
+        />
+        <input
+            type="hidden"
+            :name="nameTo"
+            :value="hiddenTo"
+        />
     </form-group>
 </template>
 
 <script>
-import { VueDatePicker } from '@vuepic/vue-datepicker';
-import FormGroup from './FormGroup';
-import * as dateFnsLocales from 'date-fns/locale';
-import { uid } from '../../../libraries/uid';
+import { VueDatePicker } from '@vuepic/vue-datepicker'
+import FormGroup from './FormGroup'
+import * as dateFnsLocales from 'date-fns/locale'
+import { uid } from '../../../libraries/uid'
 import {
     formatPlannerDateForDisplay,
     plannerValueToPickerDate,
     serializePlannerDateToBerlinDateString,
-} from '../../../helpers/plannerDates';
+} from '../../../helpers/plannerDates'
 
 export default {
     name: 'FormDateRangePicker',
@@ -82,30 +95,26 @@ export default {
         return {
             myId: uid(),
             pickerRange: [null, null],
-        };
+        }
     },
 
     computed: {
         dpLocale() {
-            return dateFnsLocales.de;
+            return dateFnsLocales.de
         },
 
         propRange() {
-            return [this.from, this.to];
+            return [this.from, this.to]
         },
 
         hiddenFrom() {
-            if (!this.from) return '';
-            return this.isoDate
-                ? this.formatIsoDate(this.from)
-                : this.formatDisplayDate(this.from);
+            if (!this.from) return ''
+            return this.isoDate ? this.formatIsoDate(this.from) : this.formatDisplayDate(this.from)
         },
 
         hiddenTo() {
-            if (!this.to) return '';
-            return this.isoDate
-                ? this.formatIsoDate(this.to)
-                : this.formatDisplayDate(this.to);
+            if (!this.to) return ''
+            return this.isoDate ? this.formatIsoDate(this.to) : this.formatDisplayDate(this.to)
         },
     },
 
@@ -113,76 +122,81 @@ export default {
         propRange: {
             immediate: true,
             handler() {
-                this.syncPickerRangeFromProps();
+                this.syncPickerRangeFromProps()
             },
         },
     },
 
     methods: {
         syncPickerRangeFromProps() {
-            const nextRange = [plannerValueToPickerDate(this.from), plannerValueToPickerDate(this.to)];
+            const nextRange = [
+                plannerValueToPickerDate(this.from),
+                plannerValueToPickerDate(this.to),
+            ]
             if (!this.isSameRange(this.pickerRange, nextRange)) {
-                this.pickerRange = nextRange;
+                this.pickerRange = nextRange
             }
         },
 
         toDate(val) {
-            return plannerValueToPickerDate(val);
+            return plannerValueToPickerDate(val)
         },
 
         formatDisplayDate(value) {
-            return formatPlannerDateForDisplay(value);
+            return formatPlannerDateForDisplay(value)
         },
 
         formatIsoDate(value) {
-            return serializePlannerDateToBerlinDateString(value);
+            return serializePlannerDateToBerlinDateString(value)
         },
 
         isSameDate(a, b) {
-            if (!a && !b) return true;
-            if (!a || !b) return false;
-            return a.getTime() === b.getTime();
+            if (!a && !b) return true
+            if (!a || !b) return false
+            return a.getTime() === b.getTime()
         },
 
         isSameRange(a, b) {
-            return this.isSameDate(a?.[0] || null, b?.[0] || null)
-                && this.isSameDate(a?.[1] || null, b?.[1] || null);
+            return (
+                this.isSameDate(a?.[0] || null, b?.[0] || null) &&
+                this.isSameDate(a?.[1] || null, b?.[1] || null)
+            )
         },
 
         onRangeChange(range) {
             if (!range || !range[0]) {
-                this.pickerRange = [null, null];
-                this.$emit('update:from', null);
-                this.$emit('update:to', null);
-                return;
+                this.pickerRange = [null, null]
+                this.$emit('update:from', null)
+                this.$emit('update:to', null)
+                return
             }
-            if (range.length < 2 || !range[1]) return;
-            const start = this.toDate(range[0]);
-            const end = this.toDate(range[1]);
-            const nextRange = [start, end];
+            if (range.length < 2 || !range[1]) return
+            const start = this.toDate(range[0])
+            const end = this.toDate(range[1])
+            const nextRange = [start, end]
             if (!this.isSameRange(this.pickerRange, nextRange)) {
-                this.pickerRange = nextRange;
+                this.pickerRange = nextRange
             }
             if (this.isoDate) {
-                const nextFrom = this.formatIsoDate(start);
-                const nextTo = this.formatIsoDate(end);
+                const nextFrom = this.formatIsoDate(start)
+                const nextTo = this.formatIsoDate(end)
                 if (nextFrom !== this.from) {
-                    this.$emit('update:from', nextFrom);
+                    this.$emit('update:from', nextFrom)
                 }
                 if (nextTo !== this.to) {
-                    this.$emit('update:to', nextTo);
+                    this.$emit('update:to', nextTo)
                 }
             } else {
-                const nextFrom = this.formatDisplayDate(start);
-                const nextTo = this.formatDisplayDate(end);
+                const nextFrom = this.formatDisplayDate(start)
+                const nextTo = this.formatDisplayDate(end)
                 if (nextFrom !== this.from) {
-                    this.$emit('update:from', nextFrom);
+                    this.$emit('update:from', nextFrom)
                 }
                 if (nextTo !== this.to) {
-                    this.$emit('update:to', nextTo);
+                    this.$emit('update:to', nextTo)
                 }
             }
         },
     },
-};
+}
 </script>

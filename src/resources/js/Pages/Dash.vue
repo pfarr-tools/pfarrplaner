@@ -27,11 +27,10 @@
   -->
 
 <script>
-
-import AdminLayout from "../Pages/Layouts/AdminLayout.vue";
+import AdminLayout from '../Pages/Layouts/AdminLayout.vue'
 export default {
-    name: "Dash",
-    components: {AdminLayout},
+    name: 'Dash',
+    components: { AdminLayout },
 }
 </script>
 
@@ -39,6 +38,4 @@ export default {
     <admin-layout title="Dashboard"></admin-layout>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

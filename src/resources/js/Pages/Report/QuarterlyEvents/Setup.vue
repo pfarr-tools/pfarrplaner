@@ -29,61 +29,145 @@
 <template>
     <admin-layout title="Quartalsprogramm erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Quartalsprogramm erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Quartalsprogramm erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'quarterlyEvents'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'quarterlyEvents' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-input name="title" label="Titel" v-model="myTitle" />
-            <form-selectize name="location" label="Liste für folgenden Veranstaltungsort" :options="locations" v-model="myLocation"/>
-            <form-selectize name="quarter" label="Quartal" :options="quarters" v-model="myQuarter" />
-            <div class="form-group"> <!-- Radio group !-->
+            <form-input
+                name="title"
+                label="Titel"
+                v-model="myTitle"
+            />
+            <form-selectize
+                name="location"
+                label="Liste für folgenden Veranstaltungsort"
+                :options="locations"
+                v-model="myLocation"
+            />
+            <form-selectize
+                name="quarter"
+                label="Quartal"
+                :options="quarters"
+                v-model="myQuarter"
+            />
+            <div class="form-group">
+                <!-- Radio group !-->
                 <label class="control-label">Folgende Informationen mit einbeziehen:</label>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="includePastor" value="1" v-model="includePastor" >
-                    <label class="form-check-label" for="includePastor">{{ globalLabels.pastor}}</label>
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="includePastor"
+                        value="1"
+                        v-model="includePastor"
+                    />
+                    <label
+                        class="form-check-label"
+                        for="includePastor"
+                        >{{ globalLabels.pastor }}</label
+                    >
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="includeOrganist" value="1" v-model="includeOrganist" >
-                    <label class="form-check-label" for="includeOrganist">{{ globalLabels.organist }}</label>
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="includeOrganist"
+                        value="1"
+                        v-model="includeOrganist"
+                    />
+                    <label
+                        class="form-check-label"
+                        for="includeOrganist"
+                        >{{ globalLabels.organist }}</label
+                    >
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="includeSacristan" value="1" v-model="includeSacristan" >
-                    <label class="form-check-label" for="includeSacristan">{{ globalLabels.sacristan }}</label>
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="includeSacristan"
+                        value="1"
+                        v-model="includeSacristan"
+                    />
+                    <label
+                        class="form-check-label"
+                        for="includeSacristan"
+                        >{{ globalLabels.sacristan }}</label
+                    >
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="includeDescription" value="1" v-model="includeDescription" >
-                    <label class="form-check-label" for="includeDescription">Besonderheiten</label>
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="includeDescription"
+                        value="1"
+                        v-model="includeDescription"
+                    />
+                    <label
+                        class="form-check-label"
+                        for="includeDescription"
+                        >Besonderheiten</label
+                    >
                 </div>
             </div>
-            <form-textarea name="notes1" label="Hinweise vor der Übersicht der Gottesdienste" v-model="myNotes1" />
-            <form-textarea name="notes2" label="Hinweise nach der Übersicht der Gottesdienste" v-model="myNotes2" />
-            <form-check name="includeContact" v-model="myIncludeContact" label="Meine Kontaktdaten für weitere Informationen mit aufnehmen" />
+            <form-textarea
+                name="notes1"
+                label="Hinweise vor der Übersicht der Gottesdienste"
+                v-model="myNotes1"
+            />
+            <form-textarea
+                name="notes2"
+                label="Hinweise nach der Übersicht der Gottesdienste"
+                v-model="myNotes2"
+            />
+            <form-check
+                name="includeContact"
+                v-model="myIncludeContact"
+                label="Meine Kontaktdaten für weitere Informationen mit aufnehmen"
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
-import FormTextarea from "../../../components/Ui/forms/FormTextarea";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDatePicker from '../../../components/Ui/forms/FormDatePicker'
+import FormTextarea from '../../../components/Ui/forms/FormTextarea'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['locations'],
-    components: {FormCheck, FormTextarea, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {
+        FormCheck,
+        FormTextarea,
+        FormDatePicker,
+        FormInput,
+        FormCsrfToken,
+        FormSelectize,
+        SaveButton,
+    },
     data() {
-        let quarters = [];
-        for (let year=moment().year(); year<=moment().year()+4; year++) {
+        let quarters = []
+        for (let year = moment().year(); year <= moment().year() + 4; year++) {
             for (let q = 1; q <= 4; q++) {
-                let qStart = String(year) + '-' + String((q - 1) * 3 + 1).padStart(2,'0') + '-01'
-                if (moment(qStart) >= moment()) quarters.push({
-                    id: qStart,
-                    name: String(year) + ' / ' + String(q),
-                });
+                let qStart = String(year) + '-' + String((q - 1) * 3 + 1).padStart(2, '0') + '-01'
+                if (moment(qStart) >= moment())
+                    quarters.push({
+                        id: qStart,
+                        name: String(year) + ' / ' + String(q),
+                    })
             }
         }
 
@@ -107,7 +191,7 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'quarterlyEvents'}), {
+            submitReportForm(route('reports.render', { report: 'quarterlyEvents' }), {
                 title: this.myTitle,
                 location: this.myLocation,
                 quarter: this.myQuarter,
@@ -118,12 +202,10 @@ export default {
                 notes1: this.myNotes1,
                 notes2: this.myNotes2,
                 includeContact: this.myIncludeContact,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -29,37 +29,42 @@
 <template>
     <admin-layout title="Benutzer zusammenführen'">
         <template v-slot:navbar-left>
-            <save-button label="Zusammenführen" @click="doJoin" />
+            <save-button
+                label="Zusammenführen"
+                @click="doJoin"
+            />
         </template>
-        <form-selectize :options="people" v-model="record.user2" name="user2"
-                        :label="'Alle Daten für Benutzer '+user.name+' umschreiben auf:'" />
+        <form-selectize
+            :options="people"
+            v-model="record.user2"
+            name="user2"
+            :label="'Alle Daten für Benutzer ' + user.name + ' umschreiben auf:'"
+        />
     </admin-layout>
 </template>
 
 <script>
-import PeopleSelect from "../../../components/Ui/elements/PeopleSelect";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
+import PeopleSelect from '../../../components/Ui/elements/PeopleSelect'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
 export default {
-    name: "Join",
-    components: {SaveButton, FormSelectize, PeopleSelect},
+    name: 'Join',
+    components: { SaveButton, FormSelectize, PeopleSelect },
     props: ['user', 'people'],
     data() {
         return {
             record: {
                 user1: this.user.id,
                 user2: '',
-            }
+            },
         }
     },
     methods: {
         doJoin() {
-            this.$inertia.post(route('user.join.finalize', this.record));
-        }
-    }
+            this.$inertia.post(route('user.join.finalize', this.record))
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -27,10 +27,7 @@
  */
 
 export class CalendarNewSortOrderEvent {
-
-    constructor(list){
+    constructor(list) {
         this.list = list
     }
-
 }
-

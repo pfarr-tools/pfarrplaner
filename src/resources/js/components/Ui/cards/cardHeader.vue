@@ -32,10 +32,8 @@
 
 <script>
 export default {
-    name: "cardHeader"
+    name: 'cardHeader',
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

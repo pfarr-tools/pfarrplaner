@@ -28,13 +28,18 @@
 
 <template>
     <div>
-        <span v-for="city in allCities" class="badge me-1" :class="city.badge" >{{ city.name }}</span>
+        <span
+            v-for="city in allCities"
+            class="badge me-1"
+            :class="city.badge"
+            >{{ city.name }}</span
+        >
     </div>
 </template>
 
 <script>
 export default {
-    name: "CitiesWithAccess",
+    name: 'CitiesWithAccess',
     props: ['user'],
     data() {
         return {
@@ -43,31 +48,35 @@ export default {
     },
     computed: {
         allCities() {
-            let cities = {};
-            this.user.admin_cities.forEach(city => {
-                if (undefined == cities[city.name]) cities[city.name] = {name: city.name, badge: 'bg-admin', id: city.id};
-            });
-            this.user.writable_cities.forEach(city => {
-                if (undefined == cities[city.name]) cities[city.name] = {name: city.name, badge: 'bg-success', id: city.id};
-            });
-            this.user.cities.forEach(city => {
-                if (undefined == cities[city.name]) cities[city.name] = {name: city.name, badge: 'bg-warning', id: city.id};
-            });
-            if (this.$page.props.currentUser.data.isAdmin) return cities;
+            let cities = {}
+            this.user.admin_cities.forEach((city) => {
+                if (undefined == cities[city.name])
+                    cities[city.name] = { name: city.name, badge: 'bg-admin', id: city.id }
+            })
+            this.user.writable_cities.forEach((city) => {
+                if (undefined == cities[city.name])
+                    cities[city.name] = { name: city.name, badge: 'bg-success', id: city.id }
+            })
+            this.user.cities.forEach((city) => {
+                if (undefined == cities[city.name])
+                    cities[city.name] = { name: city.name, badge: 'bg-warning', id: city.id }
+            })
+            if (this.$page.props.currentUser.data.isAdmin) return cities
 
-            let filteredCities = [];
+            let filteredCities = []
             for (const cityIndex in cities) {
-                if (this.visibleCities.includes(cities[cityIndex].id)) filteredCities.push(cities[cityIndex]);
+                if (this.visibleCities.includes(cities[cityIndex].id))
+                    filteredCities.push(cities[cityIndex])
             }
-            return filteredCities;
-        }
-    }
+            return filteredCities
+        },
+    },
 }
 </script>
 
 <style scoped>
-    .bg-admin {
-        background-color: purple;
-        color: white;
-    }
+.bg-admin {
+    background-color: purple;
+    color: white;
+}
 </style>

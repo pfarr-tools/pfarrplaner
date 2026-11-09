@@ -27,11 +27,19 @@
   -->
 
 <template>
-    <form-group :id="myId" :input-id="`${myId}Input`" :label="label" :help="help" :name="name"
-                :pre-label="preLabel" :is-checked-item="isCheckedItem" v-slot="field">
+    <form-group
+        :id="myId"
+        :input-id="`${myId}Input`"
+        :label="label"
+        :help="help"
+        :name="name"
+        :pre-label="preLabel"
+        :is-checked-item="isCheckedItem"
+        v-slot="field"
+    >
         <Multiselect
             :id="field.fieldId"
-            :class="{'is-invalid': field.error}"
+            :class="{ 'is-invalid': field.error }"
             v-model="myValue"
             :options="resolvedOptions"
             :value-prop="resolvedIdKey"
@@ -53,24 +61,42 @@
             :group-options="isGrouped ? '_groupOptions' : undefined"
             @change="changed"
         >
-            <template v-if="$slots.option" #option="slotProps">
-                <slot name="option" v-bind="slotProps" />
+            <template
+                v-if="$slots.option"
+                #option="slotProps"
+            >
+                <slot
+                    name="option"
+                    v-bind="slotProps"
+                />
             </template>
-            <template v-if="$slots.singlelabel" #singlelabel="slotProps">
-                <slot name="singlelabel" v-bind="slotProps" />
+            <template
+                v-if="$slots.singlelabel"
+                #singlelabel="slotProps"
+            >
+                <slot
+                    name="singlelabel"
+                    v-bind="slotProps"
+                />
             </template>
-            <template v-if="$slots.tag" #tag="slotProps">
-                <slot name="tag" v-bind="slotProps" />
+            <template
+                v-if="$slots.tag"
+                #tag="slotProps"
+            >
+                <slot
+                    name="tag"
+                    v-bind="slotProps"
+                />
             </template>
         </Multiselect>
     </form-group>
 </template>
 
 <script>
-import FormGroup from './FormGroup';
-import Multiselect from '@vueform/multiselect';
-import '@vueform/multiselect/themes/default.css';
-import { uid } from '../../../libraries/uid';
+import FormGroup from './FormGroup'
+import Multiselect from '@vueform/multiselect'
+import '@vueform/multiselect/themes/default.css'
+import { uid } from '../../../libraries/uid'
 
 export default {
     name: 'FormSelectize',
@@ -99,74 +125,89 @@ export default {
     },
     emits: ['input', 'update:modelValue'],
     data() {
-        const initialValue = this.modelValue !== undefined ? this.modelValue : this.value;
+        const initialValue = this.modelValue !== undefined ? this.modelValue : this.value
         return {
             myId: this.id || uid(),
             myValue: this.normalizeValue(initialValue),
-        };
+        }
     },
     computed: {
         resolvedIdKey() {
-            if (this.settings && this.settings.valueField) return this.settings.valueField;
-            return this.idKey || 'id';
+            if (this.settings && this.settings.valueField) return this.settings.valueField
+            return this.idKey || 'id'
         },
         resolvedTitleKey() {
-            if (this.settings && this.settings.labelField) return this.settings.labelField;
-            return this.titleKey || 'name';
+            if (this.settings && this.settings.labelField) return this.settings.labelField
+            return this.titleKey || 'name'
         },
         isGrouped() {
-            return !!(this.settings && this.settings.optgroupField);
+            return !!(this.settings && this.settings.optgroupField)
         },
         hasNativeSupport() {
-            return !!this.name;
+            return !!this.name
         },
         resolvedOptions() {
-            let opts = [];
-            if (this.options && this.options.length > 0) opts = this.options;
-            else if (this.items && this.items.length > 0) opts = this.items;
-            else if (this.settings && this.settings.options) opts = this.settings.options;
+            let opts = []
+            if (this.options && this.options.length > 0) opts = this.options
+            else if (this.items && this.items.length > 0) opts = this.items
+            else if (this.settings && this.settings.options) opts = this.settings.options
 
             if (!this.isGrouped) {
                 if (this.settings && this.settings.allowEmptyOption) {
-                    const emptyLabel = this.settings.emptyOptionLabel || '';
-                    opts = [{ [this.resolvedIdKey]: null, [this.resolvedTitleKey]: emptyLabel }, ...opts];
+                    const emptyLabel = this.settings.emptyOptionLabel || ''
+                    opts = [
+                        { [this.resolvedIdKey]: null, [this.resolvedTitleKey]: emptyLabel },
+                        ...opts,
+                    ]
                 }
-                return opts;
+                return opts
             }
 
-            const { optgroupField, optgroupLabelField, optgroupValueField, optgroups = [] } = this.settings;
-            const groups = optgroups.map(group => ({
+            const {
+                optgroupField,
+                optgroupLabelField,
+                optgroupValueField,
+                optgroups = [],
+            } = this.settings
+            const groups = optgroups.map((group) => ({
                 _groupLabel: group[optgroupLabelField],
-                _groupOptions: opts.filter(item => item[optgroupField] === group[optgroupValueField]),
-            }));
+                _groupOptions: opts.filter(
+                    (item) => item[optgroupField] === group[optgroupValueField],
+                ),
+            }))
 
             if (this.settings.allowEmptyOption) {
-                const emptyLabel = this.settings.emptyOptionLabel || '';
+                const emptyLabel = this.settings.emptyOptionLabel || ''
                 groups.unshift({
                     _groupLabel: '',
-                    _groupOptions: [{ [this.resolvedIdKey]: null, [this.resolvedTitleKey]: emptyLabel }],
-                });
+                    _groupOptions: [
+                        { [this.resolvedIdKey]: null, [this.resolvedTitleKey]: emptyLabel },
+                    ],
+                })
             }
 
-            return groups;
+            return groups
         },
     },
     watch: {
-        value(v) { this.myValue = this.normalizeValue(v); },
-        modelValue(v) { this.myValue = this.normalizeValue(v); },
+        value(v) {
+            this.myValue = this.normalizeValue(v)
+        },
+        modelValue(v) {
+            this.myValue = this.normalizeValue(v)
+        },
     },
     methods: {
         normalizeValue(value) {
-            if (this.multiple) return Array.isArray(value) ? value : [];
-            return value;
+            if (this.multiple) return Array.isArray(value) ? value : []
+            return value
         },
         changed(newVal) {
-            this.$emit('input', newVal);
-            this.$emit('update:modelValue', newVal);
+            this.$emit('input', newVal)
+            this.$emit('update:modelValue', newVal)
         },
     },
-};
+}
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

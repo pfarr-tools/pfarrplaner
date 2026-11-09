@@ -31,7 +31,8 @@
         <div class="calendar-settings-section">
             <div class="calendar-settings-heading">Angezeigte Gemeinden</div>
             <p class="calendar-settings-copy">
-                Ziehen Sie Gemeinden zwischen den Listen, um Spalten ein- oder auszublenden und ihre Reihenfolge festzulegen.
+                Ziehen Sie Gemeinden zwischen den Listen, um Spalten ein- oder auszublenden und ihre
+                Reihenfolge festzulegen.
             </p>
             <calendar-control-city-sort :cities="cities" />
         </div>
@@ -41,14 +42,27 @@
             <button
                 type="button"
                 class="calendar-settings-toggle"
-                :class="mySettings.show_cc_details ? 'calendar-settings-toggle-active' : 'calendar-settings-toggle-inactive'"
+                :class="
+                    mySettings.show_cc_details
+                        ? 'calendar-settings-toggle-active'
+                        : 'calendar-settings-toggle-inactive'
+                "
                 @click="toggleChildChurchDetails"
             >
-                <span class="calendar-settings-toggle-icon mdi"
-                      :class="mySettings.show_cc_details ? 'mdi-check-circle' : 'mdi-checkbox-blank-circle-outline'"></span>
+                <span
+                    class="calendar-settings-toggle-icon mdi"
+                    :class="
+                        mySettings.show_cc_details
+                            ? 'mdi-check-circle'
+                            : 'mdi-checkbox-blank-circle-outline'
+                    "
+                ></span>
                 <span class="calendar-settings-toggle-body">
                     <strong>Details zur Kinderkirche anzeigen</strong>
-                    <small>Thema, Ort und Mitarbeitende direkt in der Gottesdienst-Kachel einblenden</small>
+                    <small
+                        >Thema, Ort und Mitarbeitende direkt in der Gottesdienst-Kachel
+                        einblenden</small
+                    >
                 </span>
             </button>
         </div>
@@ -56,7 +70,7 @@
 </template>
 
 <script>
-import CalendarControlCitySort from "../Control/CitySort.vue";
+import CalendarControlCitySort from '../Control/CitySort.vue'
 
 export default {
     name: 'CalendarNavControlSidebar',
@@ -73,17 +87,17 @@ export default {
     },
     methods: {
         setSetting(key, value) {
-            this.$emit('setSetting', {key, value});
-            axios.post(route('setting.set', {user: this.user.id, key: key}), {
+            this.$emit('setSetting', { key, value })
+            axios.post(route('setting.set', { user: this.user.id, key: key }), {
                 value: value,
-            });
+            })
         },
         toggleChildChurchDetails() {
-            const nextValue = !this.mySettings.show_cc_details;
-            this.mySettings.show_cc_details = nextValue;
-            this.setSetting('show_cc_details', nextValue);
-        }
-    }
+            const nextValue = !this.mySettings.show_cc_details
+            this.mySettings.show_cc_details = nextValue
+            this.setSetting('show_cc_details', nextValue)
+        },
+    },
 }
 </script>
 
@@ -125,7 +139,10 @@ export default {
     border: 1px solid transparent;
     border-radius: 0;
     text-align: left;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
 }
 
 .calendar-settings-toggle-active {

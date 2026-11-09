@@ -29,25 +29,44 @@
 <template>
     <admin-layout title="Opferplan bearbeiten">
         <template #navbar-left>
-            <nav-button type="primary" title="Opferplan anzeigen" icon="mdi mdi-table"
-                        @click="showTable">Plan anzeigen</nav-button>
+            <nav-button
+                type="primary"
+                title="Opferplan anzeigen"
+                icon="mdi mdi-table"
+                @click="showTable"
+                >Plan anzeigen</nav-button
+            >
         </template>
-        <form-selectize label="Opferplan für folgende Kirchengemeinden bearbeiten" :options="cities"
-                        v-model="setup.cities" name="cities" multiple />
-        <form-selectize label="Auf folgende Orte beschränken" placeholder="Leer lassen für alle Orte"
-                        v-model="setup.locations" :options="locations" multiple />
-        <date-range-input label="Zeitraum" :model-value="dateRange" @update:modelValue="onDateRangeChange" />
+        <form-selectize
+            label="Opferplan für folgende Kirchengemeinden bearbeiten"
+            :options="cities"
+            v-model="setup.cities"
+            name="cities"
+            multiple
+        />
+        <form-selectize
+            label="Auf folgende Orte beschränken"
+            placeholder="Leer lassen für alle Orte"
+            v-model="setup.locations"
+            :options="locations"
+            multiple
+        />
+        <date-range-input
+            label="Zeitraum"
+            :model-value="dateRange"
+            @update:modelValue="onDateRangeChange"
+        />
     </admin-layout>
 </template>
 
 <script>
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-import LocationSelect from "../../../components/Ui/elements/LocationSelect";
-import DateRangeInput from "../../../components/Ui/elements/DateRangeInput";
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import NavButton from '../../../components/Ui/buttons/NavButton'
+import LocationSelect from '../../../components/Ui/elements/LocationSelect'
+import DateRangeInput from '../../../components/Ui/elements/DateRangeInput'
 export default {
-    name: "Setup",
-    components: {DateRangeInput, LocationSelect, NavButton, FormSelectize},
+    name: 'Setup',
+    components: { DateRangeInput, LocationSelect, NavButton, FormSelectize },
     props: ['cities', 'locations'],
     data() {
         return {
@@ -56,7 +75,7 @@ export default {
                 to: moment().endOf('year').format('DD.MM.YYYY'),
                 cities: this.cities.length ? [this.cities[0].id] : null,
                 locations: [],
-            }
+            },
         }
     },
     computed: {
@@ -64,23 +83,21 @@ export default {
             return [
                 this.setup.from ? moment(this.setup.from, 'DD.MM.YYYY') : null,
                 this.setup.to ? moment(this.setup.to, 'DD.MM.YYYY') : null,
-            ];
+            ]
         },
     },
     methods: {
         onDateRangeChange(val) {
             if (val && val.length === 2 && val[1]) {
-                this.setup.from = moment(val[0]).format('DD.MM.YYYY');
-                this.setup.to = moment(val[1]).format('DD.MM.YYYY');
+                this.setup.from = moment(val[0]).format('DD.MM.YYYY')
+                this.setup.to = moment(val[1]).format('DD.MM.YYYY')
             }
         },
         showTable() {
-            this.$inertia.post(route('inputs.input', 'offerings'), this.setup);
-        }
-    }
+            this.$inertia.post(route('inputs.input', 'offerings'), this.setup)
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

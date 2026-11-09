@@ -29,64 +29,108 @@
 <template>
     <admin-layout title="Kirchliche Nachrichten erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Kirchliche Nachrichten erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Kirchliche Nachrichten erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'billBoard'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'billBoard' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="cities[]" label="Kirchliche Nachrichten für folgende Kirchengemeinden erstellen" v-model="myCities"
-                            @input="setParishes" multiple
-                            :options="cities" />
-            <form-check name="printHeaders" label="Kopfzeilen drucken" v-model="printHeaders" />
-            <form-input name="altCity" label="Alternative Ortsbezeichnung" v-model="altCity" />
-            <form-date-picker name="start" label="Gottesdienste ab" v-model="myStart" iso-date />
-            <form-selectize name="parishes[]" label="Folgende Pfarrämter mit einbeziehen"
-                            v-model="myParishes" :key="'parish_'+cityUpdated"
-                            @input="setPastors"
-                            :options="availableParishes" multiple />
-            <people-select name="pastors[]" label="Urlaub für folgende Pfarrer:innen mit einbeziehen"
-                           v-model="myPastors" :key="'pastors_'+parishUpdated" :allow-create="false"
-                           :people="availablePastors" multiple />
+            <form-selectize
+                name="cities[]"
+                label="Kirchliche Nachrichten für folgende Kirchengemeinden erstellen"
+                v-model="myCities"
+                @input="setParishes"
+                multiple
+                :options="cities"
+            />
+            <form-check
+                name="printHeaders"
+                label="Kopfzeilen drucken"
+                v-model="printHeaders"
+            />
+            <form-input
+                name="altCity"
+                label="Alternative Ortsbezeichnung"
+                v-model="altCity"
+            />
+            <form-date-picker
+                name="start"
+                label="Gottesdienste ab"
+                v-model="myStart"
+                iso-date
+            />
+            <form-selectize
+                name="parishes[]"
+                label="Folgende Pfarrämter mit einbeziehen"
+                v-model="myParishes"
+                :key="'parish_' + cityUpdated"
+                @input="setPastors"
+                :options="availableParishes"
+                multiple
+            />
+            <people-select
+                name="pastors[]"
+                label="Urlaub für folgende Pfarrer:innen mit einbeziehen"
+                v-model="myPastors"
+                :key="'pastors_' + parishUpdated"
+                :allow-create="false"
+                :people="availablePastors"
+                multiple
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
-import PeopleSelect from "../../../components/Ui/elements/PeopleSelect.vue";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDatePicker from '../../../components/Ui/forms/FormDatePicker'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
+import PeopleSelect from '../../../components/Ui/elements/PeopleSelect.vue'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'parishes'],
-    components: {PeopleSelect, FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {
+        PeopleSelect,
+        FormCheck,
+        FormDatePicker,
+        FormInput,
+        FormCsrfToken,
+        FormSelectize,
+        SaveButton,
+    },
     computed: {
         availableParishes() {
-            let p = [];
-            this.myCities.forEach(city => p = p.concat(this.parishes[city]));
-            return p;
+            let p = []
+            this.myCities.forEach((city) => (p = p.concat(this.parishes[city])))
+            return p
         },
         availablePastors() {
-            let p = [];
-            this.availableParishes.forEach(parish => p.push(...parish.users));
-            return p;
+            let p = []
+            this.availableParishes.forEach((parish) => p.push(...parish.users))
+            return p
         },
     },
     data() {
-        let myStart = moment().startOf('isoWeek').add(6, 'days');
+        let myStart = moment().startOf('isoWeek').add(6, 'days')
 
-        let presets = this.$page.props.settings['reports_billboard_presets'] || {};
-        console.log('presets from setting', presets);
-        presets.cities = presets.cities || [];
-        presets.parishes = presets.parishes || [];
-        presets.pastors = presets.pastors || [];
-        presets.altCity = presets.altCity || '';
-        presets.printHeaders = presets.printHeaders || false;
-        console.log('presets normalized', presets);
-
+        let presets = this.$page.props.settings['reports_billboard_presets'] || {}
+        console.log('presets from setting', presets)
+        presets.cities = presets.cities || []
+        presets.parishes = presets.parishes || []
+        presets.pastors = presets.pastors || []
+        presets.altCity = presets.altCity || ''
+        presets.printHeaders = presets.printHeaders || false
+        console.log('presets normalized', presets)
 
         return {
             myCities: presets.cities,
@@ -100,33 +144,31 @@ export default {
         }
     },
     mounted() {
-        this.$forceUpdate();
-        this.setParishes(this.myCity);
+        this.$forceUpdate()
+        this.setParishes(this.myCity)
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'billBoard'}), {
+            submitReportForm(route('reports.render', { report: 'billBoard' }), {
                 cities: this.myCities,
                 altCity: this.altCity,
                 start: this.myStart,
                 parishes: this.myParishes,
                 pastors: this.myPastors,
                 printHeaders: this.printHeaders,
-            });
+            })
         },
         setParishes(e) {
-            this.myParishes = this.availableParishes.map(({id}) => id);
-            this.cityUpdated++;
-            this.setPastors(this.myParishes);
+            this.myParishes = this.availableParishes.map(({ id }) => id)
+            this.cityUpdated++
+            this.setPastors(this.myParishes)
         },
         setPastors(e) {
-            this.myPastors = this.availablePastors.map(({id}) => id);
-            this.parishUpdated++;
+            this.myPastors = this.availablePastors.map(({ id }) => id)
+            this.parishUpdated++
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

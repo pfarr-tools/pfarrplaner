@@ -27,14 +27,14 @@
   -->
 
 <script>
-import NavButton from "../Ui/buttons/NavButton.vue";
-import {Dataset, DatasetItem, DatasetSearch} from "vue-dataset";
-import DatasetInfo from "../Ui/dataset/DatasetInfo.vue";
-import DatasetPager from "../Ui/dataset/DatasetPager.vue";
-import DatasetShow from "../Ui/dataset/DatasetShow.vue";
+import NavButton from '../Ui/buttons/NavButton.vue'
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../Ui/dataset/DatasetInfo.vue'
+import DatasetPager from '../Ui/dataset/DatasetPager.vue'
+import DatasetShow from '../Ui/dataset/DatasetShow.vue'
 
 export default {
-    name: "ModelIndexPage",
+    name: 'ModelIndexPage',
     components: {
         NavButton,
         Dataset,
@@ -42,34 +42,48 @@ export default {
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     props: ['title', 'records', 'canCreate', 'createLabel', 'createRouteName', 'modelLabel'],
     methods: {
         deleteRecord(row) {
-            if (!row.canDelete) return;
-            if (!row.deleteRoute) return;
-            if (!confirm('Willst du diesen Eintrag wirklich unwiderruflich löschen?')) return;
-            this.$inertia.delete(row.deleteRoute);
-        }
-    }
+            if (!row.canDelete) return
+            if (!row.deleteRoute) return
+            if (!confirm('Willst du diesen Eintrag wirklich unwiderruflich löschen?')) return
+            this.$inertia.delete(row.deleteRoute)
+        },
+    },
 }
 </script>
 
 <template>
     <admin-layout :title="title">
         <template v-slot:navbar-left>
-            <nav-button v-if="canCreate"
-                        type="success" icon="mdi mdi-plus" :title="createLabel+' hinzufügen'"
-                        :href="route(createRouteName)">{{ createLabel }}</nav-button>
+            <nav-button
+                v-if="canCreate"
+                type="success"
+                icon="mdi mdi-plus"
+                :title="createLabel + ' hinzufügen'"
+                :href="route(createRouteName)"
+                >{{ createLabel }}</nav-button
+            >
         </template>
-        <dataset v-slot="{ ds }"
-                 :ds-data="records"
-                 ds-sort-by="name"
-                 :ds-search-in="['name']">
-            <div class="row mb-3" :data-page-count="ds.dsPagecount">
+        <dataset
+            v-slot="{ ds }"
+            :ds-data="records"
+            ds-sort-by="name"
+            :ds-search-in="['name']"
+        >
+            <div
+                class="row mb-3"
+                :data-page-count="ds.dsPagecount"
+            >
                 <div class="col-md-6 mb-2 mb-md-0">
-                    <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
+                    <dataset-search
+                        ds-search-placeholder="Suchen..."
+                        ref="search"
+                        autofocus
+                    />
                 </div>
                 <div class="col-md-5 text-end">
                     <dataset-show class="float-right" />
@@ -80,29 +94,46 @@ export default {
                     <div class="table-responsive">
                         <table class="table table-striped table-hover d-md-table">
                             <thead>
-                            <tr>
-                                <slot name="table-header-label-column">
-                                    <th>{{ modelLabel }}</th>
-                                </slot>
-                                <slot name="table-header-additional-columns" />
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <slot name="table-header-label-column">
+                                        <th>{{ modelLabel }}</th>
+                                    </slot>
+                                    <slot name="table-header-additional-columns" />
+                                    <th></th>
+                                </tr>
                             </thead>
                             <dataset-item tag="tbody">
                                 <template #default="{ row, rowIndex }">
                                     <tr>
-                                        <slot name="table-row-label-column" v-bind:row="row">
+                                        <slot
+                                            name="table-row-label-column"
+                                            v-bind:row="row"
+                                        >
                                             <td>{{ row.label }}</td>
                                         </slot>
-                                        <slot name="table-row-additional-columns" v-bind:row="row" />
+                                        <slot
+                                            name="table-row-additional-columns"
+                                            v-bind:row="row"
+                                        />
                                         <td class="text-end">
-                                            <inertia-link v-if="row.editRoute && row.canEdit" class="btn btn-sm btn-primary" title="Eintrag bearbeiten"
-                                                          :href="row.editRoute">
+                                            <inertia-link
+                                                v-if="row.editRoute && row.canEdit"
+                                                class="btn btn-sm btn-primary"
+                                                title="Eintrag bearbeiten"
+                                                :href="row.editRoute"
+                                            >
                                                 <span class="mdi mdi-pencil"></span>
                                             </inertia-link>
-                                            <slot name="table-row-action-buttons" v-bind:row="row" />
-                                            <button v-if="row.deleteRoute && row.canDelete" class="btn  btn-sm btn-danger ms-1" title="Eintrag löschen"
-                                                    @click="deleteRecord(row)">
+                                            <slot
+                                                name="table-row-action-buttons"
+                                                v-bind:row="row"
+                                            />
+                                            <button
+                                                v-if="row.deleteRoute && row.canDelete"
+                                                class="btn btn-sm btn-danger ms-1"
+                                                title="Eintrag löschen"
+                                                @click="deleteRecord(row)"
+                                            >
                                                 <span class="mdi mdi-delete"></span>
                                             </button>
                                         </td>
@@ -113,14 +144,14 @@ export default {
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
+            <div
+                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+            >
+                <dataset-info class="mb-2 mb-md-0" />
+                <dataset-pager />
             </div>
         </dataset>
     </admin-layout>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

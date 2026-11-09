@@ -31,45 +31,53 @@
         <span v-if="liturgy.Bezeichnung">
             {{ liturgy.Bezeichnung }}
         </span>
-        <span v-if="service.isAlternateProprium"
-              class="mdi mdi-calendar text-warning"
-              :title="'In den Gottesdiensteinstellungen wurde ein vom normalen Kalender abweichendes Proprium festgelegt.'">
-            </span>
+        <span
+            v-if="service.isAlternateProprium"
+            class="mdi mdi-calendar text-warning"
+            :title="'In den Gottesdiensteinstellungen wurde ein vom normalen Kalender abweichendes Proprium festgelegt.'"
+        >
+        </span>
         <div v-if="liturgy.Predigt">
             <bible-reference :perikope="liturgy.Predigt" />
         </div>
         <div>
-            <span class="mdi mdi-view-list indicator" :class="{'indicator-active' :service.hasLiturgy }"
-                  :title="(service.hasLiturgy ? '' : 'keine ')+'Liturgie vorhanden'"></span>
-            <span class="mdi mdi-microphone indicator"  :class="{'indicator-active' :service.hasSermon }"
-                  :title="(service.hasSermon ? '' : 'keine ')+'Predigt vorhanden'"></span>
+            <span
+                class="mdi mdi-view-list indicator"
+                :class="{ 'indicator-active': service.hasLiturgy }"
+                :title="(service.hasLiturgy ? '' : 'keine ') + 'Liturgie vorhanden'"
+            ></span>
+            <span
+                class="mdi mdi-microphone indicator"
+                :class="{ 'indicator-active': service.hasSermon }"
+                :title="(service.hasSermon ? '' : 'keine ') + 'Predigt vorhanden'"
+            ></span>
         </div>
     </div>
 </template>
 
 <script>
-import BibleReference from "../LiturgyEditor/Elements/BibleReference.vue";
+import BibleReference from '../LiturgyEditor/Elements/BibleReference.vue'
 
 export default {
-    name: "LiturgicalInfo",
-    components: {BibleReference},
+    name: 'LiturgicalInfo',
+    components: { BibleReference },
     props: ['service'],
     data() {
         return {
             liturgy: this.service.liturgicalInfo,
         }
-    }
+    },
 }
 </script>
 
 <style scoped lang="scss">
 @use '../../../sass/theme' as theme;
 
-    .indicator {
-        color: lightgrey;
-    }
+.indicator {
+    color: lightgrey;
+}
 
-    .indicator-active {
-        color: theme.theme-color("secondary");
-    }
+.indicator-active {
+    color: theme.theme-color('secondary');
+}
 </style>

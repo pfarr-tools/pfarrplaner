@@ -27,17 +27,18 @@
   -->
 
 <template>
-    <ul class="nav nav-tabs" role="tablist">
+    <ul
+        class="nav nav-tabs"
+        role="tablist"
+    >
         <slot />
     </ul>
 </template>
 
 <script>
 export default {
-    name: "tabHeaders"
+    name: 'tabHeaders',
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

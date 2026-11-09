@@ -30,35 +30,62 @@
     <div class="profile-tab">
         <div class="row">
             <div class="col-md-8">
-                <form-input name="first_name" label="Vorname" v-model="user.first_name" />
-                <form-input name="last_name" label="Nachname" v-model="user.last_name" />
-                <form-input name="email" label="E-Mailadresse" v-model="user.email" />
-                <form-input name="office" label="Pfarramt/Büro" v-model="user.office" />
-                <form-textarea name="address" label="Adresse" v-model="user.address" />
-                <form-input name="phone" label="Telefon" v-model="user.phone" />
+                <form-input
+                    name="first_name"
+                    label="Vorname"
+                    v-model="user.first_name"
+                />
+                <form-input
+                    name="last_name"
+                    label="Nachname"
+                    v-model="user.last_name"
+                />
+                <form-input
+                    name="email"
+                    label="E-Mailadresse"
+                    v-model="user.email"
+                />
+                <form-input
+                    name="office"
+                    label="Pfarramt/Büro"
+                    v-model="user.office"
+                />
+                <form-textarea
+                    name="address"
+                    label="Adresse"
+                    v-model="user.address"
+                />
+                <form-input
+                    name="phone"
+                    label="Telefon"
+                    v-model="user.phone"
+                />
             </div>
             <div class="col-md-4">
-                <form-image-attacher name="image" v-model="user.image" :no-pixabay="true"
-                                     label="Benutzerbild" :allow-uncropped="false"
-                                     :cropper-stencil="{aspectRatio: 1}"
-                                     :attach-route="route('user.attach', {model: user.id})"
-                                     :detach-route="route('user.detach', {model: user.id})"/>
+                <form-image-attacher
+                    name="image"
+                    v-model="user.image"
+                    :no-pixabay="true"
+                    label="Benutzerbild"
+                    :allow-uncropped="false"
+                    :cropper-stencil="{ aspectRatio: 1 }"
+                    :attach-route="route('user.attach', { model: user.id })"
+                    :detach-route="route('user.detach', { model: user.id })"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import FormInput from "../../Ui/forms/FormInput";
-import FormTextarea from "../../Ui/forms/FormTextarea";
-import FormImageAttacher from "../../Ui/forms/FormImageAttacher.vue";
+import FormInput from '../../Ui/forms/FormInput'
+import FormTextarea from '../../Ui/forms/FormTextarea'
+import FormImageAttacher from '../../Ui/forms/FormImageAttacher.vue'
 export default {
-    name: "ProfileTab",
+    name: 'ProfileTab',
     props: ['user'],
-    components: {FormImageAttacher, FormTextarea, FormInput}
+    components: { FormImageAttacher, FormTextarea, FormInput },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

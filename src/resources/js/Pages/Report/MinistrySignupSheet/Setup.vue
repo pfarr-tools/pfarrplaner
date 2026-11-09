@@ -29,28 +29,53 @@
 <template>
     <admin-layout title="Leeren Dienstplan für einen Dienst erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Leeren Dienstplan für einen Dienst erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Leeren Dienstplan für einen Dienst erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'ministrySignupSheet'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'ministrySignupSheet' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="cities[]" label="Plan für folgende Kirchengemeinden erstellen" :options="cities" v-model="myCities" multiple />
-            <form-selectize name="ministries[]" label="Plan für folgende Dienste erstellen" :options="ministries" v-model="myMinistries" multiple/>
-            <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
+            <form-selectize
+                name="cities[]"
+                label="Plan für folgende Kirchengemeinden erstellen"
+                :options="cities"
+                v-model="myCities"
+                multiple
+            />
+            <form-selectize
+                name="ministries[]"
+                label="Plan für folgende Dienste erstellen"
+                :options="ministries"
+                v-model="myMinistries"
+                multiple
+            />
+            <form-date-range-picker
+                label="Gottesdienste von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'ministries'],
-    components: {FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: { FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton },
     data() {
         return {
             myUser: this.$page.props.currentUser.data.id,
@@ -62,17 +87,15 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'ministrySignupSheet'}), {
+            submitReportForm(route('reports.render', { report: 'ministrySignupSheet' }), {
                 cities: this.myCities,
                 ministries: this.myMinistries,
                 start: this.myStart,
                 end: this.myEnd,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

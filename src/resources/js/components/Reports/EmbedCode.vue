@@ -30,27 +30,42 @@
     <admin-layout :title="title">
         <div class="row">
             <div class="col-md-6">
-                <p>So bindest du die gewünschte Tabelle in eine TYPO3-Website (Gemeindebaukasten) ein:</p>
+                <p>
+                    So bindest du die gewünschte Tabelle in eine TYPO3-Website (Gemeindebaukasten)
+                    ein:
+                </p>
                 <ol>
-                    <li>Lege ein neues Inhaltselement auf der gewünschten Seite an.
-                        <br/>
-                        <img src="/img/typo3/new-element.png"/>
-                        <br/>
+                    <li>
+                        Lege ein neues Inhaltselement auf der gewünschten Seite an.
+                        <br />
+                        <img src="/img/typo3/new-element.png" />
+                        <br />
                     </li>
 
-                    <li>Wähle den Typ "HTML"
-                        <br/>
-                        <img src="/img/typo3/new-html-element.png"/>
-                        <br/>
+                    <li>
+                        Wähle den Typ "HTML"
+                        <br />
+                        <img src="/img/typo3/new-html-element.png" />
+                        <br />
                     </li>
-                    <li>Kopiere den Code auf der rechten Seite komplett in das Feld "HTML-Code":</li>
+                    <li>
+                        Kopiere den Code auf der rechten Seite komplett in das Feld "HTML-Code":
+                    </li>
                 </ol>
             </div>
             <div class="col-md-6">
-                <form-textarea label="HTML-Code zum Kopieren" v-model="myHtml" rows="20"/>
-                <nav-button type="light" icon="mdi mdi-content-copy" force-icon
-                            @click="copyToClipboard"
-                            title="In die Zwischenablage kopieren">Kopieren
+                <form-textarea
+                    label="HTML-Code zum Kopieren"
+                    v-model="myHtml"
+                    rows="20"
+                />
+                <nav-button
+                    type="light"
+                    icon="mdi mdi-content-copy"
+                    force-icon
+                    @click="copyToClipboard"
+                    title="In die Zwischenablage kopieren"
+                    >Kopieren
                 </nav-button>
             </div>
         </div>
@@ -58,25 +73,22 @@
 </template>
 
 <script>
-
-import FormTextarea from "../Ui/forms/FormTextarea";
-import NavButton from "../Ui/buttons/NavButton";
+import FormTextarea from '../Ui/forms/FormTextarea'
+import NavButton from '../Ui/buttons/NavButton'
 export default {
-    name: "EmbedCode",
-    components: {NavButton, FormTextarea},
+    name: 'EmbedCode',
+    components: { NavButton, FormTextarea },
     props: ['html', 'title'],
     data() {
         return { myHtml: this.html }
     },
     methods: {
         copyToClipboard() {
-            const cb = navigator.clipboard;
-            cb.writeText(this.myHtml).then(result => {});
-        }
+            const cb = navigator.clipboard
+            cb.writeText(this.myHtml).then((result) => {})
+        },
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

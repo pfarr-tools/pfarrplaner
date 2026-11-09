@@ -29,17 +29,31 @@
 <template>
     <admin-layout title="Liederbücher">
         <template v-slot:navbar-left>
-            <nav-button type="success" icon="mdi mdi-plus" title="Neues Liederbuch anlegen" :href="route('admin.songbooks.create')">
+            <nav-button
+                type="success"
+                icon="mdi mdi-plus"
+                title="Neues Liederbuch anlegen"
+                :href="route('admin.songbooks.create')"
+            >
                 Neues Liederbuch
             </nav-button>
         </template>
-        <dataset v-slot="{ ds }"
-                 :ds-data="songbooks"
-                 ds-sort-by="name"
-                 :ds-search-in="['name', 'code']">
-            <div class="row mb-3" :data-page-count="ds.dsPagecount">
+        <dataset
+            v-slot="{ ds }"
+            :ds-data="songbooks"
+            ds-sort-by="name"
+            :ds-search-in="['name', 'code']"
+        >
+            <div
+                class="row mb-3"
+                :data-page-count="ds.dsPagecount"
+            >
                 <div class="col-md-6 mb-2 mb-md-0">
-                    <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
+                    <dataset-search
+                        ds-search-placeholder="Suchen..."
+                        ref="search"
+                        autofocus
+                    />
                 </div>
                 <div class="col-md-5 text-end">
                     <dataset-show class="float-right" />
@@ -50,32 +64,54 @@
                     <div class="table-responsive">
                         <table class="table table-striped table-hover d-md-table">
                             <thead>
-                            <tr>
-                                <th></th>
-                                <th>Kürzel</th>
-                                <th>Titel</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Kürzel</th>
+                                    <th>Titel</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <dataset-item tag="tbody">
                                 <template #default="{ row, rowIndex }">
                                     <tr>
                                         <td>
-                                            <img v-if="row.image"
-                                                 :src="route('image', {path: row.image.replace('attachments/', '')})"
-                                                 class="img-fluid" style="max-width: 3em;" />
+                                            <img
+                                                v-if="row.image"
+                                                :src="
+                                                    route('image', {
+                                                        path: row.image.replace('attachments/', ''),
+                                                    })
+                                                "
+                                                class="img-fluid"
+                                                style="max-width: 3em"
+                                            />
                                         </td>
                                         <td>{{ row.code }}</td>
-                                        <td><div class="text-bold">{{ row.name }}</div>
+                                        <td>
+                                            <div class="text-bold">{{ row.name }}</div>
                                             <div class="text-small">{{ row.description }}</div>
                                         </td>
                                         <td class="text-end">
-                                            <nav-button v-if="row.canEdit" class="btn-sm"
-                                                        type="primary" icon="mdi mdi-pencil" title="Liederbuch bearbeiten"
-                                                        force-icon force-no-text :href="route('admin.songbook.edit', row.id)" />
-                                            <nav-button v-if="row.canDelete" class="btn-sm"
-                                                        type="danger" icon="mdi mdi-delete" title="Liederbuch löschen"
-                                                        force-icon force-no-text @click="deleteSongbook(row)" />
+                                            <nav-button
+                                                v-if="row.canEdit"
+                                                class="btn-sm"
+                                                type="primary"
+                                                icon="mdi mdi-pencil"
+                                                title="Liederbuch bearbeiten"
+                                                force-icon
+                                                force-no-text
+                                                :href="route('admin.songbook.edit', row.id)"
+                                            />
+                                            <nav-button
+                                                v-if="row.canDelete"
+                                                class="btn-sm"
+                                                type="danger"
+                                                icon="mdi mdi-delete"
+                                                title="Liederbuch löschen"
+                                                force-icon
+                                                force-no-text
+                                                @click="deleteSongbook(row)"
+                                            />
                                         </td>
                                     </tr>
                                 </template>
@@ -84,25 +120,25 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
+            <div
+                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+            >
+                <dataset-info class="mb-2 mb-md-0" />
+                <dataset-pager />
             </div>
         </dataset>
     </admin-layout>
 </template>
 
 <script>
-
-import {Dataset, DatasetItem, DatasetSearch,} from 'vue-dataset';
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../../../components/Ui/dataset/DatasetInfo'
+import DatasetShow from '../../../components/Ui/dataset/DatasetShow'
+import DatasetPager from '../../../components/Ui/dataset/DatasetPager'
+import NavButton from '../../../components/Ui/buttons/NavButton'
 
 export default {
-    name: "Index",
+    name: 'Index',
     props: ['songbooks'],
     components: {
         NavButton,
@@ -111,17 +147,15 @@ export default {
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     methods: {
         deleteSongbook(songbook) {
-            if (!confirm('Willst du wirklich das komplette Liederbuch löschen?')) return;
-            this.$inertia.delete(route('admin.songbook.destroy', songbook.id));
-        }
-    }
+            if (!confirm('Willst du wirklich das komplette Liederbuch löschen?')) return
+            this.$inertia.delete(route('admin.songbook.destroy', songbook.id))
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

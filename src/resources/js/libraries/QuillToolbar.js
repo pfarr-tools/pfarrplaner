@@ -38,8 +38,8 @@ export class QuillToolbarItem {
         const me = this
         me.options = options
 
-        me.qlFormatsEl = document.createElement("span")
-        me.qlFormatsEl.className = "ql-formats"
+        me.qlFormatsEl = document.createElement('span')
+        me.qlFormatsEl.className = 'ql-formats'
     }
     /**
      * Attaches this tool to the given Quill Editor instance.
@@ -68,9 +68,11 @@ export class QuillToolbarItem {
      * @param {string} text - The text of which the length should be calculated.
      * @param {string} [font="500 14px 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif"] - The font css that shuold be applied to the text before calculating the width.
      */
-    _getTextWidth(text, font="500 14px 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif") {
-        const canvas = this._getTextWidth.canvas || (this._getTextWidth.canvas = document.createElement("canvas"))
-        const context = canvas.getContext("2d")
+    _getTextWidth(text, font = "500 14px 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif") {
+        const canvas =
+            this._getTextWidth.canvas ||
+            (this._getTextWidth.canvas = document.createElement('canvas'))
+        const context = canvas.getContext('2d')
         context.font = font
         const metrics = context.measureText(text)
         return metrics.width
@@ -81,8 +83,8 @@ export class QuillToolbarItem {
      * @param {string} cssRule - CSS rules
      */
     _addCssRule(cssRule) {
-        const style = document.createElement("style");
-        document.head.appendChild(style);
+        const style = document.createElement('style')
+        document.head.appendChild(style)
         style.sheet.insertRule(cssRule, 0)
     }
     /**
@@ -94,7 +96,6 @@ export class QuillToolbarItem {
         return Math.random().toString().substr(2, 10)
     }
 }
-
 
 /** @class Class representing a dropdown tool for a Quill Editor toolbar. */
 export class QuillToolbarDropDown extends QuillToolbarItem {
@@ -114,25 +115,24 @@ export class QuillToolbarDropDown extends QuillToolbarItem {
 
         me.id = me.options.id || `dropdown-${me._generateId()}`
 
-        const qlPicker = document.createElement("span")
+        const qlPicker = document.createElement('span')
         qlPicker.className = `ql-${me.id} ql-picker`
         me.qlFormatsEl.appendChild(qlPicker)
 
-        const qlPickerLabel = document.createElement("span")
-        qlPickerLabel.className = "ql-picker-label"
+        const qlPickerLabel = document.createElement('span')
+        qlPickerLabel.className = 'ql-picker-label'
         qlPicker.appendChild(qlPickerLabel)
-        qlPickerLabel.addEventListener('click', function(e) {
+        qlPickerLabel.addEventListener('click', function (e) {
             qlPicker.classList.toggle('ql-expanded')
-
         })
-        window.addEventListener('click', function(e){
-            if (!qlPicker.contains(e.target)){
+        window.addEventListener('click', function (e) {
+            if (!qlPicker.contains(e.target)) {
                 qlPicker.classList.remove('ql-expanded')
             }
         })
 
-        const qlPickerOptions = document.createElement("span")
-        qlPickerOptions.className = "ql-picker-options"
+        const qlPickerOptions = document.createElement('span')
+        qlPickerOptions.className = 'ql-picker-options'
         qlPicker.appendChild(qlPickerOptions)
 
         me.dropDownEl = qlPicker
@@ -140,7 +140,7 @@ export class QuillToolbarDropDown extends QuillToolbarItem {
         me.dropDownPickerLabelEl = me.dropDownEl.querySelector('.ql-picker-label')
         me.dropDownPickerLabelEl.innerHTML = `<svg viewBox="0 0 18 18"> <polygon class="ql-stroke" points="7 11 9 13 11 11 7 11"></polygon> <polygon class="ql-stroke" points="7 7 9 5 11 7 7 7"></polygon> </svg>`
 
-        me.setLabel(me.options.label || "")
+        me.setLabel(me.options.label || '')
         me.setItems(me.options.items || {})
 
         me._addCssRule(`
@@ -156,17 +156,15 @@ export class QuillToolbarDropDown extends QuillToolbarItem {
      */
     setItems(items) {
         const me = this
-        for (const [label,value] of Object.entries(items)) {
-            const newItemEl = document.createElement("span")
-            newItemEl.className = "ql-picker-item"
+        for (const [label, value] of Object.entries(items)) {
+            const newItemEl = document.createElement('span')
+            newItemEl.className = 'ql-picker-item'
             newItemEl.innerHTML = label
             newItemEl.setAttribute('data-value', value)
-            newItemEl.onclick = function(e) {
+            newItemEl.onclick = function (e) {
                 me.dropDownEl.classList.remove('ql-expanded')
-                if (me.options.rememberSelection)
-                    me.setLabel(label)
-                if (me.onSelect)
-                    me.onSelect(label, value, me.quill)
+                if (me.options.rememberSelection) me.setLabel(label)
+                if (me.onSelect) me.onSelect(label, value, me.quill)
             }
             me.dropDownPickerEl.appendChild(newItemEl)
         }
@@ -178,7 +176,7 @@ export class QuillToolbarDropDown extends QuillToolbarItem {
      */
     setLabel(newLabel) {
         const me = this
-        const requiredWidth = `${me._getTextWidth(newLabel)+30}px`
+        const requiredWidth = `${me._getTextWidth(newLabel) + 30}px`
         me.dropDownPickerLabelEl.style.width = requiredWidth
         me.dropDownPickerLabelEl.setAttribute('data-label', newLabel)
     }
@@ -189,11 +187,8 @@ export class QuillToolbarDropDown extends QuillToolbarItem {
      * @param {string} value - The value of the newly selected item.
      * @param {Quill} quill - The quill instance the dropdown tool is attached to.
      */
-    onSelect(label, value, quill) {
-
-    }
+    onSelect(label, value, quill) {}
 }
-
 
 /** @class Class representing a button tool for a Quill Editor toolbar. */
 export class QuillToolbarButton extends QuillToolbarItem {
@@ -212,11 +207,11 @@ export class QuillToolbarButton extends QuillToolbarItem {
 
         me.id = me.options.id || `button-${me._generateId()}`
 
-        me.qlButton = document.createElement("button")
+        me.qlButton = document.createElement('button')
         me.qlButton.className = `ql-${me.id}`
         me.setValue(me.options.value)
         me.setIcon(me.options.icon)
-        me.qlButton.onclick = function() {
+        me.qlButton.onclick = function () {
             me.onClick(me.quill)
         }
         me.qlFormatsEl.appendChild(me.qlButton)
@@ -253,7 +248,5 @@ export class QuillToolbarButton extends QuillToolbarItem {
      *
      * @param {Quill} quill - The quill instance the dropdown tool is attached to.
      */
-    onClick(button, quill) {
-
-    }
+    onClick(button, quill) {}
 }

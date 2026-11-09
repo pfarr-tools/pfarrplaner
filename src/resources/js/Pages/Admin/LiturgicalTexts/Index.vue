@@ -27,37 +27,66 @@
   -->
 
 <template>
-    <admin-layout enable-control-sidebar="true" title="Liturgische Texte">
+    <admin-layout
+        enable-control-sidebar="true"
+        title="Liturgische Texte"
+    >
         <template v-slot:navbar-left>
-            <nav-button :href="route('admin.text.create')" type="success">Neuen Text anlegen</nav-button>
+            <nav-button
+                :href="route('admin.text.create')"
+                type="success"
+                >Neuen Text anlegen</nav-button
+            >
         </template>
-        <dataset v-slot="{ ds }"
-                 :ds-data="texts"
-                 ds-sort-by="title"
-                 :ds-search-in="['title', 'code', 'quelle']">
-            <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus/>
+        <dataset
+            v-slot="{ ds }"
+            :ds-data="texts"
+            ds-sort-by="title"
+            :ds-search-in="['title', 'code', 'quelle']"
+        >
+            <dataset-search
+                ds-search-placeholder="Suchen..."
+                ref="search"
+                autofocus
+            />
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover d-md-table">
                             <thead>
-                            <tr>
-                                <th>Titel</th>
-                                <th>Code</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>Titel</th>
+                                    <th>Code</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <dataset-item tag="tbody">
                                 <template #default="{ row, rowIndex }">
                                     <tr>
-                                        <td><b>{{ row.title }}</b><div class="text-muted text-small">{{ row.source }}</div></td>
+                                        <td>
+                                            <b>{{ row.title }}</b>
+                                            <div class="text-muted text-small">
+                                                {{ row.source }}
+                                            </div>
+                                        </td>
                                         <td>{{ row.agenda_code }}</td>
                                         <td class="text-end">
-                                            <nav-button type="light" icon="mdi mdi-pencil" title="Text bearbeiten"
-                                                        @click="editText(row)" force-icon force-no-text/>
-                                            <nav-button type="danger" icon="mdi mdi-delete"
-                                                        title="Text löschen"
-                                                        @click="deleteText(row)" force-icon force-no-text/>
+                                            <nav-button
+                                                type="light"
+                                                icon="mdi mdi-pencil"
+                                                title="Text bearbeiten"
+                                                @click="editText(row)"
+                                                force-icon
+                                                force-no-text
+                                            />
+                                            <nav-button
+                                                type="danger"
+                                                icon="mdi mdi-delete"
+                                                title="Text löschen"
+                                                @click="deleteText(row)"
+                                                force-icon
+                                                force-no-text
+                                            />
                                         </td>
                                     </tr>
                                 </template>
@@ -66,29 +95,32 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
+            <div
+                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+            >
+                <dataset-info class="mb-2 mb-md-0" />
+                <dataset-pager />
             </div>
         </dataset>
     </admin-layout>
 </template>
 
 <script>
-import {Dataset, DatasetItem, DatasetSearch} from "vue-dataset";
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
-import NavButton from "../../../components/Ui/buttons/NavButton.vue";
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../../../components/Ui/dataset/DatasetInfo'
+import DatasetPager from '../../../components/Ui/dataset/DatasetPager'
+import DatasetShow from '../../../components/Ui/dataset/DatasetShow'
+import NavButton from '../../../components/Ui/buttons/NavButton.vue'
 
 export default {
     components: {
-        NavButton, Dataset,
+        NavButton,
+        Dataset,
         DatasetItem,
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     props: ['texts'],
     data() {
@@ -100,17 +132,17 @@ export default {
     },
     methods: {
         editText(text) {
-            this.$inertia.get(route('admin.text.edit', text.id));
+            this.$inertia.get(route('admin.text.edit', text.id))
         },
         deleteText(text) {
-            if (!confirm('Willst du diesen Text wirklich unwiderruflich löschen?')) return;
-            this.$inertia.delete(route('admin.text.destroy', text.id));
+            if (!confirm('Willst du diesen Text wirklich unwiderruflich löschen?')) return
+            this.$inertia.delete(route('admin.text.destroy', text.id))
         },
-    }
+    },
 }
 </script>
 <style scoped>
 .text-small {
-    font-size: .7em;
+    font-size: 0.7em;
 }
 </style>

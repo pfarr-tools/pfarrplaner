@@ -28,69 +28,161 @@
 
 <template>
     <div class="recurrence-tab">
-        <form-check class="mb-2" label="Diese Veranstaltung wird regelmäßig wiederholt." v-model="recurring"/>
-        <div v-if="recurring" :key="myService.rrule">
-            <hr/>
+        <form-check
+            class="mb-2"
+            label="Diese Veranstaltung wird regelmäßig wiederholt."
+            v-model="recurring"
+        />
+        <div
+            v-if="recurring"
+            :key="myService.rrule"
+        >
+            <hr />
             <div class="row">
                 <div class="col-md-4">
-                    <form-group class="form-inline" label="Wiederholen alle">
+                    <form-group
+                        class="form-inline"
+                        label="Wiederholen alle"
+                    >
                         <div class="input-group">
-                            <input id="recurrenceIntervalInput" type="number" class="form-control" aria-label="Intervall" min="1"
-                                   v-model="recurrOptions.interval">
+                            <input
+                                id="recurrenceIntervalInput"
+                                type="number"
+                                class="form-control"
+                                aria-label="Intervall"
+                                min="1"
+                                v-model="recurrOptions.interval"
+                            />
                             <div class="input-group-text p-0">
-                                <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                                        @click="freqDropdown= !freqDropdown"
-                                        data-toggle="dropdown" aria-haspopup="true" :aria-expanded="freqDropdown ? 'true' : 'false'">{{ freqText }}
+                                <button
+                                    class="btn btn-outline-secondary dropdown-toggle"
+                                    type="button"
+                                    @click="freqDropdown = !freqDropdown"
+                                    data-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    :aria-expanded="freqDropdown ? 'true' : 'false'"
+                                >
+                                    {{ freqText }}
                                 </button>
-                                <div class="dropdown-menu" :class="{show: freqDropdown}">
-                                    <button type="button" class="dropdown-item"
-                                       @click="recurrOptions.freq = 'DAILY'; freqDropdown = false;">Tage</button>
-                                    <button type="button" class="dropdown-item"
-                                       @click="recurrOptions.freq = 'WEEKLY'; freqDropdown = false;">Wochen</button>
-                                    <button type="button" class="dropdown-item"
-                                       @click="recurrOptions.freq = 'MONTHLY'; freqDropdown = false;">Monate</button>
-                                    <button type="button" class="dropdown-item"
-                                       @click="recurrOptions.freq = 'YEARLY'; freqDropdown = false;">Jahre</button>
+                                <div
+                                    class="dropdown-menu"
+                                    :class="{ show: freqDropdown }"
+                                >
+                                    <button
+                                        type="button"
+                                        class="dropdown-item"
+                                        @click="selectFrequency('DAILY')"
+                                    >
+                                        Tage
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="dropdown-item"
+                                        @click="selectFrequency('WEEKLY')"
+                                    >
+                                        Wochen
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="dropdown-item"
+                                        @click="selectFrequency('MONTHLY')"
+                                    >
+                                        Monate
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="dropdown-item"
+                                        @click="selectFrequency('YEARLY')"
+                                    >
+                                        Jahre
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </form-group>
                 </div>
-                <div class="col-md-4" v-if="recurrOptions.freq == 'WEEKLY'">
+                <div
+                    class="col-md-4"
+                    v-if="recurrOptions.freq == 'WEEKLY'"
+                >
                     <form-group label="An folgenden Wochentagen">
                         <div class="d-flex flex-wrap gap-3">
-                        <div class="form-check" v-for="(dayName, dayKey) in {MO: 'Mo', TU: 'Di', WE: 'Mi', TH: 'Do', FR: 'Fr', SA: 'Sa', SU: 'So'}" :key="dayKey">
-                            <input :id="`recurrence-${dayKey}`" type="checkbox" class="form-check-input"
-                                   :checked="recurrOptions.byday.includes(dayKey)"
-                                   @input="setWeekDayFromInput($event, dayKey)"/>
-                            <label class="form-check-label ms-1" :for="`recurrence-${dayKey}`">{{ dayName }}</label>
-                        </div>
+                            <div
+                                class="form-check"
+                                v-for="(dayName, dayKey) in {
+                                    MO: 'Mo',
+                                    TU: 'Di',
+                                    WE: 'Mi',
+                                    TH: 'Do',
+                                    FR: 'Fr',
+                                    SA: 'Sa',
+                                    SU: 'So',
+                                }"
+                                :key="dayKey"
+                            >
+                                <input
+                                    :id="`recurrence-${dayKey}`"
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    :checked="recurrOptions.byday.includes(dayKey)"
+                                    @input="setWeekDayFromInput($event, dayKey)"
+                                />
+                                <label
+                                    class="form-check-label ms-1"
+                                    :for="`recurrence-${dayKey}`"
+                                    >{{ dayName }}</label
+                                >
+                            </div>
                         </div>
                     </form-group>
                 </div>
-                <div class="col-md-8" v-if="recurrOptions.freq == 'MONTHLY'">
+                <div
+                    class="col-md-8"
+                    v-if="recurrOptions.freq == 'MONTHLY'"
+                >
                     <label class="form-label">Im Monat wiederholen:</label>
                     <div class="row mb-2">
                         <div class="col-1">
-                            <input id="monthModeDayNo" type="radio" class="form-check-input" value="dayNo"
-                                   v-model="recurrOptions.monthMode">
+                            <input
+                                id="monthModeDayNo"
+                                type="radio"
+                                class="form-check-input"
+                                value="dayNo"
+                                v-model="recurrOptions.monthMode"
+                            />
                             <label for="monthModeDayNo">am:</label>
                         </div>
                         <div class="col-3">
-                            <input id="recurrenceMonthDayInput" class="form-control" type="number" aria-label="Tag im Monat"
-                                   v-model="recurrOptions.bymonthday" :disabled="recurrOptions.monthMode != 'dayNo'"/>
+                            <input
+                                id="recurrenceMonthDayInput"
+                                class="form-control"
+                                type="number"
+                                aria-label="Tag im Monat"
+                                v-model="recurrOptions.bymonthday"
+                                :disabled="recurrOptions.monthMode != 'dayNo'"
+                            />
                         </div>
                         <div class="col-1">&nbsp;Tag</div>
                     </div>
                     <div class="row">
                         <div class="col-1">
-                            <input id="monthModeRule" type="radio" class="form-check-input"value="rule"
-                                   v-model="recurrOptions.monthMode">
+                            <input
+                                id="monthModeRule"
+                                type="radio"
+                                class="form-check-input"
+                                value="rule"
+                                v-model="recurrOptions.monthMode"
+                            />
                             <label for="monthModeRule">am:</label>
                         </div>
                         <div class="col-4">
-                            <select id="recurrenceBySetPosInput" class="form-control" v-model="recurrOptions.bysetpos"
-                                    aria-label="Position im Monat" :disabled="recurrOptions.monthMode != 'rule'">
+                            <select
+                                id="recurrenceBySetPosInput"
+                                class="form-control"
+                                v-model="recurrOptions.bysetpos"
+                                aria-label="Position im Monat"
+                                :disabled="recurrOptions.monthMode != 'rule'"
+                            >
                                 <option value="1">ersten</option>
                                 <option value="2">zweiten</option>
                                 <option value="3">dritten</option>
@@ -102,8 +194,13 @@
                             </select>
                         </div>
                         <div class="col-4">
-                            <select id="recurrenceByDayInput" class="form-control" v-model="recurrOptions.byday"
-                                    aria-label="Wochentag im Monat" :disabled="recurrOptions.monthMode != 'rule'">
+                            <select
+                                id="recurrenceByDayInput"
+                                class="form-control"
+                                v-model="recurrOptions.byday"
+                                aria-label="Wochentag im Monat"
+                                :disabled="recurrOptions.monthMode != 'rule'"
+                            >
                                 <option value="MO">Montag</option>
                                 <option value="TU">Dienstag</option>
                                 <option value="WE">Mittwoch</option>
@@ -116,8 +213,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row">
-                    </div>
+                    <div class="row"></div>
                 </div>
             </div>
             <div class="row mt-2">
@@ -125,32 +221,53 @@
                     <label>Wiederholen bis:</label>
                     <div class="row">
                         <div class="col-6">
-                            <input type="radio" class="form-check-input" name="repeat_until" value="always"
-                                   v-model="recurrOptions.repeatMode">
+                            <input
+                                type="radio"
+                                class="form-check-input"
+                                name="repeat_until"
+                                value="always"
+                                v-model="recurrOptions.repeatMode"
+                            />
                             <label>Ohne Ende</label>
                         </div>
                         <div class="col-6"></div>
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <input type="radio" class="form-check-input" name="repeat_until" value="until"
-                                   v-model="recurrOptions.repeatMode">
+                            <input
+                                type="radio"
+                                class="form-check-input"
+                                name="repeat_until"
+                                value="until"
+                                v-model="recurrOptions.repeatMode"
+                            />
                             <label>Datum</label>
                         </div>
                         <div class="col-6">
-                            <form-date-picker v-model="recurrOptions.until" iso-date
-                                              :disabled="recurrOptions.repeatMode != 'until'"/>
+                            <form-date-picker
+                                v-model="recurrOptions.until"
+                                iso-date
+                                :disabled="recurrOptions.repeatMode != 'until'"
+                            />
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <input type="radio" class="form-check-input" name="repeat_until" value="count"
-                                   v-model="recurrOptions.repeatMode">
+                            <input
+                                type="radio"
+                                class="form-check-input"
+                                name="repeat_until"
+                                value="count"
+                                v-model="recurrOptions.repeatMode"
+                            />
                             <label>Anzahl Termine</label>
                         </div>
                         <div class="col-6">
-                            <form-input type="number" v-model="recurrOptions.count"
-                                        :disabled="recurrOptions.repeatMode != 'count'"/>
+                            <form-input
+                                type="number"
+                                v-model="recurrOptions.count"
+                                :disabled="recurrOptions.repeatMode != 'count'"
+                            />
                         </div>
                     </div>
                 </div>
@@ -160,81 +277,81 @@
 </template>
 
 <script>
-import FormGroup from "../../Ui/forms/FormGroup.vue";
-import FormCheck from "../../Ui/forms/FormCheck.vue";
-import FormRadioGroup from "../../Ui/forms/FormRadioGroup.vue";
-import FormDatePicker from "../../Ui/forms/FormDatePicker.vue";
-import FormInput from "../../Ui/forms/FormInput.vue";
+import FormGroup from '../../Ui/forms/FormGroup.vue'
+import FormCheck from '../../Ui/forms/FormCheck.vue'
+import FormRadioGroup from '../../Ui/forms/FormRadioGroup.vue'
+import FormDatePicker from '../../Ui/forms/FormDatePicker.vue'
+import FormInput from '../../Ui/forms/FormInput.vue'
 
 export default {
-    name: "RecurrenceTab",
-    components: {FormInput, FormDatePicker, FormRadioGroup, FormCheck, FormGroup},
+    name: 'RecurrenceTab',
+    components: { FormInput, FormDatePicker, FormRadioGroup, FormCheck, FormGroup },
     props: ['service'],
     computed: {
         freqText() {
             switch (this.recurrOptions.freq) {
                 case 'DAILY':
-                    return 'Tage';
+                    return 'Tage'
                 case 'WEEKLY':
-                    return 'Wochen';
+                    return 'Wochen'
                 case 'MONTHLY':
-                    return 'Monate';
+                    return 'Monate'
                 case 'YEARLY':
-                    return 'Jahre';
+                    return 'Jahre'
             }
         },
         RRule() {
-            if (!this.recurring) return '';
+            if (!this.recurring) return ''
             let rruleConditions = {
-                'FREQ': this.recurrOptions.freq,
-                'INTERVAL': this.recurrOptions.interval,
-            };
+                FREQ: this.recurrOptions.freq,
+                INTERVAL: this.recurrOptions.interval,
+            }
 
             switch (this.recurrOptions.freq) {
                 case 'WEEKLY':
-                    if (this.recurrOptions.byday) rruleConditions.BYDAY = this.recurrOptions.byday;
-                    break;
+                    if (this.recurrOptions.byday) rruleConditions.BYDAY = this.recurrOptions.byday
+                    break
                 case 'MONTHLY':
                     switch (this.recurrOptions.monthMode) {
                         case 'dayNo':
-                            rruleConditions.BYMONTHDAY = this.recurrOptions.bymonthday;
-                            break;
+                            rruleConditions.BYMONTHDAY = this.recurrOptions.bymonthday
+                            break
                         case 'rule':
-                            rruleConditions.BYSETPOS = this.recurrOptions.bysetpos;
-                            if (this.recurrOptions.byday) rruleConditions.BYDAY = this.recurrOptions.byday;
-                            break;
+                            rruleConditions.BYSETPOS = this.recurrOptions.bysetpos
+                            if (this.recurrOptions.byday)
+                                rruleConditions.BYDAY = this.recurrOptions.byday
+                            break
                     }
-                    break;
+                    break
             }
 
             switch (this.recurrOptions.repeatMode) {
                 case 'until':
-                    delete rruleConditions['COUNT'];
-                    rruleConditions.UNTIL = this.recurrOptions.until;
-                    break;
+                    delete rruleConditions['COUNT']
+                    rruleConditions.UNTIL = this.recurrOptions.until
+                    break
                 case 'count':
-                    delete rruleConditions['UNTIL'];
-                    rruleConditions.COUNT = this.recurrOptions.count;
-                    break;
+                    delete rruleConditions['UNTIL']
+                    rruleConditions.COUNT = this.recurrOptions.count
+                    break
                 case 'always':
-                    delete rruleConditions['COUNT'];
-                    delete rruleConditions['UNTIL'];
+                    delete rruleConditions['COUNT']
+                    delete rruleConditions['UNTIL']
             }
 
-
-            let rrule = [];
+            let rrule = []
             for (const key in rruleConditions) {
-                rrule.push(key + '=' + rruleConditions[key]);
+                rrule.push(key + '=' + rruleConditions[key])
             }
 
-            this.myService.rrule = rrule.join(';');
-            return 'RRULE:' + rrule.join(';');
-        }
+            this.myService.rrule = rrule.join(';')
+            return 'RRULE:' + rrule.join(';')
+        },
     },
     data() {
-        let myService = this.service;
-        myService.rrule = myService.rrule || '';
-        let recurring = (myService.rrule != '');
+        let myService = this.service
+        myService.rrule = myService.rrule || ''
+        let recurring = myService.rrule != ''
 
         return {
             myService,
@@ -246,29 +363,41 @@ export default {
     watch: {
         recurring(newVal, oldVal) {
             if (newVal) {
-                this.recurrOptions = this.setDefaults(this.myService);
+                this.recurrOptions = this.setDefaults(this.myService)
             }
         },
-        'recurrOptions.freq': function(newVal, oldVal) {
+        'recurrOptions.freq': function (newVal, oldVal) {
             switch (newVal) {
                 case 'WEEKLY':
                 case 'MONTHLY':
-                    if (!this.recurrOptions.byday) this.recurrOptions.byday = ['SU','MO','TU','WE','TH','FR','SA'][moment(this.myService.date).day()];
-                    break;
+                    if (!this.recurrOptions.byday)
+                        this.recurrOptions.byday = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'][
+                            moment(this.myService.date).day()
+                        ]
+                    break
             }
         },
         RRule(newVal, oldVal) {
-            this.myService.rrule = newVal;
-        }
+            this.myService.rrule = newVal
+        },
     },
     methods: {
+        /**
+         * Select a recurrence frequency and close its dropdown.
+         *
+         * @param {string} frequency RRule frequency to select.
+         */
+        selectFrequency(frequency) {
+            this.recurrOptions.freq = frequency
+            this.freqDropdown = false
+        },
         setDefaults(service) {
             return {
                 freq: 'WEEKLY',
                 until: moment(service.date).add(1, 'year').toISOString(),
                 count: 12,
                 interval: 1,
-                byday: ['SU','MO','TU','WE','TH','FR','SA'][moment(service.date).day()],
+                byday: ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'][moment(service.date).day()],
                 byyearday: null,
                 bymonth: null,
                 bymonthday: moment(service.date).date(),
@@ -278,33 +407,36 @@ export default {
             }
         },
         parse(service) {
-            if (service.rrule == '') return this.setDefaults(service);
-            let parsed = {};
-            let parts = service.rrule.replace('RRULE:', '').split(';');
+            if (service.rrule == '') return this.setDefaults(service)
+            let parsed = {}
+            let parts = service.rrule.replace('RRULE:', '').split(';')
             for (const key in parts) {
-                let pSet = parts[key].split('=');
-                parsed[pSet[0].toLowerCase()] = pSet[1];
+                let pSet = parts[key].split('=')
+                parsed[pSet[0].toLowerCase()] = pSet[1]
             }
-            if (parsed['count']) parsed['repeatMode'] = 'count';
-            if (parsed['until']) parsed['repeatMode'] = 'until';
+            if (parsed['count']) parsed['repeatMode'] = 'count'
+            if (parsed['until']) parsed['repeatMode'] = 'until'
 
             return {
-                ...(this.setDefaults(service)),
+                ...this.setDefaults(service),
                 ...parsed,
             }
         },
         setWeekDayFromInput(e, wkDay) {
-            this.recurrOptions.byday = this.recurrOptions.byday ? this.recurrOptions.byday.split(',').filter(e => e != wkDay).join(',') : '';
+            this.recurrOptions.byday = this.recurrOptions.byday
+                ? this.recurrOptions.byday
+                      .split(',')
+                      .filter((e) => e != wkDay)
+                      .join(',')
+                : ''
             if (e.target.checked) {
-                let tmp = this.recurrOptions.byday.split(',').filter(e => e != '');
-                tmp.push(wkDay);
-                this.recurrOptions.byday = tmp.join(',');
+                let tmp = this.recurrOptions.byday.split(',').filter((e) => e != '')
+                tmp.push(wkDay)
+                this.recurrOptions.byday = tmp.join(',')
             }
-        }
-    }
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

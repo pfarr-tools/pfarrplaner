@@ -31,5 +31,3 @@ export default {
     locale: 'de',
     showClear: true,
 }
-
-

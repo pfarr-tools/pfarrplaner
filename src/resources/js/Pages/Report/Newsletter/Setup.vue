@@ -29,9 +29,17 @@
 <template>
     <admin-layout title="Gottesdienstliste für den Newsletter erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Newsletter erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Newsletter erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'newsletter'})" ref="myForm">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'newsletter' })"
+            ref="myForm"
+        >
             <form-csrf-token />
             <city-location-filter
                 :cities="cities"
@@ -42,25 +50,34 @@
                 v-model:city-model-value="myForm.cities"
                 v-model:location-model-value="myForm.locations"
             />
-            <form-check name="includeWeeklyVerse" label="Wochenspruch mit aufnehmen." v-model="myForm.includeWeeklyVerse"/>
-            <form-date-range-picker label="Gottesdienste von" v-model:from="myForm.start" v-model:to="myForm.end" iso-date />
+            <form-check
+                name="includeWeeklyVerse"
+                label="Wochenspruch mit aufnehmen."
+                v-model="myForm.includeWeeklyVerse"
+            />
+            <form-date-range-picker
+                label="Gottesdienste von"
+                v-model:from="myForm.start"
+                v-model:to="myForm.end"
+                iso-date
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
-import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
+import CityLocationFilter from '../../../components/Reports/CityLocationFilter.vue'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'locations'],
-    components: {CityLocationFilter, FormCheck, FormDateRangePicker, FormCsrfToken, SaveButton},
+    components: { CityLocationFilter, FormCheck, FormDateRangePicker, FormCsrfToken, SaveButton },
     data() {
-        let myStart = moment();
-        let myEnd = moment().add(7, 'days');
+        let myStart = moment()
+        let myEnd = moment().add(7, 'days')
 
         return {
             myForm: {
@@ -69,17 +86,15 @@ export default {
                 start: myStart,
                 end: myEnd,
                 includeWeeklyVerse: false,
-            }
+            },
         }
     },
     methods: {
         renderReport() {
-            this.$inertia.post(route('reports.render', 'newsletter'), this.myForm);
+            this.$inertia.post(route('reports.render', 'newsletter'), this.myForm)
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

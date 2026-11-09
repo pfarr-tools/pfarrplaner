@@ -28,71 +28,155 @@
 
 <template>
     <div class="streaming-tab">
-        <div v-if="(!(myService.youtube_url)) && (!creatingStream)" class="alert alert-info">
+        <div
+            v-if="!myService.youtube_url && !creatingStream"
+            class="alert alert-info"
+        >
             Diesem Gottesdienst ist noch kein Livestream zugeordnet.
-            <div v-if="myService.city.google_access_token" class="form-class">
-                <button class="btn btn-light" @click.prevent="createLivestream"><span class="mdi mdi-youtube"></span> Jetzt auf YouTube anlegen</button>
+            <div
+                v-if="myService.city.google_access_token"
+                class="form-class"
+            >
+                <button
+                    class="btn btn-light"
+                    @click.prevent="createLivestream"
+                >
+                    <span class="mdi mdi-youtube"></span> Jetzt auf YouTube anlegen
+                </button>
             </div>
             <hr />
-            <form-input label="YouTube-Adresse" help="Möglichkeit zur manuellen Eingabe eines YouTube-Links"
-                        name="youtube_url"
-                        v-model="myService.youtube_url" />
+            <form-input
+                label="YouTube-Adresse"
+                help="Möglichkeit zur manuellen Eingabe eines YouTube-Links"
+                name="youtube_url"
+                v-model="myService.youtube_url"
+            />
         </div>
         <div v-if="creatingStream">
-            <div class="alert alert-info"><span class="mdi mdi-spin mdi-loading"></span> Ein Livestream wird angelegt. Bitte warten...</div>
+            <div class="alert alert-info">
+                <span class="mdi mdi-spin mdi-loading"></span> Ein Livestream wird angelegt. Bitte
+                warten...
+            </div>
         </div>
         <div v-if="myService.youtube_url">
             <div class="row">
                 <div class="col-md-6">
-                    <form-input name="youtube_url" label="YouTube-URL" v-model="myService.youtube_url" />
+                    <form-input
+                        name="youtube_url"
+                        label="YouTube-URL"
+                        v-model="myService.youtube_url"
+                    />
                     <div v-if="myService.city.google_access_token">
-                        <form-input name="cc_streaming_url" label="URL zu einem parallel gestreamten Kindergottesdienst" v-model="myService.cc_streaming_url" />
-                        <form-input name="offering_url" label="URL zu einer Seite für Onlinespenden" v-model="myService.offering_url" />
-                        <form-input name="meeting_url" label="URL zu einer Seite für ein 'virtuelles Kirchencafé'" v-model="myService.meeting_url" />
+                        <form-input
+                            name="cc_streaming_url"
+                            label="URL zu einem parallel gestreamten Kindergottesdienst"
+                            v-model="myService.cc_streaming_url"
+                        />
+                        <form-input
+                            name="offering_url"
+                            label="URL zu einer Seite für Onlinespenden"
+                            v-model="myService.offering_url"
+                        />
+                        <form-input
+                            name="meeting_url"
+                            label="URL zu einer Seite für ein 'virtuelles Kirchencafé'"
+                            v-model="myService.meeting_url"
+                        />
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group" v-if="service.youtube_url">
-                        <iframe width="560" height="315" :src="embedUrl" title="YouTube-Vorschau"
-                                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen></iframe><br />
+                    <div
+                        class="form-group"
+                        v-if="service.youtube_url"
+                    >
+                        <iframe
+                            width="560"
+                            height="315"
+                            :src="embedUrl"
+                            title="YouTube-Vorschau"
+                            frameborder="0"
+                            allow="
+                                accelerometer;
+                                autoplay;
+                                clipboard-write;
+                                encrypted-media;
+                                gyroscope;
+                                picture-in-picture;
+                            "
+                            allowfullscreen
+                        ></iframe
+                        ><br />
                         <form-group>
-                            <a class="btn btn-light" :href="myService.youtube_url" title="Öffnet das YouTube-Video in einem neuen Fenster" target="_blank" rel="noopener noreferrer"><span class="mdi mdi-youtube"></span> Zum Video</a>
-                            <a v-if="myService.city.google_access_token" class="btn btn-light" :href="dashboardUrl" title="Öffnet das  Live-Dashboard zum Stream in einem neuen Fenster" target="_blank" rel="noopener noreferrer"><span class="mdi mdi-video"></span> Zum Live-Dashboard</a>
+                            <a
+                                class="btn btn-light"
+                                :href="myService.youtube_url"
+                                title="Öffnet das YouTube-Video in einem neuen Fenster"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                ><span class="mdi mdi-youtube"></span> Zum Video</a
+                            >
+                            <a
+                                v-if="myService.city.google_access_token"
+                                class="btn btn-light"
+                                :href="dashboardUrl"
+                                title="Öffnet das  Live-Dashboard zum Stream in einem neuen Fenster"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                ><span class="mdi mdi-video"></span> Zum Live-Dashboard</a
+                            >
                         </form-group>
                     </div>
                 </div>
             </div>
-            <div class="row" v-if="myService.city.google_access_token">
+            <div
+                class="row"
+                v-if="myService.city.google_access_token"
+            >
                 <div class="col-md-6">
-                    <form-textarea name="youtube_prefix_description" label="Einleitender Text für die Beschreibung auf YouTube" v-model="myService.youtube_prefix_description" />
+                    <form-textarea
+                        name="youtube_prefix_description"
+                        label="Einleitender Text für die Beschreibung auf YouTube"
+                        v-model="myService.youtube_prefix_description"
+                    />
                 </div>
                 <div class="col-md-6">
-                    <form-textarea name="youtube_postfix_description" label="Ergänzender Text für die Beschreibung auf YouTube" v-model="myService.youtube_postfix_description" />
+                    <form-textarea
+                        name="youtube_postfix_description"
+                        label="Ergänzender Text für die Beschreibung auf YouTube"
+                        v-model="myService.youtube_postfix_description"
+                    />
                 </div>
             </div>
         </div>
         <hr />
         <div class="row">
             <div class="col-md-6">
-                <form-input name="recording_url" label="URL zu einer Audioaufzeichnung des Gottesdiensts" v-model="myService.recording_url" />
+                <form-input
+                    name="recording_url"
+                    label="URL zu einer Audioaufzeichnung des Gottesdiensts"
+                    v-model="myService.recording_url"
+                />
             </div>
             <div class="col-md-6">
-                <audio v-if="myService.recording_url" :src="myService.recording_url" controls />
+                <audio
+                    v-if="myService.recording_url"
+                    :src="myService.recording_url"
+                    controls
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import FormInput from "../../Ui/forms/FormInput";
-import FormTextarea from "../../Ui/forms/FormTextarea";
-import FormRadioGroup from "../../Ui/forms/FormRadioGroup";
-import FormCheck from "../../Ui/forms/FormCheck";
-import FormGroup from "../../Ui/forms/FormGroup";
+import FormInput from '../../Ui/forms/FormInput'
+import FormTextarea from '../../Ui/forms/FormTextarea'
+import FormRadioGroup from '../../Ui/forms/FormRadioGroup'
+import FormCheck from '../../Ui/forms/FormCheck'
+import FormGroup from '../../Ui/forms/FormGroup'
 
 export default {
-    name: "StreamingTab",
+    name: 'StreamingTab',
     components: {
         FormGroup,
         FormCheck,
@@ -105,24 +189,24 @@ export default {
     },
     computed: {
         videoId() {
-            var url = this.myService.youtube_url;
-            if (!url) return '';
-            if (url.substr(-1) == '/') url = url.substr(0, -1);
-            var tmp = url.split('/');
-            return tmp[tmp.length-1];
+            var url = this.myService.youtube_url
+            if (!url) return ''
+            if (url.substr(-1) == '/') url = url.substr(0, -1)
+            var tmp = url.split('/')
+            return tmp[tmp.length - 1]
         },
         embedUrl() {
-            if (!this.videoId) return '';
-            return 'https://www.youtube.com/embed/'+this.videoId;
+            if (!this.videoId) return ''
+            return 'https://www.youtube.com/embed/' + this.videoId
         },
         dashboardUrl() {
-            if (!this.videoId) return '';
-            return 'https://studio.youtube.com/video/'+this.videoId+'/livestreaming';
-        }
+            if (!this.videoId) return ''
+            return 'https://studio.youtube.com/video/' + this.videoId + '/livestreaming'
+        },
     },
     data() {
-        var myService = this.service;
-        if (!(myService.offering_url)) myService.offering_url = this.service.city.default_offering_url;
+        var myService = this.service
+        if (!myService.offering_url) myService.offering_url = this.service.city.default_offering_url
         return {
             myService: myService,
             creatingStream: false,
@@ -130,17 +214,19 @@ export default {
     },
     methods: {
         createLivestream() {
-            this.creatingStream = true;
-            axios.get(route('broadcast.create', {service: this.service.id, json: 1}))
-            .then(response => { return response.data })
-            .then(data => {
-                this.creatingStream = false;
-                this.myService.youtube_url = data.url;
-            });
-        }
-    }
+            this.creatingStream = true
+            axios
+                .get(route('broadcast.create', { service: this.service.id, json: 1 }))
+                .then((response) => {
+                    return response.data
+                })
+                .then((data) => {
+                    this.creatingStream = false
+                    this.myService.youtube_url = data.url
+                })
+        },
+    },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

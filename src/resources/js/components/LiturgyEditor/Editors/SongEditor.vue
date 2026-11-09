@@ -30,67 +30,107 @@
     <div class="liturgy-item-song-editor">
         <div class="row">
             <div class="col-md-6">
-                <form-input id="liturgySongEditorTitle" v-model="editedElement.title" label="Titel im Ablaufplan" />
-                <div v-if="(!lists.songs) || (!lists.songs.length)">
-                    <span class="mdi mdi-spin mdi-loading"></span> Bitte warten, Liederliste wird geladen...
+                <form-input
+                    id="liturgySongEditorTitle"
+                    v-model="editedElement.title"
+                    label="Titel im Ablaufplan"
+                />
+                <div v-if="!lists.songs || !lists.songs.length">
+                    <span class="mdi mdi-spin mdi-loading"></span> Bitte warten, Liederliste wird
+                    geladen...
                 </div>
                 <div v-else>
-                    <form-selectize label="Lied" :options="lists.songs" @input="selectSong"
-                                    :key="songListState"
-                                    v-model="selectedSong"/>
+                    <form-selectize
+                        label="Lied"
+                        :options="lists.songs"
+                        @input="selectSong"
+                        :key="songListState"
+                        v-model="selectedSong"
+                    />
                     <div class="form-group">
                         <label for="songVersesInput">Zu singende Strophen</label>
-                        <input id="songVersesInput" class="form-control" :value="editedElement.data.verses"
-                               placeholder="Gültiges Format z.B. 1-2+4; leer lassen = alle Strophen"
-                               aria-describedby="songVersesHelp"
-                               @input="updateQuote($event)"/>
-                        <small id="songVersesHelp" class="form-text text-muted">
+                        <input
+                            id="songVersesInput"
+                            class="form-control"
+                            :value="editedElement.data.verses"
+                            placeholder="Gültiges Format z.B. 1-2+4; leer lassen = alle Strophen"
+                            aria-describedby="songVersesHelp"
+                            @input="updateQuote($event)"
+                        />
+                        <small
+                            id="songVersesHelp"
+                            class="form-text text-muted"
+                        >
                             Strophen: {{ getVersesToDisplay(editedElement.data.verses) }}
                         </small>
                     </div>
                     <div class="form-group">
-                        <inertia-link class="btn btn-sm btn-light" title="Neues Lied anlegen" :href="route('admin.songs.create')">
+                        <inertia-link
+                            class="btn btn-sm btn-light"
+                            title="Neues Lied anlegen"
+                            :href="route('admin.songs.create')"
+                        >
                             Neues Lied
                         </inertia-link>
-                        <inertia-link v-if="(undefined != editedElement.data.song) && (undefined != editedElement.data.song.song) && (editedElement.data.song.song.id > 0)"
-                                      class="btn btn-sm btn-light"
-                                title="Lied bearbeiten" :href="route('admin.song.edit', editedElement.data.song.song.id)">Lied bearbeiten
+                        <inertia-link
+                            v-if="
+                                undefined != editedElement.data.song &&
+                                undefined != editedElement.data.song.song &&
+                                editedElement.data.song.song.id > 0
+                            "
+                            class="btn btn-sm btn-light"
+                            title="Lied bearbeiten"
+                            :href="route('admin.song.edit', editedElement.data.song.song.id)"
+                            >Lied bearbeiten
                         </inertia-link>
-                        <button v-if="(undefined != editedElement.data.song) && (undefined != editedElement.data.song.song) && (editedElement.data.song.song.id != -1)"
-                                class="btn btn-sm btn-light"
-                                title="Lied im Noteneditor bearbeiten" @click.prevent="editMusic">
+                        <button
+                            v-if="
+                                undefined != editedElement.data.song &&
+                                undefined != editedElement.data.song.song &&
+                                editedElement.data.song.song.id != -1
+                            "
+                            class="btn btn-sm btn-light"
+                            title="Lied im Noteneditor bearbeiten"
+                            @click.prevent="editMusic"
+                        >
                             <span class="mdi mdi-music"></span> Lied im Noteneditor bearbeiten
                         </button>
                     </div>
                 </div>
-
             </div>
             <div class="col-md-6">
-                <div class="liturgical-text-quote" v-html="quote" :key="editedElement.data.song.song.id"/>
-                <text-stats :text="quote"/>
+                <div
+                    class="liturgical-text-quote"
+                    v-html="quote"
+                    :key="editedElement.data.song.song.id"
+                />
+                <text-stats :text="quote" />
             </div>
         </div>
-        <modal :title="(modalSong.song.id == -1) ? 'Neues Lied' : 'Lied bearbeiten'" v-if="modalOpen"
-               @close="((modalSong.song.id == -1) ? saveText() : updateText())" @cancel="modalOpen = false;"
-               close-button-label="Lied speichern" cancel-button-label="Abbrechen" max-width="800"
+        <modal
+            :title="modalSong.song.id == -1 ? 'Neues Lied' : 'Lied bearbeiten'"
+            v-if="modalOpen"
+            @close="modalSong.song.id == -1 ? saveText() : updateText()"
+            @cancel="modalOpen = false"
+            close-button-label="Lied speichern"
+            cancel-button-label="Abbrechen"
+            max-width="800"
         >
-            <song-edit-pane :song="modalSong"/>
-
-
+            <song-edit-pane :song="modalSong" />
         </modal>
     </div>
 </template>
 
 <script>
-import Modal from "../../Ui/modals/Modal";
-import TextStats from "../Elements/TextStats";
-import TimeFields from "./Elements/TimeFields";
-import SongEditPane from "./Elements/SongEditPane";
-import FormSelectize from "../../Ui/forms/FormSelectize";
+import Modal from '../../Ui/modals/Modal'
+import TextStats from '../Elements/TextStats'
+import TimeFields from './Elements/TimeFields'
+import SongEditPane from './Elements/SongEditPane'
+import FormSelectize from '../../Ui/forms/FormSelectize'
 import FormInput from '../../Ui/forms/FormInput.vue'
 
 export default {
-    name: "SongEditor",
+    name: 'SongEditor',
     components: {
         FormSelectize,
         FormInput,
@@ -105,7 +145,7 @@ export default {
         agendaMode: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     inject: ['lists'],
     /**
@@ -113,50 +153,48 @@ export default {
      * @returns {Promise<void>}
      */
     async created() {
-        const songbooks = await axios.get(route('liturgy.song.songbooks'));
+        const songbooks = await axios.get(route('liturgy.song.songbooks'))
         if (songbooks.data) {
-            var mySongbooks = [];
-            var e = this.editedElement.data;
+            var mySongbooks = []
+            var e = this.editedElement.data
             Object.entries(songbooks.data).forEach(function (book) {
-                book = book[1];
-                mySongbooks.push(book.title + '||' + book.abbreviation);
-            });
-            this.songbooks = mySongbooks;
+                book = book[1]
+                mySongbooks.push(book.title + '||' + book.abbreviation)
+            })
+            this.songbooks = mySongbooks
         }
     },
     mounted() {
-        this.quote = this.quotableText();
-        this.selectSong(this.editedElement.data.song.id);
+        this.quote = this.quotableText()
+        this.selectSong(this.editedElement.data.song.id)
     },
     data() {
-        var e = this.element;
+        var e = this.element
 
         const emptySong = {
             id: -1,
             title: '',
             verses: [
-                {id: -1, number: '1', text: '', refrain_before: false, refrain_after: false}
+                { id: -1, number: '1', text: '', refrain_before: false, refrain_after: false },
             ],
             refrain: '',
             copyrights: '',
             songbook: '',
             songbook_abbreviation: '',
             reference: '',
-        };
+        }
 
-
-        let responsible = e.data.responsible || [];
+        let responsible = e.data.responsible || []
         if (e.data.length == 0) e.data = { song: emptySong, verses: '', responsible: responsible }
-        if (undefined == e.data) e.data = {song: emptySong, verses: '', responsible: responsible};
-        if (typeof e.data != 'object') e.data = { song: emptySong, verses: '', responsible: responsible };
-        if (undefined == e.data.song) e.data.song = emptySong;
-        if (undefined == e.data.song.song) e.data.song.song = { verses: [], id: -1 };
-        if (undefined == e.data.song.song.verses) e.data.song.song.verses = [];
-        if (undefined == e.data.song.song.id) e.data.song.song.id = -1;
+        if (undefined == e.data) e.data = { song: emptySong, verses: '', responsible: responsible }
+        if (typeof e.data != 'object')
+            e.data = { song: emptySong, verses: '', responsible: responsible }
+        if (undefined == e.data.song) e.data.song = emptySong
+        if (undefined == e.data.song.song) e.data.song.song = { verses: [], id: -1 }
+        if (undefined == e.data.song.song.verses) e.data.song.song.verses = []
+        if (undefined == e.data.song.song.id) e.data.song.song.id = -1
 
-
-        if (undefined == e.data.verses) e.data.verses = '';
-
+        if (undefined == e.data.verses) e.data.verses = ''
 
         return {
             apiToken: this.$page.props.currentUser.data.api_token,
@@ -173,56 +211,60 @@ export default {
             modalSong: {},
             modalOpen: false,
             quote: '',
-        };
+        }
     },
     watch: {
         'editedElement.data.verses': {
             handler: function (newVal) {
-                this.quote = this.quotableText();
-            }
+                this.quote = this.quotableText()
+            },
         },
         'editedElement.data.song': {
             handler: function (oldVal, newVal) {
-                this.songIsDirty = this.editSong;
-                this.quote = this.quotableText();
+                this.songIsDirty = this.editSong
+                this.quote = this.quotableText()
             },
             deep: true,
         },
         songbook: {
             handler: function (newVal, oldVal) {
-                var tmp = newVal.split('||');
-                this.editedElement.data.song.songbook = tmp[0];
-                this.editedElement.data.song.songbook_abbreviation = tmp[1];
-            }
+                var tmp = newVal.split('||')
+                this.editedElement.data.song.songbook = tmp[0]
+                this.editedElement.data.song.songbook_abbreviation = tmp[1]
+            },
         },
         'lists.songs': {
-            handler: function(newVal, oldVal) {
-                this.selectSong(this.editedElement.data.song.id);
-                this.songListState++;
-            }
-        }
+            handler: function (newVal, oldVal) {
+                this.selectSong(this.editedElement.data.song.id)
+                this.songListState++
+            },
+        },
     },
     methods: {
         selectSong(e) {
-            if (!e) return;
-            if (e < 0) return;
+            if (!e) return
+            if (e < 0) return
             if (undefined == this.songList[e]) {
-                this.$api().get(route('api.liturgy.song.single', {
-                    songReferenceId: e,
-                })).then(response => {
-                    this.songList[e] = response.data;
-                    this.editedElement.data.song = this.songList[e];
-                    this.quote = this.quotableText();
-                    this.$forceUpdate();
-                });
+                this.$api()
+                    .get(
+                        route('api.liturgy.song.single', {
+                            songReferenceId: e,
+                        }),
+                    )
+                    .then((response) => {
+                        this.songList[e] = response.data
+                        this.editedElement.data.song = this.songList[e]
+                        this.quote = this.quotableText()
+                        this.$forceUpdate()
+                    })
             } else {
-                this.editedElement.data.song = this.songList[e];
-                this.quote = this.quotableText();
-                this.$forceUpdate();
+                this.editedElement.data.song = this.songList[e]
+                this.quote = this.quotableText()
+                this.$forceUpdate()
             }
         },
         editMusic() {
-            window.open(route('liturgy.song.musiceditor', this.editedElement.data.song.id));
+            window.open(route('liturgy.song.musiceditor', this.editedElement.data.song.id))
         },
         save: function () {
             var data = {
@@ -231,90 +273,99 @@ export default {
                     responsible: this.editedElement.data.responsible,
                     song: this.editedElement.data.song,
                     verses: this.editedElement.data.verses,
-                }
-            };
-            this.$inertia.patch(route('liturgy.item.update', {
-                service: this.service.id,
-                block: this.element.liturgy_block_id,
-                item: this.element.id,
-            }), data, {preserveState: false});
-            this.quote = this.quotableText();
+                },
+            }
+            this.$inertia.patch(
+                route('liturgy.item.update', {
+                    service: this.service.id,
+                    block: this.element.liturgy_block_id,
+                    item: this.element.id,
+                }),
+                data,
+                { preserveState: false },
+            )
+            this.quote = this.quotableText()
         },
         displayTitle(song) {
-            if ((!song) || (!song.song)) return '';
-            var title = song.song.title;
+            if (!song || !song.song) return ''
+            var title = song.song.title
             if (song.reference) {
-                title = song.reference + ' ' + title;
+                title = song.reference + ' ' + title
             }
             if (song.code) {
-                title = song.code + ' ' + title;
+                title = song.code + ' ' + title
             } else if (song.songbook) {
-                title = song.songbook.name + ' ' + title;
+                title = song.songbook.name + ' ' + title
             }
-            return title;
+            return title
         },
         getVersesToDisplay(range) {
-            var verses = [];
-            if ((null === range) || (undefined === range)) return [];
-            if ((!this.editedElement.data.song) || (!this.editedElement.data.song.song)) return [];
+            var verses = []
+            if (null === range || undefined === range) return []
+            if (!this.editedElement.data.song || !this.editedElement.data.song.song) return []
             if (range == '') {
                 this.editedElement.data.song.song.verses.forEach(function (verse) {
-                    verses.push(verse.number);
-                });
-                return verses;
+                    verses.push(verse.number)
+                })
+                return verses
             }
             range.split('+').forEach(function (subRange) {
                 if (subRange.indexOf('-') >= 0) {
-                    var tmp = subRange.split('-');
-                    if ((tmp[0] != '') && (tmp[1] != '')) {
-                        if ((!isNaN(tmp[0])) && (!isNaN(tmp[1]))) {
+                    var tmp = subRange.split('-')
+                    if (tmp[0] != '' && tmp[1] != '') {
+                        if (!isNaN(tmp[0]) && !isNaN(tmp[1])) {
                             for (var i = parseInt(tmp[0]); i <= parseInt(tmp[1]); i++) {
-                                verses.push(i.toString());
+                                verses.push(i.toString())
                             }
                         }
                     } else if (tmp[0] != '') {
-                        verses.push(tmp[0]);
+                        verses.push(tmp[0])
                     }
                 } else {
-                    if (subRange != '') verses.push(subRange);
+                    if (subRange != '') verses.push(subRange)
                 }
-            });
-            return verses;
+            })
+            return verses
         },
         quotableText() {
-            var e = this.editedElement;
+            var e = this.editedElement
 
-            var text = '';
-            var title = this.displayTitle(this.editedElement.data.song.song);
+            var text = ''
+            var title = this.displayTitle(this.editedElement.data.song.song)
             if (title.trim().length > 0) {
-                text = '<b>' + title + "</b>\n\n";
+                text = '<b>' + title + '</b>\n\n'
             }
 
             this.getVersesToDisplay(e.data.verses).forEach(function (verseNumber) {
                 e.data.song.song.verses.forEach(function (verse) {
                     if (verse.number == verseNumber) {
                         if (verse.refrain_before) {
-                            text = text + "<p>" + e.data.song.song.refrain + "</p>";
+                            text = text + '<p>' + e.data.song.song.refrain + '</p>'
                         }
-                        text = text + "<p>" + (verse.number != '' ? verse.number + '. ' : '') + verse.text + "</p>";
+                        text =
+                            text +
+                            '<p>' +
+                            (verse.number != '' ? verse.number + '. ' : '') +
+                            verse.text +
+                            '</p>'
                         if (verse.refrain_after) {
-                            text = text + "<p>" + e.data.song.song.refrain + "</p>";
+                            text = text + '<p>' + e.data.song.song.refrain + '</p>'
                         }
                     }
-                });
-            });
+                })
+            })
 
-            return text;
+            return text
         },
         songbookTitle(songbook) {
-            var tmp = songbook.split('||');
-            return tmp[0] + ' (' + tmp[1] + ')';
+            var tmp = songbook.split('||')
+            return tmp[0] + ' (' + tmp[1] + ')'
         },
         updateQuote(event) {
-            this.editedElement.data.verses = event.target.value;
-            this.quote = this.quotableText();
-        }
-    }
+            this.editedElement.data.verses = event.target.value
+            this.quote = this.quotableText()
+        },
+    },
 }
 </script>
 

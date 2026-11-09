@@ -29,30 +29,47 @@
 <template>
     <admin-layout title="Dienstreiseantrag erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Dienstreiseantrag erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Dienstreiseantrag erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'travelRequestForm'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'travelRequestForm' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="absence" label="Abwesenheitseintrag" v-model="myAbsence" :options="myAbsences" />
-            <input type="hidden" name="absence" v-model="myAbsence" />
+            <form-selectize
+                name="absence"
+                label="Abwesenheitseintrag"
+                v-model="myAbsence"
+                :options="myAbsences"
+            />
+            <input
+                type="hidden"
+                name="absence"
+                v-model="myAbsence"
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['absences'],
-    components: {FormCsrfToken, FormSelectize, SaveButton},
+    components: { FormCsrfToken, FormSelectize, SaveButton },
     data() {
-        let myAbsences = this.absences;
+        let myAbsences = this.absences
 
         for (let key in myAbsences) {
-            myAbsences[key].name = myAbsences[key].durationText + ' ' + myAbsences[key].reason;
+            myAbsences[key].name = myAbsences[key].durationText + ' ' + myAbsences[key].reason
         }
 
         return {
@@ -62,14 +79,12 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'travelRequestForm'}), {
+            submitReportForm(route('reports.render', { report: 'travelRequestForm' }), {
                 absence: this.myAbsence,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

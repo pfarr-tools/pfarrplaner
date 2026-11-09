@@ -29,38 +29,56 @@
 <template>
     <admin-layout title="HTML-Code für eine Veranstaltungstabelle erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="HTML-Code für eine Veranstaltungstabelle erstellen"
-                         @click="renderReport"/>
+            <save-button
+                label="Erstellen"
+                title="HTML-Code für eine Veranstaltungstabelle erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form-selectize name="includeCities[]" label="Folgende Kirchengemeinden mit einbeziehen"
-                        v-model="myForm.includeCities" :options="cities" multiple/>
-        <form-date-picker name="singleDay" label="Begrenzen auf einen Tag?" v-model="myForm.singleDay"
-                          placeholder="Leer lassen, um alle Tage anzuzeigen"
-                          iso-date/>
-        <form-input name="singleService" label="Nur einen bestimmten Gottesdienst anzeigen?"
-                    placeholder="ID des Gottesdienstes; leer lassen, um alle Gottesdienste zu zeigen"
-                    v-model="myForm.singleService" />
-        <form-input name="cors-origin" label="Aufrufende Website"
-                    placeholder="z.B. https://www.tailfingen-evangelisch.de"
-                    v-model="myForm['cors-origin']" />
+        <form-selectize
+            name="includeCities[]"
+            label="Folgende Kirchengemeinden mit einbeziehen"
+            v-model="myForm.includeCities"
+            :options="cities"
+            multiple
+        />
+        <form-date-picker
+            name="singleDay"
+            label="Begrenzen auf einen Tag?"
+            v-model="myForm.singleDay"
+            placeholder="Leer lassen, um alle Tage anzuzeigen"
+            iso-date
+        />
+        <form-input
+            name="singleService"
+            label="Nur einen bestimmten Gottesdienst anzeigen?"
+            placeholder="ID des Gottesdienstes; leer lassen, um alle Gottesdienste zu zeigen"
+            v-model="myForm.singleService"
+        />
+        <form-input
+            name="cors-origin"
+            label="Aufrufende Website"
+            placeholder="z.B. https://www.tailfingen-evangelisch.de"
+            v-model="myForm['cors-origin']"
+        />
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDatePicker from '../../../components/Ui/forms/FormDatePicker'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
 
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities'],
-    components: {FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: { FormCheck, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton },
     data() {
-        let myStart = moment();
-        let myEnd = moment().add(7, 'days');
+        let myStart = moment()
+        let myEnd = moment().add(7, 'days')
 
         return {
             myForm: {
@@ -68,17 +86,15 @@ export default {
                 singleDay: null,
                 singleService: null,
                 'cors-origin': null,
-            }
+            },
         }
     },
     methods: {
         renderReport() {
-            this.$inertia.post(route('reports.render', 'embedRegistration'), this.myForm);
+            this.$inertia.post(route('reports.render', 'embedRegistration'), this.myForm)
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

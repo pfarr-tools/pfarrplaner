@@ -27,29 +27,39 @@
   -->
 
 <template>
-    <div class="attachment btn btn-light" @click="download" :title="title + ' herunterladen'">
-        <b><span class="fa" :class="icon"></span> {{ title }}</b><br/>
+    <div
+        class="attachment btn btn-light"
+        @click="download"
+        :title="title + ' herunterladen'"
+    >
+        <b
+            ><span
+                class="fa"
+                :class="icon"
+            ></span>
+            {{ title }}</b
+        ><br />
         <small v-if="description">{{ description }}<br /></small>
-        <small>.{{ extension }}{{ size ? ', '+size : '' }}</small>
+        <small>.{{ extension }}{{ size ? ', ' + size : '' }}</small>
         <span class="float-right mdi mdi-download"></span>
     </div>
 </template>
 
 <script>
 export default {
-    name: "FakeAttachment",
+    name: 'FakeAttachment',
     props: ['title', 'icon', 'extension', 'size', 'href', 'description', 'useInertia'],
     methods: {
         download(e) {
             if (this.href) {
-                e.preventDefault();
+                e.preventDefault()
                 if (this.useInertia) {
                     this.$inertia.get(this.href)
                 } else {
-                    window.location.href = this.href;
+                    window.location.href = this.href
                 }
             } else {
-                this.$emit('download');
+                this.$emit('download')
             }
         },
         /**
@@ -59,30 +69,32 @@ export default {
          * @source https://programanddesign.com/js/human-readable-file-size-in-javascript/
          */
         fileSize(size) {
-            var i = Math.floor(Math.log(size) / Math.log(1024));
-            return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+            var i = Math.floor(Math.log(size) / Math.log(1024))
+            return (
+                (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
+            )
         },
         deleteAttachment(event) {
-            this.$emit('delete-attachment');
-        }
-    }
+            this.$emit('delete-attachment')
+        },
+    },
 }
 </script>
 
 <style scoped>
-    .attachment {
-        width: 100%;
-        text-align: left;
-        margin-bottom: .25rem;
-        vertical-align: middle;
-    }
-    small {
-        padding-left: 15px;
-    }
-    .btn-danger {
-        margin-top: -.3rem;
-    }
-    .mdi-download {
-        color: gray;
-    }
+.attachment {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 0.25rem;
+    vertical-align: middle;
+}
+small {
+    padding-left: 15px;
+}
+.btn-danger {
+    margin-top: -0.3rem;
+}
+.mdi-download {
+    color: gray;
+}
 </style>

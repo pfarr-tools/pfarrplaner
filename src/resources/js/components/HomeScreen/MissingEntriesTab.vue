@@ -28,11 +28,24 @@
 
 <template>
     <div class="missing-entries-tab">
-        <div v-if="count == 0" class="alert alert-info">Zur Zeit gibt es keine fehlenden Einträge.</div>
-        <fake-table v-else :columns="[2,4,4,2]" :headers="['Gottesdienst', 'Details', 'Fehlende Daten', '']"
-                    collapsed-header="Fehlende Daten">
-            <div v-for="(service,serviceIndex) in missing" class="row mb-3 p-1" :class="{'stripe-odd': (serviceIndex % 2 == 0)}"
-                :key="serviceIndex">
+        <div
+            v-if="count == 0"
+            class="alert alert-info"
+        >
+            Zur Zeit gibt es keine fehlenden Einträge.
+        </div>
+        <fake-table
+            v-else
+            :columns="[2, 4, 4, 2]"
+            :headers="['Gottesdienst', 'Details', 'Fehlende Daten', '']"
+            collapsed-header="Fehlende Daten"
+        >
+            <div
+                v-for="(service, serviceIndex) in missing"
+                class="row mb-3 p-1"
+                :class="{ 'stripe-odd': serviceIndex % 2 == 0 }"
+                :key="serviceIndex"
+            >
                 <div class="col-md-2">
                     <basic-info :service="service" />
                 </div>
@@ -40,12 +53,20 @@
                     <details-info :service="service" />
                 </div>
                 <div class="col-md-4">
-                    <span v-for="(ministry,ministryIndex) in missingMinistries(service)" :key="serviceIndex+'_missing_'+ministryIndex"
-                          class="badge bg-danger">{{ ministry }}</span>
+                    <span
+                        v-for="(ministry, ministryIndex) in missingMinistries(service)"
+                        :key="serviceIndex + '_missing_' + ministryIndex"
+                        class="badge bg-danger"
+                        >{{ ministry }}</span
+                    >
                 </div>
                 <div class="col-md-2 text-end">
-                    <inertia-link class="btn btn-primary" :href="route('service.edit', service.slug)"
-                       title="Eintrag bearbeiten"><span class="mdi mdi-pencil"></span></inertia-link>
+                    <inertia-link
+                        class="btn btn-primary"
+                        :href="route('service.edit', service.slug)"
+                        title="Eintrag bearbeiten"
+                        ><span class="mdi mdi-pencil"></span
+                    ></inertia-link>
                 </div>
             </div>
         </fake-table>
@@ -53,40 +74,37 @@
 </template>
 
 <script>
-import FakeTable from "../Ui/FakeTable";
-import DetailsInfo from "../Service/DetailsInfo";
-import BasicInfo from "../Service/BasicInfo";
+import FakeTable from '../Ui/FakeTable'
+import DetailsInfo from '../Service/DetailsInfo'
+import BasicInfo from '../Service/BasicInfo'
 export default {
     methods: {
         missingMinistries(service) {
-            let missingMinistryItems = [];
-            this.config.ministries.forEach(ministry => {
-                let examine = null;
+            let missingMinistryItems = []
+            this.config.ministries.forEach((ministry) => {
+                let examine = null
                 switch (ministry) {
                     case this.$page.props.labels.pastor:
-                        examine = service.pastors;
-                        break;
+                        examine = service.pastors
+                        break
                     case this.$page.props.labels.organist:
-                        examine = service.organists;
-                        break;
+                        examine = service.organists
+                        break
                     case this.$page.props.labels.sacristan:
-                        examine = service.sacristans;
-                        break;
+                        examine = service.sacristans
+                        break
                     default:
-                        examine = service.ministriesByCategory[ministry];
+                        examine = service.ministriesByCategory[ministry]
                 }
-                if (!examine) missingMinistryItems.push(ministry);
-            });
-            return missingMinistryItems;
-        }
+                if (!examine) missingMinistryItems.push(ministry)
+            })
+            return missingMinistryItems
+        },
     },
-    name: "MissingEntriesTab",
-    components: {BasicInfo, DetailsInfo, FakeTable},
-    props: ['title', 'description', 'user', 'settings', 'missing', 'count', 'config']
-
+    name: 'MissingEntriesTab',
+    components: { BasicInfo, DetailsInfo, FakeTable },
+    props: ['title', 'description', 'user', 'settings', 'missing', 'count', 'config'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

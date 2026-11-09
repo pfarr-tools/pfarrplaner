@@ -27,29 +27,68 @@
   -->
 
 <template>
-    <div class="form-group form-field" :class="groupClasses">
-        <value-check v-if="isCheckedItem" :value="value" />
-        <label v-if="label" :for="fieldId" class="control-label form-label">
-            <span v-if="preLabel" :class="preLabel" aria-hidden="true"></span>
+    <div
+        class="form-group form-field"
+        :class="groupClasses"
+    >
+        <value-check
+            v-if="isCheckedItem"
+            :value="value"
+        />
+        <label
+            v-if="label"
+            :for="fieldId"
+            class="control-label form-label"
+        >
+            <span
+                v-if="preLabel"
+                :class="preLabel"
+                aria-hidden="true"
+            ></span>
             {{ label }}
-            <span v-if="required" class="text-danger ms-1" aria-hidden="true">*</span>
-            <span v-if="required" class="visually-hidden">(Pflichtfeld)</span>
+            <span
+                v-if="required"
+                class="text-danger ms-1"
+                aria-hidden="true"
+                >*</span
+            >
+            <span
+                v-if="required"
+                class="visually-hidden"
+                >(Pflichtfeld)</span
+            >
         </label>
-        <slot :described-by="describedBy" :error="hasError" :error-id="errorId" :error-message="errorMessage"
-              :field-id="fieldId" :help-id="helpId" />
-        <small v-if="help" :id="helpId" class="message form-text text-muted">{{ help }}</small>
-        <div v-if="hasError" :id="errorId" :key="errorId + String(errorMessage)" class="message invalid-feedback d-block">
+        <slot
+            :described-by="describedBy"
+            :error="hasError"
+            :error-id="errorId"
+            :error-message="errorMessage"
+            :field-id="fieldId"
+            :help-id="helpId"
+        />
+        <small
+            v-if="help"
+            :id="helpId"
+            class="message form-text text-muted"
+            >{{ help }}</small
+        >
+        <div
+            v-if="hasError"
+            :id="errorId"
+            :key="errorId + String(errorMessage)"
+            class="message invalid-feedback d-block"
+        >
             {{ errorMessage }}
         </div>
     </div>
 </template>
 
 <script>
-import ValueCheck from "../elements/ValueCheck";
+import ValueCheck from '../elements/ValueCheck'
 
 export default {
-    name: "FormGroup",
-    components: {ValueCheck},
+    name: 'FormGroup',
+    components: { ValueCheck },
     props: {
         id: String,
         name: String,
@@ -73,45 +112,47 @@ export default {
     },
     computed: {
         fieldId() {
-            if (this.inputId) return this.inputId;
-            if (this.id) return `${this.id}Input`;
-            return '';
+            if (this.inputId) return this.inputId
+            if (this.id) return `${this.id}Input`
+            return ''
         },
         helpId() {
-            return this.id ? `${this.id}Help` : '';
+            return this.id ? `${this.id}Help` : ''
         },
         errorId() {
-            return this.id ? `${this.id}Error` : '';
+            return this.id ? `${this.id}Error` : ''
         },
         pageError() {
-            if (!this.name) return null;
-            const errors = this.$page.props.errors || {};
-            if (errors[this.name]) return errors[this.name];
+            if (!this.name) return null
+            const errors = this.$page.props.errors || {}
+            if (errors[this.name]) return errors[this.name]
 
             for (const bag of Object.values(errors)) {
                 if (bag && typeof bag === 'object' && bag[this.name]) {
-                    return bag[this.name];
+                    return bag[this.name]
                 }
             }
 
-            return null;
+            return null
         },
         errorMessage() {
-            const message = this.error ?? this.pageError;
-            if (!message) return '';
-            return Array.isArray(message) ? message.join(' ') : message;
+            const message = this.error ?? this.pageError
+            if (!message) return ''
+            return Array.isArray(message) ? message.join(' ') : message
         },
         hasError() {
-            return this.errorMessage !== '';
+            return this.errorMessage !== ''
         },
         describedBy() {
-            return [this.help ? this.helpId : null, this.hasError ? this.errorId : null].filter(Boolean).join(' ');
+            return [this.help ? this.helpId : null, this.hasError ? this.errorId : null]
+                .filter(Boolean)
+                .join(' ')
         },
         groupClasses() {
             return {
                 'form-group-required': this.required,
                 'form-field-invalid': this.hasError,
-            };
+            }
         },
     },
 }
@@ -119,11 +160,10 @@ export default {
 
 <style scoped>
 .message {
-    font-size: .8em;
+    font-size: 0.8em;
 }
 
 .form-label {
     font-weight: 500;
 }
-
 </style>

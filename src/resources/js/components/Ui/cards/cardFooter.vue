@@ -32,10 +32,8 @@
 
 <script>
 export default {
-name: "cardFooter"
+    name: 'cardFooter',
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

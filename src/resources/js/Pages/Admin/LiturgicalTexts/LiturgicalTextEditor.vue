@@ -27,84 +27,129 @@
   -->
 
 <script>
+import { markRaw } from 'vue'
+import { Editor, EditorContent } from '@tiptap/vue-3'
+import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
 
-import { markRaw } from 'vue';
-import { Editor, EditorContent } from '@tiptap/vue-3';
-import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-
-import FormInput from "../../../components/Ui/forms/FormInput.vue";
-import FormTextarea from "../../../components/Ui/forms/FormTextarea.vue";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize.vue";
-import NavButton from "../../../components/Ui/buttons/NavButton.vue";
-import SaveButton from "../../../components/Ui/buttons/SaveButton.vue";
-import FormGroup from "../../../components/Ui/forms/FormGroup.vue";
+import FormInput from '../../../components/Ui/forms/FormInput.vue'
+import FormTextarea from '../../../components/Ui/forms/FormTextarea.vue'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize.vue'
+import NavButton from '../../../components/Ui/buttons/NavButton.vue'
+import SaveButton from '../../../components/Ui/buttons/SaveButton.vue'
+import FormGroup from '../../../components/Ui/forms/FormGroup.vue'
 
 export default {
-    name: "LiturgicalTextEditor",
-    components: {FormGroup, EditorContent, SaveButton, NavButton, FormSelectize, FormTextarea, FormInput},
-    props: {text: Object, codes: Array},
+    name: 'LiturgicalTextEditor',
+    components: {
+        FormGroup,
+        EditorContent,
+        SaveButton,
+        NavButton,
+        FormSelectize,
+        FormTextarea,
+        FormInput,
+    },
+    props: { text: Object, codes: Array },
     data() {
         return {
             myText: this.text,
             replacementOptions: [
-                {id: 'funeral', name: 'Beerdigung'},
-                {id: 'baptism', name: 'Taufe'},
-                {id: 'wedding', name: 'Trauung'},
+                { id: 'funeral', name: 'Beerdigung' },
+                { id: 'baptism', name: 'Taufe' },
+                { id: 'wedding', name: 'Trauung' },
             ],
             selectizeSettings: {
                 create: function (input) {
-                    return {id: input, name: input};
+                    return { id: input, name: input }
                 },
                 render: {
                     option_create: function (data, escape) {
-                        return '<div class="create">Neuen Code anlegen: <strong>' + escape(data.input) + '</strong>&hellip;</div>';
-                    }
+                        return (
+                            '<div class="create">Neuen Code anlegen: <strong>' +
+                            escape(data.input) +
+                            '</strong>&hellip;</div>'
+                        )
+                    },
                 },
             },
-            editor: markRaw(new Editor({
-                content: this.text.text || '',
-                extensions: [StarterKit, Underline],
-                onUpdate: ({ editor }) => {
-                    this.myText.text = editor.getHTML();
-                },
-            })),
+            editor: markRaw(
+                new Editor({
+                    content: this.text.text || '',
+                    extensions: [StarterKit, Underline],
+                    onUpdate: ({ editor }) => {
+                        this.myText.text = editor.getHTML()
+                    },
+                }),
+            ),
         }
     },
     beforeUnmount() {
-        this.editor.destroy();
+        this.editor.destroy()
     },
     methods: {
         saveText() {
             if (this.myText.id) {
-                this.$inertia.patch(route('admin.text.update', this.myText.id), this.myText);
+                this.$inertia.patch(route('admin.text.update', this.myText.id), this.myText)
             } else {
-                this.$inertia.post(route('admin.text.store'), this.myText);
+                this.$inertia.post(route('admin.text.store'), this.myText)
             }
         },
         deleteText() {
-            if (!confirm('Willst du diesen Text wirklich unwiderruflich löschen?')) return;
-            this.$inertia.delete(route('admin.text.destroy', this.myText.id));
-        }
-    }
+            if (!confirm('Willst du diesen Text wirklich unwiderruflich löschen?')) return
+            this.$inertia.delete(route('admin.text.destroy', this.myText.id))
+        },
+    },
 }
 </script>
 
 <template>
     <admin-layout title="Text bearbeiten">
         <template v-slot:navbar-left>
-            <save-button label="Speichern" title="Text speichern" @click="saveText" />
-            <nav-button v-if="myText.id" class="ms-1" title="Text löschen" icon="mdi mdi-delete" type="danger" @click="deleteText">Löschen</nav-button>
+            <save-button
+                label="Speichern"
+                title="Text speichern"
+                @click="saveText"
+            />
+            <nav-button
+                v-if="myText.id"
+                class="ms-1"
+                title="Text löschen"
+                icon="mdi mdi-delete"
+                type="danger"
+                @click="deleteText"
+                >Löschen</nav-button
+            >
         </template>
-        <form-input label="Titel" v-model="myText.title"/>
+        <form-input
+            label="Titel"
+            v-model="myText.title"
+        />
         <form-group label="Text">
-            <editor-content :editor="editor" class="form-control tiptap-editor" />
+            <editor-content
+                :editor="editor"
+                class="form-control tiptap-editor"
+            />
         </form-group>
-        <form-textarea label="Quellenangaben" v-model="myText.source"/>
-        <form-textarea label="Anmerkungen" v-model="myText.notice"/>
-        <form-selectize label="Code" v-model="myText.agenda_code" :options="codes"
-                        :settings="selectizeSettings"></form-selectize>
-        <form-selectize label="Enthält Variablen für" v-model="myText.needs_replacement" :options="replacementOptions"/>
+        <form-textarea
+            label="Quellenangaben"
+            v-model="myText.source"
+        />
+        <form-textarea
+            label="Anmerkungen"
+            v-model="myText.notice"
+        />
+        <form-selectize
+            label="Code"
+            v-model="myText.agenda_code"
+            :options="codes"
+            :settings="selectizeSettings"
+        ></form-selectize>
+        <form-selectize
+            label="Enthält Variablen für"
+            v-model="myText.needs_replacement"
+            :options="replacementOptions"
+        />
     </admin-layout>
 </template>
 

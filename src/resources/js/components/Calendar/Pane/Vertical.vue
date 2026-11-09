@@ -28,41 +28,55 @@
 
 <template>
     <div class="calendar-month calendar-vertical">
-        <div class="calendar-grid-wrapper" :class="{'month-loading': loading}">
+        <div
+            class="calendar-grid-wrapper"
+            :class="{ 'month-loading': loading }"
+        >
             <table class="table table-bordered table-sm mb-0 calendar-grid">
                 <colgroup>
-                    <col class="day-column">
-                    <col v-for="city in cities" :key="'col_'+city.id" class="city-column">
+                    <col class="day-column" />
+                    <col
+                        v-for="city in cities"
+                        :key="'col_' + city.id"
+                        class="city-column"
+                    />
                 </colgroup>
                 <thead>
-                <tr>
-                    <th class="no-print text-start city-title day-column-header"></th>
-                    <th v-for="city in cities" :key="'header_'+city.id" class="city-title">
-                        <div class="city-title-content">
-                            <span class="mdi mdi-map-marker-outline city-title-icon"></span>
-                            <span class="city-title-text">{{ city.name }}</span>
-                        </div>
-                    </th>
-                </tr>
+                    <tr>
+                        <th class="no-print text-start city-title day-column-header"></th>
+                        <th
+                            v-for="city in cities"
+                            :key="'header_' + city.id"
+                            class="city-title"
+                        >
+                            <div class="city-title-content">
+                                <span class="mdi mdi-map-marker-outline city-title-icon"></span>
+                                <span class="city-title-text">{{ city.name }}</span>
+                            </div>
+                        </th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(day, dayDate) in monthDays" :key="dayDate">
-                    <calendar-day-header
-                        :day="day"
+                    <tr
+                        v-for="(day, dayDate) in monthDays"
                         :key="dayDate"
-                    />
-                    <calendar-cell
-                        v-for="city in cities"
-                        :key="'cell_'+city.id+'_'+dayDate"
-                        :day="day"
-                        :city="city"
-                        :services="getServices(city, dayDate)"
-                        :targetMode="targetMode"
-                        :target="target"
-                        :loading="loading"
-                        @deleted="removeService"
-                    />
-                </tr>
+                    >
+                        <calendar-day-header
+                            :day="day"
+                            :key="dayDate"
+                        />
+                        <calendar-cell
+                            v-for="city in cities"
+                            :key="'cell_' + city.id + '_' + dayDate"
+                            :day="day"
+                            :city="city"
+                            :services="getServices(city, dayDate)"
+                            :targetMode="targetMode"
+                            :target="target"
+                            :loading="loading"
+                            @deleted="removeService"
+                        />
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -70,104 +84,111 @@
 </template>
 
 <script>
-
-import NavButton from "../../Ui/buttons/NavButton";
-import CalendarDayHeader from "../Day/Header.vue";
-import CalendarCell from "../Cell.vue";
+import NavButton from '../../Ui/buttons/NavButton'
+import CalendarDayHeader from '../Day/Header.vue'
+import CalendarCell from '../Cell.vue'
 export default {
     name: 'CalendarPaneVertical',
-    components: {CalendarCell, CalendarDayHeader, NavButton},
+    components: { CalendarCell, CalendarDayHeader, NavButton },
     props: ['date', 'cities', 'canCreate', 'collapseState', 'targetMode', 'target', 'initialData'],
     data() {
         return {
             loading: false,
-            data: this.initialData?.data || this.createMonthShell(this.initialData?.loadedDate || this.date),
+            data:
+                this.initialData?.data ||
+                this.createMonthShell(this.initialData?.loadedDate || this.date),
             loadedDate: this.initialData?.loadedDate || null,
             loadingRequestDate: null,
         }
     },
     mounted() {
         if (this.loadedDate !== this.date) {
-            this.loadServices();
+            this.loadServices()
         }
     },
     watch: {
         date(newVal) {
             if (this.loadedDate !== newVal) {
-                this.loadServices();
+                this.loadServices()
             }
         },
     },
     methods: {
         createMonthShell(targetDate) {
-            const monthStart = moment(targetDate + '-01');
-            const result = {};
-            const dayCount = monthStart.daysInMonth();
+            const monthStart = moment(targetDate + '-01')
+            const result = {}
+            const dayCount = monthStart.daysInMonth()
 
             for (let day = 1; day <= dayCount; day++) {
-                const dayDate = monthStart.clone().date(day).format('YYYY-MM-DD');
+                const dayDate = monthStart.clone().date(day).format('YYYY-MM-DD')
                 result[dayDate] = {
                     date: dayDate,
                     liturgy: {},
                     absences: [],
                     services: {},
-                };
+                }
             }
 
-            return result;
+            return result
         },
         loadServices() {
-            const requestDate = this.date;
-            this.loading = true;
-            this.loadingRequestDate = requestDate;
-            this.data = this.createMonthShell(requestDate);
-            this.$api().get(route('api.calendar.month', {
-                date: requestDate,
-            })).then(response => {
-                if (this.loadingRequestDate !== requestDate) return;
-                this.data = response.data.data;
-                this.loadedDate = response.data.loadedDate;
-                this.loading = false;
-                this.$forceUpdate();
-            }).catch(() => {
-                if (this.loadingRequestDate !== requestDate) return;
-                this.loading = false;
-            });
+            const requestDate = this.date
+            this.loading = true
+            this.loadingRequestDate = requestDate
+            this.data = this.createMonthShell(requestDate)
+            this.$api()
+                .get(
+                    route('api.calendar.month', {
+                        date: requestDate,
+                    }),
+                )
+                .then((response) => {
+                    if (this.loadingRequestDate !== requestDate) return
+                    this.data = response.data.data
+                    this.loadedDate = response.data.loadedDate
+                    this.loading = false
+                    this.$forceUpdate()
+                })
+                .catch(() => {
+                    if (this.loadingRequestDate !== requestDate) return
+                    this.loading = false
+                })
         },
         getServices(city, day) {
-            if (this.data?.[day] == undefined) return [];
-            if (this.data[day].services == undefined) return [];
-            if (!city.is_org) return this.data[day].services[city.id] || [];
+            if (this.data?.[day] == undefined) return []
+            if (this.data[day].services == undefined) return []
+            if (!city.is_org) return this.data[day].services[city.id] || []
 
             // org results: include all child ids
             // "unpack" the lists by ids to avoid duplicates
-            let result = {};
-            (this.data[day].services[city.id] || []).forEach(item => {
-                result[item.id] = item;
-            });
-            city.childIds.forEach(childId => {
-                (this.data[day].services[childId] || []).forEach(item => {
-                    result[item.id] = item;
-                });
-            });
-            return Object.values(result);
+            let result = {}
+            ;(this.data[day].services[city.id] || []).forEach((item) => {
+                result[item.id] = item
+            })
+            city.childIds.forEach((childId) => {
+                ;(this.data[day].services[childId] || []).forEach((item) => {
+                    result[item.id] = item
+                })
+            })
+            return Object.values(result)
         },
         removeService(service) {
-            const serviceDate = service?.date;
-            const serviceId = service?.id;
-            if (!serviceDate || !serviceId || !this.data?.[serviceDate]?.services) return;
+            const serviceDate = service?.date
+            const serviceId = service?.id
+            if (!serviceDate || !serviceId || !this.data?.[serviceDate]?.services) return
 
-            Object.keys(this.data[serviceDate].services).forEach(cityId => {
-                this.data[serviceDate].services[cityId] = (this.data[serviceDate].services[cityId] || [])
-                    .filter(item => item.id !== serviceId);
-            });
+            Object.keys(this.data[serviceDate].services).forEach((cityId) => {
+                this.data[serviceDate].services[cityId] = (
+                    this.data[serviceDate].services[cityId] || []
+                ).filter((item) => item.id !== serviceId)
+            })
         },
     },
     computed: {
         monthDays() {
-            return this.data || this.createMonthShell(this.date);
+            return this.data || this.createMonthShell(this.date)
         },
-    }
+    },
 }
 </script>
 <style scoped>
@@ -277,6 +298,4 @@ export default {
         background-position: 0 50%;
     }
 }
-
-
 </style>

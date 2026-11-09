@@ -29,9 +29,17 @@
 <template>
     <admin-layout title="Jahresplan der Gottesdienste erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Jahresplan der Gottesdienste erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Jahresplan der Gottesdienste erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'serviceTable'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'serviceTable' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
             <city-location-filter
                 :cities="cities"
@@ -42,31 +50,46 @@
                 v-model:city-model-value="myCities"
                 v-model:location-model-value="myLocations"
             />
-            <form-input name="year" label="Jahr" v-model="myYear" type="number" />
-            <form-selectize name="ministries[]" label="Folgende Dienste mit einschließen" :options="ministries" v-model="myMinistries" multiple/>
-            <form-selectize name="name_format" label="Namen ausgeben als" :options="nameFormats" v-model="myNameFormat" />
+            <form-input
+                name="year"
+                label="Jahr"
+                v-model="myYear"
+                type="number"
+            />
+            <form-selectize
+                name="ministries[]"
+                label="Folgende Dienste mit einschließen"
+                :options="ministries"
+                v-model="myMinistries"
+                multiple
+            />
+            <form-selectize
+                name="name_format"
+                label="Namen ausgeben als"
+                :options="nameFormats"
+                v-model="myNameFormat"
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import CityLocationFilter from "../../../components/Reports/CityLocationFilter.vue";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import CityLocationFilter from '../../../components/Reports/CityLocationFilter.vue'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'locations', 'ministries'],
-    components: {CityLocationFilter, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: { CityLocationFilter, FormInput, FormCsrfToken, FormSelectize, SaveButton },
     data() {
         let nameFormats = [
-            {id: 1, name: 'Pfr. Müller'},
-            {id: 2, name: 'Pfr. K. Müller'},
-            {id: 3, name: 'Pfr. Karl Müller'},
-        ];
-
+            { id: 1, name: 'Pfr. Müller' },
+            { id: 2, name: 'Pfr. K. Müller' },
+            { id: 3, name: 'Pfr. Karl Müller' },
+        ]
 
         return {
             myUser: this.$page.props.currentUser.data.id,
@@ -80,18 +103,16 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'serviceTable'}), {
+            submitReportForm(route('reports.render', { report: 'serviceTable' }), {
                 cities: this.myCities,
                 locations: this.myLocations,
                 year: this.myYear,
                 ministries: this.myMinistries,
                 name_format: this.myNameFormat,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

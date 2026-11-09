@@ -40,14 +40,31 @@
                 <span class="mdi mdi-chevron-left"></span>
             </a>
         </li>
-        <template v-for="(item, index) in dsPages" :key="index">
-            <li :class="['page-item', item === dsPage && 'active', item === morePages && 'disabled']">
-                <a v-if="item !== morePages" class="page-link" href="#" @click.prevent="setActive(item)">
+        <template
+            v-for="(item, index) in dsPages"
+            :key="index"
+        >
+            <li
+                :class="[
+                    'page-item',
+                    item === dsPage && 'active',
+                    item === morePages && 'disabled',
+                ]"
+            >
+                <a
+                    v-if="item !== morePages"
+                    class="page-link"
+                    href="#"
+                    @click.prevent="setActive(item)"
+                >
                     {{ item }}
                 </a>
-                <span v-else class="page-link">
-          {{ item }}
-        </span>
+                <span
+                    v-else
+                    class="page-link"
+                >
+                    {{ item }}
+                </span>
             </li>
         </template>
         <li :class="['page-item', disabledNext && 'disabled']">
@@ -57,7 +74,9 @@
                 title="Weiter"
                 :tabindex="disabledNext && '-1'"
                 :aria-disabled="disabledNext && 'true'"
-                @click.prevent="setActive(dsPage !== dsPagecount && dsPagecount !== 0 ? dsPage + 1 : dsPage)"
+                @click.prevent="
+                    setActive(dsPage !== dsPagecount && dsPagecount !== 0 ? dsPage + 1 : dsPage)
+                "
             >
                 <span class="mdi mdi-chevron-right"></span>
             </a>
@@ -75,7 +94,9 @@ export default {
         const dsPagecount = inject('dsPagecount')
 
         const disabledPrevious = computed(() => dsPage.value === 1)
-        const disabledNext = computed(() => dsPage.value === dsPagecount.value || dsPagecount.value === 0)
+        const disabledNext = computed(
+            () => dsPage.value === dsPagecount.value || dsPagecount.value === 0,
+        )
 
         return {
             datasetI18n: inject('datasetI18n'),
@@ -85,8 +106,8 @@ export default {
             dsPage,
             morePages,
             disabledPrevious,
-            disabledNext
+            disabledNext,
         }
-    }
+    },
 }
 </script>

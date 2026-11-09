@@ -29,33 +29,60 @@
 <template>
     <admin-layout title="QR-Codes für Gottesdienste erstellen">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="QR-Codes für Gottesdienste erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="QR-Codes für Gottesdienste erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'konfiAppQR'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'konfiAppQR' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="city" label="QR-Codes für folgende Kirchengemeinde erstellen" v-model="myCity" :options="cities" />
-            <input type="hidden" name="city" v-model="myCity" />
-            <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
-            <form-input name="copies" label="Anzahl Kopien pro QR-Code" type="number" v-model="myCopies" />
+            <form-selectize
+                name="city"
+                label="QR-Codes für folgende Kirchengemeinde erstellen"
+                v-model="myCity"
+                :options="cities"
+            />
+            <input
+                type="hidden"
+                name="city"
+                v-model="myCity"
+            />
+            <form-date-range-picker
+                label="Gottesdienste von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
+            <form-input
+                name="copies"
+                label="Anzahl Kopien pro QR-Code"
+                type="number"
+                v-model="myCopies"
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDateRangePicker from "../../../components/Ui/forms/FormDateRangePicker";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDateRangePicker from '../../../components/Ui/forms/FormDateRangePicker'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['cities', 'start'],
-    components: {FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: { FormDateRangePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton },
     data() {
-        let myStart = moment();
-        let myEnd = moment().add(3, 'months');
-        let myCopies = 1;
+        let myStart = moment()
+        let myEnd = moment().add(3, 'months')
+        let myCopies = 1
 
         return {
             myCity: this.cities.length ? this.cities[0].id : null,
@@ -66,17 +93,15 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'konfiAppQR'}), {
+            submitReportForm(route('reports.render', { report: 'konfiAppQR' }), {
                 city: this.myCity,
                 start: this.myStart,
                 end: this.myEnd,
                 copies: this.myCopies,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

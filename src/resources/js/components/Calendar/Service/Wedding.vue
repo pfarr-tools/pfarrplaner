@@ -28,18 +28,18 @@
 
 <template>
     <span v-if="hasPermission('gd-kasualien-lesen')">
-        Trauung von {{ wedding.spouse1_name }}{{ wedding.spouse1_birth_name ? ' ('+wedding.spouse1_birth_name+')' : ''}}
-        und {{ wedding.spouse2_name }}{{ wedding.spouse2_birth_name ? ' ('+wedding.spouse2_birth_name+')' : ''}}
+        Trauung von {{ wedding.spouse1_name
+        }}{{ wedding.spouse1_birth_name ? ' (' + wedding.spouse1_birth_name + ')' : '' }} und
+        {{ wedding.spouse2_name
+        }}{{ wedding.spouse2_birth_name ? ' (' + wedding.spouse2_birth_name + ')' : '' }}
     </span>
 </template>
 
 <script>
 export default {
     name: 'CalendarServiceWedding',
-    props: ['wedding', 'trail', 'trailer']
+    props: ['wedding', 'trail', 'trailer'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

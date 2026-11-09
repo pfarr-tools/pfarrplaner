@@ -27,32 +27,97 @@
   -->
 
 <template>
-    <div class="attachment" @click.prevent="download" :title="tooltipTitle">
+    <div
+        class="attachment"
+        @click.prevent="download"
+        :title="tooltipTitle"
+    >
         <div class="attachment-content">
-            <b><span class="fa" :class="attachment.icon"></span> {{ attachment.title }}</b><br/>
-            <small v-if="attachment.errorMessage" class="text-danger">{{ attachment.errorMessage }}</small>
-            <small v-else>.{{ attachment.extension }}<span v-if="attachment.size !== null">, {{ fileSize(attachment.size) }}</span></small>
+            <b
+                ><span
+                    class="fa"
+                    :class="attachment.icon"
+                ></span>
+                {{ attachment.title }}</b
+            ><br />
+            <small
+                v-if="attachment.errorMessage"
+                class="text-danger"
+                >{{ attachment.errorMessage }}</small
+            >
+            <small v-else
+                >.{{ attachment.extension
+                }}<span v-if="attachment.size !== null"
+                    >, {{ fileSize(attachment.size) }}</span
+                ></small
+            >
         </div>
         <div class="attachment-actions">
-            <button v-if="allowDelete" class="btn btn-sm btn-outline-danger" title="Anhang löschen"
-                @click.prevent.stop="deleteAttachment($event)">
+            <button
+                v-if="allowDelete"
+                class="btn btn-sm btn-outline-danger"
+                title="Anhang löschen"
+                @click.prevent.stop="deleteAttachment($event)"
+            >
                 <span class="mdi mdi-delete"></span>
             </button>
-            <button type="button" class="btn btn-sm btn-outline-secondary" title="Datei herunterladen"
-                    :disabled="!attachment.hasFile" @click.prevent.stop="download">
-                <span class="mdi" :class="downloadIconClass"></span>
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary"
+                title="Datei herunterladen"
+                :disabled="!attachment.hasFile"
+                @click.prevent.stop="download"
+            >
+                <span
+                    class="mdi"
+                    :class="downloadIconClass"
+                ></span>
             </button>
         </div>
-        <img v-if="isImage" class="preview" :src="imageRoute()" @click.stop="openLightbox"/>
-        <div v-if="isImage && showLightBox && inlineLightbox" class="lightbox-backdrop"
-             @click.stop="showLightBox = false"
-             @keydown.esc="showLightBox = false">
-            <div class="btn btn-dark lightbox-close" title="Vorschau schließen"><span class="mdi mdi-close"></span></div>
-            <div class="lightbox" @keydown.esc="showLightBox = false">
-                <img class="img-fluid" :src="imageRoute()" @keydown.esc="showLightBox = false"/>
-                <div class="mt-2" @keydown.esc="showLightBox = false">
-                    <button class="btn btn-primary" @click.stop="download" @keydown.esc="showLightBox = false">Download</button>
-                    <a class="btn btn-secondary" target="_blank" :href="imageRoute()">In neuem Tab öffnen</a>
+        <img
+            v-if="isImage"
+            class="preview"
+            :src="imageRoute()"
+            @click.stop="openLightbox"
+        />
+        <div
+            v-if="isImage && showLightBox && inlineLightbox"
+            class="lightbox-backdrop"
+            @click.stop="showLightBox = false"
+            @keydown.esc="showLightBox = false"
+        >
+            <div
+                class="btn btn-dark lightbox-close"
+                title="Vorschau schließen"
+            >
+                <span class="mdi mdi-close"></span>
+            </div>
+            <div
+                class="lightbox"
+                @keydown.esc="showLightBox = false"
+            >
+                <img
+                    class="img-fluid"
+                    :src="imageRoute()"
+                    @keydown.esc="showLightBox = false"
+                />
+                <div
+                    class="mt-2"
+                    @keydown.esc="showLightBox = false"
+                >
+                    <button
+                        class="btn btn-primary"
+                        @click.stop="download"
+                        @keydown.esc="showLightBox = false"
+                    >
+                        Download
+                    </button>
+                    <a
+                        class="btn btn-secondary"
+                        target="_blank"
+                        :href="imageRoute()"
+                        >In neuem Tab öffnen</a
+                    >
                 </div>
             </div>
         </div>
@@ -61,7 +126,7 @@
 
 <script>
 export default {
-    name: "Attachment",
+    name: 'Attachment',
     emits: ['delete-attachment', 'show-lightbox'],
     props: {
         attachment: Object,
@@ -75,24 +140,24 @@ export default {
     },
     computed: {
         isImage() {
-            return this.attachment.hasFile && this.attachment.mimeType.substr(0, 5) === 'image';
+            return this.attachment.hasFile && this.attachment.mimeType.substr(0, 5) === 'image'
         },
         tooltipTitle() {
             return this.attachment.errorMessage
                 ? this.attachment.errorMessage
-                : this.attachment.title + ' herunterladen';
+                : this.attachment.title + ' herunterladen'
         },
         downloadIconClass() {
-            return this.attachment.hasFile ? 'mdi-download' : 'mdi-alert-circle text-danger';
-        }
+            return this.attachment.hasFile ? 'mdi-download' : 'mdi-alert-circle text-danger'
+        },
     },
     methods: {
         download() {
-            if (!this.attachment.hasFile) return;
-            this.redirectTo(route('attachment', {attachment: this.attachment.id}));
+            if (!this.attachment.hasFile) return
+            this.redirectTo(route('attachment', { attachment: this.attachment.id }))
         },
         redirectTo(url) {
-            window.location.href = url;
+            window.location.href = url
         },
         /**
          * Get human-readable file size
@@ -101,21 +166,23 @@ export default {
          * @source https://programanddesign.com/js/human-readable-file-size-in-javascript/
          */
         fileSize(size) {
-            if (!size) return '0 B';
-            var i = Math.floor(Math.log(size) / Math.log(1024));
-            return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+            if (!size) return '0 B'
+            var i = Math.floor(Math.log(size) / Math.log(1024))
+            return (
+                (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
+            )
         },
         deleteAttachment(event) {
-            this.$emit('delete-attachment');
+            this.$emit('delete-attachment')
         },
         imageRoute() {
-            return route('image', {path: this.attachment.file.replace('attachments/', '')});
+            return route('image', { path: this.attachment.file.replace('attachments/', '') })
         },
         openLightbox() {
             this.$emit('show-lightbox', this.attachment)
             if (this.inlineLightbox) this.showLightBox = true
-        }
-    }
+        },
+    },
 }
 </script>
 
@@ -123,11 +190,11 @@ export default {
 .attachment {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: .5rem;
+    gap: 0.5rem;
     width: 100%;
     text-align: left;
-    margin-bottom: .25rem;
-    padding: .75rem;
+    margin-bottom: 0.25rem;
+    padding: 0.75rem;
     border: 1px solid var(--bs-border-color);
     border-radius: var(--bs-border-radius);
     background: var(--bs-body-bg);
@@ -135,8 +202,14 @@ export default {
     cursor: pointer;
 }
 
-.attachment-content { min-width: 0; }
-.attachment-actions { display: flex; align-items: flex-start; gap: .5rem; }
+.attachment-content {
+    min-width: 0;
+}
+.attachment-actions {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
 small {
     color: var(--bs-secondary-color);
 }
@@ -145,8 +218,8 @@ small {
     grid-column: 1 / -1;
     width: 100%;
     height: 7rem;
-    margin-top: .25rem;
-    padding: .25rem;
+    margin-top: 0.25rem;
+    padding: 0.25rem;
     border: 1px solid var(--bs-border-color);
     border-radius: var(--bs-border-radius-sm);
     object-fit: contain;

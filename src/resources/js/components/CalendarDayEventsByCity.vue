@@ -29,49 +29,55 @@
 <template>
     <div v-if="loading"><span class="mdi mdi-spin mdi-loading"></span></div>
     <div v-else>
-        <calendar-service v-for="service in services" v-bind:key="service" :serviceId="service"></calendar-service>
-        <a class="btn btn-success btn-sm btn-add-day" title="Neuen Gottesdiensteintrag hinzufügen"
-           :href="serviceAddRoute()"><span class="mdi mdi-plus"></span></a>
-
+        <calendar-service
+            v-for="service in services"
+            v-bind:key="service"
+            :serviceId="service"
+        ></calendar-service>
+        <a
+            class="btn btn-success btn-sm btn-add-day"
+            title="Neuen Gottesdiensteintrag hinzufügen"
+            :href="serviceAddRoute()"
+            ><span class="mdi mdi-plus"></span
+        ></a>
     </div>
 </template>
 
 <script>
-    import CalendarDayEventsByCity from "./CalendarDayEventsByCity";
-    import CalendarService from "./CalendarService";
-    export default {
-        name: "CalendarDayEventsByCity",
-        components: {CalendarService},
-        props: [
-            'day',
-            'city'
-        ],
-        data() {
-            return {
-                services: [],
-                loading: true,
-            };
-        },
-
-        created() {
-            this.getData();
-        },
-
-        methods: {
-            getData(api_url) {
-                api_url = api_url || route('api.services.byDayAndCity', {day: this.day.id, city: this.city.id});
-                this.$api().get(api_url)
-                    .then(response => {
-                        this.services = response.data;
-                        this.loading = false;
-                    });
-            },
-            serviceAddRoute: function() {
-                return route('services.add', {day: this.day.id, city: this.city.id});
-            }
+import CalendarDayEventsByCity from './CalendarDayEventsByCity'
+import CalendarService from './CalendarService'
+export default {
+    name: 'CalendarDayEventsByCity',
+    components: { CalendarService },
+    props: ['day', 'city'],
+    data() {
+        return {
+            services: [],
+            loading: true,
         }
-    };</script>
+    },
 
-<style scoped>
+    created() {
+        this.getData()
+    },
 
-</style>
+    methods: {
+        getData(api_url) {
+            api_url =
+                api_url ||
+                route('api.services.byDayAndCity', { day: this.day.id, city: this.city.id })
+            this.$api()
+                .get(api_url)
+                .then((response) => {
+                    this.services = response.data
+                    this.loading = false
+                })
+        },
+        serviceAddRoute: function () {
+            return route('services.add', { day: this.day.id, city: this.city.id })
+        },
+    },
+}
+</script>
+
+<style scoped></style>

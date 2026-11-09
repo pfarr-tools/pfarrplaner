@@ -29,18 +29,51 @@
 <template>
     <div class="song-edit-pane">
         <tab-headers>
-            <tab-header id="home" :active-tab="activeTab" title="Allgemeines" :switch-handler="true" @tab="activeTab = $event"/>
-            <tab-header id="text" :active-tab="activeTab" title="Text"  :switch-handler="true" @tab="activeTab = $event"/>
-            <tab-header id="songbooks" :active-tab="activeTab" title="Liederbücher"  :switch-handler="true" @tab="activeTab = $event"/>
+            <tab-header
+                id="home"
+                :active-tab="activeTab"
+                title="Allgemeines"
+                :switch-handler="true"
+                @tab="activeTab = $event"
+            />
+            <tab-header
+                id="text"
+                :active-tab="activeTab"
+                title="Text"
+                :switch-handler="true"
+                @tab="activeTab = $event"
+            />
+            <tab-header
+                id="songbooks"
+                :active-tab="activeTab"
+                title="Liederbücher"
+                :switch-handler="true"
+                @tab="activeTab = $event"
+            />
         </tab-headers>
         <tabs>
-            <tab id="home" :active-tab="activeTab">
-                <form-input label="Titel des Lieds" v-model="song.song.title" />
-                <form-textarea label="Copyrights" v-model="song.song.copyrights" />
+            <tab
+                id="home"
+                :active-tab="activeTab"
+            >
+                <form-input
+                    label="Titel des Lieds"
+                    v-model="song.song.title"
+                />
+                <form-textarea
+                    label="Copyrights"
+                    v-model="song.song.copyrights"
+                />
             </tab>
-            <tab id="text" :active-tab="activeTab">
-                <form-textarea label="Kehrvers" v-model="song.song.refrain"
-                               placeholder="Leer lassen, wenn es keinen Kehrvers gibt" />
+            <tab
+                id="text"
+                :active-tab="activeTab"
+            >
+                <form-textarea
+                    label="Kehrvers"
+                    v-model="song.song.refrain"
+                    placeholder="Leer lassen, wenn es keinen Kehrvers gibt"
+                />
                 <div class="row">
                     <div class="col-1 form-group">
                         <label>Strophe</label>
@@ -49,37 +82,66 @@
                         <label>Text der Strophe</label>
                     </div>
                 </div>
-                <div v-for="(verse,verseKey,verseIndex) in song.song.verses" class="mb-2">
+                <div
+                    v-for="(verse, verseKey, verseIndex) in song.song.verses"
+                    class="mb-2"
+                >
                     <div class="row">
                         <div class="col-1">
-                            <form-input :id="`songPaneVerseNumber${verseIndex}`" label="" v-model="verse.number"/>
+                            <form-input
+                                :id="`songPaneVerseNumber${verseIndex}`"
+                                label=""
+                                v-model="verse.number"
+                            />
                         </div>
                         <div class="col-10">
-                            <form-textarea :id="`songPaneVerseText${verseIndex}`" label="" v-model="verse.text"/>
+                            <form-textarea
+                                :id="`songPaneVerseText${verseIndex}`"
+                                label=""
+                                v-model="verse.text"
+                            />
                             <div class="form-check-inline">
-                                <input type="checkbox" v-model="verse.refrain_before"/> &nbsp;Kehrvers vor
-                                dieser
-                                Strophe
+                                <input
+                                    type="checkbox"
+                                    v-model="verse.refrain_before"
+                                />
+                                &nbsp;Kehrvers vor dieser Strophe
                             </div>
                             <div class="form-check-inline">
-                                <input type="checkbox" v-model="verse.refrain_after"/> &nbsp;Kehrvers nach
-                                dieser
-                                Strophe
+                                <input
+                                    type="checkbox"
+                                    v-model="verse.refrain_after"
+                                />
+                                &nbsp;Kehrvers nach dieser Strophe
                             </div>
                         </div>
-                        <div class="col-1 text-end" style="margin-top: 2em;">
-                            <button class="btn btn-sm btn-danger" @click.prevent="deleteVerse(verseKey)">
+                        <div
+                            class="col-1 text-end"
+                            style="margin-top: 2em"
+                        >
+                            <button
+                                class="btn btn-sm btn-danger"
+                                @click.prevent="deleteVerse(verseKey)"
+                            >
                                 <span class="mdi mdi-delete"></span>
                             </button>
                         </div>
                     </div>
                 </div>
-                <hr/>
+                <hr />
                 <div class="form-group">
-                    <button class="btn btn-sm btn-light" @click.prevent="addVerse">Strophe hinzufügen</button>
+                    <button
+                        class="btn btn-sm btn-light"
+                        @click.prevent="addVerse"
+                    >
+                        Strophe hinzufügen
+                    </button>
                 </div>
             </tab>
-            <tab id="songbooks" :active-tab="activeTab">
+            <tab
+                id="songbooks"
+                :active-tab="activeTab"
+            >
                 <songbook-list v-model="song.song.songbooks" />
             </tab>
         </tabs>
@@ -87,17 +149,17 @@
 </template>
 
 <script>
-import SongbookList from "./SongbookList";
-import TabHeaders from "../../../Ui/tabs/tabHeaders";
-import TabHeader from "../../../Ui/tabs/tabHeader";
-import Tabs from "../../../Ui/tabs/tabs";
-import Tab from "../../../Ui/tabs/tab";
-import FormInput from "../../../Ui/forms/FormInput";
-import FormTextarea from "../../../Ui/forms/FormTextarea";
+import SongbookList from './SongbookList'
+import TabHeaders from '../../../Ui/tabs/tabHeaders'
+import TabHeader from '../../../Ui/tabs/tabHeader'
+import Tabs from '../../../Ui/tabs/tabs'
+import Tab from '../../../Ui/tabs/tab'
+import FormInput from '../../../Ui/forms/FormInput'
+import FormTextarea from '../../../Ui/forms/FormTextarea'
 export default {
-    name: "SongEditPane",
+    name: 'SongEditPane',
     props: ['song'],
-    components: {FormTextarea, FormInput, Tab, Tabs, TabHeader, TabHeaders, SongbookList},
+    components: { FormTextarea, FormInput, Tab, Tabs, TabHeader, TabHeaders, SongbookList },
     data() {
         return {
             activeTab: 'home',
@@ -110,16 +172,14 @@ export default {
                 number: this.song.song.verses.length + 1,
                 text: '',
                 refrain_before: false,
-                refrain_after: false
-            });
+                refrain_after: false,
+            })
         },
         deleteVerse(verseIndex) {
-            this.song.song.verses.splice(verseIndex, 1);
+            this.song.song.verses.splice(verseIndex, 1)
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

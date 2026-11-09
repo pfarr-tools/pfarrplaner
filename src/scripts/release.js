@@ -11,36 +11,36 @@
  * @version git: $Id$
  */
 
-'use strict';
+'use strict'
 
-const { execFileSync, execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+const { execFileSync, execSync } = require('child_process')
+const fs = require('fs')
+const path = require('path')
 
-const packagePath = path.resolve(__dirname, '..', 'package.json');
-const repositoryRoot = execSync('git rev-parse --show-toplevel', { encoding: 'utf8' }).trim();
-const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-const standardVersionConfig = pkg['standard-version'] || {};
-const tagPrefix = standardVersionConfig.tagPrefix || 'v';
+const packagePath = path.resolve(__dirname, '..', 'package.json')
+const repositoryRoot = execSync('git rev-parse --show-toplevel', { encoding: 'utf8' }).trim()
+const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'))
+const standardVersionConfig = pkg['standard-version'] || {}
+const tagPrefix = standardVersionConfig.tagPrefix || 'v'
 
 // Parse CLI args: positional "major|minor|patch" or --release-as <type>
-const args = process.argv.slice(2);
-let forcedType = null;
+const args = process.argv.slice(2)
+let forcedType = null
 for (let i = 0; i < args.length; i++) {
     if (args[i] === '--release-as' && args[i + 1]) {
-        forcedType = args[++i];
-        break;
+        forcedType = args[++i]
+        break
     }
     if (['major', 'minor', 'patch'].includes(args[i])) {
-        forcedType = args[i];
-        break;
+        forcedType = args[i]
+        break
     }
 }
 
-const currentYear = new Date().getFullYear();
-const versionMajor = parseInt(pkg.version.split('.')[0], 10);
+const currentYear = new Date().getFullYear()
+const versionMajor = parseInt(pkg.version.split('.')[0], 10)
 
-let releaseType;
+let releaseType
 
 /**
  * Stage the given paths if they exist in the working tree.
@@ -49,69 +49,70 @@ let releaseType;
  * @return {void}
  */
 function gitAddExisting(paths) {
-    const existingPaths = paths.filter((target) => fs.existsSync(path.resolve(repositoryRoot, target)));
+    const existingPaths = paths.filter((target) =>
+        fs.existsSync(path.resolve(repositoryRoot, target)),
+    )
 
     if (existingPaths.length === 0) {
-        return;
+        return
     }
 
-    execSync(`git -C "${repositoryRoot}" add -- ${existingPaths.join(' ')}`, { stdio: 'inherit' });
+    execSync(`git -C "${repositoryRoot}" add -- ${existingPaths.join(' ')}`, { stdio: 'inherit' })
 }
 
 function manualNeedsDusk() {
-    let lastTag = '';
+    let lastTag = ''
     try {
         lastTag = execFileSync('git', ['describe', '--tags', '--abbrev=0'], {
             cwd: repositoryRoot,
             encoding: 'utf8',
-        }).trim();
+        }).trim()
     } catch {
-        return true;
+        return true
     }
 
-    const changedFiles = execFileSync('git', [
-        'diff',
-        '--name-only',
-        `${lastTag}..HEAD`,
-        '--',
-        'src/resources',
-        'src/public',
-    ], {
-        cwd: repositoryRoot,
-        encoding: 'utf8',
-    });
+    const changedFiles = execFileSync(
+        'git',
+        ['diff', '--name-only', `${lastTag}..HEAD`, '--', 'src/resources', 'src/public'],
+        {
+            cwd: repositoryRoot,
+            encoding: 'utf8',
+        },
+    )
 
-    return changedFiles.trim().length > 0;
+    return changedFiles.trim().length > 0
 }
 
 function removeStaleDevNetworkEndpoints() {
-    const composeFile = path.resolve(repositoryRoot, 'compose.yaml');
-    let composeConfig;
+    const composeFile = path.resolve(repositoryRoot, 'compose.yaml')
+    let composeConfig
 
     try {
-        composeConfig = JSON.parse(execFileSync('docker', [
-            'compose', '-f', composeFile, 'config', '--format', 'json',
-        ], {
-            cwd: repositoryRoot,
-            encoding: 'utf8',
-        }));
+        composeConfig = JSON.parse(
+            execFileSync('docker', ['compose', '-f', composeFile, 'config', '--format', 'json'], {
+                cwd: repositoryRoot,
+                encoding: 'utf8',
+            }),
+        )
     } catch {
-        return;
+        return
     }
 
-    const networkName = composeConfig.networks?.pfarrplaner?.name;
+    const networkName = composeConfig.networks?.pfarrplaner?.name
     if (!networkName) {
-        return;
+        return
     }
 
-    let network;
+    let network
     try {
-        network = JSON.parse(execFileSync('docker', ['network', 'inspect', networkName], {
-            cwd: repositoryRoot,
-            encoding: 'utf8',
-        }))[0];
+        network = JSON.parse(
+            execFileSync('docker', ['network', 'inspect', networkName], {
+                cwd: repositoryRoot,
+                encoding: 'utf8',
+            }),
+        )[0]
     } catch {
-        return;
+        return
     }
 
     for (const container of Object.values(network.Containers || {})) {
@@ -119,8 +120,8 @@ function removeStaleDevNetworkEndpoints() {
             execFileSync('docker', ['network', 'disconnect', '-f', networkName, container.Name], {
                 cwd: repositoryRoot,
                 stdio: 'ignore',
-            });
-            console.log(`Bereinige verwaisten Docker-Netzwerk-Endpunkt: ${container.Name}`);
+            })
+            console.log(`Bereinige verwaisten Docker-Netzwerk-Endpunkt: ${container.Name}`)
         } catch {
             // The endpoint may disappear while Compose is reconciling the stack.
         }
@@ -128,74 +129,78 @@ function removeStaleDevNetworkEndpoints() {
 }
 
 if (forcedType) {
-    releaseType = forcedType;
-    console.log(`Forced release type: ${releaseType}`);
+    releaseType = forcedType
+    console.log(`Forced release type: ${releaseType}`)
 } else if (currentYear !== versionMajor) {
-    releaseType = 'major';
-    console.log(`Determined release type: ${releaseType} (new year)`);
+    releaseType = 'major'
+    console.log(`Determined release type: ${releaseType} (new year)`)
 } else {
     // Find the latest git tag to scope the commit search
-    let lastTag = '';
+    let lastTag = ''
     try {
-        lastTag = execSync('git describe --tags --abbrev=0', { encoding: 'utf8' }).trim();
+        lastTag = execSync('git describe --tags --abbrev=0', { encoding: 'utf8' }).trim()
     } catch {
         // No tags yet — scan all commits
     }
 
-    const range = lastTag ? `${lastTag}..HEAD` : 'HEAD';
-    let log = '';
+    const range = lastTag ? `${lastTag}..HEAD` : 'HEAD'
+    let log = ''
     try {
-        log = execSync(`git log ${range} --oneline`, { encoding: 'utf8' });
+        log = execSync(`git log ${range} --oneline`, { encoding: 'utf8' })
     } catch {
         // Empty range is fine
     }
 
-    const hasFeature = log.split('\n').some(line => /^\w+ feat(\(.+?\))?:/.test(line));
-    releaseType = hasFeature ? 'minor' : 'patch';
-    console.log(`Determined release type: ${releaseType}`);
+    const hasFeature = log.split('\n').some((line) => /^\w+ feat(\(.+?\))?:/.test(line))
+    releaseType = hasFeature ? 'minor' : 'patch'
+    console.log(`Determined release type: ${releaseType}`)
 }
 
 try {
-    execSync(`npx standard-version --release-as ${releaseType} --skip.commit --skip.tag`, { stdio: 'inherit' });
+    execSync(`npx standard-version --release-as ${releaseType} --skip.commit --skip.tag`, {
+        stdio: 'inherit',
+    })
 } catch (err) {
-    process.exit(err.status ?? 1);
+    process.exit(err.status ?? 1)
 }
 
-const newPkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-const releaseMessage = `chore(release): ${newPkg.version}`;
+const newPkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'))
+const releaseMessage = `chore(release): ${newPkg.version}`
 
 if (releaseType === 'major' || releaseType === 'minor') {
-    console.log('Rebuilding and deploying manual...');
+    console.log('Rebuilding and deploying manual...')
     try {
-        const planer = path.resolve(repositoryRoot, 'planer');
+        const planer = path.resolve(repositoryRoot, 'planer')
         execFileSync(planer, ['dev', 'down', '--remove-orphans'], {
             cwd: repositoryRoot,
             stdio: 'inherit',
-        });
-        removeStaleDevNetworkEndpoints();
+        })
+        removeStaleDevNetworkEndpoints()
         execFileSync(planer, ['dev', 'up', '-d', '--remove-orphans'], {
             cwd: repositoryRoot,
             stdio: 'inherit',
-        });
-        const manualArgs = ['dev', 'manual', 'all'];
+        })
+        const manualArgs = ['dev', 'manual', 'all']
         if (!manualNeedsDusk()) {
-            manualArgs.push('--skip-dusk');
-            console.log('Keine Änderungen unter src/resources/ oder src/public/ seit dem letzten Release; überspringe Dusk-Screenshot-Tests.');
+            manualArgs.push('--skip-dusk')
+            console.log(
+                'Keine Änderungen unter src/resources/ oder src/public/ seit dem letzten Release; überspringe Dusk-Screenshot-Tests.',
+            )
         }
         execFileSync(planer, manualArgs, {
             cwd: repositoryRoot,
             stdio: 'inherit',
-        });
-        execSync('npm run manual:deploy', { stdio: 'inherit' });
+        })
+        execSync('npm run manual:deploy', { stdio: 'inherit' })
         gitAddExisting([
             'docs/manual/benutzerhandbuch/versionsangaben.md',
             'docs/manual/benutzerhandbuch/lizenzen.md',
             'docs/manual/media/images',
             'docs/manual/media/site',
-        ]);
+        ])
     } catch (err) {
-        console.error('Manual build/deploy failed.');
-        process.exit(err.status ?? 1);
+        console.error('Manual build/deploy failed.')
+        process.exit(err.status ?? 1)
     }
 }
 
@@ -205,9 +210,11 @@ try {
         'src/package.json',
         'src/package-lock.json',
         'src/npm-shrinkwrap.json',
-    ]);
-    execSync(`git commit -m "${releaseMessage}"`, { stdio: 'inherit' });
-    execSync(`git tag -a ${tagPrefix}${newPkg.version} -m "${releaseMessage}"`, { stdio: 'inherit' });
+    ])
+    execSync(`git commit -m "${releaseMessage}"`, { stdio: 'inherit' })
+    execSync(`git tag -a ${tagPrefix}${newPkg.version} -m "${releaseMessage}"`, {
+        stdio: 'inherit',
+    })
 } catch (err) {
-    process.exit(err.status ?? 1);
+    process.exit(err.status ?? 1)
 }

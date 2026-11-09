@@ -28,78 +28,81 @@
 
 <template>
     <div>
-        <small><span class="mdi" :class="(start == '00:00') ? 'mdi-timer' : 'mdi-clock'"></span>
-            {{ formatTime(startingTime(), (start == '00:00')) }} {{ (start == '00:00') ? '' : 'Uhr' }}
+        <small
+            ><span
+                class="mdi"
+                :class="start == '00:00' ? 'mdi-timer' : 'mdi-clock'"
+            ></span>
+            {{ formatTime(startingTime(), start == '00:00') }} {{ start == '00:00' ? '' : 'Uhr' }}
         </small>
     </div>
 </template>
 
 <script>
-
-import { speechTimeInSeconds } from "./ItemTextStats";
+import { speechTimeInSeconds } from './ItemTextStats'
 
 export default {
-    name: "ItemStartingTime",
+    name: 'ItemStartingTime',
     props: ['service', 'item', 'start'],
     methods: {
         startingTime() {
-            let found = false;
-            let seconds = this.countStarter();
-            this.service.liturgy_blocks.forEach(block => {
-                block.items.forEach(item => {
-                    found = found || (this.item.id == item.id);
+            let found = false
+            let seconds = this.countStarter()
+            this.service.liturgy_blocks.forEach((block) => {
+                block.items.forEach((item) => {
+                    found = found || this.item.id == item.id
                     if (!found) {
-                        seconds += this.itemTime(item);
+                        seconds += this.itemTime(item)
                     }
-                });
-            });
-            return seconds;
+                })
+            })
+            return seconds
         },
         countStarter() {
-            let t = this.start || moment(this.service.date).locale('de').format('HH:mm');
-            if (t.length == 5) t += ':00';
-            return this.parseTimeString(t);
+            let t = this.start || moment(this.service.date).locale('de').format('HH:mm')
+            if (t.length == 5) t += ':00'
+            return this.parseTimeString(t)
         },
         itemTime(item) {
-            if (item.data.time) return this.parseTimeString(item.data.time);
+            if (item.data.time) return this.parseTimeString(item.data.time)
 
-            const rounded = this.$page.props.settings.liturgy_times_rounded ? true : false;
-            const wpm = this.$page.props.settings.wpm || 110;
-            return speechTimeInSeconds(item, this.service, rounded, wpm);
+            const rounded = this.$page.props.settings.liturgy_times_rounded ? true : false
+            const wpm = this.$page.props.settings.wpm || 110
+            return speechTimeInSeconds(item, this.service, rounded, wpm)
         },
         parseTimeString(s) {
-            let t = s.split(':');
+            let t = s.split(':')
             switch (t.length) {
                 case 3:
-                    return (3600*parseInt(t[0], 10))+(60*parseInt(t[1], 10))+parseInt(t[2], 10);
+                    return 3600 * parseInt(t[0], 10) + 60 * parseInt(t[1], 10) + parseInt(t[2], 10)
                 case 2:
-                    return (60*parseInt(t[0],10))+parseInt(t[1],10);
+                    return 60 * parseInt(t[0], 10) + parseInt(t[1], 10)
             }
-            return parseInt(t[0],10);
+            return parseInt(t[0], 10)
         },
         formatTime(sec_num, showSeconds) {
-            var hours = Math.floor(sec_num / 3600);
-            var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-            var seconds = sec_num - (hours * 3600) - (minutes * 60);
+            var hours = Math.floor(sec_num / 3600)
+            var minutes = Math.floor((sec_num - hours * 3600) / 60)
+            var seconds = sec_num - hours * 3600 - minutes * 60
 
-            var hoursText = '';
+            var hoursText = ''
             if (hours) {
-                hoursText = hours+':';
+                hoursText = hours + ':'
             }
             if (minutes < 10) {
-                minutes = "0" + minutes;
+                minutes = '0' + minutes
             }
             if (seconds < 10) {
-                seconds = "0" + seconds;
+                seconds = '0' + seconds
             }
-            return hoursText + minutes + (showSeconds ? ':' + seconds : '');
+            return hoursText + minutes + (showSeconds ? ':' + seconds : '')
         },
-    }
+    },
 }
 </script>
 
 <style scoped>
-    .fa {
-        color: lightgray;
-    }
+.fa {
+    color: lightgray;
+}
 </style>

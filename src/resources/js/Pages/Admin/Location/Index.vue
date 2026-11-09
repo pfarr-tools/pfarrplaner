@@ -29,43 +29,69 @@
 <template>
     <admin-layout title="Kirchen und Gottesdienstorte">
         <template #navbar-left>
-            <a class="btn btn-success" :href="route('location.create')">
+            <a
+                class="btn btn-success"
+                :href="route('location.create')"
+            >
                 <span class="d-inline d-md-none mdi mdi-plus"></span>
                 <span class="d-none d-md-inline">Neuen Ort hinzufügen</span>
             </a>
         </template>
-        <dataset v-slot="{ ds }"
-                 :ds-data="locations"
-                 ds-sort-by="name"
-                 :ds-search-in="['name', 'city']"
-                 :ds-search-as="{
-                    city: searchAsCity,
-                 }">
-            <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus/>
+        <dataset
+            v-slot="{ ds }"
+            :ds-data="locations"
+            ds-sort-by="name"
+            :ds-search-in="['name', 'city']"
+            :ds-search-as="{
+                city: searchAsCity,
+            }"
+        >
+            <dataset-search
+                ds-search-placeholder="Suchen..."
+                ref="search"
+                autofocus
+            />
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover d-md-table">
                             <thead>
-                            <tr>
-                                <th>Kirche / Gottesdienstort</th>
-                                <th>Kirchengemeinde</th>
-                                <th>Gottesdienst um</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>Kirche / Gottesdienstort</th>
+                                    <th>Kirchengemeinde</th>
+                                    <th>Gottesdienst um</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <dataset-item tag="tbody">
                                 <template #default="{ row, rowIndex }">
                                     <tr>
                                         <td>{{ row.name }}</td>
                                         <td>{{ row.city.name }}</td>
-                                        <td>{{ row.default_time ? row.default_time.substr(0,5)+' Uhr' : ''}}</td>
+                                        <td>
+                                            {{
+                                                row.default_time
+                                                    ? row.default_time.substr(0, 5) + ' Uhr'
+                                                    : ''
+                                            }}
+                                        </td>
                                         <td class="text-end">
-                                            <nav-button type="light" icon="mdi mdi-pencil" title="Ort bearbeiten"
-                                                        @click="editLocation(row)" force-icon force-no-text/>
-                                            <nav-button type="danger" icon="mdi mdi-delete"
-                                                        title="Ort löschen"
-                                                        @click="deleteLocation(row)" force-icon force-no-text/>
+                                            <nav-button
+                                                type="light"
+                                                icon="mdi mdi-pencil"
+                                                title="Ort bearbeiten"
+                                                @click="editLocation(row)"
+                                                force-icon
+                                                force-no-text
+                                            />
+                                            <nav-button
+                                                type="danger"
+                                                icon="mdi mdi-delete"
+                                                title="Ort löschen"
+                                                @click="deleteLocation(row)"
+                                                force-icon
+                                                force-no-text
+                                            />
                                         </td>
                                     </tr>
                                 </template>
@@ -74,23 +100,25 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
+            <div
+                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+            >
+                <dataset-info class="mb-2 mb-md-0" />
+                <dataset-pager />
             </div>
         </dataset>
     </admin-layout>
 </template>
 
 <script>
-import {Dataset, DatasetItem, DatasetSearch} from "vue-dataset";
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
-import NavButton from "../../../components/Ui/buttons/NavButton";
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import DatasetInfo from '../../../components/Ui/dataset/DatasetInfo'
+import DatasetPager from '../../../components/Ui/dataset/DatasetPager'
+import DatasetShow from '../../../components/Ui/dataset/DatasetShow'
+import NavButton from '../../../components/Ui/buttons/NavButton'
 
 export default {
-    name: "Index",
+    name: 'Index',
     props: ['locations'],
     components: {
         NavButton,
@@ -99,23 +127,21 @@ export default {
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     methods: {
         searchAsCity(value, searchString, rowData) {
-            return rowData.city.name.toLowerCase().includes(searchString);
+            return rowData.city.name.toLowerCase().includes(searchString)
         },
         editLocation(location) {
-            this.$inertia.get(route('location.edit', location.id));
+            this.$inertia.get(route('location.edit', location.id))
         },
         deleteLocation(location) {
             if (confirm('Willst du diesen Ort wirklich löschen?'))
-                this.$inertia.delete(route('location.destroy', location.id));
+                this.$inertia.delete(route('location.destroy', location.id))
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

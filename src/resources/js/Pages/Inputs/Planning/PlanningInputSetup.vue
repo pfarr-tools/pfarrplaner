@@ -29,35 +29,63 @@
 <template>
     <admin-layout title="Planungstabelle konfigurieren">
         <template #navbar-left>
-            <nav-button type="primary" title="Planungstabelle anzeigen" icon="mdi mdi-table"
-                        :disabled="setup.ministries.length == 0"
-                        :title="setup.ministries.length ? 'Planungstabelle erstellen und anzeigen' : 'Du musst mindestens einen Dienst auswählen, um eine Planungstabelle erstellen zu können.'"
-                        @click="showTable">Planungstabelle anzeigen</nav-button>
+            <nav-button
+                type="primary"
+                title="Planungstabelle anzeigen"
+                icon="mdi mdi-table"
+                :disabled="setup.ministries.length == 0"
+                :title="
+                    setup.ministries.length
+                        ? 'Planungstabelle erstellen und anzeigen'
+                        : 'Du musst mindestens einen Dienst auswählen, um eine Planungstabelle erstellen zu können.'
+                "
+                @click="showTable"
+                >Planungstabelle anzeigen</nav-button
+            >
         </template>
-        <form-selectize label="Planungstabelle für folgende Kirchengemeinden erstellen" :options="cities"
-                        v-model="setup.cities" name="cities" multiple />
-        <form-selectize label="Auf folgende Orte beschränken" placeholder="Leer lassen für alle Orte"
-                        v-model="setup.locations" :options="locations" multiple />
-        <date-range-input label="Zeitraum" :model-value="dateRange" @update:modelValue="onDateRangeChange" />
-        <form-selectize name="ministries" label="Folgende Dienste anzeigen"
-                        :help="setup.ministries.length ? '' : 'Bitte wähle mindestens einen Dienst aus.'"
-                        :options="myMinistries" v-model="setup.ministries" multiple/>
+        <form-selectize
+            label="Planungstabelle für folgende Kirchengemeinden erstellen"
+            :options="cities"
+            v-model="setup.cities"
+            name="cities"
+            multiple
+        />
+        <form-selectize
+            label="Auf folgende Orte beschränken"
+            placeholder="Leer lassen für alle Orte"
+            v-model="setup.locations"
+            :options="locations"
+            multiple
+        />
+        <date-range-input
+            label="Zeitraum"
+            :model-value="dateRange"
+            @update:modelValue="onDateRangeChange"
+        />
+        <form-selectize
+            name="ministries"
+            label="Folgende Dienste anzeigen"
+            :help="setup.ministries.length ? '' : 'Bitte wähle mindestens einen Dienst aus.'"
+            :options="myMinistries"
+            v-model="setup.ministries"
+            multiple
+        />
     </admin-layout>
 </template>
 
 <script>
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-import LocationSelect from "../../../components/Ui/elements/LocationSelect";
-import DateRangeInput from "../../../components/Ui/elements/DateRangeInput";
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import NavButton from '../../../components/Ui/buttons/NavButton'
+import LocationSelect from '../../../components/Ui/elements/LocationSelect'
+import DateRangeInput from '../../../components/Ui/elements/DateRangeInput'
 export default {
-    name: "PlanningInputSetup",
-    components: {DateRangeInput, LocationSelect, NavButton, FormSelectize},
+    name: 'PlanningInputSetup',
+    components: { DateRangeInput, LocationSelect, NavButton, FormSelectize },
     props: ['cities', 'ministries', 'locations'],
     data() {
-        var myMinistries = [];
+        var myMinistries = []
         for (const ministryKey in this.ministries) {
-            myMinistries.push({ id: ministryKey, name: this.ministries[ministryKey]});
+            myMinistries.push({ id: ministryKey, name: this.ministries[ministryKey] })
         }
         return {
             myMinistries: myMinistries,
@@ -67,7 +95,7 @@ export default {
                 cities: this.cities.length ? [this.cities[0].id] : null,
                 locations: [],
                 ministries: ['P'],
-            }
+            },
         }
     },
     computed: {
@@ -75,23 +103,21 @@ export default {
             return [
                 this.setup.from ? moment(this.setup.from, 'DD.MM.YYYY') : null,
                 this.setup.to ? moment(this.setup.to, 'DD.MM.YYYY') : null,
-            ];
+            ]
         },
     },
     methods: {
         onDateRangeChange(val) {
             if (val && val.length === 2 && val[1]) {
-                this.setup.from = moment(val[0]).format('DD.MM.YYYY');
-                this.setup.to = moment(val[1]).format('DD.MM.YYYY');
+                this.setup.from = moment(val[0]).format('DD.MM.YYYY')
+                this.setup.to = moment(val[1]).format('DD.MM.YYYY')
             }
         },
         showTable() {
-            this.$inertia.post(route('inputs.input', 'planning'), this.setup);
-        }
-    }
+            this.$inertia.post(route('inputs.input', 'planning'), this.setup)
+        },
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -27,19 +27,22 @@
   -->
 
 <template>
-    <model-index-page title="Kennzeichnungen" :records="tags" :can-create="canCreate"
-                      create-label="Neue Kennzeichnung" create-route-name="admin.tags.create"
-                      model-label="Kennzeichnung">
-
+    <model-index-page
+        title="Kennzeichnungen"
+        :records="tags"
+        :can-create="canCreate"
+        create-label="Neue Kennzeichnung"
+        create-route-name="admin.tags.create"
+        model-label="Kennzeichnung"
+    >
     </model-index-page>
 </template>
 
 <script>
-
-import ModelIndexPage from "../../../components/Admin/ModelIndexPage.vue";
+import ModelIndexPage from '../../../components/Admin/ModelIndexPage.vue'
 
 export default {
-    name: "Index",
+    name: 'Index',
     components: {
         ModelIndexPage,
     },
@@ -47,6 +50,4 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

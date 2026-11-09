@@ -28,25 +28,38 @@
 
 <template>
     <div class="security-tab">
-        <form-input name="current_password" label="Aktuelles Passwort"
-                    help="Um dein Passwort zu ändern, musst du dein aktuelles Passwort mit angeben."
-                    type="password" autocomplete="current-password" v-model="password.current" />
-        <form-input name="new_password" label="Neues Passwort"
-                    type="password" autocomplete="new-password" v-model="password.new" />
-        <form-input name="new_password_confirm" label="Neues Passwort wiederholen"
-                    type="password" autocomplete="new-password" v-model="password.confirm" />
+        <form-input
+            name="current_password"
+            label="Aktuelles Passwort"
+            help="Um dein Passwort zu ändern, musst du dein aktuelles Passwort mit angeben."
+            type="password"
+            autocomplete="current-password"
+            v-model="password.current"
+        />
+        <form-input
+            name="new_password"
+            label="Neues Passwort"
+            type="password"
+            autocomplete="new-password"
+            v-model="password.new"
+        />
+        <form-input
+            name="new_password_confirm"
+            label="Neues Passwort wiederholen"
+            type="password"
+            autocomplete="new-password"
+            v-model="password.confirm"
+        />
     </div>
 </template>
 
 <script>
-import FormInput from "../../Ui/forms/FormInput";
+import FormInput from '../../Ui/forms/FormInput'
 export default {
-    name: "SecurityTab",
-    components: {FormInput},
+    name: 'SecurityTab',
+    components: { FormInput },
     props: ['user', 'password'],
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -33,78 +33,174 @@
         </template>
         <div class="row">
             <div class="col-md-6">
-
-
-
-                <div class="accordion" id="accordionExample">
+                <div
+                    class="accordion"
+                    id="accordionExample"
+                >
                     <div class="card z-depth-0 bordered">
-                        <div class="card-header" :id="'setupHeading'">
+                        <div
+                            class="card-header"
+                            :id="'setupHeading'"
+                        >
                             <h5 class="mb-0">
-                                <button class="btn btn-link" type="button" data-bs-toggle="collapse" :data-target="'#setupBody'"
-                                        aria-expanded="true" :aria-controls="'setupBody'">
+                                <button
+                                    class="btn btn-link"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    :data-target="'#setupBody'"
+                                    aria-expanded="true"
+                                    :aria-controls="'setupBody'"
+                                >
                                     Einstellungen
                                 </button>
                             </h5>
                         </div>
-                        <div :id="'setupBody'" class="collapse p-2 show"  aria-labelledby="headingOne"
-                             data-parent="#accordionExample">
+                        <div
+                            :id="'setupBody'"
+                            class="collapse p-2 show"
+                            aria-labelledby="headingOne"
+                            data-parent="#accordionExample"
+                        >
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <form-input name="key" label="Tonart" v-model="mySong.key" />
+                                    <form-input
+                                        name="key"
+                                        label="Tonart"
+                                        v-model="mySong.key"
+                                    />
                                 </div>
                                 <div class="col-sm-4">
-                                    <form-input name="measure" label="Takt" v-model="mySong.measure" />
+                                    <form-input
+                                        name="measure"
+                                        label="Takt"
+                                        v-model="mySong.measure"
+                                    />
                                 </div>
                                 <div class="col-sm-4">
-                                    <form-input name="note_length" label="Notenlänge" v-model="mySong.note_length" />
+                                    <form-input
+                                        name="note_length"
+                                        label="Notenlänge"
+                                        v-model="mySong.note_length"
+                                    />
                                 </div>
                             </div>
-                            <form-textarea name="prolog" label="Weitere Konfiguration" v-model="mySong.prolog" help="Kopfzeilen (ABC-Notation)"/>
+                            <form-textarea
+                                name="prolog"
+                                label="Weitere Konfiguration"
+                                v-model="mySong.prolog"
+                                help="Kopfzeilen (ABC-Notation)"
+                            />
                         </div>
                     </div>
                     <div class="card z-depth-0 bordered">
-                        <div class="card-header" :id="'notationRefrainHeading'">
+                        <div
+                            class="card-header"
+                            :id="'notationRefrainHeading'"
+                        >
                             <h5 class="mb-0">
-                                <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" :data-target="'#notationRefrainBody'"
-                                        aria-expanded="true" :aria-controls="'notationRefrainBody'">
+                                <button
+                                    class="btn btn-link collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    :data-target="'#notationRefrainBody'"
+                                    aria-expanded="true"
+                                    :aria-controls="'notationRefrainBody'"
+                                >
                                     Kehrvers
                                 </button>
                             </h5>
                         </div>
-                        <div :id="'notationRefrainBody'" class="collapse p-2"  aria-labelledby="headingOne"
-                             data-parent="#accordionExample">
-                            <form-textarea name="notation_refrain" label="Notation (Kehrvers)" v-model="mySong.refrain_notation" />
-                            <form-textarea name="refrain_text_notation" label="Kehrverstext" v-model="mySong.refrain_text_notation" />
+                        <div
+                            :id="'notationRefrainBody'"
+                            class="collapse p-2"
+                            aria-labelledby="headingOne"
+                            data-parent="#accordionExample"
+                        >
+                            <form-textarea
+                                name="notation_refrain"
+                                label="Notation (Kehrvers)"
+                                v-model="mySong.refrain_notation"
+                            />
+                            <form-textarea
+                                name="refrain_text_notation"
+                                label="Kehrverstext"
+                                v-model="mySong.refrain_text_notation"
+                            />
                         </div>
                     </div>
                     <div class="card z-depth-0 bordered">
-                        <div class="card-header" :id="'notationHeading'">
+                        <div
+                            class="card-header"
+                            :id="'notationHeading'"
+                        >
                             <h5 class="mb-0">
-                                <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" :data-target="'#notationBody'"
-                                        aria-expanded="true" :aria-controls="'notationBody'">
+                                <button
+                                    class="btn btn-link collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    :data-target="'#notationBody'"
+                                    aria-expanded="true"
+                                    :aria-controls="'notationBody'"
+                                >
                                     Notation (Strophen)
                                 </button>
                             </h5>
                         </div>
-                        <div :id="'notationBody'" class="collapse p-2"  aria-labelledby="headingOne"
-                             data-parent="#accordionExample">
-                            <form-textarea name="notation" label="Notation (Strophen)" v-model="mySong.notation" />
+                        <div
+                            :id="'notationBody'"
+                            class="collapse p-2"
+                            aria-labelledby="headingOne"
+                            data-parent="#accordionExample"
+                        >
+                            <form-textarea
+                                name="notation"
+                                label="Notation (Strophen)"
+                                v-model="mySong.notation"
+                            />
                         </div>
                     </div>
-                    <div v-for="(verse,verseIndex) in mySong.verses" class="card z-depth-0 bordered">
-                        <div class="card-header" :id="'verseHeading'+verseIndex">
+                    <div
+                        v-for="(verse, verseIndex) in mySong.verses"
+                        class="card z-depth-0 bordered"
+                    >
+                        <div
+                            class="card-header"
+                            :id="'verseHeading' + verseIndex"
+                        >
                             <h5 class="mb-0">
-                                <button class="btn btn-link collapsed" type="button" data-bs-toggle="collapse" :data-target="'#verseBody'+verseIndex"
-                                        aria-expanded="true" :aria-controls="'verseBody'+verseIndex">
-                                    <span class="toggle-visibility me-1" :class="verseVisible[verse.number] ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"
-                                          @click.prevent.stop="verseVisible[verse.number] = !verseVisible[verse.number]"></span>
-                                    Strophe {{ verse.number }} -- {{ verse.text.substr(0,40) }}...
+                                <button
+                                    class="btn btn-link collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    :data-target="'#verseBody' + verseIndex"
+                                    aria-expanded="true"
+                                    :aria-controls="'verseBody' + verseIndex"
+                                >
+                                    <span
+                                        class="toggle-visibility me-1"
+                                        :class="
+                                            verseVisible[verse.number]
+                                                ? 'mdi mdi-eye'
+                                                : 'mdi mdi-eye-off'
+                                        "
+                                        @click.prevent.stop="
+                                            verseVisible[verse.number] = !verseVisible[verse.number]
+                                        "
+                                    ></span>
+                                    Strophe {{ verse.number }} -- {{ verse.text.substr(0, 40) }}...
                                 </button>
                             </h5>
                         </div>
-                        <div :id="'verseBody'+verseIndex" class="collapse p-2" aria-labelledby="headingOne"
-                             data-parent="#accordionExample">
-                            <form-textarea label="Verstext" v-model="verse.notation" />
+                        <div
+                            :id="'verseBody' + verseIndex"
+                            class="collapse p-2"
+                            aria-labelledby="headingOne"
+                            data-parent="#accordionExample"
+                        >
+                            <form-textarea
+                                label="Verstext"
+                                v-model="verse.notation"
+                            />
                         </div>
                     </div>
                 </div>
@@ -118,83 +214,102 @@
 </template>
 
 <script>
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormTextarea from "../../../components/Ui/forms/FormTextarea";
-import abcjs from 'abcjs';
-import 'abcjs/abcjs-audio.css';
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormTextarea from '../../../components/Ui/forms/FormTextarea'
+import abcjs from 'abcjs'
+import 'abcjs/abcjs-audio.css'
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
 
 export default {
-    name: "MusicEditor",
-    components: {SaveButton, FormTextarea, FormInput},
+    name: 'MusicEditor',
+    components: { SaveButton, FormTextarea, FormInput },
     props: ['song'],
     computed: {
         music() {
-            let music = 'X:1\n'
-                + 'T:'+(this.mySong.songbook_abbreviation+' '+this.mySong.reference+' '+this.mySong.title).trim()+'\n'
-                + 'C:'+this.mySong.copyrights+'\n'
-                + 'M:'+this.mySong.measure+'\n'
-                + 'L:'+this.mySong.note_length+'\n'
-            ;
+            let music =
+                'X:1\n' +
+                'T:' +
+                (
+                    this.mySong.songbook_abbreviation +
+                    ' ' +
+                    this.mySong.reference +
+                    ' ' +
+                    this.mySong.title
+                ).trim() +
+                '\n' +
+                'C:' +
+                this.mySong.copyrights +
+                '\n' +
+                'M:' +
+                this.mySong.measure +
+                '\n' +
+                'L:' +
+                this.mySong.note_length +
+                '\n'
 
-            let verseLines = {};
-            this.mySong.verses.forEach(verse => {
-                verseLines[verse.number] = [];
-                let lines = verse.notation.trim().split('\n');
-                lines.forEach(line => {
+            let verseLines = {}
+            this.mySong.verses.forEach((verse) => {
+                verseLines[verse.number] = []
+                let lines = verse.notation.trim().split('\n')
+                lines.forEach((line) => {
                     if (line.trim() != '') {
-                        verseLines[verse.number].push('w:'+verse.number+'.~'+line);
+                        verseLines[verse.number].push('w:' + verse.number + '.~' + line)
                     }
-                });
-            });
+                })
+            })
 
-            music += this.mySong.prolog ? this.mySong.prolog+'\n' : '';
-            music += 'K:'+this.mySong.key+'\n';
-
+            music += this.mySong.prolog ? this.mySong.prolog + '\n' : ''
+            music += 'K:' + this.mySong.key + '\n'
 
             if (this.mySong.notation) {
-                let lineCtr = 0;
-                this.mySong.notation.split('\n').forEach(line => {
-                    music += line+'\n';
-                    this.mySong.verses.forEach(verse => {
+                let lineCtr = 0
+                this.mySong.notation.split('\n').forEach((line) => {
+                    music += line + '\n'
+                    this.mySong.verses.forEach((verse) => {
                         if (this.verseVisible[verse.number]) {
-                            music+=verseLines[verse.number][lineCtr] ? verseLines[verse.number][lineCtr]+'\n' : '';
+                            music += verseLines[verse.number][lineCtr]
+                                ? verseLines[verse.number][lineCtr] + '\n'
+                                : ''
                         }
-                    });
-                    lineCtr++;
-                });
+                    })
+                    lineCtr++
+                })
             }
 
-
-            return music;
+            return music
         },
         refrain() {
-            if (!this.mySong.refrain_notation) return '';
-            let music = 'X:2\n'
-                + 'T:Kehrvers\n'
-                + 'M:'+this.mySong.measure+'\n'
-                + 'L:'+this.mySong.note_length+'\n';
+            if (!this.mySong.refrain_notation) return ''
+            let music =
+                'X:2\n' +
+                'T:Kehrvers\n' +
+                'M:' +
+                this.mySong.measure +
+                '\n' +
+                'L:' +
+                this.mySong.note_length +
+                '\n'
             if (this.mySong.refrain_notation) {
-                let lineCtr = 0;
-                let refrainLines = (this.mySong.refrain_text_notation || '').split('\n');
-                this.mySong.refrain_notation.split('\n').forEach(line => {
-                    music += line+'\n';
-                    music += 'w:'+refrainLines[lineCtr]+'\n';
-                    lineCtr++;
-                });
+                let lineCtr = 0
+                let refrainLines = (this.mySong.refrain_text_notation || '').split('\n')
+                this.mySong.refrain_notation.split('\n').forEach((line) => {
+                    music += line + '\n'
+                    music += 'w:' + refrainLines[lineCtr] + '\n'
+                    lineCtr++
+                })
             }
-            return music;
-        }
+            return music
+        },
     },
     data() {
-        let mySong = this.setupSong(this.song);
-        let verseVisible = {};
+        let mySong = this.setupSong(this.song)
+        let verseVisible = {}
         for (const verseIndex in mySong.verses) {
-            mySong.verses[verseIndex].notation = mySong.verses[verseIndex].notation || mySong.verses[verseIndex].text || '';
-            verseVisible[mySong.verses[verseIndex].number] = true;
+            mySong.verses[verseIndex].notation =
+                mySong.verses[verseIndex].notation || mySong.verses[verseIndex].text || ''
+            verseVisible[mySong.verses[verseIndex].number] = true
         }
-        mySong.refrain_text_notation = mySong.refrain_text_notation || mySong.refrain || '';
+        mySong.refrain_text_notation = mySong.refrain_text_notation || mySong.refrain || ''
         return {
             mySong,
             renderer: abcjs,
@@ -202,55 +317,54 @@ export default {
         }
     },
     mounted() {
-        this.redraw();
+        this.redraw()
     },
     watch: {
         mySong: {
-            handler: function() {
-                this.redraw();
+            handler: function () {
+                this.redraw()
             },
             deep: true,
         },
         verseVisible: {
-            handler: function() {
-                this.redraw();
+            handler: function () {
+                this.redraw()
             },
             deep: true,
-        }
+        },
     },
     methods: {
         setupSong(mySong) {
-            mySong.key = mySong.key || 'C';
-            mySong.measure = mySong.measure || '4/4';
-            mySong.note_length = mySong.note_length || '1/4';
-            return mySong;
+            mySong.key = mySong.key || 'C'
+            mySong.measure = mySong.measure || '4/4'
+            mySong.note_length = mySong.note_length || '1/4'
+            return mySong
         },
         redraw() {
-            this.renderer.renderAbc('paper', this.music);
-            this.renderer.renderAbc('refrain', this.refrain);
+            this.renderer.renderAbc('paper', this.music)
+            this.renderer.renderAbc('refrain', this.refrain)
         },
         saveSong() {
-            this.$inertia.patch(route('admin.song.update', {song: this.mySong.id}), this.mySong);
-        }
-    }
+            this.$inertia.patch(route('admin.song.update', { song: this.mySong.id }), this.mySong)
+        },
+    },
 }
 </script>
 
 <style scoped>
-    .btn-link {
-        width: 100%;
-        text-align: left;
-    }
+.btn-link {
+    width: 100%;
+    text-align: left;
+}
 
-    .btn-link:after {
-        content: "\f107";
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-        float: right;
-    }
+.btn-link:after {
+    content: '\f107';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    float: right;
+}
 
-    .btn-link.collapsed:after {
-        content: "\f106";
-    }
-
+.btn-link.collapsed:after {
+    content: '\f106';
+}
 </style>

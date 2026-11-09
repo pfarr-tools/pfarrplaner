@@ -31,21 +31,43 @@
         <template #navbar-left>
             <save-button @click="savePassword" />
         </template>
-        <div v-if="mustChange" class="alert alert-warning">Dein Benutzerpasswort muss geändert werden. Vielleicht verwendest du noch das Originalpasswort, das du von deinem Administrator bekommen hast?
-            Bitte wähle ein neues, eigenes Passwort, das nur du selbst kennst.</div>
+        <div
+            v-if="mustChange"
+            class="alert alert-warning"
+        >
+            Dein Benutzerpasswort muss geändert werden. Vielleicht verwendest du noch das
+            Originalpasswort, das du von deinem Administrator bekommen hast? Bitte wähle ein neues,
+            eigenes Passwort, das nur du selbst kennst.
+        </div>
         <card>
             <card-header>Passwort ändern</card-header>
             <card-body>
-                <form class="password-change-form" @submit.prevent="savePassword">
-                    <form-input name="current_password" v-if="!originalPassword"
-                                label="Aktuelles Passwort" type="password" autocomplete="current-password"
-                                v-model="auth.current_password" />
-                    <form-input name="new_password"
-                                label="Neues Passwort" type="password" autocomplete="new-password"
-                                v-model="auth.new_password" />
-                    <form-input name="new_password_confirmation"
-                                label="Neues Passwort (wiederholen)" type="password" autocomplete="new-password"
-                                v-model="auth.new_password_confirmation" />
+                <form
+                    class="password-change-form"
+                    @submit.prevent="savePassword"
+                >
+                    <form-input
+                        name="current_password"
+                        v-if="!originalPassword"
+                        label="Aktuelles Passwort"
+                        type="password"
+                        autocomplete="current-password"
+                        v-model="auth.current_password"
+                    />
+                    <form-input
+                        name="new_password"
+                        label="Neues Passwort"
+                        type="password"
+                        autocomplete="new-password"
+                        v-model="auth.new_password"
+                    />
+                    <form-input
+                        name="new_password_confirmation"
+                        label="Neues Passwort (wiederholen)"
+                        type="password"
+                        autocomplete="new-password"
+                        v-model="auth.new_password_confirmation"
+                    />
                 </form>
             </card-body>
         </card>
@@ -53,32 +75,32 @@
 </template>
 
 <script>
-import Card from "../../components/Ui/cards/card";
-import CardHeader from "../../components/Ui/cards/cardHeader";
-import CardFooter from "../../components/Ui/cards/cardFooter";
-import SaveButton from "../../components/Ui/buttons/SaveButton";
-import CardBody from "../../components/Ui/cards/cardBody";
-import FormInput from "../../components/Ui/forms/FormInput";
+import Card from '../../components/Ui/cards/card'
+import CardHeader from '../../components/Ui/cards/cardHeader'
+import CardFooter from '../../components/Ui/cards/cardFooter'
+import SaveButton from '../../components/Ui/buttons/SaveButton'
+import CardBody from '../../components/Ui/cards/cardBody'
+import FormInput from '../../components/Ui/forms/FormInput'
 export default {
-    name: "PasswordChanger",
+    name: 'PasswordChanger',
     props: ['originalPassword', 'mustChange'],
-    components: {FormInput, CardBody, SaveButton, CardFooter, CardHeader, Card},
+    components: { FormInput, CardBody, SaveButton, CardFooter, CardHeader, Card },
     data() {
         return {
             auth: {
                 current_password: '',
                 new_password: '',
                 new_password_confirmation: '',
-            }
+            },
         }
     },
     methods: {
         savePassword() {
-            const data = {...this.auth};
-            if (this.originalPassword) delete(data.current_password);
-            this.$inertia.post(route('password.change'), data);
+            const data = { ...this.auth }
+            if (this.originalPassword) delete data.current_password
+            this.$inertia.post(route('password.change'), data)
         },
-    }
+    },
 }
 </script>
 

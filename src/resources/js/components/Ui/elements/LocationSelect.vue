@@ -27,7 +27,12 @@
   -->
 
 <template>
-    <form-group :id="myId" :label="label" :help="help" :name="name">
+    <form-group
+        :id="myId"
+        :label="label"
+        :help="help"
+        :name="name"
+    >
         <Multiselect
             :id="myId + 'Input'"
             v-model="myValue"
@@ -48,13 +53,13 @@
 </template>
 
 <script>
-import FormGroup from "../forms/FormGroup";
-import Multiselect from '@vueform/multiselect';
-import '@vueform/multiselect/themes/default.css';
-import { uid } from '../../../libraries/uid';
+import FormGroup from '../forms/FormGroup'
+import Multiselect from '@vueform/multiselect'
+import '@vueform/multiselect/themes/default.css'
+import { uid } from '../../../libraries/uid'
 
 export default {
-    name: "LocationSelect",
+    name: 'LocationSelect',
     emits: ['input', 'update:modelValue', 'set-location'],
     components: { FormGroup, Multiselect },
     props: {
@@ -72,70 +77,80 @@ export default {
         multiple: Boolean,
     },
     mounted() {
-        if (this.myId === '') this.myId = uid();
+        if (this.myId === '') this.myId = uid()
     },
     data() {
-        const initVal = this.modelValue !== undefined ? this.modelValue : this.value;
-        let myValue = this.multiple ? [] : null;
+        const initVal = this.modelValue !== undefined ? this.modelValue : this.value
+        let myValue = this.multiple ? [] : null
 
         if (initVal !== null && initVal !== undefined) {
             if (this.multiple && Array.isArray(initVal)) {
-                myValue = initVal.map(item => typeof item === 'object' ? item.id : item);
+                myValue = initVal.map((item) => (typeof item === 'object' ? item.id : item))
             } else if (typeof initVal === 'object') {
-                myValue = initVal.id;
+                myValue = initVal.id
             } else {
-                myValue = initVal;
+                myValue = initVal
             }
         }
 
         return {
             myId: this.id || '',
             myValue,
-        };
+        }
     },
     computed: {
         groupedOptions() {
-            const cityGroups = {};
-            (this.locations || []).forEach(item => {
-                const cityName = item.city?.name || '';
-                if (!cityGroups[cityName]) cityGroups[cityName] = [];
-                cityGroups[cityName].push(item);
-            });
+            const cityGroups = {}
+            ;(this.locations || []).forEach((item) => {
+                const cityName = item.city?.name || ''
+                if (!cityGroups[cityName]) cityGroups[cityName] = []
+                cityGroups[cityName].push(item)
+            })
 
-            const groupedOptions = Object.keys(cityGroups).map(cityName => ({
+            const groupedOptions = Object.keys(cityGroups).map((cityName) => ({
                 label: cityName,
                 options: cityGroups[cityName],
-            }));
+            }))
 
-            const freiOptions = [];
-            const currentValues = this.multiple ? (Array.isArray(this.myValue) ? this.myValue : []) : [this.myValue];
-            currentValues.forEach(value => {
-                if ((value !== null) && (value !== undefined) && String(value).trim() !== '' && isNaN(value)) {
-                    freiOptions.push({ id: value, name: value });
+            const freiOptions = []
+            const currentValues = this.multiple
+                ? Array.isArray(this.myValue)
+                    ? this.myValue
+                    : []
+                : [this.myValue]
+            currentValues.forEach((value) => {
+                if (
+                    value !== null &&
+                    value !== undefined &&
+                    String(value).trim() !== '' &&
+                    isNaN(value)
+                ) {
+                    freiOptions.push({ id: value, name: value })
                 }
-            });
+            })
 
-            groupedOptions.push({ label: 'Freie Ortsangabe', options: freiOptions });
+            groupedOptions.push({ label: 'Freie Ortsangabe', options: freiOptions })
 
-            return groupedOptions;
+            return groupedOptions
         },
     },
     watch: {
         value(newVal) {
-            this.myValue = this.normalizeValue(newVal);
+            this.myValue = this.normalizeValue(newVal)
         },
         modelValue(newVal) {
-            this.myValue = this.normalizeValue(newVal);
+            this.myValue = this.normalizeValue(newVal)
         },
     },
     methods: {
         normalizeValue(value) {
             if (this.multiple) {
-                if (Array.isArray(value)) return value.map(item => typeof item === 'object' ? item.id : item);
-                return [];
+                if (Array.isArray(value))
+                    return value.map((item) => (typeof item === 'object' ? item.id : item))
+                return []
             }
-            if ((value !== null) && (value !== undefined) && (typeof value === 'object')) return value.id;
-            return value ?? null;
+            if (value !== null && value !== undefined && typeof value === 'object') return value.id
+            return value ?? null
         },
 
         /**
@@ -144,25 +159,25 @@ export default {
          */
         locationChanged(newVal) {
             if (newVal === null || newVal === undefined) {
-                this.sendEvent(null);
-                return;
+                this.sendEvent(null)
+                return
             }
 
             if (this.multiple && Array.isArray(newVal)) {
-                this.sendEvent(newVal);
-                return;
+                this.sendEvent(newVal)
+                return
             }
 
             if (this.returnObject) {
                 if (!isNaN(newVal) && newVal !== '') {
-                    const found = (this.locations || []).find(loc => loc.id == newVal);
-                    this.sendEvent(found || newVal);
+                    const found = (this.locations || []).find((loc) => loc.id == newVal)
+                    this.sendEvent(found || newVal)
                 } else {
                     // freetext string
-                    this.sendEvent(String(newVal));
+                    this.sendEvent(String(newVal))
                 }
             } else {
-                this.sendEvent(newVal);
+                this.sendEvent(newVal)
             }
         },
 
@@ -171,15 +186,14 @@ export default {
          */
         sendEvent(found) {
             if (this.useInput) {
-                this.$emit('input', found);
-                this.$emit('update:modelValue', found);
+                this.$emit('input', found)
+                this.$emit('update:modelValue', found)
             } else {
-                this.$emit('set-location', found);
+                this.$emit('set-location', found)
             }
         },
     },
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

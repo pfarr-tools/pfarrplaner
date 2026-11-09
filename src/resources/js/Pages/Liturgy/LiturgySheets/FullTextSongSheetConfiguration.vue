@@ -27,30 +27,53 @@
   -->
 
 <template>
-    <liturgy-sheet-configuration-layout :title="sheetConfig.title" :service="service"
-                                        :sheet-config="sheetConfig">
+    <liturgy-sheet-configuration-layout
+        :title="sheetConfig.title"
+        :service="service"
+        :sheet-config="sheetConfig"
+    >
         <fieldset>
             <legend>Folgende Inhalte mit einschließen:</legend>
-            <form-check label="Komplette Liedtexte" v-model="myConfig.includeSongTexts" name="config[includeSongTexts]"/>
-            <form-check label="Komplette Schriftlesungen" v-model="myConfig.includeFullReadings" name="config[includeFullReadings]"/>
-            <form-check label="Ausführende Personen" v-model="myConfig.includeRecipients" name="config[includeRecipients]"/>
-            <form-check v-if="service.city.konfiapp_apikey && service.konfiapp_event_qr"
-                        label="QR-Code für KonfiApp" v-model="myConfig.includeFullReadings" name="config[includeQR]"/>
+            <form-check
+                label="Komplette Liedtexte"
+                v-model="myConfig.includeSongTexts"
+                name="config[includeSongTexts]"
+            />
+            <form-check
+                label="Komplette Schriftlesungen"
+                v-model="myConfig.includeFullReadings"
+                name="config[includeFullReadings]"
+            />
+            <form-check
+                label="Ausführende Personen"
+                v-model="myConfig.includeRecipients"
+                name="config[includeRecipients]"
+            />
+            <form-check
+                v-if="service.city.konfiapp_apikey && service.konfiapp_event_qr"
+                label="QR-Code für KonfiApp"
+                v-model="myConfig.includeFullReadings"
+                name="config[includeQR]"
+            />
         </fieldset>
         <fieldset>
             <legend>Layout</legend>
-            <form-check label="Seitenzahlen" v-model="myConfig.pageNumbers" name="config[pageNumbers]"/>
+            <form-check
+                label="Seitenzahlen"
+                v-model="myConfig.pageNumbers"
+                name="config[pageNumbers]"
+            />
         </fieldset>
     </liturgy-sheet-configuration-layout>
 </template>
 
 <script>
-import LiturgySheetConfigurationLayout from "./LiturgySheetConfigurationLayout";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
+import LiturgySheetConfigurationLayout from './LiturgySheetConfigurationLayout'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
 
 export default {
-    name: "FullTextLiturgySheetConfiguration",
-    components: {FormCheck, LiturgySheetConfigurationLayout},
+    name: 'FullTextLiturgySheetConfiguration',
+    components: { FormCheck, LiturgySheetConfigurationLayout },
     props: ['service', 'sheetConfig', 'config'],
     data() {
         return {
@@ -60,6 +83,4 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

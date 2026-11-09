@@ -29,33 +29,63 @@
 <template>
     <admin-layout title="Übersicht der Gottesdienste nach AZE-Kategorie">
         <template v-slot:navbar-left>
-            <save-button label="Erstellen" title="Übersicht der eingenommenen Opfer erstellen" @click="renderReport" />
+            <save-button
+                label="Erstellen"
+                title="Übersicht der eingenommenen Opfer erstellen"
+                @click="renderReport"
+            />
         </template>
-        <form method="post" :action="route('reports.render', {report: 'servicesByWTCCategory'})" @submit.prevent="renderReport">
+        <form
+            method="post"
+            :action="route('reports.render', { report: 'servicesByWTCCategory' })"
+            @submit.prevent="renderReport"
+        >
             <form-csrf-token />
-            <form-selectize name="cities[]" label="Bericht für folgende Kirchengemeinden erstellen" v-model="myCities"
-                            :options="cities" multiple />
-            <people-select name="people[]" label="Bericht für folgende Personen erstellen" :people="people" v-model="myPeople" />
-            <form-date-range-picker label="Gottesdienste von" v-model:from="myStart" v-model:to="myEnd" iso-date />
+            <form-selectize
+                name="cities[]"
+                label="Bericht für folgende Kirchengemeinden erstellen"
+                v-model="myCities"
+                :options="cities"
+                multiple
+            />
+            <people-select
+                name="people[]"
+                label="Bericht für folgende Personen erstellen"
+                :people="people"
+                v-model="myPeople"
+            />
+            <form-date-range-picker
+                label="Gottesdienste von"
+                v-model:from="myStart"
+                v-model:to="myEnd"
+                iso-date
+            />
         </form>
     </admin-layout>
 </template>
 
 <script>
-import SaveButton from "../../../components/Ui/buttons/SaveButton";
-import FormSelectize from "../../../components/Ui/forms/FormSelectize";
-import FormCsrfToken from "../../../components/Ui/forms/FormCsrfToken";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import FormDatePicker from "../../../components/Ui/forms/FormDatePicker";
-import PeopleSelect from "../../../components/Ui/elements/PeopleSelect";
-import { submitReportForm } from "../../../helpers/submitReportForm";
+import SaveButton from '../../../components/Ui/buttons/SaveButton'
+import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormCsrfToken from '../../../components/Ui/forms/FormCsrfToken'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import FormDatePicker from '../../../components/Ui/forms/FormDatePicker'
+import PeopleSelect from '../../../components/Ui/elements/PeopleSelect'
+import { submitReportForm } from '../../../helpers/submitReportForm'
 export default {
-    name: "Setup",
+    name: 'Setup',
     props: ['people', 'cities'],
-    components: {PeopleSelect, FormDatePicker, FormInput, FormCsrfToken, FormSelectize, SaveButton},
+    components: {
+        PeopleSelect,
+        FormDatePicker,
+        FormInput,
+        FormCsrfToken,
+        FormSelectize,
+        SaveButton,
+    },
     data() {
-        let myStart = moment().startOf('year');
-        let myEnd = moment().endOf('year');
+        let myStart = moment().startOf('year')
+        let myEnd = moment().endOf('year')
 
         return {
             myCities: this.cities.length ? [this.cities[0].id] : null,
@@ -66,17 +96,15 @@ export default {
     },
     methods: {
         renderReport() {
-            submitReportForm(route('reports.render', {report: 'servicesByWTCCategory'}), {
+            submitReportForm(route('reports.render', { report: 'servicesByWTCCategory' }), {
                 cities: this.myCities,
                 people: this.myPeople,
                 start: this.myStart,
                 end: this.myEnd,
-            });
+            })
         },
-    }
+    },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

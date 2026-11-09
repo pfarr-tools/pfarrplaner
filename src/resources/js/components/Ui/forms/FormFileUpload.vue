@@ -28,74 +28,186 @@
 
 <template>
     <div>
-    <form-group :name="name" :label="label" :help="help" :key="tabUpdate">
-        <ul class="nav nav-pills mb-1" v-if="!noSourceTabs">
-            <li class="nav-item">
-                <a class="nav-link" :class="{active: showTab == 0}" @click="showTab = 0">Lokale Dateien</a>
-            </li>
-            <li class="nav-item" v-if="!noUrl">
-                <a class="nav-link" :class="{active: showTab == 1}" @click="showTab = 1">Aus dem Internet</a>
-            </li>
-            <li class="nav-item" v-if="!noCamera">
-                <a class="nav-link" :class="{active: showTab == 2}" @click="showTab = 2">Von der Kamera</a>
-            </li>
-            <li class="nav-item" v-if="showInbox">
-                <a class="nav-link" :class="{active: showTab == 3}" @click="showTab = 3">Aus der Ablage</a>
-            </li>
-            <li class="nav-item" v-if="!noPixabay && pixabayEnabled">
-                <a class="nav-link" :class="{active: showTab == 4}" @click="showTab = 4">Von Pixabay</a>
-            </li>
-        </ul>
-        <div class="upload-container" v-if="showTab == 0">
-            <div class="drop-target" :key="dragging" :class="{dragging: dragging}" @dragenter.prevent="dragEnter"
-                 @dragover.prevent
-                 @dragleave.prevent="dragLeave"
-                 @drop.prevent="drop">
-                <input ref="fileInput" class="form-control-file"
-                       type="file" :name="name" @change="handleInput" :multiple="multi"
-                       @dragenter="dragEnter" @dragleave="dragLeave" @drop="drop"/>
-                Hier klicken oder {{ multi ? 'Dateien' : 'Datei' }} hierher ziehen... {{ helpText || '' }}
+        <form-group
+            :name="name"
+            :label="label"
+            :help="help"
+            :key="tabUpdate"
+        >
+            <ul
+                class="nav nav-pills mb-1"
+                v-if="!noSourceTabs"
+            >
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        :class="{ active: showTab == 0 }"
+                        @click="showTab = 0"
+                        >Lokale Dateien</a
+                    >
+                </li>
+                <li
+                    class="nav-item"
+                    v-if="!noUrl"
+                >
+                    <a
+                        class="nav-link"
+                        :class="{ active: showTab == 1 }"
+                        @click="showTab = 1"
+                        >Aus dem Internet</a
+                    >
+                </li>
+                <li
+                    class="nav-item"
+                    v-if="!noCamera"
+                >
+                    <a
+                        class="nav-link"
+                        :class="{ active: showTab == 2 }"
+                        @click="showTab = 2"
+                        >Von der Kamera</a
+                    >
+                </li>
+                <li
+                    class="nav-item"
+                    v-if="showInbox"
+                >
+                    <a
+                        class="nav-link"
+                        :class="{ active: showTab == 3 }"
+                        @click="showTab = 3"
+                        >Aus der Ablage</a
+                    >
+                </li>
+                <li
+                    class="nav-item"
+                    v-if="!noPixabay && pixabayEnabled"
+                >
+                    <a
+                        class="nav-link"
+                        :class="{ active: showTab == 4 }"
+                        @click="showTab = 4"
+                        >Von Pixabay</a
+                    >
+                </li>
+            </ul>
+            <div
+                class="upload-container"
+                v-if="showTab == 0"
+            >
+                <div
+                    class="drop-target"
+                    :key="dragging"
+                    :class="{ dragging: dragging }"
+                    @dragenter.prevent="dragEnter"
+                    @dragover.prevent
+                    @dragleave.prevent="dragLeave"
+                    @drop.prevent="drop"
+                >
+                    <input
+                        ref="fileInput"
+                        class="form-control-file"
+                        type="file"
+                        :name="name"
+                        @change="handleInput"
+                        :multiple="multi"
+                        @dragenter="dragEnter"
+                        @dragleave="dragLeave"
+                        @drop="drop"
+                    />
+                    Hier klicken oder {{ multi ? 'Dateien' : 'Datei' }} hierher ziehen...
+                    {{ helpText || '' }}
+                </div>
             </div>
-        </div>
-        <div v-if="showTab == 1">
-            <form-input label="Url der Datei" v-model="uploadUrl" />
-            <nav-button icon="mdi-upload" @click="uploadFromUrl" :disabled="(!uploadUrl)">Von URL laden</nav-button>
-        </div>
-        <div class="upload-container" v-if="showTab == 2">
-            <div class="drop-target" :key="dragging" :class="{dragging: dragging}">
-                <input class="form-control-file" accept="image/*" capture="camera"
-                       type="file" @change="handleInput" />
-                Hier klicken, um ein Bild mit der Kamera aufzunehmen
+            <div v-if="showTab == 1">
+                <form-input
+                    label="Url der Datei"
+                    v-model="uploadUrl"
+                />
+                <nav-button
+                    icon="mdi-upload"
+                    @click="uploadFromUrl"
+                    :disabled="!uploadUrl"
+                    >Von URL laden</nav-button
+                >
             </div>
-        </div>
-        <div  v-if="showTab == 3">
-            <div class="row inbox-row" v-for="inboxFile in inboxFiles" @click="uploadFromInbox(inboxFile)">
-                <div class="col-md-8"><b><span :class="inboxFile.icon"></span> {{ inboxFile.name }}</b></div>
-                <div class="col-md-2 text-muted">{{ moment(inboxFile.date).format('DD.MM.YYYY HH:mm') }}</div>
-                <div class="col-md-2 text-right text-muted" style="text-align: right">{{ fileSize(inboxFile.filesize) }}</div>
+            <div
+                class="upload-container"
+                v-if="showTab == 2"
+            >
+                <div
+                    class="drop-target"
+                    :key="dragging"
+                    :class="{ dragging: dragging }"
+                >
+                    <input
+                        class="form-control-file"
+                        accept="image/*"
+                        capture="camera"
+                        type="file"
+                        @change="handleInput"
+                    />
+                    Hier klicken, um ein Bild mit der Kamera aufzunehmen
+                </div>
             </div>
-            <hr />
-            <nav-button icon="mdi-refresh" @click="refreshInboxIndex">Ablage neu einlesen</nav-button>
-        </div>
-        <div  v-if="showTab == 4">
-            <form-pixabay-picker @input="uploadFromPixabay" />
-        </div>
-    </form-group>
+            <div v-if="showTab == 3">
+                <div
+                    class="row inbox-row"
+                    v-for="inboxFile in inboxFiles"
+                    @click="uploadFromInbox(inboxFile)"
+                >
+                    <div class="col-md-8">
+                        <b><span :class="inboxFile.icon"></span> {{ inboxFile.name }}</b>
+                    </div>
+                    <div class="col-md-2 text-muted">
+                        {{ moment(inboxFile.date).format('DD.MM.YYYY HH:mm') }}
+                    </div>
+                    <div
+                        class="col-md-2 text-right text-muted"
+                        style="text-align: right"
+                    >
+                        {{ fileSize(inboxFile.filesize) }}
+                    </div>
+                </div>
+                <hr />
+                <nav-button
+                    icon="mdi-refresh"
+                    @click="refreshInboxIndex"
+                    >Ablage neu einlesen</nav-button
+                >
+            </div>
+            <div v-if="showTab == 4">
+                <form-pixabay-picker @input="uploadFromPixabay" />
+            </div>
+        </form-group>
     </div>
 </template>
 
 <script>
-import FormGroup from "./FormGroup";
-import NavButton from "../buttons/NavButton";
-import FormInput from "./FormInput";
-import FormPixabayPicker from "./FormPixabayPicker";
-import __ from 'lodash';
+import FormGroup from './FormGroup'
+import NavButton from '../buttons/NavButton'
+import FormInput from './FormInput'
+import FormPixabayPicker from './FormPixabayPicker'
+import __ from 'lodash'
 
 export default {
-    name: "FormFileUpload",
+    name: 'FormFileUpload',
     emits: ['input', 'upload-url', 'upload-inbox'],
-    props: ['name', 'label', 'help', 'multiple', 'helpText', 'noCamera', 'noUrl', 'noPixabay', 'noDescription', 'noInbox', 'noSourceTabs', 'cut'],
-    components: {FormPixabayPicker, FormInput, NavButton, FormGroup},
+    props: [
+        'name',
+        'label',
+        'help',
+        'multiple',
+        'helpText',
+        'noCamera',
+        'noUrl',
+        'noPixabay',
+        'noDescription',
+        'noInbox',
+        'noSourceTabs',
+        'cut',
+    ],
+    components: { FormPixabayPicker, FormInput, NavButton, FormGroup },
     data() {
         return {
             dragging: false,
@@ -110,13 +222,13 @@ export default {
         }
     },
     mounted() {
-        this.refreshInboxIndex();
+        this.refreshInboxIndex()
     },
     methods: {
         handleInput(event) {
             this.emitFiles(event.target.files)
             event.target.value = ''
-            this.dragging = false;
+            this.dragging = false
         },
         /**
          * Emit selected files once and keep the native input reusable.
@@ -127,32 +239,32 @@ export default {
         emitFiles(files) {
             const selectedFiles = Array.from(files || [])
             if (!this.multi) selectedFiles.splice(1)
-            selectedFiles.forEach(file => this.$emit('input', file))
+            selectedFiles.forEach((file) => this.$emit('input', file))
         },
         dragEnter(e) {
-            this.dragging = true;
+            this.dragging = true
         },
         dragLeave(e) {
-            this.dragging = false;
+            this.dragging = false
         },
         async drop(e) {
-            this.dragging = false;
+            this.dragging = false
 
             // 1) Dropped file(s)
-            const files = e.dataTransfer?.files;
+            const files = e.dataTransfer?.files
             if (files && files.length) {
                 this.emitFiles(files)
-                return;
+                return
             }
 
             // 2) Dropped URL (e.g. dragging an <img> or link)
-            const uri = e.dataTransfer?.getData('text/uri-list') || e.dataTransfer?.getData('text/plain');
+            const uri =
+                e.dataTransfer?.getData('text/uri-list') || e.dataTransfer?.getData('text/plain')
             if (uri && /^https?:\/\//i.test(uri.trim())) {
-                this.uploadUrl = uri.trim();
-                this.uploadFromUrl();
-                return;
+                this.uploadUrl = uri.trim()
+                this.uploadFromUrl()
+                return
             }
-
         },
         /**
          * Get human-readable file size
@@ -161,54 +273,58 @@ export default {
          * @source https://programanddesign.com/js/human-readable-file-size-in-javascript/
          */
         fileSize(size) {
-            var i = Math.floor(Math.log(size) / Math.log(1024));
-            return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+            var i = Math.floor(Math.log(size) / Math.log(1024))
+            return (
+                (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
+            )
         },
         refreshInboxIndex() {
-            this.$api().get(route('api.inbox.index')).then(response => {
-                if (!response.data) {
-                    this.showInbox = false;
-                } else {
-                    this.inboxFiles = response.data;
-                    this.showInbox = true;
-                    this.tabUpdate++;
-                    this.$forceUpdate();
-                }
-            });
+            this.$api()
+                .get(route('api.inbox.index'))
+                .then((response) => {
+                    if (!response.data) {
+                        this.showInbox = false
+                    } else {
+                        this.inboxFiles = response.data
+                        this.showInbox = true
+                        this.tabUpdate++
+                        this.$forceUpdate()
+                    }
+                })
         },
         uploadFromUrl() {
-            this.$emit('upload-url', {url: this.uploadUrl, info: this.info});
+            this.$emit('upload-url', { url: this.uploadUrl, info: this.info })
         },
         uploadFromPixabay(e) {
-            const imageUrls = [e.webformatURL, e.largeImageURL, e.fullHDURL, e.previewURL].filter(Boolean);
-            const cdnUrl = imageUrls.find(url => {
+            const imageUrls = [e.webformatURL, e.largeImageURL, e.fullHDURL, e.previewURL].filter(
+                Boolean,
+            )
+            const cdnUrl = imageUrls.find((url) => {
                 try {
-                    return new URL(url).hostname === 'cdn.pixabay.com';
+                    return new URL(url).hostname === 'cdn.pixabay.com'
                 } catch {
-                    return false;
+                    return false
                 }
-            });
-            const sourceUrl = this.preferredPixabayUrl(cdnUrl || e.previewURL || imageUrls[0] || '');
-            if (!sourceUrl) return;
-            this.uploadUrl = sourceUrl;
-            this.info = e;
-            this.$emit('upload-url', {url: this.uploadUrl, info: this.info, pixabay: true});
+            })
+            const sourceUrl = this.preferredPixabayUrl(cdnUrl || e.previewURL || imageUrls[0] || '')
+            if (!sourceUrl) return
+            this.uploadUrl = sourceUrl
+            this.info = e
+            this.$emit('upload-url', { url: this.uploadUrl, info: this.info, pixabay: true })
         },
         /** Prefer the high-resolution CDN variant while avoiding Pixabay's rate-limited get URLs. */
         preferredPixabayUrl(url) {
-            return url.replace(/_(?:150|640)\.(?=[a-z0-9]+(?:\?|$))/i, '_1280.');
+            return url.replace(/_(?:150|640)\.(?=[a-z0-9]+(?:\?|$))/i, '_1280.')
         },
         uploadFromInbox(e) {
-            this.$emit('upload-inbox', e);
-        }
-    }
+            this.$emit('upload-inbox', e)
+        },
+    },
 }
 </script>
 
 <style scoped lang="scss">
 @use '../../../../sass/theme' as theme;
-
-
 
 .upload-container {
     display: inline-block;
@@ -225,7 +341,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-     border-radius: 0;
+    border-radius: 0;
     font-weight: bold;
     color: darkgray;
 
@@ -257,7 +373,7 @@ export default {
 }
 
 .nav-pills .nav-link {
-    padding: .5rem .75rem;
+    padding: 0.5rem 0.75rem;
     cursor: pointer;
 }
 
@@ -266,7 +382,7 @@ export default {
 }
 
 .inbox-row:hover {
-    background-color: theme.theme-color("primary") !important;
+    background-color: theme.theme-color('primary') !important;
     color: white;
     cursor: pointer !important;
 }
@@ -274,6 +390,4 @@ export default {
 .inbox-row:hover .text-muted {
     color: white !important;
 }
-
-
 </style>

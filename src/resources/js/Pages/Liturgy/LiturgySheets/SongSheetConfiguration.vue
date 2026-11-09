@@ -27,23 +27,34 @@
   -->
 
 <template>
-    <liturgy-sheet-configuration-layout :title="sheetConfig.title" :service="service"
-                                        :sheet-config="sheetConfig">
+    <liturgy-sheet-configuration-layout
+        :title="sheetConfig.title"
+        :service="service"
+        :sheet-config="sheetConfig"
+    >
         <fieldset>
             <legend>Lieder</legend>
-            <form-check label="Wo möglich, Noten abdrucken" v-model="myConfig.renderMusic" name="config[renderMusic]"/>
-            <form-check label="Verse beim Notendruck kombinieren" v-model="myConfig.renderMusic" name="config[mergeVerses]"/>
+            <form-check
+                label="Wo möglich, Noten abdrucken"
+                v-model="myConfig.renderMusic"
+                name="config[renderMusic]"
+            />
+            <form-check
+                label="Verse beim Notendruck kombinieren"
+                v-model="myConfig.renderMusic"
+                name="config[mergeVerses]"
+            />
         </fieldset>
     </liturgy-sheet-configuration-layout>
 </template>
 
 <script>
-import LiturgySheetConfigurationLayout from "./LiturgySheetConfigurationLayout";
-import FormCheck from "../../../components/Ui/forms/FormCheck";
+import LiturgySheetConfigurationLayout from './LiturgySheetConfigurationLayout'
+import FormCheck from '../../../components/Ui/forms/FormCheck'
 
 export default {
-    name: "SongSheetConfiguration",
-    components: {FormCheck, LiturgySheetConfigurationLayout},
+    name: 'SongSheetConfiguration',
+    components: { FormCheck, LiturgySheetConfigurationLayout },
     props: ['service', 'sheetConfig', 'config'],
     data() {
         return {
@@ -53,6 +64,4 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

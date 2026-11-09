@@ -28,196 +28,231 @@
 
 <template>
     <div>
-        <small><span class="mdi mdi-timer"></span> <span :class="speechTime == '00:00' ? 'warning' : ''">{{ speechTime }}</span></small>
+        <small
+            ><span class="mdi mdi-timer"></span>
+            <span :class="speechTime == '00:00' ? 'warning' : ''">{{ speechTime }}</span></small
+        >
     </div>
 </template>
 
 <script>
-import TextStats from "./TextStats";
+import TextStats from './TextStats'
 
 export function speechTimeInSeconds(item, service, rounded, wpm) {
     function getVersesToDisplay(song) {
-        const range = song.data.verses;
-        var verses = [];
-        if (undefined == song.data.song) return [];
-        if (undefined == song.data.song.song) return [];
-        if ((null === range) || (undefined === range) || (range == '')) {
-            song.data.song.song.verses.forEach(v => verses.push(v.number));
-            return verses;
+        const range = song.data.verses
+        var verses = []
+        if (undefined == song.data.song) return []
+        if (undefined == song.data.song.song) return []
+        if (null === range || undefined === range || range == '') {
+            song.data.song.song.verses.forEach((v) => verses.push(v.number))
+            return verses
         }
         range.split('+').forEach(function (subRange) {
             if (subRange.indexOf('-') >= 0) {
-                var tmp = subRange.split('-');
-                if ((tmp[0] != '') && (tmp[1] != '')) {
-                    if ((!isNaN(tmp[0])) && (!isNaN(tmp[1]))) {
-                        for (var i = parseInt(tmp[0]); i <= parseInt(tmp[1]); i++) verses.push(i.toString());
+                var tmp = subRange.split('-')
+                if (tmp[0] != '' && tmp[1] != '') {
+                    if (!isNaN(tmp[0]) && !isNaN(tmp[1])) {
+                        for (var i = parseInt(tmp[0]); i <= parseInt(tmp[1]); i++)
+                            verses.push(i.toString())
                     }
                 } else if (tmp[0] != '') {
-                    verses.push(tmp[0]);
+                    verses.push(tmp[0])
                 }
             } else {
-                if (subRange != '') verses.push(subRange);
+                if (subRange != '') verses.push(subRange)
             }
-        });
-        return verses;
+        })
+        return verses
     }
     function quotableSongText(song) {
-        var text = '';
+        var text = ''
         getVersesToDisplay(song).forEach(function (verseNumber) {
             song.data.song.song.verses.forEach(function (verse) {
                 if (verse.number == verseNumber) {
-                    if (verse.refrain_before) text += "<p>" + song.data.song.song.refrain + "</p>";
-                    text += "<p>" + (verse.number != '' ? verse.number + '. ' : '') + verse.text + "</p>";
-                    if (verse.refrain_after) text += "<p>" + song.data.song.song.refrain + "</p>";
+                    if (verse.refrain_before) text += '<p>' + song.data.song.song.refrain + '</p>'
+                    text +=
+                        '<p>' +
+                        (verse.number != '' ? verse.number + '. ' : '') +
+                        verse.text +
+                        '</p>'
+                    if (verse.refrain_after) text += '<p>' + song.data.song.song.refrain + '</p>'
                 }
-            });
-        });
-        return text;
+            })
+        })
+        return text
     }
     function getItemText() {
         switch (item.data_type) {
             case 'freetext':
-                if (!item.data || !item.data.description) return '';
-                return item.data.description.replaceAll('<p>', '').replaceAll('</p>', "\r\n").replaceAll('<br>', "\n").replaceAll('<br />', "\n").replaceAll('<br/>', "\n");
+                if (!item.data || !item.data.description) return ''
+                return item.data.description
+                    .replaceAll('<p>', '')
+                    .replaceAll('</p>', '\r\n')
+                    .replaceAll('<br>', '\n')
+                    .replaceAll('<br />', '\n')
+                    .replaceAll('<br/>', '\n')
             case 'psalm':
-                return item.data.psalm ? (item.data.psalm.text || '') : '';
+                return item.data.psalm ? item.data.psalm.text || '' : ''
             case 'sermon':
-                return service.sermon ? (service.sermon.text || '') : '';
+                return service.sermon ? service.sermon.text || '' : ''
             case 'song':
-                return quotableSongText(item);
+                return quotableSongText(item)
             case 'reading':
-                return item.data ? (item.data.fullText || item.data.customText || item.data.text || '') : '';
+                return item.data
+                    ? item.data.fullText || item.data.customText || item.data.text || ''
+                    : ''
         }
-        return '';
+        return ''
     }
-    const typeWpm = item.data_type === 'song' ? 40
-        : (['psalm', 'reading'].includes(item.data_type) ? 90
-        : ((item.data_type === 'freetext' && item.title === 'Ehr sei dem Vater') ? 40
-        : (wpm || 140)));
-    const effectiveWpm = item.data.wpm || typeWpm;
-    const words = getItemText().trim().split(/\s+/).length;
-    const seconds = parseInt(words / effectiveWpm * 60, 10);
-    return rounded ? Math.ceil(seconds / 30) * 30 : seconds;
+    const typeWpm =
+        item.data_type === 'song'
+            ? 40
+            : ['psalm', 'reading'].includes(item.data_type)
+              ? 90
+              : item.data_type === 'freetext' && item.title === 'Ehr sei dem Vater'
+                ? 40
+                : wpm || 140
+    const effectiveWpm = item.data.wpm || typeWpm
+    const words = getItemText().trim().split(/\s+/).length
+    const seconds = parseInt((words / effectiveWpm) * 60, 10)
+    return rounded ? Math.ceil(seconds / 30) * 30 : seconds
 }
 
 export default {
-    name: "ItemTextStats",
-    components: {TextStats},
+    name: 'ItemTextStats',
+    components: { TextStats },
     props: ['item', 'service'],
     data() {
         return {
-            rounded: this.$page.props.settings.liturgy_times_rounded ?  true : false,
+            rounded: this.$page.props.settings.liturgy_times_rounded ? true : false,
             wpm: this.$page.props.settings.wpm || 110,
         }
     },
     computed: {
         speechTime() {
-            return this.item.data.time || this.calculatedSpeechTime();
-        }
+            return this.item.data.time || this.calculatedSpeechTime()
+        },
     },
     methods: {
         getItemText() {
-            switch(this.item.data_type) {
+            switch (this.item.data_type) {
                 case 'freetext':
-                    if (!this.item.data) return '';
-                    if (!this.item.data.description) return '';
-                    return this.item.data.description.replaceAll('<p>', '')
-                        .replaceAll('</p>', "\r\n")
-                        .replaceAll('<br>', "\n")
-                        .replaceAll('<br />', "\n")
-                        .replaceAll('<br/>', "\n");
+                    if (!this.item.data) return ''
+                    if (!this.item.data.description) return ''
+                    return this.item.data.description
+                        .replaceAll('<p>', '')
+                        .replaceAll('</p>', '\r\n')
+                        .replaceAll('<br>', '\n')
+                        .replaceAll('<br />', '\n')
+                        .replaceAll('<br/>', '\n')
                 case 'psalm':
-                    return this.item.data.psalm ? (this.item.data.psalm.text || '') : '';
+                    return this.item.data.psalm ? this.item.data.psalm.text || '' : ''
                 case 'sermon':
-                    return this.service.sermon ? (this.service.sermon.text || '') : '';
+                    return this.service.sermon ? this.service.sermon.text || '' : ''
                 case 'song':
-                    return this.quotableSongText(this.item);
+                    return this.quotableSongText(this.item)
                 case 'reading':
-                    return this.item.data ? (this.item.data.fullText || this.item.data.customText || this.item.data.text || '') : '';
+                    return this.item.data
+                        ? this.item.data.fullText ||
+                              this.item.data.customText ||
+                              this.item.data.text ||
+                              ''
+                        : ''
             }
-            return '';
+            return ''
         },
         getItemWPM() {
-            const typeWpm = this.item.data_type === 'song' ? 40
-                : (['psalm', 'reading'].includes(this.item.data_type) ? 90
-                : ((this.item.data_type === 'freetext' && this.item.title === 'Ehr sei dem Vater') ? 40
-                : (this.wpm || 140)));
-            return this.item.data.wpm || typeWpm;
+            const typeWpm =
+                this.item.data_type === 'song'
+                    ? 40
+                    : ['psalm', 'reading'].includes(this.item.data_type)
+                      ? 90
+                      : this.item.data_type === 'freetext' &&
+                          this.item.title === 'Ehr sei dem Vater'
+                        ? 40
+                        : this.wpm || 140
+            return this.item.data.wpm || typeWpm
         },
         getVersesToDisplay(song) {
-            const range = song.data.verses;
-            var verses = [];
-            if (undefined == song.data.song) return [];
-            if (undefined == song.data.song.song) return [];
-            if ((null === range) || (undefined === range) || (range == '')) {
+            const range = song.data.verses
+            var verses = []
+            if (undefined == song.data.song) return []
+            if (undefined == song.data.song.song) return []
+            if (null === range || undefined === range || range == '') {
                 song.data.song.song.verses.forEach(function (verse) {
-                    verses.push(verse.number);
-                });
-                return verses;
+                    verses.push(verse.number)
+                })
+                return verses
             }
             range.split('+').forEach(function (subRange) {
                 if (subRange.indexOf('-') >= 0) {
-                    var tmp = subRange.split('-');
-                    if ((tmp[0] != '') && (tmp[1] != '')) {
-                        if ((!isNaN(tmp[0])) && (!isNaN(tmp[1]))) {
+                    var tmp = subRange.split('-')
+                    if (tmp[0] != '' && tmp[1] != '') {
+                        if (!isNaN(tmp[0]) && !isNaN(tmp[1])) {
                             for (var i = parseInt(tmp[0]); i <= parseInt(tmp[1]); i++) {
-                                verses.push(i.toString());
+                                verses.push(i.toString())
                             }
                         }
                     } else if (tmp[0] != '') {
-                        verses.push(tmp[0]);
+                        verses.push(tmp[0])
                     }
                 } else {
-                    if (subRange != '') verses.push(subRange);
+                    if (subRange != '') verses.push(subRange)
                 }
-            });
-            return verses;
+            })
+            return verses
         },
         quotableSongText(song) {
-            var text = '';
+            var text = ''
             this.getVersesToDisplay(song).forEach(function (verseNumber) {
                 song.data.song.song.verses.forEach(function (verse) {
                     if (verse.number == verseNumber) {
                         if (verse.refrain_before) {
-                            text = text + "<p>" + song.data.song.song.refrain + "</p>";
+                            text = text + '<p>' + song.data.song.song.refrain + '</p>'
                         }
-                        text = text + "<p>" + (verse.number != '' ? verse.number + '. ' : '') + verse.text + "</p>";
+                        text =
+                            text +
+                            '<p>' +
+                            (verse.number != '' ? verse.number + '. ' : '') +
+                            verse.text +
+                            '</p>'
                         if (verse.refrain_after) {
-                            text = text + "<p>" + song.data.song.song.refrain + "</p>";
+                            text = text + '<p>' + song.data.song.song.refrain + '</p>'
                         }
                     }
-                });
-            });
-            return text;
+                })
+            })
+            return text
         },
         wordCount() {
-            return this.getItemText().trim().split(/\s+/).length;
+            return this.getItemText().trim().split(/\s+/).length
         },
         formatTime(sec_num) {
-            var hours = Math.floor(sec_num / 3600);
-            var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-            var seconds = sec_num - (hours * 3600) - (minutes * 60);
+            var hours = Math.floor(sec_num / 3600)
+            var minutes = Math.floor((sec_num - hours * 3600) / 60)
+            var seconds = sec_num - hours * 3600 - minutes * 60
 
-            var hoursText = '';
+            var hoursText = ''
             if (hours) {
-                hoursText = hours+':';
+                hoursText = hours + ':'
             }
             if (minutes < 10) {
-                minutes = "0" + minutes;
+                minutes = '0' + minutes
             }
             if (seconds < 10) {
-                seconds = "0" + seconds;
+                seconds = '0' + seconds
             }
-            return hoursText + minutes + ':' + seconds;
+            return hoursText + minutes + ':' + seconds
         },
         speechTimeInSeconds() {
-            let seconds = parseInt((this.wordCount()) / this.getItemWPM() * 60, 10);
-            return this.rounded ? Math.ceil(seconds / 30) * 30 : seconds;
+            let seconds = parseInt((this.wordCount() / this.getItemWPM()) * 60, 10)
+            return this.rounded ? Math.ceil(seconds / 30) * 30 : seconds
         },
         calculatedSpeechTime() {
-            return this.formatTime(this.speechTimeInSeconds());
+            return this.formatTime(this.speechTimeInSeconds())
         },
-    }
+    },
 }
 </script>
 

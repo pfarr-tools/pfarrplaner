@@ -29,25 +29,61 @@
 <template>
     <admin-layout title="Benutzerverwaltung">
         <template #navbar-left>
-            <nav-button v-if="canCreate" type="success" icon="mdi mdi-account-plus" title="Neue Person anlegen"
-                        @click="createUser">Person hinzufügen</nav-button>
-            <nav-button v-if="isSuperAdmin" type="warning" icon="mdi mdi-account-multiple-check" title="Doppelte Personeneinträge finden"
-                        class="ms-1" @click="findDuplicates">Duplikate finden</nav-button>
+            <nav-button
+                v-if="canCreate"
+                type="success"
+                icon="mdi mdi-account-plus"
+                title="Neue Person anlegen"
+                @click="createUser"
+                >Person hinzufügen</nav-button
+            >
+            <nav-button
+                v-if="isSuperAdmin"
+                type="warning"
+                icon="mdi mdi-account-multiple-check"
+                title="Doppelte Personeneinträge finden"
+                class="ms-1"
+                @click="findDuplicates"
+                >Duplikate finden</nav-button
+            >
         </template>
-        <dataset v-slot="{ ds }"
-                 :ds-data="users"
-                 ds-sort-by="sortName"
-                 :ds-filter-fields="filterFields"
-                 :ds-search-in="['name', 'first_name', 'last_name', 'email']">
-            <div class="row mb-3" :data-page-count="ds.dsPagecount">
+        <dataset
+            v-slot="{ ds }"
+            :ds-data="users"
+            ds-sort-by="sortName"
+            :ds-filter-fields="filterFields"
+            :ds-search-in="['name', 'first_name', 'last_name', 'email']"
+        >
+            <div
+                class="row mb-3"
+                :data-page-count="ds.dsPagecount"
+            >
                 <div class="col-md-6 mb-2 mb-md-0">
-                    <dataset-search ds-search-placeholder="Suchen..." ref="search" autofocus />
+                    <dataset-search
+                        ds-search-placeholder="Suchen..."
+                        ref="search"
+                        autofocus
+                    />
                 </div>
                 <div class="col-md-1 mb-2 mb-md-0">
-                    <template v-for="checkbox in checkboxes" :key="checkbox.name">
-                        <label v-if="checkbox.condition" class="mt-1" :title="checkbox.title">
-                            <input type="checkbox" v-model="checkbox.value" :title="checkbox.title" />
-                            <span v-if="checkbox.icon" :class="checkbox.icon"></span>
+                    <template
+                        v-for="checkbox in checkboxes"
+                        :key="checkbox.name"
+                    >
+                        <label
+                            v-if="checkbox.condition"
+                            class="mt-1"
+                            :title="checkbox.title"
+                        >
+                            <input
+                                type="checkbox"
+                                v-model="checkbox.value"
+                                :title="checkbox.title"
+                            />
+                            <span
+                                v-if="checkbox.icon"
+                                :class="checkbox.icon"
+                            ></span>
                             <span v-if="checkbox.label">{{ checkbox.label }}</span>
                         </label>
                     </template>
@@ -61,51 +97,103 @@
                     <div class="table-responsive">
                         <table class="table table-striped table-hover d-md-table">
                             <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Kirchengemeinde(n)</th>
-                                <th>E-Mailadresse</th>
-                                <th></th>
-                            </tr>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Kirchengemeinde(n)</th>
+                                    <th>E-Mailadresse</th>
+                                    <th></th>
+                                </tr>
                             </thead>
                             <dataset-item tag="tbody">
                                 <template #default="{ row, rowIndex }">
                                     <tr>
                                         <td>
                                             <div>
-                                                <span  :class="row.isOfficialUser ? 'mdi mdi-account-check' : 'mdi mdi-account-question-outline'"></span>
+                                                <span
+                                                    :class="
+                                                        row.isOfficialUser
+                                                            ? 'mdi mdi-account-check'
+                                                            : 'mdi mdi-account-question-outline'
+                                                    "
+                                                ></span>
                                                 <span v-if="row.last_name && row.first_name">
-                                                    <b>{{ row.last_name }}</b>, {{ row.first_name }}
+                                                    <b>{{ row.last_name }}</b
+                                                    >, {{ row.first_name }}
                                                 </span>
                                                 <span v-else>{{ row.name }}</span>
                                             </div>
-                                            <span class="badge bg-secondary"
-                                                  v-for="city in row.home_cities">{{ city.name }}</span>
+                                            <span
+                                                class="badge bg-secondary"
+                                                v-for="city in row.home_cities"
+                                                >{{ city.name }}</span
+                                            >
                                         </td>
                                         <td>
-                                            <cities-with-access :user="row"/>
+                                            <cities-with-access :user="row" />
                                         </td>
                                         <td>
                                             <div>{{ row.email }}</div>
-                                            <role-badge v-for="role in row.roles" :role="role" :key="role.name"/>
+                                            <role-badge
+                                                v-for="role in row.roles"
+                                                :role="role"
+                                                :key="role.name"
+                                            />
                                         </td>
                                         <td class="text-end">
-                                            <nav-button type="primary" icon="mdi mdi-account-edit" title="Person bearbeiten"
-                                                        class="btn-sm" v-if="canEdit(row)"
-                                                        force-icon force-no-text @click="editUser(row)"/>
-                                            <nav-button type="light" icon="mdi mdi-call-merge" title="Personen zusammenführen"
-                                                        class="btn-sm" v-if="canEdit(row)"
-                                                        force-icon force-no-text @click="mergeUser(row)"/>
-                                            <nav-button type="light" icon="mdi mdi-lock-reset" title="Passwort zurücksetzen"
-                                                        class="btn-sm" v-if="canEdit(row) && row.isOfficialUser"
-                                                        force-icon force-no-text @click="resetPassword(row)"/>
-                                            <nav-button type="light" icon="mdi mdi-account-switch" title="Als diese Person anmelden"
-                                                        v-if="isAdmin && (currentUser.id != row.id) && row.isOfficialUser"
-                                                        class="btn-sm"
-                                                        force-icon force-no-text @click="loginAsUser(row)"/>
-                                            <nav-button type="danger" icon="mdi mdi-account-remove" title="Person löschen" class="btn-sm"
-                                                        v-if="canEdit(row)"
-                                                        force-icon force-no-text @click="deleteUser(row)"/>
+                                            <nav-button
+                                                type="primary"
+                                                icon="mdi mdi-account-edit"
+                                                title="Person bearbeiten"
+                                                class="btn-sm"
+                                                v-if="canEdit(row)"
+                                                force-icon
+                                                force-no-text
+                                                @click="editUser(row)"
+                                            />
+                                            <nav-button
+                                                type="light"
+                                                icon="mdi mdi-call-merge"
+                                                title="Personen zusammenführen"
+                                                class="btn-sm"
+                                                v-if="canEdit(row)"
+                                                force-icon
+                                                force-no-text
+                                                @click="mergeUser(row)"
+                                            />
+                                            <nav-button
+                                                type="light"
+                                                icon="mdi mdi-lock-reset"
+                                                title="Passwort zurücksetzen"
+                                                class="btn-sm"
+                                                v-if="canEdit(row) && row.isOfficialUser"
+                                                force-icon
+                                                force-no-text
+                                                @click="resetPassword(row)"
+                                            />
+                                            <nav-button
+                                                type="light"
+                                                icon="mdi mdi-account-switch"
+                                                title="Als diese Person anmelden"
+                                                v-if="
+                                                    isAdmin &&
+                                                    currentUser.id != row.id &&
+                                                    row.isOfficialUser
+                                                "
+                                                class="btn-sm"
+                                                force-icon
+                                                force-no-text
+                                                @click="loginAsUser(row)"
+                                            />
+                                            <nav-button
+                                                type="danger"
+                                                icon="mdi mdi-account-remove"
+                                                title="Person löschen"
+                                                class="btn-sm"
+                                                v-if="canEdit(row)"
+                                                force-icon
+                                                force-no-text
+                                                @click="deleteUser(row)"
+                                            />
                                         </td>
                                     </tr>
                                 </template>
@@ -114,46 +202,50 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2">
-                <dataset-info class="mb-2 mb-md-0"/>
-                <dataset-pager/>
+            <div
+                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
+            >
+                <dataset-info class="mb-2 mb-md-0" />
+                <dataset-pager />
             </div>
         </dataset>
     </admin-layout>
 </template>
 
 <script>
-import Card from "../../../components/Ui/cards/card";
-import CardBody from "../../../components/Ui/cards/cardBody";
-import FakeTable from "../../../components/Ui/FakeTable";
-import CardHeader from "../../../components/Ui/cards/cardHeader";
-import FormInput from "../../../components/Ui/forms/FormInput";
-import PersonName from "../../../components/Ui/elements/Person/PersonName";
-import NavButton from "../../../components/Ui/buttons/NavButton";
-import {
-    Dataset,
-    DatasetItem,
-    DatasetSearch,
-} from 'vue-dataset';
-import CitiesWithAccess from "../../../components/Ui/elements/Person/CitiesWithAccess";
-import RoleBadge from "../../../components/Ui/elements/Person/RoleBadge";
-import DatasetInfo from "../../../components/Ui/dataset/DatasetInfo";
-import DatasetShow from "../../../components/Ui/dataset/DatasetShow";
-import DatasetPager from "../../../components/Ui/dataset/DatasetPager";
+import Card from '../../../components/Ui/cards/card'
+import CardBody from '../../../components/Ui/cards/cardBody'
+import FakeTable from '../../../components/Ui/FakeTable'
+import CardHeader from '../../../components/Ui/cards/cardHeader'
+import FormInput from '../../../components/Ui/forms/FormInput'
+import PersonName from '../../../components/Ui/elements/Person/PersonName'
+import NavButton from '../../../components/Ui/buttons/NavButton'
+import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
+import CitiesWithAccess from '../../../components/Ui/elements/Person/CitiesWithAccess'
+import RoleBadge from '../../../components/Ui/elements/Person/RoleBadge'
+import DatasetInfo from '../../../components/Ui/dataset/DatasetInfo'
+import DatasetShow from '../../../components/Ui/dataset/DatasetShow'
+import DatasetPager from '../../../components/Ui/dataset/DatasetPager'
 
 export default {
-    name: "Index",
+    name: 'Index',
     props: ['users', 'canCreate'],
     components: {
         RoleBadge,
         CitiesWithAccess,
-        NavButton, PersonName, FormInput, CardHeader, FakeTable, CardBody, Card,
+        NavButton,
+        PersonName,
+        FormInput,
+        CardHeader,
+        FakeTable,
+        CardBody,
+        Card,
         Dataset,
         DatasetItem,
         DatasetInfo,
         DatasetPager,
         DatasetSearch,
-        DatasetShow
+        DatasetShow,
     },
     data() {
         return {
@@ -168,9 +260,10 @@ export default {
                     icon: 'mdi mdi-account-check',
                     label: 'nur Benutzerkonten',
                     value: !!(this.$page.props.settings.userIndexFilterOfficialOnly ?? 1),
-                    condition: this.$page.props.currentUser.data.isLocalAdmin
-                        || this.$page.props.currentUser.data.isAdmin
-                        || this.hasPermission('benutzer-beabeiten')
+                    condition:
+                        this.$page.props.currentUser.data.isLocalAdmin ||
+                        this.$page.props.currentUser.data.isAdmin ||
+                        this.hasPermission('benutzer-beabeiten'),
                 },
             ],
         }
@@ -183,15 +276,21 @@ export default {
             return this.checkboxes.reduce((acc, curr) => {
                 return { ...acc, ...{ [curr.name]: curr.value === false ? '' : curr.value } }
             }, {})
-        }
+        },
     },
     watch: {
-        'checkboxes': {
+        checkboxes: {
             deep: true,
             handler(checkboxes) {
-                const cb = checkboxes.find(c => c.name === 'isOfficialUser');
+                const cb = checkboxes.find((c) => c.name === 'isOfficialUser')
                 if (cb) {
-                    axios.post(route('setting.set', { user: this.currentUser.id, key: 'userIndexFilterOfficialOnly' }), { value: cb.value ? 1 : 0 });
+                    axios.post(
+                        route('setting.set', {
+                            user: this.currentUser.id,
+                            key: 'userIndexFilterOfficialOnly',
+                        }),
+                        { value: cb.value ? 1 : 0 },
+                    )
                 }
             },
         },
@@ -199,41 +298,54 @@ export default {
     methods: {
         canEdit(user) {
             if (user.isAdmin) {
-                if (user.name == 'Admin') return (this.currentUser.name == 'Admin');
-                return (this.currentUser.isAdmin);
+                if (user.name == 'Admin') return this.currentUser.name == 'Admin'
+                return this.currentUser.isAdmin
             }
-            return this.currentUser.isAdmin
-            || this.currentUser.isLocalAdmin
-            || this.hasPermission('benutzer-bearbeiten');
+            return (
+                this.currentUser.isAdmin ||
+                this.currentUser.isLocalAdmin ||
+                this.hasPermission('benutzer-bearbeiten')
+            )
         },
         createUser() {
-            this.$inertia.get(route('user.create'));
+            this.$inertia.get(route('user.create'))
         },
         editUser(user) {
-            this.$inertia.get(route('user.edit', user.id));
+            this.$inertia.get(route('user.edit', user.id))
         },
         deleteUser(user) {
-            if (confirm('Möchtest du '+user.name+' wirklich endgültig und unwiderruflich löschen?')) {
-                this.$inertia.delete(route('user.destroy', user.id));
+            if (
+                confirm(
+                    'Möchtest du ' + user.name + ' wirklich endgültig und unwiderruflich löschen?',
+                )
+            ) {
+                this.$inertia.delete(route('user.destroy', user.id))
             }
         },
         loginAsUser(user) {
-            this.$inertia.post(route('user.switch', user.id));
+            this.$inertia.post(route('user.switch', user.id))
         },
         mergeUser(user) {
-            window.location.href = route('user.join', user.id);
+            window.location.href = route('user.join', user.id)
         },
         findDuplicates() {
-            this.$inertia.get(route('users.duplicates'));
+            this.$inertia.get(route('users.duplicates'))
         },
         resetPassword(user) {
-            if (confirm('Willst du das Passwort für '+user.name+' wirklich zurücksetzen? '
-                +(user.first_name || user.name)+' erhält dann eine E-Mail mit neuen Zugangsdaten. Das bisherige Passwort '
-                +'ist dann ab sofort ungültig.')) {
-                this.$inertia.post(route('user.password.reset', user.id), { preserveState: false });
+            if (
+                confirm(
+                    'Willst du das Passwort für ' +
+                        user.name +
+                        ' wirklich zurücksetzen? ' +
+                        (user.first_name || user.name) +
+                        ' erhält dann eine E-Mail mit neuen Zugangsdaten. Das bisherige Passwort ' +
+                        'ist dann ab sofort ungültig.',
+                )
+            ) {
+                this.$inertia.post(route('user.password.reset', user.id), { preserveState: false })
             }
-        }
-    }
+        },
+    },
 }
 </script>
 

@@ -27,10 +27,7 @@
  */
 
 export class CalendarNewNameFormatEvent {
-
-    constructor(format){
+    constructor(format) {
         this.format = format
     }
-
 }
-
