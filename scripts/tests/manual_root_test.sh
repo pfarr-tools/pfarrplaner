@@ -18,6 +18,6 @@ grep -q './planer dev manual' "$ROOT/docs/manual/technikhandbuch/laufzeit-und-bu
 ! grep -R -q '../../mail.md' "$ROOT/docs/manual"
 grep -q 'MinIO' "$ROOT/docs/manual/administratorhandbuch/installation-docker.md"
 grep -q './planer update' "$ROOT/docs/manual/administratorhandbuch/updates.md"
-grep -Fq 'if (!is_array($prefixes))' "$ROOT/src/app/Http/Middleware/HandleInertiaRequests.php"
+grep -Eq 'if \(![[:space:]]+is_array\(\$prefixes\)\)' "$ROOT/src/app/Http/Middleware/HandleInertiaRequests.php"
 
 echo 'Manual root tests passed'
