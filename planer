@@ -52,7 +52,29 @@ run_dev() {
     restart) compose restart "$@" ;;
     status|ps) compose ps "$@" ;;
     logs) compose logs -f "$@" ;;
-    exec) compose exec "$@" ;;
+    exec)
+      local exec_args=("$@")
+      local exec_arg_index
+      for ((exec_arg_index = 0; exec_arg_index < ${#exec_args[@]} - 3; exec_arg_index++)); do
+        if [[ "${exec_args[exec_arg_index]}" == app \
+          && "${exec_args[exec_arg_index + 1]}" == php \
+          && "${exec_args[exec_arg_index + 2]}" == artisan \
+          && "${exec_args[exec_arg_index + 3]}" == test ]]; then
+          cat >&2 <<'EOF'
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! ACHTUNG: Dieser Aufruf kann die normale MariaDB-Datenbank löschen          !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Verwende für Tests den sicheren Befehl:
+
+  ./planer dev test [Testoptionen]
+EOF
+          exit 2
+        fi
+      done
+      compose exec "${exec_args[@]}"
+      ;;
     shell) compose exec app bash "$@" ;;
     artisan)
       if [[ "${1:-}" == test ]]; then

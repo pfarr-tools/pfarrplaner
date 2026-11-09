@@ -20,6 +20,19 @@ run_and_assert() {
   diff -u "$expected_file" "$PLANER_ROUTING_LOG"
 }
 
+run_and_assert_rejected() {
+  : > "$PLANER_ROUTING_LOG"
+  local status=0
+  if PATH="$TEST_ROOT/bin:$PATH" "$ROOT/planer" "$@" > /dev/null 2> "$TEST_ROOT/stderr"; then
+    status=0
+  else
+    status=$?
+  fi
+  test "$status" -eq 2
+  test ! -s "$PLANER_ROUTING_LOG"
+  grep -q './planer dev test' "$TEST_ROOT/stderr"
+}
+
 printf 'compose -f %s/compose.production.yaml up -d\n' "$ROOT" > "$TEST_ROOT/production-up"
 PLANER_ROUTING_LOG="$TEST_ROOT/log" run_and_assert "$TEST_ROOT/production-up" up -d
 
@@ -32,6 +45,8 @@ PLANER_ROUTING_LOG="$TEST_ROOT/log" run_and_assert "$TEST_ROOT/production-artisa
 printf 'compose -f %s/compose.yaml exec -e APP_ENV=testing -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: -e APP_KEY=base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI= app php artisan test\n' "$ROOT" > "$TEST_ROOT/development-test"
 printf 'compose -f %s/compose.yaml exec -T -u 0 app sh -c if [ -e storage/logs/query.log ]; then chmod 666 storage/logs/query.log; fi\n' "$ROOT" >> "$TEST_ROOT/development-test"
 PLANER_ROUTING_LOG="$TEST_ROOT/log" run_and_assert "$TEST_ROOT/development-test" dev test
+
+PLANER_ROUTING_LOG="$TEST_ROOT/log" run_and_assert_rejected dev exec app php artisan test
 
 printf 'compose -f %s/compose.production.yaml ps\n' "$ROOT" > "$TEST_ROOT/production-alias"
 PLANER_ROUTING_LOG="$TEST_ROOT/log" run_and_assert "$TEST_ROOT/production-alias" prod ps

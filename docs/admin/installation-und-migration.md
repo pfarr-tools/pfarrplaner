@@ -116,7 +116,8 @@ Produktion verlangt `APP_ENV=production`.
 ```
 
 `./planer dev test` erzwingt SQLite im Speicher. `./planer dev artisan test` wird mit
-einer Warnung blockiert und akzeptiert nur die exakte interaktive Eingabe `ja`.
+einer Warnung blockiert; auch `./planer dev exec app php artisan test` wird ohne
+Ausführung blockiert. Für beide Fälle ist `./planer dev test` zu verwenden.
 `./planer dev fresh` benötigt zusätzlich `--force`.
 
 ### Große Datei-Uploads
