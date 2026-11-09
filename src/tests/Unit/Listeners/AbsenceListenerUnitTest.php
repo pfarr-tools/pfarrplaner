@@ -64,6 +64,6 @@ class AbsenceListenerUnitTest extends TestCase
         $listener = new SendAbsenceWorkflowNotification;
         $listener->handle($event);
 
-        Mail::assertSent(AbsenceRequested::class);
+        Mail::assertQueued(AbsenceRequested::class);
     }
 }

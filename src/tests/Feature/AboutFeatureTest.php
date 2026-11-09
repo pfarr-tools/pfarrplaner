@@ -31,7 +31,7 @@ class AboutFeatureTest extends TestCase
                 ->where('repositoryUrl', 'https://github.com/pfarr-tools/pfarrplaner')
                 ->has('runtime.images')
                 ->has('runtime.services')
-                ->where('runtime.images.application', 'pfarrtools/pfarrplaner:latest')
+                ->where('runtime.images.application', config('app.container_images.application'))
             );
     }
 }

@@ -13,6 +13,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\ForceDomain;
 use App\Services\SentryFeedbackService;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
@@ -157,6 +158,7 @@ class SentryErrorFeedbackFeatureTest extends TestCase
     public function test_error_test_route_is_unavailable_in_production(): void
     {
         $this->app->detectEnvironment(fn () => 'production');
+        $this->withoutMiddleware(ForceDomain::class);
 
         $this->get('/__test/500')->assertNotFound();
     }
