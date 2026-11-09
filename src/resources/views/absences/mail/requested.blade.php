@@ -1,18 +1,18 @@
 @component('mail::message')
-Abwesenheitsantrag: Bitte überprüfen
-====================================
+    Abwesenheitsantrag: Bitte überprüfen
+    ====================================
 
-{{ $absence->user->fullName() }} bittet um Überprüfung eines Abwesenheitsantrags:
+    {{ $absence->user->fullName() }} bittet um Überprüfung eines Abwesenheitsantrags:
 
-@component('mail::panel')
-**{{ $absence->reason }}**
+    @component('mail::panel')
+        **{{ $absence->reason }}**
 
-{{ $absence->from->isoFormat('dddd, DD.MM.YYYY') }} bis {{ $absence->to->isoFormat('dddd, DD.MM.YYYY') }}
-@endcomponent
+        {{ $absence->from->isoFormat('dddd, DD.MM.YYYY') }} bis {{ $absence->to->isoFormat('dddd, DD.MM.YYYY') }}
+    @endcomponent
 
-@component('mail::button', ['url' => route('absence.edit', $absence->id)])
-    Antrag prüfen
-@endcomponent
+    @component('mail::button', ['url' => route('absence.edit', $absence->id)])
+        Antrag prüfen
+    @endcomponent
 
 
 @endcomponent

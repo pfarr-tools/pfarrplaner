@@ -6,12 +6,14 @@
             margin: 0;
         }
 
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
         }
 
-        body, * {
+        body,
+        * {
             font-family: 'sarabunlight', sans-serif;
             text-align: center;
             box-sizing: border-box;
@@ -90,67 +92,73 @@
     </style>
 </head>
 <body>
-@php
-    $cards = [];
+    @php
+        $cards = [];
 
-    foreach ($services as $location => $localServices) {
-        foreach ($localServices as $service) {
-            for ($i = 0; $i < $copies; $i++) {
-                $cards[] = $service;
+        foreach ($services as $location => $localServices) {
+            foreach ($localServices as $service) {
+                for ($i = 0; $i < $copies; $i++) {
+                    $cards[] = $service;
+                }
             }
         }
-    }
 
-    $pages = array_chunk($cards, 8);
-@endphp
+        $pages = array_chunk($cards, 8);
+    @endphp
 
-@foreach ($pages as $page)
-    <div class="page">
-        <table class="grid">
-            @for ($row = 0; $row < 2; $row++)
-                <tr>
-                    @for ($column = 0; $column < 4; $column++)
-                        @php
-                            $service = $page[($row * 4) + $column] ?? null;
-                        @endphp
-                        <td class="grid-cell">
-                            @if ($service)
-                                <div class="card">
-                                    <p class="title">
-                                        {{ $service->title ?: 'Gottesdienst' }}<br />
-                                        am {{ $service->date->format('d.m.Y') }} um {{ $service->timeText() }}<br />
-                                        {{ $service->locationText() }}
-                                    </p>
-                                    <p class="qr">
-                                        @if (!empty($service->konfiapp_event_qr))
-                                            <img src="{{ route('qrcode', $service->konfiapp_event_qr) }}" alt="QR-Code" />
-                                        @else
-                                            Kein QR-Code vorhanden.
-                                        @endif
-                                    </p>
-                                    <p class="meta">
-                                        @foreach ($types as $type)
-                                            @if ($type->id == $service->konfiapp_event_type)
-                                                {{ $type->punktzahl }} {{ $type->punktzahl == 1 ? 'Punkt' : 'Punkte' }} in der Kategorie
-                                                "{{ $type->name }}"
+    @foreach ($pages as $page)
+        <div class="page">
+            <table class="grid">
+                @for ($row = 0; $row < 2; $row++)
+                    <tr>
+                        @for ($column = 0; $column < 4; $column++)
+                            @php
+                                $service = $page[$row * 4 + $column] ?? null;
+                            @endphp
+                            <td class="grid-cell">
+                                @if ($service)
+                                    <div class="card">
+                                        <p class="title">
+                                            {{ $service->title ?: 'Gottesdienst' }}<br />
+                                            am {{ $service->date->format('d.m.Y') }} um
+                                            {{ $service->timeText() }}<br />
+                                            {{ $service->locationText() }}
+                                        </p>
+                                        <p class="qr">
+                                            @if (!empty($service->konfiapp_event_qr))
+                                                <img src="{{ route('qrcode', $service->konfiapp_event_qr) }}"
+                                                    alt="QR-Code" />
+                                            @else
+                                                Kein QR-Code vorhanden.
                                             @endif
-                                        @endforeach
-                                        <span class="validity">gültig am {{ $service->date->format('d.m.Y') }} ab {{ $service->timeText() }} für 3 Stunden.</span>
-                                    </p>
+                                        </p>
+                                        <p class="meta">
+                                            @foreach ($types as $type)
+                                                @if ($type->id == $service->konfiapp_event_type)
+                                                    {{ $type->punktzahl }}
+                                                    {{ $type->punktzahl == 1 ? 'Punkt' : 'Punkte' }} in der
+                                                    Kategorie
+                                                    "{{ $type->name }}"
+                                                @endif
+                                            @endforeach
+                                            <span class="validity">gültig am {{ $service->date->format('d.m.Y') }} ab
+                                                {{ $service->timeText() }} für 3 Stunden.</span>
+                                        </p>
 
-                                    <p class="print-info">
-                                        {{ $service->konfiapp_event_qr }} | Gedruckt
-                                        am {{ \Carbon\Carbon::now()->setTimezone('Europe/Berlin')->isoFormat('DD.MM.YYYY \u\m HH:mm \U\h\r') }}
-                                        von {{ \Illuminate\Support\Facades\Auth::user()->name }}.
-                                    </p>
-                                </div>
-                            @endif
-                        </td>
-                    @endfor
-                </tr>
-            @endfor
-        </table>
-    </div>
-@endforeach
+                                        <p class="print-info">
+                                            {{ $service->konfiapp_event_qr }} | Gedruckt
+                                            am
+                                            {{ \Carbon\Carbon::now()->setTimezone('Europe/Berlin')->isoFormat('DD.MM.YYYY \u\m HH:mm \U\h\r') }}
+                                            von {{ \Illuminate\Support\Facades\Auth::user()->name }}.
+                                        </p>
+                                    </div>
+                                @endif
+                            </td>
+                        @endfor
+                    </tr>
+                @endfor
+            </table>
+        </div>
+    @endforeach
 </body>
 </html>

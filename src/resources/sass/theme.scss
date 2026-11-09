@@ -26,9 +26,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@use "sass:map";
-@use "_variables" as vars;
-@use "elkw-colors/elkw-colors" as elkw;
+@use 'sass:map';
+@use '_variables' as vars;
+@use 'elkw-colors/elkw-colors' as elkw;
 
 // Falls du aus _variables noch andere Bootstrap-Overrides brauchst,
 // kannst du die hier auch sammeln oder weiterleiten.

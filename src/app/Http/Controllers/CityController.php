@@ -91,6 +91,13 @@ class CityController extends AbstractCRUDController
         return parent::getSingleModel($request, $modelId, $relations)->load(['adChannels', 'locations', 'parishes']);
     }
 
+    /**
+     * Build editor resources including city-specific permissions and choices.
+     *
+     * @param  Request  $request  Current editor request.
+     * @param  City|null  $model  City being edited, if any.
+     * @return array<string, mixed> Editor resource payload.
+     */
     protected function getResourcesForEditor(Request $request, $model = null): array
     {
         $data = parent::getResourcesForEditor($request, $model);

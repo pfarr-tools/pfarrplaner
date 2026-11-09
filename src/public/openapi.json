@@ -14,9 +14,7 @@
     "paths": {
         "\/absence\/{absence}\/set-checked": {
             "post": {
-                "tags": [
-                    "Absence"
-                ],
+                "tags": ["Absence"],
                 "summary": "Mark an absence as checked",
                 "description": "Force checked flag on absence to on",
                 "operationId": "setAbsenceChecked",
@@ -48,9 +46,7 @@
         },
         "\/health": {
             "get": {
-                "tags": [
-                    "Health"
-                ],
+                "tags": ["Health"],
                 "summary": "Application health check",
                 "operationId": "getHealth",
                 "responses": {

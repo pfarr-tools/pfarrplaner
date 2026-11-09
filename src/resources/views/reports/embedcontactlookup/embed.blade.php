@@ -1,5 +1,6 @@
 <div id="{{ $randomId }}">
-    <div id="{{ $randomId }}_form" class="row ctype-textbox listtype-none showmobdesk-0" @if ($parish) style="display: none; "@endif>
+    <div id="{{ $randomId }}_form" class="row ctype-textbox listtype-none showmobdesk-0"
+        @if ($parish) style="display: none; " @endif>
         <div id="{{ $randomId }}_c1050561" class="col s12 bullme ">
             <div class="card-panel default">
 
@@ -13,9 +14,9 @@
                         @foreach ($streets as $street)
                             <option>{{ $street }}</option>
                         @endforeach
-                    </select><br/>
+                    </select><br />
                     <label for="number">Hausnummer</label>
-                    <input id="number" value="" type="text"/>
+                    <input id="number" value="" type="text" />
                     <button id="btnFind">Ansprechpartner finden</button>
                 </div>
             </div>
@@ -23,10 +24,11 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" type="text/javascript"></script>
     <script defer>
-        $(document).ready(function () {
-            $('#btnFind').click(function () {
+        $(document).ready(function() {
+            $('#btnFind').click(function() {
                 var cities = $('input[name=cities]').val();
-                var url = '{{ $url }}?cities='+cities+'&street=' + $('#street').val() + '&number=' + $('#number').val();
+                var url = '{{ $url }}?cities=' + cities + '&street=' + $('#street').val() +
+                    '&number=' + $('#number').val();
                 if (($('#street').val() != '') && ($('number').val() != '')) {
                     $('#{{ $randomId }}').html('Bitte warten, Daten werden übertragen...');
                     fetch(url)
@@ -41,60 +43,68 @@
 
         });
     </script>
-@if ($parish)
-    <script>
-        localStorage.setItem('parish', '{{ $parish->id }}');
-        function clearContactForm_{{ $randomId }}(e) {
-            e.preventDefault();
-            localStorage.removeItem('parish');
-            $('#{{ $randomId }}_info').hide();
-            $('#{{ $randomId }}_form').show();
-        }
+    @if ($parish)
+        <script>
+            localStorage.setItem('parish', '{{ $parish->id }}');
 
-    </script>
-    <div id="{{ $randomId }}_info" class="row ctype-textbox listtype-none showmobdesk-0">
-        <div id="{{ $randomId }}_c1050561" class="col s12 bullme ">
-            <div class="card-panel default">
-                @if($parish->congregation_name)<p>Sie gehören zur <b>
-                        @if($parish->congregation_url)<a href="{{ $parish->congregation_url }}">@endif
-                            {{ $parish->congregation_name }}
-                            @if($parish->congregation_url)</a>@endif
-                    </b>.</p>
-                @endif
-                <b>Bitte wenden Sie sich an:</b>
-                @if(count($parish->users))
-                    <br/>
-                    @foreach ($parish->users as $user)
-                        <div>
-                            @if ($user->image)
-                                <div style="float: left; width: 90px;">
-                                    <img width="80px" src="{{ url('storage/'.$user->image) }}" align="top"/>
-                                </div>
-                            @endif
-                            <div style="float:left;">
-                                <p class="bodytext"><b>{{ $user->fullName(true) }}</b><br/>
-                                    {{ $parish->name }}<br/>
-                                    {{ $parish->address }}<br/>
-                                    {{ $parish->zip }} {{ $parish->city }}<br/>
-                                    Fon {{ $parish->phone }}<br/>E-Mail <a
+            function clearContactForm_{{ $randomId }}(e) {
+                e.preventDefault();
+                localStorage.removeItem('parish');
+                $('#{{ $randomId }}_info').hide();
+                $('#{{ $randomId }}_form').show();
+            }
+        </script>
+        <div id="{{ $randomId }}_info" class="row ctype-textbox listtype-none showmobdesk-0">
+            <div id="{{ $randomId }}_c1050561" class="col s12 bullme ">
+                <div class="card-panel default">
+                    @if ($parish->congregation_name)
+                        <p>Sie gehören zur <b>
+                                @if ($parish->congregation_url)
+                                    <a href="{{ $parish->congregation_url }}">
+                                @endif
+                                {{ $parish->congregation_name }}
+                                @if ($parish->congregation_url)
+                                    </a>
+                                @endif
+                            </b>.</p>
+                    @endif
+                    <b>Bitte wenden Sie sich an:</b>
+                    @if (count($parish->users))
+                        <br />
+                        @foreach ($parish->users as $user)
+                            <div>
+                                @if ($user->image)
+                                    <div style="float: left; width: 90px;">
+                                        <img width="80px" src="{{ url('storage/' . $user->image) }}"
+                                            align="top" />
+                                    </div>
+                                @endif
+                                <div style="float:left;">
+                                    <p class="bodytext"><b>{{ $user->fullName(true) }}</b><br />
+                                        {{ $parish->name }}<br />
+                                        {{ $parish->address }}<br />
+                                        {{ $parish->zip }} {{ $parish->city }}<br />
+                                        Fon {{ $parish->phone }}<br />E-Mail <a
                                             href="mailto:{{ $parish->email }}">{{ $parish->email }}</a>
-                                </p>
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                        <div style="clear: both;"></div>
-                    @endforeach
-                @else
-                    <p class="bodytext"><b>{{ $parish->name }}</b><br/>
-                        {{ $parish->address }}<br/>
-                        {{ $parish->zip }} {{ $parish->city }}<br/>
-                        Fon {{ $parish->phone }}<br/>E-Mail <a
+                            <div style="clear: both;"></div>
+                        @endforeach
+                    @else
+                        <p class="bodytext"><b>{{ $parish->name }}</b><br />
+                            {{ $parish->address }}<br />
+                            {{ $parish->zip }} {{ $parish->city }}<br />
+                            Fon {{ $parish->phone }}<br />E-Mail <a
                                 href="mailto:{{ $parish->email }}">{{ $parish->email }}</a>
-                @endif
+                    @endif
                     <div style="width: 100%; text-align: right;">
-                        <a id="{{ $randomId }}_clearContactForm" href="#" onclick="clearContactForm_{{ $randomId }}(event);" style="font-size: 0.8em; color: #c7c7c7;">Mit anderer Adresse suchen</a>
+                        <a id="{{ $randomId }}_clearContactForm" href="#"
+                            onclick="clearContactForm_{{ $randomId }}(event);"
+                            style="font-size: 0.8em; color: #c7c7c7;">Mit anderer Adresse suchen</a>
                     </div>
+                </div>
             </div>
         </div>
-    </div>
-@endif
+    @endif
 </div>

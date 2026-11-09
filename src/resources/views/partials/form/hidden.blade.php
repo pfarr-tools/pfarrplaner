@@ -1,1 +1,2 @@
-<input type="hidden" @if(isset($name))name="{{ $name }}"@endif value="{{ $value }}" @if(isset($id)) id="{{ $id }}" @endif />
+<input type="hidden" @if (isset($name)) name="{{ $name }}" @endif value="{{ $value }}"
+    @if (isset($id)) id="{{ $id }}" @endif />

@@ -14,7 +14,8 @@
         margin-bottom: 0;
     }
 
-    body, * {
+    body,
+    * {
         font-family: 'PT Sans', 'ptsans', ptsans;
         line-height: 1em;
     }
@@ -65,7 +66,7 @@
     }
 
     .column {
-        float:left;
+        float: left;
         height: 185mm;
         overflow: hidden;
 
@@ -124,7 +125,7 @@
     }
 
     table.services {
-        table-layout:fixed;
+        table-layout: fixed;
         width: 100%;
     }
 
@@ -135,7 +136,8 @@
 
     }
 
-    table.services td, th {
+    table.services td,
+    th {
         margin: 0;
         border: 0;
         padding: 1mm;
@@ -165,7 +167,8 @@
         border-right: 0;
     }
 
-    table.services tbody td, tbody th {
+    table.services tbody td,
+    tbody th {
         color: #5a6268;
         overflow: hidden;
     }
@@ -195,13 +198,13 @@
 
 
 
-    table.services tr.highlight-row td, tr.highlight-row th {
+    table.services tr.highlight-row td,
+    tr.highlight-row th {
         background-color: #e2d5e5;
     }
 
     table.services tr td.column-spacer,
-    table.services tr th.column-spacer
-    {
+    table.services tr th.column-spacer {
         width: 3mm;
         margin: 0;
         padding: 0;
@@ -282,6 +285,7 @@
         min-width: 44mm;
         max-width: 44mm;
     }
+
     table.bullet td.heading {
         font-weight: bold;
     }
@@ -306,5 +310,4 @@
         padding: 0;
         padding-left: 3.5mm;
     }
-
 </style>

@@ -1,4 +1,5 @@
-<script defer>document.addEventListener("DOMContentLoaded", function(event) {
+<script defer>
+    document.addEventListener("DOMContentLoaded", function(event) {
         var url = '{{ $url }}';
         fetch(url).then((res) => {
             return res.text();

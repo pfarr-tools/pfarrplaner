@@ -30,7 +30,7 @@
 @use 'theme' as theme;
 
 :root {
-    --dp-font-family: "Sarabun", "Nunito", sans-serif !important;
+    --dp-font-family: 'Sarabun', 'Nunito', sans-serif !important;
 }
 
 ul.nav-tabs {
@@ -49,7 +49,6 @@ ul.nav-tabs {
     margin: 0 0 3px 5px;
 }
 
-
 body.slave nav,
 body.slave aside,
 body.slave footer,
@@ -58,14 +57,12 @@ body.login footer {
     display: none;
 }
 
-
 body.slave .content-wrapper,
 body.login .content-wrapper {
     min-height: 100vh;
     margin-left: 0 !important;
-    font-size: .8rem;
+    font-size: 0.8rem;
 }
-
 
 body.calendar .content,
 body.calendar .container-fluid {
@@ -107,7 +104,6 @@ body.calendar .content-header {
     font-size: 20px;
 }
 
-
 .day-header-collapse-hover {
     font-size: 1em;
 }
@@ -121,12 +117,10 @@ body.calendar .content-header {
     display: block;
 }
 
-
 .calendar-month th.collapsed .card,
 .calendar-month th.collapsed .vacation {
     display: none;
 }
-
 
 .calendar-month td.limited.not-my-city .btn-add-day,
 .calendar-month td.limited:not(.for-city) .btn-add-day {
@@ -138,20 +132,19 @@ body.calendar .content-header {
     display: none;
 }
 
-
 .calendar-month .special-weekday {
     color: map-get($theme-colors, 'danger');
 }
-
 
 .calendar-month th .card-effect {
     position: relative;
 }
 
-.calendar-month th .card-effect:before, .calendar-month th .card-effect:after {
+.calendar-month th .card-effect:before,
+.calendar-month th .card-effect:after {
     z-index: -1;
     position: absolute;
-    content: "";
+    content: '';
     bottom: 15px;
     left: 10px;
     width: 50%;
@@ -173,7 +166,7 @@ body.calendar .content-header {
     text-align: center;
     background-color: black;
     color: white;
-    font-size: .7rem;
+    font-size: 0.7rem;
 }
 
 .calendar-month th .day-header-So {
@@ -189,9 +182,8 @@ body.calendar .content-header {
 .calendar-month th .card-footer {
     padding: 0;
     text-align: center;
-    font-size: .6rem;
+    font-size: 0.6rem;
 }
-
 
 .calendar-month .day-description {
     font-weight: $font-weight-base;
@@ -201,14 +193,14 @@ body.calendar .content-header {
 .calendar-month .vacation {
     display: inline-block;
     font-weight: $font-weight-base;
-    background-color: theme.elkw-color("orange");
+    background-color: theme.elkw-color('orange');
     font-size: 0.7em;
     padding: 3px;
     margin: 0 1px 1px 1px;
 }
 
 span.vacation-conflict {
-    background-color: theme.elkw-color("orange");
+    background-color: theme.elkw-color('orange');
     text-decoration: underline;
     text-decoration-color: map-get($theme-colors, 'danger');
 }
@@ -237,7 +229,7 @@ span.vacation-conflict {
 
 .calendar-month .service-entry {
     background-color: white;
-    border: solid 1px theme.elkw-color("dunkelgrau");
+    border: solid 1px theme.elkw-color('dunkelgrau');
     padding: 5px;
     margin-bottom: 3px;
 }
@@ -265,20 +257,19 @@ span.vacation-conflict {
     color: map-get($theme-colors, 'info');
 }
 
-
 .calendar-month .service-entry.editable:hover {
     border-color: map-get($theme-colors, 'primary');
     outline: 0;
-    box-shadow: 0 0 0 .2rem rgba(52, 144, 220, .25);
+    box-shadow: 0 0 0 0.2rem rgba(52, 144, 220, 0.25);
 }
 
 .calendar-month .service-entry.funeral {
-    background-color: theme.elkw-color("dunkelgrau") !important;
+    background-color: theme.elkw-color('dunkelgrau') !important;
     color: white !important;
 }
 
 .calendar-month .service-entry.funeral.mine {
-    background-color: theme.elkw-color("dunkelblau") !important;
+    background-color: theme.elkw-color('dunkelblau') !important;
     color: white !important;
 }
 
@@ -290,7 +281,8 @@ span.vacation-conflict {
     color: gray;
 }
 
-.calendar-month .service-time, .calendar-month .service-location {
+.calendar-month .service-time,
+.calendar-month .service-location {
     display: inline;
 }
 
@@ -317,7 +309,8 @@ span.vacation-conflict {
     font-weight: $font-weight-base;
 }
 
-.calendar-month .service-team, .calendar-month .service-description {
+.calendar-month .service-team,
+.calendar-month .service-description {
     font-size: 0.8em;
 }
 
@@ -338,7 +331,6 @@ span.vacation-conflict {
     font-weight: $font-weight-semibold;
 }
 
-
 .print-only {
     display: none;
 }
@@ -348,7 +340,8 @@ span.vacation-conflict {
 }
 
 @media print {
-    .btn, .no-print {
+    .btn,
+    .no-print {
         display: none;
     }
 
@@ -358,7 +351,7 @@ span.vacation-conflict {
 }
 
 pre {
-    border: solid 1px theme.elkw-color("dunkelgrau");
+    border: solid 1px theme.elkw-color('dunkelgrau');
     padding: 5px;
     border-radius: 0;
 }
@@ -372,32 +365,31 @@ ol.steps img {
 }
 
 .service-row.cc {
-    background-color: theme.elkw-color("hellgrün");
+    background-color: theme.elkw-color('hellgrün');
 }
 
 .service-row.no-cc {
-    color: theme.elkw-color("dunkelgrau");
+    color: theme.elkw-color('dunkelgrau');
 }
 
 .data-row.no-cc {
     display: none;
 }
 
-
 table.table tr.past td {
-    background-color: theme.elkw-color("pastellviolett");
+    background-color: theme.elkw-color('pastellviolett');
 }
 
 table.table .fa-check-circle {
-    color: theme.theme-color("success");
+    color: theme.theme-color('success');
 }
 
 table.table .fa-times-circle {
     color: map-get($theme-colors, 'danger');
 }
 
-
-body.dragging, body.dragging * {
+body.dragging,
+body.dragging * {
     cursor: move !important;
 }
 
@@ -427,7 +419,7 @@ ul.sortable li:hover {
 
 ul.sortable li.placeholder {
     position: relative;
-    background-color: theme.elkw-color("apricot");
+    background-color: theme.elkw-color('apricot');
     border: none;
     /** More li styles **/
 }
@@ -436,7 +428,6 @@ ul.sortable li.placeholder:before {
     position: absolute;
     /** Define arrowhead **/
 }
-
 
 .date-picker-wrapper {
     border: 0;
@@ -465,46 +456,46 @@ ul.sortable li.placeholder:before {
 }
 
 #absencesTab a {
-    background-color: theme.elkw-color("orange");
+    background-color: theme.elkw-color('orange');
 }
 
 #absencesTab a.active {
-    background-color: theme.elkw-color("orange");
+    background-color: theme.elkw-color('orange');
 }
 
 .card-counter {
-    box-shadow: 2px 2px 10px #DADADA;
+    box-shadow: 2px 2px 10px #dadada;
     margin: 5px;
     padding: 20px 10px;
     background-color: #fff;
     height: 100px;
     border-radius: 0;
-    transition: .3s linear all;
+    transition: 0.3s linear all;
 }
 
 .card-counter:hover {
-    box-shadow: 4px 4px 20px #DADADA;
-    transition: .3s linear all;
+    box-shadow: 4px 4px 20px #dadada;
+    transition: 0.3s linear all;
     cursor: pointer;
 }
 
 .card-counter.primary {
-    background-color: theme.theme-color("primary");
-    color: #FFF;
+    background-color: theme.theme-color('primary');
+    color: #fff;
 }
 
 .card-counter.danger {
-    background-color: theme.theme-color("danger");
-    color: #FFF;
+    background-color: theme.theme-color('danger');
+    color: #fff;
 }
 
 .card-counter.success {
-    background-color: theme.theme-color("success");
-    color: #FFF;
+    background-color: theme.theme-color('success');
+    color: #fff;
 }
 
 .card-counter.info {
-    background-color: theme.theme-color("info");
+    background-color: theme.theme-color('info');
     color: black;
 }
 
@@ -537,7 +528,7 @@ ul.sortable li.placeholder:before {
     overflow: hidden;
 }
 
-.btn-file input[type=file] {
+.btn-file input[type='file'] {
     position: absolute;
     top: 0;
     right: 0;
@@ -552,7 +543,6 @@ ul.sortable li.placeholder:before {
     cursor: inherit;
     display: block;
 }
-
 
 body.sidebar-collapse .main-sidebar .hidden-collapsed {
     display: none;
@@ -582,31 +572,38 @@ body.login .main-sidebar:hover .login-form.hidden-collapsed {
 .form-group .form-label,
 .form-group legend.form-label {
     font-weight: $font-weight-medium;
-    margin-bottom: .35rem;
+    margin-bottom: 0.35rem;
 }
 
 .form-group .invalid-feedback {
     display: block;
 }
 
-.form-control, input.form-check-input {
+.form-control,
+input.form-check-input {
     background-color: white;
 }
 
-input.form-control, textarea.form-control, select.form-control, select.form-select {
+input.form-control,
+textarea.form-control,
+select.form-control,
+select.form-select {
     border-width: 0 0 1px 1px;
 }
 
-input.form-control:focus, textarea.form-control:focus, select.form-control:focus, select.form-select:focus {
-    background-color: tint-color(theme.elkw-color("hellblau"), 70%);
+input.form-control:focus,
+textarea.form-control:focus,
+select.form-control:focus,
+select.form-select:focus {
+    background-color: tint-color(theme.elkw-color('hellblau'), 70%);
     font-weight: $font-weight-semibold;
     box-shadow: none;
-    border-color: theme.elkw-color("dunkelblau");
+    border-color: theme.elkw-color('dunkelblau');
 }
 
 .form-check-input:checked {
-    background-color: theme.theme-color("primary");
-    border-color: theme.theme-color("primary");
+    background-color: theme.theme-color('primary');
+    border-color: theme.theme-color('primary');
 }
 
 .selectize-input {
@@ -614,11 +611,12 @@ input.form-control:focus, textarea.form-control:focus, select.form-control:focus
     border-width: 0 0 1px 1px;
 }
 
-.selectize-input:focus, .selectize-input.focus {
+.selectize-input:focus,
+.selectize-input.focus {
     border-radius: 0 !important;
-    border-color: theme.elkw-color("dunkelblau");
+    border-color: theme.elkw-color('dunkelblau');
     box-shadow: none;
-    background-color: tint-color(theme.elkw-color("hellblau"), 70%) !important;
+    background-color: tint-color(theme.elkw-color('hellblau'), 70%) !important;
     font-weight: $font-weight-semibold;
 }
 
@@ -631,14 +629,14 @@ input.form-control:focus, textarea.form-control:focus, select.form-control:focus
 
 .multiselect.is-active {
     border-width: 0 0 1px 1px !important;
-    border-color: theme.elkw-color("dunkelblau") !important;
+    border-color: theme.elkw-color('dunkelblau') !important;
     box-shadow: none !important;
     font-weight: $font-weight-semibold !important;
 }
 
 .multiselect.is-active .multiselect-search,
 .multiselect.is-active .multiselect-tags-search {
-    background-color: tint-color(theme.elkw-color("hellblau"), 70%);
+    background-color: tint-color(theme.elkw-color('hellblau'), 70%);
 }
 
 .multiselect.is-open,
@@ -652,12 +650,12 @@ input.form-control:focus, textarea.form-control:focus, select.form-control:focus
 }
 
 .multiselect-option.is-selected {
-    background: tint-color(theme.elkw-color("hellblau"), 70%) !important;
+    background: tint-color(theme.elkw-color('hellblau'), 70%) !important;
     color: #212529 !important;
 }
 
 .multiselect-option.is-selected.is-pointed {
-    background: tint-color(theme.elkw-color("hellblau"), 55%)  !important;
+    background: tint-color(theme.elkw-color('hellblau'), 55%) !important;
     color: #212529 !important;
 }
 
@@ -673,18 +671,19 @@ input.form-control:focus, textarea.form-control:focus, select.form-control:focus
     font-weight: 300 !important;
 }
 
-.dp__input, .dp__input_wrap {
+.dp__input,
+.dp__input_wrap {
     font-family: inherit !important;
 }
 
 .dp__input_focus {
-    background-color: tint-color(theme.elkw-color("hellblau"), 70%) !important;
-    border-color: theme.elkw-color("dunkelblau") !important;
+    background-color: tint-color(theme.elkw-color('hellblau'), 70%) !important;
+    border-color: theme.elkw-color('dunkelblau') !important;
     font-weight: $font-weight-semibold !important;
     box-shadow: none !important;
 }
 
-.dp__input[aria-invalid="true"] {
+.dp__input[aria-invalid='true'] {
     border-color: map-get($theme-colors, 'danger') !important;
 }
 
@@ -693,15 +692,15 @@ input.form-control:focus, textarea.form-control:focus, select.form-control:focus
 }
 
 .badge-permission-a {
-    background-color: theme.theme-color("primary") !important;
+    background-color: theme.theme-color('primary') !important;
 }
 
 .badge-permission-w {
-    background-color: theme.theme-color("success") !important;
+    background-color: theme.theme-color('success') !important;
 }
 
 .badge-permission-r {
-    background-color: theme.theme-color("warning") !important;
+    background-color: theme.theme-color('warning') !important;
 }
 
 .badge-permission-n {
@@ -712,18 +711,20 @@ input.form-control:focus, textarea.form-control:focus, select.form-control:focus
     cursor: pointer;
 }
 
-tr.changed, tr.changed td, tr.changed th {
-    background-color: theme.elkw-color("hellgrün");
+tr.changed,
+tr.changed td,
+tr.changed th {
+    background-color: theme.elkw-color('hellgrün');
 }
 
 .content .footer {
     padding-left: 10px;
-    font-size: .6em;
-    color: theme.elkw-color("dunkelgrau");
+    font-size: 0.6em;
+    color: theme.elkw-color('dunkelgrau');
 }
 
 .content .footer a {
-    color: theme.elkw-color("dunkelgrau");
+    color: theme.elkw-color('dunkelgrau');
     font-weight: $font-weight-semibold;
 }
 
@@ -749,14 +750,13 @@ tr.changed, tr.changed td, tr.changed th {
 }
 
 .nav-tabs .nav-item.tabheader-absences a.nav-link {
-    background-color: theme.elkw-color("orange") !important;
+    background-color: theme.elkw-color('orange') !important;
 }
 
 .calendar-vertical .day-header-cell {
     max-width: 150px;
     padding: 0;
 }
-
 
 .main-header.navbar {
     position: sticky;
@@ -785,40 +785,40 @@ tr.changed, tr.changed td, tr.changed th {
 }
 
 #nprogress .bar {
-    background: theme.elkw-color("violett") !important;
+    background: theme.elkw-color('violett') !important;
 }
 
 #nprogress .peg {
-    box-shadow: 0 0 10px theme.elkw-color("violett"), 0 0 5px theme.elkw-color("violett");
+    box-shadow:
+        0 0 10px theme.elkw-color('violett'),
+        0 0 5px theme.elkw-color('violett');
 }
 
 #nprogress .spinner-icon {
-    border-top-color: theme.elkw-color("violett");
-    border-left-color: theme.elkw-color("violett");
+    border-top-color: theme.elkw-color('violett');
+    border-left-color: theme.elkw-color('violett');
 }
 
-
-
 .admin-layout .datepicker table tr td.today {
-    background-color: tint-color(theme.theme-color("warning"), 50%) !important;
+    background-color: tint-color(theme.theme-color('warning'), 50%) !important;
 }
 
 .admin-layout .datepicker table tr td.today.active,
 .admin-layout .datepicker table tr td.active {
-    background-color: theme.theme-color("primary") !important;
+    background-color: theme.theme-color('primary') !important;
 }
-
 
 .nav-tabs .nav-link {
     background-color: lightgray;
 }
 
 .badge-primary {
-    background-color: theme.theme-color("primary") !important;
+    background-color: theme.theme-color('primary') !important;
 }
 
-.mdi.mdi-youtube, span.mdi-youtube {
-    background-color: theme.elkw-color("red") !important;
+.mdi.mdi-youtube,
+span.mdi-youtube {
+    background-color: theme.elkw-color('red') !important;
 }
 
 .stripe-odd {
@@ -835,7 +835,7 @@ tr.changed, tr.changed td, tr.changed th {
     padding-left: 1em;
     padding-right: 2em;
     text-align: justify;
-    font-size: .9em;
+    font-size: 0.9em;
 }
 
 .tiptap-toolbar {
@@ -857,9 +857,15 @@ tr.changed, tr.changed td, tr.changed th {
         .btn {
             border-radius: 0;
 
-            &:first-child { border-radius: 3px 0 0 3px; }
-            &:last-child  { border-radius: 0 3px 3px 0; }
-            &:only-child  { border-radius: 3px; }
+            &:first-child {
+                border-radius: 3px 0 0 3px;
+            }
+            &:last-child {
+                border-radius: 0 3px 3px 0;
+            }
+            &:only-child {
+                border-radius: 3px;
+            }
         }
     }
 
@@ -874,13 +880,15 @@ tr.changed, tr.changed td, tr.changed th {
         color: #495057;
         border-color: #ced4da;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
             background-color: #dee2e6;
             color: #212529;
             border-color: #adb5bd;
         }
 
-        &.active, &:active {
+        &.active,
+        &:active {
             background-color: #6c757d;
             color: #fff;
             border-color: #6c757d;
@@ -888,5 +896,8 @@ tr.changed, tr.changed td, tr.changed th {
     }
 
     // Remove Bootstrap spacing helpers that push margin back
-    .me-1, .me-2 { margin-right: 0 !important; }
+    .me-1,
+    .me-2 {
+        margin-right: 0 !important;
+    }
 }

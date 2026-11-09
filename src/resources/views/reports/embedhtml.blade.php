@@ -31,7 +31,8 @@
                 </div>
             </div>
             <div class="card-footer">
-                <button id="btnCopy" class="btn btn-secondary btn-sm"><span class="fa fa-copy"></span> Code kopieren</button>
+                <button id="btnCopy" class="btn btn-secondary btn-sm"><span class="fa fa-copy"></span> Code
+                    kopieren</button>
                 <small id="msgCopied"></small>
             </div>
         </div>

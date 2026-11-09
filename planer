@@ -116,6 +116,7 @@ EOF
     format:check)
       compose exec app composer format:check
       compose run --rm vite npm run format:check
+      compose run --rm vite npm run format:blade:check
       ;;
     analyse) compose exec app composer analyse ;;
     docs:check)
@@ -127,14 +128,13 @@ EOF
       local quality_files=''
       quality_files="$(git diff --name-only "${QUALITY_BASE_REF:-origin/main}...HEAD" 2>/dev/null || git diff --name-only HEAD~1)"
       quality_files+=$'\n'"$(git diff --name-only HEAD)"
+      quality_files+=$'\n'"$(git ls-files --others --exclude-standard)"
       quality_files="$(printf '%s\n' "$quality_files" | sed '/^$/d; s#^src/##' | sort -u)"
+      local format_quality_files=''
+      format_quality_files="$(printf '%s\n' "$quality_files" | sed -n '/\.(blade\.php\|css\|js\|json\|mjs\|sass\|scss\|vue\|yaml\|yml)$/p')"
       local js_quality_files=''
-      js_quality_files="$(git diff --numstat "${QUALITY_BASE_REF:-origin/main}...HEAD" 2>/dev/null || git diff --numstat HEAD~1)"
-      js_quality_files+=$'\n'"$(git diff --numstat HEAD)"
-      js_quality_files="$(printf '%s\n' "$js_quality_files" | awk '$1 != 0 || $1 == "-" {print $3}' | sed 's#^src/##')"
-      js_quality_files+=$'\n'"$(git ls-files --others --exclude-standard | sed 's#^src/##')"
-      js_quality_files="$(printf '%s\n' "$js_quality_files" | sed -n '/\.(js\|mjs\|vue)$/p' | sort -u)"
-      QUALITY_FILES="$js_quality_files" run_dev format:check
+      js_quality_files="$(printf '%s\n' "$format_quality_files" | sed -n '/\.(js\|mjs\|vue)$/p' | sort -u)"
+      QUALITY_FILES="$format_quality_files" run_dev format:check
       run_dev analyse
       QUALITY_FILES="$js_quality_files" run_dev docs:check
       QUALITY_FILES="$js_quality_files" run_dev lint

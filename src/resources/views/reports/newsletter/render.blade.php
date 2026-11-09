@@ -4,81 +4,84 @@
     <table>
         <thead></thead>
         <tbody>
-        @foreach($events as $dateCode => $theseEvents)
+            @foreach ($events as $dateCode => $theseEvents)
                 <?php
                 $date = \Carbon\Carbon::createFromFormat('YmdHis', $dateCode)->setTime(0, 0, 0);
                 $liturgy = \App\Services\LiturgyService::getLiturgyInfoByDate($date->format('d.m.Y'));
                 ?>
-            <tr>
-                <td colspan="3"
-                    style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 12px 0 12px 0; color: #804070;">
-                    <strong>{{ $date->isoFormat('dddd, DD. MMMM YYYY') }}</strong>
-                </td>
-            </tr>
-            @foreach($theseEvents as $event)
-                @if (is_object($event))
-                    <tr>
-                        <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0 0;"
-                            valign="top">
-                            {{ $event->timeText(true, '.') }}</td>
-                        <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0 0;"
-                            valign="top">
-                            <strong>{{ $event->titleText(false, false) }}</strong> ({{ $event->locationText() }})
-                            @if ($event->controlled_access)
-                                @component('components.service.controlledAccess', ['service' => $event]) @endcomponent
-                            @endif
-                            @if ($event->descriptionText() != '')
-                                <br />{{ $event->descriptionText }}
-                            @endif
-                        </td>
-                        <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0;"
-                            valign="top">
-                            <strong>{{ $event->participantsText('P') }}</strong></td>
-                    </tr>
-                    @if($event->cc)
+                <tr>
+                    <td colspan="3"
+                        style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 12px 0 12px 0; color: #804070;">
+                        <strong>{{ $date->isoFormat('dddd, DD. MMMM YYYY') }}</strong>
+                    </td>
+                </tr>
+                @foreach ($theseEvents as $event)
+                    @if (is_object($event))
                         <tr>
                             <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0 0;"
-                                valign="top">{{ $cc_alt_time ?? $event->timeText(true, '.') }}</td>
+                                valign="top">
+                                {{ $event->timeText(true, '.') }}</td>
                             <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0 0;"
                                 valign="top">
-                                <strong>Kinderkirche</strong> ({{ $event->cc_location ?? $event->locationText() }})
+                                <strong>{{ $event->titleText(false, false) }}</strong> ({{ $event->locationText() }})
+                                @if ($event->controlled_access)
+                                    @component('components.service.controlledAccess', ['service' => $event])
+                                    @endcomponent
+                                @endif
+                                @if ($event->descriptionText() != '')
+                                    <br />{{ $event->descriptionText }}
+                                @endif
+                            </td>
+                            <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0;"
+                                valign="top">
+                                <strong>{{ $event->participantsText('P') }}</strong>
+                            </td>
+                        </tr>
+                        @if ($event->cc)
+                            <tr>
+                                <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0 0;"
+                                    valign="top">{{ $cc_alt_time ?? $event->timeText(true, '.') }}</td>
+                                <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0 0;"
+                                    valign="top">
+                                    <strong>Kinderkirche</strong> ({{ $event->cc_location ?? $event->locationText() }})
+                                </td>
+                                <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0;"
+                                    valign="top"></td>
+                            </tr>
+                        @endif
+                    @else
+                        <tr>
+                            <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0 0;"
+                                valign="top">
+                                {{ $event['start']->format('H.i') }} Uhr
+                            </td>
+                            <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0 0;"
+                                valign="top">
+                                <strong>{{ $event['title'] }}</strong>
+                                @if ($event['subtitle'] ?? '')
+                                    <br />{{ $event['subtitle'] }}
+                                @endif
+                                @if ($event['locationtitle'] ?? '')
+                                    ({{ $event['locationtitle'] }})
+                                @endif
                             </td>
                             <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0;"
                                 valign="top"></td>
                         </tr>
                     @endif
-                @else
-                    <tr>
-                        <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0 0;"
-                            valign="top">
-                            {{ $event['start']->format('H.i') }} Uhr
-                        </td>
-                        <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0 0;"
-                            valign="top">
-                            <strong>{{ $event['title'] }}</strong>@if($event['subtitle'] ?? '')
-                                <br/>{{ $event['subtitle'] }}
-                            @endif
-                            @if($event['locationtitle'] ?? '')
-                                ({{ $event['locationtitle'] }})
-                            @endif
-                        </td>
-                        <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0;"
-                            valign="top"></td>
-                    </tr>
-                @endif
+                @endforeach
             @endforeach
-        @endforeach
         </tbody>
     </table>
-    <hr/>
+    <hr />
     <textarea class="form-control" rows="20"><table>
         <thead></thead>
         <tbody>
-        @foreach($events as $dateCode => $theseEvents)
-                <?php
-                $date = \Carbon\Carbon::createFromFormat('YmdHis', $dateCode)->setTime(0, 0, 0);
-                $liturgy = \App\Services\LiturgyService::getLiturgyInfoByDate($date->format('d.m.Y'));
-                ?>
+        @foreach ($events as $dateCode => $theseEvents)
+<?php
+$date = \Carbon\Carbon::createFromFormat('YmdHis', $dateCode)->setTime(0, 0, 0);
+$liturgy = \App\Services\LiturgyService::getLiturgyInfoByDate($date->format('d.m.Y'));
+?>
             <tr>
             <td colspan="3"
             style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 12px 0 12px 0; color:
@@ -86,9 +89,9 @@
             <strong>{{ $date->isoFormat('dddd, DD. MMMM YYYY') }}</strong>
             </td>
             </tr>
-            @foreach($theseEvents as $event)
-                @if (is_object($event))
-                    <tr>
+            @foreach ($theseEvents as $event)
+@if (is_object($event))
+<tr>
                     <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0
                     0;" valign="top">
                     {{ $event->timeText(true, '.') }}</td>
@@ -100,26 +103,27 @@
                     valign="top">
                     <strong>{{ $event->participantsText('P') }}</strong></td>
                     </tr>
-                @else
-                    <tr>
+@else
+<tr>
                     <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0
                     0;" valign="top">
                     {{ $event['start']->format('H.i') }} Uhr</td>
                     <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0 30px 0
                     0;" valign="top">
-                    <strong>{{ $event['title'] }}</strong>@if($event['subtitle'] ?? '')
-                        <br />{{ $event['subtitle'] }}
-                    @endif
-                    @if($event['locationtitle'] ?? '')
-                        ({{ $event['locationtitle'] }})
-                    @endif
+                    <strong>{{ $event['title'] }}</strong>
+@if ($event['subtitle'] ?? '')
+<br />{{ $event['subtitle'] }}
+@endif
+                    @if ($event['locationtitle'] ?? '')
+({{ $event['locationtitle'] }})
+@endif
                     </td>
                     <td style="font-size: 12px; font-family: verdana, arial, helvetica, sans-serif; padding: 0;"
                     valign="top"></td>
                     </tr>
-                @endif
-            @endforeach
-        @endforeach
+@endif
+@endforeach
+@endforeach
         </tbody>
     </table></textarea>
 @endsection

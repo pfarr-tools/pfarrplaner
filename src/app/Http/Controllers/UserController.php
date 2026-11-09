@@ -47,6 +47,7 @@ use App\Traits\HandlesAttachmentsTrait;
 use App\UI\Modules\Modules;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -67,6 +68,9 @@ class UserController extends Controller
 
     protected $model = User::class;
 
+    /**
+     * Create the controller and require authentication.
+     */
     public function __construct()
     {
         $this->middleware('auth');
@@ -641,6 +645,12 @@ class UserController extends Controller
         return $this->switchRedirectResponse($request);
     }
 
+    /**
+     * Return from an impersonated account to the administrator account.
+     *
+     * @param  Request  $request  Current session request.
+     * @return \Symfony\Component\HttpFoundation\Response Redirect response.
+     */
     public function switchBack(Request $request)
     {
         if (! Session::has('adminUserSwitchBack')) {
@@ -754,6 +764,12 @@ class UserController extends Controller
         return $data;
     }
 
+    /**
+     * Create a user from the compact administration form.
+     *
+     * @param  Request  $request  User creation request.
+     * @return JsonResponse Created user response.
+     */
     public function add(Request $request)
     {
         Gate::authorize('create', User::class);
@@ -768,6 +784,11 @@ class UserController extends Controller
         return response()->json($user);
     }
 
+    /**
+     * Find user records that share identifying data and may be duplicates.
+     *
+     * @return \Inertia\Response Duplicate review page.
+     */
     public function findDuplicates()
     {
         Gate::authorize('findDuplicates', User::class);
@@ -850,6 +871,12 @@ class UserController extends Controller
         return Inertia::render('Admin/User/DuplicatesWizard', compact('possibleDuplicates', 'withoutDuplicates'));
     }
 
+    /**
+     * Merge the selected duplicate users into their target records.
+     *
+     * @param  Request  $request  Duplicate groups and optional name updates.
+     * @return RedirectResponse User-list redirect.
+     */
     public function fixDuplicates(Request $request)
     {
         Gate::authorize('fixDuplicates', User::class);
@@ -887,6 +914,13 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Die doppelten Personeneinträge wurden zusammengeführt.');
     }
 
+    /**
+     * Reset a user's account password and send new credentials.
+     *
+     * @param  Request  $request  Current request.
+     * @param  User  $user  Account whose password is reset.
+     * @return RedirectResponse User-list redirect.
+     */
     public function resetPassword(Request $request, User $user)
     {
         Gate::authorize('resetPassword', $user);

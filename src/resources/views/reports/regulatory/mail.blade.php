@@ -23,10 +23,9 @@
         @component('mail::footer')
             Diese Nachricht wurde automatisch über www.pfarrplaner.de gesendet. <br />
             Bei Rückfragen wenden Sie sich bitte direkt an: <br />
-            {{ $user->fullName(true) }}@if($user->phone), Tel. ({{ $user->phone }}@endif, E-Mail {{ $user->email }}.
+            {{ $user->fullName(true) }}@if ($user->phone)
+                , Tel. ({{ $user->phone }}
+            @endif, E-Mail {{ $user->email }}.
         @endcomponent
     @endslot
 @endcomponent
-
-
-

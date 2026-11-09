@@ -1,18 +1,20 @@
 @extends('mail.layout.default')
 
 @section('preview')
-    Änderungen am Gottesdienst vom {{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }} ({{ $service->locationText() }})
+    Änderungen am Gottesdienst vom {{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }}
+    ({{ $service->locationText() }})
 @endsection
 
 @section('content')
 
     @component('mail.layout.blocks.content-table')
         @slot('title')
-            Änderungen am Gottesdienst vom {{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }} ({{ $service->locationText() }})
+            Änderungen am Gottesdienst vom {{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }}
+            ({{ $service->locationText() }})
         @endslot
         @slot('subtitle')
             {{ strftime('%A, %d. %B %Y', $service->date->timestamp) }}, {{ $service->timeText() }}
-            <br>{{ $service->locationText() }}<br/>
+            <br>{{ $service->locationText() }}<br />
             <small style="font-size: 8pt;">
                 Geändert am {{ date('d.m.Y') }} um {{ date('H:i') }} Uhr
                 durch {{ $originatingUser->name }}
@@ -37,46 +39,46 @@
             @endslot
 
             @foreach ([
-                'dateText' => 'Datum',
-                'timeText' => 'Uhrzeit',
-                'locationText' => 'Ort',
-                'descriptionText' => 'Beschreibung',
-                'internal_remarks' => 'Interne Anmerkungen',
+                    'dateText' => 'Datum',
+                    'timeText' => 'Uhrzeit',
+                    'locationText' => 'Ort',
+                    'descriptionText' => 'Beschreibung',
+                    'internal_remarks' => 'Interne Anmerkungen',
                 ] as $attribute => $title)
-                @if(isset($changes[$attribute]))
+                @if (isset($changes[$attribute]))
                     @include('mail.notifications.service.changed-attribute', [
-                             'title' => $title,
-                             'old' => $changes[$attribute]['original'],
-                             'new' => $changes[$attribute]['changed'],
-                             ])
+                        'title' => $title,
+                        'old' => $changes[$attribute]['original'],
+                        'new' => $changes[$attribute]['changed'],
+                    ])
                 @endif
             @endforeach
 
-            @if(isset($changes['hidden']))
+            @if (isset($changes['hidden']))
                 @include('mail.notifications.service.changed-attribute', [
-                         'title' => 'In öffentlichen Listen verbergen',
-                         'key' => 'hidden',
-                         'old' => $changes['hidden']['original'] ? '✔' : '✘',
-                         'new' => $changes['hidden']['changed'] ? '✔' : '✘',
-                         ])
+                    'title' => 'In öffentlichen Listen verbergen',
+                    'key' => 'hidden',
+                    'old' => $changes['hidden']['original'] ? '✔' : '✘',
+                    'new' => $changes['hidden']['changed'] ? '✔' : '✘',
+                ])
             @endif
 
-            @if(isset($changes['city_id']))
+            @if (isset($changes['city_id']))
                 @include('mail.notifications.service.changed-attribute', [
-                         'title' => 'Kirchengemeinde',
-                         'key' => 'city_id',
-                         'old' => \App\Models\Places\City::find($changes['city_id']['original'])->name,
-                         'new' => $service->city->name,
-                         ])
+                    'title' => 'Kirchengemeinde',
+                    'key' => 'city_id',
+                    'old' => \App\Models\Places\City::find($changes['city_id']['original'])->name,
+                    'new' => $service->city->name,
+                ])
             @endif
 
-            @if(isset($changes['need_predicant']))
+            @if (isset($changes['need_predicant']))
                 @include('mail.notifications.service.changed-attribute', [
-                         'title' => config('label.predicant').' benötigt',
-                         'key' => 'need_predicant',
-                         'old' => $changes['need_predicant']['original'] ? '✔' : '✘',
-                         'new' => $changes['need_predicant']['changed'] ? '✔' : '✘',
-                         ])
+                    'title' => config('label.predicant') . ' benötigt',
+                    'key' => 'need_predicant',
+                    'old' => $changes['need_predicant']['original'] ? '✔' : '✘',
+                    'new' => $changes['need_predicant']['changed'] ? '✔' : '✘',
+                ])
             @endif
 
             @foreach ($participants as $category => $categoryParticipants)
@@ -86,149 +88,142 @@
                 ])
             @endforeach
 
-            @if(isset($changes['baptism']))
+            @if (isset($changes['baptism']))
                 @include('mail.notifications.service.changed-attribute', [
-                         'title' => 'Taufgottesdienst',
-                         'key' => 'baptism',
-                         'old' => $changes['baptism']['original'] ? '✔' : '✘',
-                         'new' => $changes['baptism']['changed'] ? '✔' : '✘',
-                         ])
+                    'title' => 'Taufgottesdienst',
+                    'key' => 'baptism',
+                    'old' => $changes['baptism']['original'] ? '✔' : '✘',
+                    'new' => $changes['baptism']['changed'] ? '✔' : '✘',
+                ])
             @endif
 
-            @if(isset($changes['eucharist']))
+            @if (isset($changes['eucharist']))
                 @include('mail.notifications.service.changed-attribute', [
-                         'title' => 'Abendmahlsgottesdienst',
-                         'key' => 'eucharist',
-                         'old' => $changes['eucharist']['original'] ? '✔' : '✘',
-                         'new' => $changes['eucharist']['changed'] ? '✔' : '✘',
-                         ])
+                    'title' => 'Abendmahlsgottesdienst',
+                    'key' => 'eucharist',
+                    'old' => $changes['eucharist']['original'] ? '✔' : '✘',
+                    'new' => $changes['eucharist']['changed'] ? '✔' : '✘',
+                ])
             @endif
 
 
             @foreach ([
-                'offerings_counter1' => 'Opferzähler 1',
-                'offerings_counter2' => 'Opferzähler 2',
-                'offering_goal' => 'Opferzweck',
-                'offering_description' => 'Beschreibung zum Opfer',
-                'offering_type' => 'Opfertyp',
-                'offering_type' => 'Opfertyp',
-                'offering_amount' => 'Opfersumme',
+                    'offerings_counter1' => 'Opferzähler 1',
+                    'offerings_counter2' => 'Opferzähler 2',
+                    'offering_goal' => 'Opferzweck',
+                    'offering_description' => 'Beschreibung zum Opfer',
+                    'offering_type' => 'Opfertyp',
+                    'offering_type' => 'Opfertyp',
+                    'offering_amount' => 'Opfersumme',
                 ] as $attribute => $title)
-                @if(isset($changes[$attribute]))
+                @if (isset($changes[$attribute]))
                     @include('mail.notifications.service.changed-attribute', [
-                             'title' => $title,
-                             'old' => $changes[$attribute]['original'],
-                             'new' => $changes[$attribute]['changed'],
-                             ])
+                        'title' => $title,
+                        'old' => $changes[$attribute]['original'],
+                        'new' => $changes[$attribute]['changed'],
+                    ])
                 @endif
             @endforeach
 
-            @if(isset($changes['cc']))
+            @if (isset($changes['cc']))
                 @include('mail.notifications.service.changed-attribute', [
-                         'title' => 'Kinderkirche',
-                         'key' => 'cc',
-                         'old' => $changes['cc']['original'] ? '✔' : '✘',
-                         'new' => $changes['cc']['changed'] ? '✔' : '✘',
-                         ])
+                    'title' => 'Kinderkirche',
+                    'key' => 'cc',
+                    'old' => $changes['cc']['original'] ? '✔' : '✘',
+                    'new' => $changes['cc']['changed'] ? '✔' : '✘',
+                ])
             @endif
 
             @foreach ([
-                'cc_alt_time' => 'Uhrzeit der Kinderkirche',
-                'cc_location' => 'Ort der Kinderkirche',
-                'cc_lession' => 'Lektion für die Kinderkirche',
-                'cc_staff' => 'Mitarbeiter in der Kinderkirche',
-                'youtube_url' => 'Streaming-URL (youtube)',
-                'cc_streaming_url' => 'URL für das Streaming der Kinderkirche',
-                'offerings_url' => 'URL für Onlinespenden',
-                'meeting_url' => 'URL für ein "virtuelles Kirchencafé"',
-                'recording_url' => 'URL zur Audioaufzeichnung',
-                'songsheet' => 'URL zum Liedblatt',
-                'external_url' => 'Externe Seite zum Gottesdienst',
-                'youtube_prefix_description' => 'Einleitender Text zur Beschreibung auf YouTube',
-                'youtube_postfix_description' => 'Ergänzender Text zur Beschreibung auf YouTube',
-                'sermon_title' => 'Titel der Predigt',
-                'sermon_reference' => 'Predigttext',
-                'sermon_image' => 'Titelbild der Predigt',
-                'sermon_description' => 'Beschreibungstext zur Predigt',
+                    'cc_alt_time' => 'Uhrzeit der Kinderkirche',
+                    'cc_location' => 'Ort der Kinderkirche',
+                    'cc_lession' => 'Lektion für die Kinderkirche',
+                    'cc_staff' => 'Mitarbeiter in der Kinderkirche',
+                    'youtube_url' => 'Streaming-URL (youtube)',
+                    'cc_streaming_url' => 'URL für das Streaming der Kinderkirche',
+                    'offerings_url' => 'URL für Onlinespenden',
+                    'meeting_url' => 'URL für ein "virtuelles Kirchencafé"',
+                    'recording_url' => 'URL zur Audioaufzeichnung',
+                    'songsheet' => 'URL zum Liedblatt',
+                    'external_url' => 'Externe Seite zum Gottesdienst',
+                    'youtube_prefix_description' => 'Einleitender Text zur Beschreibung auf YouTube',
+                    'youtube_postfix_description' => 'Ergänzender Text zur Beschreibung auf YouTube',
+                    'sermon_title' => 'Titel der Predigt',
+                    'sermon_reference' => 'Predigttext',
+                    'sermon_image' => 'Titelbild der Predigt',
+                    'sermon_description' => 'Beschreibungstext zur Predigt',
                 ] as $attribute => $title)
-                @if(isset($changes[$attribute]))
+                @if (isset($changes[$attribute]))
                     @include('mail.notifications.service.changed-attribute', [
-                             'title' => $title,
-                             'key' => $attribute,
-                             'old' => $changes[$attribute]['original'],
-                             'new' => $changes[$attribute]['changed'],
-                             ])
+                        'title' => $title,
+                        'key' => $attribute,
+                        'old' => $changes[$attribute]['original'],
+                        'new' => $changes[$attribute]['changed'],
+                    ])
                 @endif
             @endforeach
 
-            @if(isset($changes['needs_reservations']))
+            @if (isset($changes['needs_reservations']))
                 @include('mail.notifications.service.changed-attribute', [
-                         'title' => 'Anmeldung benötigt',
-                         'key' => 'needs_reservations',
-                         'old' => $changes['needs_reservations']['original'] ? '✔' : '✘',
-                         'new' => $changes['needs_reservations']['changed'] ? '✔' : '✘',
-                         ])
+                    'title' => 'Anmeldung benötigt',
+                    'key' => 'needs_reservations',
+                    'old' => $changes['needs_reservations']['original'] ? '✔' : '✘',
+                    'new' => $changes['needs_reservations']['changed'] ? '✔' : '✘',
+                ])
             @endif
 
-            @if(isset($changes['registration_active']))
+            @if (isset($changes['registration_active']))
                 @include('mail.notifications.service.changed-attribute', [
-                         'title' => 'Online-Anmeldung aktiv',
-                         'key' => 'registration_active',
-                         'old' => $changes['registration_active']['original'] ? '✔' : '✘',
-                         'new' => $changes['registration_active']['changed'] ? '✔' : '✘',
-                         ])
+                    'title' => 'Online-Anmeldung aktiv',
+                    'key' => 'registration_active',
+                    'old' => $changes['registration_active']['original'] ? '✔' : '✘',
+                    'new' => $changes['registration_active']['changed'] ? '✔' : '✘',
+                ])
             @endif
 
-            @if(isset($changes['exclude_sections']))
+            @if (isset($changes['exclude_sections']))
                 @include('mail.notifications.service.changed-attribute', [
-                         'title' => 'Sitzplätze in folgenden Zonen nicht belegen',
-                         'key' => 'exclude_sections',
-                         'old' => $changes['exclude_sections']['original'],
-                         'new' => $changes['exclude_sections']['changed'],
-                         ])
+                    'title' => 'Sitzplätze in folgenden Zonen nicht belegen',
+                    'key' => 'exclude_sections',
+                    'old' => $changes['exclude_sections']['original'],
+                    'new' => $changes['exclude_sections']['changed'],
+                ])
             @endif
 
-            @if(isset($changes['exclude_places']))
+            @if (isset($changes['exclude_places']))
                 @include('mail.notifications.service.changed-attribute', [
-                         'title' => 'Folgende Sitzplätze nicht belegen',
-                         'key' => 'exclude_places',
-                         'old' => $changes['exclude_places']['original'],
-                         'new' => $changes['exclude_places']['changed'],
-                         ])
+                    'title' => 'Folgende Sitzplätze nicht belegen',
+                    'key' => 'exclude_places',
+                    'old' => $changes['exclude_places']['original'],
+                    'new' => $changes['exclude_places']['changed'],
+                ])
             @endif
 
-            @if(isset($changes['registration_phone']))
+            @if (isset($changes['registration_phone']))
                 @include('mail.notifications.service.changed-attribute', [
-                         'title' => 'Nummer für telefonische Anmeldung',
-                         'key' => 'registration_phone',
-                         'old' => $changes['registration_phone']['original'],
-                         'new' => $changes['registration_phone']['changed'],
-                         ])
+                    'title' => 'Nummer für telefonische Anmeldung',
+                    'key' => 'registration_phone',
+                    'old' => $changes['registration_phone']['original'],
+                    'new' => $changes['registration_phone']['changed'],
+                ])
             @endif
-
         @endcomponent
-
     @endcomponent
 
     @include('mail.layout.blocks.spacer')
 
-    @if($user->can('gd-kasualien-lesen') || $user->can('gd-kasualien-bearbeiten'))
-        @if($service->baptisms->count() || $service->funerals->count() || $service->weddings->count())
-
+    @if ($user->can('gd-kasualien-lesen') || $user->can('gd-kasualien-bearbeiten'))
+        @if ($service->baptisms->count() || $service->funerals->count() || $service->weddings->count())
             @component('mail.layout.blocks.content-table')
                 @slot('title')
                     Kasualien in diesem Gottesdienst
                 @endslot
                 @slot('subtitle')
-
                     @include('mail.notifications.service.baptisms')
                     @include('mail.notifications.service.weddings')
                     @include('mail.notifications.service.funerals')
-
                 @endslot
-
             @endcomponent
-
         @endif
 
         @include('mail.layout.blocks.spacer')
@@ -239,70 +234,69 @@
     @include('mail.layout.blocks.spacer')
 
     <table class="card w-100 " border="0" cellpadding="0" cellspacing="0"
-           style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important;  border-radius: 0; width: 100%; overflow: hidden; border: 1px solid #dee2e6;"
-           bgcolor="#ffffff">
+        style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important;  border-radius: 0; width: 100%; overflow: hidden; border: 1px solid #dee2e6;"
+        bgcolor="#ffffff">
         <tbody>
-        <tr>
-            <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; width: 100%; margin: 0;"
-                align="left">
-                <div>
-                    <table class="card-body" border="0" cellpadding="0" cellspacing="0"
-                           style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: collapse; width: 100%;">
-                        <tbody>
-                        <tr>
-                            <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; width: 100%; margin: 0; padding: 20px;"
-                                align="left">
-                                <div>
-                                    <h4 class="text-center"
-                                        style="margin-top: 0; margin-bottom: 0; font-weight: 500; color: inherit; vertical-align: baseline; font-size: 24px; line-height: 28.8px;"
-                                        align="center">Alle Gottesdienste in der Übersicht</h4>
-                                    <p class="text-center" style="line-height: 24px; font-size: 16px; margin: 0;"
-                                       align="center">Unser Online-Dienstplan hilft dir, komplett den Überblick zu
-                                        behalten</p>
-                                    <table class="s-2 w-100" border="0" cellpadding="0" cellspacing="0"
-                                           style="width: 100%;">
-                                        <tbody>
-                                        <tr>
-                                            <td height="8"
-                                                style="border-spacing: 0px; border-collapse: collapse; line-height: 8px; font-size: 8px; width: 100%; height: 8px; margin: 0;"
-                                                align="left">
+            <tr>
+                <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; width: 100%; margin: 0;"
+                    align="left">
+                    <div>
+                        <table class="card-body" border="0" cellpadding="0" cellspacing="0"
+                            style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: collapse; width: 100%;">
+                            <tbody>
+                                <tr>
+                                    <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; width: 100%; margin: 0; padding: 20px;"
+                                        align="left">
+                                        <div>
+                                            <h4 class="text-center"
+                                                style="margin-top: 0; margin-bottom: 0; font-weight: 500; color: inherit; vertical-align: baseline; font-size: 24px; line-height: 28.8px;"
+                                                align="center">Alle Gottesdienste in der Übersicht</h4>
+                                            <p class="text-center" style="line-height: 24px; font-size: 16px; margin: 0;"
+                                                align="center">Unser Online-Dienstplan hilft dir, komplett den Überblick zu
+                                                behalten</p>
+                                            <table class="s-2 w-100" border="0" cellpadding="0" cellspacing="0"
+                                                style="width: 100%;">
+                                                <tbody>
+                                                    <tr>
+                                                        <td height="8"
+                                                            style="border-spacing: 0px; border-collapse: collapse; line-height: 8px; font-size: 8px; width: 100%; height: 8px; margin: 0;"
+                                                            align="left">
 
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
 
-                                    <table class="btn btn-primary btn-lg mx-auto " align="center" border="0"
-                                           cellpadding="0" cellspacing="0"
-                                           style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important;  border-radius: 0; margin: 0 auto;">
-                                        <tbody>
-                                        <tr>
-                                            <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px;  border-radius: 0; margin: 0;"
-                                                align="center" bgcolor="#007bff">
-                                                @if($user->can('update', $service))
-                                                    <a
-                                                        href="{{ route('service.edit', $service) }}"
-                                                        style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none;  border-radius: 0; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #a61380; color: #ffffff; padding: 8px 16px;">Diesen
-                                                        Gottesdienst ansehen</a>
-                                                @else
-                                                    <a href="{{ route('calendar') }}"
-                                                       style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none;  border-radius: 0; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Kalender
-                                                        öffnen</a>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                            <table class="btn btn-primary btn-lg mx-auto " align="center" border="0"
+                                                cellpadding="0" cellspacing="0"
+                                                style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: separate !important;  border-radius: 0; margin: 0 auto;">
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px;  border-radius: 0; margin: 0;"
+                                                            align="center" bgcolor="#007bff">
+                                                            @if ($user->can('update', $service))
+                                                                <a href="{{ route('service.edit', $service) }}"
+                                                                    style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none;  border-radius: 0; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #a61380; color: #ffffff; padding: 8px 16px;">Diesen
+                                                                    Gottesdienst ansehen</a>
+                                                            @else
+                                                                <a href="{{ route('calendar') }}"
+                                                                    style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; text-decoration: none;  border-radius: 0; line-height: 30px; display: inline-block; font-weight: normal; white-space: nowrap; background-color: #007bff; color: #ffffff; padding: 8px 16px; border: 1px solid #007bff;">Kalender
+                                                                    öffnen</a>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
 
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                </div>
-            </td>
-        </tr>
+                    </div>
+                </td>
+            </tr>
         </tbody>
     </table>
 
@@ -311,8 +305,8 @@
 
 
     <div class="text-center text-muted" style="color: #636c72; font-size: 8pt; line-height: 9pt; margin-top: 10px;"
-         align="center">
-        @if($user->getSubscriptionType($service->city) == \App\Models\Subscription::SUBSCRIBE_ALL)
+        align="center">
+        @if ($user->getSubscriptionType($service->city) == \App\Models\Subscription::SUBSCRIBE_ALL)
             Du erhältst diese Nachricht, weil du über alle Änderungen an Gottesdiensten in {{ $service->city->name }}
             benachrichtigt werden willst.
         @elseif($user->getSubscriptionType($service->city) == \App\Models\Subscription::SUBSCRIBE_OWN)
@@ -325,30 +319,30 @@
     @include('mail.layout.blocks.hr')
 
     <table class="table-unstyled text-muted " border="0" cellpadding="0" cellspacing="0"
-           style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: collapse; width: 100%; max-width: 100%; color: #636c72;"
-           bgcolor="transparent">
+        style="font-family: Helvetica, Arial, sans-serif; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: collapse; width: 100%; max-width: 100%; color: #636c72;"
+        bgcolor="transparent">
         <tbody>
-        <tr>
-            <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 0; border-bottom-width: 0; margin: 0;"
-                align="left">© {{ \Carbon\Carbon::now()->format('Y') }} Pfarrplaner
-            </td>
-            <td class="text-end"
-                style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 0; border-bottom-width: 0; margin: 0;"
-                align="right">
-                <a class="text-muted" href="{{ env('APP_URL') }}" style="color: #636c72;">Jetzt einloggen</a>
-            </td>
-        </tr>
+            <tr>
+                <td style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 0; border-bottom-width: 0; margin: 0;"
+                    align="left">© {{ \Carbon\Carbon::now()->format('Y') }} Pfarrplaner
+                </td>
+                <td class="text-end"
+                    style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; border-top-width: 0; border-bottom-width: 0; margin: 0;"
+                    align="right">
+                    <a class="text-muted" href="{{ env('APP_URL') }}" style="color: #636c72;">Jetzt einloggen</a>
+                </td>
+            </tr>
         </tbody>
     </table>
     <table class="s-4 w-100" border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
         <tbody>
-        <tr>
-            <td height="24"
-                style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 24px; width: 100%; height: 24px; margin: 0;"
-                align="left">
+            <tr>
+                <td height="24"
+                    style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 24px; width: 100%; height: 24px; margin: 0;"
+                    align="left">
 
-            </td>
-        </tr>
+                </td>
+            </tr>
         </tbody>
     </table>
 

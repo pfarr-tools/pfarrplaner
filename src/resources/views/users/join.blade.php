@@ -16,9 +16,10 @@
                     @csrf
                     <input type="hidden" name="user1" value="{{ $user->id }}" />
                     <div class="form-group">
-                        <label for="user2">Alle Einträge für Benutzer "{{ $user->fullName() }}" sollen auf folgenden Benutzer umgeschrieben werden:</label>
+                        <label for="user2">Alle Einträge für Benutzer "{{ $user->fullName() }}" sollen auf folgenden Benutzer
+                            umgeschrieben werden:</label>
                         <select class="form-control fancy-selectize" name="user2">
-                            @foreach($users as $thisUser)
+                            @foreach ($users as $thisUser)
                                 <option value="{{ $thisUser->id }}">{{ $thisUser->fullName() }}</option>
                             @endforeach
                         </select>

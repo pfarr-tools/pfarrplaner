@@ -8,7 +8,9 @@ import { changedFiles } from './changed-files.mjs'
  */
 function main() {
     const [command, ...arguments_] = process.argv.slice(2)
-    const files = changedFiles().filter((file) => /\.(js|mjs|vue)$/.test(file))
+    const files = changedFiles().filter((file) =>
+        /\.(css|js|json|mjs|sass|scss|vue|yaml|yml)$/.test(file),
+    )
     if (files.length === 0) {
         console.log(`Keine geänderten ${command}-Dateien zu prüfen.`)
         return 0

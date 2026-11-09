@@ -74,6 +74,12 @@ class ServiceController extends Controller
         $this->middleware('auth')->except(['publicLiturgy']);
     }
 
+    /**
+     * Synchronize all request-owned relations for a service update.
+     *
+     * @param  ServiceRequest  $request  Validated service request.
+     * @param  Service  $service  Service to update.
+     */
     protected function updateFromRequest(ServiceRequest $request, Service $service): void
     {
         $service->associateParticipants($request, $service);
@@ -85,6 +91,13 @@ class ServiceController extends Controller
         $service->setAdConfigFromRequest($request);
     }
 
+    /**
+     * Build default attributes for a newly created service.
+     *
+     * @param  string|null  $date  Requested local date and time.
+     * @param  City|null  $city  Target city.
+     * @return array<string, mixed> Service attributes.
+     */
     protected function presetDataForNewService($date = null, ?City $city = null): array
     {
         $data = [];
@@ -103,6 +116,13 @@ class ServiceController extends Controller
         ];
     }
 
+    /**
+     * Create a service for a city and redirect to its editor.
+     *
+     * @param  City  $city  Target city.
+     * @param  string|null  $date  Requested service date.
+     * @return RedirectResponse Editor redirect.
+     */
     public function create(City $city, $date = null)
     {
         Gate::authorize('create', Service::class);
@@ -111,6 +131,13 @@ class ServiceController extends Controller
         return redirect()->route('service.edit', $service->slug);
     }
 
+    /**
+     * Create a service from a local event calendar entry.
+     *
+     * @param  string  $filter  Event calendar filter.
+     * @param  string|null  $date  Requested service date.
+     * @return RedirectResponse Editor redirect.
+     */
     public function createEvent($filter, $date = null)
     {
         Gate::authorize('create', Service::class);
@@ -480,6 +507,13 @@ class ServiceController extends Controller
         return response()->json($service);
     }
 
+    /**
+     * Create and persist a KonfiApp QR code for a service.
+     *
+     * @param  Request  $request  QR-code request.
+     * @param  Service  $service  Service to encode.
+     * @return RedirectResponse QR-code redirect.
+     */
     public function createQR(Request $request, Service $service)
     {
         Gate::authorize('update', $service);
@@ -522,6 +556,12 @@ class ServiceController extends Controller
         ));
     }
 
+    /**
+     * Render the public liturgy view for a service.
+     *
+     * @param  Service  $service  Service to display.
+     * @return \Illuminate\Contracts\View\View Public liturgy view.
+     */
     public function publicLiturgy(Service $service)
     {
         return view('services.public.liturgy', compact('service'));

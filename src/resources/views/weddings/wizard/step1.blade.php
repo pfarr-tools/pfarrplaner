@@ -14,14 +14,14 @@
                 <select class="form-control" name="city">
                     @foreach ($cities as $city)
                         <option value="{{ $city->id }}">
-                            {{$city->name}}
+                            {{ $city->name }}
                         </option>
                     @endforeach
                 </select>
             </div>
             <div class="form-group">
                 <label for="date">Datum</label>
-                <input type="text" class="form-control datepicker" name="date" placeholder="tt.mm.jjjj"/>
+                <input type="text" class="form-control datepicker" name="date" placeholder="tt.mm.jjjj" />
             </div>
         @endcomponent
     </form>

@@ -68,6 +68,13 @@ class ServiceController extends Controller
     /**
      * @return mixed
      */
+    /**
+     * Return service IDs for a day and city.
+     *
+     * @param  Day  $day  Calendar day to filter.
+     * @param  City  $city  City to filter.
+     * @return mixed Service identifiers.
+     */
     public function byDayAndCity(Day $day, City $city)
     {
         return Service::select('id')
@@ -94,6 +101,13 @@ class ServiceController extends Controller
         return response()->json($service);
     }
 
+    /**
+     * Return the calendar services for a month and selected cities.
+     *
+     * @param  string  $date  Date within the requested month.
+     * @param  string  $cities  Comma-separated city IDs.
+     * @return CalendarServicesCollectionResource Monthly service resources.
+     */
     public function byMonth($date, $cities)
     {
         $date = Carbon::parse($date);
@@ -163,6 +177,13 @@ class ServiceController extends Controller
 
     /**
      * Assign users to a service
+     */
+    /**
+     * Assign or remove users from service ministries.
+     *
+     * @param  Request  $request  Request containing ministry and user IDs.
+     * @param  Service  $service  Service to update.
+     * @return JsonResponse Updated service response.
      */
     public function assign(Request $request, Service $service)
     {

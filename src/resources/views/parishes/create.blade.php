@@ -19,39 +19,41 @@
             <div class="form-group">
                 @csrf
                 <label for="name">Name:</label>
-                <input type="text" class="form-control" id="name" name="name"/>
+                <input type="text" class="form-control" id="name" name="name" />
             </div>
             <div class="form-group">
                 <label for="code">Bezeichnung in DaviP:</label>
-                <input type="text" class="form-control" name="code"/>
+                <input type="text" class="form-control" name="code" />
             </div>
             <div class="form-group">
                 <label for="congregation_name">Name der Teilkirchengemeinde</label>
-                <input type="text" class="form-control" name="congregation_name" placeholder="Leer lassen, wenn keine Teilkirchengemeinde"/>
+                <input type="text" class="form-control" name="congregation_name"
+                    placeholder="Leer lassen, wenn keine Teilkirchengemeinde" />
             </div>
             <div class="form-group">
                 <label for="congregation_url">Link zur Teilkirchengemeinde</label>
-                <input type="text" class="form-control" name="congregation_url" placeholder="Leer lassen, wenn keine Teilkirchengemeinde"/>
+                <input type="text" class="form-control" name="congregation_url"
+                    placeholder="Leer lassen, wenn keine Teilkirchengemeinde" />
             </div>
             <div class="form-group">
                 <label for="adress">Straße:</label>
-                <input type="text" class="form-control" name="address"/>
+                <input type="text" class="form-control" name="address" />
             </div>
             <div class="form-group">
                 <label for="zip">PLZ:</label>
-                <input type="text" class="form-control" name="zip"/>
+                <input type="text" class="form-control" name="zip" />
             </div>
             <div class="form-group">
                 <label for="city">Ort:</label>
-                <input type="text" class="form-control" name="city"/>
+                <input type="text" class="form-control" name="city" />
             </div>
             <div class="form-group">
                 <label for="phone">Telefon:</label>
-                <input type="text" class="form-control" name="phone"/>
+                <input type="text" class="form-control" name="phone" />
             </div>
             <div class="form-group">
                 <label for="email">E-Mailadresse:</label>
-                <input type="text" class="form-control" name="email"/>
+                <input type="text" class="form-control" name="email" />
             </div>
         @endcomponent
     </form>
@@ -59,7 +61,7 @@
 
 @section('scripts')
     <script>
-        $(document).ready(function ($) {
+        $(document).ready(function($) {
             $('#name').focus();
         });
     </script>

@@ -33,12 +33,29 @@ namespace App\Http\Controllers;
 use App\Models\Places\City;
 use App\Services\RoleService;
 use App\UI\Modules\AdminModule;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * Render the administration module overview and city-specific links.
+ */
 class AdminController extends Controller
 {
+    /**
+     * Create the collection used for city-specific administration modules.
+     *
+     * @phpstan-return Collection<int, non-empty-array<string, mixed>> Empty module collection.
+     */
+    private function emptyCityModules(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * Protect administration routes with authentication middleware.
+     */
     public function __construct()
     {
         $this->middleware('auth');
@@ -49,6 +66,7 @@ class AdminController extends Controller
      */
     public function index()
     {
+        /** @var Collection<int|string, Collection<int, non-empty-array<string, mixed>>> $modules */
         $modules = collect(AdminModule::modules())->sortBy(['group', 'text'])
             ->reject(fn ($module) => empty($module['group']))
             ->groupBy('group');
@@ -59,7 +77,7 @@ class AdminController extends Controller
             $cities = collect(Auth::user()->writableCities)->merge(Auth::user()->adminCities)->unique('id');
         }
         if (count($cities) > 0) {
-            $modules['Orte'] = collect();
+            $modules['Orte'] = $this->emptyCityModules();
             foreach ($cities->sortBy('name') as $city) {
                 $modules['Orte']->push([
                     'text' => $city->name,

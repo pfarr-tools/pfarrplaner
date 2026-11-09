@@ -1,0 +1,19 @@
+{
+    "indentSize": 4,
+    "wrapLineLength": 120,
+    "wrapAttributes": "auto",
+    "wrapAttributesMinAttrs": 2,
+    "indentInnerHtml": false,
+    "endWithNewLine": true,
+    "endOfLine": "LF",
+    "useTabs": false,
+    "sortTailwindcssClasses": false,
+    "sortHtmlAttributes": "none",
+    "noMultipleEmptyLines": false,
+    "noPhpSyntaxCheck": false,
+    "noSingleQuote": false,
+    "noTrailingCommaPhp": false,
+    "extraLiners": [],
+    "componentPrefix": ["x-", "livewire:"],
+    "phpVersion": "8.4"
+}
