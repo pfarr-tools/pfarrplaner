@@ -1,4 +1,4 @@
-[//]: # (TOC: 10. Stichwortverzeichnis)
+[//]: # (TOC: 12. Stichwortverzeichnis)
 
 # Stichwortverzeichnis
 
@@ -13,6 +13,7 @@ Dieses Stichwortverzeichnis hilft beim schnellen Finden typischer Administration
 
 ## B
 
+- **Berechtigungen**: [Berechtigungen und Policies](berechtigungen.md), [Betrieb und Wartung](betrieb.md)
 - **Backup**: [Updates](updates.md), [Sicherheit, Backup und Datenschutz](sicherheit.md)
 - **Browsershot**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Fehlersuche](fehlersuche.md)
 - **Build**: [Installation mit Docker Compose](installation-docker.md)
@@ -74,6 +75,7 @@ Dieses Stichwortverzeichnis hilft beim schnellen Finden typischer Administration
 
 - **Passwort-Reset**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Updates](updates.md)
 - **PHP 8.4**: [Systemvoraussetzungen](systemvoraussetzungen.md)
+- **Policies**: [Berechtigungen und Policies](berechtigungen.md)
 - **Puppeteer**: [Systemvoraussetzungen](systemvoraussetzungen.md), [Installation mit Docker Compose](installation-docker.md)
 
 ## Q

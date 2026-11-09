@@ -1,4 +1,4 @@
-[//]: # (TOC: 9. Stichwortverzeichnis)
+[//]: # (TOC: 11. Stichwortverzeichnis)
 
 # Stichwortverzeichnis
 
@@ -14,6 +14,7 @@ Dieses Stichwortverzeichnis bündelt technische Begriffe, damit Architektur, Bet
 ## B
 
 - **Backend**: [Überblick](ueberblick.md), [Architektur und Domänen](architektur.md)
+- **Berechtigungen**: [Sicherheitsaudit und Härtung](sicherheitsaudit.md), [Berechtigungen und Policies im Administratorhandbuch](https://handbuch.pfarrplaner.de/administratorhandbuch/berechtigungen/)
 - **Browsershot**: [Überblick](ueberblick.md), [Laufzeit, Build und Hintergrundprozesse](laufzeit-und-build.md)
 - **Build**: [Laufzeit, Build und Hintergrundprozesse](laufzeit-und-build.md)
 
@@ -44,6 +45,7 @@ Dieses Stichwortverzeichnis bündelt technische Begriffe, damit Architektur, Bet
 
 ## I
 
+- **Installation**: [Installation und Erstbetrieb mit Docker](installation-docker.md)
 - **Inertia.js**: [Überblick](ueberblick.md), [Architektur und Domänen](architektur.md)
 
 ## J
