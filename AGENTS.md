@@ -154,6 +154,8 @@ Bezeichnern, Dateinamen, URLs und CLI-Optionen vorbehalten.
   zugehörigen Issue dokumentiert.
 - Der abschließende Commit verweist auf das Issue und markiert es mit
   `fixed`/`close` als erledigt.
+- Gefixte Issues werden nach erfolgreicher Verifikation ohne abweichende
+  Anweisung immer geschlossen.
 
 ## Fehlerüberwachung
 
