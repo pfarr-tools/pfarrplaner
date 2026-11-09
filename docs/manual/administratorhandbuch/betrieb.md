@@ -81,6 +81,9 @@ Zur technischen Administration gehört auch ein klares Verständnis der administ
 
 Diese Inhalte werden funktional im [Benutzerhandbuch](https://handbuch.pfarrplaner.de/benutzerhandbuch/administration/) beschrieben. Dieses Administratorhandbuch ergänzt dazu die Betriebs- und Sicherheitsaspekte.
 
+Die vollständige technische Zuordnung von Policy-Verben, Rollen und fachlichen
+Berechtigungen steht im Kapitel [Berechtigungen und Policies](berechtigungen.md).
+
 ## Gelöschte Fachdaten
 
 Für Gottesdienste, Abwesenheiten, Taufen, Bestattungen und Trauungen verwendet Pfarrplaner einen anwendungsinternen Papierkorb. Normales Löschen entfernt diese Datensätze also nicht sofort endgültig aus der Datenbank.

@@ -1,4 +1,4 @@
-[//]: # (TOC: 8. OpenAPI und Schnittstellenpflege)
+[//]: # (TOC: 10. OpenAPI und Schnittstellenpflege)
 
 # OpenAPI und Schnittstellenpflege
 

@@ -1,4 +1,4 @@
-[//]: # (TOC: 3. Dateien und Verzeichnisse)
+[//]: # (TOC: 4. Dateien und Verzeichnisse)
 
 # Dateien und Verzeichnisse
 
@@ -12,6 +12,8 @@
 - `scripts/`: Root-Betriebs-, Backup-, Migrations- und Testskripte
 - `docs/manual/`: drei veröffentlichte Handbücher und gemeinsame Medien
 - `src/`: Laravel-Anwendung als Git-Subtree
+
+Der empfohlene Einstieg für eine neue Umgebung ist [Installation und Erstbetrieb mit Docker](installation-docker.md). Die Datei beschreibt auch, welche Daten außerhalb des Quellcodes persistent bleiben müssen.
 
 ## Anwendungsquellcode unter `src/`
 

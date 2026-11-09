@@ -1,4 +1,4 @@
-[//]: # (TOC: 6. API-Authentifizierung)
+[//]: # (TOC: 8. API-Authentifizierung)
 
 # API-Authentifizierung
 

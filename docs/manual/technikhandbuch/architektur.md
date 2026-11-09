@@ -1,6 +1,15 @@
-[//]: # (TOC: 2. Architektur und Domänen)
+[//]: # (TOC: 3. Architektur und Domänen)
 
 # Architektur und Domänen
+
+## Stack-Struktur
+
+Der technische Rahmen besteht aus zwei Compose-Varianten:
+
+- `compose.yaml` bindet den Laravel-Quellbaum für Entwicklung, Vite, Tests und den Manual-Container ein.
+- `compose.production.yaml` verwendet ein versioniertes Anwendungsimage, Octane/Swoole, einen Asset-Snapshot und getrennte interne Netzwerke.
+
+In beiden Varianten sind MariaDB, Redis, MinIO, Horizon und der Scheduler zentrale Abhängigkeiten. Caddy nimmt HTTP entgegen; Soketi ergänzt die WebSocket-Kommunikation. Das [Installationskapitel](installation-docker.md) beschreibt den vollständigen Startablauf.
 
 ## Backend-Struktur
 
