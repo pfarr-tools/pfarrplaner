@@ -45,7 +45,7 @@ class Announcements
 {
     public const DEFAULT_BAPTISM_VOTE = 'Christus hat der Kirche den Auftrag gegeben: Gehet hin und machet zu Jüngern alle Völker und taufet sie auf den Namen des Vaters und des Sohnes und des Heiligen Geistes.';
 
-    public const DEFAULT_FUNERAL_VOTE = 'Unser keiner lebt sich selber, und keiner stirbt sich selber. Leben wir, so leben wir dem Herrn; sterben wir, so sterben wir dem Herrn. Darum: Wir leben oder sterben, so sind wir des Herrn. Denn dazu ist Christus gestorben und wieder lebendig geworden, dass er über Tote und Lebende Herr sei.';
+    public const DEFAULT_FUNERAL_VOTE = 'Unser keiner lebt sich selber, und keiner stirbt sich selber. Leben wir, so leben wir dem Herrn; sterben wir, so sterben wir dem Herrn. Darum: wir leben oder sterben, so sind wir des Herrn. Denn dazu ist Christus gestorben und wieder lebendig geworden, dass er über Tote und Lebende Herr sei. (Röm 14,7–9)';
 
     public const DEFAULT_WEDDING_VOTE = 'Vater im Himmel, wir bitten für dieses Hochzeitspaar. Begleite sie auf ihrem gemeinsamen Weg. Lass sie deine Liebe erfahren und stärke ihre Liebe zueinander in guten und in schweren Tagen.';
 
