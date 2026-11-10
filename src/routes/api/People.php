@@ -32,4 +32,5 @@ use App\Http\Controllers\Api\UserController;
 
 Route::get('/people/select', [UserController::class, 'select'])->name('people.select');
 Route::post('/people/search/{searchString}', [UserController::class, 'search'])->name('people.search');
+Route::post('/people/email', [UserController::class, 'email'])->name('people.email');
 Route::post('/people/activate/{user}/{city}', [UserController::class, 'activate'])->name('people.activate');

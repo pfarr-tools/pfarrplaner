@@ -77,6 +77,7 @@ Dieses Kapitel beschreibt die aktuell sichtbaren API-Routen aus `routes/api/*.ph
 |---|---|---|---|
 | `GET` | `/api/people/select` | `auth:api` | Personenauswahl |
 | `POST` | `/api/people/search/{searchString}` | `auth:api` | Personensuche |
+| `POST` | `/api/people/email` | `auth:api` | Prüfen, ob eine E-Mailadresse zu einer übernehmbaren Person gehört |
 | `POST` | `/api/people/activate/{user}/{city}` | `auth:api` | Person für Gemeinde aktivieren |
 | `GET` | `/api/teams/by-city/{city}` | `auth:api` | Teams einer Gemeinde |
 | `GET` | `/api/city/{city}/konfiapp-types` | `auth:api` | KonfiApp-Typen einer Gemeinde |

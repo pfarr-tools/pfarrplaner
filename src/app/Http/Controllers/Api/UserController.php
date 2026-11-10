@@ -37,6 +37,7 @@ use App\Models\People\User;
 use App\Models\Places\City;
 use App\Providers\AuthServiceProvider;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -95,6 +96,29 @@ class UserController extends Controller
             ->get();
 
         return response()->json($users);
+    }
+
+    /**
+     * Find a person with a matching email address that can be added to the
+     * requester's current city scope.
+     *
+     * @param  Request  $request  Request containing the email address.
+     * @return JsonResponse Matching person or null.
+     */
+    public function email(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'email', 'max:255'],
+        ]);
+
+        $person = User::with('cityScopes')
+            ->whereRaw('LOWER(email) = LOWER(?)', [$validated['email']])
+            ->whereDoesntHave('cityScopes', function ($q) {
+                return $q->whereIn('city_id', Auth::user()->cities->pluck('id'));
+            })
+            ->first();
+
+        return response()->json(['person' => $person]);
     }
 
     /**

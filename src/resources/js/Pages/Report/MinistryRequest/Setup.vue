@@ -274,7 +274,12 @@ export default {
         setLocation(e) {
             this.myLocations = e
         },
-        sendMessage() {
+        /**
+         * Resolve recipient email addresses and send the ministry request.
+         *
+         * @return {Promise<void>} Resolves after the request has been submitted or cancelled.
+         */
+        async sendMessage() {
             let record = {
                 services: [],
                 recipients: [],
@@ -286,28 +291,55 @@ export default {
                 if (service.checked) record.services.push(service.id)
             })
             let missingAddress = false
-            this.recipients.forEach((recipient) => {
+            for (const recipient of this.recipients) {
                 const recipientId = typeof recipient === 'object' ? recipient.id : recipient
                 let user = this.users.filter((u) => {
                     return u.id === recipientId
                 })[0]
                 if (user) {
-                    let address = user.email
-                    if (!user.email) {
-                        address = window.prompt(
-                            'Bitte gib eine E-Mailadresse für ' + user.name + ' an.',
-                        )
-                    }
-                    if (!address) {
+                    const recipient = await this.getRecipientEmail(user)
+                    if (!recipient) {
                         missingAddress = true
                         return
                     }
-                    record.recipients.push(recipientId)
-                    record.address[recipientId] = address
+                    record.recipients.push(recipient.id)
+                    record.address[recipient.id] = recipient.address
                 }
-            })
+            }
             if (missingAddress) return
             this.$inertia.post(route('reports.render', { report: 'ministryRequest' }), record)
+        },
+        /**
+         * Ask for a missing address and resolve an already registered person.
+         *
+         * @param {Object} user Selected recipient without an email address.
+         * @return {Promise<{id: number, address: string}|null>} Recipient data or cancellation.
+         */
+        async getRecipientEmail(user) {
+            if (user.email) return { id: user.id, address: user.email }
+
+            while (true) {
+                const address = window.prompt(
+                    'Bitte gib eine E-Mailadresse für ' + user.name + ' an.',
+                )
+                if (!address) return null
+
+                const response = await this.$api().post(route('api.people.email'), {
+                    email: address,
+                })
+                const existingPerson = response.data.person
+                if (!existingPerson) return { id: user.id, address }
+
+                const useExisting = window.confirm(
+                    'Die E-Mailadresse gehört bereits ' +
+                        '"' +
+                        existingPerson.name +
+                        '". Soll diese vorhandene Person verwendet werden? Mit „Abbrechen“ kannst du eine andere E-Mailadresse eingeben.',
+                )
+                if (useExisting) {
+                    return { id: existingPerson.id, address: existingPerson.email }
+                }
+            }
         },
     },
 }

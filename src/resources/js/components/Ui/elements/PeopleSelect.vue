@@ -187,6 +187,30 @@
                     </div>
                 </div>
                 <div v-if="ignoreSearchResults || searchResults.length == 0">
+                    <div
+                        v-if="duplicatePerson"
+                        class="alert alert-warning"
+                    >
+                        <p>
+                            Diese E-Mailadresse ist bereits der Person
+                            <strong>{{ displayName(duplicatePerson, true) }}</strong>
+                            zugeordnet.
+                        </p>
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button
+                                class="btn btn-primary btn-sm"
+                                @click.prevent.stop="useDuplicatePerson"
+                            >
+                                Diese Person verwenden
+                            </button>
+                            <button
+                                class="btn btn-warning btn-sm"
+                                @click.prevent.stop="useAnotherEmail"
+                            >
+                                Andere E-Mailadresse eingeben
+                            </button>
+                        </div>
+                    </div>
                     <form-input
                         name="name"
                         label="Name"
@@ -226,6 +250,7 @@
                         v-model="newPerson.email"
                         type="email"
                         help="(falls bekannt)"
+                        ref="newPersonEmail"
                     />
                 </div>
             </div>
@@ -364,6 +389,7 @@ export default {
             searchingForPerson: false,
             searchResults: [],
             ignoreSearchResults: false,
+            duplicatePerson: null,
             searchQuery: '',
             newPerson: {
                 name: '',
@@ -418,7 +444,31 @@ export default {
             this.personCreatedData = null
             this.myValue = newVal
         },
-        closeNewPersonModal() {
+        /**
+         * Check the entered email before creating a new person.
+         *
+         * @return {Promise<void>} Resolves after the person was created or a duplicate was shown.
+         */
+        async closeNewPersonModal() {
+            if (this.newPerson.email) {
+                const response = await this.$api().post(route('api.people.email'), {
+                    email: this.newPerson.email,
+                })
+                if (response.data.person) {
+                    this.duplicatePerson = response.data.person
+                    this.showNewPersonModal = true
+                    return
+                }
+            }
+
+            this.createNewPerson()
+        },
+        /**
+         * Create the person after the duplicate email check has completed.
+         *
+         * @return {void}
+         */
+        createNewPerson() {
             var component = this
             this.showNewPersonModal = false
             axios
@@ -438,6 +488,24 @@ export default {
                     component.personCreated = true
                     EventBus.publish(new NewPersonAddedEvent(this.uuid, data))
                 })
+        },
+        /**
+         * Select the existing person found by the email check.
+         *
+         * @return {void}
+         */
+        useDuplicatePerson() {
+            this.extendPersonScopeAndCloseModal(this.duplicatePerson)
+            this.duplicatePerson = null
+        },
+        /**
+         * Dismiss the duplicate warning and keep editing the email field.
+         *
+         * @return {void}
+         */
+        useAnotherEmail() {
+            this.duplicatePerson = null
+            this.$nextTick(() => this.$refs.newPersonEmail?.$el?.focus())
         },
         cancelNewPersonModal() {
             this.showNewPersonModal = false

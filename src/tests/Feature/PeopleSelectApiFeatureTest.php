@@ -94,4 +94,31 @@ class PeopleSelectApiFeatureTest extends TestCase
         $this->assertTrue($ids->contains($visible->id));
         $this->assertFalse($ids->contains($hidden->id));
     }
+
+    /**
+     * @return void
+     */
+    public function test_email_lookup_returns_visible_person_with_matching_email()
+    {
+        $city = City::factory()->create();
+        $requester = User::factory()->create();
+        $requester->cities()->attach($city->id);
+
+        $visible = User::factory()->create(['email' => 'anna@example.test']);
+        $visible->cityScopes()->attach(City::factory()->create()->id);
+        $alreadyAvailable = User::factory()->create(['email' => 'already@example.test']);
+        $alreadyAvailable->cityScopes()->attach($city->id);
+
+        $response = $this->actingAs($requester, 'api')
+            ->postJson(route('api.people.email'), ['email' => 'ANNA@EXAMPLE.TEST']);
+
+        $response->assertOk()
+            ->assertJsonPath('person.id', $visible->id)
+            ->assertJsonPath('person.email', 'anna@example.test');
+
+        $this->actingAs($requester, 'api')
+            ->postJson(route('api.people.email'), ['email' => 'already@example.test'])
+            ->assertOk()
+            ->assertJsonPath('person', null);
+    }
 }

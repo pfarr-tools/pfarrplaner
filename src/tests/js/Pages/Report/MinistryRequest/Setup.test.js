@@ -21,15 +21,19 @@ const stubs = {
     NavButton: { template: '<button><slot /></button>' },
 }
 
-function mountSetup() {
-    const post = vi.fn(() => Promise.resolve({ data: [] }))
+function mountSetup({ users: setupUsers = users, postResponse } = {}) {
+    const post = vi.fn((url) =>
+        Promise.resolve({
+            data: url === '/api.people.email' ? postResponse || { person: null } : [],
+        }),
+    )
     const inertiaPost = vi.fn()
     const wrapper = mount(Setup, {
         props: {
             cities,
             ministries: { P: 'Pfarrer/in' },
             locations: [],
-            users,
+            users: setupUsers,
             teams: {},
         },
         global: {
@@ -59,17 +63,68 @@ describe('Ministry request setup', () => {
         expect(request.city).toBeUndefined()
     })
 
-    it('includes the selected recipient email address when sending', () => {
+    it('includes the selected recipient email address when sending', async () => {
         const { wrapper, inertiaPost } = mountSetup()
         wrapper.vm.recipients = [{ id: 2, name: 'Empfänger' }]
         wrapper.vm.services = [{ id: 10, checked: true }]
         wrapper.vm.myMinistry = 'P'
 
-        wrapper.vm.sendMessage()
+        await wrapper.vm.sendMessage()
 
         expect(inertiaPost).toHaveBeenCalledWith('/reports.render', expect.objectContaining({
             recipients: [2],
             address: { 2: 'empfaenger@example.test' },
+        }))
+    })
+
+    it('uses the existing person when an entered address is already assigned', async () => {
+        const existingPerson = { id: 3, name: 'Vorhandene Person', email: 'vorhanden@example.test' }
+        const { wrapper, inertiaPost } = mountSetup({
+            users: [{ id: 2, name: 'Empfänger', email: '' }],
+            postResponse: { person: existingPerson },
+        })
+        window.prompt = vi.fn(() => existingPerson.email)
+        window.confirm.mockReturnValue(true)
+        wrapper.vm.recipients = [{ id: 2, name: 'Empfänger' }]
+        wrapper.vm.services = [{ id: 10, checked: true }]
+        wrapper.vm.myMinistry = 'P'
+
+        await wrapper.vm.sendMessage()
+
+        expect(inertiaPost).toHaveBeenCalledWith('/reports.render', expect.objectContaining({
+            recipients: [existingPerson.id],
+            address: { [existingPerson.id]: existingPerson.email },
+        }))
+    })
+
+    it('asks for another address when a duplicate is rejected', async () => {
+        const { wrapper, post, inertiaPost } = mountSetup({
+            users: [{ id: 2, name: 'Empfänger', email: '' }],
+            postResponse: { person: { id: 3, name: 'Vorhandene Person', email: 'vorhanden@example.test' } },
+        })
+        let emailChecks = 0
+        post.mockImplementation((url) =>
+            Promise.resolve({
+                data:
+                    url === '/api.people.email'
+                        ? { person: emailChecks++ === 0 ? { id: 3, name: 'Vorhandene Person', email: 'vorhanden@example.test' } : null }
+                        : [],
+            }),
+        )
+        window.prompt = vi
+            .fn()
+            .mockReturnValueOnce('vorhanden@example.test')
+            .mockReturnValueOnce('neu@example.test')
+        window.confirm.mockReturnValue(false)
+        wrapper.vm.recipients = [{ id: 2, name: 'Empfänger' }]
+        wrapper.vm.services = [{ id: 10, checked: true }]
+        wrapper.vm.myMinistry = 'P'
+
+        await wrapper.vm.sendMessage()
+
+        expect(inertiaPost).toHaveBeenCalledWith('/reports.render', expect.objectContaining({
+            recipients: [2],
+            address: { 2: 'neu@example.test' },
         }))
     })
 

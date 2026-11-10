@@ -282,6 +282,9 @@ Felder:
 Beim Laden erscheinen Hinweise wie **Mitarbeiterliste wird geladen...** oder **Gottesdienstliste wird geladen...**.
 
 Wenn eine ausgewählte Person keine E-Mail-Adresse hat, fragt Pfarrplaner beim Senden nach einer Adresse.
+Wenn diese Adresse bereits zu einer anderen übernehmbaren Person gehört, warnt
+Pfarrplaner. Wählen Sie dann **Diese vorhandene Person verwenden**, oder
+brechen Sie die Warnung ab und geben Sie eine andere E-Mailadresse ein.
 
 ---
 
