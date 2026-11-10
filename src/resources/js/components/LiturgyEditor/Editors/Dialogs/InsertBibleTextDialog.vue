@@ -73,7 +73,7 @@ export default {
             if (baptism.text) textSources['Taufspruch ' + baptism.candidate_name] = baptism.text
         })
         this.service.funerals.forEach((funeral) => {
-            if (funeral.text) textSources['Beerdigungstext ' + funeral.buried_name] = funeral.text
+            if (funeral.text) textSources['Sterbefalltext ' + funeral.buried_name] = funeral.text
             if (funeral.confirmation_text)
                 textSources['Denkspruch ' + funeral.buried_name] = funeral.confirmation_text
             if (funeral.wedding_text)
