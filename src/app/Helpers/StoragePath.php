@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\Storage;
 class StoragePath
 {
     /**
+     * Return the cache pathname for a materialized storage object.
+     */
+    public static function cachePath(string $path): string
+    {
+        return storage_path('framework/cache/'.sha1($path));
+    }
+
+    /**
      * Return a local pathname for a stored object, materializing remote disks
      * into the framework cache when necessary.
      */
@@ -26,11 +34,7 @@ class StoragePath
                 return $localPath;
             }
         }
-        $cacheDirectory = storage_path('framework/cache/storage-paths');
-        if (! is_dir($cacheDirectory)) {
-            mkdir($cacheDirectory, 0775, true);
-        }
-        $localPath = $cacheDirectory.'/'.sha1($path);
+        $localPath = self::cachePath($path);
         if (! is_file($localPath)) {
             file_put_contents($localPath, $disk->get($path), LOCK_EX);
         }

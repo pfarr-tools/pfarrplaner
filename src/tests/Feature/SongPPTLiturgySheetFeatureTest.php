@@ -226,6 +226,16 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
         ], $sheet->titleSlideDataForTest(Service::factory()->make()));
     }
 
+    public function test_materialized_storage_path_uses_shared_framework_cache(): void
+    {
+        $path = 'attachments/title-slide.jpg';
+
+        $this->assertSame(
+            storage_path('framework/cache/'.sha1($path)),
+            StoragePath::cachePath($path)
+        );
+    }
+
     protected function fakeAdEvent(int $id): object
     {
         $service = new class($id)
