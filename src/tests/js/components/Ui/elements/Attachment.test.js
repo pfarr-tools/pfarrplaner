@@ -21,7 +21,10 @@ describe('Attachment', () => {
     })
     it('shows delete button when allowDelete=true', () => {
         const w = mount(Attachment, { props: { attachment: att, allowDelete: true } })
-        expect(w.find('button[title="Anhang löschen"]').exists()).toBe(true)
+        const button = w.find('button[title="Anhang löschen"]')
+
+        expect(button.exists()).toBe(true)
+        expect(button.attributes('type')).toBe('button')
     })
     it('hides delete button when allowDelete=false', () => {
         const w = mount(Attachment, { props: { attachment: att, allowDelete: false } })

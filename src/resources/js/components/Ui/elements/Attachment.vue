@@ -55,6 +55,7 @@
         <div class="attachment-actions">
             <button
                 v-if="allowDelete"
+                type="button"
                 class="btn btn-sm btn-outline-danger"
                 title="Anhang löschen"
                 @click.prevent.stop="deleteAttachment($event)"
