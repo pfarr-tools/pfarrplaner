@@ -135,7 +135,9 @@
                         v-model="myConfig.titleSlideAttachmentId"
                     />
                     <form-file-uploader
+                        v-if="!titleSlideAttachments.length"
                         title="Titelfolie"
+                        single
                         :upload-route="route('service.attach', service.slug)"
                         chunk-upload-route="/api/attachment-uploads"
                         :chunk-target="{
@@ -149,6 +151,10 @@
                     <attachment-list
                         :model-value="titleSlideAttachments"
                         :prevent-empty-list-message="true"
+                        delete-route-name="service.detach"
+                        parent-type="service"
+                        :parent-object="service"
+                        @update:model-value="setTitleSlideAttachment"
                     />
                 </template>
                 <form-check
@@ -320,7 +326,15 @@ export default {
         /** Store the uploaded title-slide attachment in the export configuration. */
         setTitleSlideAttachment(attachments) {
             const attachment = (attachments || []).find((item) => item.cut === 'ppt-title-slide')
-            if (!attachment) return
+            if (!attachment) {
+                this.myConfig.titleSlideAttachmentId = null
+                this.service.attachments = attachments?.length
+                    ? attachments
+                    : (this.service.attachments || []).filter(
+                          (item) => item.cut !== 'ppt-title-slide',
+                      )
+                return
+            }
             this.myConfig.titleSlideAttachmentId = attachment.id
             this.service.attachments = [
                 ...(this.service.attachments || []).filter(

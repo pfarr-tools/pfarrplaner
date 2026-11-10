@@ -30,6 +30,7 @@
                     >
                 </label>
                 <label
+                    v-if="allowFreeCrop"
                     class="target-option"
                     :class="{ active: isFreeCropSelected }"
                 >
@@ -218,6 +219,7 @@ export default {
         preset: { type: Object, default: null },
         presets: { type: Array, default: () => [] },
         initialTransform: { type: Object, default: null },
+        allowFreeCrop: { type: Boolean, default: true },
     },
     data() {
         const initialKey = this.preset?.cut || 'free'
@@ -227,7 +229,7 @@ export default {
             imageReady: false,
             sourceImage: null,
             selectedTargets: this.preset?.cut ? [this.preset.cut] : [],
-            isFreeCropSelected: !this.preset?.cut && !this.presets.length,
+            isFreeCropSelected: this.allowFreeCrop && !this.preset?.cut && !this.presets.length,
             activeTargetKey: initialKey,
             targetStates: { [initialKey]: this.createState(this.initialTransform) },
             dragState: null,
@@ -241,7 +243,7 @@ export default {
                     return preset ? { key: cut, label: preset.title, preset } : null
                 })
                 .filter(Boolean)
-            if (this.isFreeCropSelected)
+            if (this.allowFreeCrop && this.isFreeCropSelected)
                 targets.push({ key: 'free', label: 'Freier Zuschnitt', preset: null })
             return targets
         },

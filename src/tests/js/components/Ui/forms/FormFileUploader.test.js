@@ -34,6 +34,27 @@ describe('FormFileUploader', () => {
         expect(wrapper.emitted('input')).toEqual([[[{ id: 1, title: 'Foto' }]]])
     })
 
+    it('starts a single-file upload as soon as its details are applied', async () => {
+        const wrapper = mount(FormFileUploader, {
+            props: { uploadRoute: '/attachments', single: true },
+            global: {
+                stubs: {
+                    'form-file-upload': { template: '<div />' },
+                    modal: { template: '<div><slot /></div>' },
+                    'attachment-image-editor': true,
+                },
+                mocks: { $api: () => window.axios },
+            },
+        })
+
+        wrapper.vm.addFile(makeFile())
+        await wrapper.vm.applyFileDetails()
+        await flushPromises()
+
+        expect(window.axios.post).toHaveBeenCalledTimes(1)
+        expect(wrapper.find('.upload-queue-actions').exists()).toBe(false)
+    })
+
     it('downloads URL sources locally before adding them to the queue', async () => {
         const blob = new Blob(['image'], { type: 'image/jpeg' })
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ blob: () => Promise.resolve(blob) }))

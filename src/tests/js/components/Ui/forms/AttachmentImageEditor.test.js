@@ -18,10 +18,14 @@ describe('AttachmentImageEditor', () => {
         const wrapper = mountEditor()
         wrapper.vm.currentState.zoom = 1
 
-        await wrapper.find('.editor-stage').element.dispatchEvent(new WheelEvent('wheel', {ctrlKey: true, deltaY: 100}))
-        expect(wrapper.vm.currentState.zoom).toBeCloseTo(.9)
+        await wrapper
+            .find('.editor-stage')
+            .element.dispatchEvent(new WheelEvent('wheel', { ctrlKey: true, deltaY: 100 }))
+        expect(wrapper.vm.currentState.zoom).toBeCloseTo(0.9)
 
-        await wrapper.find('.editor-stage').element.dispatchEvent(new WheelEvent('wheel', {ctrlKey: true, deltaY: -100}))
+        await wrapper
+            .find('.editor-stage')
+            .element.dispatchEvent(new WheelEvent('wheel', { ctrlKey: true, deltaY: -100 }))
         await wrapper.vm.$nextTick()
         expect(wrapper.vm.currentState.zoom).toBeCloseTo(1)
     })
@@ -49,13 +53,32 @@ describe('AttachmentImageEditor', () => {
         wrapper.vm.selectedTargets = ['wide', 'portrait']
         wrapper.vm.selectTarget('wide')
 
-        expect(wrapper.vm.activeTargets.map(target => target.key)).toEqual(['wide', 'portrait'])
+        expect(wrapper.vm.activeTargets.map((target) => target.key)).toEqual(['wide', 'portrait'])
         expect(wrapper.findAll('.target-option')).toHaveLength(3)
+    })
+
+    it('can hide the free crop target when a fixed crop is required', () => {
+        const preset = {
+            cut: 'wide',
+            title: 'Breit',
+            width: 1200,
+            height: 630,
+        }
+        const wrapper = mountEditor({
+            preset,
+            presets: [preset],
+            allowFreeCrop: false,
+        })
+
+        expect(wrapper.text()).not.toContain('Freier Zuschnitt')
+        expect(wrapper.findAll('.target-option')).toHaveLength(1)
     })
 
     it('renders a local file with the requested name', async () => {
         const wrapper = mountEditor()
-        const canvas = { toBlob: callback => callback(new Blob(['cropped'], { type: 'image/jpeg' })) }
+        const canvas = {
+            toBlob: (callback) => callback(new Blob(['cropped'], { type: 'image/jpeg' })),
+        }
 
         const output = await wrapper.vm.renderFile(canvas, 'wide')
 

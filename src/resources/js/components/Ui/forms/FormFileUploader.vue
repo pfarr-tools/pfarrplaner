@@ -52,7 +52,7 @@
                 @upload-url="uploadUrl"
                 @upload-inbox="uploadInbox"
                 @drop.stop
-                multiple="1"
+                :multiple="!single"
                 :key="updateUploader"
                 :no-camera="noCamera"
                 :no-description="noDescription"
@@ -162,7 +162,10 @@
                     ></span>
                 </button>
             </div>
-            <div class="upload-queue-actions">
+            <div
+                v-if="!single"
+                class="upload-queue-actions"
+            >
                 <button
                     type="button"
                     class="btn btn-primary"
@@ -207,6 +210,7 @@
                 :height="editingItem.preset?.height || height"
                 :preset="editingItem.preset"
                 :presets="presets"
+                :allow-free-crop="!single"
                 :initial-transform="editingItem.transform"
                 @apply="applyEditorResult"
                 @cancel="cancelEditing"
@@ -276,6 +280,7 @@ export default {
         'noSourceTabs',
         'cut',
         'helpText',
+        'single',
     ],
     data() {
         let canvasSettings = this.cropperCanvas || {}
@@ -393,13 +398,14 @@ export default {
             this.openNextEditor()
         },
         /** Finish the metadata dialog for a non-image file. */
-        applyFileDetails() {
+        async applyFileDetails() {
             if (!this.editingItem) return
             this.editingItem.status = 'ready'
             this.editingItem.error = null
             this.editingItem.progress = 0
             this.editingItem = null
             this.openNextEditor()
+            if (this.single) await this.uploadAll()
         },
         duplicate(item, metadata = {}) {
             const duplicate = duplicateUploadItem(item, metadata)
@@ -450,6 +456,7 @@ export default {
             this.editingItem = null
             this.$emit('queue-change', this.queue.length)
             this.openNextEditor()
+            if (this.single) this.uploadAll()
         },
         retry(item) {
             item.status = 'ready'

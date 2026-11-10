@@ -246,6 +246,7 @@
                             hier hochladen:
                         </p>
                         <form-file-uploader
+                            single
                             :parent="myBaptism"
                             :upload-route="route('baptism.attach', this.myBaptism.id)"
                             title="Anmeldeformular"
