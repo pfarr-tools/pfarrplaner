@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.20.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.19.0...v2026.20.0) (2026-11-10)
+
+
+### Features
+
+* **ci:** Release-Builds in GitHub Actions ausführen ([e1dda51](https://github.com/pfarr-tools/pfarrplaner/commit/e1dda51a659c1a12cd71ad53e5bf5d5c886209f7)), closes [#30](https://github.com/pfarr-tools/pfarrplaner/issues/30)
+* **ftp:** FTP-Inbox für die Ablage ergänzen ([fafe880](https://github.com/pfarr-tools/pfarrplaner/commit/fafe880fb9d91003003e5876453438548a859597))
+* **presentation:** Titelfolien-Defaults aus Gottesdienstdaten setzen. Fixes [#53](https://github.com/pfarr-tools/pfarrplaner/issues/53) ([d4e6708](https://github.com/pfarr-tools/pfarrplaner/commit/d4e6708a4a023347df80e3f41246d45c775c404c))
+
+
+### Bug Fixes
+
+* Leere Liedauswahl speichern. ([69564e9](https://github.com/pfarr-tools/pfarrplaner/commit/69564e95853a8ca1b8f598c24d93666e5d586203)), closes [#52](https://github.com/pfarr-tools/pfarrplaner/issues/52)
+* **liturgie:** ODP-Transparenz für Titelfolien wiederherstellen. Fixes [#53](https://github.com/pfarr-tools/pfarrplaner/issues/53) ([54bfcfb](https://github.com/pfarr-tools/pfarrplaner/commit/54bfcfbaba55b81f615c3b4fd87bd901d854e4ef))
+* **liturgie:** Titelfolien zwischen Elementen konfigurieren. Fixes [#53](https://github.com/pfarr-tools/pfarrplaner/issues/53) ([196a094](https://github.com/pfarr-tools/pfarrplaner/commit/196a0947ba4a07ead71fc8404149514035fc7152))
+* **liturgie:** Titelfolienbild anzeigen und Vorlage nachbilden. Fixes [#53](https://github.com/pfarr-tools/pfarrplaner/issues/53) ([3d319bf](https://github.com/pfarr-tools/pfarrplaner/commit/3d319bf0e0b72cc41b34bed6f1d48db3b0684d91))
+* **mail:** DKIM-Verzeichnis für OpenDKIM zugänglich machen. ([a248741](https://github.com/pfarr-tools/pfarrplaner/commit/a2487410d1cb6e60295e71a262313c26a5ec7e80)), closes [#57](https://github.com/pfarr-tools/pfarrplaner/issues/57)
+* **migration:** Tablespaces beim Legacy-Dump überspringen. ([39168fc](https://github.com/pfarr-tools/pfarrplaner/commit/39168fc6292c8c4c5fc082c224da8f1d6af020f1)), closes [#50](https://github.com/pfarr-tools/pfarrplaner/issues/50)
+* **people:** Doppelte E-Mailadressen beim Anlegen abfangen. Fixes [#58](https://github.com/pfarr-tools/pfarrplaner/issues/58) ([5191b47](https://github.com/pfarr-tools/pfarrplaner/commit/5191b476015e3d2e5cdad7817d85ef4fbe2b90fb))
+* PeopleSelect-Suche ohne globale Create-Prüfung erlauben. ([2d43ef3](https://github.com/pfarr-tools/pfarrplaner/commit/2d43ef3761cbb97c9d62d5099846a8f22f3a72e9)), closes [#55](https://github.com/pfarr-tools/pfarrplaner/issues/55)
+* **people:** Vorhandene E-Mailadressen gemeindeübergreifend erkennen. Fixes [#58](https://github.com/pfarr-tools/pfarrplaner/issues/58) ([500d5f8](https://github.com/pfarr-tools/pfarrplaner/commit/500d5f890d02e68730e5d5f60b2c68dd852f8ef1))
+* Quellenangabe im Bestattungs-Bekanntgabetext ergänzen. ([f6ebb98](https://github.com/pfarr-tools/pfarrplaner/commit/f6ebb981d99c61e1851456f591f768e174c960f8)), closes [#54](https://github.com/pfarr-tools/pfarrplaner/issues/54)
+* Sterbefalltext in Textquellen umbenennen. ([3d7df02](https://github.com/pfarr-tools/pfarrplaner/commit/3d7df025b6ff41c5be8c08486334673a44736228)), closes [#54](https://github.com/pfarr-tools/pfarrplaner/issues/54)
+* **storage:** Gemeinsamen Cache-Pfad für Speicherdateien verwenden. Fixes [#53](https://github.com/pfarr-tools/pfarrplaner/issues/53) ([5a8ff96](https://github.com/pfarr-tools/pfarrplaner/commit/5a8ff969f15365e8d4743bdc0c0081e749c0daa7))
+* Textbausteine im Liturgieeditor anzeigen. ([6ba440e](https://github.com/pfarr-tools/pfarrplaner/commit/6ba440ee135fa5000747f4c231255f722e424b0c)), closes [#56](https://github.com/pfarr-tools/pfarrplaner/issues/56)
+* Titelfolie für Präsentationen ergänzen. ([3c2e0a7](https://github.com/pfarr-tools/pfarrplaner/commit/3c2e0a7738ac5db7ba2d004a9235499b4fe681e5)), closes [#53](https://github.com/pfarr-tools/pfarrplaner/issues/53)
+* **upload:** Einzeldatei-Modus als Boolean übergeben. Fixes [#53](https://github.com/pfarr-tools/pfarrplaner/issues/53) ([4e7e91b](https://github.com/pfarr-tools/pfarrplaner/commit/4e7e91b1bc38a18578ae6273cc8ee9345e39f9c4))
+* **upload:** Einzeldatei-Uploads automatisch abschließen. Fixes [#53](https://github.com/pfarr-tools/pfarrplaner/issues/53) ([46d9923](https://github.com/pfarr-tools/pfarrplaner/commit/46d99238e587fe81122e1d02e99e6135cf2850a3))
+* **upload:** Löschen von Anhängen ohne Formularsubmit ausführen. Fixes [#53](https://github.com/pfarr-tools/pfarrplaner/issues/53) ([4027d56](https://github.com/pfarr-tools/pfarrplaner/commit/4027d5636bca06e88971de7317704619f0803d67))
+* **upload:** Service-Anhänge über den Slug löschen. Fixes [#53](https://github.com/pfarr-tools/pfarrplaner/issues/53) ([a3cfa6b](https://github.com/pfarr-tools/pfarrplaner/commit/a3cfa6b64e8fae3356942c340443ce7af0b4ed20))
+* Werbung für andere Veranstaltungen anzeigen. ([df107ee](https://github.com/pfarr-tools/pfarrplaner/commit/df107ee4e1cf9e2c80736c7bc5624aeb6f92683b)), closes [#51](https://github.com/pfarr-tools/pfarrplaner/issues/51)
+
 ## [2026.19.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.18.11...v2026.19.0) (2026-11-09)
 
 
