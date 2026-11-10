@@ -321,9 +321,34 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 ->setHeight(540);
         }
 
-        $this->createTextBox($slide, 10.6, $data['title'], new Color('FFFFFFFF'), 0, 28, true, Alignment::HORIZONTAL_CENTER);
+        $overlay = $slide->createRichTextShape()
+            ->setOffsetX(0)
+            ->setOffsetY(PPTUnitsHelper::convert(10.6, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL))
+            ->setWidth(960)
+            ->setHeight(PPTUnitsHelper::convert(2.6, PPTUnitsHelper::UNIT_CENTIMETER, PPTUnitsHelper::UNIT_PIXEL));
+        $overlay->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->setStartColor(new Color('D9FFFFFF'))
+            ->setEndColor(new Color('D9FFFFFF'));
+        $overlay->getBorder()->setLineStyle(Border::LINE_NONE);
+
+        $textColor = new Color('FF000000');
+        $titleParagraph = $overlay->getActiveParagraph();
+        $titleParagraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $titleParagraph->createTextRun($data['title'])->getFont()
+            ->setBold(true)
+            ->setSize(28)
+            ->setColor($textColor)
+            ->setName('Calibri');
+
         if ($data['subtitle'] !== '') {
-            $this->createTextBox($slide, 12.8, $data['subtitle'], new Color('FFFFFFFF'), 0, 26, false, Alignment::HORIZONTAL_CENTER);
+            $subtitleParagraph = $overlay->createParagraph();
+            $subtitleParagraph->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $subtitleParagraph->createTextRun($data['subtitle'])->getFont()
+                ->setBold(false)
+                ->setSize(26)
+                ->setColor($textColor)
+                ->setName('Calibri');
         }
     }
 

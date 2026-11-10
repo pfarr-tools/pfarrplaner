@@ -334,8 +334,9 @@ export default {
                 item.previewUrl = this.previewUrl(item.file)
                 item.status = 'editing'
                 if (this.title) item.title = this.title
-                item.preset = metadata.preset || null
-                item.cut = metadata.preset?.cut || metadata.cut || null
+                item.preset =
+                    metadata.preset || (this.presets?.length === 1 ? this.presets[0] : null)
+                item.cut = item.preset?.cut || metadata.cut || null
             })
             this.queue.push(...newItems)
             this.$emit('queue-change', this.queue.length)

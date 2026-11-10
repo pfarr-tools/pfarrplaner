@@ -142,10 +142,13 @@
                             target_type: 'App\\Models\\Service',
                             target_id: service.id,
                         }"
+                        :presets="[titleSlidePreset]"
                         cut="ppt-title-slide"
-                        :width="1920"
-                        :height="1080"
                         @update:model-value="setTitleSlideAttachment"
+                    />
+                    <attachment-list
+                        :model-value="titleSlideAttachments"
+                        :prevent-empty-list-message="true"
                     />
                 </template>
                 <form-check
@@ -238,6 +241,7 @@ import FormCheck from '../../Ui/forms/FormCheck'
 import FormSelectize from '../../Ui/forms/FormSelectize'
 import FormInput from '../../Ui/forms/FormInput'
 import FormFileUploader from '../../Ui/forms/FormFileUploader.vue'
+import AttachmentList from '../../Ui/elements/AttachmentList.vue'
 import Tabs from '../../Ui/tabs/tabs'
 import Tab from '../../Ui/tabs/tab'
 import TabHeaders from '../../Ui/tabs/tabHeaders'
@@ -251,6 +255,7 @@ export default {
         Tabs,
         FormInput,
         FormFileUploader,
+        AttachmentList,
         FormSelectize,
         FormCheck,
         LiturgySheetConfigurationForm,
@@ -296,11 +301,33 @@ export default {
             ],
         }
     },
+    computed: {
+        titleSlideAttachments() {
+            return (this.service.attachments || []).filter(
+                (attachment) => attachment.cut === 'ppt-title-slide',
+            )
+        },
+        titleSlidePreset() {
+            return {
+                title: 'Titelfolie (16:9)',
+                cut: 'ppt-title-slide',
+                width: 1920,
+                height: 1080,
+            }
+        },
+    },
     methods: {
         /** Store the uploaded title-slide attachment in the export configuration. */
         setTitleSlideAttachment(attachments) {
             const attachment = (attachments || []).find((item) => item.cut === 'ppt-title-slide')
-            if (attachment) this.myConfig.titleSlideAttachmentId = attachment.id
+            if (!attachment) return
+            this.myConfig.titleSlideAttachmentId = attachment.id
+            this.service.attachments = [
+                ...(this.service.attachments || []).filter(
+                    (item) => item.cut !== 'ppt-title-slide',
+                ),
+                attachment,
+            ]
         },
     },
 }
