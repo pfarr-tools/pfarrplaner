@@ -29,6 +29,8 @@ class ServiceEditorFeatureTest extends AbstractPageLoadTest
 {
     protected Service $service;
 
+    protected Service $event;
+
     protected Sermon $sermon;
 
     protected City $city;
@@ -61,6 +63,12 @@ class ServiceEditorFeatureTest extends AbstractPageLoadTest
         ]);
         $this->sermon = Sermon::create(['title' => 'Testpredigt']);
         $this->service->update(['sermon_id' => $this->sermon->id]);
+
+        $this->event = Service::factory()->create([
+            'city_id' => $this->city->id,
+            'event_class' => 'event',
+            'title' => 'Kirchenchorprobe',
+        ]);
     }
 
     public function test_service_editor_renders_form(): void
@@ -69,6 +77,16 @@ class ServiceEditorFeatureTest extends AbstractPageLoadTest
             $browser->loginAs($this->superAdminUser, 'web')
                 ->visit(new ServiceEditorPage($this->service->slug))
                 ->assertPresent('#serviceEditorForm');
+        });
+    }
+
+    public function test_advertising_link_is_available_for_other_events(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->loginAs($this->superAdminUser, 'web')
+                ->visit(new ServiceEditorPage($this->event->slug))
+                ->waitFor('a[title="Werbung bearbeiten"]', 10)
+                ->assertPresent('a[title="Werbung bearbeiten"]');
         });
     }
 

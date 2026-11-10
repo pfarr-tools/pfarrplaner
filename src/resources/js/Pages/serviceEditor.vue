@@ -104,15 +104,15 @@
                         <span class="mdi mdi-microphone me-1"></span>
                         <span class="d-none d-xl-inline">Predigt</span>
                     </inertia-link>
-                    <inertia-link
-                        class="btn btn-outline-secondary"
-                        :href="route('service.ads', service.slug)"
-                        title="Werbung bearbeiten"
-                    >
-                        <span class="mdi mdi-bullhorn me-1"></span>
-                        <span class="d-none d-xl-inline">Werbung</span>
-                    </inertia-link>
                 </div>
+                <inertia-link
+                    class="btn btn-outline-secondary"
+                    :href="route('service.ads', service.slug)"
+                    title="Werbung bearbeiten"
+                >
+                    <span class="mdi mdi-bullhorn me-1"></span>
+                    <span class="d-none d-xl-inline">Werbung</span>
+                </inertia-link>
 
                 <div class="ms-1 dropdown show">
                     <button
