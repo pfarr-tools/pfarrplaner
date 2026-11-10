@@ -49,7 +49,7 @@ describe('getTextSources()', () => {
     })
     it('adds funeral burial text', () => {
         const svc = makeService({ funerals: [{ text: 'Ps 23', confirmation_text: null, wedding_text: null, buried_name: 'Müller' }] })
-        expect(getTextSources(svc)['Sterbefalltext Müller']).toBe('Ps 23')
+        expect(getTextSources(svc)['Beerdigungstext Müller']).toBe('Ps 23')
     })
     it('adds funeral confirmation text', () => {
         const svc = makeService({ funerals: [{ text: null, confirmation_text: 'Joh 11,25', wedding_text: null, buried_name: 'Müller' }] })
