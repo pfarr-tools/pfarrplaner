@@ -1017,6 +1017,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $objWriter->save($tempFile);
 
         $patchFile = ODP::fromFile($tempFile);
+        $patchFile->applyTitleSlideTransparencyFix();
         $patchFile->applyTextEntityDecodingFix();
         $patchFile->applySlideNameFix($this->slideNames);
         $patchFile->injectBasicMacroFromBas(

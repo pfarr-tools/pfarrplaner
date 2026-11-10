@@ -375,6 +375,52 @@ class ODP extends AbstractZIPBasedFileFormat
     }
 
     /**
+     * Preserve the title-slide overlay transparency lost by PHPPresentation's ODP writer.
+     */
+    public function applyTitleSlideTransparencyFix(): void
+    {
+        $this->zip->open($this->documentFilePath);
+
+        $this->patchXMLFile('content.xml', function (DOMDocument $doc) {
+            $drawNamespace = 'urn:oasis:names:tc:opendocument:xmlns:drawing:1.0';
+            $styleNamespace = 'urn:oasis:names:tc:opendocument:xmlns:style:1.0';
+            $svgNamespace = 'urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0';
+
+            $xpath = new DOMXPath($doc);
+            $xpath->registerNamespace('draw', $drawNamespace);
+            $xpath->registerNamespace('style', $styleNamespace);
+            $xpath->registerNamespace('svg', $svgNamespace);
+
+            foreach ($xpath->query('//draw:frame[@svg:y]') as $frame) {
+                /** @var DOMElement $frame */
+                $y = (float) str_replace('cm', '', $frame->getAttributeNS($svgNamespace, 'y'));
+                if (abs($y - 10.61) > 0.01) {
+                    continue;
+                }
+
+                $styleName = $frame->getAttributeNS($drawNamespace, 'style-name');
+                if ($styleName === '') {
+                    continue;
+                }
+
+                $style = $xpath->query('//style:style[@style:name='.json_encode($styleName).']')->item(0);
+                if (! $style instanceof DOMElement) {
+                    continue;
+                }
+
+                $graphicProperties = $xpath->query('./style:graphic-properties', $style)->item(0);
+                if (! $graphicProperties instanceof DOMElement) {
+                    continue;
+                }
+
+                $graphicProperties->setAttributeNS($drawNamespace, 'draw:opacity', '85%');
+            }
+        });
+
+        $this->zip->close();
+    }
+
+    /**
      * Decode HTML entities in ODP body text so LibreOffice shows Unicode characters instead of entity strings.
      */
     public function applyTextEntityDecodingFix(): void
