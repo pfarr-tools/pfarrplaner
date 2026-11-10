@@ -138,7 +138,7 @@
                     <form-file-uploader
                         v-if="!titleSlideAttachments.length"
                         title="Titelfolie"
-                        single
+                        :single="true"
                         :upload-route="route('service.attach', service.slug)"
                         chunk-upload-route="/api/attachment-uploads"
                         :chunk-target="{

@@ -305,7 +305,7 @@
                             hier hochladen:
                         </p>
                         <form-file-uploader
-                            single
+                            :single="true"
                             :parent="myWedding"
                             :upload-route="route('wedding.attach', this.myWedding.id)"
                             title="Anmeldeformular"
