@@ -119,6 +119,7 @@ class PeopleSelectApiFeatureTest extends TestCase
         $this->actingAs($requester, 'api')
             ->postJson(route('api.people.email'), ['email' => 'already@example.test'])
             ->assertOk()
-            ->assertJsonPath('person', null);
+            ->assertJsonPath('person.id', $alreadyAvailable->id)
+            ->assertJsonPath('person.email', 'already@example.test');
     }
 }

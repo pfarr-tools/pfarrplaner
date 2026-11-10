@@ -12,8 +12,9 @@ verwenden oder eine andere E-Mailadresse einzugeben.
 - Die Prüfung erfolgt nur beim Anlegen über `PeopleSelect`.
 - Bestehende Namenssuche, Gemeinde-Sichtbarkeit und Übernahme aus einer
   anderen Kirchengemeinde bleiben erhalten.
-- Die E-Mailprüfung gibt nur Personen zurück, die für die anfragende Person
-  sichtbar sind.
+- Die E-Mailprüfung erkennt jede bereits verwendete Adresse, damit auch
+  Personen aus der aktuellen Gemeinde als vorhandene Personen angeboten
+  werden.
 - Andere Benutzerverwaltungswege und bereits vorhandene doppelte Adressen
   werden nicht automatisch verändert.
 
@@ -34,8 +35,8 @@ bleibt der bisherige Speichervorgang unverändert.
 - Eine reine Suche im bereits geladenen Frontend-Array wäre unvollständig,
   weil dort nicht alle sichtbaren oder neu aktivierten Personen enthalten sein
   müssen.
-- Der dedizierte, serverseitig sichtbarkeitsgeprüfte Endpunkt ist deshalb die
-  passende Lösung für die bestehende Architektur.
+- Der dedizierte, serverseitige Endpunkt ist deshalb die passende Lösung für
+  die bestehende Architektur und prüft jede bereits verwendete Adresse.
 
 ## Prüfung
 

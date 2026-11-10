@@ -99,8 +99,7 @@ class UserController extends Controller
     }
 
     /**
-     * Find a person with a matching email address that can be added to the
-     * requester's current city scope.
+     * Find a person with a matching email address.
      *
      * @param  Request  $request  Request containing the email address.
      * @return JsonResponse Matching person or null.
@@ -113,9 +112,6 @@ class UserController extends Controller
 
         $person = User::with('cityScopes')
             ->whereRaw('LOWER(email) = LOWER(?)', [$validated['email']])
-            ->whereDoesntHave('cityScopes', function ($q) {
-                return $q->whereIn('city_id', Auth::user()->cities->pluck('id'));
-            })
             ->first();
 
         return response()->json(['person' => $person]);
@@ -135,7 +131,7 @@ class UserController extends Controller
             || Auth::user()->hasRole(AuthServiceProvider::SUPER),
             403
         );
-        $user->cityScopes()->attach($city->id);
+        $user->cityScopes()->syncWithoutDetaching([$city->id]);
 
         return response()->json(true);
     }

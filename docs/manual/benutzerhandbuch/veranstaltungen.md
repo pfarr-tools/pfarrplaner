@@ -144,8 +144,8 @@ Hier tragen Sie alle Personen ein, die am Gottesdienst mitwirken.
 > **Hinweis:** Nur Personen, die im System als Benutzer registriert sind, können ausgewählt werden.
 
 Wenn Sie über das Personenfeld eine neue Person anlegen und deren
-E-Mailadresse bereits zu einer Person in einer anderen sichtbaren
-Kirchengemeinde gehört, warnt Pfarrplaner vor einem doppelten Eintrag. Wählen
+E-Mailadresse bereits zu einer Person gehört, warnt Pfarrplaner vor einem
+doppelten Eintrag. Wählen
 Sie **Diese Person verwenden**, um die vorhandene Person zu übernehmen, oder
 **Andere E-Mailadresse eingeben**, wenn es sich tatsächlich um eine andere
 Person handelt. Ohne E-Mailadresse oder bei einer noch nicht verwendeten
