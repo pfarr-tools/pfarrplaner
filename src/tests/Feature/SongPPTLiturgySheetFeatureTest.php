@@ -13,11 +13,15 @@
 
 namespace Tests\Feature;
 
+use App\Helpers\StoragePath;
 use App\Liturgy\LiturgySheets\SongPPTLiturgySheet;
+use App\Models\Attachment;
+use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Tests\TestCase;
 
+/** Regression tests for configurable PowerPoint/ODP separator slides. */
 class SongPPTLiturgySheetFeatureTest extends TestCase
 {
     public function test_long_event_lists_are_split_across_multiple_slides(): void
@@ -138,6 +142,88 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
 
         $this->assertCount(1, $filteredPages['2026-05-24']);
         $this->assertSame([1, 2], $filteredPages['2026-05-24'][0]->pluck('id')->all());
+    }
+
+    public function test_separator_slide_configuration_defaults_to_empty_slides(): void
+    {
+        $sheet = new SongPPTLiturgySheet;
+
+        $this->assertSame('empty', $sheet->getConfiguration()['slideBetweenElements']);
+    }
+
+    public function test_separator_slide_configuration_accepts_all_modes(): void
+    {
+        $sheet = new class extends SongPPTLiturgySheet
+        {
+            public function separatorModeForTest(): string
+            {
+                return $this->getInterElementSlideMode();
+            }
+        };
+
+        foreach (['none', 'empty', 'title'] as $mode) {
+            $sheet->setConfiguration(['slideBetweenElements' => $mode]);
+
+            $this->assertSame($mode, $sheet->separatorModeForTest());
+        }
+    }
+
+    public function test_title_slide_data_uses_configured_text_and_service_attachment(): void
+    {
+        $sheet = new class extends SongPPTLiturgySheet
+        {
+            /**
+             * @return array<string, mixed>
+             */
+            public function titleSlideDataForTest(Service $service): array
+            {
+                return $this->getTitleSlideData($service);
+            }
+        };
+
+        $service = Service::factory()->make();
+        $attachment = new Attachment([
+            'file' => 'attachments/title-slide.jpg',
+            'cut' => 'ppt-title-slide',
+        ]);
+        $attachment->id = 42;
+        $service->setRelation('attachments', collect([$attachment]));
+        $sheet->setConfiguration([
+            'titleSlideTitle' => 'Gottesdienst am Sonntag',
+            'titleSlideSubtitle' => 'Mit Prädikant Heinrich Lang',
+            'titleSlideAttachmentId' => 42,
+        ]);
+
+        $this->assertSame([
+            'title' => 'Gottesdienst am Sonntag',
+            'subtitle' => 'Mit Prädikant Heinrich Lang',
+            'image' => StoragePath::for('attachments/title-slide.jpg'),
+        ], $sheet->titleSlideDataForTest($service));
+    }
+
+    public function test_title_slide_data_without_attachment_keeps_configured_text(): void
+    {
+        $sheet = new class extends SongPPTLiturgySheet
+        {
+            /**
+             * @return array<string, mixed>
+             */
+            public function titleSlideDataForTest(Service $service): array
+            {
+                return $this->getTitleSlideData($service);
+            }
+        };
+
+        $sheet->setConfiguration([
+            'titleSlideTitle' => 'Gottesdienst',
+            'titleSlideSubtitle' => 'Ohne Hintergrundbild',
+        ]);
+
+        $this->assertSame([
+            'title' => 'Gottesdienst',
+            'subtitle' => 'Ohne Hintergrundbild',
+            'image' => null,
+        ], $sheet->titleSlideDataForTest(Service::factory()->make()));
     }
 
     protected function fakeAdEvent(int $id): object

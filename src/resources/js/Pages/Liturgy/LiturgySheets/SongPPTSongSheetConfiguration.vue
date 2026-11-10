@@ -109,11 +109,46 @@
                 />
             </tab>
             <tab id="content">
-                <form-check
-                    label="Leere Folien zwischen den Elementen"
-                    v-model="myConfig.includeEmpty"
-                    name="config[includeEmpty]"
+                <form-selectize
+                    label="Folie zwischen den Elementen einfügen"
+                    v-model="myConfig.slideBetweenElements"
+                    name="config[slideBetweenElements]"
+                    :options="[
+                        { id: 'none', name: 'Keine' },
+                        { id: 'empty', name: 'Leere Folie' },
+                        { id: 'title', name: 'Titelfolie' },
+                    ]"
                 />
+                <template v-if="myConfig.slideBetweenElements === 'title'">
+                    <form-input
+                        label="Titel der Titelfolie"
+                        v-model="myConfig.titleSlideTitle"
+                        name="config[titleSlideTitle]"
+                    />
+                    <form-input
+                        label="Untertitel der Titelfolie"
+                        v-model="myConfig.titleSlideSubtitle"
+                        name="config[titleSlideSubtitle]"
+                    />
+                    <input
+                        type="hidden"
+                        name="config[titleSlideAttachmentId]"
+                        v-model="myConfig.titleSlideAttachmentId"
+                    />
+                    <form-file-uploader
+                        title="Titelfolie"
+                        :upload-route="route('service.attach', service.slug)"
+                        chunk-upload-route="/api/attachment-uploads"
+                        :chunk-target="{
+                            target_type: 'App\\Models\\Service',
+                            target_id: service.id,
+                        }"
+                        cut="ppt-title-slide"
+                        :width="1920"
+                        :height="1080"
+                        @update:model-value="setTitleSlideAttachment"
+                    />
+                </template>
                 <form-check
                     label="Platzhalter für Jingle, Intro, ..."
                     v-model="myConfig.includeJingleAndIntro"
@@ -204,6 +239,7 @@ import Tab from '../../../components/Ui/tabs/tab.vue'
 import Tabs from '../../../components/Ui/tabs/tabs.vue'
 import FormInput from '../../../components/Ui/forms/FormInput.vue'
 import FormSelectize from '../../../components/Ui/forms/FormSelectize.vue'
+import FormFileUploader from '../../../components/Ui/forms/FormFileUploader.vue'
 import TabHeader from '../../../components/Ui/tabs/tabHeader.vue'
 import TabHeaders from '../../../components/Ui/tabs/tabHeaders.vue'
 
@@ -213,6 +249,7 @@ export default {
         TabHeaders,
         TabHeader,
         FormSelectize,
+        FormFileUploader,
         FormInput,
         Tabs,
         Tab,
@@ -232,6 +269,7 @@ export default {
         if (!(myConfig.showAdsFromCities || []).length)
             myConfig.showAdsFromCities = [this.service.city_id]
         if (!myConfig.outputFormat) myConfig.outputFormat = 'ppt'
+        if (!myConfig.slideBetweenElements) myConfig.slideBetweenElements = 'empty'
 
         let myItems = []
         if (!(myConfig.includeAdLoopElements || []).length) myConfig.includeAdLoopElements = []
@@ -257,6 +295,13 @@ export default {
                 { id: 'auto', name: 'Automatisch ausrichten' },
             ],
         }
+    },
+    methods: {
+        /** Store the uploaded title-slide attachment in the export configuration. */
+        setTitleSlideAttachment(attachments) {
+            const attachment = (attachments || []).find((item) => item.cut === 'ppt-title-slide')
+            if (attachment) this.myConfig.titleSlideAttachmentId = attachment.id
+        },
     },
 }
 </script>

@@ -405,7 +405,7 @@ Wählen Sie die Schriftgröße so, dass Liedstrophen und Gebetstexte auch aus de
 
 Im Reiter **Inhalte** steuern Sie, welche Bestandteile in die Präsentation aufgenommen werden:
 
-- **Leere Folien zwischen den Elementen**: Fügt neutrale Folien zwischen Ablaufteilen ein.
+- **Folie zwischen den Elementen einfügen**: Wählen Sie, ob zwischen Ablaufteilen keine Folie, eine leere Folie oder eine Titelfolie eingefügt wird. Bei **Titelfolie** können Sie zusätzlich ein Bild im Format 16:9 hochladen sowie Titel und Untertitel festlegen. Das Bild wird am Gottesdienst angehängt und bei der Präsentation als vollflächiges Hintergrundbild verwendet.
 - **Platzhalter für Jingle, Intro, ...**: Legt im Ablauf Notizelemente an den Stellen an, an denen später Jingle, Intro oder ähnliche Medien eingefügt werden sollen.
 - **Mitwirkende anzeigen**: Erstellt eine Folie mit allen Mitwirkenden des Gottesdienstes.
 - **Liederliste am Anfang**: Erstellt eine Folie mit der Liederliste, ähnlich einer Liednummerntafel.

@@ -38,6 +38,7 @@ use App\Liturgy\ItemHelpers\PsalmItemHelper;
 use App\Liturgy\ItemHelpers\SongItemHelper;
 use App\Liturgy\Music\ABCMusic;
 use App\Models\Announcements;
+use App\Models\Attachment;
 use App\Models\Calendar\Occurence;
 use App\Models\Liturgy\Item;
 use App\Models\Liturgy\Song;
@@ -64,6 +65,7 @@ use PhpOffice\PhpPresentation\Style\Color;
 use PhpOffice\PhpPresentation\Style\Fill;
 use PhpOffice\PhpPresentation\Style\Font;
 
+/** Render songs, liturgy texts and configurable separator slides. */
 class SongPPTLiturgySheet extends AbstractLiturgySheet
 {
     protected $title = 'Powerpoint mit Liedern';
@@ -80,7 +82,10 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         'textColor' => 'FFFFFFFF',
         'backgroundColor' => 'FF043b04',
         'backgroundColorEmpty' => 'FF043b04',
-        'includeEmpty' => 1,
+        'slideBetweenElements' => 'empty',
+        'titleSlideTitle' => 'Gottesdienst',
+        'titleSlideSubtitle' => '',
+        'titleSlideAttachmentId' => null,
         'includeJingleAndIntro' => 1,
         'includeCredits' => 1,
         'includeSongList' => 1,
@@ -133,8 +138,18 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
     /** @var PhpPresentation */
     protected $ppt;
 
+    /** @var Service Service currently rendered for the export. */
+    protected $service;
+
+    /**
+     * Render the liturgy as a PowerPoint or OpenDocument presentation.
+     *
+     * @param  Service  $service  Service whose liturgy is exported.
+     * @return mixed Download response for the generated presentation.
+     */
     public function render(Service $service)
     {
+        $this->service = $service;
         $this->ppt = new PhpPresentation;
         $this->setDocumentProperties($service);
         $this->ppt->getLayout()->setDocumentLayout(DocumentLayout::LAYOUT_SCREEN_16X9);
@@ -151,8 +166,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 $slide = $this->createEmptySlide($this->config['backgroundColor']);
                 $this->renderSongListSlide($slide, $service);
             }
-        } elseif ($this->config['includeEmpty']) {
-            $this->slide();
+        } elseif ($this->getInterElementSlideMode() !== 'none') {
+            $this->renderInterElementSlide($service);
         }
 
         if ($this->config['includeVirtualSongsheetQR'] && (! $this->config['includeAdLoopStart'])) {
@@ -164,8 +179,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             $this->slide('Hier Jingle einfügen');
             $this->slide('Hier Intro einfügen');
         }
-        if ($this->config['includeEmpty']) {
-            $this->slide();
+        if ($this->getInterElementSlideMode() !== 'none') {
+            $this->renderInterElementSlide($service);
         }
 
         if ($this->config['outputFormat'] == 'odp') {
@@ -188,8 +203,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                             $ftHelper = $item->getHelper();
                             $this->renderGloriaPatriSlide($ftHelper->getText());
                         }
-                        if ($this->config['includeEmpty']) {
-                            $this->slide();
+                        if ($this->getInterElementSlideMode() !== 'none') {
+                            $this->renderInterElementSlide($service);
                         }
                     } else {
                         $this->renderFreeTextSlides($item);
@@ -237,6 +252,94 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         return $this->sendToBrowser($this->getFileName($service, 'Texte und Lieder'));
     }
 
+    /**
+     * Return the configured kind of separator slide between liturgy elements.
+     */
+    protected function getInterElementSlideMode(): string
+    {
+        return $this->config['slideBetweenElements'] ?? 'empty';
+    }
+
+    /**
+     * Render the configured separator slide for the current service.
+     *
+     * @param  Service  $service  Service whose title slide is rendered.
+     */
+    protected function renderInterElementSlide(Service $service): void
+    {
+        if ($this->getInterElementSlideMode() === 'title') {
+            $this->renderTitleSlide($service);
+
+            return;
+        }
+
+        if ($this->getInterElementSlideMode() === 'empty') {
+            $this->slide();
+        }
+    }
+
+    /**
+     * Get the configured title slide content and its service attachment.
+     *
+     * @param  Service  $service  Service owning the configured attachment.
+     * @return array{title: string, subtitle: string, image: ?string}
+     */
+    protected function getTitleSlideData(Service $service): array
+    {
+        $attachmentId = $this->config['titleSlideAttachmentId'] ?? null;
+        /** @var Collection<int, Attachment> $attachments */
+        $attachments = $service->relationLoaded('attachments')
+            ? $service->getRelation('attachments')
+            : $service->attachments()->get();
+        $attachment = $attachmentId ? $attachments->firstWhere('id', (int) $attachmentId) : null;
+
+        return [
+            'title' => (string) ($this->config['titleSlideTitle'] ?? ''),
+            'subtitle' => (string) ($this->config['titleSlideSubtitle'] ?? ''),
+            'image' => $attachment instanceof Attachment && $attachment->file
+                ? StoragePath::for($attachment->file)
+                : null,
+        ];
+    }
+
+    /**
+     * Render a title slide following the supplied presentation template.
+     *
+     * @param  Service  $service  Service whose title slide is rendered.
+     */
+    protected function renderTitleSlide(Service $service): void
+    {
+        $data = $this->getTitleSlideData($service);
+        $slide = $this->createEmptySlide($this->config['backgroundColor']);
+
+        if ($data['image']) {
+            $slide->createDrawingShape()
+                ->setPath($data['image'])
+                ->setOffsetX(0)
+                ->setOffsetY(0)
+                ->setWidth(960)
+                ->setHeight(540);
+        }
+
+        $this->createTextBox($slide, 10.6, $data['title'], new Color('FFFFFFFF'), 0, 28, true, Alignment::HORIZONTAL_CENTER);
+        if ($data['subtitle'] !== '') {
+            $this->createTextBox($slide, 12.8, $data['subtitle'], new Color('FFFFFFFF'), 0, 26, false, Alignment::HORIZONTAL_CENTER);
+        }
+    }
+
+    /**
+     * Add a formatted text box to a presentation slide.
+     *
+     * @param  Slide  $slide  Slide receiving the text box.
+     * @param  float  $yOffset  Vertical position in centimetres.
+     * @param  string  $text  Text to render.
+     * @param  Color|null  $color  Optional text color.
+     * @param  float  $xOffset  Horizontal position in centimetres.
+     * @param  int|null  $fontSize  Optional font size.
+     * @param  bool  $bold  Whether the text is bold.
+     * @param  string  $alignment  Horizontal paragraph alignment.
+     * @return void
+     */
     protected function createTextBox($slide, $yOffset, $text, $color = null, $xOffset = 0, $fontSize = null, $bold = false, $alignment = Alignment::HORIZONTAL_LEFT)
     {
         $color ??= new Color($this->config['textColor']);
@@ -257,6 +360,12 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $paragraph->createTextRun($text);
     }
 
+    /**
+     * Render all configured presentation slides for a free-text item.
+     *
+     * @param  Item  $item  Free-text item to render.
+     * @return void
+     */
     protected function renderFreeTextSlides(Item $item)
     {
         if (! ($item->data['slideText'] ?? false)) {
@@ -275,11 +384,18 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             );
         }
 
-        if ($this->config['includeEmpty']) {
-            $this->slide();
+        if ($this->getInterElementSlideMode() !== 'none') {
+            $this->renderInterElementSlide($this->service);
         }
     }
 
+    /**
+     * Render the song and psalm list at the beginning of a presentation.
+     *
+     * @param  Slide  $slide  Slide receiving the list.
+     * @param  Service  $service  Service whose liturgy is listed.
+     * @return void
+     */
     protected function renderSongListSlide(Slide $slide, Service $service)
     {
         $color = new Color($this->config['textColor']);
@@ -371,13 +487,21 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
     }
 
+    /**
+     * Render one song item and its active verses.
+     *
+     * @param  Item  $item  Song item to render.
+     * @return void
+     */
     protected function renderSongItem(Item $item)
     {
         if ($this->config['includeSongbookReference']) {
             $this->songbookReferenceSlide($item);
         }
         if ($this->config['renderMusic'] && (isset($item->data['song']['song']['notation']))) {
-            return $this->renderSongItemWithMusic($item);
+            $this->renderSongItemWithMusic($item);
+
+            return;
         }
 
         /** @var SongItemHelper $helper */
@@ -418,11 +542,17 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
                 );
             }
         }
-        if ($this->config['includeEmpty']) {
-            $this->slide();
+        if ($this->getInterElementSlideMode() !== 'none') {
+            $this->renderInterElementSlide($this->service);
         }
     }
 
+    /**
+     * Render the musical notation images for a song item.
+     *
+     * @param  Item  $item  Song item to render.
+     * @return void
+     */
     protected function renderSongItemWithMusic(Item $item)
     {
         $song = Song::find($item->data['song']['song_id']);
@@ -439,8 +569,8 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             $shape->setOffsetY(520 - $shape->getHeight());
         }
 
-        if ($this->config['includeEmpty']) {
-            $this->slide();
+        if ($this->getInterElementSlideMode() !== 'none') {
+            $this->renderInterElementSlide($this->service);
         }
     }
 
@@ -470,6 +600,17 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->setWidth(80);
     }
 
+    /**
+     * Create a text slide, splitting content when it exceeds the layout.
+     *
+     * @param  string|array<int, string>  $text  Text or paragraphs to render.
+     * @param  int  $size  Font size or -1 for the configured size.
+     * @param  string|int  $rgb  Text color or -1 for the configured color.
+     * @param  bool  $bold  Whether the text is bold.
+     * @param  string  $copyrights  Optional footer text.
+     * @param  string|null  $backgroundColor  Optional background color.
+     * @return Slide|null Last created slide.
+     */
     protected function slide($text = '', $size = -1, $rgb = -1, $bold = true, $copyrights = '', $backgroundColor = null)
     {
         if ($size == -1) {
@@ -658,6 +799,12 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         return $lastCreatedSlide;
     }
 
+    /**
+     * Render a songbook reference slide for a song or psalm.
+     *
+     * @param  Item  $item  Item whose reference is rendered.
+     * @return void
+     */
     protected function songbookReferenceSlide(Item $item)
     {
         $data = $item->data;
@@ -738,6 +885,12 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         $paragraph->createTextRun($data[$key]['reference'].$refText);
     }
 
+    /**
+     * Render the credits slide.
+     *
+     * @param  string  $credits  Credits text.
+     * @return void
+     */
     protected function creditsSlide($credits)
     {
         $slide = $this->slide(
@@ -750,6 +903,11 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         );
     }
 
+    /**
+     * Create a slide with a solid background color.
+     *
+     * @param  string  $color  ARGB background color.
+     */
     protected function createEmptySlide($color): Slide
     {
         $backgroundColor = new Color($color);
@@ -842,6 +1000,12 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
     }
 
+    /**
+     * Set document metadata from the exported service.
+     *
+     * @param  Service  $service  Service represented by the presentation.
+     * @return void
+     */
     protected function setDocumentProperties(Service $service)
     {
         $titleLine = $service->titleText(false).' am '.$service->dateText().', '.$service->timeText(
@@ -1516,6 +1680,13 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             ->getFont()->setBold(false)->setSize($this->config['fontSize'])->setColor($textColor)->setName('Sarabun SemiBold');
     }
 
+    /**
+     * Render the QR code for the virtual song sheet.
+     *
+     * @param  Slide  $slide  Slide receiving the QR code.
+     * @param  Service  $service  Service whose QR code is rendered.
+     * @return void
+     */
     public function renderVirtualSongsheetQR(Slide $slide, Service $service)
     {
         $shape = $slide->createRichTextShape()
