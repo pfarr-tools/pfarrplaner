@@ -153,6 +153,7 @@
                         :prevent-empty-list-message="true"
                         delete-route-name="service.detach"
                         parent-type="service"
+                        parent-route-key="slug"
                         :parent-object="service"
                         @update:model-value="setTitleSlideAttachment"
                     />
