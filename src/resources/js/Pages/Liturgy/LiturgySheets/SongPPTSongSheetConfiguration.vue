@@ -124,6 +124,11 @@
                     v-model="myConfig.includeCredits"
                     name="config[includeCredits]"
                 />
+                <form-check
+                    label="Titelfolie anzeigen"
+                    v-model="myConfig.includeTitle"
+                    name="config[includeTitle]"
+                />
                 <hr />
                 <form-check
                     label="Liederliste am Anfang"
