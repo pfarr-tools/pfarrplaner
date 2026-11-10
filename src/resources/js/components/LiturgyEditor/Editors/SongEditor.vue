@@ -241,8 +241,22 @@ export default {
         },
     },
     methods: {
+        /**
+         * Select a song reference or clear the song assignment.
+         *
+         * @param {number|null|string} e Song reference ID or an empty value.
+         */
         selectSong(e) {
-            if (!e) return
+            if (e === null || e === undefined || e === '') {
+                this.selectedSong = null
+                this.editedElement.data.song = {
+                    ...this.emptySong,
+                    song: { id: -1, verses: [] },
+                }
+                this.quote = this.quotableText()
+                this.$forceUpdate()
+                return
+            }
             if (e < 0) return
             if (undefined == this.songList[e]) {
                 this.$api()

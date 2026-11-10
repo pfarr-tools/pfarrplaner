@@ -180,6 +180,39 @@ class LiturgyApiFeatureTest extends TestCase
     /**
      * @return void
      */
+    public function test_update_item_can_clear_song_data()
+    {
+        $user = User::factory()->create();
+        $user->assignRole(RoleService::ROLE_SUPER_ADMIN);
+        $service = Service::factory()->create();
+        $block = Block::create(['title' => 'Block', 'service_id' => $service->id, 'sortable' => 1]);
+        $item = Item::create([
+            'title' => 'Lied',
+            'liturgy_block_id' => $block->id,
+            'sortable' => 1,
+            'data_type' => 'song',
+        ]);
+        $item->data = [
+            'song' => ['id' => 123],
+            'verses' => '1-2',
+            'responsible' => [],
+        ];
+        $item->save();
+
+        $response = $this->actingAs($user, 'api')
+            ->patchJson(route('api.liturgy.item.update', $item), [
+                'title' => 'Lied',
+                'data_type' => 'song',
+                'data' => [],
+            ]);
+
+        $response->assertOk();
+        $this->assertSame([], $item->fresh()->data);
+    }
+
+    /**
+     * @return void
+     */
     public function test_save_tree_state_updates_block_order()
     {
         $user = User::factory()->create();
