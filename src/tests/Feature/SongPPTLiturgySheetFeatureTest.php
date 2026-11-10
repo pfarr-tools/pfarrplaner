@@ -14,7 +14,6 @@
 namespace Tests\Feature;
 
 use App\Liturgy\LiturgySheets\SongPPTLiturgySheet;
-use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Tests\TestCase;
@@ -139,31 +138,6 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
 
         $this->assertCount(1, $filteredPages['2026-05-24']);
         $this->assertSame([1, 2], $filteredPages['2026-05-24'][0]->pluck('id')->all());
-    }
-
-    public function test_title_slide_contains_service_details(): void
-    {
-        $sheet = new class extends SongPPTLiturgySheet
-        {
-            /**
-             * @return array<int, string>
-             */
-            public function titleSlideLinesForTest(object $service): array
-            {
-                return $this->titleSlideLines($service);
-            }
-        };
-
-        $service = $this->mock(Service::class);
-        $service->shouldReceive('titleText')->with(false)->andReturn('Gottesdienst zum Sonntag');
-        $service->shouldReceive('dateText')->andReturn('24.05.2026');
-        $service->shouldReceive('timeText')->andReturn('10:00 Uhr');
-        $service->shouldReceive('locationText')->andReturn('Stadtkirche');
-
-        $this->assertSame([
-            'Gottesdienst zum Sonntag',
-            '24.05.2026, 10:00 Uhr, Stadtkirche',
-        ], $sheet->titleSlideLinesForTest($service));
     }
 
     protected function fakeAdEvent(int $id): object

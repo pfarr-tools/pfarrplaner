@@ -83,7 +83,6 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         'includeEmpty' => 1,
         'includeJingleAndIntro' => 1,
         'includeCredits' => 1,
-        'includeTitle' => 1,
         'includeSongList' => 1,
         'includeSongbookReference' => 1,
         'verticalAlignment' => 'b',
@@ -145,10 +144,6 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
 
         if ($this->config['includeAdLoopStart']) {
             $this->renderAdLoop($service);
-        }
-
-        if ($this->config['includeTitle']) {
-            $this->renderTitleSlide($service);
         }
 
         if ($this->config['includeSongList']) {
@@ -240,47 +235,6 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         }
 
         return $this->sendToBrowser($this->getFileName($service, 'Texte und Lieder'));
-    }
-
-    /**
-     * Get the lines displayed on the presentation title slide.
-     *
-     * @return array<int, string>
-     */
-    protected function titleSlideLines(Service $service): array
-    {
-        return [
-            $service->titleText(false),
-            $service->dateText().', '.$service->timeText().', '.$service->locationText(),
-        ];
-    }
-
-    /** Render the presentation title slide. */
-    protected function renderTitleSlide(Service $service): void
-    {
-        $slide = $this->createEmptySlide($this->config['backgroundColor']);
-        $shape = $this->createFullScreenRichTextShape($slide);
-        $shape->getActiveParagraph()->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
-            ->setVertical(Alignment::VERTICAL_CENTER);
-
-        $title = $shape->getActiveParagraph()->getFont()
-            ->setBold(true)
-            ->setSize($this->config['fontSize'])
-            ->setColor(new Color($this->config['textColor']))
-            ->setName('Sarabun');
-        $title->createTextRun($this->titleSlideLines($service)[0]);
-
-        $details = $shape->createParagraph();
-        $details->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
-            ->setVertical(Alignment::VERTICAL_CENTER);
-        $details->getFont()
-            ->setBold(false)
-            ->setSize((int) ($this->config['fontSize'] * .6))
-            ->setColor(new Color($this->config['textColor']))
-            ->setName('Sarabun');
-        $details->createTextRun($this->titleSlideLines($service)[1]);
     }
 
     protected function createTextBox($slide, $yOffset, $text, $color = null, $xOffset = 0, $fontSize = null, $bold = false, $alignment = Alignment::HORIZONTAL_LEFT)
