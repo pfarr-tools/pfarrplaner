@@ -36,7 +36,7 @@ ask_secret() {
 generate_dkim_key() {
   local domain="$1" selector="$2" generated_private generated_public
   mkdir -p "$ROOT/secrets/dkim"
-  chmod 700 "$ROOT/secrets/dkim"
+  chmod 755 "$ROOT/secrets/dkim"
   docker compose -f "$ROOT/compose.production.yaml" --profile mail run --rm --no-deps \
     -v "$ROOT/secrets/dkim:/work:rw" \
     --user "$(id -u):$(id -g)" \

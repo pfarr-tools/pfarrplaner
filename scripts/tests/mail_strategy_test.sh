@@ -37,6 +37,8 @@ fi
 grep -q "'scheme' => env('MAIL_SCHEME')" "$MAIL_CONFIG"
 grep -q "'auto_tls' => env('MAIL_AUTO_TLS', true) ? 'true' : 'false'" "$MAIL_CONFIG"
 grep -q 'MAIL_POSTFIX_ENABLED' "$ROOT/scripts/bootstrap-mail.sh"
+grep -q 'chmod 755 "$ROOT/secrets/dkim"' "$ROOT/scripts/bootstrap-mail.sh"
+grep -q 'chmod 600 "$ROOT/secrets/dkim/${domain}.private"' "$ROOT/scripts/bootstrap-mail.sh"
 grep -q "ui_choice 'Mailmodus wählen' 2 smtp postfix disabled" "$ROOT/scripts/bootstrap-mail.sh"
 grep -q "ui_choice 'Zustellung wählen' 1 direct relay" "$ROOT/scripts/bootstrap-mail.sh"
 grep -q "ui_choice 'SMTP-Schema wählen' 1 auto smtp smtps" "$ROOT/scripts/bootstrap-mail.sh"
