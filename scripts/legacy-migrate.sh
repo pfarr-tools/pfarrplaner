@@ -158,7 +158,10 @@ if [[ "$legacy_dump_mode" == container ]]; then
 else
   legacy_db_auth_options="-h $(quote "$legacy_db_host") -P $(quote "$legacy_db_port") -u $(quote "$legacy_db_user")"
 fi
-legacy_volatile_data_options="--ignore-table-data=$(quote "${legacy_db_name}.failed_jobs") --ignore-table-data=$(quote "${legacy_db_name}.telescope_entries") --ignore-table-data=$(quote "${legacy_db_name}.telescope_entries_tags") --ignore-table-data=$(quote "${legacy_db_name}.telescope_monitoring")"
+legacy_volatile_table_options=""
+for legacy_table in failed_jobs telescope_entries telescope_entries_tags telescope_monitoring; do
+  legacy_volatile_table_options+=" --ignore-table=$(quote "${legacy_db_name}.${legacy_table}")"
+done
 legacy_dump_common_options='--no-tablespaces'
 echo '2/6 Legacy-Datenbankverbindung testen.'
 legacy_dump "$legacy_dump_common_options --no-data --single-transaction $legacy_db_auth_options $(quote "$legacy_db_name") >/dev/null"
@@ -208,7 +211,8 @@ set_env_value() {
 }
 
 echo '3/6 Unveränderliches Legacy-Datenbankarchiv erstellen.'
-legacy_dump "$legacy_dump_common_options --single-transaction --routines --events $legacy_volatile_data_options $legacy_db_auth_options --databases $(quote "$legacy_db_name")" > "$ROOT/backups/legacy/legacy-$stamp.sql"
+legacy_dump "$legacy_dump_common_options --no-data --routines --events $legacy_db_auth_options --databases $(quote "$legacy_db_name")" > "$ROOT/backups/legacy/legacy-$stamp.sql"
+legacy_dump "$legacy_dump_common_options --single-transaction --no-create-info --skip-triggers $legacy_volatile_table_options $legacy_db_auth_options --databases $(quote "$legacy_db_name")" >> "$ROOT/backups/legacy/legacy-$stamp.sql"
 remote 'tar -C . -cf - storage/app storage/inbox public/uploads 2>/dev/null || true' > "$archive"
 legacy_archives=("$ROOT/backups/legacy/legacy-$stamp.sql" "$archive")
 legacy_bible_archive="$ROOT/backups/legacy/legacy-$stamp-bible.tar"

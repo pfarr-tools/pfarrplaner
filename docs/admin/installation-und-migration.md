@@ -433,7 +433,13 @@ angelegt und bei einem Fehler automatisch zurückgespielt.
 Bucket; Backup-Buckets bleiben unberührt. Der Legacy-Import erstellt SQL-/
 Dateiarchive mit SHA-256-Prüfsummen. Daten aus `failed_jobs` sowie den
 Telescope-Tabellen werden beim Dump bewusst ausgelassen; die Tabellenstrukturen
-bleiben erhalten. Anschließend importiert der Prozess MariaDB, führt Migrationen aus,
+bleiben erhalten. Dafür erstellt der Import zuerst einen vollständigen
+`--no-data`-Dump und hängt anschließend einen reinen Datendump mit
+`--no-create-info`, `--skip-triggers` und je einem `--ignore-table` für diese
+Tabellen an. Diese zweistufige Strategie ist mit `mysqldump` und
+`mariadb-dump` kompatibel; die MariaDB-spezifische Option
+`--ignore-table-data` wird nicht vorausgesetzt. Anschließend importiert der
+Prozess MariaDB, führt Migrationen aus,
 überträgt `storage/app` und `storage/inbox` nach MinIO. Falls vorhanden, wird
 der gesamte Ordner `resources/bible` der Legacy-Installation vor dem Start der
 Zielanwendung in das persistente Docker-Volume `bible_resources` übernommen.
