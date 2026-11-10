@@ -44,16 +44,19 @@
             class="dropdown-menu"
             :class="{ show: t }"
         >
-            <button
+            <template
                 v-for="(item, itemKey) in items"
                 :key="itemKey"
-                v-if="items[itemKey]"
-                class="dropdown-item"
-                type="button"
-                @click.prevent.stop="set(items[itemKey])"
             >
-                {{ itemKey }}
-            </button>
+                <button
+                    v-if="item"
+                    class="dropdown-item"
+                    type="button"
+                    @click.prevent.stop="set(item)"
+                >
+                    {{ itemKey }}
+                </button>
+            </template>
         </div>
     </div>
 </template>
