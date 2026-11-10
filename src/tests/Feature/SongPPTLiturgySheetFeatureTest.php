@@ -16,6 +16,8 @@ namespace Tests\Feature;
 use App\Helpers\StoragePath;
 use App\Liturgy\LiturgySheets\SongPPTLiturgySheet;
 use App\Models\Attachment;
+use App\Models\People\User;
+use App\Models\Sermon;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -198,6 +200,80 @@ class SongPPTLiturgySheetFeatureTest extends TestCase
             'title' => 'Gottesdienst am Sonntag',
             'subtitle' => 'Mit Prädikant Heinrich Lang',
             'image' => StoragePath::for('attachments/title-slide.jpg'),
+        ], $sheet->titleSlideDataForTest($service));
+    }
+
+    /**
+     * The sermon title and all pastors are used in the title slide defaults.
+     */
+    public function test_title_slide_data_uses_sermon_defaults_and_lists_all_pastors(): void
+    {
+        $sheet = new class extends SongPPTLiturgySheet
+        {
+            /**
+             * @return array<string, mixed>
+             */
+            public function titleSlideDataForTest(Service $service): array
+            {
+                return $this->getTitleSlideData($service);
+            }
+        };
+
+        $service = Service::factory()->make(['date' => '2026-11-08 10:30:00']);
+        $service->setRelation('sermon', new Sermon([
+            'title' => 'Hoffnung für alle',
+            'reference' => 'Römer 15,13',
+        ]));
+        $service->setRelation('pastors', collect([
+            new User(['first_name' => 'Anna', 'last_name' => 'Muster']),
+            new User(['first_name' => 'Bernd', 'last_name' => 'Beispiel']),
+            new User(['first_name' => 'Clara', 'last_name' => 'Test']),
+        ]));
+        $sheet->setConfiguration([
+            'titleSlideTitle' => '',
+            'titleSlideSubtitle' => '',
+        ]);
+
+        $this->assertSame([
+            'title' => 'Hoffnung für alle',
+            'subtitle' => 'mit Anna Muster, Bernd Beispiel und Clara Test zu Römer 15,13',
+            'image' => null,
+        ], $sheet->titleSlideDataForTest($service));
+    }
+
+    /**
+     * The service weekday and date are used when no sermon title exists.
+     */
+    public function test_title_slide_data_uses_service_date_when_sermon_title_is_missing(): void
+    {
+        $sheet = new class extends SongPPTLiturgySheet
+        {
+            /**
+             * @return array<string, mixed>
+             */
+            public function titleSlideDataForTest(Service $service): array
+            {
+                return $this->getTitleSlideData($service);
+            }
+        };
+
+        $service = Service::factory()->make(['date' => '2026-11-08 10:30:00']);
+        $service->setRelation('sermon', new Sermon([
+            'title' => '',
+            'reference' => 'Römer 15,13',
+        ]));
+        $service->setRelation('pastors', collect([
+            new User(['first_name' => 'Anna', 'last_name' => 'Muster']),
+        ]));
+        $sheet->setConfiguration([
+            'titleSlideTitle' => '',
+            'titleSlideSubtitle' => '',
+        ]);
+
+        $this->assertSame([
+            'title' => 'Gottesdienst am Sonntag, 08.11.2026',
+            'subtitle' => 'mit Anna Muster',
+            'image' => null,
         ], $sheet->titleSlideDataForTest($service));
     }
 

@@ -44,6 +44,8 @@ use App\Models\Liturgy\Item;
 use App\Models\Liturgy\Song;
 use App\Models\Liturgy\Songbook;
 use App\Models\Liturgy\SongReference;
+use App\Models\People\User;
+use App\Models\Sermon;
 use App\Models\Service;
 use App\Services\ImageService;
 use App\Services\QRService;
@@ -83,7 +85,7 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
         'backgroundColor' => 'FF043b04',
         'backgroundColorEmpty' => 'FF043b04',
         'slideBetweenElements' => 'empty',
-        'titleSlideTitle' => 'Gottesdienst',
+        'titleSlideTitle' => '',
         'titleSlideSubtitle' => '',
         'titleSlideAttachmentId' => null,
         'includeJingleAndIntro' => 1,
@@ -293,13 +295,60 @@ class SongPPTLiturgySheet extends AbstractLiturgySheet
             : $service->attachments()->get();
         $attachment = $attachmentId ? $attachments->firstWhere('id', (int) $attachmentId) : null;
 
+        $title = (string) ($this->config['titleSlideTitle'] ?? '');
+        /** @var Sermon|null $sermon */
+        $sermon = $service->relationLoaded('sermon')
+            ? $service->getRelation('sermon')
+            : $service->sermon()->first();
+        $sermonTitle = trim((string) ($sermon ? $sermon->title : ''));
+        $pastorNames = $this->getTitleSlidePastorNames($service);
+
+        if ($title === '') {
+            $title = $sermonTitle ?: 'Gottesdienst am '.$service->date->isoFormat('dddd, DD.MM.YYYY');
+        }
+
+        $subtitle = (string) ($this->config['titleSlideSubtitle'] ?? '');
+        if ($subtitle === '') {
+            $subtitle = 'mit '.$pastorNames;
+            if ($sermonTitle && trim((string) ($sermon ? $sermon->reference : '')) !== '') {
+                $subtitle .= ' zu '.trim((string) $sermon->reference);
+            }
+        }
+
         return [
-            'title' => (string) ($this->config['titleSlideTitle'] ?? ''),
-            'subtitle' => (string) ($this->config['titleSlideSubtitle'] ?? ''),
+            'title' => $title,
+            'subtitle' => $subtitle,
             'image' => $attachment instanceof Attachment && $attachment->file
                 ? StoragePath::for($attachment->file)
                 : null,
         ];
+    }
+
+    /**
+     * Format all pastors assigned to a service for a title slide subtitle.
+     *
+     * @param  Service  $service  Service whose pastors are listed.
+     * @return string Comma-separated names with "und" before the last name.
+     */
+    protected function getTitleSlidePastorNames(Service $service): string
+    {
+        /** @var Collection<int, User> $pastors */
+        $pastors = $service->relationLoaded('pastors')
+            ? $service->getRelation('pastors')
+            : $service->pastors;
+        $names = $pastors
+            ->map(fn ($pastor) => $pastor->fullName(true))
+            ->filter()
+            ->values()
+            ->all();
+
+        if (count($names) < 2) {
+            return $names[0] ?? '';
+        }
+
+        $lastName = array_pop($names);
+
+        return implode(', ', $names).' und '.$lastName;
     }
 
     /**
