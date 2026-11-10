@@ -67,6 +67,24 @@ class PeopleApiFeatureTest extends TestCase
     /**
      * @return void
      */
+    public function test_search_allows_authenticated_users_without_create_permission()
+    {
+        $city = City::factory()->create();
+        $requester = User::factory()->create();
+        $requester->cities()->attach($city->id);
+
+        $other = User::factory()->create(['first_name' => 'Gesucht', 'last_name' => 'Person']);
+
+        $response = $this->actingAs($requester, 'api')
+            ->postJson(route('api.people.search', ['searchString' => 'Gesucht']));
+
+        $response->assertOk();
+        $this->assertTrue(collect($response->json())->pluck('id')->contains($other->id));
+    }
+
+    /**
+     * @return void
+     */
     public function test_search_requires_auth()
     {
         $response = $this->postJson(route('api.people.search', ['searchString' => 'test']));

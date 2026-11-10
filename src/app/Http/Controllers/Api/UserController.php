@@ -78,7 +78,6 @@ class UserController extends Controller
      */
     public function search($searchString)
     {
-        Gate::authorize('create', User::class);
         if (empty($searchString)) {
             return response()->json([]);
         }
