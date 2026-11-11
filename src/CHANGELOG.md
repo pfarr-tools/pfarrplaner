@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.20.2](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.20.1...v2026.20.2) (2026-11-11)
+
+
+### Features
+
+* **ci:** Produktionsdeploy über Host-Matrix ergänzen ([aa10d9e](https://github.com/pfarr-tools/pfarrplaner/commit/aa10d9e0c21247c1a407e948444140e6e71a12c3)), closes [#64](https://github.com/pfarr-tools/pfarrplaner/issues/64)
+
+
+### Bug Fixes
+
+* **ci:** Auf den Manual-Webserver warten. ([6dacc0b](https://github.com/pfarr-tools/pfarrplaner/commit/6dacc0bb7f9707de28bed189b38788f829f2ed0b)), closes [#61](https://github.com/pfarr-tools/pfarrplaner/issues/61)
+* **ci:** Diagnose den Webserver ohne Shell-Quoting-Fehler. ([6ea7269](https://github.com/pfarr-tools/pfarrplaner/commit/6ea7269e0b1d4775c6b70562a19c9db6fcffcee6)), closes [#61](https://github.com/pfarr-tools/pfarrplaner/issues/61)
+* **ci:** Dusk mit isolierter Testumgebung ausführen. ([6426f36](https://github.com/pfarr-tools/pfarrplaner/commit/6426f3607e3a25f3e5549e50cfcddf5ca3ca5c77))
+* **ci:** Dusk-Manual über Compose-Webserver ausführen. ([eadedc9](https://github.com/pfarr-tools/pfarrplaner/commit/eadedc9bb659c9912d7da17719e05f02c12ea689)), closes [#61](https://github.com/pfarr-tools/pfarrplaner/issues/61)
+* **ci:** Manual-Webserver bei Fehler diagnostizieren. ([e159844](https://github.com/pfarr-tools/pfarrplaner/commit/e159844cdde8f627fe0bb9db5194ab0417b6f769)), closes [#61](https://github.com/pfarr-tools/pfarrplaner/issues/61)
+* **ci:** Manuellen Manual-Build ohne Veröffentlichung ermöglichen. ([e2fe913](https://github.com/pfarr-tools/pfarrplaner/commit/e2fe913cdcf8e12dcba8897f9bef7d64d5eb051b))
+* **ci:** Testumgebung für den Manual-Build konfigurieren. ([a7287dd](https://github.com/pfarr-tools/pfarrplaner/commit/a7287dd1293ab77f6b4da15bb5704972b67dc3f1)), closes [#61](https://github.com/pfarr-tools/pfarrplaner/issues/61)
+* **deps:** Bibelreferenzparser auf GitHub umstellen. ([f1f14da](https://github.com/pfarr-tools/pfarrplaner/commit/f1f14da3ec794341d1f8fe741ccf762dab52a8c7)), closes [#63](https://github.com/pfarr-tools/pfarrplaner/issues/63)
+* **mail:** Dienstmail-Rendering korrigieren. ([b568ad1](https://github.com/pfarr-tools/pfarrplaner/commit/b568ad18ae71e28872a8562b97fd91a2aab0e455))
+* **mail:** E-Mail-Layouts für Outlook vereinheitlichen. ([b6e0681](https://github.com/pfarr-tools/pfarrplaner/commit/b6e0681d649260cfc46189b7ec23d29f39b1f2de))
+* **mail:** Testmail-Adresse aktualisieren. ([ea6281a](https://github.com/pfarr-tools/pfarrplaner/commit/ea6281a050aae706cdb1b8a38e3e039f1d06e638))
+* **test:** Dusk-Datenbankschlüssel setzen. ([0ee5dd6](https://github.com/pfarr-tools/pfarrplaner/commit/0ee5dd6e835eb75af9cdc7c4dca69dc2dfc3e976)), closes [#61](https://github.com/pfarr-tools/pfarrplaner/issues/61)
+
 ### [2026.20.1](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.20.0...v2026.20.1) (2026-11-11)
 
 
