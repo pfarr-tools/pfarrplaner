@@ -16,6 +16,8 @@ grep -q "'src/package-lock.json'" "$ROOT/src/scripts/release.js"
 WORKFLOW="$ROOT/.github/workflows/release.yml"
 test -f "$WORKFLOW"
 grep -q "tags:" "$WORKFLOW"
+grep -q '^  workflow_dispatch:$' "$WORKFLOW"
+test "$(grep -Fc "if: github.event_name == 'push'" "$WORKFLOW")" -eq 4
 grep -q 'docker/build-push-action' "$WORKFLOW"
 grep -Fq 'tags: ${{ env.IMAGE_REPOSITORY }}:${{ github.ref_name }}' "$WORKFLOW"
 grep -q 'manual all' "$WORKFLOW"

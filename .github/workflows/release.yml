@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -18,6 +19,7 @@ env:
 jobs:
   production-image:
     name: Produktionsimage veröffentlichen
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Quelltext des Release-Tags auschecken
@@ -65,11 +67,13 @@ jobs:
         run: ./planer dev manual all
 
       - name: SSH-Agent für Manual-Deployment einrichten
+        if: github.event_name == 'push'
         uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.MANUAL_DEPLOY_SSH_KEY }}
 
       - name: SSH-Hostschlüssel konfigurieren
+        if: github.event_name == 'push'
         env:
           MANUAL_DEPLOY_KNOWN_HOSTS: ${{ secrets.MANUAL_DEPLOY_KNOWN_HOSTS }}
         run: |
@@ -79,6 +83,7 @@ jobs:
           chmod 600 "$HOME/.ssh/known_hosts"
 
       - name: Manual veröffentlichen
+        if: github.event_name == 'push'
         env:
           MANUAL_DEPLOY_USER: ${{ vars.MANUAL_DEPLOY_USER }}
           MANUAL_DEPLOY_HOST: ${{ vars.MANUAL_DEPLOY_HOST }}
