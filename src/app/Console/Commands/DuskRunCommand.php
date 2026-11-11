@@ -636,6 +636,7 @@ class DuskRunCommand extends Command
             'APP_DEBUG' => 'true',
             'APP_KEY' => 'base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=',
             'DUSK_ENABLED' => 'true',
+            'DATABASE_KEY' => 'base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=',
             'DB_CONNECTION' => 'sqlite',
             'DB_DATABASE' => dirname(__DIR__, 3).'/database/database.dusk.sqlite',
             'DB_BUSY_TIMEOUT' => '5000',

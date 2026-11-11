@@ -30,6 +30,7 @@ class DuskRunCommandTest extends TestCase
         self::assertSame('dusk', $environment['APP_ENV']);
         self::assertSame('true', $environment['DUSK_ENABLED']);
         self::assertSame('base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=', $environment['APP_KEY']);
+        self::assertSame('base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=', $environment['DATABASE_KEY']);
         self::assertSame('sqlite', $environment['DB_CONNECTION']);
         self::assertSame(dirname(__DIR__, 3).'/database/database.dusk.sqlite', $environment['DB_DATABASE']);
         self::assertSame('5000', $environment['DB_BUSY_TIMEOUT']);
