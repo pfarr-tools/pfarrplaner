@@ -467,6 +467,9 @@ function writePdfTemplates() {
         `hr { border-color: #000000 !important; }`,
         ``,
         `a, a:link, a:visited { color: #591855 !important; }`,
+        ``,
+        `/* WeasyPrint truncates the document after this screenshot. Keep the PDF complete. */`,
+        `img[alt="Gottesdiensteditor: Kasualien"] { display: none !important; }`,
     ].join('\n')
 
     fs.writeFileSync(path.join(PDF_TEMPLATE_DIR, 'styles.scss'), pdfStyles)
