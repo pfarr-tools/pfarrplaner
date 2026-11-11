@@ -16,7 +16,6 @@ namespace Tests\Unit\Mail;
 use App\Mail\ServiceCreated;
 use App\Mail\ServiceCreatedMultiple;
 use App\Mail\ServiceUpdated;
-use App\Mail\TestMail;
 use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -42,7 +41,10 @@ class ServiceMailUnitTest extends TestCase
      */
     public function test_service_mail_renders_with_shared_mail_shell(): void
     {
-        $mail = new TestMail;
+        $user = User::factory()->create();
+        $service = Service::factory()->create();
+        $originating = User::factory()->create();
+        $mail = new ServiceCreated($user, $service, $originating, []);
 
         $html = $mail->render();
 

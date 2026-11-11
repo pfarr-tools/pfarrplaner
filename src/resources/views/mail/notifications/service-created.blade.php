@@ -701,7 +701,7 @@
         Neuer Gottesdienst am {{ $service->date->format('d.m.Y') }}, {{ $service->timeText() }}
         ({{ $service->locationText() }})
     </div>
-    <table valign="top" class="bg-light body"
+    <table valign="top" class="bg-light body" role="presentation"
         style="outline: 0; width: 100%; min-width: 100%; height: 100%; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; font-family: Helvetica, Arial, sans-serif; line-height: 24px; font-weight: normal; font-size: 16px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; border-collapse: collapse; margin: 0; padding: 0; border: 0;"
         bgcolor="#f8f9fa">
         <tbody>
@@ -709,6 +709,17 @@
                 <td valign="top"
                     style="border-spacing: 0px; border-collapse: collapse; line-height: 24px; font-size: 16px; margin: 0;"
                     align="left" bgcolor="#f8f9fa">
+
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
+                        style="width: 100%; background-color: #a61380;">
+                        <tr>
+                            <td align="center"
+                                style="padding: 20px 24px; color: #ffffff; font-size: 20px; font-weight: bold;">
+                                <a href="{{ config('app.url') }}"
+                                    style="color: #ffffff; text-decoration: none;">{{ config('app.name', 'Pfarrplaner') }}</a>
+                            </td>
+                        </tr>
+                    </table>
 
 
                     <table class="container" border="0" cellpadding="0" cellspacing="0"
@@ -1624,7 +1635,7 @@
                                                             Änderungen an Gottesdiensten
                                                             in {{ $service->city->name }} benachrichtigt werden
                                                             willst.
-                                                        @elseif($user->getSubscriptionType($service->city) == \App\Subscription::SUBSCRIBE_OWN)
+                                                        @elseif($user->getSubscriptionType($service->city) == \App\Models\Subscription::SUBSCRIBE_OWN)
                                                             Du erhältst diese Nachricht, weil du über Änderungen an
                                                             Gottesdiensten
                                                             in {{ $service->city->name }}, an denen du beteiligt
