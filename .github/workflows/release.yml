@@ -63,8 +63,13 @@ jobs:
       - name: Entwicklungsumgebung starten
         run: ./planer dev up -d --remove-orphans
 
+      - name: Manual-Webserver prüfen
+        run: docker compose -f compose.yaml exec -T app curl --fail --silent http://web/api/health
+
       - name: Manual einschließlich Dusk bauen
-        run: ./planer dev manual all
+        env:
+          PFARRPLANER_MANUAL_APP_URL: http://web
+        run: ./planer dev manual all --without-server
 
       - name: SSH-Agent für Manual-Deployment einrichten
         if: github.event_name == 'push'

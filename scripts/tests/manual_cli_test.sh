@@ -20,6 +20,9 @@ grep -q 'manual:deploy)' "$ROOT/planer"
 grep -q 'PLANER_MANUAL_DEV=1' "$ROOT/planer"
 grep -q 'tests/Browser/Manual' "$ROOT/scripts/manual.sh"
 grep -q 'manual_npm' "$ROOT/scripts/manual.sh"
+grep -q 'PFARRPLANER_MANUAL_APP_URL' "$ROOT/scripts/manual.sh"
+grep -q 'APP_URL=http://web' "$ROOT/.github/workflows/release.yml"
+grep -q -- '--without-server' "$ROOT/.github/workflows/release.yml"
 grep -q 'PFARRPLANER_MANUAL_ROOT' "$ROOT/src/scripts/publish-manual-source.js"
 
 echo 'Manual CLI tests passed'

@@ -53,8 +53,16 @@ manual_build() {
 }
 
 manual_dusk() {
+  local -a compose_environment=(
+    -e PFARRPLANER_MANUAL_ROOT=/var/www/docs/manual
+  )
+
+  if [[ -n "${PFARRPLANER_MANUAL_APP_URL:-}" ]]; then
+    compose_environment+=(-e "APP_URL=$PFARRPLANER_MANUAL_APP_URL")
+  fi
+
   compose exec -T \
-    -e PFARRPLANER_MANUAL_ROOT=/var/www/docs/manual \
+    "${compose_environment[@]}" \
     app php artisan dusk:run "$@" tests/Browser/Manual
 }
 
