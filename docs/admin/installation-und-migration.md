@@ -65,11 +65,111 @@ Berechtigungen nicht automatisch.
 
 `./planer install --dev --defaults` ist für automatisierte
 Entwicklungsumgebungen geeignet; mit `--defaults` werden synthetische
-Produktionsdefaults verwendet. Vor dem öffentlichen Betrieb müssen insbesondere `APP_URL`,
-`GOOGLE_APP_CLIENT_ID` und `GOOGLE_APP_SECRET` (falls YouTube-Livestreams
-verwendet werden),
-Backup-Ziel, Mail-Relay und `HORIZON_ALLOWED_EMAILS` geprüft werden. Die
-kommentierte `.env.example` ist die vollständige Referenz aller Einstellungen.
+Produktionsdefaults verwendet. Vor dem öffentlichen Betrieb müssen insbesondere
+`APP_URL`, Backup-Ziel, Mail-Relay und `HORIZON_ALLOWED_EMAILS` geprüft werden.
+Für YouTube-Livestreams ist zusätzlich die [Google-Integration](#google-und-youtube-integration)
+einzurichten. Die kommentierte `.env.example` ist die vollständige Referenz
+aller Einstellungen.
+
+## Google und YouTube: Integration einrichten
+
+Die Google-Integration wird für das Anlegen und Verwalten von YouTube-
+Livestreams benötigt. Die OAuth-Anmeldedaten werden ausschließlich über `.env`
+bezogen. Eine Datei `config/client_secret.json` wird nicht angelegt und darf
+nicht in das Repository oder in ein Backup der Anwendung übernommen werden.
+
+### 1. Google-Cloud-Projekt vorbereiten
+
+1. Öffnen Sie die [Google Cloud Console](https://console.cloud.google.com/)
+   und wählen Sie das Projekt aus, das für Pfarrplaner verwendet werden soll.
+   Ein eigenes Projekt für die jeweilige Betreiberorganisation ist empfohlen.
+2. Aktivieren Sie die **YouTube Data API v3**.
+3. Richten Sie den OAuth-Zustimmungsbildschirm ein. Als Anwendungstyp genügt
+   die interne Organisationsanwendung, sofern nur Konten der eigenen
+   Organisation verwendet werden; andernfalls ist der von Google verlangte
+   externe Veröffentlichungs- und Testprozess zu beachten.
+4. Erstellen Sie unter **APIs und Dienste → Anmeldedaten** einen OAuth-
+   Client vom Typ **Webanwendung**.
+5. Tragen Sie als autorisierte Weiterleitungs-URI exakt folgende Adresse ein:
+
+   ```text
+   https://<öffentliche-app-url>/google/auth/city
+   ```
+
+   Dabei muss `<öffentliche-app-url>` ohne abschließenden Schrägstrich dem
+   Wert von `APP_URL` entsprechen. Tragen Sie zusätzlich die öffentliche
+   Basisadresse als autorisierten JavaScript-Ursprung ein:
+
+   ```text
+   https://<öffentliche-app-url>
+   ```
+
+   Für eine lokale Entwicklung mit der Standardadresse sind das
+   `http://localhost:8180/google/auth/city` und
+   `http://localhost:8180`.
+
+### 2. Zugangsdaten in `.env` hinterlegen
+
+Übernehmen Sie die Client-ID und das Client-Secret aus der Google Cloud
+Console in die `.env` der passenden Umgebung:
+
+```env
+APP_URL=https://pfarrplaner.example.org
+GOOGLE_APP_CLIENT_ID=<client-id>.apps.googleusercontent.com
+GOOGLE_APP_SECRET=<client-secret>
+```
+
+`GOOGLE_APP_SECRET` ist ein Zugangsschlüssel und darf nicht in Issues, Logs,
+Screenshots oder Versionskontrolle erscheinen. Die Werte werden nicht in
+`config/` gespeichert. Nach einer Änderung müssen die Dienste mit der neuen
+Umgebung neu erstellt werden:
+
+```sh
+./planer up -d --force-recreate app horizon scheduler
+```
+
+### 3. YouTube-Konto mit einem Ort verbinden
+
+Die OAuth-Verbindung wird pro Kirchengemeinde beziehungsweise Ort hergestellt
+und speichert dort die von Google ausgegebenen Zugriffs- und Erneuerungs-Token.
+Melden Sie sich als berechtigte Administratorin oder berechtigter Administrator
+an und öffnen Sie die OAuth-Route für den gewünschten Ort:
+
+```text
+https://<öffentliche-app-url>/google/auth/city?city=<ORT-ID>&nextStep=/
+```
+
+`<ORT-ID>` ist die numerische ID des Ortes. Die Anwendung leitet anschließend
+zu Google weiter. Melden Sie sich dort mit dem YouTube-Konto an, das den
+betreffenden Kanal und die benötigten Livestream-Berechtigungen verwaltet, und
+bestätigen Sie den Zugriff. Nach dem Rücksprung prüft die Anwendung den
+OAuth-Callback und speichert die Token in der Ortsdatenbank. Schützen Sie die
+Datenbank und `APP_KEY` entsprechend den allgemeinen Sicherheitsvorgaben.
+
+Anschließend öffnen Sie im Ortseditor den Reiter **Streaming** und hinterlegen
+die YouTube-Kanaladresse sowie – falls automatische Übertragungen verwendet
+werden – den aktiven und passiven Streamschlüssel. Die Streamschlüssel werden
+in YouTube Studio erzeugt und niemals in Git oder im Handbuch dokumentiert.
+
+### 4. Einrichtung prüfen
+
+Erstellen Sie testweise einen Gottesdienst mit dem Reiter **Streaming** und
+legen Sie einen YouTube-Livestream an. Prüfen Sie außerdem die geplanten
+Aufgaben:
+
+```sh
+./planer artisan schedule:list
+./planer artisan youtube:update
+./planer artisan youtube:unpublish
+```
+
+Ohne `GOOGLE_APP_CLIENT_ID` oder `GOOGLE_APP_SECRET` werden die YouTube-
+Aufgaben kontrolliert übersprungen. Ein Fehler `client_secret.json does not
+exist` weist auf ein veraltetes Image oder einen nicht aktualisierten Dienst
+hin; prüfen Sie dann die Variablen in `.env`, `APP_URL` und die
+`--force-recreate`-Ausführung. Ein Fehler `redirect_uri_mismatch` bedeutet,
+dass die URI in der Google Cloud Console nicht exakt mit
+`APP_URL/google/auth/city` übereinstimmt.
 
 Wenn `SENTRY_LARAVEL_DSN` gesetzt ist, benötigen App-, Horizon- und
 Scheduler-Container ausgehenden HTTPS-Zugriff auf den konfigurierten
