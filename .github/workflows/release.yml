@@ -57,6 +57,18 @@ jobs:
           ref: ${{ github.ref }}
           fetch-depth: 0
 
+      - name: CI-Testumgebung konfigurieren
+        run: |
+          cp .env.example .env
+          sed -i \
+            -e 's/^APP_ENV=.*/APP_ENV=local/' \
+            -e 's/^APP_KEY=.*/APP_KEY=base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=/' \
+            -e 's#^APP_URL=.*#APP_URL=http://web#' \
+            -e 's/^DB_PASSWORD=.*/DB_PASSWORD=pfarrplaner/' \
+            -e 's/^DB_ROOT_PASSWORD=.*/DB_ROOT_PASSWORD=root/' \
+            -e 's/^REDIS_PASSWORD=.*/REDIS_PASSWORD=pfarrplaner-development-redis/' \
+            .env
+
       - name: Entwicklungsdienste bauen
         run: docker compose -f compose.yaml build app vite manual create-buckets
 
