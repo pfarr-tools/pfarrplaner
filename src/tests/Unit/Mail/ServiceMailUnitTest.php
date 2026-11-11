@@ -16,6 +16,7 @@ namespace Tests\Unit\Mail;
 use App\Mail\ServiceCreated;
 use App\Mail\ServiceCreatedMultiple;
 use App\Mail\ServiceUpdated;
+use App\Mail\TestMail;
 use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -51,6 +52,18 @@ class ServiceMailUnitTest extends TestCase
         $this->assertStringContainsString('background-color: #a61380', $html);
         $this->assertStringContainsString('role="presentation"', $html);
         $this->assertStringContainsString('Pfarrplaner', $html);
+    }
+
+    /**
+     * Verifies that the test mail contains the current developer contact data.
+     */
+    public function test_test_mail_renders_current_contact_data(): void
+    {
+        $html = (new TestMail)->render();
+
+        $this->assertStringContainsString('Buchenstr. 29', $html);
+        $this->assertStringContainsString('71126 Gäufelden', $html);
+        $this->assertStringContainsString('07032 75567', $html);
     }
 
     public function test_service_updated_builds(): void

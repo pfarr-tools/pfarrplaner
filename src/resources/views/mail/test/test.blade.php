@@ -13,10 +13,10 @@
     <p>Wenn Sie nicht sicher sind, warum Sie diese Nachricht erhalten haben, kontaktieren Sie den Entwickler:
         <br />
         Pfarrer Christoph Fischer<br />
-        Liegnitzer Str. 38<br />
-        72461 Albstadt<br />
+        Buchenstr. 29<br />
+        71126 Gäufelden<br />
         <br />
-        Telefon 07432 3762<br />
+        Telefon 07032 75567<br />
         E-Mail (privat)<a href="mailto:chris@toph.de"> chris@toph.de</a>
     </p>
 @endsection
