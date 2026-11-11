@@ -1,4 +1,4 @@
-[//]: # (TOC: 18. Stichwortverzeichnis)
+[//]: # (TOC: 19. Stichwortverzeichnis)
 
 # Stichwortverzeichnis
 
