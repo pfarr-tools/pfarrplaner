@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.20.1](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.20.0...v2026.20.1) (2026-11-11)
+
+
+### Bug Fixes
+
+* **google:** YouTube-Konfiguration aus Umgebungsvariablen laden. Fixes [#60](https://github.com/pfarr-tools/pfarrplaner/issues/60) ([ca992aa](https://github.com/pfarr-tools/pfarrplaner/commit/ca992aa6ca8916c1b80a507bf143727c6a125598))
+* **migration:** Portable mysqldump-Option verwenden. Fixes [#59](https://github.com/pfarr-tools/pfarrplaner/issues/59) ([79eda7c](https://github.com/pfarr-tools/pfarrplaner/commit/79eda7c1664ff8acc97600a717fbbd15c44f45ab))
+* **test:** Dusk-Handbuchlauf stabilisieren. ([ecfabf7](https://github.com/pfarr-tools/pfarrplaner/commit/ecfabf77bfba351ac9bc594ac60bb60d4e217763)), closes [#61](https://github.com/pfarr-tools/pfarrplaner/issues/61)
+
 ## [2026.20.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.19.0...v2026.20.0) (2026-11-10)
 
 
