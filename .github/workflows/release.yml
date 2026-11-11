@@ -74,6 +74,24 @@ jobs:
           echo 'Der Manual-Webserver wurde innerhalb von 30 Sekunden nicht erreichbar.' >&2
           exit 1
 
+      - name: Manual-Webserver bei Fehler diagnostizieren
+        if: failure()
+        run: |
+          docker compose -f compose.yaml ps
+          docker compose -f compose.yaml exec -T app sh -lc '
+            getent hosts web app || true
+            php -r '
+              $socket = @fsockopen("app", 9000, $errno, $error);
+              echo $socket ? "FPM erreichbar\n" : "FPM fehlgeschlagen: {$errno} {$error}\n";
+              if (is_resource($socket)) {
+                  fclose($socket);
+              }
+            '
+            curl -sS -D - --max-time 10 http://web/api/health || true
+            curl -sS -D - --max-time 10 http://web/ || true
+          '
+          docker compose -f compose.yaml logs --no-color --tail=200 web app
+
       - name: Manual einschließlich Dusk bauen
         env:
           PFARRPLANER_MANUAL_APP_URL: http://web
