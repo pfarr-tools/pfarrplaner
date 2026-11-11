@@ -70,7 +70,7 @@ class Broadcast
      */
     public function __construct($service = null)
     {
-        if (! file_exists(base_path('config/client_secret.json'))) {
+        if (! YoutubeIntegration::isConfigured()) {
             return;
         }
         if ($service !== null) {
@@ -78,7 +78,7 @@ class Broadcast
         }
 
         $client = new Google_Client;
-        $client->setAuthConfig(base_path('config/client_secret.json'));
+        $client->setAuthConfig(config('google'));
         $client->addScope(Google_Service_YouTube::YOUTUBE);
         $this->setClient($client);
 
@@ -88,6 +88,10 @@ class Broadcast
 
     public static function getFromId($id, $city)
     {
+        if (! YoutubeIntegration::isConfigured()) {
+            return null;
+        }
+
         $instance = new Broadcast;
         $instance->authenticate($city);
         $broadcastsResponse = $instance->getYoutube()->liveBroadcasts->listLiveBroadcasts(
@@ -111,6 +115,10 @@ class Broadcast
      */
     public static function get(Service $service)
     {
+        if (! YoutubeIntegration::isConfigured()) {
+            return null;
+        }
+
         $instance = new Broadcast($service);
         $instance->authenticate($service->city);
         $broadcast = null;
@@ -158,6 +166,10 @@ class Broadcast
      */
     public static function create(Service $service, $statusString = 'public')
     {
+        if (! YoutubeIntegration::isConfigured()) {
+            throw new \RuntimeException('Die Google-YouTube-Integration ist nicht konfiguriert.');
+        }
+
         $instance = new Broadcast($service);
 
         $instance->authenticate($service->city);
@@ -271,7 +283,7 @@ class Broadcast
      */
     public static function getActive(City $city)
     {
-        if (! $city->youtube_active_stream_id) {
+        if (! $city->youtube_active_stream_id || ! YoutubeIntegration::isConfigured()) {
             return [];
         }
         $instance = new Broadcast;
@@ -297,7 +309,7 @@ class Broadcast
 
     public static function getInactive(City $city)
     {
-        if (! $city->youtube_active_stream_id) {
+        if (! $city->youtube_active_stream_id || ! YoutubeIntegration::isConfigured()) {
             return [];
         }
         $instance = new Broadcast;

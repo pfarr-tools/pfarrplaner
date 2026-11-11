@@ -30,6 +30,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Integrations\Youtube\YoutubeIntegration;
 use App\Models\Places\City;
 use App\Models\Service;
 use App\Models\Streaming\Broadcast;
@@ -60,6 +61,8 @@ class GoogleApiController extends Controller
      */
     public function auth(Request $request)
     {
+        abort_unless(YoutubeIntegration::isConfigured(), 503, 'Die Google-YouTube-Integration ist nicht konfiguriert.');
+
         if ($request->has('state')) {
             $state = json_decode($request->get('state'), true);
             if (! isset($state['city'])) {
@@ -75,7 +78,7 @@ class GoogleApiController extends Controller
         }
 
         $client = new Google_Client;
-        $client->setAuthConfig(base_path('config/client_secret.json'));
+        $client->setAuthConfig(config('google'));
         $client->addScope(Google_Service_YouTube::YOUTUBE);
         $client->setRedirectUri(route('google-auth'));
         $client->setAccessType('offline');

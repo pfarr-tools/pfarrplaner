@@ -77,6 +77,12 @@ class UpdateYoutubeStream extends Command
      */
     public function handle()
     {
+        if (! YoutubeIntegration::isConfigured()) {
+            $this->output('Google-YouTube-Integration ist nicht konfiguriert; nichts zu tun.');
+
+            return self::SUCCESS;
+        }
+
         Log::info('Running youtube:update command');
         $cities = City::where('google_access_token', '!=', '')->get();
         foreach ($cities as $city) {

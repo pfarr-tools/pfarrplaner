@@ -30,6 +30,7 @@
 
 namespace App\Events;
 
+use App\Integrations\Youtube\YoutubeIntegration;
 use App\Models\Service;
 use App\Models\Streaming\Broadcast;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -58,7 +59,8 @@ class ServiceUpdated
         $this->originalParticipants = $originalParticipants;
 
         // update youtube if necessary
-        if (($service->youtube_url != '') && ($service->city->google_access_token != '')) {
+        if (($service->youtube_url != '') && ($service->city->google_access_token != '')
+            && YoutubeIntegration::isConfigured()) {
             Broadcast::get($service)->update();
         }
 

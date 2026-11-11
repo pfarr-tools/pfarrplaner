@@ -78,6 +78,12 @@ class UnpublishYoutubeBroadcasts extends Command
      */
     public function handle()
     {
+        if (! YoutubeIntegration::isConfigured()) {
+            $this->output('Google-YouTube-Integration ist nicht konfiguriert; nichts zu tun.');
+
+            return self::SUCCESS;
+        }
+
         $cities = City::where('youtube_channel_url', '!=', '')->where('youtube_cutoff_days', '>', 0)->get();
         foreach ($cities as $city) {
 

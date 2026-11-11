@@ -66,6 +66,8 @@ Berechtigungen nicht automatisch.
 `./planer install --dev --defaults` ist für automatisierte
 Entwicklungsumgebungen geeignet; mit `--defaults` werden synthetische
 Produktionsdefaults verwendet. Vor dem öffentlichen Betrieb müssen insbesondere `APP_URL`,
+`GOOGLE_APP_CLIENT_ID` und `GOOGLE_APP_SECRET` (falls YouTube-Livestreams
+verwendet werden),
 Backup-Ziel, Mail-Relay und `HORIZON_ALLOWED_EMAILS` geprüft werden. Die
 kommentierte `.env.example` ist die vollständige Referenz aller Einstellungen.
 

@@ -50,10 +50,18 @@ class YoutubeIntegration extends AbstractIntegration
     /** @var Google_Service_YouTube */
     protected $youtube = null;
 
+    /**
+     * Determine whether the application has the credentials required for YouTube.
+     */
+    public static function isConfigured(): bool
+    {
+        return (bool) config('google.client_id') && (bool) config('google.client_secret');
+    }
+
     public function __construct()
     {
         $client = new Google_Client;
-        $client->setAuthConfig(base_path('config/client_secret.json'));
+        $client->setAuthConfig(config('google'));
         $client->addScope(Google_Service_YouTube::YOUTUBE);
         $this->setClient($client);
 
