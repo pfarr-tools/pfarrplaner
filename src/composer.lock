@@ -4855,7 +4855,7 @@
             "version": "1.0.2",
             "source": {
                 "type": "git",
-                "url": "https://codeberg.org/peregrinus/bible-reference-parser",
+                "url": "https://github.com/pfarr-tools/bible-reference-parser",
                 "reference": "5d38518655f5759e3261d8a720ca140c209f45ba"
             },
             "require": {
