@@ -294,12 +294,7 @@ class DuskRunCommand extends Command
         $server = new Process(
             [PHP_BINARY, 'artisan', 'serve', '--no-reload', "--host={$host}", "--port={$port}"],
             base_path(),
-            array_merge($this->env(), [
-                // A browser page can keep API/assets requests open while the
-                // next Dusk test starts its login request. Multiple workers
-                // prevent the built-in server from serialising those requests.
-                'PHP_CLI_SERVER_WORKERS' => '4',
-            ])
+            $this->env()
         );
         // The test server emits one access line per browser request. Do not
         // leave Symfony's stdout/stderr pipes unread or the server eventually
@@ -639,11 +634,15 @@ class DuskRunCommand extends Command
         return [
             'APP_ENV' => 'dusk',
             'APP_DEBUG' => 'true',
+            'APP_KEY' => 'base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=',
             'DUSK_ENABLED' => 'true',
             'DB_CONNECTION' => 'sqlite',
             'DB_DATABASE' => dirname(__DIR__, 3).'/database/database.dusk.sqlite',
             'DB_BUSY_TIMEOUT' => '5000',
             'DB_JOURNAL_MODE' => 'WAL',
+            // SQLite permits only one writer. Keep the built-in server in a
+            // single process so browser requests cannot race test resets.
+            'PHP_CLI_SERVER_WORKERS' => '1',
             'CACHE_STORE' => 'array',
             'CACHE_DRIVER' => 'array',
             // The browser login and the following page request are handled by
