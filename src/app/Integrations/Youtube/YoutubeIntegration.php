@@ -58,6 +58,9 @@ class YoutubeIntegration extends AbstractIntegration
         return (bool) config('google.client_id') && (bool) config('google.client_secret');
     }
 
+    /**
+     * Create an authenticated YouTube client from the application configuration.
+     */
     public function __construct()
     {
         $client = new Google_Client;
@@ -80,6 +83,11 @@ class YoutubeIntegration extends AbstractIntegration
         return $instance;
     }
 
+    /**
+     * Authenticate the client with the refresh token stored for a city.
+     *
+     * @param  City  $city  City whose Google credentials should be used.
+     */
     public function authenticate(City $city)
     {
         $this->client->setAccessToken($city->google_access_token);
@@ -114,16 +122,31 @@ class YoutubeIntegration extends AbstractIntegration
         return $this->getYoutube()->liveChatMessages->listLiveChatMessages($id, 'id,snippet,authorDetails', $data);
     }
 
+    /**
+     * Return the configured YouTube API service.
+     */
     public function getYoutube(): Google_Service_YouTube
     {
         return $this->youtube;
     }
 
+    /**
+     * Replace the YouTube API service used by the integration.
+     *
+     * @param  Google_Service_YouTube  $youtube  API service instance.
+     */
     public function setYoutube(Google_Service_YouTube $youtube): void
     {
         $this->youtube = $youtube;
     }
 
+    /**
+     * Send a text message to a YouTube live chat.
+     *
+     * @param  string  $liveChatId  YouTube live chat identifier.
+     * @param  string  $author  Name displayed as the message author.
+     * @param  string  $message  Message text supplied by the author.
+     */
     public function sendLiveChatMessage($liveChatId, $author, $message)
     {
         $snippet = new Google_Service_YouTube_LiveChatMessageSnippet;
@@ -141,11 +164,19 @@ class YoutubeIntegration extends AbstractIntegration
         $this->getYoutube()->liveChatMessages->insert('snippet', $liveChatInsert);
     }
 
+    /**
+     * Return the Google API client.
+     */
     public function getClient(): Google_Client
     {
         return $this->client;
     }
 
+    /**
+     * Replace the Google API client used by the integration.
+     *
+     * @param  Google_Client  $client  Configured Google API client.
+     */
     public function setClient(Google_Client $client): void
     {
         $this->client = $client;

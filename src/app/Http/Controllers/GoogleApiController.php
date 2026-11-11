@@ -49,6 +49,9 @@ use Illuminate\Support\Facades\Session;
  */
 class GoogleApiController extends Controller
 {
+    /**
+     * Protect all Google integration endpoints with authentication.
+     */
     public function __construct()
     {
         $this->middleware('auth');
@@ -132,6 +135,12 @@ class GoogleApiController extends Controller
         }
     }
 
+    /**
+     * Delete the YouTube broadcast associated with a service.
+     *
+     * @param  Service  $service  Service whose broadcast should be deleted.
+     * @return RedirectResponse
+     */
     public function deleteBroadcast(Service $service)
     {
         Broadcast::delete($service);
@@ -139,6 +148,12 @@ class GoogleApiController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Refresh the YouTube description for a service broadcast.
+     *
+     * @param  Service  $service  Service whose broadcast should be refreshed.
+     * @return RedirectResponse
+     */
     public function refreshBroadcast(Service $service)
     {
         $broadcast = Broadcast::get($service);

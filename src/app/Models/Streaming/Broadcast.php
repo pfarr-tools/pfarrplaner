@@ -136,6 +136,11 @@ class Broadcast
         return $broadcast ? $instance : null;
     }
 
+    /**
+     * Authenticate the broadcast client with a city's Google credentials.
+     *
+     * @param  City  $city  City whose credentials should be used.
+     */
     public function authenticate(City $city)
     {
         if ($this->getCity() != $city) {
@@ -147,14 +152,18 @@ class Broadcast
     }
 
     /**
-     * @param  Service  $service
-     * @return string
+     * Return the YouTube API service used by this broadcast.
      */
     public function getYoutube(): Google_Service_YouTube
     {
         return $this->youtube;
     }
 
+    /**
+     * Replace the YouTube API service used by this broadcast.
+     *
+     * @param  Google_Service_YouTube  $youtube  API service instance.
+     */
     public function setYoutube(Google_Service_YouTube $youtube): void
     {
         $this->youtube = $youtube;
@@ -216,6 +225,11 @@ class Broadcast
         return $instance;
     }
 
+    /**
+     * Delete the YouTube broadcast associated with a service.
+     *
+     * @param  Service  $service  Service whose broadcast should be deleted.
+     */
     public static function delete(Service $service)
     {
         $youtube = YoutubeIntegration::get($service->city)->getYoutube();
@@ -223,6 +237,9 @@ class Broadcast
         $service->update(['youtube_url' => '']);
     }
 
+    /**
+     * Update the remote broadcast description from the current service data.
+     */
     public function update()
     {
         $broadcast = $this->getLiveBroadcast();
@@ -231,6 +248,8 @@ class Broadcast
     }
 
     /**
+     * Return the public URL of the current broadcast.
+     *
      * @return string
      */
     public function getSharerUrl()
@@ -239,6 +258,8 @@ class Broadcast
     }
 
     /**
+     * Return the YouTube Studio URL of the current broadcast.
+     *
      * @return string
      */
     public function getLiveDashboardUrl()
@@ -248,31 +269,55 @@ class Broadcast
             .'/livestreaming' : '';
     }
 
+    /**
+     * Return the local service associated with the broadcast.
+     */
     public function getService(): Service
     {
         return $this->service;
     }
 
+    /**
+     * Associate the broadcast with a local service.
+     *
+     * @param  Service  $service  Local service represented by the broadcast.
+     */
     public function setService(Service $service): void
     {
         $this->service = $service;
     }
 
+    /**
+     * Return the Google API client.
+     */
     public function getClient(): Google_Client
     {
         return $this->client;
     }
 
+    /**
+     * Replace the Google API client.
+     *
+     * @param  Google_Client  $client  Configured Google API client.
+     */
     public function setClient(Google_Client $client): void
     {
         $this->client = $client;
     }
 
+    /**
+     * Return the loaded remote broadcast.
+     */
     public function getLiveBroadcast(): Google_Service_YouTube_LiveBroadcast
     {
         return $this->liveBroadcast;
     }
 
+    /**
+     * Store the loaded remote broadcast.
+     *
+     * @param  Google_Service_YouTube_LiveBroadcast  $liveBroadcast  Remote broadcast.
+     */
     public function setLiveBroadcast(Google_Service_YouTube_LiveBroadcast $liveBroadcast): void
     {
         $this->liveBroadcast = $liveBroadcast;
@@ -307,6 +352,12 @@ class Broadcast
         return $broadcasts;
     }
 
+    /**
+     * Get incomplete broadcasts that are not bound to the active stream.
+     *
+     * @param  City  $city  City whose YouTube broadcasts should be queried.
+     * @return array
+     */
     public static function getInactive(City $city)
     {
         if (! $city->youtube_active_stream_id || ! YoutubeIntegration::isConfigured()) {
@@ -333,6 +384,9 @@ class Broadcast
 
     }
 
+    /**
+     * Activate this broadcast and move other active broadcasts to the passive stream.
+     */
     public function activate()
     {
         $this->authenticate($this->getCity());
@@ -375,11 +429,19 @@ class Broadcast
 
     }
 
+    /**
+     * Return the city associated with the broadcast.
+     */
     public function getCity(): ?City
     {
         return $this->city;
     }
 
+    /**
+     * Associate the broadcast with a city.
+     *
+     * @param  City|null  $city  City whose YouTube account should be used.
+     */
     public function setCity(?City $city): void
     {
         $this->city = $city;

@@ -5209,18 +5209,6 @@ parameters:
 			path: app/Models/Streaming/Broadcast.php
 
 		-
-			message: '#^PHPDoc tag @param references unknown parameter\: \$service$#'
-			identifier: parameter.notFound
-			count: 1
-			path: app/Models/Streaming/Broadcast.php
-
-		-
-			message: '#^PHPDoc tag @return with type string is incompatible with native type Google\\Service\\YouTube\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: app/Models/Streaming/Broadcast.php
-
-		-
 			message: '#^Parameter \#1 \$city of method App\\Models\\Streaming\\Broadcast\:\:authenticate\(\) expects App\\Models\\Places\\City, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
 			identifier: argument.type
 			count: 2

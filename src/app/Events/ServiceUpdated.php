@@ -39,6 +39,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Event raised after a service has been updated.
+ */
 class ServiceUpdated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
