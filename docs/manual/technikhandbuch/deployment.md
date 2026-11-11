@@ -55,6 +55,39 @@ können unabhängig davon ausgeführt werden:
 ./planer dev manual deploy
 ```
 
+## GitHub-Actions-Deploy auf Produktionshosts
+
+Der Release-Workflow kann nach erfolgreichem Image- und Manual-Build einen
+seriellen Produktionsdeploy ausführen. Die Zielhosts werden über die
+GitHub-Variable `PRODUCTION_HOSTS` als JSON-Matrix konfiguriert; reale
+Hostnamen und Pfade werden dadurch nicht im Repository versioniert:
+
+```json
+{
+  "include": [
+    {
+      "name": "prod-a",
+      "user": "deploy",
+      "host": "prod-a.example.org",
+      "path": "/srv/pfarrplaner"
+    },
+    {
+      "name": "prod-b",
+      "user": "deploy",
+      "host": "prod-b.example.org",
+      "path": "/srv/pfarrplaner"
+    }
+  ]
+}
+```
+
+Der Job verwendet das geschützte Environment `production` sowie die Secrets
+`PRODUCTION_DEPLOY_SSH_KEY` und `PRODUCTION_DEPLOY_KNOWN_HOSTS`. Pro Host
+werden per SSH `./planer prod backup create` und anschließend
+`./planer prod update --ref <Release-Tag> --backup-confirmed` ausgeführt. Der
+vorhandene Updatepfad wartet danach auf den Produktions-Health-Check; ein
+Fehler stoppt den seriellen Rollout.
+
 ## Health und Monitoring
 
 Für Monitoring ist mindestens der Health-Endpunkt sinnvoll:

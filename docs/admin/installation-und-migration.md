@@ -450,6 +450,49 @@ sein:
 - Variables `MANUAL_DEPLOY_USER`, `MANUAL_DEPLOY_HOST` und
   `MANUAL_DEPLOY_PATH` für das Rsync-Ziel
 
+Für den optionalen automatischen Produktionsdeploy wird zusätzlich das GitHub
+Environment `production` benötigt. Die Produktionsziele werden nicht im
+Repository, sondern als Repository- oder Organisationsvariable
+`PRODUCTION_HOSTS` gepflegt. Der Wert ist ein JSON-Objekt für die
+GitHub-Actions-Matrix, zum Beispiel:
+
+```json
+{
+  "include": [
+    {
+      "name": "prod-a",
+      "user": "deploy",
+      "host": "prod-a.example.org",
+      "path": "/srv/pfarrplaner"
+    },
+    {
+      "name": "prod-b",
+      "user": "deploy",
+      "host": "prod-b.example.org",
+      "path": "/srv/pfarrplaner"
+    }
+  ]
+}
+```
+
+Die konkreten Hostnamen und Pfade bleiben Betreiberkonfiguration. Im
+Environment `production` werden außerdem folgende Secrets hinterlegt:
+
+- `PRODUCTION_DEPLOY_SSH_KEY` mit dem privaten Ed25519-Schlüssel
+- `PRODUCTION_DEPLOY_KNOWN_HOSTS` mit den zuvor geprüften Hostschlüsseln
+
+Ein passendes Schlüsselpaar kann mit `ssh-keygen -t ed25519` erzeugt werden.
+Der öffentliche Schlüssel wird auf jedem Zielhost für den Deploy-Benutzer in
+`~/.ssh/authorized_keys` hinterlegt. Die Hostschlüssel sind vor dem Eintragen
+unabhängig zu verifizieren; `ssh-keyscan` allein ist keine ausreichende
+Authentifizierung des Zielhosts. Für das Environment `production` sollten
+zusätzlich erforderliche Reviewer konfiguriert werden.
+
+Der Job `deploy-production` läuft erst nach erfolgreichem Image- und
+Manual-Job, arbeitet die Matrix seriell ab und beendet den weiteren Rollout
+beim ersten Fehler. Jeder Host führt vor dem Update ein Backup aus. Das
+Update verwendet den konkreten Release-Tag und niemals implizit `latest`.
+
 Der Workflow läuft ausschließlich für Tags im Format `vYYYY.MAJOR.MINOR`.
 Schlägt ein Manual- oder Image-Schritt fehl, bleibt der Release-Tag bestehen,
 aber die Veröffentlichung muss nach Fehlerbehebung über den Workflow erneut

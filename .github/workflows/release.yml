@@ -93,3 +93,39 @@ jobs:
       - name: Entwicklungsumgebung beenden
         if: always()
         run: ./planer dev down -v
+
+  deploy-production:
+    name: Produktionshosts aktualisieren
+    if: github.event_name == 'push'
+    needs: [production-image, manual]
+    runs-on: ubuntu-latest
+    environment: production
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix: ${{ fromJSON(vars.PRODUCTION_HOSTS) }}
+    steps:
+      - name: SSH-Agent für Produktionsdeployment einrichten
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.PRODUCTION_DEPLOY_SSH_KEY }}
+
+      - name: Produktions-Hostschlüssel konfigurieren
+        env:
+          PRODUCTION_DEPLOY_KNOWN_HOSTS: ${{ secrets.PRODUCTION_DEPLOY_KNOWN_HOSTS }}
+        run: |
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "$PRODUCTION_DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+      - name: Produktionshost aktualisieren
+        env:
+          DEPLOY_USER: ${{ matrix.user }}
+          DEPLOY_HOST: ${{ matrix.host }}
+          DEPLOY_PATH: ${{ matrix.path }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          printf -v quoted_path '%q' "$DEPLOY_PATH"
+          remote_command="cd -- $quoted_path && ./planer prod backup create && ./planer prod update --ref '$RELEASE_TAG' --backup-confirmed && ./planer prod ps"
+          ssh -o BatchMode=yes "$DEPLOY_USER@$DEPLOY_HOST" "$remote_command"
