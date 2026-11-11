@@ -97,8 +97,8 @@ jobs:
 
       - name: Manual einschließlich Dusk bauen
         env:
-          PFARRPLANER_MANUAL_APP_URL: http://web
-        run: ./planer dev manual all --without-server
+          PFARRPLANER_MANUAL_APP_URL: http://127.0.0.1:8000
+        run: ./planer dev manual all
 
       - name: SSH-Agent für Manual-Deployment einrichten
         if: github.event_name == 'push'
