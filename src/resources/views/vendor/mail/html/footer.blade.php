@@ -1,11 +1,5 @@
 <tr>
-<td>
-<table class="footer" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
-<tr>
-<td class="content-cell" align="center">
-{{ Illuminate\Mail\Markdown::parse($slot) }}
-</td>
-</tr>
-</table>
-</td>
+    <td class="footer" align="center" style="padding: 16px 24px 0; color: #6b7280; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.5;">
+        {{ Illuminate\Mail\Markdown::parse($slot) }}
+    </td>
 </tr>

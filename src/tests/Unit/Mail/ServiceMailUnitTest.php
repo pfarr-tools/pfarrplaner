@@ -16,6 +16,7 @@ namespace Tests\Unit\Mail;
 use App\Mail\ServiceCreated;
 use App\Mail\ServiceCreatedMultiple;
 use App\Mail\ServiceUpdated;
+use App\Mail\TestMail;
 use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,6 +35,20 @@ class ServiceMailUnitTest extends TestCase
         $built = $mail->build();
         $this->assertInstanceOf(ServiceCreated::class, $built);
         $this->assertStringContainsString('Neuer Gottesdienst', $built->subject);
+    }
+
+    /**
+     * Verifies that custom service mails use the shared table-based shell.
+     */
+    public function test_service_mail_renders_with_shared_mail_shell(): void
+    {
+        $mail = new TestMail;
+
+        $html = $mail->render();
+
+        $this->assertStringContainsString('background-color: #a61380', $html);
+        $this->assertStringContainsString('role="presentation"', $html);
+        $this->assertStringContainsString('Pfarrplaner', $html);
     }
 
     public function test_service_updated_builds(): void

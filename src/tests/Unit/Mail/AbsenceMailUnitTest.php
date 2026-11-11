@@ -35,6 +35,21 @@ class AbsenceMailUnitTest extends TestCase
         $this->assertEquals('Antrag genehmigt', $built->subject);
     }
 
+    /**
+     * Verifies that Markdown mails use the Pfarrplaner-branded HTML shell.
+     */
+    public function test_markdown_mail_renders_with_pfarrplaner_branding(): void
+    {
+        $absence = Absence::factory()->create();
+        $mail = new AbsenceRequested($absence);
+
+        $html = $mail->render();
+
+        $this->assertStringContainsString('background-color: #a61380', $html);
+        $this->assertStringContainsString('border-radius: 6px', $html);
+        $this->assertStringContainsString('Pfarrplaner', $html);
+    }
+
     public function test_absence_checked_builds(): void
     {
         $absence = Absence::factory()->create();
