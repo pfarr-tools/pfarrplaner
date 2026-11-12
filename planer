@@ -96,11 +96,12 @@ EOF
         }
         [[ "$confirmation" == ja ]] || { echo 'Abbruch: nicht bestätigt.' >&2; exit 2; }
       fi
-      compose exec -e XDG_CONFIG_HOME=/tmp/config app php artisan "$@"
+      compose exec --user www-data -e XDG_CONFIG_HOME=/tmp/config app php artisan "$@"
       ;;
     test)
       local test_status=0
       compose exec \
+        --user www-data \
         -e APP_ENV=testing \
         -e DB_CONNECTION=sqlite \
         -e DB_DATABASE=:memory: \
@@ -110,18 +111,18 @@ EOF
         'if [ -e storage/logs/query.log ]; then chmod 666 storage/logs/query.log; fi'
       return "$test_status"
       ;;
-    composer) compose exec app composer "$@" ;;
+    composer) compose exec --user www-data app composer "$@" ;;
     npm) compose run --rm vite npm "$@" ;;
-    pint) compose exec app ./vendor/bin/pint "$@" ;;
-    format) compose exec app composer format; compose run --rm vite npm run format ;;
+    pint) compose exec --user www-data app ./vendor/bin/pint "$@" ;;
+    format) compose exec --user www-data app composer format; compose run --rm vite npm run format ;;
     format:check)
-      compose exec app composer format:check
+      compose exec --user www-data app composer format:check
       compose run --rm vite npm run format:check
       compose run --rm vite npm run format:blade:check
       ;;
-    analyse) compose exec app composer analyse ;;
+    analyse) compose exec --user www-data app composer analyse ;;
     docs:check)
-      compose exec app composer docs:check
+      compose exec --user www-data app composer docs:check
       compose run --rm vite npm run docs:check
       ;;
     lint) compose run --rm vite npm run lint ;;
@@ -148,7 +149,7 @@ EOF
       compose run --rm vite npm run test:js:run
       compose run --rm vite npm run build
       ;;
-    complexity:check) compose exec app composer complexity:check ;;
+    complexity:check) compose exec --user www-data app composer complexity:check ;;
     manual) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" "${1:-help}" "${@:2}" ;;
     manual:build) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" build "$@" ;;
     manual:dusk) PLANER_MANUAL_DEV=1 exec "$ROOT/scripts/manual.sh" dusk "$@" ;;
@@ -159,7 +160,7 @@ EOF
     fresh)
       [[ "${1:-}" == --force ]] || { echo 'Abbruch: ./planer dev fresh löscht die lokale Datenbank. Nutze --force.' >&2; exit 2; }
       shift
-      compose exec app php artisan migrate:fresh --seed --force "$@"
+      compose exec --user www-data app php artisan migrate:fresh --seed --force "$@"
       ;;
     data) PLANER_DEVELOPMENT=1 exec "$ROOT/scripts/data-sync.sh" "$@" ;;
     help|--help|-h) usage ;;

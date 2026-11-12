@@ -73,11 +73,18 @@ Für Entwicklung verwenden Sie einen separaten Checkout oder mindestens einen ei
 ./planer dev artisan roles:sync
 ```
 
+Die PHP-FPM-Prozesse laufen im Entwicklungscontainer als `www-data`. Die
+Artisan-, Composer-, Analyse- und Testbefehle des `./planer`-Wrappers werden
+deshalb ebenfalls unter diesem Benutzer ausgeführt. So bleiben kompilierte
+Blade-Views und andere Laravel-Laufzeitdateien für den Webprozess änderbar.
+Direkte Aufrufe über `./planer dev exec` müssen bei Bedarf `--user www-data`
+vor dem Dienstnamen setzen.
+
 Der Entwicklungs-Bootstrap legt bewusst keinen Administrator an. Für einen lokalen Administrator verwenden Sie danach den vorgesehenen Artisan-Befehl mit Passwortübergabe über stdin; das Passwort wird nicht als Argument protokolliert:
 
 ```bash
 read -r -s -p 'Passwort: ' PFARRPLANER_ADMIN_PASSWORD; printf '\n'
-printf '%s' "$PFARRPLANER_ADMIN_PASSWORD" | ./planer dev exec -T app php artisan pfarrplaner:initial-admin \
+printf '%s' "$PFARRPLANER_ADMIN_PASSWORD" | ./planer dev exec -T --user www-data app php artisan pfarrplaner:initial-admin \
   --email=admin@localhost --first-name=Administrator --last-name=Pfarrplaner \
   --password-stdin --must-change-password
 unset PFARRPLANER_ADMIN_PASSWORD
