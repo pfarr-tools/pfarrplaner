@@ -62,7 +62,6 @@
                                     <tr>
                                         <th>Gottesdienst</th>
                                         <th>Opferzweck</th>
-                                        <th>Typ</th>
                                         <th>Anmerkungen</th>
                                         <th>Opferzähler 1</th>
                                         <th>Opferzähler 2</th>
@@ -100,12 +99,11 @@
                                                     v-model="row.offering_goal"
                                                     @input="serviceChanged(component, row)"
                                                 />
-                                            </td>
-                                            <td>
                                                 <form-selectize
                                                     :options="types"
                                                     v-model="row.offering_type"
                                                     @input="saveService(component, row)"
+                                                    class="mt-1"
                                                 />
                                             </td>
                                             <td>
@@ -194,6 +192,7 @@ export default {
                     .get(route('service.data', slug), {
                         fields: [
                             'offering_goal',
+                            'offering_type',
                             'offering_description',
                             'offerings_counter1',
                             'offerings_counter2',
