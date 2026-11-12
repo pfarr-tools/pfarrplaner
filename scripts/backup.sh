@@ -40,12 +40,17 @@ run_backup() {
 }
 
 running_writers=()
+permission_cache_reset_after_restore=0
 maintenance_set=0
 restore_writers() {
   if ((${#running_writers[@]})); then
     if ! "${COMPOSE[@]}" start "${running_writers[@]}" >/dev/null; then
       echo 'Warnung: Zuvor laufende Backup-Dienste konnten nicht vollständig gestartet werden.' >&2
       return 1
+    fi
+    if ((permission_cache_reset_after_restore)); then
+      "${COMPOSE[@]}" exec -T app php artisan permission:cache-reset >/dev/null
+      permission_cache_reset_after_restore=0
     fi
   fi
 }
@@ -177,6 +182,7 @@ case "$command_name" in
       [[ " ${*} " == *' --yes '* ]] || { echo 'Fehler: --apply benötigt zusätzlich --yes.' >&2; exit 2; }
       trap 'restore_writers' EXIT INT TERM
       quiesce_restore
+      permission_cache_reset_after_restore=1
     fi
     run_backup restore "$@"
     ;;

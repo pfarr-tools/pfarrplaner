@@ -47,6 +47,7 @@ grep -q 'for service in horizon scheduler' "$ROOT/scripts/backup.sh"
 ! grep -q 'quiesce$' "$ROOT/scripts/backup.sh"
 ! grep -q 'quiesce.*app' "$ROOT/scripts/backup.sh"
 grep -q 'trap.*restore' "$ROOT/scripts/backup.sh"
+grep -q 'php artisan permission:cache-reset' "$ROOT/scripts/backup.sh"
 grep -q 'Wartungsstatus konnte nicht ermittelt werden' "$ROOT/scripts/backup.sh"
 grep -q 'Wartungsmodus konnte nicht aufgehoben werden' "$ROOT/scripts/backup.sh"
 python3 - "$ROOT/scripts/backup.sh" <<'PY'

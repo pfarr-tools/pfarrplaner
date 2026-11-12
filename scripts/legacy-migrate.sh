@@ -258,6 +258,7 @@ echo '6/6 MariaDB importieren und migrieren.'
 cat "$ROOT/backups/legacy/legacy-$stamp.sql" | "${COMPOSE[@]}" exec -T mariadb sh -lc 'mariadb --max_allowed_packet=256M -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE"'
 "${COMPOSE[@]}" exec -T app php artisan config:clear
 "${COMPOSE[@]}" exec -T app php artisan migrate --force
+"${COMPOSE[@]}" exec -T app php artisan permission:cache-reset
 
 echo '  Legacy-Dateien in MinIO übernehmen.'
 legacy_files="$(mktemp -d)"

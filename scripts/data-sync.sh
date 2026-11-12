@@ -57,6 +57,7 @@ if [[ "$direction" == push ]]; then
   remote_planer artisan down; remote_down=1
   remote_planer artisan migrate --force
   local_dump | remote "./planer exec -T mariadb sh -lc 'mariadb -u\"\$MARIADB_USER\" -p\"\$MARIADB_PASSWORD\" \"\$MARIADB_DATABASE\"'"
+  remote_planer artisan permission:cache-reset
   local_objects | remote_import_objects
   remote_planer artisan optimize:clear
 else
@@ -64,6 +65,7 @@ else
   "${COMPOSE[@]}" exec -T app php artisan down; local_down=1
   "${COMPOSE[@]}" exec -T app php artisan migrate --force
   remote_dump | local_restore
+  "${COMPOSE[@]}" exec -T app php artisan permission:cache-reset
   remote_objects | local_import_objects
   "${COMPOSE[@]}" exec -T app php artisan optimize:clear
 fi

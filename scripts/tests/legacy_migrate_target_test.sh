@@ -21,6 +21,7 @@ grep -q "legacy_dump_common_options='--no-tablespaces'" "$SCRIPT"
 grep -q 'legacy_dump_common_options.*legacy_db_auth_options.*legacy_db_name' "$SCRIPT"
 grep -q 'legacy_volatile_table_options.*--ignore-table=' "$SCRIPT"
 grep -q 'legacy_dump_common_options.*--no-create-info.*legacy_volatile_table_options.*legacy_db_auth_options' "$SCRIPT"
+grep -q 'php artisan permission:cache-reset' "$SCRIPT"
 
 output="$(bash "$SCRIPT" example:relative --dry-run 2>&1 || true)"
 grep -q 'Zielumgebung: dev' <<<"$output"
