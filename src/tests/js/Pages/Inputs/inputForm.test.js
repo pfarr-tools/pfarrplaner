@@ -42,7 +42,7 @@ const eventStubs = {
 
 describe('Offerings Form', () => {
     it('uses the services supplied with the Inertia page', () => {
-        const services = [{ id: 10255, offering_type: 'PO' }]
+        const services = [{ id: 10255, offering_type: 'PO', city: { name: 'Gemeinde A' } }]
         const wrapper = mount(OfferingsForm, {
             props: { services },
             global: { stubs },
@@ -77,7 +77,24 @@ describe('Offerings Form', () => {
     it('saves when the offering type input event is emitted', async () => {
         window.axios.post.mockResolvedValueOnce({ data: 'service-1' })
         const wrapper = mount(OfferingsForm, {
-            props: { services: [] },
+            props: {
+                services: [
+                    {
+                        city: { name: 'Gemeinde A' },
+                        id: 10255,
+                        slug: 'service-1',
+                        date: '2026-01-01',
+                        locationText: 'Kirche A',
+                        timeText: '10:00',
+                        offering_type: 'eO',
+                        offering_goal: '',
+                        offering_description: '',
+                        offerings_counter1: '',
+                        offerings_counter2: '',
+                        offering_amount: '',
+                    },
+                ],
+            },
             global: { stubs: eventStubs },
         })
 

@@ -43,124 +43,106 @@
             </div>
         </template>
         <div>
-            <dataset
-                v-slot="{ ds }"
-                :ds-data="services"
-                ds-sort-by="date"
-            >
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover d-md-table">
-                                <thead>
-                                    <tr>
-                                        <th>Gottesdienst</th>
-                                        <th>Opferzweck</th>
-                                        <th>Anmerkungen</th>
-                                        <th>Opferzähler</th>
-                                        <th>Betrag</th>
-                                    </tr>
-                                </thead>
-                                <dataset-item tag="tbody">
-                                    <template #default="{ row, rowIndex }">
-                                        <tr :key="rowIndex">
-                                            <td :class="row.cc ? '' : 'text-muted'">
-                                                {{ moment(row.date).format('DD.MM.YYYY') }},
-                                                {{ row.timeText }}<br />
-                                                {{ row.locationText }}
-                                                <div>
-                                                    <span class="badge bg-secondary">{{
-                                                        row.city.name
-                                                    }}</span>
-                                                </div>
-                                                <div>
-                                                    <nav-button
-                                                        type="primary"
-                                                        icon="mdi mdi-pencil"
-                                                        force-icon
-                                                        class="btn-sm"
-                                                        :key="row.slug"
-                                                        force-no-text
-                                                        title="Gottesdienst bearbeiten (in neuem Tab)"
-                                                        @click="editService(row)"
-                                                        >Bearbeiten</nav-button
-                                                    >
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <form-input
-                                                    v-model="row.offering_goal"
-                                                    @input="serviceChanged(component, row)"
-                                                />
-                                                <form-radio-group
-                                                    v-model="row.offering_type"
-                                                    :items="{
-                                                        '': 'Eigener Beschluss',
-                                                        eO: 'Empfohlenes Opfer',
-                                                        PO: 'Pflichtopfer',
-                                                    }"
-                                                    @input="offeringTypeChanged(row, $event)"
-                                                    class="mt-1"
-                                                />
-                                            </td>
-                                            <td>
-                                                <form-input
-                                                    v-model="row.offering_description"
-                                                    @input="serviceChanged(component, row)"
-                                                />
-                                            </td>
-                                            <td>
-                                                <form-input
-                                                    v-model="row.offerings_counter1"
-                                                    @input="serviceChanged(component, row)"
-                                                />
-                                                <form-input
-                                                    v-model="row.offerings_counter2"
-                                                    @input="serviceChanged(component, row)"
-                                                    class="mt-1"
-                                                />
-                                            </td>
-                                            <td>
-                                                <form-input
-                                                    v-model="row.offering_amount"
-                                                    @input="serviceChanged(component, row)"
-                                                />
-                                            </td>
-                                        </tr>
-                                    </template>
-                                    <template #noDataFound>
-                                        <div class="col-md-12 pt-2">
-                                            <p class="text-center">No results found</p>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover d-md-table">
+                            <thead>
+                                <tr>
+                                    <th>Gottesdienst</th>
+                                    <th>Opferzweck</th>
+                                    <th>Anmerkungen</th>
+                                    <th>Opferzähler</th>
+                                    <th>Betrag</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="(row, rowIndex) in services"
+                                    :key="rowIndex"
+                                >
+                                    <td :class="row.cc ? '' : 'text-muted'">
+                                        {{ moment(row.date).format('DD.MM.YYYY') }},
+                                        {{ row.timeText }}<br />
+                                        {{ row.locationText }}
+                                        <div>
+                                            <span class="badge bg-secondary">{{
+                                                row.city.name
+                                            }}</span>
                                         </div>
-                                    </template>
-                                </dataset-item>
-                            </table>
-                        </div>
+                                        <div>
+                                            <nav-button
+                                                type="primary"
+                                                icon="mdi mdi-pencil"
+                                                force-icon
+                                                class="btn-sm"
+                                                :key="row.slug"
+                                                force-no-text
+                                                title="Gottesdienst bearbeiten (in neuem Tab)"
+                                                @click="editService(row)"
+                                                >Bearbeiten</nav-button
+                                            >
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <form-input
+                                            v-model="row.offering_goal"
+                                            @input="serviceChanged(component, row)"
+                                        />
+                                        <form-radio-group
+                                            v-model="row.offering_type"
+                                            :items="{
+                                                '': 'Eigener Beschluss',
+                                                eO: 'Empfohlenes Opfer',
+                                                PO: 'Pflichtopfer',
+                                            }"
+                                            @input="offeringTypeChanged(row, $event)"
+                                            class="mt-1"
+                                        />
+                                    </td>
+                                    <td>
+                                        <form-input
+                                            v-model="row.offering_description"
+                                            @input="serviceChanged(component, row)"
+                                        />
+                                    </td>
+                                    <td>
+                                        <form-input
+                                            v-model="row.offerings_counter1"
+                                            @input="serviceChanged(component, row)"
+                                        />
+                                        <form-input
+                                            v-model="row.offerings_counter2"
+                                            @input="serviceChanged(component, row)"
+                                            class="mt-1"
+                                        />
+                                    </td>
+                                    <td>
+                                        <form-input
+                                            v-model="row.offering_amount"
+                                            @input="serviceChanged(component, row)"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr v-if="services.length === 0">
+                                    <td
+                                        colspan="5"
+                                        class="text-center"
+                                    >
+                                        No results found
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div
-                    class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
-                >
-                    <dataset-info class="mb-2 mb-md-0" />
-                    <dataset-show
-                        class="mb-2 mb-md-0"
-                        :ds-show-entries="showEntries"
-                    />
-                    <dataset-pager />
-                </div>
-            </dataset>
+            </div>
         </div>
     </admin-layout>
 </template>
 
 <script>
-import PeopleSelect from '../../../components/Ui/elements/PeopleSelect'
 import NavButton from '../../../components/Ui/buttons/NavButton'
-import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
-import DatasetInfo from '../../../components/Ui/dataset/DatasetInfo'
-import DatasetPager from '../../../components/Ui/dataset/DatasetPager'
-import DatasetShow from '../../../components/Ui/dataset/DatasetShow'
-import FormCheck from '../../../components/Ui/forms/FormCheck'
 import FormInput from '../../../components/Ui/forms/FormInput'
 import __ from 'lodash'
 import FormRadioGroup from '../../../components/Ui/forms/FormRadioGroup'
@@ -170,22 +152,13 @@ export default {
     components: {
         FormRadioGroup,
         FormInput,
-        FormCheck,
         NavButton,
-        PeopleSelect,
-        Dataset,
-        DatasetItem,
-        DatasetInfo,
-        DatasetPager,
-        DatasetSearch,
-        DatasetShow,
     },
     props: ['services', 'users', 'ministries', 'teams'],
     data() {
         return {
             saving: false,
             saved: false,
-            showEntries: 25,
             component: this,
         }
     },
