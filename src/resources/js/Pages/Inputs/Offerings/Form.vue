@@ -93,7 +93,7 @@
                                             >
                                         </div>
                                     </td>
-                                    <td v-if="!beamerView">
+                                    <td>
                                         <form-input
                                             v-model="row.offering_goal"
                                             @input="serviceChanged(component, row)"
@@ -126,7 +126,7 @@
                                             class="mt-1"
                                         />
                                     </td>
-                                    <td>
+                                    <td v-if="!beamerView">
                                         <form-input
                                             v-model="row.offering_amount"
                                             @input="serviceChanged(component, row)"

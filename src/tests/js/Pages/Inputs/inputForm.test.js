@@ -58,6 +58,46 @@ describe('Offerings Form', () => {
         expect(wrapper.find('.beamer-view').exists()).toBe(true)
     })
 
+    it('keeps the offering goal and type visible in beamer view', async () => {
+        const wrapper = mount(OfferingsForm, {
+            props: {
+                services: [
+                    {
+                        city: { name: 'Gemeinde A' },
+                        id: 10255,
+                        slug: 'service-1',
+                        date: '2026-01-01',
+                        locationText: 'Kirche A',
+                        timeText: '10:00',
+                        offering_type: 'PO',
+                        offering_goal: 'Brot für die Welt',
+                        offering_description: 'Anmerkung',
+                        offerings_counter1: '',
+                        offerings_counter2: '',
+                        offering_amount: '42,00',
+                    },
+                ],
+            },
+            global: {
+                stubs: {
+                    ...stubs,
+                    FormInput: { template: '<input data-testid="offering-goal" />' },
+                    FormRadioGroup: { template: '<div data-testid="offering-type" />' },
+                },
+            },
+        })
+
+        await wrapper.find('button').trigger('click')
+
+        expect(wrapper.findAll('th').map((header) => header.text())).toEqual([
+            'Gottesdienst',
+            'Opferzweck',
+        ])
+        expect(wrapper.find('tbody tr').findAll('td')).toHaveLength(2)
+        expect(wrapper.find('[data-testid="offering-goal"]').exists()).toBe(true)
+        expect(wrapper.find('[data-testid="offering-type"]').exists()).toBe(true)
+    })
+
     it('uses the services supplied with the Inertia page', () => {
         const services = [{ id: 10255, offering_type: 'PO', city: { name: 'Gemeinde A' } }]
         const wrapper = mount(OfferingsForm, {
