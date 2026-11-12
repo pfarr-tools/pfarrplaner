@@ -1,3 +1,4 @@
+{{-- blade-formatter-disable --}}
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:{{ env('APP_URL') }}
@@ -17,3 +18,4 @@ DTEND:{{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $funeral->appointment->
 DTSTAMP:{{ $funeral->updated_at->setTimezone('UTC')->format('Ymd\THis\Z') }}
 END:VEVENT
 END:VCALENDAR
+{{-- blade-formatter-enable --}}

@@ -109,4 +109,35 @@ class ICalFeatureTest extends TestCase
         $this->assertStringContainsString("\r\n , Gitarre)", $ical);
         $this->assertStringNotContainsString("\r\n, Gitarre)", $ical);
     }
+
+    /**
+     * Ensure iCalendar content lines are not indented by Blade formatting.
+     *
+     * @return void
+     */
+    public function test_ical_templates_keep_content_lines_at_column_zero()
+    {
+        $templates = [
+            'resources/views/ical/ical.blade.php',
+            'resources/views/ical/absences.blade.php',
+            'resources/views/ical/export/absences.blade.php',
+            'resources/views/ical/export/events.blade.php',
+            'resources/views/ical/export/ical.blade.php',
+            'resources/views/ical/export/occurences.blade.php',
+            'resources/views/baptisms/appointment/ical.blade.php',
+            'resources/views/funerals/appointment/ical.blade.php',
+        ];
+
+        foreach ($templates as $template) {
+            $contents = file_get_contents(base_path($template));
+
+            $this->assertIsString($contents);
+            $this->assertStringNotContainsString('fochrrmat', $contents);
+            $this->assertDoesNotMatchRegularExpression(
+                '/^[ \t]+(?:BEGIN|END):(?:VCALENDAR|VEVENT)|^[ \t]+(?:UID|LOCATION|SUMMARY|DESCRIPTION|CLASS|DTSTART|DTEND|DTSTAMP)(?:;[^:]*)?:/m',
+                $contents,
+                $template.' contains indented iCalendar content lines.'
+            );
+        }
+    }
 }
