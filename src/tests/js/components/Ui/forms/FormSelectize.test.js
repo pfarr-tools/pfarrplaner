@@ -3,8 +3,23 @@ import FormSelectize from '@/components/Ui/forms/FormSelectize.vue'
 
 const MultiselectStub = {
     template: '<div class="multiselect-stub" />',
-    props: ['modelValue', 'options', 'valueProp', 'label', 'trackBy', 'mode', 'placeholder',
-            'disabled', 'searchable', 'name', 'groups', 'groupLabel', 'groupOptions'],
+    props: [
+        'modelValue',
+        'options',
+        'valueProp',
+        'label',
+        'trackBy',
+        'mode',
+        'placeholder',
+        'disabled',
+        'canClear',
+        'canDeselect',
+        'searchable',
+        'name',
+        'groups',
+        'groupLabel',
+        'groupOptions',
+    ],
     emits: ['change'],
 }
 
@@ -38,6 +53,16 @@ describe('FormSelectize', () => {
             global: { stubs },
         })
         expect(w.vm.resolvedOptions).toEqual([])
+    })
+    it('passes clearability settings to Multiselect', () => {
+        const w = mount(FormSelectize, {
+            props: { name: 'test', canClear: false, canDeselect: false },
+            global: { stubs },
+        })
+        const multiselect = w.findComponent(MultiselectStub)
+
+        expect(multiselect.props('canClear')).toBe(false)
+        expect(multiselect.props('canDeselect')).toBe(false)
     })
     it('resolvedIdKey uses idKey prop', () => {
         const w = mount(FormSelectize, {
@@ -153,7 +178,11 @@ describe('FormSelectize — grouping', () => {
             props: {
                 name: 'test',
                 options: services,
-                settings: { ...groupSettings, allowEmptyOption: true, emptyOptionLabel: 'noch nicht gewählt' },
+                settings: {
+                    ...groupSettings,
+                    allowEmptyOption: true,
+                    emptyOptionLabel: 'noch nicht gewählt',
+                },
             },
             global: { stubs },
         })

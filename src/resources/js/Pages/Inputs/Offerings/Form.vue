@@ -96,6 +96,8 @@
                                                     :options="types"
                                                     v-model="row.offering_type"
                                                     @input="offeringTypeChanged(row, $event)"
+                                                    :can-clear="false"
+                                                    :can-deselect="false"
                                                     class="mt-1"
                                                 />
                                             </td>

@@ -48,6 +48,8 @@
             :mode="multiple ? 'tags' : 'single'"
             :placeholder="placeholder"
             :disabled="disabled"
+            :can-clear="canClear"
+            :can-deselect="canDeselect"
             :searchable="true"
             :name="name"
             :native-support="hasNativeSupport"
@@ -117,6 +119,8 @@ export default {
         settings: {},
         preLabel: String,
         multiple: { type: Boolean, default: false },
+        canClear: { type: Boolean, default: true },
+        canDeselect: { type: Boolean, default: true },
         disabled: { type: Boolean, default: false },
         options: { type: Array, default: () => [] },
         itemRenderer: { type: null },
