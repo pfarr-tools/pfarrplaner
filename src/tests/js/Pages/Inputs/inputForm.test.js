@@ -34,9 +34,11 @@ describe('Offerings Form', () => {
         await flushPromises()
 
         expect(window.axios.get).toHaveBeenCalledWith('/service.data', {
-            fields: expect.arrayContaining(['offering_type']),
-            load: ['location', 'city'],
-            append: ['locationText', 'timeText'],
+            params: {
+                fields: expect.arrayContaining(['offering_type']),
+                load: ['location', 'city'],
+                append: ['locationText', 'timeText'],
+            },
         })
     })
 })

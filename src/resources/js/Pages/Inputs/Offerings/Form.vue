@@ -63,8 +63,7 @@
                                         <th>Gottesdienst</th>
                                         <th>Opferzweck</th>
                                         <th>Anmerkungen</th>
-                                        <th>Opferzähler 1</th>
-                                        <th>Opferzähler 2</th>
+                                        <th>Opferzähler</th>
                                         <th>Betrag</th>
                                     </tr>
                                 </thead>
@@ -117,11 +116,10 @@
                                                     v-model="row.offerings_counter1"
                                                     @input="serviceChanged(component, row)"
                                                 />
-                                            </td>
-                                            <td>
                                                 <form-input
                                                     v-model="row.offerings_counter2"
                                                     @input="serviceChanged(component, row)"
+                                                    class="mt-1"
                                                 />
                                             </td>
                                             <td>
@@ -190,18 +188,20 @@ export default {
             if (slug) {
                 axios
                     .get(route('service.data', slug), {
-                        fields: [
-                            'offering_goal',
-                            'offering_type',
-                            'offering_description',
-                            'offerings_counter1',
-                            'offerings_counter2',
-                            'offering_amount',
-                            'city_id',
-                            'location_id',
-                        ],
-                        load: ['location', 'city'],
-                        append: ['locationText', 'timeText'],
+                        params: {
+                            fields: [
+                                'offering_goal',
+                                'offering_type',
+                                'offering_description',
+                                'offerings_counter1',
+                                'offerings_counter2',
+                                'offering_amount',
+                                'city_id',
+                                'location_id',
+                            ],
+                            load: ['location', 'city'],
+                            append: ['locationText', 'timeText'],
+                        },
                     })
                     .then((response) => {
                         response.data.offering_type = response.data.offering_type || ''
