@@ -4,7 +4,7 @@ import OfferingsForm from '@/Pages/Inputs/Offerings/Form.vue'
 const stubs = {
     AdminLayout: { template: '<div><slot name="after-flash" /><slot /></div>' },
     FormInput: { template: '<input />', props: ['modelValue'] },
-    FormSelectize: { template: '<select />', props: ['options', 'modelValue'] },
+    FormRadioGroup: { template: '<div />', props: ['items', 'modelValue'] },
     NavButton: { template: '<button><slot /></button>' },
     Dataset: { template: '<div><slot :ds="{}" /></div>' },
     DatasetItem: { template: '<tbody />' },
@@ -15,9 +15,9 @@ const stubs = {
 
 const eventStubs = {
     ...stubs,
-    FormSelectize: {
+    FormRadioGroup: {
         template: '<button data-testid="offering-type" @click="$emit(\'input\', \'PO\')" />',
-        props: ['options', 'modelValue'],
+        props: ['items', 'modelValue'],
     },
     DatasetItem: {
         template: '<tbody><slot :row="row" :rowIndex="0" /></tbody>',

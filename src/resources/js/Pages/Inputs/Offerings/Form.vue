@@ -92,12 +92,14 @@
                                                     v-model="row.offering_goal"
                                                     @input="serviceChanged(component, row)"
                                                 />
-                                                <form-selectize
-                                                    :options="types"
+                                                <form-radio-group
                                                     v-model="row.offering_type"
+                                                    :items="{
+                                                        '': 'Eigener Beschluss',
+                                                        eO: 'Empfohlenes Opfer',
+                                                        PO: 'Pflichtopfer',
+                                                    }"
                                                     @input="offeringTypeChanged(row, $event)"
-                                                    :can-clear="false"
-                                                    :can-deselect="false"
                                                     class="mt-1"
                                                 />
                                             </td>
@@ -161,12 +163,12 @@ import DatasetShow from '../../../components/Ui/dataset/DatasetShow'
 import FormCheck from '../../../components/Ui/forms/FormCheck'
 import FormInput from '../../../components/Ui/forms/FormInput'
 import __ from 'lodash'
-import FormSelectize from '../../../components/Ui/forms/FormSelectize'
+import FormRadioGroup from '../../../components/Ui/forms/FormRadioGroup'
 
 export default {
     name: 'Form',
     components: {
-        FormSelectize,
+        FormRadioGroup,
         FormInput,
         FormCheck,
         NavButton,
@@ -185,11 +187,6 @@ export default {
             saved: false,
             showEntries: 25,
             component: this,
-            types: [
-                { id: '', name: 'Eigener Beschluss' },
-                { id: 'eO', name: 'Empfohlenes Opfer' },
-                { id: 'PO', name: 'Pflichtopfer' },
-            ],
         }
     },
     methods: {
