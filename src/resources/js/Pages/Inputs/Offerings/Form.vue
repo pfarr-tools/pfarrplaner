@@ -213,7 +213,7 @@ export default {
 }
 
 .beamer-view {
-    font-size: 2em;
+    font-size: 4em;
 }
 
 .beamer-view :deep(.form-control),
