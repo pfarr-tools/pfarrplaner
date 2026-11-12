@@ -32,7 +32,7 @@ x-app: &app
 services:
   app:
     <<: *app
-    entrypoint: ["/usr/local/bin/pfarrplaner-dev-entrypoint"]
+    entrypoint: ["/usr/local/bin/pfarrplaner-app-entrypoint"]
     command: ["php-fpm8.4", "-F"]
     healthcheck:
       test: ["CMD-SHELL", "php-fpm-healthcheck || exit 1"]
@@ -75,12 +75,12 @@ services:
     networks: [pfarrplaner]
   horizon:
     <<: *app
-    entrypoint: ["/usr/local/bin/pfarrplaner-dev-entrypoint"]
+    entrypoint: ["/usr/local/bin/pfarrplaner-app-entrypoint"]
     command: ["php", "artisan", "horizon"]
     restart: unless-stopped
   scheduler:
     <<: *app
-    entrypoint: ["/usr/local/bin/pfarrplaner-dev-entrypoint"]
+    entrypoint: ["/usr/local/bin/pfarrplaner-app-entrypoint"]
     command: ["bash", "-lc", "set -o pipefail; php artisan schedule:work 2>&1 | grep --line-buffered -vE 'No scheduled commands are ready to run.|^[[:space:]]*$'"]
     restart: unless-stopped
   mariadb:

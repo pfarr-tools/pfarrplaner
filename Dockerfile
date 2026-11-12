@@ -32,9 +32,10 @@ RUN printf '%s\n' \
   'chown -R www-data:www-data /var/www/html/storage/framework /var/www/html/storage/logs /var/www/html/bootstrap/cache' \
   'chmod -R a+rwX /var/www/html/storage /var/www/html/bootstrap/cache /var/backups/pfarrplaner' \
   '(cd /var/www/html && php artisan config:clear >/dev/null 2>&1 || true)' \
+  '(cd /var/www/html && php artisan permission:cache-reset >/dev/null 2>&1)' \
   'exec "$@"' \
-  > /usr/local/bin/pfarrplaner-dev-entrypoint \
- && chmod +x /usr/local/bin/pfarrplaner-dev-entrypoint
+  > /usr/local/bin/pfarrplaner-app-entrypoint \
+ && chmod +x /usr/local/bin/pfarrplaner-app-entrypoint
 
 FROM base AS development
 RUN printf '#!/bin/sh\nexec php-fpm8.4 -t\n' > /usr/local/bin/php-fpm-healthcheck && chmod +x /usr/local/bin/php-fpm-healthcheck
