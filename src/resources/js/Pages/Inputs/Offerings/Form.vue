@@ -101,7 +101,7 @@
                                                 <form-selectize
                                                     :options="types"
                                                     v-model="row.offering_type"
-                                                    @input="saveService(component, row)"
+                                                    @update:modelValue="saveService(row, $event)"
                                                     class="mt-1"
                                                 />
                                             </td>
@@ -233,7 +233,10 @@ export default {
         serviceChanged: __.debounce((component, service) => {
             component.saveService(service.slug, service)
         }, 1000),
-        saveService(slug, service) {
+        saveService(service, offeringType) {
+            if (offeringType !== undefined) {
+                service.offering_type = offeringType
+            }
             this.saved = false
             this.saving = true
             this.$forceUpdate()

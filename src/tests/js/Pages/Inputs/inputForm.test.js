@@ -41,4 +41,20 @@ describe('Offerings Form', () => {
             },
         })
     })
+
+    it('saves the newly selected offering type', async () => {
+        window.axios.post.mockResolvedValueOnce({ data: 'service-1' })
+        const wrapper = mount(OfferingsForm, {
+            props: { serviceSlugs: [] },
+            global: { stubs },
+        })
+        const service = { slug: 'service-1', offering_type: 'eO' }
+
+        await wrapper.vm.saveService(service, 'PO')
+
+        expect(window.axios.post).toHaveBeenCalledWith('/inputs.save', {
+            slug: 'service-1',
+            offering_type: 'PO',
+        })
+    })
 })
