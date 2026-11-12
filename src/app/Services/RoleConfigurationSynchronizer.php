@@ -14,12 +14,20 @@ namespace App\Services;
 
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 /**
  * Synchronizes the versioned role configuration with Spatie Permission.
  */
 class RoleConfigurationSynchronizer
 {
+    /**
+     * @param  PermissionRegistrar  $permissionRegistrar  Permission cache registrar.
+     */
+    public function __construct(private PermissionRegistrar $permissionRegistrar)
+    {
+    }
+
     /**
      * Synchronize configured roles and permissions without deleting unknown records.
      *
@@ -85,6 +93,10 @@ class RoleConfigurationSynchronizer
             $role->syncPermissions($configuredPermissions);
             $result->updated++;
             $result->changes[] = "Rolle: {$roleName} (Berechtigungen)";
+        }
+
+        if (! $dryRun) {
+            $this->permissionRegistrar->forgetCachedPermissions();
         }
 
         return $result;

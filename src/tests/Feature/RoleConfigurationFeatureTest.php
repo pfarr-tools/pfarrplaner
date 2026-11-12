@@ -17,6 +17,7 @@ use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -67,6 +68,14 @@ class RoleConfigurationFeatureTest extends TestCase
         $this->assertGreaterThan(0, $result->created);
         $this->assertDatabaseMissing('roles', ['name' => RoleService::ROLE_ADMIN]);
         $this->assertDatabaseMissing('permissions', ['name' => 'admin']);
+    }
+
+    public function test_sync_resets_the_permission_cache(): void
+    {
+        $registrar = \Mockery::mock(PermissionRegistrar::class);
+        $registrar->shouldReceive('forgetCachedPermissions')->once();
+
+        (new RoleConfigurationSynchronizer($registrar))->synchronize();
     }
 
     public function test_sync_command_supports_dry_run(): void
