@@ -9,6 +9,14 @@ die() { echo "Fehler: $*" >&2; exit 2; }
 [[ -f "$ROOT/.env" ]] || die '.env fehlt. Erst ./planer install ausführen.'
 grep -Eq '^APP_ENV=production([[:space:]]|$)' "$ROOT/.env" || die 'APP_ENV muss production sein.'
 
+ensure_dkim_permissions() {
+  local dkim_dir="$ROOT/secrets/dkim"
+  [[ -d "$dkim_dir" ]] || return 0
+  chmod 755 "$dkim_dir"
+  find "$dkim_dir" -type f -name '*.private' -exec chmod 600 {} +
+  find "$dkim_dir" -type f -name '*.txt' -exec chmod 644 {} +
+}
+
 postfix_services=()
 if grep -Eq '^MAIL_POSTFIX_ENABLED=true([[:space:]]|$)' "$ROOT/.env"; then
   COMPOSE+=(--profile mail)
@@ -46,6 +54,8 @@ else
   ref="$(git -C "$ROOT" describe --tags --exact-match HEAD 2>/dev/null || true)"
   [[ -n "$ref" ]] || die 'HEAD ist kein veröffentlichter Release. Verwende --ref <tag|commit> oder --build.'
 fi
+
+ensure_dkim_permissions
 
 image_repository="${PFARRPLANER_IMAGE_REPOSITORY:-pfarrtools/pfarrplaner}"
 if (( build_local )); then

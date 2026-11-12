@@ -127,6 +127,12 @@ beziehungsweise aktualisiert:
 ./planer exec app php artisan queue:failed
 ```
 
+Beim Produktionsupdate werden die Rechte unter `secrets/dkim` vor dem
+Containerstart erneut festgelegt: Das Verzeichnis erhält `755`, private
+Schlüssel `600` und öffentliche TXT-Dateien `644`. Dadurch werden auch bereits
+vorhandene Installationen korrigiert, deren Verzeichnis noch mit `700` angelegt
+wurde und den OpenDKIM-Prozess am Zugriff hindert.
+
 Der App- und Horizon-Container verwenden intern `postfix:587`. Diese Verbindung
 liegt nur im privaten `mail`-Netzwerk und verwendet dort bewusst keine externe
 SMTP-Authentifizierung und kein STARTTLS; die Compose-Konfiguration setzt dafür
