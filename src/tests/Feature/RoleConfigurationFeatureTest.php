@@ -15,6 +15,8 @@ namespace Tests\Feature;
 use App\Services\RoleConfigurationSynchronizer;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
@@ -87,6 +89,15 @@ class RoleConfigurationFeatureTest extends TestCase
             ->expectsOutput('Vorschau: Rollen und Berechtigungen abgeglichen.')
             ->expectsOutputToContain('Rolle: Administrator:in')
             ->assertExitCode(0);
+    }
+
+    public function test_migrations_reset_the_permission_cache(): void
+    {
+        $registrar = \Mockery::mock(PermissionRegistrar::class);
+        $registrar->shouldReceive('forgetCachedPermissions')->once();
+        $this->app->instance(PermissionRegistrar::class, $registrar);
+
+        Event::dispatch(new MigrationsEnded('up'));
     }
 
     public function test_role_ui_routes_are_not_registered(): void

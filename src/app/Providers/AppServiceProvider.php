@@ -35,6 +35,7 @@ use App\Seating\SeatingValidators;
 use App\Services\QueryLogService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Mail\MailManager;
 use Illuminate\Support\Arr;
@@ -42,12 +43,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Laravel\Telescope\TelescopeServiceProvider;
+use Spatie\Permission\PermissionRegistrar;
 
 /**
  * Class AppServiceProvider
@@ -98,6 +101,10 @@ class AppServiceProvider extends ServiceProvider
         SeatingValidators::register();
 
         QueryLogService::register();
+
+        Event::listen(MigrationsEnded::class, function (): void {
+            app(PermissionRegistrar::class)->forgetCachedPermissions();
+        });
 
         Inertia::setRootView('inertia-app');
 
