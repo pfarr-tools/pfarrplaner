@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.20.3](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.20.2...v2026.20.3) (2026-11-12)
+
+
+### Features
+
+* **formate:** Ein- und Ausgabeformate kompakt darstellen ([1eb1cd2](https://github.com/pfarr-tools/pfarrplaner/commit/1eb1cd2edf45ab8867c96f8fbe204f335a4434a2)), closes [#40](https://github.com/pfarr-tools/pfarrplaner/issues/40)
+
+
+### Bug Fixes
+
+* **dev:** Laufzeitrechte für PHP-FPM korrigieren. ([4e6c4ec](https://github.com/pfarr-tools/pfarrplaner/commit/4e6c4ec7dc81f1d4e1f743c4a4e8789c6cd720a8)), closes [#69](https://github.com/pfarr-tools/pfarrplaner/issues/69)
+* **ical:** Kalenderexporte formatterfest machen. Fixes [#68](https://github.com/pfarr-tools/pfarrplaner/issues/68) ([bfd3744](https://github.com/pfarr-tools/pfarrplaner/commit/bfd3744499c9c7ca6c68355a283ed809aba33e1f))
+* **mail:** OpenDKIM-Rechte beim Produktionsupdate korrigieren. Fixes [#73](https://github.com/pfarr-tools/pfarrplaner/issues/73) ([6ef1fdc](https://github.com/pfarr-tools/pfarrplaner/commit/6ef1fdcccfb53cb6cc07f1a94cb4c28bcf3f4030))
+* **manual:** Kapitelnummern im Benutzerhandbuch korrigieren. ([3427109](https://github.com/pfarr-tools/pfarrplaner/commit/3427109af347911d9b3f1aafd982cfeb597c1d25))
+* **manual:** PDF-Handbuch vollständig erzeugen. ([a5b94ac](https://github.com/pfarr-tools/pfarrplaner/commit/a5b94acf1079c61fdaaf463fc7445cbafdbbb143))
+* **opferplan:** Änderungsereignis des Opfertyps verarbeiten ([eaeb57f](https://github.com/pfarr-tools/pfarrplaner/commit/eaeb57f67e5928ae2ed30da1c9d95c7b8ed4db3f))
+* **opferplan:** Auswahl und Opferzähler korrigieren ([ea261aa](https://github.com/pfarr-tools/pfarrplaner/commit/ea261aa48a09b1ebaabaf77d655ba5cd2ab65e13))
+* **opferplan:** Daten mit der Inertia-Seite laden ([235a59d](https://github.com/pfarr-tools/pfarrplaner/commit/235a59d5d4dd9dc2d27eb90628cb17662758d443))
+* **opferplan:** Geladene Servicedaten weiter reduzieren ([3517a14](https://github.com/pfarr-tools/pfarrplaner/commit/3517a14cb0db3024604cea573cc25884da8fe780))
+* **opferplan:** Leere Opfertypen als Auswahl anzeigen ([3167570](https://github.com/pfarr-tools/pfarrplaner/commit/3167570eba93fe164d16e6d37b251c9be93dc82a))
+* **opferplan:** Neuen Opfertyp beim Speichern verwenden ([679f9f9](https://github.com/pfarr-tools/pfarrplaner/commit/679f9f9ca14eb306a926bc8b8f6b437b3731f75a))
+* **opferplan:** Opfertypen als Radiobuttons anzeigen ([24718da](https://github.com/pfarr-tools/pfarrplaner/commit/24718daada5d86943088a5af3a7d5cea7b196fd2))
+* **opferplan:** Opfertypen beim Bearbeiten erhalten. Fixes [#71](https://github.com/pfarr-tools/pfarrplaner/issues/71) ([2648006](https://github.com/pfarr-tools/pfarrplaner/commit/264800675726a0808a750c4000565b591df6e2a5))
+* **opferplan:** Pagination im Opferplan entfernen ([b7fe55f](https://github.com/pfarr-tools/pfarrplaner/commit/b7fe55f7f77b135420c9e82e5e6d6f1c8c2fa784))
+* **opferplan:** Payload der Opferplanänderung begrenzen ([7dfdfa0](https://github.com/pfarr-tools/pfarrplaner/commit/7dfdfa0c9837ace191b20b8f34d85b1ae5632783))
+* **opferplan:** Verknüpfte Fremdgottesdienste ausblenden ([81c4db3](https://github.com/pfarr-tools/pfarrplaner/commit/81c4db389e2038c7e8ed55d2c613c3955aaba621))
+* **rollen:** Permission-Cache nach Synchronisierung zurücksetzen. ([e895352](https://github.com/pfarr-tools/pfarrplaner/commit/e895352fb85cb057823120adfc8c1a3fc4364a56))
+* **runtime:** Permission-Cache beim Anwendungsstart zurücksetzen. ([c478bae](https://github.com/pfarr-tools/pfarrplaner/commit/c478baee195b6a22d05bb5ebe512827b4a6440b3)), closes [#72](https://github.com/pfarr-tools/pfarrplaner/issues/72)
+
 ### [2026.20.2](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.20.1...v2026.20.2) (2026-11-11)
 
 
