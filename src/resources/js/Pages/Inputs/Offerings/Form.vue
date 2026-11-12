@@ -190,6 +190,8 @@ export default {
                     .get(route('service.data', slug), {
                         params: {
                             fields: [
+                                'slug',
+                                'time',
                                 'offering_goal',
                                 'offering_type',
                                 'offering_description',
@@ -198,8 +200,9 @@ export default {
                                 'offering_amount',
                                 'city_id',
                                 'location_id',
+                                'special_location',
                             ],
-                            load: ['location', 'city'],
+                            load: ['location:id,name', 'city:id,name'],
                             append: ['locationText', 'timeText'],
                         },
                     })

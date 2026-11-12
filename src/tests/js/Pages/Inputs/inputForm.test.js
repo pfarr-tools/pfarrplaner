@@ -63,7 +63,7 @@ describe('Offerings Form', () => {
         expect(window.axios.get).toHaveBeenCalledWith('/service.data', {
             params: {
                 fields: expect.arrayContaining(['offering_type']),
-                load: ['location', 'city'],
+                load: ['location:id,name', 'city:id,name'],
                 append: ['locationText', 'timeText'],
             },
         })
