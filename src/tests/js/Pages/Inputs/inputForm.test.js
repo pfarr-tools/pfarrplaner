@@ -2,10 +2,15 @@ import { mount } from '@vue/test-utils'
 import OfferingsForm from '@/Pages/Inputs/Offerings/Form.vue'
 
 const stubs = {
-    AdminLayout: { template: '<div><slot name="after-flash" /><slot /></div>' },
+    'admin-layout': {
+        template: '<div><slot name="navbar-left" /><slot name="after-flash" /><slot /></div>',
+    },
     FormInput: { template: '<input />', props: ['modelValue'] },
     FormRadioGroup: { template: '<div />', props: ['items', 'modelValue'] },
-    NavButton: { template: '<button><slot /></button>' },
+    NavButton: {
+        template: '<button @click="$emit(\'click\')"><slot /></button>',
+        emits: ['click'],
+    },
     Dataset: { template: '<div><slot :ds="{}" /></div>' },
     DatasetItem: { template: '<tbody />' },
     DatasetInfo: { template: '<div />' },
@@ -41,6 +46,18 @@ const eventStubs = {
 }
 
 describe('Offerings Form', () => {
+    it('toggles the beamer view from the top navigation', async () => {
+        const wrapper = mount(OfferingsForm, {
+            props: { services: [] },
+            global: { stubs },
+        })
+
+        expect(wrapper.vm.beamerView).toBe(false)
+        await wrapper.find('button').trigger('click')
+        expect(wrapper.vm.beamerView).toBe(true)
+        expect(wrapper.find('.beamer-view').exists()).toBe(true)
+    })
+
     it('uses the services supplied with the Inertia page', () => {
         const services = [{ id: 10255, offering_type: 'PO', city: { name: 'Gemeinde A' } }]
         const wrapper = mount(OfferingsForm, {

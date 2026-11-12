@@ -28,6 +28,15 @@
 
 <template>
     <admin-layout title="Opferplan bearbeiten">
+        <template #navbar-left>
+            <nav-button
+                type="secondary"
+                icon="mdi mdi-projector-screen"
+                title="Beameransicht umschalten"
+                @click="beamerView = !beamerView"
+                >{{ beamerView ? 'Normale Ansicht' : 'Beameransicht' }}</nav-button
+            >
+        </template>
         <template #after-flash>
             <div
                 v-if="saving"
@@ -42,7 +51,7 @@
                 <span class="mdi mdi-check"></span> Änderungen wurden automatisch gespeichert.
             </div>
         </template>
-        <div>
+        <div :class="{ 'beamer-view': beamerView }">
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
@@ -51,9 +60,9 @@
                                 <tr>
                                     <th>Gottesdienst</th>
                                     <th>Opferzweck</th>
-                                    <th>Anmerkungen</th>
-                                    <th>Opferzähler</th>
-                                    <th>Betrag</th>
+                                    <th v-if="!beamerView">Anmerkungen</th>
+                                    <th v-if="!beamerView">Opferzähler</th>
+                                    <th v-if="!beamerView">Betrag</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -84,7 +93,7 @@
                                             >
                                         </div>
                                     </td>
-                                    <td>
+                                    <td v-if="!beamerView">
                                         <form-input
                                             v-model="row.offering_goal"
                                             @input="serviceChanged(component, row)"
@@ -100,13 +109,13 @@
                                             class="mt-1"
                                         />
                                     </td>
-                                    <td>
+                                    <td v-if="!beamerView">
                                         <form-input
                                             v-model="row.offering_description"
                                             @input="serviceChanged(component, row)"
                                         />
                                     </td>
-                                    <td>
+                                    <td v-if="!beamerView">
                                         <form-input
                                             v-model="row.offerings_counter1"
                                             @input="serviceChanged(component, row)"
@@ -160,6 +169,7 @@ export default {
             saving: false,
             saved: false,
             component: this,
+            beamerView: false,
         }
     },
     methods: {
@@ -200,5 +210,15 @@ export default {
 <style scoped>
 .alert.alert-success {
     animation: fadeOut 5s forwards;
+}
+
+.beamer-view {
+    font-size: 2em;
+}
+
+.beamer-view :deep(.form-control),
+.beamer-view :deep(.form-check-label),
+.beamer-view :deep(.form-check-input) {
+    font-size: 1em;
 }
 </style>

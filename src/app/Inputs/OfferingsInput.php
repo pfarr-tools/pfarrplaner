@@ -31,6 +31,7 @@
 namespace App\Inputs;
 
 use App\Models\Location;
+use App\Models\Places\City;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -56,6 +57,11 @@ class OfferingsInput extends AbstractInput
      */
     protected $setupView = 'inputs.offerings.setup';
 
+    /**
+     * Determine whether the current user may edit offering plans.
+     *
+     * @return bool Whether the permission is granted.
+     */
     public function canEdit(): bool
     {
         return Auth::user()->can('gd-opfer-bearbeiten');
@@ -86,6 +92,14 @@ class OfferingsInput extends AbstractInput
             ]
         );
 
+        $cityIds = collect();
+        foreach (City::query()->whereIn('id', $setup['cities'])->get() as $city) {
+            $cityIds->push($city->id);
+            if ($city->is_org) {
+                $cityIds = $cityIds->merge($city->children->pluck('id'));
+            }
+        }
+
         $query = Service::setEagerLoads([])
             ->with(['location:id,name', 'city:id,name'])
             ->select([
@@ -108,6 +122,7 @@ class OfferingsInput extends AbstractInput
                 Carbon::createFromFormat('d.m.Y', $setup['to'])
             )
             ->inCities($setup['cities'])
+            ->whereIn('services.city_id', $cityIds->unique()->values())
             ->ordered();
 
         if (count($setup['locations'] ?? [])) {

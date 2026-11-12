@@ -41,6 +41,12 @@ class OfferingsInputFeatureTest extends TestCase
             'date' => '2026-06-21 10:00:00',
             'offering_type' => 'eO',
         ]);
+        $otherCity = City::factory()->create();
+        $relatedOnlyService = Service::factory()->create([
+            'city_id' => $otherCity->id,
+            'date' => '2026-06-21 11:00:00',
+        ]);
+        $relatedOnlyService->relatedCities()->attach($city->id);
 
         $response = $this->actingAs($user)->post(route('inputs.input', 'offerings'), [
             'from' => '01.01.2026',
