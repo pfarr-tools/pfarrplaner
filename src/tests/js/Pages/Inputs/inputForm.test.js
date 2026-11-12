@@ -24,11 +24,17 @@ const eventStubs = {
         data: () => ({
             row: {
                 city: { name: 'Gemeinde A' },
+                id: 10255,
                 slug: 'service-1',
                 date: '2026-01-01',
                 locationText: 'Kirche A',
                 timeText: '10:00',
                 offering_type: 'eO',
+                offering_goal: '',
+                offering_description: '',
+                offerings_counter1: '',
+                offerings_counter2: '',
+                offering_amount: '',
             },
         }),
     },
@@ -69,13 +75,19 @@ describe('Offerings Form', () => {
             props: { serviceSlugs: [] },
             global: { stubs },
         })
-        const service = { slug: 'service-1', offering_type: 'eO' }
+        const service = { id: 10255, offering_type: 'eO' }
 
-        await wrapper.vm.saveService(service, 'PO')
+        service.offering_type = 'PO'
+        await wrapper.vm.saveService(service)
 
         expect(window.axios.post).toHaveBeenCalledWith('/inputs.save', {
-            slug: 'service-1',
+            id: 10255,
+            offering_goal: '',
             offering_type: 'PO',
+            offering_description: '',
+            offerings_counter1: '',
+            offerings_counter2: '',
+            offering_amount: '',
         })
     })
 
@@ -89,12 +101,13 @@ describe('Offerings Form', () => {
         await wrapper.get('[data-testid="offering-type"]').trigger('click')
 
         expect(window.axios.post).toHaveBeenCalledWith('/inputs.save', {
-            city: { name: 'Gemeinde A' },
-            slug: 'service-1',
-            date: '2026-01-01',
-            locationText: 'Kirche A',
-            timeText: '10:00',
+            id: 10255,
+            offering_goal: '',
             offering_type: 'PO',
+            offering_description: '',
+            offerings_counter1: '',
+            offerings_counter2: '',
+            offering_amount: '',
         })
     })
 })

@@ -101,7 +101,7 @@
                                                 <form-selectize
                                                     :options="types"
                                                     v-model="row.offering_type"
-                                                    @input="saveService(row, $event)"
+                                                    @input="offeringTypeChanged(row, $event)"
                                                     class="mt-1"
                                                 />
                                             </td>
@@ -231,18 +231,27 @@ export default {
     },
     methods: {
         serviceChanged: __.debounce((component, service) => {
-            component.saveService(service.slug, service)
+            component.saveService(service)
         }, 1000),
-        saveService(service, offeringType) {
-            if (offeringType !== undefined) {
-                service.offering_type = offeringType
+        offeringTypeChanged(service, offeringType) {
+            service.offering_type = offeringType
+            this.saveService(service)
+        },
+        saveService(service) {
+            const data = {
+                id: service.id,
+                offering_goal: service.offering_goal ?? '',
+                offering_type: service.offering_type ?? '',
+                offering_description: service.offering_description ?? '',
+                offerings_counter1: service.offerings_counter1 ?? '',
+                offerings_counter2: service.offerings_counter2 ?? '',
+                offering_amount: service.offering_amount ?? '',
             }
             this.saved = false
             this.saving = true
             this.$forceUpdate()
 
-            axios.post(route('inputs.save', 'offerings'), service).then((response) => {
-                service.slug = response.data
+            axios.post(route('inputs.save', 'offerings'), data).then(() => {
                 this.saving = false
                 this.saved = true
                 this.$forceUpdate()
