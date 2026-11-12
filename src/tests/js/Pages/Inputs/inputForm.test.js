@@ -13,6 +13,27 @@ const stubs = {
     DatasetShow: { template: '<div />' },
 }
 
+const eventStubs = {
+    ...stubs,
+    FormSelectize: {
+        template: '<button data-testid="offering-type" @click="$emit(\'input\', \'PO\')" />',
+        props: ['options', 'modelValue'],
+    },
+    DatasetItem: {
+        template: '<tbody><slot :row="row" :rowIndex="0" /></tbody>',
+        data: () => ({
+            row: {
+                city: { name: 'Gemeinde A' },
+                slug: 'service-1',
+                date: '2026-01-01',
+                locationText: 'Kirche A',
+                timeText: '10:00',
+                offering_type: 'eO',
+            },
+        }),
+    },
+}
+
 describe('Offerings Form', () => {
     it('loads the offering type for each service', async () => {
         window.axios.get.mockResolvedValueOnce({
@@ -54,6 +75,25 @@ describe('Offerings Form', () => {
 
         expect(window.axios.post).toHaveBeenCalledWith('/inputs.save', {
             slug: 'service-1',
+            offering_type: 'PO',
+        })
+    })
+
+    it('saves when the offering type input event is emitted', async () => {
+        window.axios.post.mockResolvedValueOnce({ data: 'service-1' })
+        const wrapper = mount(OfferingsForm, {
+            props: { serviceSlugs: [] },
+            global: { stubs: eventStubs },
+        })
+
+        await wrapper.get('[data-testid="offering-type"]').trigger('click')
+
+        expect(window.axios.post).toHaveBeenCalledWith('/inputs.save', {
+            city: { name: 'Gemeinde A' },
+            slug: 'service-1',
+            date: '2026-01-01',
+            locationText: 'Kirche A',
+            timeText: '10:00',
             offering_type: 'PO',
         })
     })

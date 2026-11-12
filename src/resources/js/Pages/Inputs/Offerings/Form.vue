@@ -101,7 +101,7 @@
                                                 <form-selectize
                                                     :options="types"
                                                     v-model="row.offering_type"
-                                                    @update:modelValue="saveService(row, $event)"
+                                                    @input="saveService(row, $event)"
                                                     class="mt-1"
                                                 />
                                             </td>
