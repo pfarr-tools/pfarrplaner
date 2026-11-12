@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.20.4](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.20.3...v2026.20.4) (2026-11-12)
+
+
+### Bug Fixes
+
+* **opferplan:** Beamer-Schrift weiter vergrößern. ([4cafef5](https://github.com/pfarr-tools/pfarrplaner/commit/4cafef53b5f333b04ce14acb7e6345af8d6db856))
+* **opferplan:** Opferzweck in Beameransicht anzeigen. ([b989f0b](https://github.com/pfarr-tools/pfarrplaner/commit/b989f0bd87da9bd90da7079525ef2447c6c062ec))
+* **opferplan:** Tagesübernahme und Beamerdarstellung erweitern. ([d4fbb92](https://github.com/pfarr-tools/pfarrplaner/commit/d4fbb92f76e81bcddd93d14452c442bb4c00e617))
+* **quality:** PHP-Formatierung korrigieren. Fixes [#78](https://github.com/pfarr-tools/pfarrplaner/issues/78) ([4971380](https://github.com/pfarr-tools/pfarrplaner/commit/49713808f0d01612983aa1726be00cdac818e8f1))
+* **runtime:** Permission-Cache nach Datenimporten zurücksetzen. ([a6d040f](https://github.com/pfarr-tools/pfarrplaner/commit/a6d040f820487623bc2eaee4718bba94f5756d46)), closes [#76](https://github.com/pfarr-tools/pfarrplaner/issues/76)
+* **runtime:** Permission-Cache nach Migrationen invalidieren. ([1b50894](https://github.com/pfarr-tools/pfarrplaner/commit/1b50894e3f544af488836a0a002eb88fd72345bc)), closes [#77](https://github.com/pfarr-tools/pfarrplaner/issues/77)
+
 ### [2026.20.3](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.20.2...v2026.20.3) (2026-11-12)
 
 
