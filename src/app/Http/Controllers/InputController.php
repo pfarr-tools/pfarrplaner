@@ -35,6 +35,7 @@ use App\Inputs\Inputs;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Inertia\Inertia;
@@ -45,6 +46,9 @@ use Inertia\Response;
  */
 class InputController extends Controller
 {
+    /**
+     * Protect input routes with authentication.
+     */
     public function __construct()
     {
         $this->middleware('auth');
@@ -70,6 +74,12 @@ class InputController extends Controller
         return $input->setup($request);
     }
 
+    /**
+     * Resolve and authorize an input handler.
+     *
+     * @param  string  $input  Input key.
+     * @return AbstractInput Authorized input handler.
+     */
     protected function getInputClass($input): AbstractInput
     {
         try {
@@ -82,6 +92,13 @@ class InputController extends Controller
         return $input;
     }
 
+    /**
+     * Render an input's collected data page.
+     *
+     * @param  Request  $request  Input request.
+     * @param  string  $input  Input key.
+     * @return mixed Collected input response.
+     */
     public function input(Request $request, $input)
     {
         $input = $this->getInputClass($input);
@@ -89,6 +106,24 @@ class InputController extends Controller
         return $input->input($request);
     }
 
+    /**
+     * Return to the input setup when a collected input page is reloaded.
+     *
+     * @param  string  $input  Input key.
+     * @return RedirectResponse Setup redirect.
+     */
+    public function inputReload($input): RedirectResponse
+    {
+        return redirect()->route('inputs.setup', $input);
+    }
+
+    /**
+     * Save data submitted by an input page.
+     *
+     * @param  Request  $request  Save request.
+     * @param  string  $input  Input key.
+     * @return mixed Save response.
+     */
     public function save(Request $request, $input)
     {
         $input = $this->getInputClass($input);

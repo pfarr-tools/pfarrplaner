@@ -44,4 +44,5 @@ use App\Http\Controllers\InputController;
 Route::get('/input', [InputController::class, 'index'])->name('inputs.index');
 Route::get('/input/{input}', [InputController::class, 'setup'])->name('inputs.setup');
 Route::post('/input/collect/{input}', [InputController::class, 'input'])->name('inputs.input');
+Route::get('/input/collect/{input}', [InputController::class, 'inputReload'])->name('inputs.input.reload');
 Route::post('/input/save/{input}', [InputController::class, 'save'])->name('inputs.save');

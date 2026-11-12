@@ -1,4 +1,4 @@
-import { flushPromises, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import OfferingsForm from '@/Pages/Inputs/Offerings/Form.vue'
 
 const stubs = {
@@ -41,38 +41,21 @@ const eventStubs = {
 }
 
 describe('Offerings Form', () => {
-    it('loads the offering type for each service', async () => {
-        window.axios.get.mockResolvedValueOnce({
-            data: {
-                slug: 'service-1',
-                date: '2026-01-01',
-                offering_type: 'PO',
-                city: { name: 'Gemeinde A' },
-                locationText: 'Kirche A',
-                timeText: '10:00',
-            },
-        })
-
-        mount(OfferingsForm, {
-            props: { serviceSlugs: ['service-1'] },
+    it('uses the services supplied with the Inertia page', () => {
+        const services = [{ id: 10255, offering_type: 'PO' }]
+        const wrapper = mount(OfferingsForm, {
+            props: { services },
             global: { stubs },
         })
 
-        await flushPromises()
-
-        expect(window.axios.get).toHaveBeenCalledWith('/service.data', {
-            params: {
-                fields: expect.arrayContaining(['offering_type']),
-                load: ['location:id,name', 'city:id,name'],
-                append: ['locationText', 'timeText'],
-            },
-        })
+        expect(window.axios.get).not.toHaveBeenCalled()
+        expect(wrapper.vm.services).toEqual(services)
     })
 
     it('saves the newly selected offering type', async () => {
         window.axios.post.mockResolvedValueOnce({ data: 'service-1' })
         const wrapper = mount(OfferingsForm, {
-            props: { serviceSlugs: [] },
+            props: { services: [] },
             global: { stubs },
         })
         const service = { id: 10255, offering_type: 'eO' }
@@ -94,7 +77,7 @@ describe('Offerings Form', () => {
     it('saves when the offering type input event is emitted', async () => {
         window.axios.post.mockResolvedValueOnce({ data: 'service-1' })
         const wrapper = mount(OfferingsForm, {
-            props: { serviceSlugs: [] },
+            props: { services: [] },
             global: { stubs: eventStubs },
         })
 

@@ -86,10 +86,23 @@ class OfferingsInput extends AbstractInput
             ]
         );
 
-        $locations = Location::inCities($setup['cities'])->get();
-
-        $query = Service::with(['city'])
-            ->select('services.slug')
+        $query = Service::setEagerLoads([])
+            ->with(['location:id,name', 'city:id,name'])
+            ->select([
+                'services.id',
+                'services.slug',
+                'services.date',
+                'services.time',
+                'services.city_id',
+                'services.location_id',
+                'services.special_location',
+                'services.offering_goal',
+                'services.offering_type',
+                'services.offering_description',
+                'services.offerings_counter1',
+                'services.offerings_counter2',
+                'services.offering_amount',
+            ])
             ->between(
                 Carbon::createFromFormat('d.m.Y', $setup['from']),
                 Carbon::createFromFormat('d.m.Y', $setup['to'])
@@ -101,9 +114,10 @@ class OfferingsInput extends AbstractInput
             $query->whereIn('services.location_id', $setup['locations']);
         }
 
-        $serviceSlugs = $query->get()->pluck('slug');
+        $services = $query->get();
+        $services->each->setAppends(['locationText', 'timeText']);
 
-        return Inertia::render('Inputs/Offerings/Form', compact('serviceSlugs'));
+        return Inertia::render('Inputs/Offerings/Form', compact('services'));
     }
 
     /**

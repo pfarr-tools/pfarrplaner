@@ -30,12 +30,6 @@
     <admin-layout title="Opferplan bearbeiten">
         <template #after-flash>
             <div
-                v-if="serviceSlugs.length - serviceLoaded > 0"
-                class="alert alert-info"
-            >
-                Daten für {{ serviceSlugs.length - serviceLoaded }} Gottesdienste werden geladen...
-            </div>
-            <div
                 v-if="saving"
                 class="alert alert-warning"
             >
@@ -48,7 +42,7 @@
                 <span class="mdi mdi-check"></span> Änderungen wurden automatisch gespeichert.
             </div>
         </template>
-        <div v-if="serviceSlugs.length - serviceLoaded == 0">
+        <div>
             <dataset
                 v-slot="{ ds }"
                 :ds-data="services"
@@ -182,45 +176,9 @@ export default {
         DatasetSearch,
         DatasetShow,
     },
-    props: ['serviceSlugs', 'users', 'ministries', 'teams'],
-    created() {
-        this.serviceSlugs.forEach((slug) => {
-            if (slug) {
-                axios
-                    .get(route('service.data', slug), {
-                        params: {
-                            fields: [
-                                'slug',
-                                'time',
-                                'offering_goal',
-                                'offering_type',
-                                'offering_description',
-                                'offerings_counter1',
-                                'offerings_counter2',
-                                'offering_amount',
-                                'city_id',
-                                'location_id',
-                                'special_location',
-                            ],
-                            load: ['location:id,name', 'city:id,name'],
-                            append: ['locationText', 'timeText'],
-                        },
-                    })
-                    .then((response) => {
-                        response.data.offering_type = response.data.offering_type || ''
-                        this.services.push(response.data)
-                        this.services = __.orderBy(this.services, ['date'], ['asc'])
-                        this.serviceLoaded++
-                    })
-            } else {
-                this.serviceLoaded++
-            }
-        })
-    },
+    props: ['services', 'users', 'ministries', 'teams'],
     data() {
         return {
-            serviceLoaded: 0,
-            services: [],
             saving: false,
             saved: false,
             showEntries: 25,
