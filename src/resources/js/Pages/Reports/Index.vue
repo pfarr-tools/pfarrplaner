@@ -27,71 +27,61 @@
   -->
 
 <template>
-    <admin-layout title="Ausgabeformat wählen">
-        <div v-for="(groupReports, groupTitle) in reports">
-            <h3
-                v-if="groupReports.length"
-                class="mt-3"
-            >
-                {{ groupTitle }}
-            </h3>
-            <div
-                v-if="groupReports.length"
-                class="row"
-            >
-                <div
-                    v-for="report in groupReports"
-                    class="col-md-4 p-2 border-light report-card"
-                    @click="createReport(report)"
-                >
-                    <div class="fw-semibold">
-                        <span :class="report.icon"></span>
-                        {{ report.title }}
-                    </div>
-                    <div>{{ report.description }}</div>
-                </div>
-            </div>
-        </div>
+    <admin-layout
+        title="Ausgabeformat wählen"
+        no-outer-padding
+    >
+        <FormatIndex
+            search-placeholder="Ausgabeformate suchen ..."
+            empty-title="Keine Ausgabeformate verfügbar"
+            empty-description="Für deine aktuelle Auswahl stehen keine Ausgabeformate zur Verfügung."
+            :groups="formatGroups"
+            @select="createReport"
+        />
     </admin-layout>
 </template>
 
 <script>
-import Card from '../../components/Ui/cards/card.vue'
-import CardBody from '../../components/Ui/cards/cardBody.vue'
+import FormatIndex from '../../components/Ui/FormatIndex.vue'
 
 export default {
     name: 'Index',
-    props: ['reports'],
     components: {
-        Card,
-        CardBody,
+        FormatIndex,
+    },
+    props: {
+        reports: {
+            type: Object,
+            required: true,
+        },
+    },
+    computed: {
+        formatGroups() {
+            return Object.entries(this.reports).map(([title, groupReports]) => ({
+                title,
+                items: groupReports.map((report) => ({
+                    key: report.key,
+                    title: report.title,
+                    description: report.description,
+                    icon: report.icon,
+                    href: window.route('reports.setup', report.key),
+                    inertia: report.inertia,
+                })),
+            }))
+        },
     },
     methods: {
+        /**
+         * Opens a report using its configured navigation mode.
+         *
+         * @param {Object} report The selected report.
+         * @returns {void}
+         */
         createReport(report) {
             if (report.inertia) {
-                this.$inertia.get(route('reports.setup', report.key))
-            } else {
-                window.location.href = route('reports.setup', report.key)
+                this.$inertia.get(report.href)
             }
         },
     },
 }
 </script>
-
-<style scoped lang="scss">
-@use '../../../sass/theme' as theme;
-
-h3 {
-    width: 100%;
-    border-bottom: solid 1px lightgray;
-}
-
-.report-card {
-    cursor: pointer;
-}
-
-.report-card:hover {
-    background-color: theme.theme-color('secondary');
-    color: white;
-}
-</style>

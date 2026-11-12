@@ -27,138 +27,64 @@
   -->
 
 <template>
-    <admin-layout title="Assistent wählen">
-        <dataset
-            v-slot="{ ds }"
-            :ds-data="inputs"
-            ds-sort-by="name"
-            :ds-search-in="['title', 'description', 'group']"
-        >
-            <div
-                class="row mb-3"
-                :data-page-count="ds.dsPagecount"
-            >
-                <div class="col-md-6 mb-2 mb-md-0">
-                    <dataset-search
-                        ds-search-placeholder="Suchen..."
-                        ref="search"
-                        autofocus
-                    />
-                </div>
-                <div class="col-md-6 text-end">
-                    <dataset-show
-                        class="float-right"
-                        :ds-show-entries="showEntries"
-                    />
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <dataset-item class="form-row row mb-3">
-                        <template #default="{ row, rowIndex }">
-                            <div class="col-md-4">
-                                <a
-                                    @click.prevent.stop="createInput(row)"
-                                    href="#"
-                                    class="report-link"
-                                >
-                                    <card
-                                        class="mb-2 report-card"
-                                        title="Klicken, um diesen Assistenten zu wählen"
-                                        @click="createInput(row)"
-                                    >
-                                        <card-body>
-                                            <h3
-                                                class="card-title mb-2"
-                                                :title="`Index: ${rowIndex}`"
-                                            >
-                                                <span class="mdi mdi-keyboard"></span>
-                                                {{ row.name }}
-                                            </h3>
-                                            <div class="card-text mb-0 ps-4">
-                                                {{ row.description }}
-                                            </div>
-                                        </card-body>
-                                    </card>
-                                </a>
-                            </div>
-                        </template>
-                        <template #noDataFound>
-                            <div class="col-md-12 pt-2">
-                                <p class="text-center">No results found</p>
-                            </div>
-                        </template>
-                    </dataset-item>
-                </div>
-            </div>
-            <div
-                class="d-flex flex-md-row flex-column justify-content-between align-items-center border-top pt-2"
-            >
-                <dataset-info class="mb-2 mb-md-0" />
-                <dataset-pager />
-            </div>
-        </dataset>
+    <admin-layout
+        title="Assistenten wählen"
+        no-outer-padding
+    >
+        <FormatIndex
+            search-placeholder="Assistenten suchen ..."
+            empty-title="Keine Assistenten verfügbar"
+            empty-description="Für dein Konto sind derzeit keine freigeschalteten Assistenten verfügbar."
+            :groups="formatGroups"
+            @select="createInput"
+        />
     </admin-layout>
 </template>
 
 <script>
-import NavButton from '../../components/Ui/buttons/NavButton'
-import CardBody from '../../components/Ui/cards/cardBody'
-import Card from '../../components/Ui/cards/card'
-import { Dataset, DatasetItem, DatasetSearch } from 'vue-dataset'
-import DatasetInfo from '../../components/Ui/dataset/DatasetInfo'
-import DatasetPager from '../../components/Ui/dataset/DatasetPager'
-import DatasetShow from '../../components/Ui/dataset/DatasetShow'
-import CardHeader from '../../components/Ui/cards/cardHeader'
+import FormatIndex from '../../components/Ui/FormatIndex.vue'
 
 export default {
     name: 'Index',
-    props: ['inputs'],
     components: {
-        CardHeader,
-        NavButton,
-        CardBody,
-        Card,
-        Dataset,
-        DatasetItem,
-        DatasetInfo,
-        DatasetPager,
-        DatasetSearch,
-        DatasetShow,
+        FormatIndex,
     },
-    data() {
-        return {
-            showEntries: 25,
-        }
+    props: {
+        inputs: {
+            type: [Array, Object],
+            required: true,
+        },
+    },
+    computed: {
+        inputList() {
+            return Array.isArray(this.inputs) ? this.inputs : Object.values(this.inputs)
+        },
+        formatGroups() {
+            return [
+                {
+                    title: 'Assistenten',
+                    items: this.inputList.map((input) => ({
+                        key: input.id,
+                        title: input.name,
+                        description: input.description,
+                        icon: 'mdi mdi-keyboard',
+                        href: window.route('inputs.setup', input.id),
+                        inertia: true,
+                    })),
+                },
+            ]
+        },
     },
     methods: {
+        /**
+         * Opens an input assistant through Inertia.
+         *
+         * @param {Object} input The selected input assistant.
+         * @returns {void}
+         */
         createInput(input) {
-            this.$inertia.get(route('inputs.setup', input.id))
+            this.$inertia.get(input.href)
         },
     },
 }
 </script>
-
-<style scoped>
-.report-card {
-    cursor: pointer;
-}
-
-.report-card:hover {
-    border-color: #80bdff;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-.report-card .card-body h3 {
-    font-weight: bold;
-    width: 100%;
-    display: block;
-}
-
-a.report-link,
-a.report-link:hover {
-    text-decoration: none;
-    color: black;
-}
-</style>
