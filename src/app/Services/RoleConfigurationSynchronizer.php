@@ -24,9 +24,7 @@ class RoleConfigurationSynchronizer
     /**
      * @param  PermissionRegistrar  $permissionRegistrar  Permission cache registrar.
      */
-    public function __construct(private PermissionRegistrar $permissionRegistrar)
-    {
-    }
+    public function __construct(private PermissionRegistrar $permissionRegistrar) {}
 
     /**
      * Synchronize configured roles and permissions without deleting unknown records.

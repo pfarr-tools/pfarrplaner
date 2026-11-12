@@ -14,13 +14,13 @@ namespace Tests\Feature;
 
 use App\Services\RoleConfigurationSynchronizer;
 use App\Services\RoleService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class RoleConfigurationFeatureTest extends TestCase
