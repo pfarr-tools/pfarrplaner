@@ -71,7 +71,7 @@
                                     :key="rowIndex"
                                 >
                                     <td :class="row.cc ? '' : 'text-muted'">
-                                        {{ moment(row.date).format('DD.MM.YYYY') }},
+                                        <span class="service-date">{{ moment(row.date).format('DD.MM.YYYY') }}</span>,
                                         {{ row.timeText }}<br />
                                         {{ row.locationText }}
                                         <div>
@@ -91,13 +91,23 @@
                                                 @click="editService(row)"
                                                 >Bearbeiten</nav-button
                                             >
+                                            <nav-button
+                                                v-if="hasMultipleServicesOnDate(row)"
+                                                type="outline-secondary"
+                                                class="btn-sm ms-1"
+                                                title="Opferangaben für alle Gottesdienste an diesem Tag übernehmen"
+                                                @click="applyOfferingToDate(row)"
+                                                >Für alle an diesem Tag übernehmen</nav-button
+                                            >
                                         </div>
                                     </td>
                                     <td>
-                                        <form-input
-                                            v-model="row.offering_goal"
-                                            @input="serviceChanged(component, row)"
-                                        />
+                                        <div class="offering-goal-field">
+                                            <form-input
+                                                v-model="row.offering_goal"
+                                                @input="serviceChanged(component, row)"
+                                            />
+                                        </div>
                                         <form-radio-group
                                             v-model="row.offering_type"
                                             :items="{
@@ -185,6 +195,7 @@ export default {
                 id: service.id,
                 offering_goal: service.offering_goal ?? '',
                 offering_type: service.offering_type ?? '',
+                offering_text: service.offering_text ?? '',
                 offering_description: service.offering_description ?? '',
                 offerings_counter1: service.offerings_counter1 ?? '',
                 offerings_counter2: service.offerings_counter2 ?? '',
@@ -200,6 +211,49 @@ export default {
                 this.$forceUpdate()
             })
         },
+        /**
+         * Copy the offering details to all visible services on the same date.
+         *
+         * @param {Object} service The source service.
+         * @returns {void}
+         */
+        applyOfferingToDate(service) {
+            const fields = [
+                'offering_goal',
+                'offering_text',
+                'offering_type',
+                'offering_description',
+            ]
+            const servicesOnDate = this.services.filter((candidate) =>
+                this.isSameServiceDate(candidate, service),
+            )
+
+            servicesOnDate.forEach((candidate) => {
+                fields.forEach((field) => {
+                    candidate[field] = service[field] ?? ''
+                })
+                this.saveService(candidate)
+            })
+        },
+        /**
+         * Determine whether the date has more than one visible service.
+         *
+         * @param {Object} service The service whose date is checked.
+         * @returns {boolean} Whether the date has multiple visible services.
+         */
+        hasMultipleServicesOnDate(service) {
+            return this.services.filter((candidate) => this.isSameServiceDate(candidate, service)).length > 1
+        },
+        /**
+         * Compare services by the displayed calendar date.
+         *
+         * @param {Object} firstService The first service.
+         * @param {Object} secondService The second service.
+         * @returns {boolean} Whether both services take place on the same date.
+         */
+        isSameServiceDate(firstService, secondService) {
+            return moment(firstService.date).format('YYYY-MM-DD') === moment(secondService.date).format('YYYY-MM-DD')
+        },
         editService(service) {
             window.open(route('service.edit', service.slug))
         },
@@ -213,12 +267,27 @@ export default {
 }
 
 .beamer-view {
-    font-size: 4em;
+    font-size: 3em;
 }
 
 .beamer-view :deep(.form-control),
 .beamer-view :deep(.form-check-label),
 .beamer-view :deep(.form-check-input) {
     font-size: 1em;
+}
+
+.beamer-view tbody tr:hover > * {
+    background-color: #f8d7da !important;
+    color: #842029;
+}
+
+.beamer-view .service-date {
+    font-weight: 700;
+}
+
+.beamer-view .offering-goal-field :deep(.form-control) {
+    /* 1.1667em of the 3em beamer size equals approximately 3.5em overall. */
+    font-size: 1.1667em;
+    font-weight: 700;
 }
 </style>

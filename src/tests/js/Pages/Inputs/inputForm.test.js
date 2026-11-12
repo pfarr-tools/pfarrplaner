@@ -109,6 +109,76 @@ describe('Offerings Form', () => {
         expect(wrapper.vm.services).toEqual(services)
     })
 
+    it('applies the offering fields to all shown services on the same date', async () => {
+        window.axios.post.mockResolvedValue({ data: 'service-1' })
+        const services = [
+            {
+                id: 10255,
+                date: '2026-01-01',
+                city: { name: 'Gemeinde A' },
+                offering_goal: 'Brot für die Welt',
+                offering_text: 'Bitte unterstützen Sie dieses Projekt.',
+                offering_type: 'PO',
+                offering_description: 'Anmerkung',
+            },
+            {
+                id: 10256,
+                date: '2026-01-01T12:00:00',
+                city: { name: 'Gemeinde A' },
+                offering_goal: '',
+                offering_text: '',
+                offering_type: '',
+                offering_description: '',
+                offerings_counter1: '12',
+                offerings_counter2: '3',
+                offering_amount: '42,00',
+            },
+            {
+                id: 10257,
+                date: '2026-01-02',
+                city: { name: 'Gemeinde A' },
+                offering_goal: '',
+                offering_text: '',
+                offering_type: '',
+                offering_description: '',
+            },
+        ]
+        const wrapper = mount(OfferingsForm, {
+            props: { services },
+            global: { stubs },
+        })
+
+        expect(
+            wrapper
+                .findAll('button')
+                .filter((button) => button.text().includes('Für alle an diesem Tag übernehmen')),
+        ).toHaveLength(2)
+
+        await wrapper.vm.applyOfferingToDate(services[0])
+
+        expect(services[1]).toMatchObject({
+            offering_goal: 'Brot für die Welt',
+            offering_text: 'Bitte unterstützen Sie dieses Projekt.',
+            offering_type: 'PO',
+            offering_description: 'Anmerkung',
+            offerings_counter1: '12',
+            offerings_counter2: '3',
+            offering_amount: '42,00',
+        })
+        expect(services[2].offering_goal).toBe('')
+        expect(window.axios.post).toHaveBeenCalledTimes(2)
+        expect(window.axios.post).toHaveBeenNthCalledWith(2, '/inputs.save', {
+            id: 10256,
+            offering_goal: 'Brot für die Welt',
+            offering_type: 'PO',
+            offering_text: 'Bitte unterstützen Sie dieses Projekt.',
+            offering_description: 'Anmerkung',
+            offerings_counter1: '12',
+            offerings_counter2: '3',
+            offering_amount: '42,00',
+        })
+    })
+
     it('saves the newly selected offering type', async () => {
         window.axios.post.mockResolvedValueOnce({ data: 'service-1' })
         const wrapper = mount(OfferingsForm, {
@@ -124,6 +194,7 @@ describe('Offerings Form', () => {
             id: 10255,
             offering_goal: '',
             offering_type: 'PO',
+            offering_text: '',
             offering_description: '',
             offerings_counter1: '',
             offerings_counter2: '',
@@ -161,6 +232,7 @@ describe('Offerings Form', () => {
             id: 10255,
             offering_goal: '',
             offering_type: 'PO',
+            offering_text: '',
             offering_description: '',
             offerings_counter1: '',
             offerings_counter2: '',

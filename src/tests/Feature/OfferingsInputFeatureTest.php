@@ -40,6 +40,7 @@ class OfferingsInputFeatureTest extends TestCase
             'city_id' => $city->id,
             'date' => '2026-06-21 10:00:00',
             'offering_type' => 'eO',
+            'offering_text' => 'Zusätzlicher Opfertext',
         ]);
         $otherCity = City::factory()->create();
         $relatedOnlyService = Service::factory()->create([
@@ -60,6 +61,7 @@ class OfferingsInputFeatureTest extends TestCase
             ->has('services', 1)
             ->where('services.0.id', $service->id)
             ->where('services.0.offering_type', 'eO')
+            ->where('services.0.offering_text', 'Zusätzlicher Opfertext')
             ->missing('serviceSlugs'));
     }
 
