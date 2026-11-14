@@ -189,6 +189,38 @@
                     v-model="myCity.default_offering_url"
                 />
                 <form-input
+                    name="offering_certificate_email"
+                    type="email"
+                    label="Opferurkunde automatisch versenden an:"
+                    v-model="myCity.offering_certificate_email"
+                />
+                <div
+                    v-if="city.id"
+                    class="mt-3 rounded border p-3"
+                >
+                    <div class="fw-bold mb-2">Öffentliche Opfererfassung</div>
+                    <div class="input-group mb-3">
+                        <input
+                            class="form-control"
+                            readonly
+                            :value="offeringsUrl"
+                            aria-label="Signierter Link zur Opfererfassung"
+                        />
+                        <a
+                            class="btn btn-outline-secondary"
+                            :href="offeringsUrl"
+                            target="_blank"
+                            rel="noopener"
+                            >Öffnen</a
+                        >
+                    </div>
+                    <img
+                        :src="offeringsQrUrl"
+                        alt="QR-Code für die öffentliche Opfererfassung"
+                        class="offering-qr"
+                    />
+                </div>
+                <form-input
                     name="iban"
                     label="Bankkonto (IBAN)"
                     v-model="myCity.iban"
@@ -443,7 +475,16 @@ export default {
         CardHeader,
         Card,
     },
-    props: ['city', 'streams', 'ministries', 'tab', 'canDelete', 'possibleChildren'],
+    props: [
+        'city',
+        'streams',
+        'ministries',
+        'tab',
+        'canDelete',
+        'possibleChildren',
+        'offeringsUrl',
+        'offeringsQrUrl',
+    ],
     created() {
         this.$api()
             .get(route('api.ministries.list'))
@@ -507,4 +548,11 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.offering-qr {
+    display: block;
+    width: 180px;
+    max-width: 100%;
+    image-rendering: pixelated;
+}
+</style>

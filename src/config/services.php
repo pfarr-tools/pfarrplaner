@@ -69,4 +69,8 @@ return [
             'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
         ],
     ],
+
+    'browsershot' => [
+        'chrome_path' => env('BROWSERSHOT_CHROME_PATH', '/usr/bin/chromium'),
+    ],
 ];

@@ -33,6 +33,7 @@ namespace Tests\Feature;
 use App\Models\Places\City;
 use App\Services\RoleService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\URL;
 use Tests\AbstractModelFeatureTest;
 
 class CityFeatureTest extends AbstractModelFeatureTest
@@ -45,5 +46,19 @@ class CityFeatureTest extends AbstractModelFeatureTest
     {
         parent::setUp();
         $this->testUser->assignRole(RoleService::ROLE_SUPER_ADMIN);
+    }
+
+    /**
+     * City editing exposes the signed offerings URL and its QR image URL.
+     */
+    public function test_city_editor_exposes_public_offerings_links(): void
+    {
+        $city = City::factory()->create();
+
+        $this->actingAs($this->testUser)->get(route('admin.city.edit', ['modelId' => $city->id]))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('offeringsUrl', URL::signedRoute('offerings.public', ['city' => $city]))
+                ->where('offeringsQrUrl', route('offerings.qr', ['city' => $city])));
     }
 }

@@ -119,6 +119,50 @@ Die Seite enthält:
 
 Es werden kommende Gottesdienste angezeigt, bei denen Personen in den ausgewählten Dienstkategorien eingetragen sind.
 
+## Öffentliche Opfererfassung
+
+Die öffentliche Opfererfassung ist für die Personen gedacht, die nach einem Gottesdienst die eingenommene Summe eintragen. Die Seite wird über den signierten Link der Kirchengemeinde oder über den dazugehörigen QR-Code geöffnet. Eine Anmeldung ist nicht erforderlich.
+
+### Link und QR-Code einrichten
+
+Eine Person mit Schreib- oder Administrationsrechten für die Kirchengemeinde öffnet **Administration → Orte → Kirchengemeinde → Opfer**. Im Abschnitt **Öffentliche Opfererfassung** stehen:
+
+- **URL**: Der persönliche Freigabelink für diese Kirchengemeinde. Über das Kopiersymbol kann die URL in die Zwischenablage übernommen werden.
+- **QR-Code**: Dasselbe Ziel als Bild. Sie können den QR-Code auf einem Zettel, im Gottesdienstraum oder in einer internen Anleitung bereitstellen.
+- **Opferurkunde automatisch versenden an:**: Optional eine E-Mail-Adresse. Nach dem Speichern einer Opferangabe wird die Opferurkunde automatisch als PDF an diese Adresse gesendet.
+
+Geben Sie den Link und den QR-Code nur an Personen weiter, die Opferangaben für diese Kirchengemeinde erfassen sollen. Der Link ersetzt kein Benutzerkonto und darf nicht öffentlich auf der Gemeindehomepage veröffentlicht werden.
+
+![Öffentliche Opfererfassung in der Gemeindeverwaltung](media/images/admin-gemeinde-opfer.png)
+
+### Opfer eintragen
+
+Nach dem Öffnen sehen Sie die Seite **Opfer erfassen**. Sie zeigt die noch offenen Gottesdienste der aktuellen Tage. Gottesdienste, für die bereits eine Opfersumme gespeichert wurde, werden nicht mehr angeboten.
+
+1. Wählen Sie einen Gottesdienst aus. Die Eingabemaske öffnet sich als eigene Seite innerhalb des Freigabelinks.
+2. Tragen Sie die **Gesamtsumme in Euro** ein. Komma oder Punkt als Dezimaltrennzeichen sind möglich.
+3. Wenn Sie die Zusammensetzung der Summe kennen, öffnen Sie **Einzelaufstellung einblenden** und tragen Sie die Anzahl der Scheine und Münzen ein. Die Summe wird daraus automatisch berechnet und im Betragsfeld aktualisiert. Die Einzelaufstellung ist optional.
+4. Tragen Sie immer die Namen der **1. Opferzähler:in** und **2. Opferzähler:in** ein, soweit sie bekannt sind. Diese beiden Felder werden immer angezeigt.
+5. Klicken Sie auf **Opfer speichern**.
+
+Nach dem Speichern erscheint die Bestätigung **Opfer erfolgreich gespeichert**. Erst über **Weitere Opfer erfassen** gelangen Sie zurück zur Auswahl. Der gespeicherte Gottesdienst wird danach nicht mehr angezeigt und kann über diesen öffentlichen Link nicht erneut geändert werden.
+
+![Öffentliche Opfererfassung: Gottesdienst auswählen](media/images/oeffentlich-opfererfassung-auswahl.png)
+
+![Öffentliche Opfererfassung: Summe und Opferzähler:innen eintragen](media/images/oeffentlich-opfererfassung-eingabe.png)
+
+![Öffentliche Opfererfassung: Speichern bestätigt](media/images/oeffentlich-opfererfassung-bestaetigung.png)
+
+### Opferurkunde erstellen
+
+Für einen gespeicherten Gottesdienst kann eine Person mit Zugriff auf **Ausgabeformate** die **Opferurkunde** erstellen. Wählen Sie den Gottesdienst mit gespeicherter Opfersumme aus und klicken Sie auf **Opferurkunde erstellen**.
+
+Die Urkunde enthält Gemeinde, Datum, Gottesdienst, **Organist:in**, **Opferzweck** und Gesamtsumme. Ein leerer Opferzweck wird als **Eigene Gemeinde** ausgegeben. Wenn eine Einzelaufstellung erfasst wurde, erscheinen zusätzlich die Stückelungen und Einzelbeträge; die Beträge sind rechtsbündig ausgerichtet. Ohne Einzelaufstellung wird nur die Gesamtsumme ausgegeben.
+
+Unten auf der Opferurkunde stehen ohne zusätzliche Leerzeile der Block **Für die Richtigkeit!** und darunter in einer Zeile Ort, Datum sowie die Namen der beiden Opferzähler:innen. Unterschriftslinien gibt es nicht. In kleiner Schrift steht auf der Urkunde, dass sie maschinell erstellt wurde und ohne Unterschrift gültig ist. Wenn eine E-Mail-Adresse in der Gemeindeverwaltung eingetragen ist, wird die Urkunde nach der öffentlichen Erfassung automatisch als PDF an diese Adresse gesendet.
+
+![Auswahl eines Gottesdienstes für die Opferurkunde](media/images/berichte-opferurkunde-auswahl.png)
+
 ---
 
 ## Nächster Stream
@@ -133,5 +177,7 @@ Wenn kein künftiger Stream gefunden wird, verwendet Pfarrplaner den letzten vor
 
 - [Urlaubsplan](urlaubsplan.md): Öffentliche Pool-Übersicht für Bestatter
 - [Berichte und Ausgaben](berichte.md): HTML-Code für Websites erstellen
+- [Administration](administration.md): Freigabelink, QR-Code und E-Mail-Adresse für die Opfererfassung einrichten
+- [Berichte und Ausgaben](berichte.md): Opferurkunde und weitere Opferausgaben erstellen
 - [Kasualien](kasualien.md): Dimissoriale im Zusammenhang mit Kasualien
 - [Veranstaltungen und Gottesdienste](veranstaltungen.md): Kinderkirche, Dienste und Streamingdaten pflegen

@@ -44,10 +44,16 @@ use Symfony\Component\Process\Process;
 
 class PDF extends Browsershot
 {
+    /**
+     * Configure the PDF renderer with the container's Chromium executable.
+     *
+     * @param  string  $url  Optional source URL for the browser.
+     */
     public function __construct(string $url = '')
     {
         parent::__construct($url);
         $this->noSandbox();
+        $this->setChromePath(config('services.browsershot.chrome_path'));
     }
 
     protected static function getDefaultPdfStyles(): string

@@ -31,3 +31,10 @@
 use App\Http\Controllers\CityController;
 
 Route::get('qr/{city}', [CityController::class, 'qr'])->name('qr');
+Route::get('opfer/{city}', [CityController::class, 'publicOfferings'])
+    ->middleware('signed')
+    ->name('offerings.public');
+Route::post('opfer/{city}', [CityController::class, 'savePublicOffering'])
+    ->middleware('signed')
+    ->name('offerings.save');
+Route::get('opfer/{city}/qr', [CityController::class, 'offeringsQr'])->name('offerings.qr');

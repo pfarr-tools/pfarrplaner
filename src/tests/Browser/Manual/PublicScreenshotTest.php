@@ -26,6 +26,8 @@ class PublicScreenshotTest extends ManualScreenshotTestCase
 
     protected Service $service;
 
+    protected Service $offeringService;
+
     protected Baptism $baptism;
 
     protected User $pastor;
@@ -53,6 +55,16 @@ class PublicScreenshotTest extends ManualScreenshotTestCase
             'youtube_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         ]);
         $this->service->participants()->attach($this->pastor->id, ['category' => 'P']);
+
+        $this->offeringService = Service::factory()->create([
+            'city_id' => $this->city->id,
+            'date' => now()->setTime(10, 30),
+            'time' => '10:30:00',
+            'title' => 'Gottesdienst',
+            'description' => 'Gottesdienst',
+            'offering_goal' => 'Eigene Gemeinde',
+            'offering_amount' => '',
+        ]);
 
         $this->baptism = Baptism::create([
             'service_id' => $this->service->id,
@@ -121,6 +133,27 @@ class PublicScreenshotTest extends ManualScreenshotTestCase
             $browser->visit(route('what.is'))
                 ->pause(800);
             $this->captureCurrentManualScreenshot($browser, 'oeffentlich-infoseite');
+        });
+    }
+
+    public function test_capture_public_offering_entry(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->visit(URL::signedRoute('offerings.public', ['city' => $this->city]))
+                ->waitFor('[data-testid="service-selection-view"]', self::APP_RENDER_TIMEOUT_SECONDS)
+                ->pause(500);
+            $this->captureCurrentManualScreenshot($browser, 'oeffentlich-opfererfassung-auswahl');
+
+            $browser->click('[data-testid="service-selector"]')
+                ->waitFor('[data-testid="offering-entry-view"]', self::APP_RENDER_TIMEOUT_SECONDS)
+                ->pause(300);
+            $this->captureCurrentManualScreenshot($browser, 'oeffentlich-opfererfassung-eingabe');
+
+            $browser->type('#offering-amount', '12,50')
+                ->click('[data-testid="save-offering"]')
+                ->waitFor('[data-testid="save-confirmation"]', self::APP_RENDER_TIMEOUT_SECONDS)
+                ->pause(300);
+            $this->captureCurrentManualScreenshot($browser, 'oeffentlich-opfererfassung-bestaetigung');
         });
     }
 }

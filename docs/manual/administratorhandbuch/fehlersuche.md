@@ -54,6 +54,7 @@ Eine ausführliche Prüfreihenfolge und der anwendungsseitige Rollback stehen im
 Prüfen Sie:
 
 - Chromium/Chrome installiert?
+- Zeigt `BROWSERSHOT_CHROME_PATH` auf die tatsächlich vorhandene Browser-Datei? Im Docker-Image ist der Standardpfad `/usr/bin/chromium`.
 - Systembibliotheken vollständig?
 - Startet der Browser für den Webserver-Benutzer?
 - gibt es genug temporären Speicher?

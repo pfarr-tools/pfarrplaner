@@ -13,10 +13,28 @@
 
 namespace Tests\Browser\Manual;
 
+use App\Models\Places\City;
+use App\Models\Service;
 use Laravel\Dusk\Browser;
 
 class ReportsScreenshotTest extends ManualScreenshotTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $city = City::factory()->create(['name' => 'Mustergemeinde']);
+        Service::factory()->create([
+            'city_id' => $city->id,
+            'date' => now()->subDay()->setTime(10, 30),
+            'time' => '10:30:00',
+            'title' => 'Gottesdienst',
+            'description' => 'Gottesdienst',
+            'offering_goal' => 'Eigene Gemeinde',
+            'offering_amount' => '125,00',
+        ]);
+    }
+
     public function test_capture_reports_index(): void
     {
         $this->browse(function (Browser $browser) {
@@ -48,6 +66,18 @@ class ReportsScreenshotTest extends ManualScreenshotTestCase
                 $browser,
                 route('reports.setup', 'ServiceExcelTable'),
                 'berichte-excel-tabelle-gottesdienste',
+                800
+            );
+        });
+    }
+
+    public function test_capture_offering_certificate_report_setup(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $this->captureManualScreenshot(
+                $browser,
+                route('reports.setup', 'offeringCertificate'),
+                'berichte-opferurkunde-auswahl',
                 800
             );
         });

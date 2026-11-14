@@ -114,4 +114,4 @@ Technisch gehören diese Prozesse fest zur Laufzeit:
 
 ## Browser-Laufzeit
 
-Da Pfarrplaner Puppeteer und Browsershot nutzt, ist ein funktionierender Chromium-Stack Teil der Laufzeit. Fehler in diesem Bereich zeigen sich häufig erst bei PDF-, Screenshot- oder Exportfunktionen.
+Da Pfarrplaner Puppeteer und Browsershot nutzt, ist ein funktionierender Chromium-Stack Teil der Laufzeit. Das Docker-Image installiert Chromium unter `/usr/bin/chromium`; PDF-Ausgaben verwenden diesen Pfad standardmäßig. Für eine abweichende Installation kann der Pfad über `BROWSERSHOT_CHROME_PATH` in der Umgebung gesetzt werden. Fehler in diesem Bereich zeigen sich häufig erst bei PDF-, Screenshot- oder Exportfunktionen.

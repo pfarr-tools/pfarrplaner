@@ -127,6 +127,7 @@ class Service extends Model implements HasDAVCalendarItems
         'registration_online_end' => 'datetime',
         'alt_liturgy_date' => 'datetime',
         'end' => 'datetime',
+        'offering_denominations' => 'array',
     ];
 
     /**
@@ -155,6 +156,7 @@ class Service extends Model implements HasDAVCalendarItems
         'cc_staff',
         'internal_remarks',
         'offering_amount',
+        'offering_denominations',
         'title',
         'youtube_url',
         'cc_streaming_url',

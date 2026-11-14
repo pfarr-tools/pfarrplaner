@@ -112,6 +112,7 @@ class AdminScreenshotTest extends ManualScreenshotTestCase
             'default_wedding_offering_goal' => 'Familienarbeit',
             'default_wedding_offering_description' => 'Für Angebote für Familien und Paare',
             'default_offering_url' => 'https://www.musterstadt-mitte.example/spenden',
+            'offering_certificate_email' => 'opferurkunde@musterstadt-mitte.example',
             'iban' => 'DE02120300000000202051',
             'bic' => 'BYLADEM1001',
             'youtube_channel_url' => 'https://www.youtube.com/@musterstadtmitte',

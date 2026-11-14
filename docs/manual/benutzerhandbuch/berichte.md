@@ -354,6 +354,14 @@ Felder:
 Die Beträge stammen aus den Opferfeldern der Gottesdienste und aus dem Assistenten [Opferplan bearbeiten](eingaben.md).
 Die Gruppierung nach Opferzweck verwendet ebenfalls automatisch hinterlegte Standardwerte der Kirchengemeinde, wenn beim einzelnen Gottesdienst kein eigener Opferzweck eingetragen ist.
 
+## Opferurkunde
+
+Der Bericht **Opferurkunde** erstellt eine einseitige PDF-Urkunde für einen Gottesdienst, für den bereits eine Opfersumme erfasst wurde. Die Urkunde enthält Gemeinde, Datum, Gottesdienst, Organist:in, Opferzweck und Gesamtsumme.
+
+Auf der Seite **Opferurkunde** wählen Sie einen Gottesdienst aus der Liste aus. Die Schaltfläche **Erstellen** befindet sich oben in der Top-Navigation und erstellt die PDF-Datei für den ausgewählten Gottesdienst.
+
+Wenn bei der öffentlichen Erfassung die Einzelaufstellung nach Scheinen und Münzen verwendet wurde, wird sie zusätzlich auf der Urkunde ausgegeben. Ohne Einzelaufstellung erscheint nur die Gesamtsumme. Unten stehen ohne zusätzliche Leerzeile der Block **Für die Richtigkeit!** und darunter in einer Zeile Ort, Datum sowie die Namen der beiden Opferzähler:innen. Es gibt dort keine Unterschriftslinien. In kleiner Schrift weist die Urkunde darauf hin, dass sie maschinell erstellt und ohne Unterschrift gültig ist. Sie kann außerdem automatisch an die in der Gemeinde hinterlegte E-Mail-Adresse versendet werden.
+
 ---
 
 ## Opferplan

@@ -173,6 +173,8 @@ Im Reiter **Allgemeines** pflegen Sie den Namen, die offizielle Bezeichnung, die
 
 Im Reiter **Opfer** hinterlegen Sie Standardangaben für Opferzwecke. Diese Werte helfen beim Anlegen von Gottesdiensten, Beerdigungen und Trauungen, weil Pfarrplaner bei leeren Feldern sinnvolle Vorschläge übernehmen kann. Außerdem nutzt Pfarrplaner diese Standardwerte in Ausgaben, Berichten, E-Mails und öffentlichen Texten automatisch, wenn beim einzelnen Gottesdienst kein eigener Opferzweck oder keine eigene Opferanmerkung eingetragen ist. Die allgemeine Spendenseite sowie IBAN und BIC können für öffentliche Hinweise oder Ausgaben verwendet werden.
 
+Unter **Öffentliche Opfererfassung** finden Sie eine signierte URL und den zugehörigen QR-Code. Öffnen oder teilen Sie diese URL nur mit den Personen, die Opferangaben für diese Gemeinde erfassen sollen. Ein Login ist über diesen Link nicht erforderlich. Mit **Opferurkunde automatisch versenden an:** können Sie zusätzlich eine E-Mail-Adresse hinterlegen. Nach jeder öffentlichen Erfassung wird die Opferurkunde dann automatisch als PDF an diese Adresse gesendet.
+
 ![Kirchengemeinde bearbeiten: Opfer](media/images/admin-gemeinde-opfer.png)
 
 Im Reiter **Pfarrämter** verwalten Sie die Pfarrämter der Gemeinde. Ein Pfarramt hat eine Bezeichnung, ein Kürzel und Kontaktdaten. Diese Angaben werden zum Beispiel bei Zuständigkeiten, öffentlichen Informationen oder internen Listen genutzt.
