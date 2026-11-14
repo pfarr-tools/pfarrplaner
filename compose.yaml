@@ -21,8 +21,16 @@ x-app: &app
     - ./backups:/var/backups/pfarrplaner
     - ftp_inbox:/var/www/html/storage/inbox
     - composer_cache:/tmp/composer-cache
-    - node_modules:/var/www/html/node_modules
-    - vendor:/var/www/html/vendor
+    - type: volume
+      source: node_modules
+      target: /var/www/html/node_modules
+      volume:
+        nocopy: true
+    - type: volume
+      source: vendor
+      target: /var/www/html/vendor
+      volume:
+        nocopy: true
   depends_on:
     mariadb: {condition: service_healthy}
     redis: {condition: service_healthy}
@@ -60,7 +68,13 @@ services:
         required: false
     command: sh -lc "npm run dev -- --host 0.0.0.0"
     ports: ["${VITE_PORT:-5173}:5173"]
-    volumes: ["./src:/app", "node_modules:/app/node_modules"]
+    volumes:
+      - ./src:/app
+      - type: volume
+        source: node_modules
+        target: /app/node_modules
+        volume:
+          nocopy: true
     networks: [pfarrplaner]
   manual:
     build:
