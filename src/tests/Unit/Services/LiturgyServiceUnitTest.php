@@ -16,6 +16,7 @@ namespace Tests\Unit\Services;
 use App\Services\LiturgyService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -70,5 +71,21 @@ class LiturgyServiceUnitTest extends TestCase
     {
         $result = LiturgyService::getLiturgyByCode(2024, 'NONEXISTENT_CODE_12345');
         $this->assertEmpty($result);
+    }
+
+    public function test_get_year_fetches_missing_calendar_from_kirchenjahr_api(): void
+    {
+        Http::fake([
+            'https://kirchenjahr.pfarr.tools/api/jahr/2099' => Http::response([
+                'Jahr' => 2099,
+                'Tage' => ['2099-01-01' => [['Code' => 'TEST']]],
+            ]),
+        ]);
+
+        $calendar = LiturgyService::getYear(2099);
+
+        $this->assertSame(2099, $calendar['Jahr']);
+        Storage::assertExists('liturgy/2099.json');
+        Http::assertSent(fn ($request) => $request->url() === 'https://kirchenjahr.pfarr.tools/api/jahr/2099');
     }
 }

@@ -324,6 +324,7 @@ import WeddingsTab from '../components/HomeScreen/WeddingsTab'
 import FormDatePicker from '../components/Ui/forms/FormDatePicker.vue'
 import NavButton from '../components/Ui/buttons/NavButton.vue'
 import CreateServiceWizardButton from '../components/Ui/wizards/CreateServiceWizardButton.vue'
+import { SERVICE_REALTIME_CHANGED_EVENT } from '../services/ServiceRealtime.js'
 
 function normalizeHomeScreenTabsConfig(config) {
     if (!config || typeof config !== 'object' || Array.isArray(config)) {
@@ -438,6 +439,8 @@ export default {
         }
     },
     async mounted() {
+        window.addEventListener(SERVICE_REALTIME_CHANGED_EVENT, this.serviceRealtimeHandler)
+
         if (this.myActiveTab) {
             await this.$api()
                 .get(
@@ -483,7 +486,31 @@ export default {
 
         this.quickPickDate(this.myQuickPickerDate)
     },
+    beforeUnmount() {
+        window.removeEventListener(SERVICE_REALTIME_CHANGED_EVENT, this.serviceRealtimeHandler)
+    },
     methods: {
+        serviceRealtimeHandler() {
+            Object.keys(this.myTabs)
+                .filter((tabKey) => this.myTabs[tabKey].loaded)
+                .forEach((tabKey) => {
+                    this.$api()
+                        .get(route('api.tab', { tab: tabKey }))
+                        .then((response) => {
+                            this.myTabs[tabKey] = response.data.data
+                            this.myTabs[tabKey].loaded = true
+                            this.$forceUpdate()
+                        })
+                        .catch((error) => {
+                            console.error('[Pfarrplaner] Home screen realtime refresh failed', {
+                                tab: tabKey,
+                                error,
+                            })
+                        })
+                })
+
+            this.quickPickerDate(this.myQuickPickerDate)
+        },
         /**
          * Refresh quick-pick data and the visible calendar date.
          *

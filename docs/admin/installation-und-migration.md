@@ -239,6 +239,33 @@ Produktion verlangt `APP_ENV=production`.
 einer Warnung blockiert; auch `./planer dev exec app php artisan test` wird ohne
 Ausführung blockiert. Für beide Fälle ist `./planer dev test` zu verwenden.
 `./planer dev fresh` benötigt zusätzlich `--force`.
+Zusätzlich bricht die gemeinsame PHPUnit-Basis direkte Testaufrufe ab, wenn
+`APP_ENV`, `DB_CONNECTION` oder die isolierte Testdatenbank nicht korrekt
+gesetzt sind. Dadurch kann `RefreshDatabase` keine Dev- oder Produktionsdaten
+mehr erreichen.
+
+### Soketi- und Realtime-Prüfung
+
+Die App verwendet intern `soketi:6001`; der Browser verwendet den in
+`SOKETI_PORT` veröffentlichten Host-Port. App-ID, Key und Secret müssen in
+Laravel und im Soketi-Container identisch sein. Die Prüfung darf keine
+Produktionsdatenbank verwenden:
+
+```sh
+./planer dev status
+./planer dev npm run test:soketi
+```
+
+Der Test verbindet einen Pusher-kompatiblen WebSocket-Client, veröffentlicht
+ein signiertes Testereignis über die Soketi-HTTP-API und prüft den empfangenen
+Payload. Bei Änderungen an `.env` sind App und Soketi neu zu erstellen:
+
+```sh
+./planer dev up -d --force-recreate app soketi vite
+./planer dev npm run test:soketi
+```
+
+Keys und Secrets dürfen weder in Logs noch in Testausgaben erscheinen.
 
 ### Große Datei-Uploads
 

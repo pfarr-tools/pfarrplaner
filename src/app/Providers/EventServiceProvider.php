@@ -34,6 +34,7 @@ use App\Events\AbsenceUpdated;
 use App\Listeners\PingInstancesRegistry;
 use App\Models\Service;
 use App\Observers\EventRecurrenceObserver;
+use App\Observers\ServiceRealtimeObserver;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -72,9 +73,11 @@ class EventServiceProvider extends ServiceProvider
     protected $subscribe = [
     ];
 
+    /** Register model observers used by the application. */
     public function boot(): void
     {
         Service::observe(EventRecurrenceObserver::class);
+        Service::observe(ServiceRealtimeObserver::class);
     }
 
     /**

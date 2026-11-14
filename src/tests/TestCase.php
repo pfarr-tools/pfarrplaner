@@ -58,11 +58,33 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp(): void
     {
+        $this->assertSafeTestEnvironment();
         parent::setUp();
         Storage::fake();
 
         Factory::guessFactoryNamesUsing(function (string $modelName) {
             return Str::replace('App\\Models\\', '\\Database\\Factories\\', $modelName).'Factory';
         });
+    }
+
+    /**
+     * Ensure PHPUnit cannot target the development or production database.
+     *
+     * This check runs before RefreshDatabase can migrate or reset a connection.
+     */
+    private function assertSafeTestEnvironment(): void
+    {
+        $environment = getenv('APP_ENV') ?: ($_ENV['APP_ENV'] ?? null);
+        $connection = getenv('DB_CONNECTION') ?: ($_ENV['DB_CONNECTION'] ?? null);
+        $database = getenv('DB_DATABASE') ?: ($_ENV['DB_DATABASE'] ?? null);
+        $isolatedDatabase = $database === ':memory:'
+            || str_contains((string) $database, 'testing')
+            || str_ends_with((string) $database, '.test.sqlite');
+
+        if ($environment !== 'testing' || $connection !== 'sqlite' || ! $isolatedDatabase) {
+            throw new \RuntimeException(
+                'PHPUnit abgebrochen: APP_ENV=testing, DB_CONNECTION=sqlite und eine isolierte Testdatenbank sind erforderlich.'
+            );
+        }
     }
 }

@@ -45,3 +45,7 @@ Broadcast::channel(
         return (int) $user->id === (int) $id;
     }
 );
+
+Broadcast::channel('services.city.{cityId}', function ($user, $cityId) {
+    return $user->visibleCities()->whereKey($cityId)->exists();
+});

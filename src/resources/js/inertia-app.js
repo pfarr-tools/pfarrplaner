@@ -99,6 +99,7 @@ import DatePickerShim from './components/Ui/forms/DatePickerShim.vue'
 // Mixins
 import AssetMixin from './mixins/Asset.js'
 import PfarrplanerAPIMixin from './mixins/PfarrplanerAPI.js'
+import { initializeServiceRealtime } from './services/ServiceRealtime.js'
 
 const pages = import.meta.glob('./Pages/**/*.vue')
 
@@ -149,6 +150,10 @@ createInertiaApp({
         })
 
         app.mount(el)
+        initializeServiceRealtime({
+            ...props.initialPage.props,
+            component: props.initialPage.component,
+        })
         window.vm = app
     },
     progress: { color: '#29d', delay: 100, showSpinner: true },

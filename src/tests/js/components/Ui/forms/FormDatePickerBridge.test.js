@@ -43,6 +43,17 @@ describe('FormDatePicker isoDate bridge', () => {
         expect(w.emitted('input')[0][0]).toBe('2025-01-01T07:00:00.000Z')
     })
 
+    it('normalizes date picker input events before converting ISO dates', () => {
+        const w = mountPicker({
+            isoDate: true,
+            config: { locale: 'de', format: 'DD.MM.YYYY HH:mm' },
+        })
+
+        w.vm.handleInputEvent({ target: { value: '01.01.2025 08:00' } })
+
+        expect(w.emitted('input')[0][0]).toBe('2025-01-01T07:00:00.000Z')
+    })
+
     it('reinterprets ISO-like values as Berlin wall-clock time before submitting', () => {
         const w = mountPicker({
             isoDate: true,

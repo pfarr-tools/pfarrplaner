@@ -24,10 +24,21 @@ RUN composer install --no-interaction --prefer-dist --no-scripts \
 RUN printf '%s\n' \
   '#!/bin/sh' \
   'set -eu' \
-  'if [ ! -f /var/www/html/vendor/autoload.php ]; then' \
-  '  mkdir -p /var/www/html/vendor' \
-  '  cp -a /opt/pfarrplaner-vendor/. /var/www/html/vendor/' \
-  'fi' \
+  'mkdir -p /var/www/html/vendor' \
+  'composer_lock_hash="$(sha256sum /var/www/html/composer.lock | awk '\''{print $1}'\'')"' \
+  '( flock 9' \
+  '  if [ ! -f /var/www/html/vendor/autoload.php ]; then' \
+  '    cp -a /opt/pfarrplaner-vendor/. /var/www/html/vendor/' \
+  '  fi' \
+  '  installed_lock_hash=""' \
+  '  if [ -f /var/www/html/vendor/.composer-lock.sha256 ]; then' \
+  '    installed_lock_hash="$(cat /var/www/html/vendor/.composer-lock.sha256)"' \
+  '  fi' \
+  '  if [ "$installed_lock_hash" != "$composer_lock_hash" ]; then' \
+  '    composer install --no-interaction --prefer-dist --no-scripts --no-progress' \
+  '    printf '\''%s\\n'\'' "$composer_lock_hash" > /var/www/html/vendor/.composer-lock.sha256' \
+  '  fi' \
+  ') 9>/var/www/html/vendor/.composer-sync.lock' \
   'mkdir -p /var/www/html/storage/logs /var/www/html/storage/framework/cache /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/bootstrap/cache /var/backups/pfarrplaner' \
   'chown -R www-data:www-data /var/www/html/storage/framework /var/www/html/storage/logs /var/www/html/bootstrap/cache' \
   'chmod -R a+rwX /var/www/html/storage /var/www/html/bootstrap/cache /var/backups/pfarrplaner' \
