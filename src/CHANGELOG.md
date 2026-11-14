@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2026.21.1](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.21.0...v2026.21.1) (2026-11-14)
+
+
+### Bug Fixes
+
+* **ci:** Docker-Volume-Copy-up beim Release vermeiden. Fixes [#84](https://github.com/pfarr-tools/pfarrplaner/issues/84) ([ae822b7](https://github.com/pfarr-tools/pfarrplaner/commit/ae822b7061fbaf00fde2be9771de7f171aec3a53))
+* **quality:** PHPDoc- und PHPStan-Prüfungen bereinigen. ([dd9dfe2](https://github.com/pfarr-tools/pfarrplaner/commit/dd9dfe2a3cee3369d0767c324316acf90b41506f))
+
 ## [2026.21.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.20.4...v2026.21.0) (2026-11-14)
 
 
