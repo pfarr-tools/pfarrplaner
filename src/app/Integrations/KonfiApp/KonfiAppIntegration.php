@@ -36,6 +36,7 @@ use App\Models\Service;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Psr\Http\Message\ResponseInterface;
 use stdClass;
@@ -47,6 +48,12 @@ use Throwable;
 class KonfiAppIntegration extends AbstractIntegration
 {
     protected const API_URL = 'https://api.konfiapp.de/v2/';
+
+    /** @var int Cache lifetime for successfully fetched event types in seconds. */
+    protected const EVENT_TYPES_CACHE_TTL = 21600;
+
+    /** @var int Cache lifetime for stale event types in seconds. */
+    protected const EVENT_TYPES_STALE_TTL = 604800;
 
     /**
      * @var string
@@ -74,7 +81,7 @@ class KonfiAppIntegration extends AbstractIntegration
         $this->setClient(new Client([
             'base_uri' => self::API_URL,
             // Die Produktionscontainer haben keine nutzbare IPv6-Route.
-            'curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4],
+            'force_ip_resolve' => 'v4',
         ]));
     }
 
@@ -105,9 +112,31 @@ class KonfiAppIntegration extends AbstractIntegration
      */
     public function listEventTypes()
     {
-        $response = $this->requestData('verwaltung/veranstaltungen/');
+        $cacheKey = $this->getEventTypesCacheKey();
+        $staleCacheKey = $cacheKey.':stale';
+        $cachedEventTypes = Cache::get($cacheKey);
+        if (is_array($cachedEventTypes)) {
+            return collect($cachedEventTypes);
+        }
 
-        return $response ? collect($response->data->veranstaltungen) : collect();
+        $response = $this->requestData('verwaltung/veranstaltungen/');
+        if ($response && isset($response->data->veranstaltungen)) {
+            $eventTypes = collect($response->data->veranstaltungen)->values()->all();
+            Cache::put($cacheKey, $eventTypes, self::EVENT_TYPES_CACHE_TTL);
+            Cache::put($staleCacheKey, $eventTypes, self::EVENT_TYPES_STALE_TTL);
+
+            return collect($eventTypes);
+        }
+
+        return collect(Cache::get($staleCacheKey, []));
+    }
+
+    /**
+     * Return a cache key that does not expose the KonfiApp API key.
+     */
+    protected function getEventTypesCacheKey(): string
+    {
+        return 'konfiapp-event-types-'.hash('sha256', $this->apiKey);
     }
 
     /**
@@ -161,8 +190,6 @@ class KonfiAppIntegration extends AbstractIntegration
             Log::warning('KonfiApp: Anfrage fehlgeschlagen', [
                 'requestType' => $this->lastRequestType,
                 'endpoint' => $this->lastEndpoint,
-                'token' => $this->apiKey,
-                'request' => $this->lastRequest,
                 'message' => $exception->getMessage(),
                 'exception' => $exception::class,
             ]);
@@ -174,9 +201,7 @@ class KonfiAppIntegration extends AbstractIntegration
             Log::debug('KonfiApp: KonfiApp returns error response', [
                 'requestType' => $this->lastRequestType,
                 'endpoint' => $this->lastEndpoint,
-                'token' => $this->apiKey,
-                'request' => $this->lastRequest,
-                'response' => $response ? json_decode($response->getBody(), true) : 'false',
+                'status' => $response ? $response->getStatusCode() : null,
             ]);
 
             return false;
