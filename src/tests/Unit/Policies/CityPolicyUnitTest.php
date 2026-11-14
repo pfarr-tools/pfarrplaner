@@ -89,6 +89,15 @@ class CityPolicyUnitTest extends TestCase
         $this->assertTrue($this->policy->index($user));
     }
 
+    public function test_local_admin_can_update_an_assigned_city(): void
+    {
+        $user = User::factory()->create();
+        $city = City::factory()->create();
+        $user->cities()->attach($city->id, ['permission' => 'a']);
+
+        $this->assertTrue($this->policy->update($user, $city));
+    }
+
     public function test_restore_always_returns_false(): void
     {
         $user = User::factory()->create();

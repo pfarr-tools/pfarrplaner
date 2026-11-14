@@ -100,7 +100,7 @@ class CityPolicy
         )) {
             return true;
         }
-        if ($user->isAdmin && $user->adminCities->contains($city)) {
+        if (($user->isAdmin || $user->isLocalAdmin) && $user->adminCities->contains($city)) {
             return true;
         }
 
