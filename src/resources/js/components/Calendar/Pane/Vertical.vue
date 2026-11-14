@@ -29,6 +29,7 @@
 <template>
     <div class="calendar-month calendar-vertical">
         <div
+            ref="calendarGridWrapper"
             class="calendar-grid-wrapper"
             :class="{ 'month-loading': loading }"
         >
@@ -87,6 +88,7 @@
 import NavButton from '../../Ui/buttons/NavButton'
 import CalendarDayHeader from '../Day/Header.vue'
 import CalendarCell from '../Cell.vue'
+import { SERVICE_REALTIME_CHANGED_EVENT } from '../../../services/ServiceRealtime.js'
 export default {
     name: 'CalendarPaneVertical',
     components: { CalendarCell, CalendarDayHeader, NavButton },
@@ -102,9 +104,13 @@ export default {
         }
     },
     mounted() {
+        window.addEventListener(SERVICE_REALTIME_CHANGED_EVENT, this.serviceRealtimeHandler)
         if (this.loadedDate !== this.date) {
             this.loadServices()
         }
+    },
+    beforeUnmount() {
+        window.removeEventListener(SERVICE_REALTIME_CHANGED_EVENT, this.serviceRealtimeHandler)
     },
     watch: {
         date(newVal) {
@@ -131,8 +137,18 @@ export default {
 
             return result
         },
-        loadServices() {
+        /**
+         * Load the complete month dataset.
+         *
+         * @param {boolean} preserveScroll Restore the current scroll position after a refresh.
+         */
+        loadServices(preserveScroll = false) {
+            if (this.loading && this.loadingRequestDate === this.date) return
+
             const requestDate = this.date
+            const scrollContainer = preserveScroll ? this.$refs.calendarGridWrapper : null
+            const scrollTop = scrollContainer?.scrollTop || 0
+            const scrollLeft = scrollContainer?.scrollLeft || 0
             this.loading = true
             this.loadingRequestDate = requestDate
             this.data = this.createMonthShell(requestDate)
@@ -148,10 +164,23 @@ export default {
                     this.loadedDate = response.data.loadedDate
                     this.loading = false
                     this.$forceUpdate()
+                    if (scrollContainer) {
+                        this.$nextTick(() => {
+                            scrollContainer.scrollTop = scrollTop
+                            scrollContainer.scrollLeft = scrollLeft
+                        })
+                    }
                 })
-                .catch(() => {
+                .catch((error) => {
                     if (this.loadingRequestDate !== requestDate) return
                     this.loading = false
+                    console.error('[Pfarrplaner] Calendar month refresh failed', {
+                        date: requestDate,
+                        error,
+                        status: error.response?.status,
+                        url: error.config?.url,
+                        responseData: error.response?.data,
+                    })
                 })
         },
         getServices(city, day) {
@@ -182,6 +211,28 @@ export default {
                     this.data[serviceDate].services[cityId] || []
                 ).filter((item) => item.id !== serviceId)
             })
+        },
+        /**
+         * Check whether a realtime change can affect the displayed month.
+         *
+         * @param {CustomEvent} event Browser event with the broadcast payload.
+         * @returns {boolean} Whether the current or previous service date is visible.
+         */
+        serviceEventAffectsDisplayedMonth(event) {
+            const payload = event?.detail || {}
+            return [payload.date, payload.oldDate].some(
+                (date) => typeof date === 'string' && date.slice(0, 7) === this.date,
+            )
+        },
+        /**
+         * Refresh the displayed month after a relevant realtime event.
+         *
+         * @param {CustomEvent} event Browser event with the broadcast payload.
+         */
+        serviceRealtimeHandler(event) {
+            if (!this.serviceEventAffectsDisplayedMonth(event)) return
+
+            this.loadServices(true)
         },
     },
     computed: {

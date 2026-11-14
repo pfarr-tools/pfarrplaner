@@ -31,7 +31,30 @@
  */
 import mitt from 'mitt'
 
-const emitter = mitt()
+const eventBusGlobalKey = '__pfarrplanerEventBus'
+
+/**
+ * Keep one emitter for all Vite chunks loaded by the application.
+ *
+ * @returns {import('mitt').Emitter} Shared event emitter.
+ */
+function getEmitter() {
+    if (!globalThis[eventBusGlobalKey]) globalThis[eventBusGlobalKey] = mitt()
+
+    return globalThis[eventBusGlobalKey]
+}
+
+const emitter = getEmitter()
+
+/**
+ * Resolve a stable event key that survives bundling and minification.
+ *
+ * @param {Function} eventClass Event class.
+ * @returns {string} Event key.
+ */
+function getEventKey(eventClass) {
+    return eventClass.eventName || eventClass.name
+}
 
 export default {
     install(app) {
@@ -40,24 +63,24 @@ export default {
 
     /** @param {Function} eventClass  @param {Function} handler */
     listen(eventClass, handler) {
-        emitter.on(eventClass.name, handler)
+        emitter.on(getEventKey(eventClass), handler)
     },
 
     /** @param {Function} eventClass  @param {Function} handler */
     listenOnce(eventClass, handler) {
         const wrapper = (e) => {
             handler(e)
-            emitter.off(eventClass.name, wrapper)
+            emitter.off(getEventKey(eventClass), wrapper)
         }
-        emitter.on(eventClass.name, wrapper)
+        emitter.on(getEventKey(eventClass), wrapper)
     },
 
     /** @param {Function} eventClass  @param {Function} [handler] */
     remove(eventClass, handler) {
         if (handler) {
-            emitter.off(eventClass.name, handler)
+            emitter.off(getEventKey(eventClass), handler)
         } else {
-            emitter.off(eventClass.name)
+            emitter.off(getEventKey(eventClass))
         }
     },
 
@@ -67,6 +90,6 @@ export default {
 
     /** @param {Object} event */
     publish(event) {
-        emitter.emit(event.constructor.name, event)
+        emitter.emit(getEventKey(event.constructor), event)
     },
 }

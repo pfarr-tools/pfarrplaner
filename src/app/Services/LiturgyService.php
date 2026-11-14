@@ -31,6 +31,7 @@
 namespace App\Services;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 use Storage;
 use Throwable;
 
@@ -157,10 +158,16 @@ class LiturgyService
         return [];
     }
 
+    /**
+     * Fetch a missing liturgical calendar from the Kirchenjahr API.
+     *
+     * @param  string  $url  API URL
+     * @return string JSON payload
+     */
     protected static function fetchCalendarJson(string $url): string
     {
         try {
-            return file_get_contents($url) ?: '{}';
+            return Http::get($url)->throw()->body() ?: '{}';
         } catch (Throwable) {
             return '{}';
         }

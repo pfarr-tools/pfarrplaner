@@ -56,6 +56,13 @@
         @endguest
 
         window.Laravel.assetUrl = '{{ asset('') }}';
+        window.Laravel.realtime = {!! json_encode([
+            'key' => config('broadcasting.connections.pusher.key'),
+            'cluster' => config('broadcasting.connections.pusher.options.cluster') ?: 'mt1',
+            'host' => request()->getHost(),
+            'port' => (int) env('SOKETI_PORT', config('broadcasting.connections.pusher.port')),
+            'scheme' => config('broadcasting.connections.pusher.scheme'),
+        ]) !!};
     </script>
     <!-- other libraries -->
     @yield('scripts')

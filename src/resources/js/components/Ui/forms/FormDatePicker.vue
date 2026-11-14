@@ -168,11 +168,12 @@ export default {
             this.$emit('update:modelValue', this.isoDate ? this.toIsoDate(value) : value)
         },
         handleInputEvent(e) {
+            const value = e?.target?.value ?? e
             let out
             if (this.isoDate) {
-                out = this.toIsoDate(e)
+                out = this.toIsoDate(value)
             } else {
-                out = e
+                out = value
             }
             this.$emit('input', out)
         },

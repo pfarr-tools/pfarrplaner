@@ -31,6 +31,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Calendar\CalendarMonthServiceResource;
 use App\Http\Resources\Calendar\CalendarServiceResource;
 use App\Models\Places\City;
 use App\Models\Service;
@@ -40,8 +41,12 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Provides calendar data and individual service representations.
+ */
 class CalendarController extends Controller
 {
+    /** Configure API authentication middleware. */
     public function __construct()
     {
         $this->middleware('auth:api')->except('navigate');
@@ -60,9 +65,22 @@ class CalendarController extends Controller
         return response()->json(CalendarService::buildMonthPayload($date, Auth::user()));
     }
 
+    /**
+     * Return one visible service representation.
+     *
+     * @param  Service  $service  Requested service.
+     * @return CalendarMonthServiceResource|CalendarServiceResource Service data.
+     */
     public function service(Service $service)
     {
-        return new CalendarServiceResource($service);
+        abort_unless(
+            Auth::user()->visibleCities()->whereKey($service->city_id)->exists(),
+            404
+        );
+
+        return request()->boolean('compact')
+            ? new CalendarMonthServiceResource($service)
+            : new CalendarServiceResource($service);
     }
 
     /**

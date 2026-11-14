@@ -29,6 +29,17 @@ class BootstrapIntegrityTest extends TestCase
         $this->assertTrue(Route::has('login'), 'Route "login" not registered');
     }
 
+    public function test_broadcast_auth_route_is_loaded()
+    {
+        $this->assertTrue(
+            collect(Route::getRoutes()->getRoutes())->contains(
+                fn ($route) => $route->uri() === 'broadcasting/auth'
+                    && in_array('POST', $route->methods(), true)
+            ),
+            'Broadcast auth route not registered'
+        );
+    }
+
     public function test_api_routes_are_loaded()
     {
         $routes = Route::getRoutes();

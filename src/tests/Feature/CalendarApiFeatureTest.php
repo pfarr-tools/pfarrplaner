@@ -143,6 +143,35 @@ class CalendarApiFeatureTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    public function test_service_is_not_available_for_an_invisible_city(): void
+    {
+        $visibleCity = City::factory()->create();
+        $hiddenCity = City::factory()->create();
+        $user = User::factory()->create();
+        $user->cities()->attach($visibleCity->id);
+        $service = Service::factory()->create(['city_id' => $hiddenCity->id]);
+
+        $this->actingAs($user, 'api')
+            ->getJson(route('api.calendar.service', $service))
+            ->assertNotFound();
+    }
+
+    public function test_service_can_return_the_compact_calendar_representation(): void
+    {
+        $city = City::factory()->create();
+        $user = User::factory()->create();
+        $user->cities()->attach($city->id);
+        $service = Service::factory()->create(['city_id' => $city->id]);
+        $service->participants()->attach($user->id, ['category' => 'P']);
+
+        $this->actingAs($user, 'api')
+            ->getJson(route('api.calendar.service', ['service' => $service, 'compact' => 1]))
+            ->assertOk()
+            ->assertJsonPath('data.id', $service->id)
+            ->assertJsonPath('data.city_id', $city->id)
+            ->assertJsonPath('data.participantText.P', $user->name);
+    }
+
     /**
      * @return void
      */

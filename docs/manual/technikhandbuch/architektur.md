@@ -9,7 +9,7 @@ Der technische Rahmen besteht aus zwei Compose-Varianten:
 - `compose.yaml` bindet den Laravel-Quellbaum für Entwicklung, Vite, Tests und den Manual-Container ein.
 - `compose.production.yaml` verwendet ein versioniertes Anwendungsimage, Octane/Swoole, einen Asset-Snapshot und getrennte interne Netzwerke.
 
-In beiden Varianten sind MariaDB, Redis, MinIO, Horizon und der Scheduler zentrale Abhängigkeiten. Caddy nimmt HTTP entgegen; Soketi ergänzt die WebSocket-Kommunikation. Das [Installationskapitel](installation-docker.md) beschreibt den vollständigen Startablauf.
+In beiden Varianten sind MariaDB, Redis, MinIO, Horizon und der Scheduler zentrale Abhängigkeiten. Caddy nimmt HTTP entgegen; Soketi ergänzt die WebSocket-Kommunikation. Serviceänderungen werden als schlanke Invalidierungen auf privaten Gemeinde-Kanälen übertragen. Der Browser lädt die betroffene Service-Repräsentation anschließend einzeln über die autorisierte API; nicht registrierte Ansichten verwenden einen Inertia-Fallback. Liturgische Jahreskalender werden bei fehlendem `liturgy/<yyyy>.json` beim ersten Zugriff automatisch von der Kirchenjahr-API geladen und im konfigurierten Storage abgelegt. Das [Installationskapitel](installation-docker.md) beschreibt den vollständigen Startablauf.
 
 ## Backend-Struktur
 

@@ -34,6 +34,7 @@ use App\Http\Middleware\Authenticate;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Service;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
@@ -54,8 +55,11 @@ class ServiceFeatureTest extends TestCase
      */
     public function test_service_can_be_created()
     {
-        // this test is currently empty, since service creation is done via update method
-        $this->assertTrue(true);
+        Event::fake(['App\\Events\\ServiceRealtimeChanged']);
+
+        Service::factory()->create(['city_id' => $this->city->id]);
+
+        Event::assertDispatched('App\\Events\\ServiceRealtimeChanged');
     }
 
     /**
@@ -65,16 +69,19 @@ class ServiceFeatureTest extends TestCase
      */
     public function test_service_can_be_updated()
     {
+        Event::fake(['App\\Events\\ServiceRealtimeChanged']);
+
         $city = (City::class)::factory()->create();
-        $service = Service::factory()->create(['city_id' => $city]);
+        $service = Service::factory()->create(['city_id' => $city->id]);
         $this->user->writableCities()->attach($city->id);
         $response = $this->actingAs($this->user)
             ->patch(
-                route('service.update', Service::first()->slug),
+                route('service.update', $service->slug),
                 ['description' => 'cool title']
             );
         $response->assertStatus(302);
-        $this->assertEquals('cool title', Service::first()->description);
+        $this->assertEquals('cool title', $service->fresh()->description);
+        Event::assertDispatched('App\\Events\\ServiceRealtimeChanged');
     }
 
     /**
@@ -89,11 +96,11 @@ class ServiceFeatureTest extends TestCase
         $title = $service->description;
         $response = $this->actingAs($this->user)
             ->patch(
-                route('service.update', Service::first()->slug),
+                route('service.update', $service->slug),
                 ['description' => 'cool title']
             );
         $response->assertStatus(403);
-        $this->assertEquals($title, Service::first()->description);
+        $this->assertEquals($title, $service->fresh()->description);
     }
 
     /**
@@ -103,12 +110,15 @@ class ServiceFeatureTest extends TestCase
      */
     public function test_service_can_be_deleted()
     {
-        $service = Service::factory()->create(['city_id' => $this->city]);
+        Event::fake(['App\\Events\\ServiceRealtimeChanged']);
+
+        $service = Service::factory()->create(['city_id' => $this->city->id]);
         $this->assertCount(1, Service::all());
         $response = $this->actingAs($this->user)
             ->delete(route('service.destroy', $service->slug));
         $response->assertStatus(302);
         $this->assertCount(0, Service::all());
+        Event::assertDispatched('App\\Events\\ServiceRealtimeChanged');
     }
 
     protected function setUp(): void

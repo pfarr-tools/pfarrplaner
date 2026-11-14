@@ -285,7 +285,7 @@ return [
         AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         AutoModelsProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         EventServiceProvider::class,
         HorizonServiceProvider::class,
         RouteServiceProvider::class,

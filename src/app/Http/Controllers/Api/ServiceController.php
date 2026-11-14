@@ -37,6 +37,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\ServiceRealtimeChanged;
 use App\Events\ServiceUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ServiceRequest;
@@ -63,6 +64,7 @@ class ServiceController extends Controller
 {
     use HandlesAttachmentsTrait;
 
+    /** Initialize the API controller. */
     public function __construct() {}
 
     /**
@@ -170,6 +172,8 @@ class ServiceController extends Controller
         if ($service->isChanged()) {
             $service->storeDiff();
             event(new ServiceUpdated($service, $originalParticipants));
+        } elseif ($request->has('participants')) {
+            ServiceRealtimeChanged::dispatch('updated', $service);
         }
 
         return response()->json(compact('service'));
@@ -220,12 +224,19 @@ class ServiceController extends Controller
             }
         }
         $service->syncParticipantsFromArray($participants);
+        ServiceRealtimeChanged::dispatch('updated', $service);
         $service->refresh();
         $service->load(['baptisms', 'funerals', 'weddings', 'participants']);
 
         return response()->json(compact('service'));
     }
 
+    /**
+     * Claim an open predicant assignment for the current user.
+     *
+     * @param  Service  $service  Service to claim.
+     * @return JsonResponse Result of the claim operation.
+     */
     public function claimPredicant(Service $service): JsonResponse
     {
         $user = Auth::user();

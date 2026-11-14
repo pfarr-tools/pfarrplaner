@@ -30,6 +30,7 @@
 
 namespace App\Http\Resources\Calendar;
 
+use App\Models\People\User;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -48,6 +49,8 @@ class CalendarMonthServiceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var Service $resource */
+        $resource = $this->resource;
         /** @var Service $this */
         $service = $this;
         $gate = Gate::forUser($request->user('api') ?? $request->user() ?? Auth::user());
@@ -83,7 +86,8 @@ class CalendarMonthServiceResource extends JsonResource
             'isAlternateProprium' => $this->isAlternateProprium,
             'liturgicalInfo' => $this->isAlternateProprium ? $this->liturgicalInfo : [],
             'hidden' => $this->hidden,
-            'participantText' => $this->resource->participantText ?? [],
+            'participantText' => $this->resource->participantText
+                ?? self::buildCompactParticipantText($resource),
             'need_predicant' => $this->need_predicant,
             'isMine' => $this->isMine,
             'isEditable' => $this->isEditable,
@@ -91,5 +95,28 @@ class CalendarMonthServiceResource extends JsonResource
             'selfAssignViaPredicantClaim' => $service->getAttribute('self_assign_via_predicant_claim')
                 ?? (! $canUpdate && $gate->allows('claimPredicant', $service)),
         ];
+    }
+
+    /**
+     * Build compact participant strings when the resource was loaded separately.
+     *
+     * @return array<string, string> Participant names grouped by ministry.
+     */
+    private static function buildCompactParticipantText(Service $service): array
+    {
+        $result = [];
+
+        foreach ($service->participants->groupBy('pivot.category') as $category => $participants) {
+            $result[$category] = $participants->map(function ($participant) {
+                /** @var User $participant */
+                return trim(implode(' ', array_filter([
+                    $participant->title,
+                    $participant->first_name,
+                    $participant->last_name,
+                ]))) ?: $participant->name;
+            })->join(' | ');
+        }
+
+        return $result;
     }
 }
