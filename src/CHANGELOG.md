@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2026.21.0](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.20.4...v2026.21.0) (2026-11-14)
+
+
+### Features
+
+* **opfer:** Öffentliche Opfererfassung und Bescheinigungen ergänzen ([76d5580](https://github.com/pfarr-tools/pfarrplaner/commit/76d5580f2a5a36ca91ef81b2706e10e215acdb2f)), closes [#79](https://github.com/pfarr-tools/pfarrplaner/issues/79)
+
+
+### Bug Fixes
+
+* **konfiapp:** Eventtypen cachen und Ausfälle abfedern. Fixes [#82](https://github.com/pfarr-tools/pfarrplaner/issues/82) ([6003b14](https://github.com/pfarr-tools/pfarrplaner/commit/6003b14d27c349eb98e633274ace06ab3d7b53c0))
+* **konfiapp:** QR-Codes korrekt abrufen. Fixes [#83](https://github.com/pfarr-tools/pfarrplaner/issues/83) ([e4ac653](https://github.com/pfarr-tools/pfarrplaner/commit/e4ac653a2b8747325afc9d041257f9275807fa41))
+* Lokale Admins dürfen Gemeinden bearbeiten. ([eed4b35](https://github.com/pfarr-tools/pfarrplaner/commit/eed4b3587591074c2656a541b9ee444c392b3162)), closes [#81](https://github.com/pfarr-tools/pfarrplaner/issues/81)
+* **realtime:** Kalenderdaten bei Serviceänderungen synchronisieren. Fixes [#42](https://github.com/pfarr-tools/pfarrplaner/issues/42) ([82f73d6](https://github.com/pfarr-tools/pfarrplaner/commit/82f73d6cd193828408e709fad4e2c0eb1786d268))
+
 ### [2026.20.4](https://github.com/pfarr-tools/pfarrplaner/compare/v2026.20.3...v2026.20.4) (2026-11-12)
 
 
