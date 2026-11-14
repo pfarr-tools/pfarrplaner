@@ -402,21 +402,41 @@ class KonfiAppIntegration extends AbstractIntegration
         return collect($data->detail ?? []);
     }
 
+    /**
+     * Return the configured KonfiApp API key.
+     *
+     * @return string API key.
+     */
     public function getApiKey(): string
     {
         return $this->apiKey;
     }
 
+    /**
+     * Set the KonfiApp API key used for subsequent requests.
+     *
+     * @param  string  $apiKey  API key.
+     */
     public function setApiKey(string $apiKey): void
     {
         $this->apiKey = $apiKey;
     }
 
+    /**
+     * Return the HTTP client used by the integration.
+     *
+     * @return Client HTTP client.
+     */
     public function getClient(): Client
     {
         return $this->client;
     }
 
+    /**
+     * Replace the HTTP client used by the integration.
+     *
+     * @param  Client  $client  HTTP client.
+     */
     public function setClient(Client $client): void
     {
         $this->client = $client;

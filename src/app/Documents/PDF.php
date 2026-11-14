@@ -56,6 +56,11 @@ class PDF extends Browsershot
         $this->setChromePath(config('services.browsershot.chrome_path'));
     }
 
+    /**
+     * Return the default embedded styles for generated PDFs.
+     *
+     * @return string Embedded font and layout styles.
+     */
     protected static function getDefaultPdfStyles(): string
     {
         $lightFont = static::getEmbeddedFontDataUri(resource_path('fonts/Sarabun-Light.ttf'));
@@ -90,11 +95,23 @@ class PDF extends Browsershot
 HTML;
     }
 
+    /**
+     * Convert a font file into a data URI for inline PDF styles.
+     *
+     * @param  string  $path  Font file path.
+     * @return string Encoded font data URI.
+     */
     protected static function getEmbeddedFontDataUri(string $path): string
     {
         return 'data:font/ttf;base64,'.base64_encode(file_get_contents($path));
     }
 
+    /**
+     * Add the default PDF styles to rendered HTML.
+     *
+     * @param  string  $html  Rendered document markup.
+     * @return string Markup with the default styles included.
+     */
     protected static function applyDefaultPdfStyles(string $html): string
     {
         $styles = static::getDefaultPdfStyles();

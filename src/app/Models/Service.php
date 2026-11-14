@@ -407,6 +407,11 @@ class Service extends Model implements HasDAVCalendarItems
         return $this->participantsWithMinistry->groupBy('pivot.category');
     }
 
+    /**
+     * Return participant credits for display and exports.
+     *
+     * @return string Formatted participant credits.
+     */
     public function getCreditsAttribute()
     {
         $credits = [];
@@ -448,6 +453,11 @@ class Service extends Model implements HasDAVCalendarItems
 
     //
 
+    /**
+     * Return the service date as a mutable datetime value.
+     *
+     * @return Carbon Service date.
+     */
     public function getDatetimeAttribute()
     {
         return $this->date->copy();
@@ -566,6 +576,11 @@ class Service extends Model implements HasDAVCalendarItems
         return implode('; ', $funerals);
     }
 
+    /**
+     * Return the service duration in minutes.
+     *
+     * @return int Duration in minutes.
+     */
     public function getDurationAttribute()
     {
         if (! $this->end) {
@@ -575,6 +590,11 @@ class Service extends Model implements HasDAVCalendarItems
         return abs((int) $this->end->diffInMinutes($this->date));
     }
 
+    /**
+     * Return the formatted number of available seats.
+     *
+     * @return string Available-seat description.
+     */
     public function getFreeSeatsTextAttribute()
     {
         return $this->getSeatFinder()->freeSeatsText();
@@ -629,11 +649,21 @@ class Service extends Model implements HasDAVCalendarItems
         return $this->getSeatFinder()->hasSeats;
     }
 
+    /**
+     * Determine whether the authenticated user participates in this service.
+     *
+     * @return bool Whether the service belongs to the current user's participation.
+     */
     public function getIsMineAttribute()
     {
         return $this->participants->contains(Auth::user());
     }
 
+    /**
+     * Return the service date in the key format used by calendar views.
+     *
+     * @return string Date key.
+     */
     public function getKeyDateAttribute()
     {
         return $this->date->format('Y-m-d');
@@ -647,6 +677,11 @@ class Service extends Model implements HasDAVCalendarItems
         return $this->liturgy;
     }
 
+    /**
+     * Return the live-dashboard URL for the service's city and stream.
+     *
+     * @return string Dashboard URL or an empty string.
+     */
     public function getLiveDashboardUrlAttribute()
     {
         if ($this->city === null) {
@@ -683,6 +718,11 @@ class Service extends Model implements HasDAVCalendarItems
         return $this->special_location ?: (is_object($this->location) ? $this->location->fullName : '');
     }
 
+    /**
+     * Return the maximum capacity of the service location.
+     *
+     * @return int Maximum number of seats.
+     */
     public function getMaximumCapacityAttribute()
     {
         return $this->getSeatFinder()->maximumCapacity();
@@ -861,6 +901,11 @@ class Service extends Model implements HasDAVCalendarItems
             .($uhr ? ($nbsp ? '&nbsp;' : ' ').'Uhr' : '');
     }
 
+    /**
+     * Return the display title of the service.
+     *
+     * @return string Display title.
+     */
     public function getTitleTextAttribute()
     {
         return $this->titleText(false, false);
@@ -881,6 +926,12 @@ class Service extends Model implements HasDAVCalendarItems
     // END ACCESSORS
 
     // MUTATORS
+    /**
+     * Normalize a stored service time to hour and minute precision.
+     *
+     * @param  string  $time  Submitted time.
+     * @return void
+     */
     public function setTimeAttribute($time)
     {
         $this->attributes['time'] = substr($time, 0, 5);
@@ -1067,6 +1118,13 @@ class Service extends Model implements HasDAVCalendarItems
         return $query->whereYear('date', $year)->whereMonth('date', $month);
     }
 
+    /**
+     * Limit services to the month containing a date.
+     *
+     * @param  Builder  $query  Service query.
+     * @param  Carbon  $date  Reference date.
+     * @return Builder Filtered query.
+     */
     public function scopeInMonthByDate(Builder $query, Carbon $date)
     {
         return $query->whereMonth('date', $date->month)->whereYear('date', $date->year);
@@ -1279,6 +1337,11 @@ class Service extends Model implements HasDAVCalendarItems
         });
     }
 
+    /**
+     * Create the route slug for this service.
+     *
+     * @return string Service slug.
+     */
     public function createSlug()
     {
         if ($this->isTemplate()) {
@@ -1309,11 +1372,21 @@ class Service extends Model implements HasDAVCalendarItems
             ->where($field, $value);
     }
 
+    /**
+     * Determine whether this service is the template service.
+     *
+     * @return bool Whether the service uses the template date.
+     */
     public function isTemplate(): bool
     {
         return $this->date->format('Y-m-d') == '1978-03-05';
     }
 
+    /**
+     * Expose the template state as an accessor.
+     *
+     * @return bool Whether the service is a template.
+     */
     public function getIsTemplateAttribute(): bool
     {
         return $this->isTemplate();
@@ -1409,11 +1482,24 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * @return string
      */
+    /**
+     * Return the location label prefixed with its preposition.
+     *
+     * @return string Formatted location label.
+     */
     public function atText()
     {
         return is_object($this->location) ? $this->location->atText() : '('.$this->locationText().')';
     }
 
+    /**
+     * Record participant changes for the given field.
+     *
+     * @param  string  $field  Audited field.
+     * @param  Collection  $originalRecords  Original related records.
+     * @param  array<int, int>  $newIds  New related record IDs.
+     * @return void
+     */
     public function audit($field, $originalRecords, $newIds)
     {
         $originalIds = $originalRecords->pluck('id')->toArray();
@@ -1482,6 +1568,11 @@ class Service extends Model implements HasDAVCalendarItems
         return new Carbon($this->date->format('Y-m-d').' '.$t);
     }
 
+    /**
+     * Clear the predicant requirement when pastors are assigned.
+     *
+     * @return void
+     */
     public function checkIfPredicantNeeded()
     {
         if (count($this->pastors)) {
@@ -1553,6 +1644,11 @@ class Service extends Model implements HasDAVCalendarItems
         return $this->hasMany(Funeral::class);
     }
 
+    /**
+     * Build the YouTube live-broadcast metadata for this service.
+     *
+     * @return Google_Service_YouTube_LiveBroadcastSnippet Broadcast metadata.
+     */
     public function getBroadcastSnippet(): Google_Service_YouTube_LiveBroadcastSnippet
     {
         $broadcastSnippet = new Google_Service_YouTube_LiveBroadcastSnippet;
@@ -1626,6 +1722,11 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * @return array
      */
+    /**
+     * Return participants grouped for calendar synchronization.
+     *
+     * @return array<string, array<int, array<string, mixed>>> Participant data.
+     */
     public function getSyncableParticipantsArray()
     {
         $data = [];
@@ -1636,6 +1737,11 @@ class Service extends Model implements HasDAVCalendarItems
         return $data;
     }
 
+    /**
+     * Build the YouTube video metadata for this service.
+     *
+     * @return Google_Service_YouTube_VideoSnippet Video metadata.
+     */
     public function getVideoSnippet(): Google_Service_YouTube_VideoSnippet
     {
         $videoSnippet = new Google_Service_YouTube_VideoSnippet;
@@ -1669,6 +1775,9 @@ class Service extends Model implements HasDAVCalendarItems
         }
     }
 
+    /**
+     * Return the liturgy blocks belonging to this service.
+     */
     public function liturgyBlocks()
     {
         return $this->hasMany(Block::class);
@@ -1765,6 +1874,12 @@ class Service extends Model implements HasDAVCalendarItems
         return ['goal' => '', 'description' => ''];
     }
 
+    /**
+     * Return a compact one-line description of the service.
+     *
+     * @param  bool  $title  Whether to include the title.
+     * @return string Compact service description.
+     */
     public function oneLiner($title = false)
     {
         return ($title ? $this->titleText(false).', ' : '').$this->date->format(
@@ -1775,6 +1890,11 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * @return BelongsToMany
      */
+    /**
+     * Return participants that belong to ministry categories.
+     *
+     * @return BelongsToMany Ministry participant relationship.
+     */
     public function participantsWithMinistry()
     {
         return $this->belongsToMany(User::class)
@@ -1783,6 +1903,9 @@ class Service extends Model implements HasDAVCalendarItems
             ->withTimestamps();
     }
 
+    /**
+     * Return the sermon associated with this service.
+     */
     public function sermon()
     {
         return $this->belongsTo(Sermon::class);
@@ -1796,6 +1919,11 @@ class Service extends Model implements HasDAVCalendarItems
         return $this->belongsToMany(ServiceGroup::class);
     }
 
+    /**
+     * Fill empty offering fields from the city defaults.
+     *
+     * @return void
+     */
     public function setDefaultOfferingValues()
     {
         if ($this->city === null) {
@@ -1858,16 +1986,32 @@ class Service extends Model implements HasDAVCalendarItems
     /**
      * @return Carbon
      */
+    /**
+     * Return the stored service date without formatting.
+     *
+     * @return Carbon Stored service date.
+     */
     public function trueDate()
     {
         return $this->date;
     }
 
+    /**
+     * Remove computed append fields from the model serialization.
+     *
+     * @return void
+     */
     public function unsetAdditionalFields()
     {
         $this->appends = [];
     }
 
+    /**
+     * Synchronize related cities from an incoming request.
+     *
+     * @param  Request  $request  Request containing related city IDs.
+     * @return void
+     */
     public function updateRelatedCitiesFromRequest(Request $request)
     {
         $cityIds = $request->get('related_cities', []);

@@ -130,6 +130,12 @@ class LiturgyService
         return static::$calendars[$year] = json_decode(Storage::get('liturgy/'.$year.'.json'), true);
     }
 
+    /**
+     * Load the lectionary data for a year, using the application cache.
+     *
+     * @param  int|string  $year  Liturgical year.
+     * @return array<string, mixed> Lectionary data.
+     */
     public static function getLectionaryYear($year)
     {
         if (isset(static::$lectionaryYears[$year])) {
@@ -142,6 +148,12 @@ class LiturgyService
         return static::$lectionaryYears[$year] = json_decode(Storage::get('liturgy/lesejahr-'.$year.'.json'), true);
     }
 
+    /**
+     * Resolve liturgy data from an alternative proprium code.
+     *
+     * @param  string  $code  Alternative proprium code.
+     * @return array<string, mixed> Matching liturgy data.
+     */
     public static function getLiturgyByAltPropriumCode($code)
     {
         [$subCode, $year] = explode('-', $code);

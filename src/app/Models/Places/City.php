@@ -195,6 +195,9 @@ class City extends AbstractModel
         return $this->hasMany(Parish::class);
     }
 
+    /**
+     * Return pastors assigned to this city as home city.
+     */
     public function pastors()
     {
         return $this->belongsToMany(User::class, 'user_home')->role('Pfarrer:in');
@@ -268,6 +271,11 @@ class City extends AbstractModel
         return collect($channels);
     }
 
+    /**
+     * Return configured and stored advertising channels for this city.
+     *
+     * @return Collection Active advertising channels sorted by name.
+     */
     public function getActiveAdChannels()
     {
         return $this->getDefaultAdChannels()
@@ -310,6 +318,11 @@ class City extends AbstractModel
         $this->attributes['default_ministries'] = implode('||', $ministries ?? []);
     }
 
+    /**
+     * Return default values for a newly initialized city.
+     *
+     * @return array<string, mixed> Default city attributes.
+     */
     public function fillDefaults(): array
     {
         return ['default_ministries' => []];
