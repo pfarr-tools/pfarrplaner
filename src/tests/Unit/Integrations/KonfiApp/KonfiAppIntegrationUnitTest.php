@@ -16,7 +16,9 @@ use App\Integrations\KonfiApp\KonfiAppIntegration;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use ReflectionProperty;
@@ -78,6 +80,34 @@ class KonfiAppIntegrationUnitTest extends TestCase
         $eventTypes = $integration->listEventTypes();
 
         $this->assertTrue($eventTypes->isEmpty());
+    }
+
+    public function test_qr_codes_are_read_from_the_detail_response_for_the_requested_event_type(): void
+    {
+        $history = [];
+        $handler = new MockHandler([
+            new Response(200, [], json_encode([
+                'status' => 200,
+                'shortcode' => 'ok',
+                'detail' => [['code' => 'actual-code']],
+            ])),
+        ]);
+        $stack = HandlerStack::create($handler);
+        $stack->push(Middleware::history($history));
+        $integration = new KonfiAppIntegration('qr-token');
+        $integration->setClient(new Client(['handler' => $stack]));
+
+        $qrCodes = $integration->listQRCodes(37578);
+
+        $this->assertInstanceOf(Collection::class, $qrCodes);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode([['code' => 'actual-code']]),
+            $qrCodes->toJson()
+        );
+        $this->assertSame(
+            'veranstaltungID=37578',
+            $history[0]['request']->getUri()->getQuery()
+        );
     }
 
     /**

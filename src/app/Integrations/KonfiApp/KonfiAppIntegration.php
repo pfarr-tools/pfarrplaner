@@ -155,7 +155,12 @@ class KonfiAppIntegration extends AbstractIntegration
             return false;
         }
 
-        return json_decode((string) $response->getBody());
+        $data = json_decode((string) $response->getBody());
+        if ((! $data) || (! isset($data->data))) {
+            return false;
+        }
+
+        return $data;
     }
 
     /**
@@ -197,7 +202,7 @@ class KonfiAppIntegration extends AbstractIntegration
             return false;
         }
 
-        if ((! $response) || $response->getStatusCode() != 200 || (! isset(json_decode($response->getBody(), true)['data']))) {
+        if ((! $response) || $response->getStatusCode() != 200) {
             Log::debug('KonfiApp: KonfiApp returns error response', [
                 'requestType' => $this->lastRequestType,
                 'endpoint' => $this->lastEndpoint,
@@ -377,13 +382,24 @@ class KonfiAppIntegration extends AbstractIntegration
     }
 
     /**
-     * @return mixed
+     * List QR codes for a KonfiApp event type.
      *
-     * @throws Exception
+     * @return Collection QR codes returned by KonfiApp
      */
-    public function listQRCodes()
+    public function listQRCodes(int $eventType): Collection
     {
-        return $this->requestData('verwaltung/veranstaltungen/qr/list/', ['veranstaltungID' => 682])->detail;
+        $response = $this->request(
+            'GET',
+            'verwaltung/veranstaltungen/qr/list/',
+            ['veranstaltungID' => $eventType]
+        );
+        if (! $response) {
+            return collect();
+        }
+
+        $data = json_decode((string) $response->getBody());
+
+        return collect($data->detail ?? []);
     }
 
     public function getApiKey(): string
