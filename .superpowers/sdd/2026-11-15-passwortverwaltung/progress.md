@@ -46,3 +46,17 @@ abgeschlossen.
 - Verifikation: 27 isolierte PHPUnit-Tests / 130 Assertions, PHPStan,
   Format-, Diff- und Doku-/JSDoc-Prüfungen bestanden.
 
+Task 4 — E-Mail- und TOTP-Zwei-Faktor-Authentifizierung: Paketbasis abgeschlossen.
+
+- Dependency-Audit dokumentiert und als Kommentar in Issue #80 veröffentlicht.
+- `roundly-consulting/two-factor-for-laravel:^2.0` ergänzt; Composer löst
+  genau drei notwendige MIT-Transitivabhängigkeiten auf, ohne bestehende
+  Pakete zu aktualisieren.
+- Senior Review Installationsschritt: APPROVED; Laravel 13/PHP 8.4,
+  Lockfile-Konsistenz und konkrete Commit-Referenzen geprüft.
+- Offener Nebenbefund: `composer audit` meldet bestehende Advisories in elf
+  anderen Paketen; kein neues Roundly-Paket ist betroffen. Das ist ein
+  separater Release-Gate und wird nicht durch diesen Commit verborgen.
+- Verifikation: `composer validate --strict` mit den bestehenden Schema-
+  Warnungen, Plattform-/Lockfile-Prüfung, `git diff --check` bestanden.
+
