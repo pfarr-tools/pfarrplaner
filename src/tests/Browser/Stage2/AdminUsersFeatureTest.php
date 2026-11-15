@@ -85,16 +85,33 @@ class AdminUsersFeatureTest extends AbstractPageLoadTest
     /** The editor shows and refreshes the documented initial-password pattern. */
     public function test_user_create_form_suggests_and_refreshes_an_initial_password(): void
     {
-        $this->browse(function (Browser $browser) {
+        $password = null;
+
+        $this->browse(function (Browser $browser) use (&$password) {
             $browser->loginAs($this->superAdminUser, 'web')
                 ->visit(route('user.create'))
-                ->waitFor('input[type="checkbox"]', 10)
+                ->click('a[href="#account"]')
+                ->waitFor('#account input[type="checkbox"]', 10)
                 ->click('input[type="checkbox"]')
                 ->waitFor('[name="password"]', 10)
                 ->assertPresent('[name="password"]')
                 ->assertScript("/^[A-Z][aeiouy][bcdfghjklmnpqrstvwxz][aeiouy][0-9]{4}$/.test(document.querySelector('[name=\\\"password\\\"]').value)", true)
                 ->click('[data-testid="initial-password-suggest"]')
-                ->assertScript("/^[A-Z][aeiouy][bcdfghjklmnpqrstvwxz][aeiouy][0-9]{4}$/.test(document.querySelector('[name=\\\"password\\\"]').value)", true);
+                ->assertScript("/^[A-Z][aeiouy][bcdfghjklmnpqrstvwxz][aeiouy][0-9]{4}$/.test(document.querySelector('[name=\\\"password\\\"]').value)", true)
+                ->tap(function (Browser $browser) use (&$password) {
+                    $password = $browser->value('[name="password"]');
+                })
+                ->click('a[href="#home"]')
+                ->clear('[name="first_name"]')
+                ->type('[name="first_name"]', 'Browser')
+                ->clear('[name="last_name"]')
+                ->type('[name="last_name"]', 'Browserkonto')
+                ->clear('[name="email"]')
+                ->type('[name="email"]', 'browserkonto@example.com')
+                ->click('a[title="Änderungen speichern"]')
+                ->pause(1000)
+                ->assertScript('return !window.location.search.includes("password")', true)
+                ->assertDontSee($password);
         });
     }
 
