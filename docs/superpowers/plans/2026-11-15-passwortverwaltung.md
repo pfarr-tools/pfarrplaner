@@ -76,7 +76,7 @@ Passwörtern.
 
 ---
 
-### Etappe 1: Sicherheitsmodell und Passwortregeln
+### Task 1: Sicherheitsmodell und Passwortregeln
 
 **Dateien:**
 
@@ -96,7 +96,7 @@ Passwörtern.
 - [ ] Tests für gültige/ungültige Passwörter, Hash-Erhalt, Reset und
   `must_change_password` schreiben und ausführen.
 
-### Etappe 2: Admin-Passwort setzen und Initialpasswort vorschlagen
+### Task 2: Admin-Passwort setzen und Initialpasswort vorschlagen
 
 **Dateien:**
 
@@ -119,7 +119,7 @@ Passwörtern.
 - [ ] Feature- und Dusk-Tests für Berechtigungen, Mailinhalt ohne unnötige
   Geheimnisverbreitung, Hashing und den Vorschlagsdialog ergänzen.
 
-### Etappe 3: Nicht umgehbares Interstitial und Passwort-Reset
+### Task 3: Nicht umgehbares Interstitial und Passwort-Reset
 
 **Dateien:**
 
@@ -139,7 +139,7 @@ Passwörtern.
 - [ ] Feature- und Browser-Tests für alle Bypass-Versuche und den erfolgreichen
   Wechsel ergänzen.
 
-### Etappe 4: E-Mail- und TOTP-Zwei-Faktor-Authentifizierung
+### Task 4: E-Mail- und TOTP-Zwei-Faktor-Authentifizierung
 
 **Dateien:**
 
@@ -159,7 +159,7 @@ Passwörtern.
 - [ ] Rate-Limits, Replay-Schutz, Ablauf, Mailversand und generische
   Fehlermeldungen testen und im Administratorenhandbuch dokumentieren.
 
-### Etappe 5: Passkey-Anmeldung
+### Task 5: Passkey-Anmeldung
 
 **Dateien:**
 
@@ -179,7 +179,7 @@ Passwörtern.
 - [ ] API-/Browsergrenzen, HTTPS-Anforderung und Betriebsmaßnahmen im
   technischen und Administratorenhandbuch dokumentieren.
 
-### Etappe 6: Gesamtprüfung und Übergabe
+### Task 6: Gesamtprüfung und Übergabe
 
 - [ ] `./planer dev format` und `./planer dev format:check` ausführen.
 - [ ] `./planer dev quality` mit isolierter Testdatenbank ausführen.
