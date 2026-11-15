@@ -35,6 +35,15 @@ Prüfen Sie:
 - Dusk-Hilfsrouten sind nur bei `APP_ENV=dusk` und `DUSK_ENABLED=true` zugänglich. Auf normalen Entwicklungs- und Produktionsservern müssen `/_dusk` und `/_dusk/*` HTTP 404 liefern, selbst bei versehentlich aktiviertem Flag. `APP_ENV` auf einem produktiven Server niemals für Browser-Tests umstellen.
 - Entwicklungswerkzeuge wie Dusk oder Telescope laufen nicht auf einem öffentlich erreichbaren System
 
+### Horizon verweigert den Zugriff
+
+Horizon verlangt auch in der lokalen Umgebung eine Anmeldung. Zugriff haben
+Super-Administratoren sowie angemeldete Benutzer, deren E-Mail-Adresse in
+`HORIZON_ALLOWED_EMAILS` eingetragen ist. Alle anderen erhalten HTTP 403;
+das gilt für Dashboard und API einschließlich Monitoring-Änderungen.
+Prüfen Sie die Anmeldung und die Freigabeliste. Aktivieren Sie keinen
+anonymen Zugang, um eine fehlende Freigabe zu umgehen.
+
 ### Mails kommen nicht an
 
 Prüfen Sie:

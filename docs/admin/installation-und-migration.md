@@ -221,8 +221,19 @@ HORIZON_ALLOWED_EMAILS=admin@example.org,office@example.org
 ```
 
 Leerzeichen werden entfernt und die Prüfung ist unabhängig von Groß- und
-Kleinschreibung. Eine leere Liste gewährt in Produktionsumgebungen niemandem
-Zugriff auf `/horizon`.
+Kleinschreibung. Dashboard und sämtliche Horizon-API-Routen verlangen in jeder
+Umgebung eine Anmeldung und eine Freigabe durch das `viewHorizon`-Gate.
+`APP_ENV=local` gewährt keinen automatischen Zugang. Die bestehende globale
+Berechtigung für `Super-Administrator:in` gilt weiterhin; andere Benutzer
+benötigen einen Eintrag in `HORIZON_ALLOWED_EMAILS`. Eine leere Liste sperrt
+somit alle Benutzer ohne diese Super-Administrator-Rolle.
+
+Gäste und angemeldete Benutzer ohne Freigabe erhalten HTTP 403. Dies gilt
+auch für das Lesen von Jobdaten sowie das Anlegen und Entfernen von
+Monitoring-Tags. Ein gültiger CSRF-Token allein gewährt keinen Zugriff.
+Nach einem Update können Betreiber die Sperre mit einer frischen Gastsitzung
+für `/horizon` und `/horizon/api/stats` prüfen. Bestehende langlebige
+Anwendungsprozesse müssen wie bei anderen Code-Updates neu geladen werden.
 
 `.env` wird nur angelegt, wenn sie fehlt, und niemals ohne interaktive
 Bestätigung verändert. Bei einer vorhandenen `.env` ist die Standardantwort auf
