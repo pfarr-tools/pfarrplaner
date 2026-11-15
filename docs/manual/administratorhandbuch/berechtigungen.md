@@ -54,6 +54,8 @@ Beim Anlegen eines Kontos zeigt der Benutzereditor ein Anfangspasswort an. Die A
 
 Das öffentliche Verfahren **Passwort vergessen** verwendet denselben Passwortstandard und hebt die erzwungene Änderung nach einem erfolgreichen Reset auf. Schwache Passwörter werden bereits bei der Eingabe zurückgewiesen.
 
+Ein Konto mit erzwungenem Passwortwechsel kann keine Verwaltungs- oder Inhaltsseite öffnen. Die Sperre gilt auch für direkte URLs und interne Navigation. Eine kontrollierte Benutzerübernahme durch eine Administratorin oder einen Administrator bleibt rückkehrfähig; über **Zurück zu Admin** wird das ursprüngliche Administratorkonto wiederhergestellt.
+
 Einige Funktionen werden nicht als CRUD-Policy eines Modells geprüft. Dazu gehören insbesondere die fachlichen Berechtigungen für Gottesdienste und Eingaben:
 
 | Berechtigung | Bedeutung |

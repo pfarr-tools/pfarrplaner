@@ -72,6 +72,8 @@ Wenn Ihr Konto mit einem vorläufigen Anfangspasswort eingerichtet wurde, führt
 
 Das vorläufige Anfangspasswort erhalten Sie von Ihrer Administration. Es ist nur für die erste Anmeldung bestimmt und muss danach sofort durch ein eigenes starkes Passwort ersetzt werden.
 
+Während dieser erzwungenen Änderung sind die übrigen Seiten von Pfarrplaner gesperrt. Auch wenn Sie eine andere Adresse direkt aufrufen, gelangen Sie wieder zum Passwortwechsel. Abmelden bleibt jederzeit möglich.
+
 ---
 
 ## Abmelden

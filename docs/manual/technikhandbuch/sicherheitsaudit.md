@@ -27,6 +27,8 @@ Das Setzen eines Passworts für ein anderes Konto ist auf Super-Administrator:in
 
 Bei einer neuen Kontoanlage wird ein bestätigter Initialwert aus dem Benutzereditor an den bereits autorisierten Request gesendet. Der Server validiert ihn erneut, hasht ihn über das User-Modell, setzt `must_change_password` und übergibt ihn ausschließlich an die Kontodaten-Mail. Der Wert wird nicht in Redirects, Flash-Daten oder Inertia-Antworten ausgegeben.
 
+Das Middleware-Modul `App\Http\Middleware\RequirePasswordChange` liegt nach der Authentifizierung in der Web-Middleware-Kette. Es erlaubt nur Passwortwechsel, Logout, CSRF-Token-Erneuerung und den kontrollierten Admin-Rückweg. Alle anderen authentifizierten Webrouten werden auf `password.edit` mit einem sicheren Routennamen als Rücksprung-Hinweis umgeleitet. Eine vorhandene `adminUserSwitchBack`-Session markiert ausschließlich den bewusst kontrollierten Proxy-Fall als Ausnahme.
+
 Der produktive Routenbestand wurde geprüft und gezielt gehärtet. Dabei wurden folgende Klassen von Problemen beseitigt:
 
 - Debug- und Diagnose-Routen wurden entfernt oder standardmäßig blockiert.

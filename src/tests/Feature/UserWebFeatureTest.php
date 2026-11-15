@@ -282,7 +282,7 @@ class UserWebFeatureTest extends TestCase
     public function test_profile_password_change_keeps_current_hash_until_validation(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
-        $this->user->update(['password' => 'testtest', 'must_change_password' => 1]);
+        $this->user->update(['password' => 'testtest', 'must_change_password' => 0]);
 
         $this->actingAs($this->user)
             ->patch(route('user.profile.save'), [

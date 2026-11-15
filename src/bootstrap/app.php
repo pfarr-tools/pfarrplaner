@@ -34,6 +34,7 @@ use App\Http\Middleware\Cors;
 use App\Http\Middleware\ForceDomain;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RedirectIfAuthenticated;
+use App\Http\Middleware\RequirePasswordChange;
 use App\Http\Middleware\TrustProxies;
 use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Auth\AuthenticationException;
@@ -77,7 +78,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Add Inertia to the web group
-        $middleware->web(append: [HandleInertiaRequests::class]);
+        $middleware->web(append: [HandleInertiaRequests::class, RequirePasswordChange::class]);
 
         // Add Sanctum stateful handling to api group
         $middleware->api(prepend: [EnsureFrontendRequestsAreStateful::class]);
@@ -105,6 +106,7 @@ return Application::configure(basePath: dirname(__DIR__))
             StartSession::class,
             ShareErrorsFromSession::class,
             Authenticate::class,
+            RequirePasswordChange::class,
             AuthenticateSession::class,
             SubstituteBindings::class,
             Authorize::class,
