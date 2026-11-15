@@ -40,6 +40,22 @@ Restore-Regeln des Administratorenhandbuchs; ein Image-Rollback ohne passenden
 Datenbank-Restore ist nur für die expandierte, noch kompatible Schemaänderung
 zulässig.
 
+Die geschützten Web-Endpunkte für die persönliche Einschreibung sind:
+
+- `POST /profil/zwei-faktor/start`: re-authentifiziert, sperrt die User-Zeile
+  und gibt die Provisionierungs-URI sowie die einmaligen Recovery-Codes zurück.
+- `POST /profil/zwei-faktor/bestaetigen`: prüft einen 6- bis 8-stelligen TOTP-
+  Code, akzeptiert die vom Paket vorgesehenen Leerzeichen oder Bindestriche
+  und aktiviert den Faktor nur bei einer laufenden Einschreibung.
+- `POST /profil/zwei-faktor/deaktivieren`: re-authentifiziert und löscht den
+  Faktor unter derselben Zeilensperre.
+
+Alle drei Routen liegen in der authentifizierten CSRF-geschützten Web-Gruppe.
+Passwort- und Codefehler werden ohne Konto- oder Zustandsdetails gemeldet;
+Rate-Limits gelten pro Benutzer und liefern bei einer temporären Sperre HTTP
+429. Die Antworten enthalten weder den TOTP-Secretwert als eigenes Feld noch
+die sensiblen User-Modellattribute.
+
 ## Empfehlung für Integrationen
 
 - Neue produktive Integrationen dürfen nicht von implizit öffentlichen Endpunkten ausgehen.

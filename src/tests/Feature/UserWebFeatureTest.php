@@ -16,11 +16,15 @@ namespace Tests\Feature;
 use App\Mail\User\AccountData;
 use App\Models\People\User;
 use App\Services\RoleService;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia as Assert;
+use RoundlyConsulting\TwoFactor\Contracts\TwoFactorService;
 use Tests\TestCase;
 
 class UserWebFeatureTest extends TestCase
@@ -164,6 +168,133 @@ class UserWebFeatureTest extends TestCase
                 'password' => 'Strong1!',
             ])
             ->assertForbidden();
+    }
+
+    /** Activation and deactivation require a fresh password re-authentication. */
+    public function test_two_factor_security_actions_require_reauthentication(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $user = User::factory()->create(['password' => 'Current1!']);
+        RateLimiter::clear('two-factor-confirm:'.$user->getKey());
+
+        $this->actingAs($user)
+            ->postJson(route('user.two-factor.start'), ['current_password' => 'wrong'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('current_password');
+
+        $setupResponse = $this->actingAs($user)
+            ->postJson(route('user.two-factor.start'), ['current_password' => 'Current1!'])
+            ->assertOk()
+            ->assertJsonStructure(['provisioning_uri', 'recovery_codes']);
+
+        $setup = $setupResponse->json();
+        $freshUser = $user->fresh();
+
+        self::assertTrue($freshUser->hasPendingTwoFactor());
+        self::assertArrayNotHasKey('secret', $setup);
+
+        $this->actingAs($user)
+            ->postJson(route('user.two-factor.start'), ['current_password' => 'Current1!'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('current_password');
+
+        $code = app(TwoFactorService::class)->currentCode($freshUser->twoFactorSecret());
+
+        $formattedCode = substr($code, 0, 3).' '.substr($code, 3);
+
+        $this->actingAs($user)
+            ->postJson(route('user.two-factor.confirm'), [
+                'current_password' => 'Current1!',
+                'code' => $formattedCode,
+            ])
+            ->assertOk();
+
+        self::assertTrue($user->fresh()->hasTwoFactorEnabled());
+
+        $this->actingAs($user)
+            ->postJson(route('user.two-factor.disable'), ['current_password' => 'wrong'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('current_password');
+
+        $this->actingAs($user)
+            ->postJson(route('user.two-factor.disable'), ['current_password' => 'Current1!'])
+            ->assertOk();
+
+        self::assertFalse($user->fresh()->hasTwoFactorEnabled());
+    }
+
+    /** Invalid TOTP input is generic and never becomes an internal server error. */
+    public function test_two_factor_confirmation_rejects_invalid_codes_generically(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $user = User::factory()->create(['password' => 'Current1!']);
+        RateLimiter::clear('two-factor-confirm:'.$user->getKey());
+        $user->startTwoFactorEnrolment();
+
+        $this->actingAs($user)
+            ->postJson(route('user.two-factor.confirm'), [
+                'current_password' => 'Current1!',
+                'code' => '000000',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('code')
+            ->assertJsonMissingPath('exception');
+
+        self::assertTrue($user->fresh()->hasPendingTwoFactor());
+    }
+
+    /** State-changing endpoints remain in the CSRF-protected web middleware group. */
+    public function test_two_factor_start_requires_csrf_protection(): void
+    {
+        $route = Route::getRoutes()->getByName('user.two-factor.start');
+
+        self::assertNotNull($route);
+        self::assertContains('web', $route->middleware());
+        self::assertNotContains(PreventRequestForgery::class, $route->excludedMiddleware());
+    }
+
+    /** Repeated invalid confirmation attempts are throttled per user. */
+    public function test_two_factor_confirmation_is_rate_limited(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $user = User::factory()->create(['password' => 'Current1!']);
+        RateLimiter::clear('two-factor-confirm:'.$user->getKey());
+        $user->startTwoFactorEnrolment();
+
+        foreach (range(1, 5) as $attempt) {
+            $this->actingAs($user)
+                ->postJson(route('user.two-factor.confirm'), [
+                    'current_password' => 'Current1!',
+                    'code' => '000000',
+                ])
+                ->assertUnprocessable();
+        }
+
+        $this->actingAs($user)
+            ->postJson(route('user.two-factor.confirm'), [
+                'current_password' => 'Current1!',
+                'code' => '000000',
+            ])
+            ->assertStatus(429)
+            ->assertJson(['message' => 'Zu viele Versuche. Bitte später erneut versuchen.']);
+    }
+
+    /** Password re-authentication itself is throttled before factor changes. */
+    public function test_two_factor_reauthentication_is_rate_limited(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $user = User::factory()->create(['password' => 'Current1!']);
+        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
+
+        foreach (range(1, 5) as $attempt) {
+            $this->actingAs($user)
+                ->postJson(route('user.two-factor.start'), ['current_password' => 'wrong'])
+                ->assertUnprocessable();
+        }
+
+        $this->actingAs($user)
+            ->postJson(route('user.two-factor.start'), ['current_password' => 'wrong'])
+            ->assertStatus(429);
     }
 
     /** A string false value is not treated as an account-creation request. */

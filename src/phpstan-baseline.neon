@@ -4417,12 +4417,6 @@ parameters:
 			path: app/Models/People/User.php
 
 		-
-			message: '#^PHPDoc type array\<string\> of property App\\Models\\People\\User\:\:\$casts is not covariant with PHPDoc type array\<string, string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$casts\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/Models/People/User.php
-
-		-
 			message: '#^Parameter \#2 \$default of method App\\Models\\People\\User\:\:getSetting\(\) expects null, string given\.$#'
 			identifier: argument.type
 			count: 2

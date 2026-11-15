@@ -53,11 +53,20 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use RoundlyConsulting\TwoFactor\DataTransferObjects\TwoFactorSetup;
+use RoundlyConsulting\TwoFactor\Exceptions\InvalidTwoFactorCodeException;
+use RoundlyConsulting\TwoFactor\Exceptions\TwoFactorAlreadyEnabledException;
+use RoundlyConsulting\TwoFactor\Exceptions\TwoFactorNotPendingException;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 /**
  * Class UserController
@@ -528,6 +537,138 @@ class UserController extends Controller
         }
 
         return redirect()->route('home')->with('success', 'Die Änderungen wurden gespeichert.');
+    }
+
+    /**
+     * Start a re-authenticated TOTP enrolment and return one-time setup data.
+     */
+    public function startTwoFactor(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        Gate::authorize('update', $user);
+        $this->validateTwoFactorReauthentication($request, $user);
+
+        $rateLimitKey = 'two-factor-reauth:'.$user->getKey();
+        try {
+            $setup = DB::transaction(function () use ($user): TwoFactorSetup {
+                /** @var User $lockedUser */
+                $lockedUser = User::query()->lockForUpdate()->findOrFail($user->getKey());
+
+                if ($lockedUser->hasTwoFactorEnabled() || $lockedUser->hasPendingTwoFactor()) {
+                    throw TwoFactorAlreadyEnabledException::make();
+                }
+
+                return $lockedUser->startTwoFactorEnrolment();
+            });
+            RateLimiter::clear($rateLimitKey);
+        } catch (TwoFactorAlreadyEnabledException) {
+            throw ValidationException::withMessages([
+                'current_password' => 'Die Zwei-Faktor-Einstellungen konnten nicht geändert werden.',
+            ]);
+        }
+
+        return response()->json([
+            'provisioning_uri' => $setup->provisioningUri,
+            'recovery_codes' => $setup->recoveryCodes,
+        ]);
+    }
+
+    /** Confirm a re-authenticated TOTP enrolment with the first authenticator code. */
+    public function confirmTwoFactor(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        Gate::authorize('update', $user);
+        $this->validateTwoFactorReauthentication($request, $user);
+        $validated = $request->validate(['code' => ['required', 'string']]);
+        $code = str_replace([' ', '-'], '', $validated['code']);
+
+        if (! ctype_digit($code) || strlen($code) < 6 || strlen($code) > 8) {
+            throw ValidationException::withMessages([
+                'code' => 'Der Sicherheitscode ist ungültig oder nicht mehr verfügbar.',
+            ]);
+        }
+
+        $rateLimitKey = 'two-factor-confirm:'.$user->getKey();
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
+            return response()->json(['message' => 'Zu viele Versuche. Bitte später erneut versuchen.'], 429);
+        }
+
+        try {
+            DB::transaction(function () use ($user, $code, $rateLimitKey): void {
+                /** @var User $lockedUser */
+                $lockedUser = User::query()->lockForUpdate()->findOrFail($user->getKey());
+
+                if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
+                    throw new TooManyRequestsHttpException(null, 'Zu viele Versuche. Bitte später erneut versuchen.');
+                }
+
+                $lockedUser->confirmTwoFactor($code);
+                RateLimiter::hit($rateLimitKey, 60);
+            });
+        } catch (TooManyRequestsHttpException) {
+            return response()->json(['message' => 'Zu viele Versuche. Bitte später erneut versuchen.'], 429);
+        } catch (InvalidTwoFactorCodeException|TwoFactorNotPendingException) {
+            RateLimiter::hit($rateLimitKey, 60);
+
+            throw ValidationException::withMessages([
+                'code' => 'Der Sicherheitscode ist ungültig oder nicht mehr verfügbar.',
+            ]);
+        }
+
+        RateLimiter::clear($rateLimitKey);
+
+        return response()->json(['enabled' => true]);
+    }
+
+    /** Disable TOTP after a fresh password re-authentication. */
+    public function disableTwoFactor(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        Gate::authorize('update', $user);
+        $this->validateTwoFactorReauthentication($request, $user);
+
+        try {
+            DB::transaction(function () use ($user): void {
+                /** @var User $lockedUser */
+                $lockedUser = User::query()->lockForUpdate()->findOrFail($user->getKey());
+                $lockedUser->disableTwoFactor();
+            });
+        } catch (TwoFactorNotPendingException) {
+            throw ValidationException::withMessages([
+                'current_password' => 'Die Zwei-Faktor-Einstellungen konnten nicht geändert werden.',
+            ]);
+        }
+
+        return response()->json(['enabled' => false]);
+    }
+
+    /** Validate the current password without exposing account state in errors. */
+    private function validateTwoFactorReauthentication(Request $request, User $user): void
+    {
+        $rateLimitKey = 'two-factor-reauth:'.$user->getKey();
+        $password = $request->input('current_password');
+
+        DB::transaction(function () use ($user, $password, $rateLimitKey): void {
+            /** @var User $lockedUser */
+            $lockedUser = User::query()->lockForUpdate()->findOrFail($user->getKey());
+
+            if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
+                throw new TooManyRequestsHttpException(null, 'Zu viele Versuche. Bitte später erneut versuchen.');
+            }
+
+            if (! is_string($password) || ! Hash::check($password, (string) $lockedUser->password)) {
+                RateLimiter::hit($rateLimitKey, 60);
+
+                throw ValidationException::withMessages([
+                    'current_password' => 'Die Anmeldedaten konnten nicht bestätigt werden.',
+                ]);
+            }
+        });
+
+        RateLimiter::clear($rateLimitKey);
     }
 
     /**

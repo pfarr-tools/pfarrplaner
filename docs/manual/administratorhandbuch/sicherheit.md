@@ -31,6 +31,26 @@ Für Pfarrplaner selbst sollten Sie besonders darauf achten:
 
 Ein technischer Überblick über den Sicherheitsdurchgang und die abgesicherten Routen liegt im [Technikhandbuch](../technikhandbuch/sicherheitsaudit.md).
 
+## Zwei-Faktor-Authentifizierung
+
+Benutzer können die TOTP-Einschreibung nur nach erneuter Eingabe ihres
+aktuellen Passworts starten, bestätigen oder deaktivieren. Start und
+Bestätigung liefern keine dauerhaften Geheimnisse in Benutzerlisten oder
+Protokollen; Recovery-Codes werden nur einmalig nach der Einschreibung
+angezeigt und müssen sicher außerhalb von Pfarrplaner verwahrt werden.
+
+Falsche Passwörter und Sicherheitscodes werden generisch abgewiesen. Die
+Bestätigung ist pro Benutzer begrenzt; auch die Re-Authentifizierung vor jeder
+Änderung besitzt ein eigenes Limit. Nach fünf Fehlversuchen antwortet die
+Anwendung mit einer temporären Sperre. Ein Faktorwechsel wird gegen parallele
+Start-, Bestätigungs- und Deaktivierungsanfragen serialisiert.
+
+Bei Verlust des Authenticator-Geräts werden die Recovery-Codes oder der später
+folgende administrative Recovery-Prozess benötigt. Ein Datenbank-Restore muss
+immer zusammen mit dem vorherigen Anwendungsimage und einem verifizierten
+Backup geplant werden; die TOTP-Migration besitzt keinen automatischen
+Spalten-Rollback.
+
 ## Backup
 
 Ein brauchbares Backup des Docker-Betriebs umfasst mindestens:

@@ -32,6 +32,9 @@ use App\Http\Controllers\UserController;
 
 Route::get('/profil', [UserController::class, 'profile'])->name('user.profile');
 Route::patch('/profil', [UserController::class, 'profileSave'])->name('user.profile.save');
+Route::post('/profil/zwei-faktor/start', [UserController::class, 'startTwoFactor'])->name('user.two-factor.start');
+Route::post('/profil/zwei-faktor/bestaetigen', [UserController::class, 'confirmTwoFactor'])->name('user.two-factor.confirm');
+Route::post('/profil/zwei-faktor/deaktivieren', [UserController::class, 'disableTwoFactor'])->name('user.two-factor.disable');
 Route::get('/benutzer/{user}/gottesdienste', [UserController::class, 'services'])->name('user.services');
 
 Route::post('/benutzer/zurueck-zu-admin', [UserController::class, 'switchBack'])->name('user.switchback');
