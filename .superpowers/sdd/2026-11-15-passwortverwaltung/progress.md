@@ -74,3 +74,33 @@ Task 4 — E-Mail- und TOTP-Zwei-Faktor-Authentifizierung: Paketbasis abgeschlos
   weiterhin den unabhängigen Container-Dateirechtefehler bei `chmod()`; die
   PHP-Tests und Vitest liefen durch.
 
+- TOTP-Endpunkte: Commit `1467d6df`; Aktivierung, Bestätigung und Deaktivierung
+  mit Re-Authentifizierung, Rate-Limits, Zeilensperren und generischen Fehlern.
+- Senior Reviews: drei CHANGES REQUESTED-Runden; Re-Auth-Limits, Sperrverhalten,
+  formatierte Codes, Paketfehlerbehandlung und Tests nachgeschärft. Ein Review
+  wurde versehentlich auf dem Parent-Commit ausgeführt und verworfen.
+- Folgeprüfung: `63831c1d` ergänzt Authentifizierungs- und Rate-Limit-Tests;
+  `8c03bb29` korrigiert die Handbuchaussagen zur noch nicht vorhandenen UI.
+- Verifikation: isolierte PHPUnit-Tests zuletzt 9 / 66 Assertions, PHPStan
+  1088 Dateien und Formatprüfung bestanden. `docs:check` meldet bestehende
+  PHPDoc-Altlasten in unveränderten Methoden von `User.php`.
+- Senior Review zum Endpoint-Bereich fand P2-Lücken bei echtem CSRF-419,
+  Parallelprozess-Tests und Policy-Ablehnung. Die Endpunkte sind in der
+  CSRF-geschützten authentifizierten Webgruppe; echte parallele HTTP- und
+  Browser-CSRF-Abdeckung bleibt bei der Gesamtprüfung offen.
+
+- Profiloberfläche: Commit `8cfcc0f1`; Statusanzeige, Einrichtung, manuelle
+  TOTP-Schlüsseleingabe, einmalige Recovery-Codes, Bestätigung und Deaktivierung.
+  Erfolgreiche Bestätigung entfernt Schlüssel und Codes aus dem DOM. Das
+  Passwortfeld wird nach jeder Anfrage geleert. Ausstehende Einrichtung kann
+  neu gestartet werden; aktive Faktoren können dadurch nicht ersetzt werden.
+- Senior Review 1: CHANGES REQUESTED; Geheimnisse blieben nach Bestätigung
+  sichtbar, Passwort blieb für Folgeaktionen stehen und Anleitung versprach
+  Scannen ohne QR-Ausgabe. Korrekturen ergänzt und erneut geprüft.
+- Senior Review 2: APPROVED; keine offenen Findings.
+- Verifikation: PHPUnit 9 Tests / 66 Assertions, Vitest 4 Tests, PHPStan
+  1088 Dateien, Prettier-Formatcheck, `git diff --check` und Vite-Build
+  bestanden. ESLint meldet keine Fehler; es verbleiben bestehende Vue-
+  Template-Formatwarnungen. Der Build meldet bestehende große Chunks und
+  veraltete Browserslist-Daten.
+
