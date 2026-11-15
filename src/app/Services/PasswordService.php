@@ -38,7 +38,12 @@ class PasswordService
 
     private const NUMBERS = '0123456789';
 
-    public static function randomPassword()
+    /**
+     * Generate the initial password format used for administrator-created accounts.
+     *
+     * @return string
+     */
+    public static function randomPassword(): string
     {
         return strtoupper(self::randomCharsFromString(self::CONSONANTS))
             .self::randomCharsFromString(self::VOWELS)
@@ -48,11 +53,18 @@ class PasswordService
 
     }
 
-    private static function randomCharsFromString($template, $number = 1)
+    /**
+     * Select cryptographically secure random characters from a template.
+     *
+     * @param  string  $template  Characters available for selection.
+     * @param  int  $number  Number of characters to select.
+     * @return string
+     */
+    private static function randomCharsFromString(string $template, int $number = 1): string
     {
         $s = '';
         for ($i = 0; $i < $number; $i++) {
-            $s .= $template[rand(0, strlen($template) - 1)];
+            $s .= $template[random_int(0, strlen($template) - 1)];
         }
 
         return $s;

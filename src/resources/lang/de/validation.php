@@ -29,6 +29,7 @@
  */
 
 return [
+    'strong_password' => 'Das Passwort muss mindestens 8 Zeichen lang sein und Groß- und Kleinbuchstaben, eine Zahl sowie ein Sonderzeichen enthalten.',
     /*
     |--------------------------------------------------------------------------
     | Validation Language Lines

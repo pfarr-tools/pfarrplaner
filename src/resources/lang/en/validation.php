@@ -29,6 +29,7 @@
  */
 
 return [
+    'strong_password' => 'The password must be at least 8 characters long and contain uppercase and lowercase letters, a number, and a symbol.',
 
     /*
     |--------------------------------------------------------------------------
