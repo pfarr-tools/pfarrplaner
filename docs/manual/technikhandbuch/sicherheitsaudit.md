@@ -29,6 +29,12 @@ Bei einer neuen Kontoanlage wird ein bestätigter Initialwert aus dem Benutzered
 
 Das Middleware-Modul `App\Http\Middleware\RequirePasswordChange` liegt nach der Authentifizierung in der Web-Middleware-Kette. Es erlaubt nur Passwortwechsel, Logout, CSRF-Token-Erneuerung und den kontrollierten Admin-Rückweg. Alle anderen authentifizierten Webrouten werden auf `password.edit` mit einem sicheren Routennamen als Rücksprung-Hinweis umgeleitet. Eine vorhandene `adminUserSwitchBack`-Session markiert ausschließlich den bewusst kontrollierten Proxy-Fall als Ausnahme.
 
+### Vorprüfung für Zwei-Faktor-Authentifizierung
+
+Die lokale Composer-/NPM-Prüfung enthält derzeit keine TOTP- oder WebAuthn-Bibliothek. Für TOTP wird `spomky-labs/otphp` als Kandidat vorgemerkt: Die gepflegte Dokumentation beschreibt RFC-6238-TOTP, PHP ab 8.1 und eine MIT-Lizenz. Die konkrete kompatible Version wird beim Einbau mit Composer und PHP 8.4 geprüft; bis dahin wird keine neue Abhängigkeit behauptet oder installiert.
+
+Für die spätere Passkey-Etappe wird `web-auth/webauthn-framework` als Kandidat vorgemerkt. Das Projekt beschreibt eine MIT-lizenzierte PHP-WebAuthn-Implementierung; die genaue Paketversion, RP-ID-, Origin- und Laravel-Integrationsentscheidung bleibt der Passkey-Etappe vorbehalten.
+
 Der produktive Routenbestand wurde geprüft und gezielt gehärtet. Dabei wurden folgende Klassen von Problemen beseitigt:
 
 - Debug- und Diagnose-Routen wurden entfernt oder standardmäßig blockiert.
@@ -142,3 +148,21 @@ Der kritische Härtungsdurchgang ist abgeschlossen. Weitere Prüfungen bleiben n
 - neue Spezialrouten bei künftigen Features wieder gegen diese Checkliste prüfen
 - bei neuen öffentlichen Ausgaben immer zwischen offen, signiert und authentifiziert unterscheiden
 - bei neuen verschachtelten Routen die Eltern-Kind-Zugehörigkeit explizit absichern
+
+### Horizon-Betriebsoberfläche
+
+Der anwendungseigene `HorizonServiceProvider` überschreibt die
+Horizon-Autorisierung ohne lokale Ausnahme. Jeder Dashboard- und API-Aufruf
+benötigt einen angemeldeten Benutzer und ein erfolgreiches
+`Gate::forUser($user)->check('viewHorizon')`. Das Gate verwendet die normalisierte
+Freigabeliste `HORIZON_ALLOWED_EMAILS`; die bestehende globale
+Super-Administrator-Regel bleibt wirksam. Gäste und nicht freigegebene
+Benutzer erhalten auch bei `APP_ENV=local` HTTP 403. CSRF-Prüfung und
+Autorisierung erfüllen unterschiedliche Aufgaben; ein Gast-CSRF-Token
+berechtigt nicht zu Monitoring-Änderungen.
+
+Die HTTP-Regression prüft Dashboard, Monitoring-Liste, Anlegen und Entfernen
+für Gäste, nicht freigegebene Benutzer, freigegebene Betreiber und
+Super-Administratoren in lokaler und produktiver Umgebung. Dabei werden
+Horizon-Jobs abgefangen und Tagdaten ersetzt, um operative Redis-Daten
+nicht zu berühren.
