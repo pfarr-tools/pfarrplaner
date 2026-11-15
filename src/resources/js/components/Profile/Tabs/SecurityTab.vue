@@ -28,6 +28,10 @@
 
 <template>
     <div class="security-tab">
+        <p class="password-requirements">
+            Das Passwort muss mindestens 8 Zeichen lang sein und Groß- und Kleinbuchstaben, eine
+            Zahl sowie ein Sonderzeichen enthalten.
+        </p>
         <form-input
             name="current_password"
             label="Aktuelles Passwort"
@@ -62,4 +66,8 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.password-requirements {
+    max-width: 40rem;
+}
+</style>

@@ -31,6 +31,7 @@
 namespace App\Http\Requests;
 
 use App\Models\People\User;
+use App\Rules\StrongPassword;
 use App\Services\RoleService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -45,10 +46,24 @@ class UserRequest extends FormRequest
      */
     public function authorize()
     {
+        $target = $this->user;
+        $actor = $this->user();
+
+        if ($this->boolean('createAccount') && ! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
+            return false;
+        }
+
+        if ($this->filled('password')
+            && $target
+            && $target->id !== $actor->id
+            && ! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
+            return false;
+        }
+
         if (isset($this->user)) {
-            return $this->user()->can('update', $this->user);
+            return $actor->can('update', $this->user);
         } else {
-            return $this->user()->can('create', User::class);
+            return $actor->can('create', User::class);
         }
     }
 
@@ -74,7 +89,7 @@ class UserRequest extends FormRequest
             'title' => 'nullable|string',
             // add an exception to "unique" when an existing user account is updated
             'email' => 'nullable|string|email|max:255|unique:users,email'.(($user && $user->id) ? ','.$user->id : ''),
-            'password' => 'nullable|string',
+            'password' => ['nullable', 'string', new StrongPassword],
             'office' => 'nullable|string',
             'address' => 'nullable|string',
             'phone' => 'nullable|phone_number',
@@ -96,6 +111,10 @@ class UserRequest extends FormRequest
             $rules['email'] = 'required|email';
         }
 
+        if ($this->boolean('createAccount')) {
+            $rules['email'] = 'required|email';
+        }
+
         return $rules;
     }
 
@@ -112,6 +131,10 @@ class UserRequest extends FormRequest
         // api token
         if (isset($data['password']) && (($this->user === null) || ($this->user->api_token == ''))) {
             $data['api_token'] = Str::random(60);
+        }
+
+        if (isset($data['password'])) {
+            $data['must_change_password'] = true;
         }
 
         return $data;

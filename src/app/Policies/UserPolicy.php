@@ -214,7 +214,7 @@ class UserPolicy
 
     public function resetPassword(User $user, User $model): bool
     {
-        return $this->update($user, $model);
+        return $user->hasRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
     /**

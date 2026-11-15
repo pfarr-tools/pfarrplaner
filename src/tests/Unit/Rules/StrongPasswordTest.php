@@ -24,7 +24,7 @@ class StrongPasswordTest extends TestCase
     {
         $validator = Validator::make(
             ['password' => 'Secure1!'],
-            ['password' => [new StrongPassword()]],
+            ['password' => [new StrongPassword]],
         );
 
         $this->assertFalse($validator->fails());
@@ -35,7 +35,7 @@ class StrongPasswordTest extends TestCase
     {
         $validator = Validator::make(
             ['password' => $password],
-            ['password' => [new StrongPassword()]],
+            ['password' => [new StrongPassword]],
         );
 
         $this->assertTrue($validator->fails());

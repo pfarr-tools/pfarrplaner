@@ -41,6 +41,7 @@ use App\Models\Places\City;
 use App\Models\Subscription;
 use App\Providers\AuthServiceProvider;
 use App\Rules\CreatedInLocalAdminDomainRule;
+use App\Rules\StrongPassword;
 use App\Services\MinistryService;
 use App\Traits\HandlesAttachedImageTrait;
 use App\Traits\HandlesAttachmentsTrait;
@@ -506,7 +507,7 @@ class UserController extends Controller
         if ($request->has('new_password')) {
             $passwordData = $request->validate([
                 'current_password' => 'required|hash:'.Auth::user()->password,
-                'new_password' => 'required|string|min:6|confirmed|not_current_password|notIn:testtest',
+                'new_password' => ['required', 'string', new StrongPassword, 'confirmed', 'not_current_password', 'notIn:testtest'],
                 'new_password_confirmation' => 'required',
             ]);
             $user->update(['password' => $passwordData['new_password']]);
@@ -714,7 +715,7 @@ class UserController extends Controller
             'last_name' => 'required|string|max:255',
             'title' => 'nullable|string',
             'email' => 'nullable|string|email|max:255|unique:users,email'.($user ? ','.$user->id : ''),
-            'password' => 'nullable|string',
+            'password' => ['nullable', 'string', new StrongPassword],
             'office' => 'nullable|string',
             'address' => 'nullable|string',
             'phone' => 'nullable|phone_number',
@@ -744,7 +745,7 @@ class UserController extends Controller
 
                 // force setting a password
                 $rules['email'] = 'required|email';
-                $rules['password'] = 'required|string';
+                $rules['password'] = ['required', 'string', new StrongPassword];
             }
         }
 
@@ -761,6 +762,10 @@ class UserController extends Controller
             $data['api_token'] = Str::random(60);
         }
 
+        if ($data['password'] != '') {
+            $data['must_change_password'] = true;
+        }
+
         return $data;
     }
 
@@ -773,6 +778,11 @@ class UserController extends Controller
     public function add(Request $request)
     {
         Gate::authorize('create', User::class);
+
+        if ($request->filled('password') && ! Auth::user()->hasRole(AuthServiceProvider::SUPER)) {
+            abort(403);
+        }
+
         $data = $this->validateRequest($request, null, true);
         $user = User::create($data);
 

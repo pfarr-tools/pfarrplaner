@@ -583,7 +583,6 @@ export default {
         },
         createUserAccount(e) {
             if (e) {
-                this.myUser.password = 'testtest'
                 this.justCreated = true
             }
         },

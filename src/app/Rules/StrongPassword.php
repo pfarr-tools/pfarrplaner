@@ -27,7 +27,6 @@ class StrongPassword implements ValidationRule
      * @param  string  $attribute  The validated attribute name.
      * @param  mixed  $value  The submitted password.
      * @param  Closure(string): void  $fail  Validation failure callback.
-     * @return void
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

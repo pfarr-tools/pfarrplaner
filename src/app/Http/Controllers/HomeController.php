@@ -32,6 +32,7 @@ namespace App\Http\Controllers;
 
 use App\Facades\Settings;
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
+use App\Rules\StrongPassword;
 use App\Services\RedirectorService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Renderable;
@@ -129,7 +130,7 @@ class HomeController extends Controller
     {
         $rules = [
             'current_password' => 'required|hash:'.Auth::user()->password,
-            'new_password' => 'required|string|min:6|confirmed|not_current_password|notIn:testtest',
+            'new_password' => ['required', 'string', new StrongPassword, 'confirmed', 'not_current_password', 'notIn:testtest'],
             'new_password_confirmation' => 'required',
         ];
         $firstPassword = (Hash::check('testtest', Auth::user()->password));

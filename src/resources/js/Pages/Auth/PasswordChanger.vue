@@ -42,6 +42,10 @@
         <card>
             <card-header>Passwort ändern</card-header>
             <card-body>
+                <p class="password-requirements">
+                    Das Passwort muss mindestens 8 Zeichen lang sein und Groß- und Kleinbuchstaben,
+                    eine Zahl sowie ein Sonderzeichen enthalten.
+                </p>
                 <form
                     class="password-change-form"
                     @submit.prevent="savePassword"
@@ -106,6 +110,10 @@ export default {
 
 <style scoped>
 .password-change-form {
+    max-width: 40rem;
+}
+
+.password-requirements {
     max-width: 40rem;
 }
 </style>

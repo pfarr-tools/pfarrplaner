@@ -71,6 +71,18 @@ class UserPolicyUnitTest extends TestCase
         $this->assertFalse($this->policy->update($admin, $superAdmin));
     }
 
+    public function test_only_super_admin_can_reset_another_users_password(): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleService::ROLE_ADMIN);
+        $target = User::factory()->create();
+        $superAdmin = User::factory()->create();
+        $superAdmin->assignRole(RoleService::ROLE_SUPER_ADMIN);
+
+        $this->assertFalse($this->policy->resetPassword($admin, $target));
+        $this->assertTrue($this->policy->resetPassword($superAdmin, $target));
+    }
+
     public function test_super_admin_cannot_be_deleted_by_admin(): void
     {
         $admin = User::factory()->create();

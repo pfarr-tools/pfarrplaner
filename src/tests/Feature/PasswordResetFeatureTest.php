@@ -12,6 +12,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Tests\TestCase;
 
 /**
@@ -37,5 +38,20 @@ class PasswordResetFeatureTest extends TestCase
         $this->get('/password/reset/example-token')
             ->assertOk()
             ->assertSee('Neues Passwort');
+    }
+
+    /**
+     * The reset endpoint rejects a password missing the required symbol.
+     */
+    public function test_password_reset_requires_a_strong_password(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+
+        $this->post('/password/reset', [
+            'token' => 'example-token',
+            'email' => 'unknown@example.com',
+            'password' => 'Secure123',
+            'password_confirmation' => 'Secure123',
+        ])->assertSessionHasErrors('password');
     }
 }

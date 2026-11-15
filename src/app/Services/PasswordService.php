@@ -41,7 +41,8 @@ class PasswordService
     /**
      * Generate the initial password format used for administrator-created accounts.
      *
-     * @return string
+     * This password is only a temporary transport credential. The caller must
+     * persist it with the forced-password-change flag enabled.
      */
     public static function randomPassword(): string
     {
@@ -58,7 +59,6 @@ class PasswordService
      *
      * @param  string  $template  Characters available for selection.
      * @param  int  $number  Number of characters to select.
-     * @return string
      */
     private static function randomCharsFromString(string $template, int $number = 1): string
     {

@@ -983,7 +983,13 @@ class User extends Authenticatable
     }
 
     /**
-     * Reset password and send AccountData mail to user
+     * Set a temporary initial password and send the account data mail.
+     *
+     * The generated credential intentionally follows the legacy initial-password
+     * format; the forced password change prevents it from becoming a permanent
+     * user-selected password.
+     *
+     * @return void
      */
     public function resetAccount()
     {

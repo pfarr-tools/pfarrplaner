@@ -35,6 +35,14 @@ class PasswordServiceUnitTest extends TestCase
         $this->assertMatchesRegularExpression('/\d{4}$/', $password);
     }
 
+    public function test_random_password_keeps_the_initial_credential_pattern(): void
+    {
+        $this->assertMatchesRegularExpression(
+            '/^[A-Z][a-z][a-z][a-z]\d{4}$/',
+            PasswordService::randomPassword(),
+        );
+    }
+
     public function test_random_password_is_non_deterministic(): void
     {
         $passwords = array_map(fn () => PasswordService::randomPassword(), range(1, 10));
