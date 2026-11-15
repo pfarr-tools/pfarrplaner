@@ -12,3 +12,21 @@ Task 1 — Passwortregel und sichere Initialkennungen: abgeschlossen.
 - Senior Review 3: APPROVED; keine Critical-, Important- oder Minor-Findings.
 - Verifikation: 42 isolierte PHPUnit-Tests / 123 Assertions, Formatprüfung, `git diff --check`, PHPStan und Doku-/JSDoc-Prüfung bestanden.
 
+Task 2 — Admin-Passwort setzen und Initialpasswort vorschlagen: abgeschlossen.
+
+- Task-2-Brief: Commit `108f312f`.
+- Umsetzung: `f279888d`; der Benutzereditor zeigt einen bestätigbaren Vorschlag,
+  der Server validiert, hasht, `must_change_password` setzt und die Kontodaten-
+  Mail versendet.
+- Senior Review 1: nicht freigegeben; `user.store`-Autorisierung,
+  Pflichtwert bei `createAccount` und Browserabdeckung fehlten.
+- Korrekturcommit: `7f816811`; Autorisierung, Pflichtvalidierung, Testdaten-
+  schutz und fokussierter Dusk-Test ergänzt.
+- Senior Review 2: nicht freigegeben; Dusk-Test suchte im unsichtbaren Tab und
+  prüfte keinen echten Speicherklick.
+- Korrekturcommit: `c3b57d2e`; sichtbarer Tab, Vorschlag/Erneuern, Speichern
+  und Geheimnisgrenze im Browserablauf geprüft.
+- Senior Review 3: APPROVED; keine offenen Findings.
+- Verifikation: Dusk 7 Tests / 17 Assertions, PHP 16 Tests / 85 Assertions,
+  PHPStan, Format- und Dokuprüfung bestanden; TTY-Hinweis nicht blockierend.
+
