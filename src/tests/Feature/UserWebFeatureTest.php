@@ -176,6 +176,7 @@ class UserWebFeatureTest extends TestCase
         $this->withoutMiddleware(VerifyCsrfToken::class);
         $user = User::factory()->create(['password' => 'Current1!']);
         RateLimiter::clear('two-factor-confirm:'.$user->getKey());
+        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
 
         $this->actingAs($user)
             ->postJson(route('user.two-factor.start'), ['current_password' => 'wrong'])
@@ -229,6 +230,7 @@ class UserWebFeatureTest extends TestCase
         $this->withoutMiddleware(VerifyCsrfToken::class);
         $user = User::factory()->create(['password' => 'Current1!']);
         RateLimiter::clear('two-factor-confirm:'.$user->getKey());
+        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
         $user->startTwoFactorEnrolment();
 
         $this->actingAs($user)
@@ -294,6 +296,57 @@ class UserWebFeatureTest extends TestCase
 
         $this->actingAs($user)
             ->postJson(route('user.two-factor.start'), ['current_password' => 'wrong'])
+            ->assertStatus(429);
+    }
+
+    /** The personal factor routes require an authenticated user. */
+    public function test_two_factor_routes_require_authentication(): void
+    {
+        $this->postJson(route('user.two-factor.start'), ['current_password' => 'Current1!'])
+            ->assertUnauthorized();
+    }
+
+    /** Re-authentication throttling is applied independently to confirmation. */
+    public function test_two_factor_confirmation_reauthentication_is_rate_limited(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $user = User::factory()->create(['password' => 'Current1!']);
+        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
+        $user->startTwoFactorEnrolment();
+
+        foreach (range(1, 5) as $attempt) {
+            $this->actingAs($user)
+                ->postJson(route('user.two-factor.confirm'), [
+                    'current_password' => 'wrong',
+                    'code' => '000000',
+                ])
+                ->assertUnprocessable();
+        }
+
+        $this->actingAs($user)
+            ->postJson(route('user.two-factor.confirm'), [
+                'current_password' => 'wrong',
+                'code' => '000000',
+            ])
+            ->assertStatus(429);
+    }
+
+    /** Re-authentication throttling is applied independently to deactivation. */
+    public function test_two_factor_disable_reauthentication_is_rate_limited(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $user = User::factory()->create(['password' => 'Current1!']);
+        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
+        $user->startTwoFactorEnrolment();
+
+        foreach (range(1, 5) as $attempt) {
+            $this->actingAs($user)
+                ->postJson(route('user.two-factor.disable'), ['current_password' => 'wrong'])
+                ->assertUnprocessable();
+        }
+
+        $this->actingAs($user)
+            ->postJson(route('user.two-factor.disable'), ['current_password' => 'wrong'])
             ->assertStatus(429);
     }
 

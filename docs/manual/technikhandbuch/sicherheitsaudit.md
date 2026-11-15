@@ -29,9 +29,15 @@ Bei einer neuen Kontoanlage wird ein bestätigter Initialwert aus dem Benutzered
 
 Das Middleware-Modul `App\Http\Middleware\RequirePasswordChange` liegt nach der Authentifizierung in der Web-Middleware-Kette. Es erlaubt nur Passwortwechsel, Logout, CSRF-Token-Erneuerung und den kontrollierten Admin-Rückweg. Alle anderen authentifizierten Webrouten werden auf `password.edit` mit einem sicheren Routennamen als Rücksprung-Hinweis umgeleitet. Eine vorhandene `adminUserSwitchBack`-Session markiert ausschließlich den bewusst kontrollierten Proxy-Fall als Ausnahme.
 
-### Vorprüfung für Zwei-Faktor-Authentifizierung
+### Zwei-Faktor-Authentifizierung
 
-Die lokale Composer-/NPM-Prüfung enthält derzeit keine TOTP- oder WebAuthn-Bibliothek. Für TOTP wird `spomky-labs/otphp` als Kandidat vorgemerkt: Die gepflegte Dokumentation beschreibt RFC-6238-TOTP, PHP ab 8.1 und eine MIT-Lizenz. Die konkrete kompatible Version wird beim Einbau mit Composer und PHP 8.4 geprüft; bis dahin wird keine neue Abhängigkeit behauptet oder installiert.
+Für die TOTP-Einschreibung ist `roundly-consulting/two-factor-for-laravel` als
+Composer-Abhängigkeit installiert. Das Paket stellt RFC-6238-TOTP,
+verschlüsselte Secrets, gehashte Recovery-Codes und den Schutz vor der
+Wiederverwendung eines Zeitfensters bereit. Die Anwendung ergänzt die
+fachliche Re-Authentifizierung, Rate-Limits, CSRF-geschützte Web-Endpunkte und
+die Benutzeroberfläche. Die Paketversion und ihre Lizenz werden im
+Composer-Lockfile festgeschrieben und vor jedem Release geprüft.
 
 Für die spätere Passkey-Etappe wird `web-auth/webauthn-framework` als Kandidat vorgemerkt. Das Projekt beschreibt eine MIT-lizenzierte PHP-WebAuthn-Implementierung; die genaue Paketversion, RP-ID-, Origin- und Laravel-Integrationsentscheidung bleibt der Passkey-Etappe vorbehalten.
 
