@@ -102,7 +102,7 @@ Entwickler-Hilfsrouten werden in Pfarrplaner bewusst restriktiv behandelt:
 - Laravel Boost ist standardmäßig deaktiviert und muss über `BOOST_ENABLED=true` bewusst eingeschaltet werden.
 - Ignition-Housekeeping und runnable solutions bleiben standardmäßig deaktiviert und werden nur bei expliziter Freigabe über Umgebungsvariablen aktiviert.
 - Telescope bleibt standardmäßig deaktiviert und wird nur über `TELESCOPE_ENABLED=true` bewusst freigeschaltet.
-- Dusk-Hilfsrouten werden zusätzlich durch `DUSK_ENABLED=true` abgesichert und sind nur für gezielte Browser-Testläufe vorgesehen.
+- Dusk-Hilfsrouten verlangen gleichzeitig `APP_ENV=dusk` und `DUSK_ENABLED=true`. Der isolierte `dusk:run`-Testlauf setzt beide Werte standardmäßig. Normale Entwicklungs-, Test- und Produktionsumgebungen erhalten für `/_dusk` und `/_dusk/*` HTTP 404; eigene Dusk-Konfigurationen und Server für `--without-server` müssen ebenfalls die dedizierte Umgebung verwenden.
 
 ## Scheduler und Queue
 

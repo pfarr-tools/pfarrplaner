@@ -5,6 +5,20 @@ die Docker-Struktur von Pfarrplaner. Vor jeder Übernahme oder Aktualisierung
 werden ein Backup, ein Testlauf und eine dokumentierte Rückfallmöglichkeit
 benötigt.
 
+## Schutz der Browser-Testzugänge
+
+Dusk-Hilfsrouten (`/_dusk` und `/_dusk/*`) erlauben eine Test-Anmeldung ohne
+Passwort. Sie sind ausschließlich bei gleichzeitigem `APP_ENV=dusk` und
+`DUSK_ENABLED=true` freigegeben. In normalen Entwicklungs-, Test- und
+Produktionsumgebungen blockiert die Anwendung diese Zugänge mit HTTP 404,
+auch wenn `DUSK_ENABLED` versehentlich aktiviert wurde.
+
+Der isolierte `dusk:run`-Testlauf setzt beide Werte standardmäßig. Eigene
+Dusk-Konfigurationen müssen ebenfalls `APP_ENV=dusk` verwenden; niemals die
+Produktionsumgebung dafür umstellen. Produktionsinstallationen sollen keine
+Composer-Entwicklungsabhängigkeiten enthalten. Nach einem Update lässt sich
+die Sperre ohne Anmeldung mit `GET /_dusk/user` prüfen: Erwartet wird HTTP 404.
+
 ## Zielstruktur und Erstinstallation
 
 Die Betriebsdateien liegen am Repository-Root, der Laravel-Code unter

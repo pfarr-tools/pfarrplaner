@@ -32,7 +32,7 @@ Prüfen Sie:
 - `BOOST_ENABLED` und `BOOST_BROWSER_LOGS_WATCHER` sind nicht unbeabsichtigt aktiviert
 - `IGNITION_ENABLE_RUNNABLE_SOLUTIONS` ist nicht aktiviert
 - `TELESCOPE_ENABLED` ist nur für bewusst abgesicherte lokale Sitzungen aktiv
-- `DUSK_ENABLED` ist nur für gezielte Browser-Tests aktiv
+- Dusk-Hilfsrouten sind nur bei `APP_ENV=dusk` und `DUSK_ENABLED=true` zugänglich. Auf normalen Entwicklungs- und Produktionsservern müssen `/_dusk` und `/_dusk/*` HTTP 404 liefern, selbst bei versehentlich aktiviertem Flag. `APP_ENV` auf einem produktiven Server niemals für Browser-Tests umstellen.
 - Entwicklungswerkzeuge wie Dusk oder Telescope laufen nicht auf einem öffentlich erreichbaren System
 
 ### Mails kommen nicht an

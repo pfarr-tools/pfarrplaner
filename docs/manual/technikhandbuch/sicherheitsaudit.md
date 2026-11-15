@@ -66,7 +66,7 @@ Diese Endpunkte bleiben öffentlich, weil sie Produktfunktion sind:
 
 ### Öffentlich, aber technisch eingeschränkt
 
-- Laravel-Dusk-Routen können paketbedingt registriert sein, werden aber serverseitig blockiert, solange `DUSK_ENABLED` nicht ausdrücklich gesetzt ist.
+- Laravel-Dusk-Routen (`/_dusk` und `/_dusk/*`) sind ausschließlich bei `APP_ENV=dusk` und `DUSK_ENABLED=true` zugänglich. In allen anderen Umgebungen antwortet die globale Middleware `BlockDevHelperRoutes` mit HTTP 404, auch wenn das Flag versehentlich aktiviert ist.
 - Ignition-Routen können paketbedingt registriert sein, sind aber ohne aktivierte Runnable-Solutions praktisch stillgelegt.
 - Datei- und Bildrouten für `attachments/*` akzeptieren anonym nur noch signierte URLs.
 
