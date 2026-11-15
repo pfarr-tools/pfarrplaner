@@ -455,6 +455,33 @@ hinzufügen, dann die Anwendung ausrollen, alte Strukturen erst später
 entfernen. Nicht kompatible Änderungen erhalten eine geplante kurze
 Wartungszeit. Das vorherige Image bleibt als Rollback-Grundlage erhalten.
 
+### Migration der Zwei-Faktor-Spalten
+
+Die Migration `add_two_factor_columns_to_users_table` ergänzt vier nullable
+Spalten in der festen Tabelle `users`: das verschlüsselte TOTP-Geheimnis, die
+gehashten Recovery-Codes, den Bestätigungszeitpunkt und den Replay-Marker. Die
+Migration verwendet absichtlich nicht `TWO_FACTOR_TABLE`; diese Anwendung hat
+genau eine authentifizierende Benutzertabelle. Zusätzliche Kontentabellen
+benötigen eine eigene, geprüfte Migration.
+
+Vor dem ersten produktiven Lauf sind Datenbank und MinIO zu sichern und die
+Sicherung zu verifizieren:
+
+```sh
+./planer backup create
+./planer backup verify
+./planer update --backup-confirmed
+```
+
+Die Migration ist vorwärtsgerichtet. `migrate:rollback` verweigert deshalb die
+automatische Entfernung der Spalten, damit aktive TOTP-Geheimnisse und
+Recovery-Codes nicht versehentlich gelöscht werden. Für einen Rückfall wird
+das vorherige Image gestartet und die verifizierte Datenbanksicherung mit dem
+separaten Restore-Verfahren in einer quieszierten Umgebung wiederhergestellt;
+die vollständige Reihenfolge steht im Abschnitt [Fehlerbehebung und
+Rollback](#fehlerbehebung-und-rollback). Ein manuelles `DROP COLUMN` ist kein
+zulässiger Rollback.
+
 ### Release erstellen und ausrollen
 
 Die Versionierung folgt dem bestehenden Pfarrplaner-Schema. Im sauberen

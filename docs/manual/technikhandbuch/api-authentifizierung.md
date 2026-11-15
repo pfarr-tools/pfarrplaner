@@ -20,6 +20,26 @@ Im Projekt sind unter anderem diese Bausteine sichtbar:
 - Web-Authentifizierung für normale Oberflächenrouten
 - interne Vue-Komponenten verwenden für API-Aufrufe bevorzugt `this.$api()`, damit das Benutzer-Token konsistent als Bearer-Token gesendet wird
 
+## Zwei-Faktor-Authentifizierung im Web-Login
+
+Die Web-Benutzertabelle enthält die vier nullable Zustandsfelder der
+Zwei-Faktor-Authentifizierung. Das TOTP-Paket wird ausschließlich über das
+`App\Models\People\User`-Modell eingebunden:
+
+- `two_factor_secret` wird über den Eloquent-Cast `encrypted` verschlüsselt.
+- `two_factor_recovery_codes` verwendet standardmäßig den Hashing-Modus des
+  Pakets; die Klartext-Codes werden nur bei der Ausgabe nach der Erzeugung
+  bereitgestellt.
+- `two_factor_confirmed_at` kennzeichnet die aktivierte Einschreibung.
+- `two_factor_last_used_timestep` schützt gegen die Wiederverwendung eines
+  erfolgreichen TOTP-Zeitfensters.
+
+Die Migration zielt unveränderlich auf `users` und hat absichtlich keinen
+automatischen Rückwärtsweg. Vor Migrationen gelten daher die Backup- und
+Restore-Regeln des Administratorenhandbuchs; ein Image-Rollback ohne passenden
+Datenbank-Restore ist nur für die expandierte, noch kompatible Schemaänderung
+zulässig.
+
 ## Empfehlung für Integrationen
 
 - Neue produktive Integrationen dürfen nicht von implizit öffentlichen Endpunkten ausgehen.

@@ -62,15 +62,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\HasApiTokens;
+use RoundlyConsulting\TwoFactor\Concerns\HasTwoFactorAuthentication;
+use RoundlyConsulting\TwoFactor\Contracts\TwoFactorAuthenticatable;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Class User
  */
-class User extends Authenticatable
+class User extends Authenticatable implements TwoFactorAuthenticatable
 {
-    use HasApiTokens, HasFactory, HasRoles, Notifiable;
+    use HasApiTokens, HasFactory, HasRoles, HasTwoFactorAuthentication, Notifiable;
 
     public const NAME_FORMAT_DEFAULT = 1;
 
@@ -113,11 +115,18 @@ class User extends Authenticatable
     ];
 
     /**
-     * @var string[]
+     * Return the casts for persisted user attributes, including two-factor
+     * secrets and recovery-code storage supplied by the package.
+     *
+     * @return array<string, string>
      */
-    protected $casts = [
-        'new_features' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'new_features' => 'datetime',
+            ...$this->twoFactorCasts(),
+        ];
+    }
 
     /**
      * The attributes that should be hidden for arrays.
