@@ -60,3 +60,17 @@ Task 4 — E-Mail- und TOTP-Zwei-Faktor-Authentifizierung: Paketbasis abgeschlos
 - Verifikation: `composer validate --strict` mit den bestehenden Schema-
   Warnungen, Plattform-/Lockfile-Prüfung, `git diff --check` bestanden.
 
+- Migration/User-Modell-Integration: Commit `a0ea4032`.
+- Senior Review 1: CHANGES REQUESTED; At-Rest-Assertions, unveränderliches
+  `users`-Ziel, sicherer Rollback-Schutz, Restore-Dokumentation und PHPDoc
+  nachgeschärft.
+- Senior Review 2: CHANGES REQUESTED; der Test prüfte zunächst nur Cast-Namen
+  und umging mit `setRawAttributes()` die Cast-Pipeline.
+- Korrektur: echter Enrolment-Test liest Secret und Recovery-Codes aus der
+  Testdatenbank zurück und prüft Verschlüsselung beziehungsweise Hashes.
+- Senior Review 3: APPROVED; keine offenen Findings.
+- Verifikation: 2 isolierte PHPUnit-Tests / 20 Assertions, Formatprüfung und
+  `git diff --check` bestanden. Der vollständige PHP-/JS-/Build-Lauf meldete
+  weiterhin den unabhängigen Container-Dateirechtefehler bei `chmod()`; die
+  PHP-Tests und Vitest liefen durch.
+
