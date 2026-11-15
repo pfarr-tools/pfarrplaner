@@ -222,6 +222,7 @@
                         <button
                             type="button"
                             class="btn btn-outline-secondary"
+                            data-testid="initial-password-suggest"
                             @click="suggestInitialPassword"
                         >
                             Neu vorschlagen
@@ -615,9 +616,15 @@ export default {
             const consonants = 'bcdfghjklmnpqrstvwxz'
             const numbers = '0123456789'
             const randomCharacter = (characters) => {
-                const values = new Uint32Array(1)
-                window.crypto.getRandomValues(values)
-                return characters[values[0] % characters.length]
+                const limit = Math.floor(0x100000000 / characters.length) * characters.length
+                let value
+                do {
+                    const values = new Uint32Array(1)
+                    window.crypto.getRandomValues(values)
+                    value = values[0]
+                } while (value >= limit)
+
+                return characters[value % characters.length]
             }
 
             this.myUser.password =

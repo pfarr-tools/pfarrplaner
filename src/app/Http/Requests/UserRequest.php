@@ -53,8 +53,7 @@ class UserRequest extends FormRequest
         }
 
         if ($this->filled('password')
-            && $target
-            && $target->id !== $actor->id
+            && (! $target || $target->id !== $actor->id)
             && ! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
             return false;
         }
@@ -110,6 +109,7 @@ class UserRequest extends FormRequest
 
         if ($this->boolean('createAccount')) {
             $rules['email'] = 'required|email';
+            $rules['password'] = ['required', 'string', new StrongPassword];
         }
 
         return $rules;

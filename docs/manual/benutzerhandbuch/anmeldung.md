@@ -70,6 +70,8 @@ Sie können Ihr Passwort jederzeit selbst ändern.
 
 Wenn Ihr Konto mit einem vorläufigen Anfangspasswort eingerichtet wurde, führt Pfarrplaner Sie nach der Anmeldung zuerst zum Passwortwechsel. Erst nach erfolgreichem Wechsel können Sie die übrige Anwendung nutzen.
 
+Das vorläufige Anfangspasswort erhalten Sie von Ihrer Administration. Es ist nur für die erste Anmeldung bestimmt und muss danach sofort durch ein eigenes starkes Passwort ersetzt werden.
+
 ---
 
 ## Abmelden

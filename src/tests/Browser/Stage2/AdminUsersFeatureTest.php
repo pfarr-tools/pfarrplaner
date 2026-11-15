@@ -82,6 +82,22 @@ class AdminUsersFeatureTest extends AbstractPageLoadTest
         });
     }
 
+    /** The editor shows and refreshes the documented initial-password pattern. */
+    public function test_user_create_form_suggests_and_refreshes_an_initial_password(): void
+    {
+        $this->browse(function (Browser $browser) {
+            $browser->loginAs($this->superAdminUser, 'web')
+                ->visit(route('user.create'))
+                ->waitFor('input[type="checkbox"]', 10)
+                ->click('input[type="checkbox"]')
+                ->waitFor('[name="password"]', 10)
+                ->assertPresent('[name="password"]')
+                ->assertScript("/^[A-Z][aeiouy][bcdfghjklmnpqrstvwxz][aeiouy][0-9]{4}$/.test(document.querySelector('[name=\\\"password\\\"]').value)", true)
+                ->click('[data-testid="initial-password-suggest"]')
+                ->assertScript("/^[A-Z][aeiouy][bcdfghjklmnpqrstvwxz][aeiouy][0-9]{4}$/.test(document.querySelector('[name=\\\"password\\\"]').value)", true);
+        });
+    }
+
     public function test_duplicates_wizard_renders_without_error(): void
     {
         $this->browse(function (Browser $browser) {

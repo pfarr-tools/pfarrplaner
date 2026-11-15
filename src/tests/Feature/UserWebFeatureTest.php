@@ -196,7 +196,7 @@ class UserWebFeatureTest extends TestCase
         Mail::fake();
         $target = User::factory()->create(['password' => null]);
 
-        $this->actingAs($this->user)
+        $response = $this->actingAs($this->user)
             ->patch(route('user.update', $target), [
                 'id' => $target->id,
                 'first_name' => $target->first_name,
@@ -211,6 +211,39 @@ class UserWebFeatureTest extends TestCase
         $this->assertTrue(Hash::check('Voca1234!', $fresh->password));
         $this->assertTrue((bool) $fresh->must_change_password);
         Mail::assertQueued(AccountData::class);
+        $this->assertStringNotContainsString('Voca1234!', json_encode($response->getSession()->all()));
+    }
+
+    /** Account creation requires a password instead of generating an unseen replacement. */
+    public function test_create_account_requires_a_confirmed_password(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+
+        $this->actingAs($this->user)
+            ->post(route('user.store'), [
+                'first_name' => 'Neue',
+                'last_name' => 'Person',
+                'email' => 'missing-password@example.com',
+                'createAccount' => '1',
+            ])
+            ->assertSessionHasErrors('password');
+    }
+
+    /** A regular administrator cannot create a user with a password. */
+    public function test_regular_admin_cannot_store_a_password(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleService::ROLE_ADMIN);
+
+        $this->actingAs($admin)
+            ->post(route('user.store'), [
+                'first_name' => 'Neue',
+                'last_name' => 'Person',
+                'email' => 'regular-admin@example.com',
+                'password' => 'Voca1234!',
+            ])
+            ->assertForbidden();
     }
 
     public function test_super_admin_reset_uses_a_temporary_password_and_sends_account_data(): void
