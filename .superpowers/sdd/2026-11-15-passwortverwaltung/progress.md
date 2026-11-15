@@ -30,3 +30,19 @@ Task 2 — Admin-Passwort setzen und Initialpasswort vorschlagen: abgeschlossen.
 - Verifikation: Dusk 7 Tests / 17 Assertions, PHP 16 Tests / 85 Assertions,
   PHPStan, Format- und Dokuprüfung bestanden; TTY-Hinweis nicht blockierend.
 
+Task 3 — Nicht umgehbares Passwortwechsel-Interstitial und Passwort-Reset:
+abgeschlossen.
+
+- Planbrief: `fb924f9c`.
+- Erstimplementierung: `be037095`; zentrale `RequirePasswordChange`-
+  Middleware, eigenes Passwortwechselziel, erlaubte Logout-/CSRF-/Resetpfade,
+  Proxy-Ausnahme und Handbuchnachführung.
+- Senior Review 1: nicht freigegeben; vollständige Bypass- und
+  Switch-Lifecycle-Tests sowie engere Proxy-Validierung fehlten.
+- Korrekturcommit: `9c252726`; Tests für erfolgreichen Wechsel, Logout,
+  CSRF-Keepalive, Inertia, echten Switch/Switch-back-Lifecycle und gültige
+  Proxy-Autorisierung ergänzt; Sessionausnahme validiert.
+- Senior Review 2: APPROVED; keine offenen Findings.
+- Verifikation: 27 isolierte PHPUnit-Tests / 130 Assertions, PHPStan,
+  Format-, Diff- und Doku-/JSDoc-Prüfungen bestanden.
+
