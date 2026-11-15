@@ -478,6 +478,8 @@ class UserController extends Controller
         $calendarConnections = CalendarConnection::where('user_id', $user->id)->get();
         $locations = Location::inCities(Auth::user()->cities->pluck('id'))->get();
         $ministries = MinistryService::all();
+        $twoFactorEnabled = $user->hasTwoFactorEnabled();
+        $twoFactorPending = $user->hasPendingTwoFactor();
 
         $tab = $request->get('tab', '');
 
@@ -494,6 +496,8 @@ class UserController extends Controller
                 'locations',
                 'ministries',
                 'settings',
+                'twoFactorEnabled',
+                'twoFactorPending',
             )
         );
     }
@@ -555,7 +559,7 @@ class UserController extends Controller
                 /** @var User $lockedUser */
                 $lockedUser = User::query()->lockForUpdate()->findOrFail($user->getKey());
 
-                if ($lockedUser->hasTwoFactorEnabled() || $lockedUser->hasPendingTwoFactor()) {
+                if ($lockedUser->hasTwoFactorEnabled()) {
                     throw TwoFactorAlreadyEnabledException::make();
                 }
 

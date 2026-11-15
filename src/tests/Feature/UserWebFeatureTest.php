@@ -55,6 +55,21 @@ class UserWebFeatureTest extends TestCase
             );
     }
 
+    /** The profile exposes only non-sensitive factor state to the UI. */
+    public function test_profile_exposes_two_factor_state_without_secrets(): void
+    {
+        $this->actingAs($this->user)
+            ->get(route('user.profile'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Profile/ProfileEditor')
+                ->where('twoFactorEnabled', false)
+                ->where('twoFactorPending', false)
+                ->missing('user.two_factor_secret')
+                ->missing('user.two_factor_recovery_codes')
+            );
+    }
+
     public function test_editor_loads(): void
     {
         $target = User::factory()->create();
@@ -194,10 +209,13 @@ class UserWebFeatureTest extends TestCase
         self::assertTrue($freshUser->hasPendingTwoFactor());
         self::assertArrayNotHasKey('secret', $setup);
 
-        $this->actingAs($user)
+        $setupResponse = $this->actingAs($user)
             ->postJson(route('user.two-factor.start'), ['current_password' => 'Current1!'])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('current_password');
+            ->assertOk()
+            ->assertJsonStructure(['provisioning_uri', 'recovery_codes']);
+
+        $setup = $setupResponse->json();
+        $freshUser = $user->fresh();
 
         $code = app(TwoFactorService::class)->currentCode($freshUser->twoFactorSecret());
 

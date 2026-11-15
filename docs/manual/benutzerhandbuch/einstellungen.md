@@ -56,6 +56,29 @@ Hier ändern Sie Ihr Passwort.
 
 Wählen Sie ein Passwort, das Sie nicht auch für andere Dienste verwenden. Wenn das Speichern nicht klappt, prüfen Sie, ob das neue Passwort in beiden Feldern gleich geschrieben ist und alle vier Zeichenanforderungen erfüllt.
 
+### Zwei-Faktor-Authentifizierung
+
+Im Bereich **Sicherheit** können Sie die Zwei-Faktor-Authentifizierung mit
+einer Authenticator-App einrichten. Geben Sie zunächst Ihr aktuelles Passwort
+ein. Fügen Sie in Ihrer Authenticator-App manuell ein zeitbasiertes
+Einmalpasswort (TOTP) hinzu. Verwenden Sie Ihre E-Mail-Adresse als Kontonamen
+und geben Sie den angezeigten TOTP-Schlüssel ein. Bewahren Sie die angezeigten
+Recovery-Codes sicher auf.
+Die Recovery-Codes sind nur während dieses Einrichtungsschritts sichtbar und
+können jeweils nur einmal verwendet werden.
+
+Geben Sie den aktuellen Code aus der Authenticator-App ein und bestätigen Sie
+die Einrichtung. Falls Sie die Seite vor der Bestätigung verlassen oder die
+Recovery-Codes nicht gesichert haben, können Sie die noch nicht abgeschlossene
+Einrichtung neu starten. Dabei werden die vorherige URI und die vorherigen
+Recovery-Codes ungültig.
+
+Zum Deaktivieren geben Sie erneut Ihr aktuelles Passwort ein und bestätigen
+Sie die Sicherheitsabfrage. Bei zu vielen fehlerhaften Versuchen wird die
+Aktion vorübergehend gesperrt. Wenn Sie Ihr Gerät und alle Recovery-Codes
+verlieren, wenden Sie sich nach einer Identitätsprüfung an Ihre Administration.
+Teilen Sie Recovery-Codes niemals per E-Mail oder Chat.
+
 ---
 
 ## Reiter: E-Mailbenachrichtigungen

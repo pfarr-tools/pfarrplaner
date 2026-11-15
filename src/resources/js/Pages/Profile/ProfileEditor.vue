@@ -89,6 +89,9 @@
                 <security-tab
                     :user="user"
                     :password="password"
+                    :two-factor-enabled="twoFactorEnabled"
+                    :two-factor-pending="twoFactorPending"
+                    @update:password="password = $event"
                 />
             </tab>
             <tab
@@ -172,6 +175,8 @@ export default {
         'locations',
         'ministries',
         'settings',
+        'twoFactorEnabled',
+        'twoFactorPending',
     ],
     components: {
         ExternalContentTab,

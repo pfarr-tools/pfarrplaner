@@ -36,8 +36,11 @@ Composer-Abhängigkeit installiert. Das Paket stellt RFC-6238-TOTP,
 verschlüsselte Secrets, gehashte Recovery-Codes und den Schutz vor der
 Wiederverwendung eines Zeitfensters bereit. Die Anwendung ergänzt die
 fachliche Re-Authentifizierung, Rate-Limits und CSRF-geschützte Web-Endpunkte.
-Eine passende Benutzeroberfläche ist für eine folgende Etappe noch offen. Die Paketversion und ihre Lizenz werden im
-Composer-Lockfile festgeschrieben und vor jedem Release geprüft.
+Die Profiloberfläche zeigt URI und Recovery-Codes ausschließlich während der
+noch nicht bestätigten Einschreibung. Ein Neustart ersetzt eine ausstehende
+Einschreibung und die zugehörigen Recovery-Codes. Die Paketversion und ihre
+Lizenz werden im Composer-Lockfile festgeschrieben und vor jedem Release
+geprüft.
 
 Für die spätere Passkey-Etappe wird `web-auth/webauthn-framework` als Kandidat vorgemerkt. Das Projekt beschreibt eine MIT-lizenzierte PHP-WebAuthn-Implementierung; die genaue Paketversion, RP-ID-, Origin- und Laravel-Integrationsentscheidung bleibt der Passkey-Etappe vorbehalten.
 
