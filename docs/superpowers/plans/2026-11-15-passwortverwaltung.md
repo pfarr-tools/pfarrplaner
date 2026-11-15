@@ -1,0 +1,190 @@
+# Passwortverwaltung und moderne Anmeldung – Umsetzungsplan
+
+> **Für agentische Bearbeiter:** Nutze `superpowers:executing-plans` oder
+> `superpowers:subagent-driven-development`, um diesen Plan schrittweise
+> umzusetzen. Jeder Schritt wird separat verifiziert.
+
+**Ziel:** Issue #80 in sichere, testbare Etappen zerlegen und die
+Passwortverwaltung sowie die zusätzlichen Anmeldefaktoren für Pfarrplaner
+umsetzen.
+
+**Architektur:** Die bestehende Laravel-Authentifizierung, `User`-Modell,
+`PasswordService`, Inertia-Seiten und Benutzerverwaltung bleiben die
+Integrationspunkte. Passwortregeln, Reset, erzwungene Änderung, E-Mail-/TOTP-
+2FA und Passkeys werden als getrennte Sicherheitsbausteine mit gemeinsamen
+Session- und Recovery-Regeln eingeführt. Kein Klartextpasswort und kein
+geheimer Faktor wird in Logs, Props oder API-Antworten ausgegeben.
+
+**Technologie:** Laravel 11 / PHP 8.4, bestehende Session-Authentifizierung,
+Inertia.js/Vue, PHPUnit, Dusk und die vorhandene Mail-Infrastruktur. Für TOTP
+und WebAuthn wird vor der Implementierung geprüft, ob eine gepflegte, mit der
+aktuellen Laravel-Version kompatible Bibliothek bereits vorhanden ist; neue
+Abhängigkeiten werden nur mit dokumentierter Begründung aufgenommen.
+
+**Spezifikation:** GitHub Issue #80 – Neue Features zur Verwaltung von
+Passwörtern.
+
+## Globale Einschränkungen
+
+- Die Sicherheitsfunktionen müssen über bestehende Rollen und Policies
+  autorisiert werden; nur Super-Administrator:innen dürfen fremde Passwörter
+  direkt setzen.
+- Ein von Administrator:innen gesetztes oder automatisch erzeugtes Passwort
+  setzt `must_change_password`; die Änderung erfolgt in einem nicht
+  umgehbaren Interstitial ohne Admin-Layout.
+- Neue Passwörter werden serverseitig nach einer zentralen Regel validiert:
+  mindestens 8 Zeichen sowie Groß-/Kleinbuchstaben, Zahl und Sonderzeichen.
+- Der vorhandene Reset-Flow bleibt für nicht angemeldete Benutzer:innen
+  nutzbar und darf keine Benutzerexistenz verraten.
+- Sicherheitsgeheimnisse werden verschlüsselt oder gehasht gespeichert und
+  niemals in Logs, Demo-Daten oder Commit-Inhalten abgelegt.
+- Jede Datenbankmigration implementiert `up()` und `down()`; Tests verwenden
+  ausschließlich die isolierte Testdatenbank.
+- User-facing Änderungen werden im Benutzer- und Administratorenhandbuch
+  dokumentiert; technische Authentifizierungsdetails gehören zusätzlich ins
+  technische Handbuch.
+
+## Betrachtete Ansätze
+
+1. **Ein großer Auth-Refactor:** alle Passwort-, 2FA- und Passkey-Flows in
+   einem Zug umbauen. Das ergäbe eine einheitliche Oberfläche, erhöht aber
+   Risiko, Reviewgröße und Rollback-Aufwand erheblich.
+2. **Getrennte Sicherheitsbausteine mit gemeinsamem Kern (gewählt):** zuerst
+   Passwortregeln, Reset, Admin-Vorschlag und erzwungene Änderung; danach
+   E-Mail-/TOTP-2FA; zuletzt Passkeys. Gemeinsame Challenge-, Recovery- und
+   Session-Regeln werden früh definiert, während jede Etappe unabhängig
+   testbar und ausrollbar bleibt.
+3. **Nur externe Identitätsanbieter:** Passwörter und Faktoren vollständig an
+   einen zentralen Identity Provider delegieren. Das passt nicht zum
+   vorhandenen lokalen Login, zur bestehenden Admin-Verwaltung und zum
+   Offline-/Installationsmodell.
+
+## Review-Fokus
+
+- Ein Admin setzt ein Passwort für eine andere Person: Berechtigung,
+  Bestätigung, Hashing, `must_change_password` und keine Passwortausgabe in
+  Folgeanfragen.
+- Eine Person fordert einen Reset für eine unbekannte E-Mailadresse an:
+  identische Antwort und kein Account-Leak.
+- Ein erzwungener Passwortwechsel wird direkt über Menü, Zurück-Navigation
+  oder Admin-Benutzerwechsel umgangen: Zugriff bleibt gesperrt; der
+  kontrollierte Admin-Proxy-Fall bleibt möglich.
+- 2FA-Challenges laufen ab, werden nur einmal verwendet und sind gegen
+  Wiederholungs- und Rate-Limit-Angriffe geschützt.
+- Passkeys werden bei Registrierung, Widerruf, mehreren Geräten und
+  ungültigen Browserantworten sicher behandelt.
+
+---
+
+### Etappe 1: Sicherheitsmodell und Passwortregeln
+
+**Dateien:**
+
+- Ändern: `src/app/Models/People/User.php`,
+  `src/app/Services/PasswordService.php`, `src/app/Http/Requests/UserRequest.php`
+- Erstellen: dedizierte Passwortregel/Form-Request- und ggf. Migrationsdatei
+- Testen: bestehende User-/PasswordService-Feature- und Unit-Tests erweitern
+
+- [ ] Bestehende Passwortänderungs-, Admin- und Resetpfade inventarisieren und
+  ihre erlaubten Rollen und Zustände als Tests festhalten.
+- [ ] Eine zentrale serverseitige Passwortregel für Mindestlänge,
+  Groß-/Kleinbuchstaben, Zahl und Sonderzeichen einführen; die UI zeigt nur
+  dieselben Anforderungen an.
+- [ ] `PasswordService::randomPassword()` kryptographisch sicher machen und
+  das bestehende Muster `{Konsonant}{Vokal}{Konsonant}{Vokal}{4 Zahlen}` für
+  automatisch erzeugte Initialpasswörter beibehalten.
+- [ ] Tests für gültige/ungültige Passwörter, Hash-Erhalt, Reset und
+  `must_change_password` schreiben und ausführen.
+
+### Etappe 2: Admin-Passwort setzen und Initialpasswort vorschlagen
+
+**Dateien:**
+
+- Ändern: `src/app/Http/Controllers/UserController.php`,
+  `src/app/Http/Requests/UserRequest.php`,
+  `src/resources/js/Pages/Admin/User/UserEditor.vue`
+- Prüfen: `src/app/Policies/UserPolicy.php`, `src/app/Mail/User/AccountData.php`
+- Testen: `src/tests/Feature/UserWebFeatureTest.php` und fokussierte
+  Browserabdeckung für den Benutzereditor
+
+- [ ] Admin-Setzen und normales Selbständern in getrennte autorisierte
+  Aktionen/Requests trennen; Super-Admin-Rechte dürfen nicht versehentlich
+  auf lokale Admins ausgeweitet werden.
+- [ ] Beim Erstellen eines Benutzerkontos ein neues Passwort vorschlagen,
+  explizit anzeigen und nur nach Bestätigung speichern bzw. über die
+  bestehende Kontodaten-Mail versenden.
+- [ ] Beim Zurücksetzen eines Benutzerpassworts die bisherige Aktion auf den
+  zentralen Service umstellen, `must_change_password` setzen und das
+  Passwort nicht in URL, Session-Flash oder Inertia-Props zurückgeben.
+- [ ] Feature- und Dusk-Tests für Berechtigungen, Mailinhalt ohne unnötige
+  Geheimnisverbreitung, Hashing und den Vorschlagsdialog ergänzen.
+
+### Etappe 3: Nicht umgehbares Interstitial und Passwort-Reset
+
+**Dateien:**
+
+- Ändern: `src/app/Http/Controllers/HomeController.php`,
+  `src/app/Http/Controllers/Auth/*`, `src/routes/web/Auth.php`,
+  `src/resources/js/Pages/Auth/PasswordChanger.vue`
+- Erstellen/Ändern: Auth-Middleware bzw. Redirect-Regel und Reset-Tests
+- Dokumentieren: Benutzer- und Administratorenhandbuch
+
+- [ ] Den erzwungenen Wechsel als eigenes, schlankes Auth-Layout darstellen;
+  normale Navigation und Admin-Menü werden blockiert.
+- [ ] Direkte URLs, Zurück-Navigation, Inertia-Navigation und Logout sauber
+  behandeln; ein Admin-Benutzerwechsel darf den kontrollierten Proxy-Fall
+  nicht fälschlich blockieren.
+- [ ] Laravel-Reset-Token, Ablauf, Throttling und generische Antworten prüfen
+  und fehlende Sicherheitsabdeckung ergänzen.
+- [ ] Feature- und Browser-Tests für alle Bypass-Versuche und den erfolgreichen
+  Wechsel ergänzen.
+
+### Etappe 4: E-Mail- und TOTP-Zwei-Faktor-Authentifizierung
+
+**Dateien:**
+
+- Erstellen: migrations-/modellbezogene 2FA-Sicherheitsdaten,
+  Challenge-Service, Requests, Controller und Inertia-Komponenten
+- Ändern: Login-Routen/-Controller, User-Sicherheitsbereich,
+  Übersetzungen und Mail-Templates
+- Testen: PHPUnit-Featuretests, Mail-/Rate-Limit-Tests und Dusk-Flows
+
+- [ ] Vor der Implementierung Bibliotheks- und Verschlüsselungsentscheidung
+  festhalten; TOTP-Geheimnisse verschlüsselt, Recovery-Codes gehasht und
+  Einmal-Challenges mit Ablauf und Zweckbindung speichern.
+- [ ] Aktivierung, Bestätigung, Deaktivierung und Geräte-/Recovery-Verlust
+  mit Re-Authentifizierung und Super-Admin-Recovery modellieren.
+- [ ] Nach korrektem Passwort eine begrenzte E-Mail- oder TOTP-Challenge
+  anzeigen; Session-Freigabe erst nach erfolgreicher Prüfung setzen.
+- [ ] Rate-Limits, Replay-Schutz, Ablauf, Mailversand und generische
+  Fehlermeldungen testen und im Administratorenhandbuch dokumentieren.
+
+### Etappe 5: Passkey-Anmeldung
+
+**Dateien:**
+
+- Erstellen: Credential-Migration/Modell, WebAuthn-Service, Controller,
+  Requests und Inertia-Komponenten
+- Ändern: Login-/Profilrouten, User-Sicherheitsbereich, Übersetzungen und
+  technische Dokumentation
+- Testen: serverseitige Credential-/Challenge-Tests und Browserabdeckung mit
+  unterstützter Teststrategie
+
+- [ ] WebAuthn-Bibliothek, RP-ID, Origins und Deployment-Konfiguration
+  verbindlich festlegen; lokale, Dev- und Produktionsdomains berücksichtigen.
+- [ ] Registrierung, Mehrfachgeräte, Umbenennung, Widerruf und Login mit
+  Challenge-Ablauf und Replay-Schutz implementieren.
+- [ ] Fallback auf Passwort/2FA, verlorene Geräte und Admin-Recovery ohne
+  Account-Übernahme absichern.
+- [ ] API-/Browsergrenzen, HTTPS-Anforderung und Betriebsmaßnahmen im
+  technischen und Administratorenhandbuch dokumentieren.
+
+### Etappe 6: Gesamtprüfung und Übergabe
+
+- [ ] `./planer dev format` und `./planer dev format:check` ausführen.
+- [ ] `./planer dev quality` mit isolierter Testdatenbank ausführen.
+- [ ] Relevante Dusk-/Manual-Tests und `./planer dev docs:check` ausführen.
+- [ ] Migrations-Rollback, DemoBuilder-Anonymisierung und Recovery-Pfad
+  prüfen.
+- [ ] Issue #80 mit Implementierung, Tests, Dokumentation und Commits
+  kommentieren; erst nach erfolgreicher Gesamtprüfung schließen.
