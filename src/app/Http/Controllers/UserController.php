@@ -576,7 +576,7 @@ class UserController extends Controller
         $user->updateCityPermissions($request->get('permissions') ?: [], Auth::user());
 
         if ($request->boolean('createAccount')) {
-            $user->resetAccount();
+            $user->resetAccount($request->get('password'));
         }
     }
 

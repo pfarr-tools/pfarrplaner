@@ -189,6 +189,30 @@ class UserWebFeatureTest extends TestCase
         Mail::assertNothingQueued();
     }
 
+    /** A confirmed initial password is hashed, forced to change, and mailed. */
+    public function test_create_account_uses_the_confirmed_initial_password(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        Mail::fake();
+        $target = User::factory()->create(['password' => null]);
+
+        $this->actingAs($this->user)
+            ->patch(route('user.update', $target), [
+                'id' => $target->id,
+                'first_name' => $target->first_name,
+                'last_name' => $target->last_name,
+                'email' => 'new-account@example.com',
+                'createAccount' => '1',
+                'password' => 'Voca1234!',
+            ])
+            ->assertRedirect(route('users.index'));
+
+        $fresh = $target->fresh();
+        $this->assertTrue(Hash::check('Voca1234!', $fresh->password));
+        $this->assertTrue((bool) $fresh->must_change_password);
+        Mail::assertQueued(AccountData::class);
+    }
+
     public function test_super_admin_reset_uses_a_temporary_password_and_sends_account_data(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);

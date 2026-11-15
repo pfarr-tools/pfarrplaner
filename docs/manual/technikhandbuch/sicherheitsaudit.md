@@ -25,6 +25,8 @@ Automatisch erzeugte Anfangspasswörter sind eine ausdrücklich begrenzte Ausnah
 
 Das Setzen eines Passworts für ein anderes Konto ist auf Super-Administrator:innen begrenzt. Die Autorisierung verwendet für Formularwerte die normalisierte Boolean-Auswertung, damit ein transportierter String `false` nicht als Kontoanlage missverstanden wird. Die Installationspfade rufen ebenfalls die zentrale Validierung auf; ungültige Administratorpasswörter werden vor dem Speichern abgewiesen.
 
+Bei einer neuen Kontoanlage wird ein bestätigter Initialwert aus dem Benutzereditor an den bereits autorisierten Request gesendet. Der Server validiert ihn erneut, hasht ihn über das User-Modell, setzt `must_change_password` und übergibt ihn ausschließlich an die Kontodaten-Mail. Der Wert wird nicht in Redirects, Flash-Daten oder Inertia-Antworten ausgegeben.
+
 Der produktive Routenbestand wurde geprüft und gezielt gehärtet. Dabei wurden folgende Klassen von Problemen beseitigt:
 
 - Debug- und Diagnose-Routen wurden entfernt oder standardmäßig blockiert.

@@ -50,6 +50,8 @@ Ein Benutzerkonto kann sein eigenes Passwort im Reiter **Sicherheit** ändern. D
 
 Nur Super-Administrator:innen dürfen in der Benutzerverwaltung ein Passwort für ein anderes Konto setzen oder einen Passwort-Reset auslösen. Dabei wird ein vorläufiges Anfangspasswort nach dem Muster „Konsonant, Vokal, Konsonant, Vokal, vier Zahlen“ erzeugt und der nächste Passwortwechsel erzwungen. Das vorläufige Passwort ist nur für die einmalige Übergabe gedacht.
 
+Beim Anlegen eines Kontos zeigt der Benutzereditor ein Anfangspasswort an. Die Administratorin oder der Administrator muss es vor dem Speichern ausdrücklich bestätigen; anschließend wird nur der Hash gespeichert und die Kontodaten-Mail versendet. Das Passwort kann vor dem Speichern neu vorgeschlagen oder angepasst werden, muss aber weiterhin die zentrale Passwortregel erfüllen.
+
 Das öffentliche Verfahren **Passwort vergessen** verwendet denselben Passwortstandard und hebt die erzwungene Änderung nach einem erfolgreichen Reset auf. Schwache Passwörter werden bereits bei der Eingabe zurückgewiesen.
 
 Einige Funktionen werden nicht als CRUD-Policy eines Modells geprüft. Dazu gehören insbesondere die fachlichen Berechtigungen für Gottesdienste und Eingaben:

@@ -983,17 +983,17 @@ class User extends Authenticatable
     }
 
     /**
-     * Set a temporary initial password and send the account data mail.
+     * Set an initial password and send the account data mail.
      *
-     * The generated credential intentionally follows the legacy initial-password
-     * format; the forced password change prevents it from becoming a permanent
-     * user-selected password.
+     * If no password is supplied, the generated credential intentionally follows
+     * the documented initial-password format. The forced password change prevents
+     * either credential from becoming a permanent user-selected password.
      *
-     * @return void
+     * @param  string|null  $password  Validated password selected for the account.
      */
-    public function resetAccount()
+    public function resetAccount(?string $password = null): void
     {
-        $password = PasswordService::temporaryInitialPassword();
+        $password ??= PasswordService::temporaryInitialPassword();
         $this->update(['password' => $password, 'must_change_password' => 1]);
         Mail::to($this->email)->queue(new AccountData($this, Auth::user(), $password));
     }

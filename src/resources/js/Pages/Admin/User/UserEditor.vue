@@ -207,6 +207,27 @@
                         :settings="{ labelField: 'name', searchFields: ['name'] }"
                     />
                 </div>
+                <form-group
+                    v-if="justCreated"
+                    label="Anfangspasswort"
+                    help="Dieses Passwort wird nur einmalig versendet. Nach der ersten Anmeldung muss es geändert werden."
+                >
+                    <div class="input-group">
+                        <form-input
+                            name="password"
+                            type="text"
+                            autocomplete="new-password"
+                            v-model="myUser.password"
+                        />
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            @click="suggestInitialPassword"
+                        >
+                            Neu vorschlagen
+                        </button>
+                    </div>
+                </form-group>
             </tab>
             <tab
                 v-if="myUser.isOfficialUser"
@@ -585,7 +606,26 @@ export default {
         createUserAccount(e) {
             if (e) {
                 this.justCreated = true
+                this.suggestInitialPassword()
             }
+        },
+        /** Generate the documented initial-password pattern with browser randomness. */
+        suggestInitialPassword() {
+            const vowels = 'aeiouy'
+            const consonants = 'bcdfghjklmnpqrstvwxz'
+            const numbers = '0123456789'
+            const randomCharacter = (characters) => {
+                const values = new Uint32Array(1)
+                window.crypto.getRandomValues(values)
+                return characters[values[0] % characters.length]
+            }
+
+            this.myUser.password =
+                randomCharacter(consonants).toUpperCase() +
+                randomCharacter(vowels) +
+                randomCharacter(consonants) +
+                randomCharacter(vowels) +
+                Array.from({ length: 4 }, () => randomCharacter(numbers)).join('')
         },
         resetUserPassword() {
             if (
