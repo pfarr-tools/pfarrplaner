@@ -56,26 +56,6 @@ Hier ändern Sie Ihr Passwort.
 
 Wählen Sie ein Passwort, das Sie nicht auch für andere Dienste verwenden. Wenn das Speichern nicht klappt, prüfen Sie, ob das neue Passwort in beiden Feldern gleich geschrieben ist und alle vier Zeichenanforderungen erfüllt.
 
-### Zwei-Faktor-Authentifizierung
-
-Wenn die Zwei-Faktor-Authentifizierung für Ihre Installation freigeschaltet
-ist, können Sie sie im Reiter **Sicherheit** einrichten. Geben Sie dazu Ihr
-aktuelles Passwort ein und scannen Sie die angezeigte Provisionierungs-URI mit
-Ihrer Authenticator-App. Bewahren Sie die anschließend angezeigten
-Recovery-Codes sicher außerhalb von Pfarrplaner auf. Jeder Code kann nur einmal
-verwendet werden.
-
-Bestätigen Sie die Einrichtung mit dem aktuellen sechs- bis achtstelligen Code
-aus der Authenticator-App. Die Eingabe darf zur besseren Lesbarkeit Leerzeichen
-oder Bindestriche enthalten. Für die Einrichtung und die Deaktivierung ist
-jeweils eine erneute Passworteingabe erforderlich. Bei zu vielen fehlerhaften
-Versuchen wird die Aktion vorübergehend gesperrt.
-
-Wenn Sie Ihr Gerät und alle Recovery-Codes verlieren, wenden Sie sich an Ihre
-Administration. Lassen Sie die Zwei-Faktor-Authentifizierung erst nach einer
-Identitätsprüfung zurücksetzen. Teilen Sie Recovery-Codes niemals per E-Mail
-oder Chat.
-
 ---
 
 ## Reiter: E-Mailbenachrichtigungen

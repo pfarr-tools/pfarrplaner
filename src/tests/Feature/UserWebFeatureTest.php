@@ -245,7 +245,7 @@ class UserWebFeatureTest extends TestCase
         self::assertTrue($user->fresh()->hasPendingTwoFactor());
     }
 
-    /** State-changing endpoints remain in the CSRF-protected web middleware group. */
+    /** State-changing endpoints reject a request without a CSRF token. */
     public function test_two_factor_start_requires_csrf_protection(): void
     {
         $route = Route::getRoutes()->getByName('user.two-factor.start');
