@@ -15,6 +15,7 @@ namespace App\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 /**
  * Validates the password strength required for user-selected passwords.
@@ -26,7 +27,7 @@ class StrongPassword implements ValidationRule
      *
      * @param  string  $attribute  The validated attribute name.
      * @param  mixed  $value  The submitted password.
-     * @param  Closure(string): void  $fail  Validation failure callback.
+     * @param  Closure(string, string|null=): PotentiallyTranslatedString  $fail  Validation failure callback.
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

@@ -44,6 +44,14 @@ Dieses Kapitel beschreibt die im Anwendungscode verfügbaren Policy-Verben. Eine
 
 ## Direkte Berechtigungen außerhalb der Modell-Policies
 
+## Passwörter verwalten
+
+Ein Benutzerkonto kann sein eigenes Passwort im Reiter **Sicherheit** ändern. Das neue Passwort muss mindestens acht Zeichen lang sein und je einen Großbuchstaben, Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
+
+Nur Super-Administrator:innen dürfen in der Benutzerverwaltung ein Passwort für ein anderes Konto setzen oder einen Passwort-Reset auslösen. Dabei wird ein vorläufiges Anfangspasswort nach dem Muster „Konsonant, Vokal, Konsonant, Vokal, vier Zahlen“ erzeugt und der nächste Passwortwechsel erzwungen. Das vorläufige Passwort ist nur für die einmalige Übergabe gedacht.
+
+Das öffentliche Verfahren **Passwort vergessen** verwendet denselben Passwortstandard und hebt die erzwungene Änderung nach einem erfolgreichen Reset auf. Schwache Passwörter werden bereits bei der Eingabe zurückgewiesen.
+
 Einige Funktionen werden nicht als CRUD-Policy eines Modells geprüft. Dazu gehören insbesondere die fachlichen Berechtigungen für Gottesdienste und Eingaben:
 
 | Berechtigung | Bedeutung |

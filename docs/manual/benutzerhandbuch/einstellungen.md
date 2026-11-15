@@ -50,11 +50,11 @@ Sie können ein Foto von sich hochladen, das oben rechts im Menü und in einigen
 Hier ändern Sie Ihr Passwort.
 
 1. Geben Sie Ihr **aktuelles Passwort** ein.
-2. Geben Sie das **neue Passwort** ein (mindestens 8 Zeichen).
+2. Geben Sie das **neue Passwort** ein (mindestens 8 Zeichen, mit Groß- und Kleinbuchstaben, Zahl und Sonderzeichen).
 3. Wiederholen Sie das neue Passwort im Feld **Neues Passwort wiederholen**.
 4. Klicken Sie oben links auf **Speichern**.
 
-Wählen Sie ein Passwort, das Sie nicht auch für andere Dienste verwenden. Wenn das Speichern nicht klappt, prüfen Sie, ob das neue Passwort in beiden Feldern gleich geschrieben ist.
+Wählen Sie ein Passwort, das Sie nicht auch für andere Dienste verwenden. Wenn das Speichern nicht klappt, prüfen Sie, ob das neue Passwort in beiden Feldern gleich geschrieben ist und alle vier Zeichenanforderungen erfüllt.
 
 ---
 

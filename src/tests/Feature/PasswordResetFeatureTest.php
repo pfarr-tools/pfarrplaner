@@ -12,7 +12,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\People\User;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
 /**
@@ -20,6 +23,8 @@ use Tests\TestCase;
  */
 class PasswordResetFeatureTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * The password-reset request form is available to guests.
      */
@@ -53,5 +58,29 @@ class PasswordResetFeatureTest extends TestCase
             'password' => 'Secure123',
             'password_confirmation' => 'Secure123',
         ])->assertSessionHasErrors('password');
+    }
+
+    /**
+     * A successful public reset clears the forced password-change flag.
+     */
+    public function test_successful_password_reset_clears_forced_change_flag(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $user = User::factory()->create([
+            'email' => 'reset@example.com',
+            'password' => 'Old1!',
+            'must_change_password' => true,
+        ]);
+        $token = Password::broker()->createToken($user);
+
+        $this->post('/password/reset', [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'New1!word',
+            'password_confirmation' => 'New1!word',
+        ])->assertRedirect();
+
+        $this->assertTrue(password_verify('New1!word', $user->fresh()->password));
+        $this->assertFalse((bool) $user->fresh()->must_change_password);
     }
 }

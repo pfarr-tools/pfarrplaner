@@ -99,6 +99,7 @@ export default {
         }
     },
     methods: {
+        /** Submit the new password and omit the temporary credential if present. */
         savePassword() {
             const data = { ...this.auth }
             if (this.originalPassword) delete data.current_password

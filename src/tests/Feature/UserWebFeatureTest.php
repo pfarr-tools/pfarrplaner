@@ -134,6 +134,7 @@ class UserWebFeatureTest extends TestCase
         $this->assertTrue((bool) $target->fresh()->must_change_password);
     }
 
+    /** A regular administrator cannot invoke the reset action for another user. */
     public function test_non_super_admin_cannot_reset_another_users_password(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
@@ -146,6 +147,7 @@ class UserWebFeatureTest extends TestCase
             ->assertForbidden();
     }
 
+    /** A regular administrator cannot submit another user's password field. */
     public function test_non_super_admin_cannot_set_another_users_password(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
@@ -162,6 +164,29 @@ class UserWebFeatureTest extends TestCase
                 'password' => 'Strong1!',
             ])
             ->assertForbidden();
+    }
+
+    /** A string false value is not treated as an account-creation request. */
+    public function test_false_create_account_value_does_not_reset_another_users_password(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        Mail::fake();
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleService::ROLE_ADMIN);
+        $target = User::factory()->create(['password' => 'Current1!']);
+
+        $this->actingAs($admin)
+            ->patch(route('user.update', $target), [
+                'id' => $target->id,
+                'first_name' => $target->first_name,
+                'last_name' => $target->last_name,
+                'email' => $target->email,
+                'createAccount' => 'false',
+            ])
+            ->assertRedirect(route('users.index'));
+
+        $this->assertFalse((bool) $target->fresh()->must_change_password);
+        Mail::assertNothingQueued();
     }
 
     public function test_super_admin_reset_uses_a_temporary_password_and_sends_account_data(): void
@@ -214,6 +239,7 @@ class UserWebFeatureTest extends TestCase
             ->assertRedirect(route('home'));
 
         $this->assertTrue(Hash::check('Voca1234!', $this->user->fresh()->password));
+        $this->assertFalse((bool) $this->user->fresh()->must_change_password);
     }
 
     public function test_profile_password_change_rejects_password_without_symbol(): void

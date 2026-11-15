@@ -70,7 +70,7 @@ class InstallAdmin extends Command
         $role = Role::where('name', 'Super-Administrator:in')->firstOrFail();
         $domain = parse_url(url('/'), PHP_URL_HOST);
 
-        $password = PasswordService::randomPassword();
+        $password = PasswordService::temporaryInitialPassword();
         $user = User::create(['last_name' => 'Admin', 'email' => 'admin@'.$domain, 'password' => $password, 'must_change_password' => 1]);
         $user->assignRole($role);
 

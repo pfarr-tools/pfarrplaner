@@ -31,6 +31,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\People\User;
 use App\Rules\StrongPassword;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Foundation\Auth\ResetsPasswords;
@@ -77,7 +78,12 @@ class ResetPasswordController extends Controller
      */
     protected function setUserPassword($user, $password)
     {
+        if (! $user instanceof User) {
+            return;
+        }
+
         $user->password = $password;
+        $user->must_change_password = false;
     }
 
     /**

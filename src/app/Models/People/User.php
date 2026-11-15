@@ -993,7 +993,7 @@ class User extends Authenticatable
      */
     public function resetAccount()
     {
-        $password = PasswordService::randomPassword();
+        $password = PasswordService::temporaryInitialPassword();
         $this->update(['password' => $password, 'must_change_password' => 1]);
         Mail::to($this->email)->queue(new AccountData($this, Auth::user(), $password));
     }
@@ -1008,6 +1008,7 @@ class User extends Authenticatable
             ->withPivot('category');
     }
 
+    /** Replace city subscriptions from a city/type map. */
     public function setSubscriptionsFromArray($subscriptions)
     {
         foreach ($subscriptions as $city => $type) {
@@ -1055,6 +1056,7 @@ class User extends Authenticatable
         }
     }
 
+    /** Return teams assigned to the user. */
     public function teams()
     {
         return $this->belongsToMany(Team::class);
@@ -1186,6 +1188,7 @@ class User extends Authenticatable
         return $this->belongsToMany(City::class)->withPivot('permission')->wherePivotIn('permission', ['w']);
     }
 
+    /** Build the user's name-formatting service. */
     public function nameService(): NameService
     {
         return NameService::fromUser($this);
@@ -1199,6 +1202,7 @@ class User extends Authenticatable
         return $this->nameService()->format($format);
     }
 
+    /** Determine whether the user is an active poolmaster for a city today. */
     public function isCurrentlyPoolmasterForCity(City $city)
     {
         return Poolmaster::where('user_id', $this->id)

@@ -17,6 +17,14 @@ Geprüft wurden insbesondere:
 
 ## Ergebnisübersicht
 
+### Passwortlebenszyklus
+
+Die Passwortregel ist zentral in `App\Rules\StrongPassword` definiert und wird bei Profiländerungen, administrativ gesetzten Passwörtern, öffentlichen Zurücksetzungen und der Ersteinrichtung verwendet. Sie verlangt mindestens acht Zeichen sowie Großbuchstaben, Kleinbuchstaben, eine Zahl und ein Sonderzeichen. Die Regel wird serverseitig geprüft; die Hinweise in den Vue-Komponenten sind nur eine Bedienhilfe.
+
+Automatisch erzeugte Anfangspasswörter sind eine ausdrücklich begrenzte Ausnahme: `PasswordService::temporaryInitialPassword()` erzeugt eine zufällige Kennung im dokumentierten Muster, und die aufrufenden Pfade setzen `must_change_password`. Diese Kennung ist keine dauerhafte Passwortvariante. Nach einem erfolgreichen Profil- oder öffentlichen Reset wird das Flag gelöscht.
+
+Das Setzen eines Passworts für ein anderes Konto ist auf Super-Administrator:innen begrenzt. Die Autorisierung verwendet für Formularwerte die normalisierte Boolean-Auswertung, damit ein transportierter String `false` nicht als Kontoanlage missverstanden wird. Die Installationspfade rufen ebenfalls die zentrale Validierung auf; ungültige Administratorpasswörter werden vor dem Speichern abgewiesen.
+
 Der produktive Routenbestand wurde geprüft und gezielt gehärtet. Dabei wurden folgende Klassen von Problemen beseitigt:
 
 - Debug- und Diagnose-Routen wurden entfernt oder standardmäßig blockiert.

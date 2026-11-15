@@ -510,7 +510,7 @@ class UserController extends Controller
                 'new_password' => ['required', 'string', new StrongPassword, 'confirmed', 'not_current_password', 'notIn:testtest'],
                 'new_password_confirmation' => 'required',
             ]);
-            $user->update(['password' => $passwordData['new_password']]);
+            $user->update(['password' => $passwordData['new_password'], 'must_change_password' => false]);
         }
 
         // set subscriptions
@@ -575,7 +575,7 @@ class UserController extends Controller
         $user->setSubscriptionsFromArray($request->get('subscriptions') ?: []);
         $user->updateCityPermissions($request->get('permissions') ?: [], Auth::user());
 
-        if ($request->get('createAccount', false)) {
+        if ($request->boolean('createAccount')) {
             $user->resetAccount();
         }
     }

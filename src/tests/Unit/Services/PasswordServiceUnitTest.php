@@ -18,34 +18,38 @@ use Tests\TestCase;
 
 class PasswordServiceUnitTest extends TestCase
 {
-    public function test_random_password_returns_string(): void
+    /** The temporary credential has the documented string type. */
+    public function test_temporary_initial_password_returns_string(): void
     {
-        $this->assertIsString(PasswordService::randomPassword());
+        $this->assertIsString(PasswordService::temporaryInitialPassword());
     }
 
-    public function test_random_password_has_minimum_length(): void
+    /** The temporary credential has the documented eight-character length. */
+    public function test_temporary_initial_password_has_minimum_length(): void
     {
-        // Pattern: consonant + vowel + consonant + vowel + 4 digits = 8 chars minimum
-        $this->assertGreaterThanOrEqual(8, strlen(PasswordService::randomPassword()));
+        $this->assertSame(8, strlen(PasswordService::temporaryInitialPassword()));
     }
 
-    public function test_random_password_contains_digits(): void
+    /** The temporary credential ends with four digits. */
+    public function test_temporary_initial_password_contains_digits(): void
     {
-        $password = PasswordService::randomPassword();
+        $password = PasswordService::temporaryInitialPassword();
         $this->assertMatchesRegularExpression('/\d{4}$/', $password);
     }
 
-    public function test_random_password_keeps_the_initial_credential_pattern(): void
+    /** The temporary credential follows the consonant-vowel pattern. */
+    public function test_temporary_initial_password_keeps_the_initial_credential_pattern(): void
     {
         $this->assertMatchesRegularExpression(
-            '/^[A-Z][a-z][a-z][a-z]\d{4}$/',
-            PasswordService::randomPassword(),
+            '/^[A-Z][aeiouy][bcdfghjklmnpqrstvwxz][aeiouy]\d{4}$/',
+            PasswordService::temporaryInitialPassword(),
         );
     }
 
-    public function test_random_password_is_non_deterministic(): void
+    /** Repeated temporary credentials are not all identical. */
+    public function test_temporary_initial_password_is_non_deterministic(): void
     {
-        $passwords = array_map(fn () => PasswordService::randomPassword(), range(1, 10));
+        $passwords = array_map(fn () => PasswordService::temporaryInitialPassword(), range(1, 10));
         // At least 2 distinct values in 10 attempts
         $this->assertGreaterThan(1, count(array_unique($passwords)));
     }

@@ -1321,12 +1321,6 @@ parameters:
 			path: app/Http/Controllers/AttachmentController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Contracts\\Auth\\CanResetPassword\:\:\$password\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Auth/ResetPasswordController.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\Rites\\Baptism\:\:\$attachments\.$#'
 			identifier: property.notFound
 			count: 2

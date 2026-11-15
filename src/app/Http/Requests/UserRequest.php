@@ -37,14 +37,13 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
+/** Authorizes and validates user profile and account-management requests. */
 class UserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         $target = $this->user;
         $actor = $this->user();
@@ -69,10 +68,8 @@ class UserRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
-    public function rules()
+    public function rules(): array
     {
 
         // Find existing user data.
@@ -118,7 +115,14 @@ class UserRequest extends FormRequest
         return $rules;
     }
 
-    public function validated($key = null, $default = null)
+    /**
+     * Normalize optional password fields and mark administrator-set passwords.
+     *
+     * @param  string|null  $key  Optional validated value key.
+     * @param  mixed  $default  Fallback value kept for FormRequest compatibility.
+     * @return array<string, mixed>
+     */
+    public function validated($key = null, $default = null): array
     {
         $data = parent::validated();
 
@@ -140,14 +144,20 @@ class UserRequest extends FormRequest
         return $data;
     }
 
-    public function getRelationIdsForSync($key, $table = null, $tableKey = 'id')
+    /**
+     * Return validated relation identifiers for a form field.
+     *
+     * @return array<int, int|string>
+     */
+    public function getRelationIdsForSync($key, $table = null, $tableKey = 'id'): array
     {
         $table ??= $key;
 
         return $this->validate([$key => 'nullable|exists:'.$table.','.$tableKey])[$key] ?? [];
     }
 
-    public function getRoles()
+    /** Return role identifiers allowed for the current actor and target. */
+    public function getRoles(): array
     {
         $superAdminRole = Role::where('name', RoleService::ROLE_SUPER_ADMIN)->first()->id;
         $adminRole = Role::where('name', RoleService::ROLE_ADMIN)->first()->id;

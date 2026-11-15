@@ -144,6 +144,7 @@ class HomeController extends Controller
         return redirect()->route('home')->with('success', 'Dein Passwort wurde geändert.');
     }
 
+    /** Display application metadata and the current changelog. */
     public function about()
     {
         // get version
@@ -226,6 +227,7 @@ class HomeController extends Controller
         }
     }
 
+    /** Return one configured home-screen tab as JSON. */
     public function tab($tabIndex)
     {
         $user = Auth::user();

@@ -109,6 +109,7 @@ class FirstRunInstallerService
 
     public function createOrUpdateAdminUser(array $data): User
     {
+        PasswordService::validate((string) $data['password']);
         app(RoleConfigurationSynchronizer::class)->synchronize();
         $this->ensureRoleExists(RoleService::ROLE_SUPER_ADMIN);
 
@@ -132,6 +133,7 @@ class FirstRunInstallerService
         return $user;
     }
 
+    /** Ensure that the role required by the first administrator exists. */
     protected function ensureRoleExists(string $name): void
     {
         Role::query()->firstOrCreate([
@@ -140,6 +142,7 @@ class FirstRunInstallerService
         ]);
     }
 
+    /** Replace or append one value in the generated environment file. */
     protected function replaceEnvironmentValue(string $template, string $key, mixed $value): string
     {
         $line = $key.'='.$this->formatEnvironmentValue($value);
@@ -152,6 +155,7 @@ class FirstRunInstallerService
         return rtrim($template).PHP_EOL.$line.PHP_EOL;
     }
 
+    /** Format a value according to the environment-file quoting rules. */
     protected function formatEnvironmentValue(mixed $value): string
     {
         if (is_bool($value)) {
@@ -171,6 +175,7 @@ class FirstRunInstallerService
         return $value;
     }
 
+    /** Apply one environment value to the current process configuration. */
     protected function setEnvironmentValue(string $key, mixed $value): void
     {
         $stringValue = is_bool($value) ? ($value ? 'true' : 'false') : (string) $value;
@@ -180,6 +185,7 @@ class FirstRunInstallerService
         $_SERVER[$key] = $stringValue;
     }
 
+    /** Convert installer input to a boolean using PHP's filter semantics. */
     protected function toBoolean(mixed $value): bool
     {
         return filter_var($value, FILTER_VALIDATE_BOOL);

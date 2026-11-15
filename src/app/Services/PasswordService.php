@@ -30,6 +30,12 @@
 
 namespace App\Services;
 
+use App\Rules\StrongPassword;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Random\RandomException;
+
+/** Central password-policy and temporary-credential service. */
 class PasswordService
 {
     private const VOWELS = 'aeiouy';
@@ -43,8 +49,10 @@ class PasswordService
      *
      * This password is only a temporary transport credential. The caller must
      * persist it with the forced-password-change flag enabled.
+     *
+     * @throws RandomException If secure random generation fails.
      */
-    public static function randomPassword(): string
+    public static function temporaryInitialPassword(): string
     {
         return strtoupper(self::randomCharsFromString(self::CONSONANTS))
             .self::randomCharsFromString(self::VOWELS)
@@ -52,6 +60,21 @@ class PasswordService
             .self::randomCharsFromString(self::VOWELS)
             .self::randomCharsFromString(self::NUMBERS, 4);
 
+    }
+
+    /**
+     * Validate a user-selected password against the central password policy.
+     *
+     * @param  string  $password  Password to validate.
+     *
+     * @throws ValidationException When the password does not meet the policy.
+     */
+    public static function validate(string $password): void
+    {
+        Validator::make(
+            ['password' => $password],
+            ['password' => ['required', new StrongPassword]],
+        )->validate();
     }
 
     /**

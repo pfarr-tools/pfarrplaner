@@ -66,7 +66,9 @@ Sie können Ihr Passwort jederzeit selbst ändern.
 5. Geben Sie das neue Passwort ein und wiederholen Sie es zur Bestätigung.
 6. Klicken Sie oben links auf **Speichern**.
 
-> **Hinweis:** Ihr neues Passwort muss mindestens 8 Zeichen lang sein.
+> **Hinweis:** Ihr neues Passwort muss mindestens 8 Zeichen lang sein und mindestens je einen Großbuchstaben, Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
+
+Wenn Ihr Konto mit einem vorläufigen Anfangspasswort eingerichtet wurde, führt Pfarrplaner Sie nach der Anmeldung zuerst zum Passwortwechsel. Erst nach erfolgreichem Wechsel können Sie die übrige Anwendung nutzen.
 
 ---
 

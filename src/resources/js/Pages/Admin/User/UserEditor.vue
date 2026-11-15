@@ -581,6 +581,7 @@ export default {
                 this.mySettings[key] = JSON.parse(jsonText)
             } catch (_) {}
         },
+        /** Mark the form as an account-creation flow when the checkbox is selected. */
         createUserAccount(e) {
             if (e) {
                 this.justCreated = true
