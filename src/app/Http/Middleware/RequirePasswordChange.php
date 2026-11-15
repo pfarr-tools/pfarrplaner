@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\People\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +29,7 @@ class RequirePasswordChange
     /** Determine whether the request is part of the password or proxy flow. */
     protected function isExempt(Request $request): bool
     {
-        if ($request->session()->has('adminUserSwitchBack')) {
+        if ($this->hasValidProxySession($request)) {
             return true;
         }
 
@@ -39,5 +40,20 @@ class RequirePasswordChange
             'user.switchback',
             'csrf.keepalive',
         ], true);
+    }
+
+    /** Verify that the proxy session points to an administrator allowed to impersonate the user. */
+    protected function hasValidProxySession(Request $request): bool
+    {
+        $user = $request->user();
+        $adminId = $request->session()->get('adminUserSwitchBack');
+
+        if (! $user || ! $adminId) {
+            return false;
+        }
+
+        $admin = User::find($adminId);
+
+        return $admin instanceof User && $admin->can('impersonate', $user);
     }
 }
