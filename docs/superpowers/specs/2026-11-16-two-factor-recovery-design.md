@@ -31,7 +31,7 @@ Ein Benutzer, der sein Authenticator-Gerät und alle Recovery-Codes verloren hat
 ## Umfang
 
 - Neue CSRF-geschützte POST-Route, explizite Super-Admin-Policy und frische Passwort-Re-Authentifizierung des handelnden Super-Admins.
-- Reversible Migration und dauerhaftes Audit-Modell ohne Faktor- oder Passwortdaten.
+- Vorwärtsgerichtete Migration und dauerhaftes Audit-Modell ohne Faktor- oder Passwortdaten.
 - Transaktionale Recovery-Action mit Sperrung, Faktorwiderruf, Verbrauch offener Challenges, Token-/Sessionwiderruf und Audit.
 - Bestätigungsdialog mit Passwort und Supportfall-Referenz im Admin-Benutzereditor; eingeschränkte Audit-Historie.
 - Temporärer Zugriffsschutz mit eigener Wiederherstellungsseite; Freigabe erst nach erfolgreicher Neueinschreibung und Bestätigung von TOTP.
@@ -48,7 +48,8 @@ Ein Benutzer, der sein Authenticator-Gerät und alle Recovery-Codes verloren hat
 
 ## Sicherheits- und Betriebsgrenzen
 
-- Audit-Einträge enthalten ausschließlich IDs, Supportfall-Referenz, Zeit und IP, keine Geheimnisse oder Freitext zur Person.
+- Audit-Einträge enthalten ausschließlich IDs, Supportfall-Referenz, Zeit und IP, keine Geheimnisse oder Freitext zur Person. Einträge bleiben dauerhaft erhalten und werden bei Kontolöschungen nicht kaskadiert gelöscht. Die gespeicherte numerische Benutzer-ID bleibt als historische Zuordnung erhalten; nach Kontolöschung ist die Eloquent-Beziehung zum Konto erwartungsgemäß leer. Bei manuell zurückgesetzten Datenbanksequenzen oder einem Neuaufbau der Datenbank kann die ID-Zuordnung mehrdeutig werden.
+- Die lokale Demo-Anonymisierung ist ausdrücklich ausgenommen: sie löscht Audit-Einträge zu den anonymisierten Demo-Konten zusammen mit deren Sicherheitszustand, damit keine früheren Supportreferenzen oder IP-Adressen in wiederverwendbaren Demodaten verbleiben.
 - Identitätsprüfung, Berechtigung und Recovery sind getrennte Schritte; die Anwendung kann die externe Identitätsprüfung nicht selbst beweisen.
 - Die Session-Widerrufsgarantie gilt für den dokumentierten Datenbank-Session-Treiber. Abweichende Session-Treiber müssen vor der Recovery auf den Datenbanktreiber umgestellt werden.
 - Das Passwort bleibt gültig. Ein Super-Admin darf die Aktion daher nur nach dem dokumentierten Identitätsnachweis und frischer Passwort-Re-Authentifizierung ausführen.
@@ -59,5 +60,5 @@ Ein Benutzer, der sein Authenticator-Gerät und alle Recovery-Codes verloren hat
 - Der handelnde Super-Admin muss unmittelbar vor der Wiederherstellung sein aktuelles Passwort bestätigen.
 - Das Zielkonto muss TOTP erneut einrichten und bestätigen, bevor normale Anwendungsfunktionen wieder freigegeben werden.
 - Tabellen-/Routen-/Policy-Namen und vorhandenes Admin-Bestätigungsdialogmuster gemäß Repository-Konvention auswählen.
-- Bei der Migration Fremdschlüssel-Löschverhalten so wählen, dass das Audit bei Kontoentfernung nachvollziehbar bleibt, ohne Kontolöschungen unnötig zu blockieren.
+- Die Recovery-Migration ist vorwärtsgerichtet: ein automatisches Rollback darf weder den Recovery-Marker noch die Audit-Historie löschen. Bei einem Rollback sind verifiziertes Backup und vorheriges Image gemäß Betriebshandbuch zu verwenden.
 - Vor Umsetzung das Verhalten des installierten Laravel-Datenbank-Sessionhandlers und Sanctum-Tokenmodells mit Tests verifizieren.

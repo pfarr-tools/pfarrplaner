@@ -18,7 +18,7 @@
 - Das Zielkonto bleibt bis zur bestätigten TOTP-Neueinrichtung auf Wiederherstellungsrouten beschränkt.
 - Datenbank-Sitzungstreiber ist Voraussetzung; Sessions und persönliche API-Tokens des Zielkontos werden widerrufen.
 - Audit speichert Actor-ID, Ziel-ID, Supportfall-Referenz, Zeitpunkt und IP, niemals Passwörter, TOTP-Secrets, Recovery-Codes oder Login-Codes.
-- Schemaänderungen sind reversibel; Benutzer-IDs folgen dem vorhandenen `unsignedInteger`-Schema.
+- Die Recovery-Sicherheitsmigration ist vorwärtsgerichtet und verweigert destruktiven Rollback; Benutzer-IDs folgen dem vorhandenen `unsignedInteger`-Schema.
 - Tests laufen ausschließlich mit `./planer dev test` oder mit ausdrücklich isolierter Testdatenbank; niemals Dev-/Produktionsdaten verwenden.
 - Jede Implementierungsetappe erhält Senior Review, Fehlerkorrektur, erneute Verifikation und einen eigenen Commit.
 - Benutzer-, Administratoren-, Technisches Handbuch sowie Betriebsdokumentation werden mit der betroffenen Etappe aktualisiert.
@@ -47,13 +47,13 @@
 - Adds nullable `users.two_factor_recovery_required_at` timestamp.
 - Audit IDs are unsigned integers without cascading user foreign keys, preserving actor/target IDs if an account is later removed.
 
-- [ ] **Step 1: Write failing migration/model tests** asserting the recovery marker column, audit fields/indexes, migration rollback, and `DemoBuilder` clears the marker and audit rows in demo data.
+- [x] **Step 1: Write failing migration/model tests** asserting the recovery marker column, audit fields/indexes, forward-only migration behavior, account-deletion retention, and `DemoBuilder` clears the marker and audit rows in demo data.
 - Test names: `test_recovery_schema_and_audit_model_are_ready()` and `test_demo_builder_clears_recovery_markers_and_audits()`.
-- [ ] **Step 2: Run the isolated tests and confirm they fail** with missing table/column behavior.
-- [ ] **Step 3: Implement the reversible migration and documented model** with explicit fillable/casts/relations; extend demo cleanup.
-- [ ] **Step 4: Run** `./planer dev test --no-browser --no-js`; expect all PHP tests to pass with only documented skips.
-- [ ] **Step 5: Run Pint for the changed PHP files and `git diff --check`.**
-- [ ] **Step 6: Senior Review Task 1; fix findings and repeat the relevant checks.**
+- [x] **Step 2: Run the isolated tests and confirm they fail** with missing table/column behavior.
+- [x] **Step 3: Implement the forward-only migration and documented model** with explicit fillable/relations; extend demo cleanup.
+- [x] **Step 4: Run** `./planer dev test --no-browser --no-js`; expect all PHP tests to pass with only documented skips.
+- [x] **Step 5: Run Pint for the changed PHP files and `git diff --check`.**
+- [x] **Step 6: Senior Review Task 1; fix findings and repeat the relevant checks.**
 - [ ] **Step 7: Commit** as `feat(auth): Audit für 2FA-Wiederherstellungen ergänzen`.
 
 ### Task 2: Autorisierte, re-authentifizierte Recovery-Action

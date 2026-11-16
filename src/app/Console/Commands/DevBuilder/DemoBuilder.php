@@ -517,8 +517,20 @@ class DemoBuilder extends Command
         return true;
     }
 
+    /** Anonymize the user and remove factor-recovery information from demo data. */
     protected function handleUsers(User $user)
     {
+        if (Schema::hasColumn('users', 'two_factor_recovery_required_at')) {
+            DB::table('users')->where('id', $user->getKey())->update([
+                'two_factor_recovery_required_at' => null,
+            ]);
+        }
+        if (Schema::hasTable('two_factor_recovery_audits')) {
+            DB::table('two_factor_recovery_audits')
+                ->where('target_user_id', $user->getKey())
+                ->orWhere('actor_user_id', $user->getKey())
+                ->delete();
+        }
         if (Schema::hasColumns('users', [
             'two_factor_secret',
             'two_factor_recovery_codes',

@@ -102,4 +102,30 @@ final class TwoFactorUserIntegrationFeatureTest extends TestCase
         self::assertFalse($user->fresh()->hasTwoFactorEnabled());
         self::assertSame(0, DB::table('two_factor_login_challenges')->where('user_id', $user->getKey())->count());
     }
+
+    /** Demo anonymization removes recovery status and audit references. */
+    public function test_demo_builder_clears_recovery_markers_and_audits(): void
+    {
+        $user = User::factory()->create();
+        DB::table('users')->where('id', $user->getKey())->update([
+            'two_factor_recovery_required_at' => now(),
+        ]);
+        DB::table('two_factor_recovery_audits')->insert([
+            'actor_user_id' => $user->getKey(),
+            'target_user_id' => $user->getKey(),
+            'support_reference' => 'SUP-2026-002',
+            'ip_address' => '192.0.2.19',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $builder = new DemoBuilder;
+        $faker = new \ReflectionProperty($builder, 'faker');
+        $faker->setValue($builder, Factory::create('de_DE'));
+        $method = new \ReflectionMethod($builder, 'handleUsers');
+        $method->invoke($builder, $user);
+
+        self::assertNull($user->fresh()->two_factor_recovery_required_at);
+        self::assertSame(0, DB::table('two_factor_recovery_audits')->count());
+    }
 }
