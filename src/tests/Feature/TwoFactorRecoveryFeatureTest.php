@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
+use Inertia\Testing\AssertableInertia as Assert;
 use RoundlyConsulting\TwoFactor\Contracts\TwoFactorService;
 use Tests\TestCase;
 
@@ -314,6 +315,118 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         }
     }
 
+    /** A recovered account can only open reenrolment, allowed password change and logout. */
+    public function test_recovered_account_can_only_open_reenrolment_and_logout_routes(): void
+    {
+        $user = $this->createRecoveredAccount();
+
+        $this->actingAs($user)->get(route('home'))
+            ->assertRedirect('/profil/zwei-faktor/wiederherstellen');
+
+        $this->actingAs($user)->get('/profil/zwei-faktor/wiederherstellen')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Profile/TwoFactorRecovery')
+                ->missing('user.two_factor_secret')
+                ->missing('user.two_factor_recovery_codes')
+            );
+
+        $this->actingAs($user)->get(route('password.edit'))->assertOk();
+        $this->actingAs($user)->post(route('logout'))->assertRedirect(route('login'));
+    }
+
+    /** Recovered accounts cannot use authenticated API routes until reenrolment. */
+    public function test_recovered_account_cannot_call_authenticated_api_routes(): void
+    {
+        $user = $this->createRecoveredAccount();
+
+        $this->actingAs($user, 'api')->getJson('/api/kalender/monat/2026-11-16')->assertForbidden();
+    }
+
+    /** Password login grants only the reenrolment flow after recovery. */
+    public function test_recovered_account_password_login_redirects_into_reenrolment_gate(): void
+    {
+        $user = $this->createRecoveredAccount();
+
+        $this->post(route('login'), [
+            'email' => $user->email,
+            'password' => 'user-password',
+        ])->assertRedirect(route('home'));
+
+        $this->get(route('home'))->assertRedirect('/profil/zwei-faktor/wiederherstellen');
+    }
+
+    /** Guests and ordinary accounts do not inherit the recovery gate. */
+    public function test_recovery_gate_does_not_block_guests_or_normal_accounts(): void
+    {
+        $this->get(route('login'))->assertOk();
+
+        $user = User::factory()->create(['must_change_password' => false]);
+        $this->actingAs($user)->get(route('home'))->assertOk();
+    }
+
+    /** A forced password change remains available before factor reenrolment. */
+    public function test_recovered_account_can_complete_mandatory_password_change_first(): void
+    {
+        $user = $this->createRecoveredAccount(true);
+
+        $this->actingAs($user)->get(route('home'))->assertRedirect(route('password.edit', ['from' => 'home']));
+        $this->actingAs($user)->get(route('password.edit'))->assertOk();
+
+        $user->forceFill(['must_change_password' => false])->save();
+        $this->actingAs($user)->get(route('home'))
+            ->assertRedirect('/profil/zwei-faktor/wiederherstellen');
+    }
+
+    /** Invalid or incomplete TOTP confirmation keeps the recovery marker set. */
+    public function test_failed_or_incomplete_totp_confirmation_keeps_recovery_gate(): void
+    {
+        $user = $this->createRecoveredAccount();
+        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
+        RateLimiter::clear('two-factor-confirm:'.$user->getKey());
+
+        $this->actingAs($user)->postJson(route('user.two-factor.confirm'), [
+            'current_password' => 'user-password',
+            'code' => '123456',
+        ])->assertUnprocessable();
+
+        self::assertNotNull($user->fresh()->two_factor_recovery_required_at);
+
+        $setup = $user->fresh()->startTwoFactorEnrolment();
+        $this->actingAs($user)->postJson(route('user.two-factor.confirm'), [
+            'current_password' => 'user-password',
+            'code' => '000000',
+        ])->assertUnprocessable();
+
+        self::assertNotNull($user->fresh()->two_factor_recovery_required_at);
+        self::assertNotNull($user->fresh()->two_factor_secret);
+        self::assertNotSame('', $setup->secret);
+    }
+
+    /** A valid TOTP confirmation atomically releases the recovery marker. */
+    public function test_successful_totp_confirmation_releases_recovery_gate(): void
+    {
+        $user = $this->createRecoveredAccount();
+        $setup = $user->startTwoFactorEnrolment();
+        RateLimiter::clear('two-factor-reauth:'.$user->getKey());
+        RateLimiter::clear('two-factor-confirm:'.$user->getKey());
+
+        $confirmationResponse = $this->actingAs($user)->postJson(route('user.two-factor.confirm'), [
+            'current_password' => 'user-password',
+            'code' => app(TwoFactorService::class)->currentCode($setup->secret),
+        ]);
+        self::assertSame(200, $confirmationResponse->status(), json_encode([
+            'location' => $confirmationResponse->headers->get('Location'),
+            'body' => $confirmationResponse->getContent(),
+        ]));
+        $confirmationResponse->assertJson(['enabled' => true]);
+
+        self::assertNull($user->fresh()->two_factor_recovery_required_at);
+        self::assertTrue($user->fresh()->hasTwoFactorEnabled());
+        $user->refresh();
+        $this->actingAs($user)->get(route('home'))->assertOk();
+    }
+
     /** Create an administrator and target account for recovery endpoint tests. */
     private function createRecoveryPair(bool $superAdmin = true): array
     {
@@ -327,6 +440,18 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         }
 
         return [$admin, User::factory()->create()];
+    }
+
+    /** Create a normal account whose next login requires two-factor reenrolment. */
+    private function createRecoveredAccount(bool $mustChangePassword = false): User
+    {
+        $user = User::factory()->create([
+            'password' => Hash::make('user-password'),
+            'must_change_password' => $mustChangePassword,
+        ]);
+        $user->forceFill(['two_factor_recovery_required_at' => now()])->save();
+
+        return $user;
     }
 
     /** Return valid re-authentication and support-reference input. */

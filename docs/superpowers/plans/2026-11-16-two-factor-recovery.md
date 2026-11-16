@@ -100,13 +100,13 @@
 - The same guard runs for authenticated API requests; guests and normal accounts are unaffected.
 - Successful confirmation clears `two_factor_recovery_required_at` on the same locked user row and transaction that confirms TOTP.
 
-- [ ] **Step 1: Write failing tests** `test_recovered_account_can_only_open_reenrolment_and_logout_routes()`, `test_recovered_account_cannot_call_authenticated_api_routes()`, `test_failed_or_incomplete_totp_confirmation_keeps_recovery_gate()`, and `test_successful_totp_confirmation_releases_recovery_gate()`; include guest, normal account, and simultaneous mandatory-password-change coverage.
-- [ ] **Step 2: Run** `./planer dev test --no-browser --no-js` and confirm the gate tests fail.
-- [ ] **Step 3: Implement middleware and route registration** in web/API middleware groups, ordered after authentication, with route-name allowlisting rather than broad URL-prefix exceptions.
-- [ ] **Step 4: Clear the recovery marker only after successful TOTP confirmation** under the existing user-row lock; recovery failure must leave the account gated.
-- [ ] **Step 5: Implement the dedicated page** with current-password entry, TOTP setup and confirmation, accessible errors, and no unrelated profile data or secret persistence after confirmation.
-- [ ] **Step 6: Run PHP and focused Vue tests**, then Pint, Prettier, PHPStan, ESLint and `git diff --check`.
-- [ ] **Step 7: Senior Review Task 3; fix findings and repeat checks.**
+- [x] **Step 1: Write failing tests** `test_recovered_account_can_only_open_reenrolment_and_logout_routes()`, `test_recovered_account_cannot_call_authenticated_api_routes()`, `test_failed_or_incomplete_totp_confirmation_keeps_recovery_gate()`, and `test_successful_totp_confirmation_releases_recovery_gate()`; include guest, normal account, and simultaneous mandatory-password-change coverage.
+- [x] **Step 2: Run** isolated PHP and focused Vue tests and confirm the gate tests fail before implementation; RED logs are recorded in the SDD directory.
+- [x] **Step 3: Implement middleware and route registration** in web/API middleware groups, ordered after authentication, with route-name allowlisting rather than broad URL-prefix exceptions.
+- [x] **Step 4: Clear the recovery marker only after successful TOTP confirmation** under the existing user-row lock; recovery failure must leave the account gated.
+- [x] **Step 5: Implement the dedicated page** with current-password entry, TOTP setup and confirmation, accessible errors, and no unrelated profile data or secret persistence after confirmation.
+- [x] **Step 6: Run full PHP/Vue suites, Pint, format check, PHPStan, lint and `git diff --check`; record the unchanged `docs:check` baseline.**
+- [x] **Step 7: Senior Review Task 3; fix findings and repeat checks.** Approved with no findings.
 - [ ] **Step 8: Commit** as `feat(auth): 2FA-Wiederherstellung bis zur Neueinrichtung sperren`.
 
 ### Task 4: Super-Admin-Oberfläche und Audit-Historie

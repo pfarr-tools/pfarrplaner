@@ -611,6 +611,9 @@ class UserController extends Controller
                 }
 
                 $lockedUser->confirmTwoFactor($code);
+                if ($lockedUser->two_factor_recovery_required_at) {
+                    $lockedUser->forceFill(['two_factor_recovery_required_at' => null])->save();
+                }
                 RateLimiter::hit($rateLimitKey, 60);
             });
         } catch (TooManyRequestsHttpException) {
