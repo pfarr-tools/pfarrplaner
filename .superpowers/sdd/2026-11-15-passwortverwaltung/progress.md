@@ -144,3 +144,14 @@ Task 4 — Login-Challenge und E-Mail-Fallback: Umsetzung im Review.
 - Der zweite Task-4-Punkt zu Geräte-/Recovery-Verlust und Super-Admin-Recovery
   ist ausdrücklich noch offen; Task 4 und Issue #80 sind daher nicht fertig.
 
+Nächste Etappe — Entwurf zur Super-Admin-2FA-Wiederherstellung:
+
+- Auftraggeber wählte eine eigene, protokollierte 2FA-Wiederherstellung ohne
+  Passwortreset und ohne Abhängigkeit von E-Mail-Zustellung.
+- Der Builder-Check fragte nach frischer Passwortbestätigung des Super-Admins
+  und verpflichtender TOTP-Neueinschreibung des Zielkontos. Beide Punkte
+  wurden bestätigt und in den Entwurf aufgenommen.
+- Entwurf: `docs/superpowers/specs/2026-11-16-two-factor-recovery-design.md`.
+  Vor dem Implementierungsplan und vor Codeänderungen steht die Freigabe des
+  vollständigen Entwurfs durch den Auftraggeber noch aus.
+
