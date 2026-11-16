@@ -186,5 +186,42 @@ Passwörtern.
 - [ ] Relevante Dusk-/Manual-Tests und `./planer dev docs:check` ausführen.
 - [ ] Migrations-Rollback, DemoBuilder-Anonymisierung und Recovery-Pfad
   prüfen.
+- [ ] Gesamtprüfung, Migrationen, DemoBuilder-Anonymisierung, Recovery-Pfad,
+  Dokumentation und Browserabläufe abschließen.
 - [ ] Issue #80 mit Implementierung, Tests, Dokumentation und Commits
-  kommentieren; erst nach erfolgreicher Gesamtprüfung schließen.
+  aktualisieren; bis zum Abschluss von Task 7 offen lassen.
+
+### Task 7: Wiederkehrende Sicherheitsempfehlung
+
+Diese letzte Produktetappe folgt nach der Passkey-Implementierung und der
+Gesamtprüfung. Vor der Umsetzung wird mit dem Auftraggeber abgestimmt, welche
+Sicherheitsstrategie Pfarrplaner als nächste empfehlen soll und wann ein Konto
+als ausreichend abgesichert gilt.
+
+Diskussionsvorschlag zur Reihenfolge:
+
+1. Passkey als bevorzugte, phishing-resistente Anmeldung; damit ist zugleich
+   passwortlose Anmeldung möglich.
+2. TOTP als etablierte Alternative oder zusätzliche zweite Stufe für Konten,
+   die Passkeys nicht verwenden können oder wollen.
+3. Ein starkes, einzigartiges Passwort bleibt als Rückfallweg erforderlich;
+   wo nur Passwortanmeldung eingerichtet ist, empfiehlt die Oberfläche zuerst
+   Passkey und danach TOTP.
+
+Die Entscheidung muss klären, ob ein Passkey allein den Hinweis beendet oder
+ob für bestimmte Konten zusätzlich TOTP empfohlen wird, und wie Konten ohne
+Passkey-Unterstützung behandelt werden.
+
+- [ ] Reihenfolge und Mindestkriterium für „zusätzlich abgesichert“ mit dem
+  Auftraggeber festlegen und im Issue dokumentieren.
+- [ ] Ein wiederkehrendes Interstitial für Konten erstellen, die ausschließlich
+  ein Passwort verwenden. Es erklärt die empfohlene nächste Maßnahme und führt
+  direkt zu deren Einrichtung.
+- [ ] Den Hinweis für mehrere Wochen ausblendbar machen; nach Ablauf erscheint
+  er erneut, solange keine der vereinbarten zusätzlichen Sicherheitsstrategien
+  eingerichtet ist.
+- [ ] Snooze, Wiederkehr, Einrichtungslinks, Statusänderungen und bereits
+  abgesicherte Konten mit fokussierten Tests abdecken und in Benutzer- sowie
+  Administratorenhandbuch dokumentieren.
+- [ ] Issue #80 nach Implementierung, Senior Review und erfolgreicher
+  Gesamtverifikation abschließen.
