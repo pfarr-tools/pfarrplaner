@@ -30,8 +30,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Security\RecoverUserTwoFactor;
 use App\Facades\Settings;
 use App\HomeScreen\Tabs\HomeScreenTabFactory;
+use App\Http\Requests\RecoverTwoFactorRequest;
 use App\Http\Requests\UserRequest;
 use App\Models\Calendar\External\CalendarConnection;
 use App\Models\Location;
@@ -647,6 +649,30 @@ class UserController extends Controller
         }
 
         return response()->json(['enabled' => false]);
+    }
+
+    /** Recover another account after fresh Super-Admin password confirmation. */
+    public function recoverTwoFactor(
+        RecoverTwoFactorRequest $request,
+        User $user,
+        RecoverUserTwoFactor $recovery,
+    ): RedirectResponse {
+        /** @var User $actor */
+        $actor = $request->user();
+        /** @var array{current_password: string, support_reference: string} $validated */
+        $validated = $request->validated();
+        $recovery->execute(
+            $actor,
+            $user,
+            $validated['current_password'],
+            $validated['support_reference'],
+            (string) $request->ip(),
+        );
+
+        return redirect()->route('users.index')->with(
+            'success',
+            'Der Zwei-Faktor-Zugang wurde widerrufen. Das Konto muss TOTP erneut einrichten.',
+        );
     }
 
     /** Validate the current password without exposing account state in errors. */

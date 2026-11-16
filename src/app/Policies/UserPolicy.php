@@ -217,6 +217,13 @@ class UserPolicy
         return $user->hasRole(RoleService::ROLE_SUPER_ADMIN);
     }
 
+    /** Permit a Super-Admin to recover another account's two-factor access. */
+    public function recoverTwoFactor(User $user, User $model): bool
+    {
+        return $user->hasRole(RoleService::ROLE_SUPER_ADMIN)
+            && $user->getKey() !== $model->getKey();
+    }
+
     /**
      * Determine whether the user can merge this user into another one
      *

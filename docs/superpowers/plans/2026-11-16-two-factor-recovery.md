@@ -54,7 +54,7 @@
 - [x] **Step 4: Run** `./planer dev test --no-browser --no-js`; expect all PHP tests to pass with only documented skips.
 - [x] **Step 5: Run Pint for the changed PHP files and `git diff --check`.**
 - [x] **Step 6: Senior Review Task 1; fix findings and repeat the relevant checks.**
-- [ ] **Step 7: Commit** as `feat(auth): Audit für 2FA-Wiederherstellungen ergänzen`.
+- [x] **Step 7: Commit** as `feat(auth): Audit für 2FA-Wiederherstellungen ergänzen` (`52e1c305`).
 
 ### Task 2: Autorisierte, re-authentifizierte Recovery-Action
 
@@ -68,19 +68,19 @@
 
 **Interfaces:**
 - Route: `POST /benutzer/{user}/zwei-faktor/wiederherstellen`, name `user.two-factor.recover`.
-- Controller: `UserController::recoverTwoFactor(RecoverTwoFactorRequest $request, User $user): RedirectResponse`.
-- Action: `RecoverUserTwoFactor::execute(User $actor, User $target, string $supportReference, string $ipAddress): TwoFactorRecoveryAudit`.
+- Controller: `UserController::recoverTwoFactor(RecoverTwoFactorRequest $request, User $user, RecoverUserTwoFactor $recovery): RedirectResponse`.
+- Action: `RecoverUserTwoFactor::execute(User $actor, User $target, string $currentPassword, string $supportReference, string $ipAddress): TwoFactorRecoveryAudit`.
 - Policy ability: `recoverTwoFactor(User $actor, User $target): bool`, true only for Super-Admin and when actor and target differ.
 - Request accepts `current_password` and an ASCII support reference of 1–100 letters, digits, dots, underscores or hyphens; reject whitespace-only or free-form narratives.
 
-- [ ] **Step 1: Write failing feature tests** `test_super_admin_can_recover_another_users_two_factor()`, `test_recovery_rejects_non_super_admin_and_self_recovery()`, `test_recovery_requires_active_or_pending_factor()`, `test_recovery_requires_current_admin_password_and_rate_limits_failures()`, `test_recovery_reloads_factor_after_admin_reauthentication()`, `test_recovery_consumes_pending_email_codes_and_writes_secret_free_audit()`, `test_recovery_requires_database_sessions()`, `test_recovery_revokes_database_sessions_and_personal_tokens()`, and `test_recovery_rolls_back_factor_changes_when_audit_write_fails()`.
-- [ ] **Step 2: Run** `./planer dev test --no-browser --no-js`; confirm each new behavior fails for the intended reason.
-- [ ] **Step 3: Implement policy and FormRequest**; check the actor password with `Hash::check`, apply a per-actor limit of five failures per minute before expensive work, and never log password input.
-- [ ] **Step 4: Implement the Action** in one transaction: lock/reload target; require active or pending TOTP; clear both factor states with package-supported model methods; mark all unconsumed email challenges consumed; set `two_factor_recovery_required_at`; insert the audit row. Keep password and `must_change_password` unchanged.
-- [ ] **Step 5: Reject the operation unless `config('session.driver') === 'database'`; revoke Sanctum tokens and target sessions using the configured session connection, and ensure failure is reported without claiming a successful recovery.**
-- [ ] **Step 6: Re-run** `./planer dev test --no-browser --no-js`, Pint, PHPStan, and `git diff --check`.
-- [ ] **Step 7: Senior Review Task 2; fix findings and repeat checks.**
-- [ ] **Step 8: Commit** as `feat(auth): Super-Admins können verlorene 2FA widerrufen`.
+- [x] **Step 1: Write failing feature tests** for authorization/self-recovery, active and pending factors, password re-authentication/rate limits, factor state reload, consumed challenges/secret-free audit, database sessions, token/session revocation, and transaction rollback.
+- [x] **Step 2: Run** `./planer dev test --no-browser --no-js`; initial RED run failed at the absent named recovery route as expected.
+- [x] **Step 3: Implement policy and FormRequest**; check the actor password with `Hash::check`, apply a per-actor limit of five failures per minute before expensive work, and never log password input.
+- [x] **Step 4: Implement the Action** in one transaction: re-authenticate and lock actor, then lock/reload target; require active or pending TOTP; clear both factor states with package-supported model methods; mark all unconsumed email challenges consumed; set `two_factor_recovery_required_at`; insert the audit row. Keep password and `must_change_password` unchanged.
+- [x] **Step 5: Reject the operation unless `config('session.driver') === 'database'`; require the session connection to match the app DB; revoke Sanctum tokens and target sessions, and fail without claiming successful recovery.**
+- [x] **Step 6: Re-run** isolated feature tests, full `./planer dev test --no-browser --no-js`, Pint, PHPStan, and `git diff --check`.
+- [x] **Step 7: Senior Review Task 2; fix findings and repeat checks.** Review accepted Task 2 scope with the recovery-marker gate explicitly deferred to Task 3; the branch remains unpublished until Task 3 and full feature verification.
+- [x] **Step 8: Commit** as `feat(auth): Super-Admins können verlorene 2FA widerrufen`.
 
 ### Task 3: Serverseitige Sperre bis zur TOTP-Neueinrichtung
 
