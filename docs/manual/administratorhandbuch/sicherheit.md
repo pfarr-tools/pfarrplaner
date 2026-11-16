@@ -61,6 +61,67 @@ des Postfachs und aller Recovery-Codes ist weiterhin eine administrative
 Identitätsprüfung erforderlich; Support darf keine Codes oder TOTP-Schlüssel
 per Chat oder E-Mail erfragen.
 
+### Wiederherstellung nach Verlust von Gerät und Recovery-Codes
+
+Die Wiederherstellung ist ein eigener Super-Admin-Vorgang. Sie setzt weder das
+Benutzerpasswort zurück noch versendet sie ein Ersatzpasswort oder einen
+Anmeldecode. Führen Sie sie erst aus, wenn die Identität der anfragenden Person
+über einen bereits bekannten, organisationskontrollierten Kontaktweg geprüft
+wurde. Eine eingehende E-Mail oder der Zugriff auf das betroffene Postfach
+allein ist kein ausreichender Nachweis. Pflegen Sie nur die kurze
+Supportfall-Referenz in Pfarrplaner; tragen Sie dort keine Namen,
+Identitätsnachweise oder sonstigen personenbezogenen Details ein.
+
+1. Öffnen Sie in der Benutzerverwaltung das Konto der betroffenen Person.
+2. Prüfen Sie, dass die Identität außerhalb von Pfarrplaner bestätigt wurde.
+3. Wählen Sie **Verlorene Zwei-Faktor-Anmeldung widerrufen**.
+4. Geben Sie Ihr eigenes aktuelles Super-Admin-Passwort und die
+   Supportfall-Referenz ein und bestätigen Sie den Vorgang.
+
+Die Referenz muss 1 bis 100 Zeichen enthalten. Zulässig sind ASCII-Buchstaben,
+Ziffern sowie Punkt, Unterstrich und Bindestrich. Ein gültiges Beispiel ist
+`SUP-2026-123`.
+
+Ein Super-Admin kann nicht das eigene Konto wiederherstellen. Ist das Zielkonto
+selbst ein Super-Admin-Konto, muss ein anderer Super-Admin den Vorgang
+ausführen. Die Anwendung prüft das aktuelle Passwort unmittelbar vor der
+Änderung und begrenzt Fehlversuche. Falsche Passwörter, fehlende Faktoren,
+fehlende Berechtigungen und nicht unterstützte Session-Konfigurationen
+verhindern die Wiederherstellung.
+
+Bei Erfolg werden der aktive oder noch nicht bestätigte TOTP-Faktor, offene
+E-Mail-Anmeldecodes, persönliche API-Tokens und alle Datenbank-Sitzungen des
+Zielkontos widerrufen. Das Passwort und ein eventuell ausstehender
+Passwortwechsel bleiben bestehen. Nach der nächsten Passwortanmeldung darf das
+Konto nur die TOTP-Wiederherstellung, notwendige Passwortänderung und Logout
+verwenden. Erst nach erfolgreicher TOTP-Bestätigung wird der normale Zugriff
+freigegeben. Fehlgeschlagene oder abgebrochene TOTP-Bestätigungen lassen die
+Sperre bestehen. Die Person muss die bei der Einrichtung gezeigten neuen
+Recovery-Codes sicher verwahren.
+
+Für diese Funktion muss `SESSION_DRIVER=database` gesetzt sein. Falls
+`SESSION_CONNECTION` angegeben ist, muss sie dieselbe Datenbankverbindung wie
+die Anwendung verwenden. Mit einem Datei-, Redis- oder anderen Session-Treiber
+steht die Recovery-Aktion nicht zur Verfügung. Die Docker-Beispielkonfiguration
+verwendet den Datenbanktreiber; prüfen Sie vor dem Supportvorgang trotzdem die
+wirksame Konfiguration der Instanz.
+
+Jeder erfolgreiche Vorgang wird dauerhaft mit handelndem Konto, Zielkonto,
+Supportfall-Referenz, Zeitpunkt und IP-Adresse protokolliert. Das Protokoll
+enthält keine Passwörter, TOTP-Geheimnisse oder Recovery-Codes. Audit-Einträge
+werden bei einer regulären Kontolöschung nicht automatisch entfernt; die
+historischen numerischen Konto-IDs bleiben erhalten. Nur die lokale
+Demo-Anonymisierung entfernt Audit-Einträge zu den anonymisierten Demokonten.
+Behandeln Sie Referenz und IP-Adresse als personenbezogene Auditdaten und
+beschränken Sie den Zugriff auf die Benutzerverwaltung.
+
+Die Recovery-Migration ist vorwärtsgerichtet. Verwenden Sie für einen
+Rollback nicht `migrate:rollback` und entfernen Sie keine Spalten oder Tabellen
+manuell. Sichern und verifizieren Sie vor einem Update Datenbank und
+Objektspeicher. Bei einem notwendigen Rollback sind das vorherige
+Anwendungsimage und die verifizierte Datenbanksicherung nach dem dokumentierten
+Restore-Verfahren gemeinsam wiederherzustellen.
+
 ## Backup
 
 Ein brauchbares Backup des Docker-Betriebs umfasst mindestens:

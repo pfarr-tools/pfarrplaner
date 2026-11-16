@@ -55,6 +55,53 @@ dem Einmalcode wird dort nicht aufgezeichnet. Der DemoBuilder entfernt
 importierte Faktor- und Login-Challenge-Daten, damit anonymisierte Konten ihre
 Demo-Zugangsdaten weiterhin verwenden können.
 
+#### Administrative Wiederherstellung verlorener Faktoren
+
+Die Recovery ist von Passwortreset und Login per E-Mail-Code getrennt. Der
+geschützte POST-Endpunkt `user.two-factor.recover` akzeptiert das aktuelle
+Passwort des handelnden Super-Admins und eine 1 bis 100 Zeichen lange
+Supportfall-Referenz aus ASCII-Buchstaben, Ziffern, Punkt, Unterstrich oder
+Bindestrich, zum Beispiel `SUP-2026-123`. `RecoverTwoFactorRequest`, `UserPolicy::recoverTwoFactor`
+und `RecoverUserTwoFactor` prüfen die Super-Admin-Berechtigung; Selbst-Recovery
+ist sowohl in Request als auch Action ausgeschlossen. Der Passwortvergleich
+erfolgt mit `Hash::check` nach Sperren und erneutem Laden des Actor-Datensatzes.
+Fünf falsche Passwortversuche pro Actor innerhalb einer Minute lösen eine
+temporäre Sperre aus. Passwörter werden weder in Auditdaten noch in Logs
+geschrieben.
+
+Die Action verweigert die Wiederherstellung, wenn
+`config('session.driver')` nicht `database` ist. Eine gesetzte
+`session.connection` muss `database.default` entsprechen. In einer Transaktion
+werden zunächst Actor und danach Zielkonto mit `lockForUpdate()` gesperrt. Nur
+bei aktivem oder ausstehendem TOTP werden Faktor und Recovery-Codes gelöscht,
+unverbrauchte `two_factor_login_challenges` verbraucht, Datensätze des Ziels in
+der Session-Tabelle und dessen persönliche Sanctum-Tokens entfernt sowie der
+Audit-Datensatz angelegt. Ein Fehler rollt die Aktion als Ganzes zurück.
+
+Die Migration `2026_11_16_000001_add_two_factor_recovery_state_and_audit_table`
+fügt `users.two_factor_recovery_required_at` und
+`two_factor_recovery_audits` hinzu. Die Audit-Tabelle hält
+`actor_user_id`, `target_user_id`, `support_reference`, `ip_address` und
+Zeitstempel ohne kaskadierende Fremdschlüssel. Damit bleiben Auditzeilen nach
+Kontolöschung erhalten; die numerischen IDs sind dann nicht mehr über eine
+Beziehung auflösbar. Das Audit-Modell ist aus generierten Web-/API-CRUD-Routen
+ausgeschlossen. Nur die Admin-Editor-Props für Super-Admins, die ein anderes
+Konto bearbeiten, liefern Name und ID des handelnden Kontos, Zeitpunkt und Referenz zurück; IP
+und Faktor-/Passwortdaten sind nicht Teil der Historienantwort. Die
+Demo-Anonymisierung löscht passende Audits ausdrücklich mit.
+
+Der Zielaccount erhält `two_factor_recovery_required_at`. Die Middleware
+`RequireTwoFactorRecovery` schützt Web-, API- und Extranet-Routen
+serverseitig. Per Routennamen bleiben ausschließlich die Recovery-Seite,
+TOTP-Start/-Bestätigung, Logout, der erforderliche Passwortwechsel,
+`user.switchback` und `csrf.keepalive` erlaubt. Andere Webanfragen werden auf
+`user.two-factor.recovery` umgeleitet; API- und Extranet-Anfragen erhalten
+HTTP 403. Nur die erfolgreiche Bestätigung über `user.two-factor.confirm`
+löscht den Marker innerhalb derselben Benutzerzeilen-Transaktion, die den
+neuen TOTP-Faktor aktiviert. Ein fehlgeschlagener oder unvollständiger Versuch
+lässt den Marker bestehen. Nicht markierte Konten und Gäste werden nicht
+eingeschränkt.
+
 Für die spätere Passkey-Etappe wird `web-auth/webauthn-framework` als Kandidat vorgemerkt. Das Projekt beschreibt eine MIT-lizenzierte PHP-WebAuthn-Implementierung; die genaue Paketversion, RP-ID-, Origin- und Laravel-Integrationsentscheidung bleibt der Passkey-Etappe vorbehalten.
 
 Der produktive Routenbestand wurde geprüft und gezielt gehärtet. Dabei wurden folgende Klassen von Problemen beseitigt:

@@ -490,6 +490,39 @@ Migration über `./planer update` ausgeführt. E-Mail-Codes benötigen den
 konfigurierten Mailversand; bei einer nicht verfügbaren Zustellung wird der
 unbestätigte Challenge-Datensatz wieder gelöscht.
 
+### Migration der administrativen 2FA-Wiederherstellung
+
+Die Migration
+`2026_11_16_000001_add_two_factor_recovery_state_and_audit_table` ergänzt den
+nullable Marker `users.two_factor_recovery_required_at` und die Tabelle
+`two_factor_recovery_audits`. Das Markerfeld sperrt das Zielkonto nach einem
+Faktorwiderruf bis zur bestätigten TOTP-Neueinrichtung. Die Audit-Tabelle hält
+handelnde und betroffene Benutzer-ID, Supportfall-Referenz, IP-Adresse und
+Zeitstempel; sie enthält keine Passwörter, TOTP-Geheimnisse oder
+Recovery-Codes. Es gibt absichtlich keine kaskadierenden Fremdschlüssel, damit
+Auditzeilen eine Kontolöschung überstehen. Die lokale Demo-Anonymisierung
+löscht zugehörige Demo-Auditdaten ausdrücklich.
+
+Die Migration wird beim regulären `./planer update` ausgeführt. Sie ist
+vorwärtsgerichtet und verweigert `migrate:rollback`, weil dadurch Recovery-
+Marker und Audit-Historie verloren gingen. Entfernen Sie die Spalten oder
+Tabelle nicht manuell. Erstellen und verifizieren Sie vor einem Update ein
+Backup der Datenbank und des MinIO-Bestands. Ein erforderlicher Rollback muss
+das vorherige Image mit einer verifizierten Datenbanksicherung im
+quieszierten Restore-Verfahren kombinieren.
+
+Für die Wiederherstellungsaktion ist zwingend
+`SESSION_DRIVER=database` erforderlich. Nur so kann Pfarrplaner aktive
+Sitzungen benutzerbezogen widerrufen. Ist `SESSION_CONNECTION` gesetzt, muss
+der Verbindungsname derselbe wie `database.default` sein; eine leere Einstellung
+verwendet die Standardverbindung. Die Docker-Beispielkonfiguration setzt den
+Datenbanktreiber. Die separate `src/.env.example` für den eigenständigen
+Laravel-Betrieb verwendet dagegen `file` und muss für diese Funktion angepasst
+werden. Prüfen Sie stets die wirksame Laufzeitkonfiguration, nicht nur die
+Beispieldatei. Bei einem anderen Treiber oder einer abweichenden
+Session-Datenbank ist die Recovery-Aktion deaktiviert und darf nicht manuell
+über Datenbankänderungen umgangen werden.
+
 ### Release erstellen und ausrollen
 
 Die Versionierung folgt dem bestehenden Pfarrplaner-Schema. Im sauberen

@@ -82,8 +82,14 @@ Eine Login-Challenge läuft nach fünf Minuten ab.
 Zum Deaktivieren geben Sie erneut Ihr aktuelles Passwort ein und bestätigen
 Sie die Sicherheitsabfrage. Bei zu vielen fehlerhaften Versuchen wird die
 Aktion vorübergehend gesperrt. Wenn Sie Ihr Gerät und alle Recovery-Codes
-verlieren, wenden Sie sich nach einer Identitätsprüfung an Ihre Administration.
-Teilen Sie Recovery-Codes niemals per E-Mail oder Chat.
+verlieren, wenden Sie sich über einen bereits bekannten Kontaktweg an Ihre
+Administration. Diese prüft Ihre Identität außerhalb von Pfarrplaner. Eine
+eingehende E-Mail allein reicht dafür nicht aus. Nach der Prüfung kann ein
+Super-Administrator den verlorenen Faktor widerrufen. Dabei wird Ihr Passwort
+nicht geändert. Bei Ihrer nächsten Anmeldung müssen Sie TOTP neu einrichten und
+bestätigen. Geben Sie dafür auf der Wiederherstellungsseite Ihr aktuelles
+Passwort erneut ein. Bis zur Bestätigung können Sie Pfarrplaner nicht normal
+verwenden. Teilen Sie Recovery-Codes niemals per E-Mail oder Chat.
 
 ---
 
