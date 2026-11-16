@@ -42,6 +42,19 @@ Einschreibung und die zugehörigen Recovery-Codes. Die Paketversion und ihre
 Lizenz werden im Composer-Lockfile festgeschrieben und vor jedem Release
 geprüft.
 
+Der Login prüft nach korrektem Passwort den Faktor, bevor ein Guard oder ein
+Remember-Cookie gesetzt wird. Der Pending-Zustand liegt in der Session und
+läuft nach fünf Minuten ab; Passwortfehlversuche werden währenddessen nicht
+zurückgesetzt. TOTP- und Recovery-Code-Prüfung verwenden die Paket-API mit
+Replay-Schutz und Einmalverwendung. Alternativ erzeugt die Anwendung einen
+achtstelligen E-Mail-Code, speichert nur dessen Hash in
+`two_factor_login_challenges`, begrenzt Fehlversuche und verbraucht den Datensatz
+unter Zeilensperre atomar. Die Login-Routen sind CSRF-geschützte Web-Routen.
+TOTP-/Recovery-Eingaben werden in Telescope maskiert; die zugehörige E-Mail mit
+dem Einmalcode wird dort nicht aufgezeichnet. Der DemoBuilder entfernt
+importierte Faktor- und Login-Challenge-Daten, damit anonymisierte Konten ihre
+Demo-Zugangsdaten weiterhin verwenden können.
+
 Für die spätere Passkey-Etappe wird `web-auth/webauthn-framework` als Kandidat vorgemerkt. Das Projekt beschreibt eine MIT-lizenzierte PHP-WebAuthn-Implementierung; die genaue Paketversion, RP-ID-, Origin- und Laravel-Integrationsentscheidung bleibt der Passkey-Etappe vorbehalten.
 
 Der produktive Routenbestand wurde geprüft und gezielt gehärtet. Dabei wurden folgende Klassen von Problemen beseitigt:

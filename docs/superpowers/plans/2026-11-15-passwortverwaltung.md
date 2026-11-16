@@ -149,14 +149,14 @@ Passwörtern.
   Übersetzungen und Mail-Templates
 - Testen: PHPUnit-Featuretests, Mail-/Rate-Limit-Tests und Dusk-Flows
 
-- [ ] Vor der Implementierung Bibliotheks- und Verschlüsselungsentscheidung
+- [x] Vor der Implementierung Bibliotheks- und Verschlüsselungsentscheidung
   festhalten; TOTP-Geheimnisse verschlüsselt, Recovery-Codes gehasht und
   Einmal-Challenges mit Ablauf und Zweckbindung speichern.
 - [ ] Aktivierung, Bestätigung, Deaktivierung und Geräte-/Recovery-Verlust
   mit Re-Authentifizierung und Super-Admin-Recovery modellieren.
-- [ ] Nach korrektem Passwort eine begrenzte E-Mail- oder TOTP-Challenge
+- [x] Nach korrektem Passwort eine begrenzte E-Mail- oder TOTP-Challenge
   anzeigen; Session-Freigabe erst nach erfolgreicher Prüfung setzen.
-- [ ] Rate-Limits, Replay-Schutz, Ablauf, Mailversand und generische
+- [x] Rate-Limits, Replay-Schutz, Ablauf, Mailversand und generische
   Fehlermeldungen testen und im Administratorenhandbuch dokumentieren.
 
 ### Task 5: Passkey-Anmeldung

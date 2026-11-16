@@ -28,8 +28,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 
 Auth::routes(['logout' => false, 'register' => false]);
+Route::get('/login/challenge', [LoginController::class, 'showChallenge'])->name('login.challenge');
+Route::post('/login/challenge', [LoginController::class, 'verifyChallenge'])->name('login.challenge.verify');
+Route::post('/login/challenge/email', [LoginController::class, 'sendEmailChallenge'])->name('login.challenge.email');
+Route::post('/login/challenge/cancel', [LoginController::class, 'cancelChallenge'])->name('login.challenge.cancel');
 Route::match(['GET', 'POST'], '/logout', [UserController::class, 'logout'])->name('logout');

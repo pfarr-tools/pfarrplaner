@@ -45,11 +45,21 @@ Bestätigung ist pro Benutzer begrenzt; auch die Re-Authentifizierung vor jeder
 Anwendung mit einer temporären Sperre. Ein Faktorwechsel wird gegen parallele
 Start-, Bestätigungs- und Deaktivierungsanfragen serialisiert.
 
-Bei Verlust des Authenticator-Geräts werden die Recovery-Codes oder der später
-folgende administrative Recovery-Prozess benötigt. Ein Datenbank-Restore muss
+Bei Verlust des Authenticator-Geräts werden die Recovery-Codes benötigt. Wenn
+auch das Postfach und alle Recovery-Codes verloren sind, gibt es derzeit keinen
+Selbstbedienungsweg; der Betreiber muss die Identität über einen getrennten,
+verifizierten Supportprozess prüfen. Ein Datenbank-Restore muss
 immer zusammen mit dem vorherigen Anwendungsimage und einem verifizierten
 Backup geplant werden; die TOTP-Migration besitzt keinen automatischen
 Spalten-Rollback.
+
+Für aktive TOTP-Konten kann die betroffene Person bei der Anmeldung alternativ
+einen Einmalcode per E-Mail anfordern. Die Codes sind fünf Minuten gültig,
+werden nur gehasht gespeichert und nach erfolgreicher Nutzung entwertet. Der
+Mailversand benötigt die reguläre Mailkonfiguration der Instanz. Bei Verlust
+des Postfachs und aller Recovery-Codes ist weiterhin eine administrative
+Identitätsprüfung erforderlich; Support darf keine Codes oder TOTP-Schlüssel
+per Chat oder E-Mail erfragen.
 
 ## Backup
 

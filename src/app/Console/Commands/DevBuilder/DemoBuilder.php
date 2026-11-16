@@ -519,6 +519,18 @@ class DemoBuilder extends Command
 
     protected function handleUsers(User $user)
     {
+        if (Schema::hasColumns('users', [
+            'two_factor_secret',
+            'two_factor_recovery_codes',
+            'two_factor_confirmed_at',
+            'two_factor_last_used_timestep',
+        ])) {
+            $user->disableTwoFactor();
+        }
+        if (Schema::hasTable('two_factor_login_challenges')) {
+            DB::table('two_factor_login_challenges')->where('user_id', $user->getKey())->delete();
+        }
+
         $data = [
             'first_name' => $user->last_name == 'Admin' ? 'Demo' : $this->faker->firstName,
             'last_name' => $user->last_name == 'Admin' ? 'Admin' : $this->faker->lastName,
@@ -542,6 +554,7 @@ class DemoBuilder extends Command
         $user->calendarConnections()->delete();
     }
 
+    /** Replace identifying wedding data with synthetic demo values. */
     protected function handleWeddings(Wedding $wedding)
     {
         $data = [
@@ -587,6 +600,7 @@ class DemoBuilder extends Command
         $wedding->update($data);
     }
 
+    /** Remove identifying participant and instruction data from liturgy. */
     protected function anonymizeLiturgyData(): bool
     {
         try {
@@ -640,6 +654,7 @@ class DemoBuilder extends Command
         return true;
     }
 
+    /** Clear session, token, job, and Telescope data from the demo copy. */
     protected function anonymizeOperationalData(): bool
     {
         try {
@@ -661,6 +676,7 @@ class DemoBuilder extends Command
         return true;
     }
 
+    /** Determine whether a database table has the named index. */
     protected function hasIndex(string $table, string $index): bool
     {
         if (method_exists(Schema::getConnection()->getSchemaBuilder(), 'getIndexes')) {

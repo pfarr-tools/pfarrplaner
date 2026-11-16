@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Console\Commands\DevBuilder\DemoBuilder;
 use App\Models\People\User;
+use Faker\Factory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use RoundlyConsulting\TwoFactor\Contracts\TwoFactorAuthenticatable;
+use RoundlyConsulting\TwoFactor\Contracts\TwoFactorService;
 use Tests\TestCase;
 
 /**
@@ -74,5 +77,29 @@ final class TwoFactorUserIntegrationFeatureTest extends TestCase
                 ),
             );
         }
+    }
+
+    /** Demo anonymization removes imported factors and pending email codes. */
+    public function test_demo_user_anonymization_clears_two_factor_state(): void
+    {
+        $user = User::factory()->create();
+        $setup = $user->startTwoFactorEnrolment();
+        $user->confirmTwoFactor(app(TwoFactorService::class)->currentCode($setup->secret));
+        DB::table('two_factor_login_challenges')->insert([
+            'user_id' => $user->getKey(),
+            'code_hash' => Hash::make('12345678'),
+            'expires_at' => now()->addMinutes(5),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $builder = new DemoBuilder;
+        $faker = new \ReflectionProperty($builder, 'faker');
+        $faker->setValue($builder, Factory::create('de_DE'));
+        $method = new \ReflectionMethod($builder, 'handleUsers');
+        $method->invoke($builder, $user);
+
+        self::assertFalse($user->fresh()->hasTwoFactorEnabled());
+        self::assertSame(0, DB::table('two_factor_login_challenges')->where('user_id', $user->getKey())->count());
     }
 }

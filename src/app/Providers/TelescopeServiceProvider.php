@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Mail\User\TwoFactorLoginCode;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
 
+/** Configure Telescope recording and redact authentication secrets. */
 class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 {
     /**
@@ -21,6 +23,10 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         $isLocal = $this->app->environment('local');
 
         Telescope::filter(function (IncomingEntry $entry) use ($isLocal) {
+            if ($entry->type === 'mail' && ($entry->content['mailable'] ?? null) === TwoFactorLoginCode::class) {
+                return false;
+            }
+
             return $isLocal ||
                    $entry->isReportableException() ||
                    $entry->isFailedRequest() ||
@@ -35,11 +41,13 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
      */
     protected function hideSensitiveRequestDetails(): void
     {
+        Telescope::hideRequestParameters(['_token', 'password', 'current_password', 'code']);
+        Telescope::hideResponseParameters(['provisioning_uri', 'recovery_codes']);
+        Telescope::hideRequestParameters(['_old_input.code', '_old_input.password']);
+
         if ($this->app->environment('local')) {
             return;
         }
-
-        Telescope::hideRequestParameters(['_token']);
 
         Telescope::hideRequestHeaders([
             'cookie',

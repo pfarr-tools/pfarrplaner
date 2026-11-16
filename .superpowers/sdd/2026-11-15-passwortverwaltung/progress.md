@@ -104,3 +104,43 @@ Task 4 — E-Mail- und TOTP-Zwei-Faktor-Authentifizierung: Paketbasis abgeschlos
   Template-Formatwarnungen. Der Build meldet bestehende große Chunks und
   veraltete Browserslist-Daten.
 
+Task 4 — Login-Challenge und E-Mail-Fallback: Umsetzung im Review.
+
+- Planabschnitt und Abnahmekriterien vor dem Code im Issue #80 kommentiert:
+  `https://github.com/pfarr-tools/pfarrplaner/issues/80#issuecomment-6903587730`.
+- Login-Gate trennt Passwortprüfung von Faktorbestätigung. Pending-Zustand
+  liegt fünf Minuten in der Session; Anmeldung und Remember-Cookie entstehen
+  erst nach gültigem TOTP-, Recovery- oder E-Mail-Code. Laravel-Validierung,
+  Lockout-/Attempting-/Failed-Events, 200-ms-Zeitbox und Passwort-Rehashing
+  bleiben erhalten; Kontozustand wird während der Entscheidung gesperrt.
+- E-Mail-Codes werden zufällig generiert, gehasht gespeichert, auf fünf
+  Minuten begrenzt, je Code auf fünf Fehlversuche beschränkt und atomar
+  einmalig verbraucht. E-Mail-Anforderungen haben ein eigenes Fünf-Minuten-
+  Limit. TOTP- und Recovery-Prüfungen laufen über die Paket-API.
+- Challenge-Seite, Abbrechen, E-Mail-Anforderung und Fehlermeldungen ergänzt;
+  Benutzer-, Administratoren-, Technik- und Betriebshandbücher nachgeführt.
+- Senior Reviews 1–4 fanden zusammen neun P2-Befunde zu Ablauf, veraltetem
+  Pending-Zustand, Laravel-Login-Metadaten, Eingabevalidierung, fehlender
+  Challenge-Ansicht, paralleler Faktorzustandsänderung, Lockout-Event,
+  Timing-Schutz und Passwort-Rehashing. Alle bisher gefundenen Punkte wurden
+  korrigiert; abschließendes Review folgt.
+- Senior Review 5 fand fehlende direkte Request-Payload-Abdeckung im Telescope-
+  Test. Request-, verschachtelte Session- und JSON-Response-Werte werden nun
+  durch die Methoden des installierten `RequestWatcher` geprüft. Senior Review
+  6: APPROVED; keine offenen Findings zu Redaktion, Sperrreihenfolge, TOTP-
+  Faktorzustand oder E-Mail-Code-Verbrauch.
+- Verifikation nach den Korrekturen: PHP **1105 bestanden, 5 erwartete Skips,
+  4088 Assertions**; Vue **3 Tests bestanden**; PHPStan **1090 Dateien ohne
+  Fehler**; Pint und Prettier bestanden; `git diff --check` bestanden.
+  `docs:check` findet nur die bereits bestehenden PHPDoc-Lücken in
+  unveränderten Methoden von `src/app/Models/People/User.php`.
+- Der aktuelle Vite-Build konnte nicht abgeschlossen werden: Der Vite-Prozess
+  darf das root-eigene generierte Verzeichnis `src/public/build/assets` nicht
+  entfernen; ein zusätzlicher Vitest-Aufruf aus der Dev-Orchestrierung hatte
+  ebenso einen Schreibfehler unter `node_modules/.vite-temp`. Der gezielte
+  Challenge-Vitest-Lauf lief separat erfolgreich. Build-/Containerrechte sind
+  als Betriebsproblem festzuhalten und wurden nicht durch Anwendungsänderungen
+  kaschiert.
+- Der zweite Task-4-Punkt zu Geräte-/Recovery-Verlust und Super-Admin-Recovery
+  ist ausdrücklich noch offen; Task 4 und Issue #80 sind daher nicht fertig.
+

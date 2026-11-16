@@ -482,6 +482,14 @@ die vollständige Reihenfolge steht im Abschnitt [Fehlerbehebung und
 Rollback](#fehlerbehebung-und-rollback). Ein manuelles `DROP COLUMN` ist kein
 zulässiger Rollback.
 
+Die Migration `create_two_factor_login_challenges_table` ergänzt außerdem die
+Tabelle für gehashte und befristete E-Mail-Anmeldecodes. Sie ist reversibel;
+beim Rollback werden ausschließlich Login-Challenge-Datensätze entfernt, nicht
+Benutzerkonten oder TOTP-Material. Nach Updates wird sie wie jede Laravel-
+Migration über `./planer update` ausgeführt. E-Mail-Codes benötigen den
+konfigurierten Mailversand; bei einer nicht verfügbaren Zustellung wird der
+unbestätigte Challenge-Datensatz wieder gelöscht.
+
 ### Release erstellen und ausrollen
 
 Die Versionierung folgt dem bestehenden Pfarrplaner-Schema. Im sauberen

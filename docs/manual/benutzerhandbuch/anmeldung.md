@@ -38,6 +38,13 @@ Die Anmeldeseite enthält diese Elemente:
 
 Nach erfolgreicher Anmeldung werden Sie zu der Startansicht weitergeleitet, die für Ihr Konto eingestellt ist. Häufig ist das die [Startseite](startseite.md), manchmal auch direkt der [Kalender](kalender.md) oder ein anderes Modul.
 
+Wenn Sie die Zwei-Faktor-Authentifizierung eingerichtet haben, geben Sie nach
+dem Passwort zusätzlich einen aktuellen Code Ihrer Authenticator-App ein. Sie
+können stattdessen einen Anmeldecode per E-Mail anfordern. Ein Recovery-Code
+kann wie ein TOTP-Code verwendet werden; jeder Recovery-Code funktioniert nur
+einmal. Die Zwei-Faktor-Abfrage läuft nach fünf Minuten ab. Danach melden Sie
+sich erneut mit E-Mail-Adresse und Passwort an.
+
 Wenn Ihre Administration eine wichtige Mitteilung hinterlegt hat, erscheint direkt nach der Anmeldung zusätzlich ein Hinweisfenster über der eigentlichen Seite. So können Änderungen angekündigt werden, die alle Benutzerinnen und Benutzer oder nur bestimmte Gruppen betreffen.
 
 Das Hinweisfenster enthält diese Schaltflächen:

@@ -73,6 +73,12 @@ Recovery-Codes nicht gesichert haben, können Sie die noch nicht abgeschlossene
 Einrichtung neu starten. Dabei werden die vorherige URI und die vorherigen
 Recovery-Codes ungültig.
 
+Nach der Einrichtung geben Sie bei jeder Anmeldung zusätzlich zum Passwort
+einen aktuellen Code aus der Authenticator-App ein. Alternativ können Sie auf
+der Anmeldeseite einen achtstelligen Code per E-Mail anfordern. Recovery-Codes
+können dort ebenfalls eingegeben werden und sind jeweils nur einmal gültig.
+Eine Login-Challenge läuft nach fünf Minuten ab.
+
 Zum Deaktivieren geben Sie erneut Ihr aktuelles Passwort ein und bestätigen
 Sie die Sicherheitsabfrage. Bei zu vielen fehlerhaften Versuchen wird die
 Aktion vorübergehend gesperrt. Wenn Sie Ihr Gerät und alle Recovery-Codes
