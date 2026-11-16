@@ -82,6 +82,20 @@
 - [x] **Step 7: Senior Review Task 2; fix findings and repeat checks.** Review accepted Task 2 scope with the recovery-marker gate explicitly deferred to Task 3; the branch remains unpublished until Task 3 and full feature verification.
 - [x] **Step 8: Commit** as `feat(auth): Super-Admins können verlorene 2FA widerrufen`.
 
+### Task 2a: Challenge-Fremdschlüssel mit migrierter Benutzer-ID abgleichen
+
+Der angeforderte Produktions-Pull brach im lokalen Vorab-Migrationsschritt ab:
+Die seit `2025_12_30_092052_migrate_int_ids` verwendete `users.id` ist auf
+MariaDB `BIGINT UNSIGNED`, während die neue Challenge-Tabelle zunächst
+`user_id` als `INT UNSIGNED` anlegte.
+
+- [x] **Step 1: Reproduce** the failed foreign-key migration on the local Dev MariaDB and inspect the actual `users.id` type.
+- [x] **Step 2: Align** `two_factor_login_challenges.user_id` with `users.id` as `unsignedBigInteger`.
+- [x] **Step 3: Apply the pending migration on Dev and verify the resulting foreign-key types.** After removing the empty, unregistered partial table from the failed attempt, both pending migrations completed; MariaDB reports `two_factor_login_challenges.user_id` as `bigint(20) unsigned` with a foreign key to `users`.
+- [ ] **Step 4: Senior Review the migration correction and verify findings.**
+- [ ] **Step 5: Commit** as `fix(auth): Challenge-Fremdschlüssel an Bigint-ID anpassen.`
+- [ ] **Step 6: Retry the authorized production-to-Dev data pull and verify migration completion, app health and imported objects.**
+
 ### Task 3: Serverseitige Sperre bis zur TOTP-Neueinrichtung
 
 **Files:**
