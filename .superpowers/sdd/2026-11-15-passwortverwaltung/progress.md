@@ -152,6 +152,7 @@ Nächste Etappe — Entwurf zur Super-Admin-2FA-Wiederherstellung:
   und verpflichtender TOTP-Neueinschreibung des Zielkontos. Beide Punkte
   wurden bestätigt und in den Entwurf aufgenommen.
 - Entwurf: `docs/superpowers/specs/2026-11-16-two-factor-recovery-design.md`.
-  Vor dem Implementierungsplan und vor Codeänderungen steht die Freigabe des
-  vollständigen Entwurfs durch den Auftraggeber noch aus.
+  Der Auftraggeber hat ihn freigegeben. Implementierungsplan:
+  `docs/superpowers/plans/2026-11-16-two-factor-recovery.md`; die Planprüfung
+  durch den Auftraggeber steht vor der ersten Codeänderung noch aus.
 
