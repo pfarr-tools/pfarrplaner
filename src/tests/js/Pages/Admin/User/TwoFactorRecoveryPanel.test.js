@@ -41,6 +41,43 @@ describe('TwoFactorRecoveryPanel', () => {
         expect(wrapper.find('[data-testid="open-two-factor-recovery"]').exists()).toBe(false)
     })
 
+    it('explains when recovery is unavailable but keeps the history visible', () => {
+        const wrapper = mount(TwoFactorRecoveryPanel, {
+            props: {
+                recoveryRoute: '/user.two-factor.recover/42',
+                canRecover: false,
+                unavailableReason: 'Datenbank-Sitzungen sind erforderlich.',
+                history: [
+                    {
+                        actor: { id: 7, name: 'Super Admin' },
+                        createdAt: '2026-11-16T10:00:00Z',
+                        supportReference: 'SUP-80-2026',
+                    },
+                ],
+            },
+        })
+
+        expect(wrapper.text()).toContain('Datenbank-Sitzungen sind erforderlich.')
+        expect(wrapper.text()).toContain('SUP-80-2026')
+        expect(wrapper.find('[data-testid="open-two-factor-recovery"]').exists()).toBe(false)
+    })
+
+    it('closes an open form and blocks submission if recovery becomes unavailable', async () => {
+        const { post, wrapper } = mountPanel()
+        await wrapper.find('[data-testid="open-two-factor-recovery"]').trigger('click')
+        await wrapper.find('input[name="current_password"]').setValue('Current1!')
+        await wrapper.find('input[name="support_reference"]').setValue('SUP-80-2026')
+
+        await wrapper.setProps({
+            canRecover: false,
+            unavailableReason: 'Datenbank-Sitzungen sind erforderlich.',
+        })
+        await wrapper.vm.recover()
+
+        expect(wrapper.find('form').exists()).toBe(false)
+        expect(post).not.toHaveBeenCalled()
+    })
+
     it('requires current password and support reference and explains identity verification', async () => {
         const { wrapper } = mountPanel()
 

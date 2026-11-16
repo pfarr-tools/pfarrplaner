@@ -134,6 +134,19 @@
 - [x] **Step 5: Senior Review Task 4; fix findings and repeat checks.** Final re-review approved with no findings.
 - [x] **Step 6: Commit** as `feat(auth): 2FA-Recovery in der Benutzerverwaltung anzeigen`.
 
+### Task 4a: Recovery-Angebot an Laufzeitvoraussetzungen koppeln
+
+Nach dem Task-4-Review wurde festgestellt, dass die Oberfläche die Aktion auch
+ohne wiederherstellbaren Faktor oder ohne widerrufbare Datenbank-Sitzungen
+anbot. Diese Korrektur ergänzt den berechtigten Verlauf um einen Hinweis, wenn
+die Sitzungs-Konfiguration die Wiederherstellung verhindert.
+
+- [x] **Step 1: Add failing feature tests** for unsupported session driver, mismatched session connection, and targets without an active or pending factor.
+- [x] **Step 2: Gate the recovery action** on the server-side preconditions and retain authorized audit history visibility.
+- [x] **Step 3: Verify focused PHP/Vue tests and format checks.**
+- [x] **Step 4: Senior Review Task 4a; fix findings and repeat affected checks.** First review found a stale open form and non-isolated negative tests; the fixes and regression tests passed. Re-review approved with no findings.
+- [x] **Step 5: Commit** as `fix(auth): Recovery-Angebot an Voraussetzungen koppeln.`
+
 ### Task 5: Handbücher, Betriebsgrenze und Gesamtprüfung
 
 **Files:**
@@ -142,10 +155,11 @@
 - Modify: `docs/manual/technikhandbuch/sicherheitsaudit.md`
 - Modify: `docs/admin/installation-und-migration.md`
 - Modify: `docs/superpowers/plans/2026-11-16-two-factor-recovery.md`
-- Modify: `.superpowers/sdd/2026-11-15-passwortverwaltung/progress.md`
+- Modify: `.superpowers/sdd/2026-11-16-two-factor-recovery/progress.md`
+- Modify: `.superpowers/sdd/2026-11-16-two-factor-recovery/task-5-brief.md`
 
-- [ ] **Step 1: Document** the user's enforced reenrolment, administrator identity-verification procedure, required database session driver, audit fields/retention, API/session invalidation and operational recovery limitations.
-- [ ] **Step 2: Run** `./planer dev docs:check`, `./planer dev format:check`, PHPStan, full isolated PHP tests, relevant Vitest tests and `git diff --check`; record unrelated baseline/build permission failures precisely.
+- [x] **Step 1: Document** the user's enforced reenrolment, administrator identity-verification procedure, required database session driver, audit fields/retention, API/session invalidation and operational recovery limitations.
+- [x] **Step 2: Run** `./planer dev docs:check`, `./planer dev format:check`, PHPStan, full isolated PHP tests, relevant Vitest tests and `git diff --check`; record unrelated baseline/build permission failures precisely. Full manual build succeeded; `docs:check` reports only the same 10 existing PHPDoc omissions in unchanged `User.php`.
 - [ ] **Step 3: Senior Review Task 5 and whole recovery diff; fix findings and repeat affected checks.**
 - [ ] **Step 4: Commit** documentation/review ledger as `docs(auth): 2FA-Wiederherstellung dokumentieren`.
 - [ ] **Step 5: Add the implementation, per-task commits, review outcomes and verification to GitHub Issue #80, read the posted comment back, and keep the issue open for the Passkey and overall-review tasks.**

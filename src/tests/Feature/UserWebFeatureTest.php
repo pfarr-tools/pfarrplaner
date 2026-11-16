@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Testing\AssertableInertia as Assert;
 use RoundlyConsulting\TwoFactor\Contracts\TwoFactorService;
 use Tests\TestCase;
@@ -413,6 +414,10 @@ class UserWebFeatureTest extends TestCase
     public function test_only_super_admin_receives_recovery_action_and_history(): void
     {
         $target = User::factory()->create();
+        $targetSetup = $target->startTwoFactorEnrolment();
+        $target->confirmTwoFactor(app(TwoFactorService::class)->currentCode($targetSetup->secret));
+        $this->user->startTwoFactorEnrolment();
+        config(['session.driver' => 'database']);
         $actor = User::factory()->create();
         $actor->assignRole(RoleService::ROLE_ADMIN);
         $this->actingAs($actor)
@@ -431,11 +436,72 @@ class UserWebFeatureTest extends TestCase
                 ->where('twoFactorRecovery.history', [])
             );
 
+        config(['session.connection' => config('database.default')]);
         $this->actingAs($this->user)
             ->get(route('user.edit', $target->id))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->where('twoFactorRecovery.canRecover', true)
+            );
+    }
+
+    /** Recovery controls are hidden when the session backend cannot revoke sessions. */
+    public function test_recovery_action_is_hidden_for_unsupported_session_driver(): void
+    {
+        $target = User::factory()->create();
+        $target->startTwoFactorEnrolment();
+        config(['session.driver' => 'file']);
+
+        $this->actingAs($this->user)
+            ->get(route('user.edit', $target->id))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('twoFactorRecovery.canRecover', false)
+                ->where('twoFactorRecovery.unavailableReason', 'Die Wiederherstellung erfordert Datenbank-Sitzungen mit derselben Datenbankverbindung wie die Anwendung.')
+            );
+    }
+
+    /** Recovery is unavailable when the database sessions use a different connection. */
+    public function test_recovery_action_is_hidden_for_mismatched_session_connection(): void
+    {
+        $target = User::factory()->create();
+        $target->startTwoFactorEnrolment();
+        $this->actingAs($this->user);
+        config([
+            'session.driver' => 'database',
+            'session.connection' => 'other',
+            'database.default' => 'sqlite',
+            'database.connections.other' => config('database.connections.sqlite'),
+        ]);
+        Schema::connection('other')->create('sessions', function ($table): void {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+
+        $this->get(route('user.edit', $target->id))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('twoFactorRecovery.canRecover', false)
+                ->where('twoFactorRecovery.unavailableReason', 'Die Wiederherstellung erfordert Datenbank-Sitzungen mit derselben Datenbankverbindung wie die Anwendung.')
+            );
+    }
+
+    /** Recovery controls are not offered for accounts without a pending or active factor. */
+    public function test_recovery_action_is_hidden_when_target_has_no_recoverable_factor(): void
+    {
+        $target = User::factory()->create();
+        config(['session.driver' => 'database']);
+
+        $this->actingAs($this->user)
+            ->get(route('user.edit', $target->id))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('twoFactorRecovery.canRecover', false)
+                ->where('twoFactorRecovery.unavailableReason', null)
             );
     }
 

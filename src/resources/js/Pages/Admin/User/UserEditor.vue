@@ -233,9 +233,14 @@
                     </div>
                 </form-group>
                 <TwoFactorRecoveryPanel
-                    v-if="twoFactorRecovery?.canRecover"
+                    v-if="
+                        twoFactorRecovery?.canRecover ||
+                        twoFactorRecovery?.history?.length ||
+                        twoFactorRecovery?.unavailableReason
+                    "
                     :can-recover="twoFactorRecovery.canRecover"
                     :history="twoFactorRecovery.history"
+                    :unavailable-reason="twoFactorRecovery.unavailableReason"
                     :recovery-route="route('user.two-factor.recover', myUser.id)"
                 />
             </tab>

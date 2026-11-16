@@ -1,6 +1,6 @@
 <template>
     <section
-        v-if="canRecover"
+        v-if="canRecover || history.length || unavailableReason"
         class="mt-4 border-top pt-3"
         aria-labelledby="two-factor-recovery-title"
     >
@@ -10,8 +10,15 @@
             zur erneuten TOTP-Einrichtung gesperrt; vorhandene Sitzungen und API-Tokens werden
             widerrufen.
         </p>
+        <p
+            v-if="unavailableReason"
+            class="alert alert-info"
+            role="status"
+        >
+            {{ unavailableReason }}
+        </p>
         <button
-            v-if="!formOpen"
+            v-if="recoveryAvailable && !formOpen"
             type="button"
             class="btn btn-outline-danger"
             data-testid="open-two-factor-recovery"
@@ -21,7 +28,7 @@
         </button>
 
         <form
-            v-if="formOpen"
+            v-if="recoveryAvailable && formOpen"
             class="mt-3"
             @submit.prevent="recover"
         >
@@ -106,6 +113,7 @@ export default {
     name: 'TwoFactorRecoveryPanel',
     props: {
         canRecover: { type: Boolean, default: false },
+        unavailableReason: { type: String, default: '' },
         history: {
             type: Array,
             default: function defaultHistory() {
@@ -113,6 +121,20 @@ export default {
             },
         },
         recoveryRoute: { type: String, required: true },
+    },
+    /** Derivates whether every server-provided recovery prerequisite is met. */
+    computed: {
+        recoveryAvailable() {
+            return this.canRecover && !this.unavailableReason
+        },
+    },
+    /** Clear password and reference immediately when recovery becomes unavailable. */
+    watch: {
+        recoveryAvailable(available) {
+            if (!available) {
+                this.closeForm()
+            }
+        },
     },
     /** Return local form state without storing credentials in page props. */
     data() {
@@ -141,6 +163,10 @@ export default {
         },
         /** Submit only the required reauthentication and audit reference fields. */
         recover() {
+            if (!this.recoveryAvailable) {
+                return
+            }
+
             this.submitting = true
             this.error = ''
             const panel = this

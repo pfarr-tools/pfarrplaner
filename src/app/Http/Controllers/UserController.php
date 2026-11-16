@@ -269,6 +269,7 @@ class UserController extends Controller
         $ministries = MinistryService::all();
         $modules = Modules::tree();
 
+        $recoveryTargetHasFactor = $user->hasTwoFactorEnabled() || $user->hasPendingTwoFactor();
         $user = $this->compactEditorUser($user);
         $cities = $this->compactOptions($cities);
         $adminCities = $this->compactOptions($adminCities);
@@ -276,12 +277,21 @@ class UserController extends Controller
         $parishes = $this->compactOptions($parishes);
 
         $activeTab = $request->get('tab', 'home');
+        $canViewRecoveryHistory = Auth::user()->hasRole(AuthServiceProvider::SUPER)
+            && Auth::id() !== $user['id'];
+        $sessionConnection = config('session.connection');
+        $sessionRevocationSupported = config('session.driver') === 'database'
+            && (! $sessionConnection || $sessionConnection === config('database.default'));
         $twoFactorRecovery = [
-            'canRecover' => Auth::user()->hasRole(AuthServiceProvider::SUPER)
-                && Auth::id() !== $user['id'],
+            'canRecover' => $canViewRecoveryHistory
+                && $recoveryTargetHasFactor
+                && $sessionRevocationSupported,
+            'unavailableReason' => $canViewRecoveryHistory && $recoveryTargetHasFactor && ! $sessionRevocationSupported
+                ? 'Die Wiederherstellung erfordert Datenbank-Sitzungen mit derselben Datenbankverbindung wie die Anwendung.'
+                : null,
             'history' => [],
         ];
-        if ($twoFactorRecovery['canRecover']) {
+        if ($canViewRecoveryHistory) {
             $twoFactorRecovery['history'] = TwoFactorRecoveryAudit::query()
                 ->with('actor:id,first_name,last_name,title')
                 ->where('target_user_id', $user['id'])
