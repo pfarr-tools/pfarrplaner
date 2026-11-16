@@ -594,6 +594,15 @@ regulären Release-Workflows.
 ./planer migrate legacy user@altserver:/var/www/pfarrplaner --demo --confirm
 ```
 
+`./planer dev data pull user@quelle:/opt/pfarrplaner` ersetzt die lokale
+Entwicklungsdatenbank vollständig, importiert anschließend den Quelldump und
+führt danach die Migrationen des lokalen Branches aus. Damit bleiben keine
+lokalen Tabellen zurück, die in der Quelle noch nicht existieren. Der Vorgang
+überträgt zusätzlich den Live-MinIO-Bucket; Backup-Buckets bleiben unberührt.
+Die lokale `.env` wird nicht übernommen oder verändert. `APP_KEY` und
+`DATABASE_KEY` müssen daher bereits zu den verschlüsselten Quelldaten passen.
+Die Dev-Anwendung ist während des Imports im Wartungsmodus.
+
 Ein absoluter lokaler Pfad wird direkt gelesen; nur ein Pfad mit `user@host:`
 verwendet SSH. Ohne Zieloption verwendet der Import weiterhin die Entwicklungsumgebung
 (`--dev`). Für einen produktiven Import muss `--prod` ausdrücklich angegeben

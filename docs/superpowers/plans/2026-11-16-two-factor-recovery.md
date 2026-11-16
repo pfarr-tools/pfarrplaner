@@ -92,9 +92,23 @@ MariaDB `BIGINT UNSIGNED`, während die neue Challenge-Tabelle zunächst
 - [x] **Step 1: Reproduce** the failed foreign-key migration on the local Dev MariaDB and inspect the actual `users.id` type.
 - [x] **Step 2: Align** `two_factor_login_challenges.user_id` with `users.id` as `unsignedBigInteger`.
 - [x] **Step 3: Apply the pending migration on Dev and verify the resulting foreign-key types.** After removing the empty, unregistered partial table from the failed attempt, both pending migrations completed; MariaDB reports `two_factor_login_challenges.user_id` as `bigint(20) unsigned` with a foreign key to `users`.
-- [ ] **Step 4: Senior Review the migration correction and verify findings.**
-- [ ] **Step 5: Commit** as `fix(auth): Challenge-Fremdschlüssel an Bigint-ID anpassen.`
-- [ ] **Step 6: Retry the authorized production-to-Dev data pull and verify migration completion, app health and imported objects.**
+- [x] **Step 4: Senior Review the migration correction and verify findings.** Final re-review approved with no findings.
+- [x] **Step 5: Commit** as `fix(auth): Challenge-Fremdschlüssel an Bigint-ID anpassen.` (`7a289f7f`).
+- [x] **Step 6: Retry the authorized production-to-Dev data pull and verify migration completion, app health and imported objects.** Dump and 1.36 GiB object transfer completed; after removing two empty, unregistered local-only tables, both branch migrations ran. Healthcheck returned `db=connected`; Dev contains 796 users, 6,881 services and 3,614 attachment objects.
+
+### Task 2b: Dev-Daten-Pull mit Quellschema abgleichen
+
+Beim ersten Pull mit dem Issue-80-Branch blieb die lokal vorab migrierte
+Challenge-Tabelle stehen, weil der Produktionsdump sie noch nicht enthielt.
+Der anschließende Migrationlauf konnte die Tabelle deshalb nicht neu anlegen.
+
+- [x] **Step 1: Add a failing script regression** requiring the Dev pull to wipe its target before restore and migrate after the source dump is restored.
+- [x] **Step 2: Change only the development pull path** to clear the local schema before importing and apply current branch migrations after import; leave the production-target path unchanged.
+- [x] **Step 3: Document** the Dev pull replacement and post-restore migration behavior in the operator handbook.
+- [x] **Step 4: Run the script regression and relevant operational checks.** `bash scripts/tests/data_sync_test.sh`, `bash -n scripts/data-sync.sh scripts/tests/data_sync_test.sh`, and `git diff --check` passed. The already completed data import was verified separately; no second 1.36 GiB transfer was needed.
+- [x] **Step 5: Senior Review the script, test, and operator documentation; fix findings and re-review.** Initial reviews found and resolved conflicting target modes, unverified DB destination, source-dump staging, flaky pipeline ordering assertions, failure to stop when `--source-down` fails, and ineffective negative test assertions. Final Senior Review: APPROVED, no remaining findings: [review](t3-thread://v2/884d3774-4427-4d3d-945d-0bbee874384d/thread:delegated-task:command%3Amcp%3A1e0a1d41-f388-4ace-a2a5-9f442f325a47%3Adelegate-task%3A6c35491f-92b9-4a1c-8901-cde282e26380).
+- [x] **Step 6: Commit** as `fix(sync): Dev-Pull nach dem Import migrieren.`
+- [x] **Step 7: Record the already completed source-to-Dev import and verify it remains healthy.** Healthcheck returned `db=connected`; Dev still contains the imported users/services and 3,614 attachment objects.
 
 ### Task 3: Serverseitige Sperre bis zur TOTP-Neueinrichtung
 

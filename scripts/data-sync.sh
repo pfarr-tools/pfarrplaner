@@ -16,12 +16,31 @@ direction="$1"; path="$2"; source_down=0
 [[ "$path" == *:* ]] || die 'SSH-Pfad fehlt.'
 host="${path%%:*}"; remote_root="${path#*:}"
 [[ -n "$host" && "$remote_root" == /* ]] || die 'SSH-Pfad muss einen absoluten Pfad enthalten.'
+[[ "${PLANER_PRODUCTION:-0}" != 1 || "${PLANER_DEVELOPMENT:-0}" != 1 ]] || die 'Entwicklungs- und Produktionsziel dürfen nicht gleichzeitig gesetzt sein.'
 remote() { ssh "$host" "cd "$remote_root" && $*"; }
 remote_planer() { remote "./planer $*"; }
 local_down=0; remote_down=0
+local_wipe_started=0; local_pull_complete=0; local_dump_file=''
+verify_development_target() {
+  local target_info target_environment target_connection target_host target_database restore_database
+  target_info="$("${COMPOSE[@]}" exec -T app php artisan tinker --execute='echo config("app.env"), "|", config("database.default"), "|", config("database.connections.".config("database.default").".host"), "|", config("database.connections.".config("database.default").".database");')"
+  IFS='|' read -r target_environment target_connection target_host target_database <<< "$target_info"
+  restore_database="$("${COMPOSE[@]}" exec -T mariadb printenv MARIADB_DATABASE)"
+  [[ "$target_environment" == local && "$target_connection" == mysql && "$target_host" == mariadb \
+    && -n "$target_database" && "$target_database" == "$restore_database" ]] \
+    || die 'Dev-Pull erfordert APP_ENV=local und dieselbe MariaDB-Verbindung für Migration und Import.'
+  echo "Dev-Ziel bestätigt: APP_ENV=$target_environment, Datenbank=$target_database"
+}
 cleanup() {
   status=$?
-  (( local_down )) && "${COMPOSE[@]}" exec -T app php artisan up || true
+  [[ -z "$local_dump_file" ]] || rm -f -- "$local_dump_file" || true
+  if (( local_down )); then
+    if (( local_wipe_started && ! local_pull_complete )); then
+      echo 'Dev-Datenbankimport unvollständig; Anwendung bleibt im Wartungsmodus.' >&2
+    else
+      "${COMPOSE[@]}" exec -T app php artisan up || true
+    fi
+  fi
   (( remote_down )) && remote_planer artisan up || true
   exit "$status"
 }
@@ -61,12 +80,30 @@ if [[ "$direction" == push ]]; then
   local_objects | remote_import_objects
   remote_planer artisan optimize:clear
 else
-  (( source_down )) && remote_planer artisan down && remote_down=1
+  if (( source_down )); then
+    remote_planer artisan down
+    remote_down=1
+  fi
+  if [[ "${PLANER_DEVELOPMENT:-0}" == 1 ]]; then
+    verify_development_target
+    local_dump_file="$(mktemp "${TMPDIR:-/tmp}/pfarrplaner-data-pull.XXXXXX")"
+    remote_dump > "$local_dump_file"
+  fi
   "${COMPOSE[@]}" exec -T app php artisan down; local_down=1
-  "${COMPOSE[@]}" exec -T app php artisan migrate --force
-  remote_dump | local_restore
+  if [[ "${PLANER_DEVELOPMENT:-0}" == 1 ]]; then
+    local_wipe_started=1
+    "${COMPOSE[@]}" exec -T app php artisan db:wipe --force
+    local_restore < "$local_dump_file"
+    rm -f -- "$local_dump_file"
+    local_dump_file=''
+    "${COMPOSE[@]}" exec -T app php artisan migrate --force
+  else
+    "${COMPOSE[@]}" exec -T app php artisan migrate --force
+    remote_dump | local_restore
+  fi
   "${COMPOSE[@]}" exec -T app php artisan permission:cache-reset
   remote_objects | local_import_objects
   "${COMPOSE[@]}" exec -T app php artisan optimize:clear
+  local_pull_complete=1
 fi
 echo "Datenübertragung erfolgreich: $direction"
