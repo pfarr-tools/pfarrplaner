@@ -90,6 +90,9 @@ nicht geändert. Bei Ihrer nächsten Anmeldung müssen Sie TOTP neu einrichten u
 bestätigen. Geben Sie dafür auf der Wiederherstellungsseite Ihr aktuelles
 Passwort erneut ein. Bis zur Bestätigung können Sie Pfarrplaner nicht normal
 verwenden. Teilen Sie Recovery-Codes niemals per E-Mail oder Chat.
+Die Wiederherstellung meldet auch gespeicherte Sitzungen und Kalender- oder
+API-Verbindungen ab. Richten Sie diese nach der TOTP-Neueinrichtung mit Ihrem
+neuen API-Token wieder ein.
 
 ---
 

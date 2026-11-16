@@ -13,7 +13,9 @@ class RequireTwoFactorRecovery
     /** Enforce the recovery gate for authenticated web and API requests. */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
+        $user = $request->user()
+            ?? $request->user('api')
+            ?? $request->user('sanctum');
         if (! $user instanceof User || ! $user->two_factor_recovery_required_at) {
             return $next($request);
         }

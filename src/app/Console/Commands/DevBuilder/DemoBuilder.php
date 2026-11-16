@@ -501,6 +501,7 @@ class DemoBuilder extends Command
         $streetRange->delete();
     }
 
+    /** Prepare user anonymization and discard all demo recovery audit history. */
     protected function prepUsers()
     {
         // allow non-unique api_token
@@ -512,6 +513,10 @@ class DemoBuilder extends Command
             }
         } catch (\Exception $e) {
             return false;
+        }
+
+        if (Schema::hasTable('two_factor_recovery_audits')) {
+            DB::table('two_factor_recovery_audits')->delete();
         }
 
         return true;

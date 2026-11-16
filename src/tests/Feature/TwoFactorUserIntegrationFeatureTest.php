@@ -118,10 +118,20 @@ final class TwoFactorUserIntegrationFeatureTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        DB::table('two_factor_recovery_audits')->insert([
+            'actor_user_id' => 999999999,
+            'target_user_id' => 999999998,
+            'support_reference' => 'SUP-2026-ORPHAN',
+            'ip_address' => '192.0.2.20',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         $builder = new DemoBuilder;
         $faker = new \ReflectionProperty($builder, 'faker');
         $faker->setValue($builder, Factory::create('de_DE'));
+        $prepare = new \ReflectionMethod($builder, 'prepUsers');
+        $prepare->invoke($builder);
         $method = new \ReflectionMethod($builder, 'handleUsers');
         $method->invoke($builder, $user);
 

@@ -5,10 +5,11 @@ namespace App\Actions\Security;
 use App\Models\People\TwoFactorRecoveryAudit;
 use App\Models\People\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -45,68 +46,93 @@ class RecoverUserTwoFactor
             );
         }
 
-        $rateLimitKey = 'two-factor-recovery:'.$actor->getKey();
-        if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
+        $failure = null;
+        $audit = DB::transaction(function () use (
+            &$failure,
+            $actor,
+            $target,
+            $currentPassword,
+            $supportReference,
+            $ipAddress,
+        ): ?TwoFactorRecoveryAudit {
+            $failure = null;
+            /** @var User $lockedActor */
+            $lockedActor = User::query()->lockForUpdate()->findOrFail($actor->getKey());
+            $attemptedAt = $lockedActor->two_factor_recovery_attempted_at;
+            $attempts = $attemptedAt && Carbon::parse($attemptedAt)->greaterThan(now()->subMinute())
+                ? (int) $lockedActor->two_factor_recovery_attempts
+                : 0;
+
+            if ($attempts >= 5) {
+                $failure = 'rate_limit';
+
+                return null;
+            }
+
+            if (! Hash::check($currentPassword, (string) $lockedActor->password)) {
+                $lockedActor->forceFill([
+                    'two_factor_recovery_attempts' => $attempts + 1,
+                    'two_factor_recovery_attempted_at' => now(),
+                ])->save();
+                $failure = 'current_password';
+
+                return null;
+            }
+
+            /** @var User $lockedTarget */
+            $lockedTarget = User::query()->lockForUpdate()->findOrFail($target->getKey());
+
+            if (! $lockedTarget->hasTwoFactorEnabled() && ! $lockedTarget->hasPendingTwoFactor()) {
+                throw ValidationException::withMessages([
+                    'recovery' => 'Für dieses Konto ist kein wiederherstellbarer Zwei-Faktor-Status vorhanden.',
+                ]);
+            }
+
+            $lockedActor->forceFill([
+                'two_factor_recovery_attempts' => 0,
+                'two_factor_recovery_attempted_at' => null,
+            ])->save();
+
+            $lockedTarget->disableTwoFactor();
+            $lockedTarget->forceFill([
+                'two_factor_recovery_required_at' => now(),
+                'api_token' => Str::random(60),
+                'remember_token' => Str::random(60),
+            ])->save();
+
+            DB::table('two_factor_login_challenges')
+                ->where('user_id', $lockedTarget->getKey())
+                ->whereNull('consumed_at')
+                ->update(['consumed_at' => now(), 'updated_at' => now()]);
+
+            DB::connection(config('database.default'))
+                ->table(config('session.table', 'sessions'))
+                ->where('user_id', $lockedTarget->getKey())
+                ->delete();
+
+            $lockedTarget->tokens()->delete();
+
+            return TwoFactorRecoveryAudit::query()->create([
+                'actor_user_id' => $lockedActor->getKey(),
+                'target_user_id' => $lockedTarget->getKey(),
+                'support_reference' => $supportReference,
+                'ip_address' => $ipAddress,
+            ]);
+        }, 3);
+
+        if ($failure === 'rate_limit') {
             throw new TooManyRequestsHttpException(null, 'Zu viele Versuche. Bitte später erneut versuchen.');
         }
 
-        try {
-            $audit = DB::transaction(function () use (
-                $actor,
-                $target,
-                $currentPassword,
-                $supportReference,
-                $ipAddress,
-            ): TwoFactorRecoveryAudit {
-                /** @var User $lockedActor */
-                $lockedActor = User::query()->lockForUpdate()->findOrFail($actor->getKey());
-
-                if (! Hash::check($currentPassword, (string) $lockedActor->password)) {
-                    throw ValidationException::withMessages([
-                        'current_password' => 'Die Anmeldedaten konnten nicht bestätigt werden.',
-                    ]);
-                }
-
-                /** @var User $lockedTarget */
-                $lockedTarget = User::query()->lockForUpdate()->findOrFail($target->getKey());
-
-                if (! $lockedTarget->hasTwoFactorEnabled() && ! $lockedTarget->hasPendingTwoFactor()) {
-                    throw ValidationException::withMessages([
-                        'recovery' => 'Für dieses Konto ist kein wiederherstellbarer Zwei-Faktor-Status vorhanden.',
-                    ]);
-                }
-
-                $lockedTarget->disableTwoFactor();
-                $lockedTarget->forceFill(['two_factor_recovery_required_at' => now()])->save();
-
-                DB::table('two_factor_login_challenges')
-                    ->where('user_id', $lockedTarget->getKey())
-                    ->whereNull('consumed_at')
-                    ->update(['consumed_at' => now(), 'updated_at' => now()]);
-
-                DB::connection(config('database.default'))
-                    ->table(config('session.table', 'sessions'))
-                    ->where('user_id', $lockedTarget->getKey())
-                    ->delete();
-
-                $lockedTarget->tokens()->delete();
-
-                return TwoFactorRecoveryAudit::query()->create([
-                    'actor_user_id' => $lockedActor->getKey(),
-                    'target_user_id' => $lockedTarget->getKey(),
-                    'support_reference' => $supportReference,
-                    'ip_address' => $ipAddress,
-                ]);
-            }, 3);
-        } catch (ValidationException $exception) {
-            if (array_key_exists('current_password', $exception->errors())) {
-                RateLimiter::hit($rateLimitKey, 60);
-            }
-
-            throw $exception;
+        if ($failure === 'current_password') {
+            throw ValidationException::withMessages([
+                'current_password' => 'Die Anmeldedaten konnten nicht bestätigt werden.',
+            ]);
         }
 
-        RateLimiter::clear($rateLimitKey);
+        if (! $audit instanceof TwoFactorRecoveryAudit) {
+            throw new \LogicException('Die Wiederherstellung wurde ohne Ergebnis beendet.');
+        }
 
         return $audit;
     }

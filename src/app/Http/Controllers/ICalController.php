@@ -94,7 +94,9 @@ class ICalController extends Controller
      */
     protected function checkToken($token)
     {
-        $tokenUser = User::where('api_token', $token)->first();
+        $tokenUser = User::where('api_token', $token)
+            ->whereNull('two_factor_recovery_required_at')
+            ->first();
         if (! $tokenUser) {
             abort(401);
         }

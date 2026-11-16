@@ -503,25 +503,36 @@ Recovery-Codes. Es gibt absichtlich keine kaskadierenden Fremdschlüssel, damit
 Auditzeilen eine Kontolöschung überstehen. Die lokale Demo-Anonymisierung
 löscht zugehörige Demo-Auditdaten ausdrücklich.
 
-Die Migration wird beim regulären `./planer update` ausgeführt. Sie ist
-vorwärtsgerichtet und verweigert `migrate:rollback`, weil dadurch Recovery-
-Marker und Audit-Historie verloren gingen. Entfernen Sie die Spalten oder
-Tabelle nicht manuell. Erstellen und verifizieren Sie vor einem Update ein
+Die Migration
+`2026_11_16_000002_add_two_factor_recovery_attempt_tracking_to_users` ergänzt
+den Fehlversuchszähler `users.two_factor_recovery_attempts` und den Zeitstempel
+`users.two_factor_recovery_attempted_at`. Beide Werte werden gemeinsam mit der
+Passwortprüfung unter einer Datenbanksperre aktualisiert; damit ist für die
+Begrenzung kein geteilter Cache erforderlich.
+
+Beide Migrationen werden beim regulären `./planer update` ausgeführt. Sie sind
+vorwärtsgerichtet und verweigern `migrate:rollback`, weil dadurch Recovery-
+Marker, Fehlversuchszähler und Audit-Historie verloren gingen. Entfernen Sie
+Spalten oder Tabelle nicht manuell. Erstellen und verifizieren Sie vor einem Update ein
 Backup der Datenbank und des MinIO-Bestands. Ein erforderlicher Rollback muss
 das vorherige Image mit einer verifizierten Datenbanksicherung im
 quieszierten Restore-Verfahren kombinieren.
 
 Für die Wiederherstellungsaktion ist zwingend
 `SESSION_DRIVER=database` erforderlich. Nur so kann Pfarrplaner aktive
-Sitzungen benutzerbezogen widerrufen. Ist `SESSION_CONNECTION` gesetzt, muss
+Sitzungen benutzerbezogen widerrufen. Fehlversuche werden mit Zeitstempel am
+Super-Admin-Konto gespeichert und unter derselben Datenbanksperre wie die
+Passwortprüfung aktualisiert; dafür ist kein geteilter Cache erforderlich.
+Ist `SESSION_CONNECTION` gesetzt, muss
 der Verbindungsname derselbe wie `database.default` sein; eine leere Einstellung
 verwendet die Standardverbindung. Die Docker-Beispielkonfiguration setzt den
 Datenbanktreiber. Die separate `src/.env.example` für den eigenständigen
 Laravel-Betrieb verwendet dagegen `file` und muss für diese Funktion angepasst
-werden. Prüfen Sie stets die wirksame Laufzeitkonfiguration, nicht nur die
-Beispieldatei. Bei einem anderen Treiber oder einer abweichenden
-Session-Datenbank ist die Recovery-Aktion deaktiviert und darf nicht manuell
-über Datenbankänderungen umgangen werden.
+werden. Der Datei-Cache dieses Beispiels ist dafür unkritisch. Prüfen Sie stets
+die wirksame Session-Konfiguration, nicht nur die Beispieldatei. Bei einem
+anderen Session-Treiber oder einer abweichenden Session-Datenbank ist die
+Recovery-Aktion deaktiviert und darf nicht manuell über Datenbankänderungen
+umgangen werden.
 
 ### Release erstellen und ausrollen
 

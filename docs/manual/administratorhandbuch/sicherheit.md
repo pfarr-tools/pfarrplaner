@@ -90,21 +90,26 @@ fehlende Berechtigungen und nicht unterstützte Session-Konfigurationen
 verhindern die Wiederherstellung.
 
 Bei Erfolg werden der aktive oder noch nicht bestätigte TOTP-Faktor, offene
-E-Mail-Anmeldecodes, persönliche API-Tokens und alle Datenbank-Sitzungen des
-Zielkontos widerrufen. Das Passwort und ein eventuell ausstehender
-Passwortwechsel bleiben bestehen. Nach der nächsten Passwortanmeldung darf das
-Konto nur die TOTP-Wiederherstellung, notwendige Passwortänderung und Logout
-verwenden. Erst nach erfolgreicher TOTP-Bestätigung wird der normale Zugriff
-freigegeben. Fehlgeschlagene oder abgebrochene TOTP-Bestätigungen lassen die
-Sperre bestehen. Die Person muss die bei der Einrichtung gezeigten neuen
-Recovery-Codes sicher verwahren.
+E-Mail-Anmeldecodes, persönliche API-Tokens, den bisherigen API-/Kalendertoken,
+Remember-me-Zugang und alle Datenbank-Sitzungen des Zielkontos widerrufen. Das
+Passwort und ein eventuell ausstehender Passwortwechsel bleiben bestehen. Nach
+der nächsten Passwortanmeldung darf das Konto nur die TOTP-Wiederherstellung,
+notwendige Passwortänderung und Logout verwenden. Erst nach erfolgreicher
+TOTP-Bestätigung wird der normale Zugriff freigegeben. Fehlgeschlagene oder
+abgebrochene TOTP-Bestätigungen lassen die Sperre bestehen. Die Person muss die
+bei der Einrichtung gezeigten neuen Recovery-Codes sicher verwahren und
+anschließend gespeicherte Kalender- und API-Verbindungen mit dem neuen Token
+aktualisieren.
 
 Für diese Funktion muss `SESSION_DRIVER=database` gesetzt sein. Falls
 `SESSION_CONNECTION` angegeben ist, muss sie dieselbe Datenbankverbindung wie
 die Anwendung verwenden. Mit einem Datei-, Redis- oder anderen Session-Treiber
-steht die Recovery-Aktion nicht zur Verfügung. Die Docker-Beispielkonfiguration
-verwendet den Datenbanktreiber; prüfen Sie vor dem Supportvorgang trotzdem die
-wirksame Konfiguration der Instanz.
+steht die Recovery-Aktion nicht zur Verfügung. Fehlversuche werden mit
+Zeitstempel am Super-Admin-Konto gespeichert. Eine Datenbanksperre umfasst
+Passwortprüfung und Zähleränderung; parallele Versuche werden damit über alle
+App-Hosts hinweg serialisiert. Dafür ist kein Cache-Treiber vorgeschrieben.
+Prüfen Sie vor dem Supportvorgang die wirksame Session-Konfiguration der
+Instanz.
 
 Jeder erfolgreiche Vorgang wird dauerhaft mit handelndem Konto, Zielkonto,
 Supportfall-Referenz, Zeitpunkt und IP-Adresse protokolliert. Das Protokoll

@@ -2,17 +2,23 @@
 
 namespace Tests\Feature;
 
+use App\Actions\Security\RecoverUserTwoFactor;
+use App\Http\Controllers\ICalController;
 use App\Models\People\TwoFactorRecoveryAudit;
 use App\Models\People\User;
 use App\Services\RoleService;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia as Assert;
 use RoundlyConsulting\TwoFactor\Contracts\TwoFactorService;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Tests\TestCase;
 
 /** Verifies the durable schema and model contract for 2FA recovery. */
@@ -23,7 +29,11 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
     /** Recovery state and audit rows persist the expected non-secret fields. */
     public function test_recovery_schema_and_audit_model_are_ready(): void
     {
-        self::assertTrue(Schema::hasColumn('users', 'two_factor_recovery_required_at'));
+        self::assertTrue(Schema::hasColumns('users', [
+            'two_factor_recovery_required_at',
+            'two_factor_recovery_attempts',
+            'two_factor_recovery_attempted_at',
+        ]));
         self::assertTrue(Schema::hasTable('two_factor_recovery_audits'));
         self::assertTrue(Schema::hasColumns('two_factor_recovery_audits', [
             'id',
@@ -55,6 +65,9 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         $migration = require database_path(
             'migrations/2026_11_16_000001_add_two_factor_recovery_state_and_audit_table.php',
         );
+        $attemptMigration = require database_path(
+            'migrations/2026_11_16_000002_add_two_factor_recovery_attempt_tracking_to_users.php',
+        );
 
         try {
             $migration->down();
@@ -63,7 +76,18 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
             self::assertStringContainsString('vorwärtsgerichtet', $exception->getMessage());
         }
 
-        self::assertTrue(Schema::hasColumn('users', 'two_factor_recovery_required_at'));
+        try {
+            $attemptMigration->down();
+            self::fail('Recovery throttling state must not be removed by rollback.');
+        } catch (\LogicException $exception) {
+            self::assertStringContainsString('vorwärtsgerichtet', $exception->getMessage());
+        }
+
+        self::assertTrue(Schema::hasColumns('users', [
+            'two_factor_recovery_required_at',
+            'two_factor_recovery_attempts',
+            'two_factor_recovery_attempted_at',
+        ]));
         self::assertTrue(Schema::hasTable('two_factor_recovery_audits'));
     }
 
@@ -113,6 +137,8 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         self::assertNotNull($target->two_factor_recovery_required_at);
         self::assertSame($targetPassword, $target->password);
         self::assertSame((bool) $targetMustChangePassword, (bool) $target->must_change_password);
+        self::assertSame(0, (int) $admin->fresh()->two_factor_recovery_attempts);
+        self::assertNull($admin->fresh()->two_factor_recovery_attempted_at);
         self::assertSame(1, TwoFactorRecoveryAudit::query()->count());
         self::assertDatabaseHas('two_factor_recovery_audits', [
             'actor_user_id' => $admin->getKey(),
@@ -139,7 +165,6 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
             'must_change_password' => false,
         ]);
         $superAdmin->assignRole(RoleService::ROLE_SUPER_ADMIN);
-        RateLimiter::clear('two-factor-recovery:'.$superAdmin->getKey());
         $superAdmin->startTwoFactorEnrolment();
         self::assertFalse((bool) $superAdmin->must_change_password);
         $selfRecoveryResponse = $this->actingAs($superAdmin)->postJson(
@@ -187,7 +212,6 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         [$admin, $target] = $this->createRecoveryPair();
         $target->startTwoFactorEnrolment();
         config(['session.driver' => 'database']);
-        RateLimiter::clear('two-factor-recovery:'.$admin->getKey());
         $payload = $this->validRecoveryPayload();
         $invalidReference = $payload;
         $invalidReference['support_reference'] = 'SUP 80';
@@ -203,10 +227,39 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
                 ->assertJsonValidationErrors('current_password');
         }
 
+        self::assertSame(5, (int) $admin->fresh()->two_factor_recovery_attempts);
+        self::assertNotNull($admin->fresh()->two_factor_recovery_attempted_at);
+
         $this->actingAs($admin)->postJson(route('user.two-factor.recover', $target), $payload)
             ->assertStatus(429);
+        self::assertSame(5, (int) $admin->fresh()->two_factor_recovery_attempts);
         self::assertNull($target->fresh()->two_factor_recovery_required_at);
         self::assertSame(0, TwoFactorRecoveryAudit::query()->count());
+    }
+
+    /** Invalid password attempts persist under the locked actor row. */
+    public function test_recovery_persists_attempt_counter_inside_actor_transaction(): void
+    {
+        [$admin, $target] = $this->createRecoveryPair();
+        $target->startTwoFactorEnrolment();
+        config(['session.driver' => 'database']);
+        $baselineTransactionLevel = DB::transactionLevel();
+        $transactionWasActive = false;
+        Hash::shouldReceive('check')->once()->andReturnUsing(function () use (&$transactionWasActive, $baselineTransactionLevel): bool {
+            $transactionWasActive = DB::transactionLevel() > $baselineTransactionLevel;
+
+            return false;
+        });
+
+        try {
+            app(RecoverUserTwoFactor::class)->execute($admin, $target, 'incorrect-password', 'SUP-2026-081', '192.0.2.1');
+            self::fail('An incorrect password must be rejected.');
+        } catch (ValidationException) {
+            self::assertTrue($transactionWasActive);
+        }
+
+        self::assertSame(1, (int) $admin->fresh()->two_factor_recovery_attempts);
+        self::assertNotNull($admin->fresh()->two_factor_recovery_attempted_at);
     }
 
     /** A stale target model cannot bypass reloading its current factor state. */
@@ -271,21 +324,35 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         $target->startTwoFactorEnrolment();
         config(['session.driver' => 'array']);
 
-        $this->actingAs($admin)->postJson(
-            route('user.two-factor.recover', $target),
-            $this->validRecoveryPayload(),
-        )->assertStatus(503);
+        try {
+            app(RecoverUserTwoFactor::class)->execute(
+                $admin,
+                $target,
+                'admin-password',
+                'SUP-2026-081',
+                '192.0.2.1',
+            );
+            self::fail('Recovery must fail closed when database sessions are unavailable.');
+        } catch (ServiceUnavailableHttpException $exception) {
+            self::assertSame(503, $exception->getStatusCode());
+        }
 
         self::assertNotNull($target->fresh()->two_factor_secret);
         self::assertNull($target->fresh()->two_factor_recovery_required_at);
         self::assertSame(0, TwoFactorRecoveryAudit::query()->count());
     }
 
-    /** The action revokes target database sessions and Sanctum personal tokens. */
-    public function test_recovery_revokes_database_sessions_and_personal_tokens(): void
+    /** Recovery revokes sessions, Sanctum tokens, legacy API tokens, and remember-me credentials. */
+    public function test_recovery_revokes_all_target_authentication_credentials(): void
     {
         [$admin, $target] = $this->createRecoveryPair();
         $target->startTwoFactorEnrolment();
+        $target->forceFill([
+            'api_token' => 'legacy-api-token-before-recovery',
+            'remember_token' => 'remember-token-before-recovery',
+        ])->save();
+        $legacyApiToken = $target->api_token;
+        $rememberToken = $target->remember_token;
         config(['session.driver' => 'database']);
         $target->createToken('recovery-test');
         DB::table('sessions')->insert([
@@ -303,6 +370,34 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
             'tokenable_id' => $target->getKey(),
             'name' => 'recovery-test',
         ]);
+        self::assertNotSame($rememberToken, $target->fresh()->remember_token);
+        self::assertNotSame($legacyApiToken, $target->fresh()->api_token);
+        self::assertNull(Auth::guard('web')->getProvider()->retrieveByToken($target->getKey(), $rememberToken));
+        $this->withToken($legacyApiToken)->getJson(route('api.events.range', [
+            'calendar' => 'unknown',
+            'start' => '2026-01-01',
+            'end' => '2026-01-31',
+        ]))->assertUnauthorized();
+    }
+
+    /** iCalendar token lookup refuses accounts still blocked for recovery. */
+    public function test_recovery_gate_rejects_legacy_ical_tokens(): void
+    {
+        $target = User::factory()->create([
+            'api_token' => 'legacy-ical-token',
+            'two_factor_recovery_required_at' => now(),
+        ]);
+        $controller = new ICalController;
+        $method = new \ReflectionMethod($controller, 'checkToken');
+
+        try {
+            $method->invoke($controller, $target->api_token);
+            self::fail('A recovery-gated account must not authenticate an iCalendar token.');
+        } catch (\ReflectionException $exception) {
+            throw $exception;
+        } catch (HttpExceptionInterface $exception) {
+            self::assertSame(401, $exception->getStatusCode());
+        }
     }
 
     /** Audit failure rolls back factor revocation and recovery state. */
@@ -349,6 +444,19 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         $user = $this->createRecoveredAccount();
 
         $this->actingAs($user, 'api')->getJson('/api/kalender/monat/2026-11-16')->assertForbidden();
+    }
+
+    /** API-token authentication is resolved before the recovery gate is enforced. */
+    public function test_recovery_gate_blocks_the_legacy_api_guard_token(): void
+    {
+        $user = $this->createRecoveredAccount();
+        $user->forceFill(['api_token' => 'gated-api-token'])->save();
+
+        $this->withToken($user->api_token)->getJson(route('api.events.range', [
+            'calendar' => 'unknown',
+            'start' => '2026-01-01',
+            'end' => '2026-01-31',
+        ]))->assertForbidden();
     }
 
     /** Password login grants only the reenrolment flow after recovery. */
@@ -442,7 +550,6 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
             'password' => Hash::make('admin-password'),
             'must_change_password' => false,
         ]);
-        RateLimiter::clear('two-factor-recovery:'.$admin->getKey());
         if ($superAdmin) {
             $admin->assignRole(RoleService::ROLE_SUPER_ADMIN);
         }

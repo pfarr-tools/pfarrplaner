@@ -65,22 +65,31 @@ Bindestrich, zum Beispiel `SUP-2026-123`. `RecoverTwoFactorRequest`, `UserPolicy
 und `RecoverUserTwoFactor` prüfen die Super-Admin-Berechtigung; Selbst-Recovery
 ist sowohl in Request als auch Action ausgeschlossen. Der Passwortvergleich
 erfolgt mit `Hash::check` nach Sperren und erneutem Laden des Actor-Datensatzes.
-Fünf falsche Passwortversuche pro Actor innerhalb einer Minute lösen eine
-temporäre Sperre aus. Passwörter werden weder in Auditdaten noch in Logs
-geschrieben.
+Nach fünf Fehlversuchen innerhalb einer gleitenden Minute wird der Vorgang
+vorübergehend gesperrt. Zähler und Zeitpunkt liegen auf dem Super-Admin-
+Datensatz. `lockForUpdate()` serialisiert das Lesen und Ändern gemeinsam mit
+der Passwortprüfung in einer Datenbanktransaktion; dadurch gilt die Grenze
+über alle App-Hosts hinweg und benötigt keinen gemeinsam genutzten Cache.
+Erfolgreiche Recovery setzt den Zähler zurück. Passwörter werden weder in
+Auditdaten noch in Logs geschrieben.
 
 Die Action verweigert die Wiederherstellung, wenn
 `config('session.driver')` nicht `database` ist. Eine gesetzte
 `session.connection` muss `database.default` entsprechen. In einer Transaktion
 werden zunächst Actor und danach Zielkonto mit `lockForUpdate()` gesperrt. Nur
 bei aktivem oder ausstehendem TOTP werden Faktor und Recovery-Codes gelöscht,
-unverbrauchte `two_factor_login_challenges` verbraucht, Datensätze des Ziels in
-der Session-Tabelle und dessen persönliche Sanctum-Tokens entfernt sowie der
-Audit-Datensatz angelegt. Ein Fehler rollt die Aktion als Ganzes zurück.
+unverbrauchte `two_factor_login_challenges` verbraucht, `remember_token` und
+`api_token` rotiert, Datensätze des Ziels in der Session-Tabelle und dessen
+persönliche Sanctum-Tokens entfernt sowie der Audit-Datensatz angelegt. Der
+Legacy-iCalendar-Tokenvalidator weist recovery-gesperrte Konten ebenfalls ab.
+Ein Fehler rollt die Aktion als Ganzes zurück.
 
 Die Migration `2026_11_16_000001_add_two_factor_recovery_state_and_audit_table`
 fügt `users.two_factor_recovery_required_at` und
-`two_factor_recovery_audits` hinzu. Die Audit-Tabelle hält
+`two_factor_recovery_audits` hinzu. Die Migration
+`2026_11_16_000002_add_two_factor_recovery_attempt_tracking_to_users` ergänzt
+`users.two_factor_recovery_attempts` und
+`users.two_factor_recovery_attempted_at`. Die Audit-Tabelle hält
 `actor_user_id`, `target_user_id`, `support_reference`, `ip_address` und
 Zeitstempel ohne kaskadierende Fremdschlüssel. Damit bleiben Auditzeilen nach
 Kontolöschung erhalten; die numerischen IDs sind dann nicht mehr über eine

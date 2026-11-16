@@ -461,6 +461,26 @@ class UserWebFeatureTest extends TestCase
             );
     }
 
+    /** Recovery stays available with a local cache because counters use the database. */
+    public function test_recovery_action_supports_local_file_cache(): void
+    {
+        $target = User::factory()->create();
+        $target->startTwoFactorEnrolment();
+        config([
+            'cache.default' => 'file',
+            'session.driver' => 'database',
+        ]);
+        app()->instance('env', 'local');
+
+        $this->actingAs($this->user)
+            ->get(route('user.edit', $target->id))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('twoFactorRecovery.canRecover', true)
+                ->where('twoFactorRecovery.unavailableReason', null)
+            );
+    }
+
     /** Recovery is unavailable when the database sessions use a different connection. */
     public function test_recovery_action_is_hidden_for_mismatched_session_connection(): void
     {
