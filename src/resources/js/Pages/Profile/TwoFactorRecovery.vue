@@ -44,7 +44,10 @@
             </p>
             <h3>Recovery-Codes</h3>
             <ul>
-                <li v-for="recoveryCode in setup.recovery_codes" :key="recoveryCode">
+                <li
+                    v-for="recoveryCode in setup.recovery_codes"
+                    :key="recoveryCode"
+                >
                     <code>{{ recoveryCode }}</code>
                 </li>
             </ul>
@@ -65,11 +68,25 @@
             </button>
         </section>
 
-        <p v-if="complete" class="alert alert-success" role="status">
+        <p
+            v-if="complete"
+            class="alert alert-success"
+            role="status"
+        >
             TOTP wurde eingerichtet. Dein Konto ist wieder freigegeben.
         </p>
-        <p v-if="error" class="alert alert-danger mt-3" role="alert">{{ error }}</p>
-        <a class="d-block mt-4" href="/logout">Abmelden</a>
+        <p
+            v-if="error"
+            class="alert alert-danger mt-3"
+            role="alert"
+        >
+            {{ error }}
+        </p>
+        <a
+            class="d-block mt-4"
+            href="/logout"
+            >Abmelden</a
+        >
     </main>
 </template>
 
@@ -80,6 +97,7 @@ import FormInput from '@/components/Ui/forms/FormInput.vue'
 export default {
     name: 'TwoFactorRecovery',
     components: { FormInput },
+    emits: ['enrolment-complete'],
     /** Return transient form state; credentials and TOTP material stay in memory only. */
     data() {
         return {

@@ -38,6 +38,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\Calendar\External\CalendarConnection;
 use App\Models\Location;
 use App\Models\Parish;
+use App\Models\People\TwoFactorRecoveryAudit;
 use App\Models\People\User;
 use App\Models\Places\City;
 use App\Models\Subscription;
@@ -275,6 +276,31 @@ class UserController extends Controller
         $parishes = $this->compactOptions($parishes);
 
         $activeTab = $request->get('tab', 'home');
+        $twoFactorRecovery = [
+            'canRecover' => Auth::user()->hasRole(AuthServiceProvider::SUPER)
+                && Auth::id() !== $user['id'],
+            'history' => [],
+        ];
+        if ($twoFactorRecovery['canRecover']) {
+            $twoFactorRecovery['history'] = TwoFactorRecoveryAudit::query()
+                ->with('actor:id,first_name,last_name,title')
+                ->where('target_user_id', $user['id'])
+                ->latest()
+                ->get()
+                ->map(function (TwoFactorRecoveryAudit $audit): array {
+                    $actor = $audit->getRelation('actor');
+
+                    return [
+                        'actor' => [
+                            'id' => $audit->actor_user_id,
+                            'name' => $actor instanceof User ? $actor->name : 'Gelöschtes Konto',
+                        ],
+                        'createdAt' => $audit->created_at?->toIso8601String(),
+                        'supportReference' => $audit->support_reference,
+                    ];
+                })
+                ->all();
+        }
 
         return Inertia::render(
             'Admin/User/UserEditor',
@@ -293,6 +319,7 @@ class UserController extends Controller
                 'locations',
                 'ministries',
                 'modules',
+                'twoFactorRecovery',
             )
         );
     }
@@ -672,10 +699,9 @@ class UserController extends Controller
             (string) $request->ip(),
         );
 
-        return redirect()->route('users.index')->with(
-            'success',
-            'Der Zwei-Faktor-Zugang wurde widerrufen. Das Konto muss TOTP erneut einrichten.',
-        );
+        return redirect()->route('user.edit', $user->getKey())
+            ->with('message', 'Der Zwei-Faktor-Zugang wurde widerrufen. Das Konto muss TOTP erneut einrichten.')
+            ->with('type', 'success');
     }
 
     /** Validate the current password without exposing account state in errors. */

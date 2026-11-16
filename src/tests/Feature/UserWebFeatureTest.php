@@ -15,6 +15,7 @@ namespace Tests\Feature;
 
 use App\Mail\User\AccountData;
 use App\Mail\User\TwoFactorLoginCode;
+use App\Models\People\TwoFactorRecoveryAudit;
 use App\Models\People\User;
 use App\Services\RoleService;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -405,6 +406,62 @@ class UserWebFeatureTest extends TestCase
                 ->missing('user.password')
                 ->missing('user.created_at')
                 ->missing('user.updated_at')
+            );
+    }
+
+    /** Only a Super-Admin editing another account receives recovery controls and history. */
+    public function test_only_super_admin_receives_recovery_action_and_history(): void
+    {
+        $target = User::factory()->create();
+        $actor = User::factory()->create();
+        $actor->assignRole(RoleService::ROLE_ADMIN);
+        $this->actingAs($actor)
+            ->get(route('user.edit', $target->id))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('twoFactorRecovery.canRecover', false)
+                ->where('twoFactorRecovery.history', [])
+            );
+
+        $this->actingAs($this->user)
+            ->get(route('user.edit', $this->user->id))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('twoFactorRecovery.canRecover', false)
+                ->where('twoFactorRecovery.history', [])
+            );
+
+        $this->actingAs($this->user)
+            ->get(route('user.edit', $target->id))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('twoFactorRecovery.canRecover', true)
+            );
+    }
+
+    /** Recovery history exposes only actor identity, time, and the support reference. */
+    public function test_recovery_history_contains_actor_time_and_reference_only(): void
+    {
+        $target = User::factory()->create();
+        TwoFactorRecoveryAudit::query()->create([
+            'actor_user_id' => $this->user->id,
+            'target_user_id' => $target->id,
+            'support_reference' => 'SUP-80-2026',
+            'ip_address' => '192.0.2.12',
+        ]);
+
+        $this->actingAs($this->user)
+            ->get(route('user.edit', $target->id))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('twoFactorRecovery.history', 1)
+                ->where('twoFactorRecovery.history.0.actor.id', $this->user->id)
+                ->where('twoFactorRecovery.history.0.actor.name', $this->user->name)
+                ->where('twoFactorRecovery.history.0.supportReference', 'SUP-80-2026')
+                ->has('twoFactorRecovery.history.0.createdAt')
+                ->missing('twoFactorRecovery.history.0.ipAddress')
+                ->missing('twoFactorRecovery.history.0.password')
+                ->missing('twoFactorRecovery.history.0.secret')
             );
     }
 

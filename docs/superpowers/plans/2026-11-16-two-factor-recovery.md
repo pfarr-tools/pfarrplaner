@@ -107,27 +107,32 @@
 - [x] **Step 5: Implement the dedicated page** with current-password entry, TOTP setup and confirmation, accessible errors, and no unrelated profile data or secret persistence after confirmation.
 - [x] **Step 6: Run full PHP/Vue suites, Pint, format check, PHPStan, lint and `git diff --check`; record the unchanged `docs:check` baseline.**
 - [x] **Step 7: Senior Review Task 3; fix findings and repeat checks.** Approved with no findings.
-- [ ] **Step 8: Commit** as `feat(auth): 2FA-Wiederherstellung bis zur Neueinrichtung sperren`.
+- [x] **Step 8: Commit** as `feat(auth): 2FA-Wiederherstellung bis zur Neueinrichtung sperren` (`f35e637c`).
 
 ### Task 4: Super-Admin-Oberfläche und Audit-Historie
 
 **Files:**
 - Modify: `src/app/Http/Controllers/UserController.php` (user editor data)
+- Modify: `src/app/Http/Middleware/HandleInertiaRequests.php` (share flash type)
 - Modify: `src/resources/js/Pages/Admin/User/UserEditor.vue`
+- Create: `src/resources/js/Pages/Admin/User/TwoFactorRecoveryPanel.vue`
+- Modify: `src/app/Models/People/TwoFactorRecoveryAudit.php` (typed actor relations)
 - Test: `src/tests/Feature/TwoFactorRecoveryFeatureTest.php`
-- Test: `src/tests/js/Pages/Admin/User/UserEditor.test.js`
+- Test: `src/tests/Feature/UserWebFeatureTest.php`
+- Test: `src/tests/Feature/HandleInertiaRequestsFeatureTest.php`
+- Test: `src/tests/js/Pages/Admin/User/TwoFactorRecoveryPanel.test.js`
 
 **Interfaces:**
 - Only a Super-Admin editing another account sees the recovery action and audit history.
 - Confirmation requires the Super-Admin's current password and support reference; copy states that prior identity verification is required and the target must reenroll TOTP.
 - History shows timestamp, actor display name/ID, and support reference; it never shows factor material or authentication input.
 
-- [ ] **Step 1: Write failing PHPUnit/Vitest tests** `test_only_super_admin_receives_recovery_action_and_history()`, `test_recovery_history_contains_actor_time_and_reference_only()`, and Vue cases for password/reference fields, cancel/submit, success/error feedback, and no secret rendering.
-- [ ] **Step 2: Run the focused Vitest and isolated feature cases**; verify failures.
-- [ ] **Step 3: Implement admin editor data and confirmation flow** using the Task 2 route; never include password or factor secrets in page props.
-- [ ] **Step 4: Run** the full PHP suite and the relevant Vue tests; run Pint/Prettier and `git diff --check`.
-- [ ] **Step 5: Senior Review Task 4; fix findings and repeat checks.**
-- [ ] **Step 6: Commit** as `feat(auth): 2FA-Recovery in der Benutzerverwaltung anzeigen`.
+- [x] **Step 1: Write failing PHPUnit/Vitest tests** `test_only_super_admin_receives_recovery_action_and_history()`, `test_recovery_history_contains_actor_time_and_reference_only()`, and Vue cases for password/reference fields, cancel/submit, success/error feedback, and no secret rendering.
+- [x] **Step 2: Run the focused Vue and isolated feature cases**; verify missing history props and component failures before implementation.
+- [x] **Step 3: Implement admin editor data and confirmation flow** using the Task 2 route; never include password or factor secrets in page props. Return to the target editor and render typed Inertia flash feedback.
+- [x] **Step 4: Run** the full PHP suite and full Vue suite; run Pint/Prettier, PHPStan, ESLint on new Vue files, and `git diff --check`.
+- [x] **Step 5: Senior Review Task 4; fix findings and repeat checks.** Final re-review approved with no findings.
+- [x] **Step 6: Commit** as `feat(auth): 2FA-Recovery in der Benutzerverwaltung anzeigen`.
 
 ### Task 5: Handbücher, Betriebsgrenze und Gesamtprüfung
 

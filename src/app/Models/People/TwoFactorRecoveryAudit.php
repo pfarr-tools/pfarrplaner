@@ -22,13 +22,13 @@ class TwoFactorRecoveryAudit extends AbstractModel
         'ip_address',
     ];
 
-    /** Return the account that performed the recovery, when it still exists. */
+    /** @return BelongsTo<User, $this> The account that performed the recovery. */
     public function actor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'actor_user_id');
     }
 
-    /** Return the recovered account, when it still exists. */
+    /** @return BelongsTo<User, $this> The account whose factor was recovered. */
     public function target(): BelongsTo
     {
         return $this->belongsTo(User::class, 'target_user_id');

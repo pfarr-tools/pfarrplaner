@@ -98,7 +98,15 @@ final class TwoFactorRecoveryFeatureTest extends TestCase
         config(['session.driver' => 'database']);
 
         $this->actingAs($admin)->post(route('user.two-factor.recover', $target), $this->validRecoveryPayload())
-            ->assertRedirect();
+            ->assertRedirect(route('user.edit', $target))
+            ->assertSessionHas('message', 'Der Zwei-Faktor-Zugang wurde widerrufen. Das Konto muss TOTP erneut einrichten.')
+            ->assertSessionHas('type', 'success');
+
+        $this->get(route('user.edit', $target))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('flash.message', 'Der Zwei-Faktor-Zugang wurde widerrufen. Das Konto muss TOTP erneut einrichten.')
+                ->where('flash.type', 'success')
+            );
 
         $target->refresh();
         self::assertNull($target->two_factor_secret);

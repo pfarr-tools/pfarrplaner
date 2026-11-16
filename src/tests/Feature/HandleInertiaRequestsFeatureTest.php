@@ -51,11 +51,13 @@ class HandleInertiaRequestsFeatureTest extends TestCase
     public function test_flash_messages_are_shared()
     {
         Session::put('success', 'Gespeichert');
+        Session::put('type', 'success');
 
         $props = $this->sharedProps();
 
         $flash = value($props['flash']);
         $this->assertSame('Gespeichert', value($flash['success']));
+        $this->assertSame('success', value($flash['type']));
     }
 
     /**

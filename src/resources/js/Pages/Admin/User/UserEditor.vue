@@ -27,7 +27,10 @@
   -->
 
 <template>
-    <admin-layout title="Person bearbeiten">
+    <admin-layout
+        title="Person bearbeiten"
+        :flash="$page.props.flash"
+    >
         <template #navbar-left>
             <save-button @click="saveUser" />
             <nav-button
@@ -229,6 +232,12 @@
                         </button>
                     </div>
                 </form-group>
+                <TwoFactorRecoveryPanel
+                    v-if="twoFactorRecovery?.canRecover"
+                    :can-recover="twoFactorRecovery.canRecover"
+                    :history="twoFactorRecovery.history"
+                    :recovery-route="route('user.two-factor.recover', myUser.id)"
+                />
             </tab>
             <tab
                 v-if="myUser.isOfficialUser"
@@ -474,6 +483,7 @@ import FormSelectize from '../../../components/Ui/forms/FormSelectize'
 import FakeTable from '../../../components/Ui/FakeTable'
 import CityPermissionToggle from '../../../components/Ui/elements/Person/CityPermissionToggle'
 import FormGroup from '../../../components/Ui/forms/FormGroup'
+import TwoFactorRecoveryPanel from './TwoFactorRecoveryPanel.vue'
 import PeopleSelect from '../../../components/Ui/elements/PeopleSelect'
 import HomeScreenConfigurationTab from '../../../components/Profile/Tabs/HomeScreenConfigurationTab'
 import VueJsonPretty from 'vue-json-pretty'
@@ -496,11 +506,13 @@ export default {
         'locations',
         'ministries',
         'modules',
+        'twoFactorRecovery',
     ],
     components: {
         HomeScreenConfigurationTab,
         PeopleSelect,
         FormGroup,
+        TwoFactorRecoveryPanel,
         CityPermissionToggle,
         FakeTable,
         FormSelectize,
