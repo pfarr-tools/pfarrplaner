@@ -39,28 +39,28 @@
             </button>
         </template>
         <template #tab-headers>
-            <tab-headers>
-                <tab-header
+            <TabHeaders>
+                <TabHeader
                     title="Profil"
                     id="profile"
                     :active-tab="activeTab"
                 />
-                <tab-header
+                <TabHeader
                     title="Sicherheit"
                     id="security"
                     :active-tab="activeTab"
                 />
-                <tab-header
+                <TabHeader
                     title="E-Mailbenachrichtigungen"
                     id="subscriptions"
                     :active-tab="activeTab"
                 />
-                <tab-header
+                <TabHeader
                     title="Startseite"
                     id="homeScreenConfiguration"
                     :active-tab="activeTab"
                 />
-                <tab-header
+                <TabHeader
                     title="Verbundene Kalender"
                     id="calendars"
                     :active-tab="activeTab"
@@ -68,25 +68,25 @@
                     :disabled="user.email.slice(-8) != '@elkw.de'"
                     disabled-title="Diese Funktion ist nur für Benutzer mit einem ELKW-Konto verfügbar."
                 />
-                <tab-header
+                <TabHeader
                     title="Externe Inhalte"
                     id="externalContent"
                     :active-tab="activeTab"
                 />
-            </tab-headers>
+            </TabHeaders>
         </template>
-        <tabs>
-            <tab
+        <Tabs>
+            <Tab
                 id="profile"
                 :active-tab="activeTab"
             >
-                <profile-tab :user="user" />
-            </tab>
-            <tab
+                <ProfileTab :user="user" />
+            </Tab>
+            <Tab
                 id="security"
                 :active-tab="activeTab"
             >
-                <security-tab
+                <SecurityTab
                     :user="user"
                     :password="password"
                     :two-factor-enabled="twoFactorEnabled"
@@ -94,21 +94,21 @@
                     :passkeys="passkeys"
                     @update:password="password = $event"
                 />
-            </tab>
-            <tab
+            </Tab>
+            <Tab
                 id="subscriptions"
                 :active-tab="activeTab"
             >
-                <subscriptions-tab
+                <SubscriptionsTab
                     :cities="cities"
                     :subscriptions="subscriptions"
                 />
-            </tab>
-            <tab
+            </Tab>
+            <Tab
                 id="homeScreenConfiguration"
                 :active-tab="activeTab"
             >
-                <home-screen-configuration-tab
+                <HomeScreenConfigurationTab
                     :available-tabs="availableTabs"
                     :cities="cities"
                     :home-screen-tabs-config="myHomeScreenTabsConfig"
@@ -116,32 +116,29 @@
                     :ministries="ministries"
                     :settings="settings"
                 />
-            </tab>
-            <tab
+            </Tab>
+            <Tab
                 id="calendars"
                 :active-tab="activeTab"
             >
-                <calendar-connections-tab
+                <CalendarConnectionsTab
                     :user="user"
                     :calendar-connections="calendarConnections"
                 />
-            </tab>
-            <tab
+            </Tab>
+            <Tab
                 id="externalContent"
                 :active-tab="activeTab"
             >
-                <external-content-tab :user="editedUser" />
-            </tab>
-        </tabs>
+                <ExternalContentTab :user="editedUser" />
+            </Tab>
+        </Tabs>
     </admin-layout>
 </template>
 
 <script>
-import Card from '../../components/Ui/cards/card'
-import CardHeader from '../../components/Ui/cards/cardHeader'
 import TabHeaders from '../../components/Ui/tabs/tabHeaders'
 import TabHeader from '../../components/Ui/tabs/tabHeader'
-import CardBody from '../../components/Ui/cards/cardBody'
 import Tabs from '../../components/Ui/tabs/tabs'
 import Tab from '../../components/Ui/tabs/tab'
 import ProfileTab from '../../components/Profile/Tabs/ProfileTab'
@@ -151,6 +148,7 @@ import SubscriptionsTab from '../../components/Profile/Tabs/SubscriptionsTab'
 import HomeScreenConfigurationTab from '../../components/Profile/Tabs/HomeScreenConfigurationTab'
 import ExternalContentTab from '../../components/Profile/Tabs/ExternalContentTab'
 
+/** Normalize the optional home-screen configuration before editor use. */
 function normalizeHomeScreenTabsConfig(config) {
     if (!config || typeof config !== 'object' || Array.isArray(config)) {
         return { tabs: [] }
@@ -202,7 +200,7 @@ export default {
     },
     methods: {
         saveProfile() {
-            var result = {
+            const result = {
                 email: this.user.email,
                 first_name: this.user.first_name,
                 last_name: this.user.last_name,
@@ -223,7 +221,7 @@ export default {
                 result['new_password'] = this.password.new
                 result['new_password_confirmation'] = this.password.confirm
             }
-            this.$inertia.patch(route('user.profile.save'), result)
+            this.$inertia.patch(window.route('user.profile.save'), result)
         },
     },
 }

@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
+source "$ROOT/scripts/quality-files.sh"
 
 compose() { docker compose -f "$ROOT/compose.yaml" "$@"; }
 production_compose() {
@@ -137,9 +138,9 @@ EOF
         fi
       done | sort -u)"
       local format_quality_files=''
-      format_quality_files="$(printf '%s\n' "$quality_files" | sed -n '/\.(blade\.php\|css\|js\|json\|mjs\|sass\|scss\|vue\|yaml\|yml)$/p')"
+      format_quality_files="$(quality_format_files "$quality_files")"
       local js_quality_files=''
-      js_quality_files="$(printf '%s\n' "$format_quality_files" | sed -n '/\.(js\|mjs\|vue)$/p' | sort -u)"
+      js_quality_files="$(quality_js_files "$format_quality_files")"
       QUALITY_FILES="$format_quality_files" run_dev format:check
       run_dev analyse
       QUALITY_FILES="$js_quality_files" run_dev docs:check
