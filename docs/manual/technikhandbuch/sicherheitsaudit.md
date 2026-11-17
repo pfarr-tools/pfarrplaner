@@ -124,7 +124,7 @@ neuen TOTP-Faktor aktiviert. Ein fehlgeschlagener oder unvollständiger Versuch
 lässt den Marker bestehen. Nicht markierte Konten und Gäste werden nicht
 eingeschränkt.
 
-## Passkey-Grundlage (in Umsetzung)
+## Passkey-Anmeldung und Geräteverwaltung
 
 Die WebAuthn-Basis verwendet Laravels `laravel/passkeys` (`v0.3.0`) und den
 offiziellen Browser-Client `@laravel/passkeys` (`v0.4.1`). Das PHP-Paket
@@ -159,9 +159,14 @@ Paketprüfung erzwingt User Verification; Laravel bindet jede Login-Challenge
 zweckgebunden an die Session, begrenzt sie auf 60 Sekunden und verwirft sie
 nach jedem Einreichungsversuch. Beide Endpunkte sind auf sechs Anfragen pro
 Minute begrenzt. Ein erfolgreicher Passkey-Login rotiert die Session und
-durchläuft weiterhin die zentralen Passwortwechsel- und Recovery-Gates. Die
-Registrierungs- und Verwaltungsoberfläche sowie deren Routen sind noch nicht
-umgesetzt; Benutzer können in dieser Etappe noch keine Passkeys einrichten.
+durchläuft weiterhin die zentralen Passwortwechsel- und Recovery-Gates.
+Eigene Registrierungs- und Verwaltungsrouten verlangen Authentifizierung und
+eine frische Passwortbestätigung. Die Registrierung verlangt discoverable
+Credentials und User Verification. Listendarstellungen enthalten nur Namen,
+Gerätekennung und Zeitstempel, keine Credential-Payloads. Umbenennen und
+Widerruf prüfen die Eigentümerschaft; der Widerruf löscht das Credential.
+Das Profil bietet mehrere Geräte, Umbenennen und Widerruf an. Die Login-Seite
+zeigt die Passkey-Option kontoübergreifend vor einer Kontoauswahl.
 
 Der produktive Routenbestand wurde geprüft und gezielt gehärtet. Dabei wurden folgende Klassen von Problemen beseitigt:
 

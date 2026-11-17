@@ -28,19 +28,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use App\Http\Controllers\Auth\ConfirmPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasskeyLoginController;
+use App\Http\Controllers\Auth\PasskeyManagementController;
 use App\Http\Controllers\UserController;
-use App\Http\Middleware\RequireFreshPasskeyLoginChallenge;
+use App\Http\Middleware\RequireFreshPasskeyChallenge;
 use Illuminate\Support\Facades\Auth;
 
 Auth::routes(['logout' => false, 'register' => false]);
+Route::get('/password/confirm', [ConfirmPasswordController::class, 'show'])
+    ->middleware('auth')
+    ->name('password.confirm');
+Route::post('/password/confirm', [ConfirmPasswordController::class, 'store'])
+    ->middleware(['auth', 'throttle:6,1'])
+    ->name('password.confirm.store');
 Route::get('/passkeys/login/options', [PasskeyLoginController::class, 'options'])
     ->middleware(['guest', 'throttle:passkey-login'])
     ->name('passkey.login-options');
 Route::post('/passkeys/login', [PasskeyLoginController::class, 'verify'])
-    ->middleware(['guest', RequireFreshPasskeyLoginChallenge::class, 'throttle:passkey-login'])
+    ->middleware(['guest', RequireFreshPasskeyChallenge::class.':login', 'throttle:passkey-login'])
     ->name('passkey.login');
+Route::middleware(['auth', 'password.confirm'])
+    ->prefix('/user/passkeys')
+    ->name('user.passkeys.')
+    ->group(function (): void {
+        Route::get('/', [PasskeyManagementController::class, 'index'])
+            ->middleware('throttle:6,1')
+            ->name('index');
+        Route::get('/options', [PasskeyManagementController::class, 'options'])
+            ->middleware('throttle:6,1')
+            ->name('options');
+        Route::post('/', [PasskeyManagementController::class, 'store'])
+            ->middleware([RequireFreshPasskeyChallenge::class.':registration', 'throttle:6,1'])
+            ->name('store');
+        Route::patch('/{passkey}', [PasskeyManagementController::class, 'rename'])
+            ->middleware('throttle:6,1')
+            ->name('rename');
+        Route::delete('/{passkey}', [PasskeyManagementController::class, 'destroy'])
+            ->middleware('throttle:6,1')
+            ->name('destroy');
+    });
 Route::get('/login/challenge', [LoginController::class, 'showChallenge'])->name('login.challenge');
 Route::post('/login/challenge', [LoginController::class, 'verifyChallenge'])->name('login.challenge.verify');
 Route::post('/login/challenge/email', [LoginController::class, 'sendEmailChallenge'])->name('login.challenge.email');

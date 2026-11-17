@@ -65,11 +65,10 @@ des Postfachs und aller Recovery-Codes ist weiterhin eine administrative
 Identitätsprüfung erforderlich; Support darf keine Codes oder TOTP-Schlüssel
 per Chat oder E-Mail erfragen.
 
-### Passkey-Betrieb (Integration noch in Umsetzung)
+### Passkey-Betrieb
 
-Die Passkey-Basis und der generische Login-Endpunkt sind integriert. Für einen
-vollständigen Ablauf fehlen noch Registrierung und Benutzerverwaltung. Vor dem
-späteren Betrieb müssen `APP_URL`, RP-ID und zugelassene Origins zur tatsächlich
+Passkey-Login und die Einrichtung sowie Verwaltung registrierter Geräte sind
+integriert. `APP_URL`, RP-ID und zugelassene Origins müssen zur tatsächlich
 verwendeten Browseradresse passen:
 
 - `PASSKEYS_RELYING_PARTY_ID`: Domain ohne `https://` und ohne Port; leer
@@ -88,12 +87,14 @@ Produktion benötigen HTTPS. Die Migration
 Sie vor dem späteren Produktiv-Update Datenbank und Anwendungsversion. Ein
 Rollback dieser Migration entfernt die Passkeys-Tabelle samt registrierten
 Credentials; Benutzer müssten Passkeys anschließend erneut einrichten. Die
-automatischen Paket-Routen bleiben deaktiviert. Die projektspezifischen
-Login-Routen verwenden discoverable Credentials und User Verification. Ihre
-Challenges sind an die Session gebunden, nach 60 Sekunden abgelaufen und nach
-jedem Sendeversuch verbraucht. Login-Optionen und Prüfungen sind jeweils auf
-sechs Anfragen pro Minute begrenzt. Bis die Benutzeroberfläche zur Einrichtung
-umgesetzt ist, können Benutzer noch keine Passkeys registrieren.
+automatischen Paket-Routen bleiben deaktiviert. Projektspezifische Login-Routen
+verwenden discoverable Credentials und User Verification. Ihre Challenges sind
+an die Session gebunden, nach 60 Sekunden abgelaufen und nach jeder Einreichung
+verbraucht. Login-Optionen und Prüfungen teilen ein Limit von sechs Anfragen pro
+Minute je IP-Adresse. Verwaltungsrouten erfordern Anmeldung und eine frische
+Bestätigung des aktuellen Passworts. Benutzer können mehrere Credentials
+registrieren, umbenennen und widerrufen. Passkey-Anmeldungen durchlaufen
+weiterhin die erzwungene Passwortänderung und die TOTP-Recovery.
 
 ### Wiederherstellung nach Verlust von Gerät und Recovery-Codes
 

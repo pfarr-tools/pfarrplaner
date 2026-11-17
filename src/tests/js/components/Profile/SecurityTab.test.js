@@ -2,6 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import axios from 'axios'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import SecurityTab from '@/components/Profile/Tabs/SecurityTab.vue'
+import { Passkeys } from '@laravel/passkeys'
 
 vi.mock('qrcode', () => ({
     default: { toDataURL: vi.fn(() => 'data:image/png;base64,local-qr-code') },
@@ -170,5 +171,49 @@ describe('SecurityTab', () => {
         expect(wrapper.text()).not.toContain('JBSWY3DPEHPK3PXP')
         expect(wrapper.vm.twoFactor.currentPassword).toBe('')
         post.mockRestore()
+    })
+
+    it('registers a discoverable passkey and adds only safe display fields', async () => {
+        const register = vi.spyOn(Passkeys, 'register').mockResolvedValue({
+            id: 7,
+            name: 'Arbeitslaptop',
+        })
+        const wrapper = mountSecurityTab()
+
+        await wrapper.find('[data-testid="passkey-name"]').setValue('Arbeitslaptop')
+        await wrapper.find('[data-testid="register-passkey"]').trigger('click')
+        await flushPromises()
+
+        expect(wrapper.vm.passkeyError).toBe('')
+        expect(register).toHaveBeenCalledWith({
+            name: 'Arbeitslaptop',
+            routes: {
+                options: '/user.passkeys.options',
+                submit: '/user.passkeys.store',
+            },
+        })
+        expect(wrapper.find('#passkey-label-7').element.value).toBe('Arbeitslaptop')
+        expect(wrapper.text()).toContain('Passkey')
+        expect(wrapper.vm.managedPasskeys[0]).not.toHaveProperty('credential')
+    })
+
+    it('renames and revokes through the protected passkey management routes', async () => {
+        const patch = vi.spyOn(axios, 'patch').mockResolvedValue({
+            data: { id: 7, name: 'Neuer Name' },
+        })
+        const remove = vi.spyOn(axios, 'delete').mockResolvedValue({})
+        vi.spyOn(window, 'confirm').mockReturnValue(true)
+        const wrapper = mountSecurityTab({
+            passkeys: [{ id: 7, name: 'Alter Name', authenticator: 'Passkey' }],
+        })
+
+        await wrapper.find('[data-testid="rename-passkey"]').trigger('click')
+        await flushPromises()
+        expect(patch).toHaveBeenCalledWith('/user.passkeys.rename', { name: 'Alter Name' })
+
+        await wrapper.find('[data-testid="revoke-passkey"]').trigger('click')
+        await flushPromises()
+        expect(remove).toHaveBeenCalledOnce()
+        expect(wrapper.text()).toContain('Noch kein Passkey eingerichtet.')
     })
 })

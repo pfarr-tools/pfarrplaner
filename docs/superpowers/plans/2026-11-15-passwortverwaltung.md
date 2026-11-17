@@ -289,10 +289,36 @@ Vorab-Auskunft. Die kryptografische Paketprüfung verlangt User Verification.
 Die Challenge ist an Session-ID und Zweck gebunden, läuft nach höchstens 60
 Sekunden ab und wird nach jedem Einreichungsversuch verbraucht; beide Endpunkte
 haben das vereinbarte Limit von sechs Anfragen pro Minute. Erfolgreicher Login
-rotiert die Session und lässt zentrale Passwortwechsel- und Recovery-Gates
-weiterwirken. Die Registrierung und Verwaltung der Credentials folgt als
-nächster Umsetzungsschritt, daher ist die Login-Option bis dahin noch nicht
-für Endbenutzer verfügbar.
+  rotiert die Session und lässt zentrale Passwortwechsel- und Recovery-Gates
+  weiterwirken. Die allgemeine Passkey-Option auf der Login-Seite, Einrichtung
+  im Profil sowie Umbenennen und Widerruf der Credentials sind in Task 5c
+  umgesetzt und werden dort separat reviewed.
+
+**Task 5c — Einrichtung und Geräteverwaltung:** Eigentümergebundene
+Registrierungs-, Listen-, Umbenennungs- und Widerrufsrouten nutzen die Paket-
+Validatoren, verpflichtende Geräteverifikation, Session-Challenges und frische
+Passwortbestätigung. Profil und Login bieten die Abläufe in der Oberfläche an.
+Die Passwortbestätigungsseite gibt nur sichere lokale Rücksprungziele frei.
+Der Browserclient erhält die Optionen- und Submit-URLs explizit aus den
+benannten Laravel-Routen. Credential-Listen geben ausschließlich ID, Name,
+Authenticator und Zeitstempel zurück; Änderungen und Widerruf prüfen die
+Kontozugehörigkeit.
+
+Der erste Senior Review war **NOT APPROVED**: Das Profil hatte `passkeys` nicht
+als Prop deklariert und reichte daher die Serverliste nicht an den Sicherheit-
+Tab durch; außerdem war die technische Handbuchüberschrift veraltet. Beides
+wurde korrigiert und ein Profil-Komponententest ergänzt. Der zweite Re-Review
+beanstandete eine nur implizite Übereinstimmung zwischen Client-Standardpfaden
+und den eigenen Routen. Login und Registrierung verwenden nun ausdrücklich
+Ziggy-URLs der benannten Routen, mit Assertions in den Vue-Tests. Der Senior
+Re-Review genehmigte Task 5c anschließend **APPROVED**, ohne offene Befunde.
+
+Verifikation: isolierte PHP-Fokussuite **22 Tests, 104 Assertions bestanden**;
+Vue-Fokussuite **12 Tests bestanden**; PHPStan **keine Fehler**;
+`git diff --check` sauber. Die komplette Formatter-Ausführung über Docker lief
+durch; ihr alleiniger Lauf änderte zwei nicht zu Task 5c gehörende, zuvor
+unveränderte Dateien, die gezielt zurückgesetzt wurden. `docs/cve/` blieb
+unberührt.
 
 ### Task 6: Gesamtprüfung und Übergabe
 

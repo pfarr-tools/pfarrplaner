@@ -64,6 +64,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Laravel\Passkeys\Passkey;
 use RoundlyConsulting\TwoFactor\DataTransferObjects\TwoFactorSetup;
 use RoundlyConsulting\TwoFactor\Exceptions\InvalidTwoFactorCodeException;
 use RoundlyConsulting\TwoFactor\Exceptions\TwoFactorAlreadyEnabledException;
@@ -519,6 +520,13 @@ class UserController extends Controller
         $ministries = MinistryService::all();
         $twoFactorEnabled = $user->hasTwoFactorEnabled();
         $twoFactorPending = $user->hasPendingTwoFactor();
+        $passkeys = $user->passkeys()->latest()->get()->map(static fn (Passkey $passkey): array => [
+            'id' => $passkey->getKey(),
+            'name' => $passkey->name,
+            'authenticator' => $passkey->authenticator,
+            'createdAt' => $passkey->created_at?->toIso8601String(),
+            'lastUsedAt' => $passkey->last_used_at?->toIso8601String(),
+        ])->all();
 
         $tab = $request->get('tab', '');
 
@@ -537,6 +545,7 @@ class UserController extends Controller
                 'settings',
                 'twoFactorEnabled',
                 'twoFactorPending',
+                'passkeys',
             )
         );
     }

@@ -91,6 +91,7 @@
                     :password="password"
                     :two-factor-enabled="twoFactorEnabled"
                     :two-factor-pending="twoFactorPending"
+                    :passkeys="passkeys"
                     @update:password="password = $event"
                 />
             </tab>
@@ -177,6 +178,7 @@ export default {
         'settings',
         'twoFactorEnabled',
         'twoFactorPending',
+        'passkeys',
     ],
     components: {
         ExternalContentTab,

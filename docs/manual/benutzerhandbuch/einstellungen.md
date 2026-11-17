@@ -97,6 +97,20 @@ Die Wiederherstellung meldet auch gespeicherte Sitzungen und Kalender- oder
 API-Verbindungen ab. Richten Sie diese nach der TOTP-Neueinrichtung mit Ihrem
 neuen API-Token wieder ein.
 
+### Passkeys
+
+Im Bereich **Sicherheit** können Sie mehrere Passkeys für Ihre Geräte
+einrichten. Geben Sie einen wiedererkennbaren Namen ein und wählen Sie
+**Passkey einrichten**. Bestätigen Sie bei Aufforderung Ihr Passwort. Der
+Browser bittet Sie anschließend, die Geräte-PIN, Biometrie oder eine andere
+lokale Geräteverifikation zu verwenden. Das Gerät muss Passkeys unterstützen.
+
+Sie können einen Passkey umbenennen oder widerrufen. Beim Widerruf wird das
+Gerät sofort für künftige Anmeldungen gesperrt. Auf der Login-Seite steht
+**Mit Passkey anmelden** unabhängig von der zuvor eingegebenen E-Mailadresse
+zur Verfügung. Dabei wird keine Kontoauswahl vorab angezeigt. Passwort und
+TOTP-/E-Mail-Challenge bleiben als Anmeldewege bestehen.
+
 ---
 
 ## Reiter: E-Mailbenachrichtigungen

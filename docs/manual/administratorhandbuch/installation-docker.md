@@ -129,7 +129,7 @@ immer über `./planer dev ...` angesprochen. Die produktive
 
 - Dateirechte zwischen Host und Container müssen passen.
 - Die öffentliche URL in `APP_URL` muss auf die echte Außenadresse zeigen, nicht auf einen internen Containernamen.
-- Bei der späteren Passkey-Freigabe müssen `PASSKEYS_RELYING_PARTY_ID` und `PASSKEYS_ALLOWED_ORIGINS` zu dieser Browseradresse passen; Details stehen unter [Passkey-Betrieb](sicherheit.md#passkey-betrieb-integration-noch-in-umsetzung).
+- Für Passkeys müssen `PASSKEYS_RELYING_PARTY_ID` und `PASSKEYS_ALLOWED_ORIGINS` zur Browseradresse passen; Details stehen unter [Passkey-Betrieb](sicherheit.md#passkey-betrieb).
 - Headless-Chromium braucht im Image die passenden Pakete und Bibliotheken.
 - Horizon und Scheduler laufen als eigene, überwachte Compose-Dienste.
 - Für Produktionsmail wird der optionale send-only-Postfix mit `--profile mail` gestartet; er veröffentlicht keinen Host-Port.

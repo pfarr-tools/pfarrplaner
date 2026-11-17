@@ -1,6 +1,9 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import Login from '@/Pages/Auth/Login.vue'
+import { Passkeys } from '@laravel/passkeys'
+
+afterEach(() => vi.restoreAllMocks())
 
 describe('Login', () => {
     it('shows the same password step locally after the username, without a request', async () => {
@@ -32,5 +35,37 @@ describe('Login', () => {
         expect(wrapper.text()).toContain('Passwort')
         expect(window.axios.get).not.toHaveBeenCalled()
         expect(wrapper.vm.$inertia.post).not.toHaveBeenCalled()
+    })
+
+    it('offers discoverable passkey login before the account is identified', async () => {
+        const verify = vi.spyOn(Passkeys, 'verify').mockResolvedValue({})
+        const wrapper = mount(Login, {
+            global: {
+                mocks: {
+                    $page: {
+                        props: {
+                            appName: 'Pfarrplaner',
+                            appProvider: '',
+                            dev: false,
+                            demo: false,
+                            errors: {},
+                        },
+                    },
+                },
+            },
+        })
+
+        expect(wrapper.find('[name="email"]').exists()).toBe(true)
+        await wrapper.find('[data-testid="passkey-login"]').trigger('click')
+
+        expect(verify).toHaveBeenCalledOnce()
+        expect(verify).toHaveBeenCalledWith({
+            routes: {
+                options: '/passkey.login-options',
+                submit: '/passkey.login',
+            },
+            remember: expect.any(Function),
+        })
+        expect(verify.mock.calls[0][0].remember()).toBe(false)
     })
 })

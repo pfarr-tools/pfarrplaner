@@ -105,6 +105,94 @@
             Zwei-Faktor-Authentifizierung deaktivieren
         </button>
 
+        <hr />
+        <section
+            class="passkey-management"
+            data-testid="passkey-management"
+        >
+            <h3>Passkeys</h3>
+            <p>
+                Passkeys ermöglichen eine Anmeldung ohne Passwort. Die Geräteverifikation mit PIN
+                oder Biometrie muss aktiviert sein.
+            </p>
+            <p>
+                Für Einrichtung und Verwaltung ist eine aktuelle Passwortbestätigung nötig.
+                <a :href="passwordConfirmationUrl">Passwort bestätigen</a>
+            </p>
+            <label for="passkey-name">Name für dieses Gerät</label>
+            <input
+                id="passkey-name"
+                v-model="newPasskeyName"
+                class="form-control mb-2"
+                maxlength="255"
+                autocomplete="off"
+                data-testid="passkey-name"
+            />
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-testid="register-passkey"
+                :disabled="passkeyBusy || !newPasskeyName.trim()"
+                @click="registerPasskey"
+            >
+                {{ passkeyBusy ? 'Passkey wird eingerichtet …' : 'Passkey einrichten' }}
+            </button>
+            <p
+                v-if="passkeyError"
+                class="alert alert-danger mt-2"
+                role="alert"
+            >
+                {{ passkeyError }}
+                <a href="/password/confirm">Passwort jetzt bestätigen</a>
+            </p>
+            <ul
+                v-if="managedPasskeys.length"
+                class="list-group mt-3"
+            >
+                <li
+                    v-for="passkey in managedPasskeys"
+                    :key="passkey.id"
+                    class="list-group-item"
+                >
+                    <label :for="`passkey-label-${passkey.id}`">Gerätename</label>
+                    <input
+                        :id="`passkey-label-${passkey.id}`"
+                        v-model="passkey.name"
+                        class="form-control mb-2"
+                        maxlength="255"
+                        :aria-label="`Name des Passkeys ${passkey.name}`"
+                    />
+                    <small>{{ passkey.authenticator || 'Passkey' }}</small>
+                    <div class="mt-2">
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary me-2"
+                            data-testid="rename-passkey"
+                            :disabled="passkeyBusy"
+                            @click="renamePasskey(passkey)"
+                        >
+                            Umbenennen
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-danger"
+                            data-testid="revoke-passkey"
+                            :disabled="passkeyBusy"
+                            @click="revokePasskey(passkey)"
+                        >
+                            Widerrufen
+                        </button>
+                    </div>
+                </li>
+            </ul>
+            <p
+                v-else
+                class="text-muted mt-3"
+            >
+                Noch kein Passkey eingerichtet.
+            </p>
+        </section>
+
         <section
             v-if="setupModalOpen"
             class="setup-backdrop"
@@ -281,6 +369,7 @@ import axios from 'axios'
 import QRCode from 'qrcode'
 import FormInput from '../../Ui/forms/FormInput'
 import OneTimeCodeInput from '../../Ui/forms/OneTimeCodeInput.vue'
+import { Passkeys } from '@laravel/passkeys'
 export default {
     name: 'SecurityTab',
     components: { FormInput, OneTimeCodeInput },
@@ -289,6 +378,7 @@ export default {
         password: { type: Object, required: true },
         twoFactorEnabled: { type: Boolean, default: false },
         twoFactorPending: { type: Boolean, default: false },
+        passkeys: { type: Array, default: () => [] },
     },
     emits: ['two-factor-enabled', 'two-factor-disabled', 'update:password'],
     data() {
@@ -300,6 +390,10 @@ export default {
             recoveryCodesSaved: false,
             factorEnabled: this.twoFactorEnabled,
             factorPending: this.twoFactorPending,
+            managedPasskeys: this.passkeys.map((passkey) => ({ ...passkey })),
+            newPasskeyName: '',
+            passkeyBusy: false,
+            passkeyError: '',
             twoFactor: {
                 busy: false,
                 code: '',
@@ -313,8 +407,70 @@ export default {
         provisioningSecret() {
             return new window.URL(this.setup.provisioning_uri).searchParams.get('secret') || ''
         },
+        /** Return to the active security tab after password confirmation. */
+        passwordConfirmationUrl() {
+            const destination = `${window.location.pathname}${window.location.search}`
+            return `${window.route('password.confirm')}?redirect=${encodeURIComponent(destination)}`
+        },
     },
     methods: {
+        /** Register a discoverable passkey after a fresh password confirmation. */
+        async registerPasskey() {
+            if (this.passkeyBusy || !this.newPasskeyName.trim()) return
+
+            this.passkeyBusy = true
+            this.passkeyError = ''
+            try {
+                const result = await Passkeys.register({
+                    name: this.newPasskeyName.trim(),
+                    routes: {
+                        options: window.route('user.passkeys.options'),
+                        submit: window.route('user.passkeys.store'),
+                    },
+                })
+                this.managedPasskeys.unshift({ ...result, authenticator: 'Passkey' })
+                this.newPasskeyName = ''
+            } catch {
+                this.passkeyError =
+                    'Passkey konnte nicht eingerichtet werden. Bestätige dein Passwort erneut und versuche es noch einmal.'
+            } finally {
+                this.passkeyBusy = false
+            }
+        },
+        /** Persist a changed display name for one owned passkey. */
+        async renamePasskey(passkey) {
+            await this.runPasskeyManagement(async () => {
+                const response = await axios.patch(
+                    window.route('user.passkeys.rename', passkey.id),
+                    {
+                        name: passkey.name,
+                    },
+                )
+                passkey.name = response.data.name
+            })
+        },
+        /** Revoke one passkey after explicit confirmation. */
+        async revokePasskey(passkey) {
+            if (!window.confirm(`Passkey „${passkey.name}“ wirklich widerrufen?`)) return
+
+            await this.runPasskeyManagement(async () => {
+                await axios.delete(window.route('user.passkeys.destroy', passkey.id))
+                this.managedPasskeys = this.managedPasskeys.filter((item) => item.id !== passkey.id)
+            })
+        },
+        /** Run a protected mutation and report password-confirmation failures. */
+        async runPasskeyManagement(action) {
+            this.passkeyBusy = true
+            this.passkeyError = ''
+            try {
+                await action()
+            } catch {
+                this.passkeyError =
+                    'Passkey-Verwaltung nicht möglich. Bestätige dein Passwort erneut und versuche es noch einmal.'
+            } finally {
+                this.passkeyBusy = false
+            }
+        },
         /** Emit a password change without mutating the parent-owned object. */
         updatePassword(field, value) {
             this.$emit('update:password', { ...this.password, [field]: value })

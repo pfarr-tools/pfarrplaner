@@ -149,6 +149,31 @@
                                 Anmelden
                             </button>
                         </div>
+                        <div
+                            v-if="!demo"
+                            class="mt-3"
+                        >
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary"
+                                data-testid="passkey-login"
+                                :disabled="passkeyLoading"
+                                @click="loginWithPasskey"
+                            >
+                                {{
+                                    passkeyLoading
+                                        ? 'Passkey wird geprüft …'
+                                        : 'Mit Passkey anmelden'
+                                }}
+                            </button>
+                            <p
+                                v-if="passkeyError"
+                                class="text-danger mt-2"
+                                role="alert"
+                            >
+                                {{ passkeyError }}
+                            </p>
+                        </div>
                     </form>
                     <DonationNotice class="mt-4 pt-3 border-top" />
                 </div>
@@ -187,6 +212,7 @@ import FormInput from '../../components/Ui/forms/FormInput.vue'
 import FormCheck from '../../components/Ui/forms/FormCheck.vue'
 import FormCsrfToken from '../../components/Ui/forms/FormCsrfToken.vue'
 import DonationNotice from '../../components/Ui/DonationNotice.vue'
+import { Passkeys } from '@laravel/passkeys'
 
 export default {
     name: 'Login',
@@ -205,6 +231,8 @@ export default {
             attempts: 0,
             loginStep: this.$page.props.demo ? 2 : 1,
             loggingIn: false,
+            passkeyLoading: false,
+            passkeyError: '',
             form: {
                 email: this.$page.props.users?.[0]?.email || '',
                 password: '',
@@ -217,6 +245,28 @@ export default {
         continueLogin() {
             if (!this.form.email.trim()) return
             this.loginStep = 2
+        },
+        /** Start discoverable passkey login without sending the typed username. */
+        async loginWithPasskey() {
+            if (this.passkeyLoading || this.demo) return
+
+            this.passkeyLoading = true
+            this.passkeyError = ''
+            try {
+                const response = await Passkeys.verify({
+                    routes: {
+                        options: window.route('passkey.login-options'),
+                        submit: window.route('passkey.login'),
+                    },
+                    remember: () => this.form.remember,
+                })
+                if (response.redirect) window.location.assign(response.redirect)
+            } catch {
+                this.passkeyError =
+                    'Passkey-Anmeldung fehlgeschlagen. Bitte erneut versuchen oder Passwort verwenden.'
+            } finally {
+                this.passkeyLoading = false
+            }
         },
         /** Keep Enter on the username step local; submit credentials on step two. */
         submit(event) {
