@@ -356,6 +356,57 @@ unberührt.
   fortlaufend im Issue dokumentiert; Issue #80 bleibt bis zum Abschluss von
   Task 7 offen.
 
+### Task 6a: UI- und Administrations-Nacharbeiten aus Issue-Kommentaren
+
+Die Folgekommentare vom 17. November ergänzen diese prüfbaren Anforderungen.
+Sie werden vor Task 7 bearbeitet und separat reviewed/committed.
+
+- [ ] Auf dem ersten Login-Schritt erscheint nur die Aktion „Weiter“; die
+  Anmeldung per Passwort wird erst auf dem zweiten Schritt angeboten. Die
+  allgemeine Passkey-Option bleibt vor der Kontenidentifikation verfügbar.
+  Der Test belegt ausdrücklich, dass dort kein zweiter Passwort-Submit-Button
+  gerendert wird und Enter denselben lokalen nächsten Schritt auslöst.
+- [ ] Passkey-Registrierung nach einer frischen Passwortbestätigung wird
+  erfolgreich fortgesetzt. Der Ablauf startet mit nicht bestätigter und
+  abgelaufener Session, bestätigt das Passwort genau einmal, kehrt auf den
+  validierten lokalen Rücksprungpfad zurück und lädt danach Options- und
+  Registrierungsendpunkt ohne erneute Bestätigungsseite. Eine innerhalb von
+  `password.confirm`-Timeout frische Bestätigung bleibt gültig; die Tests
+  prüfen die tatsächliche Middleware-Session-Semantik.
+- [ ] Passkey- und TOTP-Eingaben im Profil-Wizard haben eindeutige Labels,
+  stabile Feldnamen/IDs und passende `autocomplete`-/`inputmode`-Attribute,
+  sodass Passwortmanager wie Bitwarden Passwort und Einmalcode erkennen.
+- [ ] Der geführte TOTP-Dialog erhält ein zugängliches X-Schließen oben rechts
+  und eine ausdrückliche Abbrechen-Aktion. Schließen/Abbrechen löschen
+  Passwort, Code, Seed, QR-Daten und Recovery-Codes aus dem clientseitigen
+  UI-Zustand; beide Aktionen werden getrennt geprüft.
+- [ ] Lokale Administrator:innen dürfen einen automatisch generierten
+  temporären Zugang nur für ein anderes Konto neu ausstellen, wenn die
+  bestehende `update`-Policy den Zugriff erlaubt. Dafür wird eine eigene
+  `resetPassword`-Policy mit expliziter Fremdkonto-, Zielrollen- und
+  Bearbeitbarkeitsprüfung verwendet. Die Zielperson erhält die Zugangsdaten
+  per bestehender AccountData-Mail und muss das Passwort ändern. Selbst-Reset,
+  Super-Admin-Ziele und nicht bearbeitbare Konten bleiben ausgeschlossen.
+- [ ] Die manuelle Vergabe eines Passworts für ein bestehendes Konto bleibt
+  Super-Administrator:innen vorbehalten. Das Formular zeigt die Aktion
+  ausdrücklich an, validiert das starke Passwort serverseitig, setzt
+  `must_change_password` und versendet die Zugangsdaten über den bestehenden
+  Mailpfad; Passwortwerte gelangen nicht in Props, Logs oder Flashdaten.
+- [ ] Die Login-Seite verlinkt auf den Laravel-Passwort-Reset. Dessen
+  tatsächliche Throttling-Konfiguration wird geprüft und nötigenfalls ergänzt.
+  Bekannte und unbekannte E-Mailadressen erhalten denselben sichtbaren
+  Antworttext und Status; Rate-Limit- und ungültige Token-Zustände werden
+  ebenfalls getestet.
+- [ ] Neue Regressionstests decken Login-Schritte, Passwortbestätigung,
+  Formular-Metadaten, beide Dialog-Schließen-Pfade und Geheimnisbereinigung,
+  lokale Admin-Autorisierung samt temporärer AccountData-Mail und erzwungener
+  Passwortänderung, Super-Admin-Vergabe eines starken Passworts sowie
+  bekannte/unbekannte Reset-Anfragen und den Login-Link getrennt ab.
+- [ ] Benutzer-, Administratoren- und Technisches Handbuch werden für
+  Login, Selbst-Reset, Admin-Reset, manuelle Vergabe und 2FA-Einrichtung
+  konsistent und rollenbezogen aktualisiert. Jeder Teilschritt erhält Review,
+  Issue-Kommentar und eigenen Commit. Danach folgt Task 7.
+
 ### Task 7: Wiederkehrende Sicherheitsempfehlung
 
 Diese letzte Produktetappe folgt nach der Passkey-Implementierung und der
