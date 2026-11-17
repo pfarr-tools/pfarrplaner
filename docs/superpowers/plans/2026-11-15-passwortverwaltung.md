@@ -159,6 +159,29 @@ Passwörtern.
 - [x] Rate-Limits, Replay-Schutz, Ablauf, Mailversand und generische
   Fehlermeldungen testen und im Administratorenhandbuch dokumentieren.
 
+### Task 4b: Verständlicher TOTP- und Login-Ablauf
+
+Der UI-Kommentar in Issue #80 ergänzt vor Passkey-Anmeldung diese
+Nutzerführung:
+
+- [ ] TOTP-Einrichtung startet über einen einzelnen Button und führt in einem
+  mehrstufigen Popup mit klaren, nicht-technischen Erklärungen durch App-Auswahl,
+  QR-Code, Bestätigung und sichere Aufbewahrung der Recovery-Codes. Microsoft
+  Authenticator und [2FAS Auth](https://2fas.com/auth/) als Open-Source-App für
+  iOS und Android werden als Beispiele genannt. Der QR-Code wird lokal erzeugt;
+  der TOTP-Seed darf nicht an einen externen QR-Dienst gelangen.
+- [ ] Login beginnt mit dem Benutzernamen und wird anschließend für Passwort,
+  Passkey und gegebenenfalls TOTP verständlich fortgeführt. Nach dem
+  Benutzernamen sehen alle denselben nächsten Schritt; die Passkey-Option wird
+  allgemein angeboten. Erst nach erfolgreicher Passwortprüfung wird bei
+  entsprechend eingerichteten Konten TOTP verlangt. Unbekannte Konten und
+  konfigurierte Faktoren dürfen vor erfolgreicher Anmeldung nicht erkennbar
+  sein. Die Passkey-Option wird mit Task 5 funktionsfähig umgesetzt.
+- [ ] TOTP-Eingabefelder erhalten passende Browser- und Passwortmanager-Semantik
+  (`autocomplete="one-time-code"`, numerische Eingabe und eindeutige
+  Beschriftung); die Erkennung mit Bitwarden wird im Browser geprüft.
+- [ ] Benutzerhandbuch und relevante Browser-/Feature-Tests aktualisieren.
+
 ### Task 5: Passkey-Anmeldung
 
 **Dateien:**
@@ -172,6 +195,8 @@ Passwörtern.
 
 - [ ] WebAuthn-Bibliothek, RP-ID, Origins und Deployment-Konfiguration
   verbindlich festlegen; lokale, Dev- und Produktionsdomains berücksichtigen.
+  Die allgemeine Passkey-Option aus Task 4b funktionsfähig in den gemeinsamen
+  zweiten Login-Schritt integrieren.
 - [ ] Registrierung, Mehrfachgeräte, Umbenennung, Widerruf und Login mit
   Challenge-Ablauf und Replay-Schutz implementieren.
 - [ ] Fallback auf Passwort/2FA, verlorene Geräte und Admin-Recovery ohne
