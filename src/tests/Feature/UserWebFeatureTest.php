@@ -17,6 +17,7 @@ use App\Mail\User\AccountData;
 use App\Mail\User\TwoFactorLoginCode;
 use App\Models\People\TwoFactorRecoveryAudit;
 use App\Models\People\User;
+use App\Services\PasswordService;
 use App\Services\RoleService;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -713,6 +714,54 @@ class UserWebFeatureTest extends TestCase
         Mail::assertQueued(AccountData::class);
     }
 
+    /** The generated temporary password format is accepted only for a forced password change. */
+    public function test_super_admin_can_manually_set_a_temporary_initial_password(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        Mail::fake();
+        $target = User::factory()->create();
+        $password = PasswordService::temporaryInitialPassword();
+
+        $this->actingAs($this->user)
+            ->patch(route('user.update', $target), [
+                'id' => $target->id,
+                'first_name' => $target->first_name,
+                'last_name' => $target->last_name,
+                'email' => $target->email,
+                'password' => $password,
+                'manualPassword' => 1,
+            ])
+            ->assertRedirect(route('users.index'));
+
+        $this->assertTrue(Hash::check($password, $target->fresh()->password));
+        $this->assertTrue((bool) $target->fresh()->must_change_password);
+        Mail::assertQueued(AccountData::class);
+    }
+
+    /** Manual Super-Admin assignment accepts any non-empty temporary password. */
+    public function test_super_admin_can_set_an_arbitrary_temporary_password(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        Mail::fake();
+        $target = User::factory()->create();
+        $password = 'x';
+
+        $this->actingAs($this->user)
+            ->patch(route('user.update', $target), [
+                'id' => $target->id,
+                'first_name' => $target->first_name,
+                'last_name' => $target->last_name,
+                'email' => $target->email,
+                'password' => $password,
+                'manualPassword' => 1,
+            ])
+            ->assertRedirect(route('users.index'));
+
+        $this->assertTrue(Hash::check($password, $target->fresh()->password));
+        $this->assertTrue((bool) $target->fresh()->must_change_password);
+        Mail::assertQueued(AccountData::class);
+    }
+
     /** Activation and deactivation require a fresh password re-authentication. */
     public function test_two_factor_security_actions_require_reauthentication(): void
     {
@@ -925,6 +974,7 @@ class UserWebFeatureTest extends TestCase
         $this->withoutMiddleware(VerifyCsrfToken::class);
         Mail::fake();
         $target = User::factory()->create(['password' => null]);
+        $password = PasswordService::temporaryInitialPassword();
 
         $response = $this->actingAs($this->user)
             ->patch(route('user.update', $target), [
@@ -933,15 +983,15 @@ class UserWebFeatureTest extends TestCase
                 'last_name' => $target->last_name,
                 'email' => 'new-account@example.com',
                 'createAccount' => '1',
-                'password' => 'Voca1234!',
+                'password' => $password,
             ])
             ->assertRedirect(route('users.index'));
 
         $fresh = $target->fresh();
-        $this->assertTrue(Hash::check('Voca1234!', $fresh->password));
+        $this->assertTrue(Hash::check($password, $fresh->password));
         $this->assertTrue((bool) $fresh->must_change_password);
         Mail::assertQueued(AccountData::class);
-        $this->assertStringNotContainsString('Voca1234!', json_encode($response->getSession()->all()));
+        $this->assertStringNotContainsString($password, json_encode($response->getSession()->all()));
     }
 
     /** Account creation requires a password instead of generating an unseen replacement. */
@@ -957,6 +1007,29 @@ class UserWebFeatureTest extends TestCase
                 'createAccount' => '1',
             ])
             ->assertSessionHasErrors('password');
+    }
+
+    /** The manual-password flag cannot weaken validation while creating an account. */
+    public function test_manual_password_flag_does_not_bypass_account_creation_password_rules(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        Mail::fake();
+        $target = User::factory()->create(['password' => null]);
+
+        $this->actingAs($this->user)
+            ->patch(route('user.update', $target), [
+                'id' => $target->id,
+                'first_name' => $target->first_name,
+                'last_name' => $target->last_name,
+                'email' => 'new-account@example.com',
+                'createAccount' => '1',
+                'manualPassword' => '1',
+                'password' => 'x',
+            ])
+            ->assertSessionHasErrors('password');
+
+        $this->assertNull($target->fresh()->password);
+        Mail::assertNothingQueued();
     }
 
     /** A regular administrator cannot create a user with a password. */

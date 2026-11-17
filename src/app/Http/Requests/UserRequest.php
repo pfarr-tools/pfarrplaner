@@ -90,7 +90,11 @@ class UserRequest extends FormRequest
             'title' => 'nullable|string',
             // add an exception to "unique" when an existing user account is updated
             'email' => 'nullable|string|email|max:255|unique:users,email'.(($user && $user->id) ? ','.$user->id : ''),
-            'password' => ['nullable', 'string', new StrongPassword],
+            'password' => [
+                'nullable',
+                'string',
+                new StrongPassword($this->boolean('manualPassword') || $this->boolean('createAccount')),
+            ],
             'manualPassword' => 'nullable|boolean',
             'office' => 'nullable|string',
             'address' => 'nullable|string',
@@ -115,7 +119,12 @@ class UserRequest extends FormRequest
 
         if ($this->boolean('createAccount')) {
             $rules['email'] = 'required|email';
-            $rules['password'] = ['required', 'string', new StrongPassword];
+            $rules['password'] = ['required', 'string', new StrongPassword(true)];
+        }
+
+        if ($this->boolean('manualPassword') && ! $this->boolean('createAccount')) {
+            // Super-Admin temporary credentials are arbitrary but must not be empty.
+            $rules['password'] = ['required', 'string'];
         }
 
         return $rules;

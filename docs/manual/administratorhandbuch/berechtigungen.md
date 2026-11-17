@@ -48,9 +48,9 @@ Dieses Kapitel beschreibt die im Anwendungscode verfügbaren Policy-Verben. Eine
 
 Ein Benutzerkonto kann sein eigenes Passwort im Reiter **Sicherheit** ändern. Das neue Passwort muss mindestens acht Zeichen lang sein und je einen Großbuchstaben, Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten.
 
-Nur Super-Administrator:innen dürfen in der Benutzerverwaltung ein Passwort für ein anderes Konto setzen oder einen Passwort-Reset auslösen. Dabei wird ein vorläufiges Anfangspasswort nach dem Muster „Konsonant, Vokal, Konsonant, Vokal, vier Zahlen“ erzeugt und der nächste Passwortwechsel erzwungen. Das vorläufige Passwort ist nur für die einmalige Übergabe gedacht.
+Nur Super-Administrator:innen dürfen in der Benutzerverwaltung ein Passwort für ein anderes Konto setzen oder einen Passwort-Reset auslösen. Beim Zurücksetzen wird ein vorläufiges Anfangspasswort nach dem Muster „Konsonant, Vokal, Konsonant, Vokal, vier Zahlen“ erzeugt. Bei der manuellen Setzung darf die Administration ein beliebiges nichtleeres Passwort wählen. Beide Wege erzwingen den Passwortwechsel bei der nächsten Anmeldung; normale, selbst gewählte Passwörter müssen weiterhin die zentrale starke Passwortregel erfüllen.
 
-Beim Anlegen eines Kontos zeigt der Benutzereditor ein Anfangspasswort an. Die Administratorin oder der Administrator muss es vor dem Speichern ausdrücklich bestätigen; anschließend wird nur der Hash gespeichert und die Kontodaten-Mail versendet. Das Passwort kann vor dem Speichern neu vorgeschlagen oder angepasst werden, muss aber weiterhin die zentrale Passwortregel erfüllen.
+Beim Anlegen eines Kontos zeigt der Benutzereditor ein Anfangspasswort an. Die Administratorin oder der Administrator muss es vor dem Speichern ausdrücklich bestätigen; anschließend wird nur der Hash gespeichert und die Kontodaten-Mail versendet. Das Passwort kann vor dem Speichern neu vorgeschlagen oder angepasst werden. Es muss entweder die zentrale Passwortregel erfüllen oder dem dokumentierten temporären Muster entsprechen; in beiden Fällen wird der nächste Passwortwechsel erzwungen.
 
 Das öffentliche Verfahren **Passwort vergessen** verwendet denselben Passwortstandard und hebt die erzwungene Änderung nach einem erfolgreichen Reset auf. Schwache Passwörter werden bereits bei der Eingabe zurückgewiesen.
 

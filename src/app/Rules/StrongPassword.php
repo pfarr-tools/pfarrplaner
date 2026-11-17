@@ -13,6 +13,7 @@
 
 namespace App\Rules;
 
+use App\Services\PasswordService;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\PotentiallyTranslatedString;
@@ -23,6 +24,13 @@ use Illuminate\Translation\PotentiallyTranslatedString;
 class StrongPassword implements ValidationRule
 {
     /**
+     * Allow temporary credentials only for explicit account-setup flows.
+     *
+     * @param  bool  $allowTemporaryInitialPassword  Whether the one-time pattern is accepted.
+     */
+    public function __construct(private readonly bool $allowTemporaryInitialPassword = false) {}
+
+    /**
      * Validate length and the required character classes of a password.
      *
      * @param  string  $attribute  The validated attribute name.
@@ -31,6 +39,12 @@ class StrongPassword implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if ($this->allowTemporaryInitialPassword
+            && is_string($value)
+            && PasswordService::isTemporaryInitialPassword($value)) {
+            return;
+        }
+
         if (! is_string($value)
             || strlen($value) < 8
             || ! preg_match('/[A-Z]/', $value)

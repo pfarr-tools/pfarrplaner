@@ -62,6 +62,12 @@ class PasswordService
 
     }
 
+    /** Check whether a credential uses the short-lived initial-password pattern. */
+    public static function isTemporaryInitialPassword(string $password): bool
+    {
+        return preg_match('/^[A-Z][aeiouy][bcdfghjklmnpqrstvwxz][aeiouy]\d{4}$/', $password) === 1;
+    }
+
     /**
      * Validate a user-selected password against the central password policy.
      *
