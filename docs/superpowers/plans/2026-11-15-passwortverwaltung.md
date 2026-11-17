@@ -201,6 +201,9 @@ Nutzerführung:
   falsche TOTP-Prüfungen werden pro Konto nach fünf Prüfungen pro Minute
   temporär gesperrt. So bleibt der TOTP-Kontoschutz erhalten, ohne dass Dritte
   gezielt Konten allein durch Passwortversuche blockieren können.
+- [x] Auch für Passkey-Anfragen keine kontoweite Sperre aufgrund fremder
+  Fehlversuche einführen; der Passkey-Endpunkt behält eine anfragebasierte
+  Begrenzung.
 - [ ] Benutzerhandbuch und relevante Browser-/Feature-Tests aktualisieren.
 
 ### Task 5: Passkey-Anmeldung
@@ -217,11 +220,22 @@ Nutzerführung:
 - [ ] WebAuthn-Bibliothek, RP-ID, Origins und Deployment-Konfiguration
   verbindlich festlegen; lokale, Dev- und Produktionsdomains berücksichtigen.
   Die allgemeine Passkey-Option aus Task 4b funktionsfähig in den gemeinsamen
-  zweiten Login-Schritt integrieren.
+  zweiten Login-Schritt integrieren. Gewählt ist `laravel/passkeys` mit dem
+  offiziellen Browser-Client `@laravel/passkeys`: beide unterstützen Laravel
+  13 beziehungsweise Vue, und die Serverbibliothek setzt PHP 8.2 voraus. Der
+  generische Login nutzt discoverable Passkeys ohne vorausgehende Kontoauswahl;
+  das vermeidet eine kontoabhängige Antwort vor der Authentifizierung.
+- RP-ID und erlaubte Origins werden explizit konfiguriert statt aus einer
+  einzigen URL abgeleitet. Die Konfiguration deckt lokale Entwicklung, Dev und
+  die produktive Domain ab. Für jede Origin ist HTTPS erforderlich; das
+  Geheimnis für stabile User-Handles bleibt an die bestehende
+  App-Schlüsselverwaltung gebunden.
 - [ ] Registrierung, Mehrfachgeräte, Umbenennung, Widerruf und Login mit
   Challenge-Ablauf und Replay-Schutz implementieren.
 - [ ] Fallback auf Passwort/2FA, verlorene Geräte und Admin-Recovery ohne
-  Account-Übernahme absichern.
+  Account-Übernahme absichern. Passkey-Login ersetzt weder das
+  Benutzername/IP-Limit für Passwortfehlversuche noch die bestehenden
+  Recovery- und `must_change_password`-Sperren.
 - [ ] API-/Browsergrenzen, HTTPS-Anforderung und Betriebsmaßnahmen im
   technischen und Administratorenhandbuch dokumentieren.
 
