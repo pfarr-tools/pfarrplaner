@@ -322,22 +322,41 @@ unberührt.
 
 ### Task 6: Gesamtprüfung und Übergabe
 
-- [ ] `./planer dev format` und `./planer dev format:check` ausführen.
-- [ ] `./planer dev quality` mit isolierter Testdatenbank ausführen.
-- [ ] Relevante Dusk-/Manual-Tests und `./planer dev docs:check` ausführen.
-- [ ] Migrations-Rollback, DemoBuilder-Anonymisierung und Recovery-Pfad
-  prüfen.
-- [ ] Gesamtprüfung, Migrationen, DemoBuilder-Anonymisierung, Recovery-Pfad,
-  Dokumentation und Browserabläufe abschließen.
-- [ ] Issue #80 mit Implementierung, Tests, Dokumentation und Commits
-  aktualisieren; bis zum Abschluss von Task 7 offen lassen.
+- [ ] Den vollständigen PHP- und JavaScript-Qualitätslauf mit einer explizit
+  isolierten Testdatenbank ausführen; vor jedem Testlauf wirksame Verbindung
+  und Datenbankname prüfen.
+- [ ] Formatprüfung, PHPStan, Lint, JSDoc-/PHPDoc-Prüfung und Handbuchprüfung
+  ausführen; bekannte Containergrenzen der changed-files-Skripte dokumentieren
+  und nötigenfalls die betroffenen Dateien gezielt prüfen.
+- [ ] Dusk-/Browserabläufe für Passwortänderung, Login-Entscheidung,
+  TOTP-/E-Mail-/Recovery-Eingabe, Passkey-Anmeldung und Geräteverwaltung
+  prüfen, soweit sie ohne externe Hardware und Produktionszugriff reproduzierbar
+  sind.
+- [ ] Migration und Rollback-Pfad der Passkeys, DemoBuilder-Anonymisierung,
+  Recovery-Audit/Sessionwiderruf sowie die beiden Rate-Limit-Entscheidungen
+  gegen den Code und die Tests abgleichen.
+- [ ] Benutzer-, Administratoren- und Technisches Handbuch auf konsistente
+  aktuelle Abläufe prüfen und verbleibende Einschränkungen benennen.
+- [ ] Ergebnisse und Commits im Issue festhalten. Issue #80 bleibt bis nach
+  Task 7 offen; Task 6 erhält eigenen Plan- und Ergebniscommit sowie Senior
+  Review.
 
 ### Task 7: Wiederkehrende Sicherheitsempfehlung
 
 Diese letzte Produktetappe folgt nach der Passkey-Implementierung und der
-Gesamtprüfung. Vor der Umsetzung wird mit dem Auftraggeber abgestimmt, welche
-Sicherheitsstrategie Pfarrplaner als nächste empfehlen soll und wann ein Konto
-als ausreichend abgesichert gilt.
+Gesamtprüfung. Die abgestimmte Empfehlung und Erledigungslogik lauten:
+
+- Passkey zuerst empfehlen, weil damit eine passwortlose Anmeldung möglich ist.
+- TOTP als Alternative oder zusätzliche zweite Stufe empfehlen.
+- Ein starkes Passwort als Rückfallmöglichkeit beibehalten.
+- Die Sicherheitserinnerung gilt vorläufig als erledigt, sobald mindestens ein
+  Passkey oder TOTP eingerichtet ist. Danach bleibt sie einige Wochen
+  ausgeblendet.
+- Wer nur ein Passwort verwendet, kann die Erinnerung ebenfalls für einige
+  Wochen stummschalten; danach erscheint sie erneut, solange kein Passkey und
+  kein TOTP eingerichtet sind.
+- Die Empfehlung erscheint als Interstitial und darf Login, notwendige
+  Passwortänderung oder laufende Faktor-Recovery nicht umgehen oder blockieren.
 
 Vereinbarte Reihenfolge und Erledigungskriterium:
 
