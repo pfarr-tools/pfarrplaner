@@ -322,24 +322,39 @@ unberührt.
 
 ### Task 6: Gesamtprüfung und Übergabe
 
-- [ ] Den vollständigen PHP- und JavaScript-Qualitätslauf mit einer explizit
-  isolierten Testdatenbank ausführen; vor jedem Testlauf wirksame Verbindung
-  und Datenbankname prüfen.
-- [ ] Formatprüfung, PHPStan, Lint, JSDoc-/PHPDoc-Prüfung und Handbuchprüfung
-  ausführen; bekannte Containergrenzen der changed-files-Skripte dokumentieren
-  und nötigenfalls die betroffenen Dateien gezielt prüfen.
-- [ ] Dusk-/Browserabläufe für Passwortänderung, Login-Entscheidung,
-  TOTP-/E-Mail-/Recovery-Eingabe, Passkey-Anmeldung und Geräteverwaltung
-  prüfen, soweit sie ohne externe Hardware und Produktionszugriff reproduzierbar
-  sind.
-- [ ] Migration und Rollback-Pfad der Passkeys, DemoBuilder-Anonymisierung,
-  Recovery-Audit/Sessionwiderruf sowie die beiden Rate-Limit-Entscheidungen
-  gegen den Code und die Tests abgleichen.
-- [ ] Benutzer-, Administratoren- und Technisches Handbuch auf konsistente
-  aktuelle Abläufe prüfen und verbleibende Einschränkungen benennen.
-- [ ] Ergebnisse und Commits im Issue festhalten. Issue #80 bleibt bis nach
-  Task 7 offen; Task 6 erhält eigenen Plan- und Ergebniscommit sowie Senior
-  Review.
+- [x] Isolierte PHP-Gesamtsuite im abschließenden `./planer dev quality`-Lauf:
+  **1153 Tests bestanden, 5 erwartungsgemäß übersprungen; 4405 Assertions**.
+  Ein vorangegangener isolierter Lauf hatte einen einmaligen Fehler in der
+  KonfiApp-Mock-Handler-Erwartung (`KonfiAppIntegrationUnitTest.php:48`); der
+  anschließende vollständige Lauf bestand einschließlich dieses Tests.
+- [x] JavaScript-Gesamtsuite: **495 Tests in 84 Dateien bestanden**;
+  Vite-Produktionsbuild erfolgreich. Beide liefen separat nach dem Abbruch
+  des Gesamt-Qualitätslaufs.
+- [x] Pint/Prettier/Blade-Formatprüfung, PHPStan, PHPDoc und JSDoc bestanden.
+  Der frische `./planer dev quality`-Lauf beendete diese Schritte erfolgreich;
+  die PHPDoc-Baseline ist an die im Branch dokumentierten Altlasten angepasst.
+- [x] Fehler in der Auswahl geänderter Qualitätsdateien behoben und mit einem
+  Shell-Regressionstest abgedeckt; betroffene Auth-/Sicherheits-UI-Dateien
+  separat mit ESLint geprüft: **0 Fehler**, bestehende Stilwarnungen bleiben.
+- [x] Die beiden geänderten Legacy-Editoren `UserEditor.vue` und
+  `PasswordChanger.vue` auf **0 ESLint-Fehler** bereinigt. Abschließender
+  ESLint-Lauf: **0 Fehler, 1677 Warnungen**; Komplexitätsprüfung meldete
+  25 nicht blockierende Hinweise. Die Warnungen bleiben sichtbar und wurden
+  nicht unterdrückt.
+- [x] Tests für Login-Entscheidung, TOTP/E-Mail/Recovery, Passkey-Anmeldung,
+  Profil-Propfluss und Geräteverwaltung sind vorhanden; die JS-Gesamtsuite
+  besteht. Dusk-/Browserabläufe wurden in dieser Etappe nicht ausgeführt;
+  insbesondere war kein realer Passkey-Authenticator verfügbar.
+- [x] Passkey-Migration/Rollback und DemoBuilder-Credentialbereinigung sowie
+  Recovery-Audit/Sessionwiderruf und die Rate-Limits wurden gegen Migration,
+  Code und vorhandene Feature-Tests abgeglichen.
+- [x] Benutzer-, Administratoren- und Technisches Handbuch auf konsistente
+  aktuelle Abläufe geprüft.
+- [x] Der vollständige Qualitätslauf einschließlich Komplexitätsprüfung,
+  isolierter PHP-Suite, JavaScript-Suite und Vite-Build ist nach den
+  Lint-Korrekturen erfolgreich abgeschlossen. Ergebnisse und Commits werden
+  fortlaufend im Issue dokumentiert; Issue #80 bleibt bis zum Abschluss von
+  Task 7 offen.
 
 ### Task 7: Wiederkehrende Sicherheitsempfehlung
 

@@ -29,7 +29,7 @@
 <template>
     <admin-layout title="Passwort ändern">
         <template #navbar-left>
-            <save-button @click="savePassword" />
+            <SaveButton @click="savePassword" />
         </template>
         <div
             v-if="mustChange"
@@ -39,9 +39,9 @@
             Originalpasswort, das du von deinem Administrator bekommen hast? Bitte wähle ein neues,
             eigenes Passwort, das nur du selbst kennst.
         </div>
-        <card>
-            <card-header>Passwort ändern</card-header>
-            <card-body>
+        <Card>
+            <CardHeader>Passwort ändern</CardHeader>
+            <CardBody>
                 <p class="password-requirements">
                     Das Passwort muss mindestens 8 Zeichen lang sein und Groß- und Kleinbuchstaben,
                     eine Zahl sowie ein Sonderzeichen enthalten.
@@ -50,7 +50,7 @@
                     class="password-change-form"
                     @submit.prevent="savePassword"
                 >
-                    <form-input
+                    <FormInput
                         name="current_password"
                         v-if="!originalPassword"
                         label="Aktuelles Passwort"
@@ -58,14 +58,14 @@
                         autocomplete="current-password"
                         v-model="auth.current_password"
                     />
-                    <form-input
+                    <FormInput
                         name="new_password"
                         label="Neues Passwort"
                         type="password"
                         autocomplete="new-password"
                         v-model="auth.new_password"
                     />
-                    <form-input
+                    <FormInput
                         name="new_password_confirmation"
                         label="Neues Passwort (wiederholen)"
                         type="password"
@@ -73,22 +73,21 @@
                         v-model="auth.new_password_confirmation"
                     />
                 </form>
-            </card-body>
-        </card>
+            </CardBody>
+        </Card>
     </admin-layout>
 </template>
 
 <script>
 import Card from '../../components/Ui/cards/card'
 import CardHeader from '../../components/Ui/cards/cardHeader'
-import CardFooter from '../../components/Ui/cards/cardFooter'
 import SaveButton from '../../components/Ui/buttons/SaveButton'
 import CardBody from '../../components/Ui/cards/cardBody'
 import FormInput from '../../components/Ui/forms/FormInput'
 export default {
     name: 'PasswordChanger',
     props: ['originalPassword', 'mustChange'],
-    components: { FormInput, CardBody, SaveButton, CardFooter, CardHeader, Card },
+    components: { FormInput, CardBody, SaveButton, CardHeader, Card },
     data() {
         return {
             auth: {
@@ -103,7 +102,7 @@ export default {
         savePassword() {
             const data = { ...this.auth }
             if (this.originalPassword) delete data.current_password
-            this.$inertia.post(route('password.change'), data)
+            this.$inertia.post(window.route('password.change'), data)
         },
     },
 }

@@ -32,8 +32,8 @@
         :flash="$page.props.flash"
     >
         <template #navbar-left>
-            <save-button @click="saveUser" />
-            <nav-button
+            <SaveButton @click="saveUser" />
+            <NavButton
                 v-if="myUser.isOfficialUser && !justCreated"
                 title="Passwort zurücksetzen und Nachricht versenden"
                 @click="resetUserPassword"
@@ -41,81 +41,81 @@
                 type="light"
                 icon="mdi mdi-lock-reset"
                 >Passwort zurücksetzen
-            </nav-button>
-            <nav-button
+            </NavButton>
+            <NavButton
                 type="danger"
                 icon="mdi mdi-account-remove"
                 title="Benutzer löschen"
                 class="ms-1"
                 @click="deleteUser"
                 >Löschen
-            </nav-button>
+            </NavButton>
         </template>
         <template #tab-headers>
-            <tab-headers>
-                <tab-header
+            <TabHeaders>
+                <TabHeader
                     id="home"
                     :active-tab="activeTab"
                     title="Person"
                 />
-                <tab-header
+                <TabHeader
                     id="account"
                     :active-tab="activeTab"
                     title="Benutzerkonto"
                 />
-                <tab-header
+                <TabHeader
                     v-if="myUser.isOfficialUser"
                     id="permissions"
                     :active-tab="activeTab"
                     title="Berechtigungen"
                 />
-                <tab-header
+                <TabHeader
                     v-if="myUser.isOfficialUser"
                     id="menu"
                     :active-tab="activeTab"
                     title="Menü"
                 />
-                <tab-header
+                <TabHeader
                     v-if="myUser.isOfficialUser"
                     id="homescreen"
                     :active-tab="activeTab"
                     title="Startseite"
                 />
-                <tab-header
+                <TabHeader
                     v-if="myUser.isOfficialUser"
                     id="settings"
                     :active-tab="activeTab"
                     title="Alle Einstellungen"
                 />
-                <tab-header
+                <TabHeader
                     id="absences"
                     :active-tab="activeTab"
                     title="Urlaub"
                 />
-            </tab-headers>
+            </TabHeaders>
         </template>
-        <tabs>
-            <tab
+        <Tabs>
+            <Tab
                 id="home"
                 :active-tab="activeTab"
             >
                 <div class="row">
                     <div class="col-md-2">
-                        <form-input
+                        <FormInput
                             name="title"
                             label="Titel"
                             v-model="myUser.title"
                         />
                     </div>
                     <div class="col-md-5">
-                        <form-input
+                        <FormInput
                             name="first_name"
                             label="Vorname"
                             v-model="myUser.first_name"
                         />
                     </div>
                     <div class="col-md-5">
-                        <form-input
+                        <FormInput
                             name="last_name"
                             label="Nachname"
                             v-model="myUser.last_name"
@@ -124,23 +124,23 @@
                 </div>
                 <div class="row">
                     <div class="col-md-7">
-                        <form-input
+                        <FormInput
                             name="office"
                             label="Dienststelle"
                             v-model="myUser.office"
                         />
-                        <form-textarea
+                        <FormTextarea
                             name="address"
                             label="Adresse"
                             v-model="myUser.address"
                         />
-                        <form-input
+                        <FormInput
                             name="phone"
                             label="Telefonnummer"
                             help="Nur Zahlen und Leerzeichen erlaubt"
                             v-model="myUser.phone"
                         />
-                        <form-input
+                        <FormInput
                             type="email"
                             name="email"
                             label="E-Mailadresse"
@@ -149,7 +149,7 @@
                         />
                     </div>
                     <div class="col-md-5">
-                        <form-image-attacher
+                        <FormImageAttacher
                             v-if="myUser.id"
                             name="image"
                             v-model="myUser.image"
@@ -166,8 +166,8 @@
                         </div>
                     </div>
                 </div>
-            </tab>
-            <tab
+            </Tab>
+            <Tab
                 id="account"
                 :active-tab="activeTab"
             >
@@ -178,22 +178,22 @@
                     <span class="text-bold"
                         >Für diese Person wurde bisher noch kein Benutzerkonto angelegt.</span
                     >
-                    <form-check
+                    <FormCheck
                         label="Benutzerkonto anlegen und Willkommensnachricht mit Kontodaten versenden"
                         v-model="myUser.isOfficialUser"
                         @input="createUserAccount"
                     />
                 </div>
                 <div v-else>
-                    <form-group
+                    <FormGroup
                         label="E-Mailadresse"
                         help="Die E-Mailadresse ist zugleich auch der Benutzername zur Anmeldung."
                     >
                         <div>
                             <code :key="myUser.email">{{ myUser.email }}</code>
                         </div>
-                    </form-group>
-                    <form-selectize
+                    </FormGroup>
+                    <FormSelectize
                         name="homeCities[]"
                         v-model="myUser.home_cities"
                         multiple
@@ -201,7 +201,7 @@
                         :options="cities"
                         :settings="{ labelField: 'name', searchFields: ['name'] }"
                     />
-                    <form-selectize
+                    <FormSelectize
                         name="parishes[]"
                         v-model="myUser.parishes"
                         multiple
@@ -210,13 +210,13 @@
                         :settings="{ labelField: 'name', searchFields: ['name'] }"
                     />
                 </div>
-                <form-group
+                <FormGroup
                     v-if="justCreated"
                     label="Anfangspasswort"
                     help="Dieses Passwort wird nur einmalig versendet. Nach der ersten Anmeldung muss es geändert werden."
                 >
                     <div class="input-group">
-                        <form-input
+                        <FormInput
                             name="password"
                             type="text"
                             autocomplete="new-password"
@@ -231,7 +231,7 @@
                             Neu vorschlagen
                         </button>
                     </div>
-                </form-group>
+                </FormGroup>
                 <TwoFactorRecoveryPanel
                     v-if="
                         twoFactorRecovery?.canRecover ||
@@ -243,13 +243,13 @@
                     :unavailable-reason="twoFactorRecovery.unavailableReason"
                     :recovery-route="route('user.two-factor.recover', myUser.id)"
                 />
-            </tab>
-            <tab
+            </Tab>
+            <Tab
                 v-if="myUser.isOfficialUser"
                 id="permissions"
                 :active-tab="activeTab"
             >
-                <form-selectize
+                <FormSelectize
                     name="roles[]"
                     v-model="myUser.roles"
                     multiple
@@ -258,7 +258,7 @@
                     :settings="{ labelField: 'name', searchFields: ['name'] }"
                 />
                 <hr />
-                <fake-table
+                <FakeTable
                     :columns="[4, 4, 4]"
                     :headers="['Kirchengemeinde', 'Rechte', 'Benachrichtungen']"
                     collapsed-header="Kirchengemeinden"
@@ -267,13 +267,14 @@
                     <div
                         class="row p-1 mb-3 border-top"
                         v-for="city in adminCities"
+                        :key="city.id"
                     >
                         <div class="col-md-4">{{ city.name }}</div>
                         <div class="col-md-4">
-                            <city-permission-toggle v-model="cityPermission[city.id].permission" />
+                            <CityPermissionToggle v-model="cityPermission[city.id].permission" />
                         </div>
                         <div class="col-md-4">
-                            <form-group
+                            <FormGroup
                                 :id="`subscriptionType${city.id}`"
                                 :input-id="`subscriptionType${city.id}Input`"
                                 :label="`Benachrichtigungen für ${city.name}`"
@@ -294,12 +295,12 @@
                                         bei Änderungen an allen Gottesdiensten
                                     </option>
                                 </select>
-                            </form-group>
+                            </FormGroup>
                         </div>
                     </div>
-                </fake-table>
-            </tab>
-            <tab
+                </FakeTable>
+            </Tab>
+            <Tab
                 v-if="myUser.isOfficialUser"
                 id="menu"
                 :active-tab="activeTab"
@@ -308,22 +309,24 @@
                     Hier können im Menü für diese Person einzelne Module an und abgeschaltet werden.
                 </p>
                 <div
-                    v-for="(moduleGroup, moduleGroupTitle, moduleGroupIndex) in modules"
+                    v-for="(moduleGroup, moduleGroupTitle) in modules"
+                    :key="moduleGroupTitle"
                     class="border-bottom"
                 >
                     <div
                         class="text-bold py-3 border-top mt-3"
-                        v-if="moduleGroupTitle != 'default'"
+                        v-if="moduleGroupTitle !== 'default'"
                     >
                         {{ moduleGroupTitle }}
                     </div>
                     <div
                         v-for="(module, moduleIndex) in moduleGroup"
+                        :key="module.key"
                         class="row module-row p-2"
                         :class="moduleIndex % 2 ? 'odd' : 'even'"
                     >
                         <div class="col-md-1">
-                            <form-check
+                            <FormCheck
                                 label=""
                                 :name="'settings[modules][' + module.key + ']'"
                                 v-model="mySettings.modules[module.key]"
@@ -338,13 +341,13 @@
                         </div>
                     </div>
                 </div>
-            </tab>
-            <tab
+            </Tab>
+            <Tab
                 v-if="myUser.isOfficialUser"
                 id="homescreen"
                 :active-tab="activeTab"
             >
-                <home-screen-configuration-tab
+                <HomeScreenConfigurationTab
                     :available-tabs="availableTabs"
                     :cities="cities"
                     :home-screen-tabs-config="mySettings.homeScreenTabsConfig"
@@ -354,8 +357,8 @@
                     third-party="1"
                     :module-groups="modules"
                 />
-            </tab>
-            <tab
+            </Tab>
+            <Tab
                 v-if="myUser.isOfficialUser"
                 id="settings"
                 :active-tab="activeTab"
@@ -368,7 +371,7 @@
                         Auf dieser Seite können <u>alle</u> Benutzereinstellungen bearbeitet werden.
                         Das solltest du nur tun, wenn du wirklich weißt, was du tust.
                     </p>
-                    <form-check
+                    <FormCheck
                         v-model="riskTaker"
                         label="Verstanden, ich weiß, was ich da tue."
                     />
@@ -377,22 +380,22 @@
                     v-if="riskTaker"
                     :key="Object.keys(mySettings).length"
                 >
-                    <fake-table
+                    <FakeTable
                         :columns="[3, 8, 1]"
                         :headers="['Einstellung', 'Inhalt', '']"
                         collapsed-header="Benutzereinstellungen"
                         class="border-bottom"
                     >
                         <div
-                            v-for="settingKey in Object.keys(mySettings).sort()"
+                            v-for="settingKey in settingsKeys"
+                            :key="settingKey"
                             class="row p-1 mb-3 border-top"
-                            v-if="mySettings[settingKey]"
                         >
                             <div class="col-md-3">
                                 <code class="text-bold">{{ settingKey }}</code>
                             </div>
                             <div class="col-md-7">
-                                <div v-if="editSetting == settingKey">
+                                <div v-if="editSetting === settingKey">
                                     <textarea
                                         class="form-control font-monospace"
                                         rows="5"
@@ -402,14 +405,14 @@
                                         "
                                     ></textarea>
                                 </div>
-                                <vue-json-pretty
+                                <VueJsonPretty
                                     v-else
                                     @click="editSetting = settingKey"
                                     :data="mySettings[settingKey]"
                                 />
                             </div>
                             <div class="col-md-1 text-end">
-                                <nav-button
+                                <NavButton
                                     type="danger"
                                     icon="mdi mdi-delete"
                                     force-no-text
@@ -420,25 +423,25 @@
                                 />
                             </div>
                         </div>
-                    </fake-table>
+                    </FakeTable>
                 </div>
-            </tab>
-            <tab
+            </Tab>
+            <Tab
                 id="absences"
                 :active-tab="activeTab"
             >
-                <form-check
+                <FormCheck
                     name="manage_absences"
                     label="Urlaub für diesen Benutzer verwalten"
                     v-model="myUser.manage_absences"
                 />
                 <div v-if="myUser.manage_absences">
-                    <form-check
+                    <FormCheck
                         name="show_absences_with_services"
                         label="Urlaub im Gottesdienstplaner anzeigen"
                         v-model="myUser.show_vacations_with_services"
                     />
-                    <form-check
+                    <FormCheck
                         name="needs_replacement"
                         label="Urlaubsvertretung benötigt"
                         v-model="myUser.needs_replacement"
@@ -454,26 +457,23 @@
                             >einen Genehmigungsprozess</a
                         >.
                     </p>
-                    <people-select
+                    <PeopleSelect
                         label="Urlaub muss durch eine der folgenden Personen geprüft werden"
                         :people="users"
                         v-model="myUser.vacation_admins"
                     />
-                    <people-select
+                    <PeopleSelect
                         label="Urlaub muss durch eine der folgenden Personen genehmigt werden"
                         :people="users"
                         v-model="myUser.vacation_approvers"
                     />
                 </div>
-            </tab>
-        </tabs>
+            </Tab>
+        </Tabs>
     </admin-layout>
 </template>
 
 <script>
-import Card from '../../../components/Ui/cards/card'
-import CardHeader from '../../../components/Ui/cards/cardHeader'
-import CardBody from '../../../components/Ui/cards/cardBody'
 import TabHeaders from '../../../components/Ui/tabs/tabHeaders'
 import TabHeader from '../../../components/Ui/tabs/tabHeader'
 import Tabs from '../../../components/Ui/tabs/tabs'
@@ -534,7 +534,7 @@ export default {
         VueJsonPretty,
     },
     data() {
-        let myUser = { ...this.user }
+        const myUser = { ...this.user }
         myUser.password = null
 
         myUser.home_cities = this.reduceToIds(myUser.home_cities)
@@ -580,21 +580,27 @@ export default {
             }
         }
 
-        let cityPermission = {}
+        const cityPermission = {}
         this.adminCities.forEach((city) => {
             cityPermission[city.id] = { permission: 'n' }
             myUser.cities.forEach((thisCity) => {
-                if (thisCity == city.id) cityPermission[thisCity] = { permission: 'r' }
+                if (String(thisCity) === String(city.id)) {
+                    cityPermission[thisCity] = { permission: 'r' }
+                }
             })
             myUser.writable_cities.forEach((thisCity) => {
-                if (thisCity == city.id) cityPermission[thisCity] = { permission: 'w' }
+                if (String(thisCity) === String(city.id)) {
+                    cityPermission[thisCity] = { permission: 'w' }
+                }
             })
             myUser.admin_cities.forEach((thisCity) => {
-                if (thisCity == city.id) cityPermission[thisCity] = { permission: 'a' }
+                if (String(thisCity) === String(city.id)) {
+                    cityPermission[thisCity] = { permission: 'a' }
+                }
             })
         })
 
-        let mySubscriptions = {}
+        const mySubscriptions = {}
         this.subscriptions.forEach((subscription) => {
             mySubscriptions[subscription.city_id] = subscription
         })
@@ -614,11 +620,21 @@ export default {
             emailChanged: 0,
         }
     },
+    computed: {
+        /** Return user setting keys that currently have a value. */
+        settingsKeys() {
+            return Object.keys(this.mySettings)
+                .sort()
+                .filter((key) => this.mySettings[key])
+        },
+    },
     methods: {
         updateJsonSetting(key, jsonText) {
             try {
                 this.mySettings[key] = JSON.parse(jsonText)
-            } catch (_) {}
+            } catch {
+                // Keep the last valid value while the user edits JSON.
+            }
         },
         /** Mark the form as an account-creation flow when the checkbox is selected. */
         createUserAccount(e) {
@@ -654,7 +670,7 @@ export default {
         },
         resetUserPassword() {
             if (
-                confirm(
+                window.confirm(
                     'Willst du das Passwort für ' +
                         this.user.name +
                         ' wirklich zurücksetzen? ' +
@@ -663,21 +679,21 @@ export default {
                         'ist dann ab sofort ungültig.',
                 )
             ) {
-                this.$inertia.post(route('user.password.reset', this.user.id))
+                this.$inertia.post(window.route('user.password.reset', this.user.id))
             }
         },
         saveUser() {
-            let permissions = {}
+            const permissions = {}
             for (const city in this.cityPermission) {
                 permissions[city] = this.cityPermission[city].permission
             }
 
-            let subscriptions = {}
+            const subscriptions = {}
             for (const city in this.mySubscriptions) {
                 subscriptions[city] = this.mySubscriptions[city].subscription_type
             }
 
-            let record = {
+            const record = {
                 ...this.myUser,
                 settings: this.mySettings,
                 cityPermissions: this.cityPermissions,
@@ -689,24 +705,24 @@ export default {
             }
             if (this.myUser.id) {
                 if (!this.justCreated) delete record.password
-                this.$inertia.patch(route('user.update', this.myUser.id), record)
+                this.$inertia.patch(window.route('user.update', this.myUser.id), record)
             } else {
-                this.$inertia.post(route('user.store'), record)
+                this.$inertia.post(window.route('user.store'), record)
             }
         },
         deleteUser() {
             if (
-                confirm(
+                window.confirm(
                     'Möchtest du ' +
                         this.user.name +
                         ' wirklich endgültig und unwiderruflich löschen?',
                 )
             ) {
-                this.$inertia.delete(route('user.destroy', this.user.id))
+                this.$inertia.delete(window.route('user.destroy', this.user.id))
             }
         },
         reduceToIds(records) {
-            let ids = []
+            const ids = []
             records.forEach((record) => {
                 if (record && !isNaN(record)) {
                     ids.push(record)
