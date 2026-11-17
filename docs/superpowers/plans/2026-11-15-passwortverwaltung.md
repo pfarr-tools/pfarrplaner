@@ -15,7 +15,7 @@ Integrationspunkte. Passwortregeln, Reset, erzwungene Änderung, E-Mail-/TOTP-
 Session- und Recovery-Regeln eingeführt. Kein Klartextpasswort und kein
 geheimer Faktor wird in Logs, Props oder API-Antworten ausgegeben.
 
-**Technologie:** Laravel 11 / PHP 8.4, bestehende Session-Authentifizierung,
+**Technologie:** Laravel 13 / PHP 8.4, bestehende Session-Authentifizierung,
 Inertia.js/Vue, PHPUnit, Dusk und die vorhandene Mail-Infrastruktur. Für TOTP
 und WebAuthn wird vor der Implementierung geprüft, ob eine gepflegte, mit der
 aktuellen Laravel-Version kompatible Bibliothek bereits vorhanden ist; neue
@@ -227,17 +227,43 @@ Nutzerführung:
   das vermeidet eine kontoabhängige Antwort vor der Authentifizierung.
 - RP-ID und erlaubte Origins werden explizit konfiguriert statt aus einer
   einzigen URL abgeleitet. Die Konfiguration deckt lokale Entwicklung, Dev und
-  die produktive Domain ab. Für jede Origin ist HTTPS erforderlich; das
-  Geheimnis für stabile User-Handles bleibt an die bestehende
+  die produktive Domain ab. Dev und Produktion benötigen HTTPS; lokale
+  Entwicklung darf die sichere Browser-Origin `http://localhost` verwenden.
+  Das Geheimnis für stabile User-Handles bleibt an die bestehende
   App-Schlüsselverwaltung gebunden.
+- Registrierung und Anmeldung verlangen eine lokale Benutzerverifikation
+  (Geräte-PIN, Biometrie oder gleichwertig). Die Serverprüfung muss das
+  User-Verified-Flag kryptografisch validieren; bloß angeforderte Verifikation
+  reicht nicht.
 - [ ] Registrierung, Mehrfachgeräte, Umbenennung, Widerruf und Login mit
-  Challenge-Ablauf und Replay-Schutz implementieren.
+  zweckgebundener, an die Browser-Session gebundener Challenge, Ablauf und
+  Replay-Schutz implementieren. Die Session-Challenge ist serverseitig nach
+  höchstens 60 Sekunden ungültig; der WebAuthn-Timeout im Browser ist nur eine
+  zusätzliche UX-Begrenzung. Erfolg rotiert die Session-ID. Tests decken
+  abgelaufene, wiederverwendete und in einer anderen Session eingereichte
+  Challenges ab.
 - [ ] Fallback auf Passwort/2FA, verlorene Geräte und Admin-Recovery ohne
   Account-Übernahme absichern. Passkey-Login ersetzt weder das
   Benutzername/IP-Limit für Passwortfehlversuche noch die bestehenden
-  Recovery- und `must_change_password`-Sperren.
+  Recovery- und `must_change_password`-Sperren. Bei Passkey-Login gilt die
+  verpflichtende Geräteverifikation als vollständige passwortlose Anmeldung;
+  die TOTP-Challenge aus dem Passwortpfad wird nicht zusätzlich verlangt. Die
+  erfolgreiche Authentifizierung verwendet eine eigene Login-Antwort, die
+  Konten mit `must_change_password` direkt auf das Passwort-Interstitial und
+  wiederherzustellende Konten auf die TOTP-Recovery-Seite leitet; diese Gates
+  werden nicht über einen abgewiesenen Login umgangen oder unerreichbar.
+- Der öffentliche Passkey-Login wird auf sechs Anfragen pro Minute und
+  Client-IP begrenzt. Verwaltungs-/Registrierungsrouten bleiben zusätzlich
+  authentifiziert und erfordern die bestehende Passwortbestätigung.
 - [ ] API-/Browsergrenzen, HTTPS-Anforderung und Betriebsmaßnahmen im
   technischen und Administratorenhandbuch dokumentieren.
+
+**Senior-Review des Task-5-Plans:** Die erste Prüfung verlangte verpflichtende
+User Verification, serverseitige Challenge-Laufzeit, Session-Rotation,
+Recovery-/Passwortwechsel-Weiterleitung, eine konkrete IP-Drosselung und die
+korrekte `localhost`-Ausnahme. Nach Ergänzung dieser Abnahmekriterien wurde der
+Plan im zweiten Re-Review **APPROVED**. Die Implementierungsreviews prüfen
+deren tatsächliche Durchsetzung erneut.
 
 ### Task 6: Gesamtprüfung und Übergabe
 
