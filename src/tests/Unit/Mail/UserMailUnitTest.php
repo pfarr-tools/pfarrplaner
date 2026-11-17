@@ -31,4 +31,24 @@ class UserMailUnitTest extends TestCase
         $this->assertInstanceOf(AccountData::class, $built);
         $this->assertEquals('Deine Zugangsdaten für den Pfarrplaner', $built->subject);
     }
+
+    /** Account credentials render as formatted HTML instead of Markdown source. */
+    public function test_account_data_renders_markdown_components_and_credentials(): void
+    {
+        config(['app.url' => 'https://pfarrplaner.example']);
+        $user = User::factory()->create([
+            'first_name' => 'Mara',
+            'email' => 'mara@example.org',
+        ]);
+
+        $html = (new AccountData($user, User::factory()->create(), 'Start1234!'))->render();
+
+        $this->assertMatchesRegularExpression('/<h1[^>]*>Deine Zugangsdaten für den Pfarrplaner<\/h1>/', $html);
+        $this->assertMatchesRegularExpression('/<strong[^>]*>Benutzername<\/strong>/', $html);
+        $this->assertStringContainsString('<code>mara@example.org</code>', $html);
+        $this->assertStringContainsString('<code>Start1234!</code>', $html);
+        $this->assertStringContainsString('class="button"', $html);
+        $this->assertStringNotContainsString('<pre', $html);
+        $this->assertStringNotContainsString('**Benutzername**', $html);
+    }
 }
