@@ -218,6 +218,33 @@ describe('SecurityTab', () => {
         expect(wrapper.vm.managedPasskeys[0]).not.toHaveProperty('credential')
     })
 
+    it('offers fresh password confirmation when registration is rejected with 423', async () => {
+        vi.spyOn(Passkeys, 'register').mockRejectedValueOnce({ response: { status: 423 } })
+        const wrapper = mountSecurityTab()
+
+        await wrapper.find('[data-testid="passkey-name"]').setValue('Arbeitslaptop')
+        await wrapper.find('[data-testid="register-passkey"]').trigger('click')
+        await flushPromises()
+
+        expect(wrapper.vm.passwordConfirmationRequired).toBe(true)
+        expect(wrapper.find('[data-testid="passkey-password-confirmation"]').exists()).toBe(true)
+        expect(wrapper.text()).toContain('Passwortbestätigung ist abgelaufen')
+    })
+
+    it('does not call other registration errors password confirmation failures', async () => {
+        vi.spyOn(Passkeys, 'register').mockRejectedValueOnce({ response: { status: 422 } })
+        const wrapper = mountSecurityTab()
+
+        await wrapper.find('[data-testid="passkey-name"]').setValue('Arbeitslaptop')
+        await wrapper.find('[data-testid="register-passkey"]').trigger('click')
+        await flushPromises()
+
+        expect(wrapper.vm.passwordConfirmationRequired).toBe(false)
+        expect(wrapper.find('[data-testid="passkey-password-confirmation"]').exists()).toBe(false)
+        expect(wrapper.vm.passkeyError).not.toContain('Passwort')
+        expect(wrapper.vm.passkeyError).toContain('Passkey konnte nicht eingerichtet werden')
+    })
+
     it('asks for password confirmation only after the session confirmation expires', async () => {
         const wrapper = mountSecurityTab()
         expect(wrapper.find('[data-testid="passkey-password-confirmation"]').exists()).toBe(false)

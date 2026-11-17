@@ -438,6 +438,7 @@ export default {
 
             this.passkeyBusy = true
             this.passkeyError = ''
+            this.passwordConfirmationRequired = false
             try {
                 const result = await Passkeys.register({
                     name: this.newPasskeyName.trim(),
@@ -448,9 +449,11 @@ export default {
                 })
                 this.managedPasskeys.unshift({ ...result, authenticator: 'Passkey' })
                 this.newPasskeyName = ''
-            } catch {
-                this.passkeyError =
-                    'Passkey konnte nicht eingerichtet werden. Bestätige dein Passwort erneut und versuche es noch einmal.'
+            } catch (error) {
+                this.passwordConfirmationRequired = error?.response?.status === 423
+                this.passkeyError = this.passwordConfirmationRequired
+                    ? 'Deine Passwortbestätigung ist abgelaufen. Bestätige dein Passwort und starte die Einrichtung erneut.'
+                    : 'Passkey konnte nicht eingerichtet werden. Bitte erneut versuchen.'
             } finally {
                 this.passkeyBusy = false
             }
