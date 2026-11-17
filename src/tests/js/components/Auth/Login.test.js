@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { nextTick } from 'vue'
 import Login from '@/Pages/Auth/Login.vue'
 import { Passkeys } from '@laravel/passkeys'
 
@@ -30,6 +31,35 @@ describe('Login', () => {
             wrapper.findAll('button').filter((button) => button.text().trim() === 'Anmelden'),
         ).toHaveLength(0)
         expect(wrapper.find('a[data-testid="forgot-password"]').exists()).toBe(true)
+    })
+
+    it('focuses the email field and then the password field as login advances', async () => {
+        const wrapper = mount(Login, {
+            attachTo: document.body,
+            global: {
+                mocks: {
+                    $page: {
+                        props: {
+                            appName: 'Pfarrplaner',
+                            appProvider: '',
+                            dev: false,
+                            demo: false,
+                            errors: {},
+                        },
+                    },
+                },
+            },
+        })
+        await nextTick()
+
+        expect(document.activeElement).toBe(wrapper.find('[name="email"]').element)
+
+        await wrapper.find('[name="email"]').setValue('person@example.org')
+        await wrapper.find('[data-testid="continue-login"]').trigger('click')
+        await nextTick()
+
+        expect(document.activeElement).toBe(wrapper.find('[name="password"]').element)
+        wrapper.unmount()
     })
 
     it('shows the same password step locally after the username, without a request', async () => {

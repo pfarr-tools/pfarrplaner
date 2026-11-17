@@ -119,9 +119,22 @@ export default {
             processing: false,
         }
     },
+    watch: {
+        /** Automatically submit a complete authenticator code. */
+        code(value) {
+            if (this.codeMode === 'totp' && /^\d{6}$/.test(value) && !this.processing) {
+                this.verify()
+            }
+        },
+    },
+    /** Focus the initial challenge input after Vue has rendered it. */
+    mounted() {
+        this.$nextTick(() => this.focusCurrentInput())
+    },
     methods: {
         /** Submit an authenticator, recovery, or email code. */
         verify() {
+            if (this.processing) return
             this.processing = true
             this.$inertia.post(
                 window.route('login.challenge.verify'),
@@ -138,11 +151,19 @@ export default {
         switchCodeMode(mode) {
             this.codeMode = mode
             this.code = ''
+            this.$nextTick(() => this.focusCurrentInput())
+        },
+        /** Focus the first input for the selected challenge method. */
+        focusCurrentInput() {
+            const selector =
+                this.codeMode === 'recovery' ? '#recovery-code' : '[data-code-index="0"]'
+            this.$el.querySelector(selector)?.focus()
         },
         /** Request an email fallback code for the pending login. */
         requestEmailCode() {
             this.codeMode = 'email'
             this.code = ''
+            this.$nextTick(() => this.focusCurrentInput())
             this.processing = true
             this.$inertia.post(
                 window.route('login.challenge.email'),

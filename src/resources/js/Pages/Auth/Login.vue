@@ -85,7 +85,7 @@
                             <button
                                 type="button"
                                 class="btn btn-link px-0"
-                                @click="loginStep = 1"
+                                @click="returnToEmail"
                             >
                                 Andere E-Mailadresse verwenden
                             </button>
@@ -252,11 +252,30 @@ export default {
             },
         }
     },
+    /** Focus the initial input after Vue has rendered the active login step. */
+    mounted() {
+        this.$nextTick(() => this.focusCurrentInput())
+    },
     methods: {
         /** Advance locally so every username receives the same next screen. */
         continueLogin() {
             if (!this.form.email.trim()) return
             this.loginStep = 2
+            this.$nextTick(() => this.focusCurrentInput())
+        },
+        /** Return to the username step and focus its input. */
+        returnToEmail() {
+            this.loginStep = 1
+            this.$nextTick(() => this.focusCurrentInput())
+        },
+        /** Focus the input for the currently displayed login step. */
+        focusCurrentInput() {
+            const selector = this.demo
+                ? '#users'
+                : this.loginStep === 1
+                  ? '[name="email"]'
+                  : '[name="password"]'
+            this.$el.querySelector(selector)?.focus()
         },
         /** Start discoverable passkey login without sending the typed username. */
         async loginWithPasskey() {
