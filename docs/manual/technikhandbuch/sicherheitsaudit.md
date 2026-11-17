@@ -29,6 +29,13 @@ Bei einer neuen Kontoanlage wird ein bestätigter Initialwert aus dem Benutzered
 
 Das Middleware-Modul `App\Http\Middleware\RequirePasswordChange` liegt nach der Authentifizierung in der Web-Middleware-Kette. Es erlaubt nur Passwortwechsel, Logout, CSRF-Token-Erneuerung und den kontrollierten Admin-Rückweg. Alle anderen authentifizierten Webrouten werden auf `password.edit` mit einem sicheren Routennamen als Rücksprung-Hinweis umgeleitet. Eine vorhandene `adminUserSwitchBack`-Session markiert ausschließlich den bewusst kontrollierten Proxy-Fall als Ausnahme.
 
+Der Admin-Reset ist an dieselbe `update`-Policy wie die Benutzerbearbeitung
+gebunden und schließt Selbst-Reset sowie Super-Administrationskonten aus.
+Manuelle Passwortvergabe für bestehende Konten ist Super-Administratoren
+vorbehalten; der Request validiert das Passwort erneut und versendet es nur
+über `AccountData`, während Inertia- und Flash-Antworten keine Passwörter
+enthalten.
+
 ### Zwei-Faktor-Authentifizierung
 
 Für die TOTP-Einschreibung ist `roundly-consulting/two-factor-for-laravel` als

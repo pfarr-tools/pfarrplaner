@@ -15,6 +15,7 @@ namespace Tests\Feature;
 use App\Models\People\User;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
@@ -82,5 +83,28 @@ class PasswordResetFeatureTest extends TestCase
 
         $this->assertTrue(password_verify('New1!word', $user->fresh()->password));
         $this->assertFalse((bool) $user->fresh()->must_change_password);
+    }
+
+    /** The password reset request gives the same visible response for known and unknown accounts. */
+    public function test_password_reset_request_does_not_disclose_account_existence(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        Mail::fake();
+        User::factory()->create(['email' => 'known@example.com']);
+
+        $known = $this->from('/password/reset')->post('/password/email', [
+            'email' => 'known@example.com',
+        ]);
+        $unknown = $this->from('/password/reset')->post('/password/email', [
+            'email' => 'unknown@example.com',
+        ]);
+
+        $known->assertRedirect('/password/reset')->assertSessionHasNoErrors();
+        $unknown->assertRedirect('/password/reset')->assertSessionHasNoErrors();
+        $this->assertSame(
+            $known->getSession()->get('status'),
+            $unknown->getSession()->get('status'),
+        );
+        $this->assertNotEmpty($known->getSession()->get('status'));
     }
 }

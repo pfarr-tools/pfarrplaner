@@ -60,7 +60,7 @@ describe('SecurityTab', () => {
         const setupButton = wrapper.find('[data-testid="open-two-factor-setup"]')
         await setupButton.trigger('click')
         const dialog = wrapper.find('[role="dialog"]')
-        const firstAction = wrapper.find('[data-testid="two-factor-intro-next"]')
+        const firstAction = wrapper.find('[data-testid="two-factor-setup-close"]')
 
         await dialog.trigger('keydown', { key: 'Tab' })
         expect(document.activeElement).toBe(firstAction.element)
@@ -68,6 +68,27 @@ describe('SecurityTab', () => {
         await dialog.trigger('keydown', { key: 'Escape' })
         expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
         expect(document.activeElement).toBe(setupButton.element)
+    })
+
+    it('offers top-right close and cancel actions that erase setup secrets', async () => {
+        const wrapper = mountSecurityTab({}, { attachTo: document.body })
+        await wrapper.find('[data-testid="open-two-factor-setup"]').trigger('click')
+        wrapper.vm.setup = { secret: 'JBSWY3DPEHPK3PXP', recovery_codes: ['secret-code'] }
+        wrapper.vm.qrCode = 'data:image/png;base64,secret'
+        wrapper.vm.twoFactor.currentPassword = 'Current1!'
+        wrapper.vm.twoFactor.code = '123456'
+        wrapper.vm.recoveryCodesSaved = true
+
+        expect(wrapper.find('[data-testid="two-factor-setup-close"]').exists()).toBe(true)
+        expect(wrapper.find('[data-testid="two-factor-setup-cancel"]').exists()).toBe(true)
+        await wrapper.find('[data-testid="two-factor-setup-cancel"]').trigger('click')
+
+        expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
+        expect(wrapper.vm.setup).toBeNull()
+        expect(wrapper.vm.qrCode).toBe('')
+        expect(wrapper.vm.twoFactor.currentPassword).toBe('')
+        expect(wrapper.vm.twoFactor.code).toBe('')
+        expect(wrapper.vm.recoveryCodesSaved).toBe(false)
     })
 
     it('shows the disable action for an enabled account', () => {
@@ -195,6 +216,27 @@ describe('SecurityTab', () => {
         expect(wrapper.find('#passkey-label-7').element.value).toBe('Arbeitslaptop')
         expect(wrapper.text()).toContain('Passkey')
         expect(wrapper.vm.managedPasskeys[0]).not.toHaveProperty('credential')
+    })
+
+    it('asks for password confirmation only after the session confirmation expires', async () => {
+        const wrapper = mountSecurityTab()
+        expect(wrapper.find('[data-testid="passkey-password-confirmation"]').exists()).toBe(false)
+
+        await wrapper.vm.runPasskeyManagement(async () => {
+            throw { response: { status: 423 } }
+        })
+
+        expect(wrapper.find('[data-testid="passkey-password-confirmation"]').exists()).toBe(true)
+    })
+
+    it('does not suggest password confirmation for unrelated passkey errors', async () => {
+        const wrapper = mountSecurityTab()
+        await wrapper.vm.runPasskeyManagement(async () => {
+            throw { response: { status: 500 } }
+        })
+
+        expect(wrapper.find('[data-testid="passkey-password-confirmation"]').exists()).toBe(false)
+        expect(wrapper.text()).not.toContain('Passwort jetzt bestätigen')
     })
 
     it('renames and revokes through the protected passkey management routes', async () => {

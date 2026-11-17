@@ -33,6 +33,15 @@ Ein technischer Überblick über den Sicherheitsdurchgang und die abgesicherten 
 
 ## Zwei-Faktor-Authentifizierung
 
+Administratoren können für ein fremdes Konto, das sie bearbeiten dürfen und
+das kein Super-Administrationskonto ist, einen neuen temporären Zugang
+ausstellen. Das Konto erhält ein zufällig erzeugtes Passwort per
+Accountdaten-E-Mail und muss es bei der nächsten Anmeldung ändern. Ein
+Administrator kann den eigenen Zugang auf diesem Weg nicht zurücksetzen.
+Ein frei gewähltes Passwort für ein bestehendes Konto bleibt
+Super-Administratoren vorbehalten; es wird serverseitig geprüft, einmalig per
+E-Mail versendet und erzwingt ebenfalls den Passwortwechsel.
+
 Benutzer können die TOTP-Einschreibung nur nach erneuter Eingabe ihres
 aktuellen Passworts starten, bestätigen oder deaktivieren. Start und
 Bestätigung liefern keine dauerhaften Geheimnisse in Benutzerlisten oder

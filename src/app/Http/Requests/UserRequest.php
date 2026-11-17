@@ -48,6 +48,11 @@ class UserRequest extends FormRequest
         $target = $this->user;
         $actor = $this->user();
 
+        if ($this->boolean('manualPassword')
+            && ! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
+            return false;
+        }
+
         if ($this->boolean('createAccount') && ! $actor->hasRole(RoleService::ROLE_SUPER_ADMIN)) {
             return false;
         }
@@ -86,6 +91,7 @@ class UserRequest extends FormRequest
             // add an exception to "unique" when an existing user account is updated
             'email' => 'nullable|string|email|max:255|unique:users,email'.(($user && $user->id) ? ','.$user->id : ''),
             'password' => ['nullable', 'string', new StrongPassword],
+            'manualPassword' => 'nullable|boolean',
             'office' => 'nullable|string',
             'address' => 'nullable|string',
             'phone' => 'nullable|phone_number',

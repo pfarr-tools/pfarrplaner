@@ -214,7 +214,12 @@ class UserPolicy
 
     public function resetPassword(User $user, User $model): bool
     {
-        return $user->hasRole(RoleService::ROLE_SUPER_ADMIN);
+        if ($user->id === $model->id || $model->hasRole(AuthServiceProvider::SUPER)) {
+            return false;
+        }
+
+        return $user->hasRole(RoleService::ROLE_SUPER_ADMIN)
+            || $this->update($user, $model);
     }
 
     /** Permit a Super-Admin to recover another account's two-factor access. */

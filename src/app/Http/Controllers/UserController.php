@@ -283,6 +283,8 @@ class UserController extends Controller
         $sessionConnection = config('session.connection');
         $sessionRevocationSupported = config('session.driver') === 'database'
             && (! $sessionConnection || $sessionConnection === config('database.default'));
+        $canSetPassword = Auth::user()->hasRole(AuthServiceProvider::SUPER)
+            && Auth::id() !== $user['id'];
         $twoFactorRecovery = [
             'canRecover' => $canViewRecoveryHistory
                 && $recoveryTargetHasFactor
@@ -331,6 +333,7 @@ class UserController extends Controller
                 'ministries',
                 'modules',
                 'twoFactorRecovery',
+                'canSetPassword',
             )
         );
     }
@@ -760,9 +763,18 @@ class UserController extends Controller
     {
         Gate::authorize('update', $user);
         $data = $request->validated();
+        $manualPassword = $request->boolean('manualPassword') && isset($data['password']);
+        $manualPasswordValue = $manualPassword ? $data['password'] : null;
+        unset($data['manualPassword']);
+        if ($manualPassword) {
+            unset($data['password'], $data['must_change_password']);
+        }
 
         $user->update($data);
         $this->updateUserDataFromRequest($request, $user);
+        if ($manualPassword && is_string($manualPasswordValue)) {
+            $user->resetAccount($manualPasswordValue);
+        }
 
         return redirect()->route('users.index')->with('success', 'Die Änderungen wurden gespeichert.');
     }

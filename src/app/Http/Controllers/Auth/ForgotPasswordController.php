@@ -32,6 +32,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use Illuminate\Http\Request;
 
 /**
  * Class ForgotPasswordController
@@ -59,5 +60,21 @@ class ForgotPasswordController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
+    }
+
+    /** Return an account-agnostic response after a reset-link request. */
+    protected function sendResetLinkResponse(Request $request, string $response)
+    {
+        return back()
+            ->withInput($request->only('email'))
+            ->with('status', 'Falls ein Konto zu dieser Adresse besteht, wurde ein Zurücksetzungslink versendet.');
+    }
+
+    /** Hide whether a reset request failed because the account is unknown or throttled. */
+    protected function sendResetLinkFailedResponse(Request $request, string $response)
+    {
+        return back()
+            ->withInput($request->only('email'))
+            ->with('status', 'Falls ein Konto zu dieser Adresse besteht, wurde ein Zurücksetzungslink versendet.');
     }
 }

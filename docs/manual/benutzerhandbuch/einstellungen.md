@@ -56,6 +56,11 @@ Hier ändern Sie Ihr Passwort.
 
 Wählen Sie ein Passwort, das Sie nicht auch für andere Dienste verwenden. Wenn das Speichern nicht klappt, prüfen Sie, ob das neue Passwort in beiden Feldern gleich geschrieben ist und alle vier Zeichenanforderungen erfüllt.
 
+Wenn Sie Ihr Passwort vergessen haben, verwenden Sie **Passwort vergessen?**
+auf der Login-Seite. Die Bestätigung der Anfrage verrät nicht, ob ein Konto
+mit dieser E-Mailadresse besteht. Prüfen Sie Ihr Postfach und den Spam-Ordner;
+bei ausbleibender Nachricht wenden Sie sich an Ihre Administration.
+
 ### Zwei-Faktor-Authentifizierung
 
 Im Bereich **Sicherheit** können Sie die Zwei-Faktor-Authentifizierung mit

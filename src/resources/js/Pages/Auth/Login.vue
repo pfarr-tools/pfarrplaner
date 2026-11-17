@@ -137,6 +137,7 @@
                             </div>
                         </div>
                         <div
+                            v-if="demo || loginStep === 2"
                             class="text-end text-lg-start mt-4 pt-2"
                             :key="attempts"
                         >
@@ -173,6 +174,17 @@
                             >
                                 {{ passkeyError }}
                             </p>
+                        </div>
+                        <div
+                            v-if="!demo"
+                            class="mt-3"
+                        >
+                            <a
+                                :href="route('password.request')"
+                                data-testid="forgot-password"
+                            >
+                                Passwort vergessen?
+                            </a>
                         </div>
                     </form>
                     <DonationNotice class="mt-4 pt-3 border-top" />

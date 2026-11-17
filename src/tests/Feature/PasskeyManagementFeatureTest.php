@@ -37,6 +37,25 @@ final class PasskeyManagementFeatureTest extends TestCase
             ->assertStatus(423);
     }
 
+    /** Password confirmation restores passkey management in the same session. */
+    public function test_registration_continues_after_password_confirmation(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create(['password' => 'Current1!']);
+
+        $this->actingAs($user)
+            ->getJson(route('user.passkeys.options'))
+            ->assertStatus(423);
+
+        $this->post(route('password.confirm.store'), [
+            'password' => 'Current1!',
+            'redirect' => '/profile?tab=security',
+        ])->assertRedirect('/profile?tab=security')
+            ->assertSessionHas('auth.password_confirmed_at');
+
+        $this->getJson(route('user.passkeys.options'))->assertOk();
+    }
+
     /** Correct confirmation enables protected actions and returns locally. */
     public function test_password_confirmation_sets_the_fresh_confirmation_timestamp(): void
     {

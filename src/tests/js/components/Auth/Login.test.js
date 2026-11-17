@@ -6,6 +6,32 @@ import { Passkeys } from '@laravel/passkeys'
 afterEach(() => vi.restoreAllMocks())
 
 describe('Login', () => {
+    it('shows only the continue action before the password step', () => {
+        const wrapper = mount(Login, {
+            global: {
+                mocks: {
+                    $page: {
+                        props: {
+                            appName: 'Pfarrplaner',
+                            appProvider: '',
+                            dev: false,
+                            demo: false,
+                            errors: {},
+                        },
+                    },
+                },
+            },
+        })
+
+        expect(
+            wrapper.findAll('button').filter((button) => button.text().trim() === 'Weiter'),
+        ).toHaveLength(1)
+        expect(
+            wrapper.findAll('button').filter((button) => button.text().trim() === 'Anmelden'),
+        ).toHaveLength(0)
+        expect(wrapper.find('a[data-testid="forgot-password"]').exists()).toBe(true)
+    })
+
     it('shows the same password step locally after the username, without a request', async () => {
         const wrapper = mount(Login, {
             global: {
@@ -33,6 +59,12 @@ describe('Login', () => {
         )
         expect(wrapper.text()).toContain('person@example.org')
         expect(wrapper.text()).toContain('Passwort')
+        expect(
+            wrapper.findAll('button').filter((button) => button.text().trim() === 'Weiter'),
+        ).toHaveLength(0)
+        expect(
+            wrapper.findAll('button').filter((button) => button.text().trim() === 'Anmelden'),
+        ).toHaveLength(1)
         expect(window.axios.get).not.toHaveBeenCalled()
         expect(wrapper.vm.$inertia.post).not.toHaveBeenCalled()
     })

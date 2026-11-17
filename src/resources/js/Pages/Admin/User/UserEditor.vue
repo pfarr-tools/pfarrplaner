@@ -211,9 +211,9 @@
                     />
                 </div>
                 <FormGroup
-                    v-if="justCreated"
-                    label="Anfangspasswort"
-                    help="Dieses Passwort wird nur einmalig versendet. Nach der ersten Anmeldung muss es geändert werden."
+                    v-if="justCreated || (canSetPassword && manualPassword)"
+                    :label="justCreated ? 'Anfangspasswort' : 'Neues Passwort'"
+                    help="Dieses Passwort wird einmalig per E-Mail versendet. Nach der nächsten Anmeldung muss es geändert werden."
                 >
                     <div class="input-group">
                         <FormInput
@@ -232,6 +232,19 @@
                         </button>
                     </div>
                 </FormGroup>
+                <div
+                    v-else-if="canSetPassword && !justCreated"
+                    class="mb-3"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        data-testid="manual-password-toggle"
+                        @click="enableManualPassword"
+                    >
+                        Passwort manuell festlegen
+                    </button>
+                </div>
                 <TwoFactorRecoveryPanel
                     v-if="
                         twoFactorRecovery?.canRecover ||
@@ -512,6 +525,7 @@ export default {
         'ministries',
         'modules',
         'twoFactorRecovery',
+        'canSetPassword',
     ],
     components: {
         HomeScreenConfigurationTab,
@@ -613,6 +627,7 @@ export default {
             myUser,
             cityPermission,
             justCreated: false,
+            manualPassword: false,
             mySubscriptions,
             riskTaker: false,
             mySettings,
@@ -642,6 +657,11 @@ export default {
                 this.justCreated = true
                 this.suggestInitialPassword()
             }
+        },
+        /** Open manual password assignment and propose a secure temporary value. */
+        enableManualPassword() {
+            this.manualPassword = true
+            this.suggestInitialPassword()
         },
         /** Generate the documented initial-password pattern with browser randomness. */
         suggestInitialPassword() {
@@ -704,7 +724,8 @@ export default {
                 subscriptions,
             }
             if (this.myUser.id) {
-                if (!this.justCreated) delete record.password
+                if (!this.justCreated && !this.manualPassword) delete record.password
+                record.manualPassword = this.manualPassword ? 1 : 0
                 this.$inertia.patch(window.route('user.update', this.myUser.id), record)
             } else {
                 this.$inertia.post(window.route('user.store'), record)

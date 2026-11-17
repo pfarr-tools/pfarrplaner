@@ -619,16 +619,32 @@ class UserWebFeatureTest extends TestCase
         $this->assertTrue((bool) $target->fresh()->must_change_password);
     }
 
-    /** A regular administrator cannot invoke the reset action for another user. */
-    public function test_non_super_admin_cannot_reset_another_users_password(): void
+    /** An administrator may issue a temporary password for an editable account. */
+    public function test_admin_can_reset_another_editable_users_password(): void
     {
         $this->withoutMiddleware(VerifyCsrfToken::class);
+        Mail::fake();
         $admin = User::factory()->create();
         $admin->assignRole(RoleService::ROLE_ADMIN);
         $target = User::factory()->create();
 
         $this->actingAs($admin)
             ->post(route('user.password.reset', $target))
+            ->assertRedirect(route('users.index'));
+
+        $this->assertTrue((bool) $target->fresh()->must_change_password);
+        Mail::assertQueued(AccountData::class);
+    }
+
+    /** An administrator cannot reset their own password through account administration. */
+    public function test_admin_cannot_reset_their_own_password(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $admin = User::factory()->create();
+        $admin->assignRole(RoleService::ROLE_ADMIN);
+
+        $this->actingAs($admin)
+            ->post(route('user.password.reset', $admin))
             ->assertForbidden();
     }
 
@@ -649,6 +665,52 @@ class UserWebFeatureTest extends TestCase
                 'password' => 'Strong1!',
             ])
             ->assertForbidden();
+    }
+
+    /** The explicit manual assignment flag is forbidden outside the super-admin role. */
+    public function test_non_super_admin_cannot_use_manual_password_flag_for_self(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        $admin = User::factory()->create(['password' => 'Current1!']);
+        $admin->assignRole(RoleService::ROLE_ADMIN);
+
+        $this->actingAs($admin)
+            ->patch(route('user.update', $admin), [
+                'id' => $admin->id,
+                'first_name' => $admin->first_name,
+                'last_name' => $admin->last_name,
+                'email' => $admin->email,
+                'password' => 'Manual1!Pass',
+                'manualPassword' => 1,
+            ])
+            ->assertForbidden();
+
+        $this->assertTrue(Hash::check('Current1!', $admin->fresh()->password));
+    }
+
+    /** A super administrator can explicitly assign and mail a temporary password. */
+    public function test_super_admin_can_manually_set_another_users_password(): void
+    {
+        $this->withoutMiddleware(VerifyCsrfToken::class);
+        Mail::fake();
+        $superAdmin = User::factory()->create();
+        $superAdmin->assignRole(RoleService::ROLE_SUPER_ADMIN);
+        $target = User::factory()->create();
+
+        $this->actingAs($superAdmin)
+            ->patch(route('user.update', $target), [
+                'id' => $target->id,
+                'first_name' => $target->first_name,
+                'last_name' => $target->last_name,
+                'email' => $target->email,
+                'password' => 'Manual1!Pass',
+                'manualPassword' => 1,
+            ])
+            ->assertRedirect(route('users.index'));
+
+        $this->assertTrue(Hash::check('Manual1!Pass', $target->fresh()->password));
+        $this->assertTrue((bool) $target->fresh()->must_change_password);
+        Mail::assertQueued(AccountData::class);
     }
 
     /** Activation and deactivation require a fresh password re-authentication. */

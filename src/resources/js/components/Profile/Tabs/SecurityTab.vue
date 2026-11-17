@@ -116,8 +116,8 @@
                 oder Biometrie muss aktiviert sein.
             </p>
             <p>
-                Für Einrichtung und Verwaltung ist eine aktuelle Passwortbestätigung nötig.
-                <a :href="passwordConfirmationUrl">Passwort bestätigen</a>
+                Bei abgelaufener Bestätigung werden Sie aufgefordert, Ihr Passwort erneut zu
+                bestätigen.
             </p>
             <label for="passkey-name">Name für dieses Gerät</label>
             <input
@@ -143,7 +143,13 @@
                 role="alert"
             >
                 {{ passkeyError }}
-                <a href="/password/confirm">Passwort jetzt bestätigen</a>
+                <a
+                    v-if="passwordConfirmationRequired"
+                    :href="passwordConfirmationUrl"
+                    data-testid="passkey-password-confirmation"
+                >
+                    Passwort bestätigen
+                </a>
             </p>
             <ul
                 v-if="managedPasskeys.length"
@@ -208,7 +214,17 @@
                 @keydown.esc.stop.prevent="closeSetup"
                 @keydown.tab="trapSetupFocus"
             >
-                <h4 id="two-factor-setup-title">Authenticator-App einrichten</h4>
+                <div class="setup-dialog-heading">
+                    <h4 id="two-factor-setup-title">Authenticator-App einrichten</h4>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        aria-label="Einrichtung schließen"
+                        data-testid="two-factor-setup-close"
+                        :disabled="twoFactor.busy"
+                        @click="closeSetup"
+                    />
+                </div>
                 <div
                     v-if="twoFactor.error"
                     class="alert alert-danger mt-3"
@@ -346,11 +362,12 @@
                 </form>
                 <button
                     type="button"
-                    class="btn btn-link"
+                    class="btn btn-outline-secondary mt-3"
+                    data-testid="two-factor-setup-cancel"
                     :disabled="twoFactor.busy"
                     @click="closeSetup"
                 >
-                    Schließen
+                    Abbrechen
                 </button>
             </div>
         </section>
@@ -394,6 +411,7 @@ export default {
             newPasskeyName: '',
             passkeyBusy: false,
             passkeyError: '',
+            passwordConfirmationRequired: false,
             twoFactor: {
                 busy: false,
                 code: '',
@@ -462,11 +480,14 @@ export default {
         async runPasskeyManagement(action) {
             this.passkeyBusy = true
             this.passkeyError = ''
+            this.passwordConfirmationRequired = false
             try {
                 await action()
-            } catch {
-                this.passkeyError =
-                    'Passkey-Verwaltung nicht möglich. Bestätige dein Passwort erneut und versuche es noch einmal.'
+            } catch (error) {
+                this.passwordConfirmationRequired = error?.response?.status === 423
+                this.passkeyError = this.passwordConfirmationRequired
+                    ? 'Deine Passwortbestätigung ist abgelaufen. Bestätige dein Passwort und starte die Aktion erneut.'
+                    : 'Passkey-Verwaltung nicht möglich. Bitte erneut versuchen.'
             } finally {
                 this.passkeyBusy = false
             }
@@ -620,6 +641,13 @@ export default {
     padding: 1.5rem;
     border-radius: 0.5rem;
     background: var(--bs-body-bg, #fff);
+}
+
+.setup-dialog-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
 .setup-dialog img {
