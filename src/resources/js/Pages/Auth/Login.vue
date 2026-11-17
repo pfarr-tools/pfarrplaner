@@ -137,11 +137,11 @@
                             </div>
                         </div>
                         <div
-                            v-if="demo || loginStep === 2"
-                            class="text-end text-lg-start mt-4 pt-2"
+                            class="d-flex flex-wrap align-items-center gap-2 mt-4 pt-2"
                             :key="attempts"
                         >
                             <button
+                                v-if="demo || loginStep === 2"
                                 type="submit"
                                 class="btn btn-primary btn-lg"
                                 :disabled="loggingIn"
@@ -149,12 +149,8 @@
                             >
                                 Anmelden
                             </button>
-                        </div>
-                        <div
-                            v-if="!demo"
-                            class="mt-3"
-                        >
                             <button
+                                v-if="!demo"
                                 type="button"
                                 class="btn btn-outline-primary"
                                 data-testid="passkey-login"
@@ -167,14 +163,14 @@
                                         : 'Mit Passkey anmelden'
                                 }}
                             </button>
-                            <p
-                                v-if="passkeyError"
-                                class="text-danger mt-2"
-                                role="alert"
-                            >
-                                {{ passkeyError }}
-                            </p>
                         </div>
+                        <p
+                            v-if="passkeyError"
+                            class="text-danger mt-2"
+                            role="alert"
+                        >
+                            {{ passkeyError }}
+                        </p>
                         <div
                             v-if="!demo"
                             class="mt-3"

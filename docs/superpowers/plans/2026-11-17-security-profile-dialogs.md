@@ -4,7 +4,7 @@
 
 **Ziel:** TOTP-Deaktivierung und Passkey-Neuregistrierung bei abgelaufener Passwortbestätigung mit einem gemeinsamen Passwortdialog im Profil ermöglichen und den Sicherheitshinweis für nicht-technische Benutzer:innen verständlich erklären.
 
-**Architektur:** Eine zugängliche Vue-Dialogkomponente kapselt Passwortfeld, Formularzustände und Abbrechen. `SecurityTab` nutzt sie für beide Aktionen; der JSON-Pfad des Passwortbestätigungscontrollers gibt maschinenlesbare Erfolgs- und Validierungsantworten zurück, während normale Formularnavigation erhalten bleibt. Das Sicherheitshinweis-Interstitial erklärt Passkey und Authenticator-App in Alltagssprache, verlinkt offizielle App-Informationen und behält seine bestehende lokale Vorschau mit `?show_interstitial=1`.
+**Architektur:** Eine zugängliche Vue-Dialogkomponente kapselt Passwortfeld, Formularzustände und Abbrechen. `SecurityTab` nutzt sie für beide Aktionen; der JSON-Pfad des Passwortbestätigungscontrollers gibt maschinenlesbare Erfolgs- und Validierungsantworten zurück, während normale Formularnavigation erhalten bleibt. Das Sicherheitshinweis-Interstitial erklärt Passkey und Authenticator-App in Alltagssprache, verlinkt offizielle App-Informationen und behält seine bestehende lokale Vorschau mit `?show_interstitial=1`. Der TOTP-Schlüssel ist immer sichtbar; zusammengehörige Aktionsbuttons stehen in responsiven Zeilen. Der Interstitial-Primärbutton speichert den 21-Tage-Aufschub vor der Navigation.
 
 **Tech Stack:** Laravel 11, Inertia.js, Vue, Axios, PHPUnit, Vitest.
 
@@ -26,6 +26,8 @@
 - TOTP-Widerruf muss bei falschem Passwort oder Rate-Limit aktiviert bleiben und das Passwort löschen.
 - Passkey-Dialogabschluss darf nicht ohne erneuten Klick `navigator.credentials.create()` auslösen.
 - Sicherheitsinterstitial bleibt für ausstehende TOTP, erzwungenen Passwortwechsel, aktive Faktoren und gültigen Aufschub unterdrückt; Microsoft Authenticator und 2FAS Auth sind als Beispiele verständlich verlinkt.
+- Primärbutton speichert den Aufschub vor dem Profilaufruf; bei weiterhin Passwort-only-Konten bleiben die Interstitial-Props bis zum Ablauf leer.
+- TOTP-Schlüssel steht ohne Aufklappen direkt unter dem QR-Code; TOTP- und Login-Aktionspaare verwenden gemeinsame Flex-Zeilen.
 
 ---
 
@@ -67,6 +69,17 @@
 - [ ] Administratorenhandbuch auf geänderte Bedien- oder Betriebsanforderungen prüfen und die Nichtänderung begründen, falls nichts angepasst werden muss.
 - [ ] Technisches Handbuch um JSON-Passwortbestätigung und den lokalen Vorschauparameter ergänzen.
 - [ ] `./planer dev docs:check`, relevante fokussierte Tests, `git diff --check` und passende Formatprüfung ausführen; Senior Review, vollständigen Issue-Bericht und Commit.
+
+### Ergänzung nach UI-Rückmeldung: sichtbarer Schlüssel, Aktionszeilen und Snooze-Regressionsschutz
+
+**Dateien:**
+- Ändern: `src/resources/js/components/Profile/Tabs/SecurityTab.vue`, `src/resources/js/Pages/Auth/Login.vue`, `src/resources/js/Pages/Auth/LoginChallenge.vue`
+- Testen: `src/tests/js/components/Profile/SecurityTab.test.js`, `src/tests/js/components/Auth/Login.test.js`, `src/tests/js/components/Auth/LoginChallenge.test.js`, `src/tests/js/components/Ui/InterstitialOverlay.test.js`, `src/tests/Feature/InterstitialFeatureTest.php`, `src/tests/Unit/Services/InterstitialServiceUnitTest.php`
+
+- [x] Den manuellen TOTP-Schlüssel direkt unter dem QR-Code zeigen und Bitwarden als Beispiel nennen.
+- [x] TOTP-Assistent sowie Passwort-/Passkey-Login und Login-Challenge mit gemeinsamen responsiven Aktionszeilen versehen.
+- [x] Regressionstests ergänzen: Snooze-POST vor Navigation, sofortiges Ausblenden, persistente 21-Tage-Unterdrückung bei Passwort-only-Konten, sichtbarer manueller Schlüssel und gemeinsame Aktionszeilen.
+- [ ] Fokussierte PHP- und JavaScript-Tests, Build, Cachebereinigung und Format-/Dokumentationsprüfung abschließen; Senior Reviews, Issue-Bericht und Commit.
 
 ## Umsetzungshinweise
 

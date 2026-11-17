@@ -71,15 +71,6 @@
         </p>
         <p v-else>Schützen Sie Ihr Konto zusätzlich mit einer Authenticator-App.</p>
 
-        <FormInput
-            v-if="factorEnabled"
-            name="two_factor_current_password"
-            label="Aktuelles Passwort zum Deaktivieren"
-            type="password"
-            autocomplete="current-password"
-            required
-            v-model="twoFactor.currentPassword"
-        />
         <button
             v-if="!factorEnabled"
             type="button"
@@ -100,6 +91,8 @@
             type="button"
             class="btn btn-outline-danger"
             :disabled="twoFactor.busy"
+            ref="disableTwoFactorTrigger"
+            data-testid="disable-two-factor"
             @click="disableTwoFactor"
         >
             Zwei-Faktor-Authentifizierung deaktivieren
@@ -131,6 +124,7 @@
             <button
                 type="button"
                 class="btn btn-secondary"
+                ref="registerPasskeyTrigger"
                 data-testid="register-passkey"
                 :disabled="passkeyBusy || !newPasskeyName.trim()"
                 @click="registerPasskey"
@@ -138,18 +132,12 @@
                 {{ passkeyBusy ? 'Passkey wird eingerichtet …' : 'Passkey einrichten' }}
             </button>
             <p
-                v-if="passkeyError"
-                class="alert alert-danger mt-2"
+                v-if="passkeyError || passkeyNotice"
+                class="alert mt-2"
+                :class="passkeyError ? 'alert-danger' : 'alert-info'"
                 role="alert"
             >
-                {{ passkeyError }}
-                <a
-                    v-if="passwordConfirmationRequired"
-                    :href="passwordConfirmationUrl"
-                    data-testid="passkey-password-confirmation"
-                >
-                    Passwort bestätigen
-                </a>
+                {{ passkeyError || passkeyNotice }}
             </p>
             <ul
                 v-if="managedPasskeys.length"
@@ -241,16 +229,9 @@
                         Geeignete Apps sind zum Beispiel Microsoft Authenticator oder die
                         quelloffene App 2FAS Auth.
                     </p>
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        data-testid="two-factor-intro-next"
-                        @click="setupStep = 2"
-                    >
-                        Weiter
-                    </button>
                 </div>
                 <form
+                    id="two-factor-start-form"
                     v-else-if="setupStep === 2"
                     @submit.prevent="startTwoFactor"
                 >
@@ -263,14 +244,6 @@
                         required
                         v-model="twoFactor.currentPassword"
                     />
-                    <button
-                        type="submit"
-                        class="btn btn-primary"
-                        data-testid="two-factor-start"
-                        :disabled="twoFactor.busy || !twoFactor.currentPassword"
-                    >
-                        Einrichtung starten
-                    </button>
                 </form>
                 <div
                     v-else-if="setupStep === 3 && setup"
@@ -289,11 +262,17 @@
                         alt="QR-Code für die Authenticator-App"
                         data-testid="two-factor-qr"
                     />
-                    <details>
-                        <summary>QR-Code lässt sich nicht scannen?</summary>
-                        <p>Geben Sie diesen Schlüssel manuell in Ihrer App ein:</p>
+                    <div
+                        class="mt-3"
+                        data-testid="two-factor-manual-key"
+                    >
+                        <h5>Einrichtungsschlüssel für die manuelle Eingabe</h5>
+                        <p>
+                            Einige Apps, zum Beispiel Bitwarden, benötigen diesen Schlüssel. Geben
+                            Sie ihn dort ein, wenn die App danach fragt:
+                        </p>
                         <code class="d-block text-break">{{ provisioningSecret }}</code>
-                    </details>
+                    </div>
                     <h5>Recovery-Codes</h5>
                     <p>
                         Bewahren Sie diese Codes sicher auf. Jeder Code kann nur einmal verwendet
@@ -315,17 +294,9 @@
                         />
                         Ich habe die Recovery-Codes sicher gespeichert.</label
                     >
-                    <button
-                        type="button"
-                        class="btn btn-primary mt-3"
-                        data-testid="two-factor-setup-next"
-                        :disabled="!recoveryCodesSaved"
-                        @click="setupStep = 4"
-                    >
-                        Weiter
-                    </button>
                 </div>
                 <form
+                    id="two-factor-confirm-form"
                     v-else-if="setupStep === 4"
                     @submit.prevent="confirmTwoFactor"
                 >
@@ -347,9 +318,45 @@
                         name="two_factor_code"
                         test-id-prefix="totp"
                     />
+                </form>
+                <div
+                    class="setup-dialog-actions d-flex flex-wrap gap-2 mt-3"
+                    data-testid="two-factor-setup-actions"
+                >
                     <button
+                        v-if="setupStep === 1"
+                        type="button"
+                        class="btn btn-primary"
+                        data-testid="two-factor-intro-next"
+                        @click="setupStep = 2"
+                    >
+                        Weiter
+                    </button>
+                    <button
+                        v-else-if="setupStep === 2"
                         type="submit"
-                        class="btn btn-primary mt-3"
+                        form="two-factor-start-form"
+                        class="btn btn-primary"
+                        data-testid="two-factor-start"
+                        :disabled="twoFactor.busy || !twoFactor.currentPassword"
+                    >
+                        Einrichtung starten
+                    </button>
+                    <button
+                        v-else-if="setupStep === 3"
+                        type="button"
+                        class="btn btn-primary"
+                        data-testid="two-factor-setup-next"
+                        :disabled="!recoveryCodesSaved"
+                        @click="setupStep = 4"
+                    >
+                        Weiter
+                    </button>
+                    <button
+                        v-else-if="setupStep === 4"
+                        type="submit"
+                        form="two-factor-confirm-form"
+                        class="btn btn-primary"
                         data-testid="two-factor-confirm"
                         :disabled="
                             twoFactor.busy ||
@@ -359,18 +366,27 @@
                     >
                         Einrichtung bestätigen
                     </button>
-                </form>
-                <button
-                    type="button"
-                    class="btn btn-outline-secondary mt-3"
-                    data-testid="two-factor-setup-cancel"
-                    :disabled="twoFactor.busy"
-                    @click="closeSetup"
-                >
-                    Abbrechen
-                </button>
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        data-testid="two-factor-setup-cancel"
+                        :disabled="twoFactor.busy"
+                        @click="closeSetup"
+                    >
+                        Abbrechen
+                    </button>
+                </div>
             </div>
         </section>
+        <PasswordConfirmationDialog
+            :show="passwordConfirmationOpen"
+            :title="passwordConfirmationTitle"
+            :description="passwordConfirmationDescription"
+            :busy="passwordConfirmationBusy"
+            :error="passwordConfirmationError"
+            @confirm="submitPasswordConfirmation"
+            @cancel="cancelPasswordConfirmation"
+        />
         <div
             v-if="twoFactor.error && !setupModalOpen"
             class="alert alert-danger mt-3"
@@ -386,10 +402,11 @@ import axios from 'axios'
 import QRCode from 'qrcode'
 import FormInput from '../../Ui/forms/FormInput'
 import OneTimeCodeInput from '../../Ui/forms/OneTimeCodeInput.vue'
+import PasswordConfirmationDialog from '../PasswordConfirmationDialog.vue'
 import { Passkeys } from '@laravel/passkeys'
 export default {
     name: 'SecurityTab',
-    components: { FormInput, OneTimeCodeInput },
+    components: { FormInput, OneTimeCodeInput, PasswordConfirmationDialog },
     props: {
         user: { type: Object, required: true },
         password: { type: Object, required: true },
@@ -411,7 +428,11 @@ export default {
             newPasskeyName: '',
             passkeyBusy: false,
             passkeyError: '',
-            passwordConfirmationRequired: false,
+            passkeyNotice: '',
+            passwordConfirmationOpen: false,
+            passwordConfirmationBusy: false,
+            passwordConfirmationError: '',
+            passwordConfirmationPurpose: '',
             twoFactor: {
                 busy: false,
                 code: '',
@@ -425,10 +446,17 @@ export default {
         provisioningSecret() {
             return new window.URL(this.setup.provisioning_uri).searchParams.get('secret') || ''
         },
-        /** Return to the active security tab after password confirmation. */
-        passwordConfirmationUrl() {
-            const destination = `${window.location.pathname}${window.location.search}`
-            return `${window.route('password.confirm')}?redirect=${encodeURIComponent(destination)}`
+        /** Return the appropriate dialog title for the pending security action. */
+        passwordConfirmationTitle() {
+            return this.passwordConfirmationPurpose === 'disable-two-factor'
+                ? 'Zwei-Faktor-Authentifizierung deaktivieren'
+                : 'Passwort bestätigen'
+        },
+        /** Explain why the current password is required for the pending action. */
+        passwordConfirmationDescription() {
+            return this.passwordConfirmationPurpose === 'disable-two-factor'
+                ? 'Geben Sie Ihr aktuelles Passwort ein, um die Authenticator-App zu entfernen.'
+                : 'Geben Sie Ihr aktuelles Passwort ein. Danach können Sie die Passkey-Aktion erneut starten.'
         },
     },
     methods: {
@@ -438,7 +466,7 @@ export default {
 
             this.passkeyBusy = true
             this.passkeyError = ''
-            this.passwordConfirmationRequired = false
+            this.passkeyNotice = ''
             try {
                 const result = await Passkeys.register({
                     name: this.newPasskeyName.trim(),
@@ -450,10 +478,12 @@ export default {
                 this.managedPasskeys.unshift({ ...result, authenticator: 'Passkey' })
                 this.newPasskeyName = ''
             } catch (error) {
-                this.passwordConfirmationRequired = error?.status === 423
-                this.passkeyError = this.passwordConfirmationRequired
-                    ? 'Deine Passwortbestätigung ist abgelaufen. Bestätige dein Passwort und starte die Einrichtung erneut.'
-                    : 'Passkey konnte nicht eingerichtet werden. Bitte erneut versuchen.'
+                if (error?.status === 423) {
+                    this.openPasswordConfirmation('passkey')
+                } else {
+                    this.passkeyError =
+                        'Passkey konnte nicht eingerichtet werden. Bitte erneut versuchen.'
+                }
             } finally {
                 this.passkeyBusy = false
             }
@@ -483,14 +513,15 @@ export default {
         async runPasskeyManagement(action) {
             this.passkeyBusy = true
             this.passkeyError = ''
-            this.passwordConfirmationRequired = false
+            this.passkeyNotice = ''
             try {
                 await action()
             } catch (error) {
-                this.passwordConfirmationRequired = error?.response?.status === 423
-                this.passkeyError = this.passwordConfirmationRequired
-                    ? 'Deine Passwortbestätigung ist abgelaufen. Bestätige dein Passwort und starte die Aktion erneut.'
-                    : 'Passkey-Verwaltung nicht möglich. Bitte erneut versuchen.'
+                if (error?.response?.status === 423) {
+                    this.openPasswordConfirmation('passkey')
+                } else {
+                    this.passkeyError = 'Passkey-Verwaltung nicht möglich. Bitte erneut versuchen.'
+                }
             } finally {
                 this.passkeyBusy = false
             }
@@ -586,19 +617,72 @@ export default {
         },
         /** Disable TOTP after fresh password re-authentication. */
         async disableTwoFactor() {
-            if (!window.confirm('Zwei-Faktor-Authentifizierung wirklich deaktivieren?')) return
+            this.openPasswordConfirmation('disable-two-factor')
+        },
+        /** Open the shared password dialog for the requested security action. */
+        openPasswordConfirmation(purpose) {
+            this.passwordConfirmationPurpose = purpose
+            this.passwordConfirmationError = ''
+            this.passwordConfirmationOpen = true
+        },
+        /** Close the password dialog and return focus to its triggering action. */
+        cancelPasswordConfirmation() {
+            const purpose = this.passwordConfirmationPurpose
+            this.passwordConfirmationOpen = false
+            this.passwordConfirmationPurpose = ''
+            this.passwordConfirmationError = ''
+            this.$nextTick(() => {
+                const target =
+                    purpose === 'disable-two-factor'
+                        ? this.$refs.disableTwoFactorTrigger
+                        : this.$refs.registerPasskeyTrigger
+                target?.focus()
+            })
+        },
+        /** Verify the current password and complete the selected security action. */
+        async submitPasswordConfirmation(password) {
+            if (this.passwordConfirmationBusy || !password) return
 
-            await this.runTwoFactorRequest(
-                () =>
-                    axios.post(window.route('user.two-factor.disable'), {
-                        current_password: this.twoFactor.currentPassword,
-                    }),
-                () => {
+            this.passwordConfirmationBusy = true
+            this.passwordConfirmationError = ''
+            const purpose = this.passwordConfirmationPurpose
+            try {
+                if (purpose === 'disable-two-factor') {
+                    await axios.post(window.route('user.two-factor.disable'), {
+                        current_password: password,
+                    })
                     this.factorEnabled = false
+                    this.factorPending = false
                     this.setup = null
                     this.$emit('two-factor-disabled')
-                },
-            )
+                } else {
+                    await axios.post(window.route('password.confirm.store'), { password })
+                    this.passkeyNotice =
+                        'Passwort bestätigt. Klicken Sie erneut auf die gewünschte Passkey-Aktion.'
+                }
+
+                this.passwordConfirmationOpen = false
+                this.passwordConfirmationPurpose = ''
+                this.$nextTick(() => {
+                    if (purpose === 'disable-two-factor') {
+                        this.$refs.setupTrigger?.focus()
+                    } else {
+                        this.$refs.registerPasskeyTrigger?.focus()
+                    }
+                })
+            } catch (error) {
+                if (error.response?.status === 429) {
+                    this.passwordConfirmationError =
+                        'Zu viele Versuche. Bitte warten Sie einen Moment und versuchen Sie es erneut.'
+                } else {
+                    this.passwordConfirmationError =
+                        error.response?.data?.errors?.password?.[0] ||
+                        error.response?.data?.errors?.current_password?.[0] ||
+                        'Das Passwort konnte nicht bestätigt werden. Bitte prüfen Sie Ihre Eingabe.'
+                }
+            } finally {
+                this.passwordConfirmationBusy = false
+            }
         },
         /** Execute a TOTP request and normalize its generic error responses. */
         async runTwoFactorRequest(request, onSuccess) {

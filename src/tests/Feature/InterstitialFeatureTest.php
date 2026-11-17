@@ -17,6 +17,7 @@ use App\Http\Middleware\ForceDomain;
 use App\Models\People\User;
 use App\Services\InterstitialService;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class InterstitialFeatureTest extends TestCase
@@ -133,5 +134,10 @@ class InterstitialFeatureTest extends TestCase
             InterstitialService::ACTION_LATER,
             $user->fresh()->getSetting('interstitials')['security-beyond-password']['status'],
         );
+
+        $this->actingAs($user)
+            ->get('/profil?tab=security')
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page->where('interstitials', []));
     }
 }

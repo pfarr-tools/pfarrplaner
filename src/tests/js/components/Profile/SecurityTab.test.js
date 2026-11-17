@@ -98,16 +98,44 @@ describe('SecurityTab', () => {
         expect(wrapper.text()).not.toContain('Zwei-Faktor-Authentifizierung einrichten')
     })
 
-    it('reauthenticates with the current password when disabling TOTP', async () => {
+    it('asks for the password in a dialog when disabling TOTP', async () => {
         const post = vi.spyOn(axios, 'post').mockResolvedValueOnce({ data: { enabled: false } })
         const wrapper = mountSecurityTab({ twoFactorEnabled: true })
-        await wrapper.find('[name="two_factor_current_password"]').setValue('Current1!')
-        await wrapper.find('button.btn-outline-danger').trigger('click')
+        expect(wrapper.find('[name="two_factor_current_password"]').exists()).toBe(false)
+        await wrapper.find('[data-testid="disable-two-factor"]').trigger('click')
+
+        expect(wrapper.find('[role="dialog"]').exists()).toBe(true)
+        await wrapper.find('[data-testid="password-confirmation-input"]').setValue('Current1!')
+        await wrapper.find('[role="dialog"] form').trigger('submit')
         await flushPromises()
 
         expect(post).toHaveBeenCalledWith('/user.two-factor.disable', {
             current_password: 'Current1!',
         })
+        expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
+        expect(wrapper.vm.factorEnabled).toBe(false)
+    })
+
+    it('keeps TOTP enabled and clears a rejected password from the dialog', async () => {
+        vi.spyOn(axios, 'post').mockRejectedValueOnce({
+            response: {
+                status: 422,
+                data: { errors: { current_password: ['Das Passwort ist nicht korrekt.'] } },
+            },
+        })
+        const wrapper = mountSecurityTab({ twoFactorEnabled: true })
+
+        await wrapper.find('[data-testid="disable-two-factor"]').trigger('click')
+        await wrapper.find('[data-testid="password-confirmation-input"]').setValue('Wrong1!')
+        await wrapper.find('[role="dialog"] form').trigger('submit')
+        await flushPromises()
+
+        expect(wrapper.find('[role="dialog"]').exists()).toBe(true)
+        expect(wrapper.find('[role="dialog"] [role="alert"]').text()).toContain(
+            'Das Passwort ist nicht korrekt.',
+        )
+        expect(wrapper.find('[data-testid="password-confirmation-input"]').element.value).toBe('')
+        expect(wrapper.vm.factorEnabled).toBe(true)
     })
 
     it('shows TOTP setup failures inside the active dialog', async () => {
@@ -168,6 +196,10 @@ describe('SecurityTab', () => {
         })
         expect(wrapper.text()).toContain('one-time-code')
         expect(wrapper.find('[data-testid="two-factor-qr"]').exists()).toBe(true)
+        expect(wrapper.find('[data-testid="two-factor-manual-key"]').exists()).toBe(true)
+        expect(wrapper.find('[data-testid="two-factor-setup-actions"]').classes()).toContain(
+            'd-flex',
+        )
 
         await wrapper.find('[data-testid="recovery-codes-saved"]').setValue(true)
         await wrapper.find('[data-testid="two-factor-setup-next"]').trigger('click')
@@ -226,9 +258,27 @@ describe('SecurityTab', () => {
         await wrapper.find('[data-testid="register-passkey"]').trigger('click')
         await flushPromises()
 
-        expect(wrapper.vm.passwordConfirmationRequired).toBe(true)
-        expect(wrapper.find('[data-testid="passkey-password-confirmation"]').exists()).toBe(true)
-        expect(wrapper.text()).toContain('Passwortbestätigung ist abgelaufen')
+        expect(wrapper.vm.passwordConfirmationOpen).toBe(true)
+        expect(wrapper.find('[role="dialog"]').exists()).toBe(true)
+        expect(wrapper.text()).toContain('Passwort bestätigen')
+    })
+
+    it('confirms a passkey password in the dialog and waits for a second click', async () => {
+        vi.spyOn(Passkeys, 'register').mockRejectedValueOnce({ status: 423 })
+        const post = vi.spyOn(axios, 'post').mockResolvedValueOnce({ data: { confirmed: true } })
+        const wrapper = mountSecurityTab()
+
+        await wrapper.find('[data-testid="passkey-name"]').setValue('Arbeitslaptop')
+        await wrapper.find('[data-testid="register-passkey"]').trigger('click')
+        await flushPromises()
+        await wrapper.find('[data-testid="password-confirmation-input"]').setValue('Current1!')
+        await wrapper.find('[role="dialog"] form').trigger('submit')
+        await flushPromises()
+
+        expect(post).toHaveBeenCalledWith('/password.confirm.store', { password: 'Current1!' })
+        expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
+        expect(wrapper.text()).toContain('Klicken Sie erneut auf die gewünschte Passkey-Aktion')
+        expect(Passkeys.register).toHaveBeenCalledOnce()
     })
 
     it('does not call other registration errors password confirmation failures', async () => {
@@ -239,21 +289,21 @@ describe('SecurityTab', () => {
         await wrapper.find('[data-testid="register-passkey"]').trigger('click')
         await flushPromises()
 
-        expect(wrapper.vm.passwordConfirmationRequired).toBe(false)
-        expect(wrapper.find('[data-testid="passkey-password-confirmation"]').exists()).toBe(false)
+        expect(wrapper.vm.passwordConfirmationOpen).toBe(false)
+        expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
         expect(wrapper.vm.passkeyError).not.toContain('Passwort')
         expect(wrapper.vm.passkeyError).toContain('Passkey konnte nicht eingerichtet werden')
     })
 
     it('asks for password confirmation only after the session confirmation expires', async () => {
         const wrapper = mountSecurityTab()
-        expect(wrapper.find('[data-testid="passkey-password-confirmation"]').exists()).toBe(false)
+        expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
 
         await wrapper.vm.runPasskeyManagement(async () => {
             throw { response: { status: 423 } }
         })
 
-        expect(wrapper.find('[data-testid="passkey-password-confirmation"]').exists()).toBe(true)
+        expect(wrapper.find('[role="dialog"]').exists()).toBe(true)
     })
 
     it('does not suggest password confirmation for unrelated passkey errors', async () => {
@@ -262,8 +312,8 @@ describe('SecurityTab', () => {
             throw { response: { status: 500 } }
         })
 
-        expect(wrapper.find('[data-testid="passkey-password-confirmation"]').exists()).toBe(false)
-        expect(wrapper.text()).not.toContain('Passwort jetzt bestätigen')
+        expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
+        expect(wrapper.text()).not.toContain('Passwort bestätigen')
     })
 
     it('renames and revokes through the protected passkey management routes', async () => {

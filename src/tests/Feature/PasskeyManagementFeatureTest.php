@@ -71,6 +71,32 @@ final class PasskeyManagementFeatureTest extends TestCase
             ->assertSessionHas('auth.password_confirmed_at');
     }
 
+    /** JSON confirmation supports profile dialogs without following a redirect. */
+    public function test_json_password_confirmation_returns_a_confirmed_result(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create(['password' => 'Current1!']);
+
+        $this->actingAs($user)
+            ->postJson(route('password.confirm.store'), ['password' => 'Current1!'])
+            ->assertOk()
+            ->assertJsonPath('confirmed', true)
+            ->assertSessionHas('auth.password_confirmed_at');
+    }
+
+    /** JSON password errors are field validation responses and do not confirm the session. */
+    public function test_json_password_confirmation_rejects_a_wrong_password(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create(['password' => 'Current1!']);
+
+        $this->actingAs($user)
+            ->postJson(route('password.confirm.store'), ['password' => 'wrong'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('password')
+            ->assertSessionMissing('auth.password_confirmed_at');
+    }
+
     /** A wrong or external confirmation return path cannot reveal or redirect credentials. */
     public function test_password_confirmation_rejects_wrong_password_and_external_redirects(): void
     {

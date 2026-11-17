@@ -71,18 +71,24 @@
                         Recovery-Code verwenden
                     </button>
                 </div>
-                <form
-                    class="mt-3"
-                    @submit.prevent="requestEmailCode"
-                >
+                <div class="mt-3 d-flex flex-wrap align-items-center gap-2">
+                    <form @submit.prevent="requestEmailCode">
+                        <button
+                            class="btn btn-outline-primary"
+                            type="submit"
+                            :disabled="processing"
+                        >
+                            Code per E-Mail anfordern
+                        </button>
+                    </form>
                     <button
-                        class="btn btn-outline-primary"
-                        type="submit"
-                        :disabled="processing"
+                        class="btn btn-link px-0"
+                        type="button"
+                        @click="cancel"
                     >
-                        Code per E-Mail anfordern
+                        Anmeldung abbrechen
                     </button>
-                </form>
+                </div>
                 <p
                     v-if="$page.props.flash?.success"
                     class="text-success mt-2"
@@ -90,17 +96,6 @@
                 >
                     {{ $page.props.flash.success }}
                 </p>
-                <form
-                    class="mt-3"
-                    @submit.prevent="cancel"
-                >
-                    <button
-                        class="btn btn-link px-0"
-                        type="submit"
-                    >
-                        Anmeldung abbrechen
-                    </button>
-                </form>
             </div>
         </div>
     </section>

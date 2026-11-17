@@ -200,6 +200,26 @@ class InterstitialServiceUnitTest extends TestCase
         $this->assertCount(1, $this->service->forUser($user));
     }
 
+    /** A password-only account stays snoozed after visiting security settings. */
+    public function test_password_only_reminder_stays_hidden_after_opening_security_settings(): void
+    {
+        config()->set('interstitials.items', [
+            'security-beyond-password' => [
+                'enabled' => true,
+                'audience' => 'password-only',
+                'repeatable' => true,
+                'dismissible' => false,
+                'snooze_days' => 21,
+                'title' => 'Sicherheit erhöhen',
+            ],
+        ]);
+
+        $user = User::factory()->create();
+        $this->service->remember($user, 'security-beyond-password', InterstitialService::ACTION_LATER);
+
+        $this->assertSame([], $this->service->forUser($user));
+    }
+
     /** Repeatable security reminders cannot be permanently dismissed. */
     public function test_non_dismissible_interstitial_cannot_be_permanently_hidden(): void
     {

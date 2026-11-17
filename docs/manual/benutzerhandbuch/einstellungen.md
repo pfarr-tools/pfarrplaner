@@ -90,6 +90,9 @@ einrichten. Ein starkes, nur hier verwendetes Passwort bleibt als
 Rückfallmöglichkeit wichtig.
 
 Über **Sicherheitseinstellungen öffnen** gelangen Sie direkt zur Einrichtung.
+Der Hinweis wird dann für drei Wochen ausgeblendet, auch wenn Sie noch keinen
+Passkey oder zweiten Faktor eingerichtet haben. Danach erinnert Pfarrplaner Sie
+erneut, solange das Konto nur mit Passwort geschützt ist.
 Mit **Später** wird der Hinweis drei Wochen ausgeblendet. Solange weder ein
 Passkey noch ein Einmalcode-Faktor eingerichtet ist, erscheint er danach
 erneut.
@@ -102,7 +105,8 @@ Bestätigen Sie Ihre Identität mit Ihrem aktuellen Passwort, scannen Sie den
 angezeigten QR-Code in einer Authenticator-App und speichern Sie die
 Recovery-Codes sicher. Beispiele für geeignete Apps sind Microsoft
 Authenticator und die quelloffene App 2FAS Auth. Wenn Sie den QR-Code nicht
-scannen können, zeigt der Assistent den Schlüssel für die manuelle Eingabe.
+scannen können oder Ihre App wie Bitwarden den Schlüssel benötigt, steht der
+Schlüssel für die manuelle Eingabe direkt unter dem QR-Code.
 Die Recovery-Codes sind nur während dieses Einrichtungsschritts sichtbar und
 können jeweils nur einmal verwendet werden.
 
@@ -120,9 +124,9 @@ der Anmeldeseite einen achtstelligen Code per E-Mail anfordern. Recovery-Codes
 können dort ebenfalls eingegeben werden und sind jeweils nur einmal gültig.
 Eine Login-Challenge läuft nach fünf Minuten ab.
 
-Zum Deaktivieren geben Sie erneut Ihr aktuelles Passwort ein und bestätigen
-Sie die Sicherheitsabfrage. Bei zu vielen fehlerhaften Versuchen wird die
-Aktion vorübergehend gesperrt. Wenn Sie Ihr Gerät und alle Recovery-Codes
+Zum Deaktivieren wählen Sie **Zwei-Faktor-Authentifizierung deaktivieren**.
+Ein Dialog fragt nach Ihrem aktuellen Passwort. Bei zu vielen fehlerhaften
+Versuchen wird die Aktion vorübergehend gesperrt. Wenn Sie Ihr Gerät und alle Recovery-Codes
 verlieren, wenden Sie sich über einen bereits bekannten Kontaktweg an Ihre
 Administration. Diese prüft Ihre Identität außerhalb von Pfarrplaner. Eine
 eingehende E-Mail allein reicht dafür nicht aus. Nach der Prüfung kann ein
@@ -140,8 +144,10 @@ neuen API-Token wieder ein.
 Im Bereich **Sicherheit** können Sie mehrere Passkeys für Ihre Geräte
 einrichten. Geben Sie einen wiedererkennbaren Namen ein und wählen Sie
 **Passkey einrichten**. Bestätigen Sie bei Aufforderung Ihr Passwort. Der
-Browser bittet Sie anschließend, die Geräte-PIN, Biometrie oder eine andere
-lokale Geräteverifikation zu verwenden. Das Gerät muss Passkeys unterstützen.
+Passwortdialog erscheint direkt im Profil. Nach der Bestätigung wählen Sie
+**Passkey einrichten** noch einmal. Der Browser bittet Sie anschließend, die
+Geräte-PIN, Biometrie oder eine andere lokale Geräteverifikation zu verwenden.
+Das Gerät muss Passkeys unterstützen.
 
 Sie können einen Passkey umbenennen oder widerrufen. Beim Widerruf wird das
 Gerät sofort für künftige Anmeldungen gesperrt. Auf der Login-Seite steht

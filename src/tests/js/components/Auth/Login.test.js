@@ -130,4 +130,31 @@ describe('Login', () => {
         })
         expect(verify.mock.calls[0][0].remember()).toBe(false)
     })
+
+    it('keeps password and passkey actions together in one responsive action row', async () => {
+        const wrapper = mount(Login, {
+            global: {
+                mocks: {
+                    $page: {
+                        props: {
+                            appName: 'Pfarrplaner',
+                            appProvider: '',
+                            dev: false,
+                            demo: false,
+                            errors: {},
+                        },
+                    },
+                },
+            },
+        })
+        await wrapper.find('[name="email"]').setValue('person@example.org')
+        await wrapper.find('[data-testid="continue-login"]').trigger('click')
+
+        const loginButton = wrapper
+            .findAll('button')
+            .find((button) => button.text().trim() === 'Anmelden')
+        const passkeyButton = wrapper.find('[data-testid="passkey-login"]')
+        expect(loginButton.element.parentElement).toBe(passkeyButton.element.parentElement)
+        expect(loginButton.element.parentElement.classList.contains('d-flex')).toBe(true)
+    })
 })

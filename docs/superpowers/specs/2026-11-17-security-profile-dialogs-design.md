@@ -11,6 +11,9 @@ Passwortgeschützte Sicherheitsaktionen sollen direkt aus der Sicherheitsansicht
 - Die bestehenden Rate-Limits, serverseitige Passwortprüfung, Faktor- und Kontoschutzregeln bleiben unverändert.
 - Das Sicherheitshinweis-Interstitial bleibt für geeignete Passwort-only-Konten aktiv. In `local` und `dusk` wird es zur Vorschau mit `?show_interstitial=1` sichtbar; ohne diesen Schalter unterdrückt die Anwendung Interstitials in diesen Umgebungen absichtlich.
 - Das Interstitial erklärt Passkey und Authenticator-App ohne vorausgesetzte Fachkenntnisse, definiert TOTP in Alltagssprache, nennt Microsoft Authenticator und die quelloffene Alternative 2FAS Auth mit offiziellen Produktlinks und erklärt die Wiederherstellungscodes.
+- Im TOTP-Assistenten ist der Einrichtungsschlüssel immer direkt sichtbar, weil manche Apps wie Bitwarden ihn standardmäßig benötigen.
+- Die jeweils zusammengehörenden Aktionen im TOTP-Assistenten, im Passwort-Login und im Login-Challenge-Ablauf stehen in derselben responsiven Aktionszeile.
+- Der Primärbutton des Interstitials speichert den 21-Tage-Aufschub vor der Navigation. Der Aufschub bleibt wirksam, solange das Konto Passwort-only ist; die Erinnerung kommt nach Ablauf wieder.
 
 ## Festgelegter Hinweistext
 
@@ -37,6 +40,8 @@ Die Passkey-Einrichtung wird nach einer erfolgreichen Passwortbestätigung nicht
 - Falsche Passwörter, Rate-Limits, Abbrechen, erneutes Öffnen und erfolgreiche Bestätigung sind verständlich und löschen Passwörter aus dem UI-Zustand.
 - Nach Passkey-Reauthentifizierung ist ein erneuter ausdrücklicher Klick nötig und ausreichend, um eine neue Registrierung zu starten.
 - Das Interstitial bleibt in Produktion an die bereits vereinbarten Passwort-only-, 21-Tage-Aufschub- und Ausschlussregeln gebunden; die lokale Vorschau ist dokumentiert.
+- Nach Klick auf „Sicherheitseinstellungen öffnen“ ist der Hinweis auch ohne eingerichteten Faktor für 21 Tage verborgen; Profil-Props nach der Navigation enthalten ihn in dieser Zeit nicht.
+- Der manuelle TOTP-Schlüssel ist ohne Dropdown sichtbar; TOTP- und Login-Aktionspaare verwenden gemeinsame Flex-Zeilen.
 - Das Interstitial erklärt Anmeldung, Einrichtung, Offline-Codes und Wiederherstellungscodes verständlich und verlinkt auf offizielle App-Seiten.
 - Benutzer-, Administratoren- und Technisches Handbuch werden auf Relevanz geprüft und konsistent aktualisiert.
 

@@ -95,6 +95,7 @@ describe('InterstitialOverlay', () => {
         await flushPromises()
 
         expect(post).toHaveBeenCalledOnce()
+        expect(wrapper.vm.currentInterstitial).toBeNull()
         expect(inertiaGet).toHaveBeenCalledWith('/profil?tab=security')
     })
 })

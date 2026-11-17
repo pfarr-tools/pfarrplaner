@@ -108,6 +108,21 @@ describe('LoginChallenge', () => {
         expect(wrapper.find('[data-testid="login-totp-digit-0"]').exists()).toBe(false)
     })
 
+    it('places email-code and cancel actions side by side', () => {
+        const wrapper = mount(LoginChallenge)
+        const emailButton = wrapper
+            .findAll('button')
+            .find((button) => button.text().includes('Code per E-Mail'))
+        const cancelButton = wrapper
+            .findAll('button')
+            .find((button) => button.text().includes('Anmeldung abbrechen'))
+
+        expect(emailButton.element.parentElement.parentElement).toBe(
+            cancelButton.element.parentElement,
+        )
+        expect(cancelButton.element.parentElement.classList.contains('d-flex')).toBe(true)
+    })
+
     it('distributes a pasted six-digit code across the TOTP fields', async () => {
         const wrapper = mount(LoginChallenge)
         await wrapper.find('[data-testid="login-totp-digit-0"]').trigger('paste', {
@@ -135,7 +150,10 @@ describe('LoginChallenge', () => {
         const forms = wrapper.findAll('form')
 
         await forms[1].trigger('submit')
-        await forms[2].trigger('submit')
+        await wrapper
+            .findAll('button')
+            .find((button) => button.text().includes('Anmeldung abbrechen'))
+            .trigger('click')
 
         expect(wrapper.vm.$inertia.post).toHaveBeenNthCalledWith(
             1,

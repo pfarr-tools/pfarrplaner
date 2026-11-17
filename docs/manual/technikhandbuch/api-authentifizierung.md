@@ -58,6 +58,12 @@ Limit nach Benutzername und Quell-IP begrenzt; es gibt keine weitere
 kontoweite Passwortsperre. Die Antworten enthalten weder den TOTP-Secretwert als eigenes Feld noch
 die sensiblen User-Modellattribute.
 
+`POST /password/confirm` behält für normale Formularanfragen das Redirect-
+Verhalten bei. JSON-Anfragen aus dem Profil erhalten bei Erfolg
+`{"confirmed": true}` und setzen denselben Session-Zeitstempel. Ein falsches
+Passwort liefert HTTP 422 mit einem Feldfehler; die Anwendung startet eine
+WebAuthn-Abfrage erst nach einem neuen ausdrücklichen Klick.
+
 ## Empfehlung für Integrationen
 
 - Neue produktive Integrationen dürfen nicht von implizit öffentlichen Endpunkten ausgehen.

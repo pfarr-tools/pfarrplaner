@@ -56,7 +56,10 @@ Super-Administratoren vorbehalten; es wird serverseitig geprüft, einmalig per
 E-Mail versendet und erzwingt ebenfalls den Passwortwechsel.
 
 Benutzer können die TOTP-Einschreibung nur nach erneuter Eingabe ihres
-aktuellen Passworts starten, bestätigen oder deaktivieren. Start und
+aktuellen Passworts starten, bestätigen oder deaktivieren. Für das Deaktivieren
+öffnet sich die Passwortabfrage erst nach Klick auf die Schaltfläche. Eine
+abgelaufene Passwortbestätigung bei Passkey-Aktionen wird ebenfalls direkt im
+Profil abgefragt; die Aktion muss danach erneut angeklickt werden. Start und
 Bestätigung liefern keine dauerhaften Geheimnisse in Benutzerlisten oder
 Protokollen; Recovery-Codes werden nur einmalig nach der Einschreibung
 angezeigt und müssen sicher außerhalb von Pfarrplaner verwahrt werden.

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -20,17 +22,32 @@ class ConfirmPasswordController extends Controller
         ]);
     }
 
-    /** Mark the session password-confirmed after verifying the current password. */
-    public function store(Request $request): RedirectResponse
+    /**
+     * Mark the session password-confirmed after verifying the current password.
+     *
+     * @param  Request  $request  The password-confirmation request.
+     * @return JsonResponse|RedirectResponse A JSON result for modal requests or the traditional redirect.
+     */
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $validated = $request->validate(['password' => ['required', 'string']]);
         $user = $request->user();
 
         if (! $user || ! Hash::check($validated['password'], $user->getAuthPassword())) {
+            if ($request->expectsJson()) {
+                throw ValidationException::withMessages([
+                    'password' => 'Das Passwort ist nicht korrekt.',
+                ]);
+            }
+
             return back()->withErrors(['password' => 'Das Passwort ist nicht korrekt.']);
         }
 
         $request->session()->put('auth.password_confirmed_at', now()->timestamp);
+        if ($request->expectsJson()) {
+            return response()->json(['confirmed' => true]);
+        }
+
         $redirect = $this->safeRedirect($request->input('redirect'));
 
         return $redirect
