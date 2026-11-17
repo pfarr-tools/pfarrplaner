@@ -124,7 +124,42 @@ neuen TOTP-Faktor aktiviert. Ein fehlgeschlagener oder unvollständiger Versuch
 lässt den Marker bestehen. Nicht markierte Konten und Gäste werden nicht
 eingeschränkt.
 
-Für die spätere Passkey-Etappe wird `web-auth/webauthn-framework` als Kandidat vorgemerkt. Das Projekt beschreibt eine MIT-lizenzierte PHP-WebAuthn-Implementierung; die genaue Paketversion, RP-ID-, Origin- und Laravel-Integrationsentscheidung bleibt der Passkey-Etappe vorbehalten.
+## Passkey-Grundlage (in Umsetzung)
+
+Die WebAuthn-Basis verwendet Laravels `laravel/passkeys` (`v0.3.0`) und den
+offiziellen Browser-Client `@laravel/passkeys` (`v0.4.1`). Das PHP-Paket
+verwaltet WebAuthn-Credentials und -Ceremonies; der Browser-Client nutzt
+`@simplewebauthn/browser`. Das Projekt bindet sein
+`App\Models\People\User`-Modell über `PasskeyUser` und
+`PasskeyAuthenticatable` an. Ein HMAC aus Tabellennamen und Benutzer-ID bildet
+den nicht personenbezogenen WebAuthn-User-Handle.
+
+`config/passkeys.php` bezieht die RP-ID und Browser-Origins aus der
+Betriebskonfiguration:
+
+- `PASSKEYS_RELYING_PARTY_ID` ist die Domain ohne Schema oder Port; leer wird
+  der Host aus `APP_URL` verwendet.
+- `PASSKEYS_ALLOWED_ORIGINS` enthält kommasepariert die exakten Browser-Origins
+  einschließlich Schema und gegebenenfalls Port; leer wird `APP_URL` verwendet.
+- `PASSKEYS_USER_HANDLE_SECRET` ist optional. Leer wird `APP_KEY` verwendet.
+  Ein eigener Wert muss zwischen allen App-Instanzen stabil und in Backups
+  enthalten sein.
+
+Lokal ergibt `APP_URL=http://localhost:8180` die RP-ID `localhost` und die
+Origin `http://localhost:8180`. Browser behandeln `localhost` als sicheren
+Kontext; Dev und Produktion müssen HTTPS verwenden. Die Passkey-Tabelle wird
+mit der Migration `2026_11_17_000000_create_passkeys_table` angelegt. Sie
+verweist fest auf `users` und löscht zugehörige Credentials bei regulärer
+Kontolöschung. DemoBuilder entfernt importierte Passkeys bei der
+Demo-Anonymisierung.
+
+Die Paket-Routen für Anmeldung und Verwaltung sind in dieser Etappe vollständig
+deaktiviert. Sie werden erst mit der projektspezifischen Anmeldung,
+Challenge-Ablaufprüfung und Wiederherstellung freigeschaltet. Das Paketlimit
+von sechs Anfragen pro Minute ist vorbereitet. Die vollständige Login-
+Oberfläche und Einbindung in Passwortwechsel-/Recovery-Abläufe sind noch in
+Umsetzung; die installierte Paketbasis allein ist daher keine fertige
+Passkey-Anmeldung.
 
 Der produktive Routenbestand wurde geprüft und gezielt gehärtet. Dabei wurden folgende Klassen von Problemen beseitigt:
 

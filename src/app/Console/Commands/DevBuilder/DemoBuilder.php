@@ -522,7 +522,7 @@ class DemoBuilder extends Command
         return true;
     }
 
-    /** Anonymize the user and remove factor-recovery information from demo data. */
+    /** Anonymize the user and remove authentication-factor and recovery information from demo data. */
     protected function handleUsers(User $user)
     {
         if (Schema::hasColumn('users', 'two_factor_recovery_required_at')) {
@@ -546,6 +546,9 @@ class DemoBuilder extends Command
         }
         if (Schema::hasTable('two_factor_login_challenges')) {
             DB::table('two_factor_login_challenges')->where('user_id', $user->getKey())->delete();
+        }
+        if (Schema::hasTable('passkeys')) {
+            DB::table('passkeys')->where('user_id', $user->getKey())->delete();
         }
 
         $data = [

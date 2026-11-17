@@ -61,6 +61,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Laravel\Passkeys\Contracts\PasskeyUser;
+use Laravel\Passkeys\PasskeyAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use RoundlyConsulting\TwoFactor\Concerns\HasTwoFactorAuthentication;
 use RoundlyConsulting\TwoFactor\Contracts\TwoFactorAuthenticatable;
@@ -70,9 +72,9 @@ use Spatie\Permission\Traits\HasRoles;
 /**
  * Class User
  */
-class User extends Authenticatable implements TwoFactorAuthenticatable
+class User extends Authenticatable implements PasskeyUser, TwoFactorAuthenticatable
 {
-    use HasApiTokens, HasFactory, HasRoles, HasTwoFactorAuthentication, Notifiable;
+    use HasApiTokens, HasFactory, HasRoles, HasTwoFactorAuthentication, Notifiable, PasskeyAuthenticatable;
 
     public const NAME_FORMAT_DEFAULT = 1;
 

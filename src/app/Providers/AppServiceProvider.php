@@ -31,6 +31,7 @@
 namespace App\Providers;
 
 use App\Exceptions\Handler;
+use App\Models\People\User;
 use App\Seating\SeatingValidators;
 use App\Services\QueryLogService;
 use Carbon\Carbon;
@@ -49,6 +50,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Laravel\Passkeys\Passkeys;
 use Laravel\Telescope\TelescopeServiceProvider;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -64,6 +66,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Passkeys::useUserModel(User::class);
 
         App::setLocale(config('app.locale'));
         Carbon::setLocale(config('app.locale'));
@@ -147,6 +150,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        Passkeys::ignoreRoutes();
+
         $this->app->singleton(
             ExceptionHandler::class,
             Handler::class

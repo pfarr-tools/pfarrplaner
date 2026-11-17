@@ -78,6 +78,7 @@
         "@inertiajs/core": "^3.0.3",
         "@inertiajs/vite": "^3.0.3",
         "@inertiajs/vue3": "^3.0.3",
+        "@laravel/passkeys": "^0.4.1",
         "@mdi/font": "^6.5.95",
         "@mdi/js": "^7.2.96",
         "@pfarr.tools/relative-date": "^1.0.0",

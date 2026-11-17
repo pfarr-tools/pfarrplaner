@@ -8,6 +8,8 @@ use Faker\Factory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Laravel\Passkeys\Contracts\PasskeyUser;
+use Laravel\Passkeys\Passkeys;
 use RoundlyConsulting\TwoFactor\Contracts\TwoFactorAuthenticatable;
 use RoundlyConsulting\TwoFactor\Contracts\TwoFactorService;
 use Tests\TestCase;
@@ -48,6 +50,27 @@ final class TwoFactorUserIntegrationFeatureTest extends TestCase
         self::assertArrayNotHasKey('two_factor_secret', $serialized);
         self::assertArrayNotHasKey('two_factor_recovery_codes', $serialized);
         self::assertArrayNotHasKey('two_factor_last_used_timestep', $serialized);
+    }
+
+    /** The user exposes a stable opaque identity and account labels to WebAuthn. */
+    public function test_user_implements_passkey_identity_contract(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'member@example.test',
+            'first_name' => 'Ada',
+            'last_name' => 'Lovelace',
+        ]);
+
+        self::assertInstanceOf(PasskeyUser::class, $user);
+        self::assertSame('member@example.test', $user->getPasskeyUsername());
+        self::assertNotSame('member@example.test', $user->getPasskeyDisplayName());
+        self::assertNotSame((string) $user->getKey(), $user->getPasskeyUserHandle());
+        self::assertSame($user->getPasskeyUserHandle(), $user->fresh()->getPasskeyUserHandle());
+        self::assertFalse($user->hasPasskeysEnabled());
+        self::assertSame(User::class, Passkeys::userModel());
+        self::assertTrue(Schema::hasTable('passkeys'));
+        self::assertFalse(app('router')->has('passkey.login'));
+        self::assertFalse(app('router')->has('passkey.store'));
     }
 
     /**
@@ -92,6 +115,14 @@ final class TwoFactorUserIntegrationFeatureTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        DB::table('passkeys')->insert([
+            'user_id' => $user->getKey(),
+            'name' => 'Demo computer',
+            'credential_id' => 'opaque-demo-credential',
+            'credential' => json_encode(['credential' => 'demo'], JSON_THROW_ON_ERROR),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         $builder = new DemoBuilder;
         $faker = new \ReflectionProperty($builder, 'faker');
@@ -101,6 +132,7 @@ final class TwoFactorUserIntegrationFeatureTest extends TestCase
 
         self::assertFalse($user->fresh()->hasTwoFactorEnabled());
         self::assertSame(0, DB::table('two_factor_login_challenges')->where('user_id', $user->getKey())->count());
+        self::assertSame(0, DB::table('passkeys')->where('user_id', $user->getKey())->count());
     }
 
     /** Demo anonymization removes recovery status and audit references. */

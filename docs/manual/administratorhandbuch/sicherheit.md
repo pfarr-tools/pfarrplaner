@@ -65,6 +65,32 @@ des Postfachs und aller Recovery-Codes ist weiterhin eine administrative
 Identitätsprüfung erforderlich; Support darf keine Codes oder TOTP-Schlüssel
 per Chat oder E-Mail erfragen.
 
+### Passkey-Betrieb (Integration noch in Umsetzung)
+
+Die Passkey-Basis ist für Laravel 13 vorbereitet; die vollständige
+Anmeldeoberfläche und die zugehörigen Sicherheitsabläufe sind noch nicht
+abgeschlossen. Vor einer späteren Freigabe müssen `APP_URL`, RP-ID und
+zugelassene Origins zur tatsächlich verwendeten Browseradresse passen:
+
+- `PASSKEYS_RELYING_PARTY_ID`: Domain ohne `https://` und ohne Port; leer
+  übernimmt den Host aus `APP_URL`.
+- `PASSKEYS_ALLOWED_ORIGINS`: kommaseparierte, exakte Origins, zum Beispiel
+  `https://www.example.org`; Schema und Port müssen übereinstimmen. Leer
+  übernimmt `APP_URL`.
+- `PASSKEYS_USER_HANDLE_SECRET`: optionaler stabiler Schlüssel für
+  pseudonyme WebAuthn-Benutzerkennungen. Leer wird `APP_KEY` genutzt. Ein
+  eigener Wert muss auf allen App-Instanzen identisch und in der
+  Wiederherstellungssicherung enthalten sein.
+
+Für lokale Entwicklung darf `http://localhost` verwendet werden; Dev und
+Produktion benötigen HTTPS. Die Migration
+`2026_11_17_000000_create_passkeys_table` legt Credential-Daten an. Sichern
+Sie vor dem späteren Produktiv-Update Datenbank und Anwendungsversion. Ein
+Rollback dieser Migration entfernt die Passkeys-Tabelle samt registrierten
+Credentials; Benutzer müssten Passkeys anschließend erneut einrichten. Die
+Paket-Routen für Anmeldung und Verwaltung bleiben bis zur Integration
+deaktiviert; das Paketlimit von sechs Anfragen pro Minute ist vorbereitet.
+
 ### Wiederherstellung nach Verlust von Gerät und Recovery-Codes
 
 Die Wiederherstellung ist ein eigener Super-Admin-Vorgang. Sie setzt weder das

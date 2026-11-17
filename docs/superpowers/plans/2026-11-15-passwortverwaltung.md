@@ -217,20 +217,28 @@ Nutzerführung:
 - Testen: serverseitige Credential-/Challenge-Tests und Browserabdeckung mit
   unterstützter Teststrategie
 
-- [ ] WebAuthn-Bibliothek, RP-ID, Origins und Deployment-Konfiguration
-  verbindlich festlegen; lokale, Dev- und Produktionsdomains berücksichtigen.
-  Die allgemeine Passkey-Option aus Task 4b funktionsfähig in den gemeinsamen
-  zweiten Login-Schritt integrieren. Gewählt ist `laravel/passkeys` mit dem
-  offiziellen Browser-Client `@laravel/passkeys`: beide unterstützen Laravel
-  13 beziehungsweise Vue, und die Serverbibliothek setzt PHP 8.2 voraus. Der
-  generische Login nutzt discoverable Passkeys ohne vorausgehende Kontoauswahl;
-  das vermeidet eine kontoabhängige Antwort vor der Authentifizierung.
-- RP-ID und erlaubte Origins werden explizit konfiguriert statt aus einer
-  einzigen URL abgeleitet. Die Konfiguration deckt lokale Entwicklung, Dev und
-  die produktive Domain ab. Dev und Produktion benötigen HTTPS; lokale
-  Entwicklung darf die sichere Browser-Origin `http://localhost` verwenden.
-  Das Geheimnis für stabile User-Handles bleibt an die bestehende
-  App-Schlüsselverwaltung gebunden.
+- [x] Als WebAuthn-Bibliothek `laravel/passkeys` (`v0.3.0`) und den offiziellen
+  Browser-Client `@laravel/passkeys` (`v0.4.1`) auswählen und locken. Die
+  Serverbibliothek unterstützt Laravel 13 und PHP 8.2+; der Browser-Client
+  unterstützt Vue. Die Auflösung brachte 13 neue Composer-Pakete ohne Updates
+  bestehender Pakete; Composer Audit fand keine Advisories in den neuen Paketen.
+- [x] RP-ID und erlaubte Origins explizit konfigurierbar machen. Leerwerte
+  leiten RP-ID und Origin aus `APP_URL` ab; mehrere exakte Origins können
+  kommasepariert angegeben werden. Der User-Handle-Schlüssel ist stabil an
+  `APP_KEY` gebunden und optional separat konfigurierbar. Lokal ergibt sich
+  `localhost` sowie `http://localhost:8180`; Dev und Produktion benötigen
+  HTTPS, während lokale Entwicklung `http://localhost` als sichere
+  Browser-Origin verwenden darf.
+- [x] Das `User`-Modell an das Passkey-User-Contract anbinden, einen
+  nicht-personenbezogenen HMAC-User-Handle bereitstellen, die Paketmigration
+  auf die feste `users`-Tabelle pinnen und Passkeys beim Demo-Anonymisieren
+  entfernen.
+- [x] Paket-Routen bis zur integrierten Anmeldung vollständig deaktivieren;
+  Regressionstests sichern ab, dass Login- und Registrierungsrouten nicht
+  vorzeitig erreichbar sind.
+- [ ] Die allgemeine Passkey-Option aus Task 4b funktionsfähig in den
+  gemeinsamen zweiten Login-Schritt integrieren. Der generische Login verwendet
+  discoverable Credentials ohne vorausgehende kontoabhängige Auswahl.
 - Registrierung und Anmeldung verlangen eine lokale Benutzerverifikation
   (Geräte-PIN, Biometrie oder gleichwertig). Die Serverprüfung muss das
   User-Verified-Flag kryptografisch validieren; bloß angeforderte Verifikation
@@ -252,9 +260,10 @@ Nutzerführung:
   Konten mit `must_change_password` direkt auf das Passwort-Interstitial und
   wiederherzustellende Konten auf die TOTP-Recovery-Seite leitet; diese Gates
   werden nicht über einen abgewiesenen Login umgangen oder unerreichbar.
-- Der öffentliche Passkey-Login wird auf sechs Anfragen pro Minute und
-  Client-IP begrenzt. Verwaltungs-/Registrierungsrouten bleiben zusätzlich
-  authentifiziert und erfordern die bestehende Passwortbestätigung.
+- Der öffentliche Passkey-Login wird bei späterer Freischaltung auf sechs
+  Anfragen pro Minute und Client-IP begrenzt. Verwaltungs-/Registrierungsrouten
+  bleiben zusätzlich authentifiziert und erfordern die bestehende
+  Passwortbestätigung.
 - [ ] API-/Browsergrenzen, HTTPS-Anforderung und Betriebsmaßnahmen im
   technischen und Administratorenhandbuch dokumentieren.
 
@@ -264,6 +273,15 @@ Recovery-/Passwortwechsel-Weiterleitung, eine konkrete IP-Drosselung und die
 korrekte `localhost`-Ausnahme. Nach Ergänzung dieser Abnahmekriterien wurde der
 Plan im zweiten Re-Review **APPROVED**. Die Implementierungsreviews prüfen
 deren tatsächliche Durchsetzung erneut.
+
+**Task 5a — Paket- und Persistenzgrundlage:** Der erste Implementierungsreview
+fand, dass die automatische Paketregistrierung bereits eigenständige Login-
+und Verwaltungsrouten freischaltet. Diese wurden in `AppServiceProvider`
+deaktiviert und durch Regressionstests abgesichert. Die Handbücher erklären
+den aktuellen Integrationsstand, Umgebungsvariablen, HTTPS und Migration.
+Senior Review 1 forderte die Routen-Härtung; Senior Re-Review 2 genehmigte die
+Etappe ohne offene Findings. Der fokussierte Test bestand mit 5 Tests und 35
+Assertions; `git diff --check` war sauber.
 
 ### Task 6: Gesamtprüfung und Übergabe
 
