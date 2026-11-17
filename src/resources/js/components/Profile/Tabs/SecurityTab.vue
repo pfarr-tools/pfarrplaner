@@ -271,21 +271,64 @@
                             Einige Apps, zum Beispiel Bitwarden, benötigen diesen Schlüssel. Geben
                             Sie ihn dort ein, wenn die App danach fragt:
                         </p>
-                        <code class="d-block text-break">{{ provisioningSecret }}</code>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <code class="d-block text-break">{{ provisioningSecret }}</code>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                data-testid="copy-totp-manual-key"
+                                aria-label="Einrichtungsschlüssel kopieren"
+                                @click="copyToClipboard(provisioningSecret, 'manual-key')"
+                            >
+                                {{ copiedField === 'manual-key' ? 'Kopiert' : 'Kopieren' }}
+                            </button>
+                        </div>
                     </div>
                     <h5>Recovery-Codes</h5>
                     <p>
                         Bewahren Sie diese Codes sicher auf. Jeder Code kann nur einmal verwendet
                         werden.
                     </p>
-                    <ul>
-                        <li
-                            v-for="code in setup.recovery_codes"
-                            :key="code"
+                    <div class="d-flex flex-wrap align-items-start gap-2">
+                        <textarea
+                            class="form-control font-monospace"
+                            rows="6"
+                            readonly
+                            spellcheck="false"
+                            aria-label="Recovery-Codes"
+                            data-testid="recovery-codes"
+                            :value="recoveryCodesText"
+                        />
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-secondary"
+                            data-testid="copy-recovery-codes"
+                            aria-label="Alle Recovery-Codes kopieren"
+                            @click="copyToClipboard(recoveryCodesText, 'recovery-codes')"
                         >
-                            <code>{{ code }}</code>
-                        </li>
-                    </ul>
+                            {{ copiedField === 'recovery-codes' ? 'Kopiert' : 'Kopieren' }}
+                        </button>
+                    </div>
+                    <p
+                        v-if="clipboardError"
+                        class="text-danger mt-2"
+                        role="alert"
+                    >
+                        {{ clipboardError }}
+                    </p>
+                    <p
+                        class="visually-hidden"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        {{
+                            copiedField === 'manual-key'
+                                ? 'Einrichtungsschlüssel kopiert.'
+                                : copiedField === 'recovery-codes'
+                                  ? 'Alle Recovery-Codes kopiert.'
+                                  : ''
+                        }}
+                    </p>
                     <label
                         ><input
                             v-model="recoveryCodesSaved"
@@ -422,6 +465,8 @@ export default {
             setupStep: 1,
             setupModalOpen: false,
             recoveryCodesSaved: false,
+            copiedField: '',
+            clipboardError: '',
             factorEnabled: this.twoFactorEnabled,
             factorPending: this.twoFactorPending,
             managedPasskeys: this.passkeys.map((passkey) => ({ ...passkey })),
@@ -446,6 +491,10 @@ export default {
         provisioningSecret() {
             return new window.URL(this.setup.provisioning_uri).searchParams.get('secret') || ''
         },
+        /** Return recovery codes as newline-separated text for display and copying. */
+        recoveryCodesText() {
+            return (this.setup?.recovery_codes || []).join('\n')
+        },
         /** Return the appropriate dialog title for the pending security action. */
         passwordConfirmationTitle() {
             return this.passwordConfirmationPurpose === 'disable-two-factor'
@@ -460,6 +509,19 @@ export default {
         },
     },
     methods: {
+        /** Copy setup data and report clipboard success or failure to the user. */
+        async copyToClipboard(value, field) {
+            this.clipboardError = ''
+            this.copiedField = ''
+
+            try {
+                await navigator.clipboard.writeText(value)
+                this.copiedField = field
+            } catch {
+                this.clipboardError =
+                    'Der Inhalt konnte nicht kopiert werden. Bitte markieren Sie ihn und kopieren Sie ihn manuell.'
+            }
+        },
         /** Register a discoverable passkey after a fresh password confirmation. */
         async registerPasskey() {
             if (this.passkeyBusy || !this.newPasskeyName.trim()) return
@@ -536,6 +598,8 @@ export default {
             this.qrCode = ''
             this.setupStep = 1
             this.recoveryCodesSaved = false
+            this.copiedField = ''
+            this.clipboardError = ''
             this.twoFactor.code = ''
             this.setupModalOpen = true
             this.$nextTick(() => this.$el.querySelector('.setup-dialog')?.focus())
@@ -546,6 +610,8 @@ export default {
             this.setup = null
             this.qrCode = ''
             this.recoveryCodesSaved = false
+            this.copiedField = ''
+            this.clipboardError = ''
             this.twoFactor.code = ''
             this.twoFactor.currentPassword = ''
             this.$nextTick(() => this.$refs.setupTrigger?.focus())

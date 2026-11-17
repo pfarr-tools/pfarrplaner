@@ -106,9 +106,10 @@ angezeigten QR-Code in einer Authenticator-App und speichern Sie die
 Recovery-Codes sicher. Beispiele für geeignete Apps sind Microsoft
 Authenticator und die quelloffene App 2FAS Auth. Wenn Sie den QR-Code nicht
 scannen können oder Ihre App wie Bitwarden den Schlüssel benötigt, steht der
-Schlüssel für die manuelle Eingabe direkt unter dem QR-Code.
-Die Recovery-Codes sind nur während dieses Einrichtungsschritts sichtbar und
-können jeweils nur einmal verwendet werden.
+Schlüssel für die manuelle Eingabe direkt unter dem QR-Code. Über **Kopieren**
+übernehmen Sie ihn in die Zwischenablage. Die Recovery-Codes stehen in einem
+Textfeld und können gemeinsam kopiert werden. Sie sind nur während dieses
+Einrichtungsschritts sichtbar und können jeweils nur einmal verwendet werden.
 
 Bestätigen Sie die gespeicherten Recovery-Codes und geben Sie anschließend
 Ihr aktuelles Passwort sowie den sechsstelligen Code aus der Authenticator-App

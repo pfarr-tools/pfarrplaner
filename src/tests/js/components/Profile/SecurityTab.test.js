@@ -8,7 +8,16 @@ vi.mock('qrcode', () => ({
     default: { toDataURL: vi.fn(() => 'data:image/png;base64,local-qr-code') },
 }))
 
-afterEach(() => vi.restoreAllMocks())
+const originalClipboardDescriptor = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
+
+afterEach(() => {
+    vi.restoreAllMocks()
+    if (originalClipboardDescriptor) {
+        Object.defineProperty(navigator, 'clipboard', originalClipboardDescriptor)
+    } else {
+        delete navigator.clipboard
+    }
+})
 
 /** Mount the profile security panel with the required profile props. */
 const mountSecurityTab = (props = {}, mountOptions = {}) =>
@@ -165,9 +174,80 @@ describe('SecurityTab', () => {
         const qrCode = wrapper.find('[data-testid="two-factor-qr"]')
         expect(qrCode.exists()).toBe(true)
         expect(qrCode.attributes('src')).toMatch(/^data:image\//)
-        expect(wrapper.text()).toContain('first-code')
-        expect(wrapper.text()).toContain('second-code')
+        expect(wrapper.find('[data-testid="recovery-codes"]').element.value).toBe(
+            'first-code\nsecond-code',
+        )
         expect(wrapper.text()).toContain('JBSWY3DPEHPK3PXP')
+    })
+
+    it('copies the visible manual TOTP key and confirms the action', async () => {
+        const writeText = vi.fn().mockResolvedValue(undefined)
+        Object.defineProperty(navigator, 'clipboard', {
+            configurable: true,
+            value: { writeText },
+        })
+        const wrapper = mountSecurityTab()
+        wrapper.vm.setup = {
+            provisioning_uri: 'otpauth://totp/Pfarrplaner:test@example.com?secret=JBSWY3DPEHPK3PXP',
+            recovery_codes: ['first-code', 'second-code'],
+        }
+        wrapper.vm.setupStep = 3
+        wrapper.vm.setupModalOpen = true
+        await wrapper.vm.$nextTick()
+
+        await wrapper.find('[data-testid="copy-totp-manual-key"]').trigger('click')
+
+        expect(writeText).toHaveBeenCalledWith('JBSWY3DPEHPK3PXP')
+        expect(wrapper.find('[data-testid="copy-totp-manual-key"]').text()).toContain('Kopiert')
+        expect(wrapper.find('[role="status"]').text()).toContain('Einrichtungsschlüssel kopiert')
+    })
+
+    it('shows recovery codes in a text field and copies them together', async () => {
+        const writeText = vi.fn().mockResolvedValue(undefined)
+        Object.defineProperty(navigator, 'clipboard', {
+            configurable: true,
+            value: { writeText },
+        })
+        const wrapper = mountSecurityTab()
+        wrapper.vm.setup = {
+            provisioning_uri: 'otpauth://totp/Pfarrplaner:test@example.com?secret=JBSWY3DPEHPK3PXP',
+            recovery_codes: ['first-code', 'second-code'],
+        }
+        wrapper.vm.setupStep = 3
+        wrapper.vm.setupModalOpen = true
+        await wrapper.vm.$nextTick()
+
+        const recoveryCodes = wrapper.find('[data-testid="recovery-codes"]')
+        expect(recoveryCodes.element.tagName).toBe('TEXTAREA')
+        expect(recoveryCodes.element.value).toBe('first-code\nsecond-code')
+        expect(wrapper.find('[role="status"]').text()).toBe('')
+
+        await wrapper.find('[data-testid="copy-recovery-codes"]').trigger('click')
+
+        expect(writeText).toHaveBeenCalledWith('first-code\nsecond-code')
+        expect(wrapper.find('[data-testid="copy-recovery-codes"]').text()).toContain('Kopiert')
+        expect(wrapper.find('[role="status"]').text()).toContain('Alle Recovery-Codes kopiert')
+    })
+
+    it('keeps secrets visible and explains when clipboard access fails', async () => {
+        Object.defineProperty(navigator, 'clipboard', {
+            configurable: true,
+            value: { writeText: vi.fn().mockRejectedValue(new Error('denied')) },
+        })
+        const wrapper = mountSecurityTab()
+        wrapper.vm.setup = {
+            provisioning_uri: 'otpauth://totp/Pfarrplaner:test@example.com?secret=JBSWY3DPEHPK3PXP',
+            recovery_codes: ['first-code'],
+        }
+        wrapper.vm.setupStep = 3
+        wrapper.vm.setupModalOpen = true
+        await wrapper.vm.$nextTick()
+
+        await wrapper.find('[data-testid="copy-recovery-codes"]').trigger('click')
+
+        expect(wrapper.find('[data-testid="recovery-codes"]').element.value).toBe('first-code')
+        expect(wrapper.find('[role="alert"]').text()).toContain('Bitte markieren Sie ihn')
+        expect(wrapper.find('[role="status"]').text()).toBe('')
     })
 
     it('starts TOTP setup and confirms a six-digit code through the wizard', async () => {
@@ -194,7 +274,7 @@ describe('SecurityTab', () => {
         expect(post).toHaveBeenNthCalledWith(1, '/user.two-factor.start', {
             current_password: 'Current1!',
         })
-        expect(wrapper.text()).toContain('one-time-code')
+        expect(wrapper.find('[data-testid="recovery-codes"]').element.value).toBe('one-time-code')
         expect(wrapper.find('[data-testid="two-factor-qr"]').exists()).toBe(true)
         expect(wrapper.find('[data-testid="two-factor-manual-key"]').exists()).toBe(true)
         expect(wrapper.find('[data-testid="two-factor-setup-actions"]').classes()).toContain(

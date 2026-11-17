@@ -12,6 +12,7 @@ Passwortgeschützte Sicherheitsaktionen sollen direkt aus der Sicherheitsansicht
 - Das Sicherheitshinweis-Interstitial bleibt für geeignete Passwort-only-Konten aktiv. In `local` und `dusk` wird es zur Vorschau mit `?show_interstitial=1` sichtbar; ohne diesen Schalter unterdrückt die Anwendung Interstitials in diesen Umgebungen absichtlich.
 - Das Interstitial erklärt Passkey und Authenticator-App ohne vorausgesetzte Fachkenntnisse, definiert TOTP in Alltagssprache, nennt Microsoft Authenticator und die quelloffene Alternative 2FAS Auth mit offiziellen Produktlinks und erklärt die Wiederherstellungscodes.
 - Im TOTP-Assistenten ist der Einrichtungsschlüssel immer direkt sichtbar, weil manche Apps wie Bitwarden ihn standardmäßig benötigen.
+- Der Einrichtungsschlüssel erhält einen eigenen Kopierbutton. Recovery-Codes werden newline-getrennt in einem schreibgeschützten Textfeld gezeigt und gemeinsam kopiert; Erfolg und Fehler werden sichtbar gemeldet.
 - Die jeweils zusammengehörenden Aktionen im TOTP-Assistenten, im Passwort-Login und im Login-Challenge-Ablauf stehen in derselben responsiven Aktionszeile.
 - Der Primärbutton des Interstitials speichert den 21-Tage-Aufschub vor der Navigation. Der Aufschub bleibt wirksam, solange das Konto Passwort-only ist; die Erinnerung kommt nach Ablauf wieder.
 

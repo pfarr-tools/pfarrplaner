@@ -28,6 +28,7 @@
 - Sicherheitsinterstitial bleibt für ausstehende TOTP, erzwungenen Passwortwechsel, aktive Faktoren und gültigen Aufschub unterdrückt; Microsoft Authenticator und 2FAS Auth sind als Beispiele verständlich verlinkt.
 - Primärbutton speichert den Aufschub vor dem Profilaufruf; bei weiterhin Passwort-only-Konten bleiben die Interstitial-Props bis zum Ablauf leer.
 - TOTP-Schlüssel steht ohne Aufklappen direkt unter dem QR-Code; TOTP- und Login-Aktionspaare verwenden gemeinsame Flex-Zeilen.
+- Der manuelle Schlüssel hat einen eigenen Kopierbutton; Recovery-Codes stehen newline-getrennt in einem schreibgeschützten Textfeld und lassen sich zusammen kopieren.
 
 ---
 
@@ -77,9 +78,10 @@
 - Testen: `src/tests/js/components/Profile/SecurityTab.test.js`, `src/tests/js/components/Auth/Login.test.js`, `src/tests/js/components/Auth/LoginChallenge.test.js`, `src/tests/js/components/Ui/InterstitialOverlay.test.js`, `src/tests/Feature/InterstitialFeatureTest.php`, `src/tests/Unit/Services/InterstitialServiceUnitTest.php`
 
 - [x] Den manuellen TOTP-Schlüssel direkt unter dem QR-Code zeigen und Bitwarden als Beispiel nennen.
+- [x] Kopierbutton für den manuellen Schlüssel und für alle Recovery-Codes ergänzen; Recovery-Codes in schreibgeschütztem Textfeld ausgeben und den Kopierstatus anzeigen.
 - [x] TOTP-Assistent sowie Passwort-/Passkey-Login und Login-Challenge mit gemeinsamen responsiven Aktionszeilen versehen.
 - [x] Regressionstests ergänzen: Snooze-POST vor Navigation, sofortiges Ausblenden, persistente 21-Tage-Unterdrückung bei Passwort-only-Konten, sichtbarer manueller Schlüssel und gemeinsame Aktionszeilen.
-- [ ] Fokussierte PHP- und JavaScript-Tests, Build, Cachebereinigung und Format-/Dokumentationsprüfung abschließen; Senior Reviews, Issue-Bericht und Commit.
+- [x] Fokussierte PHP- und JavaScript-Tests, Build, Cachebereinigung und Format-/Dokumentationsprüfung abschließen; Senior Reviews, Issue-Bericht und Commit. Letzte Kopier-UI-Prüfung: 19 SecurityTab-Tests bestanden; zwei Review-Findings (Screenreader-Live-Ansage und Clipboard-Mock-Cleanup) korrigiert und senior-reviewed **APPROVED**.
 
 ## Umsetzungshinweise
 
