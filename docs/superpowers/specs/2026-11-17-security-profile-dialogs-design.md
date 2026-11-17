@@ -10,6 +10,14 @@ Passwortgeschützte Sicherheitsaktionen sollen direkt aus der Sicherheitsansicht
 - Wenn der Passkey-Optionsaufruf wegen abgelaufener Passwortbestätigung `423` liefert, öffnet sich derselbe Dialog. Nach erfolgreicher Bestätigung bleibt der Dialog geschlossen und die Person startet die Passkey-Einrichtung mit einem neuen Klick. Dadurch beginnt `navigator.credentials.create()` aus einer aktuellen Nutzeraktion.
 - Die bestehenden Rate-Limits, serverseitige Passwortprüfung, Faktor- und Kontoschutzregeln bleiben unverändert.
 - Das Sicherheitshinweis-Interstitial bleibt für geeignete Passwort-only-Konten aktiv. In `local` und `dusk` wird es zur Vorschau mit `?show_interstitial=1` sichtbar; ohne diesen Schalter unterdrückt die Anwendung Interstitials in diesen Umgebungen absichtlich.
+- Das Interstitial erklärt Passkey und Authenticator-App ohne vorausgesetzte Fachkenntnisse, definiert TOTP in Alltagssprache, nennt Microsoft Authenticator und die quelloffene Alternative 2FAS Auth mit offiziellen Produktlinks und erklärt die Wiederherstellungscodes.
+
+## Festgelegter Hinweistext
+
+- Ein Passkey wird als digitaler Schlüssel auf Smartphone, Computer oder Passwortmanager erklärt. Anmeldung erfolgt durch Geräte-PIN oder Biometrie, ohne Passwort einzutippen; der Passkey funktioniert nur auf der echten Pfarrplaner-Seite und hilft so gegen gefälschte Anmeldeseiten.
+- Die Authenticator-App wird als Alternative oder zusätzliche Stufe beschrieben. Die Person scannt einen QR-Code, die App erzeugt alle 30 Sekunden einen neuen sechsstelligen Code, und dieser wird nach dem Passwort eingegeben. Der Code funktioniert offline. TOTP wird als technischer Name für ein zeitbasiertes Einmalpasswort erklärt.
+- Es werden Microsoft Authenticator und 2FAS Auth als quelloffene Alternative genannt und auf ihre offiziellen Seiten verlinkt.
+- Die Person wird aufgefordert, Wiederherstellungscodes getrennt vom Gerät sicher aufzubewahren. Passkey oder Authenticator-App genügt zum Beenden des Hinweises; beides ist möglich.
 
 ## Gewählte Umsetzung
 
@@ -29,6 +37,7 @@ Die Passkey-Einrichtung wird nach einer erfolgreichen Passwortbestätigung nicht
 - Falsche Passwörter, Rate-Limits, Abbrechen, erneutes Öffnen und erfolgreiche Bestätigung sind verständlich und löschen Passwörter aus dem UI-Zustand.
 - Nach Passkey-Reauthentifizierung ist ein erneuter ausdrücklicher Klick nötig und ausreichend, um eine neue Registrierung zu starten.
 - Das Interstitial bleibt in Produktion an die bereits vereinbarten Passwort-only-, 21-Tage-Aufschub- und Ausschlussregeln gebunden; die lokale Vorschau ist dokumentiert.
+- Das Interstitial erklärt Anmeldung, Einrichtung, Offline-Codes und Wiederherstellungscodes verständlich und verlinkt auf offizielle App-Seiten.
 - Benutzer-, Administratoren- und Technisches Handbuch werden auf Relevanz geprüft und konsistent aktualisiert.
 
 ## Nicht-Ziele

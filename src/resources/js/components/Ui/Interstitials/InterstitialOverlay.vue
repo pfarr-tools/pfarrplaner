@@ -43,6 +43,25 @@
                     </li>
                 </ul>
 
+                <ul
+                    v-if="(currentInterstitial.links || []).length"
+                    class="interstitial-links"
+                    aria-label="Weitere Informationen"
+                >
+                    <li
+                        v-for="link in currentInterstitial.links"
+                        :key="link.url"
+                    >
+                        <a
+                            :href="link.url"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {{ link.label }}
+                        </a>
+                    </li>
+                </ul>
+
                 <a
                     v-if="currentInterstitial.action_url"
                     class="btn btn-primary mb-3"
@@ -229,9 +248,16 @@ export default {
 
 .interstitial-panel {
     width: min(42rem, 100%);
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
     padding: 2rem;
     background: #fffdf8;
     border: 1px solid rgba(121, 85, 6, 0.18);
+}
+
+.interstitial-links {
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
 }
 
 .interstitial-badge {

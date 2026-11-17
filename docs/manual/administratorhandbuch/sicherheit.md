@@ -34,11 +34,17 @@ Ein technischer Überblick über den Sicherheitsdurchgang und die abgesicherten 
 ## Zwei-Faktor-Authentifizierung
 
 Konten, die nur ein Passwort verwenden, erhalten in der Anwendung einen
-wiederkehrenden Sicherheitshinweis. Empfohlen wird zuerst ein Passkey und
-danach oder alternativ TOTP. Die Person kann den Hinweis jeweils drei Wochen
-zurückstellen; dauerhaft ausblenden lässt er sich nicht. Sobald mindestens
-ein Passkey oder TOTP eingerichtet ist, endet die Erinnerung. Ein erzwungener
-Passwortwechsel und eine laufende TOTP-Einrichtung werden nicht überlagert.
+wiederkehrenden Sicherheitshinweis. Er erklärt Passkeys als digitale
+Anmeldeschlüssel, die mit Geräte-PIN oder Biometrie verwendet werden, und
+Authenticator-Apps, die nach dem Scannen eines QR-Codes wechselnde
+sechsstellige Einmalcodes erzeugen. Als Beispiele nennt die Oberfläche
+Microsoft Authenticator und die quelloffene App 2FAS Auth. Während der
+Einrichtung angezeigte Wiederherstellungscodes müssen sicher aufbewahrt
+werden. Empfohlen wird zuerst ein Passkey; ein Passkey oder ein bestätigter
+App-Code genügt, um den Hinweis zu beenden. Die Person kann den Hinweis
+jeweils drei Wochen zurückstellen; dauerhaft ausblenden lässt er sich nicht.
+Ein erzwungener Passwortwechsel und eine laufende TOTP-Einrichtung werden
+nicht überlagert.
 
 Administratoren können für ein fremdes Konto, das sie bearbeiten dürfen und
 das kein Super-Administrationskonto ist, einen neuen temporären Zugang

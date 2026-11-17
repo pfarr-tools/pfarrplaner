@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Schritte werden einzeln verifiziert, reviewed und committed.
 
-**Ziel:** TOTP-Deaktivierung und Passkey-Neuregistrierung bei abgelaufener Passwortbestätigung mit einem gemeinsamen Passwortdialog im Profil ermöglichen und die lokale Vorschau des Sicherheitshinweises verständlich dokumentieren.
+**Ziel:** TOTP-Deaktivierung und Passkey-Neuregistrierung bei abgelaufener Passwortbestätigung mit einem gemeinsamen Passwortdialog im Profil ermöglichen und den Sicherheitshinweis für nicht-technische Benutzer:innen verständlich erklären.
 
-**Architektur:** Eine zugängliche Vue-Dialogkomponente kapselt Passwortfeld, Formularzustände und Abbrechen. `SecurityTab` nutzt sie für beide Aktionen; der JSON-Pfad des Passwortbestätigungscontrollers gibt maschinenlesbare Erfolgs- und Validierungsantworten zurück, während normale Formularnavigation erhalten bleibt. Die bestehende lokale Interstitial-Unterdrückung wird nicht verändert; `?show_interstitial=1` wird als Vorschauweg dokumentiert.
+**Architektur:** Eine zugängliche Vue-Dialogkomponente kapselt Passwortfeld, Formularzustände und Abbrechen. `SecurityTab` nutzt sie für beide Aktionen; der JSON-Pfad des Passwortbestätigungscontrollers gibt maschinenlesbare Erfolgs- und Validierungsantworten zurück, während normale Formularnavigation erhalten bleibt. Das Sicherheitshinweis-Interstitial erklärt Passkey und Authenticator-App in Alltagssprache, verlinkt offizielle App-Informationen und behält seine bestehende lokale Vorschau mit `?show_interstitial=1`.
 
 **Tech Stack:** Laravel 11, Inertia.js, Vue, Axios, PHPUnit, Vitest.
 
@@ -25,7 +25,7 @@
 - Erfolgreiche JSON-Bestätigung muss denselben Zeitstempel setzen wie der bestehende Browser-Redirectpfad.
 - TOTP-Widerruf muss bei falschem Passwort oder Rate-Limit aktiviert bleiben und das Passwort löschen.
 - Passkey-Dialogabschluss darf nicht ohne erneuten Klick `navigator.credentials.create()` auslösen.
-- Sicherheitsinterstitial bleibt für ausstehendes TOTP, erzwungenen Passwortwechsel, aktive Faktoren und gültigen Aufschub unterdrückt.
+- Sicherheitsinterstitial bleibt für ausstehende TOTP, erzwungenen Passwortwechsel, aktive Faktoren und gültigen Aufschub unterdrückt; Microsoft Authenticator und 2FAS Auth sind als Beispiele verständlich verlinkt.
 
 ---
 
@@ -61,7 +61,8 @@
 - Prüfen/ändern: `docs/superpowers/plans/2026-11-15-passwortverwaltung.md`
 - Testen: `src/tests/Unit/Services/InterstitialServiceUnitTest.php`, `src/tests/Feature/InterstitialFeatureTest.php`, falls bestehende Abdeckung den Vorschaupfad nicht bereits belegt
 
-- [ ] Bestehende Tests zur lokalen Unterdrückung und zu `?show_interstitial=1` prüfen; nur bei fehlender Abdeckung einen gezielten Test ergänzen.
+- [ ] Bestehende Tests zur lokalen Unterdrückung und zu `?show_interstitial=1` prüfen.
+- [x] Interstitial-Overlay um sicher verlinkte App-Empfehlungen erweitern; Empfehlungstext in `src/config/interstitials.php` so ausformulieren, dass Passkey, Authenticator-App, sechsstelliger wechselnder Code, TOTP-Begriff und Wiederherstellungscodes ohne Vorwissen verständlich sind.
 - [ ] Benutzerhandbuch um Dialogabläufe und den erneuten Klick zum Starten der Passkey-Abfrage ergänzen.
 - [ ] Administratorenhandbuch auf geänderte Bedien- oder Betriebsanforderungen prüfen und die Nichtänderung begründen, falls nichts angepasst werden muss.
 - [ ] Technisches Handbuch um JSON-Passwortbestätigung und den lokalen Vorschauparameter ergänzen.

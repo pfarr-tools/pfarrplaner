@@ -35,7 +35,11 @@ erzwungenen Passwortwechsels ebenfalls unterdrückt. `InterstitialService`
 speichert „Später“ pro Benutzer mit Ablaufzeit (21 Tage); die feste
 Ausblendaktion ist deaktiviert und wird serverseitig abgewiesen. Nach einem
 Passkey oder bestätigtem TOTP greift die Zielgruppe nicht mehr. Die Empfehlung
-verwendet vorhandene Benutzereinstellungen und benötigt keine Migration.
+erläutert Passkey und Authenticator-App in Alltagssprache und verlinkt auf
+Microsoft Authenticator sowie die quelloffene App 2FAS Auth. Sie verwendet
+vorhandene Benutzereinstellungen und benötigt keine Migration. Im `local`-
+und `dusk`-Umfeld blendet der Service Interstitials standardmäßig aus;
+`?show_interstitial=1` aktiviert die Vorschau für die aktuelle Anfrage.
 
 Der Admin-Reset ist an dieselbe `update`-Policy wie die Benutzerbearbeitung
 gebunden und schließt Selbst-Reset sowie Super-Administrationskonten aus.

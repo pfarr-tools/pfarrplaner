@@ -62,14 +62,37 @@ mit dieser E-Mailadresse besteht. Prüfen Sie Ihr Postfach und den Spam-Ordner;
 bei ausbleibender Nachricht wenden Sie sich an Ihre Administration.
 
 Wenn Sie nur ein Passwort zur Anmeldung verwenden, erinnert Sie Pfarrplaner
-daran, Ihr Konto zusätzlich abzusichern. Empfohlen wird zuerst ein Passkey,
-der auch eine Anmeldung ohne Passwort ermöglicht. TOTP mit einer
-Authenticator-App ist eine Alternative oder zusätzliche zweite Stufe. Ein
-starkes, nur hier verwendetes Passwort bleibt als Rückfallmöglichkeit wichtig.
+daran, Ihr Konto zusätzlich abzusichern. Ein zweiter Schutz erschwert den
+Zugriff, wenn jemand Ihr Passwort erfährt.
+
+Empfohlen wird zuerst ein **Passkey**. Das ist ein digitaler Schlüssel, den
+Ihr Smartphone, Computer oder Passwortmanager sicher aufbewahrt. Bei der
+Anmeldung bestätigen Sie mit Fingerabdruck, Gesichtserkennung oder Geräte-PIN.
+Sie müssen kein zusätzliches Passwort eintippen. Ein Passkey funktioniert nur
+auf der echten Pfarrplaner-Seite und schützt so auch vor gefälschten
+Anmeldeseiten.
+
+Als Alternative oder zusätzlichen Schutz können Sie eine
+**Authenticator-App mit Einmalcodes** verwenden. Bei der Einrichtung scannen
+Sie einen QR-Code mit der App. Diese zeigt alle 30 Sekunden einen neuen
+sechsstelligen Zahlencode, den Sie nach Ihrem Passwort eingeben. Die App kann
+die Codes auch ohne Internetverbindung erzeugen. Dieses Verfahren heißt
+technisch TOTP (zeitbasiertes Einmalpasswort): ein Code, der nur kurze Zeit
+gilt und danach automatisch wechselt. Beispiele sind
+[Microsoft Authenticator](https://support.microsoft.com/de-de/authenticator/download-microsoft-authenticator)
+und [2FAS Auth](https://2fas.com/auth/), eine quelloffene App für Android und iPhone.
+
+Während der Einrichtung zeigt Pfarrplaner Wiederherstellungscodes. Bewahren
+Sie sie getrennt von Ihrem Gerät an einem sicheren Ort auf. Damit können Sie
+sich anmelden, falls Sie Ihr Gerät verlieren. Ein Passkey oder eine
+Authenticator-App genügt, um den Hinweis zu beenden; Sie können auch beides
+einrichten. Ein starkes, nur hier verwendetes Passwort bleibt als
+Rückfallmöglichkeit wichtig.
+
 Über **Sicherheitseinstellungen öffnen** gelangen Sie direkt zur Einrichtung.
 Mit **Später** wird der Hinweis drei Wochen ausgeblendet. Solange weder ein
-Passkey noch TOTP eingerichtet ist, erscheint er danach erneut. Sobald Sie
-einen der beiden Faktoren eingerichtet haben, entfällt der Hinweis.
+Passkey noch ein Einmalcode-Faktor eingerichtet ist, erscheint er danach
+erneut.
 
 ### Zwei-Faktor-Authentifizierung
 

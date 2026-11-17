@@ -53,12 +53,23 @@ return [
             'dismissible' => false,
             'snooze_days' => 21,
             'level' => 'warning',
-            'title' => 'Schützen Sie Ihr Konto zusätzlich zum Passwort',
-            'text' => 'Ein Passkey ist die empfohlene nächste Maßnahme und ermöglicht auch die Anmeldung ohne Passwort. Wenn Sie keinen Passkey nutzen können oder möchten, richten Sie die Zwei-Faktor-Authentifizierung ein.',
+            'title' => 'Schützen Sie Ihr Konto mit einem zweiten Schutz',
+            'text' => 'Wenn jemand Ihr Passwort erfährt, kann ein zusätzlicher Schutz den Zugriff auf Ihr Konto erschweren. Sie können dafür einen Passkey einrichten oder bei jeder Anmeldung einen Code aus einer App eingeben.',
             'details' => [
-                '1. Passkey: bevorzugte, phishing-resistente Anmeldung für Ihre Geräte.',
-                '2. TOTP: Alternative zum Passkey oder zusätzliche zweite Stufe.',
-                'Ein starkes, einzigartiges Passwort bleibt als Rückfallmöglichkeit wichtig.',
+                'Empfohlen: Passkey. Das ist ein digitaler Schlüssel, den Ihr Smartphone, Computer oder Passwortmanager sicher verwahrt. Zum Anmelden bestätigen Sie mit Fingerabdruck, Gesichtserkennung oder Geräte-PIN. Sie müssen kein zusätzliches Passwort eintippen. Ein Passkey funktioniert nur auf der echten Pfarrplaner-Seite und hilft deshalb auch gegen gefälschte Anmeldeseiten.',
+                'Alternative: Authenticator-App mit Einmalcodes. Bei der Einrichtung verbinden Sie die App mit Pfarrplaner, indem Sie einen QR-Code scannen. Die App zeigt danach alle 30 Sekunden einen neuen sechsstelligen Zahlencode. Diesen geben Sie nach Ihrem Passwort ein. Die App kann die Codes auch ohne Internetverbindung erzeugen. Der technische Name dafür ist TOTP (zeitbasiertes Einmalpasswort): ein Code, der nur kurze Zeit gilt und danach automatisch wechselt.',
+                'Bei der Einrichtung zeigt Pfarrplaner Wiederherstellungscodes. Bewahren Sie diese getrennt von Ihrem Gerät an einem sicheren Ort auf. Damit können Sie sich anmelden, falls Sie Ihr Gerät verlieren.',
+                'Ein Passkey oder eine Authenticator-App genügt. Sie können auch beides einrichten. Ein starkes, nur hier verwendetes Passwort bleibt als Rückfallmöglichkeit wichtig.',
+            ],
+            'links' => [
+                [
+                    'label' => 'Microsoft Authenticator für Android und iPhone',
+                    'url' => 'https://support.microsoft.com/de-de/authenticator/download-microsoft-authenticator',
+                ],
+                [
+                    'label' => '2FAS Auth: quelloffene App für Android und iPhone',
+                    'url' => 'https://2fas.com/auth/',
+                ],
             ],
             'action_label' => 'Sicherheitseinstellungen öffnen',
             'action_url' => '/profil?tab=security',
